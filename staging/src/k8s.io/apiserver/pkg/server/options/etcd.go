@@ -85,7 +85,7 @@ func (s *EtcdOptions) Validate() []error {
 	}
 
 	if !storageTypes.Has(s.StorageConfig.Type) {
-		allErrors = append(allErrors, fmt.Errorf("--storage-backend invalid, must be 'etcd3' or 'etcd2'. If not specified, it will default to 'etcd3'"))
+		allErrors = append(allErrors, fmt.Errorf("--storage-backend invalid, must be 'etcd3' or 'etcd2-deprecated'. If not specified, it will default to 'etcd3'. etcd2 support is deprecated in 1.10 and will be removed entirely in 1.13."))
 	}
 
 	return allErrors
@@ -123,7 +123,7 @@ func (s *EtcdOptions) AddFlags(fs *pflag.FlagSet) {
 		"when watch-cache is enabled.")
 
 	fs.StringVar(&s.StorageConfig.Type, "storage-backend", s.StorageConfig.Type,
-		"The storage backend for persistence. Options: 'etcd3' (default), 'etcd2'.")
+		"The storage backend for persistence. Options: 'etcd3' (default), 'etcd2-deprecated'. etcd2 support is deprecated in 1.10 and will be removed entirely in 1.13.")
 
 	fs.IntVar(&s.StorageConfig.DeserializationCacheSize, "deserialization-cache-size", s.StorageConfig.DeserializationCacheSize,
 		"Number of deserialized json objects to cache in memory.")

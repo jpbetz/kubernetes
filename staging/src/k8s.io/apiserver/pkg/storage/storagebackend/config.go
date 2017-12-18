@@ -25,7 +25,7 @@ import (
 
 const (
 	StorageTypeUnset = ""
-	StorageTypeETCD2 = "etcd2"
+	StorageTypeETCD2 = "etcd2-deprecated" // etcd2 support is deprecated in 1.10+ and will be removed in 1.13.
 	StorageTypeETCD3 = "etcd3"
 
 	DefaultCompactInterval = 5 * time.Minute
