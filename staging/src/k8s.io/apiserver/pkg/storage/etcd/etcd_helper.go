@@ -589,6 +589,17 @@ func (*etcdHelper) Count(pathPerfix string) (int64, error) {
 	return 0, fmt.Errorf("Count is unimplemented for etcd2!")
 }
 
+func (h *etcdHelper) CurrentResourceVersion(ctx context.Context) (string, error) {
+	opts := &etcd.GetOptions{
+		Quorum: true,
+	}
+	response, err := h.etcdKeysAPI.Get(ctx, "\x00", opts)
+	if err != nil {
+		return "", storage.NewInternalError(err.Error())
+	}
+	return fmt.Sprintf("%d", response.Index), nil
+}
+
 // etcdCache defines interface used for caching objects stored in etcd. Objects are keyed by
 // their Node.ModifiedIndex, which is unique across all types.
 // All implementations must be thread-safe.

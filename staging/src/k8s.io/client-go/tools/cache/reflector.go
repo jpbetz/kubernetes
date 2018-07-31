@@ -17,6 +17,7 @@ limitations under the License.
 package cache
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -69,12 +70,19 @@ type Reflector struct {
 	lastSyncResourceVersion string
 	// lastSyncResourceVersionMutex guards read/write access to lastSyncResourceVersion
 	lastSyncResourceVersionMutex sync.RWMutex
+	// requestLatestResourceVersionCh requests that the watcher send a progress update with the
+	// latest resource version.
+	requestLatestResourceVersionCh chan struct{}
 }
 
 var (
 	// We try to spread the load on apiserver by setting timeouts for
 	// watch requests - it is random in [minWatchTimeout, 2*minWatchTimeout].
 	minWatchTimeout = 5 * time.Minute
+
+	// blockTimeout determines how long we are willing to wait for a blocking
+	// watch channel operation to complete.
+	blockTimeout = 3 * time.Second
 )
 
 // NewNamespaceKeyedIndexerAndReflector creates an Indexer and a Reflector
@@ -105,13 +113,14 @@ func NewNamedReflector(name string, lw ListerWatcher, expectedType interface{}, 
 	r := &Reflector{
 		name: name,
 		// we need this to be unique per process (some names are still the same) but obvious who it belongs to
-		metrics:       newReflectorMetrics(makeValidPrometheusMetricLabel(fmt.Sprintf("reflector_"+name+"_%d", reflectorSuffix))),
-		listerWatcher: lw,
-		store:         store,
-		expectedType:  reflect.TypeOf(expectedType),
-		period:        time.Second,
-		resyncPeriod:  resyncPeriod,
-		clock:         &clock.RealClock{},
+		metrics:                        newReflectorMetrics(makeValidPrometheusMetricLabel(fmt.Sprintf("reflector_"+name+"_%d", reflectorSuffix))),
+		listerWatcher:                  lw,
+		store:                          store,
+		expectedType:                   reflect.TypeOf(expectedType),
+		period:                         time.Second,
+		resyncPeriod:                   resyncPeriod,
+		clock:                          &clock.RealClock{},
+		requestLatestResourceVersionCh: make(chan struct{}, 1),
 	}
 	return r
 }
@@ -304,6 +313,8 @@ loop:
 			return errorStopRequested
 		case err := <-errc:
 			return err
+		case <-r.requestLatestResourceVersionCh:
+			r.requestWatchProgress(w)
 		case event, ok := <-w.ResultChan():
 			if !ok {
 				break loop
@@ -311,8 +322,8 @@ loop:
 			if event.Type == watch.Error {
 				return apierrs.FromObject(event.Object)
 			}
-			if e, a := r.expectedType, reflect.TypeOf(event.Object); e != nil && e != a {
-				utilruntime.HandleError(fmt.Errorf("%s: expected type %v, but watch event object had type %v", r.name, e, a))
+			if !r.isValidType(event) {
+				utilruntime.HandleError(fmt.Errorf("%s: expected type %v, but watch event object had type %v", r.name, r.expectedType, reflect.TypeOf(event.Object)))
 				continue
 			}
 			meta, err := meta.Accessor(event.Object)
@@ -340,6 +351,14 @@ loop:
 				if err != nil {
 					utilruntime.HandleError(fmt.Errorf("%s: unable to delete watch event object (%#v) from store: %v", r.name, event.Object, err))
 				}
+			case watch.Progress:
+				if s, ok := r.store.(ProgressApplyableStore); ok {
+					err := s.ApplyProgress(event.Object)
+					if err != nil {
+						utilruntime.HandleError(fmt.Errorf("%s: unable to record progress with event object (%#v) from store: %v", r.name, event.Object, err))
+					}
+				}
+
 			default:
 				utilruntime.HandleError(fmt.Errorf("%s: unable to understand watch event %#v", r.name, event))
 			}
@@ -348,7 +367,6 @@ loop:
 			eventCount++
 		}
 	}
-
 	watchDuration := r.clock.Now().Sub(start)
 	if watchDuration < 1*time.Second && eventCount == 0 {
 		r.metrics.numberOfShortWatches.Inc()
@@ -358,12 +376,50 @@ loop:
 	return nil
 }
 
+func (r *Reflector) isValidType(event watch.Event) bool {
+	// Watch progress events are markers and do not need (and typically are not) the resources expected type.
+	if event.Type == watch.Progress {
+		return true
+	}
+	// All other events must match the reflector's expected type.
+	if r.expectedType != nil {
+		return reflect.TypeOf(event.Object) == r.expectedType
+	}
+	return true
+}
+
 // LastSyncResourceVersion is the resource version observed when last sync with the underlying store
 // The value returned is not synchronized with access to the underlying store and is not thread-safe
 func (r *Reflector) LastSyncResourceVersion() string {
 	r.lastSyncResourceVersionMutex.RLock()
 	defer r.lastSyncResourceVersionMutex.RUnlock()
 	return r.lastSyncResourceVersion
+}
+
+// RequestLatestResourceVersion requests the latest resource version from the watcher. If the
+// watcher supports progress updates, an event will be sent asynchroniously update the last sync
+// resource version of this reflector and the last sync resource version will be updated once that
+// event is recieved by this reflector.
+func (r *Reflector) RequestLatestResourceVersion() {
+	select {
+	case r.requestLatestResourceVersionCh <- struct{}{}:
+	default:
+		// If there is already a request for the latest resource version on the channel, do nothing.
+	}
+}
+
+// requestWatchProgress requests resource version progress from the provided watcher, if it supports
+// the progress requests. Since progress requests are best effort, this call is non-blocking and all
+// errors are logged and then ignored.
+func (r *Reflector) requestWatchProgress(w watch.Interface) {
+	if vw, ok := w.(watch.ProgressRequestableInterface); ok {
+		ctx, cancel := context.WithTimeout(context.Background(), blockTimeout)
+		defer cancel()
+		err := vw.RequestProgress(ctx)
+		if err != nil {
+			utilruntime.HandleError(fmt.Errorf("%s: Request for latest resource version of watch stream timed out", r.name))
+		}
+	}
 }
 
 func (r *Reflector) setLastSyncResourceVersion(v string) {

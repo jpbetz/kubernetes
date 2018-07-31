@@ -195,6 +195,7 @@ func NewCacherFromConfig(config Config) *Cacher {
 	watchCache := newWatchCache(config.CacheCapacity, config.KeyFunc, config.GetAttrsFunc, config.Versioner)
 	listerWatcher := newCacherListerWatcher(config.Storage, config.ResourcePrefix, config.NewListFunc)
 	reflectorName := "storage/cacher.go:" + config.ResourcePrefix
+	reflector := cache.NewNamedReflector(reflectorName, listerWatcher, config.Type, watchCache, 0)
 
 	// Give this error when it is constructed rather than when you get the
 	// first watch item, because it's much easier to track down that way.
@@ -210,7 +211,7 @@ func NewCacherFromConfig(config Config) *Cacher {
 		storage:     config.Storage,
 		objectType:  reflect.TypeOf(config.Type),
 		watchCache:  watchCache,
-		reflector:   cache.NewNamedReflector(reflectorName, listerWatcher, config.Type, watchCache, 0),
+		reflector:   reflector,
 		versioner:   config.Versioner,
 		triggerFunc: config.TriggerPublisherFunc,
 		watcherIdx:  0,
@@ -229,6 +230,7 @@ func NewCacherFromConfig(config Config) *Cacher {
 		stopCh: stopCh,
 	}
 	watchCache.SetOnEvent(cacher.processEvent)
+	watchCache.SetOnStale(reflector.RequestLatestResourceVersion)
 	go cacher.dispatchEvents()
 
 	cacher.stopWg.Add(1)
@@ -488,10 +490,22 @@ func (c *Cacher) List(ctx context.Context, key string, resourceVersion string, p
 		return err
 	}
 
-	if listRV == 0 && !c.ready.check() {
-		// If Cacher is not yet initialized and we don't require any specific
-		// minimal resource version, simply forward the request to storage.
-		return c.storage.List(ctx, key, resourceVersion, pred, listObj)
+	if listRV == 0 {
+		if !c.ready.check() {
+			// If Cacher is not yet initialized and we don't require any specific
+			// minimal resource version, simply forward the request to storage.
+			return c.storage.List(ctx, key, resourceVersion, pred, listObj)
+		}
+		// RV=0 is a request for the "current" data. To prevent stale reads, we use
+		// the latest RV from the store. See https://github.com/kubernetes/kubernetes/issues/59848.
+		latestResourceVersion, err := c.storage.CurrentResourceVersion(ctx)
+		if err != nil {
+			return err
+		}
+		listRV, err = c.versioner.ParseResourceVersion(latestResourceVersion)
+		if err != nil {
+			return err
+		}
 	}
 
 	trace := utiltrace.New(fmt.Sprintf("cacher %v: List", c.objectType.String()))
@@ -559,6 +573,10 @@ func (c *Cacher) GuaranteedUpdate(
 // Count implements storage.Interface.
 func (c *Cacher) Count(pathPrefix string) (int64, error) {
 	return c.storage.Count(pathPrefix)
+}
+
+func (c *Cacher) CurrentResourceVersion(ctx context.Context) (string, error) {
+	return c.storage.CurrentResourceVersion(ctx)
 }
 
 func (c *Cacher) triggerValues(event *watchCacheEvent) ([]string, bool) {

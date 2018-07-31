@@ -34,11 +34,11 @@ import (
 
 // Tests that the apiserver retries patches
 func TestPatchConflicts(t *testing.T) {
-	s, clientSet, closeFn := setup(t)
+	f, closeFn := setup(t)
 	defer closeFn()
 
-	ns := framework.CreateTestingNamespace("status-code", s, t)
-	defer framework.DeleteTestingNamespace(ns, s, t)
+	ns := framework.CreateTestingNamespace("status-code", f.server, t)
+	defer framework.DeleteTestingNamespace(ns, f.server, t)
 
 	numOfConcurrentPatches := 100
 
@@ -63,8 +63,8 @@ func TestPatchConflicts(t *testing.T) {
 	}
 
 	// Create the object we're going to conflict on
-	clientSet.CoreV1().Secrets(ns.Name).Create(secret)
-	client := clientSet.CoreV1().RESTClient()
+	f.clientSet.CoreV1().Secrets(ns.Name).Create(secret)
+	client := f.clientSet.CoreV1().RESTClient()
 
 	successes := int32(0)
 

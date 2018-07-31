@@ -137,7 +137,7 @@ var missingHanlders = sets.NewString(
 )
 
 func TestServerSidePrint(t *testing.T) {
-	s, _, closeFn := setup(t,
+	f, closeFn := setup(t,
 		// additional groupversions needed for the test to run
 		batchv2alpha1.SchemeGroupVersion,
 		rbacv1alpha1.SchemeGroupVersion,
@@ -146,14 +146,14 @@ func TestServerSidePrint(t *testing.T) {
 		storagev1alpha1.SchemeGroupVersion)
 	defer closeFn()
 
-	ns := framework.CreateTestingNamespace("server-print", s, t)
-	defer framework.DeleteTestingNamespace(ns, s, t)
+	ns := framework.CreateTestingNamespace("server-print", f.server, t)
+	defer framework.DeleteTestingNamespace(ns, f.server, t)
 
 	tableParam := fmt.Sprintf("application/json;as=Table;g=%s;v=%s, application/json", metav1beta1.GroupName, metav1beta1.SchemeGroupVersion.Version)
 	printer := newFakePrinter(printersinternal.AddHandlers)
 
 	configFlags := genericclioptions.NewTestConfigFlags().
-		WithClientConfig(clientcmd.NewDefaultClientConfig(*createKubeConfig(s.URL), &clientcmd.ConfigOverrides{}))
+		WithClientConfig(clientcmd.NewDefaultClientConfig(*createKubeConfig(f.server.URL), &clientcmd.ConfigOverrides{}))
 
 	restConfig, err := configFlags.ToRESTConfig()
 	if err != nil {

@@ -47,6 +47,18 @@ type Store interface {
 	Resync() error
 }
 
+// ProgressApplyableStore is a Store that supports progress updates.
+type ProgressApplyableStore interface {
+	Store
+
+	// ApplyProgress provides a store with a progress update. Reflector knows how to
+	// watch a server and produce progress updates.
+	// Typically, progress updates provide indications of how up-to-date a store is relative to a
+	// server. It is the responsibility of the implementation to define the contract for progress
+	// updates.
+	ApplyProgress(obj interface{}) error
+}
+
 // KeyFunc knows how to make a key from an object. Implementations should be deterministic.
 type KeyFunc func(obj interface{}) (string, error)
 

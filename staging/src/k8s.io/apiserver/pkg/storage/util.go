@@ -22,7 +22,9 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/validation/path"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 type SimpleUpdateFunc func(runtime.Object) (runtime.Object, error)
@@ -86,4 +88,25 @@ func (hwm *HighWaterMark) Update(current int64) bool {
 			return true
 		}
 	}
+}
+
+// progressMarker is a placeholder Object for Progress watch.Events.
+type progressMarker struct {
+	metaObj *metav1.ObjectMeta
+}
+
+func NewProgressMarker(resourceVersion string) runtime.Object {
+	return &progressMarker{&metav1.ObjectMeta{ResourceVersion: resourceVersion}}
+}
+
+func (pm *progressMarker) GetObjectMeta() metav1.Object {
+	return pm.metaObj
+}
+
+func (pm *progressMarker) GetObjectKind() schema.ObjectKind {
+	return schema.EmptyObjectKind
+}
+
+func (pm *progressMarker) DeepCopyObject() runtime.Object {
+	return &progressMarker{metaObj: pm.metaObj}
 }

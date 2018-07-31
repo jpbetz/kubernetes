@@ -26,6 +26,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/coreos/etcd/clientv3"
 	"github.com/golang/glog"
 	"k8s.io/api/core/v1"
 	"k8s.io/api/extensions/v1beta1"
@@ -44,7 +45,13 @@ import (
 	"k8s.io/kubernetes/test/integration/framework"
 )
 
-func setup(t *testing.T, groupVersions ...schema.GroupVersion) (*httptest.Server, clientset.Interface, framework.CloseFunc) {
+type fixtures struct {
+	server       *httptest.Server
+	clientSet    clientset.Interface
+	masterConfig *master.Config
+}
+
+func setup(t *testing.T, groupVersions ...schema.GroupVersion) (fixtures, framework.CloseFunc) {
 	masterConfig := framework.NewIntegrationTestMasterConfig()
 	if len(groupVersions) > 0 {
 		resourceConfig := master.DefaultAPIResourceConfigSource()
@@ -57,7 +64,7 @@ func setup(t *testing.T, groupVersions ...schema.GroupVersion) (*httptest.Server
 	if err != nil {
 		t.Fatalf("Error in create clientset: %v", err)
 	}
-	return s, clientSet, closeFn
+	return fixtures{s, clientSet, masterConfig}, closeFn
 }
 
 func verifyStatusCode(t *testing.T, verb, URL, body string, expectedStatusCode int) {
@@ -123,13 +130,13 @@ var cascDel = `
 
 // Tests that the apiserver returns 202 status code as expected.
 func Test202StatusCode(t *testing.T) {
-	s, clientSet, closeFn := setup(t)
+	f, closeFn := setup(t)
 	defer closeFn()
 
-	ns := framework.CreateTestingNamespace("status-code", s, t)
-	defer framework.DeleteTestingNamespace(ns, s, t)
+	ns := framework.CreateTestingNamespace("status-code", f.server, t)
+	defer framework.DeleteTestingNamespace(ns, f.server, t)
 
-	rsClient := clientSet.ExtensionsV1beta1().ReplicaSets(ns.Name)
+	rsClient := f.clientSet.ExtensionsV1beta1().ReplicaSets(ns.Name)
 
 	// 1. Create the resource without any finalizer and then delete it without setting DeleteOptions.
 	// Verify that server returns 200 in this case.
@@ -137,7 +144,7 @@ func Test202StatusCode(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create rs: %v", err)
 	}
-	verifyStatusCode(t, "DELETE", s.URL+path("replicasets", ns.Name, rs.Name), "", 200)
+	verifyStatusCode(t, "DELETE", f.server.URL+path("replicasets", ns.Name, rs.Name), "", 200)
 
 	// 2. Create the resource with a finalizer so that the resource is not immediately deleted and then delete it without setting DeleteOptions.
 	// Verify that the apiserver still returns 200 since DeleteOptions.OrphanDependents is not set.
@@ -147,7 +154,7 @@ func Test202StatusCode(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create rs: %v", err)
 	}
-	verifyStatusCode(t, "DELETE", s.URL+path("replicasets", ns.Name, rs.Name), "", 200)
+	verifyStatusCode(t, "DELETE", f.server.URL+path("replicasets", ns.Name, rs.Name), "", 200)
 
 	// 3. Create the resource and then delete it with DeleteOptions.OrphanDependents=false.
 	// Verify that the server still returns 200 since the resource is immediately deleted.
@@ -156,7 +163,7 @@ func Test202StatusCode(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create rs: %v", err)
 	}
-	verifyStatusCode(t, "DELETE", s.URL+path("replicasets", ns.Name, rs.Name), cascDel, 200)
+	verifyStatusCode(t, "DELETE", f.server.URL+path("replicasets", ns.Name, rs.Name), cascDel, 200)
 
 	// 4. Create the resource with a finalizer so that the resource is not immediately deleted and then delete it with DeleteOptions.OrphanDependents=false.
 	// Verify that the server returns 202 in this case.
@@ -166,20 +173,20 @@ func Test202StatusCode(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create rs: %v", err)
 	}
-	verifyStatusCode(t, "DELETE", s.URL+path("replicasets", ns.Name, rs.Name), cascDel, 202)
+	verifyStatusCode(t, "DELETE", f.server.URL+path("replicasets", ns.Name, rs.Name), cascDel, 202)
 }
 
 func TestAPIListChunking(t *testing.T) {
 	if err := utilfeature.DefaultFeatureGate.Set(string(genericfeatures.APIListChunking) + "=true"); err != nil {
 		t.Fatal(err)
 	}
-	s, clientSet, closeFn := setup(t)
+	f, closeFn := setup(t)
 	defer closeFn()
 
-	ns := framework.CreateTestingNamespace("list-paging", s, t)
-	defer framework.DeleteTestingNamespace(ns, s, t)
+	ns := framework.CreateTestingNamespace("list-paging", f.server, t)
+	defer framework.DeleteTestingNamespace(ns, f.server, t)
 
-	rsClient := clientSet.ExtensionsV1beta1().ReplicaSets(ns.Name)
+	rsClient := f.clientSet.ExtensionsV1beta1().ReplicaSets(ns.Name)
 
 	for i := 0; i < 4; i++ {
 		rs := newRS(ns.Name)
@@ -251,21 +258,21 @@ func makeSecret(name string) *v1.Secret {
 }
 
 func TestNameInFieldSelector(t *testing.T) {
-	s, clientSet, closeFn := setup(t)
+	f, closeFn := setup(t)
 	defer closeFn()
 
 	numNamespaces := 3
 	namespaces := make([]*v1.Namespace, 0, numNamespaces)
 	for i := 0; i < 3; i++ {
-		ns := framework.CreateTestingNamespace(fmt.Sprintf("ns%d", i), s, t)
-		defer framework.DeleteTestingNamespace(ns, s, t)
+		ns := framework.CreateTestingNamespace(fmt.Sprintf("ns%d", i), f.server, t)
+		defer framework.DeleteTestingNamespace(ns, f.server, t)
 		namespaces = append(namespaces, ns)
 
-		_, err := clientSet.CoreV1().Secrets(ns.Name).Create(makeSecret("foo"))
+		_, err := f.clientSet.CoreV1().Secrets(ns.Name).Create(makeSecret("foo"))
 		if err != nil {
 			t.Errorf("Couldn't create secret: %v", err)
 		}
-		_, err = clientSet.CoreV1().Secrets(ns.Name).Create(makeSecret("bar"))
+		_, err = f.clientSet.CoreV1().Secrets(ns.Name).Create(makeSecret("bar"))
 		if err != nil {
 			t.Errorf("Couldn't create secret: %v", err)
 		}
@@ -312,12 +319,61 @@ func TestNameInFieldSelector(t *testing.T) {
 		opts := metav1.ListOptions{
 			FieldSelector: tc.selector,
 		}
-		secrets, err := clientSet.CoreV1().Secrets(tc.namespace).List(opts)
+		secrets, err := f.clientSet.CoreV1().Secrets(tc.namespace).List(opts)
 		if err != nil {
 			t.Errorf("%s: Unexpected error: %v", tc.selector, err)
 		}
 		if len(secrets.Items) != tc.expectedSecrets {
 			t.Errorf("%s: Unexpected number of secrets: %d, expected: %d", tc.selector, len(secrets.Items), tc.expectedSecrets)
 		}
+	}
+}
+
+// TestListCurrentRevision ensures that LIST requests resourceVersion=0 return the current revision
+// and not arbitrarily stale data. See https://github.com/kubernetes/kubernetes/issues/59848.
+func TestListCurrentRevision(t *testing.T) {
+	var err error
+	f, closeFn := setup(t)
+	defer closeFn()
+
+	ns := framework.CreateTestingNamespace(fmt.Sprintf("rv-zero"), f.server, t)
+	defer framework.DeleteTestingNamespace(ns, f.server, t)
+
+	secretsApi := f.clientSet.CoreV1().Secrets(ns.Name)
+
+	_, err = secretsApi.Create(makeSecret("s1"))
+	if err != nil {
+		t.Fatalf("Couldn't create secret: %v", err)
+	}
+
+	_, err = secretsApi.List(metav1.ListOptions{})
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	// Simulate an out-of-band change by writing directly to etcd to increase the revision number.
+	bes := f.masterConfig.ExtraConfig.StorageFactory.Backends()
+	eps := []string{}
+	for _, bs := range bes {
+		eps = append(eps, bs.Server)
+	}
+	c, err := clientv3.New(clientv3.Config{Endpoints: eps})
+	if err != nil {
+		t.Fatalf("Unexpected error creating etcd client: %v", err)
+	}
+	pr, err := c.Put(context.Background(), "/z", "z")
+	if err != nil {
+		t.Fatalf("Unexpected error writing to etcd: %v", err)
+	}
+	latestRv := pr.Header.Revision
+
+	// Perform a RV=0 LIST operation
+	l, err := secretsApi.List(metav1.ListOptions{ResourceVersion: "0"})
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	if l.ResourceVersion != fmt.Sprintf("%d", latestRv) {
+		t.Errorf("Expected list resourceVersion of %s but got %d", l.ResourceVersion, latestRv)
 	}
 }
