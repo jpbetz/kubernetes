@@ -366,9 +366,8 @@ func (c *Cacher) Get(ctx context.Context, key string, resourceVersion string, ob
 		return err
 	}
 
-	if getRV == 0 && !c.ready.check() {
-		// If Cacher is not yet initialized and we don't require any specific
-		// minimal resource version, simply forward the request to storage.
+	if getRV == 0 {
+		// RV=0 reads are special cased to be consistent.
 		return c.storage.Get(ctx, key, resourceVersion, objPtr, ignoreNotFound)
 	}
 
@@ -419,9 +418,8 @@ func (c *Cacher) GetToList(ctx context.Context, key string, resourceVersion stri
 		return err
 	}
 
-	if listRV == 0 && !c.ready.check() {
-		// If Cacher is not yet initialized and we don't require any specific
-		// minimal resource version, simply forward the request to storage.
+	if listRV == 0 {
+		// RV=0 reads are special cased to be consistent.
 		return c.storage.GetToList(ctx, key, resourceVersion, pred, listObj)
 	}
 
@@ -488,9 +486,8 @@ func (c *Cacher) List(ctx context.Context, key string, resourceVersion string, p
 		return err
 	}
 
-	if listRV == 0 && !c.ready.check() {
-		// If Cacher is not yet initialized and we don't require any specific
-		// minimal resource version, simply forward the request to storage.
+	if listRV == 0 {
+		// RV=0 reads are special cased to be consistent.
 		return c.storage.List(ctx, key, resourceVersion, pred, listObj)
 	}
 
