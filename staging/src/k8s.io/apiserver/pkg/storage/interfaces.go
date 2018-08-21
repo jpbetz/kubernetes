@@ -195,4 +195,7 @@ type Interface interface {
 
 	// Count returns number of different entries under the key (generally being path prefix).
 	Count(key string) (int64, error)
+
+	// CurrentResourceVersion gets the storage's current resource version.
+	CurrentResourceVersion(ctx context.Context) (string, error)
 }

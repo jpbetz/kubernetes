@@ -379,6 +379,14 @@ func (s *store) GuaranteedUpdate(
 	}
 }
 
+func (s *store) CurrentResourceVersion(ctx context.Context) (string, error) {
+	getResp, err := s.client.KV.Get(ctx, "\x00", clientv3.WithKeysOnly())
+	if err != nil {
+		return "", storage.NewInternalError(err.Error())
+	}
+	return fmt.Sprintf("%d", getResp.Header.Revision), nil
+}
+
 // GetToList implements storage.Interface.GetToList.
 func (s *store) GetToList(ctx context.Context, key string, resourceVersion string, pred storage.SelectionPredicate, listObj runtime.Object) error {
 	listPtr, err := meta.GetItemsPtr(listObj)

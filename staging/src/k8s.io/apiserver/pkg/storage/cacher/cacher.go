@@ -488,10 +488,22 @@ func (c *Cacher) List(ctx context.Context, key string, resourceVersion string, p
 		return err
 	}
 
-	if listRV == 0 && !c.ready.check() {
-		// If Cacher is not yet initialized and we don't require any specific
-		// minimal resource version, simply forward the request to storage.
-		return c.storage.List(ctx, key, resourceVersion, pred, listObj)
+	if listRV == 0 {
+		if !c.ready.check() {
+			// If Cacher is not yet initialized and we don't require any specific
+			// minimal resource version, simply forward the request to storage.
+			return c.storage.List(ctx, key, resourceVersion, pred, listObj)
+		}
+		// RV=0 is a request for the "current" data. To prevent stale reads, we use
+		// the latest RV from the store. See https://github.com/kubernetes/kubernetes/issues/59848.
+		latestResourceVersion, err := c.storage.CurrentResourceVersion(ctx)
+		if err != nil {
+			return err
+		}
+		listRV, err = c.versioner.ParseResourceVersion(latestResourceVersion)
+		if err != nil {
+			return err
+		}
 	}
 
 	trace := utiltrace.New(fmt.Sprintf("cacher %v: List", c.objectType.String()))
@@ -559,6 +571,10 @@ func (c *Cacher) GuaranteedUpdate(
 // Count implements storage.Interface.
 func (c *Cacher) Count(pathPrefix string) (int64, error) {
 	return c.storage.Count(pathPrefix)
+}
+
+func (c *Cacher) CurrentResourceVersion(ctx context.Context) (string, error) {
+	return c.storage.CurrentResourceVersion(ctx)
 }
 
 func (c *Cacher) triggerValues(event *watchCacheEvent) ([]string, bool) {
