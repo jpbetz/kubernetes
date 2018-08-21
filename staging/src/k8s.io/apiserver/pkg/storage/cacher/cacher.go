@@ -195,6 +195,7 @@ func NewCacherFromConfig(config Config) *Cacher {
 	watchCache := newWatchCache(config.CacheCapacity, config.KeyFunc, config.GetAttrsFunc, config.Versioner)
 	listerWatcher := newCacherListerWatcher(config.Storage, config.ResourcePrefix, config.NewListFunc)
 	reflectorName := "storage/cacher.go:" + config.ResourcePrefix
+	reflector := cache.NewNamedReflector(reflectorName, listerWatcher, config.Type, watchCache, 0)
 
 	// Give this error when it is constructed rather than when you get the
 	// first watch item, because it's much easier to track down that way.
@@ -210,7 +211,7 @@ func NewCacherFromConfig(config Config) *Cacher {
 		storage:     config.Storage,
 		objectType:  reflect.TypeOf(config.Type),
 		watchCache:  watchCache,
-		reflector:   cache.NewNamedReflector(reflectorName, listerWatcher, config.Type, watchCache, 0),
+		reflector:   reflector,
 		versioner:   config.Versioner,
 		triggerFunc: config.TriggerPublisherFunc,
 		watcherIdx:  0,
@@ -229,6 +230,7 @@ func NewCacherFromConfig(config Config) *Cacher {
 		stopCh: stopCh,
 	}
 	watchCache.SetOnEvent(cacher.processEvent)
+	watchCache.SetOnStale(reflector.RequestLatestResourceVersion)
 	go cacher.dispatchEvents()
 
 	cacher.stopWg.Add(1)

@@ -139,6 +139,10 @@ type watchCache struct {
 
 	// An underlying storage.Versioner.
 	versioner storage.Versioner
+
+	// This handler is run for each time the watch cache recieves a request for a resource version
+	// newer than resource version up to which the watchCache has been propagated.
+	onStale func()
 }
 
 func newWatchCache(
@@ -196,6 +200,23 @@ func (w *watchCache) Delete(obj interface{}) error {
 
 	f := func(elem *storeElement) error { return w.store.Delete(elem) }
 	return w.processEvent(event, resourceVersion, f)
+}
+
+// ApplyProgress takes runtime.Object as an argument and records that the
+// watchCache has propagated up to the resource version of the object.
+func (w *watchCache) ApplyProgress(obj interface{}) error {
+	_, resourceVersion, err := w.objectToVersionedRuntimeObject(obj)
+	if err != nil {
+		return err
+	}
+
+	w.Lock()
+	defer w.Unlock()
+	if resourceVersion > w.resourceVersion {
+		w.resourceVersion = resourceVersion
+		w.cond.Broadcast()
+	}
+	return nil
 }
 
 func (w *watchCache) objectToVersionedRuntimeObject(obj interface{}) (runtime.Object, uint64, error) {
@@ -298,6 +319,10 @@ func (w *watchCache) waitUntilFreshAndBlock(resourceVersion uint64, trace *utilt
 		if w.clock.Since(startTime) >= blockTimeout {
 			// Timeout with retry after 1 second.
 			return errors.NewTimeoutError(fmt.Sprintf("Too large resource version: %v, current: %v", resourceVersion, w.resourceVersion), 1)
+		}
+
+		if w.onStale != nil {
+			w.onStale()
 		}
 		w.cond.Wait()
 	}
@@ -402,6 +427,16 @@ func (w *watchCache) SetOnReplace(onReplace func()) {
 	w.Lock()
 	defer w.Unlock()
 	w.onReplace = onReplace
+}
+
+// Sets handler to be run each time the watch cache recieves a request for a resource version
+// newer than resource version up to which the watchCache has been propagated.  A handler
+// might respond by attempting to provided the watch cache with the most recient resource version
+// available via a watch Progress event.
+func (w *watchCache) SetOnStale(onStale func()) {
+	w.Lock()
+	defer w.Unlock()
+	w.onStale = onStale
 }
 
 func (w *watchCache) SetOnEvent(onEvent func(*watchCacheEvent)) {

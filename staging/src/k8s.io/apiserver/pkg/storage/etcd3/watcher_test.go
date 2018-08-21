@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -27,6 +28,7 @@ import (
 	"github.com/coreos/etcd/clientv3"
 	"github.com/coreos/etcd/integration"
 
+	"k8s.io/apimachinery/pkg/api/meta"
 	apitesting "k8s.io/apimachinery/pkg/api/testing"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
@@ -311,6 +313,55 @@ func TestWatchDeleteEventObjectHaveLatestRV(t *testing.T) {
 	if int64(watchedDeleteRev) != wres.Events[0].Kv.ModRevision {
 		t.Errorf("Object from delete event have version: %v, should be the same as etcd delete's mod rev: %d",
 			watchedDeleteRev, wres.Events[0].Kv.ModRevision)
+	}
+}
+
+func TestWatchRequestProgress(t *testing.T) {
+	ctx, store, cluster := testSetup(t)
+	defer cluster.Terminate(t)
+	key, storedObj := testPropogateStore(ctx, t, store, &example.Pod{ObjectMeta: metav1.ObjectMeta{Name: "foo"}})
+
+	parsedLabel, err := labels.Parse("name=foo")
+	if err != nil {
+		t.Fatalf("Failed to create label: %v", err)
+	}
+	sp := storage.SelectionPredicate{
+		Label: parsedLabel,
+		Field: fields.Everything(),
+	}
+	w, err := store.Watch(ctx, key, storedObj.ResourceVersion, sp)
+	if err != nil {
+		t.Fatalf("Watch failed: %v", err)
+	}
+
+	// Bump the resource version of etcd by modifying an key that is not being watched.
+	pr, err := cluster.RandClient().Put(ctx, "/z", "z")
+	if err != nil {
+		t.Fatalf("Failed to put key: %v", err)
+	}
+
+	vw, ok := w.(watch.ProgressRequestableInterface)
+	if !ok {
+		t.Fatalf("Failed to cast watch cache to ProgressRequestableinterface")
+	}
+	err = vw.RequestProgress(ctx)
+	if err != nil {
+		t.Fatalf("Failed to request progress: %v", err)
+	}
+	select {
+	case e := <-w.ResultChan():
+		if e.Type != watch.Progress {
+			t.Fatalf("Expected watch event of type %s but got %s", watch.Progress, e.Type)
+		}
+		meta, err := meta.Accessor(e.Object)
+		if err != nil {
+			t.Fatalf("Unable to access resource version of watch event %#v: %v", e, err)
+		}
+		if strconv.FormatInt(pr.Header.Revision, 10) != meta.GetResourceVersion() {
+			t.Fatalf("Expected revision %d but got %s", pr.Header.Revision, meta.GetResourceVersion())
+		}
+	case <-time.After(3 * time.Second):
+		t.Errorf("Timed out waiting for %s event", watch.Progress)
 	}
 }
 

@@ -194,6 +194,34 @@ func TestReflectorWatchHandler(t *testing.T) {
 	}
 }
 
+func TestReflectorWatchProgress(t *testing.T) {
+	s := NewStore(MetaNamespaceKeyFunc)
+	g := NewReflector(&testLW{}, &v1.Pod{}, s, 0)
+	fw := watch.NewFake()
+	s.Add(&v1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "foo"}})
+	s.Add(&v1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "bar"}})
+	go func() {
+		fw.Add(&v1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "baz", ResourceVersion: "32"}})
+		fw.ApplyProgress(&v1.Pod{ObjectMeta: metav1.ObjectMeta{ResourceVersion: "60"}})
+		fw.Stop()
+	}()
+	var resumeRV string
+	err := g.watchHandler(fw, &resumeRV, nevererrc, wait.NeverStop)
+	if err != nil {
+		t.Errorf("unexpected error %v", err)
+	}
+
+	// RV should send the last version we see.
+	if e, a := "60", resumeRV; e != a {
+		t.Errorf("expected %v, got %v", e, a)
+	}
+
+	// last sync resource version should be the last version synced with store
+	if e, a := "60", g.LastSyncResourceVersion(); e != a {
+		t.Errorf("expected %v, got %v", e, a)
+	}
+}
+
 func TestReflectorStopWatch(t *testing.T) {
 	s := NewStore(MetaNamespaceKeyFunc)
 	g := NewReflector(&testLW{}, &v1.Pod{}, s, 0)

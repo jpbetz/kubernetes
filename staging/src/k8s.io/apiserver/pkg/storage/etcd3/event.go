@@ -22,12 +22,13 @@ import (
 )
 
 type event struct {
-	key       string
-	value     []byte
-	prevValue []byte
-	rev       int64
-	isDeleted bool
-	isCreated bool
+	key        string
+	value      []byte
+	prevValue  []byte
+	rev        int64
+	isDeleted  bool
+	isCreated  bool
+	isProgress bool
 }
 
 // parseKV converts a KeyValue retrieved from an initial sync() listing to a synthetic isCreated event.

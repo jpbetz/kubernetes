@@ -19,6 +19,7 @@ package cacher
 import (
 	"fmt"
 	"strconv"
+	"sync"
 	"testing"
 	"time"
 
@@ -295,6 +296,33 @@ func TestWaitUntilFreshAndList(t *testing.T) {
 		t.Errorf("unexpected resourceVersion: %v, expected: 5", resourceVersion)
 	}
 	if len(list) != 2 {
+		t.Errorf("unexpected list returned: %#v", list)
+	}
+}
+
+func TestWaitUntilFreshAndListWithProgressUpdate(t *testing.T) {
+	store := newTestWatchCache(3)
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	store.SetOnStale(wg.Done)
+
+	// In background, update the store.
+	go func() {
+		store.Add(makeTestPod("foo", 2))
+		store.Add(makeTestPod("bar", 5))
+		wg.Wait()
+		store.Add(makeTestPod("baz", 6))
+	}()
+
+	list, resourceVersion, err := store.WaitUntilFreshAndList(6, nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resourceVersion != 6 {
+		t.Errorf("unexpected resourceVersion: %v, expected: 6", resourceVersion)
+	}
+	if len(list) != 3 {
 		t.Errorf("unexpected list returned: %#v", list)
 	}
 }

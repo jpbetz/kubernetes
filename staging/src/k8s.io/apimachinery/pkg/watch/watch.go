@@ -17,11 +17,11 @@ limitations under the License.
 package watch
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
 	"github.com/golang/glog"
-
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -44,6 +44,9 @@ const (
 	Added    EventType = "ADDED"
 	Modified EventType = "MODIFIED"
 	Deleted  EventType = "DELETED"
+
+	// Progress events provide resource version updates.
+	Progress EventType = "PROGRESS"
 	Error    EventType = "ERROR"
 
 	DefaultChanSize int32 = 100
@@ -59,10 +62,22 @@ type Event struct {
 	//  * If Type is Deleted: the state of the object immediately before deletion.
 	//  * If Type is Error: *api.Status is recommended; other types may make sense
 	//    depending on context.
+	//  * If Type is Progress: an object with ObjectMeta where the ObjectMeta's ResourceVersion
+	//    indicates progress.
 	Object runtime.Object
 }
 
 type emptyWatch chan Event
+
+// ProgressRequestableInterface supports requests for Progress events.
+type ProgressRequestableInterface interface {
+	Interface
+
+	// RequestProgress requests a Progress event be sent over the watch channel. Progress events
+	// are useful for determining the "freshness" of watches channels, particularly for low traffic
+	// channels where the resource version may progress considerably between watch events.
+	RequestProgress(ctx context.Context) error
+}
 
 // NewEmptyWatch returns a watch interface that returns no results and is closed.
 // May be used in certain error conditions where no information is available but
@@ -148,6 +163,10 @@ func (f *FakeWatcher) Delete(lastValue runtime.Object) {
 // Error sends an Error event.
 func (f *FakeWatcher) Error(errValue runtime.Object) {
 	f.result <- Event{Error, errValue}
+}
+
+func (f *FakeWatcher) ApplyProgress(obj runtime.Object) {
+	f.result <- Event{Progress, obj}
 }
 
 // Action sends an event of the requested type, for table-based testing.

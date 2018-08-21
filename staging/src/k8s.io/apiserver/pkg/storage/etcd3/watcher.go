@@ -166,6 +166,38 @@ func (wc *watchChan) ResultChan() <-chan watch.Event {
 	return wc.resultChan
 }
 
+func (wc *watchChan) RequestProgress(ctx context.Context) error {
+	// This is a stopgap that provides functionality similar to etcd 3.4's Watcher.RequestProgress
+	// operation.  First it creates an empty etcd watch with "created notify" set to true so that a
+	// 'watch created' event is sent back from the server, then it checks the revision of that event
+	// to get up-to-date resource version that this watch has been propagated to. It then
+	// immediately closes the watch. Because the etcd client sends both the watch create an delete
+	// over it's active gRPC bi-direction watch stream that is shared by all the client watch
+	// channels, these operations are cheap and fast, and the created watch cannot be leaked.
+	//
+	// TODO: Progressively enhance to use etcd 3.4 Watcher.RequestProgress (https://github.com/coreos/etcd/pull/9869)
+	// against 3.4+ etcd servers once we upgrade to etcd 3.4 client.
+	pctx, pcancel := context.WithCancel(ctx)
+	defer pcancel()
+	zw := wc.watcher.client.Watch(pctx, "", clientv3.WithRange("\x00"), clientv3.WithCreatedNotify())
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case progress := <-zw:
+		// TODO: We've got a fundamental issue here. What to do? Although the "watch created" event
+		// used here is kept in-order by the gRPC bi-directional stream over the network relative to
+		// all other watch events, the etcd client splits the "watch created" event to a separate
+		// channel when it recieves it, separating it from the other events being watched. As a
+		// result, there is no way to guarantee that it is processed in-order. We recombine the
+		// events into a single channel immediately here to minimize the odds of them becoming
+		// out-of-order, but it is not possible to entirely eliminate it as a possibility. If it
+		// were to happen, the resource version might be briefly higher than it should be, which
+		// could result in stale reads.
+		wc.sendEvent(&event{rev: progress.Header.Revision, isProgress: true})
+	}
+	return nil
+}
+
 // sync tries to retrieve existing data and send them to process.
 // The revision to watch will be set to the revision in response.
 // All events sent will have isCreated=true
@@ -271,6 +303,11 @@ func (wc *watchChan) transform(e *event) (res *watch.Event) {
 	}
 
 	switch {
+	case e.isProgress:
+		res = &watch.Event{
+			Type:   watch.Progress,
+			Object: storage.NewProgressMarker(fmt.Sprintf("%d", e.rev)),
+		}
 	case e.isDeleted:
 		if !wc.filter(oldObj) {
 			return nil
@@ -350,7 +387,7 @@ func (wc *watchChan) sendEvent(e *event) {
 }
 
 func (wc *watchChan) prepareObjs(e *event) (curObj runtime.Object, oldObj runtime.Object, err error) {
-	if !e.isDeleted {
+	if !(e.isDeleted || e.isProgress) {
 		data, _, err := wc.watcher.transformer.TransformFromStorage(e.value, authenticatedDataString(e.key))
 		if err != nil {
 			return nil, nil, err
