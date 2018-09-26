@@ -387,3 +387,38 @@ func TestReflectorResync(t *testing.T) {
 		t.Errorf("exactly 2 iterations were expected, got: %v", iteration)
 	}
 }
+
+func TestReflectorResourceVersionConstraint(t *testing.T) {
+	s := NewStore(MetaNamespaceKeyFunc)
+	pod1 := v1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "pod1", ResourceVersion: "10"}}
+	fw := watch.NewFake()
+	lw := &testLW{
+		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+			return fw, nil
+		},
+		ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+			if options.ResourceVersion == "10" {
+				return &v1.PodList{ListMeta: metav1.ListMeta{ResourceVersion: "10"}, Items: []v1.Pod{pod1}}, nil
+			} else {
+				t.Fatalf("Expected ListOptions.ResourceVersion of 10, but go %s", options.ResourceVersion)
+				return nil, nil
+			}
+		},
+	}
+	r := NewReflector(lw, &v1.Pod{}, s, 0, ResourceVersionConstraint{MinimumResourceVersion: "10"})
+	stopCh := make(chan struct{})
+	go r.Run(stopCh)
+	fw.Add(&v1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "pod1", ResourceVersion: "11"}})
+	close(stopCh)
+	resource, exists, err := s.Get(&pod1)
+	if err != nil {
+		t.Errorf("expected error %v", err)
+	}
+	if !exists {
+		t.Errorf("expected pod to exist in store %v", pod1)
+	}
+	pod := resource.(*v1.Pod)
+	if pod.ResourceVersion != "11" {
+		t.Errorf("expected pod resource version %s, but got %s", pod.ResourceVersion, "11")
+	}
+}

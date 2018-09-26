@@ -69,6 +69,10 @@ type Reflector struct {
 	lastSyncResourceVersion string
 	// lastSyncResourceVersionMutex guards read/write access to lastSyncResourceVersion
 	lastSyncResourceVersionMutex sync.RWMutex
+
+	// minimumResourceVersion is the resource version passed to listerWatcher.List when
+	// the Reflector is initialized.
+	minimumResourceVersion string
 }
 
 var (
@@ -77,11 +81,28 @@ var (
 	minWatchTimeout = 5 * time.Minute
 )
 
+type ReflectorOp interface {
+	applyToReflector(r *Reflector)
+}
+
+// ResourceVersionConstraint is a ReflectorOp provided to Reflector constructors to
+// constraint the minimum resource version the Reflector may initialize at.
+// TODO: Document when and how to use in more detail.
+type ResourceVersionConstraint struct {
+	// MinimumResourceVersion requires the reflector initialize at a resource version no less
+	// than specified, or return a "Failed to list" when initializing the Reflector.
+	MinimumResourceVersion string
+}
+
+func (c ResourceVersionConstraint) applyToReflector(r *Reflector) {
+	r.minimumResourceVersion = c.MinimumResourceVersion
+}
+
 // NewNamespaceKeyedIndexerAndReflector creates an Indexer and a Reflector
 // The indexer is configured to key on namespace
-func NewNamespaceKeyedIndexerAndReflector(lw ListerWatcher, expectedType interface{}, resyncPeriod time.Duration) (indexer Indexer, reflector *Reflector) {
+func NewNamespaceKeyedIndexerAndReflector(lw ListerWatcher, expectedType interface{}, resyncPeriod time.Duration, opts ...ReflectorOp) (indexer Indexer, reflector *Reflector) {
 	indexer = NewIndexer(MetaNamespaceKeyFunc, Indexers{"namespace": MetaNamespaceIndexFunc})
-	reflector = NewReflector(lw, expectedType, indexer, resyncPeriod)
+	reflector = NewReflector(lw, expectedType, indexer, resyncPeriod, opts...)
 	return indexer, reflector
 }
 
@@ -91,8 +112,8 @@ func NewNamespaceKeyedIndexerAndReflector(lw ListerWatcher, expectedType interfa
 // is nil. If resyncPeriod is non-zero, then lists will be executed after every
 // resyncPeriod, so that you can use reflectors to periodically process everything as
 // well as incrementally processing the things that change.
-func NewReflector(lw ListerWatcher, expectedType interface{}, store Store, resyncPeriod time.Duration) *Reflector {
-	return NewNamedReflector(naming.GetNameFromCallsite(internalPackages...), lw, expectedType, store, resyncPeriod)
+func NewReflector(lw ListerWatcher, expectedType interface{}, store Store, resyncPeriod time.Duration, opts ...ReflectorOp) *Reflector {
+	return NewNamedReflector(naming.GetNameFromCallsite(internalPackages...), lw, expectedType, store, resyncPeriod, opts...)
 }
 
 // reflectorDisambiguator is used to disambiguate started reflectors.
@@ -100,7 +121,7 @@ func NewReflector(lw ListerWatcher, expectedType interface{}, store Store, resyn
 var reflectorDisambiguator = int64(time.Now().UnixNano() % 12345)
 
 // NewNamedReflector same as NewReflector, but with a specified name for logging
-func NewNamedReflector(name string, lw ListerWatcher, expectedType interface{}, store Store, resyncPeriod time.Duration) *Reflector {
+func NewNamedReflector(name string, lw ListerWatcher, expectedType interface{}, store Store, resyncPeriod time.Duration, opts ...ReflectorOp) *Reflector {
 	reflectorSuffix := atomic.AddInt64(&reflectorDisambiguator, 1)
 	r := &Reflector{
 		name: name,
@@ -112,6 +133,11 @@ func NewNamedReflector(name string, lw ListerWatcher, expectedType interface{}, 
 		period:        time.Second,
 		resyncPeriod:  resyncPeriod,
 		clock:         &clock.RealClock{},
+		// Unless overridden by the ResourceVersionConstraint opt, the Reflector requests initial state by listing at resource version "0".
+		minimumResourceVersion: "0",
+	}
+	for _, opt := range opts {
+		opt.applyToReflector(r)
 	}
 	return r
 }
@@ -169,10 +195,7 @@ func (r *Reflector) ListAndWatch(stopCh <-chan struct{}) error {
 	glog.V(3).Infof("Listing and watching %v from %s", r.expectedType, r.name)
 	var resourceVersion string
 
-	// Explicitly set "0" as resource version - it's fine for the List()
-	// to be served from cache and potentially be delayed relative to
-	// etcd contents. Reflector framework will catch up via Watch() eventually.
-	options := metav1.ListOptions{ResourceVersion: "0"}
+	options := metav1.ListOptions{ResourceVersion: r.minimumResourceVersion}
 	r.metrics.numberOfLists.Inc()
 	start := r.clock.Now()
 	list, err := r.listerWatcher.List(options)
