@@ -1756,7 +1756,7 @@ func TestStoreDeleteCollectionWithWatch(t *testing.T) {
 	}
 	podCreated := objCreated.(*example.Pod)
 
-	watcher, err := registry.WatchPredicate(testContext, matchPodName("foo"), podCreated.ResourceVersion)
+	watcher, err := registry.WatchPredicate(testContext, matchPodName("foo"), storage.MinimumRV(podCreated.ResourceVersion))
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -1815,7 +1815,7 @@ func TestStoreWatch(t *testing.T) {
 		}
 
 		destroyFunc, registry := NewTestGenericStoreRegistry(t)
-		wi, err := registry.WatchPredicate(ctx, m.selectPred, "0")
+		wi, err := registry.WatchPredicate(ctx, m.selectPred, storage.MinimumRV("0"))
 		if err != nil {
 			t.Errorf("%v: unexpected error: %v", name, err)
 		} else {

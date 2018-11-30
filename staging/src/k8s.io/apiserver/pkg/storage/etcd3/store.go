@@ -109,7 +109,7 @@ func (s *store) Versioner() storage.Versioner {
 }
 
 // Get implements storage.Interface.Get.
-func (s *store) Get(ctx context.Context, key string, resourceVersion string, out runtime.Object, ignoreNotFound bool) error {
+func (s *store) Get(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, out runtime.Object, ignoreNotFound bool) error {
 	key = path.Join(s.pathPrefix, key)
 	getResp, err := s.client.KV.Get(ctx, key, s.getOps...)
 	if err != nil {
@@ -368,7 +368,7 @@ func (s *store) GuaranteedUpdate(
 }
 
 // GetToList implements storage.Interface.GetToList.
-func (s *store) GetToList(ctx context.Context, key string, resourceVersion string, pred storage.SelectionPredicate, listObj runtime.Object) error {
+func (s *store) GetToList(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, pred storage.SelectionPredicate, listObj runtime.Object) error {
 	listPtr, err := meta.GetItemsPtr(listObj)
 	if err != nil {
 		return err
@@ -467,7 +467,8 @@ func encodeContinue(key, keyPrefix string, resourceVersion int64) (string, error
 }
 
 // List implements storage.Interface.List.
-func (s *store) List(ctx context.Context, key, resourceVersion string, pred storage.SelectionPredicate, listObj runtime.Object) error {
+func (s *store) List(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, pred storage.SelectionPredicate, listObj runtime.Object) error {
+	//TODO(jpbetz): handle both exact and minimum RV semantics
 	listPtr, err := meta.GetItemsPtr(listObj)
 	if err != nil {
 		return err
@@ -505,7 +506,7 @@ func (s *store) List(ctx context.Context, key, resourceVersion string, pred stor
 			return apierrors.NewBadRequest(fmt.Sprintf("invalid continue token: %v", err))
 		}
 
-		if len(resourceVersion) > 0 && resourceVersion != "0" {
+		if len(resourceVersion.ResourceVersion) > 0 && resourceVersion.ResourceVersion != "0" {
 			return apierrors.NewBadRequest("specifying resource version is not allowed when using continue")
 		}
 
@@ -521,8 +522,8 @@ func (s *store) List(ctx context.Context, key, resourceVersion string, pred stor
 			returnedRV = continueRV
 		}
 	case s.pagingEnabled && pred.Limit > 0:
-		if len(resourceVersion) > 0 {
-			fromRV, err := s.versioner.ParseResourceVersion(resourceVersion)
+		if len(resourceVersion.ResourceVersion) > 0 {
+			fromRV, err := s.versioner.ParseResourceVersion(resourceVersion.ResourceVersion)
 			if err != nil {
 				return apierrors.NewBadRequest(fmt.Sprintf("invalid resource version: %v", err))
 			}
@@ -536,8 +537,8 @@ func (s *store) List(ctx context.Context, key, resourceVersion string, pred stor
 		options = append(options, clientv3.WithRange(rangeEnd))
 
 	default:
-		if len(resourceVersion) > 0 {
-			fromRV, err := s.versioner.ParseResourceVersion(resourceVersion)
+		if len(resourceVersion.ResourceVersion) > 0 {
+			fromRV, err := s.versioner.ParseResourceVersion(resourceVersion.ResourceVersion)
 			if err != nil {
 				return apierrors.NewBadRequest(fmt.Sprintf("invalid resource version: %v", err))
 			}
@@ -653,13 +654,15 @@ func growSlice(v reflect.Value, maxCapacity int, sizes ...int) {
 }
 
 // Watch implements storage.Interface.Watch.
-func (s *store) Watch(ctx context.Context, key string, resourceVersion string, pred storage.SelectionPredicate) (watch.Interface, error) {
-	return s.watch(ctx, key, resourceVersion, pred, false)
+func (s *store) Watch(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, pred storage.SelectionPredicate) (watch.Interface, error) {
+	//TODO(jpbetz): handle both exact and minimum RV semantics
+	return s.watch(ctx, key, resourceVersion.ResourceVersion, pred, false)
 }
 
 // WatchList implements storage.Interface.WatchList.
-func (s *store) WatchList(ctx context.Context, key string, resourceVersion string, pred storage.SelectionPredicate) (watch.Interface, error) {
-	return s.watch(ctx, key, resourceVersion, pred, true)
+func (s *store) WatchList(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, pred storage.SelectionPredicate) (watch.Interface, error) {
+	//TODO(jpbetz): handle both exact and minimum RV semantics
+	return s.watch(ctx, key, resourceVersion.ResourceVersion, pred, true)
 }
 
 func (s *store) watch(ctx context.Context, key string, rv string, pred storage.SelectionPredicate, recursive bool) (watch.Interface, error) {

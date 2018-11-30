@@ -35,7 +35,7 @@ func (s *DryRunnableStorage) Versioner() storage.Versioner {
 
 func (s *DryRunnableStorage) Create(ctx context.Context, key string, obj, out runtime.Object, ttl uint64, dryRun bool) error {
 	if dryRun {
-		if err := s.Storage.Get(ctx, key, "", out, false); err == nil {
+		if err := s.Storage.Get(ctx, key, storage.MinimumRV(""), out, false); err == nil {
 			return storage.NewKeyExistsError(key, 0)
 		}
 		s.copyInto(obj, out)
@@ -46,7 +46,7 @@ func (s *DryRunnableStorage) Create(ctx context.Context, key string, obj, out ru
 
 func (s *DryRunnableStorage) Delete(ctx context.Context, key string, out runtime.Object, preconditions *storage.Preconditions, dryRun bool) error {
 	if dryRun {
-		if err := s.Storage.Get(ctx, key, "", out, false); err != nil {
+		if err := s.Storage.Get(ctx, key, storage.MinimumRV(""), out, false); err != nil {
 			return err
 		}
 		return preconditions.Check(key, out)
@@ -54,23 +54,23 @@ func (s *DryRunnableStorage) Delete(ctx context.Context, key string, out runtime
 	return s.Storage.Delete(ctx, key, out, preconditions)
 }
 
-func (s *DryRunnableStorage) Watch(ctx context.Context, key string, resourceVersion string, p storage.SelectionPredicate) (watch.Interface, error) {
+func (s *DryRunnableStorage) Watch(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, p storage.SelectionPredicate) (watch.Interface, error) {
 	return s.Storage.Watch(ctx, key, resourceVersion, p)
 }
 
-func (s *DryRunnableStorage) WatchList(ctx context.Context, key string, resourceVersion string, p storage.SelectionPredicate) (watch.Interface, error) {
+func (s *DryRunnableStorage) WatchList(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, p storage.SelectionPredicate) (watch.Interface, error) {
 	return s.Storage.WatchList(ctx, key, resourceVersion, p)
 }
 
-func (s *DryRunnableStorage) Get(ctx context.Context, key string, resourceVersion string, objPtr runtime.Object, ignoreNotFound bool) error {
+func (s *DryRunnableStorage) Get(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, objPtr runtime.Object, ignoreNotFound bool) error {
 	return s.Storage.Get(ctx, key, resourceVersion, objPtr, ignoreNotFound)
 }
 
-func (s *DryRunnableStorage) GetToList(ctx context.Context, key string, resourceVersion string, p storage.SelectionPredicate, listObj runtime.Object) error {
+func (s *DryRunnableStorage) GetToList(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, p storage.SelectionPredicate, listObj runtime.Object) error {
 	return s.Storage.GetToList(ctx, key, resourceVersion, p, listObj)
 }
 
-func (s *DryRunnableStorage) List(ctx context.Context, key string, resourceVersion string, p storage.SelectionPredicate, listObj runtime.Object) error {
+func (s *DryRunnableStorage) List(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, p storage.SelectionPredicate, listObj runtime.Object) error {
 	return s.Storage.List(ctx, key, resourceVersion, p, listObj)
 }
 
@@ -78,7 +78,7 @@ func (s *DryRunnableStorage) GuaranteedUpdate(
 	ctx context.Context, key string, ptrToType runtime.Object, ignoreNotFound bool,
 	preconditions *storage.Preconditions, tryUpdate storage.UpdateFunc, dryRun bool, suggestion ...runtime.Object) error {
 	if dryRun {
-		err := s.Storage.Get(ctx, key, "", ptrToType, ignoreNotFound)
+		err := s.Storage.Get(ctx, key, storage.MinimumRV(""), ptrToType, ignoreNotFound)
 		if err != nil {
 			return err
 		}

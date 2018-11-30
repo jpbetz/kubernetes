@@ -131,6 +131,26 @@ func (p *Preconditions) Check(key string, obj runtime.Object) error {
 
 }
 
+type ResourceVersionMatchRule int
+
+const (
+	MinimumResourceVersion ResourceVersionMatchRule = iota
+	ExactResourceVersion
+)
+
+type ResourceVersionPredicate struct {
+	MatchRule       ResourceVersionMatchRule
+	ResourceVersion string
+}
+
+func ExactRV(resourceVersion string) ResourceVersionPredicate {
+	return ResourceVersionPredicate{MatchRule: ExactResourceVersion, ResourceVersion: resourceVersion}
+}
+
+func MinimumRV(resourceVersion string) ResourceVersionPredicate {
+	return ResourceVersionPredicate{MatchRule: MinimumResourceVersion, ResourceVersion: resourceVersion}
+}
+
 // Interface offers a common interface for object marshaling/unmarshaling operations and
 // hides all the storage-related operations behind it.
 type Interface interface {
@@ -153,7 +173,7 @@ type Interface interface {
 	// (e.g. reconnecting without missing any updates).
 	// If resource version is "0", this interface will get current object at given key
 	// and send it in an "ADDED" event, before watch starts.
-	Watch(ctx context.Context, key string, resourceVersion string, p SelectionPredicate) (watch.Interface, error)
+	Watch(ctx context.Context, key string, resourceVersion ResourceVersionPredicate, p SelectionPredicate) (watch.Interface, error)
 
 	// WatchList begins watching the specified key's items. Items are decoded into API
 	// objects and any item selected by 'p' are sent down to returned watch.Interface.
@@ -162,26 +182,26 @@ type Interface interface {
 	// (e.g. reconnecting without missing any updates).
 	// If resource version is "0", this interface will list current objects directory defined by key
 	// and send them in "ADDED" events, before watch starts.
-	WatchList(ctx context.Context, key string, resourceVersion string, p SelectionPredicate) (watch.Interface, error)
+	WatchList(ctx context.Context, key string, resourceVersion ResourceVersionPredicate, p SelectionPredicate) (watch.Interface, error)
 
 	// Get unmarshals json found at key into objPtr. On a not found error, will either
 	// return a zero object of the requested type, or an error, depending on ignoreNotFound.
 	// Treats empty responses and nil response nodes exactly like a not found error.
 	// The returned contents may be delayed, but it is guaranteed that they will
 	// be have at least 'resourceVersion'.
-	Get(ctx context.Context, key string, resourceVersion string, objPtr runtime.Object, ignoreNotFound bool) error
+	Get(ctx context.Context, key string, resourceVersion ResourceVersionPredicate, objPtr runtime.Object, ignoreNotFound bool) error
 
 	// GetToList unmarshals json found at key and opaque it into *List api object
 	// (an object that satisfies the runtime.IsList definition).
 	// The returned contents may be delayed, but it is guaranteed that they will
 	// be have at least 'resourceVersion'.
-	GetToList(ctx context.Context, key string, resourceVersion string, p SelectionPredicate, listObj runtime.Object) error
+	GetToList(ctx context.Context, key string, resourceVersion ResourceVersionPredicate, p SelectionPredicate, listObj runtime.Object) error
 
 	// List unmarshalls jsons found at directory defined by key and opaque them
 	// into *List api object (an object that satisfies runtime.IsList definition).
 	// The returned contents may be delayed, but it is guaranteed that they will
 	// be have at least 'resourceVersion'.
-	List(ctx context.Context, key string, resourceVersion string, p SelectionPredicate, listObj runtime.Object) error
+	List(ctx context.Context, key string, resourceVersion ResourceVersionPredicate, p SelectionPredicate, listObj runtime.Object) error
 
 	// GuaranteedUpdate keeps calling 'tryUpdate()' to update key 'key' (of type 'ptrToType')
 	// retrying the update until success if there is index conflict.

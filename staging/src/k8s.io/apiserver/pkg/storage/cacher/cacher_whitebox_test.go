@@ -276,19 +276,19 @@ func (d *dummyStorage) Create(_ context.Context, _ string, _, _ runtime.Object, 
 func (d *dummyStorage) Delete(_ context.Context, _ string, _ runtime.Object, _ *storage.Preconditions) error {
 	return fmt.Errorf("unimplemented")
 }
-func (d *dummyStorage) Watch(_ context.Context, _ string, _ string, _ storage.SelectionPredicate) (watch.Interface, error) {
+func (d *dummyStorage) Watch(_ context.Context, _ string, _ storage.ResourceVersionPredicate, _ storage.SelectionPredicate) (watch.Interface, error) {
 	return newDummyWatch(), nil
 }
-func (d *dummyStorage) WatchList(_ context.Context, _ string, _ string, _ storage.SelectionPredicate) (watch.Interface, error) {
+func (d *dummyStorage) WatchList(_ context.Context, _ string, _ storage.ResourceVersionPredicate, _ storage.SelectionPredicate) (watch.Interface, error) {
 	return newDummyWatch(), nil
 }
-func (d *dummyStorage) Get(_ context.Context, _ string, _ string, _ runtime.Object, _ bool) error {
+func (d *dummyStorage) Get(_ context.Context, _ string, _ storage.ResourceVersionPredicate, _ runtime.Object, _ bool) error {
 	return fmt.Errorf("unimplemented")
 }
-func (d *dummyStorage) GetToList(_ context.Context, _ string, _ string, _ storage.SelectionPredicate, _ runtime.Object) error {
+func (d *dummyStorage) GetToList(_ context.Context, _ string, _ storage.ResourceVersionPredicate, _ storage.SelectionPredicate, _ runtime.Object) error {
 	return d.err
 }
-func (d *dummyStorage) List(_ context.Context, _ string, _ string, _ storage.SelectionPredicate, listObj runtime.Object) error {
+func (d *dummyStorage) List(_ context.Context, _ string, _ storage.ResourceVersionPredicate, _ storage.SelectionPredicate, listObj runtime.Object) error {
 	podList := listObj.(*example.PodList)
 	podList.ListMeta = metav1.ListMeta{ResourceVersion: "100"}
 	return d.err
@@ -315,12 +315,12 @@ func TestListWithLimitAndRV0(t *testing.T) {
 
 	// Inject error to underlying layer and check if cacher is not bypassed.
 	backingStorage.err = errDummy
-	err := cacher.List(context.TODO(), "pods/ns", "0", pred, result)
+	err := cacher.List(context.TODO(), "pods/ns", storage.MinimumRV("0"), pred, result)
 	if err != nil {
 		t.Errorf("List with Limit and RV=0 should be served from cache: %v", err)
 	}
 
-	err = cacher.List(context.TODO(), "pods/ns", "", pred, result)
+	err = cacher.List(context.TODO(), "pods/ns", storage.MinimumRV(""), pred, result)
 	if err != errDummy {
 		t.Errorf("List with Limit without RV=0 should bypass cacher: %v", err)
 	}
@@ -341,12 +341,12 @@ func TestGetToListWithLimitAndRV0(t *testing.T) {
 
 	// Inject error to underlying layer and check if cacher is not bypassed.
 	backingStorage.err = errDummy
-	err := cacher.GetToList(context.TODO(), "pods/ns", "0", pred, result)
+	err := cacher.GetToList(context.TODO(), "pods/ns", storage.MinimumRV("0"), pred, result)
 	if err != nil {
 		t.Errorf("GetToList with Limit and RV=0 should be served from cache: %v", err)
 	}
 
-	err = cacher.GetToList(context.TODO(), "pods/ns", "", pred, result)
+	err = cacher.GetToList(context.TODO(), "pods/ns", storage.MinimumRV(""), pred, result)
 	if err != errDummy {
 		t.Errorf("List with Limit without RV=0 should bypass cacher: %v", err)
 	}

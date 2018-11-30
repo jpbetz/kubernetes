@@ -303,6 +303,7 @@ func (e *Store) List(ctx context.Context, options *metainternalversion.ListOptio
 // ListPredicate returns a list of all the items matching the given
 // SelectionPredicate.
 func (e *Store) ListPredicate(ctx context.Context, p storage.SelectionPredicate, options *metainternalversion.ListOptions) (runtime.Object, error) {
+	//TODO(jpbetz): handle both exact and minimum RV semantics
 	if options == nil {
 		// By default we should serve the request from etcd.
 		options = &metainternalversion.ListOptions{ResourceVersion: ""}
@@ -314,13 +315,13 @@ func (e *Store) ListPredicate(ctx context.Context, p storage.SelectionPredicate,
 	qualifiedResource := e.qualifiedResourceFromContext(ctx)
 	if name, ok := p.MatchesSingle(); ok {
 		if key, err := e.KeyFunc(ctx, name); err == nil {
-			err := e.Storage.GetToList(ctx, key, options.ResourceVersion, p, list)
+			err := e.Storage.GetToList(ctx, key, storage.MinimumRV(options.ResourceVersion), p, list)
 			return list, storeerr.InterpretListError(err, qualifiedResource)
 		}
 		// if we cannot extract a key based on the current context, the optimization is skipped
 	}
 
-	err := e.Storage.List(ctx, e.KeyRootFunc(ctx), options.ResourceVersion, p, list)
+	err := e.Storage.List(ctx, e.KeyRootFunc(ctx), storage.MinimumRV(options.ResourceVersion), p, list)
 	return list, storeerr.InterpretListError(err, qualifiedResource)
 }
 
@@ -357,7 +358,7 @@ func (e *Store) Create(ctx context.Context, obj runtime.Object, createValidation
 		if !kubeerr.IsAlreadyExists(err) {
 			return nil, err
 		}
-		if errGet := e.Storage.Get(ctx, key, "", out, false); errGet != nil {
+		if errGet := e.Storage.Get(ctx, key, storage.MinimumRV(""), out, false); errGet != nil {
 			return nil, err
 		}
 		accessor, errGetAcc := meta.Accessor(out)
@@ -407,7 +408,7 @@ func (e *Store) WaitForInitialized(ctx context.Context, obj runtime.Object) (run
 		return nil, err
 	}
 	qualifiedResource := e.qualifiedResourceFromContext(ctx)
-	w, err := e.Storage.Watch(ctx, key, accessor.GetResourceVersion(), storage.SelectionPredicate{
+	w, err := e.Storage.Watch(ctx, key, storage.MinimumRV(accessor.GetResourceVersion()), storage.SelectionPredicate{
 		Label: labels.Everything(),
 		Field: fields.Everything(),
 
@@ -684,7 +685,7 @@ func (e *Store) Get(ctx context.Context, name string, options *metav1.GetOptions
 	if err != nil {
 		return nil, err
 	}
-	if err := e.Storage.Get(ctx, key, options.ResourceVersion, obj, false); err != nil {
+	if err := e.Storage.Get(ctx, key, storage.MinimumRV(options.ResourceVersion), obj, false); err != nil {
 		return nil, storeerr.InterpretGetError(err, e.qualifiedResourceFromContext(ctx), name)
 	}
 	if e.Decorator != nil {
@@ -961,7 +962,7 @@ func (e *Store) Delete(ctx context.Context, name string, options *metav1.DeleteO
 	}
 	obj := e.NewFunc()
 	qualifiedResource := e.qualifiedResourceFromContext(ctx)
-	if err := e.Storage.Get(ctx, key, "", obj, false); err != nil {
+	if err := e.Storage.Get(ctx, key, storage.MinimumRV(""), obj, false); err != nil {
 		return nil, false, storeerr.InterpretDeleteError(err, qualifiedResource, name)
 	}
 	// support older consumers of delete by treating "nil" as delete immediately
@@ -1172,11 +1173,11 @@ func (e *Store) Watch(ctx context.Context, options *metainternalversion.ListOpti
 		resourceVersion = options.ResourceVersion
 		predicate.IncludeUninitialized = options.IncludeUninitialized
 	}
-	return e.WatchPredicate(ctx, predicate, resourceVersion)
+	return e.WatchPredicate(ctx, predicate, storage.MinimumRV(resourceVersion))
 }
 
 // WatchPredicate starts a watch for the items that matches.
-func (e *Store) WatchPredicate(ctx context.Context, p storage.SelectionPredicate, resourceVersion string) (watch.Interface, error) {
+func (e *Store) WatchPredicate(ctx context.Context, p storage.SelectionPredicate, resourceVersion storage.ResourceVersionPredicate) (watch.Interface, error) {
 	if name, ok := p.MatchesSingle(); ok {
 		if key, err := e.KeyFunc(ctx, name); err == nil {
 			w, err := e.Storage.Watch(ctx, key, resourceVersion, p)

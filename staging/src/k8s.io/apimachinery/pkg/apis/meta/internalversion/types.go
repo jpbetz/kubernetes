@@ -44,6 +44,8 @@ type ListOptions struct {
 	// - if unset, then the result is returned from remote storage based on quorum-read flag;
 	// - if it's 0, then we simply return what we currently have in cache, no guarantee;
 	// - if set to non zero, then the result is at least as fresh as given rv.
+	// TODO(jpbetz): Above documentation assumes the presence of the watch cache, but that's not always the case, and when the cache is absent the semantics change to "(almost) exact RV".
+	// TODO(jpbetz): Add flag here to toggle to exactRV semantics when they are desired? See also staging/src/k8s.io/apiserver/pkg/registry/generic/registry/store.go:ListPredicate()
 	ResourceVersion string
 	// Timeout for the list/watch call.
 	TimeoutSeconds *int64

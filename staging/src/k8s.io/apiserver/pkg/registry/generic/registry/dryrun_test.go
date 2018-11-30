@@ -68,7 +68,7 @@ func TestDryRunCreateDoesntCreate(t *testing.T) {
 		t.Fatalf("Failed to create new dry-run object: %v", err)
 	}
 
-	err = s.Get(context.Background(), "key", "", out, false)
+	err = s.Get(context.Background(), "key", storage.MinimumRV(""), out, false)
 	if e, ok := err.(*storage.StorageError); !ok || e.Code != storage.ErrCodeKeyNotFound {
 		t.Errorf("Expected key to be not found, error: %v", err)
 	}
@@ -184,7 +184,7 @@ func TestDryRunUpdateDoesntUpdate(t *testing.T) {
 		t.Fatalf("Failed to dry-run update: %v", err)
 	}
 	out := UnstructuredOrDie(`{}`)
-	err = s.Get(context.Background(), "key", "", out, false)
+	err = s.Get(context.Background(), "key", storage.MinimumRV(""), out, false)
 	if !reflect.DeepEqual(created, out) {
 		t.Fatalf("Returned object %q different from expected %q", created, out)
 	}
@@ -238,7 +238,7 @@ func TestDryRunDeleteDoesntDelete(t *testing.T) {
 		t.Fatalf("Failed to dry-run delete the object: %v", err)
 	}
 
-	err = s.Get(context.Background(), "key", "", out, false)
+	err = s.Get(context.Background(), "key", storage.MinimumRV(""), out, false)
 	if err != nil {
 		t.Fatalf("Failed to retrieve dry-run deleted object: %v", err)
 	}

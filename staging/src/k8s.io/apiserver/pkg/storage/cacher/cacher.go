@@ -289,8 +289,9 @@ func (c *Cacher) Delete(ctx context.Context, key string, out runtime.Object, pre
 }
 
 // Watch implements storage.Interface.
-func (c *Cacher) Watch(ctx context.Context, key string, resourceVersion string, pred storage.SelectionPredicate) (watch.Interface, error) {
-	watchRV, err := c.versioner.ParseResourceVersion(resourceVersion)
+func (c *Cacher) Watch(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, pred storage.SelectionPredicate) (watch.Interface, error) {
+	//TODO(jpbetz): handle both exact and minimum RV semantics
+	watchRV, err := c.versioner.ParseResourceVersion(resourceVersion.ResourceVersion)
 	if err != nil {
 		return nil, err
 	}
@@ -346,13 +347,14 @@ func (c *Cacher) Watch(ctx context.Context, key string, resourceVersion string, 
 }
 
 // WatchList implements storage.Interface.
-func (c *Cacher) WatchList(ctx context.Context, key string, resourceVersion string, pred storage.SelectionPredicate) (watch.Interface, error) {
+func (c *Cacher) WatchList(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, pred storage.SelectionPredicate) (watch.Interface, error) {
 	return c.Watch(ctx, key, resourceVersion, pred)
 }
 
 // Get implements storage.Interface.
-func (c *Cacher) Get(ctx context.Context, key string, resourceVersion string, objPtr runtime.Object, ignoreNotFound bool) error {
-	if resourceVersion == "" {
+func (c *Cacher) Get(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, objPtr runtime.Object, ignoreNotFound bool) error {
+	//TODO(jpbetz): handle both exact and minimum RV semantics
+	if resourceVersion.ResourceVersion == "" {
 		// If resourceVersion is not specified, serve it from underlying
 		// storage (for backward compatibility).
 		return c.storage.Get(ctx, key, resourceVersion, objPtr, ignoreNotFound)
@@ -361,7 +363,7 @@ func (c *Cacher) Get(ctx context.Context, key string, resourceVersion string, ob
 	// If resourceVersion is specified, serve it from cache.
 	// It's guaranteed that the returned value is at least that
 	// fresh as the given resourceVersion.
-	getRV, err := c.versioner.ParseResourceVersion(resourceVersion)
+	getRV, err := c.versioner.ParseResourceVersion(resourceVersion.ResourceVersion)
 	if err != nil {
 		return err
 	}
@@ -402,11 +404,12 @@ func (c *Cacher) Get(ctx context.Context, key string, resourceVersion string, ob
 }
 
 // GetToList implements storage.Interface.
-func (c *Cacher) GetToList(ctx context.Context, key string, resourceVersion string, pred storage.SelectionPredicate, listObj runtime.Object) error {
+func (c *Cacher) GetToList(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, pred storage.SelectionPredicate, listObj runtime.Object) error {
+	//TODO(jpbetz): handle both exact and minimum RV semantics
 	pagingEnabled := utilfeature.DefaultFeatureGate.Enabled(features.APIListChunking)
 	hasContinuation := pagingEnabled && len(pred.Continue) > 0
-	hasLimit := pagingEnabled && pred.Limit > 0 && resourceVersion != "0"
-	if resourceVersion == "" || hasContinuation || hasLimit {
+	hasLimit := pagingEnabled && pred.Limit > 0 && resourceVersion.ResourceVersion != "0"
+	if resourceVersion.ResourceVersion == "" || hasContinuation || hasLimit {
 		// If resourceVersion is not specified, serve it from underlying
 		// storage (for backward compatibility). If a continuation is
 		// requested, serve it from the underlying storage as well.
@@ -419,7 +422,7 @@ func (c *Cacher) GetToList(ctx context.Context, key string, resourceVersion stri
 	// If resourceVersion is specified, serve it from cache.
 	// It's guaranteed that the returned value is at least that
 	// fresh as the given resourceVersion.
-	listRV, err := c.versioner.ParseResourceVersion(resourceVersion)
+	listRV, err := c.versioner.ParseResourceVersion(resourceVersion.ResourceVersion)
 	if err != nil {
 		return err
 	}
@@ -471,11 +474,12 @@ func (c *Cacher) GetToList(ctx context.Context, key string, resourceVersion stri
 }
 
 // List implements storage.Interface.
-func (c *Cacher) List(ctx context.Context, key string, resourceVersion string, pred storage.SelectionPredicate, listObj runtime.Object) error {
+func (c *Cacher) List(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, pred storage.SelectionPredicate, listObj runtime.Object) error {
+	//TODO(jpbetz): handle both exact and minimum RV semantics
 	pagingEnabled := utilfeature.DefaultFeatureGate.Enabled(features.APIListChunking)
 	hasContinuation := pagingEnabled && len(pred.Continue) > 0
-	hasLimit := pagingEnabled && pred.Limit > 0 && resourceVersion != "0"
-	if resourceVersion == "" || hasContinuation || hasLimit {
+	hasLimit := pagingEnabled && pred.Limit > 0 && resourceVersion.ResourceVersion != "0"
+	if resourceVersion.ResourceVersion == "" || hasContinuation || hasLimit {
 		// If resourceVersion is not specified, serve it from underlying
 		// storage (for backward compatibility). If a continuation is
 		// requested, serve it from the underlying storage as well.
@@ -488,7 +492,7 @@ func (c *Cacher) List(ctx context.Context, key string, resourceVersion string, p
 	// If resourceVersion is specified, serve it from cache.
 	// It's guaranteed that the returned value is at least that
 	// fresh as the given resourceVersion.
-	listRV, err := c.versioner.ParseResourceVersion(resourceVersion)
+	listRV, err := c.versioner.ParseResourceVersion(resourceVersion.ResourceVersion)
 	if err != nil {
 		return err
 	}
@@ -727,8 +731,10 @@ func newCacherListerWatcher(storage storage.Interface, resourcePrefix string, ne
 
 // Implements cache.ListerWatcher interface.
 func (lw *cacherListerWatcher) List(options metav1.ListOptions) (runtime.Object, error) {
+	//TODO(jpbetz): handle both exact and minimum RV semantics
 	list := lw.newListFunc()
-	if err := lw.storage.List(context.TODO(), lw.resourcePrefix, "", storage.Everything, list); err != nil {
+	//TODO(jpbetz): Why "" RV here? Shouldn't the one from ListOptions have been used? Might be a reason..
+	if err := lw.storage.List(context.TODO(), lw.resourcePrefix, storage.MinimumRV(""), storage.Everything, list); err != nil {
 		return nil, err
 	}
 	return list, nil
@@ -736,7 +742,8 @@ func (lw *cacherListerWatcher) List(options metav1.ListOptions) (runtime.Object,
 
 // Implements cache.ListerWatcher interface.
 func (lw *cacherListerWatcher) Watch(options metav1.ListOptions) (watch.Interface, error) {
-	return lw.storage.WatchList(context.TODO(), lw.resourcePrefix, options.ResourceVersion, storage.Everything)
+	//TODO(jpbetz): handle both exact and minimum RV semantics
+	return lw.storage.WatchList(context.TODO(), lw.resourcePrefix, storage.MinimumRV(options.ResourceVersion), storage.Everything)
 }
 
 // errWatcher implements watch.Interface to return a single error
