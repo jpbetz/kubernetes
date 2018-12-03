@@ -166,7 +166,7 @@ func TestEvents(t *testing.T) {
 
 	// Test for Added event.
 	{
-		_, err := store.GetAllEventsSince(1)
+		_, err := store.GetAllEventsSince(storage.MinimumRV("1"))
 		if err == nil {
 			t.Errorf("expected error too old")
 		}
@@ -175,7 +175,7 @@ func TestEvents(t *testing.T) {
 		}
 	}
 	{
-		result, err := store.GetAllEventsSince(2)
+		result, err := store.GetAllEventsSince(storage.MinimumRV("2"))
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -199,13 +199,13 @@ func TestEvents(t *testing.T) {
 
 	// Test with not full cache.
 	{
-		_, err := store.GetAllEventsSince(1)
+		_, err := store.GetAllEventsSince(storage.MinimumRV("1"))
 		if err == nil {
 			t.Errorf("expected error too old")
 		}
 	}
 	{
-		result, err := store.GetAllEventsSince(3)
+		result, err := store.GetAllEventsSince(storage.MinimumRV("3"))
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -233,13 +233,13 @@ func TestEvents(t *testing.T) {
 
 	// Test with full cache - there should be elements from 5 to 9.
 	{
-		_, err := store.GetAllEventsSince(3)
+		_, err := store.GetAllEventsSince(storage.MinimumRV("3"))
 		if err == nil {
 			t.Errorf("expected error too old")
 		}
 	}
 	{
-		result, err := store.GetAllEventsSince(4)
+		result, err := store.GetAllEventsSince(storage.MinimumRV("4"))
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -258,7 +258,7 @@ func TestEvents(t *testing.T) {
 	store.Delete(makeTestPod("pod", uint64(10)))
 
 	{
-		result, err := store.GetAllEventsSince(9)
+		result, err := store.GetAllEventsSince(storage.MinimumRV("9"))
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -288,13 +288,13 @@ func TestMarker(t *testing.T) {
 		makeTestPod("pod2", 9),
 	}, "9")
 
-	_, err := store.GetAllEventsSince(8)
+	_, err := store.GetAllEventsSince(storage.MinimumRV("8"))
 	if err == nil || !strings.Contains(err.Error(), "too old resource version") {
 		t.Errorf("unexpected error: %v", err)
 	}
 	// Getting events from 8 should return no events,
 	// even though there is a marker there.
-	result, err := store.GetAllEventsSince(9)
+	result, err := store.GetAllEventsSince(storage.MinimumRV("9"))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -305,7 +305,7 @@ func TestMarker(t *testing.T) {
 	pod := makeTestPod("pods", 12)
 	store.Add(pod)
 	// Getting events from 8 should still work and return one event.
-	result, err = store.GetAllEventsSince(9)
+	result, err = store.GetAllEventsSince(storage.MinimumRV("9"))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

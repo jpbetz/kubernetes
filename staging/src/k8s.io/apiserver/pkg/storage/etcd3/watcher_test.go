@@ -94,7 +94,7 @@ func testWatch(t *testing.T, recursive bool) {
 		},
 	}}
 	for i, tt := range tests {
-		w, err := store.watch(ctx, tt.key, "0", tt.pred, recursive)
+		w, err := store.watch(ctx, tt.key, storage.MinimumRV("0"), tt.pred, recursive)
 		if err != nil {
 			t.Fatalf("Watch failed: %v", err)
 		}
@@ -246,7 +246,7 @@ func TestWatchContextCancel(t *testing.T) {
 	cancel()
 	// When we watch with a canceled context, we should detect that it's context canceled.
 	// We won't take it as error and also close the watcher.
-	w, err := store.watcher.Watch(canceledCtx, "/abc", 0, false, storage.Everything)
+	w, err := store.watcher.Watch(canceledCtx, "/abc", storage.MinimumRV("0"), false, storage.Everything)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -265,7 +265,7 @@ func TestWatchErrResultNotBlockAfterCancel(t *testing.T) {
 	origCtx, store, cluster := testSetup(t)
 	defer cluster.Terminate(t)
 	ctx, cancel := context.WithCancel(origCtx)
-	w := store.watcher.createWatchChan(ctx, "/abc", 0, false, storage.Everything)
+	w := store.watcher.createWatchChan(ctx, "/abc", storage.MinimumRV("0"), 0, false, storage.Everything)
 	// make resutlChan and errChan blocking to ensure ordering.
 	w.resultChan = make(chan watch.Event)
 	w.errChan = make(chan error)

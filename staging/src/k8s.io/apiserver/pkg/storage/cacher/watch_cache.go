@@ -415,7 +415,12 @@ func (w *watchCache) SetOnEvent(onEvent func(*watchCacheEvent)) {
 	w.onEvent = onEvent
 }
 
-func (w *watchCache) GetAllEventsSinceThreadUnsafe(resourceVersion uint64) ([]*watchCacheEvent, error) {
+func (w *watchCache) GetAllEventsSinceThreadUnsafe(resourceVersion storage.ResourceVersionPredicate) ([]*watchCacheEvent, error) {
+	watchRV, err := w.versioner.ParseResourceVersion(resourceVersion.ResourceVersion)
+	if err != nil {
+		return nil, err
+	}
+
 	size := w.endIndex - w.startIndex
 	var oldest uint64
 	switch {
@@ -437,7 +442,7 @@ func (w *watchCache) GetAllEventsSinceThreadUnsafe(resourceVersion uint64) ([]*w
 		return nil, fmt.Errorf("watch cache isn't correctly initialized")
 	}
 
-	if resourceVersion == 0 {
+	if resourceVersion.RequiresMinimum() && watchRV == 0 {
 		// resourceVersion = 0 means that we don't require any specific starting point
 		// and we would like to start watching from ~now.
 		// However, to keep backward compatibility, we additionally need to return the
@@ -467,14 +472,15 @@ func (w *watchCache) GetAllEventsSinceThreadUnsafe(resourceVersion uint64) ([]*w
 		}
 		return result, nil
 	}
-	if resourceVersion < oldest-1 {
-		return nil, errors.NewGone(fmt.Sprintf("too old resource version: %d (%d)", resourceVersion, oldest-1))
+	if watchRV < oldest-1 {
+		return nil, errors.NewGone(fmt.Sprintf("too old resource version: %d (%d)", watchRV, oldest-1))
 	}
 
 	// Binary search the smallest index at which resourceVersion is greater than the given one.
 	f := func(i int) bool {
-		return w.cache[(w.startIndex+i)%w.capacity].resourceVersion > resourceVersion
+		return w.cache[(w.startIndex+i)%w.capacity].resourceVersion > watchRV
 	}
+	// TODO(jpbetz): I don't think additional check to ensure RV+1 constraint is exactly matched is possible since RV is global and watches are non-global and might have "holes".
 	first := sort.Search(size, f)
 	result := make([]*watchCacheEvent, size-first)
 	for i := 0; i < size-first; i++ {
@@ -483,7 +489,7 @@ func (w *watchCache) GetAllEventsSinceThreadUnsafe(resourceVersion uint64) ([]*w
 	return result, nil
 }
 
-func (w *watchCache) GetAllEventsSince(resourceVersion uint64) ([]*watchCacheEvent, error) {
+func (w *watchCache) GetAllEventsSince(resourceVersion storage.ResourceVersionPredicate) ([]*watchCacheEvent, error) {
 	w.RLock()
 	defer w.RUnlock()
 	return w.GetAllEventsSinceThreadUnsafe(resourceVersion)

@@ -70,6 +70,7 @@ type watcher struct {
 type watchChan struct {
 	watcher           *watcher
 	key               string
+	revPred           storage.ResourceVersionPredicate
 	initialRev        int64
 	recursive         bool
 	internalPred      storage.SelectionPredicate
@@ -96,19 +97,26 @@ func newWatcher(client *clientv3.Client, codec runtime.Codec, versioner storage.
 // If recursive is false, it watches on given key.
 // If recursive is true, it watches any children and directories under the key, excluding the root key itself.
 // pred must be non-nil. Only if pred matches the change, it will be returned.
-func (w *watcher) Watch(ctx context.Context, key string, rev int64, recursive bool, pred storage.SelectionPredicate) (watch.Interface, error) {
+func (w *watcher) Watch(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, recursive bool, pred storage.SelectionPredicate) (watch.Interface, error) {
+	rev, err := w.versioner.ParseResourceVersion(resourceVersion.ResourceVersion)
+	if err != nil {
+		return nil, err
+	}
+
 	if recursive && !strings.HasSuffix(key, "/") {
 		key += "/"
 	}
-	wc := w.createWatchChan(ctx, key, rev, recursive, pred)
+	wc := w.createWatchChan(ctx, key, resourceVersion, int64(rev), recursive, pred)
 	go wc.run()
 	return wc, nil
 }
 
-func (w *watcher) createWatchChan(ctx context.Context, key string, rev int64, recursive bool, pred storage.SelectionPredicate) *watchChan {
+// TODO(jpbetz): Cleanup duplication of data in resourceVersion and rev, might be that only option is to improve naming..
+func (w *watcher) createWatchChan(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, rev int64, recursive bool, pred storage.SelectionPredicate) *watchChan {
 	wc := &watchChan{
 		watcher:           w,
 		key:               key,
+		revPred:           resourceVersion,
 		initialRev:        rev,
 		recursive:         recursive,
 		internalPred:      pred,
@@ -189,7 +197,7 @@ func (wc *watchChan) sync() error {
 // - get current objects if initialRev=0; set initialRev to current rev
 // - watch on given key and send events to process.
 func (wc *watchChan) startWatching(watchClosedCh chan struct{}) {
-	if wc.initialRev == 0 {
+	if wc.revPred.RequiresMinimum() && wc.initialRev == 0 {
 		if err := wc.sync(); err != nil {
 			klog.Errorf("failed to sync with latest state: %v", err)
 			wc.sendError(err)

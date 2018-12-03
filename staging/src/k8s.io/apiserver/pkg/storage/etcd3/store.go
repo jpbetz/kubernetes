@@ -111,9 +111,28 @@ func (s *store) Versioner() storage.Versioner {
 // Get implements storage.Interface.Get.
 func (s *store) Get(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, out runtime.Object, ignoreNotFound bool) error {
 	key = path.Join(s.pathPrefix, key)
-	getResp, err := s.client.KV.Get(ctx, key, s.getOps...)
+	options := s.getOps
+	if resourceVersion.RequiresExact() {
+		fromRV, err := s.versioner.ParseResourceVersion(resourceVersion.ResourceVersion)
+		if err != nil {
+			return apierrors.NewBadRequest(fmt.Sprintf("invalid resource version: %v", err))
+		}
+		options = append(options, clientv3.WithRev(int64(fromRV)))
+	}
+	getResp, err := s.client.KV.Get(ctx, key, options...)
 	if err != nil {
 		return err
+	}
+
+	if resourceVersion.RequiresMinimum() {
+		fromRV, err := s.versioner.ParseResourceVersion(resourceVersion.ResourceVersion)
+		if err != nil {
+			return apierrors.NewBadRequest(fmt.Sprintf("invalid resource version: %v", err))
+		}
+		if getResp.Header.Revision < int64(fromRV) {
+			// TODO(jpbetz): Is this the correct error type for when a minimum RV request cannot be satisfied?
+			return apierrors.NewResourceExpired(expired)
+		}
 	}
 
 	if len(getResp.Kvs) == 0 {
@@ -379,9 +398,30 @@ func (s *store) GetToList(ctx context.Context, key string, resourceVersion stora
 	}
 
 	key = path.Join(s.pathPrefix, key)
+	// TODO(jpbetz): Avoid copy-paste-duplication here somehow?
+	options := s.getOps
+	if resourceVersion.RequiresExact() {
+		fromRV, err := s.versioner.ParseResourceVersion(resourceVersion.ResourceVersion)
+		if err != nil {
+			return apierrors.NewBadRequest(fmt.Sprintf("invalid resource version: %v", err))
+		}
+		options = append(options, clientv3.WithRev(int64(fromRV)))
+	}
 	getResp, err := s.client.KV.Get(ctx, key, s.getOps...)
 	if err != nil {
 		return err
+	}
+
+	// TODO(jpbetz): Avoid copy-paste-duplication here somehow?
+	if resourceVersion.RequiresMinimum() {
+		fromRV, err := s.versioner.ParseResourceVersion(resourceVersion.ResourceVersion)
+		if err != nil {
+			return apierrors.NewBadRequest(fmt.Sprintf("invalid resource version: %v", err))
+		}
+		if getResp.Header.Revision < int64(fromRV) {
+			// TODO(jpbetz): Is this the correct error type for when a minimum RV request cannot be satisfied?
+			return apierrors.NewResourceExpired(expired)
+		}
 	}
 
 	if len(getResp.Kvs) > 0 {
@@ -522,14 +562,12 @@ func (s *store) List(ctx context.Context, key string, resourceVersion storage.Re
 			returnedRV = continueRV
 		}
 	case s.pagingEnabled && pred.Limit > 0:
-		if len(resourceVersion.ResourceVersion) > 0 {
+		if resourceVersion.RequiresExact() {
 			fromRV, err := s.versioner.ParseResourceVersion(resourceVersion.ResourceVersion)
 			if err != nil {
 				return apierrors.NewBadRequest(fmt.Sprintf("invalid resource version: %v", err))
 			}
-			if fromRV > 0 {
-				options = append(options, clientv3.WithRev(int64(fromRV)))
-			}
+			options = append(options, clientv3.WithRev(int64(fromRV)))
 			returnedRV = int64(fromRV)
 		}
 
@@ -537,14 +575,12 @@ func (s *store) List(ctx context.Context, key string, resourceVersion storage.Re
 		options = append(options, clientv3.WithRange(rangeEnd))
 
 	default:
-		if len(resourceVersion.ResourceVersion) > 0 {
+		if resourceVersion.RequiresExact() {
 			fromRV, err := s.versioner.ParseResourceVersion(resourceVersion.ResourceVersion)
 			if err != nil {
 				return apierrors.NewBadRequest(fmt.Sprintf("invalid resource version: %v", err))
 			}
-			if fromRV > 0 {
-				options = append(options, clientv3.WithRev(int64(fromRV)))
-			}
+			options = append(options, clientv3.WithRev(int64(fromRV)))
 			returnedRV = int64(fromRV)
 		}
 
@@ -558,6 +594,16 @@ func (s *store) List(ctx context.Context, key string, resourceVersion storage.Re
 		getResp, err := s.client.KV.Get(ctx, key, options...)
 		if err != nil {
 			return interpretListError(err, len(pred.Continue) > 0, continueKey, keyPrefix)
+		}
+		if resourceVersion.RequiresMinimum() {
+			fromRV, err := s.versioner.ParseResourceVersion(resourceVersion.ResourceVersion)
+			if err != nil {
+				return apierrors.NewBadRequest(fmt.Sprintf("invalid resource version: %v", err))
+			}
+			if getResp.Header.Revision < int64(fromRV) {
+				// TODO(jpbetz): Is this the correct error type for when a minimum RV request cannot be satisfied?
+				return apierrors.NewResourceExpired(expired)
+			}
 		}
 		hasMore = getResp.More
 
@@ -656,22 +702,18 @@ func growSlice(v reflect.Value, maxCapacity int, sizes ...int) {
 // Watch implements storage.Interface.Watch.
 func (s *store) Watch(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, pred storage.SelectionPredicate) (watch.Interface, error) {
 	//TODO(jpbetz): handle both exact and minimum RV semantics
-	return s.watch(ctx, key, resourceVersion.ResourceVersion, pred, false)
+	return s.watch(ctx, key, resourceVersion, pred, false)
 }
 
 // WatchList implements storage.Interface.WatchList.
 func (s *store) WatchList(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, pred storage.SelectionPredicate) (watch.Interface, error) {
 	//TODO(jpbetz): handle both exact and minimum RV semantics
-	return s.watch(ctx, key, resourceVersion.ResourceVersion, pred, true)
+	return s.watch(ctx, key, resourceVersion, pred, true)
 }
 
-func (s *store) watch(ctx context.Context, key string, rv string, pred storage.SelectionPredicate, recursive bool) (watch.Interface, error) {
-	rev, err := s.versioner.ParseResourceVersion(rv)
-	if err != nil {
-		return nil, err
-	}
+func (s *store) watch(ctx context.Context, key string, resourceVersion storage.ResourceVersionPredicate, pred storage.SelectionPredicate, recursive bool) (watch.Interface, error) {
 	key = path.Join(s.pathPrefix, key)
-	return s.watcher.Watch(ctx, key, int64(rev), recursive, pred)
+	return s.watcher.Watch(ctx, key, resourceVersion, recursive, pred)
 }
 
 func (s *store) getState(getResp *clientv3.GetResponse, key string, v reflect.Value, ignoreNotFound bool) (*objState, error) {

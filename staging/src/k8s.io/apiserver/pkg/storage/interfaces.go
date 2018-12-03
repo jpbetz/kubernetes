@@ -143,6 +143,14 @@ type ResourceVersionPredicate struct {
 	ResourceVersion string
 }
 
+func (p ResourceVersionPredicate) RequiresExact() bool {
+	return p.MatchRule == ExactResourceVersion
+}
+
+func (p ResourceVersionPredicate) RequiresMinimum() bool {
+	return p.MatchRule == MinimumResourceVersion
+}
+
 func ExactRV(resourceVersion string) ResourceVersionPredicate {
 	return ResourceVersionPredicate{MatchRule: ExactResourceVersion, ResourceVersion: resourceVersion}
 }
