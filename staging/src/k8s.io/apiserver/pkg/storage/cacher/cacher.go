@@ -935,8 +935,9 @@ func (c *cacheWatcher) stop() {
 	defer c.Unlock()
 	if !c.stopped {
 		c.stopped = true
+		// c.input should never be closed, all senders and receivers should stop using the
+		// channel when c.done is closed, at let c.input be cleaned up by GC
 		close(c.done)
-		close(c.input)
 	}
 }
 
@@ -944,6 +945,8 @@ func (c *cacheWatcher) add(event *watchCacheEvent, timer *time.Timer, budget *ti
 	// Try to send the event immediately, without blocking.
 	select {
 	case c.input <- event:
+		return
+	case <-c.done:
 		return
 	default:
 	}
@@ -969,6 +972,7 @@ func (c *cacheWatcher) add(event *watchCacheEvent, timer *time.Timer, budget *ti
 		// we simply terminate it.
 		klog.V(1).Infof("Forcing watcher close due to unresponsiveness: %v", reflect.TypeOf(event.Object).String())
 		c.forget()
+	case <-c.done:
 	}
 
 	budget.returnUnused(timeout - time.Since(startTime))
@@ -1072,6 +1076,8 @@ func (c *cacheWatcher) process(ctx context.Context, initEvents []*watchCacheEven
 				c.sendWatchCacheEvent(event)
 			}
 		case <-ctx.Done():
+			return
+		case <-c.done:
 			return
 		}
 	}
