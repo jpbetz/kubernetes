@@ -612,7 +612,6 @@ func (e *Store) qualifiedResourceFromContext(ctx context.Context) schema.GroupRe
 
 var (
 	errAlreadyDeleting   = fmt.Errorf("abort delete")
-	errDeleteNow         = fmt.Errorf("delete now")
 	errEmptiedFinalizers = fmt.Errorf("emptied finalizers")
 )
 
@@ -786,6 +785,7 @@ func (e *Store) updateForGracefulDeletionAndFinalizers(ctx context.Context, name
 	lastGraceful := int64(0)
 	var pendingFinalizers bool
 	out = e.NewFunc()
+	var deleteNow bool
 	err = e.Storage.GuaranteedUpdate(
 		ctx,
 		key,
@@ -825,7 +825,8 @@ func (e *Store) updateForGracefulDeletionAndFinalizers(ctx context.Context, name
 					}
 					return existing, nil
 				}
-				return nil, errDeleteNow
+				deleteNow = true
+				return existing, nil
 			}
 			lastGraceful = *options.GracePeriodSeconds
 			lastExisting = existing
@@ -836,6 +837,11 @@ func (e *Store) updateForGracefulDeletionAndFinalizers(ctx context.Context, name
 	switch err {
 	case nil:
 		// If there are pending finalizers, we never delete the object immediately.
+		if deleteNow {
+			// we've updated the object to have a zero grace period, or it's already at 0, so
+			// we should fall through and truly delete the object.
+			return nil, false, true, out, lastExisting
+		}
 		if pendingFinalizers {
 			return nil, false, false, out, lastExisting
 		}
@@ -850,10 +856,6 @@ func (e *Store) updateForGracefulDeletionAndFinalizers(ctx context.Context, name
 		// https://github.com/kubernetes/kubernetes/issues/19403 for
 		// details.
 		return nil, true, true, out, lastExisting
-	case errDeleteNow:
-		// we've updated the object to have a zero grace period, or it's already at 0, so
-		// we should fall through and truly delete the object.
-		return nil, false, true, out, lastExisting
 	case errAlreadyDeleting:
 		out, err = e.finalizeDelete(ctx, in, true)
 		return err, false, false, out, lastExisting
