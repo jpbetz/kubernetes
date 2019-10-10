@@ -260,7 +260,7 @@ const (
 	MinExternalEtcdVersion = "3.2.18"
 
 	// DefaultEtcdVersion indicates the default etcd version that kubeadm uses
-	DefaultEtcdVersion = "3.3.15-0"
+	DefaultEtcdVersion = "3.3.16-0"
 
 	// PauseVersion indicates the default pause image version for kubeadm
 	PauseVersion = "3.1"
