@@ -34,10 +34,10 @@ import (
 	prototesting "k8s.io/kube-openapi/pkg/util/proto/testing"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	apitesting "k8s.io/kubernetes/pkg/api/testing"
-	"sigs.k8s.io/structured-merge-diff/v2/fieldpath"
-	"sigs.k8s.io/structured-merge-diff/v2/merge"
-	"sigs.k8s.io/structured-merge-diff/v2/typed"
-	"sigs.k8s.io/structured-merge-diff/v2/value"
+	"sigs.k8s.io/structured-merge-diff/v3/fieldpath"
+	"sigs.k8s.io/structured-merge-diff/v3/merge"
+	"sigs.k8s.io/structured-merge-diff/v3/typed"
+	"sigs.k8s.io/structured-merge-diff/v3/value"
 	"sigs.k8s.io/yaml"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -565,15 +565,15 @@ func BenchmarkConvertObjectToTyped(b *testing.B) {
 					}
 				}
 			})
-			// b.Run("unstructured", func(b *testing.B) {
-			// 	b.ReportAllocs()
-			// 	for n := 0; n < b.N; n++ {
-			// 		_, err := typeConverter.ObjectToTyped(toUnstructured(b, obj))
-			// 		if err != nil {
-			// 			b.Errorf("Error in ObjectToTyped: %v", err)
-			// 		}
-			// 	}
-			// })
+			b.Run("unstructured", func(b *testing.B) {
+				b.ReportAllocs()
+				for n := 0; n < b.N; n++ {
+					_, err := typeConverter.ObjectToTyped(toUnstructured(b, obj))
+					if err != nil {
+						b.Errorf("Error in ObjectToTyped: %v", err)
+					}
+				}
+			})
 		})
 	}
 }
@@ -771,11 +771,11 @@ func BenchmarkMerge(b *testing.B) {
 				for n := 0; n < b.N; n++ {
 					utv1, err := typeConverter.ObjectToTyped(toUnstructured(b, obj))
 					if err != nil {
-						b.Errorf("Error in ObjectToTyped: %v", err)
+						b.Fatalf("Error in ObjectToTyped: %v", err)
 					}
 					utv2, err := typeConverter.ObjectToTyped(toUnstructured(b, obj))
 					if err != nil {
-						b.Errorf("Error in ObjectToTyped: %v", err)
+						b.Fatalf("Error in ObjectToTyped: %v", err)
 					}
 					_, err = utv1.Merge(utv2)
 					if err != nil {

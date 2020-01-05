@@ -634,6 +634,10 @@ func (q Quantity) MarshalJSON() ([]byte, error) {
 	return result, nil
 }
 
+func (q Quantity) ToUnstructured() interface{} {
+	return q.String()
+}
+
 // UnmarshalJSON implements the json.Unmarshaller interface.
 // TODO: Remove support for leading/trailing whitespace
 func (q *Quantity) UnmarshalJSON(value []byte) error {

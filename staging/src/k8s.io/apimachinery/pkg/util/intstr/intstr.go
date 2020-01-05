@@ -118,6 +118,17 @@ func (intstr IntOrString) MarshalJSON() ([]byte, error) {
 	}
 }
 
+func (intstr IntOrString) ToUnstructured() interface{} {
+	switch intstr.Type {
+	case Int:
+		return intstr.IntVal
+	case String:
+		return intstr.StrVal
+	default:
+		panic("impossible IntOrString.Type")
+	}
+}
+
 // OpenAPISchemaType is used by the kube-openapi generator when constructing
 // the OpenAPI spec of this type.
 //
