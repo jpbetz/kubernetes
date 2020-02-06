@@ -421,13 +421,28 @@ func BenchmarkNewObject(b *testing.B) {
 					APIVersion: "v1",
 				},
 			})
-
+			appliedObj := &unstructured.Unstructured{Object: map[string]interface{}{}}
+			if err := yaml.Unmarshal(test.obj, &appliedObj.Object); err != nil {
+				b.Fatalf("Failed to parse yaml object: %v", err)
+			}
 			b.Run("Update", func(b *testing.B) {
 				b.ReportAllocs()
 				b.ResetTimer()
 				for n := 0; n < b.N; n++ {
-					err := f.Update(newObj, "fieldmanager_test")
-					if err != nil {
+					if err := f.Update(newObj, "fieldmanager_test"); err != nil {
+						b.Fatal(err)
+					}
+					f.Reset()
+				}
+			})
+			b.Run("UpdateTwice", func(b *testing.B) {
+				b.ReportAllocs()
+				b.ResetTimer()
+				for n := 0; n < b.N; n++ {
+					if err := f.Update(newObj, "fieldmanager_test"); err != nil {
+						b.Fatal(err)
+					}
+					if err := f.Update(newObj, "fieldmanager_test_2"); err != nil {
 						b.Fatal(err)
 					}
 					f.Reset()
@@ -442,6 +457,19 @@ func BenchmarkNewObject(b *testing.B) {
 						b.Fatal(err)
 					}
 					f.Reset()
+				}
+			})
+			b.Run("Apply", func(b *testing.B) {
+				b.ReportAllocs()
+				b.ResetTimer()
+				for n := 0; n < b.N; n++ {
+					if err := f.Update(newObj, "fieldmanager_test"); err != nil {
+						b.Fatal(err)
+					}
+					// if err := f.Apply(appliedObj, "fieldmanager_test", false); err != nil {
+					// 	b.Fatal(err)
+					// }
+					// f.Reset()
 				}
 			})
 		})
@@ -674,40 +702,44 @@ func BenchmarkCompare(b *testing.B) {
 			typeConverter := NewFakeTypeConverter(m)
 			//var typeConverter internal.TypeConverter = internal.DeducedTypeConverter{}
 
-			tv1, err := typeConverter.ObjectToTyped(obj)
-			if err != nil {
-				b.Errorf("Error in ObjectToTyped: %v", err)
-			}
-			tv2, err := typeConverter.ObjectToTyped(obj)
-			if err != nil {
-				b.Errorf("Error in ObjectToTyped: %v", err)
-			}
-
 			b.Run("structured", func(b *testing.B) {
 				b.ReportAllocs()
-				for n := 0; n < b.N; n++ {
-					_, err = tv1.Compare(tv2)
-					if err != nil {
-						b.Errorf("Error in ObjectToTyped: %v", err)
+				b.RunParallel(func(pb *testing.PB) {
+					for pb.Next() {
+						tv1, err := typeConverter.ObjectToTyped(obj)
+						if err != nil {
+							b.Errorf("Error in ObjectToTyped: %v", err)
+						}
+						tv2, err := typeConverter.ObjectToTyped(obj)
+						if err != nil {
+							b.Errorf("Error in ObjectToTyped: %v", err)
+						}
+						_, err = tv1.Compare(tv2)
+						if err != nil {
+							b.Errorf("Error in ObjectToTyped: %v", err)
+						}
 					}
-				}
+				})
 			})
-			utv1, err := typeConverter.ObjectToTyped(toUnstructured(b, obj))
-			if err != nil {
-				b.Errorf("Error in ObjectToTyped: %v", err)
-			}
-			utv2, err := typeConverter.ObjectToTyped(toUnstructured(b, obj))
-			if err != nil {
-				b.Errorf("Error in ObjectToTyped: %v", err)
-			}
+
 			b.Run("unstructured", func(b *testing.B) {
 				b.ReportAllocs()
-				for n := 0; n < b.N; n++ {
-					_, err = utv1.Compare(utv2)
-					if err != nil {
-						b.Errorf("Error in ObjectToTyped: %v", err)
+				b.RunParallel(func(pb *testing.PB) {
+					for pb.Next() {
+						utv1, err := typeConverter.ObjectToTyped(toUnstructured(b, obj))
+						if err != nil {
+							b.Errorf("Error in ObjectToTyped: %v", err)
+						}
+						utv2, err := typeConverter.ObjectToTyped(toUnstructured(b, obj))
+						if err != nil {
+							b.Errorf("Error in ObjectToTyped: %v", err)
+						}
+						_, err = utv1.Compare(utv2)
+						if err != nil {
+							b.Errorf("Error in ObjectToTyped: %v", err)
+						}
 					}
-				}
+				})
 			})
 		})
 	}

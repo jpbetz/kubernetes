@@ -53,6 +53,11 @@ func (DeducedTypeConverter) ObjectToTyped(obj runtime.Object) (*typed.TypedValue
 	case *unstructured.Unstructured:
 		return typed.DeducedParseableType.FromUnstructured(o.UnstructuredContent())
 	default:
+		// u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
+		// if err != nil {
+		// 	return nil, err
+		// }
+		// return typed.DeducedParseableType.FromUnstructured(u)
 		return typed.DeducedParseableType.FromStructured(obj)
 	}
 }
@@ -90,6 +95,11 @@ func (c *typeConverter) ObjectToTyped(obj runtime.Object) (*typed.TypedValue, er
 	case *unstructured.Unstructured:
 		return t.FromUnstructured(o.UnstructuredContent())
 	default:
+		// u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
+		// if err != nil {
+		// 	return nil, err
+		// }
+		// return t.FromUnstructured(u)
 		return t.FromStructured(obj)
 	}
 }
