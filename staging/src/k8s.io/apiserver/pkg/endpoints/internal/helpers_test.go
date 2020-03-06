@@ -14,13 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package handlers
+package internal
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLazyTruncatedUserAgent(t *testing.T) {
