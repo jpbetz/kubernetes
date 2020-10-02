@@ -56,35 +56,35 @@ done
 # delimit by commas for the command
 GV_DIRS_CSV=$(IFS=',';echo "${GV_DIRS[*]// /,}";IFS=$)
 
-# This can be called with one flag, --verify-only, so it works for both the
-# update- and verify- scripts.
-${clientgen} --output-base "${KUBE_ROOT}/vendor" --output-package="k8s.io/client-go" --clientset-name="kubernetes" --input-base="k8s.io/api" --input="${GV_DIRS_CSV}" --go-header-file "${KUBE_ROOT}/hack/boilerplate/boilerplate.generatego.txt" "$@"
-
-listergen_external_apis=()
-kube::util::read-array listergen_external_apis < <(
-  cd "${KUBE_ROOT}/staging/src"
-  find k8s.io/api -name types.go -print0 | xargs -0 -n1 dirname | sort
-)
-listergen_external_apis_csv=$(IFS=,; echo "${listergen_external_apis[*]}")
-${listergen} --output-base "${KUBE_ROOT}/vendor" --output-package "k8s.io/client-go/listers" --input-dirs "${listergen_external_apis_csv}" --go-header-file "${KUBE_ROOT}/hack/boilerplate/boilerplate.generatego.txt" "$@"
-
-informergen_external_apis=()
-# because client-gen doesn't do policy/v1alpha1, we have to skip it too
-kube::util::read-array informergen_external_apis < <(
-  cd "${KUBE_ROOT}/staging/src"
-  find k8s.io/api -name types.go -print0 | xargs -0 -n1 dirname | sort | grep -v pkg.apis.policy.v1alpha1
-)
-informergen_external_apis_csv=$(IFS=,; echo "${informergen_external_apis[*]}")
-
-${informergen} \
-  --output-base "${KUBE_ROOT}/vendor" \
-  --output-package "k8s.io/client-go/informers" \
-  --single-directory \
-  --input-dirs "${informergen_external_apis_csv}" \
-  --versioned-clientset-package k8s.io/client-go/kubernetes \
-  --listers-package k8s.io/client-go/listers \
-  --go-header-file "${KUBE_ROOT}/hack/boilerplate/boilerplate.generatego.txt" \
-  "$@"
+## This can be called with one flag, --verify-only, so it works for both the
+## update- and verify- scripts.
+#${clientgen} --output-base "${KUBE_ROOT}/vendor" --output-package="k8s.io/client-go" --clientset-name="kubernetes" --input-base="k8s.io/api" --input="${GV_DIRS_CSV}" --go-header-file "${KUBE_ROOT}/hack/boilerplate/boilerplate.generatego.txt" "$@"
+#
+#listergen_external_apis=()
+#kube::util::read-array listergen_external_apis < <(
+#  cd "${KUBE_ROOT}/staging/src"
+#  find k8s.io/api -name types.go -print0 | xargs -0 -n1 dirname | sort
+#)
+#listergen_external_apis_csv=$(IFS=,; echo "${listergen_external_apis[*]}")
+#${listergen} --output-base "${KUBE_ROOT}/vendor" --output-package "k8s.io/client-go/listers" --input-dirs "${listergen_external_apis_csv}" --go-header-file "${KUBE_ROOT}/hack/boilerplate/boilerplate.generatego.txt" "$@"
+#
+#informergen_external_apis=()
+## because client-gen doesn't do policy/v1alpha1, we have to skip it too
+#kube::util::read-array informergen_external_apis < <(
+#  cd "${KUBE_ROOT}/staging/src"
+#  find k8s.io/api -name types.go -print0 | xargs -0 -n1 dirname | sort | grep -v pkg.apis.policy.v1alpha1
+#)
+#informergen_external_apis_csv=$(IFS=,; echo "${informergen_external_apis[*]}")
+#
+#${informergen} \
+#  --output-base "${KUBE_ROOT}/vendor" \
+#  --output-package "k8s.io/client-go/informers" \
+#  --single-directory \
+#  --input-dirs "${informergen_external_apis_csv}" \
+#  --versioned-clientset-package k8s.io/client-go/kubernetes \
+#  --listers-package k8s.io/client-go/listers \
+#  --go-header-file "${KUBE_ROOT}/hack/boilerplate/boilerplate.generatego.txt" \
+#  "$@"
 
 typebuildergen_external_apis=()
 # because client-gen doesn't do policy/v1alpha1, we have to skip it too
@@ -107,10 +107,10 @@ ${typebuildergen} \
 # You may add additional calls of code generators like set-gen above.
 
 # call generation on sub-project for now
-CODEGEN_PKG=./vendor/k8s.io/code-generator vendor/k8s.io/code-generator/hack/update-codegen.sh
-CODEGEN_PKG=./vendor/k8s.io/code-generator vendor/k8s.io/kube-aggregator/hack/update-codegen.sh
-CODEGEN_PKG=./vendor/k8s.io/code-generator vendor/k8s.io/sample-apiserver/hack/update-codegen.sh
-CODEGEN_PKG=./vendor/k8s.io/code-generator vendor/k8s.io/sample-controller/hack/update-codegen.sh
-CODEGEN_PKG=./vendor/k8s.io/code-generator vendor/k8s.io/apiextensions-apiserver/hack/update-codegen.sh
-CODEGEN_PKG=./vendor/k8s.io/code-generator vendor/k8s.io/metrics/hack/update-codegen.sh
-CODEGEN_PKG=./vendor/k8s.io/code-generator vendor/k8s.io/apiextensions-apiserver/examples/client-go/hack/update-codegen.sh
+#CODEGEN_PKG=./vendor/k8s.io/code-generator vendor/k8s.io/code-generator/hack/update-codegen.sh
+#CODEGEN_PKG=./vendor/k8s.io/code-generator vendor/k8s.io/kube-aggregator/hack/update-codegen.sh
+#CODEGEN_PKG=./vendor/k8s.io/code-generator vendor/k8s.io/sample-apiserver/hack/update-codegen.sh
+#CODEGEN_PKG=./vendor/k8s.io/code-generator vendor/k8s.io/sample-controller/hack/update-codegen.sh
+#CODEGEN_PKG=./vendor/k8s.io/code-generator vendor/k8s.io/apiextensions-apiserver/hack/update-codegen.sh
+#CODEGEN_PKG=./vendor/k8s.io/code-generator vendor/k8s.io/metrics/hack/update-codegen.sh
+#CODEGEN_PKG=./vendor/k8s.io/code-generator vendor/k8s.io/apiextensions-apiserver/examples/client-go/hack/update-codegen.sh

@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
+	"reflect"
 	"strings"
 
 	"k8s.io/gengo/args"
@@ -39,6 +40,7 @@ func NameSystems(pluralExceptions map[string]string) namer.NameSystems {
 		"private":            namer.NewPrivateNamer(0),
 		"raw":                namer.NewRawNamer("", nil),
 		"publicPlural":       namer.NewPublicPluralNamer(pluralExceptions),
+		"privatePlural":      namer.NewPrivatePluralNamer(pluralExceptions),
 		"allLowercasePlural": namer.NewAllLowercasePluralNamer(pluralExceptions),
 		"lowercaseSingular":  &lowercaseSingularNamer{},
 	}
@@ -77,24 +79,14 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 			// no types in this package had genclient
 			continue
 		}
+		if internal {
+			continue
+		}
 
 		var gv clientgentypes.GroupVersion
-		var internalGVPkg string
-
-		if internal {
-			lastSlash := strings.LastIndex(p.Path, "/")
-			if lastSlash == -1 {
-				klog.Fatalf("error constructing internal group version for package %q", p.Path)
-			}
-			gv.Group = clientgentypes.Group(p.Path[lastSlash+1:])
-			internalGVPkg = p.Path
-		} else {
-			parts := strings.Split(p.Path, "/")
-			gv.Group = clientgentypes.Group(parts[len(parts)-2])
-			gv.Version = clientgentypes.Version(parts[len(parts)-1])
-
-			internalGVPkg = strings.Join(parts[0:len(parts)-1], "/")
-		}
+		parts := strings.Split(p.Path, "/")
+		gv.Group = clientgentypes.Group(parts[len(parts)-2])
+		gv.Version = clientgentypes.Version(parts[len(parts)-1])
 		groupPackageName := strings.ToLower(gv.Group.NonEmpty())
 
 		// If there's a comment of the form "// +groupName=somegroup" or
@@ -104,16 +96,11 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 			gv.Group = clientgentypes.Group(strings.SplitN(override[0], ".", 2)[0])
 		}
 
-		// TODO(jpbetz): This needs to be the entire list of types defined in group, not just top level ones
 		var typesToGenerate []*types.Type
 		for _, t := range p.Types {
-			tags := util.MustParseClientGenTags(append(t.SecondClosestCommentLines, t.CommentLines...))
-			if !tags.GenerateClient { // TODO(jpbetz): filter to just APIs that have Update or Apply?
-				continue
-			}
 			typesToGenerate = append(typesToGenerate, t)
 		}
-		if len(typesToGenerate) == 0 {
+		if len(p.Types) == 0 {
 			continue
 		}
 		orderer := namer.Orderer{Namer: namer.NewPrivateNamer(0)}
@@ -132,17 +119,12 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 						},
 						outputPackage:  arguments.OutputPackagePath,
 						groupVersion:   gv,
-						internalGVPkg:  internalGVPkg,
 						typeToGenerate: t,
 						imports:        generator.NewImportTracker(),
 						objectMeta:     objectMeta,
 					})
 				}
 				return generators
-			},
-			FilterFunc: func(c *generator.Context, t *types.Type) bool {
-				tags := util.MustParseClientGenTags(append(t.SecondClosestCommentLines, t.CommentLines...))
-				return tags.GenerateClient // TODO(jpbetz): filter to just APIs that have Update or Apply?
 			},
 		})
 	}
@@ -182,7 +164,6 @@ type builderTypeGenerator struct {
 	generator.DefaultGen
 	outputPackage  string
 	groupVersion   clientgentypes.GroupVersion
-	internalGVPkg  string
 	typeToGenerate *types.Type
 	imports        namer.ImportTracker
 	objectMeta     *types.Type
@@ -217,50 +198,131 @@ func (g *builderTypeGenerator) GenerateType(c *generator.Context, t *types.Type,
 		"objectMeta": g.objectMeta,
 	}
 
-	tags, err := util.ParseClientGenTags(append(t.SecondClosestCommentLines, t.CommentLines...))
-	if err != nil {
-		return err
+	//tags, err := util.ParseClientGenTags(append(t.SecondClosestCommentLines, t.CommentLines...))
+	//if err != nil {
+	//	return err
+	//}
+
+	// TODO(jpbetz): Handle list types explicitly?
+	if strings.HasSuffix(t.Name.Name, "List") {
+		return nil
 	}
 
-	if tags.NonNamespaced {
-		// TODO(jpbetz): Handle non-namespaced types
-		//sw.Do(typeListerInterface_NonNamespaced, m)
-	} else {
-		sw.Do(typeBuilderStruct, m)
-	}
+	sw.Do(typeBuilderStruct, m)
+	sw.Do(typeBuilderConstructor, m)
 
 	for _, member := range t.Members {
+		jsonName, ok := jsonName(member.Tags)
+		if !ok {
+			continue
+		}
 		m := map[string]interface{}{
 			"Resource":   c.Universe.Function(types.Name{Package: t.Name.Package, Name: "Resource"}),
 			"type":       t,
-			"member":     member,
+			"member":     member, // TODO(jpbetz): Need to get the member json name out of the tags
 			"objectMeta": g.objectMeta,
+			"memberJsonName":   jsonName,
 		}
 
-		if tags.NonNamespaced {
-			// TODO(jpbetz): Handle non-namespaced types
-			//sw.Do(typeListerInterface_NonNamespaced, m)
+		if member.Type.IsPrimitive() || (member.Type.Elem != nil && member.Type.Elem.IsPrimitive()) {
+			// TODO(jpbetz): This does not handle converting maps and lists to unstructured correctly yet
+			// e.g. it should construct map[string]interface{} instead of map[string]string
+			sw.Do(memberBuilderFunc_Set_primitive, m)
+		} else if member.Type.Kind == types.Map {
+			sw.Do(memberBuilderFunc_Set_map, m)
+		} else if member.Type.Kind == types.Slice {
+			sw.Do(memberBuilderFunc_Set_slice, m)
 		} else {
-			sw.Do(memberBuilderFunc_Get, m)
 			sw.Do(memberBuilderFunc_Set, m)
 		}
 	}
 
+	sw.Do(typeBuilderList, m)
+	sw.Do(typeBuilderMap, m)
+
 	return sw.Error()
+}
+
+func jsonName(tags string) (string, bool) {
+	jsonTag := reflect.StructTag(tags).Get("json")
+	index := strings.Index(jsonTag, ",")
+	if index == -1 {
+		index = len(jsonTag)
+	}
+	if index == 0 {
+		return "", false
+	}
+	return jsonTag[:index], true
 }
 
 // TODO: generate an interface
 
 var typeBuilderStruct = `
-type $.type|private$Builder struct {}
-`
-
-var memberBuilderFunc_Get = `
-func (b $.type|private$Builder) Get() {
+type $.type|public$Builder struct {
+  unstructured map[string]interface{}
 }
 `
+
+var typeBuilderConstructor = `
+func $.type|public$() $.type|public$Builder {
+  return $.type|public$Builder{unstructured: map[string]interface{}{}}
+}
+`
+
+//var memberBuilderFunc_Get = `
+//func (b $.type|public$Builder) Get$.member.Name$() $.member.Type|public$Builder {
+//	return b.obj.$.member.Name$
+//}
+//`
 
 var memberBuilderFunc_Set = `
-func (b $.type|private$Builder) Set() {
+func (b $.type|public$Builder) Set$.member.Name$(value $.member.Type|public$Builder) $.type|public$Builder {
+	b.unstructured["$.memberJsonName$"] = value.unstructured
+	return b
 }
+`
+
+//var memberBuilderFunc_Get_primitive = `
+//
+//func (b $.type|public$Builder) Get$.member.Name$() $.member.Type|raw$ {
+//	return  b.unstructured["$.memberJsonName$"].($.member.Type|raw$)
+//}
+//`
+
+var memberBuilderFunc_Set_primitive = `
+func (b $.type|public$Builder) Set$.member.Name$(value $.member.Type|raw$) $.type|raw$ {
+	b.unstructured["$.memberJsonName$"] = value
+	return b
+}
+`
+
+var memberBuilderFunc_Set_map = `
+func (b $.type|public$Builder) Set$.member.Name$(values $.member.Type.Elem|public$Map) $.type|raw$ {
+	u := make(map[string]interface{}, len(values))
+	for key, value := range values {
+		u[key] = value
+	}
+	b.unstructured["$.memberJsonName$"] = u
+	return b
+}
+`
+
+var memberBuilderFunc_Set_slice = `
+func (b $.type|public$Builder) Set$.member.Name$(values $.member.Type.Elem|public$List) $.type|raw$ {
+	u := make([]interface{}, len(values))
+	for i, value := range values {
+		u[i] = value
+	}
+	b.unstructured["$.memberJsonName$"] = u
+	return b
+}
+`
+
+// TODO(jpbetz): Names collide with Kubernetes List types (i.e. types that have ListMeta)
+var typeBuilderList = `
+type $.type|public$List = []$.type|public$Builder
+`
+
+var typeBuilderMap = `
+type $.type|public$Map = map[string]$.type|public$Builder
 `
