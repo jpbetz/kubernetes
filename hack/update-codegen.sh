@@ -29,10 +29,12 @@ kube::golang::setup_env
 go install k8s.io/kubernetes/vendor/k8s.io/code-generator/cmd/client-gen
 go install k8s.io/kubernetes/vendor/k8s.io/code-generator/cmd/lister-gen
 go install k8s.io/kubernetes/vendor/k8s.io/code-generator/cmd/informer-gen
+go install k8s.io/kubernetes/vendor/k8s.io/code-generator/cmd/typebuilder-gen
 
 clientgen=$(kube::util::find-binary "client-gen")
 listergen=$(kube::util::find-binary "lister-gen")
 informergen=$(kube::util::find-binary "informer-gen")
+typebuildergen=$(kube::util::find-binary "typebuilder-gen")
 
 IFS=" " read -r -a GROUP_VERSIONS <<< "${KUBE_AVAILABLE_GROUP_VERSIONS}"
 GV_DIRS=()
@@ -81,6 +83,24 @@ ${informergen} \
   --input-dirs "${informergen_external_apis_csv}" \
   --versioned-clientset-package k8s.io/client-go/kubernetes \
   --listers-package k8s.io/client-go/listers \
+  --go-header-file "${KUBE_ROOT}/hack/boilerplate/boilerplate.generatego.txt" \
+  "$@"
+
+typebuildergen_external_apis=()
+# because client-gen doesn't do policy/v1alpha1, we have to skip it too
+kube::util::read-array typebuildergen_external_apis < <(
+  cd "${KUBE_ROOT}/staging/src"
+  find k8s.io/api -name types.go -print0 | xargs -0 -n1 dirname | sort | grep -v pkg.apis.policy.v1alpha1
+)
+typebuildergen_external_apis_csv=$(IFS=,; echo "${typebuildergen_external_apis[*]}")
+
+${typebuildergen} \
+  --output-base "${KUBE_ROOT}/vendor" \
+  --output-package "k8s.io/client-go/typebuilders" \
+  --single-directory \
+  --input-dirs "${typebuildergen_external_apis_csv}" \
+  --versioned-clientset-package k8s.io/client-go/kubernetes \
+  --builders-package k8s.io/client-go/typebuilders \
   --go-header-file "${KUBE_ROOT}/hack/boilerplate/boilerplate.generatego.txt" \
   "$@"
 
