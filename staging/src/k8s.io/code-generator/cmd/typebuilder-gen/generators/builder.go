@@ -32,6 +32,15 @@ import (
 	clientgentypes "k8s.io/code-generator/cmd/client-gen/types"
 )
 
+// TODO(jpbetz): Figure out how to avoid hard coding this
+// Might work to just assume the type is a reference if we didn't generate a type for it
+var referencableTypes = []*types.Type{
+	types.Ref("k8s.io/apimachinery/pkg/runtime", "RawExtension"),
+	types.Ref("k8s.io/apimachinery/pkg/runtime", "Unknown"),
+	types.Ref("k8s.io/apimachinery/pkg/api/resource", "Quantity"),
+	types.Ref("k8s.io/apimachinery/pkg/util/intstr", "IntOrString"),
+}
+
 // NameSystems returns the name system used by the generators in this package.
 func NameSystems(pluralExceptions map[string]string) namer.NameSystems {
 	return namer.NameSystems{
@@ -67,9 +76,74 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 	}
 
 	var packageList generator.Packages
+
+	// TODO: pre compute all the names of the types that will be generated and
+	// leverage an ImportTracker to keep proper track of them so that the raw namer
+	// can output references between builders correctly
+	allTypes := map[string]BuilderGeneratedTypes{}
+
+	for _, t := range referencableTypes {
+		buildersForType := BuilderGeneratedTypes{
+			builder: t,
+			listBuilder: &types.Type{
+				Name: t.Name,
+				Kind: types.Slice,
+				Elem: t,
+			},
+			mapBuilder: &types.Type{
+				Name: t.Name,
+				Kind: types.Map,
+				Elem: t,
+			},
+		}
+		allTypes[t.Name.String()] = buildersForType
+		allTypes["*" + t.Name.String()] = buildersForType
+	}
+
 	for _, inputDir := range arguments.InputDirs {
 		p := context.Universe.Package(inputDir)
-		klog.Warningf("package: %s", p.Path)
+		_, internal, err := objectMetaForPackage(p)
+		if err != nil {
+			klog.Fatal(err)
+		}
+		if internal {
+			klog.Warningf("Skipping internal package: %s", p.Path)
+			continue
+		}
+		gv, groupPackageName := groupAndPackageName(p)
+
+		pkg := filepath.Join(arguments.OutputPackagePath, groupPackageName, strings.ToLower(gv.Version.NonEmpty()))
+		for _, t := range p.Types {
+			buildersForType := BuilderGeneratedTypes{
+				builder: &types.Type{
+					Name: types.Name{
+						Name:t.Name.Name + "Builder",
+						Package: pkg,
+					},
+					Kind: types.Struct,
+				},
+				listBuilder: &types.Type{
+					Name: types.Name{
+						Name: t.Name.Name + "List",
+						Package: pkg,
+					},
+					Kind: types.Struct,
+				},
+				mapBuilder: &types.Type{
+					Name: types.Name{
+						Name:t.Name.Name + "Map",
+						Package: pkg,
+					},
+					Kind: types.Struct,
+				},
+			}
+			allTypes[t.Name.String()] = buildersForType
+			allTypes["*" + t.Name.String()] = buildersForType
+		}
+	}
+
+	for _, inputDir := range arguments.InputDirs {
+		p := context.Universe.Package(inputDir)
 
 		_, internal, err := objectMetaForPackage(p)
 		if err != nil {
@@ -80,21 +154,13 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 			continue
 		}
 
-		var gv clientgentypes.GroupVersion
-		parts := strings.Split(p.Path, "/")
-		gv.Group = clientgentypes.Group(parts[len(parts)-2])
-		gv.Version = clientgentypes.Version(parts[len(parts)-1])
-		groupPackageName := strings.ToLower(gv.Group.NonEmpty())
-
-		// If there's a comment of the form "// +groupName=somegroup" or
-		// "// +groupName=somegroup.foo.bar.io", use the first field (somegroup) as the name of the
-		// group when generating.
-		if override := types.ExtractCommentTags("+", p.Comments)["groupName"]; override != nil {
-			gv.Group = clientgentypes.Group(strings.SplitN(override[0], ".", 2)[0])
-		}
+		gv, groupPackageName := groupAndPackageName(p)
 
 		var typesToGenerate []*types.Type
 		for _, t := range p.Types {
+			if t.Kind == types.Interface {
+				continue
+			}
 			typesToGenerate = append(typesToGenerate, t)
 		}
 		if len(p.Types) == 0 {
@@ -104,10 +170,13 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 		orderer := namer.Orderer{Namer: namer.NewPrivateNamer(0)}
 		typesToGenerate = orderer.OrderTypes(typesToGenerate)
 
-		packagePath := filepath.Join(arguments.OutputPackagePath, groupPackageName, strings.ToLower(gv.Version.NonEmpty()))
+		packageName := types.Name{
+			Name: strings.ToLower(gv.Version.NonEmpty()),
+			Package: filepath.Join(arguments.OutputPackagePath, groupPackageName, strings.ToLower(gv.Version.NonEmpty())),
+		}
 		packageList = append(packageList, &generator.DefaultPackage{
 			PackageName: strings.ToLower(gv.Version.NonEmpty()),
-			PackagePath: packagePath,
+			PackagePath: packageName.Package,
 			HeaderText:  boilerplate,
 			GeneratorFunc: func(c *generator.Context) (generators []generator.Generator) {
 				for _, t := range typesToGenerate {
@@ -116,9 +185,11 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 							OptionalName: strings.ToLower(t.Name.Name),
 						},
 						outputPackage:  arguments.OutputPackagePath,
+						localPackage: packageName,
 						groupVersion:   gv,
 						typeToGenerate: t,
 						imports:        generator.NewImportTracker(),
+						allTypes: allTypes,
 					})
 				}
 				return generators
@@ -127,6 +198,28 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 	}
 
 	return packageList
+}
+
+func groupAndPackageName(p *types.Package) (clientgentypes.GroupVersion, string) {
+	var gv clientgentypes.GroupVersion
+	parts := strings.Split(p.Path, "/")
+	gv.Group = clientgentypes.Group(parts[len(parts)-2])
+	gv.Version = clientgentypes.Version(parts[len(parts)-1])
+	groupPackageName := strings.ToLower(gv.Group.NonEmpty())
+
+	// If there's a comment of the form "// +groupName=somegroup" or
+	// "// +groupName=somegroup.foo.bar.io", use the first field (somegroup) as the name of the
+	// group when generating.
+	if override := types.ExtractCommentTags("+", p.Comments)["groupName"]; override != nil {
+		gv.Group = clientgentypes.Group(strings.SplitN(override[0], ".", 2)[0])
+	}
+	return gv, groupPackageName
+}
+
+type BuilderGeneratedTypes struct {
+	builder *types.Type
+	mapBuilder *types.Type
+	listBuilder *types.Type
 }
 
 // objectMetaForPackage returns the type of ObjectMeta used by package p.
@@ -160,9 +253,11 @@ func isInternal(m types.Member) bool {
 type builderTypeGenerator struct {
 	generator.DefaultGen
 	outputPackage  string
+	localPackage   types.Name
 	groupVersion   clientgentypes.GroupVersion
 	typeToGenerate *types.Type
 	imports        namer.ImportTracker
+	allTypes       map[string]BuilderGeneratedTypes
 }
 
 var _ generator.Generator = &builderTypeGenerator{}
@@ -173,14 +268,12 @@ func (g *builderTypeGenerator) Filter(c *generator.Context, t *types.Type) bool 
 
 func (g *builderTypeGenerator) Namers(c *generator.Context) namer.NameSystems {
 	return namer.NameSystems{
-		"raw": namer.NewRawNamer(g.outputPackage, g.imports),
+		"raw": namer.NewRawNamer(g.localPackage.Package, g.imports),
 	}
 }
 
 func (g *builderTypeGenerator) Imports(c *generator.Context) (imports []string) {
 	imports = append(imports, g.imports.ImportLines()...)
-	//imports = append(imports, "k8s.io/apimachinery/pkg/api/errors")
-	//imports = append(imports, "k8s.io/apimachinery/pkg/labels")
 	return
 }
 
@@ -219,7 +312,7 @@ func (g *builderTypeGenerator) GenerateType(c *generator.Context, t *types.Type,
 		}
 
 		// TODO(jpbetz): Clean this up
-		if member.Type.IsPrimitive() || (member.Type.Elem != nil && member.Type.Elem.IsPrimitive()) {
+		if isPrimitiveBased(member.Type) {
 			if member.Type.Kind == types.Alias {
 				// TODO: Isn't working for pointers to primitive aliases
 				sw.Do(memberBuilderFunc_Set_primitivealias, m)
@@ -229,18 +322,60 @@ func (g *builderTypeGenerator) GenerateType(c *generator.Context, t *types.Type,
 		// TODO(jpbetz): This does not handle converting maps and lists to unstructured correctly yet
 		// e.g. it should construct map[string]interface{} instead of map[string]string
 		} else if member.Type.Kind == types.Map {
+			memberTypeName := member.Type.Elem.Name.String()
+			builders, ok := g.allTypes[memberTypeName]
+			if !ok {
+				klog.Fatalf("could not find type for: %s", member.Type.String())
+			}
+			m["memberMapBuilder"] = builders.mapBuilder
 			sw.Do(memberBuilderFunc_Set_map, m)
 		} else if member.Type.Kind == types.Slice {
+			memberTypeName := member.Type.Elem.Name.String()
+			builders, ok := g.allTypes[memberTypeName]
+			if !ok {
+				klog.Fatalf("could not find type for: %s", memberTypeName)
+			}
+			mapBuilderType :=builders.listBuilder
+			m["memberListBuilder"] = mapBuilderType
 			sw.Do(memberBuilderFunc_Set_slice, m)
 		} else {
+			memberTypeName := member.Type.Name.String()
+			builders, ok := g.allTypes[memberTypeName]
+			if !ok {
+				klog.Fatalf("could not find type for: %s", memberTypeName)
+			}
+			m["memberBuilder"] = builders.builder
+			if builders.builder.Name.Package == "v1" {
+				klog.Fatalf("v1 found: %s", builders.builder.Name.String())
+			}
 			sw.Do(memberBuilderFunc_Set, m)
 		}
 	}
 
+	sw.Do(typeBuilderUnstructured, m)
 	sw.Do(typeBuilderList, m)
 	sw.Do(typeBuilderMap, m)
 
 	return sw.Error()
+}
+
+func isPrimitiveBased(t *types.Type) bool {
+	if t.IsPrimitive() {
+		return true
+	}
+	if t.Kind == types.Interface { // TODO(jpbetz): Added to handle interface{} and []interface{}
+		return true
+	}
+	for t.Elem != nil {
+		if t.Elem.IsPrimitive() {
+			return true
+		}
+		if t.Elem.Kind == types.Interface {
+			return true
+		}
+		t = t.Elem
+	}
+	return false
 }
 
 func jsonName(tags string) (string, bool) {
@@ -269,6 +404,12 @@ func $.type|public$() $.type|public$Builder {
 }
 `
 
+var typeBuilderUnstructured = `
+func (b $.type|public$Builder) Unstructured() map[string]interface{} {
+  return b.unstructured
+}
+`
+
 //var memberBuilderFunc_Get = `
 //func (b $.type|public$Builder) Get$.member.Name$() $.member.Type|public$Builder {
 //	return b.obj.$.member.Name$
@@ -276,8 +417,8 @@ func $.type|public$() $.type|public$Builder {
 //`
 
 var memberBuilderFunc_Set = `
-func (b $.type|public$Builder) Set$.member.Name$(value $.member.Type|public$Builder) $.type|public$Builder {
-	b.unstructured["$.memberJsonName$"] = value.unstructured
+func (b $.type|public$Builder) Set$.member.Name$(value $.memberBuilder|raw$) $.type|public$Builder {
+	b.unstructured["$.memberJsonName$"] = value.Unstructured()
 	return b
 }
 `
@@ -304,7 +445,7 @@ func (b $.type|public$Builder) Set$.member.Name$(value $.member.Type|raw$) $.typ
 `
 
 var memberBuilderFunc_Set_map = `
-func (b $.type|public$Builder) Set$.member.Name$(values $.member.Type.Elem|public$Map) $.type|public$Builder {
+func (b $.type|public$Builder) Set$.member.Name$(values $.memberMapBuilder|raw$) $.type|public$Builder {
 	u := make(map[string]interface{}, len(values))
 	for key, value := range values {
 		u[key] = value
@@ -315,7 +456,7 @@ func (b $.type|public$Builder) Set$.member.Name$(values $.member.Type.Elem|publi
 `
 
 var memberBuilderFunc_Set_slice = `
-func (b $.type|public$Builder) Set$.member.Name$(values $.member.Type.Elem|public$List) $.type|public$Builder {
+func (b $.type|public$Builder) Set$.member.Name$(values $.memberListBuilder|raw$) $.type|public$Builder {
 	u := make([]interface{}, len(values))
 	for i, value := range values {
 		u[i] = value

@@ -40,12 +40,10 @@ import (
 	"k8s.io/apiserver/pkg/features"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	clientset "k8s.io/client-go/kubernetes"
-	metav1manifest "k8s.io/client-go/typebuilders/meta/v1"
-	corev1manifest "k8s.io/client-go/typebuilders/core/v1"
 	appsv1manifest "k8s.io/client-go/typebuilders/apps/v1"
+	corev1manifest "k8s.io/client-go/typebuilders/core/v1"
+	metav1manifest "k8s.io/client-go/typebuilders/meta/v1"
 	featuregatetesting "k8s.io/component-base/featuregate/testing"
-	"k8s.io/kubernetes/pkg/apis/core"
-
 	"k8s.io/component-base/version"
 	kubeapiservertesting "k8s.io/kubernetes/cmd/kube-apiserver/app/testing"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
@@ -817,22 +815,20 @@ func TestApplyBuilders(t *testing.T) {
 			SetSelector(metav1manifest.LabelSelector().
 				SetMatchLabels(map[string]string{"app": "nginx"}),
 			).
-			SetTemplate(corev1manifest.PodTemplate().
+			SetTemplate(corev1manifest.PodTemplateSpec().
 				SetObjectMeta(metav1manifest.ObjectMeta().
 					SetLabels(map[string]string{"app": "nginx"}),
 				).
-				SetTemplate(corev1manifest.PodTemplateSpec(). // TODO(jpbetz): Why this extra layer of template?
-					SetSpec(corev1manifest.PodSpec().
-						SetContainers(corev1manifest.ContainerList{
-							corev1manifest.Container().
-								SetName("nginx").
-								SetImage("nginx:1.14.2"),
-						}),
-					),
+				SetSpec(corev1manifest.PodSpec().
+					SetContainers(corev1manifest.ContainerList{
+						corev1manifest.Container().
+							SetName("nginx").
+							SetImage("nginx:1.14.2"),
+					}),
 				),
 			),
 		)
-	expectedDeployment := appsv1.Deployment{
+	expectedDeployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{},
 		Spec: appsv1.DeploymentSpec{
 			Selector: &metav1.LabelSelector{
@@ -854,5 +850,12 @@ func TestApplyBuilders(t *testing.T) {
 		},
 	}
 
-	
+	obj := appsv1.Deployment{}
+	err := runtime.DefaultUnstructuredConverter.FromUnstructured(deploymentManifest.Unstructured(), obj)
+	if err != nil {
+		t.Fatalf("unexpected error when converting manifest to Deployment struct: %v", err)
+	}
+	if !reflect.DeepEqual(obj, expectedDeployment) {
+		t.Fatalf("expected %#v but got %#v", expectedDeployment, obj)
+	}
 }
