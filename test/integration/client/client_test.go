@@ -26,6 +26,7 @@ import (
 	"testing"
 	"time"
 
+	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -39,7 +40,11 @@ import (
 	"k8s.io/apiserver/pkg/features"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	clientset "k8s.io/client-go/kubernetes"
+	metav1manifest "k8s.io/client-go/typebuilders/meta/v1"
+	corev1manifest "k8s.io/client-go/typebuilders/core/v1"
+	appsv1manifest "k8s.io/client-go/typebuilders/apps/v1"
 	featuregatetesting "k8s.io/component-base/featuregate/testing"
+	"k8s.io/kubernetes/pkg/apis/core"
 
 	"k8s.io/component-base/version"
 	kubeapiservertesting "k8s.io/kubernetes/cmd/kube-apiserver/app/testing"
@@ -801,4 +806,53 @@ func TestSelfLinkOnNamespace(t *testing.T) {
 	c := clientset.NewForConfigOrDie(result.ClientConfig)
 
 	runSelfLinkTestOnNamespace(t, c, "default")
+}
+
+func TestApplyBuilders(t *testing.T) {
+	deploymentManifest := appsv1manifest.Deployment(). // TODO(jpbetz): This should stamp the appropriate object meta? How is this done for struct types?
+		SetObjectMeta(metav1manifest.ObjectMeta().
+			SetName("nginx-deployment-3"),
+		).
+		SetSpec(appsv1manifest.DeploymentSpec().
+			SetSelector(metav1manifest.LabelSelector().
+				SetMatchLabels(map[string]string{"app": "nginx"}),
+			).
+			SetTemplate(corev1manifest.PodTemplate().
+				SetObjectMeta(metav1manifest.ObjectMeta().
+					SetLabels(map[string]string{"app": "nginx"}),
+				).
+				SetTemplate(corev1manifest.PodTemplateSpec(). // TODO(jpbetz): Why this extra layer of template?
+					SetSpec(corev1manifest.PodSpec().
+						SetContainers(corev1manifest.ContainerList{
+							corev1manifest.Container().
+								SetName("nginx").
+								SetImage("nginx:1.14.2"),
+						}),
+					),
+				),
+			),
+		)
+	expectedDeployment := appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{},
+		Spec: appsv1.DeploymentSpec{
+			Selector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{"app": "nginx"},
+			},
+			Template: v1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{"app": "nginx"},
+				},
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{
+						v1.Container{
+							Name: "nginx",
+							Image: "nginx:1.14.2",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	
 }

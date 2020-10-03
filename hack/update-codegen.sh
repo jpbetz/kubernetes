@@ -92,8 +92,8 @@ kube::util::read-array typebuildergen_external_apis < <(
   cd "${KUBE_ROOT}/staging/src"
   find k8s.io/api -name types.go -print0 | xargs -0 -n1 dirname | sort | grep -v pkg.apis.policy.v1alpha1
 )
+typebuildergen_external_apis+=("k8s.io/apimachinery/pkg/apis/meta/v1")
 typebuildergen_external_apis_csv=$(IFS=,; echo "${typebuildergen_external_apis[*]}")
-
 ${typebuildergen} \
   --output-base "${KUBE_ROOT}/vendor" \
   --output-package "k8s.io/client-go/typebuilders" \

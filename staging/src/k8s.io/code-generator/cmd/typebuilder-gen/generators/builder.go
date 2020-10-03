@@ -17,7 +17,6 @@ limitations under the License.
 package generators
 
 import (
-	"fmt"
 	"io"
 	"path/filepath"
 	"reflect"
@@ -29,7 +28,7 @@ import (
 	"k8s.io/gengo/types"
 	"k8s.io/klog/v2"
 
-	"k8s.io/code-generator/cmd/client-gen/generators/util"
+	//"k8s.io/code-generator/cmd/client-gen/generators/util"
 	clientgentypes "k8s.io/code-generator/cmd/client-gen/types"
 )
 
@@ -70,16 +69,14 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 	var packageList generator.Packages
 	for _, inputDir := range arguments.InputDirs {
 		p := context.Universe.Package(inputDir)
+		klog.Warningf("package: %s", p.Path)
 
-		objectMeta, internal, err := objectMetaForPackage(p)
+		_, internal, err := objectMetaForPackage(p)
 		if err != nil {
 			klog.Fatal(err)
 		}
-		if objectMeta == nil {
-			// no types in this package had genclient
-			continue
-		}
 		if internal {
+			klog.Warningf("Skipping internal package: %s", p.Path)
 			continue
 		}
 
@@ -101,6 +98,7 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 			typesToGenerate = append(typesToGenerate, t)
 		}
 		if len(p.Types) == 0 {
+			klog.Warningf("Skipping package with no types: %s", p.Path)
 			continue
 		}
 		orderer := namer.Orderer{Namer: namer.NewPrivateNamer(0)}
@@ -121,7 +119,6 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 						groupVersion:   gv,
 						typeToGenerate: t,
 						imports:        generator.NewImportTracker(),
-						objectMeta:     objectMeta,
 					})
 				}
 				return generators
@@ -134,22 +131,22 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 
 // objectMetaForPackage returns the type of ObjectMeta used by package p.
 func objectMetaForPackage(p *types.Package) (*types.Type, bool, error) {
-	generatingForPackage := false
+	//generatingForPackage := false
 	for _, t := range p.Types {
 		// filter out types which dont have genclient.
-		if !util.MustParseClientGenTags(append(t.SecondClosestCommentLines, t.CommentLines...)).GenerateClient {
-			continue
-		}
-		generatingForPackage = true
+		//if !util.MustParseClientGenTags(append(t.SecondClosestCommentLines, t.CommentLines...)).GenerateClient {
+		//	continue
+		//}
+		//generatingForPackage = true
 		for _, member := range t.Members {
 			if member.Name == "ObjectMeta" {
 				return member.Type, isInternal(member), nil
 			}
 		}
 	}
-	if generatingForPackage {
-		return nil, false, fmt.Errorf("unable to find ObjectMeta for any types in package %s", p.Path)
-	}
+	//if generatingForPackage {
+	//	return nil, false, fmt.Errorf("unable to find ObjectMeta for any types in package %s", p.Path)
+	//}
 	return nil, false, nil
 }
 
@@ -166,7 +163,6 @@ type builderTypeGenerator struct {
 	groupVersion   clientgentypes.GroupVersion
 	typeToGenerate *types.Type
 	imports        namer.ImportTracker
-	objectMeta     *types.Type
 }
 
 var _ generator.Generator = &builderTypeGenerator{}
@@ -195,7 +191,6 @@ func (g *builderTypeGenerator) GenerateType(c *generator.Context, t *types.Type,
 	m := map[string]interface{}{
 		"Resource":   c.Universe.Function(types.Name{Package: t.Name.Package, Name: "Resource"}),
 		"type":       t,
-		"objectMeta": g.objectMeta,
 	}
 
 	//tags, err := util.ParseClientGenTags(append(t.SecondClosestCommentLines, t.CommentLines...))
@@ -220,14 +215,19 @@ func (g *builderTypeGenerator) GenerateType(c *generator.Context, t *types.Type,
 			"Resource":   c.Universe.Function(types.Name{Package: t.Name.Package, Name: "Resource"}),
 			"type":       t,
 			"member":     member, // TODO(jpbetz): Need to get the member json name out of the tags
-			"objectMeta": g.objectMeta,
 			"memberJsonName":   jsonName,
 		}
 
+		// TODO(jpbetz): Clean this up
 		if member.Type.IsPrimitive() || (member.Type.Elem != nil && member.Type.Elem.IsPrimitive()) {
-			// TODO(jpbetz): This does not handle converting maps and lists to unstructured correctly yet
-			// e.g. it should construct map[string]interface{} instead of map[string]string
-			sw.Do(memberBuilderFunc_Set_primitive, m)
+			if member.Type.Kind == types.Alias {
+				// TODO: Isn't working for pointers to primitive aliases
+				sw.Do(memberBuilderFunc_Set_primitivealias, m)
+			} else {
+				sw.Do(memberBuilderFunc_Set_primitive, m)
+			}
+		// TODO(jpbetz): This does not handle converting maps and lists to unstructured correctly yet
+		// e.g. it should construct map[string]interface{} instead of map[string]string
 		} else if member.Type.Kind == types.Map {
 			sw.Do(memberBuilderFunc_Set_map, m)
 		} else if member.Type.Kind == types.Slice {
@@ -290,14 +290,21 @@ func (b $.type|public$Builder) Set$.member.Name$(value $.member.Type|public$Buil
 //`
 
 var memberBuilderFunc_Set_primitive = `
-func (b $.type|public$Builder) Set$.member.Name$(value $.member.Type|raw$) $.type|raw$ {
+func (b $.type|public$Builder) Set$.member.Name$(value $.member.Type|raw$) $.type|public$Builder {
 	b.unstructured["$.memberJsonName$"] = value
 	return b
 }
 `
 
+var memberBuilderFunc_Set_primitivealias = `
+func (b $.type|public$Builder) Set$.member.Name$(value $.member.Type|raw$) $.type|public$Builder {
+	b.unstructured["$.memberJsonName$"] = value.($.member.Type.Underlying|raw$)
+	return b
+}
+`
+
 var memberBuilderFunc_Set_map = `
-func (b $.type|public$Builder) Set$.member.Name$(values $.member.Type.Elem|public$Map) $.type|raw$ {
+func (b $.type|public$Builder) Set$.member.Name$(values $.member.Type.Elem|public$Map) $.type|public$Builder {
 	u := make(map[string]interface{}, len(values))
 	for key, value := range values {
 		u[key] = value
@@ -308,7 +315,7 @@ func (b $.type|public$Builder) Set$.member.Name$(values $.member.Type.Elem|publi
 `
 
 var memberBuilderFunc_Set_slice = `
-func (b $.type|public$Builder) Set$.member.Name$(values $.member.Type.Elem|public$List) $.type|raw$ {
+func (b $.type|public$Builder) Set$.member.Name$(values $.member.Type.Elem|public$List) $.type|public$Builder {
 	u := make([]interface{}, len(values))
 	for i, value := range values {
 		u[i] = value
