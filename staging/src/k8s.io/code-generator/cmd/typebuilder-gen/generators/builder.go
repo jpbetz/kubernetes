@@ -32,13 +32,13 @@ import (
 	clientgentypes "k8s.io/code-generator/cmd/client-gen/types"
 )
 
-// TODO(jpbetz): Figure out how to avoid hard coding this
-// Might work to just assume the type is a reference if we didn't generate a type for it
+// TODO(jpbetz): Get rid of all these entries. We need to find a general way of handling each of these cases.
 var referencableTypes = []*types.Type{
 	types.Ref("k8s.io/apimachinery/pkg/runtime", "RawExtension"),
 	types.Ref("k8s.io/apimachinery/pkg/runtime", "Unknown"),
 	types.Ref("k8s.io/apimachinery/pkg/api/resource", "Quantity"),
 	types.Ref("k8s.io/apimachinery/pkg/util/intstr", "IntOrString"),
+	types.Ref("k8s.io/api/core/v1", "ResourceList"),
 }
 
 // NameSystems returns the name system used by the generators in this package.
@@ -95,6 +95,7 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 				Kind: types.Map,
 				Elem: t,
 			},
+			useUnstructuredConversion: true,
 		}
 		allTypes[t.Name.String()] = buildersForType
 		allTypes["*" + t.Name.String()] = buildersForType
@@ -137,8 +138,10 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 					Kind: types.Struct,
 				},
 			}
-			allTypes[t.Name.String()] = buildersForType
-			allTypes["*" + t.Name.String()] = buildersForType
+			if _, ok := allTypes[t.Name.String()]; !ok { // don't re-add existing entries
+				allTypes[t.Name.String()] = buildersForType
+				allTypes["*"+t.Name.String()] = buildersForType
+			}
 		}
 	}
 
@@ -220,6 +223,7 @@ type BuilderGeneratedTypes struct {
 	builder *types.Type
 	mapBuilder *types.Type
 	listBuilder *types.Type
+	useUnstructuredConversion bool
 }
 
 // objectMetaForPackage returns the type of ObjectMeta used by package p.
@@ -345,10 +349,12 @@ func (g *builderTypeGenerator) GenerateType(c *generator.Context, t *types.Type,
 				klog.Fatalf("could not find type for: %s", memberTypeName)
 			}
 			m["memberBuilder"] = builders.builder
-			if builders.builder.Name.Package == "v1" {
-				klog.Fatalf("v1 found: %s", builders.builder.Name.String())
+			if builders.useUnstructuredConversion {
+				m["unstructuredConverter"] = unstructuredConverter
+				sw.Do(memberBuilderFunc_Set_unstructured, m)
+			} else {
+				sw.Do(memberBuilderFunc_Set, m)
 			}
-			sw.Do(memberBuilderFunc_Set, m)
 		}
 	}
 
@@ -423,6 +429,17 @@ func (b $.type|public$Builder) Set$.member.Name$(value $.memberBuilder|raw$) $.t
 }
 `
 
+var memberBuilderFunc_Set_unstructured = `
+func (b $.type|public$Builder) Set$.member.Name$(value $.memberBuilder|raw$) $.type|public$Builder {
+	u, err := $.unstructuredConverter|raw$.ToUnstructured(value)
+	if err != nil {
+		panic(err)
+	}
+	b.unstructured["$.memberJsonName$"] = u
+	return b
+}
+`
+
 //var memberBuilderFunc_Get_primitive = `
 //
 //func (b $.type|public$Builder) Get$.member.Name$() $.member.Type|raw$ {
@@ -439,7 +456,7 @@ func (b $.type|public$Builder) Set$.member.Name$(value $.member.Type|raw$) $.typ
 
 var memberBuilderFunc_Set_primitivealias = `
 func (b $.type|public$Builder) Set$.member.Name$(value $.member.Type|raw$) $.type|public$Builder {
-	b.unstructured["$.memberJsonName$"] = value.($.member.Type.Underlying|raw$)
+	b.unstructured["$.memberJsonName$"] = $.member.Type.Underlying|raw$(value)
 	return b
 }
 `
@@ -448,7 +465,7 @@ var memberBuilderFunc_Set_map = `
 func (b $.type|public$Builder) Set$.member.Name$(values $.memberMapBuilder|raw$) $.type|public$Builder {
 	u := make(map[string]interface{}, len(values))
 	for key, value := range values {
-		u[key] = value
+		u[key] = value.Unstructured()
 	}
 	b.unstructured["$.memberJsonName$"] = u
 	return b
@@ -459,7 +476,7 @@ var memberBuilderFunc_Set_slice = `
 func (b $.type|public$Builder) Set$.member.Name$(values $.memberListBuilder|raw$) $.type|public$Builder {
 	u := make([]interface{}, len(values))
 	for i, value := range values {
-		u[i] = value
+		u[i] = value.Unstructured()
 	}
 	b.unstructured["$.memberJsonName$"] = u
 	return b

@@ -26,8 +26,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
+
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
+	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
@@ -807,7 +810,7 @@ func TestSelfLinkOnNamespace(t *testing.T) {
 }
 
 func TestApplyBuilders(t *testing.T) {
-	deploymentManifest := appsv1manifest.Deployment(). // TODO(jpbetz): This should stamp the appropriate object meta? How is this done for struct types?
+	deploymentManifest := appsv1manifest.Deployment().
 		SetObjectMeta(metav1manifest.ObjectMeta().
 			SetName("nginx-deployment-3"),
 		).
@@ -829,7 +832,9 @@ func TestApplyBuilders(t *testing.T) {
 			),
 		)
 	expectedDeployment := &appsv1.Deployment{
-		ObjectMeta: metav1.ObjectMeta{},
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "nginx-deployment-3",
+		},
 		Spec: appsv1.DeploymentSpec{
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{"app": "nginx"},
@@ -850,12 +855,12 @@ func TestApplyBuilders(t *testing.T) {
 		},
 	}
 
-	obj := appsv1.Deployment{}
+	obj := &appsv1.Deployment{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(deploymentManifest.Unstructured(), obj)
 	if err != nil {
 		t.Fatalf("unexpected error when converting manifest to Deployment struct: %v", err)
 	}
-	if !reflect.DeepEqual(obj, expectedDeployment) {
-		t.Fatalf("expected %#v but got %#v", expectedDeployment, obj)
+	if !apiequality.Semantic.DeepEqual(obj, expectedDeployment) {
+		t.Fatalf("expected %#v but got %#v\ndiff:\n%s", expectedDeployment, obj, cmp.Diff(expectedDeployment, obj))
 	}
 }
