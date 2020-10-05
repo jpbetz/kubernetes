@@ -95,7 +95,7 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 				Kind: types.Map,
 				Elem: t,
 			},
-			useUnstructuredConversion: true,
+			externalType: true,
 		}
 		allTypes[t.Name.String()] = buildersForType
 		allTypes["*" + t.Name.String()] = buildersForType
@@ -164,9 +164,12 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 			if t.Kind == types.Interface {
 				continue
 			}
+			if isPrimitiveBased(t) {
+				continue
+			}
 			typesToGenerate = append(typesToGenerate, t)
 		}
-		if len(p.Types) == 0 {
+		if len(typesToGenerate) == 0 {
 			klog.Warningf("Skipping package with no types: %s", p.Path)
 			continue
 		}
@@ -223,7 +226,7 @@ type BuilderGeneratedTypes struct {
 	builder *types.Type
 	mapBuilder *types.Type
 	listBuilder *types.Type
-	useUnstructuredConversion bool
+	externalType bool
 }
 
 // objectMetaForPackage returns the type of ObjectMeta used by package p.
@@ -266,7 +269,7 @@ type builderTypeGenerator struct {
 
 var _ generator.Generator = &builderTypeGenerator{}
 
-func (g *builderTypeGenerator) Filter(c *generator.Context, t *types.Type) bool {
+func (g *builderTypeGenerator) Filter(_ *generator.Context, t *types.Type) bool {
 	return t == g.typeToGenerate
 }
 
@@ -295,8 +298,8 @@ func (g *builderTypeGenerator) GenerateType(c *generator.Context, t *types.Type,
 	//	return err
 	//}
 
-	// TODO(jpbetz): Handle list types explicitly?
-	if strings.HasSuffix(t.Name.Name, "List") {
+	// TODO(jpbetz): Handle list types explicitly? We don't need them for apply, right?
+	if strings.HasSuffix(t.Name.Name, "List") { // TODO(jpbetz): If we keep this we need to check for ListMeta, not check the suffix
 		return nil
 	}
 
@@ -317,14 +320,13 @@ func (g *builderTypeGenerator) GenerateType(c *generator.Context, t *types.Type,
 
 		// TODO(jpbetz): Clean this up
 		if isPrimitiveBased(member.Type) {
-			if member.Type.Kind == types.Alias {
-				// TODO: Isn't working for pointers to primitive aliases
-				sw.Do(memberBuilderFunc_Set_primitivealias, m)
+			if member.Type.Kind == types.Pointer {
+				sw.Do(memberBuilderFunc_Set_primitive_ptr, m)
 			} else {
 				sw.Do(memberBuilderFunc_Set_primitive, m)
 			}
-		// TODO(jpbetz): This does not handle converting maps and lists to unstructured correctly yet
-		// e.g. it should construct map[string]interface{} instead of map[string]string
+			// TODO(jpbetz): This does not handle converting maps and lists to unstructured correctly yet
+			// e.g. it should construct map[string]interface{} instead of map[string]string
 		} else if member.Type.Kind == types.Map {
 			memberTypeName := member.Type.Elem.Name.String()
 			builders, ok := g.allTypes[memberTypeName]
@@ -348,17 +350,28 @@ func (g *builderTypeGenerator) GenerateType(c *generator.Context, t *types.Type,
 			if !ok {
 				klog.Fatalf("could not find type for: %s", memberTypeName)
 			}
-			m["memberBuilder"] = builders.builder
-			if builders.useUnstructuredConversion {
-				m["unstructuredConverter"] = unstructuredConverter
-				sw.Do(memberBuilderFunc_Set_unstructured, m)
+			if !builders.externalType {
+				m["memberBuilder"] = builders.builder
+				if member.Type.Kind == types.Pointer {
+					sw.Do(memberBuilderFunc_Set_ptr, m)
+				} else {
+					sw.Do(memberBuilderFunc_Set, m)
+				}
 			} else {
-				sw.Do(memberBuilderFunc_Set, m)
+				if member.Type.Kind == types.Pointer {
+					sw.Do(memberBuilderFunc_Set_primitive_ptr, m)
+				} else {
+					sw.Do(memberBuilderFunc_Set_primitive, m)
+				}
+				// TODO(jpbetz): This does not handle converting maps and lists to unstructured correctly yet
+				// e.g. it should construct map[string]interface{} instead of map[string]string
 			}
 		}
 	}
 
+	m["unstructuredConverter"] = unstructuredConverter
 	sw.Do(typeBuilderUnstructured, m)
+	sw.Do(typeBuilderBuild, m)
 	sw.Do(typeBuilderList, m)
 	sw.Do(typeBuilderMap, m)
 
@@ -400,85 +413,79 @@ func jsonName(tags string) (string, bool) {
 
 var typeBuilderStruct = `
 type $.type|public$Builder struct {
-  unstructured map[string]interface{}
+  underlying $.type|raw$
 }
 `
 
 var typeBuilderConstructor = `
 func $.type|public$() $.type|public$Builder {
-  return $.type|public$Builder{unstructured: map[string]interface{}{}}
+  return $.type|public$Builder{underlying: $.type|raw${}}
 }
 `
 
 var typeBuilderUnstructured = `
 func (b $.type|public$Builder) Unstructured() map[string]interface{} {
-  return b.unstructured
+  u, err := $.unstructuredConverter|raw$.ToUnstructured(&b.underlying)
+  if err != nil {
+    panic(err)
+  }
+  return u
 }
 `
 
-//var memberBuilderFunc_Get = `
-//func (b $.type|public$Builder) Get$.member.Name$() $.member.Type|public$Builder {
-//	return b.obj.$.member.Name$
-//}
-//`
+var typeBuilderBuild = `
+func (b $.type|public$Builder) Build() $.type|raw$ {
+  return b.underlying
+}
+`
 
 var memberBuilderFunc_Set = `
 func (b $.type|public$Builder) Set$.member.Name$(value $.memberBuilder|raw$) $.type|public$Builder {
-	b.unstructured["$.memberJsonName$"] = value.Unstructured()
+	b.underlying.$.member.Name$ = value.Build()
 	return b
 }
 `
 
-var memberBuilderFunc_Set_unstructured = `
+var memberBuilderFunc_Set_ptr = `
 func (b $.type|public$Builder) Set$.member.Name$(value $.memberBuilder|raw$) $.type|public$Builder {
-	u, err := $.unstructuredConverter|raw$.ToUnstructured(value)
-	if err != nil {
-		panic(err)
-	}
-	b.unstructured["$.memberJsonName$"] = u
+	ptr := value.Build()
+	b.underlying.$.member.Name$ = &ptr
 	return b
 }
 `
-
-//var memberBuilderFunc_Get_primitive = `
-//
-//func (b $.type|public$Builder) Get$.member.Name$() $.member.Type|raw$ {
-//	return  b.unstructured["$.memberJsonName$"].($.member.Type|raw$)
-//}
-//`
 
 var memberBuilderFunc_Set_primitive = `
 func (b $.type|public$Builder) Set$.member.Name$(value $.member.Type|raw$) $.type|public$Builder {
-	b.unstructured["$.memberJsonName$"] = value
+	b.underlying.$.member.Name$ = value
 	return b
 }
 `
 
-var memberBuilderFunc_Set_primitivealias = `
-func (b $.type|public$Builder) Set$.member.Name$(value $.member.Type|raw$) $.type|public$Builder {
-	b.unstructured["$.memberJsonName$"] = $.member.Type.Underlying|raw$(value)
+var memberBuilderFunc_Set_primitive_ptr = `
+func (b $.type|public$Builder) Set$.member.Name$(value $.member.Type.Elem|raw$) $.type|public$Builder {
+	b.underlying.$.member.Name$ = &value
 	return b
 }
 `
 
 var memberBuilderFunc_Set_map = `
 func (b $.type|public$Builder) Set$.member.Name$(values $.memberMapBuilder|raw$) $.type|public$Builder {
-	u := make(map[string]interface{}, len(values))
+	u := make($.member.Type|raw$, len(values))
 	for key, value := range values {
-		u[key] = value.Unstructured()
+		u[key] = value.Build()
 	}
-	b.unstructured["$.memberJsonName$"] = u
+	b.underlying.$.member.Name$ = u
 	return b
 }
 `
 
 var memberBuilderFunc_Set_slice = `
 func (b $.type|public$Builder) Set$.member.Name$(values $.memberListBuilder|raw$) $.type|public$Builder {
-	u := make([]interface{}, len(values))
+	u := make($.member.Type|raw$, len(values))
 	for i, value := range values {
-		u[i] = value.Unstructured()
+		u[i] = value.Build()
 	}
-	b.unstructured["$.memberJsonName$"] = u
+	b.underlying.$.member.Name$ = u
 	return b
 }
 `
