@@ -27,7 +27,6 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
@@ -48,6 +47,7 @@ import (
 	metav1manifest "k8s.io/client-go/typebuilders/meta/v1"
 	featuregatetesting "k8s.io/component-base/featuregate/testing"
 	"k8s.io/component-base/version"
+
 	kubeapiservertesting "k8s.io/kubernetes/cmd/kube-apiserver/app/testing"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	"k8s.io/kubernetes/test/integration/framework"
@@ -855,6 +855,9 @@ func TestApplyBuilders(t *testing.T) {
 		},
 	}
 
+	_, fs := deploymentManifest.Build()
+	t.Logf("fieldset:\n%s", fs.String())
+
 	obj := &appsv1.Deployment{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(deploymentManifest.Unstructured(), obj)
 	if err != nil {
@@ -863,4 +866,7 @@ func TestApplyBuilders(t *testing.T) {
 	if !apiequality.Semantic.DeepEqual(obj, expectedDeployment) {
 		t.Fatalf("expected %#v but got %#v\ndiff:\n%s", expectedDeployment, obj, cmp.Diff(expectedDeployment, obj))
 	}
+	// TODO(jpbetz): So we need to find some other way to assert that the field set is correctly.
+	// ObjectToTyped plus TypedValue.ToFieldSet() would get the fieldSet of the expectedDeployment, but it will contain defaulted fields and such.
+	// TypedValue around the unstructured and then get it's fieldset won't really tell that much since we used that fieldset to filter down the unstructured.
 }

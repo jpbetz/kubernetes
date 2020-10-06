@@ -281,6 +281,7 @@ func (g *builderTypeGenerator) Namers(c *generator.Context) namer.NameSystems {
 
 func (g *builderTypeGenerator) Imports(c *generator.Context) (imports []string) {
 	imports = append(imports, g.imports.ImportLines()...)
+	imports = append(imports, "sigs.k8s.io/structured-merge-diff/v4/fieldpath")
 	return
 }
 
@@ -291,6 +292,7 @@ func (g *builderTypeGenerator) GenerateType(c *generator.Context, t *types.Type,
 	m := map[string]interface{}{
 		"Resource":   c.Universe.Function(types.Name{Package: t.Name.Package, Name: "Resource"}),
 		"type":       t,
+		"unstructuredConverter": unstructuredConverter,
 	}
 
 	//tags, err := util.ParseClientGenTags(append(t.SecondClosestCommentLines, t.CommentLines...))
@@ -369,7 +371,6 @@ func (g *builderTypeGenerator) GenerateType(c *generator.Context, t *types.Type,
 		}
 	}
 
-	m["unstructuredConverter"] = unstructuredConverter
 	sw.Do(typeBuilderUnstructured, m)
 	sw.Do(typeBuilderBuild, m)
 	sw.Do(typeBuilderList, m)
@@ -414,15 +415,19 @@ func jsonName(tags string) (string, bool) {
 var typeBuilderStruct = `
 type $.type|public$Builder struct {
   underlying $.type|raw$
+  fieldSet *fieldpath.Set
 }
 `
 
 var typeBuilderConstructor = `
 func $.type|public$() $.type|public$Builder {
-  return $.type|public$Builder{underlying: $.type|raw${}}
+  return $.type|public$Builder{underlying: $.type|raw${}, fieldSet: fieldpath.NewSet()}
 }
 `
 
+// TODO(jpbetz): Remove all fields not in the fieldSet.
+// potential short term hack: Use TypedValue.Remove(TypedValue.ToFieldSet().Difference(builder.fieldSet))
+// Ideally we would have an inverse of remove that only keeps the right elements.
 var typeBuilderUnstructured = `
 func (b $.type|public$Builder) Unstructured() map[string]interface{} {
   u, err := $.unstructuredConverter|raw$.ToUnstructured(&b.underlying)
@@ -434,22 +439,31 @@ func (b $.type|public$Builder) Unstructured() map[string]interface{} {
 `
 
 var typeBuilderBuild = `
-func (b $.type|public$Builder) Build() $.type|raw$ {
-  return b.underlying
+func (b $.type|public$Builder) Build() ($.type|raw$, *fieldpath.Set) {
+  return b.underlying, b.fieldSet
 }
 `
 
 var memberBuilderFunc_Set = `
 func (b $.type|public$Builder) Set$.member.Name$(value $.memberBuilder|raw$) $.type|public$Builder {
-	b.underlying.$.member.Name$ = value.Build()
+	v, memberFieldSet := value.Build()
+	b.underlying.$.member.Name$ = v
+	fn := "$.memberJsonName$"
+	setAtMemberPath := b.fieldSet.Children.Descend(fieldpath.PathElement{FieldName: &fn})
+	setAtMemberPath.Members = *setAtMemberPath.Members.Union(&memberFieldSet.Members)
+	setAtMemberPath.Children = *setAtMemberPath.Children.Union(&memberFieldSet.Children)
 	return b
 }
 `
 
 var memberBuilderFunc_Set_ptr = `
 func (b $.type|public$Builder) Set$.member.Name$(value $.memberBuilder|raw$) $.type|public$Builder {
-	ptr := value.Build()
+	ptr, memberFieldSet := value.Build()
 	b.underlying.$.member.Name$ = &ptr
+	fn := "$.memberJsonName$"
+	setAtMemberPath := b.fieldSet.Children.Descend(fieldpath.PathElement{FieldName: &fn})
+	setAtMemberPath.Members = *setAtMemberPath.Members.Union(&memberFieldSet.Members)
+	setAtMemberPath.Children = *setAtMemberPath.Children.Union(&memberFieldSet.Children)
 	return b
 }
 `
@@ -457,6 +471,8 @@ func (b $.type|public$Builder) Set$.member.Name$(value $.memberBuilder|raw$) $.t
 var memberBuilderFunc_Set_primitive = `
 func (b $.type|public$Builder) Set$.member.Name$(value $.member.Type|raw$) $.type|public$Builder {
 	b.underlying.$.member.Name$ = value
+	fn := "$.memberJsonName$"
+	b.fieldSet.Insert(fieldpath.Path{fieldpath.PathElement{FieldName: &fn}})
 	return b
 }
 `
@@ -464,26 +480,41 @@ func (b $.type|public$Builder) Set$.member.Name$(value $.member.Type|raw$) $.typ
 var memberBuilderFunc_Set_primitive_ptr = `
 func (b $.type|public$Builder) Set$.member.Name$(value $.member.Type.Elem|raw$) $.type|public$Builder {
 	b.underlying.$.member.Name$ = &value
+	fn := "$.memberJsonName$"
+	b.fieldSet.Insert(fieldpath.Path{fieldpath.PathElement{FieldName: &fn}})
 	return b
 }
 `
 
+// TODO: This doesn't include all the labels subfields like it should
+// generally we need to respect atomic and granular when constructing field sets
 var memberBuilderFunc_Set_map = `
 func (b $.type|public$Builder) Set$.member.Name$(values $.memberMapBuilder|raw$) $.type|public$Builder {
 	u := make($.member.Type|raw$, len(values))
 	for key, value := range values {
-		u[key] = value.Build()
+		v, fs := value.Build()
+		u[key] = v
+		setAtMemberPath := b.fieldSet.Children.Descend(fieldpath.PathElement{FieldName: &key})
+		setAtMemberPath.Members = *setAtMemberPath.Members.Union(&fs.Members)
+		setAtMemberPath.Children = *setAtMemberPath.Children.Union(&fs.Children)
 	}
 	b.underlying.$.member.Name$ = u
 	return b
 }
 `
 
+// TODO: This doesn't include all subfields like it should
+// generally we need to respect atomic and granular when constructing field sets
 var memberBuilderFunc_Set_slice = `
 func (b $.type|public$Builder) Set$.member.Name$(values $.memberListBuilder|raw$) $.type|public$Builder {
 	u := make($.member.Type|raw$, len(values))
 	for i, value := range values {
-		u[i] = value.Build()
+		v, fs := value.Build()
+		u[i] = v
+		index := i
+		setAtMemberPath := b.fieldSet.Children.Descend(fieldpath.PathElement{Index: &index})
+		setAtMemberPath.Members = *setAtMemberPath.Members.Union(&fs.Members)
+		setAtMemberPath.Children = *setAtMemberPath.Children.Union(&fs.Children)
 	}
 	b.underlying.$.member.Name$ = u
 	return b
