@@ -856,11 +856,17 @@ func TestApplyBuilders(t *testing.T) {
 	}
 
 	obj := &appsv1.Deployment{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(deploymentManifest.Unstructured(), obj)
+	err := runtime.DefaultUnstructuredConverter.FromUnstructured(deploymentManifest.ToUnstructured(), obj)
 	if err != nil {
+
 		t.Fatalf("unexpected error when converting manifest to Deployment struct: %v", err)
 	}
 	if !apiequality.Semantic.DeepEqual(obj, expectedDeployment) {
 		t.Fatalf("expected %#v but got %#v\ndiff:\n%s", expectedDeployment, obj, cmp.Diff(expectedDeployment, obj))
 	}
+
+	// TODO(jpbetz): Add test cases that ensure the unstructured format from both builders and structs match (for cases where the builder sets all required fields).
+	// Make sure to cover primitive types, Quantity, RawExtension, Unknown and similar.
+
+	// TODO(jpbetz): Add CRD test cases
 }
