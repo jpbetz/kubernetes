@@ -22,6 +22,8 @@ import (
 	"sort"
 	"time"
 
+	metav1apply "k8s.io/client-go/typebuilders/meta/v1"
+	rbacv1apply "k8s.io/client-go/typebuilders/rbac/v1"
 	"k8s.io/klog/v2"
 
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -121,13 +123,28 @@ func (c *ClusterRoleAggregationController) syncClusterRole(key string) error {
 		return nil
 	}
 
-	// we need to update
-	clusterRole := sharedClusterRole.DeepCopy()
-	clusterRole.Rules = nil
+	// TODO(jpbetz): Simplify by replacing above newPolicyRules with build type
+	// Is it also OK to unconditionally apply without checking for diff?
+	var rules rbacv1apply.PolicyRuleList
 	for _, rule := range newPolicyRules {
-		clusterRole.Rules = append(clusterRole.Rules, *rule.DeepCopy())
+		rules = append(rules, rbacv1apply.PolicyRule().
+			SetResources(rule.Resources).
+			SetAPIGroups(rule.APIGroups).
+			SetNonResourceURLs(rule.NonResourceURLs).
+			SetVerbs(rule.Verbs),
+		)
 	}
-	_, err = c.clusterRoleClient.ClusterRoles().Update(context.TODO(), clusterRole, metav1.UpdateOptions{})
+	clusterRole := rbacv1apply.ClusterRole().
+		SetTypeMeta(metav1apply.TypeMeta().
+			SetKind("clusterRole").
+			SetAPIVersion(rbacv1.SchemeGroupVersion.String()),
+		).
+		SetObjectMeta(metav1apply.ObjectMeta().
+			SetName(sharedClusterRole.Name),
+		).
+		SetRules(rules)
+
+	_, err = c.clusterRoleClient.ClusterRoles().Apply(context.TODO(), clusterRole, "clusteraggregationcontroller", metav1.ApplyOptions{})
 
 	return err
 }
