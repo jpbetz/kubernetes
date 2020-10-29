@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	typebuilderscorev1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
 // FakeConfigMaps implements ConfigMapInterface
@@ -122,6 +124,29 @@ func (c *FakeConfigMaps) DeleteCollection(ctx context.Context, opts v1.DeleteOpt
 func (c *FakeConfigMaps) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *corev1.ConfigMap, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(configmapsResource, c.ns, name, pt, data, subresources...), &corev1.ConfigMap{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*corev1.ConfigMap), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied configMap.
+func (c *FakeConfigMaps) Apply(ctx context.Context, configMap typebuilderscorev1.ConfigMapBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ConfigMap, err error) {
+	data, err := configMap.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := configMap.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("configMap.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("configMap.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(configmapsResource, c.ns, name, types.ApplyPatchType, data, subresources...), &corev1.ConfigMap{})
 
 	if obj == nil {
 		return nil, err

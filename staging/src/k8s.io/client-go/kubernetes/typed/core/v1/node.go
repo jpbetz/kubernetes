@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -28,6 +29,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	corev1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
 // NodesGetter has a method to return a NodeInterface.
@@ -47,6 +49,7 @@ type NodeInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.NodeList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.Node, err error)
+	Apply(ctx context.Context, node corev1.NodeBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Node, err error)
 	NodeExpansion
 }
 
@@ -177,6 +180,33 @@ func (c *nodes) Patch(ctx context.Context, name string, pt types.PatchType, data
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied node.
+func (c *nodes) Apply(ctx context.Context, node corev1.NodeBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Node, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := node.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := node.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("node.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("node.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1.Node{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Resource("nodes").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

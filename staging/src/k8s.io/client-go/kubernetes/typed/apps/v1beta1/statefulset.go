@@ -20,6 +20,7 @@ package v1beta1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1beta1 "k8s.io/api/apps/v1beta1"
@@ -28,6 +29,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	appsv1beta1 "k8s.io/client-go/typebuilders/apps/v1beta1"
 )
 
 // StatefulSetsGetter has a method to return a StatefulSetInterface.
@@ -47,6 +49,7 @@ type StatefulSetInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1beta1.StatefulSetList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.StatefulSet, err error)
+	Apply(ctx context.Context, statefulSet appsv1beta1.StatefulSetBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.StatefulSet, err error)
 	StatefulSetExpansion
 }
 
@@ -188,6 +191,34 @@ func (c *statefulSets) Patch(ctx context.Context, name string, pt types.PatchTyp
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied statefulSet.
+func (c *statefulSets) Apply(ctx context.Context, statefulSet appsv1beta1.StatefulSetBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.StatefulSet, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := statefulSet.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := statefulSet.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("statefulSet.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("statefulSet.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1beta1.StatefulSet{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("statefulsets").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

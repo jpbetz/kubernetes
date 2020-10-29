@@ -20,6 +20,7 @@ package v1alpha1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
@@ -28,6 +29,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	flowcontrolv1alpha1 "k8s.io/client-go/typebuilders/flowcontrol/v1alpha1"
 )
 
 // PriorityLevelConfigurationsGetter has a method to return a PriorityLevelConfigurationInterface.
@@ -47,6 +49,7 @@ type PriorityLevelConfigurationInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.PriorityLevelConfigurationList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.PriorityLevelConfiguration, err error)
+	Apply(ctx context.Context, priorityLevelConfiguration flowcontrolv1alpha1.PriorityLevelConfigurationBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.PriorityLevelConfiguration, err error)
 	PriorityLevelConfigurationExpansion
 }
 
@@ -177,6 +180,33 @@ func (c *priorityLevelConfigurations) Patch(ctx context.Context, name string, pt
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied priorityLevelConfiguration.
+func (c *priorityLevelConfigurations) Apply(ctx context.Context, priorityLevelConfiguration flowcontrolv1alpha1.PriorityLevelConfigurationBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.PriorityLevelConfiguration, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := priorityLevelConfiguration.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := priorityLevelConfiguration.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("priorityLevelConfiguration.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("priorityLevelConfiguration.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1alpha1.PriorityLevelConfiguration{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Resource("prioritylevelconfigurations").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

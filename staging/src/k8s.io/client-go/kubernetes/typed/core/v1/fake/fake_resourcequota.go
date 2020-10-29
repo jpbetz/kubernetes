@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	typebuilderscorev1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
 // FakeResourceQuotas implements ResourceQuotaInterface
@@ -134,6 +136,29 @@ func (c *FakeResourceQuotas) DeleteCollection(ctx context.Context, opts v1.Delet
 func (c *FakeResourceQuotas) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *corev1.ResourceQuota, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(resourcequotasResource, c.ns, name, pt, data, subresources...), &corev1.ResourceQuota{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*corev1.ResourceQuota), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied resourceQuota.
+func (c *FakeResourceQuotas) Apply(ctx context.Context, resourceQuota typebuilderscorev1.ResourceQuotaBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ResourceQuota, err error) {
+	data, err := resourceQuota.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := resourceQuota.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("resourceQuota.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("resourceQuota.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(resourcequotasResource, c.ns, name, types.ApplyPatchType, data, subresources...), &corev1.ResourceQuota{})
 
 	if obj == nil {
 		return nil, err

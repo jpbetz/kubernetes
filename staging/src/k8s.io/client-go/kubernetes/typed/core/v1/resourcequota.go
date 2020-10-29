@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -28,6 +29,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	corev1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
 // ResourceQuotasGetter has a method to return a ResourceQuotaInterface.
@@ -47,6 +49,7 @@ type ResourceQuotaInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.ResourceQuotaList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.ResourceQuota, err error)
+	Apply(ctx context.Context, resourceQuota corev1.ResourceQuotaBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ResourceQuota, err error)
 	ResourceQuotaExpansion
 }
 
@@ -188,6 +191,34 @@ func (c *resourceQuotas) Patch(ctx context.Context, name string, pt types.PatchT
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied resourceQuota.
+func (c *resourceQuotas) Apply(ctx context.Context, resourceQuota corev1.ResourceQuotaBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ResourceQuota, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := resourceQuota.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := resourceQuota.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("resourceQuota.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("resourceQuota.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1.ResourceQuota{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("resourcequotas").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

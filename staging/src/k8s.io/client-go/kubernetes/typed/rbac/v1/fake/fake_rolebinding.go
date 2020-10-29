@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	rbacv1 "k8s.io/api/rbac/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	typebuildersrbacv1 "k8s.io/client-go/typebuilders/rbac/v1"
 )
 
 // FakeRoleBindings implements RoleBindingInterface
@@ -122,6 +124,29 @@ func (c *FakeRoleBindings) DeleteCollection(ctx context.Context, opts v1.DeleteO
 func (c *FakeRoleBindings) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *rbacv1.RoleBinding, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(rolebindingsResource, c.ns, name, pt, data, subresources...), &rbacv1.RoleBinding{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*rbacv1.RoleBinding), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied roleBinding.
+func (c *FakeRoleBindings) Apply(ctx context.Context, roleBinding typebuildersrbacv1.RoleBindingBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *rbacv1.RoleBinding, err error) {
+	data, err := roleBinding.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := roleBinding.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("roleBinding.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("roleBinding.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(rolebindingsResource, c.ns, name, types.ApplyPatchType, data, subresources...), &rbacv1.RoleBinding{})
 
 	if obj == nil {
 		return nil, err

@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	v1beta1 "k8s.io/api/extensions/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	extensionsv1beta1 "k8s.io/client-go/typebuilders/extensions/v1beta1"
 )
 
 // FakeDaemonSets implements DaemonSetInterface
@@ -134,6 +136,29 @@ func (c *FakeDaemonSets) DeleteCollection(ctx context.Context, opts v1.DeleteOpt
 func (c *FakeDaemonSets) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.DaemonSet, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(daemonsetsResource, c.ns, name, pt, data, subresources...), &v1beta1.DaemonSet{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1beta1.DaemonSet), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied daemonSet.
+func (c *FakeDaemonSets) Apply(ctx context.Context, daemonSet extensionsv1beta1.DaemonSetBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.DaemonSet, err error) {
+	data, err := daemonSet.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := daemonSet.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("daemonSet.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("daemonSet.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(daemonsetsResource, c.ns, name, types.ApplyPatchType, data, subresources...), &v1beta1.DaemonSet{})
 
 	if obj == nil {
 		return nil, err

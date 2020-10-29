@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	typebuilderscorev1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
 // FakePodTemplates implements PodTemplateInterface
@@ -122,6 +124,29 @@ func (c *FakePodTemplates) DeleteCollection(ctx context.Context, opts v1.DeleteO
 func (c *FakePodTemplates) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *corev1.PodTemplate, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(podtemplatesResource, c.ns, name, pt, data, subresources...), &corev1.PodTemplate{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*corev1.PodTemplate), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied podTemplate.
+func (c *FakePodTemplates) Apply(ctx context.Context, podTemplate typebuilderscorev1.PodTemplateBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.PodTemplate, err error) {
+	data, err := podTemplate.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := podTemplate.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("podTemplate.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("podTemplate.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(podtemplatesResource, c.ns, name, types.ApplyPatchType, data, subresources...), &corev1.PodTemplate{})
 
 	if obj == nil {
 		return nil, err

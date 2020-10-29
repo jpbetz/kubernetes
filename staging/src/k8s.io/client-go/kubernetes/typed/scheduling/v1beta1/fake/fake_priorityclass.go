@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	v1beta1 "k8s.io/api/scheduling/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	schedulingv1beta1 "k8s.io/client-go/typebuilders/scheduling/v1beta1"
 )
 
 // FakePriorityClasses implements PriorityClassInterface
@@ -115,6 +117,28 @@ func (c *FakePriorityClasses) DeleteCollection(ctx context.Context, opts v1.Dele
 func (c *FakePriorityClasses) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.PriorityClass, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootPatchSubresourceAction(priorityclassesResource, name, pt, data, subresources...), &v1beta1.PriorityClass{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1beta1.PriorityClass), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied priorityClass.
+func (c *FakePriorityClasses) Apply(ctx context.Context, priorityClass schedulingv1beta1.PriorityClassBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PriorityClass, err error) {
+	data, err := priorityClass.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := priorityClass.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("priorityClass.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("priorityClass.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewRootPatchSubresourceAction(priorityclassesResource, name, types.ApplyPatchType, data, subresources...), &v1beta1.PriorityClass{})
 	if obj == nil {
 		return nil, err
 	}

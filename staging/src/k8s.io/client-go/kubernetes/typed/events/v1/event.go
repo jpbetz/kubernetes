@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1 "k8s.io/api/events/v1"
@@ -28,6 +29,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	eventsv1 "k8s.io/client-go/typebuilders/events/v1"
 )
 
 // EventsGetter has a method to return a EventInterface.
@@ -46,6 +48,7 @@ type EventInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.EventList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.Event, err error)
+	Apply(ctx context.Context, event eventsv1.EventBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Event, err error)
 	EventExpansion
 }
 
@@ -171,6 +174,34 @@ func (c *events) Patch(ctx context.Context, name string, pt types.PatchType, dat
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied event.
+func (c *events) Apply(ctx context.Context, event eventsv1.EventBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Event, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := event.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := event.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("event.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("event.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1.Event{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("events").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

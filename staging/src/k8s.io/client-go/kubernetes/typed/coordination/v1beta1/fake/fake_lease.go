@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	v1beta1 "k8s.io/api/coordination/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	coordinationv1beta1 "k8s.io/client-go/typebuilders/coordination/v1beta1"
 )
 
 // FakeLeases implements LeaseInterface
@@ -122,6 +124,29 @@ func (c *FakeLeases) DeleteCollection(ctx context.Context, opts v1.DeleteOptions
 func (c *FakeLeases) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.Lease, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(leasesResource, c.ns, name, pt, data, subresources...), &v1beta1.Lease{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1beta1.Lease), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied lease.
+func (c *FakeLeases) Apply(ctx context.Context, lease coordinationv1beta1.LeaseBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.Lease, err error) {
+	data, err := lease.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := lease.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("lease.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("lease.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(leasesResource, c.ns, name, types.ApplyPatchType, data, subresources...), &v1beta1.Lease{})
 
 	if obj == nil {
 		return nil, err

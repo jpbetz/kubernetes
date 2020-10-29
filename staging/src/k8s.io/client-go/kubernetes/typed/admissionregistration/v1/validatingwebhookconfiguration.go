@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1 "k8s.io/api/admissionregistration/v1"
@@ -28,6 +29,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	admissionregistrationv1 "k8s.io/client-go/typebuilders/admissionregistration/v1"
 )
 
 // ValidatingWebhookConfigurationsGetter has a method to return a ValidatingWebhookConfigurationInterface.
@@ -46,6 +48,7 @@ type ValidatingWebhookConfigurationInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.ValidatingWebhookConfigurationList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.ValidatingWebhookConfiguration, err error)
+	Apply(ctx context.Context, validatingWebhookConfiguration admissionregistrationv1.ValidatingWebhookConfigurationBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ValidatingWebhookConfiguration, err error)
 	ValidatingWebhookConfigurationExpansion
 }
 
@@ -161,6 +164,33 @@ func (c *validatingWebhookConfigurations) Patch(ctx context.Context, name string
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied validatingWebhookConfiguration.
+func (c *validatingWebhookConfigurations) Apply(ctx context.Context, validatingWebhookConfiguration admissionregistrationv1.ValidatingWebhookConfigurationBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ValidatingWebhookConfiguration, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := validatingWebhookConfiguration.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := validatingWebhookConfiguration.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("validatingWebhookConfiguration.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("validatingWebhookConfiguration.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1.ValidatingWebhookConfiguration{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Resource("validatingwebhookconfigurations").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

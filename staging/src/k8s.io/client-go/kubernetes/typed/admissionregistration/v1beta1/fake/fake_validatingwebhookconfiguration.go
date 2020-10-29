@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	v1beta1 "k8s.io/api/admissionregistration/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	admissionregistrationv1beta1 "k8s.io/client-go/typebuilders/admissionregistration/v1beta1"
 )
 
 // FakeValidatingWebhookConfigurations implements ValidatingWebhookConfigurationInterface
@@ -115,6 +117,28 @@ func (c *FakeValidatingWebhookConfigurations) DeleteCollection(ctx context.Conte
 func (c *FakeValidatingWebhookConfigurations) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.ValidatingWebhookConfiguration, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootPatchSubresourceAction(validatingwebhookconfigurationsResource, name, pt, data, subresources...), &v1beta1.ValidatingWebhookConfiguration{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1beta1.ValidatingWebhookConfiguration), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied validatingWebhookConfiguration.
+func (c *FakeValidatingWebhookConfigurations) Apply(ctx context.Context, validatingWebhookConfiguration admissionregistrationv1beta1.ValidatingWebhookConfigurationBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ValidatingWebhookConfiguration, err error) {
+	data, err := validatingWebhookConfiguration.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := validatingWebhookConfiguration.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("validatingWebhookConfiguration.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("validatingWebhookConfiguration.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewRootPatchSubresourceAction(validatingwebhookconfigurationsResource, name, types.ApplyPatchType, data, subresources...), &v1beta1.ValidatingWebhookConfiguration{})
 	if obj == nil {
 		return nil, err
 	}

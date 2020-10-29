@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	storagev1 "k8s.io/api/storage/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	typebuildersstoragev1 "k8s.io/client-go/typebuilders/storage/v1"
 )
 
 // FakeStorageClasses implements StorageClassInterface
@@ -115,6 +117,28 @@ func (c *FakeStorageClasses) DeleteCollection(ctx context.Context, opts v1.Delet
 func (c *FakeStorageClasses) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *storagev1.StorageClass, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootPatchSubresourceAction(storageclassesResource, name, pt, data, subresources...), &storagev1.StorageClass{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*storagev1.StorageClass), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied storageClass.
+func (c *FakeStorageClasses) Apply(ctx context.Context, storageClass typebuildersstoragev1.StorageClassBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *storagev1.StorageClass, err error) {
+	data, err := storageClass.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := storageClass.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("storageClass.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("storageClass.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewRootPatchSubresourceAction(storageclassesResource, name, types.ApplyPatchType, data, subresources...), &storagev1.StorageClass{})
 	if obj == nil {
 		return nil, err
 	}

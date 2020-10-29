@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	v1beta1 "k8s.io/api/apps/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	appsv1beta1 "k8s.io/client-go/typebuilders/apps/v1beta1"
 )
 
 // FakeStatefulSets implements StatefulSetInterface
@@ -134,6 +136,29 @@ func (c *FakeStatefulSets) DeleteCollection(ctx context.Context, opts v1.DeleteO
 func (c *FakeStatefulSets) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.StatefulSet, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(statefulsetsResource, c.ns, name, pt, data, subresources...), &v1beta1.StatefulSet{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1beta1.StatefulSet), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied statefulSet.
+func (c *FakeStatefulSets) Apply(ctx context.Context, statefulSet appsv1beta1.StatefulSetBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.StatefulSet, err error) {
+	data, err := statefulSet.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := statefulSet.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("statefulSet.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("statefulSet.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(statefulsetsResource, c.ns, name, types.ApplyPatchType, data, subresources...), &v1beta1.StatefulSet{})
 
 	if obj == nil {
 		return nil, err

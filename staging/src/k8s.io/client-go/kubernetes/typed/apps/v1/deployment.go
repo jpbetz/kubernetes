@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1 "k8s.io/api/apps/v1"
@@ -29,6 +30,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	appsv1 "k8s.io/client-go/typebuilders/apps/v1"
 )
 
 // DeploymentsGetter has a method to return a DeploymentInterface.
@@ -48,6 +50,7 @@ type DeploymentInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.DeploymentList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.Deployment, err error)
+	Apply(ctx context.Context, deployment appsv1.DeploymentBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Deployment, err error)
 	GetScale(ctx context.Context, deploymentName string, options metav1.GetOptions) (*autoscalingv1.Scale, error)
 	UpdateScale(ctx context.Context, deploymentName string, scale *autoscalingv1.Scale, opts metav1.UpdateOptions) (*autoscalingv1.Scale, error)
 
@@ -192,6 +195,34 @@ func (c *deployments) Patch(ctx context.Context, name string, pt types.PatchType
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied deployment.
+func (c *deployments) Apply(ctx context.Context, deployment appsv1.DeploymentBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Deployment, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := deployment.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := deployment.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("deployment.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("deployment.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1.Deployment{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("deployments").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

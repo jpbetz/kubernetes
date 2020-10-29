@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	v1beta1 "k8s.io/api/certificates/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	certificatesv1beta1 "k8s.io/client-go/typebuilders/certificates/v1beta1"
 )
 
 // FakeCertificateSigningRequests implements CertificateSigningRequestInterface
@@ -126,6 +128,28 @@ func (c *FakeCertificateSigningRequests) DeleteCollection(ctx context.Context, o
 func (c *FakeCertificateSigningRequests) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.CertificateSigningRequest, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootPatchSubresourceAction(certificatesigningrequestsResource, name, pt, data, subresources...), &v1beta1.CertificateSigningRequest{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1beta1.CertificateSigningRequest), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied certificateSigningRequest.
+func (c *FakeCertificateSigningRequests) Apply(ctx context.Context, certificateSigningRequest certificatesv1beta1.CertificateSigningRequestBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.CertificateSigningRequest, err error) {
+	data, err := certificateSigningRequest.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := certificateSigningRequest.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("certificateSigningRequest.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("certificateSigningRequest.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewRootPatchSubresourceAction(certificatesigningrequestsResource, name, types.ApplyPatchType, data, subresources...), &v1beta1.CertificateSigningRequest{})
 	if obj == nil {
 		return nil, err
 	}

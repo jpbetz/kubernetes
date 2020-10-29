@@ -20,6 +20,7 @@ package v1alpha1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
@@ -28,6 +29,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	flowcontrolv1alpha1 "k8s.io/client-go/typebuilders/flowcontrol/v1alpha1"
 )
 
 // FlowSchemasGetter has a method to return a FlowSchemaInterface.
@@ -47,6 +49,7 @@ type FlowSchemaInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.FlowSchemaList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.FlowSchema, err error)
+	Apply(ctx context.Context, flowSchema flowcontrolv1alpha1.FlowSchemaBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.FlowSchema, err error)
 	FlowSchemaExpansion
 }
 
@@ -177,6 +180,33 @@ func (c *flowSchemas) Patch(ctx context.Context, name string, pt types.PatchType
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied flowSchema.
+func (c *flowSchemas) Apply(ctx context.Context, flowSchema flowcontrolv1alpha1.FlowSchemaBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.FlowSchema, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := flowSchema.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := flowSchema.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("flowSchema.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("flowSchema.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1alpha1.FlowSchema{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Resource("flowschemas").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	typebuilderscorev1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
 // FakeComponentStatuses implements ComponentStatusInterface
@@ -115,6 +117,28 @@ func (c *FakeComponentStatuses) DeleteCollection(ctx context.Context, opts v1.De
 func (c *FakeComponentStatuses) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *corev1.ComponentStatus, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootPatchSubresourceAction(componentstatusesResource, name, pt, data, subresources...), &corev1.ComponentStatus{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*corev1.ComponentStatus), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied componentStatus.
+func (c *FakeComponentStatuses) Apply(ctx context.Context, componentStatus typebuilderscorev1.ComponentStatusBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ComponentStatus, err error) {
+	data, err := componentStatus.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := componentStatus.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("componentStatus.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("componentStatus.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewRootPatchSubresourceAction(componentstatusesResource, name, types.ApplyPatchType, data, subresources...), &corev1.ComponentStatus{})
 	if obj == nil {
 		return nil, err
 	}

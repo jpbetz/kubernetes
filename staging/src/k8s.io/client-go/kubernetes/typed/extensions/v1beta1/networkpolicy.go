@@ -20,6 +20,7 @@ package v1beta1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1beta1 "k8s.io/api/extensions/v1beta1"
@@ -28,6 +29,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	extensionsv1beta1 "k8s.io/client-go/typebuilders/extensions/v1beta1"
 )
 
 // NetworkPoliciesGetter has a method to return a NetworkPolicyInterface.
@@ -46,6 +48,7 @@ type NetworkPolicyInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1beta1.NetworkPolicyList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.NetworkPolicy, err error)
+	Apply(ctx context.Context, networkPolicy extensionsv1beta1.NetworkPolicyBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.NetworkPolicy, err error)
 	NetworkPolicyExpansion
 }
 
@@ -171,6 +174,34 @@ func (c *networkPolicies) Patch(ctx context.Context, name string, pt types.Patch
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied networkPolicy.
+func (c *networkPolicies) Apply(ctx context.Context, networkPolicy extensionsv1beta1.NetworkPolicyBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.NetworkPolicy, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := networkPolicy.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := networkPolicy.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("networkPolicy.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("networkPolicy.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1beta1.NetworkPolicy{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("networkpolicies").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

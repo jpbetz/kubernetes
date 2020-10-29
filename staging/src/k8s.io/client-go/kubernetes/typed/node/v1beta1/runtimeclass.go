@@ -20,6 +20,7 @@ package v1beta1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1beta1 "k8s.io/api/node/v1beta1"
@@ -28,6 +29,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	nodev1beta1 "k8s.io/client-go/typebuilders/node/v1beta1"
 )
 
 // RuntimeClassesGetter has a method to return a RuntimeClassInterface.
@@ -46,6 +48,7 @@ type RuntimeClassInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1beta1.RuntimeClassList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.RuntimeClass, err error)
+	Apply(ctx context.Context, runtimeClass nodev1beta1.RuntimeClassBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.RuntimeClass, err error)
 	RuntimeClassExpansion
 }
 
@@ -161,6 +164,33 @@ func (c *runtimeClasses) Patch(ctx context.Context, name string, pt types.PatchT
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied runtimeClass.
+func (c *runtimeClasses) Apply(ctx context.Context, runtimeClass nodev1beta1.RuntimeClassBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.RuntimeClass, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := runtimeClass.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := runtimeClass.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("runtimeClass.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("runtimeClass.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1beta1.RuntimeClass{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Resource("runtimeclasses").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

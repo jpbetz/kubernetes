@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -28,6 +29,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	corev1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
 // PersistentVolumeClaimsGetter has a method to return a PersistentVolumeClaimInterface.
@@ -47,6 +49,7 @@ type PersistentVolumeClaimInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.PersistentVolumeClaimList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.PersistentVolumeClaim, err error)
+	Apply(ctx context.Context, persistentVolumeClaim corev1.PersistentVolumeClaimBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.PersistentVolumeClaim, err error)
 	PersistentVolumeClaimExpansion
 }
 
@@ -188,6 +191,34 @@ func (c *persistentVolumeClaims) Patch(ctx context.Context, name string, pt type
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied persistentVolumeClaim.
+func (c *persistentVolumeClaims) Apply(ctx context.Context, persistentVolumeClaim corev1.PersistentVolumeClaimBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.PersistentVolumeClaim, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := persistentVolumeClaim.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := persistentVolumeClaim.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("persistentVolumeClaim.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("persistentVolumeClaim.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1.PersistentVolumeClaim{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("persistentvolumeclaims").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

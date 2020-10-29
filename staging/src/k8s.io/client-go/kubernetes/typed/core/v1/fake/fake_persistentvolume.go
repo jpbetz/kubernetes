@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	typebuilderscorev1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
 // FakePersistentVolumes implements PersistentVolumeInterface
@@ -126,6 +128,28 @@ func (c *FakePersistentVolumes) DeleteCollection(ctx context.Context, opts v1.De
 func (c *FakePersistentVolumes) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *corev1.PersistentVolume, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootPatchSubresourceAction(persistentvolumesResource, name, pt, data, subresources...), &corev1.PersistentVolume{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*corev1.PersistentVolume), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied persistentVolume.
+func (c *FakePersistentVolumes) Apply(ctx context.Context, persistentVolume typebuilderscorev1.PersistentVolumeBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.PersistentVolume, err error) {
+	data, err := persistentVolume.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := persistentVolume.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("persistentVolume.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("persistentVolume.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewRootPatchSubresourceAction(persistentvolumesResource, name, types.ApplyPatchType, data, subresources...), &corev1.PersistentVolume{})
 	if obj == nil {
 		return nil, err
 	}

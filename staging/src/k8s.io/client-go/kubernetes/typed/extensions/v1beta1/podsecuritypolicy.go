@@ -20,6 +20,7 @@ package v1beta1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1beta1 "k8s.io/api/extensions/v1beta1"
@@ -28,6 +29,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	extensionsv1beta1 "k8s.io/client-go/typebuilders/extensions/v1beta1"
 )
 
 // PodSecurityPoliciesGetter has a method to return a PodSecurityPolicyInterface.
@@ -46,6 +48,7 @@ type PodSecurityPolicyInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1beta1.PodSecurityPolicyList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.PodSecurityPolicy, err error)
+	Apply(ctx context.Context, podSecurityPolicy extensionsv1beta1.PodSecurityPolicyBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PodSecurityPolicy, err error)
 	PodSecurityPolicyExpansion
 }
 
@@ -161,6 +164,33 @@ func (c *podSecurityPolicies) Patch(ctx context.Context, name string, pt types.P
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied podSecurityPolicy.
+func (c *podSecurityPolicies) Apply(ctx context.Context, podSecurityPolicy extensionsv1beta1.PodSecurityPolicyBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PodSecurityPolicy, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := podSecurityPolicy.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := podSecurityPolicy.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("podSecurityPolicy.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("podSecurityPolicy.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1beta1.PodSecurityPolicy{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Resource("podsecuritypolicies").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

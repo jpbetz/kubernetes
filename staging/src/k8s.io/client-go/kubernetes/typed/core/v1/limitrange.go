@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -28,6 +29,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	corev1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
 // LimitRangesGetter has a method to return a LimitRangeInterface.
@@ -46,6 +48,7 @@ type LimitRangeInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.LimitRangeList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.LimitRange, err error)
+	Apply(ctx context.Context, limitRange corev1.LimitRangeBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.LimitRange, err error)
 	LimitRangeExpansion
 }
 
@@ -171,6 +174,34 @@ func (c *limitRanges) Patch(ctx context.Context, name string, pt types.PatchType
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied limitRange.
+func (c *limitRanges) Apply(ctx context.Context, limitRange corev1.LimitRangeBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.LimitRange, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := limitRange.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := limitRange.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("limitRange.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("limitRange.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1.LimitRange{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("limitranges").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

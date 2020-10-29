@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1 "k8s.io/api/batch/v1"
@@ -28,6 +29,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	batchv1 "k8s.io/client-go/typebuilders/batch/v1"
 )
 
 // JobsGetter has a method to return a JobInterface.
@@ -47,6 +49,7 @@ type JobInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.JobList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.Job, err error)
+	Apply(ctx context.Context, job batchv1.JobBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Job, err error)
 	JobExpansion
 }
 
@@ -188,6 +191,34 @@ func (c *jobs) Patch(ctx context.Context, name string, pt types.PatchType, data 
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied job.
+func (c *jobs) Apply(ctx context.Context, job batchv1.JobBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Job, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := job.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := job.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("job.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("job.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1.Job{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("jobs").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

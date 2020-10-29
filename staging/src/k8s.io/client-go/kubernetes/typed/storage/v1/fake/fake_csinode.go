@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	storagev1 "k8s.io/api/storage/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	typebuildersstoragev1 "k8s.io/client-go/typebuilders/storage/v1"
 )
 
 // FakeCSINodes implements CSINodeInterface
@@ -115,6 +117,28 @@ func (c *FakeCSINodes) DeleteCollection(ctx context.Context, opts v1.DeleteOptio
 func (c *FakeCSINodes) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *storagev1.CSINode, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootPatchSubresourceAction(csinodesResource, name, pt, data, subresources...), &storagev1.CSINode{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*storagev1.CSINode), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied cSINode.
+func (c *FakeCSINodes) Apply(ctx context.Context, cSINode typebuildersstoragev1.CSINodeBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *storagev1.CSINode, err error) {
+	data, err := cSINode.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := cSINode.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("cSINode.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("cSINode.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewRootPatchSubresourceAction(csinodesResource, name, types.ApplyPatchType, data, subresources...), &storagev1.CSINode{})
 	if obj == nil {
 		return nil, err
 	}

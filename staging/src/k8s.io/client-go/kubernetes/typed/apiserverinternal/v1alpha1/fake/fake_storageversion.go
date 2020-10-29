@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	v1alpha1 "k8s.io/api/apiserverinternal/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	apiserverinternalv1alpha1 "k8s.io/client-go/typebuilders/apiserverinternal/v1alpha1"
 )
 
 // FakeStorageVersions implements StorageVersionInterface
@@ -126,6 +128,28 @@ func (c *FakeStorageVersions) DeleteCollection(ctx context.Context, opts v1.Dele
 func (c *FakeStorageVersions) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.StorageVersion, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootPatchSubresourceAction(storageversionsResource, name, pt, data, subresources...), &v1alpha1.StorageVersion{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1alpha1.StorageVersion), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied storageVersion.
+func (c *FakeStorageVersions) Apply(ctx context.Context, storageVersion apiserverinternalv1alpha1.StorageVersionBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.StorageVersion, err error) {
+	data, err := storageVersion.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := storageVersion.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("storageVersion.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("storageVersion.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewRootPatchSubresourceAction(storageversionsResource, name, types.ApplyPatchType, data, subresources...), &v1alpha1.StorageVersion{})
 	if obj == nil {
 		return nil, err
 	}

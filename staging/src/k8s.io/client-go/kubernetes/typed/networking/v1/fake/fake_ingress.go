@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	networkingv1 "k8s.io/api/networking/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	typebuildersnetworkingv1 "k8s.io/client-go/typebuilders/networking/v1"
 )
 
 // FakeIngresses implements IngressInterface
@@ -134,6 +136,29 @@ func (c *FakeIngresses) DeleteCollection(ctx context.Context, opts v1.DeleteOpti
 func (c *FakeIngresses) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *networkingv1.Ingress, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(ingressesResource, c.ns, name, pt, data, subresources...), &networkingv1.Ingress{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*networkingv1.Ingress), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied ingress.
+func (c *FakeIngresses) Apply(ctx context.Context, ingress typebuildersnetworkingv1.IngressBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *networkingv1.Ingress, err error) {
+	data, err := ingress.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := ingress.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("ingress.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("ingress.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(ingressesResource, c.ns, name, types.ApplyPatchType, data, subresources...), &networkingv1.Ingress{})
 
 	if obj == nil {
 		return nil, err

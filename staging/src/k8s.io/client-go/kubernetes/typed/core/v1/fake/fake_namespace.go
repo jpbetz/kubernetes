@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	typebuilderscorev1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
 // FakeNamespaces implements NamespaceInterface
@@ -118,6 +120,28 @@ func (c *FakeNamespaces) Delete(ctx context.Context, name string, opts v1.Delete
 func (c *FakeNamespaces) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *corev1.Namespace, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootPatchSubresourceAction(namespacesResource, name, pt, data, subresources...), &corev1.Namespace{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*corev1.Namespace), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied namespace.
+func (c *FakeNamespaces) Apply(ctx context.Context, namespace typebuilderscorev1.NamespaceBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Namespace, err error) {
+	data, err := namespace.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := namespace.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("namespace.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("namespace.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewRootPatchSubresourceAction(namespacesResource, name, types.ApplyPatchType, data, subresources...), &corev1.Namespace{})
 	if obj == nil {
 		return nil, err
 	}

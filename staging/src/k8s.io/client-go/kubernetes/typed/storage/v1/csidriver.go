@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1 "k8s.io/api/storage/v1"
@@ -28,6 +29,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	storagev1 "k8s.io/client-go/typebuilders/storage/v1"
 )
 
 // CSIDriversGetter has a method to return a CSIDriverInterface.
@@ -46,6 +48,7 @@ type CSIDriverInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.CSIDriverList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.CSIDriver, err error)
+	Apply(ctx context.Context, cSIDriver storagev1.CSIDriverBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.CSIDriver, err error)
 	CSIDriverExpansion
 }
 
@@ -161,6 +164,33 @@ func (c *cSIDrivers) Patch(ctx context.Context, name string, pt types.PatchType,
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied cSIDriver.
+func (c *cSIDrivers) Apply(ctx context.Context, cSIDriver storagev1.CSIDriverBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.CSIDriver, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := cSIDriver.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := cSIDriver.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("cSIDriver.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("cSIDriver.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1.CSIDriver{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Resource("csidrivers").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

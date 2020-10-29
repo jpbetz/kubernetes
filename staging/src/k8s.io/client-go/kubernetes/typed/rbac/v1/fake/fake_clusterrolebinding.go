@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	rbacv1 "k8s.io/api/rbac/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	typebuildersrbacv1 "k8s.io/client-go/typebuilders/rbac/v1"
 )
 
 // FakeClusterRoleBindings implements ClusterRoleBindingInterface
@@ -115,6 +117,28 @@ func (c *FakeClusterRoleBindings) DeleteCollection(ctx context.Context, opts v1.
 func (c *FakeClusterRoleBindings) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *rbacv1.ClusterRoleBinding, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootPatchSubresourceAction(clusterrolebindingsResource, name, pt, data, subresources...), &rbacv1.ClusterRoleBinding{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*rbacv1.ClusterRoleBinding), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied clusterRoleBinding.
+func (c *FakeClusterRoleBindings) Apply(ctx context.Context, clusterRoleBinding typebuildersrbacv1.ClusterRoleBindingBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *rbacv1.ClusterRoleBinding, err error) {
+	data, err := clusterRoleBinding.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := clusterRoleBinding.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("clusterRoleBinding.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("clusterRoleBinding.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewRootPatchSubresourceAction(clusterrolebindingsResource, name, types.ApplyPatchType, data, subresources...), &rbacv1.ClusterRoleBinding{})
 	if obj == nil {
 		return nil, err
 	}

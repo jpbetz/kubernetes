@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1 "k8s.io/api/networking/v1"
@@ -28,6 +29,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	networkingv1 "k8s.io/client-go/typebuilders/networking/v1"
 )
 
 // IngressesGetter has a method to return a IngressInterface.
@@ -47,6 +49,7 @@ type IngressInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.IngressList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.Ingress, err error)
+	Apply(ctx context.Context, ingress networkingv1.IngressBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Ingress, err error)
 	IngressExpansion
 }
 
@@ -188,6 +191,34 @@ func (c *ingresses) Patch(ctx context.Context, name string, pt types.PatchType, 
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied ingress.
+func (c *ingresses) Apply(ctx context.Context, ingress networkingv1.IngressBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Ingress, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := ingress.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := ingress.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("ingress.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("ingress.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1.Ingress{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("ingresses").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

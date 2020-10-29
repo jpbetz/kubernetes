@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	v1beta1 "k8s.io/api/batch/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	batchv1beta1 "k8s.io/client-go/typebuilders/batch/v1beta1"
 )
 
 // FakeCronJobs implements CronJobInterface
@@ -134,6 +136,29 @@ func (c *FakeCronJobs) DeleteCollection(ctx context.Context, opts v1.DeleteOptio
 func (c *FakeCronJobs) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.CronJob, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(cronjobsResource, c.ns, name, pt, data, subresources...), &v1beta1.CronJob{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1beta1.CronJob), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied cronJob.
+func (c *FakeCronJobs) Apply(ctx context.Context, cronJob batchv1beta1.CronJobBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.CronJob, err error) {
+	data, err := cronJob.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := cronJob.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("cronJob.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("cronJob.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(cronjobsResource, c.ns, name, types.ApplyPatchType, data, subresources...), &v1beta1.CronJob{})
 
 	if obj == nil {
 		return nil, err

@@ -20,6 +20,7 @@ package v1alpha1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1alpha1 "k8s.io/api/storage/v1alpha1"
@@ -28,6 +29,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	storagev1alpha1 "k8s.io/client-go/typebuilders/storage/v1alpha1"
 )
 
 // CSIStorageCapacitiesGetter has a method to return a CSIStorageCapacityInterface.
@@ -46,6 +48,7 @@ type CSIStorageCapacityInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.CSIStorageCapacityList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.CSIStorageCapacity, err error)
+	Apply(ctx context.Context, cSIStorageCapacity storagev1alpha1.CSIStorageCapacityBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.CSIStorageCapacity, err error)
 	CSIStorageCapacityExpansion
 }
 
@@ -171,6 +174,34 @@ func (c *cSIStorageCapacities) Patch(ctx context.Context, name string, pt types.
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied cSIStorageCapacity.
+func (c *cSIStorageCapacities) Apply(ctx context.Context, cSIStorageCapacity storagev1alpha1.CSIStorageCapacityBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.CSIStorageCapacity, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := cSIStorageCapacity.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := cSIStorageCapacity.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("cSIStorageCapacity.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("cSIStorageCapacity.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1alpha1.CSIStorageCapacity{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("csistoragecapacities").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

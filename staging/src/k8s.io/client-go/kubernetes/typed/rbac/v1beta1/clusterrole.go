@@ -20,6 +20,7 @@ package v1beta1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1beta1 "k8s.io/api/rbac/v1beta1"
@@ -28,6 +29,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	rbacv1beta1 "k8s.io/client-go/typebuilders/rbac/v1beta1"
 )
 
 // ClusterRolesGetter has a method to return a ClusterRoleInterface.
@@ -46,6 +48,7 @@ type ClusterRoleInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1beta1.ClusterRoleList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.ClusterRole, err error)
+	Apply(ctx context.Context, clusterRole rbacv1beta1.ClusterRoleBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ClusterRole, err error)
 	ClusterRoleExpansion
 }
 
@@ -161,6 +164,33 @@ func (c *clusterRoles) Patch(ctx context.Context, name string, pt types.PatchTyp
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied clusterRole.
+func (c *clusterRoles) Apply(ctx context.Context, clusterRole rbacv1beta1.ClusterRoleBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ClusterRole, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := clusterRole.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := clusterRole.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("clusterRole.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("clusterRole.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1beta1.ClusterRole{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Resource("clusterroles").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

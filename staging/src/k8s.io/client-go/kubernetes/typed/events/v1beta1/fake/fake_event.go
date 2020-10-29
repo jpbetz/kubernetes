@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	v1beta1 "k8s.io/api/events/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	eventsv1beta1 "k8s.io/client-go/typebuilders/events/v1beta1"
 )
 
 // FakeEvents implements EventInterface
@@ -122,6 +124,29 @@ func (c *FakeEvents) DeleteCollection(ctx context.Context, opts v1.DeleteOptions
 func (c *FakeEvents) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.Event, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(eventsResource, c.ns, name, pt, data, subresources...), &v1beta1.Event{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1beta1.Event), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied event.
+func (c *FakeEvents) Apply(ctx context.Context, event eventsv1beta1.EventBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.Event, err error) {
+	data, err := event.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := event.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("event.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("event.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(eventsResource, c.ns, name, types.ApplyPatchType, data, subresources...), &v1beta1.Event{})
 
 	if obj == nil {
 		return nil, err

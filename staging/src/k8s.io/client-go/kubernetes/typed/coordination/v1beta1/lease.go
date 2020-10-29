@@ -20,6 +20,7 @@ package v1beta1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	v1beta1 "k8s.io/api/coordination/v1beta1"
@@ -28,6 +29,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+	coordinationv1beta1 "k8s.io/client-go/typebuilders/coordination/v1beta1"
 )
 
 // LeasesGetter has a method to return a LeaseInterface.
@@ -46,6 +48,7 @@ type LeaseInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1beta1.LeaseList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.Lease, err error)
+	Apply(ctx context.Context, lease coordinationv1beta1.LeaseBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.Lease, err error)
 	LeaseExpansion
 }
 
@@ -171,6 +174,34 @@ func (c *leases) Patch(ctx context.Context, name string, pt types.PatchType, dat
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied lease.
+func (c *leases) Apply(ctx context.Context, lease coordinationv1beta1.LeaseBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.Lease, err error) {
+	patchOpts := opts.ToPatchOptions(fieldManager)
+	data, err := lease.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := lease.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("lease.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("lease.ObjectMeta.Name must be provided to Apply")
+	}
+	result = &v1beta1.Lease{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("leases").
+		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

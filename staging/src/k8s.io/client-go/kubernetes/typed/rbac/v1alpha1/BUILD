@@ -25,6 +25,7 @@ go_library(
         "//staging/src/k8s.io/apimachinery/pkg/watch:go_default_library",
         "//staging/src/k8s.io/client-go/kubernetes/scheme:go_default_library",
         "//staging/src/k8s.io/client-go/rest:go_default_library",
+        "//staging/src/k8s.io/client-go/typebuilders/rbac/v1alpha1:go_default_library",
     ],
 )
 

@@ -27,6 +27,7 @@ go_library(
         "//staging/src/k8s.io/client-go/kubernetes/typed/policy/v1beta1:go_default_library",
         "//staging/src/k8s.io/client-go/rest:go_default_library",
         "//staging/src/k8s.io/client-go/testing:go_default_library",
+        "//staging/src/k8s.io/client-go/typebuilders/policy/v1beta1:go_default_library",
     ],
 )
 

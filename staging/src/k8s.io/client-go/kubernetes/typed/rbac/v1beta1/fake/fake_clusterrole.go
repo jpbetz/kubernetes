@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	"fmt"
 
 	v1beta1 "k8s.io/api/rbac/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	rbacv1beta1 "k8s.io/client-go/typebuilders/rbac/v1beta1"
 )
 
 // FakeClusterRoles implements ClusterRoleInterface
@@ -115,6 +117,28 @@ func (c *FakeClusterRoles) DeleteCollection(ctx context.Context, opts v1.DeleteO
 func (c *FakeClusterRoles) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.ClusterRole, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootPatchSubresourceAction(clusterrolesResource, name, pt, data, subresources...), &v1beta1.ClusterRole{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1beta1.ClusterRole), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied clusterRole.
+func (c *FakeClusterRoles) Apply(ctx context.Context, clusterRole rbacv1beta1.ClusterRoleBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ClusterRole, err error) {
+	data, err := clusterRole.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	meta, ok := clusterRole.GetObjectMeta()
+	if !ok {
+		return nil, fmt.Errorf("clusterRole.ObjectMeta must be provided to Apply")
+	}
+	name, ok := meta.GetName()
+	if !ok {
+		return nil, fmt.Errorf("clusterRole.ObjectMeta.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewRootPatchSubresourceAction(clusterrolesResource, name, types.ApplyPatchType, data, subresources...), &v1beta1.ClusterRole{})
 	if obj == nil {
 		return nil, err
 	}
