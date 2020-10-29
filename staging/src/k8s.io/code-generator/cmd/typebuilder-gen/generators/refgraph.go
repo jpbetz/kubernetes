@@ -1,0 +1,148 @@
+/*
+Copyright 2020 The Kubernetes Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+package generators
+
+import (
+	"k8s.io/gengo/types"
+
+	"k8s.io/code-generator/cmd/client-gen/generators/util"
+)
+
+// refGraph maps existing types to the package the corresponding builder types will be generated in
+// so that references between builders can be correctly generated.
+type refGraph map[types.Name]string
+
+// refGraphForReachableTypes returns a refGraph that contains all reachable types from
+// the root clientgen types of the provided packages.
+func refGraphForReachableTypes(pkgTypes map[string]*types.Package) refGraph {
+	refs := refGraph{}
+
+	// Include only types that are reachable from the root clientgen types.
+	// We don't want to generate builders for types that are not reachable from a root clientgen type.
+	reachableTypes := map[types.Name]*types.Type{}
+	for _, p := range pkgTypes {
+		for _, t := range p.Types {
+			if isClientgenType(t) {
+				findReachableTypes(t, reachableTypes)
+			}
+		}
+	}
+	for pkg, p := range pkgTypes {
+		for _, t := range p.Types {
+			if _, ok := reachableTypes[t.Name]; !ok {
+				continue
+			}
+			if requiresTypeBuilder(t) {
+				refs[t.Name] = pkg
+			}
+		}
+	}
+
+	return refs
+}
+
+// builderFieldType find the type used in the generate builders for a field.
+// This may either be an existing type or one of the other generated builder types.
+func (t refGraph) builderFieldType(field *types.Type) *types.Type {
+	switch field.Kind {
+	case types.Struct:
+		if pkg, ok := t[field.Name]; ok {
+			return types.Ref(pkg, field.Name.Name+"Builder")
+		}
+		return field
+	case types.Map:
+		if pkg, ok := t[field.Elem.Name]; ok {
+			return types.Ref(pkg, field.Elem.Name.Name+"Map")
+		}
+		return field
+	case types.Slice:
+		if pkg, ok := t[field.Elem.Name]; ok {
+			return types.Ref(pkg, field.Elem.Name.Name+"List")
+		}
+		return field
+	case types.Pointer:
+		return t.builderFieldType(field.Elem)
+	default:
+		return field
+	}
+}
+
+// isClientgenType returns true if the type is has the +clientgen annotation.
+func isClientgenType(t *types.Type) bool {
+	return util.MustParseClientGenTags(append(t.SecondClosestCommentLines, t.CommentLines...)).GenerateClient
+}
+
+// findReachableTypes finds all types transitively reachable from a given root type, including
+// the root type itself.
+func findReachableTypes(t *types.Type, referencedTypes map[types.Name]*types.Type) {
+	if _, ok := referencedTypes[t.Name]; ok {
+		return
+	}
+	referencedTypes[t.Name] = t
+
+	if t.Elem != nil {
+		findReachableTypes(t.Elem, referencedTypes)
+	}
+	if t.Underlying != nil {
+		findReachableTypes(t.Underlying, referencedTypes)
+	}
+	if t.Key != nil {
+		findReachableTypes(t.Key, referencedTypes)
+	}
+	for _, m := range t.Members {
+		findReachableTypes(m.Type, referencedTypes)
+	}
+}
+
+// excludeTypes contains well known types that we do not generate builders for.
+// Hard coding because we only have two, very specific types that serve a special purpose
+// in the type system here.
+var excludeTypes = map[types.Name]struct{}{
+	rawExtension.Name: {},
+	unknown.Name:      {},
+	// DO NOT ADD TO THIS LIST. If we need to exclude other types, we should consider allowing the
+	// go type declarations to be annotated as excluded from this generator.
+}
+
+// requiresTypeBuilder returns true if a type builder should be generated for the given type.
+// types builder are only generated for struct types that contain fields with json tags.
+func requiresTypeBuilder(t *types.Type) bool {
+	for t.Kind == types.Alias {
+		t = t.Underlying
+	}
+	if t.Kind != types.Struct {
+		return false
+	}
+	if _, ok := excludeTypes[t.Name]; ok {
+		return false
+	}
+	var hasJsonTaggedMembers bool
+	for _, member := range t.Members {
+		memberType := member.Type
+		if memberType.Kind == types.Pointer {
+			memberType = memberType.Elem
+		}
+		if _, ok := lookupJsonTags(member); ok {
+			hasJsonTaggedMembers = true
+		}
+	}
+	if !hasJsonTaggedMembers {
+		return false
+	}
+
+	return true
+}
