@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	v1 "k8s.io/api/authentication/v1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -178,8 +177,9 @@ func (b *UserInfoBuilder) FromUnstructured(u map[string]interface{}) error {
 
 // MarshalJSON marshals UserInfoBuilder to JSON.
 func (b *UserInfoBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into UserInfoBuilder, replacing the contents of

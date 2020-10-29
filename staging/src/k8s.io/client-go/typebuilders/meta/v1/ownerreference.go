@@ -21,7 +21,6 @@ package v1
 import (
 	json "encoding/json"
 
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	types "k8s.io/apimachinery/pkg/types"
 )
@@ -226,8 +225,9 @@ func (b *OwnerReferenceBuilder) FromUnstructured(u map[string]interface{}) error
 
 // MarshalJSON marshals OwnerReferenceBuilder to JSON.
 func (b *OwnerReferenceBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into OwnerReferenceBuilder, replacing the contents of

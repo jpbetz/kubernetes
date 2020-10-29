@@ -21,7 +21,6 @@ package v1
 import (
 	json "encoding/json"
 
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -129,8 +128,9 @@ func (b *LocalVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) er
 
 // MarshalJSON marshals LocalVolumeSourceBuilder to JSON.
 func (b *LocalVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into LocalVolumeSourceBuilder, replacing the contents of

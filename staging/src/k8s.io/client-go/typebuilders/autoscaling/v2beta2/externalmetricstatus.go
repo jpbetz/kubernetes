@@ -21,7 +21,6 @@ package v2beta2
 import (
 	json "encoding/json"
 
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -129,8 +128,9 @@ func (b *ExternalMetricStatusBuilder) FromUnstructured(u map[string]interface{})
 
 // MarshalJSON marshals ExternalMetricStatusBuilder to JSON.
 func (b *ExternalMetricStatusBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into ExternalMetricStatusBuilder, replacing the contents of

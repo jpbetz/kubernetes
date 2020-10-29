@@ -24,7 +24,6 @@ import (
 	v2beta2 "k8s.io/api/autoscaling/v2beta2"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -204,8 +203,9 @@ func (b *HorizontalPodAutoscalerConditionBuilder) FromUnstructured(u map[string]
 
 // MarshalJSON marshals HorizontalPodAutoscalerConditionBuilder to JSON.
 func (b *HorizontalPodAutoscalerConditionBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into HorizontalPodAutoscalerConditionBuilder, replacing the contents of

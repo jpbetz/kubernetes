@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	admissionregistrationv1beta1 "k8s.io/api/admissionregistration/v1beta1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
@@ -323,8 +322,9 @@ func (b *ValidatingWebhookBuilder) FromUnstructured(u map[string]interface{}) er
 
 // MarshalJSON marshals ValidatingWebhookBuilder to JSON.
 func (b *ValidatingWebhookBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into ValidatingWebhookBuilder, replacing the contents of

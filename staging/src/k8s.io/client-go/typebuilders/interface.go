@@ -366,6 +366,10 @@ func ForKind(kind schema.GroupVersionKind) Interface {
 		return &typebuildersautoscalingv1.HorizontalPodAutoscalerStatusBuilder{}
 
 		// Group=autoscaling, Version=v2beta1
+	case v2beta1.SchemeGroupVersion.WithKind("ContainerResourceMetricSource"):
+		return &autoscalingv2beta1.ContainerResourceMetricSourceBuilder{}
+	case v2beta1.SchemeGroupVersion.WithKind("ContainerResourceMetricStatus"):
+		return &autoscalingv2beta1.ContainerResourceMetricStatusBuilder{}
 	case v2beta1.SchemeGroupVersion.WithKind("CrossVersionObjectReference"):
 		return &autoscalingv2beta1.CrossVersionObjectReferenceBuilder{}
 	case v2beta1.SchemeGroupVersion.WithKind("ExternalMetricSource"):
@@ -398,6 +402,10 @@ func ForKind(kind schema.GroupVersionKind) Interface {
 		return &autoscalingv2beta1.ResourceMetricStatusBuilder{}
 
 		// Group=autoscaling, Version=v2beta2
+	case v2beta2.SchemeGroupVersion.WithKind("ContainerResourceMetricSource"):
+		return &autoscalingv2beta2.ContainerResourceMetricSourceBuilder{}
+	case v2beta2.SchemeGroupVersion.WithKind("ContainerResourceMetricStatus"):
+		return &autoscalingv2beta2.ContainerResourceMetricStatusBuilder{}
 	case v2beta2.SchemeGroupVersion.WithKind("CrossVersionObjectReference"):
 		return &autoscalingv2beta2.CrossVersionObjectReferenceBuilder{}
 	case v2beta2.SchemeGroupVersion.WithKind("ExternalMetricSource"):

@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	v2beta1 "k8s.io/api/autoscaling/v2beta1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -38,11 +37,12 @@ type MetricStatusBuilder struct {
 // are copied out to the builder type in MetricStatusBuilder after unmarshalling.
 // Inlined builder types cannot be embedded because they do not expose their fields directly.
 type metricStatusFields struct {
-	Type     *v2beta1.MetricSourceType    `json:"type,omitempty"`
-	Object   *ObjectMetricStatusBuilder   `json:"object,omitempty"`
-	Pods     *PodsMetricStatusBuilder     `json:"pods,omitempty"`
-	Resource *ResourceMetricStatusBuilder `json:"resource,omitempty"`
-	External *ExternalMetricStatusBuilder `json:"external,omitempty"`
+	Type              *v2beta1.MetricSourceType             `json:"type,omitempty"`
+	Object            *ObjectMetricStatusBuilder            `json:"object,omitempty"`
+	Pods              *PodsMetricStatusBuilder              `json:"pods,omitempty"`
+	Resource          *ResourceMetricStatusBuilder          `json:"resource,omitempty"`
+	ContainerResource *ContainerResourceMetricStatusBuilder `json:"containerResource,omitempty"`
+	External          *ExternalMetricStatusBuilder          `json:"external,omitempty"`
 }
 
 func (b *MetricStatusBuilder) ensureInitialized() {
@@ -150,6 +150,29 @@ func (b MetricStatusBuilder) GetResource() (value ResourceMetricStatusBuilder, o
 	return value, false
 }
 
+// SetContainerResource sets the ContainerResource field in the declarative configuration to the given value.
+func (b MetricStatusBuilder) SetContainerResource(value ContainerResourceMetricStatusBuilder) MetricStatusBuilder {
+	b.ensureInitialized()
+	b.fields.ContainerResource = &value
+	return b
+}
+
+// RemoveContainerResource removes the ContainerResource field from the declarative configuration.
+func (b MetricStatusBuilder) RemoveContainerResource() MetricStatusBuilder {
+	b.ensureInitialized()
+	b.fields.ContainerResource = nil
+	return b
+}
+
+// GetContainerResource gets the ContainerResource field from the declarative configuration.
+func (b MetricStatusBuilder) GetContainerResource() (value ContainerResourceMetricStatusBuilder, ok bool) {
+	b.ensureInitialized()
+	if v := b.fields.ContainerResource; v != nil {
+		return *v, true
+	}
+	return value, false
+}
+
 // SetExternal sets the External field in the declarative configuration to the given value.
 func (b MetricStatusBuilder) SetExternal(value ExternalMetricStatusBuilder) MetricStatusBuilder {
 	b.ensureInitialized()
@@ -202,8 +225,9 @@ func (b *MetricStatusBuilder) FromUnstructured(u map[string]interface{}) error {
 
 // MarshalJSON marshals MetricStatusBuilder to JSON.
 func (b *MetricStatusBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into MetricStatusBuilder, replacing the contents of

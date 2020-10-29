@@ -21,7 +21,6 @@ package v1alpha1
 import (
 	json "encoding/json"
 
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
@@ -177,8 +176,9 @@ func (b *ClusterRoleBuilder) FromUnstructured(u map[string]interface{}) error {
 
 // MarshalJSON marshals ClusterRoleBuilder to JSON.
 func (b *ClusterRoleBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into ClusterRoleBuilder, replacing the contents of

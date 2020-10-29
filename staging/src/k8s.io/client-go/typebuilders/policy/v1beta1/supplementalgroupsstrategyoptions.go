@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	v1beta1 "k8s.io/api/policy/v1beta1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -130,8 +129,9 @@ func (b *SupplementalGroupsStrategyOptionsBuilder) FromUnstructured(u map[string
 
 // MarshalJSON marshals SupplementalGroupsStrategyOptionsBuilder to JSON.
 func (b *SupplementalGroupsStrategyOptionsBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into SupplementalGroupsStrategyOptionsBuilder, replacing the contents of

@@ -351,8 +351,9 @@ func (b *$.type|public$Builder) FromUnstructured(u map[string]interface{}) error
 var typeBuilderMarshal = `
 // MarshalJSON marshals $.type|public$Builder to JSON.
 func (b *$.type|public$Builder) MarshalJSON() ([]byte, error) {
-  u := &$.unstructured|raw${Object: b.ToUnstructured().(map[string]interface{})}
-  return u.MarshalJSON()
+  b.ensureInitialized()
+  b.preMarshal()
+  return $.jsonMarshal|raw$(b.fields)
 }
 `
 

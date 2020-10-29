@@ -21,7 +21,6 @@ package v1beta2
 import (
 	json "encoding/json"
 
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	corev1 "k8s.io/client-go/typebuilders/core/v1"
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
@@ -179,8 +178,9 @@ func (b *ReplicaSetSpecBuilder) FromUnstructured(u map[string]interface{}) error
 
 // MarshalJSON marshals ReplicaSetSpecBuilder to JSON.
 func (b *ReplicaSetSpecBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into ReplicaSetSpecBuilder, replacing the contents of

@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	appsv1 "k8s.io/api/apps/v1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	corev1 "k8s.io/client-go/typebuilders/core/v1"
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
@@ -276,8 +275,9 @@ func (b *StatefulSetSpecBuilder) FromUnstructured(u map[string]interface{}) erro
 
 // MarshalJSON marshals StatefulSetSpecBuilder to JSON.
 func (b *StatefulSetSpecBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into StatefulSetSpecBuilder, replacing the contents of

@@ -21,7 +21,6 @@ package v1
 import (
 	json "encoding/json"
 
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -151,8 +150,9 @@ func (b *ConfigMapProjectionBuilder) FromUnstructured(u map[string]interface{}) 
 
 // MarshalJSON marshals ConfigMapProjectionBuilder to JSON.
 func (b *ConfigMapProjectionBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into ConfigMapProjectionBuilder, replacing the contents of

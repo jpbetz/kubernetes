@@ -23,7 +23,6 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	storagev1 "k8s.io/api/storage/v1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	typebuilderscorev1 "k8s.io/client-go/typebuilders/core/v1"
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
@@ -300,8 +299,9 @@ func (b *StorageClassBuilder) FromUnstructured(u map[string]interface{}) error {
 
 // MarshalJSON marshals StorageClassBuilder to JSON.
 func (b *StorageClassBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into StorageClassBuilder, replacing the contents of

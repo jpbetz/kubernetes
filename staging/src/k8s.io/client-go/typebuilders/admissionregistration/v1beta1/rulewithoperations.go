@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	admissionregistrationv1beta1 "k8s.io/api/admissionregistration/v1beta1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -131,8 +130,9 @@ func (b *RuleWithOperationsBuilder) FromUnstructured(u map[string]interface{}) e
 
 // MarshalJSON marshals RuleWithOperationsBuilder to JSON.
 func (b *RuleWithOperationsBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into RuleWithOperationsBuilder, replacing the contents of

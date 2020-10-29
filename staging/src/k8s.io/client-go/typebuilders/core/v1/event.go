@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
@@ -466,8 +465,9 @@ func (b *EventBuilder) FromUnstructured(u map[string]interface{}) error {
 
 // MarshalJSON marshals EventBuilder to JSON.
 func (b *EventBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into EventBuilder, replacing the contents of

@@ -21,7 +21,6 @@ package v1beta1
 import (
 	json "encoding/json"
 
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/typebuilders/core/v1"
 )
@@ -106,8 +105,9 @@ func (b *IngressStatusBuilder) FromUnstructured(u map[string]interface{}) error 
 
 // MarshalJSON marshals IngressStatusBuilder to JSON.
 func (b *IngressStatusBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into IngressStatusBuilder, replacing the contents of

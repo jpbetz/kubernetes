@@ -21,7 +21,6 @@ package v2alpha1
 import (
 	json "encoding/json"
 
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	batchv1 "k8s.io/client-go/typebuilders/batch/v1"
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
@@ -131,8 +130,9 @@ func (b *JobTemplateSpecBuilder) FromUnstructured(u map[string]interface{}) erro
 
 // MarshalJSON marshals JobTemplateSpecBuilder to JSON.
 func (b *JobTemplateSpecBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into JobTemplateSpecBuilder, replacing the contents of

@@ -23,7 +23,6 @@ import (
 
 	v1alpha1 "k8s.io/api/apiserverinternal/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -227,8 +226,9 @@ func (b *StorageVersionConditionBuilder) FromUnstructured(u map[string]interface
 
 // MarshalJSON marshals StorageVersionConditionBuilder to JSON.
 func (b *StorageVersionConditionBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into StorageVersionConditionBuilder, replacing the contents of

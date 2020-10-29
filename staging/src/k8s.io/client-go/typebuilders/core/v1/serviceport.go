@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	v1 "k8s.io/api/core/v1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	intstr "k8s.io/apimachinery/pkg/util/intstr"
 )
@@ -227,8 +226,9 @@ func (b *ServicePortBuilder) FromUnstructured(u map[string]interface{}) error {
 
 // MarshalJSON marshals ServicePortBuilder to JSON.
 func (b *ServicePortBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into ServicePortBuilder, replacing the contents of

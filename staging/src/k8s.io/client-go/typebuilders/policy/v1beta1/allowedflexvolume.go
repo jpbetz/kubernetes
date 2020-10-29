@@ -21,7 +21,6 @@ package v1beta1
 import (
 	json "encoding/json"
 
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -105,8 +104,9 @@ func (b *AllowedFlexVolumeBuilder) FromUnstructured(u map[string]interface{}) er
 
 // MarshalJSON marshals AllowedFlexVolumeBuilder to JSON.
 func (b *AllowedFlexVolumeBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into AllowedFlexVolumeBuilder, replacing the contents of

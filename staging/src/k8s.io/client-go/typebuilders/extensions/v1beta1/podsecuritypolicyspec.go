@@ -23,7 +23,6 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	v1beta1 "k8s.io/api/extensions/v1beta1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -659,8 +658,9 @@ func (b *PodSecurityPolicySpecBuilder) FromUnstructured(u map[string]interface{}
 
 // MarshalJSON marshals PodSecurityPolicySpecBuilder to JSON.
 func (b *PodSecurityPolicySpecBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into PodSecurityPolicySpecBuilder, replacing the contents of

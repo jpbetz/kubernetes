@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -226,8 +225,9 @@ func (b *JobStatusBuilder) FromUnstructured(u map[string]interface{}) error {
 
 // MarshalJSON marshals JobStatusBuilder to JSON.
 func (b *JobStatusBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into JobStatusBuilder, replacing the contents of

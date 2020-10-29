@@ -23,7 +23,6 @@ import (
 
 	v2beta2 "k8s.io/api/autoscaling/v2beta2"
 	resource "k8s.io/apimachinery/pkg/api/resource"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -179,8 +178,9 @@ func (b *MetricTargetBuilder) FromUnstructured(u map[string]interface{}) error {
 
 // MarshalJSON marshals MetricTargetBuilder to JSON.
 func (b *MetricTargetBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into MetricTargetBuilder, replacing the contents of

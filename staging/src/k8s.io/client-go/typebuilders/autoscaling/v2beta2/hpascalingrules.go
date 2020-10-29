@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	v2beta2 "k8s.io/api/autoscaling/v2beta2"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -154,8 +153,9 @@ func (b *HPAScalingRulesBuilder) FromUnstructured(u map[string]interface{}) erro
 
 // MarshalJSON marshals HPAScalingRulesBuilder to JSON.
 func (b *HPAScalingRulesBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into HPAScalingRulesBuilder, replacing the contents of

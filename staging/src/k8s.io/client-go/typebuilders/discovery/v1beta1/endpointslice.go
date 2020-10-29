@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	v1beta1 "k8s.io/api/discovery/v1beta1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
@@ -202,8 +201,9 @@ func (b *EndpointSliceBuilder) FromUnstructured(u map[string]interface{}) error 
 
 // MarshalJSON marshals EndpointSliceBuilder to JSON.
 func (b *EndpointSliceBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into EndpointSliceBuilder, replacing the contents of

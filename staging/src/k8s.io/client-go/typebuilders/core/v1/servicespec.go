@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	corev1 "k8s.io/api/core/v1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -41,6 +40,7 @@ type serviceSpecFields struct {
 	Ports                    *ServicePortList                         `json:"ports,omitempty"`
 	Selector                 *map[string]string                       `json:"selector,omitempty"`
 	ClusterIP                *string                                  `json:"clusterIP,omitempty"`
+	ClusterIPs               *[]string                                `json:"clusterIPs,omitempty"`
 	Type                     *corev1.ServiceType                      `json:"type,omitempty"`
 	ExternalIPs              *[]string                                `json:"externalIPs,omitempty"`
 	SessionAffinity          *corev1.ServiceAffinity                  `json:"sessionAffinity,omitempty"`
@@ -51,8 +51,9 @@ type serviceSpecFields struct {
 	HealthCheckNodePort      *int32                                   `json:"healthCheckNodePort,omitempty"`
 	PublishNotReadyAddresses *bool                                    `json:"publishNotReadyAddresses,omitempty"`
 	SessionAffinityConfig    *SessionAffinityConfigBuilder            `json:"sessionAffinityConfig,omitempty"`
-	IPFamily                 *corev1.IPFamily                         `json:"ipFamily,omitempty"`
+	IPFamilies               *[]corev1.IPFamily                       `json:"ipFamilies,omitempty"`
 	TopologyKeys             *[]string                                `json:"topologyKeys,omitempty"`
+	IPFamilyPolicy           *corev1.IPFamilyPolicyType               `json:"ipFamilyPolicy,omitempty"`
 }
 
 func (b *ServiceSpecBuilder) ensureInitialized() {
@@ -132,6 +133,29 @@ func (b ServiceSpecBuilder) RemoveClusterIP() ServiceSpecBuilder {
 func (b ServiceSpecBuilder) GetClusterIP() (value string, ok bool) {
 	b.ensureInitialized()
 	if v := b.fields.ClusterIP; v != nil {
+		return *v, true
+	}
+	return value, false
+}
+
+// SetClusterIPs sets the ClusterIPs field in the declarative configuration to the given value.
+func (b ServiceSpecBuilder) SetClusterIPs(value []string) ServiceSpecBuilder {
+	b.ensureInitialized()
+	b.fields.ClusterIPs = &value
+	return b
+}
+
+// RemoveClusterIPs removes the ClusterIPs field from the declarative configuration.
+func (b ServiceSpecBuilder) RemoveClusterIPs() ServiceSpecBuilder {
+	b.ensureInitialized()
+	b.fields.ClusterIPs = nil
+	return b
+}
+
+// GetClusterIPs gets the ClusterIPs field from the declarative configuration.
+func (b ServiceSpecBuilder) GetClusterIPs() (value []string, ok bool) {
+	b.ensureInitialized()
+	if v := b.fields.ClusterIPs; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -367,24 +391,24 @@ func (b ServiceSpecBuilder) GetSessionAffinityConfig() (value SessionAffinityCon
 	return value, false
 }
 
-// SetIPFamily sets the IPFamily field in the declarative configuration to the given value.
-func (b ServiceSpecBuilder) SetIPFamily(value corev1.IPFamily) ServiceSpecBuilder {
+// SetIPFamilies sets the IPFamilies field in the declarative configuration to the given value.
+func (b ServiceSpecBuilder) SetIPFamilies(value []corev1.IPFamily) ServiceSpecBuilder {
 	b.ensureInitialized()
-	b.fields.IPFamily = &value
+	b.fields.IPFamilies = &value
 	return b
 }
 
-// RemoveIPFamily removes the IPFamily field from the declarative configuration.
-func (b ServiceSpecBuilder) RemoveIPFamily() ServiceSpecBuilder {
+// RemoveIPFamilies removes the IPFamilies field from the declarative configuration.
+func (b ServiceSpecBuilder) RemoveIPFamilies() ServiceSpecBuilder {
 	b.ensureInitialized()
-	b.fields.IPFamily = nil
+	b.fields.IPFamilies = nil
 	return b
 }
 
-// GetIPFamily gets the IPFamily field from the declarative configuration.
-func (b ServiceSpecBuilder) GetIPFamily() (value corev1.IPFamily, ok bool) {
+// GetIPFamilies gets the IPFamilies field from the declarative configuration.
+func (b ServiceSpecBuilder) GetIPFamilies() (value []corev1.IPFamily, ok bool) {
 	b.ensureInitialized()
-	if v := b.fields.IPFamily; v != nil {
+	if v := b.fields.IPFamilies; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -408,6 +432,29 @@ func (b ServiceSpecBuilder) RemoveTopologyKeys() ServiceSpecBuilder {
 func (b ServiceSpecBuilder) GetTopologyKeys() (value []string, ok bool) {
 	b.ensureInitialized()
 	if v := b.fields.TopologyKeys; v != nil {
+		return *v, true
+	}
+	return value, false
+}
+
+// SetIPFamilyPolicy sets the IPFamilyPolicy field in the declarative configuration to the given value.
+func (b ServiceSpecBuilder) SetIPFamilyPolicy(value corev1.IPFamilyPolicyType) ServiceSpecBuilder {
+	b.ensureInitialized()
+	b.fields.IPFamilyPolicy = &value
+	return b
+}
+
+// RemoveIPFamilyPolicy removes the IPFamilyPolicy field from the declarative configuration.
+func (b ServiceSpecBuilder) RemoveIPFamilyPolicy() ServiceSpecBuilder {
+	b.ensureInitialized()
+	b.fields.IPFamilyPolicy = nil
+	return b
+}
+
+// GetIPFamilyPolicy gets the IPFamilyPolicy field from the declarative configuration.
+func (b ServiceSpecBuilder) GetIPFamilyPolicy() (value corev1.IPFamilyPolicyType, ok bool) {
+	b.ensureInitialized()
+	if v := b.fields.IPFamilyPolicy; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -442,8 +489,9 @@ func (b *ServiceSpecBuilder) FromUnstructured(u map[string]interface{}) error {
 
 // MarshalJSON marshals ServiceSpecBuilder to JSON.
 func (b *ServiceSpecBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into ServiceSpecBuilder, replacing the contents of

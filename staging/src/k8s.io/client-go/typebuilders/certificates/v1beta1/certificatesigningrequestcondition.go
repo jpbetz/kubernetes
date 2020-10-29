@@ -24,7 +24,6 @@ import (
 	v1beta1 "k8s.io/api/certificates/v1beta1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -228,8 +227,9 @@ func (b *CertificateSigningRequestConditionBuilder) FromUnstructured(u map[strin
 
 // MarshalJSON marshals CertificateSigningRequestConditionBuilder to JSON.
 func (b *CertificateSigningRequestConditionBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into CertificateSigningRequestConditionBuilder, replacing the contents of

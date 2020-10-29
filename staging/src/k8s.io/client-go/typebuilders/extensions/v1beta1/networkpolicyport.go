@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	v1 "k8s.io/api/core/v1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	intstr "k8s.io/apimachinery/pkg/util/intstr"
 )
@@ -131,8 +130,9 @@ func (b *NetworkPolicyPortBuilder) FromUnstructured(u map[string]interface{}) er
 
 // MarshalJSON marshals NetworkPolicyPortBuilder to JSON.
 func (b *NetworkPolicyPortBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into NetworkPolicyPortBuilder, replacing the contents of

@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	authorizationv1beta1 "k8s.io/api/authorization/v1beta1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -226,8 +225,9 @@ func (b *SubjectAccessReviewSpecBuilder) FromUnstructured(u map[string]interface
 
 // MarshalJSON marshals SubjectAccessReviewSpecBuilder to JSON.
 func (b *SubjectAccessReviewSpecBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into SubjectAccessReviewSpecBuilder, replacing the contents of

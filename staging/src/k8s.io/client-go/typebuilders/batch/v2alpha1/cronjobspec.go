@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	v2alpha1 "k8s.io/api/batch/v2alpha1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -250,8 +249,9 @@ func (b *CronJobSpecBuilder) FromUnstructured(u map[string]interface{}) error {
 
 // MarshalJSON marshals CronJobSpecBuilder to JSON.
 func (b *CronJobSpecBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into CronJobSpecBuilder, replacing the contents of

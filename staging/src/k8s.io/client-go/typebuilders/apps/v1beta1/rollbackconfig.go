@@ -21,7 +21,6 @@ package v1beta1
 import (
 	json "encoding/json"
 
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -105,8 +104,9 @@ func (b *RollbackConfigBuilder) FromUnstructured(u map[string]interface{}) error
 
 // MarshalJSON marshals RollbackConfigBuilder to JSON.
 func (b *RollbackConfigBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into RollbackConfigBuilder, replacing the contents of

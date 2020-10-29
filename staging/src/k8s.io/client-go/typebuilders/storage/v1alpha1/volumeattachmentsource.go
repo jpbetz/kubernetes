@@ -21,7 +21,6 @@ package v1alpha1
 import (
 	json "encoding/json"
 
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/typebuilders/core/v1"
 )
@@ -130,8 +129,9 @@ func (b *VolumeAttachmentSourceBuilder) FromUnstructured(u map[string]interface{
 
 // MarshalJSON marshals VolumeAttachmentSourceBuilder to JSON.
 func (b *VolumeAttachmentSourceBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into VolumeAttachmentSourceBuilder, replacing the contents of

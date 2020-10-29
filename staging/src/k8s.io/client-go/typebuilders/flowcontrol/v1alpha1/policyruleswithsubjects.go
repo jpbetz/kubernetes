@@ -21,7 +21,6 @@ package v1alpha1
 import (
 	json "encoding/json"
 
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -153,8 +152,9 @@ func (b *PolicyRulesWithSubjectsBuilder) FromUnstructured(u map[string]interface
 
 // MarshalJSON marshals PolicyRulesWithSubjectsBuilder to JSON.
 func (b *PolicyRulesWithSubjectsBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into PolicyRulesWithSubjectsBuilder, replacing the contents of

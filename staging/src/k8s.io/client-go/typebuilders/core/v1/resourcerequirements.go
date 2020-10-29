@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	v1 "k8s.io/api/core/v1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -130,8 +129,9 @@ func (b *ResourceRequirementsBuilder) FromUnstructured(u map[string]interface{})
 
 // MarshalJSON marshals ResourceRequirementsBuilder to JSON.
 func (b *ResourceRequirementsBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into ResourceRequirementsBuilder, replacing the contents of

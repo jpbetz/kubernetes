@@ -21,7 +21,6 @@ package v1beta1
 import (
 	json "encoding/json"
 
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
@@ -153,8 +152,9 @@ func (b *PodSecurityPolicyBuilder) FromUnstructured(u map[string]interface{}) er
 
 // MarshalJSON marshals PodSecurityPolicyBuilder to JSON.
 func (b *PodSecurityPolicyBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into PodSecurityPolicyBuilder, replacing the contents of

@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	corev1 "k8s.io/api/core/v1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -322,8 +321,9 @@ func (b *PodSecurityContextBuilder) FromUnstructured(u map[string]interface{}) e
 
 // MarshalJSON marshals PodSecurityContextBuilder to JSON.
 func (b *PodSecurityContextBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into PodSecurityContextBuilder, replacing the contents of

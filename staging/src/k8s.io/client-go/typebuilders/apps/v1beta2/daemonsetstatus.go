@@ -21,7 +21,6 @@ package v1beta2
 import (
 	json "encoding/json"
 
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -321,8 +320,9 @@ func (b *DaemonSetStatusBuilder) FromUnstructured(u map[string]interface{}) erro
 
 // MarshalJSON marshals DaemonSetStatusBuilder to JSON.
 func (b *DaemonSetStatusBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into DaemonSetStatusBuilder, replacing the contents of

@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	v1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -130,8 +129,9 @@ func (b *LimitResponseBuilder) FromUnstructured(u map[string]interface{}) error 
 
 // MarshalJSON marshals LimitResponseBuilder to JSON.
 func (b *LimitResponseBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into LimitResponseBuilder, replacing the contents of

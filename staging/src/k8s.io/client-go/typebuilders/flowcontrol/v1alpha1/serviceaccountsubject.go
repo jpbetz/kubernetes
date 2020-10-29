@@ -21,7 +21,6 @@ package v1alpha1
 import (
 	json "encoding/json"
 
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -129,8 +128,9 @@ func (b *ServiceAccountSubjectBuilder) FromUnstructured(u map[string]interface{}
 
 // MarshalJSON marshals ServiceAccountSubjectBuilder to JSON.
 func (b *ServiceAccountSubjectBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into ServiceAccountSubjectBuilder, replacing the contents of

@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	v1 "k8s.io/api/core/v1"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -130,8 +129,9 @@ func (b *NamespaceStatusBuilder) FromUnstructured(u map[string]interface{}) erro
 
 // MarshalJSON marshals NamespaceStatusBuilder to JSON.
 func (b *NamespaceStatusBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into NamespaceStatusBuilder, replacing the contents of

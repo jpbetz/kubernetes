@@ -22,7 +22,6 @@ import (
 	json "encoding/json"
 
 	resource "k8s.io/apimachinery/pkg/api/resource"
-	unstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
@@ -155,8 +154,9 @@ func (b *PodsMetricSourceBuilder) FromUnstructured(u map[string]interface{}) err
 
 // MarshalJSON marshals PodsMetricSourceBuilder to JSON.
 func (b *PodsMetricSourceBuilder) MarshalJSON() ([]byte, error) {
-	u := &unstructured.Unstructured{Object: b.ToUnstructured().(map[string]interface{})}
-	return u.MarshalJSON()
+	b.ensureInitialized()
+	b.preMarshal()
+	return json.Marshal(b.fields)
 }
 
 // UnmarshalJSON unmarshals JSON into PodsMetricSourceBuilder, replacing the contents of
