@@ -32,15 +32,15 @@ import (
 // genClientForType produces a file for each top-level type.
 type genClientForType struct {
 	generator.DefaultGen
-	outputPackage       string
-	inputPackage        string
-	clientsetPackage    string
-	applyBuilderPackage string
-	group               string
-	version             string
-	groupGoName         string
-	typeToMatch         *types.Type
-	imports             namer.ImportTracker
+	outputPackage             string
+	inputPackage              string
+	clientsetPackage          string
+	applyConfigurationPackage string
+	group                     string
+	version                   string
+	groupGoName               string
+	typeToMatch               *types.Type
+	imports                   namer.ImportTracker
 }
 
 var _ generator.Generator = &genClientForType{}
@@ -77,7 +77,7 @@ func genStatus(t *types.Type) bool {
 
 // GenerateType makes the body of a file implementing the individual typed client for type t.
 func (g *genClientForType) GenerateType(c *generator.Context, t *types.Type, w io.Writer) error {
-	defaultVerbTemplates := buildDefaultVerbTemplates(len(g.applyBuilderPackage) > 0)
+	defaultVerbTemplates := buildDefaultVerbTemplates(len(g.applyConfigurationPackage) > 0)
 	sw := generator.NewSnippetWriter(w, c, "$", "$")
 	pkg := filepath.Base(t.Name.Package)
 	tags, err := util.ParseClientGenTags(append(t.SecondClosestCommentLines, t.CommentLines...))
@@ -157,11 +157,11 @@ func (g *genClientForType) GenerateType(c *generator.Context, t *types.Type, w i
 		"schemeParameterCodec": c.Universe.Variable(types.Name{Package: filepath.Join(g.clientsetPackage, "scheme"), Name: "ParameterCodec"}),
 	}
 
-	generateApply := len(g.applyBuilderPackage) > 0
+	generateApply := len(g.applyConfigurationPackage) > 0
 	if generateApply {
-		// Generated apply builder type references required for generated Apply function
+		// Generated apply configuration type references required for generated Apply function
 		_, gvString := util.ParsePathGroupVersion(g.inputPackage)
-		m["builderType"] = types.Ref(path.Join(g.applyBuilderPackage, gvString), t.Name.Name+"Builder")
+		m["applyConfig"] = types.Ref(path.Join(g.applyConfigurationPackage, gvString), t.Name.Name+"ApplyConfiguration")
 	}
 
 	sw.Do(getterComment, m)
@@ -350,7 +350,7 @@ func buildDefaultVerbTemplates(generateApply bool) map[string]string {
 	}
 	if generateApply {
 		m["patch"] += `
-          Apply(ctx context.Context, $.inputType|private$ $.builderType|raw$, fieldManager string, opts $.ApplyOptions|raw$, subresources ...string) (result *$.resultType|raw$, err error)`
+          Apply(ctx context.Context, $.inputType|private$ *$.applyConfig|raw$, fieldManager string, opts $.ApplyOptions|raw$, subresources ...string) (result *$.resultType|raw$, err error)`
 	}
 	return m
 }
@@ -639,7 +639,7 @@ func (c *$.type|privatePlural$) Patch(ctx context.Context, name string, pt $.Pat
 // TODO(jpbetz): Assert that GetObjectMeta().GetName() is retrievable and non-nil
 var applyTemplate = `
 // Apply takes the given apply declarative configuration, applies it and returns the applied $.resultType|private$.
-func (c *$.type|privatePlural$) Apply(ctx context.Context, $.inputType|private$ $.builderType|raw$, fieldManager string, opts $.ApplyOptions|raw$, subresources ...string) (result *$.resultType|raw$, err error) {
+func (c *$.type|privatePlural$) Apply(ctx context.Context, $.inputType|private$ *$.applyConfig|raw$, fieldManager string, opts $.ApplyOptions|raw$, subresources ...string) (result *$.resultType|raw$, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := $.inputType|private$.MarshalJSON()
 	if err != nil {

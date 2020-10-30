@@ -31,6 +31,11 @@ import (
 	clientgentypes "k8s.io/code-generator/cmd/client-gen/types"
 )
 
+const (
+	ApplyConfigurationTypeSuffix = "ApplyConfiguration"
+	FieldTypeSuffix              = "Fields"
+)
+
 // NameSystems returns the name system used by the generators in this package.
 func NameSystems() namer.NameSystems {
 	return namer.NameSystems{
@@ -58,26 +63,26 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 
 	groupVersions := make(map[string]clientgentypes.GroupVersions)
 	groupGoNames := make(map[string]string)
-	buildersForGroupVersion := make(map[clientgentypes.GroupVersion][]builder)
+	buildersForGroupVersion := make(map[clientgentypes.GroupVersion][]applyConfig)
 
 	var packageList generator.Packages
 	for pkg, p := range pkgTypes {
 		gv, pkgName := groupAndPackageName(p)
 		pkgType := types.Name{Name: pkgName, Package: pkg}
 
-		var toGenerate []builder
+		var toGenerate []applyConfig
 		for _, t := range p.Types {
 			if typePkg, ok := builderRefs[t.Name]; ok {
-				toGenerate = append(toGenerate, builder{
-					Type:    t,
-					Builder: types.Ref(typePkg, t.Name.Name+"Builder"),
+				toGenerate = append(toGenerate, applyConfig{
+					Type:               t,
+					ApplyConfiguration: types.Ref(typePkg, t.Name.Name+ApplyConfigurationTypeSuffix),
 				})
 			}
 		}
 		if len(toGenerate) == 0 {
 			continue // Don't generate empty packages
 		}
-		sort.Sort(builderSort(toGenerate))
+		sort.Sort(applyConfigSort(toGenerate))
 
 		// generate the apply builders
 		packageList = append(packageList, generatorForBuilderPackage(arguments.OutputPackagePath, boilerplate, pkgType, gv, toGenerate, builderRefs))
@@ -107,23 +112,23 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 	return packageList
 }
 
-func generatorForBuilderPackage(outputPackagePath string, boilerplate []byte, packageName types.Name, gv clientgentypes.GroupVersion, typesToGenerate []builder, builderRefs refGraph) *generator.DefaultPackage {
+func generatorForBuilderPackage(outputPackagePath string, boilerplate []byte, packageName types.Name, gv clientgentypes.GroupVersion, typesToGenerate []applyConfig, builderRefs refGraph) *generator.DefaultPackage {
 	return &generator.DefaultPackage{
 		PackageName: strings.ToLower(gv.Version.NonEmpty()),
 		PackagePath: packageName.Package,
 		HeaderText:  boilerplate,
 		GeneratorFunc: func(c *generator.Context) (generators []generator.Generator) {
-			for _, t := range typesToGenerate {
-				generators = append(generators, &builderTypeGenerator{
+			for _, toGenerate := range typesToGenerate {
+				generators = append(generators, &applyConfigurationGenerator{
 					DefaultGen: generator.DefaultGen{
-						OptionalName: strings.ToLower(t.Type.Name.Name),
+						OptionalName: strings.ToLower(toGenerate.Type.Name.Name),
 					},
-					outputPackage:  outputPackagePath,
-					localPackage:   packageName,
-					groupVersion:   gv,
-					typeToGenerate: t.Type,
-					imports:        generator.NewImportTracker(),
-					refGraph:       builderRefs,
+					outputPackage: outputPackagePath,
+					localPackage:  packageName,
+					groupVersion:  gv,
+					applyConfig:   toGenerate,
+					imports:       generator.NewImportTracker(),
+					refGraph:      builderRefs,
 				})
 			}
 			return generators
@@ -131,7 +136,7 @@ func generatorForBuilderPackage(outputPackagePath string, boilerplate []byte, pa
 	}
 }
 
-func generatorForUtils(outPackagePath string, boilerplate []byte, groupVersions map[string]clientgentypes.GroupVersions, buildersForGroupVersion map[clientgentypes.GroupVersion][]builder, groupGoNames map[string]string) *generator.DefaultPackage {
+func generatorForUtils(outPackagePath string, boilerplate []byte, groupVersions map[string]clientgentypes.GroupVersions, buildersForGroupVersion map[clientgentypes.GroupVersion][]applyConfig, groupGoNames map[string]string) *generator.DefaultPackage {
 	return &generator.DefaultPackage{
 		PackageName: filepath.Base(outPackagePath),
 		PackagePath: outPackagePath,

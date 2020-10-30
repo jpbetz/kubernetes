@@ -22,8 +22,8 @@ import (
 	"k8s.io/code-generator/cmd/client-gen/generators/util"
 )
 
-// refGraph maps existing types to the package the corresponding builder types will be generated in
-// so that references between builders can be correctly generated.
+// refGraph maps existing types to the package the corresponding applyConfig types will be generated in
+// so that references between apply configurations can be correctly generated.
 type refGraph map[types.Name]string
 
 // refGraphForReachableTypes returns a refGraph that contains all reachable types from
@@ -32,7 +32,8 @@ func refGraphForReachableTypes(pkgTypes map[string]*types.Package) refGraph {
 	refs := refGraph{}
 
 	// Include only types that are reachable from the root clientgen types.
-	// We don't want to generate builders for types that are not reachable from a root clientgen type.
+	// We don't want to generate apply configurations for types that are not reachable from a root
+	// clientgen type.
 	reachableTypes := map[types.Name]*types.Type{}
 	for _, p := range pkgTypes {
 		for _, t := range p.Types {
@@ -46,7 +47,7 @@ func refGraphForReachableTypes(pkgTypes map[string]*types.Package) refGraph {
 			if _, ok := reachableTypes[t.Name]; !ok {
 				continue
 			}
-			if requiresTypeBuilder(t) {
+			if requiresApplyConfiguration(t) {
 				refs[t.Name] = pkg
 			}
 		}
@@ -55,14 +56,13 @@ func refGraphForReachableTypes(pkgTypes map[string]*types.Package) refGraph {
 	return refs
 }
 
-// builderFieldType find the type used in the generate builders for a field.
-// This may either be an existing type or one of the other generated builder types.
-func (t refGraph) builderFieldType(field *types.Type) *types.Type {
+// applyConfigForType find the type used in the generate apply configurations for a field.
+// This may either be an existing type or one of the other generated applyConfig types.
+func (t refGraph) applyConfigForType(field *types.Type) *types.Type {
 	switch field.Kind {
 	case types.Struct:
 		if pkg, ok := t[field.Name]; ok {
-			//return &types.Type{Kind: types.Pointer, Elem: types.Ref(pkg, field.Name.Name+"Builder")}
-			return types.Ref(pkg, field.Name.Name+"Builder")
+			return types.Ref(pkg, field.Name.Name+ApplyConfigurationTypeSuffix)
 		}
 		return field
 	case types.Map:
@@ -76,19 +76,19 @@ func (t refGraph) builderFieldType(field *types.Type) *types.Type {
 		}
 		return field
 	case types.Pointer:
-		return t.builderFieldType(field.Elem)
+		return t.applyConfigForType(field.Elem)
 	default:
 		return field
 	}
 }
 
-func (t refGraph) isBuilder(field *types.Type) bool {
+func (t refGraph) isApplyConfig(field *types.Type) bool {
 	switch field.Kind {
 	case types.Struct:
 		_, ok := t[field.Name]
 		return ok
 	case types.Pointer:
-		return t.isBuilder(field.Elem)
+		return t.isApplyConfig(field.Elem)
 	}
 	return false
 }
@@ -120,7 +120,7 @@ func findReachableTypes(t *types.Type, referencedTypes map[types.Name]*types.Typ
 	}
 }
 
-// excludeTypes contains well known types that we do not generate builders for.
+// excludeTypes contains well known types that we do not generate apply configurations for.
 // Hard coding because we only have two, very specific types that serve a special purpose
 // in the type system here.
 var excludeTypes = map[types.Name]struct{}{
@@ -130,9 +130,9 @@ var excludeTypes = map[types.Name]struct{}{
 	// go type declarations to be annotated as excluded from this generator.
 }
 
-// requiresTypeBuilder returns true if a type builder should be generated for the given type.
-// types builder are only generated for struct types that contain fields with json tags.
-func requiresTypeBuilder(t *types.Type) bool {
+// requiresApplyConfiguration returns true if a type applyConfig should be generated for the given type.
+// types applyConfig are only generated for struct types that contain fields with json tags.
+func requiresApplyConfiguration(t *types.Type) bool {
 	for t.Kind == types.Alias {
 		t = t.Underlying
 	}

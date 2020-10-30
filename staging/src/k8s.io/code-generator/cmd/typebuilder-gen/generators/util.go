@@ -35,7 +35,7 @@ type utilGenerator struct {
 	imports              namer.ImportTracker
 	groupVersions        map[string]clientgentypes.GroupVersions
 	groupGoNames         map[string]string
-	typesForGroupVersion map[clientgentypes.GroupVersion][]builder
+	typesForGroupVersion map[clientgentypes.GroupVersion][]applyConfig
 	filtered             bool
 }
 
@@ -78,7 +78,7 @@ func (g groupSort) Swap(i, j int) { g[i], g[j] = g[j], g[i] }
 type version struct {
 	Name      string
 	GoName    string
-	Resources []builder
+	Resources []applyConfig
 }
 
 type versionSort []*version
@@ -89,18 +89,18 @@ func (v versionSort) Less(i, j int) bool {
 }
 func (v versionSort) Swap(i, j int) { v[i], v[j] = v[j], v[i] }
 
-type builder struct {
-	Type    *types.Type
-	Builder *types.Type
+type applyConfig struct {
+	Type               *types.Type
+	ApplyConfiguration *types.Type
 }
 
-type builderSort []builder
+type applyConfigSort []applyConfig
 
-func (v builderSort) Len() int { return len(v) }
-func (v builderSort) Less(i, j int) bool {
+func (v applyConfigSort) Len() int { return len(v) }
+func (v applyConfigSort) Less(i, j int) bool {
 	return strings.ToLower(v[i].Type.Name.Name) < strings.ToLower(v[j].Type.Name.Name)
 }
-func (v builderSort) Swap(i, j int) { v[i], v[j] = v[j], v[i] }
+func (v applyConfigSort) Swap(i, j int) { v[i], v[j] = v[j], v[i] }
 
 func (g *utilGenerator) GenerateType(c *generator.Context, _ *types.Type, w io.Writer) error {
 	sw := generator.NewSnippetWriter(w, c, "{{", "}}")
@@ -151,7 +151,7 @@ func ForKind(kind {{.schemaGroupVersionKind|raw}}) {{.applyConfiguration|raw}} {
 	// Group={{$group.Name}}, Version={{.Name}}
 				{{range .Resources -}}
 	case {{index $.schemeGVs $version|raw}}.WithKind("{{.Type|singularKind}}"):
-		return &{{.Builder|raw}}{}
+		return &{{.ApplyConfiguration|raw}}{}
 				{{end}}
 			{{end}}
 		{{end -}}

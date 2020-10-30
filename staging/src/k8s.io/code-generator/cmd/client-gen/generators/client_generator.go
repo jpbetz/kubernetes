@@ -151,15 +151,15 @@ func packageForGroup(gv clientgentypes.GroupVersion, typeList []*types.Type, cli
 					DefaultGen: generator.DefaultGen{
 						OptionalName: strings.ToLower(c.Namers["private"].Name(t)),
 					},
-					outputPackage:       groupVersionClientPackage,
-					inputPackage:        inputPackage,
-					clientsetPackage:    clientsetPackage,
-					applyBuilderPackage: applyBuilderPackage,
-					group:               gv.Group.NonEmpty(),
-					version:             gv.Version.String(),
-					groupGoName:         groupGoName,
-					typeToMatch:         t,
-					imports:             generator.NewImportTracker(),
+					outputPackage:             groupVersionClientPackage,
+					inputPackage:              inputPackage,
+					clientsetPackage:          clientsetPackage,
+					applyConfigurationPackage: applyBuilderPackage,
+					group:                     gv.Group.NonEmpty(),
+					version:                   gv.Version.String(),
+					groupGoName:               groupGoName,
+					typeToMatch:               t,
+					imports:                   generator.NewImportTracker(),
 				})
 			}
 
@@ -392,9 +392,9 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 			gv := clientgentypes.GroupVersion{Group: group.Group, Version: version.Version}
 			types := gvToTypes[gv]
 			inputPath := gvPackages[gv]
-			packageList = append(packageList, packageForGroup(gv, orderer.OrderTypes(types), clientsetPackage, group.PackageName, groupGoNames[gv], customArgs.ClientsetAPIPath, arguments.OutputBase, inputPath, customArgs.ApplyBuilderPackage, boilerplate))
+			packageList = append(packageList, packageForGroup(gv, orderer.OrderTypes(types), clientsetPackage, group.PackageName, groupGoNames[gv], customArgs.ClientsetAPIPath, arguments.OutputBase, inputPath, customArgs.ApplyConfigurationPackage, boilerplate))
 			if customArgs.FakeClient {
-				packageList = append(packageList, fake.PackageForGroup(gv, orderer.OrderTypes(types), clientsetPackage, group.PackageName, groupGoNames[gv], inputPath, customArgs.ApplyBuilderPackage, boilerplate))
+				packageList = append(packageList, fake.PackageForGroup(gv, orderer.OrderTypes(types), clientsetPackage, group.PackageName, groupGoNames[gv], inputPath, customArgs.ApplyConfigurationPackage, boilerplate))
 			}
 		}
 	}

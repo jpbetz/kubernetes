@@ -169,7 +169,7 @@ func (g *genFakeForType) GenerateType(c *generator.Context, t *types.Type, w io.
 	if generateApply {
 		// Generated apply builder type references required for generated Apply function
 		_, gvString := util.ParsePathGroupVersion(g.inputPackage)
-		m["builderType"] = types.Ref(gopath.Join(g.applyBuilderPackage, gvString), t.Name.Name+"Builder")
+		m["applyConfig"] = types.Ref(gopath.Join(g.applyBuilderPackage, gvString), t.Name.Name+"ApplyConfiguration")
 	}
 
 	if tags.NonNamespaced {
@@ -500,7 +500,7 @@ func (c *Fake$.type|publicPlural$) Patch(ctx context.Context, name string, pt $.
 
 var applyTemplate = `
 // Apply takes the given apply declarative configuration, applies it and returns the applied $.resultType|private$.
-func (c *Fake$.type|publicPlural$) Apply(ctx context.Context, $.inputType|private$ $.builderType|raw$, fieldManager string, opts $.ApplyOptions|raw$, subresources ...string) (result *$.resultType|raw$, err error) {
+func (c *Fake$.type|publicPlural$) Apply(ctx context.Context, $.inputType|private$ *$.applyConfig|raw$, fieldManager string, opts $.ApplyOptions|raw$, subresources ...string) (result *$.resultType|raw$, err error) {
 	data, err := $.inputType|private$.MarshalJSON()
 	if err != nil {
 		return nil, err

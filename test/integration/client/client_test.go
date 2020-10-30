@@ -927,7 +927,7 @@ func TestApplyWithBuilders(t *testing.T) {
 		defer result.TearDownFn()
 
 		c := clientset.NewForConfigOrDie(result.ClientConfig)
-		obj, err := c.AppsV1().Deployments("default").Apply(context.TODO(), *deploymentManifest, "test-mgr", metav1.ApplyOptions{})
+		obj, err := c.AppsV1().Deployments("default").Apply(context.TODO(), deploymentManifest, "test-mgr", metav1.ApplyOptions{})
 		if err != nil {
 			t.Fatalf("unexpected error when applying manifest for Deployment: %v", err)
 		}
