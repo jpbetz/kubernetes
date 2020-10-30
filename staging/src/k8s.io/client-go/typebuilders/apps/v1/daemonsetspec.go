@@ -29,14 +29,14 @@ import (
 // DaemonSetSpecBuilder represents an declarative configuration of the DaemonSetSpec type for use
 // with apply.
 type DaemonSetSpecBuilder struct {
-	fields *daemonSetSpecFields
+	fields daemonSetSpecFields
 }
 
-// daemonSetSpecFields is used by DaemonSetSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in DaemonSetSpecBuilder before marshalling, and
-// are copied out to the builder type in DaemonSetSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// daemonSetSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in DaemonSetSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type daemonSetSpecFields struct {
 	Selector             *v1.LabelSelectorBuilder        `json:"selector,omitempty"`
 	Template             *corev1.PodTemplateSpecBuilder  `json:"template,omitempty"`
@@ -45,105 +45,77 @@ type daemonSetSpecFields struct {
 	RevisionHistoryLimit *int32                          `json:"revisionHistoryLimit,omitempty"`
 }
 
-func (b *DaemonSetSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &daemonSetSpecFields{}
-	}
-}
-
 // DaemonSetSpec constructs an declarative configuration of the DaemonSetSpec type for use with
 // apply.
-// Provided as a convenience.
-func DaemonSetSpec() DaemonSetSpecBuilder {
-	return DaemonSetSpecBuilder{fields: &daemonSetSpecFields{}}
+func DaemonSetSpec() *DaemonSetSpecBuilder {
+	return &DaemonSetSpecBuilder{}
 }
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
-func (b DaemonSetSpecBuilder) SetSelector(value v1.LabelSelectorBuilder) DaemonSetSpecBuilder {
-	b.ensureInitialized()
-	b.fields.Selector = &value
+func (b *DaemonSetSpecBuilder) SetSelector(value *v1.LabelSelectorBuilder) *DaemonSetSpecBuilder {
+	b.fields.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
-func (b DaemonSetSpecBuilder) RemoveSelector() DaemonSetSpecBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetSpecBuilder) RemoveSelector() *DaemonSetSpecBuilder {
 	b.fields.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
-func (b DaemonSetSpecBuilder) GetSelector() (value v1.LabelSelectorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Selector; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *DaemonSetSpecBuilder) GetSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+	return b.fields.Selector, b.fields.Selector != nil
 }
 
 // SetTemplate sets the Template field in the declarative configuration to the given value.
-func (b DaemonSetSpecBuilder) SetTemplate(value corev1.PodTemplateSpecBuilder) DaemonSetSpecBuilder {
-	b.ensureInitialized()
-	b.fields.Template = &value
+func (b *DaemonSetSpecBuilder) SetTemplate(value *corev1.PodTemplateSpecBuilder) *DaemonSetSpecBuilder {
+	b.fields.Template = value
 	return b
 }
 
 // RemoveTemplate removes the Template field from the declarative configuration.
-func (b DaemonSetSpecBuilder) RemoveTemplate() DaemonSetSpecBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetSpecBuilder) RemoveTemplate() *DaemonSetSpecBuilder {
 	b.fields.Template = nil
 	return b
 }
 
 // GetTemplate gets the Template field from the declarative configuration.
-func (b DaemonSetSpecBuilder) GetTemplate() (value corev1.PodTemplateSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Template; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *DaemonSetSpecBuilder) GetTemplate() (value *corev1.PodTemplateSpecBuilder, ok bool) {
+	return b.fields.Template, b.fields.Template != nil
 }
 
 // SetUpdateStrategy sets the UpdateStrategy field in the declarative configuration to the given value.
-func (b DaemonSetSpecBuilder) SetUpdateStrategy(value DaemonSetUpdateStrategyBuilder) DaemonSetSpecBuilder {
-	b.ensureInitialized()
-	b.fields.UpdateStrategy = &value
+func (b *DaemonSetSpecBuilder) SetUpdateStrategy(value *DaemonSetUpdateStrategyBuilder) *DaemonSetSpecBuilder {
+	b.fields.UpdateStrategy = value
 	return b
 }
 
 // RemoveUpdateStrategy removes the UpdateStrategy field from the declarative configuration.
-func (b DaemonSetSpecBuilder) RemoveUpdateStrategy() DaemonSetSpecBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetSpecBuilder) RemoveUpdateStrategy() *DaemonSetSpecBuilder {
 	b.fields.UpdateStrategy = nil
 	return b
 }
 
 // GetUpdateStrategy gets the UpdateStrategy field from the declarative configuration.
-func (b DaemonSetSpecBuilder) GetUpdateStrategy() (value DaemonSetUpdateStrategyBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.UpdateStrategy; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *DaemonSetSpecBuilder) GetUpdateStrategy() (value *DaemonSetUpdateStrategyBuilder, ok bool) {
+	return b.fields.UpdateStrategy, b.fields.UpdateStrategy != nil
 }
 
 // SetMinReadySeconds sets the MinReadySeconds field in the declarative configuration to the given value.
-func (b DaemonSetSpecBuilder) SetMinReadySeconds(value int32) DaemonSetSpecBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetSpecBuilder) SetMinReadySeconds(value int32) *DaemonSetSpecBuilder {
 	b.fields.MinReadySeconds = &value
 	return b
 }
 
 // RemoveMinReadySeconds removes the MinReadySeconds field from the declarative configuration.
-func (b DaemonSetSpecBuilder) RemoveMinReadySeconds() DaemonSetSpecBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetSpecBuilder) RemoveMinReadySeconds() *DaemonSetSpecBuilder {
 	b.fields.MinReadySeconds = nil
 	return b
 }
 
 // GetMinReadySeconds gets the MinReadySeconds field from the declarative configuration.
-func (b DaemonSetSpecBuilder) GetMinReadySeconds() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *DaemonSetSpecBuilder) GetMinReadySeconds() (value int32, ok bool) {
 	if v := b.fields.MinReadySeconds; v != nil {
 		return *v, true
 	}
@@ -151,22 +123,19 @@ func (b DaemonSetSpecBuilder) GetMinReadySeconds() (value int32, ok bool) {
 }
 
 // SetRevisionHistoryLimit sets the RevisionHistoryLimit field in the declarative configuration to the given value.
-func (b DaemonSetSpecBuilder) SetRevisionHistoryLimit(value int32) DaemonSetSpecBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetSpecBuilder) SetRevisionHistoryLimit(value int32) *DaemonSetSpecBuilder {
 	b.fields.RevisionHistoryLimit = &value
 	return b
 }
 
 // RemoveRevisionHistoryLimit removes the RevisionHistoryLimit field from the declarative configuration.
-func (b DaemonSetSpecBuilder) RemoveRevisionHistoryLimit() DaemonSetSpecBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetSpecBuilder) RemoveRevisionHistoryLimit() *DaemonSetSpecBuilder {
 	b.fields.RevisionHistoryLimit = nil
 	return b
 }
 
 // GetRevisionHistoryLimit gets the RevisionHistoryLimit field from the declarative configuration.
-func (b DaemonSetSpecBuilder) GetRevisionHistoryLimit() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *DaemonSetSpecBuilder) GetRevisionHistoryLimit() (value int32, ok bool) {
 	if v := b.fields.RevisionHistoryLimit; v != nil {
 		return *v, true
 	}
@@ -178,9 +147,8 @@ func (b *DaemonSetSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -195,14 +163,13 @@ func (b *DaemonSetSpecBuilder) FromUnstructured(u map[string]interface{}) error 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals DaemonSetSpecBuilder to JSON.
 func (b *DaemonSetSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -210,8 +177,7 @@ func (b *DaemonSetSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into DaemonSetSpecBuilder, replacing the contents of
 // DaemonSetSpecBuilder.
 func (b *DaemonSetSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -219,11 +185,9 @@ func (b *DaemonSetSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // DaemonSetSpecList represents a list of DaemonSetSpecBuilder.
-// Provided as a convenience.
-type DaemonSetSpecList []DaemonSetSpecBuilder
+type DaemonSetSpecList []*DaemonSetSpecBuilder
 
 // DaemonSetSpecList represents a map of DaemonSetSpecBuilder.
-// Provided as a convenience.
 type DaemonSetSpecMap map[string]DaemonSetSpecBuilder
 
 func (b *DaemonSetSpecBuilder) preMarshal() {

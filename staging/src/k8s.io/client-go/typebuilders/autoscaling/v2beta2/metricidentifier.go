@@ -28,49 +28,39 @@ import (
 // MetricIdentifierBuilder represents an declarative configuration of the MetricIdentifier type for use
 // with apply.
 type MetricIdentifierBuilder struct {
-	fields *metricIdentifierFields
+	fields metricIdentifierFields
 }
 
-// metricIdentifierFields is used by MetricIdentifierBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in MetricIdentifierBuilder before marshalling, and
-// are copied out to the builder type in MetricIdentifierBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// metricIdentifierFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in MetricIdentifierBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type metricIdentifierFields struct {
 	Name     *string                  `json:"name,omitempty"`
 	Selector *v1.LabelSelectorBuilder `json:"selector,omitempty"`
 }
 
-func (b *MetricIdentifierBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &metricIdentifierFields{}
-	}
-}
-
 // MetricIdentifier constructs an declarative configuration of the MetricIdentifier type for use with
 // apply.
-// Provided as a convenience.
-func MetricIdentifier() MetricIdentifierBuilder {
-	return MetricIdentifierBuilder{fields: &metricIdentifierFields{}}
+func MetricIdentifier() *MetricIdentifierBuilder {
+	return &MetricIdentifierBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b MetricIdentifierBuilder) SetName(value string) MetricIdentifierBuilder {
-	b.ensureInitialized()
+func (b *MetricIdentifierBuilder) SetName(value string) *MetricIdentifierBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b MetricIdentifierBuilder) RemoveName() MetricIdentifierBuilder {
-	b.ensureInitialized()
+func (b *MetricIdentifierBuilder) RemoveName() *MetricIdentifierBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b MetricIdentifierBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *MetricIdentifierBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -78,26 +68,20 @@ func (b MetricIdentifierBuilder) GetName() (value string, ok bool) {
 }
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
-func (b MetricIdentifierBuilder) SetSelector(value v1.LabelSelectorBuilder) MetricIdentifierBuilder {
-	b.ensureInitialized()
-	b.fields.Selector = &value
+func (b *MetricIdentifierBuilder) SetSelector(value *v1.LabelSelectorBuilder) *MetricIdentifierBuilder {
+	b.fields.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
-func (b MetricIdentifierBuilder) RemoveSelector() MetricIdentifierBuilder {
-	b.ensureInitialized()
+func (b *MetricIdentifierBuilder) RemoveSelector() *MetricIdentifierBuilder {
 	b.fields.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
-func (b MetricIdentifierBuilder) GetSelector() (value v1.LabelSelectorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Selector; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *MetricIdentifierBuilder) GetSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+	return b.fields.Selector, b.fields.Selector != nil
 }
 
 // ToUnstructured converts MetricIdentifierBuilder to unstructured.
@@ -105,9 +89,8 @@ func (b *MetricIdentifierBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +105,13 @@ func (b *MetricIdentifierBuilder) FromUnstructured(u map[string]interface{}) err
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals MetricIdentifierBuilder to JSON.
 func (b *MetricIdentifierBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +119,7 @@ func (b *MetricIdentifierBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into MetricIdentifierBuilder, replacing the contents of
 // MetricIdentifierBuilder.
 func (b *MetricIdentifierBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +127,9 @@ func (b *MetricIdentifierBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // MetricIdentifierList represents a list of MetricIdentifierBuilder.
-// Provided as a convenience.
-type MetricIdentifierList []MetricIdentifierBuilder
+type MetricIdentifierList []*MetricIdentifierBuilder
 
 // MetricIdentifierList represents a map of MetricIdentifierBuilder.
-// Provided as a convenience.
 type MetricIdentifierMap map[string]MetricIdentifierBuilder
 
 func (b *MetricIdentifierBuilder) preMarshal() {

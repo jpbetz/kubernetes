@@ -28,15 +28,15 @@ import (
 // TokenReviewBuilder represents an declarative configuration of the TokenReview type for use
 // with apply.
 type TokenReviewBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *tokenReviewFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   tokenReviewFields
 }
 
-// tokenReviewFields is used by TokenReviewBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in TokenReviewBuilder before marshalling, and
-// are copied out to the builder type in TokenReviewBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// tokenReviewFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in TokenReviewBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type tokenReviewFields struct {
 	Kind       *string                   `json:"kind,omitempty"`       // inlined TokenReviewBuilder.typeMeta.Kind field
 	APIVersion *string                   `json:"apiVersion,omitempty"` // inlined TokenReviewBuilder.typeMeta.APIVersion field
@@ -45,106 +45,78 @@ type tokenReviewFields struct {
 	Status     *TokenReviewStatusBuilder `json:"status,omitempty"`
 }
 
-func (b *TokenReviewBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &tokenReviewFields{}
-	}
-}
-
 // TokenReview constructs an declarative configuration of the TokenReview type for use with
 // apply.
-// Provided as a convenience.
-func TokenReview() TokenReviewBuilder {
-	return TokenReviewBuilder{fields: &tokenReviewFields{}}
+func TokenReview() *TokenReviewBuilder {
+	return &TokenReviewBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b TokenReviewBuilder) SetTypeMeta(value v1.TypeMetaBuilder) TokenReviewBuilder {
-	b.ensureInitialized()
+func (b *TokenReviewBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *TokenReviewBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b TokenReviewBuilder) RemoveTypeMeta() TokenReviewBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *TokenReviewBuilder) RemoveTypeMeta() *TokenReviewBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b TokenReviewBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *TokenReviewBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b TokenReviewBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) TokenReviewBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *TokenReviewBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *TokenReviewBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b TokenReviewBuilder) RemoveObjectMeta() TokenReviewBuilder {
-	b.ensureInitialized()
+func (b *TokenReviewBuilder) RemoveObjectMeta() *TokenReviewBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b TokenReviewBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *TokenReviewBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b TokenReviewBuilder) SetSpec(value TokenReviewSpecBuilder) TokenReviewBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *TokenReviewBuilder) SetSpec(value *TokenReviewSpecBuilder) *TokenReviewBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b TokenReviewBuilder) RemoveSpec() TokenReviewBuilder {
-	b.ensureInitialized()
+func (b *TokenReviewBuilder) RemoveSpec() *TokenReviewBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b TokenReviewBuilder) GetSpec() (value TokenReviewSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *TokenReviewBuilder) GetSpec() (value *TokenReviewSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b TokenReviewBuilder) SetStatus(value TokenReviewStatusBuilder) TokenReviewBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *TokenReviewBuilder) SetStatus(value *TokenReviewStatusBuilder) *TokenReviewBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b TokenReviewBuilder) RemoveStatus() TokenReviewBuilder {
-	b.ensureInitialized()
+func (b *TokenReviewBuilder) RemoveStatus() *TokenReviewBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b TokenReviewBuilder) GetStatus() (value TokenReviewStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *TokenReviewBuilder) GetStatus() (value *TokenReviewStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts TokenReviewBuilder to unstructured.
@@ -152,9 +124,8 @@ func (b *TokenReviewBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *TokenReviewBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals TokenReviewBuilder to JSON.
 func (b *TokenReviewBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *TokenReviewBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into TokenReviewBuilder, replacing the contents of
 // TokenReviewBuilder.
 func (b *TokenReviewBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +162,25 @@ func (b *TokenReviewBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // TokenReviewList represents a list of TokenReviewBuilder.
-// Provided as a convenience.
-type TokenReviewList []TokenReviewBuilder
+type TokenReviewList []*TokenReviewBuilder
 
 // TokenReviewList represents a map of TokenReviewBuilder.
-// Provided as a convenience.
 type TokenReviewMap map[string]TokenReviewBuilder
 
 func (b *TokenReviewBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *TokenReviewBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

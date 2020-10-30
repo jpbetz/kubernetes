@@ -27,50 +27,40 @@ import (
 // EnvVarBuilder represents an declarative configuration of the EnvVar type for use
 // with apply.
 type EnvVarBuilder struct {
-	fields *envVarFields
+	fields envVarFields
 }
 
-// envVarFields is used by EnvVarBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in EnvVarBuilder before marshalling, and
-// are copied out to the builder type in EnvVarBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// envVarFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in EnvVarBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type envVarFields struct {
 	Name      *string              `json:"name,omitempty"`
 	Value     *string              `json:"value,omitempty"`
 	ValueFrom *EnvVarSourceBuilder `json:"valueFrom,omitempty"`
 }
 
-func (b *EnvVarBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &envVarFields{}
-	}
-}
-
 // EnvVar constructs an declarative configuration of the EnvVar type for use with
 // apply.
-// Provided as a convenience.
-func EnvVar() EnvVarBuilder {
-	return EnvVarBuilder{fields: &envVarFields{}}
+func EnvVar() *EnvVarBuilder {
+	return &EnvVarBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b EnvVarBuilder) SetName(value string) EnvVarBuilder {
-	b.ensureInitialized()
+func (b *EnvVarBuilder) SetName(value string) *EnvVarBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b EnvVarBuilder) RemoveName() EnvVarBuilder {
-	b.ensureInitialized()
+func (b *EnvVarBuilder) RemoveName() *EnvVarBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b EnvVarBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *EnvVarBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b EnvVarBuilder) GetName() (value string, ok bool) {
 }
 
 // SetValue sets the Value field in the declarative configuration to the given value.
-func (b EnvVarBuilder) SetValue(value string) EnvVarBuilder {
-	b.ensureInitialized()
+func (b *EnvVarBuilder) SetValue(value string) *EnvVarBuilder {
 	b.fields.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
-func (b EnvVarBuilder) RemoveValue() EnvVarBuilder {
-	b.ensureInitialized()
+func (b *EnvVarBuilder) RemoveValue() *EnvVarBuilder {
 	b.fields.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
-func (b EnvVarBuilder) GetValue() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *EnvVarBuilder) GetValue() (value string, ok bool) {
 	if v := b.fields.Value; v != nil {
 		return *v, true
 	}
@@ -101,26 +88,20 @@ func (b EnvVarBuilder) GetValue() (value string, ok bool) {
 }
 
 // SetValueFrom sets the ValueFrom field in the declarative configuration to the given value.
-func (b EnvVarBuilder) SetValueFrom(value EnvVarSourceBuilder) EnvVarBuilder {
-	b.ensureInitialized()
-	b.fields.ValueFrom = &value
+func (b *EnvVarBuilder) SetValueFrom(value *EnvVarSourceBuilder) *EnvVarBuilder {
+	b.fields.ValueFrom = value
 	return b
 }
 
 // RemoveValueFrom removes the ValueFrom field from the declarative configuration.
-func (b EnvVarBuilder) RemoveValueFrom() EnvVarBuilder {
-	b.ensureInitialized()
+func (b *EnvVarBuilder) RemoveValueFrom() *EnvVarBuilder {
 	b.fields.ValueFrom = nil
 	return b
 }
 
 // GetValueFrom gets the ValueFrom field from the declarative configuration.
-func (b EnvVarBuilder) GetValueFrom() (value EnvVarSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ValueFrom; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *EnvVarBuilder) GetValueFrom() (value *EnvVarSourceBuilder, ok bool) {
+	return b.fields.ValueFrom, b.fields.ValueFrom != nil
 }
 
 // ToUnstructured converts EnvVarBuilder to unstructured.
@@ -128,9 +109,8 @@ func (b *EnvVarBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +125,13 @@ func (b *EnvVarBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals EnvVarBuilder to JSON.
 func (b *EnvVarBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +139,7 @@ func (b *EnvVarBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into EnvVarBuilder, replacing the contents of
 // EnvVarBuilder.
 func (b *EnvVarBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +147,9 @@ func (b *EnvVarBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // EnvVarList represents a list of EnvVarBuilder.
-// Provided as a convenience.
-type EnvVarList []EnvVarBuilder
+type EnvVarList []*EnvVarBuilder
 
 // EnvVarList represents a map of EnvVarBuilder.
-// Provided as a convenience.
 type EnvVarMap map[string]EnvVarBuilder
 
 func (b *EnvVarBuilder) preMarshal() {

@@ -29,14 +29,14 @@ import (
 // PodConditionBuilder represents an declarative configuration of the PodCondition type for use
 // with apply.
 type PodConditionBuilder struct {
-	fields *podConditionFields
+	fields podConditionFields
 }
 
-// podConditionFields is used by PodConditionBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PodConditionBuilder before marshalling, and
-// are copied out to the builder type in PodConditionBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// podConditionFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PodConditionBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type podConditionFields struct {
 	Type               *v1.PodConditionType `json:"type,omitempty"`
 	Status             *v1.ConditionStatus  `json:"status,omitempty"`
@@ -46,36 +46,26 @@ type podConditionFields struct {
 	Message            *string              `json:"message,omitempty"`
 }
 
-func (b *PodConditionBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &podConditionFields{}
-	}
-}
-
 // PodCondition constructs an declarative configuration of the PodCondition type for use with
 // apply.
-// Provided as a convenience.
-func PodCondition() PodConditionBuilder {
-	return PodConditionBuilder{fields: &podConditionFields{}}
+func PodCondition() *PodConditionBuilder {
+	return &PodConditionBuilder{}
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b PodConditionBuilder) SetType(value v1.PodConditionType) PodConditionBuilder {
-	b.ensureInitialized()
+func (b *PodConditionBuilder) SetType(value v1.PodConditionType) *PodConditionBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b PodConditionBuilder) RemoveType() PodConditionBuilder {
-	b.ensureInitialized()
+func (b *PodConditionBuilder) RemoveType() *PodConditionBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b PodConditionBuilder) GetType() (value v1.PodConditionType, ok bool) {
-	b.ensureInitialized()
+func (b *PodConditionBuilder) GetType() (value v1.PodConditionType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -83,22 +73,19 @@ func (b PodConditionBuilder) GetType() (value v1.PodConditionType, ok bool) {
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b PodConditionBuilder) SetStatus(value v1.ConditionStatus) PodConditionBuilder {
-	b.ensureInitialized()
+func (b *PodConditionBuilder) SetStatus(value v1.ConditionStatus) *PodConditionBuilder {
 	b.fields.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b PodConditionBuilder) RemoveStatus() PodConditionBuilder {
-	b.ensureInitialized()
+func (b *PodConditionBuilder) RemoveStatus() *PodConditionBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b PodConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
-	b.ensureInitialized()
+func (b *PodConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
 	if v := b.fields.Status; v != nil {
 		return *v, true
 	}
@@ -106,22 +93,19 @@ func (b PodConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
 }
 
 // SetLastProbeTime sets the LastProbeTime field in the declarative configuration to the given value.
-func (b PodConditionBuilder) SetLastProbeTime(value metav1.Time) PodConditionBuilder {
-	b.ensureInitialized()
+func (b *PodConditionBuilder) SetLastProbeTime(value metav1.Time) *PodConditionBuilder {
 	b.fields.LastProbeTime = &value
 	return b
 }
 
 // RemoveLastProbeTime removes the LastProbeTime field from the declarative configuration.
-func (b PodConditionBuilder) RemoveLastProbeTime() PodConditionBuilder {
-	b.ensureInitialized()
+func (b *PodConditionBuilder) RemoveLastProbeTime() *PodConditionBuilder {
 	b.fields.LastProbeTime = nil
 	return b
 }
 
 // GetLastProbeTime gets the LastProbeTime field from the declarative configuration.
-func (b PodConditionBuilder) GetLastProbeTime() (value metav1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *PodConditionBuilder) GetLastProbeTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastProbeTime; v != nil {
 		return *v, true
 	}
@@ -129,22 +113,19 @@ func (b PodConditionBuilder) GetLastProbeTime() (value metav1.Time, ok bool) {
 }
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
-func (b PodConditionBuilder) SetLastTransitionTime(value metav1.Time) PodConditionBuilder {
-	b.ensureInitialized()
+func (b *PodConditionBuilder) SetLastTransitionTime(value metav1.Time) *PodConditionBuilder {
 	b.fields.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
-func (b PodConditionBuilder) RemoveLastTransitionTime() PodConditionBuilder {
-	b.ensureInitialized()
+func (b *PodConditionBuilder) RemoveLastTransitionTime() *PodConditionBuilder {
 	b.fields.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
-func (b PodConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *PodConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastTransitionTime; v != nil {
 		return *v, true
 	}
@@ -152,22 +133,19 @@ func (b PodConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b PodConditionBuilder) SetReason(value string) PodConditionBuilder {
-	b.ensureInitialized()
+func (b *PodConditionBuilder) SetReason(value string) *PodConditionBuilder {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b PodConditionBuilder) RemoveReason() PodConditionBuilder {
-	b.ensureInitialized()
+func (b *PodConditionBuilder) RemoveReason() *PodConditionBuilder {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b PodConditionBuilder) GetReason() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *PodConditionBuilder) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -175,22 +153,19 @@ func (b PodConditionBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b PodConditionBuilder) SetMessage(value string) PodConditionBuilder {
-	b.ensureInitialized()
+func (b *PodConditionBuilder) SetMessage(value string) *PodConditionBuilder {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b PodConditionBuilder) RemoveMessage() PodConditionBuilder {
-	b.ensureInitialized()
+func (b *PodConditionBuilder) RemoveMessage() *PodConditionBuilder {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b PodConditionBuilder) GetMessage() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *PodConditionBuilder) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
@@ -202,9 +177,8 @@ func (b *PodConditionBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -219,14 +193,13 @@ func (b *PodConditionBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PodConditionBuilder to JSON.
 func (b *PodConditionBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -234,8 +207,7 @@ func (b *PodConditionBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PodConditionBuilder, replacing the contents of
 // PodConditionBuilder.
 func (b *PodConditionBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -243,11 +215,9 @@ func (b *PodConditionBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PodConditionList represents a list of PodConditionBuilder.
-// Provided as a convenience.
-type PodConditionList []PodConditionBuilder
+type PodConditionList []*PodConditionBuilder
 
 // PodConditionList represents a map of PodConditionBuilder.
-// Provided as a convenience.
 type PodConditionMap map[string]PodConditionBuilder
 
 func (b *PodConditionBuilder) preMarshal() {

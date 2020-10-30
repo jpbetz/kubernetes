@@ -27,48 +27,38 @@ import (
 // TopologySelectorTermBuilder represents an declarative configuration of the TopologySelectorTerm type for use
 // with apply.
 type TopologySelectorTermBuilder struct {
-	fields *topologySelectorTermFields
+	fields topologySelectorTermFields
 }
 
-// topologySelectorTermFields is used by TopologySelectorTermBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in TopologySelectorTermBuilder before marshalling, and
-// are copied out to the builder type in TopologySelectorTermBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// topologySelectorTermFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in TopologySelectorTermBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type topologySelectorTermFields struct {
 	MatchLabelExpressions *TopologySelectorLabelRequirementList `json:"matchLabelExpressions,omitempty"`
 }
 
-func (b *TopologySelectorTermBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &topologySelectorTermFields{}
-	}
-}
-
 // TopologySelectorTerm constructs an declarative configuration of the TopologySelectorTerm type for use with
 // apply.
-// Provided as a convenience.
-func TopologySelectorTerm() TopologySelectorTermBuilder {
-	return TopologySelectorTermBuilder{fields: &topologySelectorTermFields{}}
+func TopologySelectorTerm() *TopologySelectorTermBuilder {
+	return &TopologySelectorTermBuilder{}
 }
 
 // SetMatchLabelExpressions sets the MatchLabelExpressions field in the declarative configuration to the given value.
-func (b TopologySelectorTermBuilder) SetMatchLabelExpressions(value TopologySelectorLabelRequirementList) TopologySelectorTermBuilder {
-	b.ensureInitialized()
+func (b *TopologySelectorTermBuilder) SetMatchLabelExpressions(value TopologySelectorLabelRequirementList) *TopologySelectorTermBuilder {
 	b.fields.MatchLabelExpressions = &value
 	return b
 }
 
 // RemoveMatchLabelExpressions removes the MatchLabelExpressions field from the declarative configuration.
-func (b TopologySelectorTermBuilder) RemoveMatchLabelExpressions() TopologySelectorTermBuilder {
-	b.ensureInitialized()
+func (b *TopologySelectorTermBuilder) RemoveMatchLabelExpressions() *TopologySelectorTermBuilder {
 	b.fields.MatchLabelExpressions = nil
 	return b
 }
 
 // GetMatchLabelExpressions gets the MatchLabelExpressions field from the declarative configuration.
-func (b TopologySelectorTermBuilder) GetMatchLabelExpressions() (value TopologySelectorLabelRequirementList, ok bool) {
-	b.ensureInitialized()
+func (b *TopologySelectorTermBuilder) GetMatchLabelExpressions() (value TopologySelectorLabelRequirementList, ok bool) {
 	if v := b.fields.MatchLabelExpressions; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *TopologySelectorTermBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *TopologySelectorTermBuilder) FromUnstructured(u map[string]interface{})
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals TopologySelectorTermBuilder to JSON.
 func (b *TopologySelectorTermBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *TopologySelectorTermBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into TopologySelectorTermBuilder, replacing the contents of
 // TopologySelectorTermBuilder.
 func (b *TopologySelectorTermBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *TopologySelectorTermBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // TopologySelectorTermList represents a list of TopologySelectorTermBuilder.
-// Provided as a convenience.
-type TopologySelectorTermList []TopologySelectorTermBuilder
+type TopologySelectorTermList []*TopologySelectorTermBuilder
 
 // TopologySelectorTermList represents a map of TopologySelectorTermBuilder.
-// Provided as a convenience.
 type TopologySelectorTermMap map[string]TopologySelectorTermBuilder
 
 func (b *TopologySelectorTermBuilder) preMarshal() {

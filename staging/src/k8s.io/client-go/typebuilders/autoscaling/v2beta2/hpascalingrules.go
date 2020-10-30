@@ -28,50 +28,40 @@ import (
 // HPAScalingRulesBuilder represents an declarative configuration of the HPAScalingRules type for use
 // with apply.
 type HPAScalingRulesBuilder struct {
-	fields *hPAScalingRulesFields
+	fields hPAScalingRulesFields
 }
 
-// hPAScalingRulesFields is used by HPAScalingRulesBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in HPAScalingRulesBuilder before marshalling, and
-// are copied out to the builder type in HPAScalingRulesBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// hPAScalingRulesFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in HPAScalingRulesBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type hPAScalingRulesFields struct {
 	StabilizationWindowSeconds *int32                       `json:"stabilizationWindowSeconds,omitempty"`
 	SelectPolicy               *v2beta2.ScalingPolicySelect `json:"selectPolicy,omitempty"`
 	Policies                   *HPAScalingPolicyList        `json:"policies,omitempty"`
 }
 
-func (b *HPAScalingRulesBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &hPAScalingRulesFields{}
-	}
-}
-
 // HPAScalingRules constructs an declarative configuration of the HPAScalingRules type for use with
 // apply.
-// Provided as a convenience.
-func HPAScalingRules() HPAScalingRulesBuilder {
-	return HPAScalingRulesBuilder{fields: &hPAScalingRulesFields{}}
+func HPAScalingRules() *HPAScalingRulesBuilder {
+	return &HPAScalingRulesBuilder{}
 }
 
 // SetStabilizationWindowSeconds sets the StabilizationWindowSeconds field in the declarative configuration to the given value.
-func (b HPAScalingRulesBuilder) SetStabilizationWindowSeconds(value int32) HPAScalingRulesBuilder {
-	b.ensureInitialized()
+func (b *HPAScalingRulesBuilder) SetStabilizationWindowSeconds(value int32) *HPAScalingRulesBuilder {
 	b.fields.StabilizationWindowSeconds = &value
 	return b
 }
 
 // RemoveStabilizationWindowSeconds removes the StabilizationWindowSeconds field from the declarative configuration.
-func (b HPAScalingRulesBuilder) RemoveStabilizationWindowSeconds() HPAScalingRulesBuilder {
-	b.ensureInitialized()
+func (b *HPAScalingRulesBuilder) RemoveStabilizationWindowSeconds() *HPAScalingRulesBuilder {
 	b.fields.StabilizationWindowSeconds = nil
 	return b
 }
 
 // GetStabilizationWindowSeconds gets the StabilizationWindowSeconds field from the declarative configuration.
-func (b HPAScalingRulesBuilder) GetStabilizationWindowSeconds() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *HPAScalingRulesBuilder) GetStabilizationWindowSeconds() (value int32, ok bool) {
 	if v := b.fields.StabilizationWindowSeconds; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b HPAScalingRulesBuilder) GetStabilizationWindowSeconds() (value int32, ok
 }
 
 // SetSelectPolicy sets the SelectPolicy field in the declarative configuration to the given value.
-func (b HPAScalingRulesBuilder) SetSelectPolicy(value v2beta2.ScalingPolicySelect) HPAScalingRulesBuilder {
-	b.ensureInitialized()
+func (b *HPAScalingRulesBuilder) SetSelectPolicy(value v2beta2.ScalingPolicySelect) *HPAScalingRulesBuilder {
 	b.fields.SelectPolicy = &value
 	return b
 }
 
 // RemoveSelectPolicy removes the SelectPolicy field from the declarative configuration.
-func (b HPAScalingRulesBuilder) RemoveSelectPolicy() HPAScalingRulesBuilder {
-	b.ensureInitialized()
+func (b *HPAScalingRulesBuilder) RemoveSelectPolicy() *HPAScalingRulesBuilder {
 	b.fields.SelectPolicy = nil
 	return b
 }
 
 // GetSelectPolicy gets the SelectPolicy field from the declarative configuration.
-func (b HPAScalingRulesBuilder) GetSelectPolicy() (value v2beta2.ScalingPolicySelect, ok bool) {
-	b.ensureInitialized()
+func (b *HPAScalingRulesBuilder) GetSelectPolicy() (value v2beta2.ScalingPolicySelect, ok bool) {
 	if v := b.fields.SelectPolicy; v != nil {
 		return *v, true
 	}
@@ -102,22 +89,19 @@ func (b HPAScalingRulesBuilder) GetSelectPolicy() (value v2beta2.ScalingPolicySe
 }
 
 // SetPolicies sets the Policies field in the declarative configuration to the given value.
-func (b HPAScalingRulesBuilder) SetPolicies(value HPAScalingPolicyList) HPAScalingRulesBuilder {
-	b.ensureInitialized()
+func (b *HPAScalingRulesBuilder) SetPolicies(value HPAScalingPolicyList) *HPAScalingRulesBuilder {
 	b.fields.Policies = &value
 	return b
 }
 
 // RemovePolicies removes the Policies field from the declarative configuration.
-func (b HPAScalingRulesBuilder) RemovePolicies() HPAScalingRulesBuilder {
-	b.ensureInitialized()
+func (b *HPAScalingRulesBuilder) RemovePolicies() *HPAScalingRulesBuilder {
 	b.fields.Policies = nil
 	return b
 }
 
 // GetPolicies gets the Policies field from the declarative configuration.
-func (b HPAScalingRulesBuilder) GetPolicies() (value HPAScalingPolicyList, ok bool) {
-	b.ensureInitialized()
+func (b *HPAScalingRulesBuilder) GetPolicies() (value HPAScalingPolicyList, ok bool) {
 	if v := b.fields.Policies; v != nil {
 		return *v, true
 	}
@@ -129,9 +113,8 @@ func (b *HPAScalingRulesBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -146,14 +129,13 @@ func (b *HPAScalingRulesBuilder) FromUnstructured(u map[string]interface{}) erro
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals HPAScalingRulesBuilder to JSON.
 func (b *HPAScalingRulesBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -161,8 +143,7 @@ func (b *HPAScalingRulesBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into HPAScalingRulesBuilder, replacing the contents of
 // HPAScalingRulesBuilder.
 func (b *HPAScalingRulesBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -170,11 +151,9 @@ func (b *HPAScalingRulesBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // HPAScalingRulesList represents a list of HPAScalingRulesBuilder.
-// Provided as a convenience.
-type HPAScalingRulesList []HPAScalingRulesBuilder
+type HPAScalingRulesList []*HPAScalingRulesBuilder
 
 // HPAScalingRulesList represents a map of HPAScalingRulesBuilder.
-// Provided as a convenience.
 type HPAScalingRulesMap map[string]HPAScalingRulesBuilder
 
 func (b *HPAScalingRulesBuilder) preMarshal() {

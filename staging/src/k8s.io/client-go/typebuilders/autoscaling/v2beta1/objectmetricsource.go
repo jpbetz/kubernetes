@@ -29,14 +29,14 @@ import (
 // ObjectMetricSourceBuilder represents an declarative configuration of the ObjectMetricSource type for use
 // with apply.
 type ObjectMetricSourceBuilder struct {
-	fields *objectMetricSourceFields
+	fields objectMetricSourceFields
 }
 
-// objectMetricSourceFields is used by ObjectMetricSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ObjectMetricSourceBuilder before marshalling, and
-// are copied out to the builder type in ObjectMetricSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// objectMetricSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ObjectMetricSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type objectMetricSourceFields struct {
 	Target       *CrossVersionObjectReferenceBuilder `json:"target,omitempty"`
 	MetricName   *string                             `json:"metricName,omitempty"`
@@ -45,59 +45,43 @@ type objectMetricSourceFields struct {
 	AverageValue *resource.Quantity                  `json:"averageValue,omitempty"`
 }
 
-func (b *ObjectMetricSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &objectMetricSourceFields{}
-	}
-}
-
 // ObjectMetricSource constructs an declarative configuration of the ObjectMetricSource type for use with
 // apply.
-// Provided as a convenience.
-func ObjectMetricSource() ObjectMetricSourceBuilder {
-	return ObjectMetricSourceBuilder{fields: &objectMetricSourceFields{}}
+func ObjectMetricSource() *ObjectMetricSourceBuilder {
+	return &ObjectMetricSourceBuilder{}
 }
 
 // SetTarget sets the Target field in the declarative configuration to the given value.
-func (b ObjectMetricSourceBuilder) SetTarget(value CrossVersionObjectReferenceBuilder) ObjectMetricSourceBuilder {
-	b.ensureInitialized()
-	b.fields.Target = &value
+func (b *ObjectMetricSourceBuilder) SetTarget(value *CrossVersionObjectReferenceBuilder) *ObjectMetricSourceBuilder {
+	b.fields.Target = value
 	return b
 }
 
 // RemoveTarget removes the Target field from the declarative configuration.
-func (b ObjectMetricSourceBuilder) RemoveTarget() ObjectMetricSourceBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetricSourceBuilder) RemoveTarget() *ObjectMetricSourceBuilder {
 	b.fields.Target = nil
 	return b
 }
 
 // GetTarget gets the Target field from the declarative configuration.
-func (b ObjectMetricSourceBuilder) GetTarget() (value CrossVersionObjectReferenceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Target; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ObjectMetricSourceBuilder) GetTarget() (value *CrossVersionObjectReferenceBuilder, ok bool) {
+	return b.fields.Target, b.fields.Target != nil
 }
 
 // SetMetricName sets the MetricName field in the declarative configuration to the given value.
-func (b ObjectMetricSourceBuilder) SetMetricName(value string) ObjectMetricSourceBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetricSourceBuilder) SetMetricName(value string) *ObjectMetricSourceBuilder {
 	b.fields.MetricName = &value
 	return b
 }
 
 // RemoveMetricName removes the MetricName field from the declarative configuration.
-func (b ObjectMetricSourceBuilder) RemoveMetricName() ObjectMetricSourceBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetricSourceBuilder) RemoveMetricName() *ObjectMetricSourceBuilder {
 	b.fields.MetricName = nil
 	return b
 }
 
 // GetMetricName gets the MetricName field from the declarative configuration.
-func (b ObjectMetricSourceBuilder) GetMetricName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetricSourceBuilder) GetMetricName() (value string, ok bool) {
 	if v := b.fields.MetricName; v != nil {
 		return *v, true
 	}
@@ -105,22 +89,19 @@ func (b ObjectMetricSourceBuilder) GetMetricName() (value string, ok bool) {
 }
 
 // SetTargetValue sets the TargetValue field in the declarative configuration to the given value.
-func (b ObjectMetricSourceBuilder) SetTargetValue(value resource.Quantity) ObjectMetricSourceBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetricSourceBuilder) SetTargetValue(value resource.Quantity) *ObjectMetricSourceBuilder {
 	b.fields.TargetValue = &value
 	return b
 }
 
 // RemoveTargetValue removes the TargetValue field from the declarative configuration.
-func (b ObjectMetricSourceBuilder) RemoveTargetValue() ObjectMetricSourceBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetricSourceBuilder) RemoveTargetValue() *ObjectMetricSourceBuilder {
 	b.fields.TargetValue = nil
 	return b
 }
 
 // GetTargetValue gets the TargetValue field from the declarative configuration.
-func (b ObjectMetricSourceBuilder) GetTargetValue() (value resource.Quantity, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetricSourceBuilder) GetTargetValue() (value resource.Quantity, ok bool) {
 	if v := b.fields.TargetValue; v != nil {
 		return *v, true
 	}
@@ -128,45 +109,36 @@ func (b ObjectMetricSourceBuilder) GetTargetValue() (value resource.Quantity, ok
 }
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
-func (b ObjectMetricSourceBuilder) SetSelector(value v1.LabelSelectorBuilder) ObjectMetricSourceBuilder {
-	b.ensureInitialized()
-	b.fields.Selector = &value
+func (b *ObjectMetricSourceBuilder) SetSelector(value *v1.LabelSelectorBuilder) *ObjectMetricSourceBuilder {
+	b.fields.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
-func (b ObjectMetricSourceBuilder) RemoveSelector() ObjectMetricSourceBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetricSourceBuilder) RemoveSelector() *ObjectMetricSourceBuilder {
 	b.fields.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
-func (b ObjectMetricSourceBuilder) GetSelector() (value v1.LabelSelectorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Selector; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ObjectMetricSourceBuilder) GetSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+	return b.fields.Selector, b.fields.Selector != nil
 }
 
 // SetAverageValue sets the AverageValue field in the declarative configuration to the given value.
-func (b ObjectMetricSourceBuilder) SetAverageValue(value resource.Quantity) ObjectMetricSourceBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetricSourceBuilder) SetAverageValue(value resource.Quantity) *ObjectMetricSourceBuilder {
 	b.fields.AverageValue = &value
 	return b
 }
 
 // RemoveAverageValue removes the AverageValue field from the declarative configuration.
-func (b ObjectMetricSourceBuilder) RemoveAverageValue() ObjectMetricSourceBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetricSourceBuilder) RemoveAverageValue() *ObjectMetricSourceBuilder {
 	b.fields.AverageValue = nil
 	return b
 }
 
 // GetAverageValue gets the AverageValue field from the declarative configuration.
-func (b ObjectMetricSourceBuilder) GetAverageValue() (value resource.Quantity, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetricSourceBuilder) GetAverageValue() (value resource.Quantity, ok bool) {
 	if v := b.fields.AverageValue; v != nil {
 		return *v, true
 	}
@@ -178,9 +150,8 @@ func (b *ObjectMetricSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -195,14 +166,13 @@ func (b *ObjectMetricSourceBuilder) FromUnstructured(u map[string]interface{}) e
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ObjectMetricSourceBuilder to JSON.
 func (b *ObjectMetricSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -210,8 +180,7 @@ func (b *ObjectMetricSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ObjectMetricSourceBuilder, replacing the contents of
 // ObjectMetricSourceBuilder.
 func (b *ObjectMetricSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -219,11 +188,9 @@ func (b *ObjectMetricSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ObjectMetricSourceList represents a list of ObjectMetricSourceBuilder.
-// Provided as a convenience.
-type ObjectMetricSourceList []ObjectMetricSourceBuilder
+type ObjectMetricSourceList []*ObjectMetricSourceBuilder
 
 // ObjectMetricSourceList represents a map of ObjectMetricSourceBuilder.
-// Provided as a convenience.
 type ObjectMetricSourceMap map[string]ObjectMetricSourceBuilder
 
 func (b *ObjectMetricSourceBuilder) preMarshal() {

@@ -27,48 +27,38 @@ import (
 // UserSubjectBuilder represents an declarative configuration of the UserSubject type for use
 // with apply.
 type UserSubjectBuilder struct {
-	fields *userSubjectFields
+	fields userSubjectFields
 }
 
-// userSubjectFields is used by UserSubjectBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in UserSubjectBuilder before marshalling, and
-// are copied out to the builder type in UserSubjectBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// userSubjectFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in UserSubjectBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type userSubjectFields struct {
 	Name *string `json:"name,omitempty"`
 }
 
-func (b *UserSubjectBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &userSubjectFields{}
-	}
-}
-
 // UserSubject constructs an declarative configuration of the UserSubject type for use with
 // apply.
-// Provided as a convenience.
-func UserSubject() UserSubjectBuilder {
-	return UserSubjectBuilder{fields: &userSubjectFields{}}
+func UserSubject() *UserSubjectBuilder {
+	return &UserSubjectBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b UserSubjectBuilder) SetName(value string) UserSubjectBuilder {
-	b.ensureInitialized()
+func (b *UserSubjectBuilder) SetName(value string) *UserSubjectBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b UserSubjectBuilder) RemoveName() UserSubjectBuilder {
-	b.ensureInitialized()
+func (b *UserSubjectBuilder) RemoveName() *UserSubjectBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b UserSubjectBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *UserSubjectBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *UserSubjectBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *UserSubjectBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals UserSubjectBuilder to JSON.
 func (b *UserSubjectBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *UserSubjectBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into UserSubjectBuilder, replacing the contents of
 // UserSubjectBuilder.
 func (b *UserSubjectBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *UserSubjectBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // UserSubjectList represents a list of UserSubjectBuilder.
-// Provided as a convenience.
-type UserSubjectList []UserSubjectBuilder
+type UserSubjectList []*UserSubjectBuilder
 
 // UserSubjectList represents a map of UserSubjectBuilder.
-// Provided as a convenience.
 type UserSubjectMap map[string]UserSubjectBuilder
 
 func (b *UserSubjectBuilder) preMarshal() {

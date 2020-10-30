@@ -27,48 +27,38 @@ import (
 // PodIPBuilder represents an declarative configuration of the PodIP type for use
 // with apply.
 type PodIPBuilder struct {
-	fields *podIPFields
+	fields podIPFields
 }
 
-// podIPFields is used by PodIPBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PodIPBuilder before marshalling, and
-// are copied out to the builder type in PodIPBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// podIPFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PodIPBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type podIPFields struct {
 	IP *string `json:"ip,omitempty"`
 }
 
-func (b *PodIPBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &podIPFields{}
-	}
-}
-
 // PodIP constructs an declarative configuration of the PodIP type for use with
 // apply.
-// Provided as a convenience.
-func PodIP() PodIPBuilder {
-	return PodIPBuilder{fields: &podIPFields{}}
+func PodIP() *PodIPBuilder {
+	return &PodIPBuilder{}
 }
 
 // SetIP sets the IP field in the declarative configuration to the given value.
-func (b PodIPBuilder) SetIP(value string) PodIPBuilder {
-	b.ensureInitialized()
+func (b *PodIPBuilder) SetIP(value string) *PodIPBuilder {
 	b.fields.IP = &value
 	return b
 }
 
 // RemoveIP removes the IP field from the declarative configuration.
-func (b PodIPBuilder) RemoveIP() PodIPBuilder {
-	b.ensureInitialized()
+func (b *PodIPBuilder) RemoveIP() *PodIPBuilder {
 	b.fields.IP = nil
 	return b
 }
 
 // GetIP gets the IP field from the declarative configuration.
-func (b PodIPBuilder) GetIP() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *PodIPBuilder) GetIP() (value string, ok bool) {
 	if v := b.fields.IP; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *PodIPBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *PodIPBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PodIPBuilder to JSON.
 func (b *PodIPBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *PodIPBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PodIPBuilder, replacing the contents of
 // PodIPBuilder.
 func (b *PodIPBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *PodIPBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PodIPList represents a list of PodIPBuilder.
-// Provided as a convenience.
-type PodIPList []PodIPBuilder
+type PodIPList []*PodIPBuilder
 
 // PodIPList represents a map of PodIPBuilder.
-// Provided as a convenience.
 type PodIPMap map[string]PodIPBuilder
 
 func (b *PodIPBuilder) preMarshal() {

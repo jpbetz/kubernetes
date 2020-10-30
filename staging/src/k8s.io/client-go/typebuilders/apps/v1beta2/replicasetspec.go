@@ -29,14 +29,14 @@ import (
 // ReplicaSetSpecBuilder represents an declarative configuration of the ReplicaSetSpec type for use
 // with apply.
 type ReplicaSetSpecBuilder struct {
-	fields *replicaSetSpecFields
+	fields replicaSetSpecFields
 }
 
-// replicaSetSpecFields is used by ReplicaSetSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ReplicaSetSpecBuilder before marshalling, and
-// are copied out to the builder type in ReplicaSetSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// replicaSetSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ReplicaSetSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type replicaSetSpecFields struct {
 	Replicas        *int32                         `json:"replicas,omitempty"`
 	MinReadySeconds *int32                         `json:"minReadySeconds,omitempty"`
@@ -44,36 +44,26 @@ type replicaSetSpecFields struct {
 	Template        *corev1.PodTemplateSpecBuilder `json:"template,omitempty"`
 }
 
-func (b *ReplicaSetSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &replicaSetSpecFields{}
-	}
-}
-
 // ReplicaSetSpec constructs an declarative configuration of the ReplicaSetSpec type for use with
 // apply.
-// Provided as a convenience.
-func ReplicaSetSpec() ReplicaSetSpecBuilder {
-	return ReplicaSetSpecBuilder{fields: &replicaSetSpecFields{}}
+func ReplicaSetSpec() *ReplicaSetSpecBuilder {
+	return &ReplicaSetSpecBuilder{}
 }
 
 // SetReplicas sets the Replicas field in the declarative configuration to the given value.
-func (b ReplicaSetSpecBuilder) SetReplicas(value int32) ReplicaSetSpecBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetSpecBuilder) SetReplicas(value int32) *ReplicaSetSpecBuilder {
 	b.fields.Replicas = &value
 	return b
 }
 
 // RemoveReplicas removes the Replicas field from the declarative configuration.
-func (b ReplicaSetSpecBuilder) RemoveReplicas() ReplicaSetSpecBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetSpecBuilder) RemoveReplicas() *ReplicaSetSpecBuilder {
 	b.fields.Replicas = nil
 	return b
 }
 
 // GetReplicas gets the Replicas field from the declarative configuration.
-func (b ReplicaSetSpecBuilder) GetReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicaSetSpecBuilder) GetReplicas() (value int32, ok bool) {
 	if v := b.fields.Replicas; v != nil {
 		return *v, true
 	}
@@ -81,22 +71,19 @@ func (b ReplicaSetSpecBuilder) GetReplicas() (value int32, ok bool) {
 }
 
 // SetMinReadySeconds sets the MinReadySeconds field in the declarative configuration to the given value.
-func (b ReplicaSetSpecBuilder) SetMinReadySeconds(value int32) ReplicaSetSpecBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetSpecBuilder) SetMinReadySeconds(value int32) *ReplicaSetSpecBuilder {
 	b.fields.MinReadySeconds = &value
 	return b
 }
 
 // RemoveMinReadySeconds removes the MinReadySeconds field from the declarative configuration.
-func (b ReplicaSetSpecBuilder) RemoveMinReadySeconds() ReplicaSetSpecBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetSpecBuilder) RemoveMinReadySeconds() *ReplicaSetSpecBuilder {
 	b.fields.MinReadySeconds = nil
 	return b
 }
 
 // GetMinReadySeconds gets the MinReadySeconds field from the declarative configuration.
-func (b ReplicaSetSpecBuilder) GetMinReadySeconds() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicaSetSpecBuilder) GetMinReadySeconds() (value int32, ok bool) {
 	if v := b.fields.MinReadySeconds; v != nil {
 		return *v, true
 	}
@@ -104,49 +91,37 @@ func (b ReplicaSetSpecBuilder) GetMinReadySeconds() (value int32, ok bool) {
 }
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
-func (b ReplicaSetSpecBuilder) SetSelector(value v1.LabelSelectorBuilder) ReplicaSetSpecBuilder {
-	b.ensureInitialized()
-	b.fields.Selector = &value
+func (b *ReplicaSetSpecBuilder) SetSelector(value *v1.LabelSelectorBuilder) *ReplicaSetSpecBuilder {
+	b.fields.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
-func (b ReplicaSetSpecBuilder) RemoveSelector() ReplicaSetSpecBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetSpecBuilder) RemoveSelector() *ReplicaSetSpecBuilder {
 	b.fields.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
-func (b ReplicaSetSpecBuilder) GetSelector() (value v1.LabelSelectorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Selector; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ReplicaSetSpecBuilder) GetSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+	return b.fields.Selector, b.fields.Selector != nil
 }
 
 // SetTemplate sets the Template field in the declarative configuration to the given value.
-func (b ReplicaSetSpecBuilder) SetTemplate(value corev1.PodTemplateSpecBuilder) ReplicaSetSpecBuilder {
-	b.ensureInitialized()
-	b.fields.Template = &value
+func (b *ReplicaSetSpecBuilder) SetTemplate(value *corev1.PodTemplateSpecBuilder) *ReplicaSetSpecBuilder {
+	b.fields.Template = value
 	return b
 }
 
 // RemoveTemplate removes the Template field from the declarative configuration.
-func (b ReplicaSetSpecBuilder) RemoveTemplate() ReplicaSetSpecBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetSpecBuilder) RemoveTemplate() *ReplicaSetSpecBuilder {
 	b.fields.Template = nil
 	return b
 }
 
 // GetTemplate gets the Template field from the declarative configuration.
-func (b ReplicaSetSpecBuilder) GetTemplate() (value corev1.PodTemplateSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Template; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ReplicaSetSpecBuilder) GetTemplate() (value *corev1.PodTemplateSpecBuilder, ok bool) {
+	return b.fields.Template, b.fields.Template != nil
 }
 
 // ToUnstructured converts ReplicaSetSpecBuilder to unstructured.
@@ -154,9 +129,8 @@ func (b *ReplicaSetSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -171,14 +145,13 @@ func (b *ReplicaSetSpecBuilder) FromUnstructured(u map[string]interface{}) error
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ReplicaSetSpecBuilder to JSON.
 func (b *ReplicaSetSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -186,8 +159,7 @@ func (b *ReplicaSetSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ReplicaSetSpecBuilder, replacing the contents of
 // ReplicaSetSpecBuilder.
 func (b *ReplicaSetSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -195,11 +167,9 @@ func (b *ReplicaSetSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ReplicaSetSpecList represents a list of ReplicaSetSpecBuilder.
-// Provided as a convenience.
-type ReplicaSetSpecList []ReplicaSetSpecBuilder
+type ReplicaSetSpecList []*ReplicaSetSpecBuilder
 
 // ReplicaSetSpecList represents a map of ReplicaSetSpecBuilder.
-// Provided as a convenience.
 type ReplicaSetSpecMap map[string]ReplicaSetSpecBuilder
 
 func (b *ReplicaSetSpecBuilder) preMarshal() {

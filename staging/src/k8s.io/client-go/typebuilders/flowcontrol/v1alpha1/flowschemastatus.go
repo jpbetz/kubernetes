@@ -27,48 +27,38 @@ import (
 // FlowSchemaStatusBuilder represents an declarative configuration of the FlowSchemaStatus type for use
 // with apply.
 type FlowSchemaStatusBuilder struct {
-	fields *flowSchemaStatusFields
+	fields flowSchemaStatusFields
 }
 
-// flowSchemaStatusFields is used by FlowSchemaStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in FlowSchemaStatusBuilder before marshalling, and
-// are copied out to the builder type in FlowSchemaStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// flowSchemaStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in FlowSchemaStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type flowSchemaStatusFields struct {
 	Conditions *FlowSchemaConditionList `json:"conditions,omitempty"`
 }
 
-func (b *FlowSchemaStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &flowSchemaStatusFields{}
-	}
-}
-
 // FlowSchemaStatus constructs an declarative configuration of the FlowSchemaStatus type for use with
 // apply.
-// Provided as a convenience.
-func FlowSchemaStatus() FlowSchemaStatusBuilder {
-	return FlowSchemaStatusBuilder{fields: &flowSchemaStatusFields{}}
+func FlowSchemaStatus() *FlowSchemaStatusBuilder {
+	return &FlowSchemaStatusBuilder{}
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b FlowSchemaStatusBuilder) SetConditions(value FlowSchemaConditionList) FlowSchemaStatusBuilder {
-	b.ensureInitialized()
+func (b *FlowSchemaStatusBuilder) SetConditions(value FlowSchemaConditionList) *FlowSchemaStatusBuilder {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b FlowSchemaStatusBuilder) RemoveConditions() FlowSchemaStatusBuilder {
-	b.ensureInitialized()
+func (b *FlowSchemaStatusBuilder) RemoveConditions() *FlowSchemaStatusBuilder {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b FlowSchemaStatusBuilder) GetConditions() (value FlowSchemaConditionList, ok bool) {
-	b.ensureInitialized()
+func (b *FlowSchemaStatusBuilder) GetConditions() (value FlowSchemaConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *FlowSchemaStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *FlowSchemaStatusBuilder) FromUnstructured(u map[string]interface{}) err
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals FlowSchemaStatusBuilder to JSON.
 func (b *FlowSchemaStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *FlowSchemaStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into FlowSchemaStatusBuilder, replacing the contents of
 // FlowSchemaStatusBuilder.
 func (b *FlowSchemaStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *FlowSchemaStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // FlowSchemaStatusList represents a list of FlowSchemaStatusBuilder.
-// Provided as a convenience.
-type FlowSchemaStatusList []FlowSchemaStatusBuilder
+type FlowSchemaStatusList []*FlowSchemaStatusBuilder
 
 // FlowSchemaStatusList represents a map of FlowSchemaStatusBuilder.
-// Provided as a convenience.
 type FlowSchemaStatusMap map[string]FlowSchemaStatusBuilder
 
 func (b *FlowSchemaStatusBuilder) preMarshal() {

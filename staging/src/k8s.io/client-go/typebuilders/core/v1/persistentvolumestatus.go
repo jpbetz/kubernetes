@@ -28,50 +28,40 @@ import (
 // PersistentVolumeStatusBuilder represents an declarative configuration of the PersistentVolumeStatus type for use
 // with apply.
 type PersistentVolumeStatusBuilder struct {
-	fields *persistentVolumeStatusFields
+	fields persistentVolumeStatusFields
 }
 
-// persistentVolumeStatusFields is used by PersistentVolumeStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PersistentVolumeStatusBuilder before marshalling, and
-// are copied out to the builder type in PersistentVolumeStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// persistentVolumeStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PersistentVolumeStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type persistentVolumeStatusFields struct {
 	Phase   *v1.PersistentVolumePhase `json:"phase,omitempty"`
 	Message *string                   `json:"message,omitempty"`
 	Reason  *string                   `json:"reason,omitempty"`
 }
 
-func (b *PersistentVolumeStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &persistentVolumeStatusFields{}
-	}
-}
-
 // PersistentVolumeStatus constructs an declarative configuration of the PersistentVolumeStatus type for use with
 // apply.
-// Provided as a convenience.
-func PersistentVolumeStatus() PersistentVolumeStatusBuilder {
-	return PersistentVolumeStatusBuilder{fields: &persistentVolumeStatusFields{}}
+func PersistentVolumeStatus() *PersistentVolumeStatusBuilder {
+	return &PersistentVolumeStatusBuilder{}
 }
 
 // SetPhase sets the Phase field in the declarative configuration to the given value.
-func (b PersistentVolumeStatusBuilder) SetPhase(value v1.PersistentVolumePhase) PersistentVolumeStatusBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeStatusBuilder) SetPhase(value v1.PersistentVolumePhase) *PersistentVolumeStatusBuilder {
 	b.fields.Phase = &value
 	return b
 }
 
 // RemovePhase removes the Phase field from the declarative configuration.
-func (b PersistentVolumeStatusBuilder) RemovePhase() PersistentVolumeStatusBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeStatusBuilder) RemovePhase() *PersistentVolumeStatusBuilder {
 	b.fields.Phase = nil
 	return b
 }
 
 // GetPhase gets the Phase field from the declarative configuration.
-func (b PersistentVolumeStatusBuilder) GetPhase() (value v1.PersistentVolumePhase, ok bool) {
-	b.ensureInitialized()
+func (b *PersistentVolumeStatusBuilder) GetPhase() (value v1.PersistentVolumePhase, ok bool) {
 	if v := b.fields.Phase; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b PersistentVolumeStatusBuilder) GetPhase() (value v1.PersistentVolumePhas
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b PersistentVolumeStatusBuilder) SetMessage(value string) PersistentVolumeStatusBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeStatusBuilder) SetMessage(value string) *PersistentVolumeStatusBuilder {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b PersistentVolumeStatusBuilder) RemoveMessage() PersistentVolumeStatusBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeStatusBuilder) RemoveMessage() *PersistentVolumeStatusBuilder {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b PersistentVolumeStatusBuilder) GetMessage() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *PersistentVolumeStatusBuilder) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
@@ -102,22 +89,19 @@ func (b PersistentVolumeStatusBuilder) GetMessage() (value string, ok bool) {
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b PersistentVolumeStatusBuilder) SetReason(value string) PersistentVolumeStatusBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeStatusBuilder) SetReason(value string) *PersistentVolumeStatusBuilder {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b PersistentVolumeStatusBuilder) RemoveReason() PersistentVolumeStatusBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeStatusBuilder) RemoveReason() *PersistentVolumeStatusBuilder {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b PersistentVolumeStatusBuilder) GetReason() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *PersistentVolumeStatusBuilder) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -129,9 +113,8 @@ func (b *PersistentVolumeStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -146,14 +129,13 @@ func (b *PersistentVolumeStatusBuilder) FromUnstructured(u map[string]interface{
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PersistentVolumeStatusBuilder to JSON.
 func (b *PersistentVolumeStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -161,8 +143,7 @@ func (b *PersistentVolumeStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PersistentVolumeStatusBuilder, replacing the contents of
 // PersistentVolumeStatusBuilder.
 func (b *PersistentVolumeStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -170,11 +151,9 @@ func (b *PersistentVolumeStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PersistentVolumeStatusList represents a list of PersistentVolumeStatusBuilder.
-// Provided as a convenience.
-type PersistentVolumeStatusList []PersistentVolumeStatusBuilder
+type PersistentVolumeStatusList []*PersistentVolumeStatusBuilder
 
 // PersistentVolumeStatusList represents a map of PersistentVolumeStatusBuilder.
-// Provided as a convenience.
 type PersistentVolumeStatusMap map[string]PersistentVolumeStatusBuilder
 
 func (b *PersistentVolumeStatusBuilder) preMarshal() {

@@ -28,49 +28,39 @@ import (
 // SchedulingBuilder represents an declarative configuration of the Scheduling type for use
 // with apply.
 type SchedulingBuilder struct {
-	fields *schedulingFields
+	fields schedulingFields
 }
 
-// schedulingFields is used by SchedulingBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in SchedulingBuilder before marshalling, and
-// are copied out to the builder type in SchedulingBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// schedulingFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in SchedulingBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type schedulingFields struct {
 	NodeSelector *map[string]string `json:"nodeSelector,omitempty"`
 	Tolerations  *v1.TolerationList `json:"tolerations,omitempty"`
 }
 
-func (b *SchedulingBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &schedulingFields{}
-	}
-}
-
 // Scheduling constructs an declarative configuration of the Scheduling type for use with
 // apply.
-// Provided as a convenience.
-func Scheduling() SchedulingBuilder {
-	return SchedulingBuilder{fields: &schedulingFields{}}
+func Scheduling() *SchedulingBuilder {
+	return &SchedulingBuilder{}
 }
 
 // SetNodeSelector sets the NodeSelector field in the declarative configuration to the given value.
-func (b SchedulingBuilder) SetNodeSelector(value map[string]string) SchedulingBuilder {
-	b.ensureInitialized()
+func (b *SchedulingBuilder) SetNodeSelector(value map[string]string) *SchedulingBuilder {
 	b.fields.NodeSelector = &value
 	return b
 }
 
 // RemoveNodeSelector removes the NodeSelector field from the declarative configuration.
-func (b SchedulingBuilder) RemoveNodeSelector() SchedulingBuilder {
-	b.ensureInitialized()
+func (b *SchedulingBuilder) RemoveNodeSelector() *SchedulingBuilder {
 	b.fields.NodeSelector = nil
 	return b
 }
 
 // GetNodeSelector gets the NodeSelector field from the declarative configuration.
-func (b SchedulingBuilder) GetNodeSelector() (value map[string]string, ok bool) {
-	b.ensureInitialized()
+func (b *SchedulingBuilder) GetNodeSelector() (value map[string]string, ok bool) {
 	if v := b.fields.NodeSelector; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b SchedulingBuilder) GetNodeSelector() (value map[string]string, ok bool) 
 }
 
 // SetTolerations sets the Tolerations field in the declarative configuration to the given value.
-func (b SchedulingBuilder) SetTolerations(value v1.TolerationList) SchedulingBuilder {
-	b.ensureInitialized()
+func (b *SchedulingBuilder) SetTolerations(value v1.TolerationList) *SchedulingBuilder {
 	b.fields.Tolerations = &value
 	return b
 }
 
 // RemoveTolerations removes the Tolerations field from the declarative configuration.
-func (b SchedulingBuilder) RemoveTolerations() SchedulingBuilder {
-	b.ensureInitialized()
+func (b *SchedulingBuilder) RemoveTolerations() *SchedulingBuilder {
 	b.fields.Tolerations = nil
 	return b
 }
 
 // GetTolerations gets the Tolerations field from the declarative configuration.
-func (b SchedulingBuilder) GetTolerations() (value v1.TolerationList, ok bool) {
-	b.ensureInitialized()
+func (b *SchedulingBuilder) GetTolerations() (value v1.TolerationList, ok bool) {
 	if v := b.fields.Tolerations; v != nil {
 		return *v, true
 	}
@@ -105,9 +92,8 @@ func (b *SchedulingBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +108,13 @@ func (b *SchedulingBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals SchedulingBuilder to JSON.
 func (b *SchedulingBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +122,7 @@ func (b *SchedulingBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into SchedulingBuilder, replacing the contents of
 // SchedulingBuilder.
 func (b *SchedulingBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +130,9 @@ func (b *SchedulingBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // SchedulingList represents a list of SchedulingBuilder.
-// Provided as a convenience.
-type SchedulingList []SchedulingBuilder
+type SchedulingList []*SchedulingBuilder
 
 // SchedulingList represents a map of SchedulingBuilder.
-// Provided as a convenience.
 type SchedulingMap map[string]SchedulingBuilder
 
 func (b *SchedulingBuilder) preMarshal() {

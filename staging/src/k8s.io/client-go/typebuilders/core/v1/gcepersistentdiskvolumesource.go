@@ -27,14 +27,14 @@ import (
 // GCEPersistentDiskVolumeSourceBuilder represents an declarative configuration of the GCEPersistentDiskVolumeSource type for use
 // with apply.
 type GCEPersistentDiskVolumeSourceBuilder struct {
-	fields *gCEPersistentDiskVolumeSourceFields
+	fields gCEPersistentDiskVolumeSourceFields
 }
 
-// gCEPersistentDiskVolumeSourceFields is used by GCEPersistentDiskVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in GCEPersistentDiskVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in GCEPersistentDiskVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// gCEPersistentDiskVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in GCEPersistentDiskVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type gCEPersistentDiskVolumeSourceFields struct {
 	PDName    *string `json:"pdName,omitempty"`
 	FSType    *string `json:"fsType,omitempty"`
@@ -42,36 +42,26 @@ type gCEPersistentDiskVolumeSourceFields struct {
 	ReadOnly  *bool   `json:"readOnly,omitempty"`
 }
 
-func (b *GCEPersistentDiskVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &gCEPersistentDiskVolumeSourceFields{}
-	}
-}
-
 // GCEPersistentDiskVolumeSource constructs an declarative configuration of the GCEPersistentDiskVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func GCEPersistentDiskVolumeSource() GCEPersistentDiskVolumeSourceBuilder {
-	return GCEPersistentDiskVolumeSourceBuilder{fields: &gCEPersistentDiskVolumeSourceFields{}}
+func GCEPersistentDiskVolumeSource() *GCEPersistentDiskVolumeSourceBuilder {
+	return &GCEPersistentDiskVolumeSourceBuilder{}
 }
 
 // SetPDName sets the PDName field in the declarative configuration to the given value.
-func (b GCEPersistentDiskVolumeSourceBuilder) SetPDName(value string) GCEPersistentDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *GCEPersistentDiskVolumeSourceBuilder) SetPDName(value string) *GCEPersistentDiskVolumeSourceBuilder {
 	b.fields.PDName = &value
 	return b
 }
 
 // RemovePDName removes the PDName field from the declarative configuration.
-func (b GCEPersistentDiskVolumeSourceBuilder) RemovePDName() GCEPersistentDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *GCEPersistentDiskVolumeSourceBuilder) RemovePDName() *GCEPersistentDiskVolumeSourceBuilder {
 	b.fields.PDName = nil
 	return b
 }
 
 // GetPDName gets the PDName field from the declarative configuration.
-func (b GCEPersistentDiskVolumeSourceBuilder) GetPDName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *GCEPersistentDiskVolumeSourceBuilder) GetPDName() (value string, ok bool) {
 	if v := b.fields.PDName; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b GCEPersistentDiskVolumeSourceBuilder) GetPDName() (value string, ok bool
 }
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
-func (b GCEPersistentDiskVolumeSourceBuilder) SetFSType(value string) GCEPersistentDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *GCEPersistentDiskVolumeSourceBuilder) SetFSType(value string) *GCEPersistentDiskVolumeSourceBuilder {
 	b.fields.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
-func (b GCEPersistentDiskVolumeSourceBuilder) RemoveFSType() GCEPersistentDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *GCEPersistentDiskVolumeSourceBuilder) RemoveFSType() *GCEPersistentDiskVolumeSourceBuilder {
 	b.fields.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
-func (b GCEPersistentDiskVolumeSourceBuilder) GetFSType() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *GCEPersistentDiskVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 	if v := b.fields.FSType; v != nil {
 		return *v, true
 	}
@@ -102,22 +89,19 @@ func (b GCEPersistentDiskVolumeSourceBuilder) GetFSType() (value string, ok bool
 }
 
 // SetPartition sets the Partition field in the declarative configuration to the given value.
-func (b GCEPersistentDiskVolumeSourceBuilder) SetPartition(value int32) GCEPersistentDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *GCEPersistentDiskVolumeSourceBuilder) SetPartition(value int32) *GCEPersistentDiskVolumeSourceBuilder {
 	b.fields.Partition = &value
 	return b
 }
 
 // RemovePartition removes the Partition field from the declarative configuration.
-func (b GCEPersistentDiskVolumeSourceBuilder) RemovePartition() GCEPersistentDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *GCEPersistentDiskVolumeSourceBuilder) RemovePartition() *GCEPersistentDiskVolumeSourceBuilder {
 	b.fields.Partition = nil
 	return b
 }
 
 // GetPartition gets the Partition field from the declarative configuration.
-func (b GCEPersistentDiskVolumeSourceBuilder) GetPartition() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *GCEPersistentDiskVolumeSourceBuilder) GetPartition() (value int32, ok bool) {
 	if v := b.fields.Partition; v != nil {
 		return *v, true
 	}
@@ -125,22 +109,19 @@ func (b GCEPersistentDiskVolumeSourceBuilder) GetPartition() (value int32, ok bo
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b GCEPersistentDiskVolumeSourceBuilder) SetReadOnly(value bool) GCEPersistentDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *GCEPersistentDiskVolumeSourceBuilder) SetReadOnly(value bool) *GCEPersistentDiskVolumeSourceBuilder {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b GCEPersistentDiskVolumeSourceBuilder) RemoveReadOnly() GCEPersistentDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *GCEPersistentDiskVolumeSourceBuilder) RemoveReadOnly() *GCEPersistentDiskVolumeSourceBuilder {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b GCEPersistentDiskVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *GCEPersistentDiskVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
@@ -152,9 +133,8 @@ func (b *GCEPersistentDiskVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +149,13 @@ func (b *GCEPersistentDiskVolumeSourceBuilder) FromUnstructured(u map[string]int
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals GCEPersistentDiskVolumeSourceBuilder to JSON.
 func (b *GCEPersistentDiskVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +163,7 @@ func (b *GCEPersistentDiskVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into GCEPersistentDiskVolumeSourceBuilder, replacing the contents of
 // GCEPersistentDiskVolumeSourceBuilder.
 func (b *GCEPersistentDiskVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,11 +171,9 @@ func (b *GCEPersistentDiskVolumeSourceBuilder) UnmarshalJSON(data []byte) error 
 }
 
 // GCEPersistentDiskVolumeSourceList represents a list of GCEPersistentDiskVolumeSourceBuilder.
-// Provided as a convenience.
-type GCEPersistentDiskVolumeSourceList []GCEPersistentDiskVolumeSourceBuilder
+type GCEPersistentDiskVolumeSourceList []*GCEPersistentDiskVolumeSourceBuilder
 
 // GCEPersistentDiskVolumeSourceList represents a map of GCEPersistentDiskVolumeSourceBuilder.
-// Provided as a convenience.
 type GCEPersistentDiskVolumeSourceMap map[string]GCEPersistentDiskVolumeSourceBuilder
 
 func (b *GCEPersistentDiskVolumeSourceBuilder) preMarshal() {

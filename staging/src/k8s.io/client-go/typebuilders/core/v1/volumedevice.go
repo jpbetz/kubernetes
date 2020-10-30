@@ -27,49 +27,39 @@ import (
 // VolumeDeviceBuilder represents an declarative configuration of the VolumeDevice type for use
 // with apply.
 type VolumeDeviceBuilder struct {
-	fields *volumeDeviceFields
+	fields volumeDeviceFields
 }
 
-// volumeDeviceFields is used by VolumeDeviceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in VolumeDeviceBuilder before marshalling, and
-// are copied out to the builder type in VolumeDeviceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// volumeDeviceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in VolumeDeviceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type volumeDeviceFields struct {
 	Name       *string `json:"name,omitempty"`
 	DevicePath *string `json:"devicePath,omitempty"`
 }
 
-func (b *VolumeDeviceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &volumeDeviceFields{}
-	}
-}
-
 // VolumeDevice constructs an declarative configuration of the VolumeDevice type for use with
 // apply.
-// Provided as a convenience.
-func VolumeDevice() VolumeDeviceBuilder {
-	return VolumeDeviceBuilder{fields: &volumeDeviceFields{}}
+func VolumeDevice() *VolumeDeviceBuilder {
+	return &VolumeDeviceBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b VolumeDeviceBuilder) SetName(value string) VolumeDeviceBuilder {
-	b.ensureInitialized()
+func (b *VolumeDeviceBuilder) SetName(value string) *VolumeDeviceBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b VolumeDeviceBuilder) RemoveName() VolumeDeviceBuilder {
-	b.ensureInitialized()
+func (b *VolumeDeviceBuilder) RemoveName() *VolumeDeviceBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b VolumeDeviceBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *VolumeDeviceBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b VolumeDeviceBuilder) GetName() (value string, ok bool) {
 }
 
 // SetDevicePath sets the DevicePath field in the declarative configuration to the given value.
-func (b VolumeDeviceBuilder) SetDevicePath(value string) VolumeDeviceBuilder {
-	b.ensureInitialized()
+func (b *VolumeDeviceBuilder) SetDevicePath(value string) *VolumeDeviceBuilder {
 	b.fields.DevicePath = &value
 	return b
 }
 
 // RemoveDevicePath removes the DevicePath field from the declarative configuration.
-func (b VolumeDeviceBuilder) RemoveDevicePath() VolumeDeviceBuilder {
-	b.ensureInitialized()
+func (b *VolumeDeviceBuilder) RemoveDevicePath() *VolumeDeviceBuilder {
 	b.fields.DevicePath = nil
 	return b
 }
 
 // GetDevicePath gets the DevicePath field from the declarative configuration.
-func (b VolumeDeviceBuilder) GetDevicePath() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *VolumeDeviceBuilder) GetDevicePath() (value string, ok bool) {
 	if v := b.fields.DevicePath; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *VolumeDeviceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *VolumeDeviceBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals VolumeDeviceBuilder to JSON.
 func (b *VolumeDeviceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *VolumeDeviceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into VolumeDeviceBuilder, replacing the contents of
 // VolumeDeviceBuilder.
 func (b *VolumeDeviceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *VolumeDeviceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // VolumeDeviceList represents a list of VolumeDeviceBuilder.
-// Provided as a convenience.
-type VolumeDeviceList []VolumeDeviceBuilder
+type VolumeDeviceList []*VolumeDeviceBuilder
 
 // VolumeDeviceList represents a map of VolumeDeviceBuilder.
-// Provided as a convenience.
 type VolumeDeviceMap map[string]VolumeDeviceBuilder
 
 func (b *VolumeDeviceBuilder) preMarshal() {

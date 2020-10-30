@@ -28,15 +28,15 @@ import (
 // RuntimeClassBuilder represents an declarative configuration of the RuntimeClass type for use
 // with apply.
 type RuntimeClassBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *runtimeClassFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   runtimeClassFields
 }
 
-// runtimeClassFields is used by RuntimeClassBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in RuntimeClassBuilder before marshalling, and
-// are copied out to the builder type in RuntimeClassBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// runtimeClassFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in RuntimeClassBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type runtimeClassFields struct {
 	Kind       *string               `json:"kind,omitempty"`       // inlined RuntimeClassBuilder.typeMeta.Kind field
 	APIVersion *string               `json:"apiVersion,omitempty"` // inlined RuntimeClassBuilder.typeMeta.APIVersion field
@@ -46,79 +46,60 @@ type runtimeClassFields struct {
 	Scheduling *SchedulingBuilder    `json:"scheduling,omitempty"`
 }
 
-func (b *RuntimeClassBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &runtimeClassFields{}
-	}
-}
-
 // RuntimeClass constructs an declarative configuration of the RuntimeClass type for use with
 // apply.
-// Provided as a convenience.
-func RuntimeClass() RuntimeClassBuilder {
-	return RuntimeClassBuilder{fields: &runtimeClassFields{}}
+func RuntimeClass() *RuntimeClassBuilder {
+	return &RuntimeClassBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b RuntimeClassBuilder) SetTypeMeta(value v1.TypeMetaBuilder) RuntimeClassBuilder {
-	b.ensureInitialized()
+func (b *RuntimeClassBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *RuntimeClassBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b RuntimeClassBuilder) RemoveTypeMeta() RuntimeClassBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *RuntimeClassBuilder) RemoveTypeMeta() *RuntimeClassBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b RuntimeClassBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *RuntimeClassBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b RuntimeClassBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) RuntimeClassBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *RuntimeClassBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *RuntimeClassBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b RuntimeClassBuilder) RemoveObjectMeta() RuntimeClassBuilder {
-	b.ensureInitialized()
+func (b *RuntimeClassBuilder) RemoveObjectMeta() *RuntimeClassBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b RuntimeClassBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *RuntimeClassBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetHandler sets the Handler field in the declarative configuration to the given value.
-func (b RuntimeClassBuilder) SetHandler(value string) RuntimeClassBuilder {
-	b.ensureInitialized()
+func (b *RuntimeClassBuilder) SetHandler(value string) *RuntimeClassBuilder {
 	b.fields.Handler = &value
 	return b
 }
 
 // RemoveHandler removes the Handler field from the declarative configuration.
-func (b RuntimeClassBuilder) RemoveHandler() RuntimeClassBuilder {
-	b.ensureInitialized()
+func (b *RuntimeClassBuilder) RemoveHandler() *RuntimeClassBuilder {
 	b.fields.Handler = nil
 	return b
 }
 
 // GetHandler gets the Handler field from the declarative configuration.
-func (b RuntimeClassBuilder) GetHandler() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *RuntimeClassBuilder) GetHandler() (value string, ok bool) {
 	if v := b.fields.Handler; v != nil {
 		return *v, true
 	}
@@ -126,49 +107,37 @@ func (b RuntimeClassBuilder) GetHandler() (value string, ok bool) {
 }
 
 // SetOverhead sets the Overhead field in the declarative configuration to the given value.
-func (b RuntimeClassBuilder) SetOverhead(value OverheadBuilder) RuntimeClassBuilder {
-	b.ensureInitialized()
-	b.fields.Overhead = &value
+func (b *RuntimeClassBuilder) SetOverhead(value *OverheadBuilder) *RuntimeClassBuilder {
+	b.fields.Overhead = value
 	return b
 }
 
 // RemoveOverhead removes the Overhead field from the declarative configuration.
-func (b RuntimeClassBuilder) RemoveOverhead() RuntimeClassBuilder {
-	b.ensureInitialized()
+func (b *RuntimeClassBuilder) RemoveOverhead() *RuntimeClassBuilder {
 	b.fields.Overhead = nil
 	return b
 }
 
 // GetOverhead gets the Overhead field from the declarative configuration.
-func (b RuntimeClassBuilder) GetOverhead() (value OverheadBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Overhead; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *RuntimeClassBuilder) GetOverhead() (value *OverheadBuilder, ok bool) {
+	return b.fields.Overhead, b.fields.Overhead != nil
 }
 
 // SetScheduling sets the Scheduling field in the declarative configuration to the given value.
-func (b RuntimeClassBuilder) SetScheduling(value SchedulingBuilder) RuntimeClassBuilder {
-	b.ensureInitialized()
-	b.fields.Scheduling = &value
+func (b *RuntimeClassBuilder) SetScheduling(value *SchedulingBuilder) *RuntimeClassBuilder {
+	b.fields.Scheduling = value
 	return b
 }
 
 // RemoveScheduling removes the Scheduling field from the declarative configuration.
-func (b RuntimeClassBuilder) RemoveScheduling() RuntimeClassBuilder {
-	b.ensureInitialized()
+func (b *RuntimeClassBuilder) RemoveScheduling() *RuntimeClassBuilder {
 	b.fields.Scheduling = nil
 	return b
 }
 
 // GetScheduling gets the Scheduling field from the declarative configuration.
-func (b RuntimeClassBuilder) GetScheduling() (value SchedulingBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Scheduling; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *RuntimeClassBuilder) GetScheduling() (value *SchedulingBuilder, ok bool) {
+	return b.fields.Scheduling, b.fields.Scheduling != nil
 }
 
 // ToUnstructured converts RuntimeClassBuilder to unstructured.
@@ -176,9 +145,8 @@ func (b *RuntimeClassBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -193,14 +161,13 @@ func (b *RuntimeClassBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals RuntimeClassBuilder to JSON.
 func (b *RuntimeClassBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -208,8 +175,7 @@ func (b *RuntimeClassBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into RuntimeClassBuilder, replacing the contents of
 // RuntimeClassBuilder.
 func (b *RuntimeClassBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -217,22 +183,25 @@ func (b *RuntimeClassBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // RuntimeClassList represents a list of RuntimeClassBuilder.
-// Provided as a convenience.
-type RuntimeClassList []RuntimeClassBuilder
+type RuntimeClassList []*RuntimeClassBuilder
 
 // RuntimeClassList represents a map of RuntimeClassBuilder.
-// Provided as a convenience.
 type RuntimeClassMap map[string]RuntimeClassBuilder
 
 func (b *RuntimeClassBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *RuntimeClassBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

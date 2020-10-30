@@ -28,49 +28,39 @@ import (
 // SeccompProfileBuilder represents an declarative configuration of the SeccompProfile type for use
 // with apply.
 type SeccompProfileBuilder struct {
-	fields *seccompProfileFields
+	fields seccompProfileFields
 }
 
-// seccompProfileFields is used by SeccompProfileBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in SeccompProfileBuilder before marshalling, and
-// are copied out to the builder type in SeccompProfileBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// seccompProfileFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in SeccompProfileBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type seccompProfileFields struct {
 	Type             *v1.SeccompProfileType `json:"type,omitempty"`
 	LocalhostProfile *string                `json:"localhostProfile,omitempty"`
 }
 
-func (b *SeccompProfileBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &seccompProfileFields{}
-	}
-}
-
 // SeccompProfile constructs an declarative configuration of the SeccompProfile type for use with
 // apply.
-// Provided as a convenience.
-func SeccompProfile() SeccompProfileBuilder {
-	return SeccompProfileBuilder{fields: &seccompProfileFields{}}
+func SeccompProfile() *SeccompProfileBuilder {
+	return &SeccompProfileBuilder{}
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b SeccompProfileBuilder) SetType(value v1.SeccompProfileType) SeccompProfileBuilder {
-	b.ensureInitialized()
+func (b *SeccompProfileBuilder) SetType(value v1.SeccompProfileType) *SeccompProfileBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b SeccompProfileBuilder) RemoveType() SeccompProfileBuilder {
-	b.ensureInitialized()
+func (b *SeccompProfileBuilder) RemoveType() *SeccompProfileBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b SeccompProfileBuilder) GetType() (value v1.SeccompProfileType, ok bool) {
-	b.ensureInitialized()
+func (b *SeccompProfileBuilder) GetType() (value v1.SeccompProfileType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b SeccompProfileBuilder) GetType() (value v1.SeccompProfileType, ok bool) 
 }
 
 // SetLocalhostProfile sets the LocalhostProfile field in the declarative configuration to the given value.
-func (b SeccompProfileBuilder) SetLocalhostProfile(value string) SeccompProfileBuilder {
-	b.ensureInitialized()
+func (b *SeccompProfileBuilder) SetLocalhostProfile(value string) *SeccompProfileBuilder {
 	b.fields.LocalhostProfile = &value
 	return b
 }
 
 // RemoveLocalhostProfile removes the LocalhostProfile field from the declarative configuration.
-func (b SeccompProfileBuilder) RemoveLocalhostProfile() SeccompProfileBuilder {
-	b.ensureInitialized()
+func (b *SeccompProfileBuilder) RemoveLocalhostProfile() *SeccompProfileBuilder {
 	b.fields.LocalhostProfile = nil
 	return b
 }
 
 // GetLocalhostProfile gets the LocalhostProfile field from the declarative configuration.
-func (b SeccompProfileBuilder) GetLocalhostProfile() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *SeccompProfileBuilder) GetLocalhostProfile() (value string, ok bool) {
 	if v := b.fields.LocalhostProfile; v != nil {
 		return *v, true
 	}
@@ -105,9 +92,8 @@ func (b *SeccompProfileBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +108,13 @@ func (b *SeccompProfileBuilder) FromUnstructured(u map[string]interface{}) error
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals SeccompProfileBuilder to JSON.
 func (b *SeccompProfileBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +122,7 @@ func (b *SeccompProfileBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into SeccompProfileBuilder, replacing the contents of
 // SeccompProfileBuilder.
 func (b *SeccompProfileBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +130,9 @@ func (b *SeccompProfileBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // SeccompProfileList represents a list of SeccompProfileBuilder.
-// Provided as a convenience.
-type SeccompProfileList []SeccompProfileBuilder
+type SeccompProfileList []*SeccompProfileBuilder
 
 // SeccompProfileList represents a map of SeccompProfileBuilder.
-// Provided as a convenience.
 type SeccompProfileMap map[string]SeccompProfileBuilder
 
 func (b *SeccompProfileBuilder) preMarshal() {

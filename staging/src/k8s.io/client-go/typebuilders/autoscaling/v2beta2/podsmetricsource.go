@@ -27,76 +27,57 @@ import (
 // PodsMetricSourceBuilder represents an declarative configuration of the PodsMetricSource type for use
 // with apply.
 type PodsMetricSourceBuilder struct {
-	fields *podsMetricSourceFields
+	fields podsMetricSourceFields
 }
 
-// podsMetricSourceFields is used by PodsMetricSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PodsMetricSourceBuilder before marshalling, and
-// are copied out to the builder type in PodsMetricSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// podsMetricSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PodsMetricSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type podsMetricSourceFields struct {
 	Metric *MetricIdentifierBuilder `json:"metric,omitempty"`
 	Target *MetricTargetBuilder     `json:"target,omitempty"`
 }
 
-func (b *PodsMetricSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &podsMetricSourceFields{}
-	}
-}
-
 // PodsMetricSource constructs an declarative configuration of the PodsMetricSource type for use with
 // apply.
-// Provided as a convenience.
-func PodsMetricSource() PodsMetricSourceBuilder {
-	return PodsMetricSourceBuilder{fields: &podsMetricSourceFields{}}
+func PodsMetricSource() *PodsMetricSourceBuilder {
+	return &PodsMetricSourceBuilder{}
 }
 
 // SetMetric sets the Metric field in the declarative configuration to the given value.
-func (b PodsMetricSourceBuilder) SetMetric(value MetricIdentifierBuilder) PodsMetricSourceBuilder {
-	b.ensureInitialized()
-	b.fields.Metric = &value
+func (b *PodsMetricSourceBuilder) SetMetric(value *MetricIdentifierBuilder) *PodsMetricSourceBuilder {
+	b.fields.Metric = value
 	return b
 }
 
 // RemoveMetric removes the Metric field from the declarative configuration.
-func (b PodsMetricSourceBuilder) RemoveMetric() PodsMetricSourceBuilder {
-	b.ensureInitialized()
+func (b *PodsMetricSourceBuilder) RemoveMetric() *PodsMetricSourceBuilder {
 	b.fields.Metric = nil
 	return b
 }
 
 // GetMetric gets the Metric field from the declarative configuration.
-func (b PodsMetricSourceBuilder) GetMetric() (value MetricIdentifierBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Metric; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodsMetricSourceBuilder) GetMetric() (value *MetricIdentifierBuilder, ok bool) {
+	return b.fields.Metric, b.fields.Metric != nil
 }
 
 // SetTarget sets the Target field in the declarative configuration to the given value.
-func (b PodsMetricSourceBuilder) SetTarget(value MetricTargetBuilder) PodsMetricSourceBuilder {
-	b.ensureInitialized()
-	b.fields.Target = &value
+func (b *PodsMetricSourceBuilder) SetTarget(value *MetricTargetBuilder) *PodsMetricSourceBuilder {
+	b.fields.Target = value
 	return b
 }
 
 // RemoveTarget removes the Target field from the declarative configuration.
-func (b PodsMetricSourceBuilder) RemoveTarget() PodsMetricSourceBuilder {
-	b.ensureInitialized()
+func (b *PodsMetricSourceBuilder) RemoveTarget() *PodsMetricSourceBuilder {
 	b.fields.Target = nil
 	return b
 }
 
 // GetTarget gets the Target field from the declarative configuration.
-func (b PodsMetricSourceBuilder) GetTarget() (value MetricTargetBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Target; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodsMetricSourceBuilder) GetTarget() (value *MetricTargetBuilder, ok bool) {
+	return b.fields.Target, b.fields.Target != nil
 }
 
 // ToUnstructured converts PodsMetricSourceBuilder to unstructured.
@@ -104,9 +85,8 @@ func (b *PodsMetricSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +101,13 @@ func (b *PodsMetricSourceBuilder) FromUnstructured(u map[string]interface{}) err
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PodsMetricSourceBuilder to JSON.
 func (b *PodsMetricSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +115,7 @@ func (b *PodsMetricSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PodsMetricSourceBuilder, replacing the contents of
 // PodsMetricSourceBuilder.
 func (b *PodsMetricSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +123,9 @@ func (b *PodsMetricSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PodsMetricSourceList represents a list of PodsMetricSourceBuilder.
-// Provided as a convenience.
-type PodsMetricSourceList []PodsMetricSourceBuilder
+type PodsMetricSourceList []*PodsMetricSourceBuilder
 
 // PodsMetricSourceList represents a map of PodsMetricSourceBuilder.
-// Provided as a convenience.
 type PodsMetricSourceMap map[string]PodsMetricSourceBuilder
 
 func (b *PodsMetricSourceBuilder) preMarshal() {

@@ -28,48 +28,38 @@ import (
 // OverheadBuilder represents an declarative configuration of the Overhead type for use
 // with apply.
 type OverheadBuilder struct {
-	fields *overheadFields
+	fields overheadFields
 }
 
-// overheadFields is used by OverheadBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in OverheadBuilder before marshalling, and
-// are copied out to the builder type in OverheadBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// overheadFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in OverheadBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type overheadFields struct {
 	PodFixed *v1.ResourceList `json:"podFixed,omitempty"`
 }
 
-func (b *OverheadBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &overheadFields{}
-	}
-}
-
 // Overhead constructs an declarative configuration of the Overhead type for use with
 // apply.
-// Provided as a convenience.
-func Overhead() OverheadBuilder {
-	return OverheadBuilder{fields: &overheadFields{}}
+func Overhead() *OverheadBuilder {
+	return &OverheadBuilder{}
 }
 
 // SetPodFixed sets the PodFixed field in the declarative configuration to the given value.
-func (b OverheadBuilder) SetPodFixed(value v1.ResourceList) OverheadBuilder {
-	b.ensureInitialized()
+func (b *OverheadBuilder) SetPodFixed(value v1.ResourceList) *OverheadBuilder {
 	b.fields.PodFixed = &value
 	return b
 }
 
 // RemovePodFixed removes the PodFixed field from the declarative configuration.
-func (b OverheadBuilder) RemovePodFixed() OverheadBuilder {
-	b.ensureInitialized()
+func (b *OverheadBuilder) RemovePodFixed() *OverheadBuilder {
 	b.fields.PodFixed = nil
 	return b
 }
 
 // GetPodFixed gets the PodFixed field from the declarative configuration.
-func (b OverheadBuilder) GetPodFixed() (value v1.ResourceList, ok bool) {
-	b.ensureInitialized()
+func (b *OverheadBuilder) GetPodFixed() (value v1.ResourceList, ok bool) {
 	if v := b.fields.PodFixed; v != nil {
 		return *v, true
 	}
@@ -81,9 +71,8 @@ func (b *OverheadBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -98,14 +87,13 @@ func (b *OverheadBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals OverheadBuilder to JSON.
 func (b *OverheadBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -113,8 +101,7 @@ func (b *OverheadBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into OverheadBuilder, replacing the contents of
 // OverheadBuilder.
 func (b *OverheadBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -122,11 +109,9 @@ func (b *OverheadBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // OverheadList represents a list of OverheadBuilder.
-// Provided as a convenience.
-type OverheadList []OverheadBuilder
+type OverheadList []*OverheadBuilder
 
 // OverheadList represents a map of OverheadBuilder.
-// Provided as a convenience.
 type OverheadMap map[string]OverheadBuilder
 
 func (b *OverheadBuilder) preMarshal() {

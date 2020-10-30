@@ -28,15 +28,15 @@ import (
 // MutatingWebhookConfigurationBuilder represents an declarative configuration of the MutatingWebhookConfiguration type for use
 // with apply.
 type MutatingWebhookConfigurationBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *mutatingWebhookConfigurationFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   mutatingWebhookConfigurationFields
 }
 
-// mutatingWebhookConfigurationFields is used by MutatingWebhookConfigurationBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in MutatingWebhookConfigurationBuilder before marshalling, and
-// are copied out to the builder type in MutatingWebhookConfigurationBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// mutatingWebhookConfigurationFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in MutatingWebhookConfigurationBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type mutatingWebhookConfigurationFields struct {
 	Kind       *string               `json:"kind,omitempty"`       // inlined MutatingWebhookConfigurationBuilder.typeMeta.Kind field
 	APIVersion *string               `json:"apiVersion,omitempty"` // inlined MutatingWebhookConfigurationBuilder.typeMeta.APIVersion field
@@ -44,79 +44,60 @@ type mutatingWebhookConfigurationFields struct {
 	Webhooks   *MutatingWebhookList  `json:"webhooks,omitempty"`
 }
 
-func (b *MutatingWebhookConfigurationBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &mutatingWebhookConfigurationFields{}
-	}
-}
-
 // MutatingWebhookConfiguration constructs an declarative configuration of the MutatingWebhookConfiguration type for use with
 // apply.
-// Provided as a convenience.
-func MutatingWebhookConfiguration() MutatingWebhookConfigurationBuilder {
-	return MutatingWebhookConfigurationBuilder{fields: &mutatingWebhookConfigurationFields{}}
+func MutatingWebhookConfiguration() *MutatingWebhookConfigurationBuilder {
+	return &MutatingWebhookConfigurationBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b MutatingWebhookConfigurationBuilder) SetTypeMeta(value v1.TypeMetaBuilder) MutatingWebhookConfigurationBuilder {
-	b.ensureInitialized()
+func (b *MutatingWebhookConfigurationBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *MutatingWebhookConfigurationBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b MutatingWebhookConfigurationBuilder) RemoveTypeMeta() MutatingWebhookConfigurationBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *MutatingWebhookConfigurationBuilder) RemoveTypeMeta() *MutatingWebhookConfigurationBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b MutatingWebhookConfigurationBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *MutatingWebhookConfigurationBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b MutatingWebhookConfigurationBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) MutatingWebhookConfigurationBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *MutatingWebhookConfigurationBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *MutatingWebhookConfigurationBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b MutatingWebhookConfigurationBuilder) RemoveObjectMeta() MutatingWebhookConfigurationBuilder {
-	b.ensureInitialized()
+func (b *MutatingWebhookConfigurationBuilder) RemoveObjectMeta() *MutatingWebhookConfigurationBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b MutatingWebhookConfigurationBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *MutatingWebhookConfigurationBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetWebhooks sets the Webhooks field in the declarative configuration to the given value.
-func (b MutatingWebhookConfigurationBuilder) SetWebhooks(value MutatingWebhookList) MutatingWebhookConfigurationBuilder {
-	b.ensureInitialized()
+func (b *MutatingWebhookConfigurationBuilder) SetWebhooks(value MutatingWebhookList) *MutatingWebhookConfigurationBuilder {
 	b.fields.Webhooks = &value
 	return b
 }
 
 // RemoveWebhooks removes the Webhooks field from the declarative configuration.
-func (b MutatingWebhookConfigurationBuilder) RemoveWebhooks() MutatingWebhookConfigurationBuilder {
-	b.ensureInitialized()
+func (b *MutatingWebhookConfigurationBuilder) RemoveWebhooks() *MutatingWebhookConfigurationBuilder {
 	b.fields.Webhooks = nil
 	return b
 }
 
 // GetWebhooks gets the Webhooks field from the declarative configuration.
-func (b MutatingWebhookConfigurationBuilder) GetWebhooks() (value MutatingWebhookList, ok bool) {
-	b.ensureInitialized()
+func (b *MutatingWebhookConfigurationBuilder) GetWebhooks() (value MutatingWebhookList, ok bool) {
 	if v := b.fields.Webhooks; v != nil {
 		return *v, true
 	}
@@ -128,9 +109,8 @@ func (b *MutatingWebhookConfigurationBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +125,13 @@ func (b *MutatingWebhookConfigurationBuilder) FromUnstructured(u map[string]inte
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals MutatingWebhookConfigurationBuilder to JSON.
 func (b *MutatingWebhookConfigurationBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +139,7 @@ func (b *MutatingWebhookConfigurationBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into MutatingWebhookConfigurationBuilder, replacing the contents of
 // MutatingWebhookConfigurationBuilder.
 func (b *MutatingWebhookConfigurationBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,22 +147,25 @@ func (b *MutatingWebhookConfigurationBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // MutatingWebhookConfigurationList represents a list of MutatingWebhookConfigurationBuilder.
-// Provided as a convenience.
-type MutatingWebhookConfigurationList []MutatingWebhookConfigurationBuilder
+type MutatingWebhookConfigurationList []*MutatingWebhookConfigurationBuilder
 
 // MutatingWebhookConfigurationList represents a map of MutatingWebhookConfigurationBuilder.
-// Provided as a convenience.
 type MutatingWebhookConfigurationMap map[string]MutatingWebhookConfigurationBuilder
 
 func (b *MutatingWebhookConfigurationBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *MutatingWebhookConfigurationBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

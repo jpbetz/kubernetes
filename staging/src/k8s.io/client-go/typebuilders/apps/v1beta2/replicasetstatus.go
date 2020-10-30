@@ -27,14 +27,14 @@ import (
 // ReplicaSetStatusBuilder represents an declarative configuration of the ReplicaSetStatus type for use
 // with apply.
 type ReplicaSetStatusBuilder struct {
-	fields *replicaSetStatusFields
+	fields replicaSetStatusFields
 }
 
-// replicaSetStatusFields is used by ReplicaSetStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ReplicaSetStatusBuilder before marshalling, and
-// are copied out to the builder type in ReplicaSetStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// replicaSetStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ReplicaSetStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type replicaSetStatusFields struct {
 	Replicas             *int32                   `json:"replicas,omitempty"`
 	FullyLabeledReplicas *int32                   `json:"fullyLabeledReplicas,omitempty"`
@@ -44,36 +44,26 @@ type replicaSetStatusFields struct {
 	Conditions           *ReplicaSetConditionList `json:"conditions,omitempty"`
 }
 
-func (b *ReplicaSetStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &replicaSetStatusFields{}
-	}
-}
-
 // ReplicaSetStatus constructs an declarative configuration of the ReplicaSetStatus type for use with
 // apply.
-// Provided as a convenience.
-func ReplicaSetStatus() ReplicaSetStatusBuilder {
-	return ReplicaSetStatusBuilder{fields: &replicaSetStatusFields{}}
+func ReplicaSetStatus() *ReplicaSetStatusBuilder {
+	return &ReplicaSetStatusBuilder{}
 }
 
 // SetReplicas sets the Replicas field in the declarative configuration to the given value.
-func (b ReplicaSetStatusBuilder) SetReplicas(value int32) ReplicaSetStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetStatusBuilder) SetReplicas(value int32) *ReplicaSetStatusBuilder {
 	b.fields.Replicas = &value
 	return b
 }
 
 // RemoveReplicas removes the Replicas field from the declarative configuration.
-func (b ReplicaSetStatusBuilder) RemoveReplicas() ReplicaSetStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetStatusBuilder) RemoveReplicas() *ReplicaSetStatusBuilder {
 	b.fields.Replicas = nil
 	return b
 }
 
 // GetReplicas gets the Replicas field from the declarative configuration.
-func (b ReplicaSetStatusBuilder) GetReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicaSetStatusBuilder) GetReplicas() (value int32, ok bool) {
 	if v := b.fields.Replicas; v != nil {
 		return *v, true
 	}
@@ -81,22 +71,19 @@ func (b ReplicaSetStatusBuilder) GetReplicas() (value int32, ok bool) {
 }
 
 // SetFullyLabeledReplicas sets the FullyLabeledReplicas field in the declarative configuration to the given value.
-func (b ReplicaSetStatusBuilder) SetFullyLabeledReplicas(value int32) ReplicaSetStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetStatusBuilder) SetFullyLabeledReplicas(value int32) *ReplicaSetStatusBuilder {
 	b.fields.FullyLabeledReplicas = &value
 	return b
 }
 
 // RemoveFullyLabeledReplicas removes the FullyLabeledReplicas field from the declarative configuration.
-func (b ReplicaSetStatusBuilder) RemoveFullyLabeledReplicas() ReplicaSetStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetStatusBuilder) RemoveFullyLabeledReplicas() *ReplicaSetStatusBuilder {
 	b.fields.FullyLabeledReplicas = nil
 	return b
 }
 
 // GetFullyLabeledReplicas gets the FullyLabeledReplicas field from the declarative configuration.
-func (b ReplicaSetStatusBuilder) GetFullyLabeledReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicaSetStatusBuilder) GetFullyLabeledReplicas() (value int32, ok bool) {
 	if v := b.fields.FullyLabeledReplicas; v != nil {
 		return *v, true
 	}
@@ -104,22 +91,19 @@ func (b ReplicaSetStatusBuilder) GetFullyLabeledReplicas() (value int32, ok bool
 }
 
 // SetReadyReplicas sets the ReadyReplicas field in the declarative configuration to the given value.
-func (b ReplicaSetStatusBuilder) SetReadyReplicas(value int32) ReplicaSetStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetStatusBuilder) SetReadyReplicas(value int32) *ReplicaSetStatusBuilder {
 	b.fields.ReadyReplicas = &value
 	return b
 }
 
 // RemoveReadyReplicas removes the ReadyReplicas field from the declarative configuration.
-func (b ReplicaSetStatusBuilder) RemoveReadyReplicas() ReplicaSetStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetStatusBuilder) RemoveReadyReplicas() *ReplicaSetStatusBuilder {
 	b.fields.ReadyReplicas = nil
 	return b
 }
 
 // GetReadyReplicas gets the ReadyReplicas field from the declarative configuration.
-func (b ReplicaSetStatusBuilder) GetReadyReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicaSetStatusBuilder) GetReadyReplicas() (value int32, ok bool) {
 	if v := b.fields.ReadyReplicas; v != nil {
 		return *v, true
 	}
@@ -127,22 +111,19 @@ func (b ReplicaSetStatusBuilder) GetReadyReplicas() (value int32, ok bool) {
 }
 
 // SetAvailableReplicas sets the AvailableReplicas field in the declarative configuration to the given value.
-func (b ReplicaSetStatusBuilder) SetAvailableReplicas(value int32) ReplicaSetStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetStatusBuilder) SetAvailableReplicas(value int32) *ReplicaSetStatusBuilder {
 	b.fields.AvailableReplicas = &value
 	return b
 }
 
 // RemoveAvailableReplicas removes the AvailableReplicas field from the declarative configuration.
-func (b ReplicaSetStatusBuilder) RemoveAvailableReplicas() ReplicaSetStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetStatusBuilder) RemoveAvailableReplicas() *ReplicaSetStatusBuilder {
 	b.fields.AvailableReplicas = nil
 	return b
 }
 
 // GetAvailableReplicas gets the AvailableReplicas field from the declarative configuration.
-func (b ReplicaSetStatusBuilder) GetAvailableReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicaSetStatusBuilder) GetAvailableReplicas() (value int32, ok bool) {
 	if v := b.fields.AvailableReplicas; v != nil {
 		return *v, true
 	}
@@ -150,22 +131,19 @@ func (b ReplicaSetStatusBuilder) GetAvailableReplicas() (value int32, ok bool) {
 }
 
 // SetObservedGeneration sets the ObservedGeneration field in the declarative configuration to the given value.
-func (b ReplicaSetStatusBuilder) SetObservedGeneration(value int64) ReplicaSetStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetStatusBuilder) SetObservedGeneration(value int64) *ReplicaSetStatusBuilder {
 	b.fields.ObservedGeneration = &value
 	return b
 }
 
 // RemoveObservedGeneration removes the ObservedGeneration field from the declarative configuration.
-func (b ReplicaSetStatusBuilder) RemoveObservedGeneration() ReplicaSetStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetStatusBuilder) RemoveObservedGeneration() *ReplicaSetStatusBuilder {
 	b.fields.ObservedGeneration = nil
 	return b
 }
 
 // GetObservedGeneration gets the ObservedGeneration field from the declarative configuration.
-func (b ReplicaSetStatusBuilder) GetObservedGeneration() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicaSetStatusBuilder) GetObservedGeneration() (value int64, ok bool) {
 	if v := b.fields.ObservedGeneration; v != nil {
 		return *v, true
 	}
@@ -173,22 +151,19 @@ func (b ReplicaSetStatusBuilder) GetObservedGeneration() (value int64, ok bool) 
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b ReplicaSetStatusBuilder) SetConditions(value ReplicaSetConditionList) ReplicaSetStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetStatusBuilder) SetConditions(value ReplicaSetConditionList) *ReplicaSetStatusBuilder {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b ReplicaSetStatusBuilder) RemoveConditions() ReplicaSetStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetStatusBuilder) RemoveConditions() *ReplicaSetStatusBuilder {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b ReplicaSetStatusBuilder) GetConditions() (value ReplicaSetConditionList, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicaSetStatusBuilder) GetConditions() (value ReplicaSetConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
@@ -200,9 +175,8 @@ func (b *ReplicaSetStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -217,14 +191,13 @@ func (b *ReplicaSetStatusBuilder) FromUnstructured(u map[string]interface{}) err
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ReplicaSetStatusBuilder to JSON.
 func (b *ReplicaSetStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -232,8 +205,7 @@ func (b *ReplicaSetStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ReplicaSetStatusBuilder, replacing the contents of
 // ReplicaSetStatusBuilder.
 func (b *ReplicaSetStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -241,11 +213,9 @@ func (b *ReplicaSetStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ReplicaSetStatusList represents a list of ReplicaSetStatusBuilder.
-// Provided as a convenience.
-type ReplicaSetStatusList []ReplicaSetStatusBuilder
+type ReplicaSetStatusList []*ReplicaSetStatusBuilder
 
 // ReplicaSetStatusList represents a map of ReplicaSetStatusBuilder.
-// Provided as a convenience.
 type ReplicaSetStatusMap map[string]ReplicaSetStatusBuilder
 
 func (b *ReplicaSetStatusBuilder) preMarshal() {

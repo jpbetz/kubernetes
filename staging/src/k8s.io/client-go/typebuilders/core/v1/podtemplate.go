@@ -28,15 +28,15 @@ import (
 // PodTemplateBuilder represents an declarative configuration of the PodTemplate type for use
 // with apply.
 type PodTemplateBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *podTemplateFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   podTemplateFields
 }
 
-// podTemplateFields is used by PodTemplateBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PodTemplateBuilder before marshalling, and
-// are copied out to the builder type in PodTemplateBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// podTemplateFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PodTemplateBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type podTemplateFields struct {
 	Kind       *string                 `json:"kind,omitempty"`       // inlined PodTemplateBuilder.typeMeta.Kind field
 	APIVersion *string                 `json:"apiVersion,omitempty"` // inlined PodTemplateBuilder.typeMeta.APIVersion field
@@ -44,83 +44,61 @@ type podTemplateFields struct {
 	Template   *PodTemplateSpecBuilder `json:"template,omitempty"`
 }
 
-func (b *PodTemplateBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &podTemplateFields{}
-	}
-}
-
 // PodTemplate constructs an declarative configuration of the PodTemplate type for use with
 // apply.
-// Provided as a convenience.
-func PodTemplate() PodTemplateBuilder {
-	return PodTemplateBuilder{fields: &podTemplateFields{}}
+func PodTemplate() *PodTemplateBuilder {
+	return &PodTemplateBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b PodTemplateBuilder) SetTypeMeta(value v1.TypeMetaBuilder) PodTemplateBuilder {
-	b.ensureInitialized()
+func (b *PodTemplateBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *PodTemplateBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b PodTemplateBuilder) RemoveTypeMeta() PodTemplateBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *PodTemplateBuilder) RemoveTypeMeta() *PodTemplateBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b PodTemplateBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *PodTemplateBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b PodTemplateBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) PodTemplateBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *PodTemplateBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *PodTemplateBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b PodTemplateBuilder) RemoveObjectMeta() PodTemplateBuilder {
-	b.ensureInitialized()
+func (b *PodTemplateBuilder) RemoveObjectMeta() *PodTemplateBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b PodTemplateBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodTemplateBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetTemplate sets the Template field in the declarative configuration to the given value.
-func (b PodTemplateBuilder) SetTemplate(value PodTemplateSpecBuilder) PodTemplateBuilder {
-	b.ensureInitialized()
-	b.fields.Template = &value
+func (b *PodTemplateBuilder) SetTemplate(value *PodTemplateSpecBuilder) *PodTemplateBuilder {
+	b.fields.Template = value
 	return b
 }
 
 // RemoveTemplate removes the Template field from the declarative configuration.
-func (b PodTemplateBuilder) RemoveTemplate() PodTemplateBuilder {
-	b.ensureInitialized()
+func (b *PodTemplateBuilder) RemoveTemplate() *PodTemplateBuilder {
 	b.fields.Template = nil
 	return b
 }
 
 // GetTemplate gets the Template field from the declarative configuration.
-func (b PodTemplateBuilder) GetTemplate() (value PodTemplateSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Template; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodTemplateBuilder) GetTemplate() (value *PodTemplateSpecBuilder, ok bool) {
+	return b.fields.Template, b.fields.Template != nil
 }
 
 // ToUnstructured converts PodTemplateBuilder to unstructured.
@@ -128,9 +106,8 @@ func (b *PodTemplateBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +122,13 @@ func (b *PodTemplateBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PodTemplateBuilder to JSON.
 func (b *PodTemplateBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +136,7 @@ func (b *PodTemplateBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PodTemplateBuilder, replacing the contents of
 // PodTemplateBuilder.
 func (b *PodTemplateBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,22 +144,25 @@ func (b *PodTemplateBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PodTemplateList represents a list of PodTemplateBuilder.
-// Provided as a convenience.
-type PodTemplateList []PodTemplateBuilder
+type PodTemplateList []*PodTemplateBuilder
 
 // PodTemplateList represents a map of PodTemplateBuilder.
-// Provided as a convenience.
 type PodTemplateMap map[string]PodTemplateBuilder
 
 func (b *PodTemplateBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *PodTemplateBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

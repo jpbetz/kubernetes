@@ -27,14 +27,14 @@ import (
 // VolumeAttachmentStatusBuilder represents an declarative configuration of the VolumeAttachmentStatus type for use
 // with apply.
 type VolumeAttachmentStatusBuilder struct {
-	fields *volumeAttachmentStatusFields
+	fields volumeAttachmentStatusFields
 }
 
-// volumeAttachmentStatusFields is used by VolumeAttachmentStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in VolumeAttachmentStatusBuilder before marshalling, and
-// are copied out to the builder type in VolumeAttachmentStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// volumeAttachmentStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in VolumeAttachmentStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type volumeAttachmentStatusFields struct {
 	Attached           *bool               `json:"attached,omitempty"`
 	AttachmentMetadata *map[string]string  `json:"attachmentMetadata,omitempty"`
@@ -42,36 +42,26 @@ type volumeAttachmentStatusFields struct {
 	DetachError        *VolumeErrorBuilder `json:"detachError,omitempty"`
 }
 
-func (b *VolumeAttachmentStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &volumeAttachmentStatusFields{}
-	}
-}
-
 // VolumeAttachmentStatus constructs an declarative configuration of the VolumeAttachmentStatus type for use with
 // apply.
-// Provided as a convenience.
-func VolumeAttachmentStatus() VolumeAttachmentStatusBuilder {
-	return VolumeAttachmentStatusBuilder{fields: &volumeAttachmentStatusFields{}}
+func VolumeAttachmentStatus() *VolumeAttachmentStatusBuilder {
+	return &VolumeAttachmentStatusBuilder{}
 }
 
 // SetAttached sets the Attached field in the declarative configuration to the given value.
-func (b VolumeAttachmentStatusBuilder) SetAttached(value bool) VolumeAttachmentStatusBuilder {
-	b.ensureInitialized()
+func (b *VolumeAttachmentStatusBuilder) SetAttached(value bool) *VolumeAttachmentStatusBuilder {
 	b.fields.Attached = &value
 	return b
 }
 
 // RemoveAttached removes the Attached field from the declarative configuration.
-func (b VolumeAttachmentStatusBuilder) RemoveAttached() VolumeAttachmentStatusBuilder {
-	b.ensureInitialized()
+func (b *VolumeAttachmentStatusBuilder) RemoveAttached() *VolumeAttachmentStatusBuilder {
 	b.fields.Attached = nil
 	return b
 }
 
 // GetAttached gets the Attached field from the declarative configuration.
-func (b VolumeAttachmentStatusBuilder) GetAttached() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *VolumeAttachmentStatusBuilder) GetAttached() (value bool, ok bool) {
 	if v := b.fields.Attached; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b VolumeAttachmentStatusBuilder) GetAttached() (value bool, ok bool) {
 }
 
 // SetAttachmentMetadata sets the AttachmentMetadata field in the declarative configuration to the given value.
-func (b VolumeAttachmentStatusBuilder) SetAttachmentMetadata(value map[string]string) VolumeAttachmentStatusBuilder {
-	b.ensureInitialized()
+func (b *VolumeAttachmentStatusBuilder) SetAttachmentMetadata(value map[string]string) *VolumeAttachmentStatusBuilder {
 	b.fields.AttachmentMetadata = &value
 	return b
 }
 
 // RemoveAttachmentMetadata removes the AttachmentMetadata field from the declarative configuration.
-func (b VolumeAttachmentStatusBuilder) RemoveAttachmentMetadata() VolumeAttachmentStatusBuilder {
-	b.ensureInitialized()
+func (b *VolumeAttachmentStatusBuilder) RemoveAttachmentMetadata() *VolumeAttachmentStatusBuilder {
 	b.fields.AttachmentMetadata = nil
 	return b
 }
 
 // GetAttachmentMetadata gets the AttachmentMetadata field from the declarative configuration.
-func (b VolumeAttachmentStatusBuilder) GetAttachmentMetadata() (value map[string]string, ok bool) {
-	b.ensureInitialized()
+func (b *VolumeAttachmentStatusBuilder) GetAttachmentMetadata() (value map[string]string, ok bool) {
 	if v := b.fields.AttachmentMetadata; v != nil {
 		return *v, true
 	}
@@ -102,49 +89,37 @@ func (b VolumeAttachmentStatusBuilder) GetAttachmentMetadata() (value map[string
 }
 
 // SetAttachError sets the AttachError field in the declarative configuration to the given value.
-func (b VolumeAttachmentStatusBuilder) SetAttachError(value VolumeErrorBuilder) VolumeAttachmentStatusBuilder {
-	b.ensureInitialized()
-	b.fields.AttachError = &value
+func (b *VolumeAttachmentStatusBuilder) SetAttachError(value *VolumeErrorBuilder) *VolumeAttachmentStatusBuilder {
+	b.fields.AttachError = value
 	return b
 }
 
 // RemoveAttachError removes the AttachError field from the declarative configuration.
-func (b VolumeAttachmentStatusBuilder) RemoveAttachError() VolumeAttachmentStatusBuilder {
-	b.ensureInitialized()
+func (b *VolumeAttachmentStatusBuilder) RemoveAttachError() *VolumeAttachmentStatusBuilder {
 	b.fields.AttachError = nil
 	return b
 }
 
 // GetAttachError gets the AttachError field from the declarative configuration.
-func (b VolumeAttachmentStatusBuilder) GetAttachError() (value VolumeErrorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.AttachError; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeAttachmentStatusBuilder) GetAttachError() (value *VolumeErrorBuilder, ok bool) {
+	return b.fields.AttachError, b.fields.AttachError != nil
 }
 
 // SetDetachError sets the DetachError field in the declarative configuration to the given value.
-func (b VolumeAttachmentStatusBuilder) SetDetachError(value VolumeErrorBuilder) VolumeAttachmentStatusBuilder {
-	b.ensureInitialized()
-	b.fields.DetachError = &value
+func (b *VolumeAttachmentStatusBuilder) SetDetachError(value *VolumeErrorBuilder) *VolumeAttachmentStatusBuilder {
+	b.fields.DetachError = value
 	return b
 }
 
 // RemoveDetachError removes the DetachError field from the declarative configuration.
-func (b VolumeAttachmentStatusBuilder) RemoveDetachError() VolumeAttachmentStatusBuilder {
-	b.ensureInitialized()
+func (b *VolumeAttachmentStatusBuilder) RemoveDetachError() *VolumeAttachmentStatusBuilder {
 	b.fields.DetachError = nil
 	return b
 }
 
 // GetDetachError gets the DetachError field from the declarative configuration.
-func (b VolumeAttachmentStatusBuilder) GetDetachError() (value VolumeErrorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.DetachError; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeAttachmentStatusBuilder) GetDetachError() (value *VolumeErrorBuilder, ok bool) {
+	return b.fields.DetachError, b.fields.DetachError != nil
 }
 
 // ToUnstructured converts VolumeAttachmentStatusBuilder to unstructured.
@@ -152,9 +127,8 @@ func (b *VolumeAttachmentStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +143,13 @@ func (b *VolumeAttachmentStatusBuilder) FromUnstructured(u map[string]interface{
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals VolumeAttachmentStatusBuilder to JSON.
 func (b *VolumeAttachmentStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +157,7 @@ func (b *VolumeAttachmentStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into VolumeAttachmentStatusBuilder, replacing the contents of
 // VolumeAttachmentStatusBuilder.
 func (b *VolumeAttachmentStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,11 +165,9 @@ func (b *VolumeAttachmentStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // VolumeAttachmentStatusList represents a list of VolumeAttachmentStatusBuilder.
-// Provided as a convenience.
-type VolumeAttachmentStatusList []VolumeAttachmentStatusBuilder
+type VolumeAttachmentStatusList []*VolumeAttachmentStatusBuilder
 
 // VolumeAttachmentStatusList represents a map of VolumeAttachmentStatusBuilder.
-// Provided as a convenience.
 type VolumeAttachmentStatusMap map[string]VolumeAttachmentStatusBuilder
 
 func (b *VolumeAttachmentStatusBuilder) preMarshal() {

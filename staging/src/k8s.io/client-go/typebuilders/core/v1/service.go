@@ -28,15 +28,15 @@ import (
 // ServiceBuilder represents an declarative configuration of the Service type for use
 // with apply.
 type ServiceBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *serviceFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   serviceFields
 }
 
-// serviceFields is used by ServiceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ServiceBuilder before marshalling, and
-// are copied out to the builder type in ServiceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// serviceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ServiceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type serviceFields struct {
 	Kind       *string               `json:"kind,omitempty"`       // inlined ServiceBuilder.typeMeta.Kind field
 	APIVersion *string               `json:"apiVersion,omitempty"` // inlined ServiceBuilder.typeMeta.APIVersion field
@@ -45,106 +45,78 @@ type serviceFields struct {
 	Status     *ServiceStatusBuilder `json:"status,omitempty"`
 }
 
-func (b *ServiceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &serviceFields{}
-	}
-}
-
 // Service constructs an declarative configuration of the Service type for use with
 // apply.
-// Provided as a convenience.
-func Service() ServiceBuilder {
-	return ServiceBuilder{fields: &serviceFields{}}
+func Service() *ServiceBuilder {
+	return &ServiceBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b ServiceBuilder) SetTypeMeta(value v1.TypeMetaBuilder) ServiceBuilder {
-	b.ensureInitialized()
+func (b *ServiceBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *ServiceBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b ServiceBuilder) RemoveTypeMeta() ServiceBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *ServiceBuilder) RemoveTypeMeta() *ServiceBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b ServiceBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *ServiceBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b ServiceBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) ServiceBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *ServiceBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *ServiceBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b ServiceBuilder) RemoveObjectMeta() ServiceBuilder {
-	b.ensureInitialized()
+func (b *ServiceBuilder) RemoveObjectMeta() *ServiceBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b ServiceBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ServiceBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b ServiceBuilder) SetSpec(value ServiceSpecBuilder) ServiceBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *ServiceBuilder) SetSpec(value *ServiceSpecBuilder) *ServiceBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b ServiceBuilder) RemoveSpec() ServiceBuilder {
-	b.ensureInitialized()
+func (b *ServiceBuilder) RemoveSpec() *ServiceBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b ServiceBuilder) GetSpec() (value ServiceSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ServiceBuilder) GetSpec() (value *ServiceSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b ServiceBuilder) SetStatus(value ServiceStatusBuilder) ServiceBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *ServiceBuilder) SetStatus(value *ServiceStatusBuilder) *ServiceBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b ServiceBuilder) RemoveStatus() ServiceBuilder {
-	b.ensureInitialized()
+func (b *ServiceBuilder) RemoveStatus() *ServiceBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b ServiceBuilder) GetStatus() (value ServiceStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ServiceBuilder) GetStatus() (value *ServiceStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts ServiceBuilder to unstructured.
@@ -152,9 +124,8 @@ func (b *ServiceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *ServiceBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ServiceBuilder to JSON.
 func (b *ServiceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *ServiceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ServiceBuilder, replacing the contents of
 // ServiceBuilder.
 func (b *ServiceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +162,25 @@ func (b *ServiceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ServiceList represents a list of ServiceBuilder.
-// Provided as a convenience.
-type ServiceList []ServiceBuilder
+type ServiceList []*ServiceBuilder
 
 // ServiceList represents a map of ServiceBuilder.
-// Provided as a convenience.
 type ServiceMap map[string]ServiceBuilder
 
 func (b *ServiceBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *ServiceBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

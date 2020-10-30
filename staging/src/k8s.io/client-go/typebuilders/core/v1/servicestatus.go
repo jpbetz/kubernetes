@@ -27,52 +27,39 @@ import (
 // ServiceStatusBuilder represents an declarative configuration of the ServiceStatus type for use
 // with apply.
 type ServiceStatusBuilder struct {
-	fields *serviceStatusFields
+	fields serviceStatusFields
 }
 
-// serviceStatusFields is used by ServiceStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ServiceStatusBuilder before marshalling, and
-// are copied out to the builder type in ServiceStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// serviceStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ServiceStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type serviceStatusFields struct {
 	LoadBalancer *LoadBalancerStatusBuilder `json:"loadBalancer,omitempty"`
 }
 
-func (b *ServiceStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &serviceStatusFields{}
-	}
-}
-
 // ServiceStatus constructs an declarative configuration of the ServiceStatus type for use with
 // apply.
-// Provided as a convenience.
-func ServiceStatus() ServiceStatusBuilder {
-	return ServiceStatusBuilder{fields: &serviceStatusFields{}}
+func ServiceStatus() *ServiceStatusBuilder {
+	return &ServiceStatusBuilder{}
 }
 
 // SetLoadBalancer sets the LoadBalancer field in the declarative configuration to the given value.
-func (b ServiceStatusBuilder) SetLoadBalancer(value LoadBalancerStatusBuilder) ServiceStatusBuilder {
-	b.ensureInitialized()
-	b.fields.LoadBalancer = &value
+func (b *ServiceStatusBuilder) SetLoadBalancer(value *LoadBalancerStatusBuilder) *ServiceStatusBuilder {
+	b.fields.LoadBalancer = value
 	return b
 }
 
 // RemoveLoadBalancer removes the LoadBalancer field from the declarative configuration.
-func (b ServiceStatusBuilder) RemoveLoadBalancer() ServiceStatusBuilder {
-	b.ensureInitialized()
+func (b *ServiceStatusBuilder) RemoveLoadBalancer() *ServiceStatusBuilder {
 	b.fields.LoadBalancer = nil
 	return b
 }
 
 // GetLoadBalancer gets the LoadBalancer field from the declarative configuration.
-func (b ServiceStatusBuilder) GetLoadBalancer() (value LoadBalancerStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.LoadBalancer; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ServiceStatusBuilder) GetLoadBalancer() (value *LoadBalancerStatusBuilder, ok bool) {
+	return b.fields.LoadBalancer, b.fields.LoadBalancer != nil
 }
 
 // ToUnstructured converts ServiceStatusBuilder to unstructured.
@@ -80,9 +67,8 @@ func (b *ServiceStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +83,13 @@ func (b *ServiceStatusBuilder) FromUnstructured(u map[string]interface{}) error 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ServiceStatusBuilder to JSON.
 func (b *ServiceStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +97,7 @@ func (b *ServiceStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ServiceStatusBuilder, replacing the contents of
 // ServiceStatusBuilder.
 func (b *ServiceStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +105,9 @@ func (b *ServiceStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ServiceStatusList represents a list of ServiceStatusBuilder.
-// Provided as a convenience.
-type ServiceStatusList []ServiceStatusBuilder
+type ServiceStatusList []*ServiceStatusBuilder
 
 // ServiceStatusList represents a map of ServiceStatusBuilder.
-// Provided as a convenience.
 type ServiceStatusMap map[string]ServiceStatusBuilder
 
 func (b *ServiceStatusBuilder) preMarshal() {

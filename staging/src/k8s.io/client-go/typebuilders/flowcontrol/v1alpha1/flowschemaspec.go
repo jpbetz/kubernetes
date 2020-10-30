@@ -27,14 +27,14 @@ import (
 // FlowSchemaSpecBuilder represents an declarative configuration of the FlowSchemaSpec type for use
 // with apply.
 type FlowSchemaSpecBuilder struct {
-	fields *flowSchemaSpecFields
+	fields flowSchemaSpecFields
 }
 
-// flowSchemaSpecFields is used by FlowSchemaSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in FlowSchemaSpecBuilder before marshalling, and
-// are copied out to the builder type in FlowSchemaSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// flowSchemaSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in FlowSchemaSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type flowSchemaSpecFields struct {
 	PriorityLevelConfiguration *PriorityLevelConfigurationReferenceBuilder `json:"priorityLevelConfiguration,omitempty"`
 	MatchingPrecedence         *int32                                      `json:"matchingPrecedence,omitempty"`
@@ -42,59 +42,43 @@ type flowSchemaSpecFields struct {
 	Rules                      *PolicyRulesWithSubjectsList                `json:"rules,omitempty"`
 }
 
-func (b *FlowSchemaSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &flowSchemaSpecFields{}
-	}
-}
-
 // FlowSchemaSpec constructs an declarative configuration of the FlowSchemaSpec type for use with
 // apply.
-// Provided as a convenience.
-func FlowSchemaSpec() FlowSchemaSpecBuilder {
-	return FlowSchemaSpecBuilder{fields: &flowSchemaSpecFields{}}
+func FlowSchemaSpec() *FlowSchemaSpecBuilder {
+	return &FlowSchemaSpecBuilder{}
 }
 
 // SetPriorityLevelConfiguration sets the PriorityLevelConfiguration field in the declarative configuration to the given value.
-func (b FlowSchemaSpecBuilder) SetPriorityLevelConfiguration(value PriorityLevelConfigurationReferenceBuilder) FlowSchemaSpecBuilder {
-	b.ensureInitialized()
-	b.fields.PriorityLevelConfiguration = &value
+func (b *FlowSchemaSpecBuilder) SetPriorityLevelConfiguration(value *PriorityLevelConfigurationReferenceBuilder) *FlowSchemaSpecBuilder {
+	b.fields.PriorityLevelConfiguration = value
 	return b
 }
 
 // RemovePriorityLevelConfiguration removes the PriorityLevelConfiguration field from the declarative configuration.
-func (b FlowSchemaSpecBuilder) RemovePriorityLevelConfiguration() FlowSchemaSpecBuilder {
-	b.ensureInitialized()
+func (b *FlowSchemaSpecBuilder) RemovePriorityLevelConfiguration() *FlowSchemaSpecBuilder {
 	b.fields.PriorityLevelConfiguration = nil
 	return b
 }
 
 // GetPriorityLevelConfiguration gets the PriorityLevelConfiguration field from the declarative configuration.
-func (b FlowSchemaSpecBuilder) GetPriorityLevelConfiguration() (value PriorityLevelConfigurationReferenceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.PriorityLevelConfiguration; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *FlowSchemaSpecBuilder) GetPriorityLevelConfiguration() (value *PriorityLevelConfigurationReferenceBuilder, ok bool) {
+	return b.fields.PriorityLevelConfiguration, b.fields.PriorityLevelConfiguration != nil
 }
 
 // SetMatchingPrecedence sets the MatchingPrecedence field in the declarative configuration to the given value.
-func (b FlowSchemaSpecBuilder) SetMatchingPrecedence(value int32) FlowSchemaSpecBuilder {
-	b.ensureInitialized()
+func (b *FlowSchemaSpecBuilder) SetMatchingPrecedence(value int32) *FlowSchemaSpecBuilder {
 	b.fields.MatchingPrecedence = &value
 	return b
 }
 
 // RemoveMatchingPrecedence removes the MatchingPrecedence field from the declarative configuration.
-func (b FlowSchemaSpecBuilder) RemoveMatchingPrecedence() FlowSchemaSpecBuilder {
-	b.ensureInitialized()
+func (b *FlowSchemaSpecBuilder) RemoveMatchingPrecedence() *FlowSchemaSpecBuilder {
 	b.fields.MatchingPrecedence = nil
 	return b
 }
 
 // GetMatchingPrecedence gets the MatchingPrecedence field from the declarative configuration.
-func (b FlowSchemaSpecBuilder) GetMatchingPrecedence() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *FlowSchemaSpecBuilder) GetMatchingPrecedence() (value int32, ok bool) {
 	if v := b.fields.MatchingPrecedence; v != nil {
 		return *v, true
 	}
@@ -102,45 +86,36 @@ func (b FlowSchemaSpecBuilder) GetMatchingPrecedence() (value int32, ok bool) {
 }
 
 // SetDistinguisherMethod sets the DistinguisherMethod field in the declarative configuration to the given value.
-func (b FlowSchemaSpecBuilder) SetDistinguisherMethod(value FlowDistinguisherMethodBuilder) FlowSchemaSpecBuilder {
-	b.ensureInitialized()
-	b.fields.DistinguisherMethod = &value
+func (b *FlowSchemaSpecBuilder) SetDistinguisherMethod(value *FlowDistinguisherMethodBuilder) *FlowSchemaSpecBuilder {
+	b.fields.DistinguisherMethod = value
 	return b
 }
 
 // RemoveDistinguisherMethod removes the DistinguisherMethod field from the declarative configuration.
-func (b FlowSchemaSpecBuilder) RemoveDistinguisherMethod() FlowSchemaSpecBuilder {
-	b.ensureInitialized()
+func (b *FlowSchemaSpecBuilder) RemoveDistinguisherMethod() *FlowSchemaSpecBuilder {
 	b.fields.DistinguisherMethod = nil
 	return b
 }
 
 // GetDistinguisherMethod gets the DistinguisherMethod field from the declarative configuration.
-func (b FlowSchemaSpecBuilder) GetDistinguisherMethod() (value FlowDistinguisherMethodBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.DistinguisherMethod; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *FlowSchemaSpecBuilder) GetDistinguisherMethod() (value *FlowDistinguisherMethodBuilder, ok bool) {
+	return b.fields.DistinguisherMethod, b.fields.DistinguisherMethod != nil
 }
 
 // SetRules sets the Rules field in the declarative configuration to the given value.
-func (b FlowSchemaSpecBuilder) SetRules(value PolicyRulesWithSubjectsList) FlowSchemaSpecBuilder {
-	b.ensureInitialized()
+func (b *FlowSchemaSpecBuilder) SetRules(value PolicyRulesWithSubjectsList) *FlowSchemaSpecBuilder {
 	b.fields.Rules = &value
 	return b
 }
 
 // RemoveRules removes the Rules field from the declarative configuration.
-func (b FlowSchemaSpecBuilder) RemoveRules() FlowSchemaSpecBuilder {
-	b.ensureInitialized()
+func (b *FlowSchemaSpecBuilder) RemoveRules() *FlowSchemaSpecBuilder {
 	b.fields.Rules = nil
 	return b
 }
 
 // GetRules gets the Rules field from the declarative configuration.
-func (b FlowSchemaSpecBuilder) GetRules() (value PolicyRulesWithSubjectsList, ok bool) {
-	b.ensureInitialized()
+func (b *FlowSchemaSpecBuilder) GetRules() (value PolicyRulesWithSubjectsList, ok bool) {
 	if v := b.fields.Rules; v != nil {
 		return *v, true
 	}
@@ -152,9 +127,8 @@ func (b *FlowSchemaSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +143,13 @@ func (b *FlowSchemaSpecBuilder) FromUnstructured(u map[string]interface{}) error
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals FlowSchemaSpecBuilder to JSON.
 func (b *FlowSchemaSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +157,7 @@ func (b *FlowSchemaSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into FlowSchemaSpecBuilder, replacing the contents of
 // FlowSchemaSpecBuilder.
 func (b *FlowSchemaSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,11 +165,9 @@ func (b *FlowSchemaSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // FlowSchemaSpecList represents a list of FlowSchemaSpecBuilder.
-// Provided as a convenience.
-type FlowSchemaSpecList []FlowSchemaSpecBuilder
+type FlowSchemaSpecList []*FlowSchemaSpecBuilder
 
 // FlowSchemaSpecList represents a map of FlowSchemaSpecBuilder.
-// Provided as a convenience.
 type FlowSchemaSpecMap map[string]FlowSchemaSpecBuilder
 
 func (b *FlowSchemaSpecBuilder) preMarshal() {

@@ -29,76 +29,57 @@ import (
 // JobTemplateSpecBuilder represents an declarative configuration of the JobTemplateSpec type for use
 // with apply.
 type JobTemplateSpecBuilder struct {
-	fields *jobTemplateSpecFields
+	fields jobTemplateSpecFields
 }
 
-// jobTemplateSpecFields is used by JobTemplateSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in JobTemplateSpecBuilder before marshalling, and
-// are copied out to the builder type in JobTemplateSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// jobTemplateSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in JobTemplateSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type jobTemplateSpecFields struct {
 	ObjectMeta *v1.ObjectMetaBuilder   `json:"metadata,omitempty"`
 	Spec       *batchv1.JobSpecBuilder `json:"spec,omitempty"`
 }
 
-func (b *JobTemplateSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &jobTemplateSpecFields{}
-	}
-}
-
 // JobTemplateSpec constructs an declarative configuration of the JobTemplateSpec type for use with
 // apply.
-// Provided as a convenience.
-func JobTemplateSpec() JobTemplateSpecBuilder {
-	return JobTemplateSpecBuilder{fields: &jobTemplateSpecFields{}}
+func JobTemplateSpec() *JobTemplateSpecBuilder {
+	return &JobTemplateSpecBuilder{}
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b JobTemplateSpecBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) JobTemplateSpecBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *JobTemplateSpecBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *JobTemplateSpecBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b JobTemplateSpecBuilder) RemoveObjectMeta() JobTemplateSpecBuilder {
-	b.ensureInitialized()
+func (b *JobTemplateSpecBuilder) RemoveObjectMeta() *JobTemplateSpecBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b JobTemplateSpecBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *JobTemplateSpecBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b JobTemplateSpecBuilder) SetSpec(value batchv1.JobSpecBuilder) JobTemplateSpecBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *JobTemplateSpecBuilder) SetSpec(value *batchv1.JobSpecBuilder) *JobTemplateSpecBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b JobTemplateSpecBuilder) RemoveSpec() JobTemplateSpecBuilder {
-	b.ensureInitialized()
+func (b *JobTemplateSpecBuilder) RemoveSpec() *JobTemplateSpecBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b JobTemplateSpecBuilder) GetSpec() (value batchv1.JobSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *JobTemplateSpecBuilder) GetSpec() (value *batchv1.JobSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // ToUnstructured converts JobTemplateSpecBuilder to unstructured.
@@ -106,9 +87,8 @@ func (b *JobTemplateSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -123,14 +103,13 @@ func (b *JobTemplateSpecBuilder) FromUnstructured(u map[string]interface{}) erro
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals JobTemplateSpecBuilder to JSON.
 func (b *JobTemplateSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -138,8 +117,7 @@ func (b *JobTemplateSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into JobTemplateSpecBuilder, replacing the contents of
 // JobTemplateSpecBuilder.
 func (b *JobTemplateSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -147,11 +125,9 @@ func (b *JobTemplateSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // JobTemplateSpecList represents a list of JobTemplateSpecBuilder.
-// Provided as a convenience.
-type JobTemplateSpecList []JobTemplateSpecBuilder
+type JobTemplateSpecList []*JobTemplateSpecBuilder
 
 // JobTemplateSpecList represents a map of JobTemplateSpecBuilder.
-// Provided as a convenience.
 type JobTemplateSpecMap map[string]JobTemplateSpecBuilder
 
 func (b *JobTemplateSpecBuilder) preMarshal() {

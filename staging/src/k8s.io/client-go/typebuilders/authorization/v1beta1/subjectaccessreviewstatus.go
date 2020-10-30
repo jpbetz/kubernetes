@@ -27,14 +27,14 @@ import (
 // SubjectAccessReviewStatusBuilder represents an declarative configuration of the SubjectAccessReviewStatus type for use
 // with apply.
 type SubjectAccessReviewStatusBuilder struct {
-	fields *subjectAccessReviewStatusFields
+	fields subjectAccessReviewStatusFields
 }
 
-// subjectAccessReviewStatusFields is used by SubjectAccessReviewStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in SubjectAccessReviewStatusBuilder before marshalling, and
-// are copied out to the builder type in SubjectAccessReviewStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// subjectAccessReviewStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in SubjectAccessReviewStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type subjectAccessReviewStatusFields struct {
 	Allowed         *bool   `json:"allowed,omitempty"`
 	Denied          *bool   `json:"denied,omitempty"`
@@ -42,36 +42,26 @@ type subjectAccessReviewStatusFields struct {
 	EvaluationError *string `json:"evaluationError,omitempty"`
 }
 
-func (b *SubjectAccessReviewStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &subjectAccessReviewStatusFields{}
-	}
-}
-
 // SubjectAccessReviewStatus constructs an declarative configuration of the SubjectAccessReviewStatus type for use with
 // apply.
-// Provided as a convenience.
-func SubjectAccessReviewStatus() SubjectAccessReviewStatusBuilder {
-	return SubjectAccessReviewStatusBuilder{fields: &subjectAccessReviewStatusFields{}}
+func SubjectAccessReviewStatus() *SubjectAccessReviewStatusBuilder {
+	return &SubjectAccessReviewStatusBuilder{}
 }
 
 // SetAllowed sets the Allowed field in the declarative configuration to the given value.
-func (b SubjectAccessReviewStatusBuilder) SetAllowed(value bool) SubjectAccessReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *SubjectAccessReviewStatusBuilder) SetAllowed(value bool) *SubjectAccessReviewStatusBuilder {
 	b.fields.Allowed = &value
 	return b
 }
 
 // RemoveAllowed removes the Allowed field from the declarative configuration.
-func (b SubjectAccessReviewStatusBuilder) RemoveAllowed() SubjectAccessReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *SubjectAccessReviewStatusBuilder) RemoveAllowed() *SubjectAccessReviewStatusBuilder {
 	b.fields.Allowed = nil
 	return b
 }
 
 // GetAllowed gets the Allowed field from the declarative configuration.
-func (b SubjectAccessReviewStatusBuilder) GetAllowed() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *SubjectAccessReviewStatusBuilder) GetAllowed() (value bool, ok bool) {
 	if v := b.fields.Allowed; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b SubjectAccessReviewStatusBuilder) GetAllowed() (value bool, ok bool) {
 }
 
 // SetDenied sets the Denied field in the declarative configuration to the given value.
-func (b SubjectAccessReviewStatusBuilder) SetDenied(value bool) SubjectAccessReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *SubjectAccessReviewStatusBuilder) SetDenied(value bool) *SubjectAccessReviewStatusBuilder {
 	b.fields.Denied = &value
 	return b
 }
 
 // RemoveDenied removes the Denied field from the declarative configuration.
-func (b SubjectAccessReviewStatusBuilder) RemoveDenied() SubjectAccessReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *SubjectAccessReviewStatusBuilder) RemoveDenied() *SubjectAccessReviewStatusBuilder {
 	b.fields.Denied = nil
 	return b
 }
 
 // GetDenied gets the Denied field from the declarative configuration.
-func (b SubjectAccessReviewStatusBuilder) GetDenied() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *SubjectAccessReviewStatusBuilder) GetDenied() (value bool, ok bool) {
 	if v := b.fields.Denied; v != nil {
 		return *v, true
 	}
@@ -102,22 +89,19 @@ func (b SubjectAccessReviewStatusBuilder) GetDenied() (value bool, ok bool) {
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b SubjectAccessReviewStatusBuilder) SetReason(value string) SubjectAccessReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *SubjectAccessReviewStatusBuilder) SetReason(value string) *SubjectAccessReviewStatusBuilder {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b SubjectAccessReviewStatusBuilder) RemoveReason() SubjectAccessReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *SubjectAccessReviewStatusBuilder) RemoveReason() *SubjectAccessReviewStatusBuilder {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b SubjectAccessReviewStatusBuilder) GetReason() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *SubjectAccessReviewStatusBuilder) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -125,22 +109,19 @@ func (b SubjectAccessReviewStatusBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetEvaluationError sets the EvaluationError field in the declarative configuration to the given value.
-func (b SubjectAccessReviewStatusBuilder) SetEvaluationError(value string) SubjectAccessReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *SubjectAccessReviewStatusBuilder) SetEvaluationError(value string) *SubjectAccessReviewStatusBuilder {
 	b.fields.EvaluationError = &value
 	return b
 }
 
 // RemoveEvaluationError removes the EvaluationError field from the declarative configuration.
-func (b SubjectAccessReviewStatusBuilder) RemoveEvaluationError() SubjectAccessReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *SubjectAccessReviewStatusBuilder) RemoveEvaluationError() *SubjectAccessReviewStatusBuilder {
 	b.fields.EvaluationError = nil
 	return b
 }
 
 // GetEvaluationError gets the EvaluationError field from the declarative configuration.
-func (b SubjectAccessReviewStatusBuilder) GetEvaluationError() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *SubjectAccessReviewStatusBuilder) GetEvaluationError() (value string, ok bool) {
 	if v := b.fields.EvaluationError; v != nil {
 		return *v, true
 	}
@@ -152,9 +133,8 @@ func (b *SubjectAccessReviewStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +149,13 @@ func (b *SubjectAccessReviewStatusBuilder) FromUnstructured(u map[string]interfa
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals SubjectAccessReviewStatusBuilder to JSON.
 func (b *SubjectAccessReviewStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +163,7 @@ func (b *SubjectAccessReviewStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into SubjectAccessReviewStatusBuilder, replacing the contents of
 // SubjectAccessReviewStatusBuilder.
 func (b *SubjectAccessReviewStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,11 +171,9 @@ func (b *SubjectAccessReviewStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // SubjectAccessReviewStatusList represents a list of SubjectAccessReviewStatusBuilder.
-// Provided as a convenience.
-type SubjectAccessReviewStatusList []SubjectAccessReviewStatusBuilder
+type SubjectAccessReviewStatusList []*SubjectAccessReviewStatusBuilder
 
 // SubjectAccessReviewStatusList represents a map of SubjectAccessReviewStatusBuilder.
-// Provided as a convenience.
 type SubjectAccessReviewStatusMap map[string]SubjectAccessReviewStatusBuilder
 
 func (b *SubjectAccessReviewStatusBuilder) preMarshal() {

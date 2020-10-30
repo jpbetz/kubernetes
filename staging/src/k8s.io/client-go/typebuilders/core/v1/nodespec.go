@@ -27,14 +27,14 @@ import (
 // NodeSpecBuilder represents an declarative configuration of the NodeSpec type for use
 // with apply.
 type NodeSpecBuilder struct {
-	fields *nodeSpecFields
+	fields nodeSpecFields
 }
 
-// nodeSpecFields is used by NodeSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in NodeSpecBuilder before marshalling, and
-// are copied out to the builder type in NodeSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// nodeSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in NodeSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type nodeSpecFields struct {
 	PodCIDR            *string                  `json:"podCIDR,omitempty"`
 	PodCIDRs           *[]string                `json:"podCIDRs,omitempty"`
@@ -45,36 +45,26 @@ type nodeSpecFields struct {
 	DoNotUseExternalID *string                  `json:"externalID,omitempty"`
 }
 
-func (b *NodeSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &nodeSpecFields{}
-	}
-}
-
 // NodeSpec constructs an declarative configuration of the NodeSpec type for use with
 // apply.
-// Provided as a convenience.
-func NodeSpec() NodeSpecBuilder {
-	return NodeSpecBuilder{fields: &nodeSpecFields{}}
+func NodeSpec() *NodeSpecBuilder {
+	return &NodeSpecBuilder{}
 }
 
 // SetPodCIDR sets the PodCIDR field in the declarative configuration to the given value.
-func (b NodeSpecBuilder) SetPodCIDR(value string) NodeSpecBuilder {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) SetPodCIDR(value string) *NodeSpecBuilder {
 	b.fields.PodCIDR = &value
 	return b
 }
 
 // RemovePodCIDR removes the PodCIDR field from the declarative configuration.
-func (b NodeSpecBuilder) RemovePodCIDR() NodeSpecBuilder {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) RemovePodCIDR() *NodeSpecBuilder {
 	b.fields.PodCIDR = nil
 	return b
 }
 
 // GetPodCIDR gets the PodCIDR field from the declarative configuration.
-func (b NodeSpecBuilder) GetPodCIDR() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) GetPodCIDR() (value string, ok bool) {
 	if v := b.fields.PodCIDR; v != nil {
 		return *v, true
 	}
@@ -82,22 +72,19 @@ func (b NodeSpecBuilder) GetPodCIDR() (value string, ok bool) {
 }
 
 // SetPodCIDRs sets the PodCIDRs field in the declarative configuration to the given value.
-func (b NodeSpecBuilder) SetPodCIDRs(value []string) NodeSpecBuilder {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) SetPodCIDRs(value []string) *NodeSpecBuilder {
 	b.fields.PodCIDRs = &value
 	return b
 }
 
 // RemovePodCIDRs removes the PodCIDRs field from the declarative configuration.
-func (b NodeSpecBuilder) RemovePodCIDRs() NodeSpecBuilder {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) RemovePodCIDRs() *NodeSpecBuilder {
 	b.fields.PodCIDRs = nil
 	return b
 }
 
 // GetPodCIDRs gets the PodCIDRs field from the declarative configuration.
-func (b NodeSpecBuilder) GetPodCIDRs() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) GetPodCIDRs() (value []string, ok bool) {
 	if v := b.fields.PodCIDRs; v != nil {
 		return *v, true
 	}
@@ -105,22 +92,19 @@ func (b NodeSpecBuilder) GetPodCIDRs() (value []string, ok bool) {
 }
 
 // SetProviderID sets the ProviderID field in the declarative configuration to the given value.
-func (b NodeSpecBuilder) SetProviderID(value string) NodeSpecBuilder {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) SetProviderID(value string) *NodeSpecBuilder {
 	b.fields.ProviderID = &value
 	return b
 }
 
 // RemoveProviderID removes the ProviderID field from the declarative configuration.
-func (b NodeSpecBuilder) RemoveProviderID() NodeSpecBuilder {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) RemoveProviderID() *NodeSpecBuilder {
 	b.fields.ProviderID = nil
 	return b
 }
 
 // GetProviderID gets the ProviderID field from the declarative configuration.
-func (b NodeSpecBuilder) GetProviderID() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) GetProviderID() (value string, ok bool) {
 	if v := b.fields.ProviderID; v != nil {
 		return *v, true
 	}
@@ -128,22 +112,19 @@ func (b NodeSpecBuilder) GetProviderID() (value string, ok bool) {
 }
 
 // SetUnschedulable sets the Unschedulable field in the declarative configuration to the given value.
-func (b NodeSpecBuilder) SetUnschedulable(value bool) NodeSpecBuilder {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) SetUnschedulable(value bool) *NodeSpecBuilder {
 	b.fields.Unschedulable = &value
 	return b
 }
 
 // RemoveUnschedulable removes the Unschedulable field from the declarative configuration.
-func (b NodeSpecBuilder) RemoveUnschedulable() NodeSpecBuilder {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) RemoveUnschedulable() *NodeSpecBuilder {
 	b.fields.Unschedulable = nil
 	return b
 }
 
 // GetUnschedulable gets the Unschedulable field from the declarative configuration.
-func (b NodeSpecBuilder) GetUnschedulable() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) GetUnschedulable() (value bool, ok bool) {
 	if v := b.fields.Unschedulable; v != nil {
 		return *v, true
 	}
@@ -151,22 +132,19 @@ func (b NodeSpecBuilder) GetUnschedulable() (value bool, ok bool) {
 }
 
 // SetTaints sets the Taints field in the declarative configuration to the given value.
-func (b NodeSpecBuilder) SetTaints(value TaintList) NodeSpecBuilder {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) SetTaints(value TaintList) *NodeSpecBuilder {
 	b.fields.Taints = &value
 	return b
 }
 
 // RemoveTaints removes the Taints field from the declarative configuration.
-func (b NodeSpecBuilder) RemoveTaints() NodeSpecBuilder {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) RemoveTaints() *NodeSpecBuilder {
 	b.fields.Taints = nil
 	return b
 }
 
 // GetTaints gets the Taints field from the declarative configuration.
-func (b NodeSpecBuilder) GetTaints() (value TaintList, ok bool) {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) GetTaints() (value TaintList, ok bool) {
 	if v := b.fields.Taints; v != nil {
 		return *v, true
 	}
@@ -174,45 +152,36 @@ func (b NodeSpecBuilder) GetTaints() (value TaintList, ok bool) {
 }
 
 // SetConfigSource sets the ConfigSource field in the declarative configuration to the given value.
-func (b NodeSpecBuilder) SetConfigSource(value NodeConfigSourceBuilder) NodeSpecBuilder {
-	b.ensureInitialized()
-	b.fields.ConfigSource = &value
+func (b *NodeSpecBuilder) SetConfigSource(value *NodeConfigSourceBuilder) *NodeSpecBuilder {
+	b.fields.ConfigSource = value
 	return b
 }
 
 // RemoveConfigSource removes the ConfigSource field from the declarative configuration.
-func (b NodeSpecBuilder) RemoveConfigSource() NodeSpecBuilder {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) RemoveConfigSource() *NodeSpecBuilder {
 	b.fields.ConfigSource = nil
 	return b
 }
 
 // GetConfigSource gets the ConfigSource field from the declarative configuration.
-func (b NodeSpecBuilder) GetConfigSource() (value NodeConfigSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ConfigSource; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *NodeSpecBuilder) GetConfigSource() (value *NodeConfigSourceBuilder, ok bool) {
+	return b.fields.ConfigSource, b.fields.ConfigSource != nil
 }
 
 // SetDoNotUseExternalID sets the DoNotUseExternalID field in the declarative configuration to the given value.
-func (b NodeSpecBuilder) SetDoNotUseExternalID(value string) NodeSpecBuilder {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) SetDoNotUseExternalID(value string) *NodeSpecBuilder {
 	b.fields.DoNotUseExternalID = &value
 	return b
 }
 
 // RemoveDoNotUseExternalID removes the DoNotUseExternalID field from the declarative configuration.
-func (b NodeSpecBuilder) RemoveDoNotUseExternalID() NodeSpecBuilder {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) RemoveDoNotUseExternalID() *NodeSpecBuilder {
 	b.fields.DoNotUseExternalID = nil
 	return b
 }
 
 // GetDoNotUseExternalID gets the DoNotUseExternalID field from the declarative configuration.
-func (b NodeSpecBuilder) GetDoNotUseExternalID() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *NodeSpecBuilder) GetDoNotUseExternalID() (value string, ok bool) {
 	if v := b.fields.DoNotUseExternalID; v != nil {
 		return *v, true
 	}
@@ -224,9 +193,8 @@ func (b *NodeSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -241,14 +209,13 @@ func (b *NodeSpecBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals NodeSpecBuilder to JSON.
 func (b *NodeSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -256,8 +223,7 @@ func (b *NodeSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into NodeSpecBuilder, replacing the contents of
 // NodeSpecBuilder.
 func (b *NodeSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -265,11 +231,9 @@ func (b *NodeSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // NodeSpecList represents a list of NodeSpecBuilder.
-// Provided as a convenience.
-type NodeSpecList []NodeSpecBuilder
+type NodeSpecList []*NodeSpecBuilder
 
 // NodeSpecList represents a map of NodeSpecBuilder.
-// Provided as a convenience.
 type NodeSpecMap map[string]NodeSpecBuilder
 
 func (b *NodeSpecBuilder) preMarshal() {

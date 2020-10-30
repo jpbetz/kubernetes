@@ -29,15 +29,15 @@ import (
 // PriorityClassBuilder represents an declarative configuration of the PriorityClass type for use
 // with apply.
 type PriorityClassBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *priorityClassFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   priorityClassFields
 }
 
-// priorityClassFields is used by PriorityClassBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PriorityClassBuilder before marshalling, and
-// are copied out to the builder type in PriorityClassBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// priorityClassFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PriorityClassBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type priorityClassFields struct {
 	Kind             *string                  `json:"kind,omitempty"`       // inlined PriorityClassBuilder.typeMeta.Kind field
 	APIVersion       *string                  `json:"apiVersion,omitempty"` // inlined PriorityClassBuilder.typeMeta.APIVersion field
@@ -48,79 +48,60 @@ type priorityClassFields struct {
 	PreemptionPolicy *corev1.PreemptionPolicy `json:"preemptionPolicy,omitempty"`
 }
 
-func (b *PriorityClassBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &priorityClassFields{}
-	}
-}
-
 // PriorityClass constructs an declarative configuration of the PriorityClass type for use with
 // apply.
-// Provided as a convenience.
-func PriorityClass() PriorityClassBuilder {
-	return PriorityClassBuilder{fields: &priorityClassFields{}}
+func PriorityClass() *PriorityClassBuilder {
+	return &PriorityClassBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b PriorityClassBuilder) SetTypeMeta(value v1.TypeMetaBuilder) PriorityClassBuilder {
-	b.ensureInitialized()
+func (b *PriorityClassBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *PriorityClassBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b PriorityClassBuilder) RemoveTypeMeta() PriorityClassBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *PriorityClassBuilder) RemoveTypeMeta() *PriorityClassBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b PriorityClassBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *PriorityClassBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b PriorityClassBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) PriorityClassBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *PriorityClassBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *PriorityClassBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b PriorityClassBuilder) RemoveObjectMeta() PriorityClassBuilder {
-	b.ensureInitialized()
+func (b *PriorityClassBuilder) RemoveObjectMeta() *PriorityClassBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b PriorityClassBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PriorityClassBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetValue sets the Value field in the declarative configuration to the given value.
-func (b PriorityClassBuilder) SetValue(value int32) PriorityClassBuilder {
-	b.ensureInitialized()
+func (b *PriorityClassBuilder) SetValue(value int32) *PriorityClassBuilder {
 	b.fields.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
-func (b PriorityClassBuilder) RemoveValue() PriorityClassBuilder {
-	b.ensureInitialized()
+func (b *PriorityClassBuilder) RemoveValue() *PriorityClassBuilder {
 	b.fields.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
-func (b PriorityClassBuilder) GetValue() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *PriorityClassBuilder) GetValue() (value int32, ok bool) {
 	if v := b.fields.Value; v != nil {
 		return *v, true
 	}
@@ -128,22 +109,19 @@ func (b PriorityClassBuilder) GetValue() (value int32, ok bool) {
 }
 
 // SetGlobalDefault sets the GlobalDefault field in the declarative configuration to the given value.
-func (b PriorityClassBuilder) SetGlobalDefault(value bool) PriorityClassBuilder {
-	b.ensureInitialized()
+func (b *PriorityClassBuilder) SetGlobalDefault(value bool) *PriorityClassBuilder {
 	b.fields.GlobalDefault = &value
 	return b
 }
 
 // RemoveGlobalDefault removes the GlobalDefault field from the declarative configuration.
-func (b PriorityClassBuilder) RemoveGlobalDefault() PriorityClassBuilder {
-	b.ensureInitialized()
+func (b *PriorityClassBuilder) RemoveGlobalDefault() *PriorityClassBuilder {
 	b.fields.GlobalDefault = nil
 	return b
 }
 
 // GetGlobalDefault gets the GlobalDefault field from the declarative configuration.
-func (b PriorityClassBuilder) GetGlobalDefault() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *PriorityClassBuilder) GetGlobalDefault() (value bool, ok bool) {
 	if v := b.fields.GlobalDefault; v != nil {
 		return *v, true
 	}
@@ -151,22 +129,19 @@ func (b PriorityClassBuilder) GetGlobalDefault() (value bool, ok bool) {
 }
 
 // SetDescription sets the Description field in the declarative configuration to the given value.
-func (b PriorityClassBuilder) SetDescription(value string) PriorityClassBuilder {
-	b.ensureInitialized()
+func (b *PriorityClassBuilder) SetDescription(value string) *PriorityClassBuilder {
 	b.fields.Description = &value
 	return b
 }
 
 // RemoveDescription removes the Description field from the declarative configuration.
-func (b PriorityClassBuilder) RemoveDescription() PriorityClassBuilder {
-	b.ensureInitialized()
+func (b *PriorityClassBuilder) RemoveDescription() *PriorityClassBuilder {
 	b.fields.Description = nil
 	return b
 }
 
 // GetDescription gets the Description field from the declarative configuration.
-func (b PriorityClassBuilder) GetDescription() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *PriorityClassBuilder) GetDescription() (value string, ok bool) {
 	if v := b.fields.Description; v != nil {
 		return *v, true
 	}
@@ -174,22 +149,19 @@ func (b PriorityClassBuilder) GetDescription() (value string, ok bool) {
 }
 
 // SetPreemptionPolicy sets the PreemptionPolicy field in the declarative configuration to the given value.
-func (b PriorityClassBuilder) SetPreemptionPolicy(value corev1.PreemptionPolicy) PriorityClassBuilder {
-	b.ensureInitialized()
+func (b *PriorityClassBuilder) SetPreemptionPolicy(value corev1.PreemptionPolicy) *PriorityClassBuilder {
 	b.fields.PreemptionPolicy = &value
 	return b
 }
 
 // RemovePreemptionPolicy removes the PreemptionPolicy field from the declarative configuration.
-func (b PriorityClassBuilder) RemovePreemptionPolicy() PriorityClassBuilder {
-	b.ensureInitialized()
+func (b *PriorityClassBuilder) RemovePreemptionPolicy() *PriorityClassBuilder {
 	b.fields.PreemptionPolicy = nil
 	return b
 }
 
 // GetPreemptionPolicy gets the PreemptionPolicy field from the declarative configuration.
-func (b PriorityClassBuilder) GetPreemptionPolicy() (value corev1.PreemptionPolicy, ok bool) {
-	b.ensureInitialized()
+func (b *PriorityClassBuilder) GetPreemptionPolicy() (value corev1.PreemptionPolicy, ok bool) {
 	if v := b.fields.PreemptionPolicy; v != nil {
 		return *v, true
 	}
@@ -201,9 +173,8 @@ func (b *PriorityClassBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -218,14 +189,13 @@ func (b *PriorityClassBuilder) FromUnstructured(u map[string]interface{}) error 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PriorityClassBuilder to JSON.
 func (b *PriorityClassBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -233,8 +203,7 @@ func (b *PriorityClassBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PriorityClassBuilder, replacing the contents of
 // PriorityClassBuilder.
 func (b *PriorityClassBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -242,22 +211,25 @@ func (b *PriorityClassBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PriorityClassList represents a list of PriorityClassBuilder.
-// Provided as a convenience.
-type PriorityClassList []PriorityClassBuilder
+type PriorityClassList []*PriorityClassBuilder
 
 // PriorityClassList represents a map of PriorityClassBuilder.
-// Provided as a convenience.
 type PriorityClassMap map[string]PriorityClassBuilder
 
 func (b *PriorityClassBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *PriorityClassBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

@@ -29,50 +29,40 @@ import (
 // IngressBackendBuilder represents an declarative configuration of the IngressBackend type for use
 // with apply.
 type IngressBackendBuilder struct {
-	fields *ingressBackendFields
+	fields ingressBackendFields
 }
 
-// ingressBackendFields is used by IngressBackendBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in IngressBackendBuilder before marshalling, and
-// are copied out to the builder type in IngressBackendBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// ingressBackendFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in IngressBackendBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type ingressBackendFields struct {
 	ServiceName *string                              `json:"serviceName,omitempty"`
 	ServicePort *intstr.IntOrString                  `json:"servicePort,omitempty"`
 	Resource    *v1.TypedLocalObjectReferenceBuilder `json:"resource,omitempty"`
 }
 
-func (b *IngressBackendBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &ingressBackendFields{}
-	}
-}
-
 // IngressBackend constructs an declarative configuration of the IngressBackend type for use with
 // apply.
-// Provided as a convenience.
-func IngressBackend() IngressBackendBuilder {
-	return IngressBackendBuilder{fields: &ingressBackendFields{}}
+func IngressBackend() *IngressBackendBuilder {
+	return &IngressBackendBuilder{}
 }
 
 // SetServiceName sets the ServiceName field in the declarative configuration to the given value.
-func (b IngressBackendBuilder) SetServiceName(value string) IngressBackendBuilder {
-	b.ensureInitialized()
+func (b *IngressBackendBuilder) SetServiceName(value string) *IngressBackendBuilder {
 	b.fields.ServiceName = &value
 	return b
 }
 
 // RemoveServiceName removes the ServiceName field from the declarative configuration.
-func (b IngressBackendBuilder) RemoveServiceName() IngressBackendBuilder {
-	b.ensureInitialized()
+func (b *IngressBackendBuilder) RemoveServiceName() *IngressBackendBuilder {
 	b.fields.ServiceName = nil
 	return b
 }
 
 // GetServiceName gets the ServiceName field from the declarative configuration.
-func (b IngressBackendBuilder) GetServiceName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *IngressBackendBuilder) GetServiceName() (value string, ok bool) {
 	if v := b.fields.ServiceName; v != nil {
 		return *v, true
 	}
@@ -80,22 +70,19 @@ func (b IngressBackendBuilder) GetServiceName() (value string, ok bool) {
 }
 
 // SetServicePort sets the ServicePort field in the declarative configuration to the given value.
-func (b IngressBackendBuilder) SetServicePort(value intstr.IntOrString) IngressBackendBuilder {
-	b.ensureInitialized()
+func (b *IngressBackendBuilder) SetServicePort(value intstr.IntOrString) *IngressBackendBuilder {
 	b.fields.ServicePort = &value
 	return b
 }
 
 // RemoveServicePort removes the ServicePort field from the declarative configuration.
-func (b IngressBackendBuilder) RemoveServicePort() IngressBackendBuilder {
-	b.ensureInitialized()
+func (b *IngressBackendBuilder) RemoveServicePort() *IngressBackendBuilder {
 	b.fields.ServicePort = nil
 	return b
 }
 
 // GetServicePort gets the ServicePort field from the declarative configuration.
-func (b IngressBackendBuilder) GetServicePort() (value intstr.IntOrString, ok bool) {
-	b.ensureInitialized()
+func (b *IngressBackendBuilder) GetServicePort() (value intstr.IntOrString, ok bool) {
 	if v := b.fields.ServicePort; v != nil {
 		return *v, true
 	}
@@ -103,26 +90,20 @@ func (b IngressBackendBuilder) GetServicePort() (value intstr.IntOrString, ok bo
 }
 
 // SetResource sets the Resource field in the declarative configuration to the given value.
-func (b IngressBackendBuilder) SetResource(value v1.TypedLocalObjectReferenceBuilder) IngressBackendBuilder {
-	b.ensureInitialized()
-	b.fields.Resource = &value
+func (b *IngressBackendBuilder) SetResource(value *v1.TypedLocalObjectReferenceBuilder) *IngressBackendBuilder {
+	b.fields.Resource = value
 	return b
 }
 
 // RemoveResource removes the Resource field from the declarative configuration.
-func (b IngressBackendBuilder) RemoveResource() IngressBackendBuilder {
-	b.ensureInitialized()
+func (b *IngressBackendBuilder) RemoveResource() *IngressBackendBuilder {
 	b.fields.Resource = nil
 	return b
 }
 
 // GetResource gets the Resource field from the declarative configuration.
-func (b IngressBackendBuilder) GetResource() (value v1.TypedLocalObjectReferenceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Resource; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *IngressBackendBuilder) GetResource() (value *v1.TypedLocalObjectReferenceBuilder, ok bool) {
+	return b.fields.Resource, b.fields.Resource != nil
 }
 
 // ToUnstructured converts IngressBackendBuilder to unstructured.
@@ -130,9 +111,8 @@ func (b *IngressBackendBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -147,14 +127,13 @@ func (b *IngressBackendBuilder) FromUnstructured(u map[string]interface{}) error
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals IngressBackendBuilder to JSON.
 func (b *IngressBackendBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -162,8 +141,7 @@ func (b *IngressBackendBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into IngressBackendBuilder, replacing the contents of
 // IngressBackendBuilder.
 func (b *IngressBackendBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -171,11 +149,9 @@ func (b *IngressBackendBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // IngressBackendList represents a list of IngressBackendBuilder.
-// Provided as a convenience.
-type IngressBackendList []IngressBackendBuilder
+type IngressBackendList []*IngressBackendBuilder
 
 // IngressBackendList represents a map of IngressBackendBuilder.
-// Provided as a convenience.
 type IngressBackendMap map[string]IngressBackendBuilder
 
 func (b *IngressBackendBuilder) preMarshal() {

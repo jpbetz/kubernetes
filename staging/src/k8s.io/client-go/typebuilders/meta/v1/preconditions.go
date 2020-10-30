@@ -28,49 +28,39 @@ import (
 // PreconditionsBuilder represents an declarative configuration of the Preconditions type for use
 // with apply.
 type PreconditionsBuilder struct {
-	fields *preconditionsFields
+	fields preconditionsFields
 }
 
-// preconditionsFields is used by PreconditionsBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PreconditionsBuilder before marshalling, and
-// are copied out to the builder type in PreconditionsBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// preconditionsFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PreconditionsBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type preconditionsFields struct {
 	UID             *types.UID `json:"uid,omitempty"`
 	ResourceVersion *string    `json:"resourceVersion,omitempty"`
 }
 
-func (b *PreconditionsBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &preconditionsFields{}
-	}
-}
-
 // Preconditions constructs an declarative configuration of the Preconditions type for use with
 // apply.
-// Provided as a convenience.
-func Preconditions() PreconditionsBuilder {
-	return PreconditionsBuilder{fields: &preconditionsFields{}}
+func Preconditions() *PreconditionsBuilder {
+	return &PreconditionsBuilder{}
 }
 
 // SetUID sets the UID field in the declarative configuration to the given value.
-func (b PreconditionsBuilder) SetUID(value types.UID) PreconditionsBuilder {
-	b.ensureInitialized()
+func (b *PreconditionsBuilder) SetUID(value types.UID) *PreconditionsBuilder {
 	b.fields.UID = &value
 	return b
 }
 
 // RemoveUID removes the UID field from the declarative configuration.
-func (b PreconditionsBuilder) RemoveUID() PreconditionsBuilder {
-	b.ensureInitialized()
+func (b *PreconditionsBuilder) RemoveUID() *PreconditionsBuilder {
 	b.fields.UID = nil
 	return b
 }
 
 // GetUID gets the UID field from the declarative configuration.
-func (b PreconditionsBuilder) GetUID() (value types.UID, ok bool) {
-	b.ensureInitialized()
+func (b *PreconditionsBuilder) GetUID() (value types.UID, ok bool) {
 	if v := b.fields.UID; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b PreconditionsBuilder) GetUID() (value types.UID, ok bool) {
 }
 
 // SetResourceVersion sets the ResourceVersion field in the declarative configuration to the given value.
-func (b PreconditionsBuilder) SetResourceVersion(value string) PreconditionsBuilder {
-	b.ensureInitialized()
+func (b *PreconditionsBuilder) SetResourceVersion(value string) *PreconditionsBuilder {
 	b.fields.ResourceVersion = &value
 	return b
 }
 
 // RemoveResourceVersion removes the ResourceVersion field from the declarative configuration.
-func (b PreconditionsBuilder) RemoveResourceVersion() PreconditionsBuilder {
-	b.ensureInitialized()
+func (b *PreconditionsBuilder) RemoveResourceVersion() *PreconditionsBuilder {
 	b.fields.ResourceVersion = nil
 	return b
 }
 
 // GetResourceVersion gets the ResourceVersion field from the declarative configuration.
-func (b PreconditionsBuilder) GetResourceVersion() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *PreconditionsBuilder) GetResourceVersion() (value string, ok bool) {
 	if v := b.fields.ResourceVersion; v != nil {
 		return *v, true
 	}
@@ -105,9 +92,8 @@ func (b *PreconditionsBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +108,13 @@ func (b *PreconditionsBuilder) FromUnstructured(u map[string]interface{}) error 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PreconditionsBuilder to JSON.
 func (b *PreconditionsBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +122,7 @@ func (b *PreconditionsBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PreconditionsBuilder, replacing the contents of
 // PreconditionsBuilder.
 func (b *PreconditionsBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +130,9 @@ func (b *PreconditionsBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PreconditionsList represents a list of PreconditionsBuilder.
-// Provided as a convenience.
-type PreconditionsList []PreconditionsBuilder
+type PreconditionsList []*PreconditionsBuilder
 
 // PreconditionsList represents a map of PreconditionsBuilder.
-// Provided as a convenience.
 type PreconditionsMap map[string]PreconditionsBuilder
 
 func (b *PreconditionsBuilder) preMarshal() {

@@ -27,49 +27,39 @@ import (
 // FlockerVolumeSourceBuilder represents an declarative configuration of the FlockerVolumeSource type for use
 // with apply.
 type FlockerVolumeSourceBuilder struct {
-	fields *flockerVolumeSourceFields
+	fields flockerVolumeSourceFields
 }
 
-// flockerVolumeSourceFields is used by FlockerVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in FlockerVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in FlockerVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// flockerVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in FlockerVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type flockerVolumeSourceFields struct {
 	DatasetName *string `json:"datasetName,omitempty"`
 	DatasetUUID *string `json:"datasetUUID,omitempty"`
 }
 
-func (b *FlockerVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &flockerVolumeSourceFields{}
-	}
-}
-
 // FlockerVolumeSource constructs an declarative configuration of the FlockerVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func FlockerVolumeSource() FlockerVolumeSourceBuilder {
-	return FlockerVolumeSourceBuilder{fields: &flockerVolumeSourceFields{}}
+func FlockerVolumeSource() *FlockerVolumeSourceBuilder {
+	return &FlockerVolumeSourceBuilder{}
 }
 
 // SetDatasetName sets the DatasetName field in the declarative configuration to the given value.
-func (b FlockerVolumeSourceBuilder) SetDatasetName(value string) FlockerVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FlockerVolumeSourceBuilder) SetDatasetName(value string) *FlockerVolumeSourceBuilder {
 	b.fields.DatasetName = &value
 	return b
 }
 
 // RemoveDatasetName removes the DatasetName field from the declarative configuration.
-func (b FlockerVolumeSourceBuilder) RemoveDatasetName() FlockerVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FlockerVolumeSourceBuilder) RemoveDatasetName() *FlockerVolumeSourceBuilder {
 	b.fields.DatasetName = nil
 	return b
 }
 
 // GetDatasetName gets the DatasetName field from the declarative configuration.
-func (b FlockerVolumeSourceBuilder) GetDatasetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *FlockerVolumeSourceBuilder) GetDatasetName() (value string, ok bool) {
 	if v := b.fields.DatasetName; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b FlockerVolumeSourceBuilder) GetDatasetName() (value string, ok bool) {
 }
 
 // SetDatasetUUID sets the DatasetUUID field in the declarative configuration to the given value.
-func (b FlockerVolumeSourceBuilder) SetDatasetUUID(value string) FlockerVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FlockerVolumeSourceBuilder) SetDatasetUUID(value string) *FlockerVolumeSourceBuilder {
 	b.fields.DatasetUUID = &value
 	return b
 }
 
 // RemoveDatasetUUID removes the DatasetUUID field from the declarative configuration.
-func (b FlockerVolumeSourceBuilder) RemoveDatasetUUID() FlockerVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FlockerVolumeSourceBuilder) RemoveDatasetUUID() *FlockerVolumeSourceBuilder {
 	b.fields.DatasetUUID = nil
 	return b
 }
 
 // GetDatasetUUID gets the DatasetUUID field from the declarative configuration.
-func (b FlockerVolumeSourceBuilder) GetDatasetUUID() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *FlockerVolumeSourceBuilder) GetDatasetUUID() (value string, ok bool) {
 	if v := b.fields.DatasetUUID; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *FlockerVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *FlockerVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals FlockerVolumeSourceBuilder to JSON.
 func (b *FlockerVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *FlockerVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into FlockerVolumeSourceBuilder, replacing the contents of
 // FlockerVolumeSourceBuilder.
 func (b *FlockerVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *FlockerVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // FlockerVolumeSourceList represents a list of FlockerVolumeSourceBuilder.
-// Provided as a convenience.
-type FlockerVolumeSourceList []FlockerVolumeSourceBuilder
+type FlockerVolumeSourceList []*FlockerVolumeSourceBuilder
 
 // FlockerVolumeSourceList represents a map of FlockerVolumeSourceBuilder.
-// Provided as a convenience.
 type FlockerVolumeSourceMap map[string]FlockerVolumeSourceBuilder
 
 func (b *FlockerVolumeSourceBuilder) preMarshal() {

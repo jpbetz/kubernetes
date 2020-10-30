@@ -27,49 +27,39 @@ import (
 // TokenReviewSpecBuilder represents an declarative configuration of the TokenReviewSpec type for use
 // with apply.
 type TokenReviewSpecBuilder struct {
-	fields *tokenReviewSpecFields
+	fields tokenReviewSpecFields
 }
 
-// tokenReviewSpecFields is used by TokenReviewSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in TokenReviewSpecBuilder before marshalling, and
-// are copied out to the builder type in TokenReviewSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// tokenReviewSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in TokenReviewSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type tokenReviewSpecFields struct {
 	Token     *string   `json:"token,omitempty"`
 	Audiences *[]string `json:"audiences,omitempty"`
 }
 
-func (b *TokenReviewSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &tokenReviewSpecFields{}
-	}
-}
-
 // TokenReviewSpec constructs an declarative configuration of the TokenReviewSpec type for use with
 // apply.
-// Provided as a convenience.
-func TokenReviewSpec() TokenReviewSpecBuilder {
-	return TokenReviewSpecBuilder{fields: &tokenReviewSpecFields{}}
+func TokenReviewSpec() *TokenReviewSpecBuilder {
+	return &TokenReviewSpecBuilder{}
 }
 
 // SetToken sets the Token field in the declarative configuration to the given value.
-func (b TokenReviewSpecBuilder) SetToken(value string) TokenReviewSpecBuilder {
-	b.ensureInitialized()
+func (b *TokenReviewSpecBuilder) SetToken(value string) *TokenReviewSpecBuilder {
 	b.fields.Token = &value
 	return b
 }
 
 // RemoveToken removes the Token field from the declarative configuration.
-func (b TokenReviewSpecBuilder) RemoveToken() TokenReviewSpecBuilder {
-	b.ensureInitialized()
+func (b *TokenReviewSpecBuilder) RemoveToken() *TokenReviewSpecBuilder {
 	b.fields.Token = nil
 	return b
 }
 
 // GetToken gets the Token field from the declarative configuration.
-func (b TokenReviewSpecBuilder) GetToken() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *TokenReviewSpecBuilder) GetToken() (value string, ok bool) {
 	if v := b.fields.Token; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b TokenReviewSpecBuilder) GetToken() (value string, ok bool) {
 }
 
 // SetAudiences sets the Audiences field in the declarative configuration to the given value.
-func (b TokenReviewSpecBuilder) SetAudiences(value []string) TokenReviewSpecBuilder {
-	b.ensureInitialized()
+func (b *TokenReviewSpecBuilder) SetAudiences(value []string) *TokenReviewSpecBuilder {
 	b.fields.Audiences = &value
 	return b
 }
 
 // RemoveAudiences removes the Audiences field from the declarative configuration.
-func (b TokenReviewSpecBuilder) RemoveAudiences() TokenReviewSpecBuilder {
-	b.ensureInitialized()
+func (b *TokenReviewSpecBuilder) RemoveAudiences() *TokenReviewSpecBuilder {
 	b.fields.Audiences = nil
 	return b
 }
 
 // GetAudiences gets the Audiences field from the declarative configuration.
-func (b TokenReviewSpecBuilder) GetAudiences() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *TokenReviewSpecBuilder) GetAudiences() (value []string, ok bool) {
 	if v := b.fields.Audiences; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *TokenReviewSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *TokenReviewSpecBuilder) FromUnstructured(u map[string]interface{}) erro
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals TokenReviewSpecBuilder to JSON.
 func (b *TokenReviewSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *TokenReviewSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into TokenReviewSpecBuilder, replacing the contents of
 // TokenReviewSpecBuilder.
 func (b *TokenReviewSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *TokenReviewSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // TokenReviewSpecList represents a list of TokenReviewSpecBuilder.
-// Provided as a convenience.
-type TokenReviewSpecList []TokenReviewSpecBuilder
+type TokenReviewSpecList []*TokenReviewSpecBuilder
 
 // TokenReviewSpecList represents a map of TokenReviewSpecBuilder.
-// Provided as a convenience.
 type TokenReviewSpecMap map[string]TokenReviewSpecBuilder
 
 func (b *TokenReviewSpecBuilder) preMarshal() {

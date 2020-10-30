@@ -27,70 +27,57 @@ import (
 // SecretEnvSourceBuilder represents an declarative configuration of the SecretEnvSource type for use
 // with apply.
 type SecretEnvSourceBuilder struct {
-	localObjectReference LocalObjectReferenceBuilder // inlined type
-	fields               *secretEnvSourceFields
+	localObjectReference *LocalObjectReferenceBuilder // inlined type
+	fields               secretEnvSourceFields
 }
 
-// secretEnvSourceFields is used by SecretEnvSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in SecretEnvSourceBuilder before marshalling, and
-// are copied out to the builder type in SecretEnvSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// secretEnvSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in SecretEnvSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type secretEnvSourceFields struct {
 	Name     *string `json:"name,omitempty"` // inlined SecretEnvSourceBuilder.localObjectReference.Name field
 	Optional *bool   `json:"optional,omitempty"`
 }
 
-func (b *SecretEnvSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &secretEnvSourceFields{}
-	}
-}
-
 // SecretEnvSource constructs an declarative configuration of the SecretEnvSource type for use with
 // apply.
-// Provided as a convenience.
-func SecretEnvSource() SecretEnvSourceBuilder {
-	return SecretEnvSourceBuilder{fields: &secretEnvSourceFields{}}
+func SecretEnvSource() *SecretEnvSourceBuilder {
+	return &SecretEnvSourceBuilder{}
 }
 
 // SetLocalObjectReference sets the LocalObjectReference field in the declarative configuration to the given value.
-func (b SecretEnvSourceBuilder) SetLocalObjectReference(value LocalObjectReferenceBuilder) SecretEnvSourceBuilder {
-	b.ensureInitialized()
+func (b *SecretEnvSourceBuilder) SetLocalObjectReference(value *LocalObjectReferenceBuilder) *SecretEnvSourceBuilder {
 	b.localObjectReference = value
 	return b
 }
 
 // RemoveLocalObjectReference removes the LocalObjectReference field from the declarative configuration.
-func (b SecretEnvSourceBuilder) RemoveLocalObjectReference() SecretEnvSourceBuilder {
-	b.ensureInitialized()
-	b.localObjectReference = LocalObjectReferenceBuilder{}
+func (b *SecretEnvSourceBuilder) RemoveLocalObjectReference() *SecretEnvSourceBuilder {
+	b.localObjectReference = nil
 	return b
 }
 
 // GetLocalObjectReference gets the LocalObjectReference field from the declarative configuration.
-func (b SecretEnvSourceBuilder) GetLocalObjectReference() (value LocalObjectReferenceBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *SecretEnvSourceBuilder) GetLocalObjectReference() (value *LocalObjectReferenceBuilder, ok bool) {
 	return b.localObjectReference, true
 }
 
 // SetOptional sets the Optional field in the declarative configuration to the given value.
-func (b SecretEnvSourceBuilder) SetOptional(value bool) SecretEnvSourceBuilder {
-	b.ensureInitialized()
+func (b *SecretEnvSourceBuilder) SetOptional(value bool) *SecretEnvSourceBuilder {
 	b.fields.Optional = &value
 	return b
 }
 
 // RemoveOptional removes the Optional field from the declarative configuration.
-func (b SecretEnvSourceBuilder) RemoveOptional() SecretEnvSourceBuilder {
-	b.ensureInitialized()
+func (b *SecretEnvSourceBuilder) RemoveOptional() *SecretEnvSourceBuilder {
 	b.fields.Optional = nil
 	return b
 }
 
 // GetOptional gets the Optional field from the declarative configuration.
-func (b SecretEnvSourceBuilder) GetOptional() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *SecretEnvSourceBuilder) GetOptional() (value bool, ok bool) {
 	if v := b.fields.Optional; v != nil {
 		return *v, true
 	}
@@ -102,9 +89,8 @@ func (b *SecretEnvSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -119,14 +105,13 @@ func (b *SecretEnvSourceBuilder) FromUnstructured(u map[string]interface{}) erro
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals SecretEnvSourceBuilder to JSON.
 func (b *SecretEnvSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -134,8 +119,7 @@ func (b *SecretEnvSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into SecretEnvSourceBuilder, replacing the contents of
 // SecretEnvSourceBuilder.
 func (b *SecretEnvSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -143,19 +127,22 @@ func (b *SecretEnvSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // SecretEnvSourceList represents a list of SecretEnvSourceBuilder.
-// Provided as a convenience.
-type SecretEnvSourceList []SecretEnvSourceBuilder
+type SecretEnvSourceList []*SecretEnvSourceBuilder
 
 // SecretEnvSourceList represents a map of SecretEnvSourceBuilder.
-// Provided as a convenience.
 type SecretEnvSourceMap map[string]SecretEnvSourceBuilder
 
 func (b *SecretEnvSourceBuilder) preMarshal() {
-	if v, ok := b.localObjectReference.GetName(); ok {
-		b.fields.Name = &v
+	if b.localObjectReference != nil {
+		if v, ok := b.localObjectReference.GetName(); ok {
+			b.fields.Name = &v
+		}
 	}
 }
 func (b *SecretEnvSourceBuilder) postUnmarshal() {
+	if b.localObjectReference == nil {
+		b.localObjectReference = &LocalObjectReferenceBuilder{}
+	}
 	if b.fields.Name != nil {
 		b.localObjectReference.SetName(*b.fields.Name)
 	}

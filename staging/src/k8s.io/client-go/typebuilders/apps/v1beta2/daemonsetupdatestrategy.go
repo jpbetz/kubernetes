@@ -28,49 +28,39 @@ import (
 // DaemonSetUpdateStrategyBuilder represents an declarative configuration of the DaemonSetUpdateStrategy type for use
 // with apply.
 type DaemonSetUpdateStrategyBuilder struct {
-	fields *daemonSetUpdateStrategyFields
+	fields daemonSetUpdateStrategyFields
 }
 
-// daemonSetUpdateStrategyFields is used by DaemonSetUpdateStrategyBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in DaemonSetUpdateStrategyBuilder before marshalling, and
-// are copied out to the builder type in DaemonSetUpdateStrategyBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// daemonSetUpdateStrategyFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in DaemonSetUpdateStrategyBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type daemonSetUpdateStrategyFields struct {
 	Type          *v1beta2.DaemonSetUpdateStrategyType `json:"type,omitempty"`
 	RollingUpdate *RollingUpdateDaemonSetBuilder       `json:"rollingUpdate,omitempty"`
 }
 
-func (b *DaemonSetUpdateStrategyBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &daemonSetUpdateStrategyFields{}
-	}
-}
-
 // DaemonSetUpdateStrategy constructs an declarative configuration of the DaemonSetUpdateStrategy type for use with
 // apply.
-// Provided as a convenience.
-func DaemonSetUpdateStrategy() DaemonSetUpdateStrategyBuilder {
-	return DaemonSetUpdateStrategyBuilder{fields: &daemonSetUpdateStrategyFields{}}
+func DaemonSetUpdateStrategy() *DaemonSetUpdateStrategyBuilder {
+	return &DaemonSetUpdateStrategyBuilder{}
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b DaemonSetUpdateStrategyBuilder) SetType(value v1beta2.DaemonSetUpdateStrategyType) DaemonSetUpdateStrategyBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetUpdateStrategyBuilder) SetType(value v1beta2.DaemonSetUpdateStrategyType) *DaemonSetUpdateStrategyBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b DaemonSetUpdateStrategyBuilder) RemoveType() DaemonSetUpdateStrategyBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetUpdateStrategyBuilder) RemoveType() *DaemonSetUpdateStrategyBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b DaemonSetUpdateStrategyBuilder) GetType() (value v1beta2.DaemonSetUpdateStrategyType, ok bool) {
-	b.ensureInitialized()
+func (b *DaemonSetUpdateStrategyBuilder) GetType() (value v1beta2.DaemonSetUpdateStrategyType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -78,26 +68,20 @@ func (b DaemonSetUpdateStrategyBuilder) GetType() (value v1beta2.DaemonSetUpdate
 }
 
 // SetRollingUpdate sets the RollingUpdate field in the declarative configuration to the given value.
-func (b DaemonSetUpdateStrategyBuilder) SetRollingUpdate(value RollingUpdateDaemonSetBuilder) DaemonSetUpdateStrategyBuilder {
-	b.ensureInitialized()
-	b.fields.RollingUpdate = &value
+func (b *DaemonSetUpdateStrategyBuilder) SetRollingUpdate(value *RollingUpdateDaemonSetBuilder) *DaemonSetUpdateStrategyBuilder {
+	b.fields.RollingUpdate = value
 	return b
 }
 
 // RemoveRollingUpdate removes the RollingUpdate field from the declarative configuration.
-func (b DaemonSetUpdateStrategyBuilder) RemoveRollingUpdate() DaemonSetUpdateStrategyBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetUpdateStrategyBuilder) RemoveRollingUpdate() *DaemonSetUpdateStrategyBuilder {
 	b.fields.RollingUpdate = nil
 	return b
 }
 
 // GetRollingUpdate gets the RollingUpdate field from the declarative configuration.
-func (b DaemonSetUpdateStrategyBuilder) GetRollingUpdate() (value RollingUpdateDaemonSetBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.RollingUpdate; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *DaemonSetUpdateStrategyBuilder) GetRollingUpdate() (value *RollingUpdateDaemonSetBuilder, ok bool) {
+	return b.fields.RollingUpdate, b.fields.RollingUpdate != nil
 }
 
 // ToUnstructured converts DaemonSetUpdateStrategyBuilder to unstructured.
@@ -105,9 +89,8 @@ func (b *DaemonSetUpdateStrategyBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +105,13 @@ func (b *DaemonSetUpdateStrategyBuilder) FromUnstructured(u map[string]interface
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals DaemonSetUpdateStrategyBuilder to JSON.
 func (b *DaemonSetUpdateStrategyBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +119,7 @@ func (b *DaemonSetUpdateStrategyBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into DaemonSetUpdateStrategyBuilder, replacing the contents of
 // DaemonSetUpdateStrategyBuilder.
 func (b *DaemonSetUpdateStrategyBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +127,9 @@ func (b *DaemonSetUpdateStrategyBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // DaemonSetUpdateStrategyList represents a list of DaemonSetUpdateStrategyBuilder.
-// Provided as a convenience.
-type DaemonSetUpdateStrategyList []DaemonSetUpdateStrategyBuilder
+type DaemonSetUpdateStrategyList []*DaemonSetUpdateStrategyBuilder
 
 // DaemonSetUpdateStrategyList represents a map of DaemonSetUpdateStrategyBuilder.
-// Provided as a convenience.
 type DaemonSetUpdateStrategyMap map[string]DaemonSetUpdateStrategyBuilder
 
 func (b *DaemonSetUpdateStrategyBuilder) preMarshal() {

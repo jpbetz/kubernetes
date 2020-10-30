@@ -27,49 +27,39 @@ import (
 // IngressTLSBuilder represents an declarative configuration of the IngressTLS type for use
 // with apply.
 type IngressTLSBuilder struct {
-	fields *ingressTLSFields
+	fields ingressTLSFields
 }
 
-// ingressTLSFields is used by IngressTLSBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in IngressTLSBuilder before marshalling, and
-// are copied out to the builder type in IngressTLSBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// ingressTLSFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in IngressTLSBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type ingressTLSFields struct {
 	Hosts      *[]string `json:"hosts,omitempty"`
 	SecretName *string   `json:"secretName,omitempty"`
 }
 
-func (b *IngressTLSBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &ingressTLSFields{}
-	}
-}
-
 // IngressTLS constructs an declarative configuration of the IngressTLS type for use with
 // apply.
-// Provided as a convenience.
-func IngressTLS() IngressTLSBuilder {
-	return IngressTLSBuilder{fields: &ingressTLSFields{}}
+func IngressTLS() *IngressTLSBuilder {
+	return &IngressTLSBuilder{}
 }
 
 // SetHosts sets the Hosts field in the declarative configuration to the given value.
-func (b IngressTLSBuilder) SetHosts(value []string) IngressTLSBuilder {
-	b.ensureInitialized()
+func (b *IngressTLSBuilder) SetHosts(value []string) *IngressTLSBuilder {
 	b.fields.Hosts = &value
 	return b
 }
 
 // RemoveHosts removes the Hosts field from the declarative configuration.
-func (b IngressTLSBuilder) RemoveHosts() IngressTLSBuilder {
-	b.ensureInitialized()
+func (b *IngressTLSBuilder) RemoveHosts() *IngressTLSBuilder {
 	b.fields.Hosts = nil
 	return b
 }
 
 // GetHosts gets the Hosts field from the declarative configuration.
-func (b IngressTLSBuilder) GetHosts() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *IngressTLSBuilder) GetHosts() (value []string, ok bool) {
 	if v := b.fields.Hosts; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b IngressTLSBuilder) GetHosts() (value []string, ok bool) {
 }
 
 // SetSecretName sets the SecretName field in the declarative configuration to the given value.
-func (b IngressTLSBuilder) SetSecretName(value string) IngressTLSBuilder {
-	b.ensureInitialized()
+func (b *IngressTLSBuilder) SetSecretName(value string) *IngressTLSBuilder {
 	b.fields.SecretName = &value
 	return b
 }
 
 // RemoveSecretName removes the SecretName field from the declarative configuration.
-func (b IngressTLSBuilder) RemoveSecretName() IngressTLSBuilder {
-	b.ensureInitialized()
+func (b *IngressTLSBuilder) RemoveSecretName() *IngressTLSBuilder {
 	b.fields.SecretName = nil
 	return b
 }
 
 // GetSecretName gets the SecretName field from the declarative configuration.
-func (b IngressTLSBuilder) GetSecretName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *IngressTLSBuilder) GetSecretName() (value string, ok bool) {
 	if v := b.fields.SecretName; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *IngressTLSBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *IngressTLSBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals IngressTLSBuilder to JSON.
 func (b *IngressTLSBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *IngressTLSBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into IngressTLSBuilder, replacing the contents of
 // IngressTLSBuilder.
 func (b *IngressTLSBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *IngressTLSBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // IngressTLSList represents a list of IngressTLSBuilder.
-// Provided as a convenience.
-type IngressTLSList []IngressTLSBuilder
+type IngressTLSList []*IngressTLSBuilder
 
 // IngressTLSList represents a map of IngressTLSBuilder.
-// Provided as a convenience.
 type IngressTLSMap map[string]IngressTLSBuilder
 
 func (b *IngressTLSBuilder) preMarshal() {

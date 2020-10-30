@@ -28,14 +28,14 @@ import (
 // EndpointBuilder represents an declarative configuration of the Endpoint type for use
 // with apply.
 type EndpointBuilder struct {
-	fields *endpointFields
+	fields endpointFields
 }
 
-// endpointFields is used by EndpointBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in EndpointBuilder before marshalling, and
-// are copied out to the builder type in EndpointBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// endpointFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in EndpointBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type endpointFields struct {
 	Addresses  *[]string                  `json:"addresses,omitempty"`
 	Conditions *EndpointConditionsBuilder `json:"conditions,omitempty"`
@@ -44,36 +44,26 @@ type endpointFields struct {
 	Topology   *map[string]string         `json:"topology,omitempty"`
 }
 
-func (b *EndpointBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &endpointFields{}
-	}
-}
-
 // Endpoint constructs an declarative configuration of the Endpoint type for use with
 // apply.
-// Provided as a convenience.
-func Endpoint() EndpointBuilder {
-	return EndpointBuilder{fields: &endpointFields{}}
+func Endpoint() *EndpointBuilder {
+	return &EndpointBuilder{}
 }
 
 // SetAddresses sets the Addresses field in the declarative configuration to the given value.
-func (b EndpointBuilder) SetAddresses(value []string) EndpointBuilder {
-	b.ensureInitialized()
+func (b *EndpointBuilder) SetAddresses(value []string) *EndpointBuilder {
 	b.fields.Addresses = &value
 	return b
 }
 
 // RemoveAddresses removes the Addresses field from the declarative configuration.
-func (b EndpointBuilder) RemoveAddresses() EndpointBuilder {
-	b.ensureInitialized()
+func (b *EndpointBuilder) RemoveAddresses() *EndpointBuilder {
 	b.fields.Addresses = nil
 	return b
 }
 
 // GetAddresses gets the Addresses field from the declarative configuration.
-func (b EndpointBuilder) GetAddresses() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *EndpointBuilder) GetAddresses() (value []string, ok bool) {
 	if v := b.fields.Addresses; v != nil {
 		return *v, true
 	}
@@ -81,45 +71,36 @@ func (b EndpointBuilder) GetAddresses() (value []string, ok bool) {
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b EndpointBuilder) SetConditions(value EndpointConditionsBuilder) EndpointBuilder {
-	b.ensureInitialized()
-	b.fields.Conditions = &value
+func (b *EndpointBuilder) SetConditions(value *EndpointConditionsBuilder) *EndpointBuilder {
+	b.fields.Conditions = value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b EndpointBuilder) RemoveConditions() EndpointBuilder {
-	b.ensureInitialized()
+func (b *EndpointBuilder) RemoveConditions() *EndpointBuilder {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b EndpointBuilder) GetConditions() (value EndpointConditionsBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Conditions; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *EndpointBuilder) GetConditions() (value *EndpointConditionsBuilder, ok bool) {
+	return b.fields.Conditions, b.fields.Conditions != nil
 }
 
 // SetHostname sets the Hostname field in the declarative configuration to the given value.
-func (b EndpointBuilder) SetHostname(value string) EndpointBuilder {
-	b.ensureInitialized()
+func (b *EndpointBuilder) SetHostname(value string) *EndpointBuilder {
 	b.fields.Hostname = &value
 	return b
 }
 
 // RemoveHostname removes the Hostname field from the declarative configuration.
-func (b EndpointBuilder) RemoveHostname() EndpointBuilder {
-	b.ensureInitialized()
+func (b *EndpointBuilder) RemoveHostname() *EndpointBuilder {
 	b.fields.Hostname = nil
 	return b
 }
 
 // GetHostname gets the Hostname field from the declarative configuration.
-func (b EndpointBuilder) GetHostname() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *EndpointBuilder) GetHostname() (value string, ok bool) {
 	if v := b.fields.Hostname; v != nil {
 		return *v, true
 	}
@@ -127,45 +108,36 @@ func (b EndpointBuilder) GetHostname() (value string, ok bool) {
 }
 
 // SetTargetRef sets the TargetRef field in the declarative configuration to the given value.
-func (b EndpointBuilder) SetTargetRef(value v1.ObjectReferenceBuilder) EndpointBuilder {
-	b.ensureInitialized()
-	b.fields.TargetRef = &value
+func (b *EndpointBuilder) SetTargetRef(value *v1.ObjectReferenceBuilder) *EndpointBuilder {
+	b.fields.TargetRef = value
 	return b
 }
 
 // RemoveTargetRef removes the TargetRef field from the declarative configuration.
-func (b EndpointBuilder) RemoveTargetRef() EndpointBuilder {
-	b.ensureInitialized()
+func (b *EndpointBuilder) RemoveTargetRef() *EndpointBuilder {
 	b.fields.TargetRef = nil
 	return b
 }
 
 // GetTargetRef gets the TargetRef field from the declarative configuration.
-func (b EndpointBuilder) GetTargetRef() (value v1.ObjectReferenceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.TargetRef; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *EndpointBuilder) GetTargetRef() (value *v1.ObjectReferenceBuilder, ok bool) {
+	return b.fields.TargetRef, b.fields.TargetRef != nil
 }
 
 // SetTopology sets the Topology field in the declarative configuration to the given value.
-func (b EndpointBuilder) SetTopology(value map[string]string) EndpointBuilder {
-	b.ensureInitialized()
+func (b *EndpointBuilder) SetTopology(value map[string]string) *EndpointBuilder {
 	b.fields.Topology = &value
 	return b
 }
 
 // RemoveTopology removes the Topology field from the declarative configuration.
-func (b EndpointBuilder) RemoveTopology() EndpointBuilder {
-	b.ensureInitialized()
+func (b *EndpointBuilder) RemoveTopology() *EndpointBuilder {
 	b.fields.Topology = nil
 	return b
 }
 
 // GetTopology gets the Topology field from the declarative configuration.
-func (b EndpointBuilder) GetTopology() (value map[string]string, ok bool) {
-	b.ensureInitialized()
+func (b *EndpointBuilder) GetTopology() (value map[string]string, ok bool) {
 	if v := b.fields.Topology; v != nil {
 		return *v, true
 	}
@@ -177,9 +149,8 @@ func (b *EndpointBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -194,14 +165,13 @@ func (b *EndpointBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals EndpointBuilder to JSON.
 func (b *EndpointBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -209,8 +179,7 @@ func (b *EndpointBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into EndpointBuilder, replacing the contents of
 // EndpointBuilder.
 func (b *EndpointBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -218,11 +187,9 @@ func (b *EndpointBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // EndpointList represents a list of EndpointBuilder.
-// Provided as a convenience.
-type EndpointList []EndpointBuilder
+type EndpointList []*EndpointBuilder
 
 // EndpointList represents a map of EndpointBuilder.
-// Provided as a convenience.
 type EndpointMap map[string]EndpointBuilder
 
 func (b *EndpointBuilder) preMarshal() {

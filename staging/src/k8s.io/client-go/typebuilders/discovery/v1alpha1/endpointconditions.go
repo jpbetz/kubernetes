@@ -27,48 +27,38 @@ import (
 // EndpointConditionsBuilder represents an declarative configuration of the EndpointConditions type for use
 // with apply.
 type EndpointConditionsBuilder struct {
-	fields *endpointConditionsFields
+	fields endpointConditionsFields
 }
 
-// endpointConditionsFields is used by EndpointConditionsBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in EndpointConditionsBuilder before marshalling, and
-// are copied out to the builder type in EndpointConditionsBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// endpointConditionsFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in EndpointConditionsBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type endpointConditionsFields struct {
 	Ready *bool `json:"ready,omitempty"`
 }
 
-func (b *EndpointConditionsBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &endpointConditionsFields{}
-	}
-}
-
 // EndpointConditions constructs an declarative configuration of the EndpointConditions type for use with
 // apply.
-// Provided as a convenience.
-func EndpointConditions() EndpointConditionsBuilder {
-	return EndpointConditionsBuilder{fields: &endpointConditionsFields{}}
+func EndpointConditions() *EndpointConditionsBuilder {
+	return &EndpointConditionsBuilder{}
 }
 
 // SetReady sets the Ready field in the declarative configuration to the given value.
-func (b EndpointConditionsBuilder) SetReady(value bool) EndpointConditionsBuilder {
-	b.ensureInitialized()
+func (b *EndpointConditionsBuilder) SetReady(value bool) *EndpointConditionsBuilder {
 	b.fields.Ready = &value
 	return b
 }
 
 // RemoveReady removes the Ready field from the declarative configuration.
-func (b EndpointConditionsBuilder) RemoveReady() EndpointConditionsBuilder {
-	b.ensureInitialized()
+func (b *EndpointConditionsBuilder) RemoveReady() *EndpointConditionsBuilder {
 	b.fields.Ready = nil
 	return b
 }
 
 // GetReady gets the Ready field from the declarative configuration.
-func (b EndpointConditionsBuilder) GetReady() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *EndpointConditionsBuilder) GetReady() (value bool, ok bool) {
 	if v := b.fields.Ready; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *EndpointConditionsBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *EndpointConditionsBuilder) FromUnstructured(u map[string]interface{}) e
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals EndpointConditionsBuilder to JSON.
 func (b *EndpointConditionsBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *EndpointConditionsBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into EndpointConditionsBuilder, replacing the contents of
 // EndpointConditionsBuilder.
 func (b *EndpointConditionsBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *EndpointConditionsBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // EndpointConditionsList represents a list of EndpointConditionsBuilder.
-// Provided as a convenience.
-type EndpointConditionsList []EndpointConditionsBuilder
+type EndpointConditionsList []*EndpointConditionsBuilder
 
 // EndpointConditionsList represents a map of EndpointConditionsBuilder.
-// Provided as a convenience.
 type EndpointConditionsMap map[string]EndpointConditionsBuilder
 
 func (b *EndpointConditionsBuilder) preMarshal() {

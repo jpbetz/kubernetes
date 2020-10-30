@@ -28,49 +28,39 @@ import (
 // ResourceRequirementsBuilder represents an declarative configuration of the ResourceRequirements type for use
 // with apply.
 type ResourceRequirementsBuilder struct {
-	fields *resourceRequirementsFields
+	fields resourceRequirementsFields
 }
 
-// resourceRequirementsFields is used by ResourceRequirementsBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ResourceRequirementsBuilder before marshalling, and
-// are copied out to the builder type in ResourceRequirementsBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// resourceRequirementsFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ResourceRequirementsBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type resourceRequirementsFields struct {
 	Limits   *v1.ResourceList `json:"limits,omitempty"`
 	Requests *v1.ResourceList `json:"requests,omitempty"`
 }
 
-func (b *ResourceRequirementsBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &resourceRequirementsFields{}
-	}
-}
-
 // ResourceRequirements constructs an declarative configuration of the ResourceRequirements type for use with
 // apply.
-// Provided as a convenience.
-func ResourceRequirements() ResourceRequirementsBuilder {
-	return ResourceRequirementsBuilder{fields: &resourceRequirementsFields{}}
+func ResourceRequirements() *ResourceRequirementsBuilder {
+	return &ResourceRequirementsBuilder{}
 }
 
 // SetLimits sets the Limits field in the declarative configuration to the given value.
-func (b ResourceRequirementsBuilder) SetLimits(value v1.ResourceList) ResourceRequirementsBuilder {
-	b.ensureInitialized()
+func (b *ResourceRequirementsBuilder) SetLimits(value v1.ResourceList) *ResourceRequirementsBuilder {
 	b.fields.Limits = &value
 	return b
 }
 
 // RemoveLimits removes the Limits field from the declarative configuration.
-func (b ResourceRequirementsBuilder) RemoveLimits() ResourceRequirementsBuilder {
-	b.ensureInitialized()
+func (b *ResourceRequirementsBuilder) RemoveLimits() *ResourceRequirementsBuilder {
 	b.fields.Limits = nil
 	return b
 }
 
 // GetLimits gets the Limits field from the declarative configuration.
-func (b ResourceRequirementsBuilder) GetLimits() (value v1.ResourceList, ok bool) {
-	b.ensureInitialized()
+func (b *ResourceRequirementsBuilder) GetLimits() (value v1.ResourceList, ok bool) {
 	if v := b.fields.Limits; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b ResourceRequirementsBuilder) GetLimits() (value v1.ResourceList, ok bool
 }
 
 // SetRequests sets the Requests field in the declarative configuration to the given value.
-func (b ResourceRequirementsBuilder) SetRequests(value v1.ResourceList) ResourceRequirementsBuilder {
-	b.ensureInitialized()
+func (b *ResourceRequirementsBuilder) SetRequests(value v1.ResourceList) *ResourceRequirementsBuilder {
 	b.fields.Requests = &value
 	return b
 }
 
 // RemoveRequests removes the Requests field from the declarative configuration.
-func (b ResourceRequirementsBuilder) RemoveRequests() ResourceRequirementsBuilder {
-	b.ensureInitialized()
+func (b *ResourceRequirementsBuilder) RemoveRequests() *ResourceRequirementsBuilder {
 	b.fields.Requests = nil
 	return b
 }
 
 // GetRequests gets the Requests field from the declarative configuration.
-func (b ResourceRequirementsBuilder) GetRequests() (value v1.ResourceList, ok bool) {
-	b.ensureInitialized()
+func (b *ResourceRequirementsBuilder) GetRequests() (value v1.ResourceList, ok bool) {
 	if v := b.fields.Requests; v != nil {
 		return *v, true
 	}
@@ -105,9 +92,8 @@ func (b *ResourceRequirementsBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +108,13 @@ func (b *ResourceRequirementsBuilder) FromUnstructured(u map[string]interface{})
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ResourceRequirementsBuilder to JSON.
 func (b *ResourceRequirementsBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +122,7 @@ func (b *ResourceRequirementsBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ResourceRequirementsBuilder, replacing the contents of
 // ResourceRequirementsBuilder.
 func (b *ResourceRequirementsBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +130,9 @@ func (b *ResourceRequirementsBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ResourceRequirementsList represents a list of ResourceRequirementsBuilder.
-// Provided as a convenience.
-type ResourceRequirementsList []ResourceRequirementsBuilder
+type ResourceRequirementsList []*ResourceRequirementsBuilder
 
 // ResourceRequirementsList represents a map of ResourceRequirementsBuilder.
-// Provided as a convenience.
 type ResourceRequirementsMap map[string]ResourceRequirementsBuilder
 
 func (b *ResourceRequirementsBuilder) preMarshal() {

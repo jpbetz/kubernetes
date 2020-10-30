@@ -28,48 +28,38 @@ import (
 // ContainerStateRunningBuilder represents an declarative configuration of the ContainerStateRunning type for use
 // with apply.
 type ContainerStateRunningBuilder struct {
-	fields *containerStateRunningFields
+	fields containerStateRunningFields
 }
 
-// containerStateRunningFields is used by ContainerStateRunningBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ContainerStateRunningBuilder before marshalling, and
-// are copied out to the builder type in ContainerStateRunningBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// containerStateRunningFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ContainerStateRunningBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type containerStateRunningFields struct {
 	StartedAt *v1.Time `json:"startedAt,omitempty"`
 }
 
-func (b *ContainerStateRunningBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &containerStateRunningFields{}
-	}
-}
-
 // ContainerStateRunning constructs an declarative configuration of the ContainerStateRunning type for use with
 // apply.
-// Provided as a convenience.
-func ContainerStateRunning() ContainerStateRunningBuilder {
-	return ContainerStateRunningBuilder{fields: &containerStateRunningFields{}}
+func ContainerStateRunning() *ContainerStateRunningBuilder {
+	return &ContainerStateRunningBuilder{}
 }
 
 // SetStartedAt sets the StartedAt field in the declarative configuration to the given value.
-func (b ContainerStateRunningBuilder) SetStartedAt(value v1.Time) ContainerStateRunningBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateRunningBuilder) SetStartedAt(value v1.Time) *ContainerStateRunningBuilder {
 	b.fields.StartedAt = &value
 	return b
 }
 
 // RemoveStartedAt removes the StartedAt field from the declarative configuration.
-func (b ContainerStateRunningBuilder) RemoveStartedAt() ContainerStateRunningBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateRunningBuilder) RemoveStartedAt() *ContainerStateRunningBuilder {
 	b.fields.StartedAt = nil
 	return b
 }
 
 // GetStartedAt gets the StartedAt field from the declarative configuration.
-func (b ContainerStateRunningBuilder) GetStartedAt() (value v1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerStateRunningBuilder) GetStartedAt() (value v1.Time, ok bool) {
 	if v := b.fields.StartedAt; v != nil {
 		return *v, true
 	}
@@ -81,9 +71,8 @@ func (b *ContainerStateRunningBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -98,14 +87,13 @@ func (b *ContainerStateRunningBuilder) FromUnstructured(u map[string]interface{}
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ContainerStateRunningBuilder to JSON.
 func (b *ContainerStateRunningBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -113,8 +101,7 @@ func (b *ContainerStateRunningBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ContainerStateRunningBuilder, replacing the contents of
 // ContainerStateRunningBuilder.
 func (b *ContainerStateRunningBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -122,11 +109,9 @@ func (b *ContainerStateRunningBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ContainerStateRunningList represents a list of ContainerStateRunningBuilder.
-// Provided as a convenience.
-type ContainerStateRunningList []ContainerStateRunningBuilder
+type ContainerStateRunningList []*ContainerStateRunningBuilder
 
 // ContainerStateRunningList represents a map of ContainerStateRunningBuilder.
-// Provided as a convenience.
 type ContainerStateRunningMap map[string]ContainerStateRunningBuilder
 
 func (b *ContainerStateRunningBuilder) preMarshal() {

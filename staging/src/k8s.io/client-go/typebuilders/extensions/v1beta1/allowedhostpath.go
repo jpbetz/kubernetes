@@ -27,49 +27,39 @@ import (
 // AllowedHostPathBuilder represents an declarative configuration of the AllowedHostPath type for use
 // with apply.
 type AllowedHostPathBuilder struct {
-	fields *allowedHostPathFields
+	fields allowedHostPathFields
 }
 
-// allowedHostPathFields is used by AllowedHostPathBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in AllowedHostPathBuilder before marshalling, and
-// are copied out to the builder type in AllowedHostPathBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// allowedHostPathFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in AllowedHostPathBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type allowedHostPathFields struct {
 	PathPrefix *string `json:"pathPrefix,omitempty"`
 	ReadOnly   *bool   `json:"readOnly,omitempty"`
 }
 
-func (b *AllowedHostPathBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &allowedHostPathFields{}
-	}
-}
-
 // AllowedHostPath constructs an declarative configuration of the AllowedHostPath type for use with
 // apply.
-// Provided as a convenience.
-func AllowedHostPath() AllowedHostPathBuilder {
-	return AllowedHostPathBuilder{fields: &allowedHostPathFields{}}
+func AllowedHostPath() *AllowedHostPathBuilder {
+	return &AllowedHostPathBuilder{}
 }
 
 // SetPathPrefix sets the PathPrefix field in the declarative configuration to the given value.
-func (b AllowedHostPathBuilder) SetPathPrefix(value string) AllowedHostPathBuilder {
-	b.ensureInitialized()
+func (b *AllowedHostPathBuilder) SetPathPrefix(value string) *AllowedHostPathBuilder {
 	b.fields.PathPrefix = &value
 	return b
 }
 
 // RemovePathPrefix removes the PathPrefix field from the declarative configuration.
-func (b AllowedHostPathBuilder) RemovePathPrefix() AllowedHostPathBuilder {
-	b.ensureInitialized()
+func (b *AllowedHostPathBuilder) RemovePathPrefix() *AllowedHostPathBuilder {
 	b.fields.PathPrefix = nil
 	return b
 }
 
 // GetPathPrefix gets the PathPrefix field from the declarative configuration.
-func (b AllowedHostPathBuilder) GetPathPrefix() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *AllowedHostPathBuilder) GetPathPrefix() (value string, ok bool) {
 	if v := b.fields.PathPrefix; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b AllowedHostPathBuilder) GetPathPrefix() (value string, ok bool) {
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b AllowedHostPathBuilder) SetReadOnly(value bool) AllowedHostPathBuilder {
-	b.ensureInitialized()
+func (b *AllowedHostPathBuilder) SetReadOnly(value bool) *AllowedHostPathBuilder {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b AllowedHostPathBuilder) RemoveReadOnly() AllowedHostPathBuilder {
-	b.ensureInitialized()
+func (b *AllowedHostPathBuilder) RemoveReadOnly() *AllowedHostPathBuilder {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b AllowedHostPathBuilder) GetReadOnly() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *AllowedHostPathBuilder) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *AllowedHostPathBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *AllowedHostPathBuilder) FromUnstructured(u map[string]interface{}) erro
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals AllowedHostPathBuilder to JSON.
 func (b *AllowedHostPathBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *AllowedHostPathBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into AllowedHostPathBuilder, replacing the contents of
 // AllowedHostPathBuilder.
 func (b *AllowedHostPathBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *AllowedHostPathBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // AllowedHostPathList represents a list of AllowedHostPathBuilder.
-// Provided as a convenience.
-type AllowedHostPathList []AllowedHostPathBuilder
+type AllowedHostPathList []*AllowedHostPathBuilder
 
 // AllowedHostPathList represents a map of AllowedHostPathBuilder.
-// Provided as a convenience.
 type AllowedHostPathMap map[string]AllowedHostPathBuilder
 
 func (b *AllowedHostPathBuilder) preMarshal() {

@@ -28,48 +28,38 @@ import (
 // NamespaceSpecBuilder represents an declarative configuration of the NamespaceSpec type for use
 // with apply.
 type NamespaceSpecBuilder struct {
-	fields *namespaceSpecFields
+	fields namespaceSpecFields
 }
 
-// namespaceSpecFields is used by NamespaceSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in NamespaceSpecBuilder before marshalling, and
-// are copied out to the builder type in NamespaceSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// namespaceSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in NamespaceSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type namespaceSpecFields struct {
 	Finalizers *[]v1.FinalizerName `json:"finalizers,omitempty"`
 }
 
-func (b *NamespaceSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &namespaceSpecFields{}
-	}
-}
-
 // NamespaceSpec constructs an declarative configuration of the NamespaceSpec type for use with
 // apply.
-// Provided as a convenience.
-func NamespaceSpec() NamespaceSpecBuilder {
-	return NamespaceSpecBuilder{fields: &namespaceSpecFields{}}
+func NamespaceSpec() *NamespaceSpecBuilder {
+	return &NamespaceSpecBuilder{}
 }
 
 // SetFinalizers sets the Finalizers field in the declarative configuration to the given value.
-func (b NamespaceSpecBuilder) SetFinalizers(value []v1.FinalizerName) NamespaceSpecBuilder {
-	b.ensureInitialized()
+func (b *NamespaceSpecBuilder) SetFinalizers(value []v1.FinalizerName) *NamespaceSpecBuilder {
 	b.fields.Finalizers = &value
 	return b
 }
 
 // RemoveFinalizers removes the Finalizers field from the declarative configuration.
-func (b NamespaceSpecBuilder) RemoveFinalizers() NamespaceSpecBuilder {
-	b.ensureInitialized()
+func (b *NamespaceSpecBuilder) RemoveFinalizers() *NamespaceSpecBuilder {
 	b.fields.Finalizers = nil
 	return b
 }
 
 // GetFinalizers gets the Finalizers field from the declarative configuration.
-func (b NamespaceSpecBuilder) GetFinalizers() (value []v1.FinalizerName, ok bool) {
-	b.ensureInitialized()
+func (b *NamespaceSpecBuilder) GetFinalizers() (value []v1.FinalizerName, ok bool) {
 	if v := b.fields.Finalizers; v != nil {
 		return *v, true
 	}
@@ -81,9 +71,8 @@ func (b *NamespaceSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -98,14 +87,13 @@ func (b *NamespaceSpecBuilder) FromUnstructured(u map[string]interface{}) error 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals NamespaceSpecBuilder to JSON.
 func (b *NamespaceSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -113,8 +101,7 @@ func (b *NamespaceSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into NamespaceSpecBuilder, replacing the contents of
 // NamespaceSpecBuilder.
 func (b *NamespaceSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -122,11 +109,9 @@ func (b *NamespaceSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // NamespaceSpecList represents a list of NamespaceSpecBuilder.
-// Provided as a convenience.
-type NamespaceSpecList []NamespaceSpecBuilder
+type NamespaceSpecList []*NamespaceSpecBuilder
 
 // NamespaceSpecList represents a map of NamespaceSpecBuilder.
-// Provided as a convenience.
 type NamespaceSpecMap map[string]NamespaceSpecBuilder
 
 func (b *NamespaceSpecBuilder) preMarshal() {

@@ -27,50 +27,40 @@ import (
 // QueuingConfigurationBuilder represents an declarative configuration of the QueuingConfiguration type for use
 // with apply.
 type QueuingConfigurationBuilder struct {
-	fields *queuingConfigurationFields
+	fields queuingConfigurationFields
 }
 
-// queuingConfigurationFields is used by QueuingConfigurationBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in QueuingConfigurationBuilder before marshalling, and
-// are copied out to the builder type in QueuingConfigurationBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// queuingConfigurationFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in QueuingConfigurationBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type queuingConfigurationFields struct {
 	Queues           *int32 `json:"queues,omitempty"`
 	HandSize         *int32 `json:"handSize,omitempty"`
 	QueueLengthLimit *int32 `json:"queueLengthLimit,omitempty"`
 }
 
-func (b *QueuingConfigurationBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &queuingConfigurationFields{}
-	}
-}
-
 // QueuingConfiguration constructs an declarative configuration of the QueuingConfiguration type for use with
 // apply.
-// Provided as a convenience.
-func QueuingConfiguration() QueuingConfigurationBuilder {
-	return QueuingConfigurationBuilder{fields: &queuingConfigurationFields{}}
+func QueuingConfiguration() *QueuingConfigurationBuilder {
+	return &QueuingConfigurationBuilder{}
 }
 
 // SetQueues sets the Queues field in the declarative configuration to the given value.
-func (b QueuingConfigurationBuilder) SetQueues(value int32) QueuingConfigurationBuilder {
-	b.ensureInitialized()
+func (b *QueuingConfigurationBuilder) SetQueues(value int32) *QueuingConfigurationBuilder {
 	b.fields.Queues = &value
 	return b
 }
 
 // RemoveQueues removes the Queues field from the declarative configuration.
-func (b QueuingConfigurationBuilder) RemoveQueues() QueuingConfigurationBuilder {
-	b.ensureInitialized()
+func (b *QueuingConfigurationBuilder) RemoveQueues() *QueuingConfigurationBuilder {
 	b.fields.Queues = nil
 	return b
 }
 
 // GetQueues gets the Queues field from the declarative configuration.
-func (b QueuingConfigurationBuilder) GetQueues() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *QueuingConfigurationBuilder) GetQueues() (value int32, ok bool) {
 	if v := b.fields.Queues; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b QueuingConfigurationBuilder) GetQueues() (value int32, ok bool) {
 }
 
 // SetHandSize sets the HandSize field in the declarative configuration to the given value.
-func (b QueuingConfigurationBuilder) SetHandSize(value int32) QueuingConfigurationBuilder {
-	b.ensureInitialized()
+func (b *QueuingConfigurationBuilder) SetHandSize(value int32) *QueuingConfigurationBuilder {
 	b.fields.HandSize = &value
 	return b
 }
 
 // RemoveHandSize removes the HandSize field from the declarative configuration.
-func (b QueuingConfigurationBuilder) RemoveHandSize() QueuingConfigurationBuilder {
-	b.ensureInitialized()
+func (b *QueuingConfigurationBuilder) RemoveHandSize() *QueuingConfigurationBuilder {
 	b.fields.HandSize = nil
 	return b
 }
 
 // GetHandSize gets the HandSize field from the declarative configuration.
-func (b QueuingConfigurationBuilder) GetHandSize() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *QueuingConfigurationBuilder) GetHandSize() (value int32, ok bool) {
 	if v := b.fields.HandSize; v != nil {
 		return *v, true
 	}
@@ -101,22 +88,19 @@ func (b QueuingConfigurationBuilder) GetHandSize() (value int32, ok bool) {
 }
 
 // SetQueueLengthLimit sets the QueueLengthLimit field in the declarative configuration to the given value.
-func (b QueuingConfigurationBuilder) SetQueueLengthLimit(value int32) QueuingConfigurationBuilder {
-	b.ensureInitialized()
+func (b *QueuingConfigurationBuilder) SetQueueLengthLimit(value int32) *QueuingConfigurationBuilder {
 	b.fields.QueueLengthLimit = &value
 	return b
 }
 
 // RemoveQueueLengthLimit removes the QueueLengthLimit field from the declarative configuration.
-func (b QueuingConfigurationBuilder) RemoveQueueLengthLimit() QueuingConfigurationBuilder {
-	b.ensureInitialized()
+func (b *QueuingConfigurationBuilder) RemoveQueueLengthLimit() *QueuingConfigurationBuilder {
 	b.fields.QueueLengthLimit = nil
 	return b
 }
 
 // GetQueueLengthLimit gets the QueueLengthLimit field from the declarative configuration.
-func (b QueuingConfigurationBuilder) GetQueueLengthLimit() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *QueuingConfigurationBuilder) GetQueueLengthLimit() (value int32, ok bool) {
 	if v := b.fields.QueueLengthLimit; v != nil {
 		return *v, true
 	}
@@ -128,9 +112,8 @@ func (b *QueuingConfigurationBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +128,13 @@ func (b *QueuingConfigurationBuilder) FromUnstructured(u map[string]interface{})
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals QueuingConfigurationBuilder to JSON.
 func (b *QueuingConfigurationBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +142,7 @@ func (b *QueuingConfigurationBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into QueuingConfigurationBuilder, replacing the contents of
 // QueuingConfigurationBuilder.
 func (b *QueuingConfigurationBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +150,9 @@ func (b *QueuingConfigurationBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // QueuingConfigurationList represents a list of QueuingConfigurationBuilder.
-// Provided as a convenience.
-type QueuingConfigurationList []QueuingConfigurationBuilder
+type QueuingConfigurationList []*QueuingConfigurationBuilder
 
 // QueuingConfigurationList represents a map of QueuingConfigurationBuilder.
-// Provided as a convenience.
 type QueuingConfigurationMap map[string]QueuingConfigurationBuilder
 
 func (b *QueuingConfigurationBuilder) preMarshal() {

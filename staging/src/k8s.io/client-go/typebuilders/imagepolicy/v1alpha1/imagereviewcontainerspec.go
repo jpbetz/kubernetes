@@ -27,48 +27,38 @@ import (
 // ImageReviewContainerSpecBuilder represents an declarative configuration of the ImageReviewContainerSpec type for use
 // with apply.
 type ImageReviewContainerSpecBuilder struct {
-	fields *imageReviewContainerSpecFields
+	fields imageReviewContainerSpecFields
 }
 
-// imageReviewContainerSpecFields is used by ImageReviewContainerSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ImageReviewContainerSpecBuilder before marshalling, and
-// are copied out to the builder type in ImageReviewContainerSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// imageReviewContainerSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ImageReviewContainerSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type imageReviewContainerSpecFields struct {
 	Image *string `json:"image,omitempty"`
 }
 
-func (b *ImageReviewContainerSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &imageReviewContainerSpecFields{}
-	}
-}
-
 // ImageReviewContainerSpec constructs an declarative configuration of the ImageReviewContainerSpec type for use with
 // apply.
-// Provided as a convenience.
-func ImageReviewContainerSpec() ImageReviewContainerSpecBuilder {
-	return ImageReviewContainerSpecBuilder{fields: &imageReviewContainerSpecFields{}}
+func ImageReviewContainerSpec() *ImageReviewContainerSpecBuilder {
+	return &ImageReviewContainerSpecBuilder{}
 }
 
 // SetImage sets the Image field in the declarative configuration to the given value.
-func (b ImageReviewContainerSpecBuilder) SetImage(value string) ImageReviewContainerSpecBuilder {
-	b.ensureInitialized()
+func (b *ImageReviewContainerSpecBuilder) SetImage(value string) *ImageReviewContainerSpecBuilder {
 	b.fields.Image = &value
 	return b
 }
 
 // RemoveImage removes the Image field from the declarative configuration.
-func (b ImageReviewContainerSpecBuilder) RemoveImage() ImageReviewContainerSpecBuilder {
-	b.ensureInitialized()
+func (b *ImageReviewContainerSpecBuilder) RemoveImage() *ImageReviewContainerSpecBuilder {
 	b.fields.Image = nil
 	return b
 }
 
 // GetImage gets the Image field from the declarative configuration.
-func (b ImageReviewContainerSpecBuilder) GetImage() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ImageReviewContainerSpecBuilder) GetImage() (value string, ok bool) {
 	if v := b.fields.Image; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *ImageReviewContainerSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *ImageReviewContainerSpecBuilder) FromUnstructured(u map[string]interfac
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ImageReviewContainerSpecBuilder to JSON.
 func (b *ImageReviewContainerSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *ImageReviewContainerSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ImageReviewContainerSpecBuilder, replacing the contents of
 // ImageReviewContainerSpecBuilder.
 func (b *ImageReviewContainerSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *ImageReviewContainerSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ImageReviewContainerSpecList represents a list of ImageReviewContainerSpecBuilder.
-// Provided as a convenience.
-type ImageReviewContainerSpecList []ImageReviewContainerSpecBuilder
+type ImageReviewContainerSpecList []*ImageReviewContainerSpecBuilder
 
 // ImageReviewContainerSpecList represents a map of ImageReviewContainerSpecBuilder.
-// Provided as a convenience.
 type ImageReviewContainerSpecMap map[string]ImageReviewContainerSpecBuilder
 
 func (b *ImageReviewContainerSpecBuilder) preMarshal() {

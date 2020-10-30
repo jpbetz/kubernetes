@@ -27,50 +27,40 @@ import (
 // WebhookClientConfigBuilder represents an declarative configuration of the WebhookClientConfig type for use
 // with apply.
 type WebhookClientConfigBuilder struct {
-	fields *webhookClientConfigFields
+	fields webhookClientConfigFields
 }
 
-// webhookClientConfigFields is used by WebhookClientConfigBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in WebhookClientConfigBuilder before marshalling, and
-// are copied out to the builder type in WebhookClientConfigBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// webhookClientConfigFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in WebhookClientConfigBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type webhookClientConfigFields struct {
 	URL      *string                  `json:"url,omitempty"`
 	Service  *ServiceReferenceBuilder `json:"service,omitempty"`
 	CABundle *[]byte                  `json:"caBundle,omitempty"`
 }
 
-func (b *WebhookClientConfigBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &webhookClientConfigFields{}
-	}
-}
-
 // WebhookClientConfig constructs an declarative configuration of the WebhookClientConfig type for use with
 // apply.
-// Provided as a convenience.
-func WebhookClientConfig() WebhookClientConfigBuilder {
-	return WebhookClientConfigBuilder{fields: &webhookClientConfigFields{}}
+func WebhookClientConfig() *WebhookClientConfigBuilder {
+	return &WebhookClientConfigBuilder{}
 }
 
 // SetURL sets the URL field in the declarative configuration to the given value.
-func (b WebhookClientConfigBuilder) SetURL(value string) WebhookClientConfigBuilder {
-	b.ensureInitialized()
+func (b *WebhookClientConfigBuilder) SetURL(value string) *WebhookClientConfigBuilder {
 	b.fields.URL = &value
 	return b
 }
 
 // RemoveURL removes the URL field from the declarative configuration.
-func (b WebhookClientConfigBuilder) RemoveURL() WebhookClientConfigBuilder {
-	b.ensureInitialized()
+func (b *WebhookClientConfigBuilder) RemoveURL() *WebhookClientConfigBuilder {
 	b.fields.URL = nil
 	return b
 }
 
 // GetURL gets the URL field from the declarative configuration.
-func (b WebhookClientConfigBuilder) GetURL() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *WebhookClientConfigBuilder) GetURL() (value string, ok bool) {
 	if v := b.fields.URL; v != nil {
 		return *v, true
 	}
@@ -78,45 +68,36 @@ func (b WebhookClientConfigBuilder) GetURL() (value string, ok bool) {
 }
 
 // SetService sets the Service field in the declarative configuration to the given value.
-func (b WebhookClientConfigBuilder) SetService(value ServiceReferenceBuilder) WebhookClientConfigBuilder {
-	b.ensureInitialized()
-	b.fields.Service = &value
+func (b *WebhookClientConfigBuilder) SetService(value *ServiceReferenceBuilder) *WebhookClientConfigBuilder {
+	b.fields.Service = value
 	return b
 }
 
 // RemoveService removes the Service field from the declarative configuration.
-func (b WebhookClientConfigBuilder) RemoveService() WebhookClientConfigBuilder {
-	b.ensureInitialized()
+func (b *WebhookClientConfigBuilder) RemoveService() *WebhookClientConfigBuilder {
 	b.fields.Service = nil
 	return b
 }
 
 // GetService gets the Service field from the declarative configuration.
-func (b WebhookClientConfigBuilder) GetService() (value ServiceReferenceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Service; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *WebhookClientConfigBuilder) GetService() (value *ServiceReferenceBuilder, ok bool) {
+	return b.fields.Service, b.fields.Service != nil
 }
 
 // SetCABundle sets the CABundle field in the declarative configuration to the given value.
-func (b WebhookClientConfigBuilder) SetCABundle(value []byte) WebhookClientConfigBuilder {
-	b.ensureInitialized()
+func (b *WebhookClientConfigBuilder) SetCABundle(value []byte) *WebhookClientConfigBuilder {
 	b.fields.CABundle = &value
 	return b
 }
 
 // RemoveCABundle removes the CABundle field from the declarative configuration.
-func (b WebhookClientConfigBuilder) RemoveCABundle() WebhookClientConfigBuilder {
-	b.ensureInitialized()
+func (b *WebhookClientConfigBuilder) RemoveCABundle() *WebhookClientConfigBuilder {
 	b.fields.CABundle = nil
 	return b
 }
 
 // GetCABundle gets the CABundle field from the declarative configuration.
-func (b WebhookClientConfigBuilder) GetCABundle() (value []byte, ok bool) {
-	b.ensureInitialized()
+func (b *WebhookClientConfigBuilder) GetCABundle() (value []byte, ok bool) {
 	if v := b.fields.CABundle; v != nil {
 		return *v, true
 	}
@@ -128,9 +109,8 @@ func (b *WebhookClientConfigBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +125,13 @@ func (b *WebhookClientConfigBuilder) FromUnstructured(u map[string]interface{}) 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals WebhookClientConfigBuilder to JSON.
 func (b *WebhookClientConfigBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +139,7 @@ func (b *WebhookClientConfigBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into WebhookClientConfigBuilder, replacing the contents of
 // WebhookClientConfigBuilder.
 func (b *WebhookClientConfigBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +147,9 @@ func (b *WebhookClientConfigBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // WebhookClientConfigList represents a list of WebhookClientConfigBuilder.
-// Provided as a convenience.
-type WebhookClientConfigList []WebhookClientConfigBuilder
+type WebhookClientConfigList []*WebhookClientConfigBuilder
 
 // WebhookClientConfigList represents a map of WebhookClientConfigBuilder.
-// Provided as a convenience.
 type WebhookClientConfigMap map[string]WebhookClientConfigBuilder
 
 func (b *WebhookClientConfigBuilder) preMarshal() {

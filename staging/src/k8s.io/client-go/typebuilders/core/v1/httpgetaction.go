@@ -29,14 +29,14 @@ import (
 // HTTPGetActionBuilder represents an declarative configuration of the HTTPGetAction type for use
 // with apply.
 type HTTPGetActionBuilder struct {
-	fields *hTTPGetActionFields
+	fields hTTPGetActionFields
 }
 
-// hTTPGetActionFields is used by HTTPGetActionBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in HTTPGetActionBuilder before marshalling, and
-// are copied out to the builder type in HTTPGetActionBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// hTTPGetActionFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in HTTPGetActionBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type hTTPGetActionFields struct {
 	Path        *string             `json:"path,omitempty"`
 	Port        *intstr.IntOrString `json:"port,omitempty"`
@@ -45,36 +45,26 @@ type hTTPGetActionFields struct {
 	HTTPHeaders *HTTPHeaderList     `json:"httpHeaders,omitempty"`
 }
 
-func (b *HTTPGetActionBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &hTTPGetActionFields{}
-	}
-}
-
 // HTTPGetAction constructs an declarative configuration of the HTTPGetAction type for use with
 // apply.
-// Provided as a convenience.
-func HTTPGetAction() HTTPGetActionBuilder {
-	return HTTPGetActionBuilder{fields: &hTTPGetActionFields{}}
+func HTTPGetAction() *HTTPGetActionBuilder {
+	return &HTTPGetActionBuilder{}
 }
 
 // SetPath sets the Path field in the declarative configuration to the given value.
-func (b HTTPGetActionBuilder) SetPath(value string) HTTPGetActionBuilder {
-	b.ensureInitialized()
+func (b *HTTPGetActionBuilder) SetPath(value string) *HTTPGetActionBuilder {
 	b.fields.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
-func (b HTTPGetActionBuilder) RemovePath() HTTPGetActionBuilder {
-	b.ensureInitialized()
+func (b *HTTPGetActionBuilder) RemovePath() *HTTPGetActionBuilder {
 	b.fields.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
-func (b HTTPGetActionBuilder) GetPath() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *HTTPGetActionBuilder) GetPath() (value string, ok bool) {
 	if v := b.fields.Path; v != nil {
 		return *v, true
 	}
@@ -82,22 +72,19 @@ func (b HTTPGetActionBuilder) GetPath() (value string, ok bool) {
 }
 
 // SetPort sets the Port field in the declarative configuration to the given value.
-func (b HTTPGetActionBuilder) SetPort(value intstr.IntOrString) HTTPGetActionBuilder {
-	b.ensureInitialized()
+func (b *HTTPGetActionBuilder) SetPort(value intstr.IntOrString) *HTTPGetActionBuilder {
 	b.fields.Port = &value
 	return b
 }
 
 // RemovePort removes the Port field from the declarative configuration.
-func (b HTTPGetActionBuilder) RemovePort() HTTPGetActionBuilder {
-	b.ensureInitialized()
+func (b *HTTPGetActionBuilder) RemovePort() *HTTPGetActionBuilder {
 	b.fields.Port = nil
 	return b
 }
 
 // GetPort gets the Port field from the declarative configuration.
-func (b HTTPGetActionBuilder) GetPort() (value intstr.IntOrString, ok bool) {
-	b.ensureInitialized()
+func (b *HTTPGetActionBuilder) GetPort() (value intstr.IntOrString, ok bool) {
 	if v := b.fields.Port; v != nil {
 		return *v, true
 	}
@@ -105,22 +92,19 @@ func (b HTTPGetActionBuilder) GetPort() (value intstr.IntOrString, ok bool) {
 }
 
 // SetHost sets the Host field in the declarative configuration to the given value.
-func (b HTTPGetActionBuilder) SetHost(value string) HTTPGetActionBuilder {
-	b.ensureInitialized()
+func (b *HTTPGetActionBuilder) SetHost(value string) *HTTPGetActionBuilder {
 	b.fields.Host = &value
 	return b
 }
 
 // RemoveHost removes the Host field from the declarative configuration.
-func (b HTTPGetActionBuilder) RemoveHost() HTTPGetActionBuilder {
-	b.ensureInitialized()
+func (b *HTTPGetActionBuilder) RemoveHost() *HTTPGetActionBuilder {
 	b.fields.Host = nil
 	return b
 }
 
 // GetHost gets the Host field from the declarative configuration.
-func (b HTTPGetActionBuilder) GetHost() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *HTTPGetActionBuilder) GetHost() (value string, ok bool) {
 	if v := b.fields.Host; v != nil {
 		return *v, true
 	}
@@ -128,22 +112,19 @@ func (b HTTPGetActionBuilder) GetHost() (value string, ok bool) {
 }
 
 // SetScheme sets the Scheme field in the declarative configuration to the given value.
-func (b HTTPGetActionBuilder) SetScheme(value v1.URIScheme) HTTPGetActionBuilder {
-	b.ensureInitialized()
+func (b *HTTPGetActionBuilder) SetScheme(value v1.URIScheme) *HTTPGetActionBuilder {
 	b.fields.Scheme = &value
 	return b
 }
 
 // RemoveScheme removes the Scheme field from the declarative configuration.
-func (b HTTPGetActionBuilder) RemoveScheme() HTTPGetActionBuilder {
-	b.ensureInitialized()
+func (b *HTTPGetActionBuilder) RemoveScheme() *HTTPGetActionBuilder {
 	b.fields.Scheme = nil
 	return b
 }
 
 // GetScheme gets the Scheme field from the declarative configuration.
-func (b HTTPGetActionBuilder) GetScheme() (value v1.URIScheme, ok bool) {
-	b.ensureInitialized()
+func (b *HTTPGetActionBuilder) GetScheme() (value v1.URIScheme, ok bool) {
 	if v := b.fields.Scheme; v != nil {
 		return *v, true
 	}
@@ -151,22 +132,19 @@ func (b HTTPGetActionBuilder) GetScheme() (value v1.URIScheme, ok bool) {
 }
 
 // SetHTTPHeaders sets the HTTPHeaders field in the declarative configuration to the given value.
-func (b HTTPGetActionBuilder) SetHTTPHeaders(value HTTPHeaderList) HTTPGetActionBuilder {
-	b.ensureInitialized()
+func (b *HTTPGetActionBuilder) SetHTTPHeaders(value HTTPHeaderList) *HTTPGetActionBuilder {
 	b.fields.HTTPHeaders = &value
 	return b
 }
 
 // RemoveHTTPHeaders removes the HTTPHeaders field from the declarative configuration.
-func (b HTTPGetActionBuilder) RemoveHTTPHeaders() HTTPGetActionBuilder {
-	b.ensureInitialized()
+func (b *HTTPGetActionBuilder) RemoveHTTPHeaders() *HTTPGetActionBuilder {
 	b.fields.HTTPHeaders = nil
 	return b
 }
 
 // GetHTTPHeaders gets the HTTPHeaders field from the declarative configuration.
-func (b HTTPGetActionBuilder) GetHTTPHeaders() (value HTTPHeaderList, ok bool) {
-	b.ensureInitialized()
+func (b *HTTPGetActionBuilder) GetHTTPHeaders() (value HTTPHeaderList, ok bool) {
 	if v := b.fields.HTTPHeaders; v != nil {
 		return *v, true
 	}
@@ -178,9 +156,8 @@ func (b *HTTPGetActionBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -195,14 +172,13 @@ func (b *HTTPGetActionBuilder) FromUnstructured(u map[string]interface{}) error 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals HTTPGetActionBuilder to JSON.
 func (b *HTTPGetActionBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -210,8 +186,7 @@ func (b *HTTPGetActionBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into HTTPGetActionBuilder, replacing the contents of
 // HTTPGetActionBuilder.
 func (b *HTTPGetActionBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -219,11 +194,9 @@ func (b *HTTPGetActionBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // HTTPGetActionList represents a list of HTTPGetActionBuilder.
-// Provided as a convenience.
-type HTTPGetActionList []HTTPGetActionBuilder
+type HTTPGetActionList []*HTTPGetActionBuilder
 
 // HTTPGetActionList represents a map of HTTPGetActionBuilder.
-// Provided as a convenience.
 type HTTPGetActionMap map[string]HTTPGetActionBuilder
 
 func (b *HTTPGetActionBuilder) preMarshal() {

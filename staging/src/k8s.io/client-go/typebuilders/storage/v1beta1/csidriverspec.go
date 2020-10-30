@@ -28,14 +28,14 @@ import (
 // CSIDriverSpecBuilder represents an declarative configuration of the CSIDriverSpec type for use
 // with apply.
 type CSIDriverSpecBuilder struct {
-	fields *cSIDriverSpecFields
+	fields cSIDriverSpecFields
 }
 
-// cSIDriverSpecFields is used by CSIDriverSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in CSIDriverSpecBuilder before marshalling, and
-// are copied out to the builder type in CSIDriverSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// cSIDriverSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in CSIDriverSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type cSIDriverSpecFields struct {
 	AttachRequired       *bool                          `json:"attachRequired,omitempty"`
 	PodInfoOnMount       *bool                          `json:"podInfoOnMount,omitempty"`
@@ -44,36 +44,26 @@ type cSIDriverSpecFields struct {
 	FSGroupPolicy        *v1beta1.FSGroupPolicy         `json:"fsGroupPolicy,omitempty"`
 }
 
-func (b *CSIDriverSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &cSIDriverSpecFields{}
-	}
-}
-
 // CSIDriverSpec constructs an declarative configuration of the CSIDriverSpec type for use with
 // apply.
-// Provided as a convenience.
-func CSIDriverSpec() CSIDriverSpecBuilder {
-	return CSIDriverSpecBuilder{fields: &cSIDriverSpecFields{}}
+func CSIDriverSpec() *CSIDriverSpecBuilder {
+	return &CSIDriverSpecBuilder{}
 }
 
 // SetAttachRequired sets the AttachRequired field in the declarative configuration to the given value.
-func (b CSIDriverSpecBuilder) SetAttachRequired(value bool) CSIDriverSpecBuilder {
-	b.ensureInitialized()
+func (b *CSIDriverSpecBuilder) SetAttachRequired(value bool) *CSIDriverSpecBuilder {
 	b.fields.AttachRequired = &value
 	return b
 }
 
 // RemoveAttachRequired removes the AttachRequired field from the declarative configuration.
-func (b CSIDriverSpecBuilder) RemoveAttachRequired() CSIDriverSpecBuilder {
-	b.ensureInitialized()
+func (b *CSIDriverSpecBuilder) RemoveAttachRequired() *CSIDriverSpecBuilder {
 	b.fields.AttachRequired = nil
 	return b
 }
 
 // GetAttachRequired gets the AttachRequired field from the declarative configuration.
-func (b CSIDriverSpecBuilder) GetAttachRequired() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *CSIDriverSpecBuilder) GetAttachRequired() (value bool, ok bool) {
 	if v := b.fields.AttachRequired; v != nil {
 		return *v, true
 	}
@@ -81,22 +71,19 @@ func (b CSIDriverSpecBuilder) GetAttachRequired() (value bool, ok bool) {
 }
 
 // SetPodInfoOnMount sets the PodInfoOnMount field in the declarative configuration to the given value.
-func (b CSIDriverSpecBuilder) SetPodInfoOnMount(value bool) CSIDriverSpecBuilder {
-	b.ensureInitialized()
+func (b *CSIDriverSpecBuilder) SetPodInfoOnMount(value bool) *CSIDriverSpecBuilder {
 	b.fields.PodInfoOnMount = &value
 	return b
 }
 
 // RemovePodInfoOnMount removes the PodInfoOnMount field from the declarative configuration.
-func (b CSIDriverSpecBuilder) RemovePodInfoOnMount() CSIDriverSpecBuilder {
-	b.ensureInitialized()
+func (b *CSIDriverSpecBuilder) RemovePodInfoOnMount() *CSIDriverSpecBuilder {
 	b.fields.PodInfoOnMount = nil
 	return b
 }
 
 // GetPodInfoOnMount gets the PodInfoOnMount field from the declarative configuration.
-func (b CSIDriverSpecBuilder) GetPodInfoOnMount() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *CSIDriverSpecBuilder) GetPodInfoOnMount() (value bool, ok bool) {
 	if v := b.fields.PodInfoOnMount; v != nil {
 		return *v, true
 	}
@@ -104,22 +91,19 @@ func (b CSIDriverSpecBuilder) GetPodInfoOnMount() (value bool, ok bool) {
 }
 
 // SetVolumeLifecycleModes sets the VolumeLifecycleModes field in the declarative configuration to the given value.
-func (b CSIDriverSpecBuilder) SetVolumeLifecycleModes(value []v1beta1.VolumeLifecycleMode) CSIDriverSpecBuilder {
-	b.ensureInitialized()
+func (b *CSIDriverSpecBuilder) SetVolumeLifecycleModes(value []v1beta1.VolumeLifecycleMode) *CSIDriverSpecBuilder {
 	b.fields.VolumeLifecycleModes = &value
 	return b
 }
 
 // RemoveVolumeLifecycleModes removes the VolumeLifecycleModes field from the declarative configuration.
-func (b CSIDriverSpecBuilder) RemoveVolumeLifecycleModes() CSIDriverSpecBuilder {
-	b.ensureInitialized()
+func (b *CSIDriverSpecBuilder) RemoveVolumeLifecycleModes() *CSIDriverSpecBuilder {
 	b.fields.VolumeLifecycleModes = nil
 	return b
 }
 
 // GetVolumeLifecycleModes gets the VolumeLifecycleModes field from the declarative configuration.
-func (b CSIDriverSpecBuilder) GetVolumeLifecycleModes() (value []v1beta1.VolumeLifecycleMode, ok bool) {
-	b.ensureInitialized()
+func (b *CSIDriverSpecBuilder) GetVolumeLifecycleModes() (value []v1beta1.VolumeLifecycleMode, ok bool) {
 	if v := b.fields.VolumeLifecycleModes; v != nil {
 		return *v, true
 	}
@@ -127,22 +111,19 @@ func (b CSIDriverSpecBuilder) GetVolumeLifecycleModes() (value []v1beta1.VolumeL
 }
 
 // SetStorageCapacity sets the StorageCapacity field in the declarative configuration to the given value.
-func (b CSIDriverSpecBuilder) SetStorageCapacity(value bool) CSIDriverSpecBuilder {
-	b.ensureInitialized()
+func (b *CSIDriverSpecBuilder) SetStorageCapacity(value bool) *CSIDriverSpecBuilder {
 	b.fields.StorageCapacity = &value
 	return b
 }
 
 // RemoveStorageCapacity removes the StorageCapacity field from the declarative configuration.
-func (b CSIDriverSpecBuilder) RemoveStorageCapacity() CSIDriverSpecBuilder {
-	b.ensureInitialized()
+func (b *CSIDriverSpecBuilder) RemoveStorageCapacity() *CSIDriverSpecBuilder {
 	b.fields.StorageCapacity = nil
 	return b
 }
 
 // GetStorageCapacity gets the StorageCapacity field from the declarative configuration.
-func (b CSIDriverSpecBuilder) GetStorageCapacity() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *CSIDriverSpecBuilder) GetStorageCapacity() (value bool, ok bool) {
 	if v := b.fields.StorageCapacity; v != nil {
 		return *v, true
 	}
@@ -150,22 +131,19 @@ func (b CSIDriverSpecBuilder) GetStorageCapacity() (value bool, ok bool) {
 }
 
 // SetFSGroupPolicy sets the FSGroupPolicy field in the declarative configuration to the given value.
-func (b CSIDriverSpecBuilder) SetFSGroupPolicy(value v1beta1.FSGroupPolicy) CSIDriverSpecBuilder {
-	b.ensureInitialized()
+func (b *CSIDriverSpecBuilder) SetFSGroupPolicy(value v1beta1.FSGroupPolicy) *CSIDriverSpecBuilder {
 	b.fields.FSGroupPolicy = &value
 	return b
 }
 
 // RemoveFSGroupPolicy removes the FSGroupPolicy field from the declarative configuration.
-func (b CSIDriverSpecBuilder) RemoveFSGroupPolicy() CSIDriverSpecBuilder {
-	b.ensureInitialized()
+func (b *CSIDriverSpecBuilder) RemoveFSGroupPolicy() *CSIDriverSpecBuilder {
 	b.fields.FSGroupPolicy = nil
 	return b
 }
 
 // GetFSGroupPolicy gets the FSGroupPolicy field from the declarative configuration.
-func (b CSIDriverSpecBuilder) GetFSGroupPolicy() (value v1beta1.FSGroupPolicy, ok bool) {
-	b.ensureInitialized()
+func (b *CSIDriverSpecBuilder) GetFSGroupPolicy() (value v1beta1.FSGroupPolicy, ok bool) {
 	if v := b.fields.FSGroupPolicy; v != nil {
 		return *v, true
 	}
@@ -177,9 +155,8 @@ func (b *CSIDriverSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -194,14 +171,13 @@ func (b *CSIDriverSpecBuilder) FromUnstructured(u map[string]interface{}) error 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals CSIDriverSpecBuilder to JSON.
 func (b *CSIDriverSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -209,8 +185,7 @@ func (b *CSIDriverSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into CSIDriverSpecBuilder, replacing the contents of
 // CSIDriverSpecBuilder.
 func (b *CSIDriverSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -218,11 +193,9 @@ func (b *CSIDriverSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // CSIDriverSpecList represents a list of CSIDriverSpecBuilder.
-// Provided as a convenience.
-type CSIDriverSpecList []CSIDriverSpecBuilder
+type CSIDriverSpecList []*CSIDriverSpecBuilder
 
 // CSIDriverSpecList represents a map of CSIDriverSpecBuilder.
-// Provided as a convenience.
 type CSIDriverSpecMap map[string]CSIDriverSpecBuilder
 
 func (b *CSIDriverSpecBuilder) preMarshal() {

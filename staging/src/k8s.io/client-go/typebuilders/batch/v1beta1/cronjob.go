@@ -28,15 +28,15 @@ import (
 // CronJobBuilder represents an declarative configuration of the CronJob type for use
 // with apply.
 type CronJobBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *cronJobFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   cronJobFields
 }
 
-// cronJobFields is used by CronJobBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in CronJobBuilder before marshalling, and
-// are copied out to the builder type in CronJobBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// cronJobFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in CronJobBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type cronJobFields struct {
 	Kind       *string               `json:"kind,omitempty"`       // inlined CronJobBuilder.typeMeta.Kind field
 	APIVersion *string               `json:"apiVersion,omitempty"` // inlined CronJobBuilder.typeMeta.APIVersion field
@@ -45,106 +45,78 @@ type cronJobFields struct {
 	Status     *CronJobStatusBuilder `json:"status,omitempty"`
 }
 
-func (b *CronJobBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &cronJobFields{}
-	}
-}
-
 // CronJob constructs an declarative configuration of the CronJob type for use with
 // apply.
-// Provided as a convenience.
-func CronJob() CronJobBuilder {
-	return CronJobBuilder{fields: &cronJobFields{}}
+func CronJob() *CronJobBuilder {
+	return &CronJobBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b CronJobBuilder) SetTypeMeta(value v1.TypeMetaBuilder) CronJobBuilder {
-	b.ensureInitialized()
+func (b *CronJobBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *CronJobBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b CronJobBuilder) RemoveTypeMeta() CronJobBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *CronJobBuilder) RemoveTypeMeta() *CronJobBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b CronJobBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *CronJobBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b CronJobBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) CronJobBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *CronJobBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *CronJobBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b CronJobBuilder) RemoveObjectMeta() CronJobBuilder {
-	b.ensureInitialized()
+func (b *CronJobBuilder) RemoveObjectMeta() *CronJobBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b CronJobBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *CronJobBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b CronJobBuilder) SetSpec(value CronJobSpecBuilder) CronJobBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *CronJobBuilder) SetSpec(value *CronJobSpecBuilder) *CronJobBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b CronJobBuilder) RemoveSpec() CronJobBuilder {
-	b.ensureInitialized()
+func (b *CronJobBuilder) RemoveSpec() *CronJobBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b CronJobBuilder) GetSpec() (value CronJobSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *CronJobBuilder) GetSpec() (value *CronJobSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b CronJobBuilder) SetStatus(value CronJobStatusBuilder) CronJobBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *CronJobBuilder) SetStatus(value *CronJobStatusBuilder) *CronJobBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b CronJobBuilder) RemoveStatus() CronJobBuilder {
-	b.ensureInitialized()
+func (b *CronJobBuilder) RemoveStatus() *CronJobBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b CronJobBuilder) GetStatus() (value CronJobStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *CronJobBuilder) GetStatus() (value *CronJobStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts CronJobBuilder to unstructured.
@@ -152,9 +124,8 @@ func (b *CronJobBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *CronJobBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals CronJobBuilder to JSON.
 func (b *CronJobBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *CronJobBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into CronJobBuilder, replacing the contents of
 // CronJobBuilder.
 func (b *CronJobBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +162,25 @@ func (b *CronJobBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // CronJobList represents a list of CronJobBuilder.
-// Provided as a convenience.
-type CronJobList []CronJobBuilder
+type CronJobList []*CronJobBuilder
 
 // CronJobList represents a map of CronJobBuilder.
-// Provided as a convenience.
 type CronJobMap map[string]CronJobBuilder
 
 func (b *CronJobBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *CronJobBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

@@ -27,14 +27,14 @@ import (
 // DeploymentStatusBuilder represents an declarative configuration of the DeploymentStatus type for use
 // with apply.
 type DeploymentStatusBuilder struct {
-	fields *deploymentStatusFields
+	fields deploymentStatusFields
 }
 
-// deploymentStatusFields is used by DeploymentStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in DeploymentStatusBuilder before marshalling, and
-// are copied out to the builder type in DeploymentStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// deploymentStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in DeploymentStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type deploymentStatusFields struct {
 	ObservedGeneration  *int64                   `json:"observedGeneration,omitempty"`
 	Replicas            *int32                   `json:"replicas,omitempty"`
@@ -46,36 +46,26 @@ type deploymentStatusFields struct {
 	CollisionCount      *int32                   `json:"collisionCount,omitempty"`
 }
 
-func (b *DeploymentStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &deploymentStatusFields{}
-	}
-}
-
 // DeploymentStatus constructs an declarative configuration of the DeploymentStatus type for use with
 // apply.
-// Provided as a convenience.
-func DeploymentStatus() DeploymentStatusBuilder {
-	return DeploymentStatusBuilder{fields: &deploymentStatusFields{}}
+func DeploymentStatus() *DeploymentStatusBuilder {
+	return &DeploymentStatusBuilder{}
 }
 
 // SetObservedGeneration sets the ObservedGeneration field in the declarative configuration to the given value.
-func (b DeploymentStatusBuilder) SetObservedGeneration(value int64) DeploymentStatusBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) SetObservedGeneration(value int64) *DeploymentStatusBuilder {
 	b.fields.ObservedGeneration = &value
 	return b
 }
 
 // RemoveObservedGeneration removes the ObservedGeneration field from the declarative configuration.
-func (b DeploymentStatusBuilder) RemoveObservedGeneration() DeploymentStatusBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) RemoveObservedGeneration() *DeploymentStatusBuilder {
 	b.fields.ObservedGeneration = nil
 	return b
 }
 
 // GetObservedGeneration gets the ObservedGeneration field from the declarative configuration.
-func (b DeploymentStatusBuilder) GetObservedGeneration() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) GetObservedGeneration() (value int64, ok bool) {
 	if v := b.fields.ObservedGeneration; v != nil {
 		return *v, true
 	}
@@ -83,22 +73,19 @@ func (b DeploymentStatusBuilder) GetObservedGeneration() (value int64, ok bool) 
 }
 
 // SetReplicas sets the Replicas field in the declarative configuration to the given value.
-func (b DeploymentStatusBuilder) SetReplicas(value int32) DeploymentStatusBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) SetReplicas(value int32) *DeploymentStatusBuilder {
 	b.fields.Replicas = &value
 	return b
 }
 
 // RemoveReplicas removes the Replicas field from the declarative configuration.
-func (b DeploymentStatusBuilder) RemoveReplicas() DeploymentStatusBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) RemoveReplicas() *DeploymentStatusBuilder {
 	b.fields.Replicas = nil
 	return b
 }
 
 // GetReplicas gets the Replicas field from the declarative configuration.
-func (b DeploymentStatusBuilder) GetReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) GetReplicas() (value int32, ok bool) {
 	if v := b.fields.Replicas; v != nil {
 		return *v, true
 	}
@@ -106,22 +93,19 @@ func (b DeploymentStatusBuilder) GetReplicas() (value int32, ok bool) {
 }
 
 // SetUpdatedReplicas sets the UpdatedReplicas field in the declarative configuration to the given value.
-func (b DeploymentStatusBuilder) SetUpdatedReplicas(value int32) DeploymentStatusBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) SetUpdatedReplicas(value int32) *DeploymentStatusBuilder {
 	b.fields.UpdatedReplicas = &value
 	return b
 }
 
 // RemoveUpdatedReplicas removes the UpdatedReplicas field from the declarative configuration.
-func (b DeploymentStatusBuilder) RemoveUpdatedReplicas() DeploymentStatusBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) RemoveUpdatedReplicas() *DeploymentStatusBuilder {
 	b.fields.UpdatedReplicas = nil
 	return b
 }
 
 // GetUpdatedReplicas gets the UpdatedReplicas field from the declarative configuration.
-func (b DeploymentStatusBuilder) GetUpdatedReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) GetUpdatedReplicas() (value int32, ok bool) {
 	if v := b.fields.UpdatedReplicas; v != nil {
 		return *v, true
 	}
@@ -129,22 +113,19 @@ func (b DeploymentStatusBuilder) GetUpdatedReplicas() (value int32, ok bool) {
 }
 
 // SetReadyReplicas sets the ReadyReplicas field in the declarative configuration to the given value.
-func (b DeploymentStatusBuilder) SetReadyReplicas(value int32) DeploymentStatusBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) SetReadyReplicas(value int32) *DeploymentStatusBuilder {
 	b.fields.ReadyReplicas = &value
 	return b
 }
 
 // RemoveReadyReplicas removes the ReadyReplicas field from the declarative configuration.
-func (b DeploymentStatusBuilder) RemoveReadyReplicas() DeploymentStatusBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) RemoveReadyReplicas() *DeploymentStatusBuilder {
 	b.fields.ReadyReplicas = nil
 	return b
 }
 
 // GetReadyReplicas gets the ReadyReplicas field from the declarative configuration.
-func (b DeploymentStatusBuilder) GetReadyReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) GetReadyReplicas() (value int32, ok bool) {
 	if v := b.fields.ReadyReplicas; v != nil {
 		return *v, true
 	}
@@ -152,22 +133,19 @@ func (b DeploymentStatusBuilder) GetReadyReplicas() (value int32, ok bool) {
 }
 
 // SetAvailableReplicas sets the AvailableReplicas field in the declarative configuration to the given value.
-func (b DeploymentStatusBuilder) SetAvailableReplicas(value int32) DeploymentStatusBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) SetAvailableReplicas(value int32) *DeploymentStatusBuilder {
 	b.fields.AvailableReplicas = &value
 	return b
 }
 
 // RemoveAvailableReplicas removes the AvailableReplicas field from the declarative configuration.
-func (b DeploymentStatusBuilder) RemoveAvailableReplicas() DeploymentStatusBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) RemoveAvailableReplicas() *DeploymentStatusBuilder {
 	b.fields.AvailableReplicas = nil
 	return b
 }
 
 // GetAvailableReplicas gets the AvailableReplicas field from the declarative configuration.
-func (b DeploymentStatusBuilder) GetAvailableReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) GetAvailableReplicas() (value int32, ok bool) {
 	if v := b.fields.AvailableReplicas; v != nil {
 		return *v, true
 	}
@@ -175,22 +153,19 @@ func (b DeploymentStatusBuilder) GetAvailableReplicas() (value int32, ok bool) {
 }
 
 // SetUnavailableReplicas sets the UnavailableReplicas field in the declarative configuration to the given value.
-func (b DeploymentStatusBuilder) SetUnavailableReplicas(value int32) DeploymentStatusBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) SetUnavailableReplicas(value int32) *DeploymentStatusBuilder {
 	b.fields.UnavailableReplicas = &value
 	return b
 }
 
 // RemoveUnavailableReplicas removes the UnavailableReplicas field from the declarative configuration.
-func (b DeploymentStatusBuilder) RemoveUnavailableReplicas() DeploymentStatusBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) RemoveUnavailableReplicas() *DeploymentStatusBuilder {
 	b.fields.UnavailableReplicas = nil
 	return b
 }
 
 // GetUnavailableReplicas gets the UnavailableReplicas field from the declarative configuration.
-func (b DeploymentStatusBuilder) GetUnavailableReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) GetUnavailableReplicas() (value int32, ok bool) {
 	if v := b.fields.UnavailableReplicas; v != nil {
 		return *v, true
 	}
@@ -198,22 +173,19 @@ func (b DeploymentStatusBuilder) GetUnavailableReplicas() (value int32, ok bool)
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b DeploymentStatusBuilder) SetConditions(value DeploymentConditionList) DeploymentStatusBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) SetConditions(value DeploymentConditionList) *DeploymentStatusBuilder {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b DeploymentStatusBuilder) RemoveConditions() DeploymentStatusBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) RemoveConditions() *DeploymentStatusBuilder {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b DeploymentStatusBuilder) GetConditions() (value DeploymentConditionList, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) GetConditions() (value DeploymentConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
@@ -221,22 +193,19 @@ func (b DeploymentStatusBuilder) GetConditions() (value DeploymentConditionList,
 }
 
 // SetCollisionCount sets the CollisionCount field in the declarative configuration to the given value.
-func (b DeploymentStatusBuilder) SetCollisionCount(value int32) DeploymentStatusBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) SetCollisionCount(value int32) *DeploymentStatusBuilder {
 	b.fields.CollisionCount = &value
 	return b
 }
 
 // RemoveCollisionCount removes the CollisionCount field from the declarative configuration.
-func (b DeploymentStatusBuilder) RemoveCollisionCount() DeploymentStatusBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) RemoveCollisionCount() *DeploymentStatusBuilder {
 	b.fields.CollisionCount = nil
 	return b
 }
 
 // GetCollisionCount gets the CollisionCount field from the declarative configuration.
-func (b DeploymentStatusBuilder) GetCollisionCount() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentStatusBuilder) GetCollisionCount() (value int32, ok bool) {
 	if v := b.fields.CollisionCount; v != nil {
 		return *v, true
 	}
@@ -248,9 +217,8 @@ func (b *DeploymentStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -265,14 +233,13 @@ func (b *DeploymentStatusBuilder) FromUnstructured(u map[string]interface{}) err
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals DeploymentStatusBuilder to JSON.
 func (b *DeploymentStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -280,8 +247,7 @@ func (b *DeploymentStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into DeploymentStatusBuilder, replacing the contents of
 // DeploymentStatusBuilder.
 func (b *DeploymentStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -289,11 +255,9 @@ func (b *DeploymentStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // DeploymentStatusList represents a list of DeploymentStatusBuilder.
-// Provided as a convenience.
-type DeploymentStatusList []DeploymentStatusBuilder
+type DeploymentStatusList []*DeploymentStatusBuilder
 
 // DeploymentStatusList represents a map of DeploymentStatusBuilder.
-// Provided as a convenience.
 type DeploymentStatusMap map[string]DeploymentStatusBuilder
 
 func (b *DeploymentStatusBuilder) preMarshal() {

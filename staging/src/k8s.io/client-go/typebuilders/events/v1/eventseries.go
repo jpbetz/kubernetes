@@ -28,49 +28,39 @@ import (
 // EventSeriesBuilder represents an declarative configuration of the EventSeries type for use
 // with apply.
 type EventSeriesBuilder struct {
-	fields *eventSeriesFields
+	fields eventSeriesFields
 }
 
-// eventSeriesFields is used by EventSeriesBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in EventSeriesBuilder before marshalling, and
-// are copied out to the builder type in EventSeriesBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// eventSeriesFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in EventSeriesBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type eventSeriesFields struct {
 	Count            *int32        `json:"count,omitempty"`
 	LastObservedTime *v1.MicroTime `json:"lastObservedTime,omitempty"`
 }
 
-func (b *EventSeriesBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &eventSeriesFields{}
-	}
-}
-
 // EventSeries constructs an declarative configuration of the EventSeries type for use with
 // apply.
-// Provided as a convenience.
-func EventSeries() EventSeriesBuilder {
-	return EventSeriesBuilder{fields: &eventSeriesFields{}}
+func EventSeries() *EventSeriesBuilder {
+	return &EventSeriesBuilder{}
 }
 
 // SetCount sets the Count field in the declarative configuration to the given value.
-func (b EventSeriesBuilder) SetCount(value int32) EventSeriesBuilder {
-	b.ensureInitialized()
+func (b *EventSeriesBuilder) SetCount(value int32) *EventSeriesBuilder {
 	b.fields.Count = &value
 	return b
 }
 
 // RemoveCount removes the Count field from the declarative configuration.
-func (b EventSeriesBuilder) RemoveCount() EventSeriesBuilder {
-	b.ensureInitialized()
+func (b *EventSeriesBuilder) RemoveCount() *EventSeriesBuilder {
 	b.fields.Count = nil
 	return b
 }
 
 // GetCount gets the Count field from the declarative configuration.
-func (b EventSeriesBuilder) GetCount() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *EventSeriesBuilder) GetCount() (value int32, ok bool) {
 	if v := b.fields.Count; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b EventSeriesBuilder) GetCount() (value int32, ok bool) {
 }
 
 // SetLastObservedTime sets the LastObservedTime field in the declarative configuration to the given value.
-func (b EventSeriesBuilder) SetLastObservedTime(value v1.MicroTime) EventSeriesBuilder {
-	b.ensureInitialized()
+func (b *EventSeriesBuilder) SetLastObservedTime(value v1.MicroTime) *EventSeriesBuilder {
 	b.fields.LastObservedTime = &value
 	return b
 }
 
 // RemoveLastObservedTime removes the LastObservedTime field from the declarative configuration.
-func (b EventSeriesBuilder) RemoveLastObservedTime() EventSeriesBuilder {
-	b.ensureInitialized()
+func (b *EventSeriesBuilder) RemoveLastObservedTime() *EventSeriesBuilder {
 	b.fields.LastObservedTime = nil
 	return b
 }
 
 // GetLastObservedTime gets the LastObservedTime field from the declarative configuration.
-func (b EventSeriesBuilder) GetLastObservedTime() (value v1.MicroTime, ok bool) {
-	b.ensureInitialized()
+func (b *EventSeriesBuilder) GetLastObservedTime() (value v1.MicroTime, ok bool) {
 	if v := b.fields.LastObservedTime; v != nil {
 		return *v, true
 	}
@@ -105,9 +92,8 @@ func (b *EventSeriesBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +108,13 @@ func (b *EventSeriesBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals EventSeriesBuilder to JSON.
 func (b *EventSeriesBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +122,7 @@ func (b *EventSeriesBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into EventSeriesBuilder, replacing the contents of
 // EventSeriesBuilder.
 func (b *EventSeriesBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +130,9 @@ func (b *EventSeriesBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // EventSeriesList represents a list of EventSeriesBuilder.
-// Provided as a convenience.
-type EventSeriesList []EventSeriesBuilder
+type EventSeriesList []*EventSeriesBuilder
 
 // EventSeriesList represents a map of EventSeriesBuilder.
-// Provided as a convenience.
 type EventSeriesMap map[string]EventSeriesBuilder
 
 func (b *EventSeriesBuilder) preMarshal() {

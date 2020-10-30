@@ -28,15 +28,15 @@ import (
 // LimitRangeBuilder represents an declarative configuration of the LimitRange type for use
 // with apply.
 type LimitRangeBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *limitRangeFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   limitRangeFields
 }
 
-// limitRangeFields is used by LimitRangeBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in LimitRangeBuilder before marshalling, and
-// are copied out to the builder type in LimitRangeBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// limitRangeFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in LimitRangeBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type limitRangeFields struct {
 	Kind       *string                `json:"kind,omitempty"`       // inlined LimitRangeBuilder.typeMeta.Kind field
 	APIVersion *string                `json:"apiVersion,omitempty"` // inlined LimitRangeBuilder.typeMeta.APIVersion field
@@ -44,83 +44,61 @@ type limitRangeFields struct {
 	Spec       *LimitRangeSpecBuilder `json:"spec,omitempty"`
 }
 
-func (b *LimitRangeBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &limitRangeFields{}
-	}
-}
-
 // LimitRange constructs an declarative configuration of the LimitRange type for use with
 // apply.
-// Provided as a convenience.
-func LimitRange() LimitRangeBuilder {
-	return LimitRangeBuilder{fields: &limitRangeFields{}}
+func LimitRange() *LimitRangeBuilder {
+	return &LimitRangeBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b LimitRangeBuilder) SetTypeMeta(value v1.TypeMetaBuilder) LimitRangeBuilder {
-	b.ensureInitialized()
+func (b *LimitRangeBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *LimitRangeBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b LimitRangeBuilder) RemoveTypeMeta() LimitRangeBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *LimitRangeBuilder) RemoveTypeMeta() *LimitRangeBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b LimitRangeBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *LimitRangeBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b LimitRangeBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) LimitRangeBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *LimitRangeBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *LimitRangeBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b LimitRangeBuilder) RemoveObjectMeta() LimitRangeBuilder {
-	b.ensureInitialized()
+func (b *LimitRangeBuilder) RemoveObjectMeta() *LimitRangeBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b LimitRangeBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *LimitRangeBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b LimitRangeBuilder) SetSpec(value LimitRangeSpecBuilder) LimitRangeBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *LimitRangeBuilder) SetSpec(value *LimitRangeSpecBuilder) *LimitRangeBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b LimitRangeBuilder) RemoveSpec() LimitRangeBuilder {
-	b.ensureInitialized()
+func (b *LimitRangeBuilder) RemoveSpec() *LimitRangeBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b LimitRangeBuilder) GetSpec() (value LimitRangeSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *LimitRangeBuilder) GetSpec() (value *LimitRangeSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // ToUnstructured converts LimitRangeBuilder to unstructured.
@@ -128,9 +106,8 @@ func (b *LimitRangeBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +122,13 @@ func (b *LimitRangeBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals LimitRangeBuilder to JSON.
 func (b *LimitRangeBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +136,7 @@ func (b *LimitRangeBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into LimitRangeBuilder, replacing the contents of
 // LimitRangeBuilder.
 func (b *LimitRangeBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,22 +144,25 @@ func (b *LimitRangeBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // LimitRangeList represents a list of LimitRangeBuilder.
-// Provided as a convenience.
-type LimitRangeList []LimitRangeBuilder
+type LimitRangeList []*LimitRangeBuilder
 
 // LimitRangeList represents a map of LimitRangeBuilder.
-// Provided as a convenience.
 type LimitRangeMap map[string]LimitRangeBuilder
 
 func (b *LimitRangeBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *LimitRangeBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

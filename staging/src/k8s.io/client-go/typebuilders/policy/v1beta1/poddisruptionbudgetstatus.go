@@ -28,14 +28,14 @@ import (
 // PodDisruptionBudgetStatusBuilder represents an declarative configuration of the PodDisruptionBudgetStatus type for use
 // with apply.
 type PodDisruptionBudgetStatusBuilder struct {
-	fields *podDisruptionBudgetStatusFields
+	fields podDisruptionBudgetStatusFields
 }
 
-// podDisruptionBudgetStatusFields is used by PodDisruptionBudgetStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PodDisruptionBudgetStatusBuilder before marshalling, and
-// are copied out to the builder type in PodDisruptionBudgetStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// podDisruptionBudgetStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PodDisruptionBudgetStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type podDisruptionBudgetStatusFields struct {
 	ObservedGeneration *int64              `json:"observedGeneration,omitempty"`
 	DisruptedPods      *map[string]v1.Time `json:"disruptedPods,omitempty"`
@@ -45,36 +45,26 @@ type podDisruptionBudgetStatusFields struct {
 	ExpectedPods       *int32              `json:"expectedPods,omitempty"`
 }
 
-func (b *PodDisruptionBudgetStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &podDisruptionBudgetStatusFields{}
-	}
-}
-
 // PodDisruptionBudgetStatus constructs an declarative configuration of the PodDisruptionBudgetStatus type for use with
 // apply.
-// Provided as a convenience.
-func PodDisruptionBudgetStatus() PodDisruptionBudgetStatusBuilder {
-	return PodDisruptionBudgetStatusBuilder{fields: &podDisruptionBudgetStatusFields{}}
+func PodDisruptionBudgetStatus() *PodDisruptionBudgetStatusBuilder {
+	return &PodDisruptionBudgetStatusBuilder{}
 }
 
 // SetObservedGeneration sets the ObservedGeneration field in the declarative configuration to the given value.
-func (b PodDisruptionBudgetStatusBuilder) SetObservedGeneration(value int64) PodDisruptionBudgetStatusBuilder {
-	b.ensureInitialized()
+func (b *PodDisruptionBudgetStatusBuilder) SetObservedGeneration(value int64) *PodDisruptionBudgetStatusBuilder {
 	b.fields.ObservedGeneration = &value
 	return b
 }
 
 // RemoveObservedGeneration removes the ObservedGeneration field from the declarative configuration.
-func (b PodDisruptionBudgetStatusBuilder) RemoveObservedGeneration() PodDisruptionBudgetStatusBuilder {
-	b.ensureInitialized()
+func (b *PodDisruptionBudgetStatusBuilder) RemoveObservedGeneration() *PodDisruptionBudgetStatusBuilder {
 	b.fields.ObservedGeneration = nil
 	return b
 }
 
 // GetObservedGeneration gets the ObservedGeneration field from the declarative configuration.
-func (b PodDisruptionBudgetStatusBuilder) GetObservedGeneration() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *PodDisruptionBudgetStatusBuilder) GetObservedGeneration() (value int64, ok bool) {
 	if v := b.fields.ObservedGeneration; v != nil {
 		return *v, true
 	}
@@ -82,22 +72,19 @@ func (b PodDisruptionBudgetStatusBuilder) GetObservedGeneration() (value int64, 
 }
 
 // SetDisruptedPods sets the DisruptedPods field in the declarative configuration to the given value.
-func (b PodDisruptionBudgetStatusBuilder) SetDisruptedPods(value map[string]v1.Time) PodDisruptionBudgetStatusBuilder {
-	b.ensureInitialized()
+func (b *PodDisruptionBudgetStatusBuilder) SetDisruptedPods(value map[string]v1.Time) *PodDisruptionBudgetStatusBuilder {
 	b.fields.DisruptedPods = &value
 	return b
 }
 
 // RemoveDisruptedPods removes the DisruptedPods field from the declarative configuration.
-func (b PodDisruptionBudgetStatusBuilder) RemoveDisruptedPods() PodDisruptionBudgetStatusBuilder {
-	b.ensureInitialized()
+func (b *PodDisruptionBudgetStatusBuilder) RemoveDisruptedPods() *PodDisruptionBudgetStatusBuilder {
 	b.fields.DisruptedPods = nil
 	return b
 }
 
 // GetDisruptedPods gets the DisruptedPods field from the declarative configuration.
-func (b PodDisruptionBudgetStatusBuilder) GetDisruptedPods() (value map[string]v1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *PodDisruptionBudgetStatusBuilder) GetDisruptedPods() (value map[string]v1.Time, ok bool) {
 	if v := b.fields.DisruptedPods; v != nil {
 		return *v, true
 	}
@@ -105,22 +92,19 @@ func (b PodDisruptionBudgetStatusBuilder) GetDisruptedPods() (value map[string]v
 }
 
 // SetDisruptionsAllowed sets the DisruptionsAllowed field in the declarative configuration to the given value.
-func (b PodDisruptionBudgetStatusBuilder) SetDisruptionsAllowed(value int32) PodDisruptionBudgetStatusBuilder {
-	b.ensureInitialized()
+func (b *PodDisruptionBudgetStatusBuilder) SetDisruptionsAllowed(value int32) *PodDisruptionBudgetStatusBuilder {
 	b.fields.DisruptionsAllowed = &value
 	return b
 }
 
 // RemoveDisruptionsAllowed removes the DisruptionsAllowed field from the declarative configuration.
-func (b PodDisruptionBudgetStatusBuilder) RemoveDisruptionsAllowed() PodDisruptionBudgetStatusBuilder {
-	b.ensureInitialized()
+func (b *PodDisruptionBudgetStatusBuilder) RemoveDisruptionsAllowed() *PodDisruptionBudgetStatusBuilder {
 	b.fields.DisruptionsAllowed = nil
 	return b
 }
 
 // GetDisruptionsAllowed gets the DisruptionsAllowed field from the declarative configuration.
-func (b PodDisruptionBudgetStatusBuilder) GetDisruptionsAllowed() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *PodDisruptionBudgetStatusBuilder) GetDisruptionsAllowed() (value int32, ok bool) {
 	if v := b.fields.DisruptionsAllowed; v != nil {
 		return *v, true
 	}
@@ -128,22 +112,19 @@ func (b PodDisruptionBudgetStatusBuilder) GetDisruptionsAllowed() (value int32, 
 }
 
 // SetCurrentHealthy sets the CurrentHealthy field in the declarative configuration to the given value.
-func (b PodDisruptionBudgetStatusBuilder) SetCurrentHealthy(value int32) PodDisruptionBudgetStatusBuilder {
-	b.ensureInitialized()
+func (b *PodDisruptionBudgetStatusBuilder) SetCurrentHealthy(value int32) *PodDisruptionBudgetStatusBuilder {
 	b.fields.CurrentHealthy = &value
 	return b
 }
 
 // RemoveCurrentHealthy removes the CurrentHealthy field from the declarative configuration.
-func (b PodDisruptionBudgetStatusBuilder) RemoveCurrentHealthy() PodDisruptionBudgetStatusBuilder {
-	b.ensureInitialized()
+func (b *PodDisruptionBudgetStatusBuilder) RemoveCurrentHealthy() *PodDisruptionBudgetStatusBuilder {
 	b.fields.CurrentHealthy = nil
 	return b
 }
 
 // GetCurrentHealthy gets the CurrentHealthy field from the declarative configuration.
-func (b PodDisruptionBudgetStatusBuilder) GetCurrentHealthy() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *PodDisruptionBudgetStatusBuilder) GetCurrentHealthy() (value int32, ok bool) {
 	if v := b.fields.CurrentHealthy; v != nil {
 		return *v, true
 	}
@@ -151,22 +132,19 @@ func (b PodDisruptionBudgetStatusBuilder) GetCurrentHealthy() (value int32, ok b
 }
 
 // SetDesiredHealthy sets the DesiredHealthy field in the declarative configuration to the given value.
-func (b PodDisruptionBudgetStatusBuilder) SetDesiredHealthy(value int32) PodDisruptionBudgetStatusBuilder {
-	b.ensureInitialized()
+func (b *PodDisruptionBudgetStatusBuilder) SetDesiredHealthy(value int32) *PodDisruptionBudgetStatusBuilder {
 	b.fields.DesiredHealthy = &value
 	return b
 }
 
 // RemoveDesiredHealthy removes the DesiredHealthy field from the declarative configuration.
-func (b PodDisruptionBudgetStatusBuilder) RemoveDesiredHealthy() PodDisruptionBudgetStatusBuilder {
-	b.ensureInitialized()
+func (b *PodDisruptionBudgetStatusBuilder) RemoveDesiredHealthy() *PodDisruptionBudgetStatusBuilder {
 	b.fields.DesiredHealthy = nil
 	return b
 }
 
 // GetDesiredHealthy gets the DesiredHealthy field from the declarative configuration.
-func (b PodDisruptionBudgetStatusBuilder) GetDesiredHealthy() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *PodDisruptionBudgetStatusBuilder) GetDesiredHealthy() (value int32, ok bool) {
 	if v := b.fields.DesiredHealthy; v != nil {
 		return *v, true
 	}
@@ -174,22 +152,19 @@ func (b PodDisruptionBudgetStatusBuilder) GetDesiredHealthy() (value int32, ok b
 }
 
 // SetExpectedPods sets the ExpectedPods field in the declarative configuration to the given value.
-func (b PodDisruptionBudgetStatusBuilder) SetExpectedPods(value int32) PodDisruptionBudgetStatusBuilder {
-	b.ensureInitialized()
+func (b *PodDisruptionBudgetStatusBuilder) SetExpectedPods(value int32) *PodDisruptionBudgetStatusBuilder {
 	b.fields.ExpectedPods = &value
 	return b
 }
 
 // RemoveExpectedPods removes the ExpectedPods field from the declarative configuration.
-func (b PodDisruptionBudgetStatusBuilder) RemoveExpectedPods() PodDisruptionBudgetStatusBuilder {
-	b.ensureInitialized()
+func (b *PodDisruptionBudgetStatusBuilder) RemoveExpectedPods() *PodDisruptionBudgetStatusBuilder {
 	b.fields.ExpectedPods = nil
 	return b
 }
 
 // GetExpectedPods gets the ExpectedPods field from the declarative configuration.
-func (b PodDisruptionBudgetStatusBuilder) GetExpectedPods() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *PodDisruptionBudgetStatusBuilder) GetExpectedPods() (value int32, ok bool) {
 	if v := b.fields.ExpectedPods; v != nil {
 		return *v, true
 	}
@@ -201,9 +176,8 @@ func (b *PodDisruptionBudgetStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -218,14 +192,13 @@ func (b *PodDisruptionBudgetStatusBuilder) FromUnstructured(u map[string]interfa
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PodDisruptionBudgetStatusBuilder to JSON.
 func (b *PodDisruptionBudgetStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -233,8 +206,7 @@ func (b *PodDisruptionBudgetStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PodDisruptionBudgetStatusBuilder, replacing the contents of
 // PodDisruptionBudgetStatusBuilder.
 func (b *PodDisruptionBudgetStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -242,11 +214,9 @@ func (b *PodDisruptionBudgetStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PodDisruptionBudgetStatusList represents a list of PodDisruptionBudgetStatusBuilder.
-// Provided as a convenience.
-type PodDisruptionBudgetStatusList []PodDisruptionBudgetStatusBuilder
+type PodDisruptionBudgetStatusList []*PodDisruptionBudgetStatusBuilder
 
 // PodDisruptionBudgetStatusList represents a map of PodDisruptionBudgetStatusBuilder.
-// Provided as a convenience.
 type PodDisruptionBudgetStatusMap map[string]PodDisruptionBudgetStatusBuilder
 
 func (b *PodDisruptionBudgetStatusBuilder) preMarshal() {

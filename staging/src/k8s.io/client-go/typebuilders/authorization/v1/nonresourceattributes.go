@@ -27,49 +27,39 @@ import (
 // NonResourceAttributesBuilder represents an declarative configuration of the NonResourceAttributes type for use
 // with apply.
 type NonResourceAttributesBuilder struct {
-	fields *nonResourceAttributesFields
+	fields nonResourceAttributesFields
 }
 
-// nonResourceAttributesFields is used by NonResourceAttributesBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in NonResourceAttributesBuilder before marshalling, and
-// are copied out to the builder type in NonResourceAttributesBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// nonResourceAttributesFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in NonResourceAttributesBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type nonResourceAttributesFields struct {
 	Path *string `json:"path,omitempty"`
 	Verb *string `json:"verb,omitempty"`
 }
 
-func (b *NonResourceAttributesBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &nonResourceAttributesFields{}
-	}
-}
-
 // NonResourceAttributes constructs an declarative configuration of the NonResourceAttributes type for use with
 // apply.
-// Provided as a convenience.
-func NonResourceAttributes() NonResourceAttributesBuilder {
-	return NonResourceAttributesBuilder{fields: &nonResourceAttributesFields{}}
+func NonResourceAttributes() *NonResourceAttributesBuilder {
+	return &NonResourceAttributesBuilder{}
 }
 
 // SetPath sets the Path field in the declarative configuration to the given value.
-func (b NonResourceAttributesBuilder) SetPath(value string) NonResourceAttributesBuilder {
-	b.ensureInitialized()
+func (b *NonResourceAttributesBuilder) SetPath(value string) *NonResourceAttributesBuilder {
 	b.fields.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
-func (b NonResourceAttributesBuilder) RemovePath() NonResourceAttributesBuilder {
-	b.ensureInitialized()
+func (b *NonResourceAttributesBuilder) RemovePath() *NonResourceAttributesBuilder {
 	b.fields.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
-func (b NonResourceAttributesBuilder) GetPath() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *NonResourceAttributesBuilder) GetPath() (value string, ok bool) {
 	if v := b.fields.Path; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b NonResourceAttributesBuilder) GetPath() (value string, ok bool) {
 }
 
 // SetVerb sets the Verb field in the declarative configuration to the given value.
-func (b NonResourceAttributesBuilder) SetVerb(value string) NonResourceAttributesBuilder {
-	b.ensureInitialized()
+func (b *NonResourceAttributesBuilder) SetVerb(value string) *NonResourceAttributesBuilder {
 	b.fields.Verb = &value
 	return b
 }
 
 // RemoveVerb removes the Verb field from the declarative configuration.
-func (b NonResourceAttributesBuilder) RemoveVerb() NonResourceAttributesBuilder {
-	b.ensureInitialized()
+func (b *NonResourceAttributesBuilder) RemoveVerb() *NonResourceAttributesBuilder {
 	b.fields.Verb = nil
 	return b
 }
 
 // GetVerb gets the Verb field from the declarative configuration.
-func (b NonResourceAttributesBuilder) GetVerb() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *NonResourceAttributesBuilder) GetVerb() (value string, ok bool) {
 	if v := b.fields.Verb; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *NonResourceAttributesBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *NonResourceAttributesBuilder) FromUnstructured(u map[string]interface{}
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals NonResourceAttributesBuilder to JSON.
 func (b *NonResourceAttributesBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *NonResourceAttributesBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into NonResourceAttributesBuilder, replacing the contents of
 // NonResourceAttributesBuilder.
 func (b *NonResourceAttributesBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *NonResourceAttributesBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // NonResourceAttributesList represents a list of NonResourceAttributesBuilder.
-// Provided as a convenience.
-type NonResourceAttributesList []NonResourceAttributesBuilder
+type NonResourceAttributesList []*NonResourceAttributesBuilder
 
 // NonResourceAttributesList represents a map of NonResourceAttributesBuilder.
-// Provided as a convenience.
 type NonResourceAttributesMap map[string]NonResourceAttributesBuilder
 
 func (b *NonResourceAttributesBuilder) preMarshal() {

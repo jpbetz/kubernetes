@@ -28,50 +28,40 @@ import (
 // HTTPIngressPathBuilder represents an declarative configuration of the HTTPIngressPath type for use
 // with apply.
 type HTTPIngressPathBuilder struct {
-	fields *hTTPIngressPathFields
+	fields hTTPIngressPathFields
 }
 
-// hTTPIngressPathFields is used by HTTPIngressPathBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in HTTPIngressPathBuilder before marshalling, and
-// are copied out to the builder type in HTTPIngressPathBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// hTTPIngressPathFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in HTTPIngressPathBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type hTTPIngressPathFields struct {
 	Path     *string                `json:"path,omitempty"`
 	PathType *v1.PathType           `json:"pathType,omitempty"`
 	Backend  *IngressBackendBuilder `json:"backend,omitempty"`
 }
 
-func (b *HTTPIngressPathBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &hTTPIngressPathFields{}
-	}
-}
-
 // HTTPIngressPath constructs an declarative configuration of the HTTPIngressPath type for use with
 // apply.
-// Provided as a convenience.
-func HTTPIngressPath() HTTPIngressPathBuilder {
-	return HTTPIngressPathBuilder{fields: &hTTPIngressPathFields{}}
+func HTTPIngressPath() *HTTPIngressPathBuilder {
+	return &HTTPIngressPathBuilder{}
 }
 
 // SetPath sets the Path field in the declarative configuration to the given value.
-func (b HTTPIngressPathBuilder) SetPath(value string) HTTPIngressPathBuilder {
-	b.ensureInitialized()
+func (b *HTTPIngressPathBuilder) SetPath(value string) *HTTPIngressPathBuilder {
 	b.fields.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
-func (b HTTPIngressPathBuilder) RemovePath() HTTPIngressPathBuilder {
-	b.ensureInitialized()
+func (b *HTTPIngressPathBuilder) RemovePath() *HTTPIngressPathBuilder {
 	b.fields.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
-func (b HTTPIngressPathBuilder) GetPath() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *HTTPIngressPathBuilder) GetPath() (value string, ok bool) {
 	if v := b.fields.Path; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b HTTPIngressPathBuilder) GetPath() (value string, ok bool) {
 }
 
 // SetPathType sets the PathType field in the declarative configuration to the given value.
-func (b HTTPIngressPathBuilder) SetPathType(value v1.PathType) HTTPIngressPathBuilder {
-	b.ensureInitialized()
+func (b *HTTPIngressPathBuilder) SetPathType(value v1.PathType) *HTTPIngressPathBuilder {
 	b.fields.PathType = &value
 	return b
 }
 
 // RemovePathType removes the PathType field from the declarative configuration.
-func (b HTTPIngressPathBuilder) RemovePathType() HTTPIngressPathBuilder {
-	b.ensureInitialized()
+func (b *HTTPIngressPathBuilder) RemovePathType() *HTTPIngressPathBuilder {
 	b.fields.PathType = nil
 	return b
 }
 
 // GetPathType gets the PathType field from the declarative configuration.
-func (b HTTPIngressPathBuilder) GetPathType() (value v1.PathType, ok bool) {
-	b.ensureInitialized()
+func (b *HTTPIngressPathBuilder) GetPathType() (value v1.PathType, ok bool) {
 	if v := b.fields.PathType; v != nil {
 		return *v, true
 	}
@@ -102,26 +89,20 @@ func (b HTTPIngressPathBuilder) GetPathType() (value v1.PathType, ok bool) {
 }
 
 // SetBackend sets the Backend field in the declarative configuration to the given value.
-func (b HTTPIngressPathBuilder) SetBackend(value IngressBackendBuilder) HTTPIngressPathBuilder {
-	b.ensureInitialized()
-	b.fields.Backend = &value
+func (b *HTTPIngressPathBuilder) SetBackend(value *IngressBackendBuilder) *HTTPIngressPathBuilder {
+	b.fields.Backend = value
 	return b
 }
 
 // RemoveBackend removes the Backend field from the declarative configuration.
-func (b HTTPIngressPathBuilder) RemoveBackend() HTTPIngressPathBuilder {
-	b.ensureInitialized()
+func (b *HTTPIngressPathBuilder) RemoveBackend() *HTTPIngressPathBuilder {
 	b.fields.Backend = nil
 	return b
 }
 
 // GetBackend gets the Backend field from the declarative configuration.
-func (b HTTPIngressPathBuilder) GetBackend() (value IngressBackendBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Backend; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *HTTPIngressPathBuilder) GetBackend() (value *IngressBackendBuilder, ok bool) {
+	return b.fields.Backend, b.fields.Backend != nil
 }
 
 // ToUnstructured converts HTTPIngressPathBuilder to unstructured.
@@ -129,9 +110,8 @@ func (b *HTTPIngressPathBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -146,14 +126,13 @@ func (b *HTTPIngressPathBuilder) FromUnstructured(u map[string]interface{}) erro
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals HTTPIngressPathBuilder to JSON.
 func (b *HTTPIngressPathBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -161,8 +140,7 @@ func (b *HTTPIngressPathBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into HTTPIngressPathBuilder, replacing the contents of
 // HTTPIngressPathBuilder.
 func (b *HTTPIngressPathBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -170,11 +148,9 @@ func (b *HTTPIngressPathBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // HTTPIngressPathList represents a list of HTTPIngressPathBuilder.
-// Provided as a convenience.
-type HTTPIngressPathList []HTTPIngressPathBuilder
+type HTTPIngressPathList []*HTTPIngressPathBuilder
 
 // HTTPIngressPathList represents a map of HTTPIngressPathBuilder.
-// Provided as a convenience.
 type HTTPIngressPathMap map[string]HTTPIngressPathBuilder
 
 func (b *HTTPIngressPathBuilder) preMarshal() {

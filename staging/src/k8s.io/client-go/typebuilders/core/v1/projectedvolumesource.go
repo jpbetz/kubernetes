@@ -27,49 +27,39 @@ import (
 // ProjectedVolumeSourceBuilder represents an declarative configuration of the ProjectedVolumeSource type for use
 // with apply.
 type ProjectedVolumeSourceBuilder struct {
-	fields *projectedVolumeSourceFields
+	fields projectedVolumeSourceFields
 }
 
-// projectedVolumeSourceFields is used by ProjectedVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ProjectedVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in ProjectedVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// projectedVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ProjectedVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type projectedVolumeSourceFields struct {
 	Sources     *VolumeProjectionList `json:"sources,omitempty"`
 	DefaultMode *int32                `json:"defaultMode,omitempty"`
 }
 
-func (b *ProjectedVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &projectedVolumeSourceFields{}
-	}
-}
-
 // ProjectedVolumeSource constructs an declarative configuration of the ProjectedVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func ProjectedVolumeSource() ProjectedVolumeSourceBuilder {
-	return ProjectedVolumeSourceBuilder{fields: &projectedVolumeSourceFields{}}
+func ProjectedVolumeSource() *ProjectedVolumeSourceBuilder {
+	return &ProjectedVolumeSourceBuilder{}
 }
 
 // SetSources sets the Sources field in the declarative configuration to the given value.
-func (b ProjectedVolumeSourceBuilder) SetSources(value VolumeProjectionList) ProjectedVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ProjectedVolumeSourceBuilder) SetSources(value VolumeProjectionList) *ProjectedVolumeSourceBuilder {
 	b.fields.Sources = &value
 	return b
 }
 
 // RemoveSources removes the Sources field from the declarative configuration.
-func (b ProjectedVolumeSourceBuilder) RemoveSources() ProjectedVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ProjectedVolumeSourceBuilder) RemoveSources() *ProjectedVolumeSourceBuilder {
 	b.fields.Sources = nil
 	return b
 }
 
 // GetSources gets the Sources field from the declarative configuration.
-func (b ProjectedVolumeSourceBuilder) GetSources() (value VolumeProjectionList, ok bool) {
-	b.ensureInitialized()
+func (b *ProjectedVolumeSourceBuilder) GetSources() (value VolumeProjectionList, ok bool) {
 	if v := b.fields.Sources; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b ProjectedVolumeSourceBuilder) GetSources() (value VolumeProjectionList, 
 }
 
 // SetDefaultMode sets the DefaultMode field in the declarative configuration to the given value.
-func (b ProjectedVolumeSourceBuilder) SetDefaultMode(value int32) ProjectedVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ProjectedVolumeSourceBuilder) SetDefaultMode(value int32) *ProjectedVolumeSourceBuilder {
 	b.fields.DefaultMode = &value
 	return b
 }
 
 // RemoveDefaultMode removes the DefaultMode field from the declarative configuration.
-func (b ProjectedVolumeSourceBuilder) RemoveDefaultMode() ProjectedVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ProjectedVolumeSourceBuilder) RemoveDefaultMode() *ProjectedVolumeSourceBuilder {
 	b.fields.DefaultMode = nil
 	return b
 }
 
 // GetDefaultMode gets the DefaultMode field from the declarative configuration.
-func (b ProjectedVolumeSourceBuilder) GetDefaultMode() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ProjectedVolumeSourceBuilder) GetDefaultMode() (value int32, ok bool) {
 	if v := b.fields.DefaultMode; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *ProjectedVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *ProjectedVolumeSourceBuilder) FromUnstructured(u map[string]interface{}
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ProjectedVolumeSourceBuilder to JSON.
 func (b *ProjectedVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *ProjectedVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ProjectedVolumeSourceBuilder, replacing the contents of
 // ProjectedVolumeSourceBuilder.
 func (b *ProjectedVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *ProjectedVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ProjectedVolumeSourceList represents a list of ProjectedVolumeSourceBuilder.
-// Provided as a convenience.
-type ProjectedVolumeSourceList []ProjectedVolumeSourceBuilder
+type ProjectedVolumeSourceList []*ProjectedVolumeSourceBuilder
 
 // ProjectedVolumeSourceList represents a map of ProjectedVolumeSourceBuilder.
-// Provided as a convenience.
 type ProjectedVolumeSourceMap map[string]ProjectedVolumeSourceBuilder
 
 func (b *ProjectedVolumeSourceBuilder) preMarshal() {

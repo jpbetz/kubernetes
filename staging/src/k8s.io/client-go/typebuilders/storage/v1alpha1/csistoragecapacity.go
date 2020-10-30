@@ -29,15 +29,15 @@ import (
 // CSIStorageCapacityBuilder represents an declarative configuration of the CSIStorageCapacity type for use
 // with apply.
 type CSIStorageCapacityBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *cSIStorageCapacityFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   cSIStorageCapacityFields
 }
 
-// cSIStorageCapacityFields is used by CSIStorageCapacityBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in CSIStorageCapacityBuilder before marshalling, and
-// are copied out to the builder type in CSIStorageCapacityBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// cSIStorageCapacityFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in CSIStorageCapacityBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type cSIStorageCapacityFields struct {
 	Kind             *string                  `json:"kind,omitempty"`       // inlined CSIStorageCapacityBuilder.typeMeta.Kind field
 	APIVersion       *string                  `json:"apiVersion,omitempty"` // inlined CSIStorageCapacityBuilder.typeMeta.APIVersion field
@@ -47,102 +47,77 @@ type cSIStorageCapacityFields struct {
 	Capacity         *resource.Quantity       `json:"capacity,omitempty"`
 }
 
-func (b *CSIStorageCapacityBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &cSIStorageCapacityFields{}
-	}
-}
-
 // CSIStorageCapacity constructs an declarative configuration of the CSIStorageCapacity type for use with
 // apply.
-// Provided as a convenience.
-func CSIStorageCapacity() CSIStorageCapacityBuilder {
-	return CSIStorageCapacityBuilder{fields: &cSIStorageCapacityFields{}}
+func CSIStorageCapacity() *CSIStorageCapacityBuilder {
+	return &CSIStorageCapacityBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b CSIStorageCapacityBuilder) SetTypeMeta(value v1.TypeMetaBuilder) CSIStorageCapacityBuilder {
-	b.ensureInitialized()
+func (b *CSIStorageCapacityBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *CSIStorageCapacityBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b CSIStorageCapacityBuilder) RemoveTypeMeta() CSIStorageCapacityBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *CSIStorageCapacityBuilder) RemoveTypeMeta() *CSIStorageCapacityBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b CSIStorageCapacityBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *CSIStorageCapacityBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b CSIStorageCapacityBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) CSIStorageCapacityBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *CSIStorageCapacityBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *CSIStorageCapacityBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b CSIStorageCapacityBuilder) RemoveObjectMeta() CSIStorageCapacityBuilder {
-	b.ensureInitialized()
+func (b *CSIStorageCapacityBuilder) RemoveObjectMeta() *CSIStorageCapacityBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b CSIStorageCapacityBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *CSIStorageCapacityBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetNodeTopology sets the NodeTopology field in the declarative configuration to the given value.
-func (b CSIStorageCapacityBuilder) SetNodeTopology(value v1.LabelSelectorBuilder) CSIStorageCapacityBuilder {
-	b.ensureInitialized()
-	b.fields.NodeTopology = &value
+func (b *CSIStorageCapacityBuilder) SetNodeTopology(value *v1.LabelSelectorBuilder) *CSIStorageCapacityBuilder {
+	b.fields.NodeTopology = value
 	return b
 }
 
 // RemoveNodeTopology removes the NodeTopology field from the declarative configuration.
-func (b CSIStorageCapacityBuilder) RemoveNodeTopology() CSIStorageCapacityBuilder {
-	b.ensureInitialized()
+func (b *CSIStorageCapacityBuilder) RemoveNodeTopology() *CSIStorageCapacityBuilder {
 	b.fields.NodeTopology = nil
 	return b
 }
 
 // GetNodeTopology gets the NodeTopology field from the declarative configuration.
-func (b CSIStorageCapacityBuilder) GetNodeTopology() (value v1.LabelSelectorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.NodeTopology; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *CSIStorageCapacityBuilder) GetNodeTopology() (value *v1.LabelSelectorBuilder, ok bool) {
+	return b.fields.NodeTopology, b.fields.NodeTopology != nil
 }
 
 // SetStorageClassName sets the StorageClassName field in the declarative configuration to the given value.
-func (b CSIStorageCapacityBuilder) SetStorageClassName(value string) CSIStorageCapacityBuilder {
-	b.ensureInitialized()
+func (b *CSIStorageCapacityBuilder) SetStorageClassName(value string) *CSIStorageCapacityBuilder {
 	b.fields.StorageClassName = &value
 	return b
 }
 
 // RemoveStorageClassName removes the StorageClassName field from the declarative configuration.
-func (b CSIStorageCapacityBuilder) RemoveStorageClassName() CSIStorageCapacityBuilder {
-	b.ensureInitialized()
+func (b *CSIStorageCapacityBuilder) RemoveStorageClassName() *CSIStorageCapacityBuilder {
 	b.fields.StorageClassName = nil
 	return b
 }
 
 // GetStorageClassName gets the StorageClassName field from the declarative configuration.
-func (b CSIStorageCapacityBuilder) GetStorageClassName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *CSIStorageCapacityBuilder) GetStorageClassName() (value string, ok bool) {
 	if v := b.fields.StorageClassName; v != nil {
 		return *v, true
 	}
@@ -150,22 +125,19 @@ func (b CSIStorageCapacityBuilder) GetStorageClassName() (value string, ok bool)
 }
 
 // SetCapacity sets the Capacity field in the declarative configuration to the given value.
-func (b CSIStorageCapacityBuilder) SetCapacity(value resource.Quantity) CSIStorageCapacityBuilder {
-	b.ensureInitialized()
+func (b *CSIStorageCapacityBuilder) SetCapacity(value resource.Quantity) *CSIStorageCapacityBuilder {
 	b.fields.Capacity = &value
 	return b
 }
 
 // RemoveCapacity removes the Capacity field from the declarative configuration.
-func (b CSIStorageCapacityBuilder) RemoveCapacity() CSIStorageCapacityBuilder {
-	b.ensureInitialized()
+func (b *CSIStorageCapacityBuilder) RemoveCapacity() *CSIStorageCapacityBuilder {
 	b.fields.Capacity = nil
 	return b
 }
 
 // GetCapacity gets the Capacity field from the declarative configuration.
-func (b CSIStorageCapacityBuilder) GetCapacity() (value resource.Quantity, ok bool) {
-	b.ensureInitialized()
+func (b *CSIStorageCapacityBuilder) GetCapacity() (value resource.Quantity, ok bool) {
 	if v := b.fields.Capacity; v != nil {
 		return *v, true
 	}
@@ -177,9 +149,8 @@ func (b *CSIStorageCapacityBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -194,14 +165,13 @@ func (b *CSIStorageCapacityBuilder) FromUnstructured(u map[string]interface{}) e
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals CSIStorageCapacityBuilder to JSON.
 func (b *CSIStorageCapacityBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -209,8 +179,7 @@ func (b *CSIStorageCapacityBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into CSIStorageCapacityBuilder, replacing the contents of
 // CSIStorageCapacityBuilder.
 func (b *CSIStorageCapacityBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -218,22 +187,25 @@ func (b *CSIStorageCapacityBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // CSIStorageCapacityList represents a list of CSIStorageCapacityBuilder.
-// Provided as a convenience.
-type CSIStorageCapacityList []CSIStorageCapacityBuilder
+type CSIStorageCapacityList []*CSIStorageCapacityBuilder
 
 // CSIStorageCapacityList represents a map of CSIStorageCapacityBuilder.
-// Provided as a convenience.
 type CSIStorageCapacityMap map[string]CSIStorageCapacityBuilder
 
 func (b *CSIStorageCapacityBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *CSIStorageCapacityBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

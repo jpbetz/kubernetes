@@ -27,14 +27,14 @@ import (
 // ResourcePolicyRuleBuilder represents an declarative configuration of the ResourcePolicyRule type for use
 // with apply.
 type ResourcePolicyRuleBuilder struct {
-	fields *resourcePolicyRuleFields
+	fields resourcePolicyRuleFields
 }
 
-// resourcePolicyRuleFields is used by ResourcePolicyRuleBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ResourcePolicyRuleBuilder before marshalling, and
-// are copied out to the builder type in ResourcePolicyRuleBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// resourcePolicyRuleFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ResourcePolicyRuleBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type resourcePolicyRuleFields struct {
 	Verbs        *[]string `json:"verbs,omitempty"`
 	APIGroups    *[]string `json:"apiGroups,omitempty"`
@@ -43,36 +43,26 @@ type resourcePolicyRuleFields struct {
 	Namespaces   *[]string `json:"namespaces,omitempty"`
 }
 
-func (b *ResourcePolicyRuleBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &resourcePolicyRuleFields{}
-	}
-}
-
 // ResourcePolicyRule constructs an declarative configuration of the ResourcePolicyRule type for use with
 // apply.
-// Provided as a convenience.
-func ResourcePolicyRule() ResourcePolicyRuleBuilder {
-	return ResourcePolicyRuleBuilder{fields: &resourcePolicyRuleFields{}}
+func ResourcePolicyRule() *ResourcePolicyRuleBuilder {
+	return &ResourcePolicyRuleBuilder{}
 }
 
 // SetVerbs sets the Verbs field in the declarative configuration to the given value.
-func (b ResourcePolicyRuleBuilder) SetVerbs(value []string) ResourcePolicyRuleBuilder {
-	b.ensureInitialized()
+func (b *ResourcePolicyRuleBuilder) SetVerbs(value []string) *ResourcePolicyRuleBuilder {
 	b.fields.Verbs = &value
 	return b
 }
 
 // RemoveVerbs removes the Verbs field from the declarative configuration.
-func (b ResourcePolicyRuleBuilder) RemoveVerbs() ResourcePolicyRuleBuilder {
-	b.ensureInitialized()
+func (b *ResourcePolicyRuleBuilder) RemoveVerbs() *ResourcePolicyRuleBuilder {
 	b.fields.Verbs = nil
 	return b
 }
 
 // GetVerbs gets the Verbs field from the declarative configuration.
-func (b ResourcePolicyRuleBuilder) GetVerbs() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *ResourcePolicyRuleBuilder) GetVerbs() (value []string, ok bool) {
 	if v := b.fields.Verbs; v != nil {
 		return *v, true
 	}
@@ -80,22 +70,19 @@ func (b ResourcePolicyRuleBuilder) GetVerbs() (value []string, ok bool) {
 }
 
 // SetAPIGroups sets the APIGroups field in the declarative configuration to the given value.
-func (b ResourcePolicyRuleBuilder) SetAPIGroups(value []string) ResourcePolicyRuleBuilder {
-	b.ensureInitialized()
+func (b *ResourcePolicyRuleBuilder) SetAPIGroups(value []string) *ResourcePolicyRuleBuilder {
 	b.fields.APIGroups = &value
 	return b
 }
 
 // RemoveAPIGroups removes the APIGroups field from the declarative configuration.
-func (b ResourcePolicyRuleBuilder) RemoveAPIGroups() ResourcePolicyRuleBuilder {
-	b.ensureInitialized()
+func (b *ResourcePolicyRuleBuilder) RemoveAPIGroups() *ResourcePolicyRuleBuilder {
 	b.fields.APIGroups = nil
 	return b
 }
 
 // GetAPIGroups gets the APIGroups field from the declarative configuration.
-func (b ResourcePolicyRuleBuilder) GetAPIGroups() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *ResourcePolicyRuleBuilder) GetAPIGroups() (value []string, ok bool) {
 	if v := b.fields.APIGroups; v != nil {
 		return *v, true
 	}
@@ -103,22 +90,19 @@ func (b ResourcePolicyRuleBuilder) GetAPIGroups() (value []string, ok bool) {
 }
 
 // SetResources sets the Resources field in the declarative configuration to the given value.
-func (b ResourcePolicyRuleBuilder) SetResources(value []string) ResourcePolicyRuleBuilder {
-	b.ensureInitialized()
+func (b *ResourcePolicyRuleBuilder) SetResources(value []string) *ResourcePolicyRuleBuilder {
 	b.fields.Resources = &value
 	return b
 }
 
 // RemoveResources removes the Resources field from the declarative configuration.
-func (b ResourcePolicyRuleBuilder) RemoveResources() ResourcePolicyRuleBuilder {
-	b.ensureInitialized()
+func (b *ResourcePolicyRuleBuilder) RemoveResources() *ResourcePolicyRuleBuilder {
 	b.fields.Resources = nil
 	return b
 }
 
 // GetResources gets the Resources field from the declarative configuration.
-func (b ResourcePolicyRuleBuilder) GetResources() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *ResourcePolicyRuleBuilder) GetResources() (value []string, ok bool) {
 	if v := b.fields.Resources; v != nil {
 		return *v, true
 	}
@@ -126,22 +110,19 @@ func (b ResourcePolicyRuleBuilder) GetResources() (value []string, ok bool) {
 }
 
 // SetClusterScope sets the ClusterScope field in the declarative configuration to the given value.
-func (b ResourcePolicyRuleBuilder) SetClusterScope(value bool) ResourcePolicyRuleBuilder {
-	b.ensureInitialized()
+func (b *ResourcePolicyRuleBuilder) SetClusterScope(value bool) *ResourcePolicyRuleBuilder {
 	b.fields.ClusterScope = &value
 	return b
 }
 
 // RemoveClusterScope removes the ClusterScope field from the declarative configuration.
-func (b ResourcePolicyRuleBuilder) RemoveClusterScope() ResourcePolicyRuleBuilder {
-	b.ensureInitialized()
+func (b *ResourcePolicyRuleBuilder) RemoveClusterScope() *ResourcePolicyRuleBuilder {
 	b.fields.ClusterScope = nil
 	return b
 }
 
 // GetClusterScope gets the ClusterScope field from the declarative configuration.
-func (b ResourcePolicyRuleBuilder) GetClusterScope() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *ResourcePolicyRuleBuilder) GetClusterScope() (value bool, ok bool) {
 	if v := b.fields.ClusterScope; v != nil {
 		return *v, true
 	}
@@ -149,22 +130,19 @@ func (b ResourcePolicyRuleBuilder) GetClusterScope() (value bool, ok bool) {
 }
 
 // SetNamespaces sets the Namespaces field in the declarative configuration to the given value.
-func (b ResourcePolicyRuleBuilder) SetNamespaces(value []string) ResourcePolicyRuleBuilder {
-	b.ensureInitialized()
+func (b *ResourcePolicyRuleBuilder) SetNamespaces(value []string) *ResourcePolicyRuleBuilder {
 	b.fields.Namespaces = &value
 	return b
 }
 
 // RemoveNamespaces removes the Namespaces field from the declarative configuration.
-func (b ResourcePolicyRuleBuilder) RemoveNamespaces() ResourcePolicyRuleBuilder {
-	b.ensureInitialized()
+func (b *ResourcePolicyRuleBuilder) RemoveNamespaces() *ResourcePolicyRuleBuilder {
 	b.fields.Namespaces = nil
 	return b
 }
 
 // GetNamespaces gets the Namespaces field from the declarative configuration.
-func (b ResourcePolicyRuleBuilder) GetNamespaces() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *ResourcePolicyRuleBuilder) GetNamespaces() (value []string, ok bool) {
 	if v := b.fields.Namespaces; v != nil {
 		return *v, true
 	}
@@ -176,9 +154,8 @@ func (b *ResourcePolicyRuleBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -193,14 +170,13 @@ func (b *ResourcePolicyRuleBuilder) FromUnstructured(u map[string]interface{}) e
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ResourcePolicyRuleBuilder to JSON.
 func (b *ResourcePolicyRuleBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -208,8 +184,7 @@ func (b *ResourcePolicyRuleBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ResourcePolicyRuleBuilder, replacing the contents of
 // ResourcePolicyRuleBuilder.
 func (b *ResourcePolicyRuleBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -217,11 +192,9 @@ func (b *ResourcePolicyRuleBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ResourcePolicyRuleList represents a list of ResourcePolicyRuleBuilder.
-// Provided as a convenience.
-type ResourcePolicyRuleList []ResourcePolicyRuleBuilder
+type ResourcePolicyRuleList []*ResourcePolicyRuleBuilder
 
 // ResourcePolicyRuleList represents a map of ResourcePolicyRuleBuilder.
-// Provided as a convenience.
 type ResourcePolicyRuleMap map[string]ResourcePolicyRuleBuilder
 
 func (b *ResourcePolicyRuleBuilder) preMarshal() {

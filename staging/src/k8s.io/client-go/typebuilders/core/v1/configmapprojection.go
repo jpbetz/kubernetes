@@ -27,71 +27,58 @@ import (
 // ConfigMapProjectionBuilder represents an declarative configuration of the ConfigMapProjection type for use
 // with apply.
 type ConfigMapProjectionBuilder struct {
-	localObjectReference LocalObjectReferenceBuilder // inlined type
-	fields               *configMapProjectionFields
+	localObjectReference *LocalObjectReferenceBuilder // inlined type
+	fields               configMapProjectionFields
 }
 
-// configMapProjectionFields is used by ConfigMapProjectionBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ConfigMapProjectionBuilder before marshalling, and
-// are copied out to the builder type in ConfigMapProjectionBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// configMapProjectionFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ConfigMapProjectionBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type configMapProjectionFields struct {
 	Name     *string        `json:"name,omitempty"` // inlined ConfigMapProjectionBuilder.localObjectReference.Name field
 	Items    *KeyToPathList `json:"items,omitempty"`
 	Optional *bool          `json:"optional,omitempty"`
 }
 
-func (b *ConfigMapProjectionBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &configMapProjectionFields{}
-	}
-}
-
 // ConfigMapProjection constructs an declarative configuration of the ConfigMapProjection type for use with
 // apply.
-// Provided as a convenience.
-func ConfigMapProjection() ConfigMapProjectionBuilder {
-	return ConfigMapProjectionBuilder{fields: &configMapProjectionFields{}}
+func ConfigMapProjection() *ConfigMapProjectionBuilder {
+	return &ConfigMapProjectionBuilder{}
 }
 
 // SetLocalObjectReference sets the LocalObjectReference field in the declarative configuration to the given value.
-func (b ConfigMapProjectionBuilder) SetLocalObjectReference(value LocalObjectReferenceBuilder) ConfigMapProjectionBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapProjectionBuilder) SetLocalObjectReference(value *LocalObjectReferenceBuilder) *ConfigMapProjectionBuilder {
 	b.localObjectReference = value
 	return b
 }
 
 // RemoveLocalObjectReference removes the LocalObjectReference field from the declarative configuration.
-func (b ConfigMapProjectionBuilder) RemoveLocalObjectReference() ConfigMapProjectionBuilder {
-	b.ensureInitialized()
-	b.localObjectReference = LocalObjectReferenceBuilder{}
+func (b *ConfigMapProjectionBuilder) RemoveLocalObjectReference() *ConfigMapProjectionBuilder {
+	b.localObjectReference = nil
 	return b
 }
 
 // GetLocalObjectReference gets the LocalObjectReference field from the declarative configuration.
-func (b ConfigMapProjectionBuilder) GetLocalObjectReference() (value LocalObjectReferenceBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapProjectionBuilder) GetLocalObjectReference() (value *LocalObjectReferenceBuilder, ok bool) {
 	return b.localObjectReference, true
 }
 
 // SetItems sets the Items field in the declarative configuration to the given value.
-func (b ConfigMapProjectionBuilder) SetItems(value KeyToPathList) ConfigMapProjectionBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapProjectionBuilder) SetItems(value KeyToPathList) *ConfigMapProjectionBuilder {
 	b.fields.Items = &value
 	return b
 }
 
 // RemoveItems removes the Items field from the declarative configuration.
-func (b ConfigMapProjectionBuilder) RemoveItems() ConfigMapProjectionBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapProjectionBuilder) RemoveItems() *ConfigMapProjectionBuilder {
 	b.fields.Items = nil
 	return b
 }
 
 // GetItems gets the Items field from the declarative configuration.
-func (b ConfigMapProjectionBuilder) GetItems() (value KeyToPathList, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapProjectionBuilder) GetItems() (value KeyToPathList, ok bool) {
 	if v := b.fields.Items; v != nil {
 		return *v, true
 	}
@@ -99,22 +86,19 @@ func (b ConfigMapProjectionBuilder) GetItems() (value KeyToPathList, ok bool) {
 }
 
 // SetOptional sets the Optional field in the declarative configuration to the given value.
-func (b ConfigMapProjectionBuilder) SetOptional(value bool) ConfigMapProjectionBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapProjectionBuilder) SetOptional(value bool) *ConfigMapProjectionBuilder {
 	b.fields.Optional = &value
 	return b
 }
 
 // RemoveOptional removes the Optional field from the declarative configuration.
-func (b ConfigMapProjectionBuilder) RemoveOptional() ConfigMapProjectionBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapProjectionBuilder) RemoveOptional() *ConfigMapProjectionBuilder {
 	b.fields.Optional = nil
 	return b
 }
 
 // GetOptional gets the Optional field from the declarative configuration.
-func (b ConfigMapProjectionBuilder) GetOptional() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapProjectionBuilder) GetOptional() (value bool, ok bool) {
 	if v := b.fields.Optional; v != nil {
 		return *v, true
 	}
@@ -126,9 +110,8 @@ func (b *ConfigMapProjectionBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -143,14 +126,13 @@ func (b *ConfigMapProjectionBuilder) FromUnstructured(u map[string]interface{}) 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ConfigMapProjectionBuilder to JSON.
 func (b *ConfigMapProjectionBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -158,8 +140,7 @@ func (b *ConfigMapProjectionBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ConfigMapProjectionBuilder, replacing the contents of
 // ConfigMapProjectionBuilder.
 func (b *ConfigMapProjectionBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -167,19 +148,22 @@ func (b *ConfigMapProjectionBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ConfigMapProjectionList represents a list of ConfigMapProjectionBuilder.
-// Provided as a convenience.
-type ConfigMapProjectionList []ConfigMapProjectionBuilder
+type ConfigMapProjectionList []*ConfigMapProjectionBuilder
 
 // ConfigMapProjectionList represents a map of ConfigMapProjectionBuilder.
-// Provided as a convenience.
 type ConfigMapProjectionMap map[string]ConfigMapProjectionBuilder
 
 func (b *ConfigMapProjectionBuilder) preMarshal() {
-	if v, ok := b.localObjectReference.GetName(); ok {
-		b.fields.Name = &v
+	if b.localObjectReference != nil {
+		if v, ok := b.localObjectReference.GetName(); ok {
+			b.fields.Name = &v
+		}
 	}
 }
 func (b *ConfigMapProjectionBuilder) postUnmarshal() {
+	if b.localObjectReference == nil {
+		b.localObjectReference = &LocalObjectReferenceBuilder{}
+	}
 	if b.fields.Name != nil {
 		b.localObjectReference.SetName(*b.fields.Name)
 	}

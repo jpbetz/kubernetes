@@ -28,15 +28,15 @@ import (
 // IngressClassBuilder represents an declarative configuration of the IngressClass type for use
 // with apply.
 type IngressClassBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *ingressClassFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   ingressClassFields
 }
 
-// ingressClassFields is used by IngressClassBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in IngressClassBuilder before marshalling, and
-// are copied out to the builder type in IngressClassBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// ingressClassFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in IngressClassBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type ingressClassFields struct {
 	Kind       *string                  `json:"kind,omitempty"`       // inlined IngressClassBuilder.typeMeta.Kind field
 	APIVersion *string                  `json:"apiVersion,omitempty"` // inlined IngressClassBuilder.typeMeta.APIVersion field
@@ -44,83 +44,61 @@ type ingressClassFields struct {
 	Spec       *IngressClassSpecBuilder `json:"spec,omitempty"`
 }
 
-func (b *IngressClassBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &ingressClassFields{}
-	}
-}
-
 // IngressClass constructs an declarative configuration of the IngressClass type for use with
 // apply.
-// Provided as a convenience.
-func IngressClass() IngressClassBuilder {
-	return IngressClassBuilder{fields: &ingressClassFields{}}
+func IngressClass() *IngressClassBuilder {
+	return &IngressClassBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b IngressClassBuilder) SetTypeMeta(value v1.TypeMetaBuilder) IngressClassBuilder {
-	b.ensureInitialized()
+func (b *IngressClassBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *IngressClassBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b IngressClassBuilder) RemoveTypeMeta() IngressClassBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *IngressClassBuilder) RemoveTypeMeta() *IngressClassBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b IngressClassBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *IngressClassBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b IngressClassBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) IngressClassBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *IngressClassBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *IngressClassBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b IngressClassBuilder) RemoveObjectMeta() IngressClassBuilder {
-	b.ensureInitialized()
+func (b *IngressClassBuilder) RemoveObjectMeta() *IngressClassBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b IngressClassBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *IngressClassBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b IngressClassBuilder) SetSpec(value IngressClassSpecBuilder) IngressClassBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *IngressClassBuilder) SetSpec(value *IngressClassSpecBuilder) *IngressClassBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b IngressClassBuilder) RemoveSpec() IngressClassBuilder {
-	b.ensureInitialized()
+func (b *IngressClassBuilder) RemoveSpec() *IngressClassBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b IngressClassBuilder) GetSpec() (value IngressClassSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *IngressClassBuilder) GetSpec() (value *IngressClassSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // ToUnstructured converts IngressClassBuilder to unstructured.
@@ -128,9 +106,8 @@ func (b *IngressClassBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +122,13 @@ func (b *IngressClassBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals IngressClassBuilder to JSON.
 func (b *IngressClassBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +136,7 @@ func (b *IngressClassBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into IngressClassBuilder, replacing the contents of
 // IngressClassBuilder.
 func (b *IngressClassBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,22 +144,25 @@ func (b *IngressClassBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // IngressClassList represents a list of IngressClassBuilder.
-// Provided as a convenience.
-type IngressClassList []IngressClassBuilder
+type IngressClassList []*IngressClassBuilder
 
 // IngressClassList represents a map of IngressClassBuilder.
-// Provided as a convenience.
 type IngressClassMap map[string]IngressClassBuilder
 
 func (b *IngressClassBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *IngressClassBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

@@ -27,52 +27,39 @@ import (
 // IngressRuleValueBuilder represents an declarative configuration of the IngressRuleValue type for use
 // with apply.
 type IngressRuleValueBuilder struct {
-	fields *ingressRuleValueFields
+	fields ingressRuleValueFields
 }
 
-// ingressRuleValueFields is used by IngressRuleValueBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in IngressRuleValueBuilder before marshalling, and
-// are copied out to the builder type in IngressRuleValueBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// ingressRuleValueFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in IngressRuleValueBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type ingressRuleValueFields struct {
 	HTTP *HTTPIngressRuleValueBuilder `json:"http,omitempty"`
 }
 
-func (b *IngressRuleValueBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &ingressRuleValueFields{}
-	}
-}
-
 // IngressRuleValue constructs an declarative configuration of the IngressRuleValue type for use with
 // apply.
-// Provided as a convenience.
-func IngressRuleValue() IngressRuleValueBuilder {
-	return IngressRuleValueBuilder{fields: &ingressRuleValueFields{}}
+func IngressRuleValue() *IngressRuleValueBuilder {
+	return &IngressRuleValueBuilder{}
 }
 
 // SetHTTP sets the HTTP field in the declarative configuration to the given value.
-func (b IngressRuleValueBuilder) SetHTTP(value HTTPIngressRuleValueBuilder) IngressRuleValueBuilder {
-	b.ensureInitialized()
-	b.fields.HTTP = &value
+func (b *IngressRuleValueBuilder) SetHTTP(value *HTTPIngressRuleValueBuilder) *IngressRuleValueBuilder {
+	b.fields.HTTP = value
 	return b
 }
 
 // RemoveHTTP removes the HTTP field from the declarative configuration.
-func (b IngressRuleValueBuilder) RemoveHTTP() IngressRuleValueBuilder {
-	b.ensureInitialized()
+func (b *IngressRuleValueBuilder) RemoveHTTP() *IngressRuleValueBuilder {
 	b.fields.HTTP = nil
 	return b
 }
 
 // GetHTTP gets the HTTP field from the declarative configuration.
-func (b IngressRuleValueBuilder) GetHTTP() (value HTTPIngressRuleValueBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.HTTP; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *IngressRuleValueBuilder) GetHTTP() (value *HTTPIngressRuleValueBuilder, ok bool) {
+	return b.fields.HTTP, b.fields.HTTP != nil
 }
 
 // ToUnstructured converts IngressRuleValueBuilder to unstructured.
@@ -80,9 +67,8 @@ func (b *IngressRuleValueBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +83,13 @@ func (b *IngressRuleValueBuilder) FromUnstructured(u map[string]interface{}) err
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals IngressRuleValueBuilder to JSON.
 func (b *IngressRuleValueBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +97,7 @@ func (b *IngressRuleValueBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into IngressRuleValueBuilder, replacing the contents of
 // IngressRuleValueBuilder.
 func (b *IngressRuleValueBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +105,9 @@ func (b *IngressRuleValueBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // IngressRuleValueList represents a list of IngressRuleValueBuilder.
-// Provided as a convenience.
-type IngressRuleValueList []IngressRuleValueBuilder
+type IngressRuleValueList []*IngressRuleValueBuilder
 
 // IngressRuleValueList represents a map of IngressRuleValueBuilder.
-// Provided as a convenience.
 type IngressRuleValueMap map[string]IngressRuleValueBuilder
 
 func (b *IngressRuleValueBuilder) preMarshal() {

@@ -27,50 +27,40 @@ import (
 // VolumeAttachmentSpecBuilder represents an declarative configuration of the VolumeAttachmentSpec type for use
 // with apply.
 type VolumeAttachmentSpecBuilder struct {
-	fields *volumeAttachmentSpecFields
+	fields volumeAttachmentSpecFields
 }
 
-// volumeAttachmentSpecFields is used by VolumeAttachmentSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in VolumeAttachmentSpecBuilder before marshalling, and
-// are copied out to the builder type in VolumeAttachmentSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// volumeAttachmentSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in VolumeAttachmentSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type volumeAttachmentSpecFields struct {
 	Attacher *string                        `json:"attacher,omitempty"`
 	Source   *VolumeAttachmentSourceBuilder `json:"source,omitempty"`
 	NodeName *string                        `json:"nodeName,omitempty"`
 }
 
-func (b *VolumeAttachmentSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &volumeAttachmentSpecFields{}
-	}
-}
-
 // VolumeAttachmentSpec constructs an declarative configuration of the VolumeAttachmentSpec type for use with
 // apply.
-// Provided as a convenience.
-func VolumeAttachmentSpec() VolumeAttachmentSpecBuilder {
-	return VolumeAttachmentSpecBuilder{fields: &volumeAttachmentSpecFields{}}
+func VolumeAttachmentSpec() *VolumeAttachmentSpecBuilder {
+	return &VolumeAttachmentSpecBuilder{}
 }
 
 // SetAttacher sets the Attacher field in the declarative configuration to the given value.
-func (b VolumeAttachmentSpecBuilder) SetAttacher(value string) VolumeAttachmentSpecBuilder {
-	b.ensureInitialized()
+func (b *VolumeAttachmentSpecBuilder) SetAttacher(value string) *VolumeAttachmentSpecBuilder {
 	b.fields.Attacher = &value
 	return b
 }
 
 // RemoveAttacher removes the Attacher field from the declarative configuration.
-func (b VolumeAttachmentSpecBuilder) RemoveAttacher() VolumeAttachmentSpecBuilder {
-	b.ensureInitialized()
+func (b *VolumeAttachmentSpecBuilder) RemoveAttacher() *VolumeAttachmentSpecBuilder {
 	b.fields.Attacher = nil
 	return b
 }
 
 // GetAttacher gets the Attacher field from the declarative configuration.
-func (b VolumeAttachmentSpecBuilder) GetAttacher() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *VolumeAttachmentSpecBuilder) GetAttacher() (value string, ok bool) {
 	if v := b.fields.Attacher; v != nil {
 		return *v, true
 	}
@@ -78,45 +68,36 @@ func (b VolumeAttachmentSpecBuilder) GetAttacher() (value string, ok bool) {
 }
 
 // SetSource sets the Source field in the declarative configuration to the given value.
-func (b VolumeAttachmentSpecBuilder) SetSource(value VolumeAttachmentSourceBuilder) VolumeAttachmentSpecBuilder {
-	b.ensureInitialized()
-	b.fields.Source = &value
+func (b *VolumeAttachmentSpecBuilder) SetSource(value *VolumeAttachmentSourceBuilder) *VolumeAttachmentSpecBuilder {
+	b.fields.Source = value
 	return b
 }
 
 // RemoveSource removes the Source field from the declarative configuration.
-func (b VolumeAttachmentSpecBuilder) RemoveSource() VolumeAttachmentSpecBuilder {
-	b.ensureInitialized()
+func (b *VolumeAttachmentSpecBuilder) RemoveSource() *VolumeAttachmentSpecBuilder {
 	b.fields.Source = nil
 	return b
 }
 
 // GetSource gets the Source field from the declarative configuration.
-func (b VolumeAttachmentSpecBuilder) GetSource() (value VolumeAttachmentSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Source; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeAttachmentSpecBuilder) GetSource() (value *VolumeAttachmentSourceBuilder, ok bool) {
+	return b.fields.Source, b.fields.Source != nil
 }
 
 // SetNodeName sets the NodeName field in the declarative configuration to the given value.
-func (b VolumeAttachmentSpecBuilder) SetNodeName(value string) VolumeAttachmentSpecBuilder {
-	b.ensureInitialized()
+func (b *VolumeAttachmentSpecBuilder) SetNodeName(value string) *VolumeAttachmentSpecBuilder {
 	b.fields.NodeName = &value
 	return b
 }
 
 // RemoveNodeName removes the NodeName field from the declarative configuration.
-func (b VolumeAttachmentSpecBuilder) RemoveNodeName() VolumeAttachmentSpecBuilder {
-	b.ensureInitialized()
+func (b *VolumeAttachmentSpecBuilder) RemoveNodeName() *VolumeAttachmentSpecBuilder {
 	b.fields.NodeName = nil
 	return b
 }
 
 // GetNodeName gets the NodeName field from the declarative configuration.
-func (b VolumeAttachmentSpecBuilder) GetNodeName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *VolumeAttachmentSpecBuilder) GetNodeName() (value string, ok bool) {
 	if v := b.fields.NodeName; v != nil {
 		return *v, true
 	}
@@ -128,9 +109,8 @@ func (b *VolumeAttachmentSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +125,13 @@ func (b *VolumeAttachmentSpecBuilder) FromUnstructured(u map[string]interface{})
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals VolumeAttachmentSpecBuilder to JSON.
 func (b *VolumeAttachmentSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +139,7 @@ func (b *VolumeAttachmentSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into VolumeAttachmentSpecBuilder, replacing the contents of
 // VolumeAttachmentSpecBuilder.
 func (b *VolumeAttachmentSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +147,9 @@ func (b *VolumeAttachmentSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // VolumeAttachmentSpecList represents a list of VolumeAttachmentSpecBuilder.
-// Provided as a convenience.
-type VolumeAttachmentSpecList []VolumeAttachmentSpecBuilder
+type VolumeAttachmentSpecList []*VolumeAttachmentSpecBuilder
 
 // VolumeAttachmentSpecList represents a map of VolumeAttachmentSpecBuilder.
-// Provided as a convenience.
 type VolumeAttachmentSpecMap map[string]VolumeAttachmentSpecBuilder
 
 func (b *VolumeAttachmentSpecBuilder) preMarshal() {

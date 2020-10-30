@@ -27,48 +27,38 @@ import (
 // LocalObjectReferenceBuilder represents an declarative configuration of the LocalObjectReference type for use
 // with apply.
 type LocalObjectReferenceBuilder struct {
-	fields *localObjectReferenceFields
+	fields localObjectReferenceFields
 }
 
-// localObjectReferenceFields is used by LocalObjectReferenceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in LocalObjectReferenceBuilder before marshalling, and
-// are copied out to the builder type in LocalObjectReferenceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// localObjectReferenceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in LocalObjectReferenceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type localObjectReferenceFields struct {
 	Name *string `json:"name,omitempty"`
 }
 
-func (b *LocalObjectReferenceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &localObjectReferenceFields{}
-	}
-}
-
 // LocalObjectReference constructs an declarative configuration of the LocalObjectReference type for use with
 // apply.
-// Provided as a convenience.
-func LocalObjectReference() LocalObjectReferenceBuilder {
-	return LocalObjectReferenceBuilder{fields: &localObjectReferenceFields{}}
+func LocalObjectReference() *LocalObjectReferenceBuilder {
+	return &LocalObjectReferenceBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b LocalObjectReferenceBuilder) SetName(value string) LocalObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *LocalObjectReferenceBuilder) SetName(value string) *LocalObjectReferenceBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b LocalObjectReferenceBuilder) RemoveName() LocalObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *LocalObjectReferenceBuilder) RemoveName() *LocalObjectReferenceBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b LocalObjectReferenceBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *LocalObjectReferenceBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *LocalObjectReferenceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *LocalObjectReferenceBuilder) FromUnstructured(u map[string]interface{})
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals LocalObjectReferenceBuilder to JSON.
 func (b *LocalObjectReferenceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *LocalObjectReferenceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into LocalObjectReferenceBuilder, replacing the contents of
 // LocalObjectReferenceBuilder.
 func (b *LocalObjectReferenceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *LocalObjectReferenceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // LocalObjectReferenceList represents a list of LocalObjectReferenceBuilder.
-// Provided as a convenience.
-type LocalObjectReferenceList []LocalObjectReferenceBuilder
+type LocalObjectReferenceList []*LocalObjectReferenceBuilder
 
 // LocalObjectReferenceList represents a map of LocalObjectReferenceBuilder.
-// Provided as a convenience.
 type LocalObjectReferenceMap map[string]LocalObjectReferenceBuilder
 
 func (b *LocalObjectReferenceBuilder) preMarshal() {

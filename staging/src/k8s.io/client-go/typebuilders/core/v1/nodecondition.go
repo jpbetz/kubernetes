@@ -29,14 +29,14 @@ import (
 // NodeConditionBuilder represents an declarative configuration of the NodeCondition type for use
 // with apply.
 type NodeConditionBuilder struct {
-	fields *nodeConditionFields
+	fields nodeConditionFields
 }
 
-// nodeConditionFields is used by NodeConditionBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in NodeConditionBuilder before marshalling, and
-// are copied out to the builder type in NodeConditionBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// nodeConditionFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in NodeConditionBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type nodeConditionFields struct {
 	Type               *v1.NodeConditionType `json:"type,omitempty"`
 	Status             *v1.ConditionStatus   `json:"status,omitempty"`
@@ -46,36 +46,26 @@ type nodeConditionFields struct {
 	Message            *string               `json:"message,omitempty"`
 }
 
-func (b *NodeConditionBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &nodeConditionFields{}
-	}
-}
-
 // NodeCondition constructs an declarative configuration of the NodeCondition type for use with
 // apply.
-// Provided as a convenience.
-func NodeCondition() NodeConditionBuilder {
-	return NodeConditionBuilder{fields: &nodeConditionFields{}}
+func NodeCondition() *NodeConditionBuilder {
+	return &NodeConditionBuilder{}
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b NodeConditionBuilder) SetType(value v1.NodeConditionType) NodeConditionBuilder {
-	b.ensureInitialized()
+func (b *NodeConditionBuilder) SetType(value v1.NodeConditionType) *NodeConditionBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b NodeConditionBuilder) RemoveType() NodeConditionBuilder {
-	b.ensureInitialized()
+func (b *NodeConditionBuilder) RemoveType() *NodeConditionBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b NodeConditionBuilder) GetType() (value v1.NodeConditionType, ok bool) {
-	b.ensureInitialized()
+func (b *NodeConditionBuilder) GetType() (value v1.NodeConditionType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -83,22 +73,19 @@ func (b NodeConditionBuilder) GetType() (value v1.NodeConditionType, ok bool) {
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b NodeConditionBuilder) SetStatus(value v1.ConditionStatus) NodeConditionBuilder {
-	b.ensureInitialized()
+func (b *NodeConditionBuilder) SetStatus(value v1.ConditionStatus) *NodeConditionBuilder {
 	b.fields.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b NodeConditionBuilder) RemoveStatus() NodeConditionBuilder {
-	b.ensureInitialized()
+func (b *NodeConditionBuilder) RemoveStatus() *NodeConditionBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b NodeConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
-	b.ensureInitialized()
+func (b *NodeConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
 	if v := b.fields.Status; v != nil {
 		return *v, true
 	}
@@ -106,22 +93,19 @@ func (b NodeConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
 }
 
 // SetLastHeartbeatTime sets the LastHeartbeatTime field in the declarative configuration to the given value.
-func (b NodeConditionBuilder) SetLastHeartbeatTime(value metav1.Time) NodeConditionBuilder {
-	b.ensureInitialized()
+func (b *NodeConditionBuilder) SetLastHeartbeatTime(value metav1.Time) *NodeConditionBuilder {
 	b.fields.LastHeartbeatTime = &value
 	return b
 }
 
 // RemoveLastHeartbeatTime removes the LastHeartbeatTime field from the declarative configuration.
-func (b NodeConditionBuilder) RemoveLastHeartbeatTime() NodeConditionBuilder {
-	b.ensureInitialized()
+func (b *NodeConditionBuilder) RemoveLastHeartbeatTime() *NodeConditionBuilder {
 	b.fields.LastHeartbeatTime = nil
 	return b
 }
 
 // GetLastHeartbeatTime gets the LastHeartbeatTime field from the declarative configuration.
-func (b NodeConditionBuilder) GetLastHeartbeatTime() (value metav1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *NodeConditionBuilder) GetLastHeartbeatTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastHeartbeatTime; v != nil {
 		return *v, true
 	}
@@ -129,22 +113,19 @@ func (b NodeConditionBuilder) GetLastHeartbeatTime() (value metav1.Time, ok bool
 }
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
-func (b NodeConditionBuilder) SetLastTransitionTime(value metav1.Time) NodeConditionBuilder {
-	b.ensureInitialized()
+func (b *NodeConditionBuilder) SetLastTransitionTime(value metav1.Time) *NodeConditionBuilder {
 	b.fields.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
-func (b NodeConditionBuilder) RemoveLastTransitionTime() NodeConditionBuilder {
-	b.ensureInitialized()
+func (b *NodeConditionBuilder) RemoveLastTransitionTime() *NodeConditionBuilder {
 	b.fields.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
-func (b NodeConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *NodeConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastTransitionTime; v != nil {
 		return *v, true
 	}
@@ -152,22 +133,19 @@ func (b NodeConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok boo
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b NodeConditionBuilder) SetReason(value string) NodeConditionBuilder {
-	b.ensureInitialized()
+func (b *NodeConditionBuilder) SetReason(value string) *NodeConditionBuilder {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b NodeConditionBuilder) RemoveReason() NodeConditionBuilder {
-	b.ensureInitialized()
+func (b *NodeConditionBuilder) RemoveReason() *NodeConditionBuilder {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b NodeConditionBuilder) GetReason() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *NodeConditionBuilder) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -175,22 +153,19 @@ func (b NodeConditionBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b NodeConditionBuilder) SetMessage(value string) NodeConditionBuilder {
-	b.ensureInitialized()
+func (b *NodeConditionBuilder) SetMessage(value string) *NodeConditionBuilder {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b NodeConditionBuilder) RemoveMessage() NodeConditionBuilder {
-	b.ensureInitialized()
+func (b *NodeConditionBuilder) RemoveMessage() *NodeConditionBuilder {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b NodeConditionBuilder) GetMessage() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *NodeConditionBuilder) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
@@ -202,9 +177,8 @@ func (b *NodeConditionBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -219,14 +193,13 @@ func (b *NodeConditionBuilder) FromUnstructured(u map[string]interface{}) error 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals NodeConditionBuilder to JSON.
 func (b *NodeConditionBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -234,8 +207,7 @@ func (b *NodeConditionBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into NodeConditionBuilder, replacing the contents of
 // NodeConditionBuilder.
 func (b *NodeConditionBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -243,11 +215,9 @@ func (b *NodeConditionBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // NodeConditionList represents a list of NodeConditionBuilder.
-// Provided as a convenience.
-type NodeConditionList []NodeConditionBuilder
+type NodeConditionList []*NodeConditionBuilder
 
 // NodeConditionList represents a map of NodeConditionBuilder.
-// Provided as a convenience.
 type NodeConditionMap map[string]NodeConditionBuilder
 
 func (b *NodeConditionBuilder) preMarshal() {

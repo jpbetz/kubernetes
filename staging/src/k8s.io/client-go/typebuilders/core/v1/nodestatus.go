@@ -28,14 +28,14 @@ import (
 // NodeStatusBuilder represents an declarative configuration of the NodeStatus type for use
 // with apply.
 type NodeStatusBuilder struct {
-	fields *nodeStatusFields
+	fields nodeStatusFields
 }
 
-// nodeStatusFields is used by NodeStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in NodeStatusBuilder before marshalling, and
-// are copied out to the builder type in NodeStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// nodeStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in NodeStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type nodeStatusFields struct {
 	Capacity        *v1.ResourceList            `json:"capacity,omitempty"`
 	Allocatable     *v1.ResourceList            `json:"allocatable,omitempty"`
@@ -50,36 +50,26 @@ type nodeStatusFields struct {
 	Config          *NodeConfigStatusBuilder    `json:"config,omitempty"`
 }
 
-func (b *NodeStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &nodeStatusFields{}
-	}
-}
-
 // NodeStatus constructs an declarative configuration of the NodeStatus type for use with
 // apply.
-// Provided as a convenience.
-func NodeStatus() NodeStatusBuilder {
-	return NodeStatusBuilder{fields: &nodeStatusFields{}}
+func NodeStatus() *NodeStatusBuilder {
+	return &NodeStatusBuilder{}
 }
 
 // SetCapacity sets the Capacity field in the declarative configuration to the given value.
-func (b NodeStatusBuilder) SetCapacity(value v1.ResourceList) NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) SetCapacity(value v1.ResourceList) *NodeStatusBuilder {
 	b.fields.Capacity = &value
 	return b
 }
 
 // RemoveCapacity removes the Capacity field from the declarative configuration.
-func (b NodeStatusBuilder) RemoveCapacity() NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) RemoveCapacity() *NodeStatusBuilder {
 	b.fields.Capacity = nil
 	return b
 }
 
 // GetCapacity gets the Capacity field from the declarative configuration.
-func (b NodeStatusBuilder) GetCapacity() (value v1.ResourceList, ok bool) {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) GetCapacity() (value v1.ResourceList, ok bool) {
 	if v := b.fields.Capacity; v != nil {
 		return *v, true
 	}
@@ -87,22 +77,19 @@ func (b NodeStatusBuilder) GetCapacity() (value v1.ResourceList, ok bool) {
 }
 
 // SetAllocatable sets the Allocatable field in the declarative configuration to the given value.
-func (b NodeStatusBuilder) SetAllocatable(value v1.ResourceList) NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) SetAllocatable(value v1.ResourceList) *NodeStatusBuilder {
 	b.fields.Allocatable = &value
 	return b
 }
 
 // RemoveAllocatable removes the Allocatable field from the declarative configuration.
-func (b NodeStatusBuilder) RemoveAllocatable() NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) RemoveAllocatable() *NodeStatusBuilder {
 	b.fields.Allocatable = nil
 	return b
 }
 
 // GetAllocatable gets the Allocatable field from the declarative configuration.
-func (b NodeStatusBuilder) GetAllocatable() (value v1.ResourceList, ok bool) {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) GetAllocatable() (value v1.ResourceList, ok bool) {
 	if v := b.fields.Allocatable; v != nil {
 		return *v, true
 	}
@@ -110,22 +97,19 @@ func (b NodeStatusBuilder) GetAllocatable() (value v1.ResourceList, ok bool) {
 }
 
 // SetPhase sets the Phase field in the declarative configuration to the given value.
-func (b NodeStatusBuilder) SetPhase(value v1.NodePhase) NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) SetPhase(value v1.NodePhase) *NodeStatusBuilder {
 	b.fields.Phase = &value
 	return b
 }
 
 // RemovePhase removes the Phase field from the declarative configuration.
-func (b NodeStatusBuilder) RemovePhase() NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) RemovePhase() *NodeStatusBuilder {
 	b.fields.Phase = nil
 	return b
 }
 
 // GetPhase gets the Phase field from the declarative configuration.
-func (b NodeStatusBuilder) GetPhase() (value v1.NodePhase, ok bool) {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) GetPhase() (value v1.NodePhase, ok bool) {
 	if v := b.fields.Phase; v != nil {
 		return *v, true
 	}
@@ -133,22 +117,19 @@ func (b NodeStatusBuilder) GetPhase() (value v1.NodePhase, ok bool) {
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b NodeStatusBuilder) SetConditions(value NodeConditionList) NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) SetConditions(value NodeConditionList) *NodeStatusBuilder {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b NodeStatusBuilder) RemoveConditions() NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) RemoveConditions() *NodeStatusBuilder {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b NodeStatusBuilder) GetConditions() (value NodeConditionList, ok bool) {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) GetConditions() (value NodeConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
@@ -156,22 +137,19 @@ func (b NodeStatusBuilder) GetConditions() (value NodeConditionList, ok bool) {
 }
 
 // SetAddresses sets the Addresses field in the declarative configuration to the given value.
-func (b NodeStatusBuilder) SetAddresses(value NodeAddressList) NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) SetAddresses(value NodeAddressList) *NodeStatusBuilder {
 	b.fields.Addresses = &value
 	return b
 }
 
 // RemoveAddresses removes the Addresses field from the declarative configuration.
-func (b NodeStatusBuilder) RemoveAddresses() NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) RemoveAddresses() *NodeStatusBuilder {
 	b.fields.Addresses = nil
 	return b
 }
 
 // GetAddresses gets the Addresses field from the declarative configuration.
-func (b NodeStatusBuilder) GetAddresses() (value NodeAddressList, ok bool) {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) GetAddresses() (value NodeAddressList, ok bool) {
 	if v := b.fields.Addresses; v != nil {
 		return *v, true
 	}
@@ -179,68 +157,53 @@ func (b NodeStatusBuilder) GetAddresses() (value NodeAddressList, ok bool) {
 }
 
 // SetDaemonEndpoints sets the DaemonEndpoints field in the declarative configuration to the given value.
-func (b NodeStatusBuilder) SetDaemonEndpoints(value NodeDaemonEndpointsBuilder) NodeStatusBuilder {
-	b.ensureInitialized()
-	b.fields.DaemonEndpoints = &value
+func (b *NodeStatusBuilder) SetDaemonEndpoints(value *NodeDaemonEndpointsBuilder) *NodeStatusBuilder {
+	b.fields.DaemonEndpoints = value
 	return b
 }
 
 // RemoveDaemonEndpoints removes the DaemonEndpoints field from the declarative configuration.
-func (b NodeStatusBuilder) RemoveDaemonEndpoints() NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) RemoveDaemonEndpoints() *NodeStatusBuilder {
 	b.fields.DaemonEndpoints = nil
 	return b
 }
 
 // GetDaemonEndpoints gets the DaemonEndpoints field from the declarative configuration.
-func (b NodeStatusBuilder) GetDaemonEndpoints() (value NodeDaemonEndpointsBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.DaemonEndpoints; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *NodeStatusBuilder) GetDaemonEndpoints() (value *NodeDaemonEndpointsBuilder, ok bool) {
+	return b.fields.DaemonEndpoints, b.fields.DaemonEndpoints != nil
 }
 
 // SetNodeInfo sets the NodeInfo field in the declarative configuration to the given value.
-func (b NodeStatusBuilder) SetNodeInfo(value NodeSystemInfoBuilder) NodeStatusBuilder {
-	b.ensureInitialized()
-	b.fields.NodeInfo = &value
+func (b *NodeStatusBuilder) SetNodeInfo(value *NodeSystemInfoBuilder) *NodeStatusBuilder {
+	b.fields.NodeInfo = value
 	return b
 }
 
 // RemoveNodeInfo removes the NodeInfo field from the declarative configuration.
-func (b NodeStatusBuilder) RemoveNodeInfo() NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) RemoveNodeInfo() *NodeStatusBuilder {
 	b.fields.NodeInfo = nil
 	return b
 }
 
 // GetNodeInfo gets the NodeInfo field from the declarative configuration.
-func (b NodeStatusBuilder) GetNodeInfo() (value NodeSystemInfoBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.NodeInfo; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *NodeStatusBuilder) GetNodeInfo() (value *NodeSystemInfoBuilder, ok bool) {
+	return b.fields.NodeInfo, b.fields.NodeInfo != nil
 }
 
 // SetImages sets the Images field in the declarative configuration to the given value.
-func (b NodeStatusBuilder) SetImages(value ContainerImageList) NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) SetImages(value ContainerImageList) *NodeStatusBuilder {
 	b.fields.Images = &value
 	return b
 }
 
 // RemoveImages removes the Images field from the declarative configuration.
-func (b NodeStatusBuilder) RemoveImages() NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) RemoveImages() *NodeStatusBuilder {
 	b.fields.Images = nil
 	return b
 }
 
 // GetImages gets the Images field from the declarative configuration.
-func (b NodeStatusBuilder) GetImages() (value ContainerImageList, ok bool) {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) GetImages() (value ContainerImageList, ok bool) {
 	if v := b.fields.Images; v != nil {
 		return *v, true
 	}
@@ -248,22 +211,19 @@ func (b NodeStatusBuilder) GetImages() (value ContainerImageList, ok bool) {
 }
 
 // SetVolumesInUse sets the VolumesInUse field in the declarative configuration to the given value.
-func (b NodeStatusBuilder) SetVolumesInUse(value []v1.UniqueVolumeName) NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) SetVolumesInUse(value []v1.UniqueVolumeName) *NodeStatusBuilder {
 	b.fields.VolumesInUse = &value
 	return b
 }
 
 // RemoveVolumesInUse removes the VolumesInUse field from the declarative configuration.
-func (b NodeStatusBuilder) RemoveVolumesInUse() NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) RemoveVolumesInUse() *NodeStatusBuilder {
 	b.fields.VolumesInUse = nil
 	return b
 }
 
 // GetVolumesInUse gets the VolumesInUse field from the declarative configuration.
-func (b NodeStatusBuilder) GetVolumesInUse() (value []v1.UniqueVolumeName, ok bool) {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) GetVolumesInUse() (value []v1.UniqueVolumeName, ok bool) {
 	if v := b.fields.VolumesInUse; v != nil {
 		return *v, true
 	}
@@ -271,22 +231,19 @@ func (b NodeStatusBuilder) GetVolumesInUse() (value []v1.UniqueVolumeName, ok bo
 }
 
 // SetVolumesAttached sets the VolumesAttached field in the declarative configuration to the given value.
-func (b NodeStatusBuilder) SetVolumesAttached(value AttachedVolumeList) NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) SetVolumesAttached(value AttachedVolumeList) *NodeStatusBuilder {
 	b.fields.VolumesAttached = &value
 	return b
 }
 
 // RemoveVolumesAttached removes the VolumesAttached field from the declarative configuration.
-func (b NodeStatusBuilder) RemoveVolumesAttached() NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) RemoveVolumesAttached() *NodeStatusBuilder {
 	b.fields.VolumesAttached = nil
 	return b
 }
 
 // GetVolumesAttached gets the VolumesAttached field from the declarative configuration.
-func (b NodeStatusBuilder) GetVolumesAttached() (value AttachedVolumeList, ok bool) {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) GetVolumesAttached() (value AttachedVolumeList, ok bool) {
 	if v := b.fields.VolumesAttached; v != nil {
 		return *v, true
 	}
@@ -294,26 +251,20 @@ func (b NodeStatusBuilder) GetVolumesAttached() (value AttachedVolumeList, ok bo
 }
 
 // SetConfig sets the Config field in the declarative configuration to the given value.
-func (b NodeStatusBuilder) SetConfig(value NodeConfigStatusBuilder) NodeStatusBuilder {
-	b.ensureInitialized()
-	b.fields.Config = &value
+func (b *NodeStatusBuilder) SetConfig(value *NodeConfigStatusBuilder) *NodeStatusBuilder {
+	b.fields.Config = value
 	return b
 }
 
 // RemoveConfig removes the Config field from the declarative configuration.
-func (b NodeStatusBuilder) RemoveConfig() NodeStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeStatusBuilder) RemoveConfig() *NodeStatusBuilder {
 	b.fields.Config = nil
 	return b
 }
 
 // GetConfig gets the Config field from the declarative configuration.
-func (b NodeStatusBuilder) GetConfig() (value NodeConfigStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Config; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *NodeStatusBuilder) GetConfig() (value *NodeConfigStatusBuilder, ok bool) {
+	return b.fields.Config, b.fields.Config != nil
 }
 
 // ToUnstructured converts NodeStatusBuilder to unstructured.
@@ -321,9 +272,8 @@ func (b *NodeStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -338,14 +288,13 @@ func (b *NodeStatusBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals NodeStatusBuilder to JSON.
 func (b *NodeStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -353,8 +302,7 @@ func (b *NodeStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into NodeStatusBuilder, replacing the contents of
 // NodeStatusBuilder.
 func (b *NodeStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -362,11 +310,9 @@ func (b *NodeStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // NodeStatusList represents a list of NodeStatusBuilder.
-// Provided as a convenience.
-type NodeStatusList []NodeStatusBuilder
+type NodeStatusList []*NodeStatusBuilder
 
 // NodeStatusList represents a map of NodeStatusBuilder.
-// Provided as a convenience.
 type NodeStatusMap map[string]NodeStatusBuilder
 
 func (b *NodeStatusBuilder) preMarshal() {

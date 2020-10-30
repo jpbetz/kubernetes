@@ -27,70 +27,57 @@ import (
 // ConfigMapEnvSourceBuilder represents an declarative configuration of the ConfigMapEnvSource type for use
 // with apply.
 type ConfigMapEnvSourceBuilder struct {
-	localObjectReference LocalObjectReferenceBuilder // inlined type
-	fields               *configMapEnvSourceFields
+	localObjectReference *LocalObjectReferenceBuilder // inlined type
+	fields               configMapEnvSourceFields
 }
 
-// configMapEnvSourceFields is used by ConfigMapEnvSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ConfigMapEnvSourceBuilder before marshalling, and
-// are copied out to the builder type in ConfigMapEnvSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// configMapEnvSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ConfigMapEnvSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type configMapEnvSourceFields struct {
 	Name     *string `json:"name,omitempty"` // inlined ConfigMapEnvSourceBuilder.localObjectReference.Name field
 	Optional *bool   `json:"optional,omitempty"`
 }
 
-func (b *ConfigMapEnvSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &configMapEnvSourceFields{}
-	}
-}
-
 // ConfigMapEnvSource constructs an declarative configuration of the ConfigMapEnvSource type for use with
 // apply.
-// Provided as a convenience.
-func ConfigMapEnvSource() ConfigMapEnvSourceBuilder {
-	return ConfigMapEnvSourceBuilder{fields: &configMapEnvSourceFields{}}
+func ConfigMapEnvSource() *ConfigMapEnvSourceBuilder {
+	return &ConfigMapEnvSourceBuilder{}
 }
 
 // SetLocalObjectReference sets the LocalObjectReference field in the declarative configuration to the given value.
-func (b ConfigMapEnvSourceBuilder) SetLocalObjectReference(value LocalObjectReferenceBuilder) ConfigMapEnvSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapEnvSourceBuilder) SetLocalObjectReference(value *LocalObjectReferenceBuilder) *ConfigMapEnvSourceBuilder {
 	b.localObjectReference = value
 	return b
 }
 
 // RemoveLocalObjectReference removes the LocalObjectReference field from the declarative configuration.
-func (b ConfigMapEnvSourceBuilder) RemoveLocalObjectReference() ConfigMapEnvSourceBuilder {
-	b.ensureInitialized()
-	b.localObjectReference = LocalObjectReferenceBuilder{}
+func (b *ConfigMapEnvSourceBuilder) RemoveLocalObjectReference() *ConfigMapEnvSourceBuilder {
+	b.localObjectReference = nil
 	return b
 }
 
 // GetLocalObjectReference gets the LocalObjectReference field from the declarative configuration.
-func (b ConfigMapEnvSourceBuilder) GetLocalObjectReference() (value LocalObjectReferenceBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapEnvSourceBuilder) GetLocalObjectReference() (value *LocalObjectReferenceBuilder, ok bool) {
 	return b.localObjectReference, true
 }
 
 // SetOptional sets the Optional field in the declarative configuration to the given value.
-func (b ConfigMapEnvSourceBuilder) SetOptional(value bool) ConfigMapEnvSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapEnvSourceBuilder) SetOptional(value bool) *ConfigMapEnvSourceBuilder {
 	b.fields.Optional = &value
 	return b
 }
 
 // RemoveOptional removes the Optional field from the declarative configuration.
-func (b ConfigMapEnvSourceBuilder) RemoveOptional() ConfigMapEnvSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapEnvSourceBuilder) RemoveOptional() *ConfigMapEnvSourceBuilder {
 	b.fields.Optional = nil
 	return b
 }
 
 // GetOptional gets the Optional field from the declarative configuration.
-func (b ConfigMapEnvSourceBuilder) GetOptional() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapEnvSourceBuilder) GetOptional() (value bool, ok bool) {
 	if v := b.fields.Optional; v != nil {
 		return *v, true
 	}
@@ -102,9 +89,8 @@ func (b *ConfigMapEnvSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -119,14 +105,13 @@ func (b *ConfigMapEnvSourceBuilder) FromUnstructured(u map[string]interface{}) e
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ConfigMapEnvSourceBuilder to JSON.
 func (b *ConfigMapEnvSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -134,8 +119,7 @@ func (b *ConfigMapEnvSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ConfigMapEnvSourceBuilder, replacing the contents of
 // ConfigMapEnvSourceBuilder.
 func (b *ConfigMapEnvSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -143,19 +127,22 @@ func (b *ConfigMapEnvSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ConfigMapEnvSourceList represents a list of ConfigMapEnvSourceBuilder.
-// Provided as a convenience.
-type ConfigMapEnvSourceList []ConfigMapEnvSourceBuilder
+type ConfigMapEnvSourceList []*ConfigMapEnvSourceBuilder
 
 // ConfigMapEnvSourceList represents a map of ConfigMapEnvSourceBuilder.
-// Provided as a convenience.
 type ConfigMapEnvSourceMap map[string]ConfigMapEnvSourceBuilder
 
 func (b *ConfigMapEnvSourceBuilder) preMarshal() {
-	if v, ok := b.localObjectReference.GetName(); ok {
-		b.fields.Name = &v
+	if b.localObjectReference != nil {
+		if v, ok := b.localObjectReference.GetName(); ok {
+			b.fields.Name = &v
+		}
 	}
 }
 func (b *ConfigMapEnvSourceBuilder) postUnmarshal() {
+	if b.localObjectReference == nil {
+		b.localObjectReference = &LocalObjectReferenceBuilder{}
+	}
 	if b.fields.Name != nil {
 		b.localObjectReference.SetName(*b.fields.Name)
 	}

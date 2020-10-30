@@ -27,15 +27,15 @@ import (
 // VolumeBuilder represents an declarative configuration of the Volume type for use
 // with apply.
 type VolumeBuilder struct {
-	volumeSource VolumeSourceBuilder // inlined type
-	fields       *volumeFields
+	volumeSource *VolumeSourceBuilder // inlined type
+	fields       volumeFields
 }
 
-// volumeFields is used by VolumeBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in VolumeBuilder before marshalling, and
-// are copied out to the builder type in VolumeBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// volumeFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in VolumeBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type volumeFields struct {
 	Name                  *string                                   `json:"name,omitempty"`
 	HostPath              *HostPathVolumeSourceBuilder              `json:"hostPath,omitempty"`              // inlined VolumeBuilder.volumeSource.HostPath field
@@ -69,36 +69,26 @@ type volumeFields struct {
 	Ephemeral             *EphemeralVolumeSourceBuilder             `json:"ephemeral,omitempty"`             // inlined VolumeBuilder.volumeSource.Ephemeral field
 }
 
-func (b *VolumeBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &volumeFields{}
-	}
-}
-
 // Volume constructs an declarative configuration of the Volume type for use with
 // apply.
-// Provided as a convenience.
-func Volume() VolumeBuilder {
-	return VolumeBuilder{fields: &volumeFields{}}
+func Volume() *VolumeBuilder {
+	return &VolumeBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b VolumeBuilder) SetName(value string) VolumeBuilder {
-	b.ensureInitialized()
+func (b *VolumeBuilder) SetName(value string) *VolumeBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b VolumeBuilder) RemoveName() VolumeBuilder {
-	b.ensureInitialized()
+func (b *VolumeBuilder) RemoveName() *VolumeBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b VolumeBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *VolumeBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -106,22 +96,19 @@ func (b VolumeBuilder) GetName() (value string, ok bool) {
 }
 
 // SetVolumeSource sets the VolumeSource field in the declarative configuration to the given value.
-func (b VolumeBuilder) SetVolumeSource(value VolumeSourceBuilder) VolumeBuilder {
-	b.ensureInitialized()
+func (b *VolumeBuilder) SetVolumeSource(value *VolumeSourceBuilder) *VolumeBuilder {
 	b.volumeSource = value
 	return b
 }
 
 // RemoveVolumeSource removes the VolumeSource field from the declarative configuration.
-func (b VolumeBuilder) RemoveVolumeSource() VolumeBuilder {
-	b.ensureInitialized()
-	b.volumeSource = VolumeSourceBuilder{}
+func (b *VolumeBuilder) RemoveVolumeSource() *VolumeBuilder {
+	b.volumeSource = nil
 	return b
 }
 
 // GetVolumeSource gets the VolumeSource field from the declarative configuration.
-func (b VolumeBuilder) GetVolumeSource() (value VolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *VolumeBuilder) GetVolumeSource() (value *VolumeSourceBuilder, ok bool) {
 	return b.volumeSource, true
 }
 
@@ -130,9 +117,8 @@ func (b *VolumeBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -147,14 +133,13 @@ func (b *VolumeBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals VolumeBuilder to JSON.
 func (b *VolumeBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -162,8 +147,7 @@ func (b *VolumeBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into VolumeBuilder, replacing the contents of
 // VolumeBuilder.
 func (b *VolumeBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -171,188 +155,191 @@ func (b *VolumeBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // VolumeList represents a list of VolumeBuilder.
-// Provided as a convenience.
-type VolumeList []VolumeBuilder
+type VolumeList []*VolumeBuilder
 
 // VolumeList represents a map of VolumeBuilder.
-// Provided as a convenience.
 type VolumeMap map[string]VolumeBuilder
 
 func (b *VolumeBuilder) preMarshal() {
-	if v, ok := b.volumeSource.GetHostPath(); ok {
-		b.fields.HostPath = &v
-	}
-	if v, ok := b.volumeSource.GetEmptyDir(); ok {
-		b.fields.EmptyDir = &v
-	}
-	if v, ok := b.volumeSource.GetGCEPersistentDisk(); ok {
-		b.fields.GCEPersistentDisk = &v
-	}
-	if v, ok := b.volumeSource.GetAWSElasticBlockStore(); ok {
-		b.fields.AWSElasticBlockStore = &v
-	}
-	if v, ok := b.volumeSource.GetGitRepo(); ok {
-		b.fields.GitRepo = &v
-	}
-	if v, ok := b.volumeSource.GetSecret(); ok {
-		b.fields.Secret = &v
-	}
-	if v, ok := b.volumeSource.GetNFS(); ok {
-		b.fields.NFS = &v
-	}
-	if v, ok := b.volumeSource.GetISCSI(); ok {
-		b.fields.ISCSI = &v
-	}
-	if v, ok := b.volumeSource.GetGlusterfs(); ok {
-		b.fields.Glusterfs = &v
-	}
-	if v, ok := b.volumeSource.GetPersistentVolumeClaim(); ok {
-		b.fields.PersistentVolumeClaim = &v
-	}
-	if v, ok := b.volumeSource.GetRBD(); ok {
-		b.fields.RBD = &v
-	}
-	if v, ok := b.volumeSource.GetFlexVolume(); ok {
-		b.fields.FlexVolume = &v
-	}
-	if v, ok := b.volumeSource.GetCinder(); ok {
-		b.fields.Cinder = &v
-	}
-	if v, ok := b.volumeSource.GetCephFS(); ok {
-		b.fields.CephFS = &v
-	}
-	if v, ok := b.volumeSource.GetFlocker(); ok {
-		b.fields.Flocker = &v
-	}
-	if v, ok := b.volumeSource.GetDownwardAPI(); ok {
-		b.fields.DownwardAPI = &v
-	}
-	if v, ok := b.volumeSource.GetFC(); ok {
-		b.fields.FC = &v
-	}
-	if v, ok := b.volumeSource.GetAzureFile(); ok {
-		b.fields.AzureFile = &v
-	}
-	if v, ok := b.volumeSource.GetConfigMap(); ok {
-		b.fields.ConfigMap = &v
-	}
-	if v, ok := b.volumeSource.GetVsphereVolume(); ok {
-		b.fields.VsphereVolume = &v
-	}
-	if v, ok := b.volumeSource.GetQuobyte(); ok {
-		b.fields.Quobyte = &v
-	}
-	if v, ok := b.volumeSource.GetAzureDisk(); ok {
-		b.fields.AzureDisk = &v
-	}
-	if v, ok := b.volumeSource.GetPhotonPersistentDisk(); ok {
-		b.fields.PhotonPersistentDisk = &v
-	}
-	if v, ok := b.volumeSource.GetProjected(); ok {
-		b.fields.Projected = &v
-	}
-	if v, ok := b.volumeSource.GetPortworxVolume(); ok {
-		b.fields.PortworxVolume = &v
-	}
-	if v, ok := b.volumeSource.GetScaleIO(); ok {
-		b.fields.ScaleIO = &v
-	}
-	if v, ok := b.volumeSource.GetStorageOS(); ok {
-		b.fields.StorageOS = &v
-	}
-	if v, ok := b.volumeSource.GetCSI(); ok {
-		b.fields.CSI = &v
-	}
-	if v, ok := b.volumeSource.GetEphemeral(); ok {
-		b.fields.Ephemeral = &v
+	if b.volumeSource != nil {
+		if v, ok := b.volumeSource.GetHostPath(); ok {
+			b.fields.HostPath = v
+		}
+		if v, ok := b.volumeSource.GetEmptyDir(); ok {
+			b.fields.EmptyDir = v
+		}
+		if v, ok := b.volumeSource.GetGCEPersistentDisk(); ok {
+			b.fields.GCEPersistentDisk = v
+		}
+		if v, ok := b.volumeSource.GetAWSElasticBlockStore(); ok {
+			b.fields.AWSElasticBlockStore = v
+		}
+		if v, ok := b.volumeSource.GetGitRepo(); ok {
+			b.fields.GitRepo = v
+		}
+		if v, ok := b.volumeSource.GetSecret(); ok {
+			b.fields.Secret = v
+		}
+		if v, ok := b.volumeSource.GetNFS(); ok {
+			b.fields.NFS = v
+		}
+		if v, ok := b.volumeSource.GetISCSI(); ok {
+			b.fields.ISCSI = v
+		}
+		if v, ok := b.volumeSource.GetGlusterfs(); ok {
+			b.fields.Glusterfs = v
+		}
+		if v, ok := b.volumeSource.GetPersistentVolumeClaim(); ok {
+			b.fields.PersistentVolumeClaim = v
+		}
+		if v, ok := b.volumeSource.GetRBD(); ok {
+			b.fields.RBD = v
+		}
+		if v, ok := b.volumeSource.GetFlexVolume(); ok {
+			b.fields.FlexVolume = v
+		}
+		if v, ok := b.volumeSource.GetCinder(); ok {
+			b.fields.Cinder = v
+		}
+		if v, ok := b.volumeSource.GetCephFS(); ok {
+			b.fields.CephFS = v
+		}
+		if v, ok := b.volumeSource.GetFlocker(); ok {
+			b.fields.Flocker = v
+		}
+		if v, ok := b.volumeSource.GetDownwardAPI(); ok {
+			b.fields.DownwardAPI = v
+		}
+		if v, ok := b.volumeSource.GetFC(); ok {
+			b.fields.FC = v
+		}
+		if v, ok := b.volumeSource.GetAzureFile(); ok {
+			b.fields.AzureFile = v
+		}
+		if v, ok := b.volumeSource.GetConfigMap(); ok {
+			b.fields.ConfigMap = v
+		}
+		if v, ok := b.volumeSource.GetVsphereVolume(); ok {
+			b.fields.VsphereVolume = v
+		}
+		if v, ok := b.volumeSource.GetQuobyte(); ok {
+			b.fields.Quobyte = v
+		}
+		if v, ok := b.volumeSource.GetAzureDisk(); ok {
+			b.fields.AzureDisk = v
+		}
+		if v, ok := b.volumeSource.GetPhotonPersistentDisk(); ok {
+			b.fields.PhotonPersistentDisk = v
+		}
+		if v, ok := b.volumeSource.GetProjected(); ok {
+			b.fields.Projected = v
+		}
+		if v, ok := b.volumeSource.GetPortworxVolume(); ok {
+			b.fields.PortworxVolume = v
+		}
+		if v, ok := b.volumeSource.GetScaleIO(); ok {
+			b.fields.ScaleIO = v
+		}
+		if v, ok := b.volumeSource.GetStorageOS(); ok {
+			b.fields.StorageOS = v
+		}
+		if v, ok := b.volumeSource.GetCSI(); ok {
+			b.fields.CSI = v
+		}
+		if v, ok := b.volumeSource.GetEphemeral(); ok {
+			b.fields.Ephemeral = v
+		}
 	}
 }
 func (b *VolumeBuilder) postUnmarshal() {
+	if b.volumeSource == nil {
+		b.volumeSource = &VolumeSourceBuilder{}
+	}
 	if b.fields.HostPath != nil {
-		b.volumeSource.SetHostPath(*b.fields.HostPath)
+		b.volumeSource.SetHostPath(b.fields.HostPath)
 	}
 	if b.fields.EmptyDir != nil {
-		b.volumeSource.SetEmptyDir(*b.fields.EmptyDir)
+		b.volumeSource.SetEmptyDir(b.fields.EmptyDir)
 	}
 	if b.fields.GCEPersistentDisk != nil {
-		b.volumeSource.SetGCEPersistentDisk(*b.fields.GCEPersistentDisk)
+		b.volumeSource.SetGCEPersistentDisk(b.fields.GCEPersistentDisk)
 	}
 	if b.fields.AWSElasticBlockStore != nil {
-		b.volumeSource.SetAWSElasticBlockStore(*b.fields.AWSElasticBlockStore)
+		b.volumeSource.SetAWSElasticBlockStore(b.fields.AWSElasticBlockStore)
 	}
 	if b.fields.GitRepo != nil {
-		b.volumeSource.SetGitRepo(*b.fields.GitRepo)
+		b.volumeSource.SetGitRepo(b.fields.GitRepo)
 	}
 	if b.fields.Secret != nil {
-		b.volumeSource.SetSecret(*b.fields.Secret)
+		b.volumeSource.SetSecret(b.fields.Secret)
 	}
 	if b.fields.NFS != nil {
-		b.volumeSource.SetNFS(*b.fields.NFS)
+		b.volumeSource.SetNFS(b.fields.NFS)
 	}
 	if b.fields.ISCSI != nil {
-		b.volumeSource.SetISCSI(*b.fields.ISCSI)
+		b.volumeSource.SetISCSI(b.fields.ISCSI)
 	}
 	if b.fields.Glusterfs != nil {
-		b.volumeSource.SetGlusterfs(*b.fields.Glusterfs)
+		b.volumeSource.SetGlusterfs(b.fields.Glusterfs)
 	}
 	if b.fields.PersistentVolumeClaim != nil {
-		b.volumeSource.SetPersistentVolumeClaim(*b.fields.PersistentVolumeClaim)
+		b.volumeSource.SetPersistentVolumeClaim(b.fields.PersistentVolumeClaim)
 	}
 	if b.fields.RBD != nil {
-		b.volumeSource.SetRBD(*b.fields.RBD)
+		b.volumeSource.SetRBD(b.fields.RBD)
 	}
 	if b.fields.FlexVolume != nil {
-		b.volumeSource.SetFlexVolume(*b.fields.FlexVolume)
+		b.volumeSource.SetFlexVolume(b.fields.FlexVolume)
 	}
 	if b.fields.Cinder != nil {
-		b.volumeSource.SetCinder(*b.fields.Cinder)
+		b.volumeSource.SetCinder(b.fields.Cinder)
 	}
 	if b.fields.CephFS != nil {
-		b.volumeSource.SetCephFS(*b.fields.CephFS)
+		b.volumeSource.SetCephFS(b.fields.CephFS)
 	}
 	if b.fields.Flocker != nil {
-		b.volumeSource.SetFlocker(*b.fields.Flocker)
+		b.volumeSource.SetFlocker(b.fields.Flocker)
 	}
 	if b.fields.DownwardAPI != nil {
-		b.volumeSource.SetDownwardAPI(*b.fields.DownwardAPI)
+		b.volumeSource.SetDownwardAPI(b.fields.DownwardAPI)
 	}
 	if b.fields.FC != nil {
-		b.volumeSource.SetFC(*b.fields.FC)
+		b.volumeSource.SetFC(b.fields.FC)
 	}
 	if b.fields.AzureFile != nil {
-		b.volumeSource.SetAzureFile(*b.fields.AzureFile)
+		b.volumeSource.SetAzureFile(b.fields.AzureFile)
 	}
 	if b.fields.ConfigMap != nil {
-		b.volumeSource.SetConfigMap(*b.fields.ConfigMap)
+		b.volumeSource.SetConfigMap(b.fields.ConfigMap)
 	}
 	if b.fields.VsphereVolume != nil {
-		b.volumeSource.SetVsphereVolume(*b.fields.VsphereVolume)
+		b.volumeSource.SetVsphereVolume(b.fields.VsphereVolume)
 	}
 	if b.fields.Quobyte != nil {
-		b.volumeSource.SetQuobyte(*b.fields.Quobyte)
+		b.volumeSource.SetQuobyte(b.fields.Quobyte)
 	}
 	if b.fields.AzureDisk != nil {
-		b.volumeSource.SetAzureDisk(*b.fields.AzureDisk)
+		b.volumeSource.SetAzureDisk(b.fields.AzureDisk)
 	}
 	if b.fields.PhotonPersistentDisk != nil {
-		b.volumeSource.SetPhotonPersistentDisk(*b.fields.PhotonPersistentDisk)
+		b.volumeSource.SetPhotonPersistentDisk(b.fields.PhotonPersistentDisk)
 	}
 	if b.fields.Projected != nil {
-		b.volumeSource.SetProjected(*b.fields.Projected)
+		b.volumeSource.SetProjected(b.fields.Projected)
 	}
 	if b.fields.PortworxVolume != nil {
-		b.volumeSource.SetPortworxVolume(*b.fields.PortworxVolume)
+		b.volumeSource.SetPortworxVolume(b.fields.PortworxVolume)
 	}
 	if b.fields.ScaleIO != nil {
-		b.volumeSource.SetScaleIO(*b.fields.ScaleIO)
+		b.volumeSource.SetScaleIO(b.fields.ScaleIO)
 	}
 	if b.fields.StorageOS != nil {
-		b.volumeSource.SetStorageOS(*b.fields.StorageOS)
+		b.volumeSource.SetStorageOS(b.fields.StorageOS)
 	}
 	if b.fields.CSI != nil {
-		b.volumeSource.SetCSI(*b.fields.CSI)
+		b.volumeSource.SetCSI(b.fields.CSI)
 	}
 	if b.fields.Ephemeral != nil {
-		b.volumeSource.SetEphemeral(*b.fields.Ephemeral)
+		b.volumeSource.SetEphemeral(b.fields.Ephemeral)
 	}
 }

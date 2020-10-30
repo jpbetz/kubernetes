@@ -27,50 +27,40 @@ import (
 // CrossVersionObjectReferenceBuilder represents an declarative configuration of the CrossVersionObjectReference type for use
 // with apply.
 type CrossVersionObjectReferenceBuilder struct {
-	fields *crossVersionObjectReferenceFields
+	fields crossVersionObjectReferenceFields
 }
 
-// crossVersionObjectReferenceFields is used by CrossVersionObjectReferenceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in CrossVersionObjectReferenceBuilder before marshalling, and
-// are copied out to the builder type in CrossVersionObjectReferenceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// crossVersionObjectReferenceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in CrossVersionObjectReferenceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type crossVersionObjectReferenceFields struct {
 	Kind       *string `json:"kind,omitempty"`
 	Name       *string `json:"name,omitempty"`
 	APIVersion *string `json:"apiVersion,omitempty"`
 }
 
-func (b *CrossVersionObjectReferenceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &crossVersionObjectReferenceFields{}
-	}
-}
-
 // CrossVersionObjectReference constructs an declarative configuration of the CrossVersionObjectReference type for use with
 // apply.
-// Provided as a convenience.
-func CrossVersionObjectReference() CrossVersionObjectReferenceBuilder {
-	return CrossVersionObjectReferenceBuilder{fields: &crossVersionObjectReferenceFields{}}
+func CrossVersionObjectReference() *CrossVersionObjectReferenceBuilder {
+	return &CrossVersionObjectReferenceBuilder{}
 }
 
 // SetKind sets the Kind field in the declarative configuration to the given value.
-func (b CrossVersionObjectReferenceBuilder) SetKind(value string) CrossVersionObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *CrossVersionObjectReferenceBuilder) SetKind(value string) *CrossVersionObjectReferenceBuilder {
 	b.fields.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
-func (b CrossVersionObjectReferenceBuilder) RemoveKind() CrossVersionObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *CrossVersionObjectReferenceBuilder) RemoveKind() *CrossVersionObjectReferenceBuilder {
 	b.fields.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
-func (b CrossVersionObjectReferenceBuilder) GetKind() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *CrossVersionObjectReferenceBuilder) GetKind() (value string, ok bool) {
 	if v := b.fields.Kind; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b CrossVersionObjectReferenceBuilder) GetKind() (value string, ok bool) {
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b CrossVersionObjectReferenceBuilder) SetName(value string) CrossVersionObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *CrossVersionObjectReferenceBuilder) SetName(value string) *CrossVersionObjectReferenceBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b CrossVersionObjectReferenceBuilder) RemoveName() CrossVersionObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *CrossVersionObjectReferenceBuilder) RemoveName() *CrossVersionObjectReferenceBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b CrossVersionObjectReferenceBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *CrossVersionObjectReferenceBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -101,22 +88,19 @@ func (b CrossVersionObjectReferenceBuilder) GetName() (value string, ok bool) {
 }
 
 // SetAPIVersion sets the APIVersion field in the declarative configuration to the given value.
-func (b CrossVersionObjectReferenceBuilder) SetAPIVersion(value string) CrossVersionObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *CrossVersionObjectReferenceBuilder) SetAPIVersion(value string) *CrossVersionObjectReferenceBuilder {
 	b.fields.APIVersion = &value
 	return b
 }
 
 // RemoveAPIVersion removes the APIVersion field from the declarative configuration.
-func (b CrossVersionObjectReferenceBuilder) RemoveAPIVersion() CrossVersionObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *CrossVersionObjectReferenceBuilder) RemoveAPIVersion() *CrossVersionObjectReferenceBuilder {
 	b.fields.APIVersion = nil
 	return b
 }
 
 // GetAPIVersion gets the APIVersion field from the declarative configuration.
-func (b CrossVersionObjectReferenceBuilder) GetAPIVersion() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *CrossVersionObjectReferenceBuilder) GetAPIVersion() (value string, ok bool) {
 	if v := b.fields.APIVersion; v != nil {
 		return *v, true
 	}
@@ -128,9 +112,8 @@ func (b *CrossVersionObjectReferenceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +128,13 @@ func (b *CrossVersionObjectReferenceBuilder) FromUnstructured(u map[string]inter
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals CrossVersionObjectReferenceBuilder to JSON.
 func (b *CrossVersionObjectReferenceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +142,7 @@ func (b *CrossVersionObjectReferenceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into CrossVersionObjectReferenceBuilder, replacing the contents of
 // CrossVersionObjectReferenceBuilder.
 func (b *CrossVersionObjectReferenceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +150,9 @@ func (b *CrossVersionObjectReferenceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // CrossVersionObjectReferenceList represents a list of CrossVersionObjectReferenceBuilder.
-// Provided as a convenience.
-type CrossVersionObjectReferenceList []CrossVersionObjectReferenceBuilder
+type CrossVersionObjectReferenceList []*CrossVersionObjectReferenceBuilder
 
 // CrossVersionObjectReferenceList represents a map of CrossVersionObjectReferenceBuilder.
-// Provided as a convenience.
 type CrossVersionObjectReferenceMap map[string]CrossVersionObjectReferenceBuilder
 
 func (b *CrossVersionObjectReferenceBuilder) preMarshal() {

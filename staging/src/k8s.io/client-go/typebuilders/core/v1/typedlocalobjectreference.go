@@ -27,50 +27,40 @@ import (
 // TypedLocalObjectReferenceBuilder represents an declarative configuration of the TypedLocalObjectReference type for use
 // with apply.
 type TypedLocalObjectReferenceBuilder struct {
-	fields *typedLocalObjectReferenceFields
+	fields typedLocalObjectReferenceFields
 }
 
-// typedLocalObjectReferenceFields is used by TypedLocalObjectReferenceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in TypedLocalObjectReferenceBuilder before marshalling, and
-// are copied out to the builder type in TypedLocalObjectReferenceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// typedLocalObjectReferenceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in TypedLocalObjectReferenceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type typedLocalObjectReferenceFields struct {
 	APIGroup *string `json:"apiGroup,omitempty"`
 	Kind     *string `json:"kind,omitempty"`
 	Name     *string `json:"name,omitempty"`
 }
 
-func (b *TypedLocalObjectReferenceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &typedLocalObjectReferenceFields{}
-	}
-}
-
 // TypedLocalObjectReference constructs an declarative configuration of the TypedLocalObjectReference type for use with
 // apply.
-// Provided as a convenience.
-func TypedLocalObjectReference() TypedLocalObjectReferenceBuilder {
-	return TypedLocalObjectReferenceBuilder{fields: &typedLocalObjectReferenceFields{}}
+func TypedLocalObjectReference() *TypedLocalObjectReferenceBuilder {
+	return &TypedLocalObjectReferenceBuilder{}
 }
 
 // SetAPIGroup sets the APIGroup field in the declarative configuration to the given value.
-func (b TypedLocalObjectReferenceBuilder) SetAPIGroup(value string) TypedLocalObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *TypedLocalObjectReferenceBuilder) SetAPIGroup(value string) *TypedLocalObjectReferenceBuilder {
 	b.fields.APIGroup = &value
 	return b
 }
 
 // RemoveAPIGroup removes the APIGroup field from the declarative configuration.
-func (b TypedLocalObjectReferenceBuilder) RemoveAPIGroup() TypedLocalObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *TypedLocalObjectReferenceBuilder) RemoveAPIGroup() *TypedLocalObjectReferenceBuilder {
 	b.fields.APIGroup = nil
 	return b
 }
 
 // GetAPIGroup gets the APIGroup field from the declarative configuration.
-func (b TypedLocalObjectReferenceBuilder) GetAPIGroup() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *TypedLocalObjectReferenceBuilder) GetAPIGroup() (value string, ok bool) {
 	if v := b.fields.APIGroup; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b TypedLocalObjectReferenceBuilder) GetAPIGroup() (value string, ok bool) 
 }
 
 // SetKind sets the Kind field in the declarative configuration to the given value.
-func (b TypedLocalObjectReferenceBuilder) SetKind(value string) TypedLocalObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *TypedLocalObjectReferenceBuilder) SetKind(value string) *TypedLocalObjectReferenceBuilder {
 	b.fields.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
-func (b TypedLocalObjectReferenceBuilder) RemoveKind() TypedLocalObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *TypedLocalObjectReferenceBuilder) RemoveKind() *TypedLocalObjectReferenceBuilder {
 	b.fields.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
-func (b TypedLocalObjectReferenceBuilder) GetKind() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *TypedLocalObjectReferenceBuilder) GetKind() (value string, ok bool) {
 	if v := b.fields.Kind; v != nil {
 		return *v, true
 	}
@@ -101,22 +88,19 @@ func (b TypedLocalObjectReferenceBuilder) GetKind() (value string, ok bool) {
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b TypedLocalObjectReferenceBuilder) SetName(value string) TypedLocalObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *TypedLocalObjectReferenceBuilder) SetName(value string) *TypedLocalObjectReferenceBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b TypedLocalObjectReferenceBuilder) RemoveName() TypedLocalObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *TypedLocalObjectReferenceBuilder) RemoveName() *TypedLocalObjectReferenceBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b TypedLocalObjectReferenceBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *TypedLocalObjectReferenceBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -128,9 +112,8 @@ func (b *TypedLocalObjectReferenceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +128,13 @@ func (b *TypedLocalObjectReferenceBuilder) FromUnstructured(u map[string]interfa
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals TypedLocalObjectReferenceBuilder to JSON.
 func (b *TypedLocalObjectReferenceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +142,7 @@ func (b *TypedLocalObjectReferenceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into TypedLocalObjectReferenceBuilder, replacing the contents of
 // TypedLocalObjectReferenceBuilder.
 func (b *TypedLocalObjectReferenceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +150,9 @@ func (b *TypedLocalObjectReferenceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // TypedLocalObjectReferenceList represents a list of TypedLocalObjectReferenceBuilder.
-// Provided as a convenience.
-type TypedLocalObjectReferenceList []TypedLocalObjectReferenceBuilder
+type TypedLocalObjectReferenceList []*TypedLocalObjectReferenceBuilder
 
 // TypedLocalObjectReferenceList represents a map of TypedLocalObjectReferenceBuilder.
-// Provided as a convenience.
 type TypedLocalObjectReferenceMap map[string]TypedLocalObjectReferenceBuilder
 
 func (b *TypedLocalObjectReferenceBuilder) preMarshal() {

@@ -29,14 +29,14 @@ import (
 // PodSecurityPolicySpecBuilder represents an declarative configuration of the PodSecurityPolicySpec type for use
 // with apply.
 type PodSecurityPolicySpecBuilder struct {
-	fields *podSecurityPolicySpecFields
+	fields podSecurityPolicySpecFields
 }
 
-// podSecurityPolicySpecFields is used by PodSecurityPolicySpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PodSecurityPolicySpecBuilder before marshalling, and
-// are copied out to the builder type in PodSecurityPolicySpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// podSecurityPolicySpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PodSecurityPolicySpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type podSecurityPolicySpecFields struct {
 	Privileged                      *bool                                     `json:"privileged,omitempty"`
 	DefaultAddCapabilities          *[]v1.Capability                          `json:"defaultAddCapabilities,omitempty"`
@@ -64,36 +64,26 @@ type podSecurityPolicySpecFields struct {
 	RuntimeClass                    *RuntimeClassStrategyOptionsBuilder       `json:"runtimeClass,omitempty"`
 }
 
-func (b *PodSecurityPolicySpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &podSecurityPolicySpecFields{}
-	}
-}
-
 // PodSecurityPolicySpec constructs an declarative configuration of the PodSecurityPolicySpec type for use with
 // apply.
-// Provided as a convenience.
-func PodSecurityPolicySpec() PodSecurityPolicySpecBuilder {
-	return PodSecurityPolicySpecBuilder{fields: &podSecurityPolicySpecFields{}}
+func PodSecurityPolicySpec() *PodSecurityPolicySpecBuilder {
+	return &PodSecurityPolicySpecBuilder{}
 }
 
 // SetPrivileged sets the Privileged field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetPrivileged(value bool) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) SetPrivileged(value bool) *PodSecurityPolicySpecBuilder {
 	b.fields.Privileged = &value
 	return b
 }
 
 // RemovePrivileged removes the Privileged field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemovePrivileged() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemovePrivileged() *PodSecurityPolicySpecBuilder {
 	b.fields.Privileged = nil
 	return b
 }
 
 // GetPrivileged gets the Privileged field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetPrivileged() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) GetPrivileged() (value bool, ok bool) {
 	if v := b.fields.Privileged; v != nil {
 		return *v, true
 	}
@@ -101,22 +91,19 @@ func (b PodSecurityPolicySpecBuilder) GetPrivileged() (value bool, ok bool) {
 }
 
 // SetDefaultAddCapabilities sets the DefaultAddCapabilities field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetDefaultAddCapabilities(value []v1.Capability) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) SetDefaultAddCapabilities(value []v1.Capability) *PodSecurityPolicySpecBuilder {
 	b.fields.DefaultAddCapabilities = &value
 	return b
 }
 
 // RemoveDefaultAddCapabilities removes the DefaultAddCapabilities field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveDefaultAddCapabilities() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveDefaultAddCapabilities() *PodSecurityPolicySpecBuilder {
 	b.fields.DefaultAddCapabilities = nil
 	return b
 }
 
 // GetDefaultAddCapabilities gets the DefaultAddCapabilities field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetDefaultAddCapabilities() (value []v1.Capability, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) GetDefaultAddCapabilities() (value []v1.Capability, ok bool) {
 	if v := b.fields.DefaultAddCapabilities; v != nil {
 		return *v, true
 	}
@@ -124,22 +111,19 @@ func (b PodSecurityPolicySpecBuilder) GetDefaultAddCapabilities() (value []v1.Ca
 }
 
 // SetRequiredDropCapabilities sets the RequiredDropCapabilities field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetRequiredDropCapabilities(value []v1.Capability) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) SetRequiredDropCapabilities(value []v1.Capability) *PodSecurityPolicySpecBuilder {
 	b.fields.RequiredDropCapabilities = &value
 	return b
 }
 
 // RemoveRequiredDropCapabilities removes the RequiredDropCapabilities field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveRequiredDropCapabilities() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveRequiredDropCapabilities() *PodSecurityPolicySpecBuilder {
 	b.fields.RequiredDropCapabilities = nil
 	return b
 }
 
 // GetRequiredDropCapabilities gets the RequiredDropCapabilities field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetRequiredDropCapabilities() (value []v1.Capability, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) GetRequiredDropCapabilities() (value []v1.Capability, ok bool) {
 	if v := b.fields.RequiredDropCapabilities; v != nil {
 		return *v, true
 	}
@@ -147,22 +131,19 @@ func (b PodSecurityPolicySpecBuilder) GetRequiredDropCapabilities() (value []v1.
 }
 
 // SetAllowedCapabilities sets the AllowedCapabilities field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetAllowedCapabilities(value []v1.Capability) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) SetAllowedCapabilities(value []v1.Capability) *PodSecurityPolicySpecBuilder {
 	b.fields.AllowedCapabilities = &value
 	return b
 }
 
 // RemoveAllowedCapabilities removes the AllowedCapabilities field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveAllowedCapabilities() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveAllowedCapabilities() *PodSecurityPolicySpecBuilder {
 	b.fields.AllowedCapabilities = nil
 	return b
 }
 
 // GetAllowedCapabilities gets the AllowedCapabilities field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetAllowedCapabilities() (value []v1.Capability, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) GetAllowedCapabilities() (value []v1.Capability, ok bool) {
 	if v := b.fields.AllowedCapabilities; v != nil {
 		return *v, true
 	}
@@ -170,22 +151,19 @@ func (b PodSecurityPolicySpecBuilder) GetAllowedCapabilities() (value []v1.Capab
 }
 
 // SetVolumes sets the Volumes field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetVolumes(value []v1beta1.FSType) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) SetVolumes(value []v1beta1.FSType) *PodSecurityPolicySpecBuilder {
 	b.fields.Volumes = &value
 	return b
 }
 
 // RemoveVolumes removes the Volumes field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveVolumes() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveVolumes() *PodSecurityPolicySpecBuilder {
 	b.fields.Volumes = nil
 	return b
 }
 
 // GetVolumes gets the Volumes field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetVolumes() (value []v1beta1.FSType, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) GetVolumes() (value []v1beta1.FSType, ok bool) {
 	if v := b.fields.Volumes; v != nil {
 		return *v, true
 	}
@@ -193,22 +171,19 @@ func (b PodSecurityPolicySpecBuilder) GetVolumes() (value []v1beta1.FSType, ok b
 }
 
 // SetHostNetwork sets the HostNetwork field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetHostNetwork(value bool) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) SetHostNetwork(value bool) *PodSecurityPolicySpecBuilder {
 	b.fields.HostNetwork = &value
 	return b
 }
 
 // RemoveHostNetwork removes the HostNetwork field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveHostNetwork() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveHostNetwork() *PodSecurityPolicySpecBuilder {
 	b.fields.HostNetwork = nil
 	return b
 }
 
 // GetHostNetwork gets the HostNetwork field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetHostNetwork() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) GetHostNetwork() (value bool, ok bool) {
 	if v := b.fields.HostNetwork; v != nil {
 		return *v, true
 	}
@@ -216,22 +191,19 @@ func (b PodSecurityPolicySpecBuilder) GetHostNetwork() (value bool, ok bool) {
 }
 
 // SetHostPorts sets the HostPorts field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetHostPorts(value HostPortRangeList) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) SetHostPorts(value HostPortRangeList) *PodSecurityPolicySpecBuilder {
 	b.fields.HostPorts = &value
 	return b
 }
 
 // RemoveHostPorts removes the HostPorts field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveHostPorts() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveHostPorts() *PodSecurityPolicySpecBuilder {
 	b.fields.HostPorts = nil
 	return b
 }
 
 // GetHostPorts gets the HostPorts field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetHostPorts() (value HostPortRangeList, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) GetHostPorts() (value HostPortRangeList, ok bool) {
 	if v := b.fields.HostPorts; v != nil {
 		return *v, true
 	}
@@ -239,22 +211,19 @@ func (b PodSecurityPolicySpecBuilder) GetHostPorts() (value HostPortRangeList, o
 }
 
 // SetHostPID sets the HostPID field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetHostPID(value bool) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) SetHostPID(value bool) *PodSecurityPolicySpecBuilder {
 	b.fields.HostPID = &value
 	return b
 }
 
 // RemoveHostPID removes the HostPID field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveHostPID() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveHostPID() *PodSecurityPolicySpecBuilder {
 	b.fields.HostPID = nil
 	return b
 }
 
 // GetHostPID gets the HostPID field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetHostPID() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) GetHostPID() (value bool, ok bool) {
 	if v := b.fields.HostPID; v != nil {
 		return *v, true
 	}
@@ -262,22 +231,19 @@ func (b PodSecurityPolicySpecBuilder) GetHostPID() (value bool, ok bool) {
 }
 
 // SetHostIPC sets the HostIPC field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetHostIPC(value bool) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) SetHostIPC(value bool) *PodSecurityPolicySpecBuilder {
 	b.fields.HostIPC = &value
 	return b
 }
 
 // RemoveHostIPC removes the HostIPC field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveHostIPC() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveHostIPC() *PodSecurityPolicySpecBuilder {
 	b.fields.HostIPC = nil
 	return b
 }
 
 // GetHostIPC gets the HostIPC field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetHostIPC() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) GetHostIPC() (value bool, ok bool) {
 	if v := b.fields.HostIPC; v != nil {
 		return *v, true
 	}
@@ -285,137 +251,104 @@ func (b PodSecurityPolicySpecBuilder) GetHostIPC() (value bool, ok bool) {
 }
 
 // SetSELinux sets the SELinux field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetSELinux(value SELinuxStrategyOptionsBuilder) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
-	b.fields.SELinux = &value
+func (b *PodSecurityPolicySpecBuilder) SetSELinux(value *SELinuxStrategyOptionsBuilder) *PodSecurityPolicySpecBuilder {
+	b.fields.SELinux = value
 	return b
 }
 
 // RemoveSELinux removes the SELinux field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveSELinux() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveSELinux() *PodSecurityPolicySpecBuilder {
 	b.fields.SELinux = nil
 	return b
 }
 
 // GetSELinux gets the SELinux field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetSELinux() (value SELinuxStrategyOptionsBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.SELinux; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodSecurityPolicySpecBuilder) GetSELinux() (value *SELinuxStrategyOptionsBuilder, ok bool) {
+	return b.fields.SELinux, b.fields.SELinux != nil
 }
 
 // SetRunAsUser sets the RunAsUser field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetRunAsUser(value RunAsUserStrategyOptionsBuilder) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
-	b.fields.RunAsUser = &value
+func (b *PodSecurityPolicySpecBuilder) SetRunAsUser(value *RunAsUserStrategyOptionsBuilder) *PodSecurityPolicySpecBuilder {
+	b.fields.RunAsUser = value
 	return b
 }
 
 // RemoveRunAsUser removes the RunAsUser field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveRunAsUser() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveRunAsUser() *PodSecurityPolicySpecBuilder {
 	b.fields.RunAsUser = nil
 	return b
 }
 
 // GetRunAsUser gets the RunAsUser field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetRunAsUser() (value RunAsUserStrategyOptionsBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.RunAsUser; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodSecurityPolicySpecBuilder) GetRunAsUser() (value *RunAsUserStrategyOptionsBuilder, ok bool) {
+	return b.fields.RunAsUser, b.fields.RunAsUser != nil
 }
 
 // SetRunAsGroup sets the RunAsGroup field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetRunAsGroup(value RunAsGroupStrategyOptionsBuilder) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
-	b.fields.RunAsGroup = &value
+func (b *PodSecurityPolicySpecBuilder) SetRunAsGroup(value *RunAsGroupStrategyOptionsBuilder) *PodSecurityPolicySpecBuilder {
+	b.fields.RunAsGroup = value
 	return b
 }
 
 // RemoveRunAsGroup removes the RunAsGroup field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveRunAsGroup() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveRunAsGroup() *PodSecurityPolicySpecBuilder {
 	b.fields.RunAsGroup = nil
 	return b
 }
 
 // GetRunAsGroup gets the RunAsGroup field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetRunAsGroup() (value RunAsGroupStrategyOptionsBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.RunAsGroup; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodSecurityPolicySpecBuilder) GetRunAsGroup() (value *RunAsGroupStrategyOptionsBuilder, ok bool) {
+	return b.fields.RunAsGroup, b.fields.RunAsGroup != nil
 }
 
 // SetSupplementalGroups sets the SupplementalGroups field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetSupplementalGroups(value SupplementalGroupsStrategyOptionsBuilder) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
-	b.fields.SupplementalGroups = &value
+func (b *PodSecurityPolicySpecBuilder) SetSupplementalGroups(value *SupplementalGroupsStrategyOptionsBuilder) *PodSecurityPolicySpecBuilder {
+	b.fields.SupplementalGroups = value
 	return b
 }
 
 // RemoveSupplementalGroups removes the SupplementalGroups field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveSupplementalGroups() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveSupplementalGroups() *PodSecurityPolicySpecBuilder {
 	b.fields.SupplementalGroups = nil
 	return b
 }
 
 // GetSupplementalGroups gets the SupplementalGroups field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetSupplementalGroups() (value SupplementalGroupsStrategyOptionsBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.SupplementalGroups; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodSecurityPolicySpecBuilder) GetSupplementalGroups() (value *SupplementalGroupsStrategyOptionsBuilder, ok bool) {
+	return b.fields.SupplementalGroups, b.fields.SupplementalGroups != nil
 }
 
 // SetFSGroup sets the FSGroup field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetFSGroup(value FSGroupStrategyOptionsBuilder) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
-	b.fields.FSGroup = &value
+func (b *PodSecurityPolicySpecBuilder) SetFSGroup(value *FSGroupStrategyOptionsBuilder) *PodSecurityPolicySpecBuilder {
+	b.fields.FSGroup = value
 	return b
 }
 
 // RemoveFSGroup removes the FSGroup field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveFSGroup() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveFSGroup() *PodSecurityPolicySpecBuilder {
 	b.fields.FSGroup = nil
 	return b
 }
 
 // GetFSGroup gets the FSGroup field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetFSGroup() (value FSGroupStrategyOptionsBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.FSGroup; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodSecurityPolicySpecBuilder) GetFSGroup() (value *FSGroupStrategyOptionsBuilder, ok bool) {
+	return b.fields.FSGroup, b.fields.FSGroup != nil
 }
 
 // SetReadOnlyRootFilesystem sets the ReadOnlyRootFilesystem field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetReadOnlyRootFilesystem(value bool) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) SetReadOnlyRootFilesystem(value bool) *PodSecurityPolicySpecBuilder {
 	b.fields.ReadOnlyRootFilesystem = &value
 	return b
 }
 
 // RemoveReadOnlyRootFilesystem removes the ReadOnlyRootFilesystem field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveReadOnlyRootFilesystem() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveReadOnlyRootFilesystem() *PodSecurityPolicySpecBuilder {
 	b.fields.ReadOnlyRootFilesystem = nil
 	return b
 }
 
 // GetReadOnlyRootFilesystem gets the ReadOnlyRootFilesystem field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetReadOnlyRootFilesystem() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) GetReadOnlyRootFilesystem() (value bool, ok bool) {
 	if v := b.fields.ReadOnlyRootFilesystem; v != nil {
 		return *v, true
 	}
@@ -423,22 +356,19 @@ func (b PodSecurityPolicySpecBuilder) GetReadOnlyRootFilesystem() (value bool, o
 }
 
 // SetDefaultAllowPrivilegeEscalation sets the DefaultAllowPrivilegeEscalation field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetDefaultAllowPrivilegeEscalation(value bool) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) SetDefaultAllowPrivilegeEscalation(value bool) *PodSecurityPolicySpecBuilder {
 	b.fields.DefaultAllowPrivilegeEscalation = &value
 	return b
 }
 
 // RemoveDefaultAllowPrivilegeEscalation removes the DefaultAllowPrivilegeEscalation field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveDefaultAllowPrivilegeEscalation() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveDefaultAllowPrivilegeEscalation() *PodSecurityPolicySpecBuilder {
 	b.fields.DefaultAllowPrivilegeEscalation = nil
 	return b
 }
 
 // GetDefaultAllowPrivilegeEscalation gets the DefaultAllowPrivilegeEscalation field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetDefaultAllowPrivilegeEscalation() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) GetDefaultAllowPrivilegeEscalation() (value bool, ok bool) {
 	if v := b.fields.DefaultAllowPrivilegeEscalation; v != nil {
 		return *v, true
 	}
@@ -446,22 +376,19 @@ func (b PodSecurityPolicySpecBuilder) GetDefaultAllowPrivilegeEscalation() (valu
 }
 
 // SetAllowPrivilegeEscalation sets the AllowPrivilegeEscalation field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetAllowPrivilegeEscalation(value bool) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) SetAllowPrivilegeEscalation(value bool) *PodSecurityPolicySpecBuilder {
 	b.fields.AllowPrivilegeEscalation = &value
 	return b
 }
 
 // RemoveAllowPrivilegeEscalation removes the AllowPrivilegeEscalation field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveAllowPrivilegeEscalation() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveAllowPrivilegeEscalation() *PodSecurityPolicySpecBuilder {
 	b.fields.AllowPrivilegeEscalation = nil
 	return b
 }
 
 // GetAllowPrivilegeEscalation gets the AllowPrivilegeEscalation field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetAllowPrivilegeEscalation() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) GetAllowPrivilegeEscalation() (value bool, ok bool) {
 	if v := b.fields.AllowPrivilegeEscalation; v != nil {
 		return *v, true
 	}
@@ -469,22 +396,19 @@ func (b PodSecurityPolicySpecBuilder) GetAllowPrivilegeEscalation() (value bool,
 }
 
 // SetAllowedHostPaths sets the AllowedHostPaths field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetAllowedHostPaths(value AllowedHostPathList) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) SetAllowedHostPaths(value AllowedHostPathList) *PodSecurityPolicySpecBuilder {
 	b.fields.AllowedHostPaths = &value
 	return b
 }
 
 // RemoveAllowedHostPaths removes the AllowedHostPaths field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveAllowedHostPaths() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveAllowedHostPaths() *PodSecurityPolicySpecBuilder {
 	b.fields.AllowedHostPaths = nil
 	return b
 }
 
 // GetAllowedHostPaths gets the AllowedHostPaths field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetAllowedHostPaths() (value AllowedHostPathList, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) GetAllowedHostPaths() (value AllowedHostPathList, ok bool) {
 	if v := b.fields.AllowedHostPaths; v != nil {
 		return *v, true
 	}
@@ -492,22 +416,19 @@ func (b PodSecurityPolicySpecBuilder) GetAllowedHostPaths() (value AllowedHostPa
 }
 
 // SetAllowedFlexVolumes sets the AllowedFlexVolumes field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetAllowedFlexVolumes(value AllowedFlexVolumeList) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) SetAllowedFlexVolumes(value AllowedFlexVolumeList) *PodSecurityPolicySpecBuilder {
 	b.fields.AllowedFlexVolumes = &value
 	return b
 }
 
 // RemoveAllowedFlexVolumes removes the AllowedFlexVolumes field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveAllowedFlexVolumes() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveAllowedFlexVolumes() *PodSecurityPolicySpecBuilder {
 	b.fields.AllowedFlexVolumes = nil
 	return b
 }
 
 // GetAllowedFlexVolumes gets the AllowedFlexVolumes field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetAllowedFlexVolumes() (value AllowedFlexVolumeList, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) GetAllowedFlexVolumes() (value AllowedFlexVolumeList, ok bool) {
 	if v := b.fields.AllowedFlexVolumes; v != nil {
 		return *v, true
 	}
@@ -515,22 +436,19 @@ func (b PodSecurityPolicySpecBuilder) GetAllowedFlexVolumes() (value AllowedFlex
 }
 
 // SetAllowedCSIDrivers sets the AllowedCSIDrivers field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetAllowedCSIDrivers(value AllowedCSIDriverList) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) SetAllowedCSIDrivers(value AllowedCSIDriverList) *PodSecurityPolicySpecBuilder {
 	b.fields.AllowedCSIDrivers = &value
 	return b
 }
 
 // RemoveAllowedCSIDrivers removes the AllowedCSIDrivers field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveAllowedCSIDrivers() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveAllowedCSIDrivers() *PodSecurityPolicySpecBuilder {
 	b.fields.AllowedCSIDrivers = nil
 	return b
 }
 
 // GetAllowedCSIDrivers gets the AllowedCSIDrivers field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetAllowedCSIDrivers() (value AllowedCSIDriverList, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) GetAllowedCSIDrivers() (value AllowedCSIDriverList, ok bool) {
 	if v := b.fields.AllowedCSIDrivers; v != nil {
 		return *v, true
 	}
@@ -538,22 +456,19 @@ func (b PodSecurityPolicySpecBuilder) GetAllowedCSIDrivers() (value AllowedCSIDr
 }
 
 // SetAllowedUnsafeSysctls sets the AllowedUnsafeSysctls field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetAllowedUnsafeSysctls(value []string) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) SetAllowedUnsafeSysctls(value []string) *PodSecurityPolicySpecBuilder {
 	b.fields.AllowedUnsafeSysctls = &value
 	return b
 }
 
 // RemoveAllowedUnsafeSysctls removes the AllowedUnsafeSysctls field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveAllowedUnsafeSysctls() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveAllowedUnsafeSysctls() *PodSecurityPolicySpecBuilder {
 	b.fields.AllowedUnsafeSysctls = nil
 	return b
 }
 
 // GetAllowedUnsafeSysctls gets the AllowedUnsafeSysctls field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetAllowedUnsafeSysctls() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) GetAllowedUnsafeSysctls() (value []string, ok bool) {
 	if v := b.fields.AllowedUnsafeSysctls; v != nil {
 		return *v, true
 	}
@@ -561,22 +476,19 @@ func (b PodSecurityPolicySpecBuilder) GetAllowedUnsafeSysctls() (value []string,
 }
 
 // SetForbiddenSysctls sets the ForbiddenSysctls field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetForbiddenSysctls(value []string) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) SetForbiddenSysctls(value []string) *PodSecurityPolicySpecBuilder {
 	b.fields.ForbiddenSysctls = &value
 	return b
 }
 
 // RemoveForbiddenSysctls removes the ForbiddenSysctls field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveForbiddenSysctls() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveForbiddenSysctls() *PodSecurityPolicySpecBuilder {
 	b.fields.ForbiddenSysctls = nil
 	return b
 }
 
 // GetForbiddenSysctls gets the ForbiddenSysctls field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetForbiddenSysctls() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) GetForbiddenSysctls() (value []string, ok bool) {
 	if v := b.fields.ForbiddenSysctls; v != nil {
 		return *v, true
 	}
@@ -584,22 +496,19 @@ func (b PodSecurityPolicySpecBuilder) GetForbiddenSysctls() (value []string, ok 
 }
 
 // SetAllowedProcMountTypes sets the AllowedProcMountTypes field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetAllowedProcMountTypes(value []v1.ProcMountType) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) SetAllowedProcMountTypes(value []v1.ProcMountType) *PodSecurityPolicySpecBuilder {
 	b.fields.AllowedProcMountTypes = &value
 	return b
 }
 
 // RemoveAllowedProcMountTypes removes the AllowedProcMountTypes field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveAllowedProcMountTypes() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveAllowedProcMountTypes() *PodSecurityPolicySpecBuilder {
 	b.fields.AllowedProcMountTypes = nil
 	return b
 }
 
 // GetAllowedProcMountTypes gets the AllowedProcMountTypes field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetAllowedProcMountTypes() (value []v1.ProcMountType, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) GetAllowedProcMountTypes() (value []v1.ProcMountType, ok bool) {
 	if v := b.fields.AllowedProcMountTypes; v != nil {
 		return *v, true
 	}
@@ -607,26 +516,20 @@ func (b PodSecurityPolicySpecBuilder) GetAllowedProcMountTypes() (value []v1.Pro
 }
 
 // SetRuntimeClass sets the RuntimeClass field in the declarative configuration to the given value.
-func (b PodSecurityPolicySpecBuilder) SetRuntimeClass(value RuntimeClassStrategyOptionsBuilder) PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
-	b.fields.RuntimeClass = &value
+func (b *PodSecurityPolicySpecBuilder) SetRuntimeClass(value *RuntimeClassStrategyOptionsBuilder) *PodSecurityPolicySpecBuilder {
+	b.fields.RuntimeClass = value
 	return b
 }
 
 // RemoveRuntimeClass removes the RuntimeClass field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) RemoveRuntimeClass() PodSecurityPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicySpecBuilder) RemoveRuntimeClass() *PodSecurityPolicySpecBuilder {
 	b.fields.RuntimeClass = nil
 	return b
 }
 
 // GetRuntimeClass gets the RuntimeClass field from the declarative configuration.
-func (b PodSecurityPolicySpecBuilder) GetRuntimeClass() (value RuntimeClassStrategyOptionsBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.RuntimeClass; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodSecurityPolicySpecBuilder) GetRuntimeClass() (value *RuntimeClassStrategyOptionsBuilder, ok bool) {
+	return b.fields.RuntimeClass, b.fields.RuntimeClass != nil
 }
 
 // ToUnstructured converts PodSecurityPolicySpecBuilder to unstructured.
@@ -634,9 +537,8 @@ func (b *PodSecurityPolicySpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -651,14 +553,13 @@ func (b *PodSecurityPolicySpecBuilder) FromUnstructured(u map[string]interface{}
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PodSecurityPolicySpecBuilder to JSON.
 func (b *PodSecurityPolicySpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -666,8 +567,7 @@ func (b *PodSecurityPolicySpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PodSecurityPolicySpecBuilder, replacing the contents of
 // PodSecurityPolicySpecBuilder.
 func (b *PodSecurityPolicySpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -675,11 +575,9 @@ func (b *PodSecurityPolicySpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PodSecurityPolicySpecList represents a list of PodSecurityPolicySpecBuilder.
-// Provided as a convenience.
-type PodSecurityPolicySpecList []PodSecurityPolicySpecBuilder
+type PodSecurityPolicySpecList []*PodSecurityPolicySpecBuilder
 
 // PodSecurityPolicySpecList represents a map of PodSecurityPolicySpecBuilder.
-// Provided as a convenience.
 type PodSecurityPolicySpecMap map[string]PodSecurityPolicySpecBuilder
 
 func (b *PodSecurityPolicySpecBuilder) preMarshal() {

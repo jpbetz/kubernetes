@@ -27,48 +27,38 @@ import (
 // PriorityLevelConfigurationStatusBuilder represents an declarative configuration of the PriorityLevelConfigurationStatus type for use
 // with apply.
 type PriorityLevelConfigurationStatusBuilder struct {
-	fields *priorityLevelConfigurationStatusFields
+	fields priorityLevelConfigurationStatusFields
 }
 
-// priorityLevelConfigurationStatusFields is used by PriorityLevelConfigurationStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PriorityLevelConfigurationStatusBuilder before marshalling, and
-// are copied out to the builder type in PriorityLevelConfigurationStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// priorityLevelConfigurationStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PriorityLevelConfigurationStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type priorityLevelConfigurationStatusFields struct {
 	Conditions *PriorityLevelConfigurationConditionList `json:"conditions,omitempty"`
 }
 
-func (b *PriorityLevelConfigurationStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &priorityLevelConfigurationStatusFields{}
-	}
-}
-
 // PriorityLevelConfigurationStatus constructs an declarative configuration of the PriorityLevelConfigurationStatus type for use with
 // apply.
-// Provided as a convenience.
-func PriorityLevelConfigurationStatus() PriorityLevelConfigurationStatusBuilder {
-	return PriorityLevelConfigurationStatusBuilder{fields: &priorityLevelConfigurationStatusFields{}}
+func PriorityLevelConfigurationStatus() *PriorityLevelConfigurationStatusBuilder {
+	return &PriorityLevelConfigurationStatusBuilder{}
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b PriorityLevelConfigurationStatusBuilder) SetConditions(value PriorityLevelConfigurationConditionList) PriorityLevelConfigurationStatusBuilder {
-	b.ensureInitialized()
+func (b *PriorityLevelConfigurationStatusBuilder) SetConditions(value PriorityLevelConfigurationConditionList) *PriorityLevelConfigurationStatusBuilder {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b PriorityLevelConfigurationStatusBuilder) RemoveConditions() PriorityLevelConfigurationStatusBuilder {
-	b.ensureInitialized()
+func (b *PriorityLevelConfigurationStatusBuilder) RemoveConditions() *PriorityLevelConfigurationStatusBuilder {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b PriorityLevelConfigurationStatusBuilder) GetConditions() (value PriorityLevelConfigurationConditionList, ok bool) {
-	b.ensureInitialized()
+func (b *PriorityLevelConfigurationStatusBuilder) GetConditions() (value PriorityLevelConfigurationConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *PriorityLevelConfigurationStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *PriorityLevelConfigurationStatusBuilder) FromUnstructured(u map[string]
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PriorityLevelConfigurationStatusBuilder to JSON.
 func (b *PriorityLevelConfigurationStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *PriorityLevelConfigurationStatusBuilder) MarshalJSON() ([]byte, error) 
 // UnmarshalJSON unmarshals JSON into PriorityLevelConfigurationStatusBuilder, replacing the contents of
 // PriorityLevelConfigurationStatusBuilder.
 func (b *PriorityLevelConfigurationStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *PriorityLevelConfigurationStatusBuilder) UnmarshalJSON(data []byte) err
 }
 
 // PriorityLevelConfigurationStatusList represents a list of PriorityLevelConfigurationStatusBuilder.
-// Provided as a convenience.
-type PriorityLevelConfigurationStatusList []PriorityLevelConfigurationStatusBuilder
+type PriorityLevelConfigurationStatusList []*PriorityLevelConfigurationStatusBuilder
 
 // PriorityLevelConfigurationStatusList represents a map of PriorityLevelConfigurationStatusBuilder.
-// Provided as a convenience.
 type PriorityLevelConfigurationStatusMap map[string]PriorityLevelConfigurationStatusBuilder
 
 func (b *PriorityLevelConfigurationStatusBuilder) preMarshal() {

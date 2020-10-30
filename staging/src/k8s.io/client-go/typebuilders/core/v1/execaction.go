@@ -27,48 +27,38 @@ import (
 // ExecActionBuilder represents an declarative configuration of the ExecAction type for use
 // with apply.
 type ExecActionBuilder struct {
-	fields *execActionFields
+	fields execActionFields
 }
 
-// execActionFields is used by ExecActionBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ExecActionBuilder before marshalling, and
-// are copied out to the builder type in ExecActionBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// execActionFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ExecActionBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type execActionFields struct {
 	Command *[]string `json:"command,omitempty"`
 }
 
-func (b *ExecActionBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &execActionFields{}
-	}
-}
-
 // ExecAction constructs an declarative configuration of the ExecAction type for use with
 // apply.
-// Provided as a convenience.
-func ExecAction() ExecActionBuilder {
-	return ExecActionBuilder{fields: &execActionFields{}}
+func ExecAction() *ExecActionBuilder {
+	return &ExecActionBuilder{}
 }
 
 // SetCommand sets the Command field in the declarative configuration to the given value.
-func (b ExecActionBuilder) SetCommand(value []string) ExecActionBuilder {
-	b.ensureInitialized()
+func (b *ExecActionBuilder) SetCommand(value []string) *ExecActionBuilder {
 	b.fields.Command = &value
 	return b
 }
 
 // RemoveCommand removes the Command field from the declarative configuration.
-func (b ExecActionBuilder) RemoveCommand() ExecActionBuilder {
-	b.ensureInitialized()
+func (b *ExecActionBuilder) RemoveCommand() *ExecActionBuilder {
 	b.fields.Command = nil
 	return b
 }
 
 // GetCommand gets the Command field from the declarative configuration.
-func (b ExecActionBuilder) GetCommand() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *ExecActionBuilder) GetCommand() (value []string, ok bool) {
 	if v := b.fields.Command; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *ExecActionBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *ExecActionBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ExecActionBuilder to JSON.
 func (b *ExecActionBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *ExecActionBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ExecActionBuilder, replacing the contents of
 // ExecActionBuilder.
 func (b *ExecActionBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *ExecActionBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ExecActionList represents a list of ExecActionBuilder.
-// Provided as a convenience.
-type ExecActionList []ExecActionBuilder
+type ExecActionList []*ExecActionBuilder
 
 // ExecActionList represents a map of ExecActionBuilder.
-// Provided as a convenience.
 type ExecActionMap map[string]ExecActionBuilder
 
 func (b *ExecActionBuilder) preMarshal() {

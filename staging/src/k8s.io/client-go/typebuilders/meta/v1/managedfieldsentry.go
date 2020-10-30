@@ -28,14 +28,14 @@ import (
 // ManagedFieldsEntryBuilder represents an declarative configuration of the ManagedFieldsEntry type for use
 // with apply.
 type ManagedFieldsEntryBuilder struct {
-	fields *managedFieldsEntryFields
+	fields managedFieldsEntryFields
 }
 
-// managedFieldsEntryFields is used by ManagedFieldsEntryBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ManagedFieldsEntryBuilder before marshalling, and
-// are copied out to the builder type in ManagedFieldsEntryBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// managedFieldsEntryFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ManagedFieldsEntryBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type managedFieldsEntryFields struct {
 	Manager    *string                        `json:"manager,omitempty"`
 	Operation  *v1.ManagedFieldsOperationType `json:"operation,omitempty"`
@@ -45,36 +45,26 @@ type managedFieldsEntryFields struct {
 	FieldsV1   *v1.FieldsV1                   `json:"fieldsV1,omitempty"`
 }
 
-func (b *ManagedFieldsEntryBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &managedFieldsEntryFields{}
-	}
-}
-
 // ManagedFieldsEntry constructs an declarative configuration of the ManagedFieldsEntry type for use with
 // apply.
-// Provided as a convenience.
-func ManagedFieldsEntry() ManagedFieldsEntryBuilder {
-	return ManagedFieldsEntryBuilder{fields: &managedFieldsEntryFields{}}
+func ManagedFieldsEntry() *ManagedFieldsEntryBuilder {
+	return &ManagedFieldsEntryBuilder{}
 }
 
 // SetManager sets the Manager field in the declarative configuration to the given value.
-func (b ManagedFieldsEntryBuilder) SetManager(value string) ManagedFieldsEntryBuilder {
-	b.ensureInitialized()
+func (b *ManagedFieldsEntryBuilder) SetManager(value string) *ManagedFieldsEntryBuilder {
 	b.fields.Manager = &value
 	return b
 }
 
 // RemoveManager removes the Manager field from the declarative configuration.
-func (b ManagedFieldsEntryBuilder) RemoveManager() ManagedFieldsEntryBuilder {
-	b.ensureInitialized()
+func (b *ManagedFieldsEntryBuilder) RemoveManager() *ManagedFieldsEntryBuilder {
 	b.fields.Manager = nil
 	return b
 }
 
 // GetManager gets the Manager field from the declarative configuration.
-func (b ManagedFieldsEntryBuilder) GetManager() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ManagedFieldsEntryBuilder) GetManager() (value string, ok bool) {
 	if v := b.fields.Manager; v != nil {
 		return *v, true
 	}
@@ -82,22 +72,19 @@ func (b ManagedFieldsEntryBuilder) GetManager() (value string, ok bool) {
 }
 
 // SetOperation sets the Operation field in the declarative configuration to the given value.
-func (b ManagedFieldsEntryBuilder) SetOperation(value v1.ManagedFieldsOperationType) ManagedFieldsEntryBuilder {
-	b.ensureInitialized()
+func (b *ManagedFieldsEntryBuilder) SetOperation(value v1.ManagedFieldsOperationType) *ManagedFieldsEntryBuilder {
 	b.fields.Operation = &value
 	return b
 }
 
 // RemoveOperation removes the Operation field from the declarative configuration.
-func (b ManagedFieldsEntryBuilder) RemoveOperation() ManagedFieldsEntryBuilder {
-	b.ensureInitialized()
+func (b *ManagedFieldsEntryBuilder) RemoveOperation() *ManagedFieldsEntryBuilder {
 	b.fields.Operation = nil
 	return b
 }
 
 // GetOperation gets the Operation field from the declarative configuration.
-func (b ManagedFieldsEntryBuilder) GetOperation() (value v1.ManagedFieldsOperationType, ok bool) {
-	b.ensureInitialized()
+func (b *ManagedFieldsEntryBuilder) GetOperation() (value v1.ManagedFieldsOperationType, ok bool) {
 	if v := b.fields.Operation; v != nil {
 		return *v, true
 	}
@@ -105,22 +92,19 @@ func (b ManagedFieldsEntryBuilder) GetOperation() (value v1.ManagedFieldsOperati
 }
 
 // SetAPIVersion sets the APIVersion field in the declarative configuration to the given value.
-func (b ManagedFieldsEntryBuilder) SetAPIVersion(value string) ManagedFieldsEntryBuilder {
-	b.ensureInitialized()
+func (b *ManagedFieldsEntryBuilder) SetAPIVersion(value string) *ManagedFieldsEntryBuilder {
 	b.fields.APIVersion = &value
 	return b
 }
 
 // RemoveAPIVersion removes the APIVersion field from the declarative configuration.
-func (b ManagedFieldsEntryBuilder) RemoveAPIVersion() ManagedFieldsEntryBuilder {
-	b.ensureInitialized()
+func (b *ManagedFieldsEntryBuilder) RemoveAPIVersion() *ManagedFieldsEntryBuilder {
 	b.fields.APIVersion = nil
 	return b
 }
 
 // GetAPIVersion gets the APIVersion field from the declarative configuration.
-func (b ManagedFieldsEntryBuilder) GetAPIVersion() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ManagedFieldsEntryBuilder) GetAPIVersion() (value string, ok bool) {
 	if v := b.fields.APIVersion; v != nil {
 		return *v, true
 	}
@@ -128,22 +112,19 @@ func (b ManagedFieldsEntryBuilder) GetAPIVersion() (value string, ok bool) {
 }
 
 // SetTime sets the Time field in the declarative configuration to the given value.
-func (b ManagedFieldsEntryBuilder) SetTime(value v1.Time) ManagedFieldsEntryBuilder {
-	b.ensureInitialized()
+func (b *ManagedFieldsEntryBuilder) SetTime(value v1.Time) *ManagedFieldsEntryBuilder {
 	b.fields.Time = &value
 	return b
 }
 
 // RemoveTime removes the Time field from the declarative configuration.
-func (b ManagedFieldsEntryBuilder) RemoveTime() ManagedFieldsEntryBuilder {
-	b.ensureInitialized()
+func (b *ManagedFieldsEntryBuilder) RemoveTime() *ManagedFieldsEntryBuilder {
 	b.fields.Time = nil
 	return b
 }
 
 // GetTime gets the Time field from the declarative configuration.
-func (b ManagedFieldsEntryBuilder) GetTime() (value v1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *ManagedFieldsEntryBuilder) GetTime() (value v1.Time, ok bool) {
 	if v := b.fields.Time; v != nil {
 		return *v, true
 	}
@@ -151,22 +132,19 @@ func (b ManagedFieldsEntryBuilder) GetTime() (value v1.Time, ok bool) {
 }
 
 // SetFieldsType sets the FieldsType field in the declarative configuration to the given value.
-func (b ManagedFieldsEntryBuilder) SetFieldsType(value string) ManagedFieldsEntryBuilder {
-	b.ensureInitialized()
+func (b *ManagedFieldsEntryBuilder) SetFieldsType(value string) *ManagedFieldsEntryBuilder {
 	b.fields.FieldsType = &value
 	return b
 }
 
 // RemoveFieldsType removes the FieldsType field from the declarative configuration.
-func (b ManagedFieldsEntryBuilder) RemoveFieldsType() ManagedFieldsEntryBuilder {
-	b.ensureInitialized()
+func (b *ManagedFieldsEntryBuilder) RemoveFieldsType() *ManagedFieldsEntryBuilder {
 	b.fields.FieldsType = nil
 	return b
 }
 
 // GetFieldsType gets the FieldsType field from the declarative configuration.
-func (b ManagedFieldsEntryBuilder) GetFieldsType() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ManagedFieldsEntryBuilder) GetFieldsType() (value string, ok bool) {
 	if v := b.fields.FieldsType; v != nil {
 		return *v, true
 	}
@@ -174,22 +152,19 @@ func (b ManagedFieldsEntryBuilder) GetFieldsType() (value string, ok bool) {
 }
 
 // SetFieldsV1 sets the FieldsV1 field in the declarative configuration to the given value.
-func (b ManagedFieldsEntryBuilder) SetFieldsV1(value v1.FieldsV1) ManagedFieldsEntryBuilder {
-	b.ensureInitialized()
+func (b *ManagedFieldsEntryBuilder) SetFieldsV1(value v1.FieldsV1) *ManagedFieldsEntryBuilder {
 	b.fields.FieldsV1 = &value
 	return b
 }
 
 // RemoveFieldsV1 removes the FieldsV1 field from the declarative configuration.
-func (b ManagedFieldsEntryBuilder) RemoveFieldsV1() ManagedFieldsEntryBuilder {
-	b.ensureInitialized()
+func (b *ManagedFieldsEntryBuilder) RemoveFieldsV1() *ManagedFieldsEntryBuilder {
 	b.fields.FieldsV1 = nil
 	return b
 }
 
 // GetFieldsV1 gets the FieldsV1 field from the declarative configuration.
-func (b ManagedFieldsEntryBuilder) GetFieldsV1() (value v1.FieldsV1, ok bool) {
-	b.ensureInitialized()
+func (b *ManagedFieldsEntryBuilder) GetFieldsV1() (value v1.FieldsV1, ok bool) {
 	if v := b.fields.FieldsV1; v != nil {
 		return *v, true
 	}
@@ -201,9 +176,8 @@ func (b *ManagedFieldsEntryBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -218,14 +192,13 @@ func (b *ManagedFieldsEntryBuilder) FromUnstructured(u map[string]interface{}) e
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ManagedFieldsEntryBuilder to JSON.
 func (b *ManagedFieldsEntryBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -233,8 +206,7 @@ func (b *ManagedFieldsEntryBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ManagedFieldsEntryBuilder, replacing the contents of
 // ManagedFieldsEntryBuilder.
 func (b *ManagedFieldsEntryBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -242,11 +214,9 @@ func (b *ManagedFieldsEntryBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ManagedFieldsEntryList represents a list of ManagedFieldsEntryBuilder.
-// Provided as a convenience.
-type ManagedFieldsEntryList []ManagedFieldsEntryBuilder
+type ManagedFieldsEntryList []*ManagedFieldsEntryBuilder
 
 // ManagedFieldsEntryList represents a map of ManagedFieldsEntryBuilder.
-// Provided as a convenience.
 type ManagedFieldsEntryMap map[string]ManagedFieldsEntryBuilder
 
 func (b *ManagedFieldsEntryBuilder) preMarshal() {

@@ -27,49 +27,39 @@ import (
 // NonResourcePolicyRuleBuilder represents an declarative configuration of the NonResourcePolicyRule type for use
 // with apply.
 type NonResourcePolicyRuleBuilder struct {
-	fields *nonResourcePolicyRuleFields
+	fields nonResourcePolicyRuleFields
 }
 
-// nonResourcePolicyRuleFields is used by NonResourcePolicyRuleBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in NonResourcePolicyRuleBuilder before marshalling, and
-// are copied out to the builder type in NonResourcePolicyRuleBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// nonResourcePolicyRuleFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in NonResourcePolicyRuleBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type nonResourcePolicyRuleFields struct {
 	Verbs           *[]string `json:"verbs,omitempty"`
 	NonResourceURLs *[]string `json:"nonResourceURLs,omitempty"`
 }
 
-func (b *NonResourcePolicyRuleBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &nonResourcePolicyRuleFields{}
-	}
-}
-
 // NonResourcePolicyRule constructs an declarative configuration of the NonResourcePolicyRule type for use with
 // apply.
-// Provided as a convenience.
-func NonResourcePolicyRule() NonResourcePolicyRuleBuilder {
-	return NonResourcePolicyRuleBuilder{fields: &nonResourcePolicyRuleFields{}}
+func NonResourcePolicyRule() *NonResourcePolicyRuleBuilder {
+	return &NonResourcePolicyRuleBuilder{}
 }
 
 // SetVerbs sets the Verbs field in the declarative configuration to the given value.
-func (b NonResourcePolicyRuleBuilder) SetVerbs(value []string) NonResourcePolicyRuleBuilder {
-	b.ensureInitialized()
+func (b *NonResourcePolicyRuleBuilder) SetVerbs(value []string) *NonResourcePolicyRuleBuilder {
 	b.fields.Verbs = &value
 	return b
 }
 
 // RemoveVerbs removes the Verbs field from the declarative configuration.
-func (b NonResourcePolicyRuleBuilder) RemoveVerbs() NonResourcePolicyRuleBuilder {
-	b.ensureInitialized()
+func (b *NonResourcePolicyRuleBuilder) RemoveVerbs() *NonResourcePolicyRuleBuilder {
 	b.fields.Verbs = nil
 	return b
 }
 
 // GetVerbs gets the Verbs field from the declarative configuration.
-func (b NonResourcePolicyRuleBuilder) GetVerbs() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *NonResourcePolicyRuleBuilder) GetVerbs() (value []string, ok bool) {
 	if v := b.fields.Verbs; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b NonResourcePolicyRuleBuilder) GetVerbs() (value []string, ok bool) {
 }
 
 // SetNonResourceURLs sets the NonResourceURLs field in the declarative configuration to the given value.
-func (b NonResourcePolicyRuleBuilder) SetNonResourceURLs(value []string) NonResourcePolicyRuleBuilder {
-	b.ensureInitialized()
+func (b *NonResourcePolicyRuleBuilder) SetNonResourceURLs(value []string) *NonResourcePolicyRuleBuilder {
 	b.fields.NonResourceURLs = &value
 	return b
 }
 
 // RemoveNonResourceURLs removes the NonResourceURLs field from the declarative configuration.
-func (b NonResourcePolicyRuleBuilder) RemoveNonResourceURLs() NonResourcePolicyRuleBuilder {
-	b.ensureInitialized()
+func (b *NonResourcePolicyRuleBuilder) RemoveNonResourceURLs() *NonResourcePolicyRuleBuilder {
 	b.fields.NonResourceURLs = nil
 	return b
 }
 
 // GetNonResourceURLs gets the NonResourceURLs field from the declarative configuration.
-func (b NonResourcePolicyRuleBuilder) GetNonResourceURLs() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *NonResourcePolicyRuleBuilder) GetNonResourceURLs() (value []string, ok bool) {
 	if v := b.fields.NonResourceURLs; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *NonResourcePolicyRuleBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *NonResourcePolicyRuleBuilder) FromUnstructured(u map[string]interface{}
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals NonResourcePolicyRuleBuilder to JSON.
 func (b *NonResourcePolicyRuleBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *NonResourcePolicyRuleBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into NonResourcePolicyRuleBuilder, replacing the contents of
 // NonResourcePolicyRuleBuilder.
 func (b *NonResourcePolicyRuleBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *NonResourcePolicyRuleBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // NonResourcePolicyRuleList represents a list of NonResourcePolicyRuleBuilder.
-// Provided as a convenience.
-type NonResourcePolicyRuleList []NonResourcePolicyRuleBuilder
+type NonResourcePolicyRuleList []*NonResourcePolicyRuleBuilder
 
 // NonResourcePolicyRuleList represents a map of NonResourcePolicyRuleBuilder.
-// Provided as a convenience.
 type NonResourcePolicyRuleMap map[string]NonResourcePolicyRuleBuilder
 
 func (b *NonResourcePolicyRuleBuilder) preMarshal() {

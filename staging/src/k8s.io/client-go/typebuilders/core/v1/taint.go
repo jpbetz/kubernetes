@@ -29,14 +29,14 @@ import (
 // TaintBuilder represents an declarative configuration of the Taint type for use
 // with apply.
 type TaintBuilder struct {
-	fields *taintFields
+	fields taintFields
 }
 
-// taintFields is used by TaintBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in TaintBuilder before marshalling, and
-// are copied out to the builder type in TaintBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// taintFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in TaintBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type taintFields struct {
 	Key       *string         `json:"key,omitempty"`
 	Value     *string         `json:"value,omitempty"`
@@ -44,36 +44,26 @@ type taintFields struct {
 	TimeAdded *metav1.Time    `json:"timeAdded,omitempty"`
 }
 
-func (b *TaintBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &taintFields{}
-	}
-}
-
 // Taint constructs an declarative configuration of the Taint type for use with
 // apply.
-// Provided as a convenience.
-func Taint() TaintBuilder {
-	return TaintBuilder{fields: &taintFields{}}
+func Taint() *TaintBuilder {
+	return &TaintBuilder{}
 }
 
 // SetKey sets the Key field in the declarative configuration to the given value.
-func (b TaintBuilder) SetKey(value string) TaintBuilder {
-	b.ensureInitialized()
+func (b *TaintBuilder) SetKey(value string) *TaintBuilder {
 	b.fields.Key = &value
 	return b
 }
 
 // RemoveKey removes the Key field from the declarative configuration.
-func (b TaintBuilder) RemoveKey() TaintBuilder {
-	b.ensureInitialized()
+func (b *TaintBuilder) RemoveKey() *TaintBuilder {
 	b.fields.Key = nil
 	return b
 }
 
 // GetKey gets the Key field from the declarative configuration.
-func (b TaintBuilder) GetKey() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *TaintBuilder) GetKey() (value string, ok bool) {
 	if v := b.fields.Key; v != nil {
 		return *v, true
 	}
@@ -81,22 +71,19 @@ func (b TaintBuilder) GetKey() (value string, ok bool) {
 }
 
 // SetValue sets the Value field in the declarative configuration to the given value.
-func (b TaintBuilder) SetValue(value string) TaintBuilder {
-	b.ensureInitialized()
+func (b *TaintBuilder) SetValue(value string) *TaintBuilder {
 	b.fields.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
-func (b TaintBuilder) RemoveValue() TaintBuilder {
-	b.ensureInitialized()
+func (b *TaintBuilder) RemoveValue() *TaintBuilder {
 	b.fields.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
-func (b TaintBuilder) GetValue() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *TaintBuilder) GetValue() (value string, ok bool) {
 	if v := b.fields.Value; v != nil {
 		return *v, true
 	}
@@ -104,22 +91,19 @@ func (b TaintBuilder) GetValue() (value string, ok bool) {
 }
 
 // SetEffect sets the Effect field in the declarative configuration to the given value.
-func (b TaintBuilder) SetEffect(value v1.TaintEffect) TaintBuilder {
-	b.ensureInitialized()
+func (b *TaintBuilder) SetEffect(value v1.TaintEffect) *TaintBuilder {
 	b.fields.Effect = &value
 	return b
 }
 
 // RemoveEffect removes the Effect field from the declarative configuration.
-func (b TaintBuilder) RemoveEffect() TaintBuilder {
-	b.ensureInitialized()
+func (b *TaintBuilder) RemoveEffect() *TaintBuilder {
 	b.fields.Effect = nil
 	return b
 }
 
 // GetEffect gets the Effect field from the declarative configuration.
-func (b TaintBuilder) GetEffect() (value v1.TaintEffect, ok bool) {
-	b.ensureInitialized()
+func (b *TaintBuilder) GetEffect() (value v1.TaintEffect, ok bool) {
 	if v := b.fields.Effect; v != nil {
 		return *v, true
 	}
@@ -127,22 +111,19 @@ func (b TaintBuilder) GetEffect() (value v1.TaintEffect, ok bool) {
 }
 
 // SetTimeAdded sets the TimeAdded field in the declarative configuration to the given value.
-func (b TaintBuilder) SetTimeAdded(value metav1.Time) TaintBuilder {
-	b.ensureInitialized()
+func (b *TaintBuilder) SetTimeAdded(value metav1.Time) *TaintBuilder {
 	b.fields.TimeAdded = &value
 	return b
 }
 
 // RemoveTimeAdded removes the TimeAdded field from the declarative configuration.
-func (b TaintBuilder) RemoveTimeAdded() TaintBuilder {
-	b.ensureInitialized()
+func (b *TaintBuilder) RemoveTimeAdded() *TaintBuilder {
 	b.fields.TimeAdded = nil
 	return b
 }
 
 // GetTimeAdded gets the TimeAdded field from the declarative configuration.
-func (b TaintBuilder) GetTimeAdded() (value metav1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *TaintBuilder) GetTimeAdded() (value metav1.Time, ok bool) {
 	if v := b.fields.TimeAdded; v != nil {
 		return *v, true
 	}
@@ -154,9 +135,8 @@ func (b *TaintBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -171,14 +151,13 @@ func (b *TaintBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals TaintBuilder to JSON.
 func (b *TaintBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -186,8 +165,7 @@ func (b *TaintBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into TaintBuilder, replacing the contents of
 // TaintBuilder.
 func (b *TaintBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -195,11 +173,9 @@ func (b *TaintBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // TaintList represents a list of TaintBuilder.
-// Provided as a convenience.
-type TaintList []TaintBuilder
+type TaintList []*TaintBuilder
 
 // TaintList represents a map of TaintBuilder.
-// Provided as a convenience.
 type TaintMap map[string]TaintBuilder
 
 func (b *TaintBuilder) preMarshal() {

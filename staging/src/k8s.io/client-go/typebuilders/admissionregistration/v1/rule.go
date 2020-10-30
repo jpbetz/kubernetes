@@ -28,14 +28,14 @@ import (
 // RuleBuilder represents an declarative configuration of the Rule type for use
 // with apply.
 type RuleBuilder struct {
-	fields *ruleFields
+	fields ruleFields
 }
 
-// ruleFields is used by RuleBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in RuleBuilder before marshalling, and
-// are copied out to the builder type in RuleBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// ruleFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in RuleBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type ruleFields struct {
 	APIGroups   *[]string     `json:"apiGroups,omitempty"`
 	APIVersions *[]string     `json:"apiVersions,omitempty"`
@@ -43,36 +43,26 @@ type ruleFields struct {
 	Scope       *v1.ScopeType `json:"scope,omitempty"`
 }
 
-func (b *RuleBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &ruleFields{}
-	}
-}
-
 // Rule constructs an declarative configuration of the Rule type for use with
 // apply.
-// Provided as a convenience.
-func Rule() RuleBuilder {
-	return RuleBuilder{fields: &ruleFields{}}
+func Rule() *RuleBuilder {
+	return &RuleBuilder{}
 }
 
 // SetAPIGroups sets the APIGroups field in the declarative configuration to the given value.
-func (b RuleBuilder) SetAPIGroups(value []string) RuleBuilder {
-	b.ensureInitialized()
+func (b *RuleBuilder) SetAPIGroups(value []string) *RuleBuilder {
 	b.fields.APIGroups = &value
 	return b
 }
 
 // RemoveAPIGroups removes the APIGroups field from the declarative configuration.
-func (b RuleBuilder) RemoveAPIGroups() RuleBuilder {
-	b.ensureInitialized()
+func (b *RuleBuilder) RemoveAPIGroups() *RuleBuilder {
 	b.fields.APIGroups = nil
 	return b
 }
 
 // GetAPIGroups gets the APIGroups field from the declarative configuration.
-func (b RuleBuilder) GetAPIGroups() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *RuleBuilder) GetAPIGroups() (value []string, ok bool) {
 	if v := b.fields.APIGroups; v != nil {
 		return *v, true
 	}
@@ -80,22 +70,19 @@ func (b RuleBuilder) GetAPIGroups() (value []string, ok bool) {
 }
 
 // SetAPIVersions sets the APIVersions field in the declarative configuration to the given value.
-func (b RuleBuilder) SetAPIVersions(value []string) RuleBuilder {
-	b.ensureInitialized()
+func (b *RuleBuilder) SetAPIVersions(value []string) *RuleBuilder {
 	b.fields.APIVersions = &value
 	return b
 }
 
 // RemoveAPIVersions removes the APIVersions field from the declarative configuration.
-func (b RuleBuilder) RemoveAPIVersions() RuleBuilder {
-	b.ensureInitialized()
+func (b *RuleBuilder) RemoveAPIVersions() *RuleBuilder {
 	b.fields.APIVersions = nil
 	return b
 }
 
 // GetAPIVersions gets the APIVersions field from the declarative configuration.
-func (b RuleBuilder) GetAPIVersions() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *RuleBuilder) GetAPIVersions() (value []string, ok bool) {
 	if v := b.fields.APIVersions; v != nil {
 		return *v, true
 	}
@@ -103,22 +90,19 @@ func (b RuleBuilder) GetAPIVersions() (value []string, ok bool) {
 }
 
 // SetResources sets the Resources field in the declarative configuration to the given value.
-func (b RuleBuilder) SetResources(value []string) RuleBuilder {
-	b.ensureInitialized()
+func (b *RuleBuilder) SetResources(value []string) *RuleBuilder {
 	b.fields.Resources = &value
 	return b
 }
 
 // RemoveResources removes the Resources field from the declarative configuration.
-func (b RuleBuilder) RemoveResources() RuleBuilder {
-	b.ensureInitialized()
+func (b *RuleBuilder) RemoveResources() *RuleBuilder {
 	b.fields.Resources = nil
 	return b
 }
 
 // GetResources gets the Resources field from the declarative configuration.
-func (b RuleBuilder) GetResources() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *RuleBuilder) GetResources() (value []string, ok bool) {
 	if v := b.fields.Resources; v != nil {
 		return *v, true
 	}
@@ -126,22 +110,19 @@ func (b RuleBuilder) GetResources() (value []string, ok bool) {
 }
 
 // SetScope sets the Scope field in the declarative configuration to the given value.
-func (b RuleBuilder) SetScope(value v1.ScopeType) RuleBuilder {
-	b.ensureInitialized()
+func (b *RuleBuilder) SetScope(value v1.ScopeType) *RuleBuilder {
 	b.fields.Scope = &value
 	return b
 }
 
 // RemoveScope removes the Scope field from the declarative configuration.
-func (b RuleBuilder) RemoveScope() RuleBuilder {
-	b.ensureInitialized()
+func (b *RuleBuilder) RemoveScope() *RuleBuilder {
 	b.fields.Scope = nil
 	return b
 }
 
 // GetScope gets the Scope field from the declarative configuration.
-func (b RuleBuilder) GetScope() (value v1.ScopeType, ok bool) {
-	b.ensureInitialized()
+func (b *RuleBuilder) GetScope() (value v1.ScopeType, ok bool) {
 	if v := b.fields.Scope; v != nil {
 		return *v, true
 	}
@@ -153,9 +134,8 @@ func (b *RuleBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -170,14 +150,13 @@ func (b *RuleBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals RuleBuilder to JSON.
 func (b *RuleBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -185,8 +164,7 @@ func (b *RuleBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into RuleBuilder, replacing the contents of
 // RuleBuilder.
 func (b *RuleBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -194,11 +172,9 @@ func (b *RuleBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // RuleList represents a list of RuleBuilder.
-// Provided as a convenience.
-type RuleList []RuleBuilder
+type RuleList []*RuleBuilder
 
 // RuleList represents a map of RuleBuilder.
-// Provided as a convenience.
 type RuleMap map[string]RuleBuilder
 
 func (b *RuleBuilder) preMarshal() {

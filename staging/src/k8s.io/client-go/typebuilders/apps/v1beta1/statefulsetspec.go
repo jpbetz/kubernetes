@@ -30,14 +30,14 @@ import (
 // StatefulSetSpecBuilder represents an declarative configuration of the StatefulSetSpec type for use
 // with apply.
 type StatefulSetSpecBuilder struct {
-	fields *statefulSetSpecFields
+	fields statefulSetSpecFields
 }
 
-// statefulSetSpecFields is used by StatefulSetSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in StatefulSetSpecBuilder before marshalling, and
-// are copied out to the builder type in StatefulSetSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// statefulSetSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in StatefulSetSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type statefulSetSpecFields struct {
 	Replicas             *int32                            `json:"replicas,omitempty"`
 	Selector             *v1.LabelSelectorBuilder          `json:"selector,omitempty"`
@@ -49,36 +49,26 @@ type statefulSetSpecFields struct {
 	RevisionHistoryLimit *int32                            `json:"revisionHistoryLimit,omitempty"`
 }
 
-func (b *StatefulSetSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &statefulSetSpecFields{}
-	}
-}
-
 // StatefulSetSpec constructs an declarative configuration of the StatefulSetSpec type for use with
 // apply.
-// Provided as a convenience.
-func StatefulSetSpec() StatefulSetSpecBuilder {
-	return StatefulSetSpecBuilder{fields: &statefulSetSpecFields{}}
+func StatefulSetSpec() *StatefulSetSpecBuilder {
+	return &StatefulSetSpecBuilder{}
 }
 
 // SetReplicas sets the Replicas field in the declarative configuration to the given value.
-func (b StatefulSetSpecBuilder) SetReplicas(value int32) StatefulSetSpecBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetSpecBuilder) SetReplicas(value int32) *StatefulSetSpecBuilder {
 	b.fields.Replicas = &value
 	return b
 }
 
 // RemoveReplicas removes the Replicas field from the declarative configuration.
-func (b StatefulSetSpecBuilder) RemoveReplicas() StatefulSetSpecBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetSpecBuilder) RemoveReplicas() *StatefulSetSpecBuilder {
 	b.fields.Replicas = nil
 	return b
 }
 
 // GetReplicas gets the Replicas field from the declarative configuration.
-func (b StatefulSetSpecBuilder) GetReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetSpecBuilder) GetReplicas() (value int32, ok bool) {
 	if v := b.fields.Replicas; v != nil {
 		return *v, true
 	}
@@ -86,68 +76,53 @@ func (b StatefulSetSpecBuilder) GetReplicas() (value int32, ok bool) {
 }
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
-func (b StatefulSetSpecBuilder) SetSelector(value v1.LabelSelectorBuilder) StatefulSetSpecBuilder {
-	b.ensureInitialized()
-	b.fields.Selector = &value
+func (b *StatefulSetSpecBuilder) SetSelector(value *v1.LabelSelectorBuilder) *StatefulSetSpecBuilder {
+	b.fields.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
-func (b StatefulSetSpecBuilder) RemoveSelector() StatefulSetSpecBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetSpecBuilder) RemoveSelector() *StatefulSetSpecBuilder {
 	b.fields.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
-func (b StatefulSetSpecBuilder) GetSelector() (value v1.LabelSelectorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Selector; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *StatefulSetSpecBuilder) GetSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+	return b.fields.Selector, b.fields.Selector != nil
 }
 
 // SetTemplate sets the Template field in the declarative configuration to the given value.
-func (b StatefulSetSpecBuilder) SetTemplate(value corev1.PodTemplateSpecBuilder) StatefulSetSpecBuilder {
-	b.ensureInitialized()
-	b.fields.Template = &value
+func (b *StatefulSetSpecBuilder) SetTemplate(value *corev1.PodTemplateSpecBuilder) *StatefulSetSpecBuilder {
+	b.fields.Template = value
 	return b
 }
 
 // RemoveTemplate removes the Template field from the declarative configuration.
-func (b StatefulSetSpecBuilder) RemoveTemplate() StatefulSetSpecBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetSpecBuilder) RemoveTemplate() *StatefulSetSpecBuilder {
 	b.fields.Template = nil
 	return b
 }
 
 // GetTemplate gets the Template field from the declarative configuration.
-func (b StatefulSetSpecBuilder) GetTemplate() (value corev1.PodTemplateSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Template; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *StatefulSetSpecBuilder) GetTemplate() (value *corev1.PodTemplateSpecBuilder, ok bool) {
+	return b.fields.Template, b.fields.Template != nil
 }
 
 // SetVolumeClaimTemplates sets the VolumeClaimTemplates field in the declarative configuration to the given value.
-func (b StatefulSetSpecBuilder) SetVolumeClaimTemplates(value corev1.PersistentVolumeClaimList) StatefulSetSpecBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetSpecBuilder) SetVolumeClaimTemplates(value corev1.PersistentVolumeClaimList) *StatefulSetSpecBuilder {
 	b.fields.VolumeClaimTemplates = &value
 	return b
 }
 
 // RemoveVolumeClaimTemplates removes the VolumeClaimTemplates field from the declarative configuration.
-func (b StatefulSetSpecBuilder) RemoveVolumeClaimTemplates() StatefulSetSpecBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetSpecBuilder) RemoveVolumeClaimTemplates() *StatefulSetSpecBuilder {
 	b.fields.VolumeClaimTemplates = nil
 	return b
 }
 
 // GetVolumeClaimTemplates gets the VolumeClaimTemplates field from the declarative configuration.
-func (b StatefulSetSpecBuilder) GetVolumeClaimTemplates() (value corev1.PersistentVolumeClaimList, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetSpecBuilder) GetVolumeClaimTemplates() (value corev1.PersistentVolumeClaimList, ok bool) {
 	if v := b.fields.VolumeClaimTemplates; v != nil {
 		return *v, true
 	}
@@ -155,22 +130,19 @@ func (b StatefulSetSpecBuilder) GetVolumeClaimTemplates() (value corev1.Persiste
 }
 
 // SetServiceName sets the ServiceName field in the declarative configuration to the given value.
-func (b StatefulSetSpecBuilder) SetServiceName(value string) StatefulSetSpecBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetSpecBuilder) SetServiceName(value string) *StatefulSetSpecBuilder {
 	b.fields.ServiceName = &value
 	return b
 }
 
 // RemoveServiceName removes the ServiceName field from the declarative configuration.
-func (b StatefulSetSpecBuilder) RemoveServiceName() StatefulSetSpecBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetSpecBuilder) RemoveServiceName() *StatefulSetSpecBuilder {
 	b.fields.ServiceName = nil
 	return b
 }
 
 // GetServiceName gets the ServiceName field from the declarative configuration.
-func (b StatefulSetSpecBuilder) GetServiceName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetSpecBuilder) GetServiceName() (value string, ok bool) {
 	if v := b.fields.ServiceName; v != nil {
 		return *v, true
 	}
@@ -178,22 +150,19 @@ func (b StatefulSetSpecBuilder) GetServiceName() (value string, ok bool) {
 }
 
 // SetPodManagementPolicy sets the PodManagementPolicy field in the declarative configuration to the given value.
-func (b StatefulSetSpecBuilder) SetPodManagementPolicy(value v1beta1.PodManagementPolicyType) StatefulSetSpecBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetSpecBuilder) SetPodManagementPolicy(value v1beta1.PodManagementPolicyType) *StatefulSetSpecBuilder {
 	b.fields.PodManagementPolicy = &value
 	return b
 }
 
 // RemovePodManagementPolicy removes the PodManagementPolicy field from the declarative configuration.
-func (b StatefulSetSpecBuilder) RemovePodManagementPolicy() StatefulSetSpecBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetSpecBuilder) RemovePodManagementPolicy() *StatefulSetSpecBuilder {
 	b.fields.PodManagementPolicy = nil
 	return b
 }
 
 // GetPodManagementPolicy gets the PodManagementPolicy field from the declarative configuration.
-func (b StatefulSetSpecBuilder) GetPodManagementPolicy() (value v1beta1.PodManagementPolicyType, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetSpecBuilder) GetPodManagementPolicy() (value v1beta1.PodManagementPolicyType, ok bool) {
 	if v := b.fields.PodManagementPolicy; v != nil {
 		return *v, true
 	}
@@ -201,45 +170,36 @@ func (b StatefulSetSpecBuilder) GetPodManagementPolicy() (value v1beta1.PodManag
 }
 
 // SetUpdateStrategy sets the UpdateStrategy field in the declarative configuration to the given value.
-func (b StatefulSetSpecBuilder) SetUpdateStrategy(value StatefulSetUpdateStrategyBuilder) StatefulSetSpecBuilder {
-	b.ensureInitialized()
-	b.fields.UpdateStrategy = &value
+func (b *StatefulSetSpecBuilder) SetUpdateStrategy(value *StatefulSetUpdateStrategyBuilder) *StatefulSetSpecBuilder {
+	b.fields.UpdateStrategy = value
 	return b
 }
 
 // RemoveUpdateStrategy removes the UpdateStrategy field from the declarative configuration.
-func (b StatefulSetSpecBuilder) RemoveUpdateStrategy() StatefulSetSpecBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetSpecBuilder) RemoveUpdateStrategy() *StatefulSetSpecBuilder {
 	b.fields.UpdateStrategy = nil
 	return b
 }
 
 // GetUpdateStrategy gets the UpdateStrategy field from the declarative configuration.
-func (b StatefulSetSpecBuilder) GetUpdateStrategy() (value StatefulSetUpdateStrategyBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.UpdateStrategy; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *StatefulSetSpecBuilder) GetUpdateStrategy() (value *StatefulSetUpdateStrategyBuilder, ok bool) {
+	return b.fields.UpdateStrategy, b.fields.UpdateStrategy != nil
 }
 
 // SetRevisionHistoryLimit sets the RevisionHistoryLimit field in the declarative configuration to the given value.
-func (b StatefulSetSpecBuilder) SetRevisionHistoryLimit(value int32) StatefulSetSpecBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetSpecBuilder) SetRevisionHistoryLimit(value int32) *StatefulSetSpecBuilder {
 	b.fields.RevisionHistoryLimit = &value
 	return b
 }
 
 // RemoveRevisionHistoryLimit removes the RevisionHistoryLimit field from the declarative configuration.
-func (b StatefulSetSpecBuilder) RemoveRevisionHistoryLimit() StatefulSetSpecBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetSpecBuilder) RemoveRevisionHistoryLimit() *StatefulSetSpecBuilder {
 	b.fields.RevisionHistoryLimit = nil
 	return b
 }
 
 // GetRevisionHistoryLimit gets the RevisionHistoryLimit field from the declarative configuration.
-func (b StatefulSetSpecBuilder) GetRevisionHistoryLimit() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetSpecBuilder) GetRevisionHistoryLimit() (value int32, ok bool) {
 	if v := b.fields.RevisionHistoryLimit; v != nil {
 		return *v, true
 	}
@@ -251,9 +211,8 @@ func (b *StatefulSetSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -268,14 +227,13 @@ func (b *StatefulSetSpecBuilder) FromUnstructured(u map[string]interface{}) erro
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals StatefulSetSpecBuilder to JSON.
 func (b *StatefulSetSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -283,8 +241,7 @@ func (b *StatefulSetSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into StatefulSetSpecBuilder, replacing the contents of
 // StatefulSetSpecBuilder.
 func (b *StatefulSetSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -292,11 +249,9 @@ func (b *StatefulSetSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // StatefulSetSpecList represents a list of StatefulSetSpecBuilder.
-// Provided as a convenience.
-type StatefulSetSpecList []StatefulSetSpecBuilder
+type StatefulSetSpecList []*StatefulSetSpecBuilder
 
 // StatefulSetSpecList represents a map of StatefulSetSpecBuilder.
-// Provided as a convenience.
 type StatefulSetSpecMap map[string]StatefulSetSpecBuilder
 
 func (b *StatefulSetSpecBuilder) preMarshal() {

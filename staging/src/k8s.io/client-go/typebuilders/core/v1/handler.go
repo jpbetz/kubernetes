@@ -27,100 +27,75 @@ import (
 // HandlerBuilder represents an declarative configuration of the Handler type for use
 // with apply.
 type HandlerBuilder struct {
-	fields *handlerFields
+	fields handlerFields
 }
 
-// handlerFields is used by HandlerBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in HandlerBuilder before marshalling, and
-// are copied out to the builder type in HandlerBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// handlerFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in HandlerBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type handlerFields struct {
 	Exec      *ExecActionBuilder      `json:"exec,omitempty"`
 	HTTPGet   *HTTPGetActionBuilder   `json:"httpGet,omitempty"`
 	TCPSocket *TCPSocketActionBuilder `json:"tcpSocket,omitempty"`
 }
 
-func (b *HandlerBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &handlerFields{}
-	}
-}
-
 // Handler constructs an declarative configuration of the Handler type for use with
 // apply.
-// Provided as a convenience.
-func Handler() HandlerBuilder {
-	return HandlerBuilder{fields: &handlerFields{}}
+func Handler() *HandlerBuilder {
+	return &HandlerBuilder{}
 }
 
 // SetExec sets the Exec field in the declarative configuration to the given value.
-func (b HandlerBuilder) SetExec(value ExecActionBuilder) HandlerBuilder {
-	b.ensureInitialized()
-	b.fields.Exec = &value
+func (b *HandlerBuilder) SetExec(value *ExecActionBuilder) *HandlerBuilder {
+	b.fields.Exec = value
 	return b
 }
 
 // RemoveExec removes the Exec field from the declarative configuration.
-func (b HandlerBuilder) RemoveExec() HandlerBuilder {
-	b.ensureInitialized()
+func (b *HandlerBuilder) RemoveExec() *HandlerBuilder {
 	b.fields.Exec = nil
 	return b
 }
 
 // GetExec gets the Exec field from the declarative configuration.
-func (b HandlerBuilder) GetExec() (value ExecActionBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Exec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *HandlerBuilder) GetExec() (value *ExecActionBuilder, ok bool) {
+	return b.fields.Exec, b.fields.Exec != nil
 }
 
 // SetHTTPGet sets the HTTPGet field in the declarative configuration to the given value.
-func (b HandlerBuilder) SetHTTPGet(value HTTPGetActionBuilder) HandlerBuilder {
-	b.ensureInitialized()
-	b.fields.HTTPGet = &value
+func (b *HandlerBuilder) SetHTTPGet(value *HTTPGetActionBuilder) *HandlerBuilder {
+	b.fields.HTTPGet = value
 	return b
 }
 
 // RemoveHTTPGet removes the HTTPGet field from the declarative configuration.
-func (b HandlerBuilder) RemoveHTTPGet() HandlerBuilder {
-	b.ensureInitialized()
+func (b *HandlerBuilder) RemoveHTTPGet() *HandlerBuilder {
 	b.fields.HTTPGet = nil
 	return b
 }
 
 // GetHTTPGet gets the HTTPGet field from the declarative configuration.
-func (b HandlerBuilder) GetHTTPGet() (value HTTPGetActionBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.HTTPGet; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *HandlerBuilder) GetHTTPGet() (value *HTTPGetActionBuilder, ok bool) {
+	return b.fields.HTTPGet, b.fields.HTTPGet != nil
 }
 
 // SetTCPSocket sets the TCPSocket field in the declarative configuration to the given value.
-func (b HandlerBuilder) SetTCPSocket(value TCPSocketActionBuilder) HandlerBuilder {
-	b.ensureInitialized()
-	b.fields.TCPSocket = &value
+func (b *HandlerBuilder) SetTCPSocket(value *TCPSocketActionBuilder) *HandlerBuilder {
+	b.fields.TCPSocket = value
 	return b
 }
 
 // RemoveTCPSocket removes the TCPSocket field from the declarative configuration.
-func (b HandlerBuilder) RemoveTCPSocket() HandlerBuilder {
-	b.ensureInitialized()
+func (b *HandlerBuilder) RemoveTCPSocket() *HandlerBuilder {
 	b.fields.TCPSocket = nil
 	return b
 }
 
 // GetTCPSocket gets the TCPSocket field from the declarative configuration.
-func (b HandlerBuilder) GetTCPSocket() (value TCPSocketActionBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.TCPSocket; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *HandlerBuilder) GetTCPSocket() (value *TCPSocketActionBuilder, ok bool) {
+	return b.fields.TCPSocket, b.fields.TCPSocket != nil
 }
 
 // ToUnstructured converts HandlerBuilder to unstructured.
@@ -128,9 +103,8 @@ func (b *HandlerBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +119,13 @@ func (b *HandlerBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals HandlerBuilder to JSON.
 func (b *HandlerBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +133,7 @@ func (b *HandlerBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into HandlerBuilder, replacing the contents of
 // HandlerBuilder.
 func (b *HandlerBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +141,9 @@ func (b *HandlerBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // HandlerList represents a list of HandlerBuilder.
-// Provided as a convenience.
-type HandlerList []HandlerBuilder
+type HandlerList []*HandlerBuilder
 
 // HandlerList represents a map of HandlerBuilder.
-// Provided as a convenience.
 type HandlerMap map[string]HandlerBuilder
 
 func (b *HandlerBuilder) preMarshal() {

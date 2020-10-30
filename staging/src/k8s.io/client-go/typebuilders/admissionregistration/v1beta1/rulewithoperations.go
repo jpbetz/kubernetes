@@ -28,15 +28,15 @@ import (
 // RuleWithOperationsBuilder represents an declarative configuration of the RuleWithOperations type for use
 // with apply.
 type RuleWithOperationsBuilder struct {
-	rule   RuleBuilder // inlined type
-	fields *ruleWithOperationsFields
+	rule   *RuleBuilder // inlined type
+	fields ruleWithOperationsFields
 }
 
-// ruleWithOperationsFields is used by RuleWithOperationsBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in RuleWithOperationsBuilder before marshalling, and
-// are copied out to the builder type in RuleWithOperationsBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// ruleWithOperationsFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in RuleWithOperationsBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type ruleWithOperationsFields struct {
 	Operations  *[]admissionregistrationv1beta1.OperationType `json:"operations,omitempty"`
 	APIGroups   *[]string                                     `json:"apiGroups,omitempty"`   // inlined RuleWithOperationsBuilder.rule.APIGroups field
@@ -45,36 +45,26 @@ type ruleWithOperationsFields struct {
 	Scope       *admissionregistrationv1beta1.ScopeType       `json:"scope,omitempty"`       // inlined RuleWithOperationsBuilder.rule.Scope field
 }
 
-func (b *RuleWithOperationsBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &ruleWithOperationsFields{}
-	}
-}
-
 // RuleWithOperations constructs an declarative configuration of the RuleWithOperations type for use with
 // apply.
-// Provided as a convenience.
-func RuleWithOperations() RuleWithOperationsBuilder {
-	return RuleWithOperationsBuilder{fields: &ruleWithOperationsFields{}}
+func RuleWithOperations() *RuleWithOperationsBuilder {
+	return &RuleWithOperationsBuilder{}
 }
 
 // SetOperations sets the Operations field in the declarative configuration to the given value.
-func (b RuleWithOperationsBuilder) SetOperations(value []admissionregistrationv1beta1.OperationType) RuleWithOperationsBuilder {
-	b.ensureInitialized()
+func (b *RuleWithOperationsBuilder) SetOperations(value []admissionregistrationv1beta1.OperationType) *RuleWithOperationsBuilder {
 	b.fields.Operations = &value
 	return b
 }
 
 // RemoveOperations removes the Operations field from the declarative configuration.
-func (b RuleWithOperationsBuilder) RemoveOperations() RuleWithOperationsBuilder {
-	b.ensureInitialized()
+func (b *RuleWithOperationsBuilder) RemoveOperations() *RuleWithOperationsBuilder {
 	b.fields.Operations = nil
 	return b
 }
 
 // GetOperations gets the Operations field from the declarative configuration.
-func (b RuleWithOperationsBuilder) GetOperations() (value []admissionregistrationv1beta1.OperationType, ok bool) {
-	b.ensureInitialized()
+func (b *RuleWithOperationsBuilder) GetOperations() (value []admissionregistrationv1beta1.OperationType, ok bool) {
 	if v := b.fields.Operations; v != nil {
 		return *v, true
 	}
@@ -82,22 +72,19 @@ func (b RuleWithOperationsBuilder) GetOperations() (value []admissionregistratio
 }
 
 // SetRule sets the Rule field in the declarative configuration to the given value.
-func (b RuleWithOperationsBuilder) SetRule(value RuleBuilder) RuleWithOperationsBuilder {
-	b.ensureInitialized()
+func (b *RuleWithOperationsBuilder) SetRule(value *RuleBuilder) *RuleWithOperationsBuilder {
 	b.rule = value
 	return b
 }
 
 // RemoveRule removes the Rule field from the declarative configuration.
-func (b RuleWithOperationsBuilder) RemoveRule() RuleWithOperationsBuilder {
-	b.ensureInitialized()
-	b.rule = RuleBuilder{}
+func (b *RuleWithOperationsBuilder) RemoveRule() *RuleWithOperationsBuilder {
+	b.rule = nil
 	return b
 }
 
 // GetRule gets the Rule field from the declarative configuration.
-func (b RuleWithOperationsBuilder) GetRule() (value RuleBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *RuleWithOperationsBuilder) GetRule() (value *RuleBuilder, ok bool) {
 	return b.rule, true
 }
 
@@ -106,9 +93,8 @@ func (b *RuleWithOperationsBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -123,14 +109,13 @@ func (b *RuleWithOperationsBuilder) FromUnstructured(u map[string]interface{}) e
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals RuleWithOperationsBuilder to JSON.
 func (b *RuleWithOperationsBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -138,8 +123,7 @@ func (b *RuleWithOperationsBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into RuleWithOperationsBuilder, replacing the contents of
 // RuleWithOperationsBuilder.
 func (b *RuleWithOperationsBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -147,28 +131,31 @@ func (b *RuleWithOperationsBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // RuleWithOperationsList represents a list of RuleWithOperationsBuilder.
-// Provided as a convenience.
-type RuleWithOperationsList []RuleWithOperationsBuilder
+type RuleWithOperationsList []*RuleWithOperationsBuilder
 
 // RuleWithOperationsList represents a map of RuleWithOperationsBuilder.
-// Provided as a convenience.
 type RuleWithOperationsMap map[string]RuleWithOperationsBuilder
 
 func (b *RuleWithOperationsBuilder) preMarshal() {
-	if v, ok := b.rule.GetAPIGroups(); ok {
-		b.fields.APIGroups = &v
-	}
-	if v, ok := b.rule.GetAPIVersions(); ok {
-		b.fields.APIVersions = &v
-	}
-	if v, ok := b.rule.GetResources(); ok {
-		b.fields.Resources = &v
-	}
-	if v, ok := b.rule.GetScope(); ok {
-		b.fields.Scope = &v
+	if b.rule != nil {
+		if v, ok := b.rule.GetAPIGroups(); ok {
+			b.fields.APIGroups = &v
+		}
+		if v, ok := b.rule.GetAPIVersions(); ok {
+			b.fields.APIVersions = &v
+		}
+		if v, ok := b.rule.GetResources(); ok {
+			b.fields.Resources = &v
+		}
+		if v, ok := b.rule.GetScope(); ok {
+			b.fields.Scope = &v
+		}
 	}
 }
 func (b *RuleWithOperationsBuilder) postUnmarshal() {
+	if b.rule == nil {
+		b.rule = &RuleBuilder{}
+	}
 	if b.fields.APIGroups != nil {
 		b.rule.SetAPIGroups(*b.fields.APIGroups)
 	}

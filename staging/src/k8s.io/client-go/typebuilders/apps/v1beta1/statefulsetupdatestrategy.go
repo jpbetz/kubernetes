@@ -28,49 +28,39 @@ import (
 // StatefulSetUpdateStrategyBuilder represents an declarative configuration of the StatefulSetUpdateStrategy type for use
 // with apply.
 type StatefulSetUpdateStrategyBuilder struct {
-	fields *statefulSetUpdateStrategyFields
+	fields statefulSetUpdateStrategyFields
 }
 
-// statefulSetUpdateStrategyFields is used by StatefulSetUpdateStrategyBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in StatefulSetUpdateStrategyBuilder before marshalling, and
-// are copied out to the builder type in StatefulSetUpdateStrategyBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// statefulSetUpdateStrategyFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in StatefulSetUpdateStrategyBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type statefulSetUpdateStrategyFields struct {
 	Type          *v1beta1.StatefulSetUpdateStrategyType   `json:"type,omitempty"`
 	RollingUpdate *RollingUpdateStatefulSetStrategyBuilder `json:"rollingUpdate,omitempty"`
 }
 
-func (b *StatefulSetUpdateStrategyBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &statefulSetUpdateStrategyFields{}
-	}
-}
-
 // StatefulSetUpdateStrategy constructs an declarative configuration of the StatefulSetUpdateStrategy type for use with
 // apply.
-// Provided as a convenience.
-func StatefulSetUpdateStrategy() StatefulSetUpdateStrategyBuilder {
-	return StatefulSetUpdateStrategyBuilder{fields: &statefulSetUpdateStrategyFields{}}
+func StatefulSetUpdateStrategy() *StatefulSetUpdateStrategyBuilder {
+	return &StatefulSetUpdateStrategyBuilder{}
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b StatefulSetUpdateStrategyBuilder) SetType(value v1beta1.StatefulSetUpdateStrategyType) StatefulSetUpdateStrategyBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetUpdateStrategyBuilder) SetType(value v1beta1.StatefulSetUpdateStrategyType) *StatefulSetUpdateStrategyBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b StatefulSetUpdateStrategyBuilder) RemoveType() StatefulSetUpdateStrategyBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetUpdateStrategyBuilder) RemoveType() *StatefulSetUpdateStrategyBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b StatefulSetUpdateStrategyBuilder) GetType() (value v1beta1.StatefulSetUpdateStrategyType, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetUpdateStrategyBuilder) GetType() (value v1beta1.StatefulSetUpdateStrategyType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -78,26 +68,20 @@ func (b StatefulSetUpdateStrategyBuilder) GetType() (value v1beta1.StatefulSetUp
 }
 
 // SetRollingUpdate sets the RollingUpdate field in the declarative configuration to the given value.
-func (b StatefulSetUpdateStrategyBuilder) SetRollingUpdate(value RollingUpdateStatefulSetStrategyBuilder) StatefulSetUpdateStrategyBuilder {
-	b.ensureInitialized()
-	b.fields.RollingUpdate = &value
+func (b *StatefulSetUpdateStrategyBuilder) SetRollingUpdate(value *RollingUpdateStatefulSetStrategyBuilder) *StatefulSetUpdateStrategyBuilder {
+	b.fields.RollingUpdate = value
 	return b
 }
 
 // RemoveRollingUpdate removes the RollingUpdate field from the declarative configuration.
-func (b StatefulSetUpdateStrategyBuilder) RemoveRollingUpdate() StatefulSetUpdateStrategyBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetUpdateStrategyBuilder) RemoveRollingUpdate() *StatefulSetUpdateStrategyBuilder {
 	b.fields.RollingUpdate = nil
 	return b
 }
 
 // GetRollingUpdate gets the RollingUpdate field from the declarative configuration.
-func (b StatefulSetUpdateStrategyBuilder) GetRollingUpdate() (value RollingUpdateStatefulSetStrategyBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.RollingUpdate; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *StatefulSetUpdateStrategyBuilder) GetRollingUpdate() (value *RollingUpdateStatefulSetStrategyBuilder, ok bool) {
+	return b.fields.RollingUpdate, b.fields.RollingUpdate != nil
 }
 
 // ToUnstructured converts StatefulSetUpdateStrategyBuilder to unstructured.
@@ -105,9 +89,8 @@ func (b *StatefulSetUpdateStrategyBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +105,13 @@ func (b *StatefulSetUpdateStrategyBuilder) FromUnstructured(u map[string]interfa
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals StatefulSetUpdateStrategyBuilder to JSON.
 func (b *StatefulSetUpdateStrategyBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +119,7 @@ func (b *StatefulSetUpdateStrategyBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into StatefulSetUpdateStrategyBuilder, replacing the contents of
 // StatefulSetUpdateStrategyBuilder.
 func (b *StatefulSetUpdateStrategyBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +127,9 @@ func (b *StatefulSetUpdateStrategyBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // StatefulSetUpdateStrategyList represents a list of StatefulSetUpdateStrategyBuilder.
-// Provided as a convenience.
-type StatefulSetUpdateStrategyList []StatefulSetUpdateStrategyBuilder
+type StatefulSetUpdateStrategyList []*StatefulSetUpdateStrategyBuilder
 
 // StatefulSetUpdateStrategyList represents a map of StatefulSetUpdateStrategyBuilder.
-// Provided as a convenience.
 type StatefulSetUpdateStrategyMap map[string]StatefulSetUpdateStrategyBuilder
 
 func (b *StatefulSetUpdateStrategyBuilder) preMarshal() {

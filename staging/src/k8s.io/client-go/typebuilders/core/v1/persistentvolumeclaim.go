@@ -28,15 +28,15 @@ import (
 // PersistentVolumeClaimBuilder represents an declarative configuration of the PersistentVolumeClaim type for use
 // with apply.
 type PersistentVolumeClaimBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *persistentVolumeClaimFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   persistentVolumeClaimFields
 }
 
-// persistentVolumeClaimFields is used by PersistentVolumeClaimBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PersistentVolumeClaimBuilder before marshalling, and
-// are copied out to the builder type in PersistentVolumeClaimBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// persistentVolumeClaimFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PersistentVolumeClaimBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type persistentVolumeClaimFields struct {
 	Kind       *string                             `json:"kind,omitempty"`       // inlined PersistentVolumeClaimBuilder.typeMeta.Kind field
 	APIVersion *string                             `json:"apiVersion,omitempty"` // inlined PersistentVolumeClaimBuilder.typeMeta.APIVersion field
@@ -45,106 +45,78 @@ type persistentVolumeClaimFields struct {
 	Status     *PersistentVolumeClaimStatusBuilder `json:"status,omitempty"`
 }
 
-func (b *PersistentVolumeClaimBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &persistentVolumeClaimFields{}
-	}
-}
-
 // PersistentVolumeClaim constructs an declarative configuration of the PersistentVolumeClaim type for use with
 // apply.
-// Provided as a convenience.
-func PersistentVolumeClaim() PersistentVolumeClaimBuilder {
-	return PersistentVolumeClaimBuilder{fields: &persistentVolumeClaimFields{}}
+func PersistentVolumeClaim() *PersistentVolumeClaimBuilder {
+	return &PersistentVolumeClaimBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b PersistentVolumeClaimBuilder) SetTypeMeta(value v1.TypeMetaBuilder) PersistentVolumeClaimBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *PersistentVolumeClaimBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b PersistentVolumeClaimBuilder) RemoveTypeMeta() PersistentVolumeClaimBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *PersistentVolumeClaimBuilder) RemoveTypeMeta() *PersistentVolumeClaimBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b PersistentVolumeClaimBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b PersistentVolumeClaimBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) PersistentVolumeClaimBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *PersistentVolumeClaimBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *PersistentVolumeClaimBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b PersistentVolumeClaimBuilder) RemoveObjectMeta() PersistentVolumeClaimBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimBuilder) RemoveObjectMeta() *PersistentVolumeClaimBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b PersistentVolumeClaimBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PersistentVolumeClaimBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b PersistentVolumeClaimBuilder) SetSpec(value PersistentVolumeClaimSpecBuilder) PersistentVolumeClaimBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *PersistentVolumeClaimBuilder) SetSpec(value *PersistentVolumeClaimSpecBuilder) *PersistentVolumeClaimBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b PersistentVolumeClaimBuilder) RemoveSpec() PersistentVolumeClaimBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimBuilder) RemoveSpec() *PersistentVolumeClaimBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b PersistentVolumeClaimBuilder) GetSpec() (value PersistentVolumeClaimSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PersistentVolumeClaimBuilder) GetSpec() (value *PersistentVolumeClaimSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b PersistentVolumeClaimBuilder) SetStatus(value PersistentVolumeClaimStatusBuilder) PersistentVolumeClaimBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *PersistentVolumeClaimBuilder) SetStatus(value *PersistentVolumeClaimStatusBuilder) *PersistentVolumeClaimBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b PersistentVolumeClaimBuilder) RemoveStatus() PersistentVolumeClaimBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimBuilder) RemoveStatus() *PersistentVolumeClaimBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b PersistentVolumeClaimBuilder) GetStatus() (value PersistentVolumeClaimStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PersistentVolumeClaimBuilder) GetStatus() (value *PersistentVolumeClaimStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts PersistentVolumeClaimBuilder to unstructured.
@@ -152,9 +124,8 @@ func (b *PersistentVolumeClaimBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *PersistentVolumeClaimBuilder) FromUnstructured(u map[string]interface{}
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PersistentVolumeClaimBuilder to JSON.
 func (b *PersistentVolumeClaimBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *PersistentVolumeClaimBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PersistentVolumeClaimBuilder, replacing the contents of
 // PersistentVolumeClaimBuilder.
 func (b *PersistentVolumeClaimBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +162,25 @@ func (b *PersistentVolumeClaimBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PersistentVolumeClaimList represents a list of PersistentVolumeClaimBuilder.
-// Provided as a convenience.
-type PersistentVolumeClaimList []PersistentVolumeClaimBuilder
+type PersistentVolumeClaimList []*PersistentVolumeClaimBuilder
 
 // PersistentVolumeClaimList represents a map of PersistentVolumeClaimBuilder.
-// Provided as a convenience.
 type PersistentVolumeClaimMap map[string]PersistentVolumeClaimBuilder
 
 func (b *PersistentVolumeClaimBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *PersistentVolumeClaimBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

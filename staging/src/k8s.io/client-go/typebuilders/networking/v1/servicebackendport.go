@@ -27,49 +27,39 @@ import (
 // ServiceBackendPortBuilder represents an declarative configuration of the ServiceBackendPort type for use
 // with apply.
 type ServiceBackendPortBuilder struct {
-	fields *serviceBackendPortFields
+	fields serviceBackendPortFields
 }
 
-// serviceBackendPortFields is used by ServiceBackendPortBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ServiceBackendPortBuilder before marshalling, and
-// are copied out to the builder type in ServiceBackendPortBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// serviceBackendPortFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ServiceBackendPortBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type serviceBackendPortFields struct {
 	Name   *string `json:"name,omitempty"`
 	Number *int32  `json:"number,omitempty"`
 }
 
-func (b *ServiceBackendPortBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &serviceBackendPortFields{}
-	}
-}
-
 // ServiceBackendPort constructs an declarative configuration of the ServiceBackendPort type for use with
 // apply.
-// Provided as a convenience.
-func ServiceBackendPort() ServiceBackendPortBuilder {
-	return ServiceBackendPortBuilder{fields: &serviceBackendPortFields{}}
+func ServiceBackendPort() *ServiceBackendPortBuilder {
+	return &ServiceBackendPortBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b ServiceBackendPortBuilder) SetName(value string) ServiceBackendPortBuilder {
-	b.ensureInitialized()
+func (b *ServiceBackendPortBuilder) SetName(value string) *ServiceBackendPortBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b ServiceBackendPortBuilder) RemoveName() ServiceBackendPortBuilder {
-	b.ensureInitialized()
+func (b *ServiceBackendPortBuilder) RemoveName() *ServiceBackendPortBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b ServiceBackendPortBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ServiceBackendPortBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b ServiceBackendPortBuilder) GetName() (value string, ok bool) {
 }
 
 // SetNumber sets the Number field in the declarative configuration to the given value.
-func (b ServiceBackendPortBuilder) SetNumber(value int32) ServiceBackendPortBuilder {
-	b.ensureInitialized()
+func (b *ServiceBackendPortBuilder) SetNumber(value int32) *ServiceBackendPortBuilder {
 	b.fields.Number = &value
 	return b
 }
 
 // RemoveNumber removes the Number field from the declarative configuration.
-func (b ServiceBackendPortBuilder) RemoveNumber() ServiceBackendPortBuilder {
-	b.ensureInitialized()
+func (b *ServiceBackendPortBuilder) RemoveNumber() *ServiceBackendPortBuilder {
 	b.fields.Number = nil
 	return b
 }
 
 // GetNumber gets the Number field from the declarative configuration.
-func (b ServiceBackendPortBuilder) GetNumber() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ServiceBackendPortBuilder) GetNumber() (value int32, ok bool) {
 	if v := b.fields.Number; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *ServiceBackendPortBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *ServiceBackendPortBuilder) FromUnstructured(u map[string]interface{}) e
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ServiceBackendPortBuilder to JSON.
 func (b *ServiceBackendPortBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *ServiceBackendPortBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ServiceBackendPortBuilder, replacing the contents of
 // ServiceBackendPortBuilder.
 func (b *ServiceBackendPortBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *ServiceBackendPortBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ServiceBackendPortList represents a list of ServiceBackendPortBuilder.
-// Provided as a convenience.
-type ServiceBackendPortList []ServiceBackendPortBuilder
+type ServiceBackendPortList []*ServiceBackendPortBuilder
 
 // ServiceBackendPortList represents a map of ServiceBackendPortBuilder.
-// Provided as a convenience.
 type ServiceBackendPortMap map[string]ServiceBackendPortBuilder
 
 func (b *ServiceBackendPortBuilder) preMarshal() {

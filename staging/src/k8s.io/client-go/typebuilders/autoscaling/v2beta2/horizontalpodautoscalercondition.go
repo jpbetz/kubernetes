@@ -30,14 +30,14 @@ import (
 // HorizontalPodAutoscalerConditionBuilder represents an declarative configuration of the HorizontalPodAutoscalerCondition type for use
 // with apply.
 type HorizontalPodAutoscalerConditionBuilder struct {
-	fields *horizontalPodAutoscalerConditionFields
+	fields horizontalPodAutoscalerConditionFields
 }
 
-// horizontalPodAutoscalerConditionFields is used by HorizontalPodAutoscalerConditionBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in HorizontalPodAutoscalerConditionBuilder before marshalling, and
-// are copied out to the builder type in HorizontalPodAutoscalerConditionBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// horizontalPodAutoscalerConditionFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in HorizontalPodAutoscalerConditionBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type horizontalPodAutoscalerConditionFields struct {
 	Type               *v2beta2.HorizontalPodAutoscalerConditionType `json:"type,omitempty"`
 	Status             *v1.ConditionStatus                           `json:"status,omitempty"`
@@ -46,36 +46,26 @@ type horizontalPodAutoscalerConditionFields struct {
 	Message            *string                                       `json:"message,omitempty"`
 }
 
-func (b *HorizontalPodAutoscalerConditionBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &horizontalPodAutoscalerConditionFields{}
-	}
-}
-
 // HorizontalPodAutoscalerCondition constructs an declarative configuration of the HorizontalPodAutoscalerCondition type for use with
 // apply.
-// Provided as a convenience.
-func HorizontalPodAutoscalerCondition() HorizontalPodAutoscalerConditionBuilder {
-	return HorizontalPodAutoscalerConditionBuilder{fields: &horizontalPodAutoscalerConditionFields{}}
+func HorizontalPodAutoscalerCondition() *HorizontalPodAutoscalerConditionBuilder {
+	return &HorizontalPodAutoscalerConditionBuilder{}
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerConditionBuilder) SetType(value v2beta2.HorizontalPodAutoscalerConditionType) HorizontalPodAutoscalerConditionBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerConditionBuilder) SetType(value v2beta2.HorizontalPodAutoscalerConditionType) *HorizontalPodAutoscalerConditionBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b HorizontalPodAutoscalerConditionBuilder) RemoveType() HorizontalPodAutoscalerConditionBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerConditionBuilder) RemoveType() *HorizontalPodAutoscalerConditionBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b HorizontalPodAutoscalerConditionBuilder) GetType() (value v2beta2.HorizontalPodAutoscalerConditionType, ok bool) {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerConditionBuilder) GetType() (value v2beta2.HorizontalPodAutoscalerConditionType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -83,22 +73,19 @@ func (b HorizontalPodAutoscalerConditionBuilder) GetType() (value v2beta2.Horizo
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerConditionBuilder) SetStatus(value v1.ConditionStatus) HorizontalPodAutoscalerConditionBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerConditionBuilder) SetStatus(value v1.ConditionStatus) *HorizontalPodAutoscalerConditionBuilder {
 	b.fields.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b HorizontalPodAutoscalerConditionBuilder) RemoveStatus() HorizontalPodAutoscalerConditionBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerConditionBuilder) RemoveStatus() *HorizontalPodAutoscalerConditionBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b HorizontalPodAutoscalerConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
 	if v := b.fields.Status; v != nil {
 		return *v, true
 	}
@@ -106,22 +93,19 @@ func (b HorizontalPodAutoscalerConditionBuilder) GetStatus() (value v1.Condition
 }
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerConditionBuilder) SetLastTransitionTime(value metav1.Time) HorizontalPodAutoscalerConditionBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerConditionBuilder) SetLastTransitionTime(value metav1.Time) *HorizontalPodAutoscalerConditionBuilder {
 	b.fields.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
-func (b HorizontalPodAutoscalerConditionBuilder) RemoveLastTransitionTime() HorizontalPodAutoscalerConditionBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerConditionBuilder) RemoveLastTransitionTime() *HorizontalPodAutoscalerConditionBuilder {
 	b.fields.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
-func (b HorizontalPodAutoscalerConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastTransitionTime; v != nil {
 		return *v, true
 	}
@@ -129,22 +113,19 @@ func (b HorizontalPodAutoscalerConditionBuilder) GetLastTransitionTime() (value 
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerConditionBuilder) SetReason(value string) HorizontalPodAutoscalerConditionBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerConditionBuilder) SetReason(value string) *HorizontalPodAutoscalerConditionBuilder {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b HorizontalPodAutoscalerConditionBuilder) RemoveReason() HorizontalPodAutoscalerConditionBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerConditionBuilder) RemoveReason() *HorizontalPodAutoscalerConditionBuilder {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b HorizontalPodAutoscalerConditionBuilder) GetReason() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerConditionBuilder) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -152,22 +133,19 @@ func (b HorizontalPodAutoscalerConditionBuilder) GetReason() (value string, ok b
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerConditionBuilder) SetMessage(value string) HorizontalPodAutoscalerConditionBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerConditionBuilder) SetMessage(value string) *HorizontalPodAutoscalerConditionBuilder {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b HorizontalPodAutoscalerConditionBuilder) RemoveMessage() HorizontalPodAutoscalerConditionBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerConditionBuilder) RemoveMessage() *HorizontalPodAutoscalerConditionBuilder {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b HorizontalPodAutoscalerConditionBuilder) GetMessage() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerConditionBuilder) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
@@ -179,9 +157,8 @@ func (b *HorizontalPodAutoscalerConditionBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -196,14 +173,13 @@ func (b *HorizontalPodAutoscalerConditionBuilder) FromUnstructured(u map[string]
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals HorizontalPodAutoscalerConditionBuilder to JSON.
 func (b *HorizontalPodAutoscalerConditionBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -211,8 +187,7 @@ func (b *HorizontalPodAutoscalerConditionBuilder) MarshalJSON() ([]byte, error) 
 // UnmarshalJSON unmarshals JSON into HorizontalPodAutoscalerConditionBuilder, replacing the contents of
 // HorizontalPodAutoscalerConditionBuilder.
 func (b *HorizontalPodAutoscalerConditionBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -220,11 +195,9 @@ func (b *HorizontalPodAutoscalerConditionBuilder) UnmarshalJSON(data []byte) err
 }
 
 // HorizontalPodAutoscalerConditionList represents a list of HorizontalPodAutoscalerConditionBuilder.
-// Provided as a convenience.
-type HorizontalPodAutoscalerConditionList []HorizontalPodAutoscalerConditionBuilder
+type HorizontalPodAutoscalerConditionList []*HorizontalPodAutoscalerConditionBuilder
 
 // HorizontalPodAutoscalerConditionList represents a map of HorizontalPodAutoscalerConditionBuilder.
-// Provided as a convenience.
 type HorizontalPodAutoscalerConditionMap map[string]HorizontalPodAutoscalerConditionBuilder
 
 func (b *HorizontalPodAutoscalerConditionBuilder) preMarshal() {

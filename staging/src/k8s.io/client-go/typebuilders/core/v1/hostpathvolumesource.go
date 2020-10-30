@@ -28,49 +28,39 @@ import (
 // HostPathVolumeSourceBuilder represents an declarative configuration of the HostPathVolumeSource type for use
 // with apply.
 type HostPathVolumeSourceBuilder struct {
-	fields *hostPathVolumeSourceFields
+	fields hostPathVolumeSourceFields
 }
 
-// hostPathVolumeSourceFields is used by HostPathVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in HostPathVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in HostPathVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// hostPathVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in HostPathVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type hostPathVolumeSourceFields struct {
 	Path *string          `json:"path,omitempty"`
 	Type *v1.HostPathType `json:"type,omitempty"`
 }
 
-func (b *HostPathVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &hostPathVolumeSourceFields{}
-	}
-}
-
 // HostPathVolumeSource constructs an declarative configuration of the HostPathVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func HostPathVolumeSource() HostPathVolumeSourceBuilder {
-	return HostPathVolumeSourceBuilder{fields: &hostPathVolumeSourceFields{}}
+func HostPathVolumeSource() *HostPathVolumeSourceBuilder {
+	return &HostPathVolumeSourceBuilder{}
 }
 
 // SetPath sets the Path field in the declarative configuration to the given value.
-func (b HostPathVolumeSourceBuilder) SetPath(value string) HostPathVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *HostPathVolumeSourceBuilder) SetPath(value string) *HostPathVolumeSourceBuilder {
 	b.fields.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
-func (b HostPathVolumeSourceBuilder) RemovePath() HostPathVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *HostPathVolumeSourceBuilder) RemovePath() *HostPathVolumeSourceBuilder {
 	b.fields.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
-func (b HostPathVolumeSourceBuilder) GetPath() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *HostPathVolumeSourceBuilder) GetPath() (value string, ok bool) {
 	if v := b.fields.Path; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b HostPathVolumeSourceBuilder) GetPath() (value string, ok bool) {
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b HostPathVolumeSourceBuilder) SetType(value v1.HostPathType) HostPathVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *HostPathVolumeSourceBuilder) SetType(value v1.HostPathType) *HostPathVolumeSourceBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b HostPathVolumeSourceBuilder) RemoveType() HostPathVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *HostPathVolumeSourceBuilder) RemoveType() *HostPathVolumeSourceBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b HostPathVolumeSourceBuilder) GetType() (value v1.HostPathType, ok bool) {
-	b.ensureInitialized()
+func (b *HostPathVolumeSourceBuilder) GetType() (value v1.HostPathType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -105,9 +92,8 @@ func (b *HostPathVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +108,13 @@ func (b *HostPathVolumeSourceBuilder) FromUnstructured(u map[string]interface{})
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals HostPathVolumeSourceBuilder to JSON.
 func (b *HostPathVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +122,7 @@ func (b *HostPathVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into HostPathVolumeSourceBuilder, replacing the contents of
 // HostPathVolumeSourceBuilder.
 func (b *HostPathVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +130,9 @@ func (b *HostPathVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // HostPathVolumeSourceList represents a list of HostPathVolumeSourceBuilder.
-// Provided as a convenience.
-type HostPathVolumeSourceList []HostPathVolumeSourceBuilder
+type HostPathVolumeSourceList []*HostPathVolumeSourceBuilder
 
 // HostPathVolumeSourceList represents a map of HostPathVolumeSourceBuilder.
-// Provided as a convenience.
 type HostPathVolumeSourceMap map[string]HostPathVolumeSourceBuilder
 
 func (b *HostPathVolumeSourceBuilder) preMarshal() {

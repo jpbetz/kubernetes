@@ -27,14 +27,14 @@ import (
 // StatefulSetStatusBuilder represents an declarative configuration of the StatefulSetStatus type for use
 // with apply.
 type StatefulSetStatusBuilder struct {
-	fields *statefulSetStatusFields
+	fields statefulSetStatusFields
 }
 
-// statefulSetStatusFields is used by StatefulSetStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in StatefulSetStatusBuilder before marshalling, and
-// are copied out to the builder type in StatefulSetStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// statefulSetStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in StatefulSetStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type statefulSetStatusFields struct {
 	ObservedGeneration *int64                    `json:"observedGeneration,omitempty"`
 	Replicas           *int32                    `json:"replicas,omitempty"`
@@ -47,36 +47,26 @@ type statefulSetStatusFields struct {
 	Conditions         *StatefulSetConditionList `json:"conditions,omitempty"`
 }
 
-func (b *StatefulSetStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &statefulSetStatusFields{}
-	}
-}
-
 // StatefulSetStatus constructs an declarative configuration of the StatefulSetStatus type for use with
 // apply.
-// Provided as a convenience.
-func StatefulSetStatus() StatefulSetStatusBuilder {
-	return StatefulSetStatusBuilder{fields: &statefulSetStatusFields{}}
+func StatefulSetStatus() *StatefulSetStatusBuilder {
+	return &StatefulSetStatusBuilder{}
 }
 
 // SetObservedGeneration sets the ObservedGeneration field in the declarative configuration to the given value.
-func (b StatefulSetStatusBuilder) SetObservedGeneration(value int64) StatefulSetStatusBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) SetObservedGeneration(value int64) *StatefulSetStatusBuilder {
 	b.fields.ObservedGeneration = &value
 	return b
 }
 
 // RemoveObservedGeneration removes the ObservedGeneration field from the declarative configuration.
-func (b StatefulSetStatusBuilder) RemoveObservedGeneration() StatefulSetStatusBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) RemoveObservedGeneration() *StatefulSetStatusBuilder {
 	b.fields.ObservedGeneration = nil
 	return b
 }
 
 // GetObservedGeneration gets the ObservedGeneration field from the declarative configuration.
-func (b StatefulSetStatusBuilder) GetObservedGeneration() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) GetObservedGeneration() (value int64, ok bool) {
 	if v := b.fields.ObservedGeneration; v != nil {
 		return *v, true
 	}
@@ -84,22 +74,19 @@ func (b StatefulSetStatusBuilder) GetObservedGeneration() (value int64, ok bool)
 }
 
 // SetReplicas sets the Replicas field in the declarative configuration to the given value.
-func (b StatefulSetStatusBuilder) SetReplicas(value int32) StatefulSetStatusBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) SetReplicas(value int32) *StatefulSetStatusBuilder {
 	b.fields.Replicas = &value
 	return b
 }
 
 // RemoveReplicas removes the Replicas field from the declarative configuration.
-func (b StatefulSetStatusBuilder) RemoveReplicas() StatefulSetStatusBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) RemoveReplicas() *StatefulSetStatusBuilder {
 	b.fields.Replicas = nil
 	return b
 }
 
 // GetReplicas gets the Replicas field from the declarative configuration.
-func (b StatefulSetStatusBuilder) GetReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) GetReplicas() (value int32, ok bool) {
 	if v := b.fields.Replicas; v != nil {
 		return *v, true
 	}
@@ -107,22 +94,19 @@ func (b StatefulSetStatusBuilder) GetReplicas() (value int32, ok bool) {
 }
 
 // SetReadyReplicas sets the ReadyReplicas field in the declarative configuration to the given value.
-func (b StatefulSetStatusBuilder) SetReadyReplicas(value int32) StatefulSetStatusBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) SetReadyReplicas(value int32) *StatefulSetStatusBuilder {
 	b.fields.ReadyReplicas = &value
 	return b
 }
 
 // RemoveReadyReplicas removes the ReadyReplicas field from the declarative configuration.
-func (b StatefulSetStatusBuilder) RemoveReadyReplicas() StatefulSetStatusBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) RemoveReadyReplicas() *StatefulSetStatusBuilder {
 	b.fields.ReadyReplicas = nil
 	return b
 }
 
 // GetReadyReplicas gets the ReadyReplicas field from the declarative configuration.
-func (b StatefulSetStatusBuilder) GetReadyReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) GetReadyReplicas() (value int32, ok bool) {
 	if v := b.fields.ReadyReplicas; v != nil {
 		return *v, true
 	}
@@ -130,22 +114,19 @@ func (b StatefulSetStatusBuilder) GetReadyReplicas() (value int32, ok bool) {
 }
 
 // SetCurrentReplicas sets the CurrentReplicas field in the declarative configuration to the given value.
-func (b StatefulSetStatusBuilder) SetCurrentReplicas(value int32) StatefulSetStatusBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) SetCurrentReplicas(value int32) *StatefulSetStatusBuilder {
 	b.fields.CurrentReplicas = &value
 	return b
 }
 
 // RemoveCurrentReplicas removes the CurrentReplicas field from the declarative configuration.
-func (b StatefulSetStatusBuilder) RemoveCurrentReplicas() StatefulSetStatusBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) RemoveCurrentReplicas() *StatefulSetStatusBuilder {
 	b.fields.CurrentReplicas = nil
 	return b
 }
 
 // GetCurrentReplicas gets the CurrentReplicas field from the declarative configuration.
-func (b StatefulSetStatusBuilder) GetCurrentReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) GetCurrentReplicas() (value int32, ok bool) {
 	if v := b.fields.CurrentReplicas; v != nil {
 		return *v, true
 	}
@@ -153,22 +134,19 @@ func (b StatefulSetStatusBuilder) GetCurrentReplicas() (value int32, ok bool) {
 }
 
 // SetUpdatedReplicas sets the UpdatedReplicas field in the declarative configuration to the given value.
-func (b StatefulSetStatusBuilder) SetUpdatedReplicas(value int32) StatefulSetStatusBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) SetUpdatedReplicas(value int32) *StatefulSetStatusBuilder {
 	b.fields.UpdatedReplicas = &value
 	return b
 }
 
 // RemoveUpdatedReplicas removes the UpdatedReplicas field from the declarative configuration.
-func (b StatefulSetStatusBuilder) RemoveUpdatedReplicas() StatefulSetStatusBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) RemoveUpdatedReplicas() *StatefulSetStatusBuilder {
 	b.fields.UpdatedReplicas = nil
 	return b
 }
 
 // GetUpdatedReplicas gets the UpdatedReplicas field from the declarative configuration.
-func (b StatefulSetStatusBuilder) GetUpdatedReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) GetUpdatedReplicas() (value int32, ok bool) {
 	if v := b.fields.UpdatedReplicas; v != nil {
 		return *v, true
 	}
@@ -176,22 +154,19 @@ func (b StatefulSetStatusBuilder) GetUpdatedReplicas() (value int32, ok bool) {
 }
 
 // SetCurrentRevision sets the CurrentRevision field in the declarative configuration to the given value.
-func (b StatefulSetStatusBuilder) SetCurrentRevision(value string) StatefulSetStatusBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) SetCurrentRevision(value string) *StatefulSetStatusBuilder {
 	b.fields.CurrentRevision = &value
 	return b
 }
 
 // RemoveCurrentRevision removes the CurrentRevision field from the declarative configuration.
-func (b StatefulSetStatusBuilder) RemoveCurrentRevision() StatefulSetStatusBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) RemoveCurrentRevision() *StatefulSetStatusBuilder {
 	b.fields.CurrentRevision = nil
 	return b
 }
 
 // GetCurrentRevision gets the CurrentRevision field from the declarative configuration.
-func (b StatefulSetStatusBuilder) GetCurrentRevision() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) GetCurrentRevision() (value string, ok bool) {
 	if v := b.fields.CurrentRevision; v != nil {
 		return *v, true
 	}
@@ -199,22 +174,19 @@ func (b StatefulSetStatusBuilder) GetCurrentRevision() (value string, ok bool) {
 }
 
 // SetUpdateRevision sets the UpdateRevision field in the declarative configuration to the given value.
-func (b StatefulSetStatusBuilder) SetUpdateRevision(value string) StatefulSetStatusBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) SetUpdateRevision(value string) *StatefulSetStatusBuilder {
 	b.fields.UpdateRevision = &value
 	return b
 }
 
 // RemoveUpdateRevision removes the UpdateRevision field from the declarative configuration.
-func (b StatefulSetStatusBuilder) RemoveUpdateRevision() StatefulSetStatusBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) RemoveUpdateRevision() *StatefulSetStatusBuilder {
 	b.fields.UpdateRevision = nil
 	return b
 }
 
 // GetUpdateRevision gets the UpdateRevision field from the declarative configuration.
-func (b StatefulSetStatusBuilder) GetUpdateRevision() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) GetUpdateRevision() (value string, ok bool) {
 	if v := b.fields.UpdateRevision; v != nil {
 		return *v, true
 	}
@@ -222,22 +194,19 @@ func (b StatefulSetStatusBuilder) GetUpdateRevision() (value string, ok bool) {
 }
 
 // SetCollisionCount sets the CollisionCount field in the declarative configuration to the given value.
-func (b StatefulSetStatusBuilder) SetCollisionCount(value int32) StatefulSetStatusBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) SetCollisionCount(value int32) *StatefulSetStatusBuilder {
 	b.fields.CollisionCount = &value
 	return b
 }
 
 // RemoveCollisionCount removes the CollisionCount field from the declarative configuration.
-func (b StatefulSetStatusBuilder) RemoveCollisionCount() StatefulSetStatusBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) RemoveCollisionCount() *StatefulSetStatusBuilder {
 	b.fields.CollisionCount = nil
 	return b
 }
 
 // GetCollisionCount gets the CollisionCount field from the declarative configuration.
-func (b StatefulSetStatusBuilder) GetCollisionCount() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) GetCollisionCount() (value int32, ok bool) {
 	if v := b.fields.CollisionCount; v != nil {
 		return *v, true
 	}
@@ -245,22 +214,19 @@ func (b StatefulSetStatusBuilder) GetCollisionCount() (value int32, ok bool) {
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b StatefulSetStatusBuilder) SetConditions(value StatefulSetConditionList) StatefulSetStatusBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) SetConditions(value StatefulSetConditionList) *StatefulSetStatusBuilder {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b StatefulSetStatusBuilder) RemoveConditions() StatefulSetStatusBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) RemoveConditions() *StatefulSetStatusBuilder {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b StatefulSetStatusBuilder) GetConditions() (value StatefulSetConditionList, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetStatusBuilder) GetConditions() (value StatefulSetConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
@@ -272,9 +238,8 @@ func (b *StatefulSetStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -289,14 +254,13 @@ func (b *StatefulSetStatusBuilder) FromUnstructured(u map[string]interface{}) er
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals StatefulSetStatusBuilder to JSON.
 func (b *StatefulSetStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -304,8 +268,7 @@ func (b *StatefulSetStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into StatefulSetStatusBuilder, replacing the contents of
 // StatefulSetStatusBuilder.
 func (b *StatefulSetStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -313,11 +276,9 @@ func (b *StatefulSetStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // StatefulSetStatusList represents a list of StatefulSetStatusBuilder.
-// Provided as a convenience.
-type StatefulSetStatusList []StatefulSetStatusBuilder
+type StatefulSetStatusList []*StatefulSetStatusBuilder
 
 // StatefulSetStatusList represents a map of StatefulSetStatusBuilder.
-// Provided as a convenience.
 type StatefulSetStatusMap map[string]StatefulSetStatusBuilder
 
 func (b *StatefulSetStatusBuilder) preMarshal() {

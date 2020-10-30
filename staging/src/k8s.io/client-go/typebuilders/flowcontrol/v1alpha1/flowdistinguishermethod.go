@@ -28,48 +28,38 @@ import (
 // FlowDistinguisherMethodBuilder represents an declarative configuration of the FlowDistinguisherMethod type for use
 // with apply.
 type FlowDistinguisherMethodBuilder struct {
-	fields *flowDistinguisherMethodFields
+	fields flowDistinguisherMethodFields
 }
 
-// flowDistinguisherMethodFields is used by FlowDistinguisherMethodBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in FlowDistinguisherMethodBuilder before marshalling, and
-// are copied out to the builder type in FlowDistinguisherMethodBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// flowDistinguisherMethodFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in FlowDistinguisherMethodBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type flowDistinguisherMethodFields struct {
 	Type *v1alpha1.FlowDistinguisherMethodType `json:"type,omitempty"`
 }
 
-func (b *FlowDistinguisherMethodBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &flowDistinguisherMethodFields{}
-	}
-}
-
 // FlowDistinguisherMethod constructs an declarative configuration of the FlowDistinguisherMethod type for use with
 // apply.
-// Provided as a convenience.
-func FlowDistinguisherMethod() FlowDistinguisherMethodBuilder {
-	return FlowDistinguisherMethodBuilder{fields: &flowDistinguisherMethodFields{}}
+func FlowDistinguisherMethod() *FlowDistinguisherMethodBuilder {
+	return &FlowDistinguisherMethodBuilder{}
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b FlowDistinguisherMethodBuilder) SetType(value v1alpha1.FlowDistinguisherMethodType) FlowDistinguisherMethodBuilder {
-	b.ensureInitialized()
+func (b *FlowDistinguisherMethodBuilder) SetType(value v1alpha1.FlowDistinguisherMethodType) *FlowDistinguisherMethodBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b FlowDistinguisherMethodBuilder) RemoveType() FlowDistinguisherMethodBuilder {
-	b.ensureInitialized()
+func (b *FlowDistinguisherMethodBuilder) RemoveType() *FlowDistinguisherMethodBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b FlowDistinguisherMethodBuilder) GetType() (value v1alpha1.FlowDistinguisherMethodType, ok bool) {
-	b.ensureInitialized()
+func (b *FlowDistinguisherMethodBuilder) GetType() (value v1alpha1.FlowDistinguisherMethodType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -81,9 +71,8 @@ func (b *FlowDistinguisherMethodBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -98,14 +87,13 @@ func (b *FlowDistinguisherMethodBuilder) FromUnstructured(u map[string]interface
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals FlowDistinguisherMethodBuilder to JSON.
 func (b *FlowDistinguisherMethodBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -113,8 +101,7 @@ func (b *FlowDistinguisherMethodBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into FlowDistinguisherMethodBuilder, replacing the contents of
 // FlowDistinguisherMethodBuilder.
 func (b *FlowDistinguisherMethodBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -122,11 +109,9 @@ func (b *FlowDistinguisherMethodBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // FlowDistinguisherMethodList represents a list of FlowDistinguisherMethodBuilder.
-// Provided as a convenience.
-type FlowDistinguisherMethodList []FlowDistinguisherMethodBuilder
+type FlowDistinguisherMethodList []*FlowDistinguisherMethodBuilder
 
 // FlowDistinguisherMethodList represents a map of FlowDistinguisherMethodBuilder.
-// Provided as a convenience.
 type FlowDistinguisherMethodMap map[string]FlowDistinguisherMethodBuilder
 
 func (b *FlowDistinguisherMethodBuilder) preMarshal() {

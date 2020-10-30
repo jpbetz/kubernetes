@@ -27,49 +27,39 @@ import (
 // SecretReferenceBuilder represents an declarative configuration of the SecretReference type for use
 // with apply.
 type SecretReferenceBuilder struct {
-	fields *secretReferenceFields
+	fields secretReferenceFields
 }
 
-// secretReferenceFields is used by SecretReferenceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in SecretReferenceBuilder before marshalling, and
-// are copied out to the builder type in SecretReferenceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// secretReferenceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in SecretReferenceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type secretReferenceFields struct {
 	Name      *string `json:"name,omitempty"`
 	Namespace *string `json:"namespace,omitempty"`
 }
 
-func (b *SecretReferenceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &secretReferenceFields{}
-	}
-}
-
 // SecretReference constructs an declarative configuration of the SecretReference type for use with
 // apply.
-// Provided as a convenience.
-func SecretReference() SecretReferenceBuilder {
-	return SecretReferenceBuilder{fields: &secretReferenceFields{}}
+func SecretReference() *SecretReferenceBuilder {
+	return &SecretReferenceBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b SecretReferenceBuilder) SetName(value string) SecretReferenceBuilder {
-	b.ensureInitialized()
+func (b *SecretReferenceBuilder) SetName(value string) *SecretReferenceBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b SecretReferenceBuilder) RemoveName() SecretReferenceBuilder {
-	b.ensureInitialized()
+func (b *SecretReferenceBuilder) RemoveName() *SecretReferenceBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b SecretReferenceBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *SecretReferenceBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b SecretReferenceBuilder) GetName() (value string, ok bool) {
 }
 
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
-func (b SecretReferenceBuilder) SetNamespace(value string) SecretReferenceBuilder {
-	b.ensureInitialized()
+func (b *SecretReferenceBuilder) SetNamespace(value string) *SecretReferenceBuilder {
 	b.fields.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
-func (b SecretReferenceBuilder) RemoveNamespace() SecretReferenceBuilder {
-	b.ensureInitialized()
+func (b *SecretReferenceBuilder) RemoveNamespace() *SecretReferenceBuilder {
 	b.fields.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
-func (b SecretReferenceBuilder) GetNamespace() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *SecretReferenceBuilder) GetNamespace() (value string, ok bool) {
 	if v := b.fields.Namespace; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *SecretReferenceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *SecretReferenceBuilder) FromUnstructured(u map[string]interface{}) erro
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals SecretReferenceBuilder to JSON.
 func (b *SecretReferenceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *SecretReferenceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into SecretReferenceBuilder, replacing the contents of
 // SecretReferenceBuilder.
 func (b *SecretReferenceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *SecretReferenceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // SecretReferenceList represents a list of SecretReferenceBuilder.
-// Provided as a convenience.
-type SecretReferenceList []SecretReferenceBuilder
+type SecretReferenceList []*SecretReferenceBuilder
 
 // SecretReferenceList represents a map of SecretReferenceBuilder.
-// Provided as a convenience.
 type SecretReferenceMap map[string]SecretReferenceBuilder
 
 func (b *SecretReferenceBuilder) preMarshal() {

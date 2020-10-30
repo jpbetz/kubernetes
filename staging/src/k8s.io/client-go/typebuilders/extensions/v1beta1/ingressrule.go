@@ -27,50 +27,40 @@ import (
 // IngressRuleBuilder represents an declarative configuration of the IngressRule type for use
 // with apply.
 type IngressRuleBuilder struct {
-	ingressRuleValue IngressRuleValueBuilder // inlined type
-	fields           *ingressRuleFields
+	ingressRuleValue *IngressRuleValueBuilder // inlined type
+	fields           ingressRuleFields
 }
 
-// ingressRuleFields is used by IngressRuleBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in IngressRuleBuilder before marshalling, and
-// are copied out to the builder type in IngressRuleBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// ingressRuleFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in IngressRuleBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type ingressRuleFields struct {
 	Host *string                      `json:"host,omitempty"`
 	HTTP *HTTPIngressRuleValueBuilder `json:"http,omitempty"` // inlined IngressRuleBuilder.ingressRuleValue.HTTP field
 }
 
-func (b *IngressRuleBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &ingressRuleFields{}
-	}
-}
-
 // IngressRule constructs an declarative configuration of the IngressRule type for use with
 // apply.
-// Provided as a convenience.
-func IngressRule() IngressRuleBuilder {
-	return IngressRuleBuilder{fields: &ingressRuleFields{}}
+func IngressRule() *IngressRuleBuilder {
+	return &IngressRuleBuilder{}
 }
 
 // SetHost sets the Host field in the declarative configuration to the given value.
-func (b IngressRuleBuilder) SetHost(value string) IngressRuleBuilder {
-	b.ensureInitialized()
+func (b *IngressRuleBuilder) SetHost(value string) *IngressRuleBuilder {
 	b.fields.Host = &value
 	return b
 }
 
 // RemoveHost removes the Host field from the declarative configuration.
-func (b IngressRuleBuilder) RemoveHost() IngressRuleBuilder {
-	b.ensureInitialized()
+func (b *IngressRuleBuilder) RemoveHost() *IngressRuleBuilder {
 	b.fields.Host = nil
 	return b
 }
 
 // GetHost gets the Host field from the declarative configuration.
-func (b IngressRuleBuilder) GetHost() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *IngressRuleBuilder) GetHost() (value string, ok bool) {
 	if v := b.fields.Host; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b IngressRuleBuilder) GetHost() (value string, ok bool) {
 }
 
 // SetIngressRuleValue sets the IngressRuleValue field in the declarative configuration to the given value.
-func (b IngressRuleBuilder) SetIngressRuleValue(value IngressRuleValueBuilder) IngressRuleBuilder {
-	b.ensureInitialized()
+func (b *IngressRuleBuilder) SetIngressRuleValue(value *IngressRuleValueBuilder) *IngressRuleBuilder {
 	b.ingressRuleValue = value
 	return b
 }
 
 // RemoveIngressRuleValue removes the IngressRuleValue field from the declarative configuration.
-func (b IngressRuleBuilder) RemoveIngressRuleValue() IngressRuleBuilder {
-	b.ensureInitialized()
-	b.ingressRuleValue = IngressRuleValueBuilder{}
+func (b *IngressRuleBuilder) RemoveIngressRuleValue() *IngressRuleBuilder {
+	b.ingressRuleValue = nil
 	return b
 }
 
 // GetIngressRuleValue gets the IngressRuleValue field from the declarative configuration.
-func (b IngressRuleBuilder) GetIngressRuleValue() (value IngressRuleValueBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *IngressRuleBuilder) GetIngressRuleValue() (value *IngressRuleValueBuilder, ok bool) {
 	return b.ingressRuleValue, true
 }
 
@@ -102,9 +89,8 @@ func (b *IngressRuleBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -119,14 +105,13 @@ func (b *IngressRuleBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals IngressRuleBuilder to JSON.
 func (b *IngressRuleBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -134,8 +119,7 @@ func (b *IngressRuleBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into IngressRuleBuilder, replacing the contents of
 // IngressRuleBuilder.
 func (b *IngressRuleBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -143,20 +127,23 @@ func (b *IngressRuleBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // IngressRuleList represents a list of IngressRuleBuilder.
-// Provided as a convenience.
-type IngressRuleList []IngressRuleBuilder
+type IngressRuleList []*IngressRuleBuilder
 
 // IngressRuleList represents a map of IngressRuleBuilder.
-// Provided as a convenience.
 type IngressRuleMap map[string]IngressRuleBuilder
 
 func (b *IngressRuleBuilder) preMarshal() {
-	if v, ok := b.ingressRuleValue.GetHTTP(); ok {
-		b.fields.HTTP = &v
+	if b.ingressRuleValue != nil {
+		if v, ok := b.ingressRuleValue.GetHTTP(); ok {
+			b.fields.HTTP = v
+		}
 	}
 }
 func (b *IngressRuleBuilder) postUnmarshal() {
+	if b.ingressRuleValue == nil {
+		b.ingressRuleValue = &IngressRuleValueBuilder{}
+	}
 	if b.fields.HTTP != nil {
-		b.ingressRuleValue.SetHTTP(*b.fields.HTTP)
+		b.ingressRuleValue.SetHTTP(b.fields.HTTP)
 	}
 }

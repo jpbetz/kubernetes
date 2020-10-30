@@ -27,50 +27,40 @@ import (
 // KeyToPathBuilder represents an declarative configuration of the KeyToPath type for use
 // with apply.
 type KeyToPathBuilder struct {
-	fields *keyToPathFields
+	fields keyToPathFields
 }
 
-// keyToPathFields is used by KeyToPathBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in KeyToPathBuilder before marshalling, and
-// are copied out to the builder type in KeyToPathBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// keyToPathFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in KeyToPathBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type keyToPathFields struct {
 	Key  *string `json:"key,omitempty"`
 	Path *string `json:"path,omitempty"`
 	Mode *int32  `json:"mode,omitempty"`
 }
 
-func (b *KeyToPathBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &keyToPathFields{}
-	}
-}
-
 // KeyToPath constructs an declarative configuration of the KeyToPath type for use with
 // apply.
-// Provided as a convenience.
-func KeyToPath() KeyToPathBuilder {
-	return KeyToPathBuilder{fields: &keyToPathFields{}}
+func KeyToPath() *KeyToPathBuilder {
+	return &KeyToPathBuilder{}
 }
 
 // SetKey sets the Key field in the declarative configuration to the given value.
-func (b KeyToPathBuilder) SetKey(value string) KeyToPathBuilder {
-	b.ensureInitialized()
+func (b *KeyToPathBuilder) SetKey(value string) *KeyToPathBuilder {
 	b.fields.Key = &value
 	return b
 }
 
 // RemoveKey removes the Key field from the declarative configuration.
-func (b KeyToPathBuilder) RemoveKey() KeyToPathBuilder {
-	b.ensureInitialized()
+func (b *KeyToPathBuilder) RemoveKey() *KeyToPathBuilder {
 	b.fields.Key = nil
 	return b
 }
 
 // GetKey gets the Key field from the declarative configuration.
-func (b KeyToPathBuilder) GetKey() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *KeyToPathBuilder) GetKey() (value string, ok bool) {
 	if v := b.fields.Key; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b KeyToPathBuilder) GetKey() (value string, ok bool) {
 }
 
 // SetPath sets the Path field in the declarative configuration to the given value.
-func (b KeyToPathBuilder) SetPath(value string) KeyToPathBuilder {
-	b.ensureInitialized()
+func (b *KeyToPathBuilder) SetPath(value string) *KeyToPathBuilder {
 	b.fields.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
-func (b KeyToPathBuilder) RemovePath() KeyToPathBuilder {
-	b.ensureInitialized()
+func (b *KeyToPathBuilder) RemovePath() *KeyToPathBuilder {
 	b.fields.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
-func (b KeyToPathBuilder) GetPath() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *KeyToPathBuilder) GetPath() (value string, ok bool) {
 	if v := b.fields.Path; v != nil {
 		return *v, true
 	}
@@ -101,22 +88,19 @@ func (b KeyToPathBuilder) GetPath() (value string, ok bool) {
 }
 
 // SetMode sets the Mode field in the declarative configuration to the given value.
-func (b KeyToPathBuilder) SetMode(value int32) KeyToPathBuilder {
-	b.ensureInitialized()
+func (b *KeyToPathBuilder) SetMode(value int32) *KeyToPathBuilder {
 	b.fields.Mode = &value
 	return b
 }
 
 // RemoveMode removes the Mode field from the declarative configuration.
-func (b KeyToPathBuilder) RemoveMode() KeyToPathBuilder {
-	b.ensureInitialized()
+func (b *KeyToPathBuilder) RemoveMode() *KeyToPathBuilder {
 	b.fields.Mode = nil
 	return b
 }
 
 // GetMode gets the Mode field from the declarative configuration.
-func (b KeyToPathBuilder) GetMode() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *KeyToPathBuilder) GetMode() (value int32, ok bool) {
 	if v := b.fields.Mode; v != nil {
 		return *v, true
 	}
@@ -128,9 +112,8 @@ func (b *KeyToPathBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +128,13 @@ func (b *KeyToPathBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals KeyToPathBuilder to JSON.
 func (b *KeyToPathBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +142,7 @@ func (b *KeyToPathBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into KeyToPathBuilder, replacing the contents of
 // KeyToPathBuilder.
 func (b *KeyToPathBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +150,9 @@ func (b *KeyToPathBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // KeyToPathList represents a list of KeyToPathBuilder.
-// Provided as a convenience.
-type KeyToPathList []KeyToPathBuilder
+type KeyToPathList []*KeyToPathBuilder
 
 // KeyToPathList represents a map of KeyToPathBuilder.
-// Provided as a convenience.
 type KeyToPathMap map[string]KeyToPathBuilder
 
 func (b *KeyToPathBuilder) preMarshal() {

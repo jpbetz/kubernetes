@@ -27,49 +27,39 @@ import (
 // NetworkPolicyIngressRuleBuilder represents an declarative configuration of the NetworkPolicyIngressRule type for use
 // with apply.
 type NetworkPolicyIngressRuleBuilder struct {
-	fields *networkPolicyIngressRuleFields
+	fields networkPolicyIngressRuleFields
 }
 
-// networkPolicyIngressRuleFields is used by NetworkPolicyIngressRuleBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in NetworkPolicyIngressRuleBuilder before marshalling, and
-// are copied out to the builder type in NetworkPolicyIngressRuleBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// networkPolicyIngressRuleFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in NetworkPolicyIngressRuleBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type networkPolicyIngressRuleFields struct {
 	Ports *NetworkPolicyPortList `json:"ports,omitempty"`
 	From  *NetworkPolicyPeerList `json:"from,omitempty"`
 }
 
-func (b *NetworkPolicyIngressRuleBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &networkPolicyIngressRuleFields{}
-	}
-}
-
 // NetworkPolicyIngressRule constructs an declarative configuration of the NetworkPolicyIngressRule type for use with
 // apply.
-// Provided as a convenience.
-func NetworkPolicyIngressRule() NetworkPolicyIngressRuleBuilder {
-	return NetworkPolicyIngressRuleBuilder{fields: &networkPolicyIngressRuleFields{}}
+func NetworkPolicyIngressRule() *NetworkPolicyIngressRuleBuilder {
+	return &NetworkPolicyIngressRuleBuilder{}
 }
 
 // SetPorts sets the Ports field in the declarative configuration to the given value.
-func (b NetworkPolicyIngressRuleBuilder) SetPorts(value NetworkPolicyPortList) NetworkPolicyIngressRuleBuilder {
-	b.ensureInitialized()
+func (b *NetworkPolicyIngressRuleBuilder) SetPorts(value NetworkPolicyPortList) *NetworkPolicyIngressRuleBuilder {
 	b.fields.Ports = &value
 	return b
 }
 
 // RemovePorts removes the Ports field from the declarative configuration.
-func (b NetworkPolicyIngressRuleBuilder) RemovePorts() NetworkPolicyIngressRuleBuilder {
-	b.ensureInitialized()
+func (b *NetworkPolicyIngressRuleBuilder) RemovePorts() *NetworkPolicyIngressRuleBuilder {
 	b.fields.Ports = nil
 	return b
 }
 
 // GetPorts gets the Ports field from the declarative configuration.
-func (b NetworkPolicyIngressRuleBuilder) GetPorts() (value NetworkPolicyPortList, ok bool) {
-	b.ensureInitialized()
+func (b *NetworkPolicyIngressRuleBuilder) GetPorts() (value NetworkPolicyPortList, ok bool) {
 	if v := b.fields.Ports; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b NetworkPolicyIngressRuleBuilder) GetPorts() (value NetworkPolicyPortList
 }
 
 // SetFrom sets the From field in the declarative configuration to the given value.
-func (b NetworkPolicyIngressRuleBuilder) SetFrom(value NetworkPolicyPeerList) NetworkPolicyIngressRuleBuilder {
-	b.ensureInitialized()
+func (b *NetworkPolicyIngressRuleBuilder) SetFrom(value NetworkPolicyPeerList) *NetworkPolicyIngressRuleBuilder {
 	b.fields.From = &value
 	return b
 }
 
 // RemoveFrom removes the From field from the declarative configuration.
-func (b NetworkPolicyIngressRuleBuilder) RemoveFrom() NetworkPolicyIngressRuleBuilder {
-	b.ensureInitialized()
+func (b *NetworkPolicyIngressRuleBuilder) RemoveFrom() *NetworkPolicyIngressRuleBuilder {
 	b.fields.From = nil
 	return b
 }
 
 // GetFrom gets the From field from the declarative configuration.
-func (b NetworkPolicyIngressRuleBuilder) GetFrom() (value NetworkPolicyPeerList, ok bool) {
-	b.ensureInitialized()
+func (b *NetworkPolicyIngressRuleBuilder) GetFrom() (value NetworkPolicyPeerList, ok bool) {
 	if v := b.fields.From; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *NetworkPolicyIngressRuleBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *NetworkPolicyIngressRuleBuilder) FromUnstructured(u map[string]interfac
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals NetworkPolicyIngressRuleBuilder to JSON.
 func (b *NetworkPolicyIngressRuleBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *NetworkPolicyIngressRuleBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into NetworkPolicyIngressRuleBuilder, replacing the contents of
 // NetworkPolicyIngressRuleBuilder.
 func (b *NetworkPolicyIngressRuleBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *NetworkPolicyIngressRuleBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // NetworkPolicyIngressRuleList represents a list of NetworkPolicyIngressRuleBuilder.
-// Provided as a convenience.
-type NetworkPolicyIngressRuleList []NetworkPolicyIngressRuleBuilder
+type NetworkPolicyIngressRuleList []*NetworkPolicyIngressRuleBuilder
 
 // NetworkPolicyIngressRuleList represents a map of NetworkPolicyIngressRuleBuilder.
-// Provided as a convenience.
 type NetworkPolicyIngressRuleMap map[string]NetworkPolicyIngressRuleBuilder
 
 func (b *NetworkPolicyIngressRuleBuilder) preMarshal() {

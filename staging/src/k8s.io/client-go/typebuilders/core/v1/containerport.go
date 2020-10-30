@@ -28,14 +28,14 @@ import (
 // ContainerPortBuilder represents an declarative configuration of the ContainerPort type for use
 // with apply.
 type ContainerPortBuilder struct {
-	fields *containerPortFields
+	fields containerPortFields
 }
 
-// containerPortFields is used by ContainerPortBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ContainerPortBuilder before marshalling, and
-// are copied out to the builder type in ContainerPortBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// containerPortFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ContainerPortBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type containerPortFields struct {
 	Name          *string      `json:"name,omitempty"`
 	HostPort      *int32       `json:"hostPort,omitempty"`
@@ -44,36 +44,26 @@ type containerPortFields struct {
 	HostIP        *string      `json:"hostIP,omitempty"`
 }
 
-func (b *ContainerPortBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &containerPortFields{}
-	}
-}
-
 // ContainerPort constructs an declarative configuration of the ContainerPort type for use with
 // apply.
-// Provided as a convenience.
-func ContainerPort() ContainerPortBuilder {
-	return ContainerPortBuilder{fields: &containerPortFields{}}
+func ContainerPort() *ContainerPortBuilder {
+	return &ContainerPortBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b ContainerPortBuilder) SetName(value string) ContainerPortBuilder {
-	b.ensureInitialized()
+func (b *ContainerPortBuilder) SetName(value string) *ContainerPortBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b ContainerPortBuilder) RemoveName() ContainerPortBuilder {
-	b.ensureInitialized()
+func (b *ContainerPortBuilder) RemoveName() *ContainerPortBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b ContainerPortBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerPortBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -81,22 +71,19 @@ func (b ContainerPortBuilder) GetName() (value string, ok bool) {
 }
 
 // SetHostPort sets the HostPort field in the declarative configuration to the given value.
-func (b ContainerPortBuilder) SetHostPort(value int32) ContainerPortBuilder {
-	b.ensureInitialized()
+func (b *ContainerPortBuilder) SetHostPort(value int32) *ContainerPortBuilder {
 	b.fields.HostPort = &value
 	return b
 }
 
 // RemoveHostPort removes the HostPort field from the declarative configuration.
-func (b ContainerPortBuilder) RemoveHostPort() ContainerPortBuilder {
-	b.ensureInitialized()
+func (b *ContainerPortBuilder) RemoveHostPort() *ContainerPortBuilder {
 	b.fields.HostPort = nil
 	return b
 }
 
 // GetHostPort gets the HostPort field from the declarative configuration.
-func (b ContainerPortBuilder) GetHostPort() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerPortBuilder) GetHostPort() (value int32, ok bool) {
 	if v := b.fields.HostPort; v != nil {
 		return *v, true
 	}
@@ -104,22 +91,19 @@ func (b ContainerPortBuilder) GetHostPort() (value int32, ok bool) {
 }
 
 // SetContainerPort sets the ContainerPort field in the declarative configuration to the given value.
-func (b ContainerPortBuilder) SetContainerPort(value int32) ContainerPortBuilder {
-	b.ensureInitialized()
+func (b *ContainerPortBuilder) SetContainerPort(value int32) *ContainerPortBuilder {
 	b.fields.ContainerPort = &value
 	return b
 }
 
 // RemoveContainerPort removes the ContainerPort field from the declarative configuration.
-func (b ContainerPortBuilder) RemoveContainerPort() ContainerPortBuilder {
-	b.ensureInitialized()
+func (b *ContainerPortBuilder) RemoveContainerPort() *ContainerPortBuilder {
 	b.fields.ContainerPort = nil
 	return b
 }
 
 // GetContainerPort gets the ContainerPort field from the declarative configuration.
-func (b ContainerPortBuilder) GetContainerPort() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerPortBuilder) GetContainerPort() (value int32, ok bool) {
 	if v := b.fields.ContainerPort; v != nil {
 		return *v, true
 	}
@@ -127,22 +111,19 @@ func (b ContainerPortBuilder) GetContainerPort() (value int32, ok bool) {
 }
 
 // SetProtocol sets the Protocol field in the declarative configuration to the given value.
-func (b ContainerPortBuilder) SetProtocol(value v1.Protocol) ContainerPortBuilder {
-	b.ensureInitialized()
+func (b *ContainerPortBuilder) SetProtocol(value v1.Protocol) *ContainerPortBuilder {
 	b.fields.Protocol = &value
 	return b
 }
 
 // RemoveProtocol removes the Protocol field from the declarative configuration.
-func (b ContainerPortBuilder) RemoveProtocol() ContainerPortBuilder {
-	b.ensureInitialized()
+func (b *ContainerPortBuilder) RemoveProtocol() *ContainerPortBuilder {
 	b.fields.Protocol = nil
 	return b
 }
 
 // GetProtocol gets the Protocol field from the declarative configuration.
-func (b ContainerPortBuilder) GetProtocol() (value v1.Protocol, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerPortBuilder) GetProtocol() (value v1.Protocol, ok bool) {
 	if v := b.fields.Protocol; v != nil {
 		return *v, true
 	}
@@ -150,22 +131,19 @@ func (b ContainerPortBuilder) GetProtocol() (value v1.Protocol, ok bool) {
 }
 
 // SetHostIP sets the HostIP field in the declarative configuration to the given value.
-func (b ContainerPortBuilder) SetHostIP(value string) ContainerPortBuilder {
-	b.ensureInitialized()
+func (b *ContainerPortBuilder) SetHostIP(value string) *ContainerPortBuilder {
 	b.fields.HostIP = &value
 	return b
 }
 
 // RemoveHostIP removes the HostIP field from the declarative configuration.
-func (b ContainerPortBuilder) RemoveHostIP() ContainerPortBuilder {
-	b.ensureInitialized()
+func (b *ContainerPortBuilder) RemoveHostIP() *ContainerPortBuilder {
 	b.fields.HostIP = nil
 	return b
 }
 
 // GetHostIP gets the HostIP field from the declarative configuration.
-func (b ContainerPortBuilder) GetHostIP() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerPortBuilder) GetHostIP() (value string, ok bool) {
 	if v := b.fields.HostIP; v != nil {
 		return *v, true
 	}
@@ -177,9 +155,8 @@ func (b *ContainerPortBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -194,14 +171,13 @@ func (b *ContainerPortBuilder) FromUnstructured(u map[string]interface{}) error 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ContainerPortBuilder to JSON.
 func (b *ContainerPortBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -209,8 +185,7 @@ func (b *ContainerPortBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ContainerPortBuilder, replacing the contents of
 // ContainerPortBuilder.
 func (b *ContainerPortBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -218,11 +193,9 @@ func (b *ContainerPortBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ContainerPortList represents a list of ContainerPortBuilder.
-// Provided as a convenience.
-type ContainerPortList []ContainerPortBuilder
+type ContainerPortList []*ContainerPortBuilder
 
 // ContainerPortList represents a map of ContainerPortBuilder.
-// Provided as a convenience.
 type ContainerPortMap map[string]ContainerPortBuilder
 
 func (b *ContainerPortBuilder) preMarshal() {

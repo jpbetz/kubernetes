@@ -27,49 +27,39 @@ import (
 // ContainerStateWaitingBuilder represents an declarative configuration of the ContainerStateWaiting type for use
 // with apply.
 type ContainerStateWaitingBuilder struct {
-	fields *containerStateWaitingFields
+	fields containerStateWaitingFields
 }
 
-// containerStateWaitingFields is used by ContainerStateWaitingBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ContainerStateWaitingBuilder before marshalling, and
-// are copied out to the builder type in ContainerStateWaitingBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// containerStateWaitingFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ContainerStateWaitingBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type containerStateWaitingFields struct {
 	Reason  *string `json:"reason,omitempty"`
 	Message *string `json:"message,omitempty"`
 }
 
-func (b *ContainerStateWaitingBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &containerStateWaitingFields{}
-	}
-}
-
 // ContainerStateWaiting constructs an declarative configuration of the ContainerStateWaiting type for use with
 // apply.
-// Provided as a convenience.
-func ContainerStateWaiting() ContainerStateWaitingBuilder {
-	return ContainerStateWaitingBuilder{fields: &containerStateWaitingFields{}}
+func ContainerStateWaiting() *ContainerStateWaitingBuilder {
+	return &ContainerStateWaitingBuilder{}
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b ContainerStateWaitingBuilder) SetReason(value string) ContainerStateWaitingBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateWaitingBuilder) SetReason(value string) *ContainerStateWaitingBuilder {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b ContainerStateWaitingBuilder) RemoveReason() ContainerStateWaitingBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateWaitingBuilder) RemoveReason() *ContainerStateWaitingBuilder {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b ContainerStateWaitingBuilder) GetReason() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerStateWaitingBuilder) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b ContainerStateWaitingBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b ContainerStateWaitingBuilder) SetMessage(value string) ContainerStateWaitingBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateWaitingBuilder) SetMessage(value string) *ContainerStateWaitingBuilder {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b ContainerStateWaitingBuilder) RemoveMessage() ContainerStateWaitingBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateWaitingBuilder) RemoveMessage() *ContainerStateWaitingBuilder {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b ContainerStateWaitingBuilder) GetMessage() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerStateWaitingBuilder) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *ContainerStateWaitingBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *ContainerStateWaitingBuilder) FromUnstructured(u map[string]interface{}
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ContainerStateWaitingBuilder to JSON.
 func (b *ContainerStateWaitingBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *ContainerStateWaitingBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ContainerStateWaitingBuilder, replacing the contents of
 // ContainerStateWaitingBuilder.
 func (b *ContainerStateWaitingBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *ContainerStateWaitingBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ContainerStateWaitingList represents a list of ContainerStateWaitingBuilder.
-// Provided as a convenience.
-type ContainerStateWaitingList []ContainerStateWaitingBuilder
+type ContainerStateWaitingList []*ContainerStateWaitingBuilder
 
 // ContainerStateWaitingList represents a map of ContainerStateWaitingBuilder.
-// Provided as a convenience.
 type ContainerStateWaitingMap map[string]ContainerStateWaitingBuilder
 
 func (b *ContainerStateWaitingBuilder) preMarshal() {

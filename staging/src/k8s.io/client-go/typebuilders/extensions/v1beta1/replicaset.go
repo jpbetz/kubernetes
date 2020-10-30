@@ -28,15 +28,15 @@ import (
 // ReplicaSetBuilder represents an declarative configuration of the ReplicaSet type for use
 // with apply.
 type ReplicaSetBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *replicaSetFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   replicaSetFields
 }
 
-// replicaSetFields is used by ReplicaSetBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ReplicaSetBuilder before marshalling, and
-// are copied out to the builder type in ReplicaSetBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// replicaSetFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ReplicaSetBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type replicaSetFields struct {
 	Kind       *string                  `json:"kind,omitempty"`       // inlined ReplicaSetBuilder.typeMeta.Kind field
 	APIVersion *string                  `json:"apiVersion,omitempty"` // inlined ReplicaSetBuilder.typeMeta.APIVersion field
@@ -45,106 +45,78 @@ type replicaSetFields struct {
 	Status     *ReplicaSetStatusBuilder `json:"status,omitempty"`
 }
 
-func (b *ReplicaSetBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &replicaSetFields{}
-	}
-}
-
 // ReplicaSet constructs an declarative configuration of the ReplicaSet type for use with
 // apply.
-// Provided as a convenience.
-func ReplicaSet() ReplicaSetBuilder {
-	return ReplicaSetBuilder{fields: &replicaSetFields{}}
+func ReplicaSet() *ReplicaSetBuilder {
+	return &ReplicaSetBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b ReplicaSetBuilder) SetTypeMeta(value v1.TypeMetaBuilder) ReplicaSetBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *ReplicaSetBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b ReplicaSetBuilder) RemoveTypeMeta() ReplicaSetBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *ReplicaSetBuilder) RemoveTypeMeta() *ReplicaSetBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b ReplicaSetBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicaSetBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b ReplicaSetBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) ReplicaSetBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *ReplicaSetBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *ReplicaSetBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b ReplicaSetBuilder) RemoveObjectMeta() ReplicaSetBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetBuilder) RemoveObjectMeta() *ReplicaSetBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b ReplicaSetBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ReplicaSetBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b ReplicaSetBuilder) SetSpec(value ReplicaSetSpecBuilder) ReplicaSetBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *ReplicaSetBuilder) SetSpec(value *ReplicaSetSpecBuilder) *ReplicaSetBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b ReplicaSetBuilder) RemoveSpec() ReplicaSetBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetBuilder) RemoveSpec() *ReplicaSetBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b ReplicaSetBuilder) GetSpec() (value ReplicaSetSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ReplicaSetBuilder) GetSpec() (value *ReplicaSetSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b ReplicaSetBuilder) SetStatus(value ReplicaSetStatusBuilder) ReplicaSetBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *ReplicaSetBuilder) SetStatus(value *ReplicaSetStatusBuilder) *ReplicaSetBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b ReplicaSetBuilder) RemoveStatus() ReplicaSetBuilder {
-	b.ensureInitialized()
+func (b *ReplicaSetBuilder) RemoveStatus() *ReplicaSetBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b ReplicaSetBuilder) GetStatus() (value ReplicaSetStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ReplicaSetBuilder) GetStatus() (value *ReplicaSetStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts ReplicaSetBuilder to unstructured.
@@ -152,9 +124,8 @@ func (b *ReplicaSetBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *ReplicaSetBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ReplicaSetBuilder to JSON.
 func (b *ReplicaSetBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *ReplicaSetBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ReplicaSetBuilder, replacing the contents of
 // ReplicaSetBuilder.
 func (b *ReplicaSetBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +162,25 @@ func (b *ReplicaSetBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ReplicaSetList represents a list of ReplicaSetBuilder.
-// Provided as a convenience.
-type ReplicaSetList []ReplicaSetBuilder
+type ReplicaSetList []*ReplicaSetBuilder
 
 // ReplicaSetList represents a map of ReplicaSetBuilder.
-// Provided as a convenience.
 type ReplicaSetMap map[string]ReplicaSetBuilder
 
 func (b *ReplicaSetBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *ReplicaSetBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

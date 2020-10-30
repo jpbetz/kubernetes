@@ -27,50 +27,40 @@ import (
 // WindowsSecurityContextOptionsBuilder represents an declarative configuration of the WindowsSecurityContextOptions type for use
 // with apply.
 type WindowsSecurityContextOptionsBuilder struct {
-	fields *windowsSecurityContextOptionsFields
+	fields windowsSecurityContextOptionsFields
 }
 
-// windowsSecurityContextOptionsFields is used by WindowsSecurityContextOptionsBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in WindowsSecurityContextOptionsBuilder before marshalling, and
-// are copied out to the builder type in WindowsSecurityContextOptionsBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// windowsSecurityContextOptionsFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in WindowsSecurityContextOptionsBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type windowsSecurityContextOptionsFields struct {
 	GMSACredentialSpecName *string `json:"gmsaCredentialSpecName,omitempty"`
 	GMSACredentialSpec     *string `json:"gmsaCredentialSpec,omitempty"`
 	RunAsUserName          *string `json:"runAsUserName,omitempty"`
 }
 
-func (b *WindowsSecurityContextOptionsBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &windowsSecurityContextOptionsFields{}
-	}
-}
-
 // WindowsSecurityContextOptions constructs an declarative configuration of the WindowsSecurityContextOptions type for use with
 // apply.
-// Provided as a convenience.
-func WindowsSecurityContextOptions() WindowsSecurityContextOptionsBuilder {
-	return WindowsSecurityContextOptionsBuilder{fields: &windowsSecurityContextOptionsFields{}}
+func WindowsSecurityContextOptions() *WindowsSecurityContextOptionsBuilder {
+	return &WindowsSecurityContextOptionsBuilder{}
 }
 
 // SetGMSACredentialSpecName sets the GMSACredentialSpecName field in the declarative configuration to the given value.
-func (b WindowsSecurityContextOptionsBuilder) SetGMSACredentialSpecName(value string) WindowsSecurityContextOptionsBuilder {
-	b.ensureInitialized()
+func (b *WindowsSecurityContextOptionsBuilder) SetGMSACredentialSpecName(value string) *WindowsSecurityContextOptionsBuilder {
 	b.fields.GMSACredentialSpecName = &value
 	return b
 }
 
 // RemoveGMSACredentialSpecName removes the GMSACredentialSpecName field from the declarative configuration.
-func (b WindowsSecurityContextOptionsBuilder) RemoveGMSACredentialSpecName() WindowsSecurityContextOptionsBuilder {
-	b.ensureInitialized()
+func (b *WindowsSecurityContextOptionsBuilder) RemoveGMSACredentialSpecName() *WindowsSecurityContextOptionsBuilder {
 	b.fields.GMSACredentialSpecName = nil
 	return b
 }
 
 // GetGMSACredentialSpecName gets the GMSACredentialSpecName field from the declarative configuration.
-func (b WindowsSecurityContextOptionsBuilder) GetGMSACredentialSpecName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *WindowsSecurityContextOptionsBuilder) GetGMSACredentialSpecName() (value string, ok bool) {
 	if v := b.fields.GMSACredentialSpecName; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b WindowsSecurityContextOptionsBuilder) GetGMSACredentialSpecName() (value
 }
 
 // SetGMSACredentialSpec sets the GMSACredentialSpec field in the declarative configuration to the given value.
-func (b WindowsSecurityContextOptionsBuilder) SetGMSACredentialSpec(value string) WindowsSecurityContextOptionsBuilder {
-	b.ensureInitialized()
+func (b *WindowsSecurityContextOptionsBuilder) SetGMSACredentialSpec(value string) *WindowsSecurityContextOptionsBuilder {
 	b.fields.GMSACredentialSpec = &value
 	return b
 }
 
 // RemoveGMSACredentialSpec removes the GMSACredentialSpec field from the declarative configuration.
-func (b WindowsSecurityContextOptionsBuilder) RemoveGMSACredentialSpec() WindowsSecurityContextOptionsBuilder {
-	b.ensureInitialized()
+func (b *WindowsSecurityContextOptionsBuilder) RemoveGMSACredentialSpec() *WindowsSecurityContextOptionsBuilder {
 	b.fields.GMSACredentialSpec = nil
 	return b
 }
 
 // GetGMSACredentialSpec gets the GMSACredentialSpec field from the declarative configuration.
-func (b WindowsSecurityContextOptionsBuilder) GetGMSACredentialSpec() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *WindowsSecurityContextOptionsBuilder) GetGMSACredentialSpec() (value string, ok bool) {
 	if v := b.fields.GMSACredentialSpec; v != nil {
 		return *v, true
 	}
@@ -101,22 +88,19 @@ func (b WindowsSecurityContextOptionsBuilder) GetGMSACredentialSpec() (value str
 }
 
 // SetRunAsUserName sets the RunAsUserName field in the declarative configuration to the given value.
-func (b WindowsSecurityContextOptionsBuilder) SetRunAsUserName(value string) WindowsSecurityContextOptionsBuilder {
-	b.ensureInitialized()
+func (b *WindowsSecurityContextOptionsBuilder) SetRunAsUserName(value string) *WindowsSecurityContextOptionsBuilder {
 	b.fields.RunAsUserName = &value
 	return b
 }
 
 // RemoveRunAsUserName removes the RunAsUserName field from the declarative configuration.
-func (b WindowsSecurityContextOptionsBuilder) RemoveRunAsUserName() WindowsSecurityContextOptionsBuilder {
-	b.ensureInitialized()
+func (b *WindowsSecurityContextOptionsBuilder) RemoveRunAsUserName() *WindowsSecurityContextOptionsBuilder {
 	b.fields.RunAsUserName = nil
 	return b
 }
 
 // GetRunAsUserName gets the RunAsUserName field from the declarative configuration.
-func (b WindowsSecurityContextOptionsBuilder) GetRunAsUserName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *WindowsSecurityContextOptionsBuilder) GetRunAsUserName() (value string, ok bool) {
 	if v := b.fields.RunAsUserName; v != nil {
 		return *v, true
 	}
@@ -128,9 +112,8 @@ func (b *WindowsSecurityContextOptionsBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +128,13 @@ func (b *WindowsSecurityContextOptionsBuilder) FromUnstructured(u map[string]int
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals WindowsSecurityContextOptionsBuilder to JSON.
 func (b *WindowsSecurityContextOptionsBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +142,7 @@ func (b *WindowsSecurityContextOptionsBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into WindowsSecurityContextOptionsBuilder, replacing the contents of
 // WindowsSecurityContextOptionsBuilder.
 func (b *WindowsSecurityContextOptionsBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +150,9 @@ func (b *WindowsSecurityContextOptionsBuilder) UnmarshalJSON(data []byte) error 
 }
 
 // WindowsSecurityContextOptionsList represents a list of WindowsSecurityContextOptionsBuilder.
-// Provided as a convenience.
-type WindowsSecurityContextOptionsList []WindowsSecurityContextOptionsBuilder
+type WindowsSecurityContextOptionsList []*WindowsSecurityContextOptionsBuilder
 
 // WindowsSecurityContextOptionsList represents a map of WindowsSecurityContextOptionsBuilder.
-// Provided as a convenience.
 type WindowsSecurityContextOptionsMap map[string]WindowsSecurityContextOptionsBuilder
 
 func (b *WindowsSecurityContextOptionsBuilder) preMarshal() {

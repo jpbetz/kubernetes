@@ -28,15 +28,15 @@ import (
 // PodSecurityPolicyBuilder represents an declarative configuration of the PodSecurityPolicy type for use
 // with apply.
 type PodSecurityPolicyBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *podSecurityPolicyFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   podSecurityPolicyFields
 }
 
-// podSecurityPolicyFields is used by PodSecurityPolicyBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PodSecurityPolicyBuilder before marshalling, and
-// are copied out to the builder type in PodSecurityPolicyBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// podSecurityPolicyFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PodSecurityPolicyBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type podSecurityPolicyFields struct {
 	Kind       *string                       `json:"kind,omitempty"`       // inlined PodSecurityPolicyBuilder.typeMeta.Kind field
 	APIVersion *string                       `json:"apiVersion,omitempty"` // inlined PodSecurityPolicyBuilder.typeMeta.APIVersion field
@@ -44,83 +44,61 @@ type podSecurityPolicyFields struct {
 	Spec       *PodSecurityPolicySpecBuilder `json:"spec,omitempty"`
 }
 
-func (b *PodSecurityPolicyBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &podSecurityPolicyFields{}
-	}
-}
-
 // PodSecurityPolicy constructs an declarative configuration of the PodSecurityPolicy type for use with
 // apply.
-// Provided as a convenience.
-func PodSecurityPolicy() PodSecurityPolicyBuilder {
-	return PodSecurityPolicyBuilder{fields: &podSecurityPolicyFields{}}
+func PodSecurityPolicy() *PodSecurityPolicyBuilder {
+	return &PodSecurityPolicyBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b PodSecurityPolicyBuilder) SetTypeMeta(value v1.TypeMetaBuilder) PodSecurityPolicyBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicyBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *PodSecurityPolicyBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b PodSecurityPolicyBuilder) RemoveTypeMeta() PodSecurityPolicyBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *PodSecurityPolicyBuilder) RemoveTypeMeta() *PodSecurityPolicyBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b PodSecurityPolicyBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *PodSecurityPolicyBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b PodSecurityPolicyBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) PodSecurityPolicyBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *PodSecurityPolicyBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *PodSecurityPolicyBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b PodSecurityPolicyBuilder) RemoveObjectMeta() PodSecurityPolicyBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicyBuilder) RemoveObjectMeta() *PodSecurityPolicyBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b PodSecurityPolicyBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodSecurityPolicyBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b PodSecurityPolicyBuilder) SetSpec(value PodSecurityPolicySpecBuilder) PodSecurityPolicyBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *PodSecurityPolicyBuilder) SetSpec(value *PodSecurityPolicySpecBuilder) *PodSecurityPolicyBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b PodSecurityPolicyBuilder) RemoveSpec() PodSecurityPolicyBuilder {
-	b.ensureInitialized()
+func (b *PodSecurityPolicyBuilder) RemoveSpec() *PodSecurityPolicyBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b PodSecurityPolicyBuilder) GetSpec() (value PodSecurityPolicySpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodSecurityPolicyBuilder) GetSpec() (value *PodSecurityPolicySpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // ToUnstructured converts PodSecurityPolicyBuilder to unstructured.
@@ -128,9 +106,8 @@ func (b *PodSecurityPolicyBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +122,13 @@ func (b *PodSecurityPolicyBuilder) FromUnstructured(u map[string]interface{}) er
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PodSecurityPolicyBuilder to JSON.
 func (b *PodSecurityPolicyBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +136,7 @@ func (b *PodSecurityPolicyBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PodSecurityPolicyBuilder, replacing the contents of
 // PodSecurityPolicyBuilder.
 func (b *PodSecurityPolicyBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,22 +144,25 @@ func (b *PodSecurityPolicyBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PodSecurityPolicyList represents a list of PodSecurityPolicyBuilder.
-// Provided as a convenience.
-type PodSecurityPolicyList []PodSecurityPolicyBuilder
+type PodSecurityPolicyList []*PodSecurityPolicyBuilder
 
 // PodSecurityPolicyList represents a map of PodSecurityPolicyBuilder.
-// Provided as a convenience.
 type PodSecurityPolicyMap map[string]PodSecurityPolicyBuilder
 
 func (b *PodSecurityPolicyBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *PodSecurityPolicyBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

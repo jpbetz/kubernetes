@@ -27,14 +27,14 @@ import (
 // ServiceReferenceBuilder represents an declarative configuration of the ServiceReference type for use
 // with apply.
 type ServiceReferenceBuilder struct {
-	fields *serviceReferenceFields
+	fields serviceReferenceFields
 }
 
-// serviceReferenceFields is used by ServiceReferenceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ServiceReferenceBuilder before marshalling, and
-// are copied out to the builder type in ServiceReferenceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// serviceReferenceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ServiceReferenceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type serviceReferenceFields struct {
 	Namespace *string `json:"namespace,omitempty"`
 	Name      *string `json:"name,omitempty"`
@@ -42,36 +42,26 @@ type serviceReferenceFields struct {
 	Port      *int32  `json:"port,omitempty"`
 }
 
-func (b *ServiceReferenceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &serviceReferenceFields{}
-	}
-}
-
 // ServiceReference constructs an declarative configuration of the ServiceReference type for use with
 // apply.
-// Provided as a convenience.
-func ServiceReference() ServiceReferenceBuilder {
-	return ServiceReferenceBuilder{fields: &serviceReferenceFields{}}
+func ServiceReference() *ServiceReferenceBuilder {
+	return &ServiceReferenceBuilder{}
 }
 
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
-func (b ServiceReferenceBuilder) SetNamespace(value string) ServiceReferenceBuilder {
-	b.ensureInitialized()
+func (b *ServiceReferenceBuilder) SetNamespace(value string) *ServiceReferenceBuilder {
 	b.fields.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
-func (b ServiceReferenceBuilder) RemoveNamespace() ServiceReferenceBuilder {
-	b.ensureInitialized()
+func (b *ServiceReferenceBuilder) RemoveNamespace() *ServiceReferenceBuilder {
 	b.fields.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
-func (b ServiceReferenceBuilder) GetNamespace() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ServiceReferenceBuilder) GetNamespace() (value string, ok bool) {
 	if v := b.fields.Namespace; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b ServiceReferenceBuilder) GetNamespace() (value string, ok bool) {
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b ServiceReferenceBuilder) SetName(value string) ServiceReferenceBuilder {
-	b.ensureInitialized()
+func (b *ServiceReferenceBuilder) SetName(value string) *ServiceReferenceBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b ServiceReferenceBuilder) RemoveName() ServiceReferenceBuilder {
-	b.ensureInitialized()
+func (b *ServiceReferenceBuilder) RemoveName() *ServiceReferenceBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b ServiceReferenceBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ServiceReferenceBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -102,22 +89,19 @@ func (b ServiceReferenceBuilder) GetName() (value string, ok bool) {
 }
 
 // SetPath sets the Path field in the declarative configuration to the given value.
-func (b ServiceReferenceBuilder) SetPath(value string) ServiceReferenceBuilder {
-	b.ensureInitialized()
+func (b *ServiceReferenceBuilder) SetPath(value string) *ServiceReferenceBuilder {
 	b.fields.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
-func (b ServiceReferenceBuilder) RemovePath() ServiceReferenceBuilder {
-	b.ensureInitialized()
+func (b *ServiceReferenceBuilder) RemovePath() *ServiceReferenceBuilder {
 	b.fields.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
-func (b ServiceReferenceBuilder) GetPath() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ServiceReferenceBuilder) GetPath() (value string, ok bool) {
 	if v := b.fields.Path; v != nil {
 		return *v, true
 	}
@@ -125,22 +109,19 @@ func (b ServiceReferenceBuilder) GetPath() (value string, ok bool) {
 }
 
 // SetPort sets the Port field in the declarative configuration to the given value.
-func (b ServiceReferenceBuilder) SetPort(value int32) ServiceReferenceBuilder {
-	b.ensureInitialized()
+func (b *ServiceReferenceBuilder) SetPort(value int32) *ServiceReferenceBuilder {
 	b.fields.Port = &value
 	return b
 }
 
 // RemovePort removes the Port field from the declarative configuration.
-func (b ServiceReferenceBuilder) RemovePort() ServiceReferenceBuilder {
-	b.ensureInitialized()
+func (b *ServiceReferenceBuilder) RemovePort() *ServiceReferenceBuilder {
 	b.fields.Port = nil
 	return b
 }
 
 // GetPort gets the Port field from the declarative configuration.
-func (b ServiceReferenceBuilder) GetPort() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ServiceReferenceBuilder) GetPort() (value int32, ok bool) {
 	if v := b.fields.Port; v != nil {
 		return *v, true
 	}
@@ -152,9 +133,8 @@ func (b *ServiceReferenceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +149,13 @@ func (b *ServiceReferenceBuilder) FromUnstructured(u map[string]interface{}) err
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ServiceReferenceBuilder to JSON.
 func (b *ServiceReferenceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +163,7 @@ func (b *ServiceReferenceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ServiceReferenceBuilder, replacing the contents of
 // ServiceReferenceBuilder.
 func (b *ServiceReferenceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,11 +171,9 @@ func (b *ServiceReferenceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ServiceReferenceList represents a list of ServiceReferenceBuilder.
-// Provided as a convenience.
-type ServiceReferenceList []ServiceReferenceBuilder
+type ServiceReferenceList []*ServiceReferenceBuilder
 
 // ServiceReferenceList represents a map of ServiceReferenceBuilder.
-// Provided as a convenience.
 type ServiceReferenceMap map[string]ServiceReferenceBuilder
 
 func (b *ServiceReferenceBuilder) preMarshal() {

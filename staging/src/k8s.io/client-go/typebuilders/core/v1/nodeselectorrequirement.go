@@ -28,50 +28,40 @@ import (
 // NodeSelectorRequirementBuilder represents an declarative configuration of the NodeSelectorRequirement type for use
 // with apply.
 type NodeSelectorRequirementBuilder struct {
-	fields *nodeSelectorRequirementFields
+	fields nodeSelectorRequirementFields
 }
 
-// nodeSelectorRequirementFields is used by NodeSelectorRequirementBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in NodeSelectorRequirementBuilder before marshalling, and
-// are copied out to the builder type in NodeSelectorRequirementBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// nodeSelectorRequirementFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in NodeSelectorRequirementBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type nodeSelectorRequirementFields struct {
 	Key      *string                  `json:"key,omitempty"`
 	Operator *v1.NodeSelectorOperator `json:"operator,omitempty"`
 	Values   *[]string                `json:"values,omitempty"`
 }
 
-func (b *NodeSelectorRequirementBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &nodeSelectorRequirementFields{}
-	}
-}
-
 // NodeSelectorRequirement constructs an declarative configuration of the NodeSelectorRequirement type for use with
 // apply.
-// Provided as a convenience.
-func NodeSelectorRequirement() NodeSelectorRequirementBuilder {
-	return NodeSelectorRequirementBuilder{fields: &nodeSelectorRequirementFields{}}
+func NodeSelectorRequirement() *NodeSelectorRequirementBuilder {
+	return &NodeSelectorRequirementBuilder{}
 }
 
 // SetKey sets the Key field in the declarative configuration to the given value.
-func (b NodeSelectorRequirementBuilder) SetKey(value string) NodeSelectorRequirementBuilder {
-	b.ensureInitialized()
+func (b *NodeSelectorRequirementBuilder) SetKey(value string) *NodeSelectorRequirementBuilder {
 	b.fields.Key = &value
 	return b
 }
 
 // RemoveKey removes the Key field from the declarative configuration.
-func (b NodeSelectorRequirementBuilder) RemoveKey() NodeSelectorRequirementBuilder {
-	b.ensureInitialized()
+func (b *NodeSelectorRequirementBuilder) RemoveKey() *NodeSelectorRequirementBuilder {
 	b.fields.Key = nil
 	return b
 }
 
 // GetKey gets the Key field from the declarative configuration.
-func (b NodeSelectorRequirementBuilder) GetKey() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *NodeSelectorRequirementBuilder) GetKey() (value string, ok bool) {
 	if v := b.fields.Key; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b NodeSelectorRequirementBuilder) GetKey() (value string, ok bool) {
 }
 
 // SetOperator sets the Operator field in the declarative configuration to the given value.
-func (b NodeSelectorRequirementBuilder) SetOperator(value v1.NodeSelectorOperator) NodeSelectorRequirementBuilder {
-	b.ensureInitialized()
+func (b *NodeSelectorRequirementBuilder) SetOperator(value v1.NodeSelectorOperator) *NodeSelectorRequirementBuilder {
 	b.fields.Operator = &value
 	return b
 }
 
 // RemoveOperator removes the Operator field from the declarative configuration.
-func (b NodeSelectorRequirementBuilder) RemoveOperator() NodeSelectorRequirementBuilder {
-	b.ensureInitialized()
+func (b *NodeSelectorRequirementBuilder) RemoveOperator() *NodeSelectorRequirementBuilder {
 	b.fields.Operator = nil
 	return b
 }
 
 // GetOperator gets the Operator field from the declarative configuration.
-func (b NodeSelectorRequirementBuilder) GetOperator() (value v1.NodeSelectorOperator, ok bool) {
-	b.ensureInitialized()
+func (b *NodeSelectorRequirementBuilder) GetOperator() (value v1.NodeSelectorOperator, ok bool) {
 	if v := b.fields.Operator; v != nil {
 		return *v, true
 	}
@@ -102,22 +89,19 @@ func (b NodeSelectorRequirementBuilder) GetOperator() (value v1.NodeSelectorOper
 }
 
 // SetValues sets the Values field in the declarative configuration to the given value.
-func (b NodeSelectorRequirementBuilder) SetValues(value []string) NodeSelectorRequirementBuilder {
-	b.ensureInitialized()
+func (b *NodeSelectorRequirementBuilder) SetValues(value []string) *NodeSelectorRequirementBuilder {
 	b.fields.Values = &value
 	return b
 }
 
 // RemoveValues removes the Values field from the declarative configuration.
-func (b NodeSelectorRequirementBuilder) RemoveValues() NodeSelectorRequirementBuilder {
-	b.ensureInitialized()
+func (b *NodeSelectorRequirementBuilder) RemoveValues() *NodeSelectorRequirementBuilder {
 	b.fields.Values = nil
 	return b
 }
 
 // GetValues gets the Values field from the declarative configuration.
-func (b NodeSelectorRequirementBuilder) GetValues() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *NodeSelectorRequirementBuilder) GetValues() (value []string, ok bool) {
 	if v := b.fields.Values; v != nil {
 		return *v, true
 	}
@@ -129,9 +113,8 @@ func (b *NodeSelectorRequirementBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -146,14 +129,13 @@ func (b *NodeSelectorRequirementBuilder) FromUnstructured(u map[string]interface
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals NodeSelectorRequirementBuilder to JSON.
 func (b *NodeSelectorRequirementBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -161,8 +143,7 @@ func (b *NodeSelectorRequirementBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into NodeSelectorRequirementBuilder, replacing the contents of
 // NodeSelectorRequirementBuilder.
 func (b *NodeSelectorRequirementBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -170,11 +151,9 @@ func (b *NodeSelectorRequirementBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // NodeSelectorRequirementList represents a list of NodeSelectorRequirementBuilder.
-// Provided as a convenience.
-type NodeSelectorRequirementList []NodeSelectorRequirementBuilder
+type NodeSelectorRequirementList []*NodeSelectorRequirementBuilder
 
 // NodeSelectorRequirementList represents a map of NodeSelectorRequirementBuilder.
-// Provided as a convenience.
 type NodeSelectorRequirementMap map[string]NodeSelectorRequirementBuilder
 
 func (b *NodeSelectorRequirementBuilder) preMarshal() {

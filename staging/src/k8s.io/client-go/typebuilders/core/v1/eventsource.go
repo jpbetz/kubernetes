@@ -27,49 +27,39 @@ import (
 // EventSourceBuilder represents an declarative configuration of the EventSource type for use
 // with apply.
 type EventSourceBuilder struct {
-	fields *eventSourceFields
+	fields eventSourceFields
 }
 
-// eventSourceFields is used by EventSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in EventSourceBuilder before marshalling, and
-// are copied out to the builder type in EventSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// eventSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in EventSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type eventSourceFields struct {
 	Component *string `json:"component,omitempty"`
 	Host      *string `json:"host,omitempty"`
 }
 
-func (b *EventSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &eventSourceFields{}
-	}
-}
-
 // EventSource constructs an declarative configuration of the EventSource type for use with
 // apply.
-// Provided as a convenience.
-func EventSource() EventSourceBuilder {
-	return EventSourceBuilder{fields: &eventSourceFields{}}
+func EventSource() *EventSourceBuilder {
+	return &EventSourceBuilder{}
 }
 
 // SetComponent sets the Component field in the declarative configuration to the given value.
-func (b EventSourceBuilder) SetComponent(value string) EventSourceBuilder {
-	b.ensureInitialized()
+func (b *EventSourceBuilder) SetComponent(value string) *EventSourceBuilder {
 	b.fields.Component = &value
 	return b
 }
 
 // RemoveComponent removes the Component field from the declarative configuration.
-func (b EventSourceBuilder) RemoveComponent() EventSourceBuilder {
-	b.ensureInitialized()
+func (b *EventSourceBuilder) RemoveComponent() *EventSourceBuilder {
 	b.fields.Component = nil
 	return b
 }
 
 // GetComponent gets the Component field from the declarative configuration.
-func (b EventSourceBuilder) GetComponent() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *EventSourceBuilder) GetComponent() (value string, ok bool) {
 	if v := b.fields.Component; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b EventSourceBuilder) GetComponent() (value string, ok bool) {
 }
 
 // SetHost sets the Host field in the declarative configuration to the given value.
-func (b EventSourceBuilder) SetHost(value string) EventSourceBuilder {
-	b.ensureInitialized()
+func (b *EventSourceBuilder) SetHost(value string) *EventSourceBuilder {
 	b.fields.Host = &value
 	return b
 }
 
 // RemoveHost removes the Host field from the declarative configuration.
-func (b EventSourceBuilder) RemoveHost() EventSourceBuilder {
-	b.ensureInitialized()
+func (b *EventSourceBuilder) RemoveHost() *EventSourceBuilder {
 	b.fields.Host = nil
 	return b
 }
 
 // GetHost gets the Host field from the declarative configuration.
-func (b EventSourceBuilder) GetHost() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *EventSourceBuilder) GetHost() (value string, ok bool) {
 	if v := b.fields.Host; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *EventSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *EventSourceBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals EventSourceBuilder to JSON.
 func (b *EventSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *EventSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into EventSourceBuilder, replacing the contents of
 // EventSourceBuilder.
 func (b *EventSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *EventSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // EventSourceList represents a list of EventSourceBuilder.
-// Provided as a convenience.
-type EventSourceList []EventSourceBuilder
+type EventSourceList []*EventSourceBuilder
 
 // EventSourceList represents a map of EventSourceBuilder.
-// Provided as a convenience.
 type EventSourceMap map[string]EventSourceBuilder
 
 func (b *EventSourceBuilder) preMarshal() {

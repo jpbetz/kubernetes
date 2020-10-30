@@ -27,71 +27,58 @@ import (
 // ConfigMapKeySelectorBuilder represents an declarative configuration of the ConfigMapKeySelector type for use
 // with apply.
 type ConfigMapKeySelectorBuilder struct {
-	localObjectReference LocalObjectReferenceBuilder // inlined type
-	fields               *configMapKeySelectorFields
+	localObjectReference *LocalObjectReferenceBuilder // inlined type
+	fields               configMapKeySelectorFields
 }
 
-// configMapKeySelectorFields is used by ConfigMapKeySelectorBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ConfigMapKeySelectorBuilder before marshalling, and
-// are copied out to the builder type in ConfigMapKeySelectorBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// configMapKeySelectorFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ConfigMapKeySelectorBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type configMapKeySelectorFields struct {
 	Name     *string `json:"name,omitempty"` // inlined ConfigMapKeySelectorBuilder.localObjectReference.Name field
 	Key      *string `json:"key,omitempty"`
 	Optional *bool   `json:"optional,omitempty"`
 }
 
-func (b *ConfigMapKeySelectorBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &configMapKeySelectorFields{}
-	}
-}
-
 // ConfigMapKeySelector constructs an declarative configuration of the ConfigMapKeySelector type for use with
 // apply.
-// Provided as a convenience.
-func ConfigMapKeySelector() ConfigMapKeySelectorBuilder {
-	return ConfigMapKeySelectorBuilder{fields: &configMapKeySelectorFields{}}
+func ConfigMapKeySelector() *ConfigMapKeySelectorBuilder {
+	return &ConfigMapKeySelectorBuilder{}
 }
 
 // SetLocalObjectReference sets the LocalObjectReference field in the declarative configuration to the given value.
-func (b ConfigMapKeySelectorBuilder) SetLocalObjectReference(value LocalObjectReferenceBuilder) ConfigMapKeySelectorBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapKeySelectorBuilder) SetLocalObjectReference(value *LocalObjectReferenceBuilder) *ConfigMapKeySelectorBuilder {
 	b.localObjectReference = value
 	return b
 }
 
 // RemoveLocalObjectReference removes the LocalObjectReference field from the declarative configuration.
-func (b ConfigMapKeySelectorBuilder) RemoveLocalObjectReference() ConfigMapKeySelectorBuilder {
-	b.ensureInitialized()
-	b.localObjectReference = LocalObjectReferenceBuilder{}
+func (b *ConfigMapKeySelectorBuilder) RemoveLocalObjectReference() *ConfigMapKeySelectorBuilder {
+	b.localObjectReference = nil
 	return b
 }
 
 // GetLocalObjectReference gets the LocalObjectReference field from the declarative configuration.
-func (b ConfigMapKeySelectorBuilder) GetLocalObjectReference() (value LocalObjectReferenceBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapKeySelectorBuilder) GetLocalObjectReference() (value *LocalObjectReferenceBuilder, ok bool) {
 	return b.localObjectReference, true
 }
 
 // SetKey sets the Key field in the declarative configuration to the given value.
-func (b ConfigMapKeySelectorBuilder) SetKey(value string) ConfigMapKeySelectorBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapKeySelectorBuilder) SetKey(value string) *ConfigMapKeySelectorBuilder {
 	b.fields.Key = &value
 	return b
 }
 
 // RemoveKey removes the Key field from the declarative configuration.
-func (b ConfigMapKeySelectorBuilder) RemoveKey() ConfigMapKeySelectorBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapKeySelectorBuilder) RemoveKey() *ConfigMapKeySelectorBuilder {
 	b.fields.Key = nil
 	return b
 }
 
 // GetKey gets the Key field from the declarative configuration.
-func (b ConfigMapKeySelectorBuilder) GetKey() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapKeySelectorBuilder) GetKey() (value string, ok bool) {
 	if v := b.fields.Key; v != nil {
 		return *v, true
 	}
@@ -99,22 +86,19 @@ func (b ConfigMapKeySelectorBuilder) GetKey() (value string, ok bool) {
 }
 
 // SetOptional sets the Optional field in the declarative configuration to the given value.
-func (b ConfigMapKeySelectorBuilder) SetOptional(value bool) ConfigMapKeySelectorBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapKeySelectorBuilder) SetOptional(value bool) *ConfigMapKeySelectorBuilder {
 	b.fields.Optional = &value
 	return b
 }
 
 // RemoveOptional removes the Optional field from the declarative configuration.
-func (b ConfigMapKeySelectorBuilder) RemoveOptional() ConfigMapKeySelectorBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapKeySelectorBuilder) RemoveOptional() *ConfigMapKeySelectorBuilder {
 	b.fields.Optional = nil
 	return b
 }
 
 // GetOptional gets the Optional field from the declarative configuration.
-func (b ConfigMapKeySelectorBuilder) GetOptional() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapKeySelectorBuilder) GetOptional() (value bool, ok bool) {
 	if v := b.fields.Optional; v != nil {
 		return *v, true
 	}
@@ -126,9 +110,8 @@ func (b *ConfigMapKeySelectorBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -143,14 +126,13 @@ func (b *ConfigMapKeySelectorBuilder) FromUnstructured(u map[string]interface{})
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ConfigMapKeySelectorBuilder to JSON.
 func (b *ConfigMapKeySelectorBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -158,8 +140,7 @@ func (b *ConfigMapKeySelectorBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ConfigMapKeySelectorBuilder, replacing the contents of
 // ConfigMapKeySelectorBuilder.
 func (b *ConfigMapKeySelectorBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -167,19 +148,22 @@ func (b *ConfigMapKeySelectorBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ConfigMapKeySelectorList represents a list of ConfigMapKeySelectorBuilder.
-// Provided as a convenience.
-type ConfigMapKeySelectorList []ConfigMapKeySelectorBuilder
+type ConfigMapKeySelectorList []*ConfigMapKeySelectorBuilder
 
 // ConfigMapKeySelectorList represents a map of ConfigMapKeySelectorBuilder.
-// Provided as a convenience.
 type ConfigMapKeySelectorMap map[string]ConfigMapKeySelectorBuilder
 
 func (b *ConfigMapKeySelectorBuilder) preMarshal() {
-	if v, ok := b.localObjectReference.GetName(); ok {
-		b.fields.Name = &v
+	if b.localObjectReference != nil {
+		if v, ok := b.localObjectReference.GetName(); ok {
+			b.fields.Name = &v
+		}
 	}
 }
 func (b *ConfigMapKeySelectorBuilder) postUnmarshal() {
+	if b.localObjectReference == nil {
+		b.localObjectReference = &LocalObjectReferenceBuilder{}
+	}
 	if b.fields.Name != nil {
 		b.localObjectReference.SetName(*b.fields.Name)
 	}

@@ -28,15 +28,15 @@ import (
 // ClusterRoleBuilder represents an declarative configuration of the ClusterRole type for use
 // with apply.
 type ClusterRoleBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *clusterRoleFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   clusterRoleFields
 }
 
-// clusterRoleFields is used by ClusterRoleBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ClusterRoleBuilder before marshalling, and
-// are copied out to the builder type in ClusterRoleBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// clusterRoleFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ClusterRoleBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type clusterRoleFields struct {
 	Kind            *string                 `json:"kind,omitempty"`       // inlined ClusterRoleBuilder.typeMeta.Kind field
 	APIVersion      *string                 `json:"apiVersion,omitempty"` // inlined ClusterRoleBuilder.typeMeta.APIVersion field
@@ -45,79 +45,60 @@ type clusterRoleFields struct {
 	AggregationRule *AggregationRuleBuilder `json:"aggregationRule,omitempty"`
 }
 
-func (b *ClusterRoleBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &clusterRoleFields{}
-	}
-}
-
 // ClusterRole constructs an declarative configuration of the ClusterRole type for use with
 // apply.
-// Provided as a convenience.
-func ClusterRole() ClusterRoleBuilder {
-	return ClusterRoleBuilder{fields: &clusterRoleFields{}}
+func ClusterRole() *ClusterRoleBuilder {
+	return &ClusterRoleBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b ClusterRoleBuilder) SetTypeMeta(value v1.TypeMetaBuilder) ClusterRoleBuilder {
-	b.ensureInitialized()
+func (b *ClusterRoleBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *ClusterRoleBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b ClusterRoleBuilder) RemoveTypeMeta() ClusterRoleBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *ClusterRoleBuilder) RemoveTypeMeta() *ClusterRoleBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b ClusterRoleBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *ClusterRoleBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b ClusterRoleBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) ClusterRoleBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *ClusterRoleBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *ClusterRoleBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b ClusterRoleBuilder) RemoveObjectMeta() ClusterRoleBuilder {
-	b.ensureInitialized()
+func (b *ClusterRoleBuilder) RemoveObjectMeta() *ClusterRoleBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b ClusterRoleBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ClusterRoleBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetRules sets the Rules field in the declarative configuration to the given value.
-func (b ClusterRoleBuilder) SetRules(value PolicyRuleList) ClusterRoleBuilder {
-	b.ensureInitialized()
+func (b *ClusterRoleBuilder) SetRules(value PolicyRuleList) *ClusterRoleBuilder {
 	b.fields.Rules = &value
 	return b
 }
 
 // RemoveRules removes the Rules field from the declarative configuration.
-func (b ClusterRoleBuilder) RemoveRules() ClusterRoleBuilder {
-	b.ensureInitialized()
+func (b *ClusterRoleBuilder) RemoveRules() *ClusterRoleBuilder {
 	b.fields.Rules = nil
 	return b
 }
 
 // GetRules gets the Rules field from the declarative configuration.
-func (b ClusterRoleBuilder) GetRules() (value PolicyRuleList, ok bool) {
-	b.ensureInitialized()
+func (b *ClusterRoleBuilder) GetRules() (value PolicyRuleList, ok bool) {
 	if v := b.fields.Rules; v != nil {
 		return *v, true
 	}
@@ -125,26 +106,20 @@ func (b ClusterRoleBuilder) GetRules() (value PolicyRuleList, ok bool) {
 }
 
 // SetAggregationRule sets the AggregationRule field in the declarative configuration to the given value.
-func (b ClusterRoleBuilder) SetAggregationRule(value AggregationRuleBuilder) ClusterRoleBuilder {
-	b.ensureInitialized()
-	b.fields.AggregationRule = &value
+func (b *ClusterRoleBuilder) SetAggregationRule(value *AggregationRuleBuilder) *ClusterRoleBuilder {
+	b.fields.AggregationRule = value
 	return b
 }
 
 // RemoveAggregationRule removes the AggregationRule field from the declarative configuration.
-func (b ClusterRoleBuilder) RemoveAggregationRule() ClusterRoleBuilder {
-	b.ensureInitialized()
+func (b *ClusterRoleBuilder) RemoveAggregationRule() *ClusterRoleBuilder {
 	b.fields.AggregationRule = nil
 	return b
 }
 
 // GetAggregationRule gets the AggregationRule field from the declarative configuration.
-func (b ClusterRoleBuilder) GetAggregationRule() (value AggregationRuleBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.AggregationRule; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ClusterRoleBuilder) GetAggregationRule() (value *AggregationRuleBuilder, ok bool) {
+	return b.fields.AggregationRule, b.fields.AggregationRule != nil
 }
 
 // ToUnstructured converts ClusterRoleBuilder to unstructured.
@@ -152,9 +127,8 @@ func (b *ClusterRoleBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +143,13 @@ func (b *ClusterRoleBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ClusterRoleBuilder to JSON.
 func (b *ClusterRoleBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +157,7 @@ func (b *ClusterRoleBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ClusterRoleBuilder, replacing the contents of
 // ClusterRoleBuilder.
 func (b *ClusterRoleBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +165,25 @@ func (b *ClusterRoleBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ClusterRoleList represents a list of ClusterRoleBuilder.
-// Provided as a convenience.
-type ClusterRoleList []ClusterRoleBuilder
+type ClusterRoleList []*ClusterRoleBuilder
 
 // ClusterRoleList represents a map of ClusterRoleBuilder.
-// Provided as a convenience.
 type ClusterRoleMap map[string]ClusterRoleBuilder
 
 func (b *ClusterRoleBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *ClusterRoleBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

@@ -28,14 +28,14 @@ import (
 // ConfigMapNodeConfigSourceBuilder represents an declarative configuration of the ConfigMapNodeConfigSource type for use
 // with apply.
 type ConfigMapNodeConfigSourceBuilder struct {
-	fields *configMapNodeConfigSourceFields
+	fields configMapNodeConfigSourceFields
 }
 
-// configMapNodeConfigSourceFields is used by ConfigMapNodeConfigSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ConfigMapNodeConfigSourceBuilder before marshalling, and
-// are copied out to the builder type in ConfigMapNodeConfigSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// configMapNodeConfigSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ConfigMapNodeConfigSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type configMapNodeConfigSourceFields struct {
 	Namespace        *string    `json:"namespace,omitempty"`
 	Name             *string    `json:"name,omitempty"`
@@ -44,36 +44,26 @@ type configMapNodeConfigSourceFields struct {
 	KubeletConfigKey *string    `json:"kubeletConfigKey,omitempty"`
 }
 
-func (b *ConfigMapNodeConfigSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &configMapNodeConfigSourceFields{}
-	}
-}
-
 // ConfigMapNodeConfigSource constructs an declarative configuration of the ConfigMapNodeConfigSource type for use with
 // apply.
-// Provided as a convenience.
-func ConfigMapNodeConfigSource() ConfigMapNodeConfigSourceBuilder {
-	return ConfigMapNodeConfigSourceBuilder{fields: &configMapNodeConfigSourceFields{}}
+func ConfigMapNodeConfigSource() *ConfigMapNodeConfigSourceBuilder {
+	return &ConfigMapNodeConfigSourceBuilder{}
 }
 
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
-func (b ConfigMapNodeConfigSourceBuilder) SetNamespace(value string) ConfigMapNodeConfigSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapNodeConfigSourceBuilder) SetNamespace(value string) *ConfigMapNodeConfigSourceBuilder {
 	b.fields.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
-func (b ConfigMapNodeConfigSourceBuilder) RemoveNamespace() ConfigMapNodeConfigSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapNodeConfigSourceBuilder) RemoveNamespace() *ConfigMapNodeConfigSourceBuilder {
 	b.fields.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
-func (b ConfigMapNodeConfigSourceBuilder) GetNamespace() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapNodeConfigSourceBuilder) GetNamespace() (value string, ok bool) {
 	if v := b.fields.Namespace; v != nil {
 		return *v, true
 	}
@@ -81,22 +71,19 @@ func (b ConfigMapNodeConfigSourceBuilder) GetNamespace() (value string, ok bool)
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b ConfigMapNodeConfigSourceBuilder) SetName(value string) ConfigMapNodeConfigSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapNodeConfigSourceBuilder) SetName(value string) *ConfigMapNodeConfigSourceBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b ConfigMapNodeConfigSourceBuilder) RemoveName() ConfigMapNodeConfigSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapNodeConfigSourceBuilder) RemoveName() *ConfigMapNodeConfigSourceBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b ConfigMapNodeConfigSourceBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapNodeConfigSourceBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -104,22 +91,19 @@ func (b ConfigMapNodeConfigSourceBuilder) GetName() (value string, ok bool) {
 }
 
 // SetUID sets the UID field in the declarative configuration to the given value.
-func (b ConfigMapNodeConfigSourceBuilder) SetUID(value types.UID) ConfigMapNodeConfigSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapNodeConfigSourceBuilder) SetUID(value types.UID) *ConfigMapNodeConfigSourceBuilder {
 	b.fields.UID = &value
 	return b
 }
 
 // RemoveUID removes the UID field from the declarative configuration.
-func (b ConfigMapNodeConfigSourceBuilder) RemoveUID() ConfigMapNodeConfigSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapNodeConfigSourceBuilder) RemoveUID() *ConfigMapNodeConfigSourceBuilder {
 	b.fields.UID = nil
 	return b
 }
 
 // GetUID gets the UID field from the declarative configuration.
-func (b ConfigMapNodeConfigSourceBuilder) GetUID() (value types.UID, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapNodeConfigSourceBuilder) GetUID() (value types.UID, ok bool) {
 	if v := b.fields.UID; v != nil {
 		return *v, true
 	}
@@ -127,22 +111,19 @@ func (b ConfigMapNodeConfigSourceBuilder) GetUID() (value types.UID, ok bool) {
 }
 
 // SetResourceVersion sets the ResourceVersion field in the declarative configuration to the given value.
-func (b ConfigMapNodeConfigSourceBuilder) SetResourceVersion(value string) ConfigMapNodeConfigSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapNodeConfigSourceBuilder) SetResourceVersion(value string) *ConfigMapNodeConfigSourceBuilder {
 	b.fields.ResourceVersion = &value
 	return b
 }
 
 // RemoveResourceVersion removes the ResourceVersion field from the declarative configuration.
-func (b ConfigMapNodeConfigSourceBuilder) RemoveResourceVersion() ConfigMapNodeConfigSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapNodeConfigSourceBuilder) RemoveResourceVersion() *ConfigMapNodeConfigSourceBuilder {
 	b.fields.ResourceVersion = nil
 	return b
 }
 
 // GetResourceVersion gets the ResourceVersion field from the declarative configuration.
-func (b ConfigMapNodeConfigSourceBuilder) GetResourceVersion() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapNodeConfigSourceBuilder) GetResourceVersion() (value string, ok bool) {
 	if v := b.fields.ResourceVersion; v != nil {
 		return *v, true
 	}
@@ -150,22 +131,19 @@ func (b ConfigMapNodeConfigSourceBuilder) GetResourceVersion() (value string, ok
 }
 
 // SetKubeletConfigKey sets the KubeletConfigKey field in the declarative configuration to the given value.
-func (b ConfigMapNodeConfigSourceBuilder) SetKubeletConfigKey(value string) ConfigMapNodeConfigSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapNodeConfigSourceBuilder) SetKubeletConfigKey(value string) *ConfigMapNodeConfigSourceBuilder {
 	b.fields.KubeletConfigKey = &value
 	return b
 }
 
 // RemoveKubeletConfigKey removes the KubeletConfigKey field from the declarative configuration.
-func (b ConfigMapNodeConfigSourceBuilder) RemoveKubeletConfigKey() ConfigMapNodeConfigSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapNodeConfigSourceBuilder) RemoveKubeletConfigKey() *ConfigMapNodeConfigSourceBuilder {
 	b.fields.KubeletConfigKey = nil
 	return b
 }
 
 // GetKubeletConfigKey gets the KubeletConfigKey field from the declarative configuration.
-func (b ConfigMapNodeConfigSourceBuilder) GetKubeletConfigKey() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapNodeConfigSourceBuilder) GetKubeletConfigKey() (value string, ok bool) {
 	if v := b.fields.KubeletConfigKey; v != nil {
 		return *v, true
 	}
@@ -177,9 +155,8 @@ func (b *ConfigMapNodeConfigSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -194,14 +171,13 @@ func (b *ConfigMapNodeConfigSourceBuilder) FromUnstructured(u map[string]interfa
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ConfigMapNodeConfigSourceBuilder to JSON.
 func (b *ConfigMapNodeConfigSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -209,8 +185,7 @@ func (b *ConfigMapNodeConfigSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ConfigMapNodeConfigSourceBuilder, replacing the contents of
 // ConfigMapNodeConfigSourceBuilder.
 func (b *ConfigMapNodeConfigSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -218,11 +193,9 @@ func (b *ConfigMapNodeConfigSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ConfigMapNodeConfigSourceList represents a list of ConfigMapNodeConfigSourceBuilder.
-// Provided as a convenience.
-type ConfigMapNodeConfigSourceList []ConfigMapNodeConfigSourceBuilder
+type ConfigMapNodeConfigSourceList []*ConfigMapNodeConfigSourceBuilder
 
 // ConfigMapNodeConfigSourceList represents a map of ConfigMapNodeConfigSourceBuilder.
-// Provided as a convenience.
 type ConfigMapNodeConfigSourceMap map[string]ConfigMapNodeConfigSourceBuilder
 
 func (b *ConfigMapNodeConfigSourceBuilder) preMarshal() {

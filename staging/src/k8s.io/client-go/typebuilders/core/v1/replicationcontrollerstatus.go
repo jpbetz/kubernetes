@@ -27,14 +27,14 @@ import (
 // ReplicationControllerStatusBuilder represents an declarative configuration of the ReplicationControllerStatus type for use
 // with apply.
 type ReplicationControllerStatusBuilder struct {
-	fields *replicationControllerStatusFields
+	fields replicationControllerStatusFields
 }
 
-// replicationControllerStatusFields is used by ReplicationControllerStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ReplicationControllerStatusBuilder before marshalling, and
-// are copied out to the builder type in ReplicationControllerStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// replicationControllerStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ReplicationControllerStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type replicationControllerStatusFields struct {
 	Replicas             *int32                              `json:"replicas,omitempty"`
 	FullyLabeledReplicas *int32                              `json:"fullyLabeledReplicas,omitempty"`
@@ -44,36 +44,26 @@ type replicationControllerStatusFields struct {
 	Conditions           *ReplicationControllerConditionList `json:"conditions,omitempty"`
 }
 
-func (b *ReplicationControllerStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &replicationControllerStatusFields{}
-	}
-}
-
 // ReplicationControllerStatus constructs an declarative configuration of the ReplicationControllerStatus type for use with
 // apply.
-// Provided as a convenience.
-func ReplicationControllerStatus() ReplicationControllerStatusBuilder {
-	return ReplicationControllerStatusBuilder{fields: &replicationControllerStatusFields{}}
+func ReplicationControllerStatus() *ReplicationControllerStatusBuilder {
+	return &ReplicationControllerStatusBuilder{}
 }
 
 // SetReplicas sets the Replicas field in the declarative configuration to the given value.
-func (b ReplicationControllerStatusBuilder) SetReplicas(value int32) ReplicationControllerStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerStatusBuilder) SetReplicas(value int32) *ReplicationControllerStatusBuilder {
 	b.fields.Replicas = &value
 	return b
 }
 
 // RemoveReplicas removes the Replicas field from the declarative configuration.
-func (b ReplicationControllerStatusBuilder) RemoveReplicas() ReplicationControllerStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerStatusBuilder) RemoveReplicas() *ReplicationControllerStatusBuilder {
 	b.fields.Replicas = nil
 	return b
 }
 
 // GetReplicas gets the Replicas field from the declarative configuration.
-func (b ReplicationControllerStatusBuilder) GetReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicationControllerStatusBuilder) GetReplicas() (value int32, ok bool) {
 	if v := b.fields.Replicas; v != nil {
 		return *v, true
 	}
@@ -81,22 +71,19 @@ func (b ReplicationControllerStatusBuilder) GetReplicas() (value int32, ok bool)
 }
 
 // SetFullyLabeledReplicas sets the FullyLabeledReplicas field in the declarative configuration to the given value.
-func (b ReplicationControllerStatusBuilder) SetFullyLabeledReplicas(value int32) ReplicationControllerStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerStatusBuilder) SetFullyLabeledReplicas(value int32) *ReplicationControllerStatusBuilder {
 	b.fields.FullyLabeledReplicas = &value
 	return b
 }
 
 // RemoveFullyLabeledReplicas removes the FullyLabeledReplicas field from the declarative configuration.
-func (b ReplicationControllerStatusBuilder) RemoveFullyLabeledReplicas() ReplicationControllerStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerStatusBuilder) RemoveFullyLabeledReplicas() *ReplicationControllerStatusBuilder {
 	b.fields.FullyLabeledReplicas = nil
 	return b
 }
 
 // GetFullyLabeledReplicas gets the FullyLabeledReplicas field from the declarative configuration.
-func (b ReplicationControllerStatusBuilder) GetFullyLabeledReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicationControllerStatusBuilder) GetFullyLabeledReplicas() (value int32, ok bool) {
 	if v := b.fields.FullyLabeledReplicas; v != nil {
 		return *v, true
 	}
@@ -104,22 +91,19 @@ func (b ReplicationControllerStatusBuilder) GetFullyLabeledReplicas() (value int
 }
 
 // SetReadyReplicas sets the ReadyReplicas field in the declarative configuration to the given value.
-func (b ReplicationControllerStatusBuilder) SetReadyReplicas(value int32) ReplicationControllerStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerStatusBuilder) SetReadyReplicas(value int32) *ReplicationControllerStatusBuilder {
 	b.fields.ReadyReplicas = &value
 	return b
 }
 
 // RemoveReadyReplicas removes the ReadyReplicas field from the declarative configuration.
-func (b ReplicationControllerStatusBuilder) RemoveReadyReplicas() ReplicationControllerStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerStatusBuilder) RemoveReadyReplicas() *ReplicationControllerStatusBuilder {
 	b.fields.ReadyReplicas = nil
 	return b
 }
 
 // GetReadyReplicas gets the ReadyReplicas field from the declarative configuration.
-func (b ReplicationControllerStatusBuilder) GetReadyReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicationControllerStatusBuilder) GetReadyReplicas() (value int32, ok bool) {
 	if v := b.fields.ReadyReplicas; v != nil {
 		return *v, true
 	}
@@ -127,22 +111,19 @@ func (b ReplicationControllerStatusBuilder) GetReadyReplicas() (value int32, ok 
 }
 
 // SetAvailableReplicas sets the AvailableReplicas field in the declarative configuration to the given value.
-func (b ReplicationControllerStatusBuilder) SetAvailableReplicas(value int32) ReplicationControllerStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerStatusBuilder) SetAvailableReplicas(value int32) *ReplicationControllerStatusBuilder {
 	b.fields.AvailableReplicas = &value
 	return b
 }
 
 // RemoveAvailableReplicas removes the AvailableReplicas field from the declarative configuration.
-func (b ReplicationControllerStatusBuilder) RemoveAvailableReplicas() ReplicationControllerStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerStatusBuilder) RemoveAvailableReplicas() *ReplicationControllerStatusBuilder {
 	b.fields.AvailableReplicas = nil
 	return b
 }
 
 // GetAvailableReplicas gets the AvailableReplicas field from the declarative configuration.
-func (b ReplicationControllerStatusBuilder) GetAvailableReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicationControllerStatusBuilder) GetAvailableReplicas() (value int32, ok bool) {
 	if v := b.fields.AvailableReplicas; v != nil {
 		return *v, true
 	}
@@ -150,22 +131,19 @@ func (b ReplicationControllerStatusBuilder) GetAvailableReplicas() (value int32,
 }
 
 // SetObservedGeneration sets the ObservedGeneration field in the declarative configuration to the given value.
-func (b ReplicationControllerStatusBuilder) SetObservedGeneration(value int64) ReplicationControllerStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerStatusBuilder) SetObservedGeneration(value int64) *ReplicationControllerStatusBuilder {
 	b.fields.ObservedGeneration = &value
 	return b
 }
 
 // RemoveObservedGeneration removes the ObservedGeneration field from the declarative configuration.
-func (b ReplicationControllerStatusBuilder) RemoveObservedGeneration() ReplicationControllerStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerStatusBuilder) RemoveObservedGeneration() *ReplicationControllerStatusBuilder {
 	b.fields.ObservedGeneration = nil
 	return b
 }
 
 // GetObservedGeneration gets the ObservedGeneration field from the declarative configuration.
-func (b ReplicationControllerStatusBuilder) GetObservedGeneration() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicationControllerStatusBuilder) GetObservedGeneration() (value int64, ok bool) {
 	if v := b.fields.ObservedGeneration; v != nil {
 		return *v, true
 	}
@@ -173,22 +151,19 @@ func (b ReplicationControllerStatusBuilder) GetObservedGeneration() (value int64
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b ReplicationControllerStatusBuilder) SetConditions(value ReplicationControllerConditionList) ReplicationControllerStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerStatusBuilder) SetConditions(value ReplicationControllerConditionList) *ReplicationControllerStatusBuilder {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b ReplicationControllerStatusBuilder) RemoveConditions() ReplicationControllerStatusBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerStatusBuilder) RemoveConditions() *ReplicationControllerStatusBuilder {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b ReplicationControllerStatusBuilder) GetConditions() (value ReplicationControllerConditionList, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicationControllerStatusBuilder) GetConditions() (value ReplicationControllerConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
@@ -200,9 +175,8 @@ func (b *ReplicationControllerStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -217,14 +191,13 @@ func (b *ReplicationControllerStatusBuilder) FromUnstructured(u map[string]inter
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ReplicationControllerStatusBuilder to JSON.
 func (b *ReplicationControllerStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -232,8 +205,7 @@ func (b *ReplicationControllerStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ReplicationControllerStatusBuilder, replacing the contents of
 // ReplicationControllerStatusBuilder.
 func (b *ReplicationControllerStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -241,11 +213,9 @@ func (b *ReplicationControllerStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ReplicationControllerStatusList represents a list of ReplicationControllerStatusBuilder.
-// Provided as a convenience.
-type ReplicationControllerStatusList []ReplicationControllerStatusBuilder
+type ReplicationControllerStatusList []*ReplicationControllerStatusBuilder
 
 // ReplicationControllerStatusList represents a map of ReplicationControllerStatusBuilder.
-// Provided as a convenience.
 type ReplicationControllerStatusMap map[string]ReplicationControllerStatusBuilder
 
 func (b *ReplicationControllerStatusBuilder) preMarshal() {

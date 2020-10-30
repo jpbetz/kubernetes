@@ -28,15 +28,15 @@ import (
 // EvictionBuilder represents an declarative configuration of the Eviction type for use
 // with apply.
 type EvictionBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *evictionFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   evictionFields
 }
 
-// evictionFields is used by EvictionBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in EvictionBuilder before marshalling, and
-// are copied out to the builder type in EvictionBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// evictionFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in EvictionBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type evictionFields struct {
 	Kind          *string                  `json:"kind,omitempty"`       // inlined EvictionBuilder.typeMeta.Kind field
 	APIVersion    *string                  `json:"apiVersion,omitempty"` // inlined EvictionBuilder.typeMeta.APIVersion field
@@ -44,83 +44,61 @@ type evictionFields struct {
 	DeleteOptions *v1.DeleteOptionsBuilder `json:"deleteOptions,omitempty"`
 }
 
-func (b *EvictionBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &evictionFields{}
-	}
-}
-
 // Eviction constructs an declarative configuration of the Eviction type for use with
 // apply.
-// Provided as a convenience.
-func Eviction() EvictionBuilder {
-	return EvictionBuilder{fields: &evictionFields{}}
+func Eviction() *EvictionBuilder {
+	return &EvictionBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b EvictionBuilder) SetTypeMeta(value v1.TypeMetaBuilder) EvictionBuilder {
-	b.ensureInitialized()
+func (b *EvictionBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *EvictionBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b EvictionBuilder) RemoveTypeMeta() EvictionBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *EvictionBuilder) RemoveTypeMeta() *EvictionBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b EvictionBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *EvictionBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b EvictionBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) EvictionBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *EvictionBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *EvictionBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b EvictionBuilder) RemoveObjectMeta() EvictionBuilder {
-	b.ensureInitialized()
+func (b *EvictionBuilder) RemoveObjectMeta() *EvictionBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b EvictionBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *EvictionBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetDeleteOptions sets the DeleteOptions field in the declarative configuration to the given value.
-func (b EvictionBuilder) SetDeleteOptions(value v1.DeleteOptionsBuilder) EvictionBuilder {
-	b.ensureInitialized()
-	b.fields.DeleteOptions = &value
+func (b *EvictionBuilder) SetDeleteOptions(value *v1.DeleteOptionsBuilder) *EvictionBuilder {
+	b.fields.DeleteOptions = value
 	return b
 }
 
 // RemoveDeleteOptions removes the DeleteOptions field from the declarative configuration.
-func (b EvictionBuilder) RemoveDeleteOptions() EvictionBuilder {
-	b.ensureInitialized()
+func (b *EvictionBuilder) RemoveDeleteOptions() *EvictionBuilder {
 	b.fields.DeleteOptions = nil
 	return b
 }
 
 // GetDeleteOptions gets the DeleteOptions field from the declarative configuration.
-func (b EvictionBuilder) GetDeleteOptions() (value v1.DeleteOptionsBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.DeleteOptions; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *EvictionBuilder) GetDeleteOptions() (value *v1.DeleteOptionsBuilder, ok bool) {
+	return b.fields.DeleteOptions, b.fields.DeleteOptions != nil
 }
 
 // ToUnstructured converts EvictionBuilder to unstructured.
@@ -128,9 +106,8 @@ func (b *EvictionBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +122,13 @@ func (b *EvictionBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals EvictionBuilder to JSON.
 func (b *EvictionBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +136,7 @@ func (b *EvictionBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into EvictionBuilder, replacing the contents of
 // EvictionBuilder.
 func (b *EvictionBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,22 +144,25 @@ func (b *EvictionBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // EvictionList represents a list of EvictionBuilder.
-// Provided as a convenience.
-type EvictionList []EvictionBuilder
+type EvictionList []*EvictionBuilder
 
 // EvictionList represents a map of EvictionBuilder.
-// Provided as a convenience.
 type EvictionMap map[string]EvictionBuilder
 
 func (b *EvictionBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *EvictionBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

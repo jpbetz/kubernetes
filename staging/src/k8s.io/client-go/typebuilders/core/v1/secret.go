@@ -29,15 +29,15 @@ import (
 // SecretBuilder represents an declarative configuration of the Secret type for use
 // with apply.
 type SecretBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *secretFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   secretFields
 }
 
-// secretFields is used by SecretBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in SecretBuilder before marshalling, and
-// are copied out to the builder type in SecretBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// secretFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in SecretBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type secretFields struct {
 	Kind       *string               `json:"kind,omitempty"`       // inlined SecretBuilder.typeMeta.Kind field
 	APIVersion *string               `json:"apiVersion,omitempty"` // inlined SecretBuilder.typeMeta.APIVersion field
@@ -48,79 +48,60 @@ type secretFields struct {
 	Type       *corev1.SecretType    `json:"type,omitempty"`
 }
 
-func (b *SecretBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &secretFields{}
-	}
-}
-
 // Secret constructs an declarative configuration of the Secret type for use with
 // apply.
-// Provided as a convenience.
-func Secret() SecretBuilder {
-	return SecretBuilder{fields: &secretFields{}}
+func Secret() *SecretBuilder {
+	return &SecretBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b SecretBuilder) SetTypeMeta(value v1.TypeMetaBuilder) SecretBuilder {
-	b.ensureInitialized()
+func (b *SecretBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *SecretBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b SecretBuilder) RemoveTypeMeta() SecretBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *SecretBuilder) RemoveTypeMeta() *SecretBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b SecretBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *SecretBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b SecretBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) SecretBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *SecretBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *SecretBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b SecretBuilder) RemoveObjectMeta() SecretBuilder {
-	b.ensureInitialized()
+func (b *SecretBuilder) RemoveObjectMeta() *SecretBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b SecretBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *SecretBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetImmutable sets the Immutable field in the declarative configuration to the given value.
-func (b SecretBuilder) SetImmutable(value bool) SecretBuilder {
-	b.ensureInitialized()
+func (b *SecretBuilder) SetImmutable(value bool) *SecretBuilder {
 	b.fields.Immutable = &value
 	return b
 }
 
 // RemoveImmutable removes the Immutable field from the declarative configuration.
-func (b SecretBuilder) RemoveImmutable() SecretBuilder {
-	b.ensureInitialized()
+func (b *SecretBuilder) RemoveImmutable() *SecretBuilder {
 	b.fields.Immutable = nil
 	return b
 }
 
 // GetImmutable gets the Immutable field from the declarative configuration.
-func (b SecretBuilder) GetImmutable() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *SecretBuilder) GetImmutable() (value bool, ok bool) {
 	if v := b.fields.Immutable; v != nil {
 		return *v, true
 	}
@@ -128,22 +109,19 @@ func (b SecretBuilder) GetImmutable() (value bool, ok bool) {
 }
 
 // SetData sets the Data field in the declarative configuration to the given value.
-func (b SecretBuilder) SetData(value map[string][]byte) SecretBuilder {
-	b.ensureInitialized()
+func (b *SecretBuilder) SetData(value map[string][]byte) *SecretBuilder {
 	b.fields.Data = &value
 	return b
 }
 
 // RemoveData removes the Data field from the declarative configuration.
-func (b SecretBuilder) RemoveData() SecretBuilder {
-	b.ensureInitialized()
+func (b *SecretBuilder) RemoveData() *SecretBuilder {
 	b.fields.Data = nil
 	return b
 }
 
 // GetData gets the Data field from the declarative configuration.
-func (b SecretBuilder) GetData() (value map[string][]byte, ok bool) {
-	b.ensureInitialized()
+func (b *SecretBuilder) GetData() (value map[string][]byte, ok bool) {
 	if v := b.fields.Data; v != nil {
 		return *v, true
 	}
@@ -151,22 +129,19 @@ func (b SecretBuilder) GetData() (value map[string][]byte, ok bool) {
 }
 
 // SetStringData sets the StringData field in the declarative configuration to the given value.
-func (b SecretBuilder) SetStringData(value map[string]string) SecretBuilder {
-	b.ensureInitialized()
+func (b *SecretBuilder) SetStringData(value map[string]string) *SecretBuilder {
 	b.fields.StringData = &value
 	return b
 }
 
 // RemoveStringData removes the StringData field from the declarative configuration.
-func (b SecretBuilder) RemoveStringData() SecretBuilder {
-	b.ensureInitialized()
+func (b *SecretBuilder) RemoveStringData() *SecretBuilder {
 	b.fields.StringData = nil
 	return b
 }
 
 // GetStringData gets the StringData field from the declarative configuration.
-func (b SecretBuilder) GetStringData() (value map[string]string, ok bool) {
-	b.ensureInitialized()
+func (b *SecretBuilder) GetStringData() (value map[string]string, ok bool) {
 	if v := b.fields.StringData; v != nil {
 		return *v, true
 	}
@@ -174,22 +149,19 @@ func (b SecretBuilder) GetStringData() (value map[string]string, ok bool) {
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b SecretBuilder) SetType(value corev1.SecretType) SecretBuilder {
-	b.ensureInitialized()
+func (b *SecretBuilder) SetType(value corev1.SecretType) *SecretBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b SecretBuilder) RemoveType() SecretBuilder {
-	b.ensureInitialized()
+func (b *SecretBuilder) RemoveType() *SecretBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b SecretBuilder) GetType() (value corev1.SecretType, ok bool) {
-	b.ensureInitialized()
+func (b *SecretBuilder) GetType() (value corev1.SecretType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -201,9 +173,8 @@ func (b *SecretBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -218,14 +189,13 @@ func (b *SecretBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals SecretBuilder to JSON.
 func (b *SecretBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -233,8 +203,7 @@ func (b *SecretBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into SecretBuilder, replacing the contents of
 // SecretBuilder.
 func (b *SecretBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -242,22 +211,25 @@ func (b *SecretBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // SecretList represents a list of SecretBuilder.
-// Provided as a convenience.
-type SecretList []SecretBuilder
+type SecretList []*SecretBuilder
 
 // SecretList represents a map of SecretBuilder.
-// Provided as a convenience.
 type SecretMap map[string]SecretBuilder
 
 func (b *SecretBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *SecretBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

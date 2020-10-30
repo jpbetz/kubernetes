@@ -27,14 +27,14 @@ import (
 // ResourceRuleBuilder represents an declarative configuration of the ResourceRule type for use
 // with apply.
 type ResourceRuleBuilder struct {
-	fields *resourceRuleFields
+	fields resourceRuleFields
 }
 
-// resourceRuleFields is used by ResourceRuleBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ResourceRuleBuilder before marshalling, and
-// are copied out to the builder type in ResourceRuleBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// resourceRuleFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ResourceRuleBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type resourceRuleFields struct {
 	Verbs         *[]string `json:"verbs,omitempty"`
 	APIGroups     *[]string `json:"apiGroups,omitempty"`
@@ -42,36 +42,26 @@ type resourceRuleFields struct {
 	ResourceNames *[]string `json:"resourceNames,omitempty"`
 }
 
-func (b *ResourceRuleBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &resourceRuleFields{}
-	}
-}
-
 // ResourceRule constructs an declarative configuration of the ResourceRule type for use with
 // apply.
-// Provided as a convenience.
-func ResourceRule() ResourceRuleBuilder {
-	return ResourceRuleBuilder{fields: &resourceRuleFields{}}
+func ResourceRule() *ResourceRuleBuilder {
+	return &ResourceRuleBuilder{}
 }
 
 // SetVerbs sets the Verbs field in the declarative configuration to the given value.
-func (b ResourceRuleBuilder) SetVerbs(value []string) ResourceRuleBuilder {
-	b.ensureInitialized()
+func (b *ResourceRuleBuilder) SetVerbs(value []string) *ResourceRuleBuilder {
 	b.fields.Verbs = &value
 	return b
 }
 
 // RemoveVerbs removes the Verbs field from the declarative configuration.
-func (b ResourceRuleBuilder) RemoveVerbs() ResourceRuleBuilder {
-	b.ensureInitialized()
+func (b *ResourceRuleBuilder) RemoveVerbs() *ResourceRuleBuilder {
 	b.fields.Verbs = nil
 	return b
 }
 
 // GetVerbs gets the Verbs field from the declarative configuration.
-func (b ResourceRuleBuilder) GetVerbs() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *ResourceRuleBuilder) GetVerbs() (value []string, ok bool) {
 	if v := b.fields.Verbs; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b ResourceRuleBuilder) GetVerbs() (value []string, ok bool) {
 }
 
 // SetAPIGroups sets the APIGroups field in the declarative configuration to the given value.
-func (b ResourceRuleBuilder) SetAPIGroups(value []string) ResourceRuleBuilder {
-	b.ensureInitialized()
+func (b *ResourceRuleBuilder) SetAPIGroups(value []string) *ResourceRuleBuilder {
 	b.fields.APIGroups = &value
 	return b
 }
 
 // RemoveAPIGroups removes the APIGroups field from the declarative configuration.
-func (b ResourceRuleBuilder) RemoveAPIGroups() ResourceRuleBuilder {
-	b.ensureInitialized()
+func (b *ResourceRuleBuilder) RemoveAPIGroups() *ResourceRuleBuilder {
 	b.fields.APIGroups = nil
 	return b
 }
 
 // GetAPIGroups gets the APIGroups field from the declarative configuration.
-func (b ResourceRuleBuilder) GetAPIGroups() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *ResourceRuleBuilder) GetAPIGroups() (value []string, ok bool) {
 	if v := b.fields.APIGroups; v != nil {
 		return *v, true
 	}
@@ -102,22 +89,19 @@ func (b ResourceRuleBuilder) GetAPIGroups() (value []string, ok bool) {
 }
 
 // SetResources sets the Resources field in the declarative configuration to the given value.
-func (b ResourceRuleBuilder) SetResources(value []string) ResourceRuleBuilder {
-	b.ensureInitialized()
+func (b *ResourceRuleBuilder) SetResources(value []string) *ResourceRuleBuilder {
 	b.fields.Resources = &value
 	return b
 }
 
 // RemoveResources removes the Resources field from the declarative configuration.
-func (b ResourceRuleBuilder) RemoveResources() ResourceRuleBuilder {
-	b.ensureInitialized()
+func (b *ResourceRuleBuilder) RemoveResources() *ResourceRuleBuilder {
 	b.fields.Resources = nil
 	return b
 }
 
 // GetResources gets the Resources field from the declarative configuration.
-func (b ResourceRuleBuilder) GetResources() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *ResourceRuleBuilder) GetResources() (value []string, ok bool) {
 	if v := b.fields.Resources; v != nil {
 		return *v, true
 	}
@@ -125,22 +109,19 @@ func (b ResourceRuleBuilder) GetResources() (value []string, ok bool) {
 }
 
 // SetResourceNames sets the ResourceNames field in the declarative configuration to the given value.
-func (b ResourceRuleBuilder) SetResourceNames(value []string) ResourceRuleBuilder {
-	b.ensureInitialized()
+func (b *ResourceRuleBuilder) SetResourceNames(value []string) *ResourceRuleBuilder {
 	b.fields.ResourceNames = &value
 	return b
 }
 
 // RemoveResourceNames removes the ResourceNames field from the declarative configuration.
-func (b ResourceRuleBuilder) RemoveResourceNames() ResourceRuleBuilder {
-	b.ensureInitialized()
+func (b *ResourceRuleBuilder) RemoveResourceNames() *ResourceRuleBuilder {
 	b.fields.ResourceNames = nil
 	return b
 }
 
 // GetResourceNames gets the ResourceNames field from the declarative configuration.
-func (b ResourceRuleBuilder) GetResourceNames() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *ResourceRuleBuilder) GetResourceNames() (value []string, ok bool) {
 	if v := b.fields.ResourceNames; v != nil {
 		return *v, true
 	}
@@ -152,9 +133,8 @@ func (b *ResourceRuleBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +149,13 @@ func (b *ResourceRuleBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ResourceRuleBuilder to JSON.
 func (b *ResourceRuleBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +163,7 @@ func (b *ResourceRuleBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ResourceRuleBuilder, replacing the contents of
 // ResourceRuleBuilder.
 func (b *ResourceRuleBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,11 +171,9 @@ func (b *ResourceRuleBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ResourceRuleList represents a list of ResourceRuleBuilder.
-// Provided as a convenience.
-type ResourceRuleList []ResourceRuleBuilder
+type ResourceRuleList []*ResourceRuleBuilder
 
 // ResourceRuleList represents a map of ResourceRuleBuilder.
-// Provided as a convenience.
 type ResourceRuleMap map[string]ResourceRuleBuilder
 
 func (b *ResourceRuleBuilder) preMarshal() {

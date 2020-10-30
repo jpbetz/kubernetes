@@ -27,49 +27,39 @@ import (
 // PreferredSchedulingTermBuilder represents an declarative configuration of the PreferredSchedulingTerm type for use
 // with apply.
 type PreferredSchedulingTermBuilder struct {
-	fields *preferredSchedulingTermFields
+	fields preferredSchedulingTermFields
 }
 
-// preferredSchedulingTermFields is used by PreferredSchedulingTermBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PreferredSchedulingTermBuilder before marshalling, and
-// are copied out to the builder type in PreferredSchedulingTermBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// preferredSchedulingTermFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PreferredSchedulingTermBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type preferredSchedulingTermFields struct {
 	Weight     *int32                   `json:"weight,omitempty"`
 	Preference *NodeSelectorTermBuilder `json:"preference,omitempty"`
 }
 
-func (b *PreferredSchedulingTermBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &preferredSchedulingTermFields{}
-	}
-}
-
 // PreferredSchedulingTerm constructs an declarative configuration of the PreferredSchedulingTerm type for use with
 // apply.
-// Provided as a convenience.
-func PreferredSchedulingTerm() PreferredSchedulingTermBuilder {
-	return PreferredSchedulingTermBuilder{fields: &preferredSchedulingTermFields{}}
+func PreferredSchedulingTerm() *PreferredSchedulingTermBuilder {
+	return &PreferredSchedulingTermBuilder{}
 }
 
 // SetWeight sets the Weight field in the declarative configuration to the given value.
-func (b PreferredSchedulingTermBuilder) SetWeight(value int32) PreferredSchedulingTermBuilder {
-	b.ensureInitialized()
+func (b *PreferredSchedulingTermBuilder) SetWeight(value int32) *PreferredSchedulingTermBuilder {
 	b.fields.Weight = &value
 	return b
 }
 
 // RemoveWeight removes the Weight field from the declarative configuration.
-func (b PreferredSchedulingTermBuilder) RemoveWeight() PreferredSchedulingTermBuilder {
-	b.ensureInitialized()
+func (b *PreferredSchedulingTermBuilder) RemoveWeight() *PreferredSchedulingTermBuilder {
 	b.fields.Weight = nil
 	return b
 }
 
 // GetWeight gets the Weight field from the declarative configuration.
-func (b PreferredSchedulingTermBuilder) GetWeight() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *PreferredSchedulingTermBuilder) GetWeight() (value int32, ok bool) {
 	if v := b.fields.Weight; v != nil {
 		return *v, true
 	}
@@ -77,26 +67,20 @@ func (b PreferredSchedulingTermBuilder) GetWeight() (value int32, ok bool) {
 }
 
 // SetPreference sets the Preference field in the declarative configuration to the given value.
-func (b PreferredSchedulingTermBuilder) SetPreference(value NodeSelectorTermBuilder) PreferredSchedulingTermBuilder {
-	b.ensureInitialized()
-	b.fields.Preference = &value
+func (b *PreferredSchedulingTermBuilder) SetPreference(value *NodeSelectorTermBuilder) *PreferredSchedulingTermBuilder {
+	b.fields.Preference = value
 	return b
 }
 
 // RemovePreference removes the Preference field from the declarative configuration.
-func (b PreferredSchedulingTermBuilder) RemovePreference() PreferredSchedulingTermBuilder {
-	b.ensureInitialized()
+func (b *PreferredSchedulingTermBuilder) RemovePreference() *PreferredSchedulingTermBuilder {
 	b.fields.Preference = nil
 	return b
 }
 
 // GetPreference gets the Preference field from the declarative configuration.
-func (b PreferredSchedulingTermBuilder) GetPreference() (value NodeSelectorTermBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Preference; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PreferredSchedulingTermBuilder) GetPreference() (value *NodeSelectorTermBuilder, ok bool) {
+	return b.fields.Preference, b.fields.Preference != nil
 }
 
 // ToUnstructured converts PreferredSchedulingTermBuilder to unstructured.
@@ -104,9 +88,8 @@ func (b *PreferredSchedulingTermBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +104,13 @@ func (b *PreferredSchedulingTermBuilder) FromUnstructured(u map[string]interface
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PreferredSchedulingTermBuilder to JSON.
 func (b *PreferredSchedulingTermBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +118,7 @@ func (b *PreferredSchedulingTermBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PreferredSchedulingTermBuilder, replacing the contents of
 // PreferredSchedulingTermBuilder.
 func (b *PreferredSchedulingTermBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +126,9 @@ func (b *PreferredSchedulingTermBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PreferredSchedulingTermList represents a list of PreferredSchedulingTermBuilder.
-// Provided as a convenience.
-type PreferredSchedulingTermList []PreferredSchedulingTermBuilder
+type PreferredSchedulingTermList []*PreferredSchedulingTermBuilder
 
 // PreferredSchedulingTermList represents a map of PreferredSchedulingTermBuilder.
-// Provided as a convenience.
 type PreferredSchedulingTermMap map[string]PreferredSchedulingTermBuilder
 
 func (b *PreferredSchedulingTermBuilder) preMarshal() {

@@ -27,48 +27,38 @@ import (
 // ScopeSelectorBuilder represents an declarative configuration of the ScopeSelector type for use
 // with apply.
 type ScopeSelectorBuilder struct {
-	fields *scopeSelectorFields
+	fields scopeSelectorFields
 }
 
-// scopeSelectorFields is used by ScopeSelectorBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ScopeSelectorBuilder before marshalling, and
-// are copied out to the builder type in ScopeSelectorBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// scopeSelectorFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ScopeSelectorBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type scopeSelectorFields struct {
 	MatchExpressions *ScopedResourceSelectorRequirementList `json:"matchExpressions,omitempty"`
 }
 
-func (b *ScopeSelectorBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &scopeSelectorFields{}
-	}
-}
-
 // ScopeSelector constructs an declarative configuration of the ScopeSelector type for use with
 // apply.
-// Provided as a convenience.
-func ScopeSelector() ScopeSelectorBuilder {
-	return ScopeSelectorBuilder{fields: &scopeSelectorFields{}}
+func ScopeSelector() *ScopeSelectorBuilder {
+	return &ScopeSelectorBuilder{}
 }
 
 // SetMatchExpressions sets the MatchExpressions field in the declarative configuration to the given value.
-func (b ScopeSelectorBuilder) SetMatchExpressions(value ScopedResourceSelectorRequirementList) ScopeSelectorBuilder {
-	b.ensureInitialized()
+func (b *ScopeSelectorBuilder) SetMatchExpressions(value ScopedResourceSelectorRequirementList) *ScopeSelectorBuilder {
 	b.fields.MatchExpressions = &value
 	return b
 }
 
 // RemoveMatchExpressions removes the MatchExpressions field from the declarative configuration.
-func (b ScopeSelectorBuilder) RemoveMatchExpressions() ScopeSelectorBuilder {
-	b.ensureInitialized()
+func (b *ScopeSelectorBuilder) RemoveMatchExpressions() *ScopeSelectorBuilder {
 	b.fields.MatchExpressions = nil
 	return b
 }
 
 // GetMatchExpressions gets the MatchExpressions field from the declarative configuration.
-func (b ScopeSelectorBuilder) GetMatchExpressions() (value ScopedResourceSelectorRequirementList, ok bool) {
-	b.ensureInitialized()
+func (b *ScopeSelectorBuilder) GetMatchExpressions() (value ScopedResourceSelectorRequirementList, ok bool) {
 	if v := b.fields.MatchExpressions; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *ScopeSelectorBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *ScopeSelectorBuilder) FromUnstructured(u map[string]interface{}) error 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ScopeSelectorBuilder to JSON.
 func (b *ScopeSelectorBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *ScopeSelectorBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ScopeSelectorBuilder, replacing the contents of
 // ScopeSelectorBuilder.
 func (b *ScopeSelectorBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *ScopeSelectorBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ScopeSelectorList represents a list of ScopeSelectorBuilder.
-// Provided as a convenience.
-type ScopeSelectorList []ScopeSelectorBuilder
+type ScopeSelectorList []*ScopeSelectorBuilder
 
 // ScopeSelectorList represents a map of ScopeSelectorBuilder.
-// Provided as a convenience.
 type ScopeSelectorMap map[string]ScopeSelectorBuilder
 
 func (b *ScopeSelectorBuilder) preMarshal() {

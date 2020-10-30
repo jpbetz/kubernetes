@@ -28,15 +28,15 @@ import (
 // PodBuilder represents an declarative configuration of the Pod type for use
 // with apply.
 type PodBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *podFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   podFields
 }
 
-// podFields is used by PodBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PodBuilder before marshalling, and
-// are copied out to the builder type in PodBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// podFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PodBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type podFields struct {
 	Kind       *string               `json:"kind,omitempty"`       // inlined PodBuilder.typeMeta.Kind field
 	APIVersion *string               `json:"apiVersion,omitempty"` // inlined PodBuilder.typeMeta.APIVersion field
@@ -45,106 +45,78 @@ type podFields struct {
 	Status     *PodStatusBuilder     `json:"status,omitempty"`
 }
 
-func (b *PodBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &podFields{}
-	}
-}
-
 // Pod constructs an declarative configuration of the Pod type for use with
 // apply.
-// Provided as a convenience.
-func Pod() PodBuilder {
-	return PodBuilder{fields: &podFields{}}
+func Pod() *PodBuilder {
+	return &PodBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b PodBuilder) SetTypeMeta(value v1.TypeMetaBuilder) PodBuilder {
-	b.ensureInitialized()
+func (b *PodBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *PodBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b PodBuilder) RemoveTypeMeta() PodBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *PodBuilder) RemoveTypeMeta() *PodBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b PodBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *PodBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b PodBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) PodBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *PodBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *PodBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b PodBuilder) RemoveObjectMeta() PodBuilder {
-	b.ensureInitialized()
+func (b *PodBuilder) RemoveObjectMeta() *PodBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b PodBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b PodBuilder) SetSpec(value PodSpecBuilder) PodBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *PodBuilder) SetSpec(value *PodSpecBuilder) *PodBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b PodBuilder) RemoveSpec() PodBuilder {
-	b.ensureInitialized()
+func (b *PodBuilder) RemoveSpec() *PodBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b PodBuilder) GetSpec() (value PodSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodBuilder) GetSpec() (value *PodSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b PodBuilder) SetStatus(value PodStatusBuilder) PodBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *PodBuilder) SetStatus(value *PodStatusBuilder) *PodBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b PodBuilder) RemoveStatus() PodBuilder {
-	b.ensureInitialized()
+func (b *PodBuilder) RemoveStatus() *PodBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b PodBuilder) GetStatus() (value PodStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodBuilder) GetStatus() (value *PodStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts PodBuilder to unstructured.
@@ -152,9 +124,8 @@ func (b *PodBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *PodBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PodBuilder to JSON.
 func (b *PodBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *PodBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PodBuilder, replacing the contents of
 // PodBuilder.
 func (b *PodBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +162,25 @@ func (b *PodBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PodList represents a list of PodBuilder.
-// Provided as a convenience.
-type PodList []PodBuilder
+type PodList []*PodBuilder
 
 // PodList represents a map of PodBuilder.
-// Provided as a convenience.
 type PodMap map[string]PodBuilder
 
 func (b *PodBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *PodBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

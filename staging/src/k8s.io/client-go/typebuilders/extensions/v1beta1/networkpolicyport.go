@@ -29,49 +29,39 @@ import (
 // NetworkPolicyPortBuilder represents an declarative configuration of the NetworkPolicyPort type for use
 // with apply.
 type NetworkPolicyPortBuilder struct {
-	fields *networkPolicyPortFields
+	fields networkPolicyPortFields
 }
 
-// networkPolicyPortFields is used by NetworkPolicyPortBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in NetworkPolicyPortBuilder before marshalling, and
-// are copied out to the builder type in NetworkPolicyPortBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// networkPolicyPortFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in NetworkPolicyPortBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type networkPolicyPortFields struct {
 	Protocol *v1.Protocol        `json:"protocol,omitempty"`
 	Port     *intstr.IntOrString `json:"port,omitempty"`
 }
 
-func (b *NetworkPolicyPortBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &networkPolicyPortFields{}
-	}
-}
-
 // NetworkPolicyPort constructs an declarative configuration of the NetworkPolicyPort type for use with
 // apply.
-// Provided as a convenience.
-func NetworkPolicyPort() NetworkPolicyPortBuilder {
-	return NetworkPolicyPortBuilder{fields: &networkPolicyPortFields{}}
+func NetworkPolicyPort() *NetworkPolicyPortBuilder {
+	return &NetworkPolicyPortBuilder{}
 }
 
 // SetProtocol sets the Protocol field in the declarative configuration to the given value.
-func (b NetworkPolicyPortBuilder) SetProtocol(value v1.Protocol) NetworkPolicyPortBuilder {
-	b.ensureInitialized()
+func (b *NetworkPolicyPortBuilder) SetProtocol(value v1.Protocol) *NetworkPolicyPortBuilder {
 	b.fields.Protocol = &value
 	return b
 }
 
 // RemoveProtocol removes the Protocol field from the declarative configuration.
-func (b NetworkPolicyPortBuilder) RemoveProtocol() NetworkPolicyPortBuilder {
-	b.ensureInitialized()
+func (b *NetworkPolicyPortBuilder) RemoveProtocol() *NetworkPolicyPortBuilder {
 	b.fields.Protocol = nil
 	return b
 }
 
 // GetProtocol gets the Protocol field from the declarative configuration.
-func (b NetworkPolicyPortBuilder) GetProtocol() (value v1.Protocol, ok bool) {
-	b.ensureInitialized()
+func (b *NetworkPolicyPortBuilder) GetProtocol() (value v1.Protocol, ok bool) {
 	if v := b.fields.Protocol; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b NetworkPolicyPortBuilder) GetProtocol() (value v1.Protocol, ok bool) {
 }
 
 // SetPort sets the Port field in the declarative configuration to the given value.
-func (b NetworkPolicyPortBuilder) SetPort(value intstr.IntOrString) NetworkPolicyPortBuilder {
-	b.ensureInitialized()
+func (b *NetworkPolicyPortBuilder) SetPort(value intstr.IntOrString) *NetworkPolicyPortBuilder {
 	b.fields.Port = &value
 	return b
 }
 
 // RemovePort removes the Port field from the declarative configuration.
-func (b NetworkPolicyPortBuilder) RemovePort() NetworkPolicyPortBuilder {
-	b.ensureInitialized()
+func (b *NetworkPolicyPortBuilder) RemovePort() *NetworkPolicyPortBuilder {
 	b.fields.Port = nil
 	return b
 }
 
 // GetPort gets the Port field from the declarative configuration.
-func (b NetworkPolicyPortBuilder) GetPort() (value intstr.IntOrString, ok bool) {
-	b.ensureInitialized()
+func (b *NetworkPolicyPortBuilder) GetPort() (value intstr.IntOrString, ok bool) {
 	if v := b.fields.Port; v != nil {
 		return *v, true
 	}
@@ -106,9 +93,8 @@ func (b *NetworkPolicyPortBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -123,14 +109,13 @@ func (b *NetworkPolicyPortBuilder) FromUnstructured(u map[string]interface{}) er
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals NetworkPolicyPortBuilder to JSON.
 func (b *NetworkPolicyPortBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -138,8 +123,7 @@ func (b *NetworkPolicyPortBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into NetworkPolicyPortBuilder, replacing the contents of
 // NetworkPolicyPortBuilder.
 func (b *NetworkPolicyPortBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -147,11 +131,9 @@ func (b *NetworkPolicyPortBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // NetworkPolicyPortList represents a list of NetworkPolicyPortBuilder.
-// Provided as a convenience.
-type NetworkPolicyPortList []NetworkPolicyPortBuilder
+type NetworkPolicyPortList []*NetworkPolicyPortBuilder
 
 // NetworkPolicyPortList represents a map of NetworkPolicyPortBuilder.
-// Provided as a convenience.
 type NetworkPolicyPortMap map[string]NetworkPolicyPortBuilder
 
 func (b *NetworkPolicyPortBuilder) preMarshal() {

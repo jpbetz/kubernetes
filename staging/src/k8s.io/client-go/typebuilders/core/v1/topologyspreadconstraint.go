@@ -29,14 +29,14 @@ import (
 // TopologySpreadConstraintBuilder represents an declarative configuration of the TopologySpreadConstraint type for use
 // with apply.
 type TopologySpreadConstraintBuilder struct {
-	fields *topologySpreadConstraintFields
+	fields topologySpreadConstraintFields
 }
 
-// topologySpreadConstraintFields is used by TopologySpreadConstraintBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in TopologySpreadConstraintBuilder before marshalling, and
-// are copied out to the builder type in TopologySpreadConstraintBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// topologySpreadConstraintFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in TopologySpreadConstraintBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type topologySpreadConstraintFields struct {
 	MaxSkew           *int32                            `json:"maxSkew,omitempty"`
 	TopologyKey       *string                           `json:"topologyKey,omitempty"`
@@ -44,36 +44,26 @@ type topologySpreadConstraintFields struct {
 	LabelSelector     *metav1.LabelSelectorBuilder      `json:"labelSelector,omitempty"`
 }
 
-func (b *TopologySpreadConstraintBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &topologySpreadConstraintFields{}
-	}
-}
-
 // TopologySpreadConstraint constructs an declarative configuration of the TopologySpreadConstraint type for use with
 // apply.
-// Provided as a convenience.
-func TopologySpreadConstraint() TopologySpreadConstraintBuilder {
-	return TopologySpreadConstraintBuilder{fields: &topologySpreadConstraintFields{}}
+func TopologySpreadConstraint() *TopologySpreadConstraintBuilder {
+	return &TopologySpreadConstraintBuilder{}
 }
 
 // SetMaxSkew sets the MaxSkew field in the declarative configuration to the given value.
-func (b TopologySpreadConstraintBuilder) SetMaxSkew(value int32) TopologySpreadConstraintBuilder {
-	b.ensureInitialized()
+func (b *TopologySpreadConstraintBuilder) SetMaxSkew(value int32) *TopologySpreadConstraintBuilder {
 	b.fields.MaxSkew = &value
 	return b
 }
 
 // RemoveMaxSkew removes the MaxSkew field from the declarative configuration.
-func (b TopologySpreadConstraintBuilder) RemoveMaxSkew() TopologySpreadConstraintBuilder {
-	b.ensureInitialized()
+func (b *TopologySpreadConstraintBuilder) RemoveMaxSkew() *TopologySpreadConstraintBuilder {
 	b.fields.MaxSkew = nil
 	return b
 }
 
 // GetMaxSkew gets the MaxSkew field from the declarative configuration.
-func (b TopologySpreadConstraintBuilder) GetMaxSkew() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *TopologySpreadConstraintBuilder) GetMaxSkew() (value int32, ok bool) {
 	if v := b.fields.MaxSkew; v != nil {
 		return *v, true
 	}
@@ -81,22 +71,19 @@ func (b TopologySpreadConstraintBuilder) GetMaxSkew() (value int32, ok bool) {
 }
 
 // SetTopologyKey sets the TopologyKey field in the declarative configuration to the given value.
-func (b TopologySpreadConstraintBuilder) SetTopologyKey(value string) TopologySpreadConstraintBuilder {
-	b.ensureInitialized()
+func (b *TopologySpreadConstraintBuilder) SetTopologyKey(value string) *TopologySpreadConstraintBuilder {
 	b.fields.TopologyKey = &value
 	return b
 }
 
 // RemoveTopologyKey removes the TopologyKey field from the declarative configuration.
-func (b TopologySpreadConstraintBuilder) RemoveTopologyKey() TopologySpreadConstraintBuilder {
-	b.ensureInitialized()
+func (b *TopologySpreadConstraintBuilder) RemoveTopologyKey() *TopologySpreadConstraintBuilder {
 	b.fields.TopologyKey = nil
 	return b
 }
 
 // GetTopologyKey gets the TopologyKey field from the declarative configuration.
-func (b TopologySpreadConstraintBuilder) GetTopologyKey() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *TopologySpreadConstraintBuilder) GetTopologyKey() (value string, ok bool) {
 	if v := b.fields.TopologyKey; v != nil {
 		return *v, true
 	}
@@ -104,22 +91,19 @@ func (b TopologySpreadConstraintBuilder) GetTopologyKey() (value string, ok bool
 }
 
 // SetWhenUnsatisfiable sets the WhenUnsatisfiable field in the declarative configuration to the given value.
-func (b TopologySpreadConstraintBuilder) SetWhenUnsatisfiable(value v1.UnsatisfiableConstraintAction) TopologySpreadConstraintBuilder {
-	b.ensureInitialized()
+func (b *TopologySpreadConstraintBuilder) SetWhenUnsatisfiable(value v1.UnsatisfiableConstraintAction) *TopologySpreadConstraintBuilder {
 	b.fields.WhenUnsatisfiable = &value
 	return b
 }
 
 // RemoveWhenUnsatisfiable removes the WhenUnsatisfiable field from the declarative configuration.
-func (b TopologySpreadConstraintBuilder) RemoveWhenUnsatisfiable() TopologySpreadConstraintBuilder {
-	b.ensureInitialized()
+func (b *TopologySpreadConstraintBuilder) RemoveWhenUnsatisfiable() *TopologySpreadConstraintBuilder {
 	b.fields.WhenUnsatisfiable = nil
 	return b
 }
 
 // GetWhenUnsatisfiable gets the WhenUnsatisfiable field from the declarative configuration.
-func (b TopologySpreadConstraintBuilder) GetWhenUnsatisfiable() (value v1.UnsatisfiableConstraintAction, ok bool) {
-	b.ensureInitialized()
+func (b *TopologySpreadConstraintBuilder) GetWhenUnsatisfiable() (value v1.UnsatisfiableConstraintAction, ok bool) {
 	if v := b.fields.WhenUnsatisfiable; v != nil {
 		return *v, true
 	}
@@ -127,26 +111,20 @@ func (b TopologySpreadConstraintBuilder) GetWhenUnsatisfiable() (value v1.Unsati
 }
 
 // SetLabelSelector sets the LabelSelector field in the declarative configuration to the given value.
-func (b TopologySpreadConstraintBuilder) SetLabelSelector(value metav1.LabelSelectorBuilder) TopologySpreadConstraintBuilder {
-	b.ensureInitialized()
-	b.fields.LabelSelector = &value
+func (b *TopologySpreadConstraintBuilder) SetLabelSelector(value *metav1.LabelSelectorBuilder) *TopologySpreadConstraintBuilder {
+	b.fields.LabelSelector = value
 	return b
 }
 
 // RemoveLabelSelector removes the LabelSelector field from the declarative configuration.
-func (b TopologySpreadConstraintBuilder) RemoveLabelSelector() TopologySpreadConstraintBuilder {
-	b.ensureInitialized()
+func (b *TopologySpreadConstraintBuilder) RemoveLabelSelector() *TopologySpreadConstraintBuilder {
 	b.fields.LabelSelector = nil
 	return b
 }
 
 // GetLabelSelector gets the LabelSelector field from the declarative configuration.
-func (b TopologySpreadConstraintBuilder) GetLabelSelector() (value metav1.LabelSelectorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.LabelSelector; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *TopologySpreadConstraintBuilder) GetLabelSelector() (value *metav1.LabelSelectorBuilder, ok bool) {
+	return b.fields.LabelSelector, b.fields.LabelSelector != nil
 }
 
 // ToUnstructured converts TopologySpreadConstraintBuilder to unstructured.
@@ -154,9 +132,8 @@ func (b *TopologySpreadConstraintBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -171,14 +148,13 @@ func (b *TopologySpreadConstraintBuilder) FromUnstructured(u map[string]interfac
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals TopologySpreadConstraintBuilder to JSON.
 func (b *TopologySpreadConstraintBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -186,8 +162,7 @@ func (b *TopologySpreadConstraintBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into TopologySpreadConstraintBuilder, replacing the contents of
 // TopologySpreadConstraintBuilder.
 func (b *TopologySpreadConstraintBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -195,11 +170,9 @@ func (b *TopologySpreadConstraintBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // TopologySpreadConstraintList represents a list of TopologySpreadConstraintBuilder.
-// Provided as a convenience.
-type TopologySpreadConstraintList []TopologySpreadConstraintBuilder
+type TopologySpreadConstraintList []*TopologySpreadConstraintBuilder
 
 // TopologySpreadConstraintList represents a map of TopologySpreadConstraintBuilder.
-// Provided as a convenience.
 type TopologySpreadConstraintMap map[string]TopologySpreadConstraintBuilder
 
 func (b *TopologySpreadConstraintBuilder) preMarshal() {

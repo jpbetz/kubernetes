@@ -30,14 +30,14 @@ import (
 // CertificateSigningRequestConditionBuilder represents an declarative configuration of the CertificateSigningRequestCondition type for use
 // with apply.
 type CertificateSigningRequestConditionBuilder struct {
-	fields *certificateSigningRequestConditionFields
+	fields certificateSigningRequestConditionFields
 }
 
-// certificateSigningRequestConditionFields is used by CertificateSigningRequestConditionBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in CertificateSigningRequestConditionBuilder before marshalling, and
-// are copied out to the builder type in CertificateSigningRequestConditionBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// certificateSigningRequestConditionFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in CertificateSigningRequestConditionBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type certificateSigningRequestConditionFields struct {
 	Type               *v1.RequestConditionType `json:"type,omitempty"`
 	Status             *corev1.ConditionStatus  `json:"status,omitempty"`
@@ -47,36 +47,26 @@ type certificateSigningRequestConditionFields struct {
 	LastTransitionTime *metav1.Time             `json:"lastTransitionTime,omitempty"`
 }
 
-func (b *CertificateSigningRequestConditionBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &certificateSigningRequestConditionFields{}
-	}
-}
-
 // CertificateSigningRequestCondition constructs an declarative configuration of the CertificateSigningRequestCondition type for use with
 // apply.
-// Provided as a convenience.
-func CertificateSigningRequestCondition() CertificateSigningRequestConditionBuilder {
-	return CertificateSigningRequestConditionBuilder{fields: &certificateSigningRequestConditionFields{}}
+func CertificateSigningRequestCondition() *CertificateSigningRequestConditionBuilder {
+	return &CertificateSigningRequestConditionBuilder{}
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b CertificateSigningRequestConditionBuilder) SetType(value v1.RequestConditionType) CertificateSigningRequestConditionBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestConditionBuilder) SetType(value v1.RequestConditionType) *CertificateSigningRequestConditionBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b CertificateSigningRequestConditionBuilder) RemoveType() CertificateSigningRequestConditionBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestConditionBuilder) RemoveType() *CertificateSigningRequestConditionBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b CertificateSigningRequestConditionBuilder) GetType() (value v1.RequestConditionType, ok bool) {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestConditionBuilder) GetType() (value v1.RequestConditionType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -84,22 +74,19 @@ func (b CertificateSigningRequestConditionBuilder) GetType() (value v1.RequestCo
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b CertificateSigningRequestConditionBuilder) SetStatus(value corev1.ConditionStatus) CertificateSigningRequestConditionBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestConditionBuilder) SetStatus(value corev1.ConditionStatus) *CertificateSigningRequestConditionBuilder {
 	b.fields.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b CertificateSigningRequestConditionBuilder) RemoveStatus() CertificateSigningRequestConditionBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestConditionBuilder) RemoveStatus() *CertificateSigningRequestConditionBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b CertificateSigningRequestConditionBuilder) GetStatus() (value corev1.ConditionStatus, ok bool) {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestConditionBuilder) GetStatus() (value corev1.ConditionStatus, ok bool) {
 	if v := b.fields.Status; v != nil {
 		return *v, true
 	}
@@ -107,22 +94,19 @@ func (b CertificateSigningRequestConditionBuilder) GetStatus() (value corev1.Con
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b CertificateSigningRequestConditionBuilder) SetReason(value string) CertificateSigningRequestConditionBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestConditionBuilder) SetReason(value string) *CertificateSigningRequestConditionBuilder {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b CertificateSigningRequestConditionBuilder) RemoveReason() CertificateSigningRequestConditionBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestConditionBuilder) RemoveReason() *CertificateSigningRequestConditionBuilder {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b CertificateSigningRequestConditionBuilder) GetReason() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestConditionBuilder) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -130,22 +114,19 @@ func (b CertificateSigningRequestConditionBuilder) GetReason() (value string, ok
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b CertificateSigningRequestConditionBuilder) SetMessage(value string) CertificateSigningRequestConditionBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestConditionBuilder) SetMessage(value string) *CertificateSigningRequestConditionBuilder {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b CertificateSigningRequestConditionBuilder) RemoveMessage() CertificateSigningRequestConditionBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestConditionBuilder) RemoveMessage() *CertificateSigningRequestConditionBuilder {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b CertificateSigningRequestConditionBuilder) GetMessage() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestConditionBuilder) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
@@ -153,22 +134,19 @@ func (b CertificateSigningRequestConditionBuilder) GetMessage() (value string, o
 }
 
 // SetLastUpdateTime sets the LastUpdateTime field in the declarative configuration to the given value.
-func (b CertificateSigningRequestConditionBuilder) SetLastUpdateTime(value metav1.Time) CertificateSigningRequestConditionBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestConditionBuilder) SetLastUpdateTime(value metav1.Time) *CertificateSigningRequestConditionBuilder {
 	b.fields.LastUpdateTime = &value
 	return b
 }
 
 // RemoveLastUpdateTime removes the LastUpdateTime field from the declarative configuration.
-func (b CertificateSigningRequestConditionBuilder) RemoveLastUpdateTime() CertificateSigningRequestConditionBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestConditionBuilder) RemoveLastUpdateTime() *CertificateSigningRequestConditionBuilder {
 	b.fields.LastUpdateTime = nil
 	return b
 }
 
 // GetLastUpdateTime gets the LastUpdateTime field from the declarative configuration.
-func (b CertificateSigningRequestConditionBuilder) GetLastUpdateTime() (value metav1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestConditionBuilder) GetLastUpdateTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastUpdateTime; v != nil {
 		return *v, true
 	}
@@ -176,22 +154,19 @@ func (b CertificateSigningRequestConditionBuilder) GetLastUpdateTime() (value me
 }
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
-func (b CertificateSigningRequestConditionBuilder) SetLastTransitionTime(value metav1.Time) CertificateSigningRequestConditionBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestConditionBuilder) SetLastTransitionTime(value metav1.Time) *CertificateSigningRequestConditionBuilder {
 	b.fields.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
-func (b CertificateSigningRequestConditionBuilder) RemoveLastTransitionTime() CertificateSigningRequestConditionBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestConditionBuilder) RemoveLastTransitionTime() *CertificateSigningRequestConditionBuilder {
 	b.fields.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
-func (b CertificateSigningRequestConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastTransitionTime; v != nil {
 		return *v, true
 	}
@@ -203,9 +178,8 @@ func (b *CertificateSigningRequestConditionBuilder) ToUnstructured() interface{}
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -220,14 +194,13 @@ func (b *CertificateSigningRequestConditionBuilder) FromUnstructured(u map[strin
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals CertificateSigningRequestConditionBuilder to JSON.
 func (b *CertificateSigningRequestConditionBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -235,8 +208,7 @@ func (b *CertificateSigningRequestConditionBuilder) MarshalJSON() ([]byte, error
 // UnmarshalJSON unmarshals JSON into CertificateSigningRequestConditionBuilder, replacing the contents of
 // CertificateSigningRequestConditionBuilder.
 func (b *CertificateSigningRequestConditionBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -244,11 +216,9 @@ func (b *CertificateSigningRequestConditionBuilder) UnmarshalJSON(data []byte) e
 }
 
 // CertificateSigningRequestConditionList represents a list of CertificateSigningRequestConditionBuilder.
-// Provided as a convenience.
-type CertificateSigningRequestConditionList []CertificateSigningRequestConditionBuilder
+type CertificateSigningRequestConditionList []*CertificateSigningRequestConditionBuilder
 
 // CertificateSigningRequestConditionList represents a map of CertificateSigningRequestConditionBuilder.
-// Provided as a convenience.
 type CertificateSigningRequestConditionMap map[string]CertificateSigningRequestConditionBuilder
 
 func (b *CertificateSigningRequestConditionBuilder) preMarshal() {

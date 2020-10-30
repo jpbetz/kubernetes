@@ -27,14 +27,14 @@ import (
 // StorageOSPersistentVolumeSourceBuilder represents an declarative configuration of the StorageOSPersistentVolumeSource type for use
 // with apply.
 type StorageOSPersistentVolumeSourceBuilder struct {
-	fields *storageOSPersistentVolumeSourceFields
+	fields storageOSPersistentVolumeSourceFields
 }
 
-// storageOSPersistentVolumeSourceFields is used by StorageOSPersistentVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in StorageOSPersistentVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in StorageOSPersistentVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// storageOSPersistentVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in StorageOSPersistentVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type storageOSPersistentVolumeSourceFields struct {
 	VolumeName      *string                 `json:"volumeName,omitempty"`
 	VolumeNamespace *string                 `json:"volumeNamespace,omitempty"`
@@ -43,36 +43,26 @@ type storageOSPersistentVolumeSourceFields struct {
 	SecretRef       *ObjectReferenceBuilder `json:"secretRef,omitempty"`
 }
 
-func (b *StorageOSPersistentVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &storageOSPersistentVolumeSourceFields{}
-	}
-}
-
 // StorageOSPersistentVolumeSource constructs an declarative configuration of the StorageOSPersistentVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func StorageOSPersistentVolumeSource() StorageOSPersistentVolumeSourceBuilder {
-	return StorageOSPersistentVolumeSourceBuilder{fields: &storageOSPersistentVolumeSourceFields{}}
+func StorageOSPersistentVolumeSource() *StorageOSPersistentVolumeSourceBuilder {
+	return &StorageOSPersistentVolumeSourceBuilder{}
 }
 
 // SetVolumeName sets the VolumeName field in the declarative configuration to the given value.
-func (b StorageOSPersistentVolumeSourceBuilder) SetVolumeName(value string) StorageOSPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *StorageOSPersistentVolumeSourceBuilder) SetVolumeName(value string) *StorageOSPersistentVolumeSourceBuilder {
 	b.fields.VolumeName = &value
 	return b
 }
 
 // RemoveVolumeName removes the VolumeName field from the declarative configuration.
-func (b StorageOSPersistentVolumeSourceBuilder) RemoveVolumeName() StorageOSPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *StorageOSPersistentVolumeSourceBuilder) RemoveVolumeName() *StorageOSPersistentVolumeSourceBuilder {
 	b.fields.VolumeName = nil
 	return b
 }
 
 // GetVolumeName gets the VolumeName field from the declarative configuration.
-func (b StorageOSPersistentVolumeSourceBuilder) GetVolumeName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *StorageOSPersistentVolumeSourceBuilder) GetVolumeName() (value string, ok bool) {
 	if v := b.fields.VolumeName; v != nil {
 		return *v, true
 	}
@@ -80,22 +70,19 @@ func (b StorageOSPersistentVolumeSourceBuilder) GetVolumeName() (value string, o
 }
 
 // SetVolumeNamespace sets the VolumeNamespace field in the declarative configuration to the given value.
-func (b StorageOSPersistentVolumeSourceBuilder) SetVolumeNamespace(value string) StorageOSPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *StorageOSPersistentVolumeSourceBuilder) SetVolumeNamespace(value string) *StorageOSPersistentVolumeSourceBuilder {
 	b.fields.VolumeNamespace = &value
 	return b
 }
 
 // RemoveVolumeNamespace removes the VolumeNamespace field from the declarative configuration.
-func (b StorageOSPersistentVolumeSourceBuilder) RemoveVolumeNamespace() StorageOSPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *StorageOSPersistentVolumeSourceBuilder) RemoveVolumeNamespace() *StorageOSPersistentVolumeSourceBuilder {
 	b.fields.VolumeNamespace = nil
 	return b
 }
 
 // GetVolumeNamespace gets the VolumeNamespace field from the declarative configuration.
-func (b StorageOSPersistentVolumeSourceBuilder) GetVolumeNamespace() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *StorageOSPersistentVolumeSourceBuilder) GetVolumeNamespace() (value string, ok bool) {
 	if v := b.fields.VolumeNamespace; v != nil {
 		return *v, true
 	}
@@ -103,22 +90,19 @@ func (b StorageOSPersistentVolumeSourceBuilder) GetVolumeNamespace() (value stri
 }
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
-func (b StorageOSPersistentVolumeSourceBuilder) SetFSType(value string) StorageOSPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *StorageOSPersistentVolumeSourceBuilder) SetFSType(value string) *StorageOSPersistentVolumeSourceBuilder {
 	b.fields.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
-func (b StorageOSPersistentVolumeSourceBuilder) RemoveFSType() StorageOSPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *StorageOSPersistentVolumeSourceBuilder) RemoveFSType() *StorageOSPersistentVolumeSourceBuilder {
 	b.fields.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
-func (b StorageOSPersistentVolumeSourceBuilder) GetFSType() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *StorageOSPersistentVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 	if v := b.fields.FSType; v != nil {
 		return *v, true
 	}
@@ -126,22 +110,19 @@ func (b StorageOSPersistentVolumeSourceBuilder) GetFSType() (value string, ok bo
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b StorageOSPersistentVolumeSourceBuilder) SetReadOnly(value bool) StorageOSPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *StorageOSPersistentVolumeSourceBuilder) SetReadOnly(value bool) *StorageOSPersistentVolumeSourceBuilder {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b StorageOSPersistentVolumeSourceBuilder) RemoveReadOnly() StorageOSPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *StorageOSPersistentVolumeSourceBuilder) RemoveReadOnly() *StorageOSPersistentVolumeSourceBuilder {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b StorageOSPersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *StorageOSPersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
@@ -149,26 +130,20 @@ func (b StorageOSPersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok bo
 }
 
 // SetSecretRef sets the SecretRef field in the declarative configuration to the given value.
-func (b StorageOSPersistentVolumeSourceBuilder) SetSecretRef(value ObjectReferenceBuilder) StorageOSPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.SecretRef = &value
+func (b *StorageOSPersistentVolumeSourceBuilder) SetSecretRef(value *ObjectReferenceBuilder) *StorageOSPersistentVolumeSourceBuilder {
+	b.fields.SecretRef = value
 	return b
 }
 
 // RemoveSecretRef removes the SecretRef field from the declarative configuration.
-func (b StorageOSPersistentVolumeSourceBuilder) RemoveSecretRef() StorageOSPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *StorageOSPersistentVolumeSourceBuilder) RemoveSecretRef() *StorageOSPersistentVolumeSourceBuilder {
 	b.fields.SecretRef = nil
 	return b
 }
 
 // GetSecretRef gets the SecretRef field from the declarative configuration.
-func (b StorageOSPersistentVolumeSourceBuilder) GetSecretRef() (value ObjectReferenceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.SecretRef; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *StorageOSPersistentVolumeSourceBuilder) GetSecretRef() (value *ObjectReferenceBuilder, ok bool) {
+	return b.fields.SecretRef, b.fields.SecretRef != nil
 }
 
 // ToUnstructured converts StorageOSPersistentVolumeSourceBuilder to unstructured.
@@ -176,9 +151,8 @@ func (b *StorageOSPersistentVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -193,14 +167,13 @@ func (b *StorageOSPersistentVolumeSourceBuilder) FromUnstructured(u map[string]i
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals StorageOSPersistentVolumeSourceBuilder to JSON.
 func (b *StorageOSPersistentVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -208,8 +181,7 @@ func (b *StorageOSPersistentVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into StorageOSPersistentVolumeSourceBuilder, replacing the contents of
 // StorageOSPersistentVolumeSourceBuilder.
 func (b *StorageOSPersistentVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -217,11 +189,9 @@ func (b *StorageOSPersistentVolumeSourceBuilder) UnmarshalJSON(data []byte) erro
 }
 
 // StorageOSPersistentVolumeSourceList represents a list of StorageOSPersistentVolumeSourceBuilder.
-// Provided as a convenience.
-type StorageOSPersistentVolumeSourceList []StorageOSPersistentVolumeSourceBuilder
+type StorageOSPersistentVolumeSourceList []*StorageOSPersistentVolumeSourceBuilder
 
 // StorageOSPersistentVolumeSourceList represents a map of StorageOSPersistentVolumeSourceBuilder.
-// Provided as a convenience.
 type StorageOSPersistentVolumeSourceMap map[string]StorageOSPersistentVolumeSourceBuilder
 
 func (b *StorageOSPersistentVolumeSourceBuilder) preMarshal() {

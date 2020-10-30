@@ -27,48 +27,38 @@ import (
 // GroupSubjectBuilder represents an declarative configuration of the GroupSubject type for use
 // with apply.
 type GroupSubjectBuilder struct {
-	fields *groupSubjectFields
+	fields groupSubjectFields
 }
 
-// groupSubjectFields is used by GroupSubjectBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in GroupSubjectBuilder before marshalling, and
-// are copied out to the builder type in GroupSubjectBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// groupSubjectFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in GroupSubjectBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type groupSubjectFields struct {
 	Name *string `json:"name,omitempty"`
 }
 
-func (b *GroupSubjectBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &groupSubjectFields{}
-	}
-}
-
 // GroupSubject constructs an declarative configuration of the GroupSubject type for use with
 // apply.
-// Provided as a convenience.
-func GroupSubject() GroupSubjectBuilder {
-	return GroupSubjectBuilder{fields: &groupSubjectFields{}}
+func GroupSubject() *GroupSubjectBuilder {
+	return &GroupSubjectBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b GroupSubjectBuilder) SetName(value string) GroupSubjectBuilder {
-	b.ensureInitialized()
+func (b *GroupSubjectBuilder) SetName(value string) *GroupSubjectBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b GroupSubjectBuilder) RemoveName() GroupSubjectBuilder {
-	b.ensureInitialized()
+func (b *GroupSubjectBuilder) RemoveName() *GroupSubjectBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b GroupSubjectBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *GroupSubjectBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *GroupSubjectBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *GroupSubjectBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals GroupSubjectBuilder to JSON.
 func (b *GroupSubjectBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *GroupSubjectBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into GroupSubjectBuilder, replacing the contents of
 // GroupSubjectBuilder.
 func (b *GroupSubjectBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *GroupSubjectBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // GroupSubjectList represents a list of GroupSubjectBuilder.
-// Provided as a convenience.
-type GroupSubjectList []GroupSubjectBuilder
+type GroupSubjectList []*GroupSubjectBuilder
 
 // GroupSubjectList represents a map of GroupSubjectBuilder.
-// Provided as a convenience.
 type GroupSubjectMap map[string]GroupSubjectBuilder
 
 func (b *GroupSubjectBuilder) preMarshal() {

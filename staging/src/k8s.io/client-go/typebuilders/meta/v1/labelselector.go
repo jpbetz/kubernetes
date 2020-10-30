@@ -27,49 +27,39 @@ import (
 // LabelSelectorBuilder represents an declarative configuration of the LabelSelector type for use
 // with apply.
 type LabelSelectorBuilder struct {
-	fields *labelSelectorFields
+	fields labelSelectorFields
 }
 
-// labelSelectorFields is used by LabelSelectorBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in LabelSelectorBuilder before marshalling, and
-// are copied out to the builder type in LabelSelectorBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// labelSelectorFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in LabelSelectorBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type labelSelectorFields struct {
 	MatchLabels      *map[string]string            `json:"matchLabels,omitempty"`
 	MatchExpressions *LabelSelectorRequirementList `json:"matchExpressions,omitempty"`
 }
 
-func (b *LabelSelectorBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &labelSelectorFields{}
-	}
-}
-
 // LabelSelector constructs an declarative configuration of the LabelSelector type for use with
 // apply.
-// Provided as a convenience.
-func LabelSelector() LabelSelectorBuilder {
-	return LabelSelectorBuilder{fields: &labelSelectorFields{}}
+func LabelSelector() *LabelSelectorBuilder {
+	return &LabelSelectorBuilder{}
 }
 
 // SetMatchLabels sets the MatchLabels field in the declarative configuration to the given value.
-func (b LabelSelectorBuilder) SetMatchLabels(value map[string]string) LabelSelectorBuilder {
-	b.ensureInitialized()
+func (b *LabelSelectorBuilder) SetMatchLabels(value map[string]string) *LabelSelectorBuilder {
 	b.fields.MatchLabels = &value
 	return b
 }
 
 // RemoveMatchLabels removes the MatchLabels field from the declarative configuration.
-func (b LabelSelectorBuilder) RemoveMatchLabels() LabelSelectorBuilder {
-	b.ensureInitialized()
+func (b *LabelSelectorBuilder) RemoveMatchLabels() *LabelSelectorBuilder {
 	b.fields.MatchLabels = nil
 	return b
 }
 
 // GetMatchLabels gets the MatchLabels field from the declarative configuration.
-func (b LabelSelectorBuilder) GetMatchLabels() (value map[string]string, ok bool) {
-	b.ensureInitialized()
+func (b *LabelSelectorBuilder) GetMatchLabels() (value map[string]string, ok bool) {
 	if v := b.fields.MatchLabels; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b LabelSelectorBuilder) GetMatchLabels() (value map[string]string, ok bool
 }
 
 // SetMatchExpressions sets the MatchExpressions field in the declarative configuration to the given value.
-func (b LabelSelectorBuilder) SetMatchExpressions(value LabelSelectorRequirementList) LabelSelectorBuilder {
-	b.ensureInitialized()
+func (b *LabelSelectorBuilder) SetMatchExpressions(value LabelSelectorRequirementList) *LabelSelectorBuilder {
 	b.fields.MatchExpressions = &value
 	return b
 }
 
 // RemoveMatchExpressions removes the MatchExpressions field from the declarative configuration.
-func (b LabelSelectorBuilder) RemoveMatchExpressions() LabelSelectorBuilder {
-	b.ensureInitialized()
+func (b *LabelSelectorBuilder) RemoveMatchExpressions() *LabelSelectorBuilder {
 	b.fields.MatchExpressions = nil
 	return b
 }
 
 // GetMatchExpressions gets the MatchExpressions field from the declarative configuration.
-func (b LabelSelectorBuilder) GetMatchExpressions() (value LabelSelectorRequirementList, ok bool) {
-	b.ensureInitialized()
+func (b *LabelSelectorBuilder) GetMatchExpressions() (value LabelSelectorRequirementList, ok bool) {
 	if v := b.fields.MatchExpressions; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *LabelSelectorBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *LabelSelectorBuilder) FromUnstructured(u map[string]interface{}) error 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals LabelSelectorBuilder to JSON.
 func (b *LabelSelectorBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *LabelSelectorBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into LabelSelectorBuilder, replacing the contents of
 // LabelSelectorBuilder.
 func (b *LabelSelectorBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *LabelSelectorBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // LabelSelectorList represents a list of LabelSelectorBuilder.
-// Provided as a convenience.
-type LabelSelectorList []LabelSelectorBuilder
+type LabelSelectorList []*LabelSelectorBuilder
 
 // LabelSelectorList represents a map of LabelSelectorBuilder.
-// Provided as a convenience.
 type LabelSelectorMap map[string]LabelSelectorBuilder
 
 func (b *LabelSelectorBuilder) preMarshal() {

@@ -27,49 +27,39 @@ import (
 // HostAliasBuilder represents an declarative configuration of the HostAlias type for use
 // with apply.
 type HostAliasBuilder struct {
-	fields *hostAliasFields
+	fields hostAliasFields
 }
 
-// hostAliasFields is used by HostAliasBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in HostAliasBuilder before marshalling, and
-// are copied out to the builder type in HostAliasBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// hostAliasFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in HostAliasBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type hostAliasFields struct {
 	IP        *string   `json:"ip,omitempty"`
 	Hostnames *[]string `json:"hostnames,omitempty"`
 }
 
-func (b *HostAliasBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &hostAliasFields{}
-	}
-}
-
 // HostAlias constructs an declarative configuration of the HostAlias type for use with
 // apply.
-// Provided as a convenience.
-func HostAlias() HostAliasBuilder {
-	return HostAliasBuilder{fields: &hostAliasFields{}}
+func HostAlias() *HostAliasBuilder {
+	return &HostAliasBuilder{}
 }
 
 // SetIP sets the IP field in the declarative configuration to the given value.
-func (b HostAliasBuilder) SetIP(value string) HostAliasBuilder {
-	b.ensureInitialized()
+func (b *HostAliasBuilder) SetIP(value string) *HostAliasBuilder {
 	b.fields.IP = &value
 	return b
 }
 
 // RemoveIP removes the IP field from the declarative configuration.
-func (b HostAliasBuilder) RemoveIP() HostAliasBuilder {
-	b.ensureInitialized()
+func (b *HostAliasBuilder) RemoveIP() *HostAliasBuilder {
 	b.fields.IP = nil
 	return b
 }
 
 // GetIP gets the IP field from the declarative configuration.
-func (b HostAliasBuilder) GetIP() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *HostAliasBuilder) GetIP() (value string, ok bool) {
 	if v := b.fields.IP; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b HostAliasBuilder) GetIP() (value string, ok bool) {
 }
 
 // SetHostnames sets the Hostnames field in the declarative configuration to the given value.
-func (b HostAliasBuilder) SetHostnames(value []string) HostAliasBuilder {
-	b.ensureInitialized()
+func (b *HostAliasBuilder) SetHostnames(value []string) *HostAliasBuilder {
 	b.fields.Hostnames = &value
 	return b
 }
 
 // RemoveHostnames removes the Hostnames field from the declarative configuration.
-func (b HostAliasBuilder) RemoveHostnames() HostAliasBuilder {
-	b.ensureInitialized()
+func (b *HostAliasBuilder) RemoveHostnames() *HostAliasBuilder {
 	b.fields.Hostnames = nil
 	return b
 }
 
 // GetHostnames gets the Hostnames field from the declarative configuration.
-func (b HostAliasBuilder) GetHostnames() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *HostAliasBuilder) GetHostnames() (value []string, ok bool) {
 	if v := b.fields.Hostnames; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *HostAliasBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *HostAliasBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals HostAliasBuilder to JSON.
 func (b *HostAliasBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *HostAliasBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into HostAliasBuilder, replacing the contents of
 // HostAliasBuilder.
 func (b *HostAliasBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *HostAliasBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // HostAliasList represents a list of HostAliasBuilder.
-// Provided as a convenience.
-type HostAliasList []HostAliasBuilder
+type HostAliasList []*HostAliasBuilder
 
 // HostAliasList represents a map of HostAliasBuilder.
-// Provided as a convenience.
 type HostAliasMap map[string]HostAliasBuilder
 
 func (b *HostAliasBuilder) preMarshal() {

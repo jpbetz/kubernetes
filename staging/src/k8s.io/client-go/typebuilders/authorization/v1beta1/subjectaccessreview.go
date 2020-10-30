@@ -28,15 +28,15 @@ import (
 // SubjectAccessReviewBuilder represents an declarative configuration of the SubjectAccessReview type for use
 // with apply.
 type SubjectAccessReviewBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *subjectAccessReviewFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   subjectAccessReviewFields
 }
 
-// subjectAccessReviewFields is used by SubjectAccessReviewBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in SubjectAccessReviewBuilder before marshalling, and
-// are copied out to the builder type in SubjectAccessReviewBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// subjectAccessReviewFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in SubjectAccessReviewBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type subjectAccessReviewFields struct {
 	Kind       *string                           `json:"kind,omitempty"`       // inlined SubjectAccessReviewBuilder.typeMeta.Kind field
 	APIVersion *string                           `json:"apiVersion,omitempty"` // inlined SubjectAccessReviewBuilder.typeMeta.APIVersion field
@@ -45,106 +45,78 @@ type subjectAccessReviewFields struct {
 	Status     *SubjectAccessReviewStatusBuilder `json:"status,omitempty"`
 }
 
-func (b *SubjectAccessReviewBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &subjectAccessReviewFields{}
-	}
-}
-
 // SubjectAccessReview constructs an declarative configuration of the SubjectAccessReview type for use with
 // apply.
-// Provided as a convenience.
-func SubjectAccessReview() SubjectAccessReviewBuilder {
-	return SubjectAccessReviewBuilder{fields: &subjectAccessReviewFields{}}
+func SubjectAccessReview() *SubjectAccessReviewBuilder {
+	return &SubjectAccessReviewBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b SubjectAccessReviewBuilder) SetTypeMeta(value v1.TypeMetaBuilder) SubjectAccessReviewBuilder {
-	b.ensureInitialized()
+func (b *SubjectAccessReviewBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *SubjectAccessReviewBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b SubjectAccessReviewBuilder) RemoveTypeMeta() SubjectAccessReviewBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *SubjectAccessReviewBuilder) RemoveTypeMeta() *SubjectAccessReviewBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b SubjectAccessReviewBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *SubjectAccessReviewBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b SubjectAccessReviewBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) SubjectAccessReviewBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *SubjectAccessReviewBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *SubjectAccessReviewBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b SubjectAccessReviewBuilder) RemoveObjectMeta() SubjectAccessReviewBuilder {
-	b.ensureInitialized()
+func (b *SubjectAccessReviewBuilder) RemoveObjectMeta() *SubjectAccessReviewBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b SubjectAccessReviewBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *SubjectAccessReviewBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b SubjectAccessReviewBuilder) SetSpec(value SubjectAccessReviewSpecBuilder) SubjectAccessReviewBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *SubjectAccessReviewBuilder) SetSpec(value *SubjectAccessReviewSpecBuilder) *SubjectAccessReviewBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b SubjectAccessReviewBuilder) RemoveSpec() SubjectAccessReviewBuilder {
-	b.ensureInitialized()
+func (b *SubjectAccessReviewBuilder) RemoveSpec() *SubjectAccessReviewBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b SubjectAccessReviewBuilder) GetSpec() (value SubjectAccessReviewSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *SubjectAccessReviewBuilder) GetSpec() (value *SubjectAccessReviewSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b SubjectAccessReviewBuilder) SetStatus(value SubjectAccessReviewStatusBuilder) SubjectAccessReviewBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *SubjectAccessReviewBuilder) SetStatus(value *SubjectAccessReviewStatusBuilder) *SubjectAccessReviewBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b SubjectAccessReviewBuilder) RemoveStatus() SubjectAccessReviewBuilder {
-	b.ensureInitialized()
+func (b *SubjectAccessReviewBuilder) RemoveStatus() *SubjectAccessReviewBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b SubjectAccessReviewBuilder) GetStatus() (value SubjectAccessReviewStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *SubjectAccessReviewBuilder) GetStatus() (value *SubjectAccessReviewStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts SubjectAccessReviewBuilder to unstructured.
@@ -152,9 +124,8 @@ func (b *SubjectAccessReviewBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *SubjectAccessReviewBuilder) FromUnstructured(u map[string]interface{}) 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals SubjectAccessReviewBuilder to JSON.
 func (b *SubjectAccessReviewBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *SubjectAccessReviewBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into SubjectAccessReviewBuilder, replacing the contents of
 // SubjectAccessReviewBuilder.
 func (b *SubjectAccessReviewBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +162,25 @@ func (b *SubjectAccessReviewBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // SubjectAccessReviewList represents a list of SubjectAccessReviewBuilder.
-// Provided as a convenience.
-type SubjectAccessReviewList []SubjectAccessReviewBuilder
+type SubjectAccessReviewList []*SubjectAccessReviewBuilder
 
 // SubjectAccessReviewList represents a map of SubjectAccessReviewBuilder.
-// Provided as a convenience.
 type SubjectAccessReviewMap map[string]SubjectAccessReviewBuilder
 
 func (b *SubjectAccessReviewBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *SubjectAccessReviewBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

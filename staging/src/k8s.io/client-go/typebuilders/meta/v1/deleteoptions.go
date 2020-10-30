@@ -28,15 +28,15 @@ import (
 // DeleteOptionsBuilder represents an declarative configuration of the DeleteOptions type for use
 // with apply.
 type DeleteOptionsBuilder struct {
-	typeMeta TypeMetaBuilder // inlined type
-	fields   *deleteOptionsFields
+	typeMeta *TypeMetaBuilder // inlined type
+	fields   deleteOptionsFields
 }
 
-// deleteOptionsFields is used by DeleteOptionsBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in DeleteOptionsBuilder before marshalling, and
-// are copied out to the builder type in DeleteOptionsBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// deleteOptionsFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in DeleteOptionsBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type deleteOptionsFields struct {
 	Kind               *string                     `json:"kind,omitempty"`       // inlined DeleteOptionsBuilder.typeMeta.Kind field
 	APIVersion         *string                     `json:"apiVersion,omitempty"` // inlined DeleteOptionsBuilder.typeMeta.APIVersion field
@@ -47,56 +47,43 @@ type deleteOptionsFields struct {
 	DryRun             *[]string                   `json:"dryRun,omitempty"`
 }
 
-func (b *DeleteOptionsBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &deleteOptionsFields{}
-	}
-}
-
 // DeleteOptions constructs an declarative configuration of the DeleteOptions type for use with
 // apply.
-// Provided as a convenience.
-func DeleteOptions() DeleteOptionsBuilder {
-	return DeleteOptionsBuilder{fields: &deleteOptionsFields{}}
+func DeleteOptions() *DeleteOptionsBuilder {
+	return &DeleteOptionsBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b DeleteOptionsBuilder) SetTypeMeta(value TypeMetaBuilder) DeleteOptionsBuilder {
-	b.ensureInitialized()
+func (b *DeleteOptionsBuilder) SetTypeMeta(value *TypeMetaBuilder) *DeleteOptionsBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b DeleteOptionsBuilder) RemoveTypeMeta() DeleteOptionsBuilder {
-	b.ensureInitialized()
-	b.typeMeta = TypeMetaBuilder{}
+func (b *DeleteOptionsBuilder) RemoveTypeMeta() *DeleteOptionsBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b DeleteOptionsBuilder) GetTypeMeta() (value TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *DeleteOptionsBuilder) GetTypeMeta() (value *TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetGracePeriodSeconds sets the GracePeriodSeconds field in the declarative configuration to the given value.
-func (b DeleteOptionsBuilder) SetGracePeriodSeconds(value int64) DeleteOptionsBuilder {
-	b.ensureInitialized()
+func (b *DeleteOptionsBuilder) SetGracePeriodSeconds(value int64) *DeleteOptionsBuilder {
 	b.fields.GracePeriodSeconds = &value
 	return b
 }
 
 // RemoveGracePeriodSeconds removes the GracePeriodSeconds field from the declarative configuration.
-func (b DeleteOptionsBuilder) RemoveGracePeriodSeconds() DeleteOptionsBuilder {
-	b.ensureInitialized()
+func (b *DeleteOptionsBuilder) RemoveGracePeriodSeconds() *DeleteOptionsBuilder {
 	b.fields.GracePeriodSeconds = nil
 	return b
 }
 
 // GetGracePeriodSeconds gets the GracePeriodSeconds field from the declarative configuration.
-func (b DeleteOptionsBuilder) GetGracePeriodSeconds() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *DeleteOptionsBuilder) GetGracePeriodSeconds() (value int64, ok bool) {
 	if v := b.fields.GracePeriodSeconds; v != nil {
 		return *v, true
 	}
@@ -104,45 +91,36 @@ func (b DeleteOptionsBuilder) GetGracePeriodSeconds() (value int64, ok bool) {
 }
 
 // SetPreconditions sets the Preconditions field in the declarative configuration to the given value.
-func (b DeleteOptionsBuilder) SetPreconditions(value PreconditionsBuilder) DeleteOptionsBuilder {
-	b.ensureInitialized()
-	b.fields.Preconditions = &value
+func (b *DeleteOptionsBuilder) SetPreconditions(value *PreconditionsBuilder) *DeleteOptionsBuilder {
+	b.fields.Preconditions = value
 	return b
 }
 
 // RemovePreconditions removes the Preconditions field from the declarative configuration.
-func (b DeleteOptionsBuilder) RemovePreconditions() DeleteOptionsBuilder {
-	b.ensureInitialized()
+func (b *DeleteOptionsBuilder) RemovePreconditions() *DeleteOptionsBuilder {
 	b.fields.Preconditions = nil
 	return b
 }
 
 // GetPreconditions gets the Preconditions field from the declarative configuration.
-func (b DeleteOptionsBuilder) GetPreconditions() (value PreconditionsBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Preconditions; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *DeleteOptionsBuilder) GetPreconditions() (value *PreconditionsBuilder, ok bool) {
+	return b.fields.Preconditions, b.fields.Preconditions != nil
 }
 
 // SetOrphanDependents sets the OrphanDependents field in the declarative configuration to the given value.
-func (b DeleteOptionsBuilder) SetOrphanDependents(value bool) DeleteOptionsBuilder {
-	b.ensureInitialized()
+func (b *DeleteOptionsBuilder) SetOrphanDependents(value bool) *DeleteOptionsBuilder {
 	b.fields.OrphanDependents = &value
 	return b
 }
 
 // RemoveOrphanDependents removes the OrphanDependents field from the declarative configuration.
-func (b DeleteOptionsBuilder) RemoveOrphanDependents() DeleteOptionsBuilder {
-	b.ensureInitialized()
+func (b *DeleteOptionsBuilder) RemoveOrphanDependents() *DeleteOptionsBuilder {
 	b.fields.OrphanDependents = nil
 	return b
 }
 
 // GetOrphanDependents gets the OrphanDependents field from the declarative configuration.
-func (b DeleteOptionsBuilder) GetOrphanDependents() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *DeleteOptionsBuilder) GetOrphanDependents() (value bool, ok bool) {
 	if v := b.fields.OrphanDependents; v != nil {
 		return *v, true
 	}
@@ -150,22 +128,19 @@ func (b DeleteOptionsBuilder) GetOrphanDependents() (value bool, ok bool) {
 }
 
 // SetPropagationPolicy sets the PropagationPolicy field in the declarative configuration to the given value.
-func (b DeleteOptionsBuilder) SetPropagationPolicy(value metav1.DeletionPropagation) DeleteOptionsBuilder {
-	b.ensureInitialized()
+func (b *DeleteOptionsBuilder) SetPropagationPolicy(value metav1.DeletionPropagation) *DeleteOptionsBuilder {
 	b.fields.PropagationPolicy = &value
 	return b
 }
 
 // RemovePropagationPolicy removes the PropagationPolicy field from the declarative configuration.
-func (b DeleteOptionsBuilder) RemovePropagationPolicy() DeleteOptionsBuilder {
-	b.ensureInitialized()
+func (b *DeleteOptionsBuilder) RemovePropagationPolicy() *DeleteOptionsBuilder {
 	b.fields.PropagationPolicy = nil
 	return b
 }
 
 // GetPropagationPolicy gets the PropagationPolicy field from the declarative configuration.
-func (b DeleteOptionsBuilder) GetPropagationPolicy() (value metav1.DeletionPropagation, ok bool) {
-	b.ensureInitialized()
+func (b *DeleteOptionsBuilder) GetPropagationPolicy() (value metav1.DeletionPropagation, ok bool) {
 	if v := b.fields.PropagationPolicy; v != nil {
 		return *v, true
 	}
@@ -173,22 +148,19 @@ func (b DeleteOptionsBuilder) GetPropagationPolicy() (value metav1.DeletionPropa
 }
 
 // SetDryRun sets the DryRun field in the declarative configuration to the given value.
-func (b DeleteOptionsBuilder) SetDryRun(value []string) DeleteOptionsBuilder {
-	b.ensureInitialized()
+func (b *DeleteOptionsBuilder) SetDryRun(value []string) *DeleteOptionsBuilder {
 	b.fields.DryRun = &value
 	return b
 }
 
 // RemoveDryRun removes the DryRun field from the declarative configuration.
-func (b DeleteOptionsBuilder) RemoveDryRun() DeleteOptionsBuilder {
-	b.ensureInitialized()
+func (b *DeleteOptionsBuilder) RemoveDryRun() *DeleteOptionsBuilder {
 	b.fields.DryRun = nil
 	return b
 }
 
 // GetDryRun gets the DryRun field from the declarative configuration.
-func (b DeleteOptionsBuilder) GetDryRun() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *DeleteOptionsBuilder) GetDryRun() (value []string, ok bool) {
 	if v := b.fields.DryRun; v != nil {
 		return *v, true
 	}
@@ -200,9 +172,8 @@ func (b *DeleteOptionsBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -217,14 +188,13 @@ func (b *DeleteOptionsBuilder) FromUnstructured(u map[string]interface{}) error 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals DeleteOptionsBuilder to JSON.
 func (b *DeleteOptionsBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -232,8 +202,7 @@ func (b *DeleteOptionsBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into DeleteOptionsBuilder, replacing the contents of
 // DeleteOptionsBuilder.
 func (b *DeleteOptionsBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -241,22 +210,25 @@ func (b *DeleteOptionsBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // DeleteOptionsList represents a list of DeleteOptionsBuilder.
-// Provided as a convenience.
-type DeleteOptionsList []DeleteOptionsBuilder
+type DeleteOptionsList []*DeleteOptionsBuilder
 
 // DeleteOptionsList represents a map of DeleteOptionsBuilder.
-// Provided as a convenience.
 type DeleteOptionsMap map[string]DeleteOptionsBuilder
 
 func (b *DeleteOptionsBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *DeleteOptionsBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

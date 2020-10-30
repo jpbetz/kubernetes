@@ -27,14 +27,14 @@ import (
 // ReplicationControllerSpecBuilder represents an declarative configuration of the ReplicationControllerSpec type for use
 // with apply.
 type ReplicationControllerSpecBuilder struct {
-	fields *replicationControllerSpecFields
+	fields replicationControllerSpecFields
 }
 
-// replicationControllerSpecFields is used by ReplicationControllerSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ReplicationControllerSpecBuilder before marshalling, and
-// are copied out to the builder type in ReplicationControllerSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// replicationControllerSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ReplicationControllerSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type replicationControllerSpecFields struct {
 	Replicas        *int32                  `json:"replicas,omitempty"`
 	MinReadySeconds *int32                  `json:"minReadySeconds,omitempty"`
@@ -42,36 +42,26 @@ type replicationControllerSpecFields struct {
 	Template        *PodTemplateSpecBuilder `json:"template,omitempty"`
 }
 
-func (b *ReplicationControllerSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &replicationControllerSpecFields{}
-	}
-}
-
 // ReplicationControllerSpec constructs an declarative configuration of the ReplicationControllerSpec type for use with
 // apply.
-// Provided as a convenience.
-func ReplicationControllerSpec() ReplicationControllerSpecBuilder {
-	return ReplicationControllerSpecBuilder{fields: &replicationControllerSpecFields{}}
+func ReplicationControllerSpec() *ReplicationControllerSpecBuilder {
+	return &ReplicationControllerSpecBuilder{}
 }
 
 // SetReplicas sets the Replicas field in the declarative configuration to the given value.
-func (b ReplicationControllerSpecBuilder) SetReplicas(value int32) ReplicationControllerSpecBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerSpecBuilder) SetReplicas(value int32) *ReplicationControllerSpecBuilder {
 	b.fields.Replicas = &value
 	return b
 }
 
 // RemoveReplicas removes the Replicas field from the declarative configuration.
-func (b ReplicationControllerSpecBuilder) RemoveReplicas() ReplicationControllerSpecBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerSpecBuilder) RemoveReplicas() *ReplicationControllerSpecBuilder {
 	b.fields.Replicas = nil
 	return b
 }
 
 // GetReplicas gets the Replicas field from the declarative configuration.
-func (b ReplicationControllerSpecBuilder) GetReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicationControllerSpecBuilder) GetReplicas() (value int32, ok bool) {
 	if v := b.fields.Replicas; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b ReplicationControllerSpecBuilder) GetReplicas() (value int32, ok bool) {
 }
 
 // SetMinReadySeconds sets the MinReadySeconds field in the declarative configuration to the given value.
-func (b ReplicationControllerSpecBuilder) SetMinReadySeconds(value int32) ReplicationControllerSpecBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerSpecBuilder) SetMinReadySeconds(value int32) *ReplicationControllerSpecBuilder {
 	b.fields.MinReadySeconds = &value
 	return b
 }
 
 // RemoveMinReadySeconds removes the MinReadySeconds field from the declarative configuration.
-func (b ReplicationControllerSpecBuilder) RemoveMinReadySeconds() ReplicationControllerSpecBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerSpecBuilder) RemoveMinReadySeconds() *ReplicationControllerSpecBuilder {
 	b.fields.MinReadySeconds = nil
 	return b
 }
 
 // GetMinReadySeconds gets the MinReadySeconds field from the declarative configuration.
-func (b ReplicationControllerSpecBuilder) GetMinReadySeconds() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicationControllerSpecBuilder) GetMinReadySeconds() (value int32, ok bool) {
 	if v := b.fields.MinReadySeconds; v != nil {
 		return *v, true
 	}
@@ -102,22 +89,19 @@ func (b ReplicationControllerSpecBuilder) GetMinReadySeconds() (value int32, ok 
 }
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
-func (b ReplicationControllerSpecBuilder) SetSelector(value map[string]string) ReplicationControllerSpecBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerSpecBuilder) SetSelector(value map[string]string) *ReplicationControllerSpecBuilder {
 	b.fields.Selector = &value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
-func (b ReplicationControllerSpecBuilder) RemoveSelector() ReplicationControllerSpecBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerSpecBuilder) RemoveSelector() *ReplicationControllerSpecBuilder {
 	b.fields.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
-func (b ReplicationControllerSpecBuilder) GetSelector() (value map[string]string, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicationControllerSpecBuilder) GetSelector() (value map[string]string, ok bool) {
 	if v := b.fields.Selector; v != nil {
 		return *v, true
 	}
@@ -125,26 +109,20 @@ func (b ReplicationControllerSpecBuilder) GetSelector() (value map[string]string
 }
 
 // SetTemplate sets the Template field in the declarative configuration to the given value.
-func (b ReplicationControllerSpecBuilder) SetTemplate(value PodTemplateSpecBuilder) ReplicationControllerSpecBuilder {
-	b.ensureInitialized()
-	b.fields.Template = &value
+func (b *ReplicationControllerSpecBuilder) SetTemplate(value *PodTemplateSpecBuilder) *ReplicationControllerSpecBuilder {
+	b.fields.Template = value
 	return b
 }
 
 // RemoveTemplate removes the Template field from the declarative configuration.
-func (b ReplicationControllerSpecBuilder) RemoveTemplate() ReplicationControllerSpecBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerSpecBuilder) RemoveTemplate() *ReplicationControllerSpecBuilder {
 	b.fields.Template = nil
 	return b
 }
 
 // GetTemplate gets the Template field from the declarative configuration.
-func (b ReplicationControllerSpecBuilder) GetTemplate() (value PodTemplateSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Template; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ReplicationControllerSpecBuilder) GetTemplate() (value *PodTemplateSpecBuilder, ok bool) {
+	return b.fields.Template, b.fields.Template != nil
 }
 
 // ToUnstructured converts ReplicationControllerSpecBuilder to unstructured.
@@ -152,9 +130,8 @@ func (b *ReplicationControllerSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +146,13 @@ func (b *ReplicationControllerSpecBuilder) FromUnstructured(u map[string]interfa
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ReplicationControllerSpecBuilder to JSON.
 func (b *ReplicationControllerSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +160,7 @@ func (b *ReplicationControllerSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ReplicationControllerSpecBuilder, replacing the contents of
 // ReplicationControllerSpecBuilder.
 func (b *ReplicationControllerSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,11 +168,9 @@ func (b *ReplicationControllerSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ReplicationControllerSpecList represents a list of ReplicationControllerSpecBuilder.
-// Provided as a convenience.
-type ReplicationControllerSpecList []ReplicationControllerSpecBuilder
+type ReplicationControllerSpecList []*ReplicationControllerSpecBuilder
 
 // ReplicationControllerSpecList represents a map of ReplicationControllerSpecBuilder.
-// Provided as a convenience.
 type ReplicationControllerSpecMap map[string]ReplicationControllerSpecBuilder
 
 func (b *ReplicationControllerSpecBuilder) preMarshal() {

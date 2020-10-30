@@ -27,14 +27,14 @@ import (
 // SubjectBuilder represents an declarative configuration of the Subject type for use
 // with apply.
 type SubjectBuilder struct {
-	fields *subjectFields
+	fields subjectFields
 }
 
-// subjectFields is used by SubjectBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in SubjectBuilder before marshalling, and
-// are copied out to the builder type in SubjectBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// subjectFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in SubjectBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type subjectFields struct {
 	Kind       *string `json:"kind,omitempty"`
 	APIVersion *string `json:"apiVersion,omitempty"`
@@ -42,36 +42,26 @@ type subjectFields struct {
 	Namespace  *string `json:"namespace,omitempty"`
 }
 
-func (b *SubjectBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &subjectFields{}
-	}
-}
-
 // Subject constructs an declarative configuration of the Subject type for use with
 // apply.
-// Provided as a convenience.
-func Subject() SubjectBuilder {
-	return SubjectBuilder{fields: &subjectFields{}}
+func Subject() *SubjectBuilder {
+	return &SubjectBuilder{}
 }
 
 // SetKind sets the Kind field in the declarative configuration to the given value.
-func (b SubjectBuilder) SetKind(value string) SubjectBuilder {
-	b.ensureInitialized()
+func (b *SubjectBuilder) SetKind(value string) *SubjectBuilder {
 	b.fields.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
-func (b SubjectBuilder) RemoveKind() SubjectBuilder {
-	b.ensureInitialized()
+func (b *SubjectBuilder) RemoveKind() *SubjectBuilder {
 	b.fields.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
-func (b SubjectBuilder) GetKind() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *SubjectBuilder) GetKind() (value string, ok bool) {
 	if v := b.fields.Kind; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b SubjectBuilder) GetKind() (value string, ok bool) {
 }
 
 // SetAPIVersion sets the APIVersion field in the declarative configuration to the given value.
-func (b SubjectBuilder) SetAPIVersion(value string) SubjectBuilder {
-	b.ensureInitialized()
+func (b *SubjectBuilder) SetAPIVersion(value string) *SubjectBuilder {
 	b.fields.APIVersion = &value
 	return b
 }
 
 // RemoveAPIVersion removes the APIVersion field from the declarative configuration.
-func (b SubjectBuilder) RemoveAPIVersion() SubjectBuilder {
-	b.ensureInitialized()
+func (b *SubjectBuilder) RemoveAPIVersion() *SubjectBuilder {
 	b.fields.APIVersion = nil
 	return b
 }
 
 // GetAPIVersion gets the APIVersion field from the declarative configuration.
-func (b SubjectBuilder) GetAPIVersion() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *SubjectBuilder) GetAPIVersion() (value string, ok bool) {
 	if v := b.fields.APIVersion; v != nil {
 		return *v, true
 	}
@@ -102,22 +89,19 @@ func (b SubjectBuilder) GetAPIVersion() (value string, ok bool) {
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b SubjectBuilder) SetName(value string) SubjectBuilder {
-	b.ensureInitialized()
+func (b *SubjectBuilder) SetName(value string) *SubjectBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b SubjectBuilder) RemoveName() SubjectBuilder {
-	b.ensureInitialized()
+func (b *SubjectBuilder) RemoveName() *SubjectBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b SubjectBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *SubjectBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -125,22 +109,19 @@ func (b SubjectBuilder) GetName() (value string, ok bool) {
 }
 
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
-func (b SubjectBuilder) SetNamespace(value string) SubjectBuilder {
-	b.ensureInitialized()
+func (b *SubjectBuilder) SetNamespace(value string) *SubjectBuilder {
 	b.fields.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
-func (b SubjectBuilder) RemoveNamespace() SubjectBuilder {
-	b.ensureInitialized()
+func (b *SubjectBuilder) RemoveNamespace() *SubjectBuilder {
 	b.fields.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
-func (b SubjectBuilder) GetNamespace() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *SubjectBuilder) GetNamespace() (value string, ok bool) {
 	if v := b.fields.Namespace; v != nil {
 		return *v, true
 	}
@@ -152,9 +133,8 @@ func (b *SubjectBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +149,13 @@ func (b *SubjectBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals SubjectBuilder to JSON.
 func (b *SubjectBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +163,7 @@ func (b *SubjectBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into SubjectBuilder, replacing the contents of
 // SubjectBuilder.
 func (b *SubjectBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,11 +171,9 @@ func (b *SubjectBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // SubjectList represents a list of SubjectBuilder.
-// Provided as a convenience.
-type SubjectList []SubjectBuilder
+type SubjectList []*SubjectBuilder
 
 // SubjectList represents a map of SubjectBuilder.
-// Provided as a convenience.
 type SubjectMap map[string]SubjectBuilder
 
 func (b *SubjectBuilder) preMarshal() {

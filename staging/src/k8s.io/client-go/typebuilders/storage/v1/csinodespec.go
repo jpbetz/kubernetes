@@ -27,48 +27,38 @@ import (
 // CSINodeSpecBuilder represents an declarative configuration of the CSINodeSpec type for use
 // with apply.
 type CSINodeSpecBuilder struct {
-	fields *cSINodeSpecFields
+	fields cSINodeSpecFields
 }
 
-// cSINodeSpecFields is used by CSINodeSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in CSINodeSpecBuilder before marshalling, and
-// are copied out to the builder type in CSINodeSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// cSINodeSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in CSINodeSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type cSINodeSpecFields struct {
 	Drivers *CSINodeDriverList `json:"drivers,omitempty"`
 }
 
-func (b *CSINodeSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &cSINodeSpecFields{}
-	}
-}
-
 // CSINodeSpec constructs an declarative configuration of the CSINodeSpec type for use with
 // apply.
-// Provided as a convenience.
-func CSINodeSpec() CSINodeSpecBuilder {
-	return CSINodeSpecBuilder{fields: &cSINodeSpecFields{}}
+func CSINodeSpec() *CSINodeSpecBuilder {
+	return &CSINodeSpecBuilder{}
 }
 
 // SetDrivers sets the Drivers field in the declarative configuration to the given value.
-func (b CSINodeSpecBuilder) SetDrivers(value CSINodeDriverList) CSINodeSpecBuilder {
-	b.ensureInitialized()
+func (b *CSINodeSpecBuilder) SetDrivers(value CSINodeDriverList) *CSINodeSpecBuilder {
 	b.fields.Drivers = &value
 	return b
 }
 
 // RemoveDrivers removes the Drivers field from the declarative configuration.
-func (b CSINodeSpecBuilder) RemoveDrivers() CSINodeSpecBuilder {
-	b.ensureInitialized()
+func (b *CSINodeSpecBuilder) RemoveDrivers() *CSINodeSpecBuilder {
 	b.fields.Drivers = nil
 	return b
 }
 
 // GetDrivers gets the Drivers field from the declarative configuration.
-func (b CSINodeSpecBuilder) GetDrivers() (value CSINodeDriverList, ok bool) {
-	b.ensureInitialized()
+func (b *CSINodeSpecBuilder) GetDrivers() (value CSINodeDriverList, ok bool) {
 	if v := b.fields.Drivers; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *CSINodeSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *CSINodeSpecBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals CSINodeSpecBuilder to JSON.
 func (b *CSINodeSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *CSINodeSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into CSINodeSpecBuilder, replacing the contents of
 // CSINodeSpecBuilder.
 func (b *CSINodeSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *CSINodeSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // CSINodeSpecList represents a list of CSINodeSpecBuilder.
-// Provided as a convenience.
-type CSINodeSpecList []CSINodeSpecBuilder
+type CSINodeSpecList []*CSINodeSpecBuilder
 
 // CSINodeSpecList represents a map of CSINodeSpecBuilder.
-// Provided as a convenience.
 type CSINodeSpecMap map[string]CSINodeSpecBuilder
 
 func (b *CSINodeSpecBuilder) preMarshal() {

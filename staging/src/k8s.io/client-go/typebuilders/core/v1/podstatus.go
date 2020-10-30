@@ -29,14 +29,14 @@ import (
 // PodStatusBuilder represents an declarative configuration of the PodStatus type for use
 // with apply.
 type PodStatusBuilder struct {
-	fields *podStatusFields
+	fields podStatusFields
 }
 
-// podStatusFields is used by PodStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PodStatusBuilder before marshalling, and
-// are copied out to the builder type in PodStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// podStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PodStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type podStatusFields struct {
 	Phase                      *v1.PodPhase         `json:"phase,omitempty"`
 	Conditions                 *PodConditionList    `json:"conditions,omitempty"`
@@ -53,36 +53,26 @@ type podStatusFields struct {
 	EphemeralContainerStatuses *ContainerStatusList `json:"ephemeralContainerStatuses,omitempty"`
 }
 
-func (b *PodStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &podStatusFields{}
-	}
-}
-
 // PodStatus constructs an declarative configuration of the PodStatus type for use with
 // apply.
-// Provided as a convenience.
-func PodStatus() PodStatusBuilder {
-	return PodStatusBuilder{fields: &podStatusFields{}}
+func PodStatus() *PodStatusBuilder {
+	return &PodStatusBuilder{}
 }
 
 // SetPhase sets the Phase field in the declarative configuration to the given value.
-func (b PodStatusBuilder) SetPhase(value v1.PodPhase) PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) SetPhase(value v1.PodPhase) *PodStatusBuilder {
 	b.fields.Phase = &value
 	return b
 }
 
 // RemovePhase removes the Phase field from the declarative configuration.
-func (b PodStatusBuilder) RemovePhase() PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) RemovePhase() *PodStatusBuilder {
 	b.fields.Phase = nil
 	return b
 }
 
 // GetPhase gets the Phase field from the declarative configuration.
-func (b PodStatusBuilder) GetPhase() (value v1.PodPhase, ok bool) {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) GetPhase() (value v1.PodPhase, ok bool) {
 	if v := b.fields.Phase; v != nil {
 		return *v, true
 	}
@@ -90,22 +80,19 @@ func (b PodStatusBuilder) GetPhase() (value v1.PodPhase, ok bool) {
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b PodStatusBuilder) SetConditions(value PodConditionList) PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) SetConditions(value PodConditionList) *PodStatusBuilder {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b PodStatusBuilder) RemoveConditions() PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) RemoveConditions() *PodStatusBuilder {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b PodStatusBuilder) GetConditions() (value PodConditionList, ok bool) {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) GetConditions() (value PodConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
@@ -113,22 +100,19 @@ func (b PodStatusBuilder) GetConditions() (value PodConditionList, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b PodStatusBuilder) SetMessage(value string) PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) SetMessage(value string) *PodStatusBuilder {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b PodStatusBuilder) RemoveMessage() PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) RemoveMessage() *PodStatusBuilder {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b PodStatusBuilder) GetMessage() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
@@ -136,22 +120,19 @@ func (b PodStatusBuilder) GetMessage() (value string, ok bool) {
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b PodStatusBuilder) SetReason(value string) PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) SetReason(value string) *PodStatusBuilder {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b PodStatusBuilder) RemoveReason() PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) RemoveReason() *PodStatusBuilder {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b PodStatusBuilder) GetReason() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -159,22 +140,19 @@ func (b PodStatusBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetNominatedNodeName sets the NominatedNodeName field in the declarative configuration to the given value.
-func (b PodStatusBuilder) SetNominatedNodeName(value string) PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) SetNominatedNodeName(value string) *PodStatusBuilder {
 	b.fields.NominatedNodeName = &value
 	return b
 }
 
 // RemoveNominatedNodeName removes the NominatedNodeName field from the declarative configuration.
-func (b PodStatusBuilder) RemoveNominatedNodeName() PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) RemoveNominatedNodeName() *PodStatusBuilder {
 	b.fields.NominatedNodeName = nil
 	return b
 }
 
 // GetNominatedNodeName gets the NominatedNodeName field from the declarative configuration.
-func (b PodStatusBuilder) GetNominatedNodeName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) GetNominatedNodeName() (value string, ok bool) {
 	if v := b.fields.NominatedNodeName; v != nil {
 		return *v, true
 	}
@@ -182,22 +160,19 @@ func (b PodStatusBuilder) GetNominatedNodeName() (value string, ok bool) {
 }
 
 // SetHostIP sets the HostIP field in the declarative configuration to the given value.
-func (b PodStatusBuilder) SetHostIP(value string) PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) SetHostIP(value string) *PodStatusBuilder {
 	b.fields.HostIP = &value
 	return b
 }
 
 // RemoveHostIP removes the HostIP field from the declarative configuration.
-func (b PodStatusBuilder) RemoveHostIP() PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) RemoveHostIP() *PodStatusBuilder {
 	b.fields.HostIP = nil
 	return b
 }
 
 // GetHostIP gets the HostIP field from the declarative configuration.
-func (b PodStatusBuilder) GetHostIP() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) GetHostIP() (value string, ok bool) {
 	if v := b.fields.HostIP; v != nil {
 		return *v, true
 	}
@@ -205,22 +180,19 @@ func (b PodStatusBuilder) GetHostIP() (value string, ok bool) {
 }
 
 // SetPodIP sets the PodIP field in the declarative configuration to the given value.
-func (b PodStatusBuilder) SetPodIP(value string) PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) SetPodIP(value string) *PodStatusBuilder {
 	b.fields.PodIP = &value
 	return b
 }
 
 // RemovePodIP removes the PodIP field from the declarative configuration.
-func (b PodStatusBuilder) RemovePodIP() PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) RemovePodIP() *PodStatusBuilder {
 	b.fields.PodIP = nil
 	return b
 }
 
 // GetPodIP gets the PodIP field from the declarative configuration.
-func (b PodStatusBuilder) GetPodIP() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) GetPodIP() (value string, ok bool) {
 	if v := b.fields.PodIP; v != nil {
 		return *v, true
 	}
@@ -228,22 +200,19 @@ func (b PodStatusBuilder) GetPodIP() (value string, ok bool) {
 }
 
 // SetPodIPs sets the PodIPs field in the declarative configuration to the given value.
-func (b PodStatusBuilder) SetPodIPs(value PodIPList) PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) SetPodIPs(value PodIPList) *PodStatusBuilder {
 	b.fields.PodIPs = &value
 	return b
 }
 
 // RemovePodIPs removes the PodIPs field from the declarative configuration.
-func (b PodStatusBuilder) RemovePodIPs() PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) RemovePodIPs() *PodStatusBuilder {
 	b.fields.PodIPs = nil
 	return b
 }
 
 // GetPodIPs gets the PodIPs field from the declarative configuration.
-func (b PodStatusBuilder) GetPodIPs() (value PodIPList, ok bool) {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) GetPodIPs() (value PodIPList, ok bool) {
 	if v := b.fields.PodIPs; v != nil {
 		return *v, true
 	}
@@ -251,22 +220,19 @@ func (b PodStatusBuilder) GetPodIPs() (value PodIPList, ok bool) {
 }
 
 // SetStartTime sets the StartTime field in the declarative configuration to the given value.
-func (b PodStatusBuilder) SetStartTime(value metav1.Time) PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) SetStartTime(value metav1.Time) *PodStatusBuilder {
 	b.fields.StartTime = &value
 	return b
 }
 
 // RemoveStartTime removes the StartTime field from the declarative configuration.
-func (b PodStatusBuilder) RemoveStartTime() PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) RemoveStartTime() *PodStatusBuilder {
 	b.fields.StartTime = nil
 	return b
 }
 
 // GetStartTime gets the StartTime field from the declarative configuration.
-func (b PodStatusBuilder) GetStartTime() (value metav1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) GetStartTime() (value metav1.Time, ok bool) {
 	if v := b.fields.StartTime; v != nil {
 		return *v, true
 	}
@@ -274,22 +240,19 @@ func (b PodStatusBuilder) GetStartTime() (value metav1.Time, ok bool) {
 }
 
 // SetInitContainerStatuses sets the InitContainerStatuses field in the declarative configuration to the given value.
-func (b PodStatusBuilder) SetInitContainerStatuses(value ContainerStatusList) PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) SetInitContainerStatuses(value ContainerStatusList) *PodStatusBuilder {
 	b.fields.InitContainerStatuses = &value
 	return b
 }
 
 // RemoveInitContainerStatuses removes the InitContainerStatuses field from the declarative configuration.
-func (b PodStatusBuilder) RemoveInitContainerStatuses() PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) RemoveInitContainerStatuses() *PodStatusBuilder {
 	b.fields.InitContainerStatuses = nil
 	return b
 }
 
 // GetInitContainerStatuses gets the InitContainerStatuses field from the declarative configuration.
-func (b PodStatusBuilder) GetInitContainerStatuses() (value ContainerStatusList, ok bool) {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) GetInitContainerStatuses() (value ContainerStatusList, ok bool) {
 	if v := b.fields.InitContainerStatuses; v != nil {
 		return *v, true
 	}
@@ -297,22 +260,19 @@ func (b PodStatusBuilder) GetInitContainerStatuses() (value ContainerStatusList,
 }
 
 // SetContainerStatuses sets the ContainerStatuses field in the declarative configuration to the given value.
-func (b PodStatusBuilder) SetContainerStatuses(value ContainerStatusList) PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) SetContainerStatuses(value ContainerStatusList) *PodStatusBuilder {
 	b.fields.ContainerStatuses = &value
 	return b
 }
 
 // RemoveContainerStatuses removes the ContainerStatuses field from the declarative configuration.
-func (b PodStatusBuilder) RemoveContainerStatuses() PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) RemoveContainerStatuses() *PodStatusBuilder {
 	b.fields.ContainerStatuses = nil
 	return b
 }
 
 // GetContainerStatuses gets the ContainerStatuses field from the declarative configuration.
-func (b PodStatusBuilder) GetContainerStatuses() (value ContainerStatusList, ok bool) {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) GetContainerStatuses() (value ContainerStatusList, ok bool) {
 	if v := b.fields.ContainerStatuses; v != nil {
 		return *v, true
 	}
@@ -320,22 +280,19 @@ func (b PodStatusBuilder) GetContainerStatuses() (value ContainerStatusList, ok 
 }
 
 // SetQOSClass sets the QOSClass field in the declarative configuration to the given value.
-func (b PodStatusBuilder) SetQOSClass(value v1.PodQOSClass) PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) SetQOSClass(value v1.PodQOSClass) *PodStatusBuilder {
 	b.fields.QOSClass = &value
 	return b
 }
 
 // RemoveQOSClass removes the QOSClass field from the declarative configuration.
-func (b PodStatusBuilder) RemoveQOSClass() PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) RemoveQOSClass() *PodStatusBuilder {
 	b.fields.QOSClass = nil
 	return b
 }
 
 // GetQOSClass gets the QOSClass field from the declarative configuration.
-func (b PodStatusBuilder) GetQOSClass() (value v1.PodQOSClass, ok bool) {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) GetQOSClass() (value v1.PodQOSClass, ok bool) {
 	if v := b.fields.QOSClass; v != nil {
 		return *v, true
 	}
@@ -343,22 +300,19 @@ func (b PodStatusBuilder) GetQOSClass() (value v1.PodQOSClass, ok bool) {
 }
 
 // SetEphemeralContainerStatuses sets the EphemeralContainerStatuses field in the declarative configuration to the given value.
-func (b PodStatusBuilder) SetEphemeralContainerStatuses(value ContainerStatusList) PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) SetEphemeralContainerStatuses(value ContainerStatusList) *PodStatusBuilder {
 	b.fields.EphemeralContainerStatuses = &value
 	return b
 }
 
 // RemoveEphemeralContainerStatuses removes the EphemeralContainerStatuses field from the declarative configuration.
-func (b PodStatusBuilder) RemoveEphemeralContainerStatuses() PodStatusBuilder {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) RemoveEphemeralContainerStatuses() *PodStatusBuilder {
 	b.fields.EphemeralContainerStatuses = nil
 	return b
 }
 
 // GetEphemeralContainerStatuses gets the EphemeralContainerStatuses field from the declarative configuration.
-func (b PodStatusBuilder) GetEphemeralContainerStatuses() (value ContainerStatusList, ok bool) {
-	b.ensureInitialized()
+func (b *PodStatusBuilder) GetEphemeralContainerStatuses() (value ContainerStatusList, ok bool) {
 	if v := b.fields.EphemeralContainerStatuses; v != nil {
 		return *v, true
 	}
@@ -370,9 +324,8 @@ func (b *PodStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -387,14 +340,13 @@ func (b *PodStatusBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PodStatusBuilder to JSON.
 func (b *PodStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -402,8 +354,7 @@ func (b *PodStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PodStatusBuilder, replacing the contents of
 // PodStatusBuilder.
 func (b *PodStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -411,11 +362,9 @@ func (b *PodStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PodStatusList represents a list of PodStatusBuilder.
-// Provided as a convenience.
-type PodStatusList []PodStatusBuilder
+type PodStatusList []*PodStatusBuilder
 
 // PodStatusList represents a map of PodStatusBuilder.
-// Provided as a convenience.
 type PodStatusMap map[string]PodStatusBuilder
 
 func (b *PodStatusBuilder) preMarshal() {

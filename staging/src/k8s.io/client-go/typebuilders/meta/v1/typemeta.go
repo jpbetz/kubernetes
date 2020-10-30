@@ -27,49 +27,39 @@ import (
 // TypeMetaBuilder represents an declarative configuration of the TypeMeta type for use
 // with apply.
 type TypeMetaBuilder struct {
-	fields *typeMetaFields
+	fields typeMetaFields
 }
 
-// typeMetaFields is used by TypeMetaBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in TypeMetaBuilder before marshalling, and
-// are copied out to the builder type in TypeMetaBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// typeMetaFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in TypeMetaBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type typeMetaFields struct {
 	Kind       *string `json:"kind,omitempty"`
 	APIVersion *string `json:"apiVersion,omitempty"`
 }
 
-func (b *TypeMetaBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &typeMetaFields{}
-	}
-}
-
 // TypeMeta constructs an declarative configuration of the TypeMeta type for use with
 // apply.
-// Provided as a convenience.
-func TypeMeta() TypeMetaBuilder {
-	return TypeMetaBuilder{fields: &typeMetaFields{}}
+func TypeMeta() *TypeMetaBuilder {
+	return &TypeMetaBuilder{}
 }
 
 // SetKind sets the Kind field in the declarative configuration to the given value.
-func (b TypeMetaBuilder) SetKind(value string) TypeMetaBuilder {
-	b.ensureInitialized()
+func (b *TypeMetaBuilder) SetKind(value string) *TypeMetaBuilder {
 	b.fields.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
-func (b TypeMetaBuilder) RemoveKind() TypeMetaBuilder {
-	b.ensureInitialized()
+func (b *TypeMetaBuilder) RemoveKind() *TypeMetaBuilder {
 	b.fields.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
-func (b TypeMetaBuilder) GetKind() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *TypeMetaBuilder) GetKind() (value string, ok bool) {
 	if v := b.fields.Kind; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b TypeMetaBuilder) GetKind() (value string, ok bool) {
 }
 
 // SetAPIVersion sets the APIVersion field in the declarative configuration to the given value.
-func (b TypeMetaBuilder) SetAPIVersion(value string) TypeMetaBuilder {
-	b.ensureInitialized()
+func (b *TypeMetaBuilder) SetAPIVersion(value string) *TypeMetaBuilder {
 	b.fields.APIVersion = &value
 	return b
 }
 
 // RemoveAPIVersion removes the APIVersion field from the declarative configuration.
-func (b TypeMetaBuilder) RemoveAPIVersion() TypeMetaBuilder {
-	b.ensureInitialized()
+func (b *TypeMetaBuilder) RemoveAPIVersion() *TypeMetaBuilder {
 	b.fields.APIVersion = nil
 	return b
 }
 
 // GetAPIVersion gets the APIVersion field from the declarative configuration.
-func (b TypeMetaBuilder) GetAPIVersion() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *TypeMetaBuilder) GetAPIVersion() (value string, ok bool) {
 	if v := b.fields.APIVersion; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *TypeMetaBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *TypeMetaBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals TypeMetaBuilder to JSON.
 func (b *TypeMetaBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *TypeMetaBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into TypeMetaBuilder, replacing the contents of
 // TypeMetaBuilder.
 func (b *TypeMetaBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *TypeMetaBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // TypeMetaList represents a list of TypeMetaBuilder.
-// Provided as a convenience.
-type TypeMetaList []TypeMetaBuilder
+type TypeMetaList []*TypeMetaBuilder
 
 // TypeMetaList represents a map of TypeMetaBuilder.
-// Provided as a convenience.
 type TypeMetaMap map[string]TypeMetaBuilder
 
 func (b *TypeMetaBuilder) preMarshal() {

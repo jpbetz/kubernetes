@@ -28,49 +28,39 @@ import (
 // IngressClassSpecBuilder represents an declarative configuration of the IngressClassSpec type for use
 // with apply.
 type IngressClassSpecBuilder struct {
-	fields *ingressClassSpecFields
+	fields ingressClassSpecFields
 }
 
-// ingressClassSpecFields is used by IngressClassSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in IngressClassSpecBuilder before marshalling, and
-// are copied out to the builder type in IngressClassSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// ingressClassSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in IngressClassSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type ingressClassSpecFields struct {
 	Controller *string                              `json:"controller,omitempty"`
 	Parameters *v1.TypedLocalObjectReferenceBuilder `json:"parameters,omitempty"`
 }
 
-func (b *IngressClassSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &ingressClassSpecFields{}
-	}
-}
-
 // IngressClassSpec constructs an declarative configuration of the IngressClassSpec type for use with
 // apply.
-// Provided as a convenience.
-func IngressClassSpec() IngressClassSpecBuilder {
-	return IngressClassSpecBuilder{fields: &ingressClassSpecFields{}}
+func IngressClassSpec() *IngressClassSpecBuilder {
+	return &IngressClassSpecBuilder{}
 }
 
 // SetController sets the Controller field in the declarative configuration to the given value.
-func (b IngressClassSpecBuilder) SetController(value string) IngressClassSpecBuilder {
-	b.ensureInitialized()
+func (b *IngressClassSpecBuilder) SetController(value string) *IngressClassSpecBuilder {
 	b.fields.Controller = &value
 	return b
 }
 
 // RemoveController removes the Controller field from the declarative configuration.
-func (b IngressClassSpecBuilder) RemoveController() IngressClassSpecBuilder {
-	b.ensureInitialized()
+func (b *IngressClassSpecBuilder) RemoveController() *IngressClassSpecBuilder {
 	b.fields.Controller = nil
 	return b
 }
 
 // GetController gets the Controller field from the declarative configuration.
-func (b IngressClassSpecBuilder) GetController() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *IngressClassSpecBuilder) GetController() (value string, ok bool) {
 	if v := b.fields.Controller; v != nil {
 		return *v, true
 	}
@@ -78,26 +68,20 @@ func (b IngressClassSpecBuilder) GetController() (value string, ok bool) {
 }
 
 // SetParameters sets the Parameters field in the declarative configuration to the given value.
-func (b IngressClassSpecBuilder) SetParameters(value v1.TypedLocalObjectReferenceBuilder) IngressClassSpecBuilder {
-	b.ensureInitialized()
-	b.fields.Parameters = &value
+func (b *IngressClassSpecBuilder) SetParameters(value *v1.TypedLocalObjectReferenceBuilder) *IngressClassSpecBuilder {
+	b.fields.Parameters = value
 	return b
 }
 
 // RemoveParameters removes the Parameters field from the declarative configuration.
-func (b IngressClassSpecBuilder) RemoveParameters() IngressClassSpecBuilder {
-	b.ensureInitialized()
+func (b *IngressClassSpecBuilder) RemoveParameters() *IngressClassSpecBuilder {
 	b.fields.Parameters = nil
 	return b
 }
 
 // GetParameters gets the Parameters field from the declarative configuration.
-func (b IngressClassSpecBuilder) GetParameters() (value v1.TypedLocalObjectReferenceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Parameters; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *IngressClassSpecBuilder) GetParameters() (value *v1.TypedLocalObjectReferenceBuilder, ok bool) {
+	return b.fields.Parameters, b.fields.Parameters != nil
 }
 
 // ToUnstructured converts IngressClassSpecBuilder to unstructured.
@@ -105,9 +89,8 @@ func (b *IngressClassSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +105,13 @@ func (b *IngressClassSpecBuilder) FromUnstructured(u map[string]interface{}) err
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals IngressClassSpecBuilder to JSON.
 func (b *IngressClassSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +119,7 @@ func (b *IngressClassSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into IngressClassSpecBuilder, replacing the contents of
 // IngressClassSpecBuilder.
 func (b *IngressClassSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +127,9 @@ func (b *IngressClassSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // IngressClassSpecList represents a list of IngressClassSpecBuilder.
-// Provided as a convenience.
-type IngressClassSpecList []IngressClassSpecBuilder
+type IngressClassSpecList []*IngressClassSpecBuilder
 
 // IngressClassSpecList represents a map of IngressClassSpecBuilder.
-// Provided as a convenience.
 type IngressClassSpecMap map[string]IngressClassSpecBuilder
 
 func (b *IngressClassSpecBuilder) preMarshal() {

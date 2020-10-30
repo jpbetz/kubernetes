@@ -28,15 +28,15 @@ import (
 // ResourceQuotaBuilder represents an declarative configuration of the ResourceQuota type for use
 // with apply.
 type ResourceQuotaBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *resourceQuotaFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   resourceQuotaFields
 }
 
-// resourceQuotaFields is used by ResourceQuotaBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ResourceQuotaBuilder before marshalling, and
-// are copied out to the builder type in ResourceQuotaBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// resourceQuotaFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ResourceQuotaBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type resourceQuotaFields struct {
 	Kind       *string                     `json:"kind,omitempty"`       // inlined ResourceQuotaBuilder.typeMeta.Kind field
 	APIVersion *string                     `json:"apiVersion,omitempty"` // inlined ResourceQuotaBuilder.typeMeta.APIVersion field
@@ -45,106 +45,78 @@ type resourceQuotaFields struct {
 	Status     *ResourceQuotaStatusBuilder `json:"status,omitempty"`
 }
 
-func (b *ResourceQuotaBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &resourceQuotaFields{}
-	}
-}
-
 // ResourceQuota constructs an declarative configuration of the ResourceQuota type for use with
 // apply.
-// Provided as a convenience.
-func ResourceQuota() ResourceQuotaBuilder {
-	return ResourceQuotaBuilder{fields: &resourceQuotaFields{}}
+func ResourceQuota() *ResourceQuotaBuilder {
+	return &ResourceQuotaBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b ResourceQuotaBuilder) SetTypeMeta(value v1.TypeMetaBuilder) ResourceQuotaBuilder {
-	b.ensureInitialized()
+func (b *ResourceQuotaBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *ResourceQuotaBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b ResourceQuotaBuilder) RemoveTypeMeta() ResourceQuotaBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *ResourceQuotaBuilder) RemoveTypeMeta() *ResourceQuotaBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b ResourceQuotaBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *ResourceQuotaBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b ResourceQuotaBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) ResourceQuotaBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *ResourceQuotaBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *ResourceQuotaBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b ResourceQuotaBuilder) RemoveObjectMeta() ResourceQuotaBuilder {
-	b.ensureInitialized()
+func (b *ResourceQuotaBuilder) RemoveObjectMeta() *ResourceQuotaBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b ResourceQuotaBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ResourceQuotaBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b ResourceQuotaBuilder) SetSpec(value ResourceQuotaSpecBuilder) ResourceQuotaBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *ResourceQuotaBuilder) SetSpec(value *ResourceQuotaSpecBuilder) *ResourceQuotaBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b ResourceQuotaBuilder) RemoveSpec() ResourceQuotaBuilder {
-	b.ensureInitialized()
+func (b *ResourceQuotaBuilder) RemoveSpec() *ResourceQuotaBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b ResourceQuotaBuilder) GetSpec() (value ResourceQuotaSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ResourceQuotaBuilder) GetSpec() (value *ResourceQuotaSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b ResourceQuotaBuilder) SetStatus(value ResourceQuotaStatusBuilder) ResourceQuotaBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *ResourceQuotaBuilder) SetStatus(value *ResourceQuotaStatusBuilder) *ResourceQuotaBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b ResourceQuotaBuilder) RemoveStatus() ResourceQuotaBuilder {
-	b.ensureInitialized()
+func (b *ResourceQuotaBuilder) RemoveStatus() *ResourceQuotaBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b ResourceQuotaBuilder) GetStatus() (value ResourceQuotaStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ResourceQuotaBuilder) GetStatus() (value *ResourceQuotaStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts ResourceQuotaBuilder to unstructured.
@@ -152,9 +124,8 @@ func (b *ResourceQuotaBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *ResourceQuotaBuilder) FromUnstructured(u map[string]interface{}) error 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ResourceQuotaBuilder to JSON.
 func (b *ResourceQuotaBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *ResourceQuotaBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ResourceQuotaBuilder, replacing the contents of
 // ResourceQuotaBuilder.
 func (b *ResourceQuotaBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +162,25 @@ func (b *ResourceQuotaBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ResourceQuotaList represents a list of ResourceQuotaBuilder.
-// Provided as a convenience.
-type ResourceQuotaList []ResourceQuotaBuilder
+type ResourceQuotaList []*ResourceQuotaBuilder
 
 // ResourceQuotaList represents a map of ResourceQuotaBuilder.
-// Provided as a convenience.
 type ResourceQuotaMap map[string]ResourceQuotaBuilder
 
 func (b *ResourceQuotaBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *ResourceQuotaBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

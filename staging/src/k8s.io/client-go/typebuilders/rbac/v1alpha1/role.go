@@ -28,15 +28,15 @@ import (
 // RoleBuilder represents an declarative configuration of the Role type for use
 // with apply.
 type RoleBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *roleFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   roleFields
 }
 
-// roleFields is used by RoleBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in RoleBuilder before marshalling, and
-// are copied out to the builder type in RoleBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// roleFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in RoleBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type roleFields struct {
 	Kind       *string               `json:"kind,omitempty"`       // inlined RoleBuilder.typeMeta.Kind field
 	APIVersion *string               `json:"apiVersion,omitempty"` // inlined RoleBuilder.typeMeta.APIVersion field
@@ -44,79 +44,60 @@ type roleFields struct {
 	Rules      *PolicyRuleList       `json:"rules,omitempty"`
 }
 
-func (b *RoleBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &roleFields{}
-	}
-}
-
 // Role constructs an declarative configuration of the Role type for use with
 // apply.
-// Provided as a convenience.
-func Role() RoleBuilder {
-	return RoleBuilder{fields: &roleFields{}}
+func Role() *RoleBuilder {
+	return &RoleBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b RoleBuilder) SetTypeMeta(value v1.TypeMetaBuilder) RoleBuilder {
-	b.ensureInitialized()
+func (b *RoleBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *RoleBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b RoleBuilder) RemoveTypeMeta() RoleBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *RoleBuilder) RemoveTypeMeta() *RoleBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b RoleBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *RoleBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b RoleBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) RoleBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *RoleBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *RoleBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b RoleBuilder) RemoveObjectMeta() RoleBuilder {
-	b.ensureInitialized()
+func (b *RoleBuilder) RemoveObjectMeta() *RoleBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b RoleBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *RoleBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetRules sets the Rules field in the declarative configuration to the given value.
-func (b RoleBuilder) SetRules(value PolicyRuleList) RoleBuilder {
-	b.ensureInitialized()
+func (b *RoleBuilder) SetRules(value PolicyRuleList) *RoleBuilder {
 	b.fields.Rules = &value
 	return b
 }
 
 // RemoveRules removes the Rules field from the declarative configuration.
-func (b RoleBuilder) RemoveRules() RoleBuilder {
-	b.ensureInitialized()
+func (b *RoleBuilder) RemoveRules() *RoleBuilder {
 	b.fields.Rules = nil
 	return b
 }
 
 // GetRules gets the Rules field from the declarative configuration.
-func (b RoleBuilder) GetRules() (value PolicyRuleList, ok bool) {
-	b.ensureInitialized()
+func (b *RoleBuilder) GetRules() (value PolicyRuleList, ok bool) {
 	if v := b.fields.Rules; v != nil {
 		return *v, true
 	}
@@ -128,9 +109,8 @@ func (b *RoleBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +125,13 @@ func (b *RoleBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals RoleBuilder to JSON.
 func (b *RoleBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +139,7 @@ func (b *RoleBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into RoleBuilder, replacing the contents of
 // RoleBuilder.
 func (b *RoleBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,22 +147,25 @@ func (b *RoleBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // RoleList represents a list of RoleBuilder.
-// Provided as a convenience.
-type RoleList []RoleBuilder
+type RoleList []*RoleBuilder
 
 // RoleList represents a map of RoleBuilder.
-// Provided as a convenience.
 type RoleMap map[string]RoleBuilder
 
 func (b *RoleBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *RoleBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

@@ -27,14 +27,14 @@ import (
 // FlexVolumeSourceBuilder represents an declarative configuration of the FlexVolumeSource type for use
 // with apply.
 type FlexVolumeSourceBuilder struct {
-	fields *flexVolumeSourceFields
+	fields flexVolumeSourceFields
 }
 
-// flexVolumeSourceFields is used by FlexVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in FlexVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in FlexVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// flexVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in FlexVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type flexVolumeSourceFields struct {
 	Driver    *string                      `json:"driver,omitempty"`
 	FSType    *string                      `json:"fsType,omitempty"`
@@ -43,36 +43,26 @@ type flexVolumeSourceFields struct {
 	Options   *map[string]string           `json:"options,omitempty"`
 }
 
-func (b *FlexVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &flexVolumeSourceFields{}
-	}
-}
-
 // FlexVolumeSource constructs an declarative configuration of the FlexVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func FlexVolumeSource() FlexVolumeSourceBuilder {
-	return FlexVolumeSourceBuilder{fields: &flexVolumeSourceFields{}}
+func FlexVolumeSource() *FlexVolumeSourceBuilder {
+	return &FlexVolumeSourceBuilder{}
 }
 
 // SetDriver sets the Driver field in the declarative configuration to the given value.
-func (b FlexVolumeSourceBuilder) SetDriver(value string) FlexVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FlexVolumeSourceBuilder) SetDriver(value string) *FlexVolumeSourceBuilder {
 	b.fields.Driver = &value
 	return b
 }
 
 // RemoveDriver removes the Driver field from the declarative configuration.
-func (b FlexVolumeSourceBuilder) RemoveDriver() FlexVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FlexVolumeSourceBuilder) RemoveDriver() *FlexVolumeSourceBuilder {
 	b.fields.Driver = nil
 	return b
 }
 
 // GetDriver gets the Driver field from the declarative configuration.
-func (b FlexVolumeSourceBuilder) GetDriver() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *FlexVolumeSourceBuilder) GetDriver() (value string, ok bool) {
 	if v := b.fields.Driver; v != nil {
 		return *v, true
 	}
@@ -80,22 +70,19 @@ func (b FlexVolumeSourceBuilder) GetDriver() (value string, ok bool) {
 }
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
-func (b FlexVolumeSourceBuilder) SetFSType(value string) FlexVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FlexVolumeSourceBuilder) SetFSType(value string) *FlexVolumeSourceBuilder {
 	b.fields.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
-func (b FlexVolumeSourceBuilder) RemoveFSType() FlexVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FlexVolumeSourceBuilder) RemoveFSType() *FlexVolumeSourceBuilder {
 	b.fields.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
-func (b FlexVolumeSourceBuilder) GetFSType() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *FlexVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 	if v := b.fields.FSType; v != nil {
 		return *v, true
 	}
@@ -103,45 +90,36 @@ func (b FlexVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 }
 
 // SetSecretRef sets the SecretRef field in the declarative configuration to the given value.
-func (b FlexVolumeSourceBuilder) SetSecretRef(value LocalObjectReferenceBuilder) FlexVolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.SecretRef = &value
+func (b *FlexVolumeSourceBuilder) SetSecretRef(value *LocalObjectReferenceBuilder) *FlexVolumeSourceBuilder {
+	b.fields.SecretRef = value
 	return b
 }
 
 // RemoveSecretRef removes the SecretRef field from the declarative configuration.
-func (b FlexVolumeSourceBuilder) RemoveSecretRef() FlexVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FlexVolumeSourceBuilder) RemoveSecretRef() *FlexVolumeSourceBuilder {
 	b.fields.SecretRef = nil
 	return b
 }
 
 // GetSecretRef gets the SecretRef field from the declarative configuration.
-func (b FlexVolumeSourceBuilder) GetSecretRef() (value LocalObjectReferenceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.SecretRef; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *FlexVolumeSourceBuilder) GetSecretRef() (value *LocalObjectReferenceBuilder, ok bool) {
+	return b.fields.SecretRef, b.fields.SecretRef != nil
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b FlexVolumeSourceBuilder) SetReadOnly(value bool) FlexVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FlexVolumeSourceBuilder) SetReadOnly(value bool) *FlexVolumeSourceBuilder {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b FlexVolumeSourceBuilder) RemoveReadOnly() FlexVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FlexVolumeSourceBuilder) RemoveReadOnly() *FlexVolumeSourceBuilder {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b FlexVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *FlexVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
@@ -149,22 +127,19 @@ func (b FlexVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
 }
 
 // SetOptions sets the Options field in the declarative configuration to the given value.
-func (b FlexVolumeSourceBuilder) SetOptions(value map[string]string) FlexVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FlexVolumeSourceBuilder) SetOptions(value map[string]string) *FlexVolumeSourceBuilder {
 	b.fields.Options = &value
 	return b
 }
 
 // RemoveOptions removes the Options field from the declarative configuration.
-func (b FlexVolumeSourceBuilder) RemoveOptions() FlexVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FlexVolumeSourceBuilder) RemoveOptions() *FlexVolumeSourceBuilder {
 	b.fields.Options = nil
 	return b
 }
 
 // GetOptions gets the Options field from the declarative configuration.
-func (b FlexVolumeSourceBuilder) GetOptions() (value map[string]string, ok bool) {
-	b.ensureInitialized()
+func (b *FlexVolumeSourceBuilder) GetOptions() (value map[string]string, ok bool) {
 	if v := b.fields.Options; v != nil {
 		return *v, true
 	}
@@ -176,9 +151,8 @@ func (b *FlexVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -193,14 +167,13 @@ func (b *FlexVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) err
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals FlexVolumeSourceBuilder to JSON.
 func (b *FlexVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -208,8 +181,7 @@ func (b *FlexVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into FlexVolumeSourceBuilder, replacing the contents of
 // FlexVolumeSourceBuilder.
 func (b *FlexVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -217,11 +189,9 @@ func (b *FlexVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // FlexVolumeSourceList represents a list of FlexVolumeSourceBuilder.
-// Provided as a convenience.
-type FlexVolumeSourceList []FlexVolumeSourceBuilder
+type FlexVolumeSourceList []*FlexVolumeSourceBuilder
 
 // FlexVolumeSourceList represents a map of FlexVolumeSourceBuilder.
-// Provided as a convenience.
 type FlexVolumeSourceMap map[string]FlexVolumeSourceBuilder
 
 func (b *FlexVolumeSourceBuilder) preMarshal() {

@@ -30,14 +30,14 @@ import (
 // StatefulSetConditionBuilder represents an declarative configuration of the StatefulSetCondition type for use
 // with apply.
 type StatefulSetConditionBuilder struct {
-	fields *statefulSetConditionFields
+	fields statefulSetConditionFields
 }
 
-// statefulSetConditionFields is used by StatefulSetConditionBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in StatefulSetConditionBuilder before marshalling, and
-// are copied out to the builder type in StatefulSetConditionBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// statefulSetConditionFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in StatefulSetConditionBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type statefulSetConditionFields struct {
 	Type               *v1beta1.StatefulSetConditionType `json:"type,omitempty"`
 	Status             *v1.ConditionStatus               `json:"status,omitempty"`
@@ -46,36 +46,26 @@ type statefulSetConditionFields struct {
 	Message            *string                           `json:"message,omitempty"`
 }
 
-func (b *StatefulSetConditionBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &statefulSetConditionFields{}
-	}
-}
-
 // StatefulSetCondition constructs an declarative configuration of the StatefulSetCondition type for use with
 // apply.
-// Provided as a convenience.
-func StatefulSetCondition() StatefulSetConditionBuilder {
-	return StatefulSetConditionBuilder{fields: &statefulSetConditionFields{}}
+func StatefulSetCondition() *StatefulSetConditionBuilder {
+	return &StatefulSetConditionBuilder{}
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b StatefulSetConditionBuilder) SetType(value v1beta1.StatefulSetConditionType) StatefulSetConditionBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetConditionBuilder) SetType(value v1beta1.StatefulSetConditionType) *StatefulSetConditionBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b StatefulSetConditionBuilder) RemoveType() StatefulSetConditionBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetConditionBuilder) RemoveType() *StatefulSetConditionBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b StatefulSetConditionBuilder) GetType() (value v1beta1.StatefulSetConditionType, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetConditionBuilder) GetType() (value v1beta1.StatefulSetConditionType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -83,22 +73,19 @@ func (b StatefulSetConditionBuilder) GetType() (value v1beta1.StatefulSetConditi
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b StatefulSetConditionBuilder) SetStatus(value v1.ConditionStatus) StatefulSetConditionBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetConditionBuilder) SetStatus(value v1.ConditionStatus) *StatefulSetConditionBuilder {
 	b.fields.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b StatefulSetConditionBuilder) RemoveStatus() StatefulSetConditionBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetConditionBuilder) RemoveStatus() *StatefulSetConditionBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b StatefulSetConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
 	if v := b.fields.Status; v != nil {
 		return *v, true
 	}
@@ -106,22 +93,19 @@ func (b StatefulSetConditionBuilder) GetStatus() (value v1.ConditionStatus, ok b
 }
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
-func (b StatefulSetConditionBuilder) SetLastTransitionTime(value metav1.Time) StatefulSetConditionBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetConditionBuilder) SetLastTransitionTime(value metav1.Time) *StatefulSetConditionBuilder {
 	b.fields.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
-func (b StatefulSetConditionBuilder) RemoveLastTransitionTime() StatefulSetConditionBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetConditionBuilder) RemoveLastTransitionTime() *StatefulSetConditionBuilder {
 	b.fields.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
-func (b StatefulSetConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastTransitionTime; v != nil {
 		return *v, true
 	}
@@ -129,22 +113,19 @@ func (b StatefulSetConditionBuilder) GetLastTransitionTime() (value metav1.Time,
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b StatefulSetConditionBuilder) SetReason(value string) StatefulSetConditionBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetConditionBuilder) SetReason(value string) *StatefulSetConditionBuilder {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b StatefulSetConditionBuilder) RemoveReason() StatefulSetConditionBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetConditionBuilder) RemoveReason() *StatefulSetConditionBuilder {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b StatefulSetConditionBuilder) GetReason() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetConditionBuilder) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -152,22 +133,19 @@ func (b StatefulSetConditionBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b StatefulSetConditionBuilder) SetMessage(value string) StatefulSetConditionBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetConditionBuilder) SetMessage(value string) *StatefulSetConditionBuilder {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b StatefulSetConditionBuilder) RemoveMessage() StatefulSetConditionBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetConditionBuilder) RemoveMessage() *StatefulSetConditionBuilder {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b StatefulSetConditionBuilder) GetMessage() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetConditionBuilder) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
@@ -179,9 +157,8 @@ func (b *StatefulSetConditionBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -196,14 +173,13 @@ func (b *StatefulSetConditionBuilder) FromUnstructured(u map[string]interface{})
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals StatefulSetConditionBuilder to JSON.
 func (b *StatefulSetConditionBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -211,8 +187,7 @@ func (b *StatefulSetConditionBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into StatefulSetConditionBuilder, replacing the contents of
 // StatefulSetConditionBuilder.
 func (b *StatefulSetConditionBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -220,11 +195,9 @@ func (b *StatefulSetConditionBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // StatefulSetConditionList represents a list of StatefulSetConditionBuilder.
-// Provided as a convenience.
-type StatefulSetConditionList []StatefulSetConditionBuilder
+type StatefulSetConditionList []*StatefulSetConditionBuilder
 
 // StatefulSetConditionList represents a map of StatefulSetConditionBuilder.
-// Provided as a convenience.
 type StatefulSetConditionMap map[string]StatefulSetConditionBuilder
 
 func (b *StatefulSetConditionBuilder) preMarshal() {

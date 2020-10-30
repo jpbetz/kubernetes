@@ -28,14 +28,14 @@ import (
 // AzureDiskVolumeSourceBuilder represents an declarative configuration of the AzureDiskVolumeSource type for use
 // with apply.
 type AzureDiskVolumeSourceBuilder struct {
-	fields *azureDiskVolumeSourceFields
+	fields azureDiskVolumeSourceFields
 }
 
-// azureDiskVolumeSourceFields is used by AzureDiskVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in AzureDiskVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in AzureDiskVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// azureDiskVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in AzureDiskVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type azureDiskVolumeSourceFields struct {
 	DiskName    *string                      `json:"diskName,omitempty"`
 	DataDiskURI *string                      `json:"diskURI,omitempty"`
@@ -45,36 +45,26 @@ type azureDiskVolumeSourceFields struct {
 	Kind        *v1.AzureDataDiskKind        `json:"kind,omitempty"`
 }
 
-func (b *AzureDiskVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &azureDiskVolumeSourceFields{}
-	}
-}
-
 // AzureDiskVolumeSource constructs an declarative configuration of the AzureDiskVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func AzureDiskVolumeSource() AzureDiskVolumeSourceBuilder {
-	return AzureDiskVolumeSourceBuilder{fields: &azureDiskVolumeSourceFields{}}
+func AzureDiskVolumeSource() *AzureDiskVolumeSourceBuilder {
+	return &AzureDiskVolumeSourceBuilder{}
 }
 
 // SetDiskName sets the DiskName field in the declarative configuration to the given value.
-func (b AzureDiskVolumeSourceBuilder) SetDiskName(value string) AzureDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *AzureDiskVolumeSourceBuilder) SetDiskName(value string) *AzureDiskVolumeSourceBuilder {
 	b.fields.DiskName = &value
 	return b
 }
 
 // RemoveDiskName removes the DiskName field from the declarative configuration.
-func (b AzureDiskVolumeSourceBuilder) RemoveDiskName() AzureDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *AzureDiskVolumeSourceBuilder) RemoveDiskName() *AzureDiskVolumeSourceBuilder {
 	b.fields.DiskName = nil
 	return b
 }
 
 // GetDiskName gets the DiskName field from the declarative configuration.
-func (b AzureDiskVolumeSourceBuilder) GetDiskName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *AzureDiskVolumeSourceBuilder) GetDiskName() (value string, ok bool) {
 	if v := b.fields.DiskName; v != nil {
 		return *v, true
 	}
@@ -82,22 +72,19 @@ func (b AzureDiskVolumeSourceBuilder) GetDiskName() (value string, ok bool) {
 }
 
 // SetDataDiskURI sets the DataDiskURI field in the declarative configuration to the given value.
-func (b AzureDiskVolumeSourceBuilder) SetDataDiskURI(value string) AzureDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *AzureDiskVolumeSourceBuilder) SetDataDiskURI(value string) *AzureDiskVolumeSourceBuilder {
 	b.fields.DataDiskURI = &value
 	return b
 }
 
 // RemoveDataDiskURI removes the DataDiskURI field from the declarative configuration.
-func (b AzureDiskVolumeSourceBuilder) RemoveDataDiskURI() AzureDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *AzureDiskVolumeSourceBuilder) RemoveDataDiskURI() *AzureDiskVolumeSourceBuilder {
 	b.fields.DataDiskURI = nil
 	return b
 }
 
 // GetDataDiskURI gets the DataDiskURI field from the declarative configuration.
-func (b AzureDiskVolumeSourceBuilder) GetDataDiskURI() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *AzureDiskVolumeSourceBuilder) GetDataDiskURI() (value string, ok bool) {
 	if v := b.fields.DataDiskURI; v != nil {
 		return *v, true
 	}
@@ -105,22 +92,19 @@ func (b AzureDiskVolumeSourceBuilder) GetDataDiskURI() (value string, ok bool) {
 }
 
 // SetCachingMode sets the CachingMode field in the declarative configuration to the given value.
-func (b AzureDiskVolumeSourceBuilder) SetCachingMode(value v1.AzureDataDiskCachingMode) AzureDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *AzureDiskVolumeSourceBuilder) SetCachingMode(value v1.AzureDataDiskCachingMode) *AzureDiskVolumeSourceBuilder {
 	b.fields.CachingMode = &value
 	return b
 }
 
 // RemoveCachingMode removes the CachingMode field from the declarative configuration.
-func (b AzureDiskVolumeSourceBuilder) RemoveCachingMode() AzureDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *AzureDiskVolumeSourceBuilder) RemoveCachingMode() *AzureDiskVolumeSourceBuilder {
 	b.fields.CachingMode = nil
 	return b
 }
 
 // GetCachingMode gets the CachingMode field from the declarative configuration.
-func (b AzureDiskVolumeSourceBuilder) GetCachingMode() (value v1.AzureDataDiskCachingMode, ok bool) {
-	b.ensureInitialized()
+func (b *AzureDiskVolumeSourceBuilder) GetCachingMode() (value v1.AzureDataDiskCachingMode, ok bool) {
 	if v := b.fields.CachingMode; v != nil {
 		return *v, true
 	}
@@ -128,22 +112,19 @@ func (b AzureDiskVolumeSourceBuilder) GetCachingMode() (value v1.AzureDataDiskCa
 }
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
-func (b AzureDiskVolumeSourceBuilder) SetFSType(value string) AzureDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *AzureDiskVolumeSourceBuilder) SetFSType(value string) *AzureDiskVolumeSourceBuilder {
 	b.fields.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
-func (b AzureDiskVolumeSourceBuilder) RemoveFSType() AzureDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *AzureDiskVolumeSourceBuilder) RemoveFSType() *AzureDiskVolumeSourceBuilder {
 	b.fields.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
-func (b AzureDiskVolumeSourceBuilder) GetFSType() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *AzureDiskVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 	if v := b.fields.FSType; v != nil {
 		return *v, true
 	}
@@ -151,22 +132,19 @@ func (b AzureDiskVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b AzureDiskVolumeSourceBuilder) SetReadOnly(value bool) AzureDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *AzureDiskVolumeSourceBuilder) SetReadOnly(value bool) *AzureDiskVolumeSourceBuilder {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b AzureDiskVolumeSourceBuilder) RemoveReadOnly() AzureDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *AzureDiskVolumeSourceBuilder) RemoveReadOnly() *AzureDiskVolumeSourceBuilder {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b AzureDiskVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *AzureDiskVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
@@ -174,22 +152,19 @@ func (b AzureDiskVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
 }
 
 // SetKind sets the Kind field in the declarative configuration to the given value.
-func (b AzureDiskVolumeSourceBuilder) SetKind(value v1.AzureDataDiskKind) AzureDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *AzureDiskVolumeSourceBuilder) SetKind(value v1.AzureDataDiskKind) *AzureDiskVolumeSourceBuilder {
 	b.fields.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
-func (b AzureDiskVolumeSourceBuilder) RemoveKind() AzureDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *AzureDiskVolumeSourceBuilder) RemoveKind() *AzureDiskVolumeSourceBuilder {
 	b.fields.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
-func (b AzureDiskVolumeSourceBuilder) GetKind() (value v1.AzureDataDiskKind, ok bool) {
-	b.ensureInitialized()
+func (b *AzureDiskVolumeSourceBuilder) GetKind() (value v1.AzureDataDiskKind, ok bool) {
 	if v := b.fields.Kind; v != nil {
 		return *v, true
 	}
@@ -201,9 +176,8 @@ func (b *AzureDiskVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -218,14 +192,13 @@ func (b *AzureDiskVolumeSourceBuilder) FromUnstructured(u map[string]interface{}
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals AzureDiskVolumeSourceBuilder to JSON.
 func (b *AzureDiskVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -233,8 +206,7 @@ func (b *AzureDiskVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into AzureDiskVolumeSourceBuilder, replacing the contents of
 // AzureDiskVolumeSourceBuilder.
 func (b *AzureDiskVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -242,11 +214,9 @@ func (b *AzureDiskVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // AzureDiskVolumeSourceList represents a list of AzureDiskVolumeSourceBuilder.
-// Provided as a convenience.
-type AzureDiskVolumeSourceList []AzureDiskVolumeSourceBuilder
+type AzureDiskVolumeSourceList []*AzureDiskVolumeSourceBuilder
 
 // AzureDiskVolumeSourceList represents a map of AzureDiskVolumeSourceBuilder.
-// Provided as a convenience.
 type AzureDiskVolumeSourceMap map[string]AzureDiskVolumeSourceBuilder
 
 func (b *AzureDiskVolumeSourceBuilder) preMarshal() {

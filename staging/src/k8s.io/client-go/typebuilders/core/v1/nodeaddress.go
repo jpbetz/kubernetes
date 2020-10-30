@@ -28,49 +28,39 @@ import (
 // NodeAddressBuilder represents an declarative configuration of the NodeAddress type for use
 // with apply.
 type NodeAddressBuilder struct {
-	fields *nodeAddressFields
+	fields nodeAddressFields
 }
 
-// nodeAddressFields is used by NodeAddressBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in NodeAddressBuilder before marshalling, and
-// are copied out to the builder type in NodeAddressBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// nodeAddressFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in NodeAddressBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type nodeAddressFields struct {
 	Type    *v1.NodeAddressType `json:"type,omitempty"`
 	Address *string             `json:"address,omitempty"`
 }
 
-func (b *NodeAddressBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &nodeAddressFields{}
-	}
-}
-
 // NodeAddress constructs an declarative configuration of the NodeAddress type for use with
 // apply.
-// Provided as a convenience.
-func NodeAddress() NodeAddressBuilder {
-	return NodeAddressBuilder{fields: &nodeAddressFields{}}
+func NodeAddress() *NodeAddressBuilder {
+	return &NodeAddressBuilder{}
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b NodeAddressBuilder) SetType(value v1.NodeAddressType) NodeAddressBuilder {
-	b.ensureInitialized()
+func (b *NodeAddressBuilder) SetType(value v1.NodeAddressType) *NodeAddressBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b NodeAddressBuilder) RemoveType() NodeAddressBuilder {
-	b.ensureInitialized()
+func (b *NodeAddressBuilder) RemoveType() *NodeAddressBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b NodeAddressBuilder) GetType() (value v1.NodeAddressType, ok bool) {
-	b.ensureInitialized()
+func (b *NodeAddressBuilder) GetType() (value v1.NodeAddressType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b NodeAddressBuilder) GetType() (value v1.NodeAddressType, ok bool) {
 }
 
 // SetAddress sets the Address field in the declarative configuration to the given value.
-func (b NodeAddressBuilder) SetAddress(value string) NodeAddressBuilder {
-	b.ensureInitialized()
+func (b *NodeAddressBuilder) SetAddress(value string) *NodeAddressBuilder {
 	b.fields.Address = &value
 	return b
 }
 
 // RemoveAddress removes the Address field from the declarative configuration.
-func (b NodeAddressBuilder) RemoveAddress() NodeAddressBuilder {
-	b.ensureInitialized()
+func (b *NodeAddressBuilder) RemoveAddress() *NodeAddressBuilder {
 	b.fields.Address = nil
 	return b
 }
 
 // GetAddress gets the Address field from the declarative configuration.
-func (b NodeAddressBuilder) GetAddress() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *NodeAddressBuilder) GetAddress() (value string, ok bool) {
 	if v := b.fields.Address; v != nil {
 		return *v, true
 	}
@@ -105,9 +92,8 @@ func (b *NodeAddressBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +108,13 @@ func (b *NodeAddressBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals NodeAddressBuilder to JSON.
 func (b *NodeAddressBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +122,7 @@ func (b *NodeAddressBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into NodeAddressBuilder, replacing the contents of
 // NodeAddressBuilder.
 func (b *NodeAddressBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +130,9 @@ func (b *NodeAddressBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // NodeAddressList represents a list of NodeAddressBuilder.
-// Provided as a convenience.
-type NodeAddressList []NodeAddressBuilder
+type NodeAddressList []*NodeAddressBuilder
 
 // NodeAddressList represents a map of NodeAddressBuilder.
-// Provided as a convenience.
 type NodeAddressMap map[string]NodeAddressBuilder
 
 func (b *NodeAddressBuilder) preMarshal() {

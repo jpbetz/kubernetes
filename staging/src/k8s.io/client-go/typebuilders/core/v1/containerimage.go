@@ -27,49 +27,39 @@ import (
 // ContainerImageBuilder represents an declarative configuration of the ContainerImage type for use
 // with apply.
 type ContainerImageBuilder struct {
-	fields *containerImageFields
+	fields containerImageFields
 }
 
-// containerImageFields is used by ContainerImageBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ContainerImageBuilder before marshalling, and
-// are copied out to the builder type in ContainerImageBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// containerImageFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ContainerImageBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type containerImageFields struct {
 	Names     *[]string `json:"names,omitempty"`
 	SizeBytes *int64    `json:"sizeBytes,omitempty"`
 }
 
-func (b *ContainerImageBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &containerImageFields{}
-	}
-}
-
 // ContainerImage constructs an declarative configuration of the ContainerImage type for use with
 // apply.
-// Provided as a convenience.
-func ContainerImage() ContainerImageBuilder {
-	return ContainerImageBuilder{fields: &containerImageFields{}}
+func ContainerImage() *ContainerImageBuilder {
+	return &ContainerImageBuilder{}
 }
 
 // SetNames sets the Names field in the declarative configuration to the given value.
-func (b ContainerImageBuilder) SetNames(value []string) ContainerImageBuilder {
-	b.ensureInitialized()
+func (b *ContainerImageBuilder) SetNames(value []string) *ContainerImageBuilder {
 	b.fields.Names = &value
 	return b
 }
 
 // RemoveNames removes the Names field from the declarative configuration.
-func (b ContainerImageBuilder) RemoveNames() ContainerImageBuilder {
-	b.ensureInitialized()
+func (b *ContainerImageBuilder) RemoveNames() *ContainerImageBuilder {
 	b.fields.Names = nil
 	return b
 }
 
 // GetNames gets the Names field from the declarative configuration.
-func (b ContainerImageBuilder) GetNames() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerImageBuilder) GetNames() (value []string, ok bool) {
 	if v := b.fields.Names; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b ContainerImageBuilder) GetNames() (value []string, ok bool) {
 }
 
 // SetSizeBytes sets the SizeBytes field in the declarative configuration to the given value.
-func (b ContainerImageBuilder) SetSizeBytes(value int64) ContainerImageBuilder {
-	b.ensureInitialized()
+func (b *ContainerImageBuilder) SetSizeBytes(value int64) *ContainerImageBuilder {
 	b.fields.SizeBytes = &value
 	return b
 }
 
 // RemoveSizeBytes removes the SizeBytes field from the declarative configuration.
-func (b ContainerImageBuilder) RemoveSizeBytes() ContainerImageBuilder {
-	b.ensureInitialized()
+func (b *ContainerImageBuilder) RemoveSizeBytes() *ContainerImageBuilder {
 	b.fields.SizeBytes = nil
 	return b
 }
 
 // GetSizeBytes gets the SizeBytes field from the declarative configuration.
-func (b ContainerImageBuilder) GetSizeBytes() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerImageBuilder) GetSizeBytes() (value int64, ok bool) {
 	if v := b.fields.SizeBytes; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *ContainerImageBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *ContainerImageBuilder) FromUnstructured(u map[string]interface{}) error
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ContainerImageBuilder to JSON.
 func (b *ContainerImageBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *ContainerImageBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ContainerImageBuilder, replacing the contents of
 // ContainerImageBuilder.
 func (b *ContainerImageBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *ContainerImageBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ContainerImageList represents a list of ContainerImageBuilder.
-// Provided as a convenience.
-type ContainerImageList []ContainerImageBuilder
+type ContainerImageList []*ContainerImageBuilder
 
 // ContainerImageList represents a map of ContainerImageBuilder.
-// Provided as a convenience.
 type ContainerImageMap map[string]ContainerImageBuilder
 
 func (b *ContainerImageBuilder) preMarshal() {

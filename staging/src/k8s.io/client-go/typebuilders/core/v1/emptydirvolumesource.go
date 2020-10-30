@@ -29,49 +29,39 @@ import (
 // EmptyDirVolumeSourceBuilder represents an declarative configuration of the EmptyDirVolumeSource type for use
 // with apply.
 type EmptyDirVolumeSourceBuilder struct {
-	fields *emptyDirVolumeSourceFields
+	fields emptyDirVolumeSourceFields
 }
 
-// emptyDirVolumeSourceFields is used by EmptyDirVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in EmptyDirVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in EmptyDirVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// emptyDirVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in EmptyDirVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type emptyDirVolumeSourceFields struct {
 	Medium    *v1.StorageMedium  `json:"medium,omitempty"`
 	SizeLimit *resource.Quantity `json:"sizeLimit,omitempty"`
 }
 
-func (b *EmptyDirVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &emptyDirVolumeSourceFields{}
-	}
-}
-
 // EmptyDirVolumeSource constructs an declarative configuration of the EmptyDirVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func EmptyDirVolumeSource() EmptyDirVolumeSourceBuilder {
-	return EmptyDirVolumeSourceBuilder{fields: &emptyDirVolumeSourceFields{}}
+func EmptyDirVolumeSource() *EmptyDirVolumeSourceBuilder {
+	return &EmptyDirVolumeSourceBuilder{}
 }
 
 // SetMedium sets the Medium field in the declarative configuration to the given value.
-func (b EmptyDirVolumeSourceBuilder) SetMedium(value v1.StorageMedium) EmptyDirVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *EmptyDirVolumeSourceBuilder) SetMedium(value v1.StorageMedium) *EmptyDirVolumeSourceBuilder {
 	b.fields.Medium = &value
 	return b
 }
 
 // RemoveMedium removes the Medium field from the declarative configuration.
-func (b EmptyDirVolumeSourceBuilder) RemoveMedium() EmptyDirVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *EmptyDirVolumeSourceBuilder) RemoveMedium() *EmptyDirVolumeSourceBuilder {
 	b.fields.Medium = nil
 	return b
 }
 
 // GetMedium gets the Medium field from the declarative configuration.
-func (b EmptyDirVolumeSourceBuilder) GetMedium() (value v1.StorageMedium, ok bool) {
-	b.ensureInitialized()
+func (b *EmptyDirVolumeSourceBuilder) GetMedium() (value v1.StorageMedium, ok bool) {
 	if v := b.fields.Medium; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b EmptyDirVolumeSourceBuilder) GetMedium() (value v1.StorageMedium, ok boo
 }
 
 // SetSizeLimit sets the SizeLimit field in the declarative configuration to the given value.
-func (b EmptyDirVolumeSourceBuilder) SetSizeLimit(value resource.Quantity) EmptyDirVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *EmptyDirVolumeSourceBuilder) SetSizeLimit(value resource.Quantity) *EmptyDirVolumeSourceBuilder {
 	b.fields.SizeLimit = &value
 	return b
 }
 
 // RemoveSizeLimit removes the SizeLimit field from the declarative configuration.
-func (b EmptyDirVolumeSourceBuilder) RemoveSizeLimit() EmptyDirVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *EmptyDirVolumeSourceBuilder) RemoveSizeLimit() *EmptyDirVolumeSourceBuilder {
 	b.fields.SizeLimit = nil
 	return b
 }
 
 // GetSizeLimit gets the SizeLimit field from the declarative configuration.
-func (b EmptyDirVolumeSourceBuilder) GetSizeLimit() (value resource.Quantity, ok bool) {
-	b.ensureInitialized()
+func (b *EmptyDirVolumeSourceBuilder) GetSizeLimit() (value resource.Quantity, ok bool) {
 	if v := b.fields.SizeLimit; v != nil {
 		return *v, true
 	}
@@ -106,9 +93,8 @@ func (b *EmptyDirVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -123,14 +109,13 @@ func (b *EmptyDirVolumeSourceBuilder) FromUnstructured(u map[string]interface{})
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals EmptyDirVolumeSourceBuilder to JSON.
 func (b *EmptyDirVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -138,8 +123,7 @@ func (b *EmptyDirVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into EmptyDirVolumeSourceBuilder, replacing the contents of
 // EmptyDirVolumeSourceBuilder.
 func (b *EmptyDirVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -147,11 +131,9 @@ func (b *EmptyDirVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // EmptyDirVolumeSourceList represents a list of EmptyDirVolumeSourceBuilder.
-// Provided as a convenience.
-type EmptyDirVolumeSourceList []EmptyDirVolumeSourceBuilder
+type EmptyDirVolumeSourceList []*EmptyDirVolumeSourceBuilder
 
 // EmptyDirVolumeSourceList represents a map of EmptyDirVolumeSourceBuilder.
-// Provided as a convenience.
 type EmptyDirVolumeSourceMap map[string]EmptyDirVolumeSourceBuilder
 
 func (b *EmptyDirVolumeSourceBuilder) preMarshal() {

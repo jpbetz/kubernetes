@@ -27,50 +27,40 @@ import (
 // EnvFromSourceBuilder represents an declarative configuration of the EnvFromSource type for use
 // with apply.
 type EnvFromSourceBuilder struct {
-	fields *envFromSourceFields
+	fields envFromSourceFields
 }
 
-// envFromSourceFields is used by EnvFromSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in EnvFromSourceBuilder before marshalling, and
-// are copied out to the builder type in EnvFromSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// envFromSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in EnvFromSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type envFromSourceFields struct {
 	Prefix       *string                    `json:"prefix,omitempty"`
 	ConfigMapRef *ConfigMapEnvSourceBuilder `json:"configMapRef,omitempty"`
 	SecretRef    *SecretEnvSourceBuilder    `json:"secretRef,omitempty"`
 }
 
-func (b *EnvFromSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &envFromSourceFields{}
-	}
-}
-
 // EnvFromSource constructs an declarative configuration of the EnvFromSource type for use with
 // apply.
-// Provided as a convenience.
-func EnvFromSource() EnvFromSourceBuilder {
-	return EnvFromSourceBuilder{fields: &envFromSourceFields{}}
+func EnvFromSource() *EnvFromSourceBuilder {
+	return &EnvFromSourceBuilder{}
 }
 
 // SetPrefix sets the Prefix field in the declarative configuration to the given value.
-func (b EnvFromSourceBuilder) SetPrefix(value string) EnvFromSourceBuilder {
-	b.ensureInitialized()
+func (b *EnvFromSourceBuilder) SetPrefix(value string) *EnvFromSourceBuilder {
 	b.fields.Prefix = &value
 	return b
 }
 
 // RemovePrefix removes the Prefix field from the declarative configuration.
-func (b EnvFromSourceBuilder) RemovePrefix() EnvFromSourceBuilder {
-	b.ensureInitialized()
+func (b *EnvFromSourceBuilder) RemovePrefix() *EnvFromSourceBuilder {
 	b.fields.Prefix = nil
 	return b
 }
 
 // GetPrefix gets the Prefix field from the declarative configuration.
-func (b EnvFromSourceBuilder) GetPrefix() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *EnvFromSourceBuilder) GetPrefix() (value string, ok bool) {
 	if v := b.fields.Prefix; v != nil {
 		return *v, true
 	}
@@ -78,49 +68,37 @@ func (b EnvFromSourceBuilder) GetPrefix() (value string, ok bool) {
 }
 
 // SetConfigMapRef sets the ConfigMapRef field in the declarative configuration to the given value.
-func (b EnvFromSourceBuilder) SetConfigMapRef(value ConfigMapEnvSourceBuilder) EnvFromSourceBuilder {
-	b.ensureInitialized()
-	b.fields.ConfigMapRef = &value
+func (b *EnvFromSourceBuilder) SetConfigMapRef(value *ConfigMapEnvSourceBuilder) *EnvFromSourceBuilder {
+	b.fields.ConfigMapRef = value
 	return b
 }
 
 // RemoveConfigMapRef removes the ConfigMapRef field from the declarative configuration.
-func (b EnvFromSourceBuilder) RemoveConfigMapRef() EnvFromSourceBuilder {
-	b.ensureInitialized()
+func (b *EnvFromSourceBuilder) RemoveConfigMapRef() *EnvFromSourceBuilder {
 	b.fields.ConfigMapRef = nil
 	return b
 }
 
 // GetConfigMapRef gets the ConfigMapRef field from the declarative configuration.
-func (b EnvFromSourceBuilder) GetConfigMapRef() (value ConfigMapEnvSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ConfigMapRef; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *EnvFromSourceBuilder) GetConfigMapRef() (value *ConfigMapEnvSourceBuilder, ok bool) {
+	return b.fields.ConfigMapRef, b.fields.ConfigMapRef != nil
 }
 
 // SetSecretRef sets the SecretRef field in the declarative configuration to the given value.
-func (b EnvFromSourceBuilder) SetSecretRef(value SecretEnvSourceBuilder) EnvFromSourceBuilder {
-	b.ensureInitialized()
-	b.fields.SecretRef = &value
+func (b *EnvFromSourceBuilder) SetSecretRef(value *SecretEnvSourceBuilder) *EnvFromSourceBuilder {
+	b.fields.SecretRef = value
 	return b
 }
 
 // RemoveSecretRef removes the SecretRef field from the declarative configuration.
-func (b EnvFromSourceBuilder) RemoveSecretRef() EnvFromSourceBuilder {
-	b.ensureInitialized()
+func (b *EnvFromSourceBuilder) RemoveSecretRef() *EnvFromSourceBuilder {
 	b.fields.SecretRef = nil
 	return b
 }
 
 // GetSecretRef gets the SecretRef field from the declarative configuration.
-func (b EnvFromSourceBuilder) GetSecretRef() (value SecretEnvSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.SecretRef; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *EnvFromSourceBuilder) GetSecretRef() (value *SecretEnvSourceBuilder, ok bool) {
+	return b.fields.SecretRef, b.fields.SecretRef != nil
 }
 
 // ToUnstructured converts EnvFromSourceBuilder to unstructured.
@@ -128,9 +106,8 @@ func (b *EnvFromSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +122,13 @@ func (b *EnvFromSourceBuilder) FromUnstructured(u map[string]interface{}) error 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals EnvFromSourceBuilder to JSON.
 func (b *EnvFromSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +136,7 @@ func (b *EnvFromSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into EnvFromSourceBuilder, replacing the contents of
 // EnvFromSourceBuilder.
 func (b *EnvFromSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +144,9 @@ func (b *EnvFromSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // EnvFromSourceList represents a list of EnvFromSourceBuilder.
-// Provided as a convenience.
-type EnvFromSourceList []EnvFromSourceBuilder
+type EnvFromSourceList []*EnvFromSourceBuilder
 
 // EnvFromSourceList represents a map of EnvFromSourceBuilder.
-// Provided as a convenience.
 type EnvFromSourceMap map[string]EnvFromSourceBuilder
 
 func (b *EnvFromSourceBuilder) preMarshal() {

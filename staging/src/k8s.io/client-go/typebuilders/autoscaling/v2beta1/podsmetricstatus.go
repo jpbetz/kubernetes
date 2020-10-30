@@ -29,50 +29,40 @@ import (
 // PodsMetricStatusBuilder represents an declarative configuration of the PodsMetricStatus type for use
 // with apply.
 type PodsMetricStatusBuilder struct {
-	fields *podsMetricStatusFields
+	fields podsMetricStatusFields
 }
 
-// podsMetricStatusFields is used by PodsMetricStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PodsMetricStatusBuilder before marshalling, and
-// are copied out to the builder type in PodsMetricStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// podsMetricStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PodsMetricStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type podsMetricStatusFields struct {
 	MetricName          *string                  `json:"metricName,omitempty"`
 	CurrentAverageValue *resource.Quantity       `json:"currentAverageValue,omitempty"`
 	Selector            *v1.LabelSelectorBuilder `json:"selector,omitempty"`
 }
 
-func (b *PodsMetricStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &podsMetricStatusFields{}
-	}
-}
-
 // PodsMetricStatus constructs an declarative configuration of the PodsMetricStatus type for use with
 // apply.
-// Provided as a convenience.
-func PodsMetricStatus() PodsMetricStatusBuilder {
-	return PodsMetricStatusBuilder{fields: &podsMetricStatusFields{}}
+func PodsMetricStatus() *PodsMetricStatusBuilder {
+	return &PodsMetricStatusBuilder{}
 }
 
 // SetMetricName sets the MetricName field in the declarative configuration to the given value.
-func (b PodsMetricStatusBuilder) SetMetricName(value string) PodsMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *PodsMetricStatusBuilder) SetMetricName(value string) *PodsMetricStatusBuilder {
 	b.fields.MetricName = &value
 	return b
 }
 
 // RemoveMetricName removes the MetricName field from the declarative configuration.
-func (b PodsMetricStatusBuilder) RemoveMetricName() PodsMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *PodsMetricStatusBuilder) RemoveMetricName() *PodsMetricStatusBuilder {
 	b.fields.MetricName = nil
 	return b
 }
 
 // GetMetricName gets the MetricName field from the declarative configuration.
-func (b PodsMetricStatusBuilder) GetMetricName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *PodsMetricStatusBuilder) GetMetricName() (value string, ok bool) {
 	if v := b.fields.MetricName; v != nil {
 		return *v, true
 	}
@@ -80,22 +70,19 @@ func (b PodsMetricStatusBuilder) GetMetricName() (value string, ok bool) {
 }
 
 // SetCurrentAverageValue sets the CurrentAverageValue field in the declarative configuration to the given value.
-func (b PodsMetricStatusBuilder) SetCurrentAverageValue(value resource.Quantity) PodsMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *PodsMetricStatusBuilder) SetCurrentAverageValue(value resource.Quantity) *PodsMetricStatusBuilder {
 	b.fields.CurrentAverageValue = &value
 	return b
 }
 
 // RemoveCurrentAverageValue removes the CurrentAverageValue field from the declarative configuration.
-func (b PodsMetricStatusBuilder) RemoveCurrentAverageValue() PodsMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *PodsMetricStatusBuilder) RemoveCurrentAverageValue() *PodsMetricStatusBuilder {
 	b.fields.CurrentAverageValue = nil
 	return b
 }
 
 // GetCurrentAverageValue gets the CurrentAverageValue field from the declarative configuration.
-func (b PodsMetricStatusBuilder) GetCurrentAverageValue() (value resource.Quantity, ok bool) {
-	b.ensureInitialized()
+func (b *PodsMetricStatusBuilder) GetCurrentAverageValue() (value resource.Quantity, ok bool) {
 	if v := b.fields.CurrentAverageValue; v != nil {
 		return *v, true
 	}
@@ -103,26 +90,20 @@ func (b PodsMetricStatusBuilder) GetCurrentAverageValue() (value resource.Quanti
 }
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
-func (b PodsMetricStatusBuilder) SetSelector(value v1.LabelSelectorBuilder) PodsMetricStatusBuilder {
-	b.ensureInitialized()
-	b.fields.Selector = &value
+func (b *PodsMetricStatusBuilder) SetSelector(value *v1.LabelSelectorBuilder) *PodsMetricStatusBuilder {
+	b.fields.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
-func (b PodsMetricStatusBuilder) RemoveSelector() PodsMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *PodsMetricStatusBuilder) RemoveSelector() *PodsMetricStatusBuilder {
 	b.fields.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
-func (b PodsMetricStatusBuilder) GetSelector() (value v1.LabelSelectorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Selector; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodsMetricStatusBuilder) GetSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+	return b.fields.Selector, b.fields.Selector != nil
 }
 
 // ToUnstructured converts PodsMetricStatusBuilder to unstructured.
@@ -130,9 +111,8 @@ func (b *PodsMetricStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -147,14 +127,13 @@ func (b *PodsMetricStatusBuilder) FromUnstructured(u map[string]interface{}) err
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PodsMetricStatusBuilder to JSON.
 func (b *PodsMetricStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -162,8 +141,7 @@ func (b *PodsMetricStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PodsMetricStatusBuilder, replacing the contents of
 // PodsMetricStatusBuilder.
 func (b *PodsMetricStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -171,11 +149,9 @@ func (b *PodsMetricStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PodsMetricStatusList represents a list of PodsMetricStatusBuilder.
-// Provided as a convenience.
-type PodsMetricStatusList []PodsMetricStatusBuilder
+type PodsMetricStatusList []*PodsMetricStatusBuilder
 
 // PodsMetricStatusList represents a map of PodsMetricStatusBuilder.
-// Provided as a convenience.
 type PodsMetricStatusMap map[string]PodsMetricStatusBuilder
 
 func (b *PodsMetricStatusBuilder) preMarshal() {

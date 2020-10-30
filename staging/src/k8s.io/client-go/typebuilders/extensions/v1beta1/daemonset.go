@@ -28,15 +28,15 @@ import (
 // DaemonSetBuilder represents an declarative configuration of the DaemonSet type for use
 // with apply.
 type DaemonSetBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *daemonSetFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   daemonSetFields
 }
 
-// daemonSetFields is used by DaemonSetBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in DaemonSetBuilder before marshalling, and
-// are copied out to the builder type in DaemonSetBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// daemonSetFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in DaemonSetBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type daemonSetFields struct {
 	Kind       *string                 `json:"kind,omitempty"`       // inlined DaemonSetBuilder.typeMeta.Kind field
 	APIVersion *string                 `json:"apiVersion,omitempty"` // inlined DaemonSetBuilder.typeMeta.APIVersion field
@@ -45,106 +45,78 @@ type daemonSetFields struct {
 	Status     *DaemonSetStatusBuilder `json:"status,omitempty"`
 }
 
-func (b *DaemonSetBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &daemonSetFields{}
-	}
-}
-
 // DaemonSet constructs an declarative configuration of the DaemonSet type for use with
 // apply.
-// Provided as a convenience.
-func DaemonSet() DaemonSetBuilder {
-	return DaemonSetBuilder{fields: &daemonSetFields{}}
+func DaemonSet() *DaemonSetBuilder {
+	return &DaemonSetBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b DaemonSetBuilder) SetTypeMeta(value v1.TypeMetaBuilder) DaemonSetBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *DaemonSetBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b DaemonSetBuilder) RemoveTypeMeta() DaemonSetBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *DaemonSetBuilder) RemoveTypeMeta() *DaemonSetBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b DaemonSetBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *DaemonSetBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b DaemonSetBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) DaemonSetBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *DaemonSetBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *DaemonSetBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b DaemonSetBuilder) RemoveObjectMeta() DaemonSetBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetBuilder) RemoveObjectMeta() *DaemonSetBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b DaemonSetBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *DaemonSetBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b DaemonSetBuilder) SetSpec(value DaemonSetSpecBuilder) DaemonSetBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *DaemonSetBuilder) SetSpec(value *DaemonSetSpecBuilder) *DaemonSetBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b DaemonSetBuilder) RemoveSpec() DaemonSetBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetBuilder) RemoveSpec() *DaemonSetBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b DaemonSetBuilder) GetSpec() (value DaemonSetSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *DaemonSetBuilder) GetSpec() (value *DaemonSetSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b DaemonSetBuilder) SetStatus(value DaemonSetStatusBuilder) DaemonSetBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *DaemonSetBuilder) SetStatus(value *DaemonSetStatusBuilder) *DaemonSetBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b DaemonSetBuilder) RemoveStatus() DaemonSetBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetBuilder) RemoveStatus() *DaemonSetBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b DaemonSetBuilder) GetStatus() (value DaemonSetStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *DaemonSetBuilder) GetStatus() (value *DaemonSetStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts DaemonSetBuilder to unstructured.
@@ -152,9 +124,8 @@ func (b *DaemonSetBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *DaemonSetBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals DaemonSetBuilder to JSON.
 func (b *DaemonSetBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *DaemonSetBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into DaemonSetBuilder, replacing the contents of
 // DaemonSetBuilder.
 func (b *DaemonSetBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +162,25 @@ func (b *DaemonSetBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // DaemonSetList represents a list of DaemonSetBuilder.
-// Provided as a convenience.
-type DaemonSetList []DaemonSetBuilder
+type DaemonSetList []*DaemonSetBuilder
 
 // DaemonSetList represents a map of DaemonSetBuilder.
-// Provided as a convenience.
 type DaemonSetMap map[string]DaemonSetBuilder
 
 func (b *DaemonSetBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *DaemonSetBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

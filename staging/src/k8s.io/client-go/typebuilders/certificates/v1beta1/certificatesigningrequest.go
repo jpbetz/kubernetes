@@ -28,15 +28,15 @@ import (
 // CertificateSigningRequestBuilder represents an declarative configuration of the CertificateSigningRequest type for use
 // with apply.
 type CertificateSigningRequestBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *certificateSigningRequestFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   certificateSigningRequestFields
 }
 
-// certificateSigningRequestFields is used by CertificateSigningRequestBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in CertificateSigningRequestBuilder before marshalling, and
-// are copied out to the builder type in CertificateSigningRequestBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// certificateSigningRequestFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in CertificateSigningRequestBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type certificateSigningRequestFields struct {
 	Kind       *string                                 `json:"kind,omitempty"`       // inlined CertificateSigningRequestBuilder.typeMeta.Kind field
 	APIVersion *string                                 `json:"apiVersion,omitempty"` // inlined CertificateSigningRequestBuilder.typeMeta.APIVersion field
@@ -45,106 +45,78 @@ type certificateSigningRequestFields struct {
 	Status     *CertificateSigningRequestStatusBuilder `json:"status,omitempty"`
 }
 
-func (b *CertificateSigningRequestBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &certificateSigningRequestFields{}
-	}
-}
-
 // CertificateSigningRequest constructs an declarative configuration of the CertificateSigningRequest type for use with
 // apply.
-// Provided as a convenience.
-func CertificateSigningRequest() CertificateSigningRequestBuilder {
-	return CertificateSigningRequestBuilder{fields: &certificateSigningRequestFields{}}
+func CertificateSigningRequest() *CertificateSigningRequestBuilder {
+	return &CertificateSigningRequestBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b CertificateSigningRequestBuilder) SetTypeMeta(value v1.TypeMetaBuilder) CertificateSigningRequestBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *CertificateSigningRequestBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b CertificateSigningRequestBuilder) RemoveTypeMeta() CertificateSigningRequestBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *CertificateSigningRequestBuilder) RemoveTypeMeta() *CertificateSigningRequestBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b CertificateSigningRequestBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b CertificateSigningRequestBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) CertificateSigningRequestBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *CertificateSigningRequestBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *CertificateSigningRequestBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b CertificateSigningRequestBuilder) RemoveObjectMeta() CertificateSigningRequestBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestBuilder) RemoveObjectMeta() *CertificateSigningRequestBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b CertificateSigningRequestBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *CertificateSigningRequestBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b CertificateSigningRequestBuilder) SetSpec(value CertificateSigningRequestSpecBuilder) CertificateSigningRequestBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *CertificateSigningRequestBuilder) SetSpec(value *CertificateSigningRequestSpecBuilder) *CertificateSigningRequestBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b CertificateSigningRequestBuilder) RemoveSpec() CertificateSigningRequestBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestBuilder) RemoveSpec() *CertificateSigningRequestBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b CertificateSigningRequestBuilder) GetSpec() (value CertificateSigningRequestSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *CertificateSigningRequestBuilder) GetSpec() (value *CertificateSigningRequestSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b CertificateSigningRequestBuilder) SetStatus(value CertificateSigningRequestStatusBuilder) CertificateSigningRequestBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *CertificateSigningRequestBuilder) SetStatus(value *CertificateSigningRequestStatusBuilder) *CertificateSigningRequestBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b CertificateSigningRequestBuilder) RemoveStatus() CertificateSigningRequestBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestBuilder) RemoveStatus() *CertificateSigningRequestBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b CertificateSigningRequestBuilder) GetStatus() (value CertificateSigningRequestStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *CertificateSigningRequestBuilder) GetStatus() (value *CertificateSigningRequestStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts CertificateSigningRequestBuilder to unstructured.
@@ -152,9 +124,8 @@ func (b *CertificateSigningRequestBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *CertificateSigningRequestBuilder) FromUnstructured(u map[string]interfa
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals CertificateSigningRequestBuilder to JSON.
 func (b *CertificateSigningRequestBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *CertificateSigningRequestBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into CertificateSigningRequestBuilder, replacing the contents of
 // CertificateSigningRequestBuilder.
 func (b *CertificateSigningRequestBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +162,25 @@ func (b *CertificateSigningRequestBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // CertificateSigningRequestList represents a list of CertificateSigningRequestBuilder.
-// Provided as a convenience.
-type CertificateSigningRequestList []CertificateSigningRequestBuilder
+type CertificateSigningRequestList []*CertificateSigningRequestBuilder
 
 // CertificateSigningRequestList represents a map of CertificateSigningRequestBuilder.
-// Provided as a convenience.
 type CertificateSigningRequestMap map[string]CertificateSigningRequestBuilder
 
 func (b *CertificateSigningRequestBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *CertificateSigningRequestBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

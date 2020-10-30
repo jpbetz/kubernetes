@@ -27,49 +27,39 @@ import (
 // PersistentVolumeClaimVolumeSourceBuilder represents an declarative configuration of the PersistentVolumeClaimVolumeSource type for use
 // with apply.
 type PersistentVolumeClaimVolumeSourceBuilder struct {
-	fields *persistentVolumeClaimVolumeSourceFields
+	fields persistentVolumeClaimVolumeSourceFields
 }
 
-// persistentVolumeClaimVolumeSourceFields is used by PersistentVolumeClaimVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PersistentVolumeClaimVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in PersistentVolumeClaimVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// persistentVolumeClaimVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PersistentVolumeClaimVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type persistentVolumeClaimVolumeSourceFields struct {
 	ClaimName *string `json:"claimName,omitempty"`
 	ReadOnly  *bool   `json:"readOnly,omitempty"`
 }
 
-func (b *PersistentVolumeClaimVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &persistentVolumeClaimVolumeSourceFields{}
-	}
-}
-
 // PersistentVolumeClaimVolumeSource constructs an declarative configuration of the PersistentVolumeClaimVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func PersistentVolumeClaimVolumeSource() PersistentVolumeClaimVolumeSourceBuilder {
-	return PersistentVolumeClaimVolumeSourceBuilder{fields: &persistentVolumeClaimVolumeSourceFields{}}
+func PersistentVolumeClaimVolumeSource() *PersistentVolumeClaimVolumeSourceBuilder {
+	return &PersistentVolumeClaimVolumeSourceBuilder{}
 }
 
 // SetClaimName sets the ClaimName field in the declarative configuration to the given value.
-func (b PersistentVolumeClaimVolumeSourceBuilder) SetClaimName(value string) PersistentVolumeClaimVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimVolumeSourceBuilder) SetClaimName(value string) *PersistentVolumeClaimVolumeSourceBuilder {
 	b.fields.ClaimName = &value
 	return b
 }
 
 // RemoveClaimName removes the ClaimName field from the declarative configuration.
-func (b PersistentVolumeClaimVolumeSourceBuilder) RemoveClaimName() PersistentVolumeClaimVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimVolumeSourceBuilder) RemoveClaimName() *PersistentVolumeClaimVolumeSourceBuilder {
 	b.fields.ClaimName = nil
 	return b
 }
 
 // GetClaimName gets the ClaimName field from the declarative configuration.
-func (b PersistentVolumeClaimVolumeSourceBuilder) GetClaimName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimVolumeSourceBuilder) GetClaimName() (value string, ok bool) {
 	if v := b.fields.ClaimName; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b PersistentVolumeClaimVolumeSourceBuilder) GetClaimName() (value string, 
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b PersistentVolumeClaimVolumeSourceBuilder) SetReadOnly(value bool) PersistentVolumeClaimVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimVolumeSourceBuilder) SetReadOnly(value bool) *PersistentVolumeClaimVolumeSourceBuilder {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b PersistentVolumeClaimVolumeSourceBuilder) RemoveReadOnly() PersistentVolumeClaimVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimVolumeSourceBuilder) RemoveReadOnly() *PersistentVolumeClaimVolumeSourceBuilder {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b PersistentVolumeClaimVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *PersistentVolumeClaimVolumeSourceBuilder) ToUnstructured() interface{} 
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *PersistentVolumeClaimVolumeSourceBuilder) FromUnstructured(u map[string
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PersistentVolumeClaimVolumeSourceBuilder to JSON.
 func (b *PersistentVolumeClaimVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *PersistentVolumeClaimVolumeSourceBuilder) MarshalJSON() ([]byte, error)
 // UnmarshalJSON unmarshals JSON into PersistentVolumeClaimVolumeSourceBuilder, replacing the contents of
 // PersistentVolumeClaimVolumeSourceBuilder.
 func (b *PersistentVolumeClaimVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *PersistentVolumeClaimVolumeSourceBuilder) UnmarshalJSON(data []byte) er
 }
 
 // PersistentVolumeClaimVolumeSourceList represents a list of PersistentVolumeClaimVolumeSourceBuilder.
-// Provided as a convenience.
-type PersistentVolumeClaimVolumeSourceList []PersistentVolumeClaimVolumeSourceBuilder
+type PersistentVolumeClaimVolumeSourceList []*PersistentVolumeClaimVolumeSourceBuilder
 
 // PersistentVolumeClaimVolumeSourceList represents a map of PersistentVolumeClaimVolumeSourceBuilder.
-// Provided as a convenience.
 type PersistentVolumeClaimVolumeSourceMap map[string]PersistentVolumeClaimVolumeSourceBuilder
 
 func (b *PersistentVolumeClaimVolumeSourceBuilder) preMarshal() {

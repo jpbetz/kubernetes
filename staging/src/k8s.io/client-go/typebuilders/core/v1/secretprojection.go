@@ -27,71 +27,58 @@ import (
 // SecretProjectionBuilder represents an declarative configuration of the SecretProjection type for use
 // with apply.
 type SecretProjectionBuilder struct {
-	localObjectReference LocalObjectReferenceBuilder // inlined type
-	fields               *secretProjectionFields
+	localObjectReference *LocalObjectReferenceBuilder // inlined type
+	fields               secretProjectionFields
 }
 
-// secretProjectionFields is used by SecretProjectionBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in SecretProjectionBuilder before marshalling, and
-// are copied out to the builder type in SecretProjectionBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// secretProjectionFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in SecretProjectionBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type secretProjectionFields struct {
 	Name     *string        `json:"name,omitempty"` // inlined SecretProjectionBuilder.localObjectReference.Name field
 	Items    *KeyToPathList `json:"items,omitempty"`
 	Optional *bool          `json:"optional,omitempty"`
 }
 
-func (b *SecretProjectionBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &secretProjectionFields{}
-	}
-}
-
 // SecretProjection constructs an declarative configuration of the SecretProjection type for use with
 // apply.
-// Provided as a convenience.
-func SecretProjection() SecretProjectionBuilder {
-	return SecretProjectionBuilder{fields: &secretProjectionFields{}}
+func SecretProjection() *SecretProjectionBuilder {
+	return &SecretProjectionBuilder{}
 }
 
 // SetLocalObjectReference sets the LocalObjectReference field in the declarative configuration to the given value.
-func (b SecretProjectionBuilder) SetLocalObjectReference(value LocalObjectReferenceBuilder) SecretProjectionBuilder {
-	b.ensureInitialized()
+func (b *SecretProjectionBuilder) SetLocalObjectReference(value *LocalObjectReferenceBuilder) *SecretProjectionBuilder {
 	b.localObjectReference = value
 	return b
 }
 
 // RemoveLocalObjectReference removes the LocalObjectReference field from the declarative configuration.
-func (b SecretProjectionBuilder) RemoveLocalObjectReference() SecretProjectionBuilder {
-	b.ensureInitialized()
-	b.localObjectReference = LocalObjectReferenceBuilder{}
+func (b *SecretProjectionBuilder) RemoveLocalObjectReference() *SecretProjectionBuilder {
+	b.localObjectReference = nil
 	return b
 }
 
 // GetLocalObjectReference gets the LocalObjectReference field from the declarative configuration.
-func (b SecretProjectionBuilder) GetLocalObjectReference() (value LocalObjectReferenceBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *SecretProjectionBuilder) GetLocalObjectReference() (value *LocalObjectReferenceBuilder, ok bool) {
 	return b.localObjectReference, true
 }
 
 // SetItems sets the Items field in the declarative configuration to the given value.
-func (b SecretProjectionBuilder) SetItems(value KeyToPathList) SecretProjectionBuilder {
-	b.ensureInitialized()
+func (b *SecretProjectionBuilder) SetItems(value KeyToPathList) *SecretProjectionBuilder {
 	b.fields.Items = &value
 	return b
 }
 
 // RemoveItems removes the Items field from the declarative configuration.
-func (b SecretProjectionBuilder) RemoveItems() SecretProjectionBuilder {
-	b.ensureInitialized()
+func (b *SecretProjectionBuilder) RemoveItems() *SecretProjectionBuilder {
 	b.fields.Items = nil
 	return b
 }
 
 // GetItems gets the Items field from the declarative configuration.
-func (b SecretProjectionBuilder) GetItems() (value KeyToPathList, ok bool) {
-	b.ensureInitialized()
+func (b *SecretProjectionBuilder) GetItems() (value KeyToPathList, ok bool) {
 	if v := b.fields.Items; v != nil {
 		return *v, true
 	}
@@ -99,22 +86,19 @@ func (b SecretProjectionBuilder) GetItems() (value KeyToPathList, ok bool) {
 }
 
 // SetOptional sets the Optional field in the declarative configuration to the given value.
-func (b SecretProjectionBuilder) SetOptional(value bool) SecretProjectionBuilder {
-	b.ensureInitialized()
+func (b *SecretProjectionBuilder) SetOptional(value bool) *SecretProjectionBuilder {
 	b.fields.Optional = &value
 	return b
 }
 
 // RemoveOptional removes the Optional field from the declarative configuration.
-func (b SecretProjectionBuilder) RemoveOptional() SecretProjectionBuilder {
-	b.ensureInitialized()
+func (b *SecretProjectionBuilder) RemoveOptional() *SecretProjectionBuilder {
 	b.fields.Optional = nil
 	return b
 }
 
 // GetOptional gets the Optional field from the declarative configuration.
-func (b SecretProjectionBuilder) GetOptional() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *SecretProjectionBuilder) GetOptional() (value bool, ok bool) {
 	if v := b.fields.Optional; v != nil {
 		return *v, true
 	}
@@ -126,9 +110,8 @@ func (b *SecretProjectionBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -143,14 +126,13 @@ func (b *SecretProjectionBuilder) FromUnstructured(u map[string]interface{}) err
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals SecretProjectionBuilder to JSON.
 func (b *SecretProjectionBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -158,8 +140,7 @@ func (b *SecretProjectionBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into SecretProjectionBuilder, replacing the contents of
 // SecretProjectionBuilder.
 func (b *SecretProjectionBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -167,19 +148,22 @@ func (b *SecretProjectionBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // SecretProjectionList represents a list of SecretProjectionBuilder.
-// Provided as a convenience.
-type SecretProjectionList []SecretProjectionBuilder
+type SecretProjectionList []*SecretProjectionBuilder
 
 // SecretProjectionList represents a map of SecretProjectionBuilder.
-// Provided as a convenience.
 type SecretProjectionMap map[string]SecretProjectionBuilder
 
 func (b *SecretProjectionBuilder) preMarshal() {
-	if v, ok := b.localObjectReference.GetName(); ok {
-		b.fields.Name = &v
+	if b.localObjectReference != nil {
+		if v, ok := b.localObjectReference.GetName(); ok {
+			b.fields.Name = &v
+		}
 	}
 }
 func (b *SecretProjectionBuilder) postUnmarshal() {
+	if b.localObjectReference == nil {
+		b.localObjectReference = &LocalObjectReferenceBuilder{}
+	}
 	if b.fields.Name != nil {
 		b.localObjectReference.SetName(*b.fields.Name)
 	}

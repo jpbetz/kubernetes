@@ -27,50 +27,40 @@ import (
 // GitRepoVolumeSourceBuilder represents an declarative configuration of the GitRepoVolumeSource type for use
 // with apply.
 type GitRepoVolumeSourceBuilder struct {
-	fields *gitRepoVolumeSourceFields
+	fields gitRepoVolumeSourceFields
 }
 
-// gitRepoVolumeSourceFields is used by GitRepoVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in GitRepoVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in GitRepoVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// gitRepoVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in GitRepoVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type gitRepoVolumeSourceFields struct {
 	Repository *string `json:"repository,omitempty"`
 	Revision   *string `json:"revision,omitempty"`
 	Directory  *string `json:"directory,omitempty"`
 }
 
-func (b *GitRepoVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &gitRepoVolumeSourceFields{}
-	}
-}
-
 // GitRepoVolumeSource constructs an declarative configuration of the GitRepoVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func GitRepoVolumeSource() GitRepoVolumeSourceBuilder {
-	return GitRepoVolumeSourceBuilder{fields: &gitRepoVolumeSourceFields{}}
+func GitRepoVolumeSource() *GitRepoVolumeSourceBuilder {
+	return &GitRepoVolumeSourceBuilder{}
 }
 
 // SetRepository sets the Repository field in the declarative configuration to the given value.
-func (b GitRepoVolumeSourceBuilder) SetRepository(value string) GitRepoVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *GitRepoVolumeSourceBuilder) SetRepository(value string) *GitRepoVolumeSourceBuilder {
 	b.fields.Repository = &value
 	return b
 }
 
 // RemoveRepository removes the Repository field from the declarative configuration.
-func (b GitRepoVolumeSourceBuilder) RemoveRepository() GitRepoVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *GitRepoVolumeSourceBuilder) RemoveRepository() *GitRepoVolumeSourceBuilder {
 	b.fields.Repository = nil
 	return b
 }
 
 // GetRepository gets the Repository field from the declarative configuration.
-func (b GitRepoVolumeSourceBuilder) GetRepository() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *GitRepoVolumeSourceBuilder) GetRepository() (value string, ok bool) {
 	if v := b.fields.Repository; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b GitRepoVolumeSourceBuilder) GetRepository() (value string, ok bool) {
 }
 
 // SetRevision sets the Revision field in the declarative configuration to the given value.
-func (b GitRepoVolumeSourceBuilder) SetRevision(value string) GitRepoVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *GitRepoVolumeSourceBuilder) SetRevision(value string) *GitRepoVolumeSourceBuilder {
 	b.fields.Revision = &value
 	return b
 }
 
 // RemoveRevision removes the Revision field from the declarative configuration.
-func (b GitRepoVolumeSourceBuilder) RemoveRevision() GitRepoVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *GitRepoVolumeSourceBuilder) RemoveRevision() *GitRepoVolumeSourceBuilder {
 	b.fields.Revision = nil
 	return b
 }
 
 // GetRevision gets the Revision field from the declarative configuration.
-func (b GitRepoVolumeSourceBuilder) GetRevision() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *GitRepoVolumeSourceBuilder) GetRevision() (value string, ok bool) {
 	if v := b.fields.Revision; v != nil {
 		return *v, true
 	}
@@ -101,22 +88,19 @@ func (b GitRepoVolumeSourceBuilder) GetRevision() (value string, ok bool) {
 }
 
 // SetDirectory sets the Directory field in the declarative configuration to the given value.
-func (b GitRepoVolumeSourceBuilder) SetDirectory(value string) GitRepoVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *GitRepoVolumeSourceBuilder) SetDirectory(value string) *GitRepoVolumeSourceBuilder {
 	b.fields.Directory = &value
 	return b
 }
 
 // RemoveDirectory removes the Directory field from the declarative configuration.
-func (b GitRepoVolumeSourceBuilder) RemoveDirectory() GitRepoVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *GitRepoVolumeSourceBuilder) RemoveDirectory() *GitRepoVolumeSourceBuilder {
 	b.fields.Directory = nil
 	return b
 }
 
 // GetDirectory gets the Directory field from the declarative configuration.
-func (b GitRepoVolumeSourceBuilder) GetDirectory() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *GitRepoVolumeSourceBuilder) GetDirectory() (value string, ok bool) {
 	if v := b.fields.Directory; v != nil {
 		return *v, true
 	}
@@ -128,9 +112,8 @@ func (b *GitRepoVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +128,13 @@ func (b *GitRepoVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals GitRepoVolumeSourceBuilder to JSON.
 func (b *GitRepoVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +142,7 @@ func (b *GitRepoVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into GitRepoVolumeSourceBuilder, replacing the contents of
 // GitRepoVolumeSourceBuilder.
 func (b *GitRepoVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +150,9 @@ func (b *GitRepoVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // GitRepoVolumeSourceList represents a list of GitRepoVolumeSourceBuilder.
-// Provided as a convenience.
-type GitRepoVolumeSourceList []GitRepoVolumeSourceBuilder
+type GitRepoVolumeSourceList []*GitRepoVolumeSourceBuilder
 
 // GitRepoVolumeSourceList represents a map of GitRepoVolumeSourceBuilder.
-// Provided as a convenience.
 type GitRepoVolumeSourceMap map[string]GitRepoVolumeSourceBuilder
 
 func (b *GitRepoVolumeSourceBuilder) preMarshal() {

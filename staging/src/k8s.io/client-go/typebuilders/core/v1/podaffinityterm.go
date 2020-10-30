@@ -28,73 +28,57 @@ import (
 // PodAffinityTermBuilder represents an declarative configuration of the PodAffinityTerm type for use
 // with apply.
 type PodAffinityTermBuilder struct {
-	fields *podAffinityTermFields
+	fields podAffinityTermFields
 }
 
-// podAffinityTermFields is used by PodAffinityTermBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PodAffinityTermBuilder before marshalling, and
-// are copied out to the builder type in PodAffinityTermBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// podAffinityTermFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PodAffinityTermBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type podAffinityTermFields struct {
 	LabelSelector *v1.LabelSelectorBuilder `json:"labelSelector,omitempty"`
 	Namespaces    *[]string                `json:"namespaces,omitempty"`
 	TopologyKey   *string                  `json:"topologyKey,omitempty"`
 }
 
-func (b *PodAffinityTermBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &podAffinityTermFields{}
-	}
-}
-
 // PodAffinityTerm constructs an declarative configuration of the PodAffinityTerm type for use with
 // apply.
-// Provided as a convenience.
-func PodAffinityTerm() PodAffinityTermBuilder {
-	return PodAffinityTermBuilder{fields: &podAffinityTermFields{}}
+func PodAffinityTerm() *PodAffinityTermBuilder {
+	return &PodAffinityTermBuilder{}
 }
 
 // SetLabelSelector sets the LabelSelector field in the declarative configuration to the given value.
-func (b PodAffinityTermBuilder) SetLabelSelector(value v1.LabelSelectorBuilder) PodAffinityTermBuilder {
-	b.ensureInitialized()
-	b.fields.LabelSelector = &value
+func (b *PodAffinityTermBuilder) SetLabelSelector(value *v1.LabelSelectorBuilder) *PodAffinityTermBuilder {
+	b.fields.LabelSelector = value
 	return b
 }
 
 // RemoveLabelSelector removes the LabelSelector field from the declarative configuration.
-func (b PodAffinityTermBuilder) RemoveLabelSelector() PodAffinityTermBuilder {
-	b.ensureInitialized()
+func (b *PodAffinityTermBuilder) RemoveLabelSelector() *PodAffinityTermBuilder {
 	b.fields.LabelSelector = nil
 	return b
 }
 
 // GetLabelSelector gets the LabelSelector field from the declarative configuration.
-func (b PodAffinityTermBuilder) GetLabelSelector() (value v1.LabelSelectorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.LabelSelector; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodAffinityTermBuilder) GetLabelSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+	return b.fields.LabelSelector, b.fields.LabelSelector != nil
 }
 
 // SetNamespaces sets the Namespaces field in the declarative configuration to the given value.
-func (b PodAffinityTermBuilder) SetNamespaces(value []string) PodAffinityTermBuilder {
-	b.ensureInitialized()
+func (b *PodAffinityTermBuilder) SetNamespaces(value []string) *PodAffinityTermBuilder {
 	b.fields.Namespaces = &value
 	return b
 }
 
 // RemoveNamespaces removes the Namespaces field from the declarative configuration.
-func (b PodAffinityTermBuilder) RemoveNamespaces() PodAffinityTermBuilder {
-	b.ensureInitialized()
+func (b *PodAffinityTermBuilder) RemoveNamespaces() *PodAffinityTermBuilder {
 	b.fields.Namespaces = nil
 	return b
 }
 
 // GetNamespaces gets the Namespaces field from the declarative configuration.
-func (b PodAffinityTermBuilder) GetNamespaces() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *PodAffinityTermBuilder) GetNamespaces() (value []string, ok bool) {
 	if v := b.fields.Namespaces; v != nil {
 		return *v, true
 	}
@@ -102,22 +86,19 @@ func (b PodAffinityTermBuilder) GetNamespaces() (value []string, ok bool) {
 }
 
 // SetTopologyKey sets the TopologyKey field in the declarative configuration to the given value.
-func (b PodAffinityTermBuilder) SetTopologyKey(value string) PodAffinityTermBuilder {
-	b.ensureInitialized()
+func (b *PodAffinityTermBuilder) SetTopologyKey(value string) *PodAffinityTermBuilder {
 	b.fields.TopologyKey = &value
 	return b
 }
 
 // RemoveTopologyKey removes the TopologyKey field from the declarative configuration.
-func (b PodAffinityTermBuilder) RemoveTopologyKey() PodAffinityTermBuilder {
-	b.ensureInitialized()
+func (b *PodAffinityTermBuilder) RemoveTopologyKey() *PodAffinityTermBuilder {
 	b.fields.TopologyKey = nil
 	return b
 }
 
 // GetTopologyKey gets the TopologyKey field from the declarative configuration.
-func (b PodAffinityTermBuilder) GetTopologyKey() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *PodAffinityTermBuilder) GetTopologyKey() (value string, ok bool) {
 	if v := b.fields.TopologyKey; v != nil {
 		return *v, true
 	}
@@ -129,9 +110,8 @@ func (b *PodAffinityTermBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -146,14 +126,13 @@ func (b *PodAffinityTermBuilder) FromUnstructured(u map[string]interface{}) erro
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PodAffinityTermBuilder to JSON.
 func (b *PodAffinityTermBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -161,8 +140,7 @@ func (b *PodAffinityTermBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PodAffinityTermBuilder, replacing the contents of
 // PodAffinityTermBuilder.
 func (b *PodAffinityTermBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -170,11 +148,9 @@ func (b *PodAffinityTermBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PodAffinityTermList represents a list of PodAffinityTermBuilder.
-// Provided as a convenience.
-type PodAffinityTermList []PodAffinityTermBuilder
+type PodAffinityTermList []*PodAffinityTermBuilder
 
 // PodAffinityTermList represents a map of PodAffinityTermBuilder.
-// Provided as a convenience.
 type PodAffinityTermMap map[string]PodAffinityTermBuilder
 
 func (b *PodAffinityTermBuilder) preMarshal() {

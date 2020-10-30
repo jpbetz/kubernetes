@@ -27,48 +27,38 @@ import (
 // PriorityLevelConfigurationReferenceBuilder represents an declarative configuration of the PriorityLevelConfigurationReference type for use
 // with apply.
 type PriorityLevelConfigurationReferenceBuilder struct {
-	fields *priorityLevelConfigurationReferenceFields
+	fields priorityLevelConfigurationReferenceFields
 }
 
-// priorityLevelConfigurationReferenceFields is used by PriorityLevelConfigurationReferenceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PriorityLevelConfigurationReferenceBuilder before marshalling, and
-// are copied out to the builder type in PriorityLevelConfigurationReferenceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// priorityLevelConfigurationReferenceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PriorityLevelConfigurationReferenceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type priorityLevelConfigurationReferenceFields struct {
 	Name *string `json:"name,omitempty"`
 }
 
-func (b *PriorityLevelConfigurationReferenceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &priorityLevelConfigurationReferenceFields{}
-	}
-}
-
 // PriorityLevelConfigurationReference constructs an declarative configuration of the PriorityLevelConfigurationReference type for use with
 // apply.
-// Provided as a convenience.
-func PriorityLevelConfigurationReference() PriorityLevelConfigurationReferenceBuilder {
-	return PriorityLevelConfigurationReferenceBuilder{fields: &priorityLevelConfigurationReferenceFields{}}
+func PriorityLevelConfigurationReference() *PriorityLevelConfigurationReferenceBuilder {
+	return &PriorityLevelConfigurationReferenceBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b PriorityLevelConfigurationReferenceBuilder) SetName(value string) PriorityLevelConfigurationReferenceBuilder {
-	b.ensureInitialized()
+func (b *PriorityLevelConfigurationReferenceBuilder) SetName(value string) *PriorityLevelConfigurationReferenceBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b PriorityLevelConfigurationReferenceBuilder) RemoveName() PriorityLevelConfigurationReferenceBuilder {
-	b.ensureInitialized()
+func (b *PriorityLevelConfigurationReferenceBuilder) RemoveName() *PriorityLevelConfigurationReferenceBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b PriorityLevelConfigurationReferenceBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *PriorityLevelConfigurationReferenceBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *PriorityLevelConfigurationReferenceBuilder) ToUnstructured() interface{
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *PriorityLevelConfigurationReferenceBuilder) FromUnstructured(u map[stri
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PriorityLevelConfigurationReferenceBuilder to JSON.
 func (b *PriorityLevelConfigurationReferenceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *PriorityLevelConfigurationReferenceBuilder) MarshalJSON() ([]byte, erro
 // UnmarshalJSON unmarshals JSON into PriorityLevelConfigurationReferenceBuilder, replacing the contents of
 // PriorityLevelConfigurationReferenceBuilder.
 func (b *PriorityLevelConfigurationReferenceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *PriorityLevelConfigurationReferenceBuilder) UnmarshalJSON(data []byte) 
 }
 
 // PriorityLevelConfigurationReferenceList represents a list of PriorityLevelConfigurationReferenceBuilder.
-// Provided as a convenience.
-type PriorityLevelConfigurationReferenceList []PriorityLevelConfigurationReferenceBuilder
+type PriorityLevelConfigurationReferenceList []*PriorityLevelConfigurationReferenceBuilder
 
 // PriorityLevelConfigurationReferenceList represents a map of PriorityLevelConfigurationReferenceBuilder.
-// Provided as a convenience.
 type PriorityLevelConfigurationReferenceMap map[string]PriorityLevelConfigurationReferenceBuilder
 
 func (b *PriorityLevelConfigurationReferenceBuilder) preMarshal() {

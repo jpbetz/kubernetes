@@ -27,50 +27,40 @@ import (
 // PodDNSConfigBuilder represents an declarative configuration of the PodDNSConfig type for use
 // with apply.
 type PodDNSConfigBuilder struct {
-	fields *podDNSConfigFields
+	fields podDNSConfigFields
 }
 
-// podDNSConfigFields is used by PodDNSConfigBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PodDNSConfigBuilder before marshalling, and
-// are copied out to the builder type in PodDNSConfigBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// podDNSConfigFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PodDNSConfigBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type podDNSConfigFields struct {
 	Nameservers *[]string               `json:"nameservers,omitempty"`
 	Searches    *[]string               `json:"searches,omitempty"`
 	Options     *PodDNSConfigOptionList `json:"options,omitempty"`
 }
 
-func (b *PodDNSConfigBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &podDNSConfigFields{}
-	}
-}
-
 // PodDNSConfig constructs an declarative configuration of the PodDNSConfig type for use with
 // apply.
-// Provided as a convenience.
-func PodDNSConfig() PodDNSConfigBuilder {
-	return PodDNSConfigBuilder{fields: &podDNSConfigFields{}}
+func PodDNSConfig() *PodDNSConfigBuilder {
+	return &PodDNSConfigBuilder{}
 }
 
 // SetNameservers sets the Nameservers field in the declarative configuration to the given value.
-func (b PodDNSConfigBuilder) SetNameservers(value []string) PodDNSConfigBuilder {
-	b.ensureInitialized()
+func (b *PodDNSConfigBuilder) SetNameservers(value []string) *PodDNSConfigBuilder {
 	b.fields.Nameservers = &value
 	return b
 }
 
 // RemoveNameservers removes the Nameservers field from the declarative configuration.
-func (b PodDNSConfigBuilder) RemoveNameservers() PodDNSConfigBuilder {
-	b.ensureInitialized()
+func (b *PodDNSConfigBuilder) RemoveNameservers() *PodDNSConfigBuilder {
 	b.fields.Nameservers = nil
 	return b
 }
 
 // GetNameservers gets the Nameservers field from the declarative configuration.
-func (b PodDNSConfigBuilder) GetNameservers() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *PodDNSConfigBuilder) GetNameservers() (value []string, ok bool) {
 	if v := b.fields.Nameservers; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b PodDNSConfigBuilder) GetNameservers() (value []string, ok bool) {
 }
 
 // SetSearches sets the Searches field in the declarative configuration to the given value.
-func (b PodDNSConfigBuilder) SetSearches(value []string) PodDNSConfigBuilder {
-	b.ensureInitialized()
+func (b *PodDNSConfigBuilder) SetSearches(value []string) *PodDNSConfigBuilder {
 	b.fields.Searches = &value
 	return b
 }
 
 // RemoveSearches removes the Searches field from the declarative configuration.
-func (b PodDNSConfigBuilder) RemoveSearches() PodDNSConfigBuilder {
-	b.ensureInitialized()
+func (b *PodDNSConfigBuilder) RemoveSearches() *PodDNSConfigBuilder {
 	b.fields.Searches = nil
 	return b
 }
 
 // GetSearches gets the Searches field from the declarative configuration.
-func (b PodDNSConfigBuilder) GetSearches() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *PodDNSConfigBuilder) GetSearches() (value []string, ok bool) {
 	if v := b.fields.Searches; v != nil {
 		return *v, true
 	}
@@ -101,22 +88,19 @@ func (b PodDNSConfigBuilder) GetSearches() (value []string, ok bool) {
 }
 
 // SetOptions sets the Options field in the declarative configuration to the given value.
-func (b PodDNSConfigBuilder) SetOptions(value PodDNSConfigOptionList) PodDNSConfigBuilder {
-	b.ensureInitialized()
+func (b *PodDNSConfigBuilder) SetOptions(value PodDNSConfigOptionList) *PodDNSConfigBuilder {
 	b.fields.Options = &value
 	return b
 }
 
 // RemoveOptions removes the Options field from the declarative configuration.
-func (b PodDNSConfigBuilder) RemoveOptions() PodDNSConfigBuilder {
-	b.ensureInitialized()
+func (b *PodDNSConfigBuilder) RemoveOptions() *PodDNSConfigBuilder {
 	b.fields.Options = nil
 	return b
 }
 
 // GetOptions gets the Options field from the declarative configuration.
-func (b PodDNSConfigBuilder) GetOptions() (value PodDNSConfigOptionList, ok bool) {
-	b.ensureInitialized()
+func (b *PodDNSConfigBuilder) GetOptions() (value PodDNSConfigOptionList, ok bool) {
 	if v := b.fields.Options; v != nil {
 		return *v, true
 	}
@@ -128,9 +112,8 @@ func (b *PodDNSConfigBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +128,13 @@ func (b *PodDNSConfigBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PodDNSConfigBuilder to JSON.
 func (b *PodDNSConfigBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +142,7 @@ func (b *PodDNSConfigBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PodDNSConfigBuilder, replacing the contents of
 // PodDNSConfigBuilder.
 func (b *PodDNSConfigBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +150,9 @@ func (b *PodDNSConfigBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PodDNSConfigList represents a list of PodDNSConfigBuilder.
-// Provided as a convenience.
-type PodDNSConfigList []PodDNSConfigBuilder
+type PodDNSConfigList []*PodDNSConfigBuilder
 
 // PodDNSConfigList represents a map of PodDNSConfigBuilder.
-// Provided as a convenience.
 type PodDNSConfigMap map[string]PodDNSConfigBuilder
 
 func (b *PodDNSConfigBuilder) preMarshal() {

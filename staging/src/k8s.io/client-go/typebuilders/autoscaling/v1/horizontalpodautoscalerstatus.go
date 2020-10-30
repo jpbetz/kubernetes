@@ -28,14 +28,14 @@ import (
 // HorizontalPodAutoscalerStatusBuilder represents an declarative configuration of the HorizontalPodAutoscalerStatus type for use
 // with apply.
 type HorizontalPodAutoscalerStatusBuilder struct {
-	fields *horizontalPodAutoscalerStatusFields
+	fields horizontalPodAutoscalerStatusFields
 }
 
-// horizontalPodAutoscalerStatusFields is used by HorizontalPodAutoscalerStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in HorizontalPodAutoscalerStatusBuilder before marshalling, and
-// are copied out to the builder type in HorizontalPodAutoscalerStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// horizontalPodAutoscalerStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in HorizontalPodAutoscalerStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type horizontalPodAutoscalerStatusFields struct {
 	ObservedGeneration              *int64   `json:"observedGeneration,omitempty"`
 	LastScaleTime                   *v1.Time `json:"lastScaleTime,omitempty"`
@@ -44,36 +44,26 @@ type horizontalPodAutoscalerStatusFields struct {
 	CurrentCPUUtilizationPercentage *int32   `json:"currentCPUUtilizationPercentage,omitempty"`
 }
 
-func (b *HorizontalPodAutoscalerStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &horizontalPodAutoscalerStatusFields{}
-	}
-}
-
 // HorizontalPodAutoscalerStatus constructs an declarative configuration of the HorizontalPodAutoscalerStatus type for use with
 // apply.
-// Provided as a convenience.
-func HorizontalPodAutoscalerStatus() HorizontalPodAutoscalerStatusBuilder {
-	return HorizontalPodAutoscalerStatusBuilder{fields: &horizontalPodAutoscalerStatusFields{}}
+func HorizontalPodAutoscalerStatus() *HorizontalPodAutoscalerStatusBuilder {
+	return &HorizontalPodAutoscalerStatusBuilder{}
 }
 
 // SetObservedGeneration sets the ObservedGeneration field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerStatusBuilder) SetObservedGeneration(value int64) HorizontalPodAutoscalerStatusBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerStatusBuilder) SetObservedGeneration(value int64) *HorizontalPodAutoscalerStatusBuilder {
 	b.fields.ObservedGeneration = &value
 	return b
 }
 
 // RemoveObservedGeneration removes the ObservedGeneration field from the declarative configuration.
-func (b HorizontalPodAutoscalerStatusBuilder) RemoveObservedGeneration() HorizontalPodAutoscalerStatusBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerStatusBuilder) RemoveObservedGeneration() *HorizontalPodAutoscalerStatusBuilder {
 	b.fields.ObservedGeneration = nil
 	return b
 }
 
 // GetObservedGeneration gets the ObservedGeneration field from the declarative configuration.
-func (b HorizontalPodAutoscalerStatusBuilder) GetObservedGeneration() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerStatusBuilder) GetObservedGeneration() (value int64, ok bool) {
 	if v := b.fields.ObservedGeneration; v != nil {
 		return *v, true
 	}
@@ -81,22 +71,19 @@ func (b HorizontalPodAutoscalerStatusBuilder) GetObservedGeneration() (value int
 }
 
 // SetLastScaleTime sets the LastScaleTime field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerStatusBuilder) SetLastScaleTime(value v1.Time) HorizontalPodAutoscalerStatusBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerStatusBuilder) SetLastScaleTime(value v1.Time) *HorizontalPodAutoscalerStatusBuilder {
 	b.fields.LastScaleTime = &value
 	return b
 }
 
 // RemoveLastScaleTime removes the LastScaleTime field from the declarative configuration.
-func (b HorizontalPodAutoscalerStatusBuilder) RemoveLastScaleTime() HorizontalPodAutoscalerStatusBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerStatusBuilder) RemoveLastScaleTime() *HorizontalPodAutoscalerStatusBuilder {
 	b.fields.LastScaleTime = nil
 	return b
 }
 
 // GetLastScaleTime gets the LastScaleTime field from the declarative configuration.
-func (b HorizontalPodAutoscalerStatusBuilder) GetLastScaleTime() (value v1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerStatusBuilder) GetLastScaleTime() (value v1.Time, ok bool) {
 	if v := b.fields.LastScaleTime; v != nil {
 		return *v, true
 	}
@@ -104,22 +91,19 @@ func (b HorizontalPodAutoscalerStatusBuilder) GetLastScaleTime() (value v1.Time,
 }
 
 // SetCurrentReplicas sets the CurrentReplicas field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerStatusBuilder) SetCurrentReplicas(value int32) HorizontalPodAutoscalerStatusBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerStatusBuilder) SetCurrentReplicas(value int32) *HorizontalPodAutoscalerStatusBuilder {
 	b.fields.CurrentReplicas = &value
 	return b
 }
 
 // RemoveCurrentReplicas removes the CurrentReplicas field from the declarative configuration.
-func (b HorizontalPodAutoscalerStatusBuilder) RemoveCurrentReplicas() HorizontalPodAutoscalerStatusBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerStatusBuilder) RemoveCurrentReplicas() *HorizontalPodAutoscalerStatusBuilder {
 	b.fields.CurrentReplicas = nil
 	return b
 }
 
 // GetCurrentReplicas gets the CurrentReplicas field from the declarative configuration.
-func (b HorizontalPodAutoscalerStatusBuilder) GetCurrentReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerStatusBuilder) GetCurrentReplicas() (value int32, ok bool) {
 	if v := b.fields.CurrentReplicas; v != nil {
 		return *v, true
 	}
@@ -127,22 +111,19 @@ func (b HorizontalPodAutoscalerStatusBuilder) GetCurrentReplicas() (value int32,
 }
 
 // SetDesiredReplicas sets the DesiredReplicas field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerStatusBuilder) SetDesiredReplicas(value int32) HorizontalPodAutoscalerStatusBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerStatusBuilder) SetDesiredReplicas(value int32) *HorizontalPodAutoscalerStatusBuilder {
 	b.fields.DesiredReplicas = &value
 	return b
 }
 
 // RemoveDesiredReplicas removes the DesiredReplicas field from the declarative configuration.
-func (b HorizontalPodAutoscalerStatusBuilder) RemoveDesiredReplicas() HorizontalPodAutoscalerStatusBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerStatusBuilder) RemoveDesiredReplicas() *HorizontalPodAutoscalerStatusBuilder {
 	b.fields.DesiredReplicas = nil
 	return b
 }
 
 // GetDesiredReplicas gets the DesiredReplicas field from the declarative configuration.
-func (b HorizontalPodAutoscalerStatusBuilder) GetDesiredReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerStatusBuilder) GetDesiredReplicas() (value int32, ok bool) {
 	if v := b.fields.DesiredReplicas; v != nil {
 		return *v, true
 	}
@@ -150,22 +131,19 @@ func (b HorizontalPodAutoscalerStatusBuilder) GetDesiredReplicas() (value int32,
 }
 
 // SetCurrentCPUUtilizationPercentage sets the CurrentCPUUtilizationPercentage field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerStatusBuilder) SetCurrentCPUUtilizationPercentage(value int32) HorizontalPodAutoscalerStatusBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerStatusBuilder) SetCurrentCPUUtilizationPercentage(value int32) *HorizontalPodAutoscalerStatusBuilder {
 	b.fields.CurrentCPUUtilizationPercentage = &value
 	return b
 }
 
 // RemoveCurrentCPUUtilizationPercentage removes the CurrentCPUUtilizationPercentage field from the declarative configuration.
-func (b HorizontalPodAutoscalerStatusBuilder) RemoveCurrentCPUUtilizationPercentage() HorizontalPodAutoscalerStatusBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerStatusBuilder) RemoveCurrentCPUUtilizationPercentage() *HorizontalPodAutoscalerStatusBuilder {
 	b.fields.CurrentCPUUtilizationPercentage = nil
 	return b
 }
 
 // GetCurrentCPUUtilizationPercentage gets the CurrentCPUUtilizationPercentage field from the declarative configuration.
-func (b HorizontalPodAutoscalerStatusBuilder) GetCurrentCPUUtilizationPercentage() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerStatusBuilder) GetCurrentCPUUtilizationPercentage() (value int32, ok bool) {
 	if v := b.fields.CurrentCPUUtilizationPercentage; v != nil {
 		return *v, true
 	}
@@ -177,9 +155,8 @@ func (b *HorizontalPodAutoscalerStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -194,14 +171,13 @@ func (b *HorizontalPodAutoscalerStatusBuilder) FromUnstructured(u map[string]int
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals HorizontalPodAutoscalerStatusBuilder to JSON.
 func (b *HorizontalPodAutoscalerStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -209,8 +185,7 @@ func (b *HorizontalPodAutoscalerStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into HorizontalPodAutoscalerStatusBuilder, replacing the contents of
 // HorizontalPodAutoscalerStatusBuilder.
 func (b *HorizontalPodAutoscalerStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -218,11 +193,9 @@ func (b *HorizontalPodAutoscalerStatusBuilder) UnmarshalJSON(data []byte) error 
 }
 
 // HorizontalPodAutoscalerStatusList represents a list of HorizontalPodAutoscalerStatusBuilder.
-// Provided as a convenience.
-type HorizontalPodAutoscalerStatusList []HorizontalPodAutoscalerStatusBuilder
+type HorizontalPodAutoscalerStatusList []*HorizontalPodAutoscalerStatusBuilder
 
 // HorizontalPodAutoscalerStatusList represents a map of HorizontalPodAutoscalerStatusBuilder.
-// Provided as a convenience.
 type HorizontalPodAutoscalerStatusMap map[string]HorizontalPodAutoscalerStatusBuilder
 
 func (b *HorizontalPodAutoscalerStatusBuilder) preMarshal() {

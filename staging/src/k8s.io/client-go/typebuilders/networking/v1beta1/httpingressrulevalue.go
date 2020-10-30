@@ -27,48 +27,38 @@ import (
 // HTTPIngressRuleValueBuilder represents an declarative configuration of the HTTPIngressRuleValue type for use
 // with apply.
 type HTTPIngressRuleValueBuilder struct {
-	fields *hTTPIngressRuleValueFields
+	fields hTTPIngressRuleValueFields
 }
 
-// hTTPIngressRuleValueFields is used by HTTPIngressRuleValueBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in HTTPIngressRuleValueBuilder before marshalling, and
-// are copied out to the builder type in HTTPIngressRuleValueBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// hTTPIngressRuleValueFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in HTTPIngressRuleValueBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type hTTPIngressRuleValueFields struct {
 	Paths *HTTPIngressPathList `json:"paths,omitempty"`
 }
 
-func (b *HTTPIngressRuleValueBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &hTTPIngressRuleValueFields{}
-	}
-}
-
 // HTTPIngressRuleValue constructs an declarative configuration of the HTTPIngressRuleValue type for use with
 // apply.
-// Provided as a convenience.
-func HTTPIngressRuleValue() HTTPIngressRuleValueBuilder {
-	return HTTPIngressRuleValueBuilder{fields: &hTTPIngressRuleValueFields{}}
+func HTTPIngressRuleValue() *HTTPIngressRuleValueBuilder {
+	return &HTTPIngressRuleValueBuilder{}
 }
 
 // SetPaths sets the Paths field in the declarative configuration to the given value.
-func (b HTTPIngressRuleValueBuilder) SetPaths(value HTTPIngressPathList) HTTPIngressRuleValueBuilder {
-	b.ensureInitialized()
+func (b *HTTPIngressRuleValueBuilder) SetPaths(value HTTPIngressPathList) *HTTPIngressRuleValueBuilder {
 	b.fields.Paths = &value
 	return b
 }
 
 // RemovePaths removes the Paths field from the declarative configuration.
-func (b HTTPIngressRuleValueBuilder) RemovePaths() HTTPIngressRuleValueBuilder {
-	b.ensureInitialized()
+func (b *HTTPIngressRuleValueBuilder) RemovePaths() *HTTPIngressRuleValueBuilder {
 	b.fields.Paths = nil
 	return b
 }
 
 // GetPaths gets the Paths field from the declarative configuration.
-func (b HTTPIngressRuleValueBuilder) GetPaths() (value HTTPIngressPathList, ok bool) {
-	b.ensureInitialized()
+func (b *HTTPIngressRuleValueBuilder) GetPaths() (value HTTPIngressPathList, ok bool) {
 	if v := b.fields.Paths; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *HTTPIngressRuleValueBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *HTTPIngressRuleValueBuilder) FromUnstructured(u map[string]interface{})
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals HTTPIngressRuleValueBuilder to JSON.
 func (b *HTTPIngressRuleValueBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *HTTPIngressRuleValueBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into HTTPIngressRuleValueBuilder, replacing the contents of
 // HTTPIngressRuleValueBuilder.
 func (b *HTTPIngressRuleValueBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *HTTPIngressRuleValueBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // HTTPIngressRuleValueList represents a list of HTTPIngressRuleValueBuilder.
-// Provided as a convenience.
-type HTTPIngressRuleValueList []HTTPIngressRuleValueBuilder
+type HTTPIngressRuleValueList []*HTTPIngressRuleValueBuilder
 
 // HTTPIngressRuleValueList represents a map of HTTPIngressRuleValueBuilder.
-// Provided as a convenience.
 type HTTPIngressRuleValueMap map[string]HTTPIngressRuleValueBuilder
 
 func (b *HTTPIngressRuleValueBuilder) preMarshal() {

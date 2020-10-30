@@ -28,52 +28,39 @@ import (
 // IngressStatusBuilder represents an declarative configuration of the IngressStatus type for use
 // with apply.
 type IngressStatusBuilder struct {
-	fields *ingressStatusFields
+	fields ingressStatusFields
 }
 
-// ingressStatusFields is used by IngressStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in IngressStatusBuilder before marshalling, and
-// are copied out to the builder type in IngressStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// ingressStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in IngressStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type ingressStatusFields struct {
 	LoadBalancer *v1.LoadBalancerStatusBuilder `json:"loadBalancer,omitempty"`
 }
 
-func (b *IngressStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &ingressStatusFields{}
-	}
-}
-
 // IngressStatus constructs an declarative configuration of the IngressStatus type for use with
 // apply.
-// Provided as a convenience.
-func IngressStatus() IngressStatusBuilder {
-	return IngressStatusBuilder{fields: &ingressStatusFields{}}
+func IngressStatus() *IngressStatusBuilder {
+	return &IngressStatusBuilder{}
 }
 
 // SetLoadBalancer sets the LoadBalancer field in the declarative configuration to the given value.
-func (b IngressStatusBuilder) SetLoadBalancer(value v1.LoadBalancerStatusBuilder) IngressStatusBuilder {
-	b.ensureInitialized()
-	b.fields.LoadBalancer = &value
+func (b *IngressStatusBuilder) SetLoadBalancer(value *v1.LoadBalancerStatusBuilder) *IngressStatusBuilder {
+	b.fields.LoadBalancer = value
 	return b
 }
 
 // RemoveLoadBalancer removes the LoadBalancer field from the declarative configuration.
-func (b IngressStatusBuilder) RemoveLoadBalancer() IngressStatusBuilder {
-	b.ensureInitialized()
+func (b *IngressStatusBuilder) RemoveLoadBalancer() *IngressStatusBuilder {
 	b.fields.LoadBalancer = nil
 	return b
 }
 
 // GetLoadBalancer gets the LoadBalancer field from the declarative configuration.
-func (b IngressStatusBuilder) GetLoadBalancer() (value v1.LoadBalancerStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.LoadBalancer; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *IngressStatusBuilder) GetLoadBalancer() (value *v1.LoadBalancerStatusBuilder, ok bool) {
+	return b.fields.LoadBalancer, b.fields.LoadBalancer != nil
 }
 
 // ToUnstructured converts IngressStatusBuilder to unstructured.
@@ -81,9 +68,8 @@ func (b *IngressStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -98,14 +84,13 @@ func (b *IngressStatusBuilder) FromUnstructured(u map[string]interface{}) error 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals IngressStatusBuilder to JSON.
 func (b *IngressStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -113,8 +98,7 @@ func (b *IngressStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into IngressStatusBuilder, replacing the contents of
 // IngressStatusBuilder.
 func (b *IngressStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -122,11 +106,9 @@ func (b *IngressStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // IngressStatusList represents a list of IngressStatusBuilder.
-// Provided as a convenience.
-type IngressStatusList []IngressStatusBuilder
+type IngressStatusList []*IngressStatusBuilder
 
 // IngressStatusList represents a map of IngressStatusBuilder.
-// Provided as a convenience.
 type IngressStatusMap map[string]IngressStatusBuilder
 
 func (b *IngressStatusBuilder) preMarshal() {

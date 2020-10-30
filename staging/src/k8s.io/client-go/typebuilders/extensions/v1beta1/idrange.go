@@ -27,49 +27,39 @@ import (
 // IDRangeBuilder represents an declarative configuration of the IDRange type for use
 // with apply.
 type IDRangeBuilder struct {
-	fields *iDRangeFields
+	fields iDRangeFields
 }
 
-// iDRangeFields is used by IDRangeBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in IDRangeBuilder before marshalling, and
-// are copied out to the builder type in IDRangeBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// iDRangeFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in IDRangeBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type iDRangeFields struct {
 	Min *int64 `json:"min,omitempty"`
 	Max *int64 `json:"max,omitempty"`
 }
 
-func (b *IDRangeBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &iDRangeFields{}
-	}
-}
-
 // IDRange constructs an declarative configuration of the IDRange type for use with
 // apply.
-// Provided as a convenience.
-func IDRange() IDRangeBuilder {
-	return IDRangeBuilder{fields: &iDRangeFields{}}
+func IDRange() *IDRangeBuilder {
+	return &IDRangeBuilder{}
 }
 
 // SetMin sets the Min field in the declarative configuration to the given value.
-func (b IDRangeBuilder) SetMin(value int64) IDRangeBuilder {
-	b.ensureInitialized()
+func (b *IDRangeBuilder) SetMin(value int64) *IDRangeBuilder {
 	b.fields.Min = &value
 	return b
 }
 
 // RemoveMin removes the Min field from the declarative configuration.
-func (b IDRangeBuilder) RemoveMin() IDRangeBuilder {
-	b.ensureInitialized()
+func (b *IDRangeBuilder) RemoveMin() *IDRangeBuilder {
 	b.fields.Min = nil
 	return b
 }
 
 // GetMin gets the Min field from the declarative configuration.
-func (b IDRangeBuilder) GetMin() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *IDRangeBuilder) GetMin() (value int64, ok bool) {
 	if v := b.fields.Min; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b IDRangeBuilder) GetMin() (value int64, ok bool) {
 }
 
 // SetMax sets the Max field in the declarative configuration to the given value.
-func (b IDRangeBuilder) SetMax(value int64) IDRangeBuilder {
-	b.ensureInitialized()
+func (b *IDRangeBuilder) SetMax(value int64) *IDRangeBuilder {
 	b.fields.Max = &value
 	return b
 }
 
 // RemoveMax removes the Max field from the declarative configuration.
-func (b IDRangeBuilder) RemoveMax() IDRangeBuilder {
-	b.ensureInitialized()
+func (b *IDRangeBuilder) RemoveMax() *IDRangeBuilder {
 	b.fields.Max = nil
 	return b
 }
 
 // GetMax gets the Max field from the declarative configuration.
-func (b IDRangeBuilder) GetMax() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *IDRangeBuilder) GetMax() (value int64, ok bool) {
 	if v := b.fields.Max; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *IDRangeBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *IDRangeBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals IDRangeBuilder to JSON.
 func (b *IDRangeBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *IDRangeBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into IDRangeBuilder, replacing the contents of
 // IDRangeBuilder.
 func (b *IDRangeBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *IDRangeBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // IDRangeList represents a list of IDRangeBuilder.
-// Provided as a convenience.
-type IDRangeList []IDRangeBuilder
+type IDRangeList []*IDRangeBuilder
 
 // IDRangeList represents a map of IDRangeBuilder.
-// Provided as a convenience.
 type IDRangeMap map[string]IDRangeBuilder
 
 func (b *IDRangeBuilder) preMarshal() {

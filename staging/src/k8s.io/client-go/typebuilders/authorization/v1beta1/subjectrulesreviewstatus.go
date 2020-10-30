@@ -27,14 +27,14 @@ import (
 // SubjectRulesReviewStatusBuilder represents an declarative configuration of the SubjectRulesReviewStatus type for use
 // with apply.
 type SubjectRulesReviewStatusBuilder struct {
-	fields *subjectRulesReviewStatusFields
+	fields subjectRulesReviewStatusFields
 }
 
-// subjectRulesReviewStatusFields is used by SubjectRulesReviewStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in SubjectRulesReviewStatusBuilder before marshalling, and
-// are copied out to the builder type in SubjectRulesReviewStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// subjectRulesReviewStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in SubjectRulesReviewStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type subjectRulesReviewStatusFields struct {
 	ResourceRules    *ResourceRuleList    `json:"resourceRules,omitempty"`
 	NonResourceRules *NonResourceRuleList `json:"nonResourceRules,omitempty"`
@@ -42,36 +42,26 @@ type subjectRulesReviewStatusFields struct {
 	EvaluationError  *string              `json:"evaluationError,omitempty"`
 }
 
-func (b *SubjectRulesReviewStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &subjectRulesReviewStatusFields{}
-	}
-}
-
 // SubjectRulesReviewStatus constructs an declarative configuration of the SubjectRulesReviewStatus type for use with
 // apply.
-// Provided as a convenience.
-func SubjectRulesReviewStatus() SubjectRulesReviewStatusBuilder {
-	return SubjectRulesReviewStatusBuilder{fields: &subjectRulesReviewStatusFields{}}
+func SubjectRulesReviewStatus() *SubjectRulesReviewStatusBuilder {
+	return &SubjectRulesReviewStatusBuilder{}
 }
 
 // SetResourceRules sets the ResourceRules field in the declarative configuration to the given value.
-func (b SubjectRulesReviewStatusBuilder) SetResourceRules(value ResourceRuleList) SubjectRulesReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *SubjectRulesReviewStatusBuilder) SetResourceRules(value ResourceRuleList) *SubjectRulesReviewStatusBuilder {
 	b.fields.ResourceRules = &value
 	return b
 }
 
 // RemoveResourceRules removes the ResourceRules field from the declarative configuration.
-func (b SubjectRulesReviewStatusBuilder) RemoveResourceRules() SubjectRulesReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *SubjectRulesReviewStatusBuilder) RemoveResourceRules() *SubjectRulesReviewStatusBuilder {
 	b.fields.ResourceRules = nil
 	return b
 }
 
 // GetResourceRules gets the ResourceRules field from the declarative configuration.
-func (b SubjectRulesReviewStatusBuilder) GetResourceRules() (value ResourceRuleList, ok bool) {
-	b.ensureInitialized()
+func (b *SubjectRulesReviewStatusBuilder) GetResourceRules() (value ResourceRuleList, ok bool) {
 	if v := b.fields.ResourceRules; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b SubjectRulesReviewStatusBuilder) GetResourceRules() (value ResourceRuleL
 }
 
 // SetNonResourceRules sets the NonResourceRules field in the declarative configuration to the given value.
-func (b SubjectRulesReviewStatusBuilder) SetNonResourceRules(value NonResourceRuleList) SubjectRulesReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *SubjectRulesReviewStatusBuilder) SetNonResourceRules(value NonResourceRuleList) *SubjectRulesReviewStatusBuilder {
 	b.fields.NonResourceRules = &value
 	return b
 }
 
 // RemoveNonResourceRules removes the NonResourceRules field from the declarative configuration.
-func (b SubjectRulesReviewStatusBuilder) RemoveNonResourceRules() SubjectRulesReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *SubjectRulesReviewStatusBuilder) RemoveNonResourceRules() *SubjectRulesReviewStatusBuilder {
 	b.fields.NonResourceRules = nil
 	return b
 }
 
 // GetNonResourceRules gets the NonResourceRules field from the declarative configuration.
-func (b SubjectRulesReviewStatusBuilder) GetNonResourceRules() (value NonResourceRuleList, ok bool) {
-	b.ensureInitialized()
+func (b *SubjectRulesReviewStatusBuilder) GetNonResourceRules() (value NonResourceRuleList, ok bool) {
 	if v := b.fields.NonResourceRules; v != nil {
 		return *v, true
 	}
@@ -102,22 +89,19 @@ func (b SubjectRulesReviewStatusBuilder) GetNonResourceRules() (value NonResourc
 }
 
 // SetIncomplete sets the Incomplete field in the declarative configuration to the given value.
-func (b SubjectRulesReviewStatusBuilder) SetIncomplete(value bool) SubjectRulesReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *SubjectRulesReviewStatusBuilder) SetIncomplete(value bool) *SubjectRulesReviewStatusBuilder {
 	b.fields.Incomplete = &value
 	return b
 }
 
 // RemoveIncomplete removes the Incomplete field from the declarative configuration.
-func (b SubjectRulesReviewStatusBuilder) RemoveIncomplete() SubjectRulesReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *SubjectRulesReviewStatusBuilder) RemoveIncomplete() *SubjectRulesReviewStatusBuilder {
 	b.fields.Incomplete = nil
 	return b
 }
 
 // GetIncomplete gets the Incomplete field from the declarative configuration.
-func (b SubjectRulesReviewStatusBuilder) GetIncomplete() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *SubjectRulesReviewStatusBuilder) GetIncomplete() (value bool, ok bool) {
 	if v := b.fields.Incomplete; v != nil {
 		return *v, true
 	}
@@ -125,22 +109,19 @@ func (b SubjectRulesReviewStatusBuilder) GetIncomplete() (value bool, ok bool) {
 }
 
 // SetEvaluationError sets the EvaluationError field in the declarative configuration to the given value.
-func (b SubjectRulesReviewStatusBuilder) SetEvaluationError(value string) SubjectRulesReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *SubjectRulesReviewStatusBuilder) SetEvaluationError(value string) *SubjectRulesReviewStatusBuilder {
 	b.fields.EvaluationError = &value
 	return b
 }
 
 // RemoveEvaluationError removes the EvaluationError field from the declarative configuration.
-func (b SubjectRulesReviewStatusBuilder) RemoveEvaluationError() SubjectRulesReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *SubjectRulesReviewStatusBuilder) RemoveEvaluationError() *SubjectRulesReviewStatusBuilder {
 	b.fields.EvaluationError = nil
 	return b
 }
 
 // GetEvaluationError gets the EvaluationError field from the declarative configuration.
-func (b SubjectRulesReviewStatusBuilder) GetEvaluationError() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *SubjectRulesReviewStatusBuilder) GetEvaluationError() (value string, ok bool) {
 	if v := b.fields.EvaluationError; v != nil {
 		return *v, true
 	}
@@ -152,9 +133,8 @@ func (b *SubjectRulesReviewStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +149,13 @@ func (b *SubjectRulesReviewStatusBuilder) FromUnstructured(u map[string]interfac
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals SubjectRulesReviewStatusBuilder to JSON.
 func (b *SubjectRulesReviewStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +163,7 @@ func (b *SubjectRulesReviewStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into SubjectRulesReviewStatusBuilder, replacing the contents of
 // SubjectRulesReviewStatusBuilder.
 func (b *SubjectRulesReviewStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,11 +171,9 @@ func (b *SubjectRulesReviewStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // SubjectRulesReviewStatusList represents a list of SubjectRulesReviewStatusBuilder.
-// Provided as a convenience.
-type SubjectRulesReviewStatusList []SubjectRulesReviewStatusBuilder
+type SubjectRulesReviewStatusList []*SubjectRulesReviewStatusBuilder
 
 // SubjectRulesReviewStatusList represents a map of SubjectRulesReviewStatusBuilder.
-// Provided as a convenience.
 type SubjectRulesReviewStatusMap map[string]SubjectRulesReviewStatusBuilder
 
 func (b *SubjectRulesReviewStatusBuilder) preMarshal() {

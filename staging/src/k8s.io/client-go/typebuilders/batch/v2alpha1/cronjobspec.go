@@ -28,14 +28,14 @@ import (
 // CronJobSpecBuilder represents an declarative configuration of the CronJobSpec type for use
 // with apply.
 type CronJobSpecBuilder struct {
-	fields *cronJobSpecFields
+	fields cronJobSpecFields
 }
 
-// cronJobSpecFields is used by CronJobSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in CronJobSpecBuilder before marshalling, and
-// are copied out to the builder type in CronJobSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// cronJobSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in CronJobSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type cronJobSpecFields struct {
 	Schedule                   *string                     `json:"schedule,omitempty"`
 	StartingDeadlineSeconds    *int64                      `json:"startingDeadlineSeconds,omitempty"`
@@ -46,36 +46,26 @@ type cronJobSpecFields struct {
 	FailedJobsHistoryLimit     *int32                      `json:"failedJobsHistoryLimit,omitempty"`
 }
 
-func (b *CronJobSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &cronJobSpecFields{}
-	}
-}
-
 // CronJobSpec constructs an declarative configuration of the CronJobSpec type for use with
 // apply.
-// Provided as a convenience.
-func CronJobSpec() CronJobSpecBuilder {
-	return CronJobSpecBuilder{fields: &cronJobSpecFields{}}
+func CronJobSpec() *CronJobSpecBuilder {
+	return &CronJobSpecBuilder{}
 }
 
 // SetSchedule sets the Schedule field in the declarative configuration to the given value.
-func (b CronJobSpecBuilder) SetSchedule(value string) CronJobSpecBuilder {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) SetSchedule(value string) *CronJobSpecBuilder {
 	b.fields.Schedule = &value
 	return b
 }
 
 // RemoveSchedule removes the Schedule field from the declarative configuration.
-func (b CronJobSpecBuilder) RemoveSchedule() CronJobSpecBuilder {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) RemoveSchedule() *CronJobSpecBuilder {
 	b.fields.Schedule = nil
 	return b
 }
 
 // GetSchedule gets the Schedule field from the declarative configuration.
-func (b CronJobSpecBuilder) GetSchedule() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) GetSchedule() (value string, ok bool) {
 	if v := b.fields.Schedule; v != nil {
 		return *v, true
 	}
@@ -83,22 +73,19 @@ func (b CronJobSpecBuilder) GetSchedule() (value string, ok bool) {
 }
 
 // SetStartingDeadlineSeconds sets the StartingDeadlineSeconds field in the declarative configuration to the given value.
-func (b CronJobSpecBuilder) SetStartingDeadlineSeconds(value int64) CronJobSpecBuilder {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) SetStartingDeadlineSeconds(value int64) *CronJobSpecBuilder {
 	b.fields.StartingDeadlineSeconds = &value
 	return b
 }
 
 // RemoveStartingDeadlineSeconds removes the StartingDeadlineSeconds field from the declarative configuration.
-func (b CronJobSpecBuilder) RemoveStartingDeadlineSeconds() CronJobSpecBuilder {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) RemoveStartingDeadlineSeconds() *CronJobSpecBuilder {
 	b.fields.StartingDeadlineSeconds = nil
 	return b
 }
 
 // GetStartingDeadlineSeconds gets the StartingDeadlineSeconds field from the declarative configuration.
-func (b CronJobSpecBuilder) GetStartingDeadlineSeconds() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) GetStartingDeadlineSeconds() (value int64, ok bool) {
 	if v := b.fields.StartingDeadlineSeconds; v != nil {
 		return *v, true
 	}
@@ -106,22 +93,19 @@ func (b CronJobSpecBuilder) GetStartingDeadlineSeconds() (value int64, ok bool) 
 }
 
 // SetConcurrencyPolicy sets the ConcurrencyPolicy field in the declarative configuration to the given value.
-func (b CronJobSpecBuilder) SetConcurrencyPolicy(value v2alpha1.ConcurrencyPolicy) CronJobSpecBuilder {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) SetConcurrencyPolicy(value v2alpha1.ConcurrencyPolicy) *CronJobSpecBuilder {
 	b.fields.ConcurrencyPolicy = &value
 	return b
 }
 
 // RemoveConcurrencyPolicy removes the ConcurrencyPolicy field from the declarative configuration.
-func (b CronJobSpecBuilder) RemoveConcurrencyPolicy() CronJobSpecBuilder {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) RemoveConcurrencyPolicy() *CronJobSpecBuilder {
 	b.fields.ConcurrencyPolicy = nil
 	return b
 }
 
 // GetConcurrencyPolicy gets the ConcurrencyPolicy field from the declarative configuration.
-func (b CronJobSpecBuilder) GetConcurrencyPolicy() (value v2alpha1.ConcurrencyPolicy, ok bool) {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) GetConcurrencyPolicy() (value v2alpha1.ConcurrencyPolicy, ok bool) {
 	if v := b.fields.ConcurrencyPolicy; v != nil {
 		return *v, true
 	}
@@ -129,22 +113,19 @@ func (b CronJobSpecBuilder) GetConcurrencyPolicy() (value v2alpha1.ConcurrencyPo
 }
 
 // SetSuspend sets the Suspend field in the declarative configuration to the given value.
-func (b CronJobSpecBuilder) SetSuspend(value bool) CronJobSpecBuilder {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) SetSuspend(value bool) *CronJobSpecBuilder {
 	b.fields.Suspend = &value
 	return b
 }
 
 // RemoveSuspend removes the Suspend field from the declarative configuration.
-func (b CronJobSpecBuilder) RemoveSuspend() CronJobSpecBuilder {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) RemoveSuspend() *CronJobSpecBuilder {
 	b.fields.Suspend = nil
 	return b
 }
 
 // GetSuspend gets the Suspend field from the declarative configuration.
-func (b CronJobSpecBuilder) GetSuspend() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) GetSuspend() (value bool, ok bool) {
 	if v := b.fields.Suspend; v != nil {
 		return *v, true
 	}
@@ -152,45 +133,36 @@ func (b CronJobSpecBuilder) GetSuspend() (value bool, ok bool) {
 }
 
 // SetJobTemplate sets the JobTemplate field in the declarative configuration to the given value.
-func (b CronJobSpecBuilder) SetJobTemplate(value JobTemplateSpecBuilder) CronJobSpecBuilder {
-	b.ensureInitialized()
-	b.fields.JobTemplate = &value
+func (b *CronJobSpecBuilder) SetJobTemplate(value *JobTemplateSpecBuilder) *CronJobSpecBuilder {
+	b.fields.JobTemplate = value
 	return b
 }
 
 // RemoveJobTemplate removes the JobTemplate field from the declarative configuration.
-func (b CronJobSpecBuilder) RemoveJobTemplate() CronJobSpecBuilder {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) RemoveJobTemplate() *CronJobSpecBuilder {
 	b.fields.JobTemplate = nil
 	return b
 }
 
 // GetJobTemplate gets the JobTemplate field from the declarative configuration.
-func (b CronJobSpecBuilder) GetJobTemplate() (value JobTemplateSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.JobTemplate; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *CronJobSpecBuilder) GetJobTemplate() (value *JobTemplateSpecBuilder, ok bool) {
+	return b.fields.JobTemplate, b.fields.JobTemplate != nil
 }
 
 // SetSuccessfulJobsHistoryLimit sets the SuccessfulJobsHistoryLimit field in the declarative configuration to the given value.
-func (b CronJobSpecBuilder) SetSuccessfulJobsHistoryLimit(value int32) CronJobSpecBuilder {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) SetSuccessfulJobsHistoryLimit(value int32) *CronJobSpecBuilder {
 	b.fields.SuccessfulJobsHistoryLimit = &value
 	return b
 }
 
 // RemoveSuccessfulJobsHistoryLimit removes the SuccessfulJobsHistoryLimit field from the declarative configuration.
-func (b CronJobSpecBuilder) RemoveSuccessfulJobsHistoryLimit() CronJobSpecBuilder {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) RemoveSuccessfulJobsHistoryLimit() *CronJobSpecBuilder {
 	b.fields.SuccessfulJobsHistoryLimit = nil
 	return b
 }
 
 // GetSuccessfulJobsHistoryLimit gets the SuccessfulJobsHistoryLimit field from the declarative configuration.
-func (b CronJobSpecBuilder) GetSuccessfulJobsHistoryLimit() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) GetSuccessfulJobsHistoryLimit() (value int32, ok bool) {
 	if v := b.fields.SuccessfulJobsHistoryLimit; v != nil {
 		return *v, true
 	}
@@ -198,22 +170,19 @@ func (b CronJobSpecBuilder) GetSuccessfulJobsHistoryLimit() (value int32, ok boo
 }
 
 // SetFailedJobsHistoryLimit sets the FailedJobsHistoryLimit field in the declarative configuration to the given value.
-func (b CronJobSpecBuilder) SetFailedJobsHistoryLimit(value int32) CronJobSpecBuilder {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) SetFailedJobsHistoryLimit(value int32) *CronJobSpecBuilder {
 	b.fields.FailedJobsHistoryLimit = &value
 	return b
 }
 
 // RemoveFailedJobsHistoryLimit removes the FailedJobsHistoryLimit field from the declarative configuration.
-func (b CronJobSpecBuilder) RemoveFailedJobsHistoryLimit() CronJobSpecBuilder {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) RemoveFailedJobsHistoryLimit() *CronJobSpecBuilder {
 	b.fields.FailedJobsHistoryLimit = nil
 	return b
 }
 
 // GetFailedJobsHistoryLimit gets the FailedJobsHistoryLimit field from the declarative configuration.
-func (b CronJobSpecBuilder) GetFailedJobsHistoryLimit() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *CronJobSpecBuilder) GetFailedJobsHistoryLimit() (value int32, ok bool) {
 	if v := b.fields.FailedJobsHistoryLimit; v != nil {
 		return *v, true
 	}
@@ -225,9 +194,8 @@ func (b *CronJobSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -242,14 +210,13 @@ func (b *CronJobSpecBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals CronJobSpecBuilder to JSON.
 func (b *CronJobSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -257,8 +224,7 @@ func (b *CronJobSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into CronJobSpecBuilder, replacing the contents of
 // CronJobSpecBuilder.
 func (b *CronJobSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -266,11 +232,9 @@ func (b *CronJobSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // CronJobSpecList represents a list of CronJobSpecBuilder.
-// Provided as a convenience.
-type CronJobSpecList []CronJobSpecBuilder
+type CronJobSpecList []*CronJobSpecBuilder
 
 // CronJobSpecList represents a map of CronJobSpecBuilder.
-// Provided as a convenience.
 type CronJobSpecMap map[string]CronJobSpecBuilder
 
 func (b *CronJobSpecBuilder) preMarshal() {

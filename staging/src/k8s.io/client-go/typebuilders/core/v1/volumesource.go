@@ -27,14 +27,14 @@ import (
 // VolumeSourceBuilder represents an declarative configuration of the VolumeSource type for use
 // with apply.
 type VolumeSourceBuilder struct {
-	fields *volumeSourceFields
+	fields volumeSourceFields
 }
 
-// volumeSourceFields is used by VolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in VolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in VolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// volumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in VolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type volumeSourceFields struct {
 	HostPath              *HostPathVolumeSourceBuilder              `json:"hostPath,omitempty"`
 	EmptyDir              *EmptyDirVolumeSourceBuilder              `json:"emptyDir,omitempty"`
@@ -67,684 +67,503 @@ type volumeSourceFields struct {
 	Ephemeral             *EphemeralVolumeSourceBuilder             `json:"ephemeral,omitempty"`
 }
 
-func (b *VolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &volumeSourceFields{}
-	}
-}
-
 // VolumeSource constructs an declarative configuration of the VolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func VolumeSource() VolumeSourceBuilder {
-	return VolumeSourceBuilder{fields: &volumeSourceFields{}}
+func VolumeSource() *VolumeSourceBuilder {
+	return &VolumeSourceBuilder{}
 }
 
 // SetHostPath sets the HostPath field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetHostPath(value HostPathVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.HostPath = &value
+func (b *VolumeSourceBuilder) SetHostPath(value *HostPathVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.HostPath = value
 	return b
 }
 
 // RemoveHostPath removes the HostPath field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveHostPath() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveHostPath() *VolumeSourceBuilder {
 	b.fields.HostPath = nil
 	return b
 }
 
 // GetHostPath gets the HostPath field from the declarative configuration.
-func (b VolumeSourceBuilder) GetHostPath() (value HostPathVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.HostPath; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetHostPath() (value *HostPathVolumeSourceBuilder, ok bool) {
+	return b.fields.HostPath, b.fields.HostPath != nil
 }
 
 // SetEmptyDir sets the EmptyDir field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetEmptyDir(value EmptyDirVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.EmptyDir = &value
+func (b *VolumeSourceBuilder) SetEmptyDir(value *EmptyDirVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.EmptyDir = value
 	return b
 }
 
 // RemoveEmptyDir removes the EmptyDir field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveEmptyDir() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveEmptyDir() *VolumeSourceBuilder {
 	b.fields.EmptyDir = nil
 	return b
 }
 
 // GetEmptyDir gets the EmptyDir field from the declarative configuration.
-func (b VolumeSourceBuilder) GetEmptyDir() (value EmptyDirVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.EmptyDir; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetEmptyDir() (value *EmptyDirVolumeSourceBuilder, ok bool) {
+	return b.fields.EmptyDir, b.fields.EmptyDir != nil
 }
 
 // SetGCEPersistentDisk sets the GCEPersistentDisk field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetGCEPersistentDisk(value GCEPersistentDiskVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.GCEPersistentDisk = &value
+func (b *VolumeSourceBuilder) SetGCEPersistentDisk(value *GCEPersistentDiskVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.GCEPersistentDisk = value
 	return b
 }
 
 // RemoveGCEPersistentDisk removes the GCEPersistentDisk field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveGCEPersistentDisk() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveGCEPersistentDisk() *VolumeSourceBuilder {
 	b.fields.GCEPersistentDisk = nil
 	return b
 }
 
 // GetGCEPersistentDisk gets the GCEPersistentDisk field from the declarative configuration.
-func (b VolumeSourceBuilder) GetGCEPersistentDisk() (value GCEPersistentDiskVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.GCEPersistentDisk; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetGCEPersistentDisk() (value *GCEPersistentDiskVolumeSourceBuilder, ok bool) {
+	return b.fields.GCEPersistentDisk, b.fields.GCEPersistentDisk != nil
 }
 
 // SetAWSElasticBlockStore sets the AWSElasticBlockStore field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetAWSElasticBlockStore(value AWSElasticBlockStoreVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.AWSElasticBlockStore = &value
+func (b *VolumeSourceBuilder) SetAWSElasticBlockStore(value *AWSElasticBlockStoreVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.AWSElasticBlockStore = value
 	return b
 }
 
 // RemoveAWSElasticBlockStore removes the AWSElasticBlockStore field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveAWSElasticBlockStore() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveAWSElasticBlockStore() *VolumeSourceBuilder {
 	b.fields.AWSElasticBlockStore = nil
 	return b
 }
 
 // GetAWSElasticBlockStore gets the AWSElasticBlockStore field from the declarative configuration.
-func (b VolumeSourceBuilder) GetAWSElasticBlockStore() (value AWSElasticBlockStoreVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.AWSElasticBlockStore; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetAWSElasticBlockStore() (value *AWSElasticBlockStoreVolumeSourceBuilder, ok bool) {
+	return b.fields.AWSElasticBlockStore, b.fields.AWSElasticBlockStore != nil
 }
 
 // SetGitRepo sets the GitRepo field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetGitRepo(value GitRepoVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.GitRepo = &value
+func (b *VolumeSourceBuilder) SetGitRepo(value *GitRepoVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.GitRepo = value
 	return b
 }
 
 // RemoveGitRepo removes the GitRepo field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveGitRepo() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveGitRepo() *VolumeSourceBuilder {
 	b.fields.GitRepo = nil
 	return b
 }
 
 // GetGitRepo gets the GitRepo field from the declarative configuration.
-func (b VolumeSourceBuilder) GetGitRepo() (value GitRepoVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.GitRepo; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetGitRepo() (value *GitRepoVolumeSourceBuilder, ok bool) {
+	return b.fields.GitRepo, b.fields.GitRepo != nil
 }
 
 // SetSecret sets the Secret field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetSecret(value SecretVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.Secret = &value
+func (b *VolumeSourceBuilder) SetSecret(value *SecretVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.Secret = value
 	return b
 }
 
 // RemoveSecret removes the Secret field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveSecret() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveSecret() *VolumeSourceBuilder {
 	b.fields.Secret = nil
 	return b
 }
 
 // GetSecret gets the Secret field from the declarative configuration.
-func (b VolumeSourceBuilder) GetSecret() (value SecretVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Secret; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetSecret() (value *SecretVolumeSourceBuilder, ok bool) {
+	return b.fields.Secret, b.fields.Secret != nil
 }
 
 // SetNFS sets the NFS field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetNFS(value NFSVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.NFS = &value
+func (b *VolumeSourceBuilder) SetNFS(value *NFSVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.NFS = value
 	return b
 }
 
 // RemoveNFS removes the NFS field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveNFS() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveNFS() *VolumeSourceBuilder {
 	b.fields.NFS = nil
 	return b
 }
 
 // GetNFS gets the NFS field from the declarative configuration.
-func (b VolumeSourceBuilder) GetNFS() (value NFSVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.NFS; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetNFS() (value *NFSVolumeSourceBuilder, ok bool) {
+	return b.fields.NFS, b.fields.NFS != nil
 }
 
 // SetISCSI sets the ISCSI field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetISCSI(value ISCSIVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.ISCSI = &value
+func (b *VolumeSourceBuilder) SetISCSI(value *ISCSIVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.ISCSI = value
 	return b
 }
 
 // RemoveISCSI removes the ISCSI field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveISCSI() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveISCSI() *VolumeSourceBuilder {
 	b.fields.ISCSI = nil
 	return b
 }
 
 // GetISCSI gets the ISCSI field from the declarative configuration.
-func (b VolumeSourceBuilder) GetISCSI() (value ISCSIVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ISCSI; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetISCSI() (value *ISCSIVolumeSourceBuilder, ok bool) {
+	return b.fields.ISCSI, b.fields.ISCSI != nil
 }
 
 // SetGlusterfs sets the Glusterfs field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetGlusterfs(value GlusterfsVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.Glusterfs = &value
+func (b *VolumeSourceBuilder) SetGlusterfs(value *GlusterfsVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.Glusterfs = value
 	return b
 }
 
 // RemoveGlusterfs removes the Glusterfs field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveGlusterfs() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveGlusterfs() *VolumeSourceBuilder {
 	b.fields.Glusterfs = nil
 	return b
 }
 
 // GetGlusterfs gets the Glusterfs field from the declarative configuration.
-func (b VolumeSourceBuilder) GetGlusterfs() (value GlusterfsVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Glusterfs; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetGlusterfs() (value *GlusterfsVolumeSourceBuilder, ok bool) {
+	return b.fields.Glusterfs, b.fields.Glusterfs != nil
 }
 
 // SetPersistentVolumeClaim sets the PersistentVolumeClaim field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetPersistentVolumeClaim(value PersistentVolumeClaimVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.PersistentVolumeClaim = &value
+func (b *VolumeSourceBuilder) SetPersistentVolumeClaim(value *PersistentVolumeClaimVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.PersistentVolumeClaim = value
 	return b
 }
 
 // RemovePersistentVolumeClaim removes the PersistentVolumeClaim field from the declarative configuration.
-func (b VolumeSourceBuilder) RemovePersistentVolumeClaim() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemovePersistentVolumeClaim() *VolumeSourceBuilder {
 	b.fields.PersistentVolumeClaim = nil
 	return b
 }
 
 // GetPersistentVolumeClaim gets the PersistentVolumeClaim field from the declarative configuration.
-func (b VolumeSourceBuilder) GetPersistentVolumeClaim() (value PersistentVolumeClaimVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.PersistentVolumeClaim; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetPersistentVolumeClaim() (value *PersistentVolumeClaimVolumeSourceBuilder, ok bool) {
+	return b.fields.PersistentVolumeClaim, b.fields.PersistentVolumeClaim != nil
 }
 
 // SetRBD sets the RBD field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetRBD(value RBDVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.RBD = &value
+func (b *VolumeSourceBuilder) SetRBD(value *RBDVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.RBD = value
 	return b
 }
 
 // RemoveRBD removes the RBD field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveRBD() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveRBD() *VolumeSourceBuilder {
 	b.fields.RBD = nil
 	return b
 }
 
 // GetRBD gets the RBD field from the declarative configuration.
-func (b VolumeSourceBuilder) GetRBD() (value RBDVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.RBD; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetRBD() (value *RBDVolumeSourceBuilder, ok bool) {
+	return b.fields.RBD, b.fields.RBD != nil
 }
 
 // SetFlexVolume sets the FlexVolume field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetFlexVolume(value FlexVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.FlexVolume = &value
+func (b *VolumeSourceBuilder) SetFlexVolume(value *FlexVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.FlexVolume = value
 	return b
 }
 
 // RemoveFlexVolume removes the FlexVolume field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveFlexVolume() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveFlexVolume() *VolumeSourceBuilder {
 	b.fields.FlexVolume = nil
 	return b
 }
 
 // GetFlexVolume gets the FlexVolume field from the declarative configuration.
-func (b VolumeSourceBuilder) GetFlexVolume() (value FlexVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.FlexVolume; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetFlexVolume() (value *FlexVolumeSourceBuilder, ok bool) {
+	return b.fields.FlexVolume, b.fields.FlexVolume != nil
 }
 
 // SetCinder sets the Cinder field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetCinder(value CinderVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.Cinder = &value
+func (b *VolumeSourceBuilder) SetCinder(value *CinderVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.Cinder = value
 	return b
 }
 
 // RemoveCinder removes the Cinder field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveCinder() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveCinder() *VolumeSourceBuilder {
 	b.fields.Cinder = nil
 	return b
 }
 
 // GetCinder gets the Cinder field from the declarative configuration.
-func (b VolumeSourceBuilder) GetCinder() (value CinderVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Cinder; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetCinder() (value *CinderVolumeSourceBuilder, ok bool) {
+	return b.fields.Cinder, b.fields.Cinder != nil
 }
 
 // SetCephFS sets the CephFS field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetCephFS(value CephFSVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.CephFS = &value
+func (b *VolumeSourceBuilder) SetCephFS(value *CephFSVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.CephFS = value
 	return b
 }
 
 // RemoveCephFS removes the CephFS field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveCephFS() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveCephFS() *VolumeSourceBuilder {
 	b.fields.CephFS = nil
 	return b
 }
 
 // GetCephFS gets the CephFS field from the declarative configuration.
-func (b VolumeSourceBuilder) GetCephFS() (value CephFSVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.CephFS; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetCephFS() (value *CephFSVolumeSourceBuilder, ok bool) {
+	return b.fields.CephFS, b.fields.CephFS != nil
 }
 
 // SetFlocker sets the Flocker field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetFlocker(value FlockerVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.Flocker = &value
+func (b *VolumeSourceBuilder) SetFlocker(value *FlockerVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.Flocker = value
 	return b
 }
 
 // RemoveFlocker removes the Flocker field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveFlocker() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveFlocker() *VolumeSourceBuilder {
 	b.fields.Flocker = nil
 	return b
 }
 
 // GetFlocker gets the Flocker field from the declarative configuration.
-func (b VolumeSourceBuilder) GetFlocker() (value FlockerVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Flocker; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetFlocker() (value *FlockerVolumeSourceBuilder, ok bool) {
+	return b.fields.Flocker, b.fields.Flocker != nil
 }
 
 // SetDownwardAPI sets the DownwardAPI field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetDownwardAPI(value DownwardAPIVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.DownwardAPI = &value
+func (b *VolumeSourceBuilder) SetDownwardAPI(value *DownwardAPIVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.DownwardAPI = value
 	return b
 }
 
 // RemoveDownwardAPI removes the DownwardAPI field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveDownwardAPI() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveDownwardAPI() *VolumeSourceBuilder {
 	b.fields.DownwardAPI = nil
 	return b
 }
 
 // GetDownwardAPI gets the DownwardAPI field from the declarative configuration.
-func (b VolumeSourceBuilder) GetDownwardAPI() (value DownwardAPIVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.DownwardAPI; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetDownwardAPI() (value *DownwardAPIVolumeSourceBuilder, ok bool) {
+	return b.fields.DownwardAPI, b.fields.DownwardAPI != nil
 }
 
 // SetFC sets the FC field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetFC(value FCVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.FC = &value
+func (b *VolumeSourceBuilder) SetFC(value *FCVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.FC = value
 	return b
 }
 
 // RemoveFC removes the FC field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveFC() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveFC() *VolumeSourceBuilder {
 	b.fields.FC = nil
 	return b
 }
 
 // GetFC gets the FC field from the declarative configuration.
-func (b VolumeSourceBuilder) GetFC() (value FCVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.FC; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetFC() (value *FCVolumeSourceBuilder, ok bool) {
+	return b.fields.FC, b.fields.FC != nil
 }
 
 // SetAzureFile sets the AzureFile field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetAzureFile(value AzureFileVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.AzureFile = &value
+func (b *VolumeSourceBuilder) SetAzureFile(value *AzureFileVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.AzureFile = value
 	return b
 }
 
 // RemoveAzureFile removes the AzureFile field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveAzureFile() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveAzureFile() *VolumeSourceBuilder {
 	b.fields.AzureFile = nil
 	return b
 }
 
 // GetAzureFile gets the AzureFile field from the declarative configuration.
-func (b VolumeSourceBuilder) GetAzureFile() (value AzureFileVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.AzureFile; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetAzureFile() (value *AzureFileVolumeSourceBuilder, ok bool) {
+	return b.fields.AzureFile, b.fields.AzureFile != nil
 }
 
 // SetConfigMap sets the ConfigMap field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetConfigMap(value ConfigMapVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.ConfigMap = &value
+func (b *VolumeSourceBuilder) SetConfigMap(value *ConfigMapVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.ConfigMap = value
 	return b
 }
 
 // RemoveConfigMap removes the ConfigMap field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveConfigMap() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveConfigMap() *VolumeSourceBuilder {
 	b.fields.ConfigMap = nil
 	return b
 }
 
 // GetConfigMap gets the ConfigMap field from the declarative configuration.
-func (b VolumeSourceBuilder) GetConfigMap() (value ConfigMapVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ConfigMap; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetConfigMap() (value *ConfigMapVolumeSourceBuilder, ok bool) {
+	return b.fields.ConfigMap, b.fields.ConfigMap != nil
 }
 
 // SetVsphereVolume sets the VsphereVolume field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetVsphereVolume(value VsphereVirtualDiskVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.VsphereVolume = &value
+func (b *VolumeSourceBuilder) SetVsphereVolume(value *VsphereVirtualDiskVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.VsphereVolume = value
 	return b
 }
 
 // RemoveVsphereVolume removes the VsphereVolume field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveVsphereVolume() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveVsphereVolume() *VolumeSourceBuilder {
 	b.fields.VsphereVolume = nil
 	return b
 }
 
 // GetVsphereVolume gets the VsphereVolume field from the declarative configuration.
-func (b VolumeSourceBuilder) GetVsphereVolume() (value VsphereVirtualDiskVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.VsphereVolume; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetVsphereVolume() (value *VsphereVirtualDiskVolumeSourceBuilder, ok bool) {
+	return b.fields.VsphereVolume, b.fields.VsphereVolume != nil
 }
 
 // SetQuobyte sets the Quobyte field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetQuobyte(value QuobyteVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.Quobyte = &value
+func (b *VolumeSourceBuilder) SetQuobyte(value *QuobyteVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.Quobyte = value
 	return b
 }
 
 // RemoveQuobyte removes the Quobyte field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveQuobyte() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveQuobyte() *VolumeSourceBuilder {
 	b.fields.Quobyte = nil
 	return b
 }
 
 // GetQuobyte gets the Quobyte field from the declarative configuration.
-func (b VolumeSourceBuilder) GetQuobyte() (value QuobyteVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Quobyte; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetQuobyte() (value *QuobyteVolumeSourceBuilder, ok bool) {
+	return b.fields.Quobyte, b.fields.Quobyte != nil
 }
 
 // SetAzureDisk sets the AzureDisk field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetAzureDisk(value AzureDiskVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.AzureDisk = &value
+func (b *VolumeSourceBuilder) SetAzureDisk(value *AzureDiskVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.AzureDisk = value
 	return b
 }
 
 // RemoveAzureDisk removes the AzureDisk field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveAzureDisk() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveAzureDisk() *VolumeSourceBuilder {
 	b.fields.AzureDisk = nil
 	return b
 }
 
 // GetAzureDisk gets the AzureDisk field from the declarative configuration.
-func (b VolumeSourceBuilder) GetAzureDisk() (value AzureDiskVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.AzureDisk; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetAzureDisk() (value *AzureDiskVolumeSourceBuilder, ok bool) {
+	return b.fields.AzureDisk, b.fields.AzureDisk != nil
 }
 
 // SetPhotonPersistentDisk sets the PhotonPersistentDisk field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetPhotonPersistentDisk(value PhotonPersistentDiskVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.PhotonPersistentDisk = &value
+func (b *VolumeSourceBuilder) SetPhotonPersistentDisk(value *PhotonPersistentDiskVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.PhotonPersistentDisk = value
 	return b
 }
 
 // RemovePhotonPersistentDisk removes the PhotonPersistentDisk field from the declarative configuration.
-func (b VolumeSourceBuilder) RemovePhotonPersistentDisk() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemovePhotonPersistentDisk() *VolumeSourceBuilder {
 	b.fields.PhotonPersistentDisk = nil
 	return b
 }
 
 // GetPhotonPersistentDisk gets the PhotonPersistentDisk field from the declarative configuration.
-func (b VolumeSourceBuilder) GetPhotonPersistentDisk() (value PhotonPersistentDiskVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.PhotonPersistentDisk; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetPhotonPersistentDisk() (value *PhotonPersistentDiskVolumeSourceBuilder, ok bool) {
+	return b.fields.PhotonPersistentDisk, b.fields.PhotonPersistentDisk != nil
 }
 
 // SetProjected sets the Projected field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetProjected(value ProjectedVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.Projected = &value
+func (b *VolumeSourceBuilder) SetProjected(value *ProjectedVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.Projected = value
 	return b
 }
 
 // RemoveProjected removes the Projected field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveProjected() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveProjected() *VolumeSourceBuilder {
 	b.fields.Projected = nil
 	return b
 }
 
 // GetProjected gets the Projected field from the declarative configuration.
-func (b VolumeSourceBuilder) GetProjected() (value ProjectedVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Projected; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetProjected() (value *ProjectedVolumeSourceBuilder, ok bool) {
+	return b.fields.Projected, b.fields.Projected != nil
 }
 
 // SetPortworxVolume sets the PortworxVolume field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetPortworxVolume(value PortworxVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.PortworxVolume = &value
+func (b *VolumeSourceBuilder) SetPortworxVolume(value *PortworxVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.PortworxVolume = value
 	return b
 }
 
 // RemovePortworxVolume removes the PortworxVolume field from the declarative configuration.
-func (b VolumeSourceBuilder) RemovePortworxVolume() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemovePortworxVolume() *VolumeSourceBuilder {
 	b.fields.PortworxVolume = nil
 	return b
 }
 
 // GetPortworxVolume gets the PortworxVolume field from the declarative configuration.
-func (b VolumeSourceBuilder) GetPortworxVolume() (value PortworxVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.PortworxVolume; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetPortworxVolume() (value *PortworxVolumeSourceBuilder, ok bool) {
+	return b.fields.PortworxVolume, b.fields.PortworxVolume != nil
 }
 
 // SetScaleIO sets the ScaleIO field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetScaleIO(value ScaleIOVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.ScaleIO = &value
+func (b *VolumeSourceBuilder) SetScaleIO(value *ScaleIOVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.ScaleIO = value
 	return b
 }
 
 // RemoveScaleIO removes the ScaleIO field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveScaleIO() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveScaleIO() *VolumeSourceBuilder {
 	b.fields.ScaleIO = nil
 	return b
 }
 
 // GetScaleIO gets the ScaleIO field from the declarative configuration.
-func (b VolumeSourceBuilder) GetScaleIO() (value ScaleIOVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ScaleIO; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetScaleIO() (value *ScaleIOVolumeSourceBuilder, ok bool) {
+	return b.fields.ScaleIO, b.fields.ScaleIO != nil
 }
 
 // SetStorageOS sets the StorageOS field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetStorageOS(value StorageOSVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.StorageOS = &value
+func (b *VolumeSourceBuilder) SetStorageOS(value *StorageOSVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.StorageOS = value
 	return b
 }
 
 // RemoveStorageOS removes the StorageOS field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveStorageOS() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveStorageOS() *VolumeSourceBuilder {
 	b.fields.StorageOS = nil
 	return b
 }
 
 // GetStorageOS gets the StorageOS field from the declarative configuration.
-func (b VolumeSourceBuilder) GetStorageOS() (value StorageOSVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.StorageOS; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetStorageOS() (value *StorageOSVolumeSourceBuilder, ok bool) {
+	return b.fields.StorageOS, b.fields.StorageOS != nil
 }
 
 // SetCSI sets the CSI field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetCSI(value CSIVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.CSI = &value
+func (b *VolumeSourceBuilder) SetCSI(value *CSIVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.CSI = value
 	return b
 }
 
 // RemoveCSI removes the CSI field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveCSI() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveCSI() *VolumeSourceBuilder {
 	b.fields.CSI = nil
 	return b
 }
 
 // GetCSI gets the CSI field from the declarative configuration.
-func (b VolumeSourceBuilder) GetCSI() (value CSIVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.CSI; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetCSI() (value *CSIVolumeSourceBuilder, ok bool) {
+	return b.fields.CSI, b.fields.CSI != nil
 }
 
 // SetEphemeral sets the Ephemeral field in the declarative configuration to the given value.
-func (b VolumeSourceBuilder) SetEphemeral(value EphemeralVolumeSourceBuilder) VolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.Ephemeral = &value
+func (b *VolumeSourceBuilder) SetEphemeral(value *EphemeralVolumeSourceBuilder) *VolumeSourceBuilder {
+	b.fields.Ephemeral = value
 	return b
 }
 
 // RemoveEphemeral removes the Ephemeral field from the declarative configuration.
-func (b VolumeSourceBuilder) RemoveEphemeral() VolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VolumeSourceBuilder) RemoveEphemeral() *VolumeSourceBuilder {
 	b.fields.Ephemeral = nil
 	return b
 }
 
 // GetEphemeral gets the Ephemeral field from the declarative configuration.
-func (b VolumeSourceBuilder) GetEphemeral() (value EphemeralVolumeSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Ephemeral; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeSourceBuilder) GetEphemeral() (value *EphemeralVolumeSourceBuilder, ok bool) {
+	return b.fields.Ephemeral, b.fields.Ephemeral != nil
 }
 
 // ToUnstructured converts VolumeSourceBuilder to unstructured.
@@ -752,9 +571,8 @@ func (b *VolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -769,14 +587,13 @@ func (b *VolumeSourceBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals VolumeSourceBuilder to JSON.
 func (b *VolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -784,8 +601,7 @@ func (b *VolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into VolumeSourceBuilder, replacing the contents of
 // VolumeSourceBuilder.
 func (b *VolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -793,11 +609,9 @@ func (b *VolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // VolumeSourceList represents a list of VolumeSourceBuilder.
-// Provided as a convenience.
-type VolumeSourceList []VolumeSourceBuilder
+type VolumeSourceList []*VolumeSourceBuilder
 
 // VolumeSourceList represents a map of VolumeSourceBuilder.
-// Provided as a convenience.
 type VolumeSourceMap map[string]VolumeSourceBuilder
 
 func (b *VolumeSourceBuilder) preMarshal() {

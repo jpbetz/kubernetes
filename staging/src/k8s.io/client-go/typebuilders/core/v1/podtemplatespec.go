@@ -28,76 +28,57 @@ import (
 // PodTemplateSpecBuilder represents an declarative configuration of the PodTemplateSpec type for use
 // with apply.
 type PodTemplateSpecBuilder struct {
-	fields *podTemplateSpecFields
+	fields podTemplateSpecFields
 }
 
-// podTemplateSpecFields is used by PodTemplateSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PodTemplateSpecBuilder before marshalling, and
-// are copied out to the builder type in PodTemplateSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// podTemplateSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PodTemplateSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type podTemplateSpecFields struct {
 	ObjectMeta *v1.ObjectMetaBuilder `json:"metadata,omitempty"`
 	Spec       *PodSpecBuilder       `json:"spec,omitempty"`
 }
 
-func (b *PodTemplateSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &podTemplateSpecFields{}
-	}
-}
-
 // PodTemplateSpec constructs an declarative configuration of the PodTemplateSpec type for use with
 // apply.
-// Provided as a convenience.
-func PodTemplateSpec() PodTemplateSpecBuilder {
-	return PodTemplateSpecBuilder{fields: &podTemplateSpecFields{}}
+func PodTemplateSpec() *PodTemplateSpecBuilder {
+	return &PodTemplateSpecBuilder{}
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b PodTemplateSpecBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) PodTemplateSpecBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *PodTemplateSpecBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *PodTemplateSpecBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b PodTemplateSpecBuilder) RemoveObjectMeta() PodTemplateSpecBuilder {
-	b.ensureInitialized()
+func (b *PodTemplateSpecBuilder) RemoveObjectMeta() *PodTemplateSpecBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b PodTemplateSpecBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodTemplateSpecBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b PodTemplateSpecBuilder) SetSpec(value PodSpecBuilder) PodTemplateSpecBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *PodTemplateSpecBuilder) SetSpec(value *PodSpecBuilder) *PodTemplateSpecBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b PodTemplateSpecBuilder) RemoveSpec() PodTemplateSpecBuilder {
-	b.ensureInitialized()
+func (b *PodTemplateSpecBuilder) RemoveSpec() *PodTemplateSpecBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b PodTemplateSpecBuilder) GetSpec() (value PodSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodTemplateSpecBuilder) GetSpec() (value *PodSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // ToUnstructured converts PodTemplateSpecBuilder to unstructured.
@@ -105,9 +86,8 @@ func (b *PodTemplateSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +102,13 @@ func (b *PodTemplateSpecBuilder) FromUnstructured(u map[string]interface{}) erro
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PodTemplateSpecBuilder to JSON.
 func (b *PodTemplateSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +116,7 @@ func (b *PodTemplateSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PodTemplateSpecBuilder, replacing the contents of
 // PodTemplateSpecBuilder.
 func (b *PodTemplateSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +124,9 @@ func (b *PodTemplateSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PodTemplateSpecList represents a list of PodTemplateSpecBuilder.
-// Provided as a convenience.
-type PodTemplateSpecList []PodTemplateSpecBuilder
+type PodTemplateSpecList []*PodTemplateSpecBuilder
 
 // PodTemplateSpecList represents a map of PodTemplateSpecBuilder.
-// Provided as a convenience.
 type PodTemplateSpecMap map[string]PodTemplateSpecBuilder
 
 func (b *PodTemplateSpecBuilder) preMarshal() {

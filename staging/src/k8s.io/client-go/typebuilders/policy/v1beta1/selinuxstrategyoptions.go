@@ -29,49 +29,39 @@ import (
 // SELinuxStrategyOptionsBuilder represents an declarative configuration of the SELinuxStrategyOptions type for use
 // with apply.
 type SELinuxStrategyOptionsBuilder struct {
-	fields *sELinuxStrategyOptionsFields
+	fields sELinuxStrategyOptionsFields
 }
 
-// sELinuxStrategyOptionsFields is used by SELinuxStrategyOptionsBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in SELinuxStrategyOptionsBuilder before marshalling, and
-// are copied out to the builder type in SELinuxStrategyOptionsBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// sELinuxStrategyOptionsFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in SELinuxStrategyOptionsBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type sELinuxStrategyOptionsFields struct {
 	Rule           *v1beta1.SELinuxStrategy  `json:"rule,omitempty"`
 	SELinuxOptions *v1.SELinuxOptionsBuilder `json:"seLinuxOptions,omitempty"`
 }
 
-func (b *SELinuxStrategyOptionsBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &sELinuxStrategyOptionsFields{}
-	}
-}
-
 // SELinuxStrategyOptions constructs an declarative configuration of the SELinuxStrategyOptions type for use with
 // apply.
-// Provided as a convenience.
-func SELinuxStrategyOptions() SELinuxStrategyOptionsBuilder {
-	return SELinuxStrategyOptionsBuilder{fields: &sELinuxStrategyOptionsFields{}}
+func SELinuxStrategyOptions() *SELinuxStrategyOptionsBuilder {
+	return &SELinuxStrategyOptionsBuilder{}
 }
 
 // SetRule sets the Rule field in the declarative configuration to the given value.
-func (b SELinuxStrategyOptionsBuilder) SetRule(value v1beta1.SELinuxStrategy) SELinuxStrategyOptionsBuilder {
-	b.ensureInitialized()
+func (b *SELinuxStrategyOptionsBuilder) SetRule(value v1beta1.SELinuxStrategy) *SELinuxStrategyOptionsBuilder {
 	b.fields.Rule = &value
 	return b
 }
 
 // RemoveRule removes the Rule field from the declarative configuration.
-func (b SELinuxStrategyOptionsBuilder) RemoveRule() SELinuxStrategyOptionsBuilder {
-	b.ensureInitialized()
+func (b *SELinuxStrategyOptionsBuilder) RemoveRule() *SELinuxStrategyOptionsBuilder {
 	b.fields.Rule = nil
 	return b
 }
 
 // GetRule gets the Rule field from the declarative configuration.
-func (b SELinuxStrategyOptionsBuilder) GetRule() (value v1beta1.SELinuxStrategy, ok bool) {
-	b.ensureInitialized()
+func (b *SELinuxStrategyOptionsBuilder) GetRule() (value v1beta1.SELinuxStrategy, ok bool) {
 	if v := b.fields.Rule; v != nil {
 		return *v, true
 	}
@@ -79,26 +69,20 @@ func (b SELinuxStrategyOptionsBuilder) GetRule() (value v1beta1.SELinuxStrategy,
 }
 
 // SetSELinuxOptions sets the SELinuxOptions field in the declarative configuration to the given value.
-func (b SELinuxStrategyOptionsBuilder) SetSELinuxOptions(value v1.SELinuxOptionsBuilder) SELinuxStrategyOptionsBuilder {
-	b.ensureInitialized()
-	b.fields.SELinuxOptions = &value
+func (b *SELinuxStrategyOptionsBuilder) SetSELinuxOptions(value *v1.SELinuxOptionsBuilder) *SELinuxStrategyOptionsBuilder {
+	b.fields.SELinuxOptions = value
 	return b
 }
 
 // RemoveSELinuxOptions removes the SELinuxOptions field from the declarative configuration.
-func (b SELinuxStrategyOptionsBuilder) RemoveSELinuxOptions() SELinuxStrategyOptionsBuilder {
-	b.ensureInitialized()
+func (b *SELinuxStrategyOptionsBuilder) RemoveSELinuxOptions() *SELinuxStrategyOptionsBuilder {
 	b.fields.SELinuxOptions = nil
 	return b
 }
 
 // GetSELinuxOptions gets the SELinuxOptions field from the declarative configuration.
-func (b SELinuxStrategyOptionsBuilder) GetSELinuxOptions() (value v1.SELinuxOptionsBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.SELinuxOptions; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *SELinuxStrategyOptionsBuilder) GetSELinuxOptions() (value *v1.SELinuxOptionsBuilder, ok bool) {
+	return b.fields.SELinuxOptions, b.fields.SELinuxOptions != nil
 }
 
 // ToUnstructured converts SELinuxStrategyOptionsBuilder to unstructured.
@@ -106,9 +90,8 @@ func (b *SELinuxStrategyOptionsBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -123,14 +106,13 @@ func (b *SELinuxStrategyOptionsBuilder) FromUnstructured(u map[string]interface{
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals SELinuxStrategyOptionsBuilder to JSON.
 func (b *SELinuxStrategyOptionsBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -138,8 +120,7 @@ func (b *SELinuxStrategyOptionsBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into SELinuxStrategyOptionsBuilder, replacing the contents of
 // SELinuxStrategyOptionsBuilder.
 func (b *SELinuxStrategyOptionsBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -147,11 +128,9 @@ func (b *SELinuxStrategyOptionsBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // SELinuxStrategyOptionsList represents a list of SELinuxStrategyOptionsBuilder.
-// Provided as a convenience.
-type SELinuxStrategyOptionsList []SELinuxStrategyOptionsBuilder
+type SELinuxStrategyOptionsList []*SELinuxStrategyOptionsBuilder
 
 // SELinuxStrategyOptionsList represents a map of SELinuxStrategyOptionsBuilder.
-// Provided as a convenience.
 type SELinuxStrategyOptionsMap map[string]SELinuxStrategyOptionsBuilder
 
 func (b *SELinuxStrategyOptionsBuilder) preMarshal() {

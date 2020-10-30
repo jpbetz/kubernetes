@@ -27,76 +27,57 @@ import (
 // PodsMetricStatusBuilder represents an declarative configuration of the PodsMetricStatus type for use
 // with apply.
 type PodsMetricStatusBuilder struct {
-	fields *podsMetricStatusFields
+	fields podsMetricStatusFields
 }
 
-// podsMetricStatusFields is used by PodsMetricStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PodsMetricStatusBuilder before marshalling, and
-// are copied out to the builder type in PodsMetricStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// podsMetricStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PodsMetricStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type podsMetricStatusFields struct {
 	Metric  *MetricIdentifierBuilder  `json:"metric,omitempty"`
 	Current *MetricValueStatusBuilder `json:"current,omitempty"`
 }
 
-func (b *PodsMetricStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &podsMetricStatusFields{}
-	}
-}
-
 // PodsMetricStatus constructs an declarative configuration of the PodsMetricStatus type for use with
 // apply.
-// Provided as a convenience.
-func PodsMetricStatus() PodsMetricStatusBuilder {
-	return PodsMetricStatusBuilder{fields: &podsMetricStatusFields{}}
+func PodsMetricStatus() *PodsMetricStatusBuilder {
+	return &PodsMetricStatusBuilder{}
 }
 
 // SetMetric sets the Metric field in the declarative configuration to the given value.
-func (b PodsMetricStatusBuilder) SetMetric(value MetricIdentifierBuilder) PodsMetricStatusBuilder {
-	b.ensureInitialized()
-	b.fields.Metric = &value
+func (b *PodsMetricStatusBuilder) SetMetric(value *MetricIdentifierBuilder) *PodsMetricStatusBuilder {
+	b.fields.Metric = value
 	return b
 }
 
 // RemoveMetric removes the Metric field from the declarative configuration.
-func (b PodsMetricStatusBuilder) RemoveMetric() PodsMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *PodsMetricStatusBuilder) RemoveMetric() *PodsMetricStatusBuilder {
 	b.fields.Metric = nil
 	return b
 }
 
 // GetMetric gets the Metric field from the declarative configuration.
-func (b PodsMetricStatusBuilder) GetMetric() (value MetricIdentifierBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Metric; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodsMetricStatusBuilder) GetMetric() (value *MetricIdentifierBuilder, ok bool) {
+	return b.fields.Metric, b.fields.Metric != nil
 }
 
 // SetCurrent sets the Current field in the declarative configuration to the given value.
-func (b PodsMetricStatusBuilder) SetCurrent(value MetricValueStatusBuilder) PodsMetricStatusBuilder {
-	b.ensureInitialized()
-	b.fields.Current = &value
+func (b *PodsMetricStatusBuilder) SetCurrent(value *MetricValueStatusBuilder) *PodsMetricStatusBuilder {
+	b.fields.Current = value
 	return b
 }
 
 // RemoveCurrent removes the Current field from the declarative configuration.
-func (b PodsMetricStatusBuilder) RemoveCurrent() PodsMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *PodsMetricStatusBuilder) RemoveCurrent() *PodsMetricStatusBuilder {
 	b.fields.Current = nil
 	return b
 }
 
 // GetCurrent gets the Current field from the declarative configuration.
-func (b PodsMetricStatusBuilder) GetCurrent() (value MetricValueStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Current; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PodsMetricStatusBuilder) GetCurrent() (value *MetricValueStatusBuilder, ok bool) {
+	return b.fields.Current, b.fields.Current != nil
 }
 
 // ToUnstructured converts PodsMetricStatusBuilder to unstructured.
@@ -104,9 +85,8 @@ func (b *PodsMetricStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +101,13 @@ func (b *PodsMetricStatusBuilder) FromUnstructured(u map[string]interface{}) err
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PodsMetricStatusBuilder to JSON.
 func (b *PodsMetricStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +115,7 @@ func (b *PodsMetricStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PodsMetricStatusBuilder, replacing the contents of
 // PodsMetricStatusBuilder.
 func (b *PodsMetricStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +123,9 @@ func (b *PodsMetricStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PodsMetricStatusList represents a list of PodsMetricStatusBuilder.
-// Provided as a convenience.
-type PodsMetricStatusList []PodsMetricStatusBuilder
+type PodsMetricStatusList []*PodsMetricStatusBuilder
 
 // PodsMetricStatusList represents a map of PodsMetricStatusBuilder.
-// Provided as a convenience.
 type PodsMetricStatusMap map[string]PodsMetricStatusBuilder
 
 func (b *PodsMetricStatusBuilder) preMarshal() {

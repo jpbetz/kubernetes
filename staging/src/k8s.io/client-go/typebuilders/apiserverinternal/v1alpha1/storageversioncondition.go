@@ -29,14 +29,14 @@ import (
 // StorageVersionConditionBuilder represents an declarative configuration of the StorageVersionCondition type for use
 // with apply.
 type StorageVersionConditionBuilder struct {
-	fields *storageVersionConditionFields
+	fields storageVersionConditionFields
 }
 
-// storageVersionConditionFields is used by StorageVersionConditionBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in StorageVersionConditionBuilder before marshalling, and
-// are copied out to the builder type in StorageVersionConditionBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// storageVersionConditionFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in StorageVersionConditionBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type storageVersionConditionFields struct {
 	Type               *v1alpha1.StorageVersionConditionType `json:"type,omitempty"`
 	Status             *v1alpha1.ConditionStatus             `json:"status,omitempty"`
@@ -46,36 +46,26 @@ type storageVersionConditionFields struct {
 	Message            *string                               `json:"message,omitempty"`
 }
 
-func (b *StorageVersionConditionBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &storageVersionConditionFields{}
-	}
-}
-
 // StorageVersionCondition constructs an declarative configuration of the StorageVersionCondition type for use with
 // apply.
-// Provided as a convenience.
-func StorageVersionCondition() StorageVersionConditionBuilder {
-	return StorageVersionConditionBuilder{fields: &storageVersionConditionFields{}}
+func StorageVersionCondition() *StorageVersionConditionBuilder {
+	return &StorageVersionConditionBuilder{}
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b StorageVersionConditionBuilder) SetType(value v1alpha1.StorageVersionConditionType) StorageVersionConditionBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionConditionBuilder) SetType(value v1alpha1.StorageVersionConditionType) *StorageVersionConditionBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b StorageVersionConditionBuilder) RemoveType() StorageVersionConditionBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionConditionBuilder) RemoveType() *StorageVersionConditionBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b StorageVersionConditionBuilder) GetType() (value v1alpha1.StorageVersionConditionType, ok bool) {
-	b.ensureInitialized()
+func (b *StorageVersionConditionBuilder) GetType() (value v1alpha1.StorageVersionConditionType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -83,22 +73,19 @@ func (b StorageVersionConditionBuilder) GetType() (value v1alpha1.StorageVersion
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b StorageVersionConditionBuilder) SetStatus(value v1alpha1.ConditionStatus) StorageVersionConditionBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionConditionBuilder) SetStatus(value v1alpha1.ConditionStatus) *StorageVersionConditionBuilder {
 	b.fields.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b StorageVersionConditionBuilder) RemoveStatus() StorageVersionConditionBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionConditionBuilder) RemoveStatus() *StorageVersionConditionBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b StorageVersionConditionBuilder) GetStatus() (value v1alpha1.ConditionStatus, ok bool) {
-	b.ensureInitialized()
+func (b *StorageVersionConditionBuilder) GetStatus() (value v1alpha1.ConditionStatus, ok bool) {
 	if v := b.fields.Status; v != nil {
 		return *v, true
 	}
@@ -106,22 +93,19 @@ func (b StorageVersionConditionBuilder) GetStatus() (value v1alpha1.ConditionSta
 }
 
 // SetObservedGeneration sets the ObservedGeneration field in the declarative configuration to the given value.
-func (b StorageVersionConditionBuilder) SetObservedGeneration(value int64) StorageVersionConditionBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionConditionBuilder) SetObservedGeneration(value int64) *StorageVersionConditionBuilder {
 	b.fields.ObservedGeneration = &value
 	return b
 }
 
 // RemoveObservedGeneration removes the ObservedGeneration field from the declarative configuration.
-func (b StorageVersionConditionBuilder) RemoveObservedGeneration() StorageVersionConditionBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionConditionBuilder) RemoveObservedGeneration() *StorageVersionConditionBuilder {
 	b.fields.ObservedGeneration = nil
 	return b
 }
 
 // GetObservedGeneration gets the ObservedGeneration field from the declarative configuration.
-func (b StorageVersionConditionBuilder) GetObservedGeneration() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *StorageVersionConditionBuilder) GetObservedGeneration() (value int64, ok bool) {
 	if v := b.fields.ObservedGeneration; v != nil {
 		return *v, true
 	}
@@ -129,22 +113,19 @@ func (b StorageVersionConditionBuilder) GetObservedGeneration() (value int64, ok
 }
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
-func (b StorageVersionConditionBuilder) SetLastTransitionTime(value v1.Time) StorageVersionConditionBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionConditionBuilder) SetLastTransitionTime(value v1.Time) *StorageVersionConditionBuilder {
 	b.fields.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
-func (b StorageVersionConditionBuilder) RemoveLastTransitionTime() StorageVersionConditionBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionConditionBuilder) RemoveLastTransitionTime() *StorageVersionConditionBuilder {
 	b.fields.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
-func (b StorageVersionConditionBuilder) GetLastTransitionTime() (value v1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *StorageVersionConditionBuilder) GetLastTransitionTime() (value v1.Time, ok bool) {
 	if v := b.fields.LastTransitionTime; v != nil {
 		return *v, true
 	}
@@ -152,22 +133,19 @@ func (b StorageVersionConditionBuilder) GetLastTransitionTime() (value v1.Time, 
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b StorageVersionConditionBuilder) SetReason(value string) StorageVersionConditionBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionConditionBuilder) SetReason(value string) *StorageVersionConditionBuilder {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b StorageVersionConditionBuilder) RemoveReason() StorageVersionConditionBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionConditionBuilder) RemoveReason() *StorageVersionConditionBuilder {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b StorageVersionConditionBuilder) GetReason() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *StorageVersionConditionBuilder) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -175,22 +153,19 @@ func (b StorageVersionConditionBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b StorageVersionConditionBuilder) SetMessage(value string) StorageVersionConditionBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionConditionBuilder) SetMessage(value string) *StorageVersionConditionBuilder {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b StorageVersionConditionBuilder) RemoveMessage() StorageVersionConditionBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionConditionBuilder) RemoveMessage() *StorageVersionConditionBuilder {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b StorageVersionConditionBuilder) GetMessage() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *StorageVersionConditionBuilder) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
@@ -202,9 +177,8 @@ func (b *StorageVersionConditionBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -219,14 +193,13 @@ func (b *StorageVersionConditionBuilder) FromUnstructured(u map[string]interface
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals StorageVersionConditionBuilder to JSON.
 func (b *StorageVersionConditionBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -234,8 +207,7 @@ func (b *StorageVersionConditionBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into StorageVersionConditionBuilder, replacing the contents of
 // StorageVersionConditionBuilder.
 func (b *StorageVersionConditionBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -243,11 +215,9 @@ func (b *StorageVersionConditionBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // StorageVersionConditionList represents a list of StorageVersionConditionBuilder.
-// Provided as a convenience.
-type StorageVersionConditionList []StorageVersionConditionBuilder
+type StorageVersionConditionList []*StorageVersionConditionBuilder
 
 // StorageVersionConditionList represents a map of StorageVersionConditionBuilder.
-// Provided as a convenience.
 type StorageVersionConditionMap map[string]StorageVersionConditionBuilder
 
 func (b *StorageVersionConditionBuilder) preMarshal() {

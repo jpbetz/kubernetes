@@ -27,49 +27,39 @@ import (
 // SysctlBuilder represents an declarative configuration of the Sysctl type for use
 // with apply.
 type SysctlBuilder struct {
-	fields *sysctlFields
+	fields sysctlFields
 }
 
-// sysctlFields is used by SysctlBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in SysctlBuilder before marshalling, and
-// are copied out to the builder type in SysctlBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// sysctlFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in SysctlBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type sysctlFields struct {
 	Name  *string `json:"name,omitempty"`
 	Value *string `json:"value,omitempty"`
 }
 
-func (b *SysctlBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &sysctlFields{}
-	}
-}
-
 // Sysctl constructs an declarative configuration of the Sysctl type for use with
 // apply.
-// Provided as a convenience.
-func Sysctl() SysctlBuilder {
-	return SysctlBuilder{fields: &sysctlFields{}}
+func Sysctl() *SysctlBuilder {
+	return &SysctlBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b SysctlBuilder) SetName(value string) SysctlBuilder {
-	b.ensureInitialized()
+func (b *SysctlBuilder) SetName(value string) *SysctlBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b SysctlBuilder) RemoveName() SysctlBuilder {
-	b.ensureInitialized()
+func (b *SysctlBuilder) RemoveName() *SysctlBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b SysctlBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *SysctlBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b SysctlBuilder) GetName() (value string, ok bool) {
 }
 
 // SetValue sets the Value field in the declarative configuration to the given value.
-func (b SysctlBuilder) SetValue(value string) SysctlBuilder {
-	b.ensureInitialized()
+func (b *SysctlBuilder) SetValue(value string) *SysctlBuilder {
 	b.fields.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
-func (b SysctlBuilder) RemoveValue() SysctlBuilder {
-	b.ensureInitialized()
+func (b *SysctlBuilder) RemoveValue() *SysctlBuilder {
 	b.fields.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
-func (b SysctlBuilder) GetValue() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *SysctlBuilder) GetValue() (value string, ok bool) {
 	if v := b.fields.Value; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *SysctlBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *SysctlBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals SysctlBuilder to JSON.
 func (b *SysctlBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *SysctlBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into SysctlBuilder, replacing the contents of
 // SysctlBuilder.
 func (b *SysctlBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *SysctlBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // SysctlList represents a list of SysctlBuilder.
-// Provided as a convenience.
-type SysctlList []SysctlBuilder
+type SysctlList []*SysctlBuilder
 
 // SysctlList represents a map of SysctlBuilder.
-// Provided as a convenience.
 type SysctlMap map[string]SysctlBuilder
 
 func (b *SysctlBuilder) preMarshal() {

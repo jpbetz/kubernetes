@@ -27,50 +27,40 @@ import (
 // PolicyRulesWithSubjectsBuilder represents an declarative configuration of the PolicyRulesWithSubjects type for use
 // with apply.
 type PolicyRulesWithSubjectsBuilder struct {
-	fields *policyRulesWithSubjectsFields
+	fields policyRulesWithSubjectsFields
 }
 
-// policyRulesWithSubjectsFields is used by PolicyRulesWithSubjectsBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PolicyRulesWithSubjectsBuilder before marshalling, and
-// are copied out to the builder type in PolicyRulesWithSubjectsBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// policyRulesWithSubjectsFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PolicyRulesWithSubjectsBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type policyRulesWithSubjectsFields struct {
 	Subjects         *SubjectList               `json:"subjects,omitempty"`
 	ResourceRules    *ResourcePolicyRuleList    `json:"resourceRules,omitempty"`
 	NonResourceRules *NonResourcePolicyRuleList `json:"nonResourceRules,omitempty"`
 }
 
-func (b *PolicyRulesWithSubjectsBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &policyRulesWithSubjectsFields{}
-	}
-}
-
 // PolicyRulesWithSubjects constructs an declarative configuration of the PolicyRulesWithSubjects type for use with
 // apply.
-// Provided as a convenience.
-func PolicyRulesWithSubjects() PolicyRulesWithSubjectsBuilder {
-	return PolicyRulesWithSubjectsBuilder{fields: &policyRulesWithSubjectsFields{}}
+func PolicyRulesWithSubjects() *PolicyRulesWithSubjectsBuilder {
+	return &PolicyRulesWithSubjectsBuilder{}
 }
 
 // SetSubjects sets the Subjects field in the declarative configuration to the given value.
-func (b PolicyRulesWithSubjectsBuilder) SetSubjects(value SubjectList) PolicyRulesWithSubjectsBuilder {
-	b.ensureInitialized()
+func (b *PolicyRulesWithSubjectsBuilder) SetSubjects(value SubjectList) *PolicyRulesWithSubjectsBuilder {
 	b.fields.Subjects = &value
 	return b
 }
 
 // RemoveSubjects removes the Subjects field from the declarative configuration.
-func (b PolicyRulesWithSubjectsBuilder) RemoveSubjects() PolicyRulesWithSubjectsBuilder {
-	b.ensureInitialized()
+func (b *PolicyRulesWithSubjectsBuilder) RemoveSubjects() *PolicyRulesWithSubjectsBuilder {
 	b.fields.Subjects = nil
 	return b
 }
 
 // GetSubjects gets the Subjects field from the declarative configuration.
-func (b PolicyRulesWithSubjectsBuilder) GetSubjects() (value SubjectList, ok bool) {
-	b.ensureInitialized()
+func (b *PolicyRulesWithSubjectsBuilder) GetSubjects() (value SubjectList, ok bool) {
 	if v := b.fields.Subjects; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b PolicyRulesWithSubjectsBuilder) GetSubjects() (value SubjectList, ok boo
 }
 
 // SetResourceRules sets the ResourceRules field in the declarative configuration to the given value.
-func (b PolicyRulesWithSubjectsBuilder) SetResourceRules(value ResourcePolicyRuleList) PolicyRulesWithSubjectsBuilder {
-	b.ensureInitialized()
+func (b *PolicyRulesWithSubjectsBuilder) SetResourceRules(value ResourcePolicyRuleList) *PolicyRulesWithSubjectsBuilder {
 	b.fields.ResourceRules = &value
 	return b
 }
 
 // RemoveResourceRules removes the ResourceRules field from the declarative configuration.
-func (b PolicyRulesWithSubjectsBuilder) RemoveResourceRules() PolicyRulesWithSubjectsBuilder {
-	b.ensureInitialized()
+func (b *PolicyRulesWithSubjectsBuilder) RemoveResourceRules() *PolicyRulesWithSubjectsBuilder {
 	b.fields.ResourceRules = nil
 	return b
 }
 
 // GetResourceRules gets the ResourceRules field from the declarative configuration.
-func (b PolicyRulesWithSubjectsBuilder) GetResourceRules() (value ResourcePolicyRuleList, ok bool) {
-	b.ensureInitialized()
+func (b *PolicyRulesWithSubjectsBuilder) GetResourceRules() (value ResourcePolicyRuleList, ok bool) {
 	if v := b.fields.ResourceRules; v != nil {
 		return *v, true
 	}
@@ -101,22 +88,19 @@ func (b PolicyRulesWithSubjectsBuilder) GetResourceRules() (value ResourcePolicy
 }
 
 // SetNonResourceRules sets the NonResourceRules field in the declarative configuration to the given value.
-func (b PolicyRulesWithSubjectsBuilder) SetNonResourceRules(value NonResourcePolicyRuleList) PolicyRulesWithSubjectsBuilder {
-	b.ensureInitialized()
+func (b *PolicyRulesWithSubjectsBuilder) SetNonResourceRules(value NonResourcePolicyRuleList) *PolicyRulesWithSubjectsBuilder {
 	b.fields.NonResourceRules = &value
 	return b
 }
 
 // RemoveNonResourceRules removes the NonResourceRules field from the declarative configuration.
-func (b PolicyRulesWithSubjectsBuilder) RemoveNonResourceRules() PolicyRulesWithSubjectsBuilder {
-	b.ensureInitialized()
+func (b *PolicyRulesWithSubjectsBuilder) RemoveNonResourceRules() *PolicyRulesWithSubjectsBuilder {
 	b.fields.NonResourceRules = nil
 	return b
 }
 
 // GetNonResourceRules gets the NonResourceRules field from the declarative configuration.
-func (b PolicyRulesWithSubjectsBuilder) GetNonResourceRules() (value NonResourcePolicyRuleList, ok bool) {
-	b.ensureInitialized()
+func (b *PolicyRulesWithSubjectsBuilder) GetNonResourceRules() (value NonResourcePolicyRuleList, ok bool) {
 	if v := b.fields.NonResourceRules; v != nil {
 		return *v, true
 	}
@@ -128,9 +112,8 @@ func (b *PolicyRulesWithSubjectsBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +128,13 @@ func (b *PolicyRulesWithSubjectsBuilder) FromUnstructured(u map[string]interface
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PolicyRulesWithSubjectsBuilder to JSON.
 func (b *PolicyRulesWithSubjectsBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +142,7 @@ func (b *PolicyRulesWithSubjectsBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PolicyRulesWithSubjectsBuilder, replacing the contents of
 // PolicyRulesWithSubjectsBuilder.
 func (b *PolicyRulesWithSubjectsBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +150,9 @@ func (b *PolicyRulesWithSubjectsBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PolicyRulesWithSubjectsList represents a list of PolicyRulesWithSubjectsBuilder.
-// Provided as a convenience.
-type PolicyRulesWithSubjectsList []PolicyRulesWithSubjectsBuilder
+type PolicyRulesWithSubjectsList []*PolicyRulesWithSubjectsBuilder
 
 // PolicyRulesWithSubjectsList represents a map of PolicyRulesWithSubjectsBuilder.
-// Provided as a convenience.
 type PolicyRulesWithSubjectsMap map[string]PolicyRulesWithSubjectsBuilder
 
 func (b *PolicyRulesWithSubjectsBuilder) preMarshal() {

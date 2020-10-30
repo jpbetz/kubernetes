@@ -28,15 +28,15 @@ import (
 // JobBuilder represents an declarative configuration of the Job type for use
 // with apply.
 type JobBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *jobFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   jobFields
 }
 
-// jobFields is used by JobBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in JobBuilder before marshalling, and
-// are copied out to the builder type in JobBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// jobFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in JobBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type jobFields struct {
 	Kind       *string               `json:"kind,omitempty"`       // inlined JobBuilder.typeMeta.Kind field
 	APIVersion *string               `json:"apiVersion,omitempty"` // inlined JobBuilder.typeMeta.APIVersion field
@@ -45,106 +45,78 @@ type jobFields struct {
 	Status     *JobStatusBuilder     `json:"status,omitempty"`
 }
 
-func (b *JobBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &jobFields{}
-	}
-}
-
 // Job constructs an declarative configuration of the Job type for use with
 // apply.
-// Provided as a convenience.
-func Job() JobBuilder {
-	return JobBuilder{fields: &jobFields{}}
+func Job() *JobBuilder {
+	return &JobBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b JobBuilder) SetTypeMeta(value v1.TypeMetaBuilder) JobBuilder {
-	b.ensureInitialized()
+func (b *JobBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *JobBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b JobBuilder) RemoveTypeMeta() JobBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *JobBuilder) RemoveTypeMeta() *JobBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b JobBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *JobBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b JobBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) JobBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *JobBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *JobBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b JobBuilder) RemoveObjectMeta() JobBuilder {
-	b.ensureInitialized()
+func (b *JobBuilder) RemoveObjectMeta() *JobBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b JobBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *JobBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b JobBuilder) SetSpec(value JobSpecBuilder) JobBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *JobBuilder) SetSpec(value *JobSpecBuilder) *JobBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b JobBuilder) RemoveSpec() JobBuilder {
-	b.ensureInitialized()
+func (b *JobBuilder) RemoveSpec() *JobBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b JobBuilder) GetSpec() (value JobSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *JobBuilder) GetSpec() (value *JobSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b JobBuilder) SetStatus(value JobStatusBuilder) JobBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *JobBuilder) SetStatus(value *JobStatusBuilder) *JobBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b JobBuilder) RemoveStatus() JobBuilder {
-	b.ensureInitialized()
+func (b *JobBuilder) RemoveStatus() *JobBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b JobBuilder) GetStatus() (value JobStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *JobBuilder) GetStatus() (value *JobStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts JobBuilder to unstructured.
@@ -152,9 +124,8 @@ func (b *JobBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *JobBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals JobBuilder to JSON.
 func (b *JobBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *JobBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into JobBuilder, replacing the contents of
 // JobBuilder.
 func (b *JobBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +162,25 @@ func (b *JobBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // JobList represents a list of JobBuilder.
-// Provided as a convenience.
-type JobList []JobBuilder
+type JobList []*JobBuilder
 
 // JobList represents a map of JobBuilder.
-// Provided as a convenience.
 type JobMap map[string]JobBuilder
 
 func (b *JobBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *JobBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

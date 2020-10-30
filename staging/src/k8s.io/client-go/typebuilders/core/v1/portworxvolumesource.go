@@ -27,50 +27,40 @@ import (
 // PortworxVolumeSourceBuilder represents an declarative configuration of the PortworxVolumeSource type for use
 // with apply.
 type PortworxVolumeSourceBuilder struct {
-	fields *portworxVolumeSourceFields
+	fields portworxVolumeSourceFields
 }
 
-// portworxVolumeSourceFields is used by PortworxVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PortworxVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in PortworxVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// portworxVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PortworxVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type portworxVolumeSourceFields struct {
 	VolumeID *string `json:"volumeID,omitempty"`
 	FSType   *string `json:"fsType,omitempty"`
 	ReadOnly *bool   `json:"readOnly,omitempty"`
 }
 
-func (b *PortworxVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &portworxVolumeSourceFields{}
-	}
-}
-
 // PortworxVolumeSource constructs an declarative configuration of the PortworxVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func PortworxVolumeSource() PortworxVolumeSourceBuilder {
-	return PortworxVolumeSourceBuilder{fields: &portworxVolumeSourceFields{}}
+func PortworxVolumeSource() *PortworxVolumeSourceBuilder {
+	return &PortworxVolumeSourceBuilder{}
 }
 
 // SetVolumeID sets the VolumeID field in the declarative configuration to the given value.
-func (b PortworxVolumeSourceBuilder) SetVolumeID(value string) PortworxVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *PortworxVolumeSourceBuilder) SetVolumeID(value string) *PortworxVolumeSourceBuilder {
 	b.fields.VolumeID = &value
 	return b
 }
 
 // RemoveVolumeID removes the VolumeID field from the declarative configuration.
-func (b PortworxVolumeSourceBuilder) RemoveVolumeID() PortworxVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *PortworxVolumeSourceBuilder) RemoveVolumeID() *PortworxVolumeSourceBuilder {
 	b.fields.VolumeID = nil
 	return b
 }
 
 // GetVolumeID gets the VolumeID field from the declarative configuration.
-func (b PortworxVolumeSourceBuilder) GetVolumeID() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *PortworxVolumeSourceBuilder) GetVolumeID() (value string, ok bool) {
 	if v := b.fields.VolumeID; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b PortworxVolumeSourceBuilder) GetVolumeID() (value string, ok bool) {
 }
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
-func (b PortworxVolumeSourceBuilder) SetFSType(value string) PortworxVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *PortworxVolumeSourceBuilder) SetFSType(value string) *PortworxVolumeSourceBuilder {
 	b.fields.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
-func (b PortworxVolumeSourceBuilder) RemoveFSType() PortworxVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *PortworxVolumeSourceBuilder) RemoveFSType() *PortworxVolumeSourceBuilder {
 	b.fields.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
-func (b PortworxVolumeSourceBuilder) GetFSType() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *PortworxVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 	if v := b.fields.FSType; v != nil {
 		return *v, true
 	}
@@ -101,22 +88,19 @@ func (b PortworxVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b PortworxVolumeSourceBuilder) SetReadOnly(value bool) PortworxVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *PortworxVolumeSourceBuilder) SetReadOnly(value bool) *PortworxVolumeSourceBuilder {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b PortworxVolumeSourceBuilder) RemoveReadOnly() PortworxVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *PortworxVolumeSourceBuilder) RemoveReadOnly() *PortworxVolumeSourceBuilder {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b PortworxVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *PortworxVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
@@ -128,9 +112,8 @@ func (b *PortworxVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +128,13 @@ func (b *PortworxVolumeSourceBuilder) FromUnstructured(u map[string]interface{})
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PortworxVolumeSourceBuilder to JSON.
 func (b *PortworxVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +142,7 @@ func (b *PortworxVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PortworxVolumeSourceBuilder, replacing the contents of
 // PortworxVolumeSourceBuilder.
 func (b *PortworxVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +150,9 @@ func (b *PortworxVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PortworxVolumeSourceList represents a list of PortworxVolumeSourceBuilder.
-// Provided as a convenience.
-type PortworxVolumeSourceList []PortworxVolumeSourceBuilder
+type PortworxVolumeSourceList []*PortworxVolumeSourceBuilder
 
 // PortworxVolumeSourceList represents a map of PortworxVolumeSourceBuilder.
-// Provided as a convenience.
 type PortworxVolumeSourceMap map[string]PortworxVolumeSourceBuilder
 
 func (b *PortworxVolumeSourceBuilder) preMarshal() {

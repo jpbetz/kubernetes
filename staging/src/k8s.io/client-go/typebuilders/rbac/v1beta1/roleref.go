@@ -27,50 +27,40 @@ import (
 // RoleRefBuilder represents an declarative configuration of the RoleRef type for use
 // with apply.
 type RoleRefBuilder struct {
-	fields *roleRefFields
+	fields roleRefFields
 }
 
-// roleRefFields is used by RoleRefBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in RoleRefBuilder before marshalling, and
-// are copied out to the builder type in RoleRefBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// roleRefFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in RoleRefBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type roleRefFields struct {
 	APIGroup *string `json:"apiGroup,omitempty"`
 	Kind     *string `json:"kind,omitempty"`
 	Name     *string `json:"name,omitempty"`
 }
 
-func (b *RoleRefBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &roleRefFields{}
-	}
-}
-
 // RoleRef constructs an declarative configuration of the RoleRef type for use with
 // apply.
-// Provided as a convenience.
-func RoleRef() RoleRefBuilder {
-	return RoleRefBuilder{fields: &roleRefFields{}}
+func RoleRef() *RoleRefBuilder {
+	return &RoleRefBuilder{}
 }
 
 // SetAPIGroup sets the APIGroup field in the declarative configuration to the given value.
-func (b RoleRefBuilder) SetAPIGroup(value string) RoleRefBuilder {
-	b.ensureInitialized()
+func (b *RoleRefBuilder) SetAPIGroup(value string) *RoleRefBuilder {
 	b.fields.APIGroup = &value
 	return b
 }
 
 // RemoveAPIGroup removes the APIGroup field from the declarative configuration.
-func (b RoleRefBuilder) RemoveAPIGroup() RoleRefBuilder {
-	b.ensureInitialized()
+func (b *RoleRefBuilder) RemoveAPIGroup() *RoleRefBuilder {
 	b.fields.APIGroup = nil
 	return b
 }
 
 // GetAPIGroup gets the APIGroup field from the declarative configuration.
-func (b RoleRefBuilder) GetAPIGroup() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *RoleRefBuilder) GetAPIGroup() (value string, ok bool) {
 	if v := b.fields.APIGroup; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b RoleRefBuilder) GetAPIGroup() (value string, ok bool) {
 }
 
 // SetKind sets the Kind field in the declarative configuration to the given value.
-func (b RoleRefBuilder) SetKind(value string) RoleRefBuilder {
-	b.ensureInitialized()
+func (b *RoleRefBuilder) SetKind(value string) *RoleRefBuilder {
 	b.fields.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
-func (b RoleRefBuilder) RemoveKind() RoleRefBuilder {
-	b.ensureInitialized()
+func (b *RoleRefBuilder) RemoveKind() *RoleRefBuilder {
 	b.fields.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
-func (b RoleRefBuilder) GetKind() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *RoleRefBuilder) GetKind() (value string, ok bool) {
 	if v := b.fields.Kind; v != nil {
 		return *v, true
 	}
@@ -101,22 +88,19 @@ func (b RoleRefBuilder) GetKind() (value string, ok bool) {
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b RoleRefBuilder) SetName(value string) RoleRefBuilder {
-	b.ensureInitialized()
+func (b *RoleRefBuilder) SetName(value string) *RoleRefBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b RoleRefBuilder) RemoveName() RoleRefBuilder {
-	b.ensureInitialized()
+func (b *RoleRefBuilder) RemoveName() *RoleRefBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b RoleRefBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *RoleRefBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -128,9 +112,8 @@ func (b *RoleRefBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +128,13 @@ func (b *RoleRefBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals RoleRefBuilder to JSON.
 func (b *RoleRefBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +142,7 @@ func (b *RoleRefBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into RoleRefBuilder, replacing the contents of
 // RoleRefBuilder.
 func (b *RoleRefBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +150,9 @@ func (b *RoleRefBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // RoleRefList represents a list of RoleRefBuilder.
-// Provided as a convenience.
-type RoleRefList []RoleRefBuilder
+type RoleRefList []*RoleRefBuilder
 
 // RoleRefList represents a map of RoleRefBuilder.
-// Provided as a convenience.
 type RoleRefMap map[string]RoleRefBuilder
 
 func (b *RoleRefBuilder) preMarshal() {

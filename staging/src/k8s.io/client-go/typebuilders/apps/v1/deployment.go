@@ -28,15 +28,15 @@ import (
 // DeploymentBuilder represents an declarative configuration of the Deployment type for use
 // with apply.
 type DeploymentBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *deploymentFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   deploymentFields
 }
 
-// deploymentFields is used by DeploymentBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in DeploymentBuilder before marshalling, and
-// are copied out to the builder type in DeploymentBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// deploymentFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in DeploymentBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type deploymentFields struct {
 	Kind       *string                  `json:"kind,omitempty"`       // inlined DeploymentBuilder.typeMeta.Kind field
 	APIVersion *string                  `json:"apiVersion,omitempty"` // inlined DeploymentBuilder.typeMeta.APIVersion field
@@ -45,106 +45,78 @@ type deploymentFields struct {
 	Status     *DeploymentStatusBuilder `json:"status,omitempty"`
 }
 
-func (b *DeploymentBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &deploymentFields{}
-	}
-}
-
 // Deployment constructs an declarative configuration of the Deployment type for use with
 // apply.
-// Provided as a convenience.
-func Deployment() DeploymentBuilder {
-	return DeploymentBuilder{fields: &deploymentFields{}}
+func Deployment() *DeploymentBuilder {
+	return &DeploymentBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b DeploymentBuilder) SetTypeMeta(value v1.TypeMetaBuilder) DeploymentBuilder {
-	b.ensureInitialized()
+func (b *DeploymentBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *DeploymentBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b DeploymentBuilder) RemoveTypeMeta() DeploymentBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *DeploymentBuilder) RemoveTypeMeta() *DeploymentBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b DeploymentBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b DeploymentBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) DeploymentBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *DeploymentBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *DeploymentBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b DeploymentBuilder) RemoveObjectMeta() DeploymentBuilder {
-	b.ensureInitialized()
+func (b *DeploymentBuilder) RemoveObjectMeta() *DeploymentBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b DeploymentBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *DeploymentBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b DeploymentBuilder) SetSpec(value DeploymentSpecBuilder) DeploymentBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *DeploymentBuilder) SetSpec(value *DeploymentSpecBuilder) *DeploymentBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b DeploymentBuilder) RemoveSpec() DeploymentBuilder {
-	b.ensureInitialized()
+func (b *DeploymentBuilder) RemoveSpec() *DeploymentBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b DeploymentBuilder) GetSpec() (value DeploymentSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *DeploymentBuilder) GetSpec() (value *DeploymentSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b DeploymentBuilder) SetStatus(value DeploymentStatusBuilder) DeploymentBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *DeploymentBuilder) SetStatus(value *DeploymentStatusBuilder) *DeploymentBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b DeploymentBuilder) RemoveStatus() DeploymentBuilder {
-	b.ensureInitialized()
+func (b *DeploymentBuilder) RemoveStatus() *DeploymentBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b DeploymentBuilder) GetStatus() (value DeploymentStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *DeploymentBuilder) GetStatus() (value *DeploymentStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts DeploymentBuilder to unstructured.
@@ -152,9 +124,8 @@ func (b *DeploymentBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *DeploymentBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals DeploymentBuilder to JSON.
 func (b *DeploymentBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *DeploymentBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into DeploymentBuilder, replacing the contents of
 // DeploymentBuilder.
 func (b *DeploymentBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +162,25 @@ func (b *DeploymentBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // DeploymentList represents a list of DeploymentBuilder.
-// Provided as a convenience.
-type DeploymentList []DeploymentBuilder
+type DeploymentList []*DeploymentBuilder
 
 // DeploymentList represents a map of DeploymentBuilder.
-// Provided as a convenience.
 type DeploymentMap map[string]DeploymentBuilder
 
 func (b *DeploymentBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *DeploymentBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

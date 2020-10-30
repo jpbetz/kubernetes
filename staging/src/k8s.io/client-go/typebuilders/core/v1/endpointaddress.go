@@ -27,14 +27,14 @@ import (
 // EndpointAddressBuilder represents an declarative configuration of the EndpointAddress type for use
 // with apply.
 type EndpointAddressBuilder struct {
-	fields *endpointAddressFields
+	fields endpointAddressFields
 }
 
-// endpointAddressFields is used by EndpointAddressBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in EndpointAddressBuilder before marshalling, and
-// are copied out to the builder type in EndpointAddressBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// endpointAddressFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in EndpointAddressBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type endpointAddressFields struct {
 	IP        *string                 `json:"ip,omitempty"`
 	Hostname  *string                 `json:"hostname,omitempty"`
@@ -42,36 +42,26 @@ type endpointAddressFields struct {
 	TargetRef *ObjectReferenceBuilder `json:"targetRef,omitempty"`
 }
 
-func (b *EndpointAddressBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &endpointAddressFields{}
-	}
-}
-
 // EndpointAddress constructs an declarative configuration of the EndpointAddress type for use with
 // apply.
-// Provided as a convenience.
-func EndpointAddress() EndpointAddressBuilder {
-	return EndpointAddressBuilder{fields: &endpointAddressFields{}}
+func EndpointAddress() *EndpointAddressBuilder {
+	return &EndpointAddressBuilder{}
 }
 
 // SetIP sets the IP field in the declarative configuration to the given value.
-func (b EndpointAddressBuilder) SetIP(value string) EndpointAddressBuilder {
-	b.ensureInitialized()
+func (b *EndpointAddressBuilder) SetIP(value string) *EndpointAddressBuilder {
 	b.fields.IP = &value
 	return b
 }
 
 // RemoveIP removes the IP field from the declarative configuration.
-func (b EndpointAddressBuilder) RemoveIP() EndpointAddressBuilder {
-	b.ensureInitialized()
+func (b *EndpointAddressBuilder) RemoveIP() *EndpointAddressBuilder {
 	b.fields.IP = nil
 	return b
 }
 
 // GetIP gets the IP field from the declarative configuration.
-func (b EndpointAddressBuilder) GetIP() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *EndpointAddressBuilder) GetIP() (value string, ok bool) {
 	if v := b.fields.IP; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b EndpointAddressBuilder) GetIP() (value string, ok bool) {
 }
 
 // SetHostname sets the Hostname field in the declarative configuration to the given value.
-func (b EndpointAddressBuilder) SetHostname(value string) EndpointAddressBuilder {
-	b.ensureInitialized()
+func (b *EndpointAddressBuilder) SetHostname(value string) *EndpointAddressBuilder {
 	b.fields.Hostname = &value
 	return b
 }
 
 // RemoveHostname removes the Hostname field from the declarative configuration.
-func (b EndpointAddressBuilder) RemoveHostname() EndpointAddressBuilder {
-	b.ensureInitialized()
+func (b *EndpointAddressBuilder) RemoveHostname() *EndpointAddressBuilder {
 	b.fields.Hostname = nil
 	return b
 }
 
 // GetHostname gets the Hostname field from the declarative configuration.
-func (b EndpointAddressBuilder) GetHostname() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *EndpointAddressBuilder) GetHostname() (value string, ok bool) {
 	if v := b.fields.Hostname; v != nil {
 		return *v, true
 	}
@@ -102,22 +89,19 @@ func (b EndpointAddressBuilder) GetHostname() (value string, ok bool) {
 }
 
 // SetNodeName sets the NodeName field in the declarative configuration to the given value.
-func (b EndpointAddressBuilder) SetNodeName(value string) EndpointAddressBuilder {
-	b.ensureInitialized()
+func (b *EndpointAddressBuilder) SetNodeName(value string) *EndpointAddressBuilder {
 	b.fields.NodeName = &value
 	return b
 }
 
 // RemoveNodeName removes the NodeName field from the declarative configuration.
-func (b EndpointAddressBuilder) RemoveNodeName() EndpointAddressBuilder {
-	b.ensureInitialized()
+func (b *EndpointAddressBuilder) RemoveNodeName() *EndpointAddressBuilder {
 	b.fields.NodeName = nil
 	return b
 }
 
 // GetNodeName gets the NodeName field from the declarative configuration.
-func (b EndpointAddressBuilder) GetNodeName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *EndpointAddressBuilder) GetNodeName() (value string, ok bool) {
 	if v := b.fields.NodeName; v != nil {
 		return *v, true
 	}
@@ -125,26 +109,20 @@ func (b EndpointAddressBuilder) GetNodeName() (value string, ok bool) {
 }
 
 // SetTargetRef sets the TargetRef field in the declarative configuration to the given value.
-func (b EndpointAddressBuilder) SetTargetRef(value ObjectReferenceBuilder) EndpointAddressBuilder {
-	b.ensureInitialized()
-	b.fields.TargetRef = &value
+func (b *EndpointAddressBuilder) SetTargetRef(value *ObjectReferenceBuilder) *EndpointAddressBuilder {
+	b.fields.TargetRef = value
 	return b
 }
 
 // RemoveTargetRef removes the TargetRef field from the declarative configuration.
-func (b EndpointAddressBuilder) RemoveTargetRef() EndpointAddressBuilder {
-	b.ensureInitialized()
+func (b *EndpointAddressBuilder) RemoveTargetRef() *EndpointAddressBuilder {
 	b.fields.TargetRef = nil
 	return b
 }
 
 // GetTargetRef gets the TargetRef field from the declarative configuration.
-func (b EndpointAddressBuilder) GetTargetRef() (value ObjectReferenceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.TargetRef; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *EndpointAddressBuilder) GetTargetRef() (value *ObjectReferenceBuilder, ok bool) {
+	return b.fields.TargetRef, b.fields.TargetRef != nil
 }
 
 // ToUnstructured converts EndpointAddressBuilder to unstructured.
@@ -152,9 +130,8 @@ func (b *EndpointAddressBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +146,13 @@ func (b *EndpointAddressBuilder) FromUnstructured(u map[string]interface{}) erro
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals EndpointAddressBuilder to JSON.
 func (b *EndpointAddressBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +160,7 @@ func (b *EndpointAddressBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into EndpointAddressBuilder, replacing the contents of
 // EndpointAddressBuilder.
 func (b *EndpointAddressBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,11 +168,9 @@ func (b *EndpointAddressBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // EndpointAddressList represents a list of EndpointAddressBuilder.
-// Provided as a convenience.
-type EndpointAddressList []EndpointAddressBuilder
+type EndpointAddressList []*EndpointAddressBuilder
 
 // EndpointAddressList represents a map of EndpointAddressBuilder.
-// Provided as a convenience.
 type EndpointAddressMap map[string]EndpointAddressBuilder
 
 func (b *EndpointAddressBuilder) preMarshal() {

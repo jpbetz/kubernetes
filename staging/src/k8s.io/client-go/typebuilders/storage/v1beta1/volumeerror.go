@@ -28,49 +28,39 @@ import (
 // VolumeErrorBuilder represents an declarative configuration of the VolumeError type for use
 // with apply.
 type VolumeErrorBuilder struct {
-	fields *volumeErrorFields
+	fields volumeErrorFields
 }
 
-// volumeErrorFields is used by VolumeErrorBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in VolumeErrorBuilder before marshalling, and
-// are copied out to the builder type in VolumeErrorBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// volumeErrorFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in VolumeErrorBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type volumeErrorFields struct {
 	Time    *v1.Time `json:"time,omitempty"`
 	Message *string  `json:"message,omitempty"`
 }
 
-func (b *VolumeErrorBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &volumeErrorFields{}
-	}
-}
-
 // VolumeError constructs an declarative configuration of the VolumeError type for use with
 // apply.
-// Provided as a convenience.
-func VolumeError() VolumeErrorBuilder {
-	return VolumeErrorBuilder{fields: &volumeErrorFields{}}
+func VolumeError() *VolumeErrorBuilder {
+	return &VolumeErrorBuilder{}
 }
 
 // SetTime sets the Time field in the declarative configuration to the given value.
-func (b VolumeErrorBuilder) SetTime(value v1.Time) VolumeErrorBuilder {
-	b.ensureInitialized()
+func (b *VolumeErrorBuilder) SetTime(value v1.Time) *VolumeErrorBuilder {
 	b.fields.Time = &value
 	return b
 }
 
 // RemoveTime removes the Time field from the declarative configuration.
-func (b VolumeErrorBuilder) RemoveTime() VolumeErrorBuilder {
-	b.ensureInitialized()
+func (b *VolumeErrorBuilder) RemoveTime() *VolumeErrorBuilder {
 	b.fields.Time = nil
 	return b
 }
 
 // GetTime gets the Time field from the declarative configuration.
-func (b VolumeErrorBuilder) GetTime() (value v1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *VolumeErrorBuilder) GetTime() (value v1.Time, ok bool) {
 	if v := b.fields.Time; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b VolumeErrorBuilder) GetTime() (value v1.Time, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b VolumeErrorBuilder) SetMessage(value string) VolumeErrorBuilder {
-	b.ensureInitialized()
+func (b *VolumeErrorBuilder) SetMessage(value string) *VolumeErrorBuilder {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b VolumeErrorBuilder) RemoveMessage() VolumeErrorBuilder {
-	b.ensureInitialized()
+func (b *VolumeErrorBuilder) RemoveMessage() *VolumeErrorBuilder {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b VolumeErrorBuilder) GetMessage() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *VolumeErrorBuilder) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
@@ -105,9 +92,8 @@ func (b *VolumeErrorBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +108,13 @@ func (b *VolumeErrorBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals VolumeErrorBuilder to JSON.
 func (b *VolumeErrorBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +122,7 @@ func (b *VolumeErrorBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into VolumeErrorBuilder, replacing the contents of
 // VolumeErrorBuilder.
 func (b *VolumeErrorBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +130,9 @@ func (b *VolumeErrorBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // VolumeErrorList represents a list of VolumeErrorBuilder.
-// Provided as a convenience.
-type VolumeErrorList []VolumeErrorBuilder
+type VolumeErrorList []*VolumeErrorBuilder
 
 // VolumeErrorList represents a map of VolumeErrorBuilder.
-// Provided as a convenience.
 type VolumeErrorMap map[string]VolumeErrorBuilder
 
 func (b *VolumeErrorBuilder) preMarshal() {

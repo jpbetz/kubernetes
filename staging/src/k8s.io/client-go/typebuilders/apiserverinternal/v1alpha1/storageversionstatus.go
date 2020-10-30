@@ -27,50 +27,40 @@ import (
 // StorageVersionStatusBuilder represents an declarative configuration of the StorageVersionStatus type for use
 // with apply.
 type StorageVersionStatusBuilder struct {
-	fields *storageVersionStatusFields
+	fields storageVersionStatusFields
 }
 
-// storageVersionStatusFields is used by StorageVersionStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in StorageVersionStatusBuilder before marshalling, and
-// are copied out to the builder type in StorageVersionStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// storageVersionStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in StorageVersionStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type storageVersionStatusFields struct {
 	StorageVersions       *ServerStorageVersionList    `json:"storageVersions,omitempty"`
 	CommonEncodingVersion *string                      `json:"commonEncodingVersion,omitempty"`
 	Conditions            *StorageVersionConditionList `json:"conditions,omitempty"`
 }
 
-func (b *StorageVersionStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &storageVersionStatusFields{}
-	}
-}
-
 // StorageVersionStatus constructs an declarative configuration of the StorageVersionStatus type for use with
 // apply.
-// Provided as a convenience.
-func StorageVersionStatus() StorageVersionStatusBuilder {
-	return StorageVersionStatusBuilder{fields: &storageVersionStatusFields{}}
+func StorageVersionStatus() *StorageVersionStatusBuilder {
+	return &StorageVersionStatusBuilder{}
 }
 
 // SetStorageVersions sets the StorageVersions field in the declarative configuration to the given value.
-func (b StorageVersionStatusBuilder) SetStorageVersions(value ServerStorageVersionList) StorageVersionStatusBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionStatusBuilder) SetStorageVersions(value ServerStorageVersionList) *StorageVersionStatusBuilder {
 	b.fields.StorageVersions = &value
 	return b
 }
 
 // RemoveStorageVersions removes the StorageVersions field from the declarative configuration.
-func (b StorageVersionStatusBuilder) RemoveStorageVersions() StorageVersionStatusBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionStatusBuilder) RemoveStorageVersions() *StorageVersionStatusBuilder {
 	b.fields.StorageVersions = nil
 	return b
 }
 
 // GetStorageVersions gets the StorageVersions field from the declarative configuration.
-func (b StorageVersionStatusBuilder) GetStorageVersions() (value ServerStorageVersionList, ok bool) {
-	b.ensureInitialized()
+func (b *StorageVersionStatusBuilder) GetStorageVersions() (value ServerStorageVersionList, ok bool) {
 	if v := b.fields.StorageVersions; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b StorageVersionStatusBuilder) GetStorageVersions() (value ServerStorageVe
 }
 
 // SetCommonEncodingVersion sets the CommonEncodingVersion field in the declarative configuration to the given value.
-func (b StorageVersionStatusBuilder) SetCommonEncodingVersion(value string) StorageVersionStatusBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionStatusBuilder) SetCommonEncodingVersion(value string) *StorageVersionStatusBuilder {
 	b.fields.CommonEncodingVersion = &value
 	return b
 }
 
 // RemoveCommonEncodingVersion removes the CommonEncodingVersion field from the declarative configuration.
-func (b StorageVersionStatusBuilder) RemoveCommonEncodingVersion() StorageVersionStatusBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionStatusBuilder) RemoveCommonEncodingVersion() *StorageVersionStatusBuilder {
 	b.fields.CommonEncodingVersion = nil
 	return b
 }
 
 // GetCommonEncodingVersion gets the CommonEncodingVersion field from the declarative configuration.
-func (b StorageVersionStatusBuilder) GetCommonEncodingVersion() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *StorageVersionStatusBuilder) GetCommonEncodingVersion() (value string, ok bool) {
 	if v := b.fields.CommonEncodingVersion; v != nil {
 		return *v, true
 	}
@@ -101,22 +88,19 @@ func (b StorageVersionStatusBuilder) GetCommonEncodingVersion() (value string, o
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b StorageVersionStatusBuilder) SetConditions(value StorageVersionConditionList) StorageVersionStatusBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionStatusBuilder) SetConditions(value StorageVersionConditionList) *StorageVersionStatusBuilder {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b StorageVersionStatusBuilder) RemoveConditions() StorageVersionStatusBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionStatusBuilder) RemoveConditions() *StorageVersionStatusBuilder {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b StorageVersionStatusBuilder) GetConditions() (value StorageVersionConditionList, ok bool) {
-	b.ensureInitialized()
+func (b *StorageVersionStatusBuilder) GetConditions() (value StorageVersionConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
@@ -128,9 +112,8 @@ func (b *StorageVersionStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +128,13 @@ func (b *StorageVersionStatusBuilder) FromUnstructured(u map[string]interface{})
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals StorageVersionStatusBuilder to JSON.
 func (b *StorageVersionStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +142,7 @@ func (b *StorageVersionStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into StorageVersionStatusBuilder, replacing the contents of
 // StorageVersionStatusBuilder.
 func (b *StorageVersionStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +150,9 @@ func (b *StorageVersionStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // StorageVersionStatusList represents a list of StorageVersionStatusBuilder.
-// Provided as a convenience.
-type StorageVersionStatusList []StorageVersionStatusBuilder
+type StorageVersionStatusList []*StorageVersionStatusBuilder
 
 // StorageVersionStatusList represents a map of StorageVersionStatusBuilder.
-// Provided as a convenience.
 type StorageVersionStatusMap map[string]StorageVersionStatusBuilder
 
 func (b *StorageVersionStatusBuilder) preMarshal() {

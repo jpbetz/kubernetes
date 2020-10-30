@@ -27,49 +27,39 @@ import (
 // LocalVolumeSourceBuilder represents an declarative configuration of the LocalVolumeSource type for use
 // with apply.
 type LocalVolumeSourceBuilder struct {
-	fields *localVolumeSourceFields
+	fields localVolumeSourceFields
 }
 
-// localVolumeSourceFields is used by LocalVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in LocalVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in LocalVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// localVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in LocalVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type localVolumeSourceFields struct {
 	Path   *string `json:"path,omitempty"`
 	FSType *string `json:"fsType,omitempty"`
 }
 
-func (b *LocalVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &localVolumeSourceFields{}
-	}
-}
-
 // LocalVolumeSource constructs an declarative configuration of the LocalVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func LocalVolumeSource() LocalVolumeSourceBuilder {
-	return LocalVolumeSourceBuilder{fields: &localVolumeSourceFields{}}
+func LocalVolumeSource() *LocalVolumeSourceBuilder {
+	return &LocalVolumeSourceBuilder{}
 }
 
 // SetPath sets the Path field in the declarative configuration to the given value.
-func (b LocalVolumeSourceBuilder) SetPath(value string) LocalVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *LocalVolumeSourceBuilder) SetPath(value string) *LocalVolumeSourceBuilder {
 	b.fields.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
-func (b LocalVolumeSourceBuilder) RemovePath() LocalVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *LocalVolumeSourceBuilder) RemovePath() *LocalVolumeSourceBuilder {
 	b.fields.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
-func (b LocalVolumeSourceBuilder) GetPath() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *LocalVolumeSourceBuilder) GetPath() (value string, ok bool) {
 	if v := b.fields.Path; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b LocalVolumeSourceBuilder) GetPath() (value string, ok bool) {
 }
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
-func (b LocalVolumeSourceBuilder) SetFSType(value string) LocalVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *LocalVolumeSourceBuilder) SetFSType(value string) *LocalVolumeSourceBuilder {
 	b.fields.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
-func (b LocalVolumeSourceBuilder) RemoveFSType() LocalVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *LocalVolumeSourceBuilder) RemoveFSType() *LocalVolumeSourceBuilder {
 	b.fields.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
-func (b LocalVolumeSourceBuilder) GetFSType() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *LocalVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 	if v := b.fields.FSType; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *LocalVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *LocalVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) er
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals LocalVolumeSourceBuilder to JSON.
 func (b *LocalVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *LocalVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into LocalVolumeSourceBuilder, replacing the contents of
 // LocalVolumeSourceBuilder.
 func (b *LocalVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *LocalVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // LocalVolumeSourceList represents a list of LocalVolumeSourceBuilder.
-// Provided as a convenience.
-type LocalVolumeSourceList []LocalVolumeSourceBuilder
+type LocalVolumeSourceList []*LocalVolumeSourceBuilder
 
 // LocalVolumeSourceList represents a map of LocalVolumeSourceBuilder.
-// Provided as a convenience.
 type LocalVolumeSourceMap map[string]LocalVolumeSourceBuilder
 
 func (b *LocalVolumeSourceBuilder) preMarshal() {

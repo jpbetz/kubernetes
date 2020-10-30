@@ -27,76 +27,57 @@ import (
 // LifecycleBuilder represents an declarative configuration of the Lifecycle type for use
 // with apply.
 type LifecycleBuilder struct {
-	fields *lifecycleFields
+	fields lifecycleFields
 }
 
-// lifecycleFields is used by LifecycleBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in LifecycleBuilder before marshalling, and
-// are copied out to the builder type in LifecycleBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// lifecycleFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in LifecycleBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type lifecycleFields struct {
 	PostStart *HandlerBuilder `json:"postStart,omitempty"`
 	PreStop   *HandlerBuilder `json:"preStop,omitempty"`
 }
 
-func (b *LifecycleBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &lifecycleFields{}
-	}
-}
-
 // Lifecycle constructs an declarative configuration of the Lifecycle type for use with
 // apply.
-// Provided as a convenience.
-func Lifecycle() LifecycleBuilder {
-	return LifecycleBuilder{fields: &lifecycleFields{}}
+func Lifecycle() *LifecycleBuilder {
+	return &LifecycleBuilder{}
 }
 
 // SetPostStart sets the PostStart field in the declarative configuration to the given value.
-func (b LifecycleBuilder) SetPostStart(value HandlerBuilder) LifecycleBuilder {
-	b.ensureInitialized()
-	b.fields.PostStart = &value
+func (b *LifecycleBuilder) SetPostStart(value *HandlerBuilder) *LifecycleBuilder {
+	b.fields.PostStart = value
 	return b
 }
 
 // RemovePostStart removes the PostStart field from the declarative configuration.
-func (b LifecycleBuilder) RemovePostStart() LifecycleBuilder {
-	b.ensureInitialized()
+func (b *LifecycleBuilder) RemovePostStart() *LifecycleBuilder {
 	b.fields.PostStart = nil
 	return b
 }
 
 // GetPostStart gets the PostStart field from the declarative configuration.
-func (b LifecycleBuilder) GetPostStart() (value HandlerBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.PostStart; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *LifecycleBuilder) GetPostStart() (value *HandlerBuilder, ok bool) {
+	return b.fields.PostStart, b.fields.PostStart != nil
 }
 
 // SetPreStop sets the PreStop field in the declarative configuration to the given value.
-func (b LifecycleBuilder) SetPreStop(value HandlerBuilder) LifecycleBuilder {
-	b.ensureInitialized()
-	b.fields.PreStop = &value
+func (b *LifecycleBuilder) SetPreStop(value *HandlerBuilder) *LifecycleBuilder {
+	b.fields.PreStop = value
 	return b
 }
 
 // RemovePreStop removes the PreStop field from the declarative configuration.
-func (b LifecycleBuilder) RemovePreStop() LifecycleBuilder {
-	b.ensureInitialized()
+func (b *LifecycleBuilder) RemovePreStop() *LifecycleBuilder {
 	b.fields.PreStop = nil
 	return b
 }
 
 // GetPreStop gets the PreStop field from the declarative configuration.
-func (b LifecycleBuilder) GetPreStop() (value HandlerBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.PreStop; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *LifecycleBuilder) GetPreStop() (value *HandlerBuilder, ok bool) {
+	return b.fields.PreStop, b.fields.PreStop != nil
 }
 
 // ToUnstructured converts LifecycleBuilder to unstructured.
@@ -104,9 +85,8 @@ func (b *LifecycleBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +101,13 @@ func (b *LifecycleBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals LifecycleBuilder to JSON.
 func (b *LifecycleBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +115,7 @@ func (b *LifecycleBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into LifecycleBuilder, replacing the contents of
 // LifecycleBuilder.
 func (b *LifecycleBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +123,9 @@ func (b *LifecycleBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // LifecycleList represents a list of LifecycleBuilder.
-// Provided as a convenience.
-type LifecycleList []LifecycleBuilder
+type LifecycleList []*LifecycleBuilder
 
 // LifecycleList represents a map of LifecycleBuilder.
-// Provided as a convenience.
 type LifecycleMap map[string]LifecycleBuilder
 
 func (b *LifecycleBuilder) preMarshal() {

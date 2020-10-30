@@ -27,14 +27,14 @@ import (
 // IngressSpecBuilder represents an declarative configuration of the IngressSpec type for use
 // with apply.
 type IngressSpecBuilder struct {
-	fields *ingressSpecFields
+	fields ingressSpecFields
 }
 
-// ingressSpecFields is used by IngressSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in IngressSpecBuilder before marshalling, and
-// are copied out to the builder type in IngressSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// ingressSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in IngressSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type ingressSpecFields struct {
 	IngressClassName *string                `json:"ingressClassName,omitempty"`
 	Backend          *IngressBackendBuilder `json:"backend,omitempty"`
@@ -42,36 +42,26 @@ type ingressSpecFields struct {
 	Rules            *IngressRuleList       `json:"rules,omitempty"`
 }
 
-func (b *IngressSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &ingressSpecFields{}
-	}
-}
-
 // IngressSpec constructs an declarative configuration of the IngressSpec type for use with
 // apply.
-// Provided as a convenience.
-func IngressSpec() IngressSpecBuilder {
-	return IngressSpecBuilder{fields: &ingressSpecFields{}}
+func IngressSpec() *IngressSpecBuilder {
+	return &IngressSpecBuilder{}
 }
 
 // SetIngressClassName sets the IngressClassName field in the declarative configuration to the given value.
-func (b IngressSpecBuilder) SetIngressClassName(value string) IngressSpecBuilder {
-	b.ensureInitialized()
+func (b *IngressSpecBuilder) SetIngressClassName(value string) *IngressSpecBuilder {
 	b.fields.IngressClassName = &value
 	return b
 }
 
 // RemoveIngressClassName removes the IngressClassName field from the declarative configuration.
-func (b IngressSpecBuilder) RemoveIngressClassName() IngressSpecBuilder {
-	b.ensureInitialized()
+func (b *IngressSpecBuilder) RemoveIngressClassName() *IngressSpecBuilder {
 	b.fields.IngressClassName = nil
 	return b
 }
 
 // GetIngressClassName gets the IngressClassName field from the declarative configuration.
-func (b IngressSpecBuilder) GetIngressClassName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *IngressSpecBuilder) GetIngressClassName() (value string, ok bool) {
 	if v := b.fields.IngressClassName; v != nil {
 		return *v, true
 	}
@@ -79,45 +69,36 @@ func (b IngressSpecBuilder) GetIngressClassName() (value string, ok bool) {
 }
 
 // SetBackend sets the Backend field in the declarative configuration to the given value.
-func (b IngressSpecBuilder) SetBackend(value IngressBackendBuilder) IngressSpecBuilder {
-	b.ensureInitialized()
-	b.fields.Backend = &value
+func (b *IngressSpecBuilder) SetBackend(value *IngressBackendBuilder) *IngressSpecBuilder {
+	b.fields.Backend = value
 	return b
 }
 
 // RemoveBackend removes the Backend field from the declarative configuration.
-func (b IngressSpecBuilder) RemoveBackend() IngressSpecBuilder {
-	b.ensureInitialized()
+func (b *IngressSpecBuilder) RemoveBackend() *IngressSpecBuilder {
 	b.fields.Backend = nil
 	return b
 }
 
 // GetBackend gets the Backend field from the declarative configuration.
-func (b IngressSpecBuilder) GetBackend() (value IngressBackendBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Backend; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *IngressSpecBuilder) GetBackend() (value *IngressBackendBuilder, ok bool) {
+	return b.fields.Backend, b.fields.Backend != nil
 }
 
 // SetTLS sets the TLS field in the declarative configuration to the given value.
-func (b IngressSpecBuilder) SetTLS(value IngressTLSList) IngressSpecBuilder {
-	b.ensureInitialized()
+func (b *IngressSpecBuilder) SetTLS(value IngressTLSList) *IngressSpecBuilder {
 	b.fields.TLS = &value
 	return b
 }
 
 // RemoveTLS removes the TLS field from the declarative configuration.
-func (b IngressSpecBuilder) RemoveTLS() IngressSpecBuilder {
-	b.ensureInitialized()
+func (b *IngressSpecBuilder) RemoveTLS() *IngressSpecBuilder {
 	b.fields.TLS = nil
 	return b
 }
 
 // GetTLS gets the TLS field from the declarative configuration.
-func (b IngressSpecBuilder) GetTLS() (value IngressTLSList, ok bool) {
-	b.ensureInitialized()
+func (b *IngressSpecBuilder) GetTLS() (value IngressTLSList, ok bool) {
 	if v := b.fields.TLS; v != nil {
 		return *v, true
 	}
@@ -125,22 +106,19 @@ func (b IngressSpecBuilder) GetTLS() (value IngressTLSList, ok bool) {
 }
 
 // SetRules sets the Rules field in the declarative configuration to the given value.
-func (b IngressSpecBuilder) SetRules(value IngressRuleList) IngressSpecBuilder {
-	b.ensureInitialized()
+func (b *IngressSpecBuilder) SetRules(value IngressRuleList) *IngressSpecBuilder {
 	b.fields.Rules = &value
 	return b
 }
 
 // RemoveRules removes the Rules field from the declarative configuration.
-func (b IngressSpecBuilder) RemoveRules() IngressSpecBuilder {
-	b.ensureInitialized()
+func (b *IngressSpecBuilder) RemoveRules() *IngressSpecBuilder {
 	b.fields.Rules = nil
 	return b
 }
 
 // GetRules gets the Rules field from the declarative configuration.
-func (b IngressSpecBuilder) GetRules() (value IngressRuleList, ok bool) {
-	b.ensureInitialized()
+func (b *IngressSpecBuilder) GetRules() (value IngressRuleList, ok bool) {
 	if v := b.fields.Rules; v != nil {
 		return *v, true
 	}
@@ -152,9 +130,8 @@ func (b *IngressSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +146,13 @@ func (b *IngressSpecBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals IngressSpecBuilder to JSON.
 func (b *IngressSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +160,7 @@ func (b *IngressSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into IngressSpecBuilder, replacing the contents of
 // IngressSpecBuilder.
 func (b *IngressSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,11 +168,9 @@ func (b *IngressSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // IngressSpecList represents a list of IngressSpecBuilder.
-// Provided as a convenience.
-type IngressSpecList []IngressSpecBuilder
+type IngressSpecList []*IngressSpecBuilder
 
 // IngressSpecList represents a map of IngressSpecBuilder.
-// Provided as a convenience.
 type IngressSpecMap map[string]IngressSpecBuilder
 
 func (b *IngressSpecBuilder) preMarshal() {

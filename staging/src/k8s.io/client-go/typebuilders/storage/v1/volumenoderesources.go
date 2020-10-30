@@ -27,48 +27,38 @@ import (
 // VolumeNodeResourcesBuilder represents an declarative configuration of the VolumeNodeResources type for use
 // with apply.
 type VolumeNodeResourcesBuilder struct {
-	fields *volumeNodeResourcesFields
+	fields volumeNodeResourcesFields
 }
 
-// volumeNodeResourcesFields is used by VolumeNodeResourcesBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in VolumeNodeResourcesBuilder before marshalling, and
-// are copied out to the builder type in VolumeNodeResourcesBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// volumeNodeResourcesFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in VolumeNodeResourcesBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type volumeNodeResourcesFields struct {
 	Count *int32 `json:"count,omitempty"`
 }
 
-func (b *VolumeNodeResourcesBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &volumeNodeResourcesFields{}
-	}
-}
-
 // VolumeNodeResources constructs an declarative configuration of the VolumeNodeResources type for use with
 // apply.
-// Provided as a convenience.
-func VolumeNodeResources() VolumeNodeResourcesBuilder {
-	return VolumeNodeResourcesBuilder{fields: &volumeNodeResourcesFields{}}
+func VolumeNodeResources() *VolumeNodeResourcesBuilder {
+	return &VolumeNodeResourcesBuilder{}
 }
 
 // SetCount sets the Count field in the declarative configuration to the given value.
-func (b VolumeNodeResourcesBuilder) SetCount(value int32) VolumeNodeResourcesBuilder {
-	b.ensureInitialized()
+func (b *VolumeNodeResourcesBuilder) SetCount(value int32) *VolumeNodeResourcesBuilder {
 	b.fields.Count = &value
 	return b
 }
 
 // RemoveCount removes the Count field from the declarative configuration.
-func (b VolumeNodeResourcesBuilder) RemoveCount() VolumeNodeResourcesBuilder {
-	b.ensureInitialized()
+func (b *VolumeNodeResourcesBuilder) RemoveCount() *VolumeNodeResourcesBuilder {
 	b.fields.Count = nil
 	return b
 }
 
 // GetCount gets the Count field from the declarative configuration.
-func (b VolumeNodeResourcesBuilder) GetCount() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *VolumeNodeResourcesBuilder) GetCount() (value int32, ok bool) {
 	if v := b.fields.Count; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *VolumeNodeResourcesBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *VolumeNodeResourcesBuilder) FromUnstructured(u map[string]interface{}) 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals VolumeNodeResourcesBuilder to JSON.
 func (b *VolumeNodeResourcesBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *VolumeNodeResourcesBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into VolumeNodeResourcesBuilder, replacing the contents of
 // VolumeNodeResourcesBuilder.
 func (b *VolumeNodeResourcesBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *VolumeNodeResourcesBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // VolumeNodeResourcesList represents a list of VolumeNodeResourcesBuilder.
-// Provided as a convenience.
-type VolumeNodeResourcesList []VolumeNodeResourcesBuilder
+type VolumeNodeResourcesList []*VolumeNodeResourcesBuilder
 
 // VolumeNodeResourcesList represents a map of VolumeNodeResourcesBuilder.
-// Provided as a convenience.
 type VolumeNodeResourcesMap map[string]VolumeNodeResourcesBuilder
 
 func (b *VolumeNodeResourcesBuilder) preMarshal() {

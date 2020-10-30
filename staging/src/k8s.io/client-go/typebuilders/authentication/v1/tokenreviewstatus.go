@@ -27,14 +27,14 @@ import (
 // TokenReviewStatusBuilder represents an declarative configuration of the TokenReviewStatus type for use
 // with apply.
 type TokenReviewStatusBuilder struct {
-	fields *tokenReviewStatusFields
+	fields tokenReviewStatusFields
 }
 
-// tokenReviewStatusFields is used by TokenReviewStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in TokenReviewStatusBuilder before marshalling, and
-// are copied out to the builder type in TokenReviewStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// tokenReviewStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in TokenReviewStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type tokenReviewStatusFields struct {
 	Authenticated *bool            `json:"authenticated,omitempty"`
 	User          *UserInfoBuilder `json:"user,omitempty"`
@@ -42,36 +42,26 @@ type tokenReviewStatusFields struct {
 	Error         *string          `json:"error,omitempty"`
 }
 
-func (b *TokenReviewStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &tokenReviewStatusFields{}
-	}
-}
-
 // TokenReviewStatus constructs an declarative configuration of the TokenReviewStatus type for use with
 // apply.
-// Provided as a convenience.
-func TokenReviewStatus() TokenReviewStatusBuilder {
-	return TokenReviewStatusBuilder{fields: &tokenReviewStatusFields{}}
+func TokenReviewStatus() *TokenReviewStatusBuilder {
+	return &TokenReviewStatusBuilder{}
 }
 
 // SetAuthenticated sets the Authenticated field in the declarative configuration to the given value.
-func (b TokenReviewStatusBuilder) SetAuthenticated(value bool) TokenReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *TokenReviewStatusBuilder) SetAuthenticated(value bool) *TokenReviewStatusBuilder {
 	b.fields.Authenticated = &value
 	return b
 }
 
 // RemoveAuthenticated removes the Authenticated field from the declarative configuration.
-func (b TokenReviewStatusBuilder) RemoveAuthenticated() TokenReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *TokenReviewStatusBuilder) RemoveAuthenticated() *TokenReviewStatusBuilder {
 	b.fields.Authenticated = nil
 	return b
 }
 
 // GetAuthenticated gets the Authenticated field from the declarative configuration.
-func (b TokenReviewStatusBuilder) GetAuthenticated() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *TokenReviewStatusBuilder) GetAuthenticated() (value bool, ok bool) {
 	if v := b.fields.Authenticated; v != nil {
 		return *v, true
 	}
@@ -79,45 +69,36 @@ func (b TokenReviewStatusBuilder) GetAuthenticated() (value bool, ok bool) {
 }
 
 // SetUser sets the User field in the declarative configuration to the given value.
-func (b TokenReviewStatusBuilder) SetUser(value UserInfoBuilder) TokenReviewStatusBuilder {
-	b.ensureInitialized()
-	b.fields.User = &value
+func (b *TokenReviewStatusBuilder) SetUser(value *UserInfoBuilder) *TokenReviewStatusBuilder {
+	b.fields.User = value
 	return b
 }
 
 // RemoveUser removes the User field from the declarative configuration.
-func (b TokenReviewStatusBuilder) RemoveUser() TokenReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *TokenReviewStatusBuilder) RemoveUser() *TokenReviewStatusBuilder {
 	b.fields.User = nil
 	return b
 }
 
 // GetUser gets the User field from the declarative configuration.
-func (b TokenReviewStatusBuilder) GetUser() (value UserInfoBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.User; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *TokenReviewStatusBuilder) GetUser() (value *UserInfoBuilder, ok bool) {
+	return b.fields.User, b.fields.User != nil
 }
 
 // SetAudiences sets the Audiences field in the declarative configuration to the given value.
-func (b TokenReviewStatusBuilder) SetAudiences(value []string) TokenReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *TokenReviewStatusBuilder) SetAudiences(value []string) *TokenReviewStatusBuilder {
 	b.fields.Audiences = &value
 	return b
 }
 
 // RemoveAudiences removes the Audiences field from the declarative configuration.
-func (b TokenReviewStatusBuilder) RemoveAudiences() TokenReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *TokenReviewStatusBuilder) RemoveAudiences() *TokenReviewStatusBuilder {
 	b.fields.Audiences = nil
 	return b
 }
 
 // GetAudiences gets the Audiences field from the declarative configuration.
-func (b TokenReviewStatusBuilder) GetAudiences() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *TokenReviewStatusBuilder) GetAudiences() (value []string, ok bool) {
 	if v := b.fields.Audiences; v != nil {
 		return *v, true
 	}
@@ -125,22 +106,19 @@ func (b TokenReviewStatusBuilder) GetAudiences() (value []string, ok bool) {
 }
 
 // SetError sets the Error field in the declarative configuration to the given value.
-func (b TokenReviewStatusBuilder) SetError(value string) TokenReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *TokenReviewStatusBuilder) SetError(value string) *TokenReviewStatusBuilder {
 	b.fields.Error = &value
 	return b
 }
 
 // RemoveError removes the Error field from the declarative configuration.
-func (b TokenReviewStatusBuilder) RemoveError() TokenReviewStatusBuilder {
-	b.ensureInitialized()
+func (b *TokenReviewStatusBuilder) RemoveError() *TokenReviewStatusBuilder {
 	b.fields.Error = nil
 	return b
 }
 
 // GetError gets the Error field from the declarative configuration.
-func (b TokenReviewStatusBuilder) GetError() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *TokenReviewStatusBuilder) GetError() (value string, ok bool) {
 	if v := b.fields.Error; v != nil {
 		return *v, true
 	}
@@ -152,9 +130,8 @@ func (b *TokenReviewStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +146,13 @@ func (b *TokenReviewStatusBuilder) FromUnstructured(u map[string]interface{}) er
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals TokenReviewStatusBuilder to JSON.
 func (b *TokenReviewStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +160,7 @@ func (b *TokenReviewStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into TokenReviewStatusBuilder, replacing the contents of
 // TokenReviewStatusBuilder.
 func (b *TokenReviewStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,11 +168,9 @@ func (b *TokenReviewStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // TokenReviewStatusList represents a list of TokenReviewStatusBuilder.
-// Provided as a convenience.
-type TokenReviewStatusList []TokenReviewStatusBuilder
+type TokenReviewStatusList []*TokenReviewStatusBuilder
 
 // TokenReviewStatusList represents a map of TokenReviewStatusBuilder.
-// Provided as a convenience.
 type TokenReviewStatusMap map[string]TokenReviewStatusBuilder
 
 func (b *TokenReviewStatusBuilder) preMarshal() {

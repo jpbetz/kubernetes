@@ -28,49 +28,39 @@ import (
 // DeploymentStrategyBuilder represents an declarative configuration of the DeploymentStrategy type for use
 // with apply.
 type DeploymentStrategyBuilder struct {
-	fields *deploymentStrategyFields
+	fields deploymentStrategyFields
 }
 
-// deploymentStrategyFields is used by DeploymentStrategyBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in DeploymentStrategyBuilder before marshalling, and
-// are copied out to the builder type in DeploymentStrategyBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// deploymentStrategyFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in DeploymentStrategyBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type deploymentStrategyFields struct {
 	Type          *v1.DeploymentStrategyType      `json:"type,omitempty"`
 	RollingUpdate *RollingUpdateDeploymentBuilder `json:"rollingUpdate,omitempty"`
 }
 
-func (b *DeploymentStrategyBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &deploymentStrategyFields{}
-	}
-}
-
 // DeploymentStrategy constructs an declarative configuration of the DeploymentStrategy type for use with
 // apply.
-// Provided as a convenience.
-func DeploymentStrategy() DeploymentStrategyBuilder {
-	return DeploymentStrategyBuilder{fields: &deploymentStrategyFields{}}
+func DeploymentStrategy() *DeploymentStrategyBuilder {
+	return &DeploymentStrategyBuilder{}
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b DeploymentStrategyBuilder) SetType(value v1.DeploymentStrategyType) DeploymentStrategyBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStrategyBuilder) SetType(value v1.DeploymentStrategyType) *DeploymentStrategyBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b DeploymentStrategyBuilder) RemoveType() DeploymentStrategyBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStrategyBuilder) RemoveType() *DeploymentStrategyBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b DeploymentStrategyBuilder) GetType() (value v1.DeploymentStrategyType, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentStrategyBuilder) GetType() (value v1.DeploymentStrategyType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -78,26 +68,20 @@ func (b DeploymentStrategyBuilder) GetType() (value v1.DeploymentStrategyType, o
 }
 
 // SetRollingUpdate sets the RollingUpdate field in the declarative configuration to the given value.
-func (b DeploymentStrategyBuilder) SetRollingUpdate(value RollingUpdateDeploymentBuilder) DeploymentStrategyBuilder {
-	b.ensureInitialized()
-	b.fields.RollingUpdate = &value
+func (b *DeploymentStrategyBuilder) SetRollingUpdate(value *RollingUpdateDeploymentBuilder) *DeploymentStrategyBuilder {
+	b.fields.RollingUpdate = value
 	return b
 }
 
 // RemoveRollingUpdate removes the RollingUpdate field from the declarative configuration.
-func (b DeploymentStrategyBuilder) RemoveRollingUpdate() DeploymentStrategyBuilder {
-	b.ensureInitialized()
+func (b *DeploymentStrategyBuilder) RemoveRollingUpdate() *DeploymentStrategyBuilder {
 	b.fields.RollingUpdate = nil
 	return b
 }
 
 // GetRollingUpdate gets the RollingUpdate field from the declarative configuration.
-func (b DeploymentStrategyBuilder) GetRollingUpdate() (value RollingUpdateDeploymentBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.RollingUpdate; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *DeploymentStrategyBuilder) GetRollingUpdate() (value *RollingUpdateDeploymentBuilder, ok bool) {
+	return b.fields.RollingUpdate, b.fields.RollingUpdate != nil
 }
 
 // ToUnstructured converts DeploymentStrategyBuilder to unstructured.
@@ -105,9 +89,8 @@ func (b *DeploymentStrategyBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +105,13 @@ func (b *DeploymentStrategyBuilder) FromUnstructured(u map[string]interface{}) e
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals DeploymentStrategyBuilder to JSON.
 func (b *DeploymentStrategyBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +119,7 @@ func (b *DeploymentStrategyBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into DeploymentStrategyBuilder, replacing the contents of
 // DeploymentStrategyBuilder.
 func (b *DeploymentStrategyBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +127,9 @@ func (b *DeploymentStrategyBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // DeploymentStrategyList represents a list of DeploymentStrategyBuilder.
-// Provided as a convenience.
-type DeploymentStrategyList []DeploymentStrategyBuilder
+type DeploymentStrategyList []*DeploymentStrategyBuilder
 
 // DeploymentStrategyList represents a map of DeploymentStrategyBuilder.
-// Provided as a convenience.
 type DeploymentStrategyMap map[string]DeploymentStrategyBuilder
 
 func (b *DeploymentStrategyBuilder) preMarshal() {

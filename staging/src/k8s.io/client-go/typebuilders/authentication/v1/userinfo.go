@@ -28,14 +28,14 @@ import (
 // UserInfoBuilder represents an declarative configuration of the UserInfo type for use
 // with apply.
 type UserInfoBuilder struct {
-	fields *userInfoFields
+	fields userInfoFields
 }
 
-// userInfoFields is used by UserInfoBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in UserInfoBuilder before marshalling, and
-// are copied out to the builder type in UserInfoBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// userInfoFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in UserInfoBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type userInfoFields struct {
 	Username *string                   `json:"username,omitempty"`
 	UID      *string                   `json:"uid,omitempty"`
@@ -43,36 +43,26 @@ type userInfoFields struct {
 	Extra    *map[string]v1.ExtraValue `json:"extra,omitempty"`
 }
 
-func (b *UserInfoBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &userInfoFields{}
-	}
-}
-
 // UserInfo constructs an declarative configuration of the UserInfo type for use with
 // apply.
-// Provided as a convenience.
-func UserInfo() UserInfoBuilder {
-	return UserInfoBuilder{fields: &userInfoFields{}}
+func UserInfo() *UserInfoBuilder {
+	return &UserInfoBuilder{}
 }
 
 // SetUsername sets the Username field in the declarative configuration to the given value.
-func (b UserInfoBuilder) SetUsername(value string) UserInfoBuilder {
-	b.ensureInitialized()
+func (b *UserInfoBuilder) SetUsername(value string) *UserInfoBuilder {
 	b.fields.Username = &value
 	return b
 }
 
 // RemoveUsername removes the Username field from the declarative configuration.
-func (b UserInfoBuilder) RemoveUsername() UserInfoBuilder {
-	b.ensureInitialized()
+func (b *UserInfoBuilder) RemoveUsername() *UserInfoBuilder {
 	b.fields.Username = nil
 	return b
 }
 
 // GetUsername gets the Username field from the declarative configuration.
-func (b UserInfoBuilder) GetUsername() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *UserInfoBuilder) GetUsername() (value string, ok bool) {
 	if v := b.fields.Username; v != nil {
 		return *v, true
 	}
@@ -80,22 +70,19 @@ func (b UserInfoBuilder) GetUsername() (value string, ok bool) {
 }
 
 // SetUID sets the UID field in the declarative configuration to the given value.
-func (b UserInfoBuilder) SetUID(value string) UserInfoBuilder {
-	b.ensureInitialized()
+func (b *UserInfoBuilder) SetUID(value string) *UserInfoBuilder {
 	b.fields.UID = &value
 	return b
 }
 
 // RemoveUID removes the UID field from the declarative configuration.
-func (b UserInfoBuilder) RemoveUID() UserInfoBuilder {
-	b.ensureInitialized()
+func (b *UserInfoBuilder) RemoveUID() *UserInfoBuilder {
 	b.fields.UID = nil
 	return b
 }
 
 // GetUID gets the UID field from the declarative configuration.
-func (b UserInfoBuilder) GetUID() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *UserInfoBuilder) GetUID() (value string, ok bool) {
 	if v := b.fields.UID; v != nil {
 		return *v, true
 	}
@@ -103,22 +90,19 @@ func (b UserInfoBuilder) GetUID() (value string, ok bool) {
 }
 
 // SetGroups sets the Groups field in the declarative configuration to the given value.
-func (b UserInfoBuilder) SetGroups(value []string) UserInfoBuilder {
-	b.ensureInitialized()
+func (b *UserInfoBuilder) SetGroups(value []string) *UserInfoBuilder {
 	b.fields.Groups = &value
 	return b
 }
 
 // RemoveGroups removes the Groups field from the declarative configuration.
-func (b UserInfoBuilder) RemoveGroups() UserInfoBuilder {
-	b.ensureInitialized()
+func (b *UserInfoBuilder) RemoveGroups() *UserInfoBuilder {
 	b.fields.Groups = nil
 	return b
 }
 
 // GetGroups gets the Groups field from the declarative configuration.
-func (b UserInfoBuilder) GetGroups() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *UserInfoBuilder) GetGroups() (value []string, ok bool) {
 	if v := b.fields.Groups; v != nil {
 		return *v, true
 	}
@@ -126,22 +110,19 @@ func (b UserInfoBuilder) GetGroups() (value []string, ok bool) {
 }
 
 // SetExtra sets the Extra field in the declarative configuration to the given value.
-func (b UserInfoBuilder) SetExtra(value map[string]v1.ExtraValue) UserInfoBuilder {
-	b.ensureInitialized()
+func (b *UserInfoBuilder) SetExtra(value map[string]v1.ExtraValue) *UserInfoBuilder {
 	b.fields.Extra = &value
 	return b
 }
 
 // RemoveExtra removes the Extra field from the declarative configuration.
-func (b UserInfoBuilder) RemoveExtra() UserInfoBuilder {
-	b.ensureInitialized()
+func (b *UserInfoBuilder) RemoveExtra() *UserInfoBuilder {
 	b.fields.Extra = nil
 	return b
 }
 
 // GetExtra gets the Extra field from the declarative configuration.
-func (b UserInfoBuilder) GetExtra() (value map[string]v1.ExtraValue, ok bool) {
-	b.ensureInitialized()
+func (b *UserInfoBuilder) GetExtra() (value map[string]v1.ExtraValue, ok bool) {
 	if v := b.fields.Extra; v != nil {
 		return *v, true
 	}
@@ -153,9 +134,8 @@ func (b *UserInfoBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -170,14 +150,13 @@ func (b *UserInfoBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals UserInfoBuilder to JSON.
 func (b *UserInfoBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -185,8 +164,7 @@ func (b *UserInfoBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into UserInfoBuilder, replacing the contents of
 // UserInfoBuilder.
 func (b *UserInfoBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -194,11 +172,9 @@ func (b *UserInfoBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // UserInfoList represents a list of UserInfoBuilder.
-// Provided as a convenience.
-type UserInfoList []UserInfoBuilder
+type UserInfoList []*UserInfoBuilder
 
 // UserInfoList represents a map of UserInfoBuilder.
-// Provided as a convenience.
 type UserInfoMap map[string]UserInfoBuilder
 
 func (b *UserInfoBuilder) preMarshal() {

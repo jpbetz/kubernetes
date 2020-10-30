@@ -28,15 +28,15 @@ import (
 // ConfigMapBuilder represents an declarative configuration of the ConfigMap type for use
 // with apply.
 type ConfigMapBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *configMapFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   configMapFields
 }
 
-// configMapFields is used by ConfigMapBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ConfigMapBuilder before marshalling, and
-// are copied out to the builder type in ConfigMapBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// configMapFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ConfigMapBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type configMapFields struct {
 	Kind       *string               `json:"kind,omitempty"`       // inlined ConfigMapBuilder.typeMeta.Kind field
 	APIVersion *string               `json:"apiVersion,omitempty"` // inlined ConfigMapBuilder.typeMeta.APIVersion field
@@ -46,79 +46,60 @@ type configMapFields struct {
 	BinaryData *map[string][]byte    `json:"binaryData,omitempty"`
 }
 
-func (b *ConfigMapBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &configMapFields{}
-	}
-}
-
 // ConfigMap constructs an declarative configuration of the ConfigMap type for use with
 // apply.
-// Provided as a convenience.
-func ConfigMap() ConfigMapBuilder {
-	return ConfigMapBuilder{fields: &configMapFields{}}
+func ConfigMap() *ConfigMapBuilder {
+	return &ConfigMapBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b ConfigMapBuilder) SetTypeMeta(value v1.TypeMetaBuilder) ConfigMapBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *ConfigMapBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b ConfigMapBuilder) RemoveTypeMeta() ConfigMapBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *ConfigMapBuilder) RemoveTypeMeta() *ConfigMapBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b ConfigMapBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b ConfigMapBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) ConfigMapBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *ConfigMapBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *ConfigMapBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b ConfigMapBuilder) RemoveObjectMeta() ConfigMapBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapBuilder) RemoveObjectMeta() *ConfigMapBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b ConfigMapBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ConfigMapBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetImmutable sets the Immutable field in the declarative configuration to the given value.
-func (b ConfigMapBuilder) SetImmutable(value bool) ConfigMapBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapBuilder) SetImmutable(value bool) *ConfigMapBuilder {
 	b.fields.Immutable = &value
 	return b
 }
 
 // RemoveImmutable removes the Immutable field from the declarative configuration.
-func (b ConfigMapBuilder) RemoveImmutable() ConfigMapBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapBuilder) RemoveImmutable() *ConfigMapBuilder {
 	b.fields.Immutable = nil
 	return b
 }
 
 // GetImmutable gets the Immutable field from the declarative configuration.
-func (b ConfigMapBuilder) GetImmutable() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapBuilder) GetImmutable() (value bool, ok bool) {
 	if v := b.fields.Immutable; v != nil {
 		return *v, true
 	}
@@ -126,22 +107,19 @@ func (b ConfigMapBuilder) GetImmutable() (value bool, ok bool) {
 }
 
 // SetData sets the Data field in the declarative configuration to the given value.
-func (b ConfigMapBuilder) SetData(value map[string]string) ConfigMapBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapBuilder) SetData(value map[string]string) *ConfigMapBuilder {
 	b.fields.Data = &value
 	return b
 }
 
 // RemoveData removes the Data field from the declarative configuration.
-func (b ConfigMapBuilder) RemoveData() ConfigMapBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapBuilder) RemoveData() *ConfigMapBuilder {
 	b.fields.Data = nil
 	return b
 }
 
 // GetData gets the Data field from the declarative configuration.
-func (b ConfigMapBuilder) GetData() (value map[string]string, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapBuilder) GetData() (value map[string]string, ok bool) {
 	if v := b.fields.Data; v != nil {
 		return *v, true
 	}
@@ -149,22 +127,19 @@ func (b ConfigMapBuilder) GetData() (value map[string]string, ok bool) {
 }
 
 // SetBinaryData sets the BinaryData field in the declarative configuration to the given value.
-func (b ConfigMapBuilder) SetBinaryData(value map[string][]byte) ConfigMapBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapBuilder) SetBinaryData(value map[string][]byte) *ConfigMapBuilder {
 	b.fields.BinaryData = &value
 	return b
 }
 
 // RemoveBinaryData removes the BinaryData field from the declarative configuration.
-func (b ConfigMapBuilder) RemoveBinaryData() ConfigMapBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapBuilder) RemoveBinaryData() *ConfigMapBuilder {
 	b.fields.BinaryData = nil
 	return b
 }
 
 // GetBinaryData gets the BinaryData field from the declarative configuration.
-func (b ConfigMapBuilder) GetBinaryData() (value map[string][]byte, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapBuilder) GetBinaryData() (value map[string][]byte, ok bool) {
 	if v := b.fields.BinaryData; v != nil {
 		return *v, true
 	}
@@ -176,9 +151,8 @@ func (b *ConfigMapBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -193,14 +167,13 @@ func (b *ConfigMapBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ConfigMapBuilder to JSON.
 func (b *ConfigMapBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -208,8 +181,7 @@ func (b *ConfigMapBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ConfigMapBuilder, replacing the contents of
 // ConfigMapBuilder.
 func (b *ConfigMapBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -217,22 +189,25 @@ func (b *ConfigMapBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ConfigMapList represents a list of ConfigMapBuilder.
-// Provided as a convenience.
-type ConfigMapList []ConfigMapBuilder
+type ConfigMapList []*ConfigMapBuilder
 
 // ConfigMapList represents a map of ConfigMapBuilder.
-// Provided as a convenience.
 type ConfigMapMap map[string]ConfigMapBuilder
 
 func (b *ConfigMapBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *ConfigMapBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

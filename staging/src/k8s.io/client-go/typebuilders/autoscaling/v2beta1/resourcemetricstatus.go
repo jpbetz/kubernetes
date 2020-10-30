@@ -29,50 +29,40 @@ import (
 // ResourceMetricStatusBuilder represents an declarative configuration of the ResourceMetricStatus type for use
 // with apply.
 type ResourceMetricStatusBuilder struct {
-	fields *resourceMetricStatusFields
+	fields resourceMetricStatusFields
 }
 
-// resourceMetricStatusFields is used by ResourceMetricStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ResourceMetricStatusBuilder before marshalling, and
-// are copied out to the builder type in ResourceMetricStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// resourceMetricStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ResourceMetricStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type resourceMetricStatusFields struct {
 	Name                      *v1.ResourceName   `json:"name,omitempty"`
 	CurrentAverageUtilization *int32             `json:"currentAverageUtilization,omitempty"`
 	CurrentAverageValue       *resource.Quantity `json:"currentAverageValue,omitempty"`
 }
 
-func (b *ResourceMetricStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &resourceMetricStatusFields{}
-	}
-}
-
 // ResourceMetricStatus constructs an declarative configuration of the ResourceMetricStatus type for use with
 // apply.
-// Provided as a convenience.
-func ResourceMetricStatus() ResourceMetricStatusBuilder {
-	return ResourceMetricStatusBuilder{fields: &resourceMetricStatusFields{}}
+func ResourceMetricStatus() *ResourceMetricStatusBuilder {
+	return &ResourceMetricStatusBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b ResourceMetricStatusBuilder) SetName(value v1.ResourceName) ResourceMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *ResourceMetricStatusBuilder) SetName(value v1.ResourceName) *ResourceMetricStatusBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b ResourceMetricStatusBuilder) RemoveName() ResourceMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *ResourceMetricStatusBuilder) RemoveName() *ResourceMetricStatusBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b ResourceMetricStatusBuilder) GetName() (value v1.ResourceName, ok bool) {
-	b.ensureInitialized()
+func (b *ResourceMetricStatusBuilder) GetName() (value v1.ResourceName, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -80,22 +70,19 @@ func (b ResourceMetricStatusBuilder) GetName() (value v1.ResourceName, ok bool) 
 }
 
 // SetCurrentAverageUtilization sets the CurrentAverageUtilization field in the declarative configuration to the given value.
-func (b ResourceMetricStatusBuilder) SetCurrentAverageUtilization(value int32) ResourceMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *ResourceMetricStatusBuilder) SetCurrentAverageUtilization(value int32) *ResourceMetricStatusBuilder {
 	b.fields.CurrentAverageUtilization = &value
 	return b
 }
 
 // RemoveCurrentAverageUtilization removes the CurrentAverageUtilization field from the declarative configuration.
-func (b ResourceMetricStatusBuilder) RemoveCurrentAverageUtilization() ResourceMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *ResourceMetricStatusBuilder) RemoveCurrentAverageUtilization() *ResourceMetricStatusBuilder {
 	b.fields.CurrentAverageUtilization = nil
 	return b
 }
 
 // GetCurrentAverageUtilization gets the CurrentAverageUtilization field from the declarative configuration.
-func (b ResourceMetricStatusBuilder) GetCurrentAverageUtilization() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ResourceMetricStatusBuilder) GetCurrentAverageUtilization() (value int32, ok bool) {
 	if v := b.fields.CurrentAverageUtilization; v != nil {
 		return *v, true
 	}
@@ -103,22 +90,19 @@ func (b ResourceMetricStatusBuilder) GetCurrentAverageUtilization() (value int32
 }
 
 // SetCurrentAverageValue sets the CurrentAverageValue field in the declarative configuration to the given value.
-func (b ResourceMetricStatusBuilder) SetCurrentAverageValue(value resource.Quantity) ResourceMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *ResourceMetricStatusBuilder) SetCurrentAverageValue(value resource.Quantity) *ResourceMetricStatusBuilder {
 	b.fields.CurrentAverageValue = &value
 	return b
 }
 
 // RemoveCurrentAverageValue removes the CurrentAverageValue field from the declarative configuration.
-func (b ResourceMetricStatusBuilder) RemoveCurrentAverageValue() ResourceMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *ResourceMetricStatusBuilder) RemoveCurrentAverageValue() *ResourceMetricStatusBuilder {
 	b.fields.CurrentAverageValue = nil
 	return b
 }
 
 // GetCurrentAverageValue gets the CurrentAverageValue field from the declarative configuration.
-func (b ResourceMetricStatusBuilder) GetCurrentAverageValue() (value resource.Quantity, ok bool) {
-	b.ensureInitialized()
+func (b *ResourceMetricStatusBuilder) GetCurrentAverageValue() (value resource.Quantity, ok bool) {
 	if v := b.fields.CurrentAverageValue; v != nil {
 		return *v, true
 	}
@@ -130,9 +114,8 @@ func (b *ResourceMetricStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -147,14 +130,13 @@ func (b *ResourceMetricStatusBuilder) FromUnstructured(u map[string]interface{})
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ResourceMetricStatusBuilder to JSON.
 func (b *ResourceMetricStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -162,8 +144,7 @@ func (b *ResourceMetricStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ResourceMetricStatusBuilder, replacing the contents of
 // ResourceMetricStatusBuilder.
 func (b *ResourceMetricStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -171,11 +152,9 @@ func (b *ResourceMetricStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ResourceMetricStatusList represents a list of ResourceMetricStatusBuilder.
-// Provided as a convenience.
-type ResourceMetricStatusList []ResourceMetricStatusBuilder
+type ResourceMetricStatusList []*ResourceMetricStatusBuilder
 
 // ResourceMetricStatusList represents a map of ResourceMetricStatusBuilder.
-// Provided as a convenience.
 type ResourceMetricStatusMap map[string]ResourceMetricStatusBuilder
 
 func (b *ResourceMetricStatusBuilder) preMarshal() {

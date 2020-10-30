@@ -29,14 +29,14 @@ import (
 // ReplicationControllerConditionBuilder represents an declarative configuration of the ReplicationControllerCondition type for use
 // with apply.
 type ReplicationControllerConditionBuilder struct {
-	fields *replicationControllerConditionFields
+	fields replicationControllerConditionFields
 }
 
-// replicationControllerConditionFields is used by ReplicationControllerConditionBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ReplicationControllerConditionBuilder before marshalling, and
-// are copied out to the builder type in ReplicationControllerConditionBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// replicationControllerConditionFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ReplicationControllerConditionBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type replicationControllerConditionFields struct {
 	Type               *v1.ReplicationControllerConditionType `json:"type,omitempty"`
 	Status             *v1.ConditionStatus                    `json:"status,omitempty"`
@@ -45,36 +45,26 @@ type replicationControllerConditionFields struct {
 	Message            *string                                `json:"message,omitempty"`
 }
 
-func (b *ReplicationControllerConditionBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &replicationControllerConditionFields{}
-	}
-}
-
 // ReplicationControllerCondition constructs an declarative configuration of the ReplicationControllerCondition type for use with
 // apply.
-// Provided as a convenience.
-func ReplicationControllerCondition() ReplicationControllerConditionBuilder {
-	return ReplicationControllerConditionBuilder{fields: &replicationControllerConditionFields{}}
+func ReplicationControllerCondition() *ReplicationControllerConditionBuilder {
+	return &ReplicationControllerConditionBuilder{}
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b ReplicationControllerConditionBuilder) SetType(value v1.ReplicationControllerConditionType) ReplicationControllerConditionBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerConditionBuilder) SetType(value v1.ReplicationControllerConditionType) *ReplicationControllerConditionBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b ReplicationControllerConditionBuilder) RemoveType() ReplicationControllerConditionBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerConditionBuilder) RemoveType() *ReplicationControllerConditionBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b ReplicationControllerConditionBuilder) GetType() (value v1.ReplicationControllerConditionType, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicationControllerConditionBuilder) GetType() (value v1.ReplicationControllerConditionType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -82,22 +72,19 @@ func (b ReplicationControllerConditionBuilder) GetType() (value v1.ReplicationCo
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b ReplicationControllerConditionBuilder) SetStatus(value v1.ConditionStatus) ReplicationControllerConditionBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerConditionBuilder) SetStatus(value v1.ConditionStatus) *ReplicationControllerConditionBuilder {
 	b.fields.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b ReplicationControllerConditionBuilder) RemoveStatus() ReplicationControllerConditionBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerConditionBuilder) RemoveStatus() *ReplicationControllerConditionBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b ReplicationControllerConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicationControllerConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
 	if v := b.fields.Status; v != nil {
 		return *v, true
 	}
@@ -105,22 +92,19 @@ func (b ReplicationControllerConditionBuilder) GetStatus() (value v1.ConditionSt
 }
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
-func (b ReplicationControllerConditionBuilder) SetLastTransitionTime(value metav1.Time) ReplicationControllerConditionBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerConditionBuilder) SetLastTransitionTime(value metav1.Time) *ReplicationControllerConditionBuilder {
 	b.fields.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
-func (b ReplicationControllerConditionBuilder) RemoveLastTransitionTime() ReplicationControllerConditionBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerConditionBuilder) RemoveLastTransitionTime() *ReplicationControllerConditionBuilder {
 	b.fields.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
-func (b ReplicationControllerConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicationControllerConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastTransitionTime; v != nil {
 		return *v, true
 	}
@@ -128,22 +112,19 @@ func (b ReplicationControllerConditionBuilder) GetLastTransitionTime() (value me
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b ReplicationControllerConditionBuilder) SetReason(value string) ReplicationControllerConditionBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerConditionBuilder) SetReason(value string) *ReplicationControllerConditionBuilder {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b ReplicationControllerConditionBuilder) RemoveReason() ReplicationControllerConditionBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerConditionBuilder) RemoveReason() *ReplicationControllerConditionBuilder {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b ReplicationControllerConditionBuilder) GetReason() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicationControllerConditionBuilder) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -151,22 +132,19 @@ func (b ReplicationControllerConditionBuilder) GetReason() (value string, ok boo
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b ReplicationControllerConditionBuilder) SetMessage(value string) ReplicationControllerConditionBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerConditionBuilder) SetMessage(value string) *ReplicationControllerConditionBuilder {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b ReplicationControllerConditionBuilder) RemoveMessage() ReplicationControllerConditionBuilder {
-	b.ensureInitialized()
+func (b *ReplicationControllerConditionBuilder) RemoveMessage() *ReplicationControllerConditionBuilder {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b ReplicationControllerConditionBuilder) GetMessage() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ReplicationControllerConditionBuilder) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
@@ -178,9 +156,8 @@ func (b *ReplicationControllerConditionBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -195,14 +172,13 @@ func (b *ReplicationControllerConditionBuilder) FromUnstructured(u map[string]in
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ReplicationControllerConditionBuilder to JSON.
 func (b *ReplicationControllerConditionBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -210,8 +186,7 @@ func (b *ReplicationControllerConditionBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ReplicationControllerConditionBuilder, replacing the contents of
 // ReplicationControllerConditionBuilder.
 func (b *ReplicationControllerConditionBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -219,11 +194,9 @@ func (b *ReplicationControllerConditionBuilder) UnmarshalJSON(data []byte) error
 }
 
 // ReplicationControllerConditionList represents a list of ReplicationControllerConditionBuilder.
-// Provided as a convenience.
-type ReplicationControllerConditionList []ReplicationControllerConditionBuilder
+type ReplicationControllerConditionList []*ReplicationControllerConditionBuilder
 
 // ReplicationControllerConditionList represents a map of ReplicationControllerConditionBuilder.
-// Provided as a convenience.
 type ReplicationControllerConditionMap map[string]ReplicationControllerConditionBuilder
 
 func (b *ReplicationControllerConditionBuilder) preMarshal() {

@@ -27,72 +27,56 @@ import (
 // NodeAffinityBuilder represents an declarative configuration of the NodeAffinity type for use
 // with apply.
 type NodeAffinityBuilder struct {
-	fields *nodeAffinityFields
+	fields nodeAffinityFields
 }
 
-// nodeAffinityFields is used by NodeAffinityBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in NodeAffinityBuilder before marshalling, and
-// are copied out to the builder type in NodeAffinityBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// nodeAffinityFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in NodeAffinityBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type nodeAffinityFields struct {
 	RequiredDuringSchedulingIgnoredDuringExecution  *NodeSelectorBuilder         `json:"requiredDuringSchedulingIgnoredDuringExecution,omitempty"`
 	PreferredDuringSchedulingIgnoredDuringExecution *PreferredSchedulingTermList `json:"preferredDuringSchedulingIgnoredDuringExecution,omitempty"`
 }
 
-func (b *NodeAffinityBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &nodeAffinityFields{}
-	}
-}
-
 // NodeAffinity constructs an declarative configuration of the NodeAffinity type for use with
 // apply.
-// Provided as a convenience.
-func NodeAffinity() NodeAffinityBuilder {
-	return NodeAffinityBuilder{fields: &nodeAffinityFields{}}
+func NodeAffinity() *NodeAffinityBuilder {
+	return &NodeAffinityBuilder{}
 }
 
 // SetRequiredDuringSchedulingIgnoredDuringExecution sets the RequiredDuringSchedulingIgnoredDuringExecution field in the declarative configuration to the given value.
-func (b NodeAffinityBuilder) SetRequiredDuringSchedulingIgnoredDuringExecution(value NodeSelectorBuilder) NodeAffinityBuilder {
-	b.ensureInitialized()
-	b.fields.RequiredDuringSchedulingIgnoredDuringExecution = &value
+func (b *NodeAffinityBuilder) SetRequiredDuringSchedulingIgnoredDuringExecution(value *NodeSelectorBuilder) *NodeAffinityBuilder {
+	b.fields.RequiredDuringSchedulingIgnoredDuringExecution = value
 	return b
 }
 
 // RemoveRequiredDuringSchedulingIgnoredDuringExecution removes the RequiredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
-func (b NodeAffinityBuilder) RemoveRequiredDuringSchedulingIgnoredDuringExecution() NodeAffinityBuilder {
-	b.ensureInitialized()
+func (b *NodeAffinityBuilder) RemoveRequiredDuringSchedulingIgnoredDuringExecution() *NodeAffinityBuilder {
 	b.fields.RequiredDuringSchedulingIgnoredDuringExecution = nil
 	return b
 }
 
 // GetRequiredDuringSchedulingIgnoredDuringExecution gets the RequiredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
-func (b NodeAffinityBuilder) GetRequiredDuringSchedulingIgnoredDuringExecution() (value NodeSelectorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.RequiredDuringSchedulingIgnoredDuringExecution; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *NodeAffinityBuilder) GetRequiredDuringSchedulingIgnoredDuringExecution() (value *NodeSelectorBuilder, ok bool) {
+	return b.fields.RequiredDuringSchedulingIgnoredDuringExecution, b.fields.RequiredDuringSchedulingIgnoredDuringExecution != nil
 }
 
 // SetPreferredDuringSchedulingIgnoredDuringExecution sets the PreferredDuringSchedulingIgnoredDuringExecution field in the declarative configuration to the given value.
-func (b NodeAffinityBuilder) SetPreferredDuringSchedulingIgnoredDuringExecution(value PreferredSchedulingTermList) NodeAffinityBuilder {
-	b.ensureInitialized()
+func (b *NodeAffinityBuilder) SetPreferredDuringSchedulingIgnoredDuringExecution(value PreferredSchedulingTermList) *NodeAffinityBuilder {
 	b.fields.PreferredDuringSchedulingIgnoredDuringExecution = &value
 	return b
 }
 
 // RemovePreferredDuringSchedulingIgnoredDuringExecution removes the PreferredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
-func (b NodeAffinityBuilder) RemovePreferredDuringSchedulingIgnoredDuringExecution() NodeAffinityBuilder {
-	b.ensureInitialized()
+func (b *NodeAffinityBuilder) RemovePreferredDuringSchedulingIgnoredDuringExecution() *NodeAffinityBuilder {
 	b.fields.PreferredDuringSchedulingIgnoredDuringExecution = nil
 	return b
 }
 
 // GetPreferredDuringSchedulingIgnoredDuringExecution gets the PreferredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
-func (b NodeAffinityBuilder) GetPreferredDuringSchedulingIgnoredDuringExecution() (value PreferredSchedulingTermList, ok bool) {
-	b.ensureInitialized()
+func (b *NodeAffinityBuilder) GetPreferredDuringSchedulingIgnoredDuringExecution() (value PreferredSchedulingTermList, ok bool) {
 	if v := b.fields.PreferredDuringSchedulingIgnoredDuringExecution; v != nil {
 		return *v, true
 	}
@@ -104,9 +88,8 @@ func (b *NodeAffinityBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +104,13 @@ func (b *NodeAffinityBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals NodeAffinityBuilder to JSON.
 func (b *NodeAffinityBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +118,7 @@ func (b *NodeAffinityBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into NodeAffinityBuilder, replacing the contents of
 // NodeAffinityBuilder.
 func (b *NodeAffinityBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +126,9 @@ func (b *NodeAffinityBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // NodeAffinityList represents a list of NodeAffinityBuilder.
-// Provided as a convenience.
-type NodeAffinityList []NodeAffinityBuilder
+type NodeAffinityList []*NodeAffinityBuilder
 
 // NodeAffinityList represents a map of NodeAffinityBuilder.
-// Provided as a convenience.
 type NodeAffinityMap map[string]NodeAffinityBuilder
 
 func (b *NodeAffinityBuilder) preMarshal() {

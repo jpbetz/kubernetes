@@ -27,48 +27,38 @@ import (
 // DownwardAPIProjectionBuilder represents an declarative configuration of the DownwardAPIProjection type for use
 // with apply.
 type DownwardAPIProjectionBuilder struct {
-	fields *downwardAPIProjectionFields
+	fields downwardAPIProjectionFields
 }
 
-// downwardAPIProjectionFields is used by DownwardAPIProjectionBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in DownwardAPIProjectionBuilder before marshalling, and
-// are copied out to the builder type in DownwardAPIProjectionBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// downwardAPIProjectionFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in DownwardAPIProjectionBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type downwardAPIProjectionFields struct {
 	Items *DownwardAPIVolumeFileList `json:"items,omitempty"`
 }
 
-func (b *DownwardAPIProjectionBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &downwardAPIProjectionFields{}
-	}
-}
-
 // DownwardAPIProjection constructs an declarative configuration of the DownwardAPIProjection type for use with
 // apply.
-// Provided as a convenience.
-func DownwardAPIProjection() DownwardAPIProjectionBuilder {
-	return DownwardAPIProjectionBuilder{fields: &downwardAPIProjectionFields{}}
+func DownwardAPIProjection() *DownwardAPIProjectionBuilder {
+	return &DownwardAPIProjectionBuilder{}
 }
 
 // SetItems sets the Items field in the declarative configuration to the given value.
-func (b DownwardAPIProjectionBuilder) SetItems(value DownwardAPIVolumeFileList) DownwardAPIProjectionBuilder {
-	b.ensureInitialized()
+func (b *DownwardAPIProjectionBuilder) SetItems(value DownwardAPIVolumeFileList) *DownwardAPIProjectionBuilder {
 	b.fields.Items = &value
 	return b
 }
 
 // RemoveItems removes the Items field from the declarative configuration.
-func (b DownwardAPIProjectionBuilder) RemoveItems() DownwardAPIProjectionBuilder {
-	b.ensureInitialized()
+func (b *DownwardAPIProjectionBuilder) RemoveItems() *DownwardAPIProjectionBuilder {
 	b.fields.Items = nil
 	return b
 }
 
 // GetItems gets the Items field from the declarative configuration.
-func (b DownwardAPIProjectionBuilder) GetItems() (value DownwardAPIVolumeFileList, ok bool) {
-	b.ensureInitialized()
+func (b *DownwardAPIProjectionBuilder) GetItems() (value DownwardAPIVolumeFileList, ok bool) {
 	if v := b.fields.Items; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *DownwardAPIProjectionBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *DownwardAPIProjectionBuilder) FromUnstructured(u map[string]interface{}
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals DownwardAPIProjectionBuilder to JSON.
 func (b *DownwardAPIProjectionBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *DownwardAPIProjectionBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into DownwardAPIProjectionBuilder, replacing the contents of
 // DownwardAPIProjectionBuilder.
 func (b *DownwardAPIProjectionBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *DownwardAPIProjectionBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // DownwardAPIProjectionList represents a list of DownwardAPIProjectionBuilder.
-// Provided as a convenience.
-type DownwardAPIProjectionList []DownwardAPIProjectionBuilder
+type DownwardAPIProjectionList []*DownwardAPIProjectionBuilder
 
 // DownwardAPIProjectionList represents a map of DownwardAPIProjectionBuilder.
-// Provided as a convenience.
 type DownwardAPIProjectionMap map[string]DownwardAPIProjectionBuilder
 
 func (b *DownwardAPIProjectionBuilder) preMarshal() {

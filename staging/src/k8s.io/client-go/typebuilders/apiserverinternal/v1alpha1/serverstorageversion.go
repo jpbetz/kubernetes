@@ -27,50 +27,40 @@ import (
 // ServerStorageVersionBuilder represents an declarative configuration of the ServerStorageVersion type for use
 // with apply.
 type ServerStorageVersionBuilder struct {
-	fields *serverStorageVersionFields
+	fields serverStorageVersionFields
 }
 
-// serverStorageVersionFields is used by ServerStorageVersionBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ServerStorageVersionBuilder before marshalling, and
-// are copied out to the builder type in ServerStorageVersionBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// serverStorageVersionFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ServerStorageVersionBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type serverStorageVersionFields struct {
 	APIServerID       *string   `json:"apiServerID,omitempty"`
 	EncodingVersion   *string   `json:"encodingVersion,omitempty"`
 	DecodableVersions *[]string `json:"decodableVersions,omitempty"`
 }
 
-func (b *ServerStorageVersionBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &serverStorageVersionFields{}
-	}
-}
-
 // ServerStorageVersion constructs an declarative configuration of the ServerStorageVersion type for use with
 // apply.
-// Provided as a convenience.
-func ServerStorageVersion() ServerStorageVersionBuilder {
-	return ServerStorageVersionBuilder{fields: &serverStorageVersionFields{}}
+func ServerStorageVersion() *ServerStorageVersionBuilder {
+	return &ServerStorageVersionBuilder{}
 }
 
 // SetAPIServerID sets the APIServerID field in the declarative configuration to the given value.
-func (b ServerStorageVersionBuilder) SetAPIServerID(value string) ServerStorageVersionBuilder {
-	b.ensureInitialized()
+func (b *ServerStorageVersionBuilder) SetAPIServerID(value string) *ServerStorageVersionBuilder {
 	b.fields.APIServerID = &value
 	return b
 }
 
 // RemoveAPIServerID removes the APIServerID field from the declarative configuration.
-func (b ServerStorageVersionBuilder) RemoveAPIServerID() ServerStorageVersionBuilder {
-	b.ensureInitialized()
+func (b *ServerStorageVersionBuilder) RemoveAPIServerID() *ServerStorageVersionBuilder {
 	b.fields.APIServerID = nil
 	return b
 }
 
 // GetAPIServerID gets the APIServerID field from the declarative configuration.
-func (b ServerStorageVersionBuilder) GetAPIServerID() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ServerStorageVersionBuilder) GetAPIServerID() (value string, ok bool) {
 	if v := b.fields.APIServerID; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b ServerStorageVersionBuilder) GetAPIServerID() (value string, ok bool) {
 }
 
 // SetEncodingVersion sets the EncodingVersion field in the declarative configuration to the given value.
-func (b ServerStorageVersionBuilder) SetEncodingVersion(value string) ServerStorageVersionBuilder {
-	b.ensureInitialized()
+func (b *ServerStorageVersionBuilder) SetEncodingVersion(value string) *ServerStorageVersionBuilder {
 	b.fields.EncodingVersion = &value
 	return b
 }
 
 // RemoveEncodingVersion removes the EncodingVersion field from the declarative configuration.
-func (b ServerStorageVersionBuilder) RemoveEncodingVersion() ServerStorageVersionBuilder {
-	b.ensureInitialized()
+func (b *ServerStorageVersionBuilder) RemoveEncodingVersion() *ServerStorageVersionBuilder {
 	b.fields.EncodingVersion = nil
 	return b
 }
 
 // GetEncodingVersion gets the EncodingVersion field from the declarative configuration.
-func (b ServerStorageVersionBuilder) GetEncodingVersion() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ServerStorageVersionBuilder) GetEncodingVersion() (value string, ok bool) {
 	if v := b.fields.EncodingVersion; v != nil {
 		return *v, true
 	}
@@ -101,22 +88,19 @@ func (b ServerStorageVersionBuilder) GetEncodingVersion() (value string, ok bool
 }
 
 // SetDecodableVersions sets the DecodableVersions field in the declarative configuration to the given value.
-func (b ServerStorageVersionBuilder) SetDecodableVersions(value []string) ServerStorageVersionBuilder {
-	b.ensureInitialized()
+func (b *ServerStorageVersionBuilder) SetDecodableVersions(value []string) *ServerStorageVersionBuilder {
 	b.fields.DecodableVersions = &value
 	return b
 }
 
 // RemoveDecodableVersions removes the DecodableVersions field from the declarative configuration.
-func (b ServerStorageVersionBuilder) RemoveDecodableVersions() ServerStorageVersionBuilder {
-	b.ensureInitialized()
+func (b *ServerStorageVersionBuilder) RemoveDecodableVersions() *ServerStorageVersionBuilder {
 	b.fields.DecodableVersions = nil
 	return b
 }
 
 // GetDecodableVersions gets the DecodableVersions field from the declarative configuration.
-func (b ServerStorageVersionBuilder) GetDecodableVersions() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *ServerStorageVersionBuilder) GetDecodableVersions() (value []string, ok bool) {
 	if v := b.fields.DecodableVersions; v != nil {
 		return *v, true
 	}
@@ -128,9 +112,8 @@ func (b *ServerStorageVersionBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +128,13 @@ func (b *ServerStorageVersionBuilder) FromUnstructured(u map[string]interface{})
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ServerStorageVersionBuilder to JSON.
 func (b *ServerStorageVersionBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +142,7 @@ func (b *ServerStorageVersionBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ServerStorageVersionBuilder, replacing the contents of
 // ServerStorageVersionBuilder.
 func (b *ServerStorageVersionBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +150,9 @@ func (b *ServerStorageVersionBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ServerStorageVersionList represents a list of ServerStorageVersionBuilder.
-// Provided as a convenience.
-type ServerStorageVersionList []ServerStorageVersionBuilder
+type ServerStorageVersionList []*ServerStorageVersionBuilder
 
 // ServerStorageVersionList represents a map of ServerStorageVersionBuilder.
-// Provided as a convenience.
 type ServerStorageVersionMap map[string]ServerStorageVersionBuilder
 
 func (b *ServerStorageVersionBuilder) preMarshal() {

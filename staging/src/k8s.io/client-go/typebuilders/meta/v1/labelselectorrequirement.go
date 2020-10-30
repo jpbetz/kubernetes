@@ -28,50 +28,40 @@ import (
 // LabelSelectorRequirementBuilder represents an declarative configuration of the LabelSelectorRequirement type for use
 // with apply.
 type LabelSelectorRequirementBuilder struct {
-	fields *labelSelectorRequirementFields
+	fields labelSelectorRequirementFields
 }
 
-// labelSelectorRequirementFields is used by LabelSelectorRequirementBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in LabelSelectorRequirementBuilder before marshalling, and
-// are copied out to the builder type in LabelSelectorRequirementBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// labelSelectorRequirementFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in LabelSelectorRequirementBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type labelSelectorRequirementFields struct {
 	Key      *string                   `json:"key,omitempty"`
 	Operator *v1.LabelSelectorOperator `json:"operator,omitempty"`
 	Values   *[]string                 `json:"values,omitempty"`
 }
 
-func (b *LabelSelectorRequirementBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &labelSelectorRequirementFields{}
-	}
-}
-
 // LabelSelectorRequirement constructs an declarative configuration of the LabelSelectorRequirement type for use with
 // apply.
-// Provided as a convenience.
-func LabelSelectorRequirement() LabelSelectorRequirementBuilder {
-	return LabelSelectorRequirementBuilder{fields: &labelSelectorRequirementFields{}}
+func LabelSelectorRequirement() *LabelSelectorRequirementBuilder {
+	return &LabelSelectorRequirementBuilder{}
 }
 
 // SetKey sets the Key field in the declarative configuration to the given value.
-func (b LabelSelectorRequirementBuilder) SetKey(value string) LabelSelectorRequirementBuilder {
-	b.ensureInitialized()
+func (b *LabelSelectorRequirementBuilder) SetKey(value string) *LabelSelectorRequirementBuilder {
 	b.fields.Key = &value
 	return b
 }
 
 // RemoveKey removes the Key field from the declarative configuration.
-func (b LabelSelectorRequirementBuilder) RemoveKey() LabelSelectorRequirementBuilder {
-	b.ensureInitialized()
+func (b *LabelSelectorRequirementBuilder) RemoveKey() *LabelSelectorRequirementBuilder {
 	b.fields.Key = nil
 	return b
 }
 
 // GetKey gets the Key field from the declarative configuration.
-func (b LabelSelectorRequirementBuilder) GetKey() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *LabelSelectorRequirementBuilder) GetKey() (value string, ok bool) {
 	if v := b.fields.Key; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b LabelSelectorRequirementBuilder) GetKey() (value string, ok bool) {
 }
 
 // SetOperator sets the Operator field in the declarative configuration to the given value.
-func (b LabelSelectorRequirementBuilder) SetOperator(value v1.LabelSelectorOperator) LabelSelectorRequirementBuilder {
-	b.ensureInitialized()
+func (b *LabelSelectorRequirementBuilder) SetOperator(value v1.LabelSelectorOperator) *LabelSelectorRequirementBuilder {
 	b.fields.Operator = &value
 	return b
 }
 
 // RemoveOperator removes the Operator field from the declarative configuration.
-func (b LabelSelectorRequirementBuilder) RemoveOperator() LabelSelectorRequirementBuilder {
-	b.ensureInitialized()
+func (b *LabelSelectorRequirementBuilder) RemoveOperator() *LabelSelectorRequirementBuilder {
 	b.fields.Operator = nil
 	return b
 }
 
 // GetOperator gets the Operator field from the declarative configuration.
-func (b LabelSelectorRequirementBuilder) GetOperator() (value v1.LabelSelectorOperator, ok bool) {
-	b.ensureInitialized()
+func (b *LabelSelectorRequirementBuilder) GetOperator() (value v1.LabelSelectorOperator, ok bool) {
 	if v := b.fields.Operator; v != nil {
 		return *v, true
 	}
@@ -102,22 +89,19 @@ func (b LabelSelectorRequirementBuilder) GetOperator() (value v1.LabelSelectorOp
 }
 
 // SetValues sets the Values field in the declarative configuration to the given value.
-func (b LabelSelectorRequirementBuilder) SetValues(value []string) LabelSelectorRequirementBuilder {
-	b.ensureInitialized()
+func (b *LabelSelectorRequirementBuilder) SetValues(value []string) *LabelSelectorRequirementBuilder {
 	b.fields.Values = &value
 	return b
 }
 
 // RemoveValues removes the Values field from the declarative configuration.
-func (b LabelSelectorRequirementBuilder) RemoveValues() LabelSelectorRequirementBuilder {
-	b.ensureInitialized()
+func (b *LabelSelectorRequirementBuilder) RemoveValues() *LabelSelectorRequirementBuilder {
 	b.fields.Values = nil
 	return b
 }
 
 // GetValues gets the Values field from the declarative configuration.
-func (b LabelSelectorRequirementBuilder) GetValues() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *LabelSelectorRequirementBuilder) GetValues() (value []string, ok bool) {
 	if v := b.fields.Values; v != nil {
 		return *v, true
 	}
@@ -129,9 +113,8 @@ func (b *LabelSelectorRequirementBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -146,14 +129,13 @@ func (b *LabelSelectorRequirementBuilder) FromUnstructured(u map[string]interfac
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals LabelSelectorRequirementBuilder to JSON.
 func (b *LabelSelectorRequirementBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -161,8 +143,7 @@ func (b *LabelSelectorRequirementBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into LabelSelectorRequirementBuilder, replacing the contents of
 // LabelSelectorRequirementBuilder.
 func (b *LabelSelectorRequirementBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -170,11 +151,9 @@ func (b *LabelSelectorRequirementBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // LabelSelectorRequirementList represents a list of LabelSelectorRequirementBuilder.
-// Provided as a convenience.
-type LabelSelectorRequirementList []LabelSelectorRequirementBuilder
+type LabelSelectorRequirementList []*LabelSelectorRequirementBuilder
 
 // LabelSelectorRequirementList represents a map of LabelSelectorRequirementBuilder.
-// Provided as a convenience.
 type LabelSelectorRequirementMap map[string]LabelSelectorRequirementBuilder
 
 func (b *LabelSelectorRequirementBuilder) preMarshal() {

@@ -29,14 +29,14 @@ import (
 // DeploymentSpecBuilder represents an declarative configuration of the DeploymentSpec type for use
 // with apply.
 type DeploymentSpecBuilder struct {
-	fields *deploymentSpecFields
+	fields deploymentSpecFields
 }
 
-// deploymentSpecFields is used by DeploymentSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in DeploymentSpecBuilder before marshalling, and
-// are copied out to the builder type in DeploymentSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// deploymentSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in DeploymentSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type deploymentSpecFields struct {
 	Replicas                *int32                         `json:"replicas,omitempty"`
 	Selector                *v1.LabelSelectorBuilder       `json:"selector,omitempty"`
@@ -48,36 +48,26 @@ type deploymentSpecFields struct {
 	ProgressDeadlineSeconds *int32                         `json:"progressDeadlineSeconds,omitempty"`
 }
 
-func (b *DeploymentSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &deploymentSpecFields{}
-	}
-}
-
 // DeploymentSpec constructs an declarative configuration of the DeploymentSpec type for use with
 // apply.
-// Provided as a convenience.
-func DeploymentSpec() DeploymentSpecBuilder {
-	return DeploymentSpecBuilder{fields: &deploymentSpecFields{}}
+func DeploymentSpec() *DeploymentSpecBuilder {
+	return &DeploymentSpecBuilder{}
 }
 
 // SetReplicas sets the Replicas field in the declarative configuration to the given value.
-func (b DeploymentSpecBuilder) SetReplicas(value int32) DeploymentSpecBuilder {
-	b.ensureInitialized()
+func (b *DeploymentSpecBuilder) SetReplicas(value int32) *DeploymentSpecBuilder {
 	b.fields.Replicas = &value
 	return b
 }
 
 // RemoveReplicas removes the Replicas field from the declarative configuration.
-func (b DeploymentSpecBuilder) RemoveReplicas() DeploymentSpecBuilder {
-	b.ensureInitialized()
+func (b *DeploymentSpecBuilder) RemoveReplicas() *DeploymentSpecBuilder {
 	b.fields.Replicas = nil
 	return b
 }
 
 // GetReplicas gets the Replicas field from the declarative configuration.
-func (b DeploymentSpecBuilder) GetReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentSpecBuilder) GetReplicas() (value int32, ok bool) {
 	if v := b.fields.Replicas; v != nil {
 		return *v, true
 	}
@@ -85,91 +75,70 @@ func (b DeploymentSpecBuilder) GetReplicas() (value int32, ok bool) {
 }
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
-func (b DeploymentSpecBuilder) SetSelector(value v1.LabelSelectorBuilder) DeploymentSpecBuilder {
-	b.ensureInitialized()
-	b.fields.Selector = &value
+func (b *DeploymentSpecBuilder) SetSelector(value *v1.LabelSelectorBuilder) *DeploymentSpecBuilder {
+	b.fields.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
-func (b DeploymentSpecBuilder) RemoveSelector() DeploymentSpecBuilder {
-	b.ensureInitialized()
+func (b *DeploymentSpecBuilder) RemoveSelector() *DeploymentSpecBuilder {
 	b.fields.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
-func (b DeploymentSpecBuilder) GetSelector() (value v1.LabelSelectorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Selector; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *DeploymentSpecBuilder) GetSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+	return b.fields.Selector, b.fields.Selector != nil
 }
 
 // SetTemplate sets the Template field in the declarative configuration to the given value.
-func (b DeploymentSpecBuilder) SetTemplate(value corev1.PodTemplateSpecBuilder) DeploymentSpecBuilder {
-	b.ensureInitialized()
-	b.fields.Template = &value
+func (b *DeploymentSpecBuilder) SetTemplate(value *corev1.PodTemplateSpecBuilder) *DeploymentSpecBuilder {
+	b.fields.Template = value
 	return b
 }
 
 // RemoveTemplate removes the Template field from the declarative configuration.
-func (b DeploymentSpecBuilder) RemoveTemplate() DeploymentSpecBuilder {
-	b.ensureInitialized()
+func (b *DeploymentSpecBuilder) RemoveTemplate() *DeploymentSpecBuilder {
 	b.fields.Template = nil
 	return b
 }
 
 // GetTemplate gets the Template field from the declarative configuration.
-func (b DeploymentSpecBuilder) GetTemplate() (value corev1.PodTemplateSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Template; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *DeploymentSpecBuilder) GetTemplate() (value *corev1.PodTemplateSpecBuilder, ok bool) {
+	return b.fields.Template, b.fields.Template != nil
 }
 
 // SetStrategy sets the Strategy field in the declarative configuration to the given value.
-func (b DeploymentSpecBuilder) SetStrategy(value DeploymentStrategyBuilder) DeploymentSpecBuilder {
-	b.ensureInitialized()
-	b.fields.Strategy = &value
+func (b *DeploymentSpecBuilder) SetStrategy(value *DeploymentStrategyBuilder) *DeploymentSpecBuilder {
+	b.fields.Strategy = value
 	return b
 }
 
 // RemoveStrategy removes the Strategy field from the declarative configuration.
-func (b DeploymentSpecBuilder) RemoveStrategy() DeploymentSpecBuilder {
-	b.ensureInitialized()
+func (b *DeploymentSpecBuilder) RemoveStrategy() *DeploymentSpecBuilder {
 	b.fields.Strategy = nil
 	return b
 }
 
 // GetStrategy gets the Strategy field from the declarative configuration.
-func (b DeploymentSpecBuilder) GetStrategy() (value DeploymentStrategyBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Strategy; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *DeploymentSpecBuilder) GetStrategy() (value *DeploymentStrategyBuilder, ok bool) {
+	return b.fields.Strategy, b.fields.Strategy != nil
 }
 
 // SetMinReadySeconds sets the MinReadySeconds field in the declarative configuration to the given value.
-func (b DeploymentSpecBuilder) SetMinReadySeconds(value int32) DeploymentSpecBuilder {
-	b.ensureInitialized()
+func (b *DeploymentSpecBuilder) SetMinReadySeconds(value int32) *DeploymentSpecBuilder {
 	b.fields.MinReadySeconds = &value
 	return b
 }
 
 // RemoveMinReadySeconds removes the MinReadySeconds field from the declarative configuration.
-func (b DeploymentSpecBuilder) RemoveMinReadySeconds() DeploymentSpecBuilder {
-	b.ensureInitialized()
+func (b *DeploymentSpecBuilder) RemoveMinReadySeconds() *DeploymentSpecBuilder {
 	b.fields.MinReadySeconds = nil
 	return b
 }
 
 // GetMinReadySeconds gets the MinReadySeconds field from the declarative configuration.
-func (b DeploymentSpecBuilder) GetMinReadySeconds() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentSpecBuilder) GetMinReadySeconds() (value int32, ok bool) {
 	if v := b.fields.MinReadySeconds; v != nil {
 		return *v, true
 	}
@@ -177,22 +146,19 @@ func (b DeploymentSpecBuilder) GetMinReadySeconds() (value int32, ok bool) {
 }
 
 // SetRevisionHistoryLimit sets the RevisionHistoryLimit field in the declarative configuration to the given value.
-func (b DeploymentSpecBuilder) SetRevisionHistoryLimit(value int32) DeploymentSpecBuilder {
-	b.ensureInitialized()
+func (b *DeploymentSpecBuilder) SetRevisionHistoryLimit(value int32) *DeploymentSpecBuilder {
 	b.fields.RevisionHistoryLimit = &value
 	return b
 }
 
 // RemoveRevisionHistoryLimit removes the RevisionHistoryLimit field from the declarative configuration.
-func (b DeploymentSpecBuilder) RemoveRevisionHistoryLimit() DeploymentSpecBuilder {
-	b.ensureInitialized()
+func (b *DeploymentSpecBuilder) RemoveRevisionHistoryLimit() *DeploymentSpecBuilder {
 	b.fields.RevisionHistoryLimit = nil
 	return b
 }
 
 // GetRevisionHistoryLimit gets the RevisionHistoryLimit field from the declarative configuration.
-func (b DeploymentSpecBuilder) GetRevisionHistoryLimit() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentSpecBuilder) GetRevisionHistoryLimit() (value int32, ok bool) {
 	if v := b.fields.RevisionHistoryLimit; v != nil {
 		return *v, true
 	}
@@ -200,22 +166,19 @@ func (b DeploymentSpecBuilder) GetRevisionHistoryLimit() (value int32, ok bool) 
 }
 
 // SetPaused sets the Paused field in the declarative configuration to the given value.
-func (b DeploymentSpecBuilder) SetPaused(value bool) DeploymentSpecBuilder {
-	b.ensureInitialized()
+func (b *DeploymentSpecBuilder) SetPaused(value bool) *DeploymentSpecBuilder {
 	b.fields.Paused = &value
 	return b
 }
 
 // RemovePaused removes the Paused field from the declarative configuration.
-func (b DeploymentSpecBuilder) RemovePaused() DeploymentSpecBuilder {
-	b.ensureInitialized()
+func (b *DeploymentSpecBuilder) RemovePaused() *DeploymentSpecBuilder {
 	b.fields.Paused = nil
 	return b
 }
 
 // GetPaused gets the Paused field from the declarative configuration.
-func (b DeploymentSpecBuilder) GetPaused() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentSpecBuilder) GetPaused() (value bool, ok bool) {
 	if v := b.fields.Paused; v != nil {
 		return *v, true
 	}
@@ -223,22 +186,19 @@ func (b DeploymentSpecBuilder) GetPaused() (value bool, ok bool) {
 }
 
 // SetProgressDeadlineSeconds sets the ProgressDeadlineSeconds field in the declarative configuration to the given value.
-func (b DeploymentSpecBuilder) SetProgressDeadlineSeconds(value int32) DeploymentSpecBuilder {
-	b.ensureInitialized()
+func (b *DeploymentSpecBuilder) SetProgressDeadlineSeconds(value int32) *DeploymentSpecBuilder {
 	b.fields.ProgressDeadlineSeconds = &value
 	return b
 }
 
 // RemoveProgressDeadlineSeconds removes the ProgressDeadlineSeconds field from the declarative configuration.
-func (b DeploymentSpecBuilder) RemoveProgressDeadlineSeconds() DeploymentSpecBuilder {
-	b.ensureInitialized()
+func (b *DeploymentSpecBuilder) RemoveProgressDeadlineSeconds() *DeploymentSpecBuilder {
 	b.fields.ProgressDeadlineSeconds = nil
 	return b
 }
 
 // GetProgressDeadlineSeconds gets the ProgressDeadlineSeconds field from the declarative configuration.
-func (b DeploymentSpecBuilder) GetProgressDeadlineSeconds() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentSpecBuilder) GetProgressDeadlineSeconds() (value int32, ok bool) {
 	if v := b.fields.ProgressDeadlineSeconds; v != nil {
 		return *v, true
 	}
@@ -250,9 +210,8 @@ func (b *DeploymentSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -267,14 +226,13 @@ func (b *DeploymentSpecBuilder) FromUnstructured(u map[string]interface{}) error
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals DeploymentSpecBuilder to JSON.
 func (b *DeploymentSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -282,8 +240,7 @@ func (b *DeploymentSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into DeploymentSpecBuilder, replacing the contents of
 // DeploymentSpecBuilder.
 func (b *DeploymentSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -291,11 +248,9 @@ func (b *DeploymentSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // DeploymentSpecList represents a list of DeploymentSpecBuilder.
-// Provided as a convenience.
-type DeploymentSpecList []DeploymentSpecBuilder
+type DeploymentSpecList []*DeploymentSpecBuilder
 
 // DeploymentSpecList represents a map of DeploymentSpecBuilder.
-// Provided as a convenience.
 type DeploymentSpecMap map[string]DeploymentSpecBuilder
 
 func (b *DeploymentSpecBuilder) preMarshal() {

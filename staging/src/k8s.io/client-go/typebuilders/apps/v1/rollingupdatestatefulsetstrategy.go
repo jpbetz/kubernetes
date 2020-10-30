@@ -27,48 +27,38 @@ import (
 // RollingUpdateStatefulSetStrategyBuilder represents an declarative configuration of the RollingUpdateStatefulSetStrategy type for use
 // with apply.
 type RollingUpdateStatefulSetStrategyBuilder struct {
-	fields *rollingUpdateStatefulSetStrategyFields
+	fields rollingUpdateStatefulSetStrategyFields
 }
 
-// rollingUpdateStatefulSetStrategyFields is used by RollingUpdateStatefulSetStrategyBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in RollingUpdateStatefulSetStrategyBuilder before marshalling, and
-// are copied out to the builder type in RollingUpdateStatefulSetStrategyBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// rollingUpdateStatefulSetStrategyFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in RollingUpdateStatefulSetStrategyBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type rollingUpdateStatefulSetStrategyFields struct {
 	Partition *int32 `json:"partition,omitempty"`
 }
 
-func (b *RollingUpdateStatefulSetStrategyBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &rollingUpdateStatefulSetStrategyFields{}
-	}
-}
-
 // RollingUpdateStatefulSetStrategy constructs an declarative configuration of the RollingUpdateStatefulSetStrategy type for use with
 // apply.
-// Provided as a convenience.
-func RollingUpdateStatefulSetStrategy() RollingUpdateStatefulSetStrategyBuilder {
-	return RollingUpdateStatefulSetStrategyBuilder{fields: &rollingUpdateStatefulSetStrategyFields{}}
+func RollingUpdateStatefulSetStrategy() *RollingUpdateStatefulSetStrategyBuilder {
+	return &RollingUpdateStatefulSetStrategyBuilder{}
 }
 
 // SetPartition sets the Partition field in the declarative configuration to the given value.
-func (b RollingUpdateStatefulSetStrategyBuilder) SetPartition(value int32) RollingUpdateStatefulSetStrategyBuilder {
-	b.ensureInitialized()
+func (b *RollingUpdateStatefulSetStrategyBuilder) SetPartition(value int32) *RollingUpdateStatefulSetStrategyBuilder {
 	b.fields.Partition = &value
 	return b
 }
 
 // RemovePartition removes the Partition field from the declarative configuration.
-func (b RollingUpdateStatefulSetStrategyBuilder) RemovePartition() RollingUpdateStatefulSetStrategyBuilder {
-	b.ensureInitialized()
+func (b *RollingUpdateStatefulSetStrategyBuilder) RemovePartition() *RollingUpdateStatefulSetStrategyBuilder {
 	b.fields.Partition = nil
 	return b
 }
 
 // GetPartition gets the Partition field from the declarative configuration.
-func (b RollingUpdateStatefulSetStrategyBuilder) GetPartition() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *RollingUpdateStatefulSetStrategyBuilder) GetPartition() (value int32, ok bool) {
 	if v := b.fields.Partition; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *RollingUpdateStatefulSetStrategyBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *RollingUpdateStatefulSetStrategyBuilder) FromUnstructured(u map[string]
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals RollingUpdateStatefulSetStrategyBuilder to JSON.
 func (b *RollingUpdateStatefulSetStrategyBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *RollingUpdateStatefulSetStrategyBuilder) MarshalJSON() ([]byte, error) 
 // UnmarshalJSON unmarshals JSON into RollingUpdateStatefulSetStrategyBuilder, replacing the contents of
 // RollingUpdateStatefulSetStrategyBuilder.
 func (b *RollingUpdateStatefulSetStrategyBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *RollingUpdateStatefulSetStrategyBuilder) UnmarshalJSON(data []byte) err
 }
 
 // RollingUpdateStatefulSetStrategyList represents a list of RollingUpdateStatefulSetStrategyBuilder.
-// Provided as a convenience.
-type RollingUpdateStatefulSetStrategyList []RollingUpdateStatefulSetStrategyBuilder
+type RollingUpdateStatefulSetStrategyList []*RollingUpdateStatefulSetStrategyBuilder
 
 // RollingUpdateStatefulSetStrategyList represents a map of RollingUpdateStatefulSetStrategyBuilder.
-// Provided as a convenience.
 type RollingUpdateStatefulSetStrategyMap map[string]RollingUpdateStatefulSetStrategyBuilder
 
 func (b *RollingUpdateStatefulSetStrategyBuilder) preMarshal() {

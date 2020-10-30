@@ -29,14 +29,14 @@ import (
 // JobSpecBuilder represents an declarative configuration of the JobSpec type for use
 // with apply.
 type JobSpecBuilder struct {
-	fields *jobSpecFields
+	fields jobSpecFields
 }
 
-// jobSpecFields is used by JobSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in JobSpecBuilder before marshalling, and
-// are copied out to the builder type in JobSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// jobSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in JobSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type jobSpecFields struct {
 	Parallelism             *int32                         `json:"parallelism,omitempty"`
 	Completions             *int32                         `json:"completions,omitempty"`
@@ -48,36 +48,26 @@ type jobSpecFields struct {
 	TTLSecondsAfterFinished *int32                         `json:"ttlSecondsAfterFinished,omitempty"`
 }
 
-func (b *JobSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &jobSpecFields{}
-	}
-}
-
 // JobSpec constructs an declarative configuration of the JobSpec type for use with
 // apply.
-// Provided as a convenience.
-func JobSpec() JobSpecBuilder {
-	return JobSpecBuilder{fields: &jobSpecFields{}}
+func JobSpec() *JobSpecBuilder {
+	return &JobSpecBuilder{}
 }
 
 // SetParallelism sets the Parallelism field in the declarative configuration to the given value.
-func (b JobSpecBuilder) SetParallelism(value int32) JobSpecBuilder {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) SetParallelism(value int32) *JobSpecBuilder {
 	b.fields.Parallelism = &value
 	return b
 }
 
 // RemoveParallelism removes the Parallelism field from the declarative configuration.
-func (b JobSpecBuilder) RemoveParallelism() JobSpecBuilder {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) RemoveParallelism() *JobSpecBuilder {
 	b.fields.Parallelism = nil
 	return b
 }
 
 // GetParallelism gets the Parallelism field from the declarative configuration.
-func (b JobSpecBuilder) GetParallelism() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) GetParallelism() (value int32, ok bool) {
 	if v := b.fields.Parallelism; v != nil {
 		return *v, true
 	}
@@ -85,22 +75,19 @@ func (b JobSpecBuilder) GetParallelism() (value int32, ok bool) {
 }
 
 // SetCompletions sets the Completions field in the declarative configuration to the given value.
-func (b JobSpecBuilder) SetCompletions(value int32) JobSpecBuilder {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) SetCompletions(value int32) *JobSpecBuilder {
 	b.fields.Completions = &value
 	return b
 }
 
 // RemoveCompletions removes the Completions field from the declarative configuration.
-func (b JobSpecBuilder) RemoveCompletions() JobSpecBuilder {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) RemoveCompletions() *JobSpecBuilder {
 	b.fields.Completions = nil
 	return b
 }
 
 // GetCompletions gets the Completions field from the declarative configuration.
-func (b JobSpecBuilder) GetCompletions() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) GetCompletions() (value int32, ok bool) {
 	if v := b.fields.Completions; v != nil {
 		return *v, true
 	}
@@ -108,22 +95,19 @@ func (b JobSpecBuilder) GetCompletions() (value int32, ok bool) {
 }
 
 // SetActiveDeadlineSeconds sets the ActiveDeadlineSeconds field in the declarative configuration to the given value.
-func (b JobSpecBuilder) SetActiveDeadlineSeconds(value int64) JobSpecBuilder {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) SetActiveDeadlineSeconds(value int64) *JobSpecBuilder {
 	b.fields.ActiveDeadlineSeconds = &value
 	return b
 }
 
 // RemoveActiveDeadlineSeconds removes the ActiveDeadlineSeconds field from the declarative configuration.
-func (b JobSpecBuilder) RemoveActiveDeadlineSeconds() JobSpecBuilder {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) RemoveActiveDeadlineSeconds() *JobSpecBuilder {
 	b.fields.ActiveDeadlineSeconds = nil
 	return b
 }
 
 // GetActiveDeadlineSeconds gets the ActiveDeadlineSeconds field from the declarative configuration.
-func (b JobSpecBuilder) GetActiveDeadlineSeconds() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) GetActiveDeadlineSeconds() (value int64, ok bool) {
 	if v := b.fields.ActiveDeadlineSeconds; v != nil {
 		return *v, true
 	}
@@ -131,22 +115,19 @@ func (b JobSpecBuilder) GetActiveDeadlineSeconds() (value int64, ok bool) {
 }
 
 // SetBackoffLimit sets the BackoffLimit field in the declarative configuration to the given value.
-func (b JobSpecBuilder) SetBackoffLimit(value int32) JobSpecBuilder {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) SetBackoffLimit(value int32) *JobSpecBuilder {
 	b.fields.BackoffLimit = &value
 	return b
 }
 
 // RemoveBackoffLimit removes the BackoffLimit field from the declarative configuration.
-func (b JobSpecBuilder) RemoveBackoffLimit() JobSpecBuilder {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) RemoveBackoffLimit() *JobSpecBuilder {
 	b.fields.BackoffLimit = nil
 	return b
 }
 
 // GetBackoffLimit gets the BackoffLimit field from the declarative configuration.
-func (b JobSpecBuilder) GetBackoffLimit() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) GetBackoffLimit() (value int32, ok bool) {
 	if v := b.fields.BackoffLimit; v != nil {
 		return *v, true
 	}
@@ -154,45 +135,36 @@ func (b JobSpecBuilder) GetBackoffLimit() (value int32, ok bool) {
 }
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
-func (b JobSpecBuilder) SetSelector(value v1.LabelSelectorBuilder) JobSpecBuilder {
-	b.ensureInitialized()
-	b.fields.Selector = &value
+func (b *JobSpecBuilder) SetSelector(value *v1.LabelSelectorBuilder) *JobSpecBuilder {
+	b.fields.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
-func (b JobSpecBuilder) RemoveSelector() JobSpecBuilder {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) RemoveSelector() *JobSpecBuilder {
 	b.fields.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
-func (b JobSpecBuilder) GetSelector() (value v1.LabelSelectorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Selector; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *JobSpecBuilder) GetSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+	return b.fields.Selector, b.fields.Selector != nil
 }
 
 // SetManualSelector sets the ManualSelector field in the declarative configuration to the given value.
-func (b JobSpecBuilder) SetManualSelector(value bool) JobSpecBuilder {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) SetManualSelector(value bool) *JobSpecBuilder {
 	b.fields.ManualSelector = &value
 	return b
 }
 
 // RemoveManualSelector removes the ManualSelector field from the declarative configuration.
-func (b JobSpecBuilder) RemoveManualSelector() JobSpecBuilder {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) RemoveManualSelector() *JobSpecBuilder {
 	b.fields.ManualSelector = nil
 	return b
 }
 
 // GetManualSelector gets the ManualSelector field from the declarative configuration.
-func (b JobSpecBuilder) GetManualSelector() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) GetManualSelector() (value bool, ok bool) {
 	if v := b.fields.ManualSelector; v != nil {
 		return *v, true
 	}
@@ -200,45 +172,36 @@ func (b JobSpecBuilder) GetManualSelector() (value bool, ok bool) {
 }
 
 // SetTemplate sets the Template field in the declarative configuration to the given value.
-func (b JobSpecBuilder) SetTemplate(value corev1.PodTemplateSpecBuilder) JobSpecBuilder {
-	b.ensureInitialized()
-	b.fields.Template = &value
+func (b *JobSpecBuilder) SetTemplate(value *corev1.PodTemplateSpecBuilder) *JobSpecBuilder {
+	b.fields.Template = value
 	return b
 }
 
 // RemoveTemplate removes the Template field from the declarative configuration.
-func (b JobSpecBuilder) RemoveTemplate() JobSpecBuilder {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) RemoveTemplate() *JobSpecBuilder {
 	b.fields.Template = nil
 	return b
 }
 
 // GetTemplate gets the Template field from the declarative configuration.
-func (b JobSpecBuilder) GetTemplate() (value corev1.PodTemplateSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Template; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *JobSpecBuilder) GetTemplate() (value *corev1.PodTemplateSpecBuilder, ok bool) {
+	return b.fields.Template, b.fields.Template != nil
 }
 
 // SetTTLSecondsAfterFinished sets the TTLSecondsAfterFinished field in the declarative configuration to the given value.
-func (b JobSpecBuilder) SetTTLSecondsAfterFinished(value int32) JobSpecBuilder {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) SetTTLSecondsAfterFinished(value int32) *JobSpecBuilder {
 	b.fields.TTLSecondsAfterFinished = &value
 	return b
 }
 
 // RemoveTTLSecondsAfterFinished removes the TTLSecondsAfterFinished field from the declarative configuration.
-func (b JobSpecBuilder) RemoveTTLSecondsAfterFinished() JobSpecBuilder {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) RemoveTTLSecondsAfterFinished() *JobSpecBuilder {
 	b.fields.TTLSecondsAfterFinished = nil
 	return b
 }
 
 // GetTTLSecondsAfterFinished gets the TTLSecondsAfterFinished field from the declarative configuration.
-func (b JobSpecBuilder) GetTTLSecondsAfterFinished() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *JobSpecBuilder) GetTTLSecondsAfterFinished() (value int32, ok bool) {
 	if v := b.fields.TTLSecondsAfterFinished; v != nil {
 		return *v, true
 	}
@@ -250,9 +213,8 @@ func (b *JobSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -267,14 +229,13 @@ func (b *JobSpecBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals JobSpecBuilder to JSON.
 func (b *JobSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -282,8 +243,7 @@ func (b *JobSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into JobSpecBuilder, replacing the contents of
 // JobSpecBuilder.
 func (b *JobSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -291,11 +251,9 @@ func (b *JobSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // JobSpecList represents a list of JobSpecBuilder.
-// Provided as a convenience.
-type JobSpecList []JobSpecBuilder
+type JobSpecList []*JobSpecBuilder
 
 // JobSpecList represents a map of JobSpecBuilder.
-// Provided as a convenience.
 type JobSpecMap map[string]JobSpecBuilder
 
 func (b *JobSpecBuilder) preMarshal() {

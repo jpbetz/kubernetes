@@ -27,14 +27,14 @@ import (
 // ContainerStatusBuilder represents an declarative configuration of the ContainerStatus type for use
 // with apply.
 type ContainerStatusBuilder struct {
-	fields *containerStatusFields
+	fields containerStatusFields
 }
 
-// containerStatusFields is used by ContainerStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ContainerStatusBuilder before marshalling, and
-// are copied out to the builder type in ContainerStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// containerStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ContainerStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type containerStatusFields struct {
 	Name                 *string                `json:"name,omitempty"`
 	State                *ContainerStateBuilder `json:"state,omitempty"`
@@ -47,36 +47,26 @@ type containerStatusFields struct {
 	Started              *bool                  `json:"started,omitempty"`
 }
 
-func (b *ContainerStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &containerStatusFields{}
-	}
-}
-
 // ContainerStatus constructs an declarative configuration of the ContainerStatus type for use with
 // apply.
-// Provided as a convenience.
-func ContainerStatus() ContainerStatusBuilder {
-	return ContainerStatusBuilder{fields: &containerStatusFields{}}
+func ContainerStatus() *ContainerStatusBuilder {
+	return &ContainerStatusBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b ContainerStatusBuilder) SetName(value string) ContainerStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) SetName(value string) *ContainerStatusBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b ContainerStatusBuilder) RemoveName() ContainerStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) RemoveName() *ContainerStatusBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b ContainerStatusBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -84,68 +74,53 @@ func (b ContainerStatusBuilder) GetName() (value string, ok bool) {
 }
 
 // SetState sets the State field in the declarative configuration to the given value.
-func (b ContainerStatusBuilder) SetState(value ContainerStateBuilder) ContainerStatusBuilder {
-	b.ensureInitialized()
-	b.fields.State = &value
+func (b *ContainerStatusBuilder) SetState(value *ContainerStateBuilder) *ContainerStatusBuilder {
+	b.fields.State = value
 	return b
 }
 
 // RemoveState removes the State field from the declarative configuration.
-func (b ContainerStatusBuilder) RemoveState() ContainerStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) RemoveState() *ContainerStatusBuilder {
 	b.fields.State = nil
 	return b
 }
 
 // GetState gets the State field from the declarative configuration.
-func (b ContainerStatusBuilder) GetState() (value ContainerStateBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.State; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ContainerStatusBuilder) GetState() (value *ContainerStateBuilder, ok bool) {
+	return b.fields.State, b.fields.State != nil
 }
 
 // SetLastTerminationState sets the LastTerminationState field in the declarative configuration to the given value.
-func (b ContainerStatusBuilder) SetLastTerminationState(value ContainerStateBuilder) ContainerStatusBuilder {
-	b.ensureInitialized()
-	b.fields.LastTerminationState = &value
+func (b *ContainerStatusBuilder) SetLastTerminationState(value *ContainerStateBuilder) *ContainerStatusBuilder {
+	b.fields.LastTerminationState = value
 	return b
 }
 
 // RemoveLastTerminationState removes the LastTerminationState field from the declarative configuration.
-func (b ContainerStatusBuilder) RemoveLastTerminationState() ContainerStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) RemoveLastTerminationState() *ContainerStatusBuilder {
 	b.fields.LastTerminationState = nil
 	return b
 }
 
 // GetLastTerminationState gets the LastTerminationState field from the declarative configuration.
-func (b ContainerStatusBuilder) GetLastTerminationState() (value ContainerStateBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.LastTerminationState; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ContainerStatusBuilder) GetLastTerminationState() (value *ContainerStateBuilder, ok bool) {
+	return b.fields.LastTerminationState, b.fields.LastTerminationState != nil
 }
 
 // SetReady sets the Ready field in the declarative configuration to the given value.
-func (b ContainerStatusBuilder) SetReady(value bool) ContainerStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) SetReady(value bool) *ContainerStatusBuilder {
 	b.fields.Ready = &value
 	return b
 }
 
 // RemoveReady removes the Ready field from the declarative configuration.
-func (b ContainerStatusBuilder) RemoveReady() ContainerStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) RemoveReady() *ContainerStatusBuilder {
 	b.fields.Ready = nil
 	return b
 }
 
 // GetReady gets the Ready field from the declarative configuration.
-func (b ContainerStatusBuilder) GetReady() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) GetReady() (value bool, ok bool) {
 	if v := b.fields.Ready; v != nil {
 		return *v, true
 	}
@@ -153,22 +128,19 @@ func (b ContainerStatusBuilder) GetReady() (value bool, ok bool) {
 }
 
 // SetRestartCount sets the RestartCount field in the declarative configuration to the given value.
-func (b ContainerStatusBuilder) SetRestartCount(value int32) ContainerStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) SetRestartCount(value int32) *ContainerStatusBuilder {
 	b.fields.RestartCount = &value
 	return b
 }
 
 // RemoveRestartCount removes the RestartCount field from the declarative configuration.
-func (b ContainerStatusBuilder) RemoveRestartCount() ContainerStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) RemoveRestartCount() *ContainerStatusBuilder {
 	b.fields.RestartCount = nil
 	return b
 }
 
 // GetRestartCount gets the RestartCount field from the declarative configuration.
-func (b ContainerStatusBuilder) GetRestartCount() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) GetRestartCount() (value int32, ok bool) {
 	if v := b.fields.RestartCount; v != nil {
 		return *v, true
 	}
@@ -176,22 +148,19 @@ func (b ContainerStatusBuilder) GetRestartCount() (value int32, ok bool) {
 }
 
 // SetImage sets the Image field in the declarative configuration to the given value.
-func (b ContainerStatusBuilder) SetImage(value string) ContainerStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) SetImage(value string) *ContainerStatusBuilder {
 	b.fields.Image = &value
 	return b
 }
 
 // RemoveImage removes the Image field from the declarative configuration.
-func (b ContainerStatusBuilder) RemoveImage() ContainerStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) RemoveImage() *ContainerStatusBuilder {
 	b.fields.Image = nil
 	return b
 }
 
 // GetImage gets the Image field from the declarative configuration.
-func (b ContainerStatusBuilder) GetImage() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) GetImage() (value string, ok bool) {
 	if v := b.fields.Image; v != nil {
 		return *v, true
 	}
@@ -199,22 +168,19 @@ func (b ContainerStatusBuilder) GetImage() (value string, ok bool) {
 }
 
 // SetImageID sets the ImageID field in the declarative configuration to the given value.
-func (b ContainerStatusBuilder) SetImageID(value string) ContainerStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) SetImageID(value string) *ContainerStatusBuilder {
 	b.fields.ImageID = &value
 	return b
 }
 
 // RemoveImageID removes the ImageID field from the declarative configuration.
-func (b ContainerStatusBuilder) RemoveImageID() ContainerStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) RemoveImageID() *ContainerStatusBuilder {
 	b.fields.ImageID = nil
 	return b
 }
 
 // GetImageID gets the ImageID field from the declarative configuration.
-func (b ContainerStatusBuilder) GetImageID() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) GetImageID() (value string, ok bool) {
 	if v := b.fields.ImageID; v != nil {
 		return *v, true
 	}
@@ -222,22 +188,19 @@ func (b ContainerStatusBuilder) GetImageID() (value string, ok bool) {
 }
 
 // SetContainerID sets the ContainerID field in the declarative configuration to the given value.
-func (b ContainerStatusBuilder) SetContainerID(value string) ContainerStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) SetContainerID(value string) *ContainerStatusBuilder {
 	b.fields.ContainerID = &value
 	return b
 }
 
 // RemoveContainerID removes the ContainerID field from the declarative configuration.
-func (b ContainerStatusBuilder) RemoveContainerID() ContainerStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) RemoveContainerID() *ContainerStatusBuilder {
 	b.fields.ContainerID = nil
 	return b
 }
 
 // GetContainerID gets the ContainerID field from the declarative configuration.
-func (b ContainerStatusBuilder) GetContainerID() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) GetContainerID() (value string, ok bool) {
 	if v := b.fields.ContainerID; v != nil {
 		return *v, true
 	}
@@ -245,22 +208,19 @@ func (b ContainerStatusBuilder) GetContainerID() (value string, ok bool) {
 }
 
 // SetStarted sets the Started field in the declarative configuration to the given value.
-func (b ContainerStatusBuilder) SetStarted(value bool) ContainerStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) SetStarted(value bool) *ContainerStatusBuilder {
 	b.fields.Started = &value
 	return b
 }
 
 // RemoveStarted removes the Started field from the declarative configuration.
-func (b ContainerStatusBuilder) RemoveStarted() ContainerStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) RemoveStarted() *ContainerStatusBuilder {
 	b.fields.Started = nil
 	return b
 }
 
 // GetStarted gets the Started field from the declarative configuration.
-func (b ContainerStatusBuilder) GetStarted() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerStatusBuilder) GetStarted() (value bool, ok bool) {
 	if v := b.fields.Started; v != nil {
 		return *v, true
 	}
@@ -272,9 +232,8 @@ func (b *ContainerStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -289,14 +248,13 @@ func (b *ContainerStatusBuilder) FromUnstructured(u map[string]interface{}) erro
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ContainerStatusBuilder to JSON.
 func (b *ContainerStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -304,8 +262,7 @@ func (b *ContainerStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ContainerStatusBuilder, replacing the contents of
 // ContainerStatusBuilder.
 func (b *ContainerStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -313,11 +270,9 @@ func (b *ContainerStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ContainerStatusList represents a list of ContainerStatusBuilder.
-// Provided as a convenience.
-type ContainerStatusList []ContainerStatusBuilder
+type ContainerStatusList []*ContainerStatusBuilder
 
 // ContainerStatusList represents a map of ContainerStatusBuilder.
-// Provided as a convenience.
 type ContainerStatusMap map[string]ContainerStatusBuilder
 
 func (b *ContainerStatusBuilder) preMarshal() {

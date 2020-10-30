@@ -28,14 +28,14 @@ import (
 // ObjectReferenceBuilder represents an declarative configuration of the ObjectReference type for use
 // with apply.
 type ObjectReferenceBuilder struct {
-	fields *objectReferenceFields
+	fields objectReferenceFields
 }
 
-// objectReferenceFields is used by ObjectReferenceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ObjectReferenceBuilder before marshalling, and
-// are copied out to the builder type in ObjectReferenceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// objectReferenceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ObjectReferenceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type objectReferenceFields struct {
 	Kind            *string    `json:"kind,omitempty"`
 	Namespace       *string    `json:"namespace,omitempty"`
@@ -46,36 +46,26 @@ type objectReferenceFields struct {
 	FieldPath       *string    `json:"fieldPath,omitempty"`
 }
 
-func (b *ObjectReferenceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &objectReferenceFields{}
-	}
-}
-
 // ObjectReference constructs an declarative configuration of the ObjectReference type for use with
 // apply.
-// Provided as a convenience.
-func ObjectReference() ObjectReferenceBuilder {
-	return ObjectReferenceBuilder{fields: &objectReferenceFields{}}
+func ObjectReference() *ObjectReferenceBuilder {
+	return &ObjectReferenceBuilder{}
 }
 
 // SetKind sets the Kind field in the declarative configuration to the given value.
-func (b ObjectReferenceBuilder) SetKind(value string) ObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) SetKind(value string) *ObjectReferenceBuilder {
 	b.fields.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
-func (b ObjectReferenceBuilder) RemoveKind() ObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) RemoveKind() *ObjectReferenceBuilder {
 	b.fields.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
-func (b ObjectReferenceBuilder) GetKind() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) GetKind() (value string, ok bool) {
 	if v := b.fields.Kind; v != nil {
 		return *v, true
 	}
@@ -83,22 +73,19 @@ func (b ObjectReferenceBuilder) GetKind() (value string, ok bool) {
 }
 
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
-func (b ObjectReferenceBuilder) SetNamespace(value string) ObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) SetNamespace(value string) *ObjectReferenceBuilder {
 	b.fields.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
-func (b ObjectReferenceBuilder) RemoveNamespace() ObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) RemoveNamespace() *ObjectReferenceBuilder {
 	b.fields.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
-func (b ObjectReferenceBuilder) GetNamespace() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) GetNamespace() (value string, ok bool) {
 	if v := b.fields.Namespace; v != nil {
 		return *v, true
 	}
@@ -106,22 +93,19 @@ func (b ObjectReferenceBuilder) GetNamespace() (value string, ok bool) {
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b ObjectReferenceBuilder) SetName(value string) ObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) SetName(value string) *ObjectReferenceBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b ObjectReferenceBuilder) RemoveName() ObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) RemoveName() *ObjectReferenceBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b ObjectReferenceBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -129,22 +113,19 @@ func (b ObjectReferenceBuilder) GetName() (value string, ok bool) {
 }
 
 // SetUID sets the UID field in the declarative configuration to the given value.
-func (b ObjectReferenceBuilder) SetUID(value types.UID) ObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) SetUID(value types.UID) *ObjectReferenceBuilder {
 	b.fields.UID = &value
 	return b
 }
 
 // RemoveUID removes the UID field from the declarative configuration.
-func (b ObjectReferenceBuilder) RemoveUID() ObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) RemoveUID() *ObjectReferenceBuilder {
 	b.fields.UID = nil
 	return b
 }
 
 // GetUID gets the UID field from the declarative configuration.
-func (b ObjectReferenceBuilder) GetUID() (value types.UID, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) GetUID() (value types.UID, ok bool) {
 	if v := b.fields.UID; v != nil {
 		return *v, true
 	}
@@ -152,22 +133,19 @@ func (b ObjectReferenceBuilder) GetUID() (value types.UID, ok bool) {
 }
 
 // SetAPIVersion sets the APIVersion field in the declarative configuration to the given value.
-func (b ObjectReferenceBuilder) SetAPIVersion(value string) ObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) SetAPIVersion(value string) *ObjectReferenceBuilder {
 	b.fields.APIVersion = &value
 	return b
 }
 
 // RemoveAPIVersion removes the APIVersion field from the declarative configuration.
-func (b ObjectReferenceBuilder) RemoveAPIVersion() ObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) RemoveAPIVersion() *ObjectReferenceBuilder {
 	b.fields.APIVersion = nil
 	return b
 }
 
 // GetAPIVersion gets the APIVersion field from the declarative configuration.
-func (b ObjectReferenceBuilder) GetAPIVersion() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) GetAPIVersion() (value string, ok bool) {
 	if v := b.fields.APIVersion; v != nil {
 		return *v, true
 	}
@@ -175,22 +153,19 @@ func (b ObjectReferenceBuilder) GetAPIVersion() (value string, ok bool) {
 }
 
 // SetResourceVersion sets the ResourceVersion field in the declarative configuration to the given value.
-func (b ObjectReferenceBuilder) SetResourceVersion(value string) ObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) SetResourceVersion(value string) *ObjectReferenceBuilder {
 	b.fields.ResourceVersion = &value
 	return b
 }
 
 // RemoveResourceVersion removes the ResourceVersion field from the declarative configuration.
-func (b ObjectReferenceBuilder) RemoveResourceVersion() ObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) RemoveResourceVersion() *ObjectReferenceBuilder {
 	b.fields.ResourceVersion = nil
 	return b
 }
 
 // GetResourceVersion gets the ResourceVersion field from the declarative configuration.
-func (b ObjectReferenceBuilder) GetResourceVersion() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) GetResourceVersion() (value string, ok bool) {
 	if v := b.fields.ResourceVersion; v != nil {
 		return *v, true
 	}
@@ -198,22 +173,19 @@ func (b ObjectReferenceBuilder) GetResourceVersion() (value string, ok bool) {
 }
 
 // SetFieldPath sets the FieldPath field in the declarative configuration to the given value.
-func (b ObjectReferenceBuilder) SetFieldPath(value string) ObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) SetFieldPath(value string) *ObjectReferenceBuilder {
 	b.fields.FieldPath = &value
 	return b
 }
 
 // RemoveFieldPath removes the FieldPath field from the declarative configuration.
-func (b ObjectReferenceBuilder) RemoveFieldPath() ObjectReferenceBuilder {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) RemoveFieldPath() *ObjectReferenceBuilder {
 	b.fields.FieldPath = nil
 	return b
 }
 
 // GetFieldPath gets the FieldPath field from the declarative configuration.
-func (b ObjectReferenceBuilder) GetFieldPath() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectReferenceBuilder) GetFieldPath() (value string, ok bool) {
 	if v := b.fields.FieldPath; v != nil {
 		return *v, true
 	}
@@ -225,9 +197,8 @@ func (b *ObjectReferenceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -242,14 +213,13 @@ func (b *ObjectReferenceBuilder) FromUnstructured(u map[string]interface{}) erro
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ObjectReferenceBuilder to JSON.
 func (b *ObjectReferenceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -257,8 +227,7 @@ func (b *ObjectReferenceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ObjectReferenceBuilder, replacing the contents of
 // ObjectReferenceBuilder.
 func (b *ObjectReferenceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -266,11 +235,9 @@ func (b *ObjectReferenceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ObjectReferenceList represents a list of ObjectReferenceBuilder.
-// Provided as a convenience.
-type ObjectReferenceList []ObjectReferenceBuilder
+type ObjectReferenceList []*ObjectReferenceBuilder
 
 // ObjectReferenceList represents a map of ObjectReferenceBuilder.
-// Provided as a convenience.
 type ObjectReferenceMap map[string]ObjectReferenceBuilder
 
 func (b *ObjectReferenceBuilder) preMarshal() {

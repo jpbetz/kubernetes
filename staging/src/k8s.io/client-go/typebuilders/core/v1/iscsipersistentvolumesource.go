@@ -27,14 +27,14 @@ import (
 // ISCSIPersistentVolumeSourceBuilder represents an declarative configuration of the ISCSIPersistentVolumeSource type for use
 // with apply.
 type ISCSIPersistentVolumeSourceBuilder struct {
-	fields *iSCSIPersistentVolumeSourceFields
+	fields iSCSIPersistentVolumeSourceFields
 }
 
-// iSCSIPersistentVolumeSourceFields is used by ISCSIPersistentVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ISCSIPersistentVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in ISCSIPersistentVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// iSCSIPersistentVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ISCSIPersistentVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type iSCSIPersistentVolumeSourceFields struct {
 	TargetPortal      *string                 `json:"targetPortal,omitempty"`
 	IQN               *string                 `json:"iqn,omitempty"`
@@ -49,36 +49,26 @@ type iSCSIPersistentVolumeSourceFields struct {
 	InitiatorName     *string                 `json:"initiatorName,omitempty"`
 }
 
-func (b *ISCSIPersistentVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &iSCSIPersistentVolumeSourceFields{}
-	}
-}
-
 // ISCSIPersistentVolumeSource constructs an declarative configuration of the ISCSIPersistentVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func ISCSIPersistentVolumeSource() ISCSIPersistentVolumeSourceBuilder {
-	return ISCSIPersistentVolumeSourceBuilder{fields: &iSCSIPersistentVolumeSourceFields{}}
+func ISCSIPersistentVolumeSource() *ISCSIPersistentVolumeSourceBuilder {
+	return &ISCSIPersistentVolumeSourceBuilder{}
 }
 
 // SetTargetPortal sets the TargetPortal field in the declarative configuration to the given value.
-func (b ISCSIPersistentVolumeSourceBuilder) SetTargetPortal(value string) ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) SetTargetPortal(value string) *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.TargetPortal = &value
 	return b
 }
 
 // RemoveTargetPortal removes the TargetPortal field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) RemoveTargetPortal() ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) RemoveTargetPortal() *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.TargetPortal = nil
 	return b
 }
 
 // GetTargetPortal gets the TargetPortal field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) GetTargetPortal() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) GetTargetPortal() (value string, ok bool) {
 	if v := b.fields.TargetPortal; v != nil {
 		return *v, true
 	}
@@ -86,22 +76,19 @@ func (b ISCSIPersistentVolumeSourceBuilder) GetTargetPortal() (value string, ok 
 }
 
 // SetIQN sets the IQN field in the declarative configuration to the given value.
-func (b ISCSIPersistentVolumeSourceBuilder) SetIQN(value string) ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) SetIQN(value string) *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.IQN = &value
 	return b
 }
 
 // RemoveIQN removes the IQN field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) RemoveIQN() ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) RemoveIQN() *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.IQN = nil
 	return b
 }
 
 // GetIQN gets the IQN field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) GetIQN() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) GetIQN() (value string, ok bool) {
 	if v := b.fields.IQN; v != nil {
 		return *v, true
 	}
@@ -109,22 +96,19 @@ func (b ISCSIPersistentVolumeSourceBuilder) GetIQN() (value string, ok bool) {
 }
 
 // SetLun sets the Lun field in the declarative configuration to the given value.
-func (b ISCSIPersistentVolumeSourceBuilder) SetLun(value int32) ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) SetLun(value int32) *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.Lun = &value
 	return b
 }
 
 // RemoveLun removes the Lun field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) RemoveLun() ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) RemoveLun() *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.Lun = nil
 	return b
 }
 
 // GetLun gets the Lun field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) GetLun() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) GetLun() (value int32, ok bool) {
 	if v := b.fields.Lun; v != nil {
 		return *v, true
 	}
@@ -132,22 +116,19 @@ func (b ISCSIPersistentVolumeSourceBuilder) GetLun() (value int32, ok bool) {
 }
 
 // SetISCSIInterface sets the ISCSIInterface field in the declarative configuration to the given value.
-func (b ISCSIPersistentVolumeSourceBuilder) SetISCSIInterface(value string) ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) SetISCSIInterface(value string) *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.ISCSIInterface = &value
 	return b
 }
 
 // RemoveISCSIInterface removes the ISCSIInterface field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) RemoveISCSIInterface() ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) RemoveISCSIInterface() *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.ISCSIInterface = nil
 	return b
 }
 
 // GetISCSIInterface gets the ISCSIInterface field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) GetISCSIInterface() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) GetISCSIInterface() (value string, ok bool) {
 	if v := b.fields.ISCSIInterface; v != nil {
 		return *v, true
 	}
@@ -155,22 +136,19 @@ func (b ISCSIPersistentVolumeSourceBuilder) GetISCSIInterface() (value string, o
 }
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
-func (b ISCSIPersistentVolumeSourceBuilder) SetFSType(value string) ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) SetFSType(value string) *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) RemoveFSType() ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) RemoveFSType() *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) GetFSType() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 	if v := b.fields.FSType; v != nil {
 		return *v, true
 	}
@@ -178,22 +156,19 @@ func (b ISCSIPersistentVolumeSourceBuilder) GetFSType() (value string, ok bool) 
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b ISCSIPersistentVolumeSourceBuilder) SetReadOnly(value bool) ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) SetReadOnly(value bool) *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) RemoveReadOnly() ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) RemoveReadOnly() *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
@@ -201,22 +176,19 @@ func (b ISCSIPersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) 
 }
 
 // SetPortals sets the Portals field in the declarative configuration to the given value.
-func (b ISCSIPersistentVolumeSourceBuilder) SetPortals(value []string) ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) SetPortals(value []string) *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.Portals = &value
 	return b
 }
 
 // RemovePortals removes the Portals field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) RemovePortals() ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) RemovePortals() *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.Portals = nil
 	return b
 }
 
 // GetPortals gets the Portals field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) GetPortals() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) GetPortals() (value []string, ok bool) {
 	if v := b.fields.Portals; v != nil {
 		return *v, true
 	}
@@ -224,22 +196,19 @@ func (b ISCSIPersistentVolumeSourceBuilder) GetPortals() (value []string, ok boo
 }
 
 // SetDiscoveryCHAPAuth sets the DiscoveryCHAPAuth field in the declarative configuration to the given value.
-func (b ISCSIPersistentVolumeSourceBuilder) SetDiscoveryCHAPAuth(value bool) ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) SetDiscoveryCHAPAuth(value bool) *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.DiscoveryCHAPAuth = &value
 	return b
 }
 
 // RemoveDiscoveryCHAPAuth removes the DiscoveryCHAPAuth field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) RemoveDiscoveryCHAPAuth() ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) RemoveDiscoveryCHAPAuth() *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.DiscoveryCHAPAuth = nil
 	return b
 }
 
 // GetDiscoveryCHAPAuth gets the DiscoveryCHAPAuth field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) GetDiscoveryCHAPAuth() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) GetDiscoveryCHAPAuth() (value bool, ok bool) {
 	if v := b.fields.DiscoveryCHAPAuth; v != nil {
 		return *v, true
 	}
@@ -247,22 +216,19 @@ func (b ISCSIPersistentVolumeSourceBuilder) GetDiscoveryCHAPAuth() (value bool, 
 }
 
 // SetSessionCHAPAuth sets the SessionCHAPAuth field in the declarative configuration to the given value.
-func (b ISCSIPersistentVolumeSourceBuilder) SetSessionCHAPAuth(value bool) ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) SetSessionCHAPAuth(value bool) *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.SessionCHAPAuth = &value
 	return b
 }
 
 // RemoveSessionCHAPAuth removes the SessionCHAPAuth field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) RemoveSessionCHAPAuth() ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) RemoveSessionCHAPAuth() *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.SessionCHAPAuth = nil
 	return b
 }
 
 // GetSessionCHAPAuth gets the SessionCHAPAuth field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) GetSessionCHAPAuth() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) GetSessionCHAPAuth() (value bool, ok bool) {
 	if v := b.fields.SessionCHAPAuth; v != nil {
 		return *v, true
 	}
@@ -270,45 +236,36 @@ func (b ISCSIPersistentVolumeSourceBuilder) GetSessionCHAPAuth() (value bool, ok
 }
 
 // SetSecretRef sets the SecretRef field in the declarative configuration to the given value.
-func (b ISCSIPersistentVolumeSourceBuilder) SetSecretRef(value SecretReferenceBuilder) ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.SecretRef = &value
+func (b *ISCSIPersistentVolumeSourceBuilder) SetSecretRef(value *SecretReferenceBuilder) *ISCSIPersistentVolumeSourceBuilder {
+	b.fields.SecretRef = value
 	return b
 }
 
 // RemoveSecretRef removes the SecretRef field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) RemoveSecretRef() ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) RemoveSecretRef() *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.SecretRef = nil
 	return b
 }
 
 // GetSecretRef gets the SecretRef field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) GetSecretRef() (value SecretReferenceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.SecretRef; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ISCSIPersistentVolumeSourceBuilder) GetSecretRef() (value *SecretReferenceBuilder, ok bool) {
+	return b.fields.SecretRef, b.fields.SecretRef != nil
 }
 
 // SetInitiatorName sets the InitiatorName field in the declarative configuration to the given value.
-func (b ISCSIPersistentVolumeSourceBuilder) SetInitiatorName(value string) ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) SetInitiatorName(value string) *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.InitiatorName = &value
 	return b
 }
 
 // RemoveInitiatorName removes the InitiatorName field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) RemoveInitiatorName() ISCSIPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) RemoveInitiatorName() *ISCSIPersistentVolumeSourceBuilder {
 	b.fields.InitiatorName = nil
 	return b
 }
 
 // GetInitiatorName gets the InitiatorName field from the declarative configuration.
-func (b ISCSIPersistentVolumeSourceBuilder) GetInitiatorName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ISCSIPersistentVolumeSourceBuilder) GetInitiatorName() (value string, ok bool) {
 	if v := b.fields.InitiatorName; v != nil {
 		return *v, true
 	}
@@ -320,9 +277,8 @@ func (b *ISCSIPersistentVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -337,14 +293,13 @@ func (b *ISCSIPersistentVolumeSourceBuilder) FromUnstructured(u map[string]inter
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ISCSIPersistentVolumeSourceBuilder to JSON.
 func (b *ISCSIPersistentVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -352,8 +307,7 @@ func (b *ISCSIPersistentVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ISCSIPersistentVolumeSourceBuilder, replacing the contents of
 // ISCSIPersistentVolumeSourceBuilder.
 func (b *ISCSIPersistentVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -361,11 +315,9 @@ func (b *ISCSIPersistentVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ISCSIPersistentVolumeSourceList represents a list of ISCSIPersistentVolumeSourceBuilder.
-// Provided as a convenience.
-type ISCSIPersistentVolumeSourceList []ISCSIPersistentVolumeSourceBuilder
+type ISCSIPersistentVolumeSourceList []*ISCSIPersistentVolumeSourceBuilder
 
 // ISCSIPersistentVolumeSourceList represents a map of ISCSIPersistentVolumeSourceBuilder.
-// Provided as a convenience.
 type ISCSIPersistentVolumeSourceMap map[string]ISCSIPersistentVolumeSourceBuilder
 
 func (b *ISCSIPersistentVolumeSourceBuilder) preMarshal() {

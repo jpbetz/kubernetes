@@ -27,48 +27,38 @@ import (
 // NodeSelectorBuilder represents an declarative configuration of the NodeSelector type for use
 // with apply.
 type NodeSelectorBuilder struct {
-	fields *nodeSelectorFields
+	fields nodeSelectorFields
 }
 
-// nodeSelectorFields is used by NodeSelectorBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in NodeSelectorBuilder before marshalling, and
-// are copied out to the builder type in NodeSelectorBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// nodeSelectorFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in NodeSelectorBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type nodeSelectorFields struct {
 	NodeSelectorTerms *NodeSelectorTermList `json:"nodeSelectorTerms,omitempty"`
 }
 
-func (b *NodeSelectorBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &nodeSelectorFields{}
-	}
-}
-
 // NodeSelector constructs an declarative configuration of the NodeSelector type for use with
 // apply.
-// Provided as a convenience.
-func NodeSelector() NodeSelectorBuilder {
-	return NodeSelectorBuilder{fields: &nodeSelectorFields{}}
+func NodeSelector() *NodeSelectorBuilder {
+	return &NodeSelectorBuilder{}
 }
 
 // SetNodeSelectorTerms sets the NodeSelectorTerms field in the declarative configuration to the given value.
-func (b NodeSelectorBuilder) SetNodeSelectorTerms(value NodeSelectorTermList) NodeSelectorBuilder {
-	b.ensureInitialized()
+func (b *NodeSelectorBuilder) SetNodeSelectorTerms(value NodeSelectorTermList) *NodeSelectorBuilder {
 	b.fields.NodeSelectorTerms = &value
 	return b
 }
 
 // RemoveNodeSelectorTerms removes the NodeSelectorTerms field from the declarative configuration.
-func (b NodeSelectorBuilder) RemoveNodeSelectorTerms() NodeSelectorBuilder {
-	b.ensureInitialized()
+func (b *NodeSelectorBuilder) RemoveNodeSelectorTerms() *NodeSelectorBuilder {
 	b.fields.NodeSelectorTerms = nil
 	return b
 }
 
 // GetNodeSelectorTerms gets the NodeSelectorTerms field from the declarative configuration.
-func (b NodeSelectorBuilder) GetNodeSelectorTerms() (value NodeSelectorTermList, ok bool) {
-	b.ensureInitialized()
+func (b *NodeSelectorBuilder) GetNodeSelectorTerms() (value NodeSelectorTermList, ok bool) {
 	if v := b.fields.NodeSelectorTerms; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *NodeSelectorBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *NodeSelectorBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals NodeSelectorBuilder to JSON.
 func (b *NodeSelectorBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *NodeSelectorBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into NodeSelectorBuilder, replacing the contents of
 // NodeSelectorBuilder.
 func (b *NodeSelectorBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *NodeSelectorBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // NodeSelectorList represents a list of NodeSelectorBuilder.
-// Provided as a convenience.
-type NodeSelectorList []NodeSelectorBuilder
+type NodeSelectorList []*NodeSelectorBuilder
 
 // NodeSelectorList represents a map of NodeSelectorBuilder.
-// Provided as a convenience.
 type NodeSelectorMap map[string]NodeSelectorBuilder
 
 func (b *NodeSelectorBuilder) preMarshal() {

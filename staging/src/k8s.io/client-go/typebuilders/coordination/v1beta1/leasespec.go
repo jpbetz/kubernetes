@@ -28,14 +28,14 @@ import (
 // LeaseSpecBuilder represents an declarative configuration of the LeaseSpec type for use
 // with apply.
 type LeaseSpecBuilder struct {
-	fields *leaseSpecFields
+	fields leaseSpecFields
 }
 
-// leaseSpecFields is used by LeaseSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in LeaseSpecBuilder before marshalling, and
-// are copied out to the builder type in LeaseSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// leaseSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in LeaseSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type leaseSpecFields struct {
 	HolderIdentity       *string       `json:"holderIdentity,omitempty"`
 	LeaseDurationSeconds *int32        `json:"leaseDurationSeconds,omitempty"`
@@ -44,36 +44,26 @@ type leaseSpecFields struct {
 	LeaseTransitions     *int32        `json:"leaseTransitions,omitempty"`
 }
 
-func (b *LeaseSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &leaseSpecFields{}
-	}
-}
-
 // LeaseSpec constructs an declarative configuration of the LeaseSpec type for use with
 // apply.
-// Provided as a convenience.
-func LeaseSpec() LeaseSpecBuilder {
-	return LeaseSpecBuilder{fields: &leaseSpecFields{}}
+func LeaseSpec() *LeaseSpecBuilder {
+	return &LeaseSpecBuilder{}
 }
 
 // SetHolderIdentity sets the HolderIdentity field in the declarative configuration to the given value.
-func (b LeaseSpecBuilder) SetHolderIdentity(value string) LeaseSpecBuilder {
-	b.ensureInitialized()
+func (b *LeaseSpecBuilder) SetHolderIdentity(value string) *LeaseSpecBuilder {
 	b.fields.HolderIdentity = &value
 	return b
 }
 
 // RemoveHolderIdentity removes the HolderIdentity field from the declarative configuration.
-func (b LeaseSpecBuilder) RemoveHolderIdentity() LeaseSpecBuilder {
-	b.ensureInitialized()
+func (b *LeaseSpecBuilder) RemoveHolderIdentity() *LeaseSpecBuilder {
 	b.fields.HolderIdentity = nil
 	return b
 }
 
 // GetHolderIdentity gets the HolderIdentity field from the declarative configuration.
-func (b LeaseSpecBuilder) GetHolderIdentity() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *LeaseSpecBuilder) GetHolderIdentity() (value string, ok bool) {
 	if v := b.fields.HolderIdentity; v != nil {
 		return *v, true
 	}
@@ -81,22 +71,19 @@ func (b LeaseSpecBuilder) GetHolderIdentity() (value string, ok bool) {
 }
 
 // SetLeaseDurationSeconds sets the LeaseDurationSeconds field in the declarative configuration to the given value.
-func (b LeaseSpecBuilder) SetLeaseDurationSeconds(value int32) LeaseSpecBuilder {
-	b.ensureInitialized()
+func (b *LeaseSpecBuilder) SetLeaseDurationSeconds(value int32) *LeaseSpecBuilder {
 	b.fields.LeaseDurationSeconds = &value
 	return b
 }
 
 // RemoveLeaseDurationSeconds removes the LeaseDurationSeconds field from the declarative configuration.
-func (b LeaseSpecBuilder) RemoveLeaseDurationSeconds() LeaseSpecBuilder {
-	b.ensureInitialized()
+func (b *LeaseSpecBuilder) RemoveLeaseDurationSeconds() *LeaseSpecBuilder {
 	b.fields.LeaseDurationSeconds = nil
 	return b
 }
 
 // GetLeaseDurationSeconds gets the LeaseDurationSeconds field from the declarative configuration.
-func (b LeaseSpecBuilder) GetLeaseDurationSeconds() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *LeaseSpecBuilder) GetLeaseDurationSeconds() (value int32, ok bool) {
 	if v := b.fields.LeaseDurationSeconds; v != nil {
 		return *v, true
 	}
@@ -104,22 +91,19 @@ func (b LeaseSpecBuilder) GetLeaseDurationSeconds() (value int32, ok bool) {
 }
 
 // SetAcquireTime sets the AcquireTime field in the declarative configuration to the given value.
-func (b LeaseSpecBuilder) SetAcquireTime(value v1.MicroTime) LeaseSpecBuilder {
-	b.ensureInitialized()
+func (b *LeaseSpecBuilder) SetAcquireTime(value v1.MicroTime) *LeaseSpecBuilder {
 	b.fields.AcquireTime = &value
 	return b
 }
 
 // RemoveAcquireTime removes the AcquireTime field from the declarative configuration.
-func (b LeaseSpecBuilder) RemoveAcquireTime() LeaseSpecBuilder {
-	b.ensureInitialized()
+func (b *LeaseSpecBuilder) RemoveAcquireTime() *LeaseSpecBuilder {
 	b.fields.AcquireTime = nil
 	return b
 }
 
 // GetAcquireTime gets the AcquireTime field from the declarative configuration.
-func (b LeaseSpecBuilder) GetAcquireTime() (value v1.MicroTime, ok bool) {
-	b.ensureInitialized()
+func (b *LeaseSpecBuilder) GetAcquireTime() (value v1.MicroTime, ok bool) {
 	if v := b.fields.AcquireTime; v != nil {
 		return *v, true
 	}
@@ -127,22 +111,19 @@ func (b LeaseSpecBuilder) GetAcquireTime() (value v1.MicroTime, ok bool) {
 }
 
 // SetRenewTime sets the RenewTime field in the declarative configuration to the given value.
-func (b LeaseSpecBuilder) SetRenewTime(value v1.MicroTime) LeaseSpecBuilder {
-	b.ensureInitialized()
+func (b *LeaseSpecBuilder) SetRenewTime(value v1.MicroTime) *LeaseSpecBuilder {
 	b.fields.RenewTime = &value
 	return b
 }
 
 // RemoveRenewTime removes the RenewTime field from the declarative configuration.
-func (b LeaseSpecBuilder) RemoveRenewTime() LeaseSpecBuilder {
-	b.ensureInitialized()
+func (b *LeaseSpecBuilder) RemoveRenewTime() *LeaseSpecBuilder {
 	b.fields.RenewTime = nil
 	return b
 }
 
 // GetRenewTime gets the RenewTime field from the declarative configuration.
-func (b LeaseSpecBuilder) GetRenewTime() (value v1.MicroTime, ok bool) {
-	b.ensureInitialized()
+func (b *LeaseSpecBuilder) GetRenewTime() (value v1.MicroTime, ok bool) {
 	if v := b.fields.RenewTime; v != nil {
 		return *v, true
 	}
@@ -150,22 +131,19 @@ func (b LeaseSpecBuilder) GetRenewTime() (value v1.MicroTime, ok bool) {
 }
 
 // SetLeaseTransitions sets the LeaseTransitions field in the declarative configuration to the given value.
-func (b LeaseSpecBuilder) SetLeaseTransitions(value int32) LeaseSpecBuilder {
-	b.ensureInitialized()
+func (b *LeaseSpecBuilder) SetLeaseTransitions(value int32) *LeaseSpecBuilder {
 	b.fields.LeaseTransitions = &value
 	return b
 }
 
 // RemoveLeaseTransitions removes the LeaseTransitions field from the declarative configuration.
-func (b LeaseSpecBuilder) RemoveLeaseTransitions() LeaseSpecBuilder {
-	b.ensureInitialized()
+func (b *LeaseSpecBuilder) RemoveLeaseTransitions() *LeaseSpecBuilder {
 	b.fields.LeaseTransitions = nil
 	return b
 }
 
 // GetLeaseTransitions gets the LeaseTransitions field from the declarative configuration.
-func (b LeaseSpecBuilder) GetLeaseTransitions() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *LeaseSpecBuilder) GetLeaseTransitions() (value int32, ok bool) {
 	if v := b.fields.LeaseTransitions; v != nil {
 		return *v, true
 	}
@@ -177,9 +155,8 @@ func (b *LeaseSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -194,14 +171,13 @@ func (b *LeaseSpecBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals LeaseSpecBuilder to JSON.
 func (b *LeaseSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -209,8 +185,7 @@ func (b *LeaseSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into LeaseSpecBuilder, replacing the contents of
 // LeaseSpecBuilder.
 func (b *LeaseSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -218,11 +193,9 @@ func (b *LeaseSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // LeaseSpecList represents a list of LeaseSpecBuilder.
-// Provided as a convenience.
-type LeaseSpecList []LeaseSpecBuilder
+type LeaseSpecList []*LeaseSpecBuilder
 
 // LeaseSpecList represents a map of LeaseSpecBuilder.
-// Provided as a convenience.
 type LeaseSpecMap map[string]LeaseSpecBuilder
 
 func (b *LeaseSpecBuilder) preMarshal() {

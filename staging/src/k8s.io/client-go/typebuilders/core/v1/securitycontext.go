@@ -28,14 +28,14 @@ import (
 // SecurityContextBuilder represents an declarative configuration of the SecurityContext type for use
 // with apply.
 type SecurityContextBuilder struct {
-	fields *securityContextFields
+	fields securityContextFields
 }
 
-// securityContextFields is used by SecurityContextBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in SecurityContextBuilder before marshalling, and
-// are copied out to the builder type in SecurityContextBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// securityContextFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in SecurityContextBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type securityContextFields struct {
 	Capabilities             *CapabilitiesBuilder                  `json:"capabilities,omitempty"`
 	Privileged               *bool                                 `json:"privileged,omitempty"`
@@ -50,59 +50,43 @@ type securityContextFields struct {
 	SeccompProfile           *SeccompProfileBuilder                `json:"seccompProfile,omitempty"`
 }
 
-func (b *SecurityContextBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &securityContextFields{}
-	}
-}
-
 // SecurityContext constructs an declarative configuration of the SecurityContext type for use with
 // apply.
-// Provided as a convenience.
-func SecurityContext() SecurityContextBuilder {
-	return SecurityContextBuilder{fields: &securityContextFields{}}
+func SecurityContext() *SecurityContextBuilder {
+	return &SecurityContextBuilder{}
 }
 
 // SetCapabilities sets the Capabilities field in the declarative configuration to the given value.
-func (b SecurityContextBuilder) SetCapabilities(value CapabilitiesBuilder) SecurityContextBuilder {
-	b.ensureInitialized()
-	b.fields.Capabilities = &value
+func (b *SecurityContextBuilder) SetCapabilities(value *CapabilitiesBuilder) *SecurityContextBuilder {
+	b.fields.Capabilities = value
 	return b
 }
 
 // RemoveCapabilities removes the Capabilities field from the declarative configuration.
-func (b SecurityContextBuilder) RemoveCapabilities() SecurityContextBuilder {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) RemoveCapabilities() *SecurityContextBuilder {
 	b.fields.Capabilities = nil
 	return b
 }
 
 // GetCapabilities gets the Capabilities field from the declarative configuration.
-func (b SecurityContextBuilder) GetCapabilities() (value CapabilitiesBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Capabilities; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *SecurityContextBuilder) GetCapabilities() (value *CapabilitiesBuilder, ok bool) {
+	return b.fields.Capabilities, b.fields.Capabilities != nil
 }
 
 // SetPrivileged sets the Privileged field in the declarative configuration to the given value.
-func (b SecurityContextBuilder) SetPrivileged(value bool) SecurityContextBuilder {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) SetPrivileged(value bool) *SecurityContextBuilder {
 	b.fields.Privileged = &value
 	return b
 }
 
 // RemovePrivileged removes the Privileged field from the declarative configuration.
-func (b SecurityContextBuilder) RemovePrivileged() SecurityContextBuilder {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) RemovePrivileged() *SecurityContextBuilder {
 	b.fields.Privileged = nil
 	return b
 }
 
 // GetPrivileged gets the Privileged field from the declarative configuration.
-func (b SecurityContextBuilder) GetPrivileged() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) GetPrivileged() (value bool, ok bool) {
 	if v := b.fields.Privileged; v != nil {
 		return *v, true
 	}
@@ -110,68 +94,53 @@ func (b SecurityContextBuilder) GetPrivileged() (value bool, ok bool) {
 }
 
 // SetSELinuxOptions sets the SELinuxOptions field in the declarative configuration to the given value.
-func (b SecurityContextBuilder) SetSELinuxOptions(value SELinuxOptionsBuilder) SecurityContextBuilder {
-	b.ensureInitialized()
-	b.fields.SELinuxOptions = &value
+func (b *SecurityContextBuilder) SetSELinuxOptions(value *SELinuxOptionsBuilder) *SecurityContextBuilder {
+	b.fields.SELinuxOptions = value
 	return b
 }
 
 // RemoveSELinuxOptions removes the SELinuxOptions field from the declarative configuration.
-func (b SecurityContextBuilder) RemoveSELinuxOptions() SecurityContextBuilder {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) RemoveSELinuxOptions() *SecurityContextBuilder {
 	b.fields.SELinuxOptions = nil
 	return b
 }
 
 // GetSELinuxOptions gets the SELinuxOptions field from the declarative configuration.
-func (b SecurityContextBuilder) GetSELinuxOptions() (value SELinuxOptionsBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.SELinuxOptions; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *SecurityContextBuilder) GetSELinuxOptions() (value *SELinuxOptionsBuilder, ok bool) {
+	return b.fields.SELinuxOptions, b.fields.SELinuxOptions != nil
 }
 
 // SetWindowsOptions sets the WindowsOptions field in the declarative configuration to the given value.
-func (b SecurityContextBuilder) SetWindowsOptions(value WindowsSecurityContextOptionsBuilder) SecurityContextBuilder {
-	b.ensureInitialized()
-	b.fields.WindowsOptions = &value
+func (b *SecurityContextBuilder) SetWindowsOptions(value *WindowsSecurityContextOptionsBuilder) *SecurityContextBuilder {
+	b.fields.WindowsOptions = value
 	return b
 }
 
 // RemoveWindowsOptions removes the WindowsOptions field from the declarative configuration.
-func (b SecurityContextBuilder) RemoveWindowsOptions() SecurityContextBuilder {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) RemoveWindowsOptions() *SecurityContextBuilder {
 	b.fields.WindowsOptions = nil
 	return b
 }
 
 // GetWindowsOptions gets the WindowsOptions field from the declarative configuration.
-func (b SecurityContextBuilder) GetWindowsOptions() (value WindowsSecurityContextOptionsBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.WindowsOptions; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *SecurityContextBuilder) GetWindowsOptions() (value *WindowsSecurityContextOptionsBuilder, ok bool) {
+	return b.fields.WindowsOptions, b.fields.WindowsOptions != nil
 }
 
 // SetRunAsUser sets the RunAsUser field in the declarative configuration to the given value.
-func (b SecurityContextBuilder) SetRunAsUser(value int64) SecurityContextBuilder {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) SetRunAsUser(value int64) *SecurityContextBuilder {
 	b.fields.RunAsUser = &value
 	return b
 }
 
 // RemoveRunAsUser removes the RunAsUser field from the declarative configuration.
-func (b SecurityContextBuilder) RemoveRunAsUser() SecurityContextBuilder {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) RemoveRunAsUser() *SecurityContextBuilder {
 	b.fields.RunAsUser = nil
 	return b
 }
 
 // GetRunAsUser gets the RunAsUser field from the declarative configuration.
-func (b SecurityContextBuilder) GetRunAsUser() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) GetRunAsUser() (value int64, ok bool) {
 	if v := b.fields.RunAsUser; v != nil {
 		return *v, true
 	}
@@ -179,22 +148,19 @@ func (b SecurityContextBuilder) GetRunAsUser() (value int64, ok bool) {
 }
 
 // SetRunAsGroup sets the RunAsGroup field in the declarative configuration to the given value.
-func (b SecurityContextBuilder) SetRunAsGroup(value int64) SecurityContextBuilder {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) SetRunAsGroup(value int64) *SecurityContextBuilder {
 	b.fields.RunAsGroup = &value
 	return b
 }
 
 // RemoveRunAsGroup removes the RunAsGroup field from the declarative configuration.
-func (b SecurityContextBuilder) RemoveRunAsGroup() SecurityContextBuilder {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) RemoveRunAsGroup() *SecurityContextBuilder {
 	b.fields.RunAsGroup = nil
 	return b
 }
 
 // GetRunAsGroup gets the RunAsGroup field from the declarative configuration.
-func (b SecurityContextBuilder) GetRunAsGroup() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) GetRunAsGroup() (value int64, ok bool) {
 	if v := b.fields.RunAsGroup; v != nil {
 		return *v, true
 	}
@@ -202,22 +168,19 @@ func (b SecurityContextBuilder) GetRunAsGroup() (value int64, ok bool) {
 }
 
 // SetRunAsNonRoot sets the RunAsNonRoot field in the declarative configuration to the given value.
-func (b SecurityContextBuilder) SetRunAsNonRoot(value bool) SecurityContextBuilder {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) SetRunAsNonRoot(value bool) *SecurityContextBuilder {
 	b.fields.RunAsNonRoot = &value
 	return b
 }
 
 // RemoveRunAsNonRoot removes the RunAsNonRoot field from the declarative configuration.
-func (b SecurityContextBuilder) RemoveRunAsNonRoot() SecurityContextBuilder {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) RemoveRunAsNonRoot() *SecurityContextBuilder {
 	b.fields.RunAsNonRoot = nil
 	return b
 }
 
 // GetRunAsNonRoot gets the RunAsNonRoot field from the declarative configuration.
-func (b SecurityContextBuilder) GetRunAsNonRoot() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) GetRunAsNonRoot() (value bool, ok bool) {
 	if v := b.fields.RunAsNonRoot; v != nil {
 		return *v, true
 	}
@@ -225,22 +188,19 @@ func (b SecurityContextBuilder) GetRunAsNonRoot() (value bool, ok bool) {
 }
 
 // SetReadOnlyRootFilesystem sets the ReadOnlyRootFilesystem field in the declarative configuration to the given value.
-func (b SecurityContextBuilder) SetReadOnlyRootFilesystem(value bool) SecurityContextBuilder {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) SetReadOnlyRootFilesystem(value bool) *SecurityContextBuilder {
 	b.fields.ReadOnlyRootFilesystem = &value
 	return b
 }
 
 // RemoveReadOnlyRootFilesystem removes the ReadOnlyRootFilesystem field from the declarative configuration.
-func (b SecurityContextBuilder) RemoveReadOnlyRootFilesystem() SecurityContextBuilder {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) RemoveReadOnlyRootFilesystem() *SecurityContextBuilder {
 	b.fields.ReadOnlyRootFilesystem = nil
 	return b
 }
 
 // GetReadOnlyRootFilesystem gets the ReadOnlyRootFilesystem field from the declarative configuration.
-func (b SecurityContextBuilder) GetReadOnlyRootFilesystem() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) GetReadOnlyRootFilesystem() (value bool, ok bool) {
 	if v := b.fields.ReadOnlyRootFilesystem; v != nil {
 		return *v, true
 	}
@@ -248,22 +208,19 @@ func (b SecurityContextBuilder) GetReadOnlyRootFilesystem() (value bool, ok bool
 }
 
 // SetAllowPrivilegeEscalation sets the AllowPrivilegeEscalation field in the declarative configuration to the given value.
-func (b SecurityContextBuilder) SetAllowPrivilegeEscalation(value bool) SecurityContextBuilder {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) SetAllowPrivilegeEscalation(value bool) *SecurityContextBuilder {
 	b.fields.AllowPrivilegeEscalation = &value
 	return b
 }
 
 // RemoveAllowPrivilegeEscalation removes the AllowPrivilegeEscalation field from the declarative configuration.
-func (b SecurityContextBuilder) RemoveAllowPrivilegeEscalation() SecurityContextBuilder {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) RemoveAllowPrivilegeEscalation() *SecurityContextBuilder {
 	b.fields.AllowPrivilegeEscalation = nil
 	return b
 }
 
 // GetAllowPrivilegeEscalation gets the AllowPrivilegeEscalation field from the declarative configuration.
-func (b SecurityContextBuilder) GetAllowPrivilegeEscalation() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) GetAllowPrivilegeEscalation() (value bool, ok bool) {
 	if v := b.fields.AllowPrivilegeEscalation; v != nil {
 		return *v, true
 	}
@@ -271,22 +228,19 @@ func (b SecurityContextBuilder) GetAllowPrivilegeEscalation() (value bool, ok bo
 }
 
 // SetProcMount sets the ProcMount field in the declarative configuration to the given value.
-func (b SecurityContextBuilder) SetProcMount(value corev1.ProcMountType) SecurityContextBuilder {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) SetProcMount(value corev1.ProcMountType) *SecurityContextBuilder {
 	b.fields.ProcMount = &value
 	return b
 }
 
 // RemoveProcMount removes the ProcMount field from the declarative configuration.
-func (b SecurityContextBuilder) RemoveProcMount() SecurityContextBuilder {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) RemoveProcMount() *SecurityContextBuilder {
 	b.fields.ProcMount = nil
 	return b
 }
 
 // GetProcMount gets the ProcMount field from the declarative configuration.
-func (b SecurityContextBuilder) GetProcMount() (value corev1.ProcMountType, ok bool) {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) GetProcMount() (value corev1.ProcMountType, ok bool) {
 	if v := b.fields.ProcMount; v != nil {
 		return *v, true
 	}
@@ -294,26 +248,20 @@ func (b SecurityContextBuilder) GetProcMount() (value corev1.ProcMountType, ok b
 }
 
 // SetSeccompProfile sets the SeccompProfile field in the declarative configuration to the given value.
-func (b SecurityContextBuilder) SetSeccompProfile(value SeccompProfileBuilder) SecurityContextBuilder {
-	b.ensureInitialized()
-	b.fields.SeccompProfile = &value
+func (b *SecurityContextBuilder) SetSeccompProfile(value *SeccompProfileBuilder) *SecurityContextBuilder {
+	b.fields.SeccompProfile = value
 	return b
 }
 
 // RemoveSeccompProfile removes the SeccompProfile field from the declarative configuration.
-func (b SecurityContextBuilder) RemoveSeccompProfile() SecurityContextBuilder {
-	b.ensureInitialized()
+func (b *SecurityContextBuilder) RemoveSeccompProfile() *SecurityContextBuilder {
 	b.fields.SeccompProfile = nil
 	return b
 }
 
 // GetSeccompProfile gets the SeccompProfile field from the declarative configuration.
-func (b SecurityContextBuilder) GetSeccompProfile() (value SeccompProfileBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.SeccompProfile; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *SecurityContextBuilder) GetSeccompProfile() (value *SeccompProfileBuilder, ok bool) {
+	return b.fields.SeccompProfile, b.fields.SeccompProfile != nil
 }
 
 // ToUnstructured converts SecurityContextBuilder to unstructured.
@@ -321,9 +269,8 @@ func (b *SecurityContextBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -338,14 +285,13 @@ func (b *SecurityContextBuilder) FromUnstructured(u map[string]interface{}) erro
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals SecurityContextBuilder to JSON.
 func (b *SecurityContextBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -353,8 +299,7 @@ func (b *SecurityContextBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into SecurityContextBuilder, replacing the contents of
 // SecurityContextBuilder.
 func (b *SecurityContextBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -362,11 +307,9 @@ func (b *SecurityContextBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // SecurityContextList represents a list of SecurityContextBuilder.
-// Provided as a convenience.
-type SecurityContextList []SecurityContextBuilder
+type SecurityContextList []*SecurityContextBuilder
 
 // SecurityContextList represents a map of SecurityContextBuilder.
-// Provided as a convenience.
 type SecurityContextMap map[string]SecurityContextBuilder
 
 func (b *SecurityContextBuilder) preMarshal() {

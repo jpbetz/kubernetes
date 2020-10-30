@@ -27,52 +27,39 @@ import (
 // SessionAffinityConfigBuilder represents an declarative configuration of the SessionAffinityConfig type for use
 // with apply.
 type SessionAffinityConfigBuilder struct {
-	fields *sessionAffinityConfigFields
+	fields sessionAffinityConfigFields
 }
 
-// sessionAffinityConfigFields is used by SessionAffinityConfigBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in SessionAffinityConfigBuilder before marshalling, and
-// are copied out to the builder type in SessionAffinityConfigBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// sessionAffinityConfigFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in SessionAffinityConfigBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type sessionAffinityConfigFields struct {
 	ClientIP *ClientIPConfigBuilder `json:"clientIP,omitempty"`
 }
 
-func (b *SessionAffinityConfigBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &sessionAffinityConfigFields{}
-	}
-}
-
 // SessionAffinityConfig constructs an declarative configuration of the SessionAffinityConfig type for use with
 // apply.
-// Provided as a convenience.
-func SessionAffinityConfig() SessionAffinityConfigBuilder {
-	return SessionAffinityConfigBuilder{fields: &sessionAffinityConfigFields{}}
+func SessionAffinityConfig() *SessionAffinityConfigBuilder {
+	return &SessionAffinityConfigBuilder{}
 }
 
 // SetClientIP sets the ClientIP field in the declarative configuration to the given value.
-func (b SessionAffinityConfigBuilder) SetClientIP(value ClientIPConfigBuilder) SessionAffinityConfigBuilder {
-	b.ensureInitialized()
-	b.fields.ClientIP = &value
+func (b *SessionAffinityConfigBuilder) SetClientIP(value *ClientIPConfigBuilder) *SessionAffinityConfigBuilder {
+	b.fields.ClientIP = value
 	return b
 }
 
 // RemoveClientIP removes the ClientIP field from the declarative configuration.
-func (b SessionAffinityConfigBuilder) RemoveClientIP() SessionAffinityConfigBuilder {
-	b.ensureInitialized()
+func (b *SessionAffinityConfigBuilder) RemoveClientIP() *SessionAffinityConfigBuilder {
 	b.fields.ClientIP = nil
 	return b
 }
 
 // GetClientIP gets the ClientIP field from the declarative configuration.
-func (b SessionAffinityConfigBuilder) GetClientIP() (value ClientIPConfigBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ClientIP; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *SessionAffinityConfigBuilder) GetClientIP() (value *ClientIPConfigBuilder, ok bool) {
+	return b.fields.ClientIP, b.fields.ClientIP != nil
 }
 
 // ToUnstructured converts SessionAffinityConfigBuilder to unstructured.
@@ -80,9 +67,8 @@ func (b *SessionAffinityConfigBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +83,13 @@ func (b *SessionAffinityConfigBuilder) FromUnstructured(u map[string]interface{}
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals SessionAffinityConfigBuilder to JSON.
 func (b *SessionAffinityConfigBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +97,7 @@ func (b *SessionAffinityConfigBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into SessionAffinityConfigBuilder, replacing the contents of
 // SessionAffinityConfigBuilder.
 func (b *SessionAffinityConfigBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +105,9 @@ func (b *SessionAffinityConfigBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // SessionAffinityConfigList represents a list of SessionAffinityConfigBuilder.
-// Provided as a convenience.
-type SessionAffinityConfigList []SessionAffinityConfigBuilder
+type SessionAffinityConfigList []*SessionAffinityConfigBuilder
 
 // SessionAffinityConfigList represents a map of SessionAffinityConfigBuilder.
-// Provided as a convenience.
 type SessionAffinityConfigMap map[string]SessionAffinityConfigBuilder
 
 func (b *SessionAffinityConfigBuilder) preMarshal() {

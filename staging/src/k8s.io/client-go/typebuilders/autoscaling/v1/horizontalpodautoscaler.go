@@ -28,15 +28,15 @@ import (
 // HorizontalPodAutoscalerBuilder represents an declarative configuration of the HorizontalPodAutoscaler type for use
 // with apply.
 type HorizontalPodAutoscalerBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *horizontalPodAutoscalerFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   horizontalPodAutoscalerFields
 }
 
-// horizontalPodAutoscalerFields is used by HorizontalPodAutoscalerBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in HorizontalPodAutoscalerBuilder before marshalling, and
-// are copied out to the builder type in HorizontalPodAutoscalerBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// horizontalPodAutoscalerFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in HorizontalPodAutoscalerBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type horizontalPodAutoscalerFields struct {
 	Kind       *string                               `json:"kind,omitempty"`       // inlined HorizontalPodAutoscalerBuilder.typeMeta.Kind field
 	APIVersion *string                               `json:"apiVersion,omitempty"` // inlined HorizontalPodAutoscalerBuilder.typeMeta.APIVersion field
@@ -45,106 +45,78 @@ type horizontalPodAutoscalerFields struct {
 	Status     *HorizontalPodAutoscalerStatusBuilder `json:"status,omitempty"`
 }
 
-func (b *HorizontalPodAutoscalerBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &horizontalPodAutoscalerFields{}
-	}
-}
-
 // HorizontalPodAutoscaler constructs an declarative configuration of the HorizontalPodAutoscaler type for use with
 // apply.
-// Provided as a convenience.
-func HorizontalPodAutoscaler() HorizontalPodAutoscalerBuilder {
-	return HorizontalPodAutoscalerBuilder{fields: &horizontalPodAutoscalerFields{}}
+func HorizontalPodAutoscaler() *HorizontalPodAutoscalerBuilder {
+	return &HorizontalPodAutoscalerBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerBuilder) SetTypeMeta(value v1.TypeMetaBuilder) HorizontalPodAutoscalerBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *HorizontalPodAutoscalerBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b HorizontalPodAutoscalerBuilder) RemoveTypeMeta() HorizontalPodAutoscalerBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *HorizontalPodAutoscalerBuilder) RemoveTypeMeta() *HorizontalPodAutoscalerBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b HorizontalPodAutoscalerBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) HorizontalPodAutoscalerBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *HorizontalPodAutoscalerBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *HorizontalPodAutoscalerBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b HorizontalPodAutoscalerBuilder) RemoveObjectMeta() HorizontalPodAutoscalerBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerBuilder) RemoveObjectMeta() *HorizontalPodAutoscalerBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b HorizontalPodAutoscalerBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *HorizontalPodAutoscalerBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerBuilder) SetSpec(value HorizontalPodAutoscalerSpecBuilder) HorizontalPodAutoscalerBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *HorizontalPodAutoscalerBuilder) SetSpec(value *HorizontalPodAutoscalerSpecBuilder) *HorizontalPodAutoscalerBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b HorizontalPodAutoscalerBuilder) RemoveSpec() HorizontalPodAutoscalerBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerBuilder) RemoveSpec() *HorizontalPodAutoscalerBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b HorizontalPodAutoscalerBuilder) GetSpec() (value HorizontalPodAutoscalerSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *HorizontalPodAutoscalerBuilder) GetSpec() (value *HorizontalPodAutoscalerSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerBuilder) SetStatus(value HorizontalPodAutoscalerStatusBuilder) HorizontalPodAutoscalerBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *HorizontalPodAutoscalerBuilder) SetStatus(value *HorizontalPodAutoscalerStatusBuilder) *HorizontalPodAutoscalerBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b HorizontalPodAutoscalerBuilder) RemoveStatus() HorizontalPodAutoscalerBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerBuilder) RemoveStatus() *HorizontalPodAutoscalerBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b HorizontalPodAutoscalerBuilder) GetStatus() (value HorizontalPodAutoscalerStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *HorizontalPodAutoscalerBuilder) GetStatus() (value *HorizontalPodAutoscalerStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts HorizontalPodAutoscalerBuilder to unstructured.
@@ -152,9 +124,8 @@ func (b *HorizontalPodAutoscalerBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *HorizontalPodAutoscalerBuilder) FromUnstructured(u map[string]interface
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals HorizontalPodAutoscalerBuilder to JSON.
 func (b *HorizontalPodAutoscalerBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *HorizontalPodAutoscalerBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into HorizontalPodAutoscalerBuilder, replacing the contents of
 // HorizontalPodAutoscalerBuilder.
 func (b *HorizontalPodAutoscalerBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +162,25 @@ func (b *HorizontalPodAutoscalerBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // HorizontalPodAutoscalerList represents a list of HorizontalPodAutoscalerBuilder.
-// Provided as a convenience.
-type HorizontalPodAutoscalerList []HorizontalPodAutoscalerBuilder
+type HorizontalPodAutoscalerList []*HorizontalPodAutoscalerBuilder
 
 // HorizontalPodAutoscalerList represents a map of HorizontalPodAutoscalerBuilder.
-// Provided as a convenience.
 type HorizontalPodAutoscalerMap map[string]HorizontalPodAutoscalerBuilder
 
 func (b *HorizontalPodAutoscalerBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *HorizontalPodAutoscalerBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

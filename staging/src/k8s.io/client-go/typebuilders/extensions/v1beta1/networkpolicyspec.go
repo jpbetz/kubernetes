@@ -29,14 +29,14 @@ import (
 // NetworkPolicySpecBuilder represents an declarative configuration of the NetworkPolicySpec type for use
 // with apply.
 type NetworkPolicySpecBuilder struct {
-	fields *networkPolicySpecFields
+	fields networkPolicySpecFields
 }
 
-// networkPolicySpecFields is used by NetworkPolicySpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in NetworkPolicySpecBuilder before marshalling, and
-// are copied out to the builder type in NetworkPolicySpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// networkPolicySpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in NetworkPolicySpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type networkPolicySpecFields struct {
 	PodSelector *v1.LabelSelectorBuilder        `json:"podSelector,omitempty"`
 	Ingress     *NetworkPolicyIngressRuleList   `json:"ingress,omitempty"`
@@ -44,59 +44,43 @@ type networkPolicySpecFields struct {
 	PolicyTypes *[]extensionsv1beta1.PolicyType `json:"policyTypes,omitempty"`
 }
 
-func (b *NetworkPolicySpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &networkPolicySpecFields{}
-	}
-}
-
 // NetworkPolicySpec constructs an declarative configuration of the NetworkPolicySpec type for use with
 // apply.
-// Provided as a convenience.
-func NetworkPolicySpec() NetworkPolicySpecBuilder {
-	return NetworkPolicySpecBuilder{fields: &networkPolicySpecFields{}}
+func NetworkPolicySpec() *NetworkPolicySpecBuilder {
+	return &NetworkPolicySpecBuilder{}
 }
 
 // SetPodSelector sets the PodSelector field in the declarative configuration to the given value.
-func (b NetworkPolicySpecBuilder) SetPodSelector(value v1.LabelSelectorBuilder) NetworkPolicySpecBuilder {
-	b.ensureInitialized()
-	b.fields.PodSelector = &value
+func (b *NetworkPolicySpecBuilder) SetPodSelector(value *v1.LabelSelectorBuilder) *NetworkPolicySpecBuilder {
+	b.fields.PodSelector = value
 	return b
 }
 
 // RemovePodSelector removes the PodSelector field from the declarative configuration.
-func (b NetworkPolicySpecBuilder) RemovePodSelector() NetworkPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *NetworkPolicySpecBuilder) RemovePodSelector() *NetworkPolicySpecBuilder {
 	b.fields.PodSelector = nil
 	return b
 }
 
 // GetPodSelector gets the PodSelector field from the declarative configuration.
-func (b NetworkPolicySpecBuilder) GetPodSelector() (value v1.LabelSelectorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.PodSelector; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *NetworkPolicySpecBuilder) GetPodSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+	return b.fields.PodSelector, b.fields.PodSelector != nil
 }
 
 // SetIngress sets the Ingress field in the declarative configuration to the given value.
-func (b NetworkPolicySpecBuilder) SetIngress(value NetworkPolicyIngressRuleList) NetworkPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *NetworkPolicySpecBuilder) SetIngress(value NetworkPolicyIngressRuleList) *NetworkPolicySpecBuilder {
 	b.fields.Ingress = &value
 	return b
 }
 
 // RemoveIngress removes the Ingress field from the declarative configuration.
-func (b NetworkPolicySpecBuilder) RemoveIngress() NetworkPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *NetworkPolicySpecBuilder) RemoveIngress() *NetworkPolicySpecBuilder {
 	b.fields.Ingress = nil
 	return b
 }
 
 // GetIngress gets the Ingress field from the declarative configuration.
-func (b NetworkPolicySpecBuilder) GetIngress() (value NetworkPolicyIngressRuleList, ok bool) {
-	b.ensureInitialized()
+func (b *NetworkPolicySpecBuilder) GetIngress() (value NetworkPolicyIngressRuleList, ok bool) {
 	if v := b.fields.Ingress; v != nil {
 		return *v, true
 	}
@@ -104,22 +88,19 @@ func (b NetworkPolicySpecBuilder) GetIngress() (value NetworkPolicyIngressRuleLi
 }
 
 // SetEgress sets the Egress field in the declarative configuration to the given value.
-func (b NetworkPolicySpecBuilder) SetEgress(value NetworkPolicyEgressRuleList) NetworkPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *NetworkPolicySpecBuilder) SetEgress(value NetworkPolicyEgressRuleList) *NetworkPolicySpecBuilder {
 	b.fields.Egress = &value
 	return b
 }
 
 // RemoveEgress removes the Egress field from the declarative configuration.
-func (b NetworkPolicySpecBuilder) RemoveEgress() NetworkPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *NetworkPolicySpecBuilder) RemoveEgress() *NetworkPolicySpecBuilder {
 	b.fields.Egress = nil
 	return b
 }
 
 // GetEgress gets the Egress field from the declarative configuration.
-func (b NetworkPolicySpecBuilder) GetEgress() (value NetworkPolicyEgressRuleList, ok bool) {
-	b.ensureInitialized()
+func (b *NetworkPolicySpecBuilder) GetEgress() (value NetworkPolicyEgressRuleList, ok bool) {
 	if v := b.fields.Egress; v != nil {
 		return *v, true
 	}
@@ -127,22 +108,19 @@ func (b NetworkPolicySpecBuilder) GetEgress() (value NetworkPolicyEgressRuleList
 }
 
 // SetPolicyTypes sets the PolicyTypes field in the declarative configuration to the given value.
-func (b NetworkPolicySpecBuilder) SetPolicyTypes(value []extensionsv1beta1.PolicyType) NetworkPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *NetworkPolicySpecBuilder) SetPolicyTypes(value []extensionsv1beta1.PolicyType) *NetworkPolicySpecBuilder {
 	b.fields.PolicyTypes = &value
 	return b
 }
 
 // RemovePolicyTypes removes the PolicyTypes field from the declarative configuration.
-func (b NetworkPolicySpecBuilder) RemovePolicyTypes() NetworkPolicySpecBuilder {
-	b.ensureInitialized()
+func (b *NetworkPolicySpecBuilder) RemovePolicyTypes() *NetworkPolicySpecBuilder {
 	b.fields.PolicyTypes = nil
 	return b
 }
 
 // GetPolicyTypes gets the PolicyTypes field from the declarative configuration.
-func (b NetworkPolicySpecBuilder) GetPolicyTypes() (value []extensionsv1beta1.PolicyType, ok bool) {
-	b.ensureInitialized()
+func (b *NetworkPolicySpecBuilder) GetPolicyTypes() (value []extensionsv1beta1.PolicyType, ok bool) {
 	if v := b.fields.PolicyTypes; v != nil {
 		return *v, true
 	}
@@ -154,9 +132,8 @@ func (b *NetworkPolicySpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -171,14 +148,13 @@ func (b *NetworkPolicySpecBuilder) FromUnstructured(u map[string]interface{}) er
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals NetworkPolicySpecBuilder to JSON.
 func (b *NetworkPolicySpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -186,8 +162,7 @@ func (b *NetworkPolicySpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into NetworkPolicySpecBuilder, replacing the contents of
 // NetworkPolicySpecBuilder.
 func (b *NetworkPolicySpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -195,11 +170,9 @@ func (b *NetworkPolicySpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // NetworkPolicySpecList represents a list of NetworkPolicySpecBuilder.
-// Provided as a convenience.
-type NetworkPolicySpecList []NetworkPolicySpecBuilder
+type NetworkPolicySpecList []*NetworkPolicySpecBuilder
 
 // NetworkPolicySpecList represents a map of NetworkPolicySpecBuilder.
-// Provided as a convenience.
 type NetworkPolicySpecMap map[string]NetworkPolicySpecBuilder
 
 func (b *NetworkPolicySpecBuilder) preMarshal() {

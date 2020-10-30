@@ -27,52 +27,39 @@ import (
 // NodeDaemonEndpointsBuilder represents an declarative configuration of the NodeDaemonEndpoints type for use
 // with apply.
 type NodeDaemonEndpointsBuilder struct {
-	fields *nodeDaemonEndpointsFields
+	fields nodeDaemonEndpointsFields
 }
 
-// nodeDaemonEndpointsFields is used by NodeDaemonEndpointsBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in NodeDaemonEndpointsBuilder before marshalling, and
-// are copied out to the builder type in NodeDaemonEndpointsBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// nodeDaemonEndpointsFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in NodeDaemonEndpointsBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type nodeDaemonEndpointsFields struct {
 	KubeletEndpoint *DaemonEndpointBuilder `json:"kubeletEndpoint,omitempty"`
 }
 
-func (b *NodeDaemonEndpointsBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &nodeDaemonEndpointsFields{}
-	}
-}
-
 // NodeDaemonEndpoints constructs an declarative configuration of the NodeDaemonEndpoints type for use with
 // apply.
-// Provided as a convenience.
-func NodeDaemonEndpoints() NodeDaemonEndpointsBuilder {
-	return NodeDaemonEndpointsBuilder{fields: &nodeDaemonEndpointsFields{}}
+func NodeDaemonEndpoints() *NodeDaemonEndpointsBuilder {
+	return &NodeDaemonEndpointsBuilder{}
 }
 
 // SetKubeletEndpoint sets the KubeletEndpoint field in the declarative configuration to the given value.
-func (b NodeDaemonEndpointsBuilder) SetKubeletEndpoint(value DaemonEndpointBuilder) NodeDaemonEndpointsBuilder {
-	b.ensureInitialized()
-	b.fields.KubeletEndpoint = &value
+func (b *NodeDaemonEndpointsBuilder) SetKubeletEndpoint(value *DaemonEndpointBuilder) *NodeDaemonEndpointsBuilder {
+	b.fields.KubeletEndpoint = value
 	return b
 }
 
 // RemoveKubeletEndpoint removes the KubeletEndpoint field from the declarative configuration.
-func (b NodeDaemonEndpointsBuilder) RemoveKubeletEndpoint() NodeDaemonEndpointsBuilder {
-	b.ensureInitialized()
+func (b *NodeDaemonEndpointsBuilder) RemoveKubeletEndpoint() *NodeDaemonEndpointsBuilder {
 	b.fields.KubeletEndpoint = nil
 	return b
 }
 
 // GetKubeletEndpoint gets the KubeletEndpoint field from the declarative configuration.
-func (b NodeDaemonEndpointsBuilder) GetKubeletEndpoint() (value DaemonEndpointBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.KubeletEndpoint; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *NodeDaemonEndpointsBuilder) GetKubeletEndpoint() (value *DaemonEndpointBuilder, ok bool) {
+	return b.fields.KubeletEndpoint, b.fields.KubeletEndpoint != nil
 }
 
 // ToUnstructured converts NodeDaemonEndpointsBuilder to unstructured.
@@ -80,9 +67,8 @@ func (b *NodeDaemonEndpointsBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +83,13 @@ func (b *NodeDaemonEndpointsBuilder) FromUnstructured(u map[string]interface{}) 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals NodeDaemonEndpointsBuilder to JSON.
 func (b *NodeDaemonEndpointsBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +97,7 @@ func (b *NodeDaemonEndpointsBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into NodeDaemonEndpointsBuilder, replacing the contents of
 // NodeDaemonEndpointsBuilder.
 func (b *NodeDaemonEndpointsBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +105,9 @@ func (b *NodeDaemonEndpointsBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // NodeDaemonEndpointsList represents a list of NodeDaemonEndpointsBuilder.
-// Provided as a convenience.
-type NodeDaemonEndpointsList []NodeDaemonEndpointsBuilder
+type NodeDaemonEndpointsList []*NodeDaemonEndpointsBuilder
 
 // NodeDaemonEndpointsList represents a map of NodeDaemonEndpointsBuilder.
-// Provided as a convenience.
 type NodeDaemonEndpointsMap map[string]NodeDaemonEndpointsBuilder
 
 func (b *NodeDaemonEndpointsBuilder) preMarshal() {

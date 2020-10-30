@@ -27,50 +27,40 @@ import (
 // AzureFileVolumeSourceBuilder represents an declarative configuration of the AzureFileVolumeSource type for use
 // with apply.
 type AzureFileVolumeSourceBuilder struct {
-	fields *azureFileVolumeSourceFields
+	fields azureFileVolumeSourceFields
 }
 
-// azureFileVolumeSourceFields is used by AzureFileVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in AzureFileVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in AzureFileVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// azureFileVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in AzureFileVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type azureFileVolumeSourceFields struct {
 	SecretName *string `json:"secretName,omitempty"`
 	ShareName  *string `json:"shareName,omitempty"`
 	ReadOnly   *bool   `json:"readOnly,omitempty"`
 }
 
-func (b *AzureFileVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &azureFileVolumeSourceFields{}
-	}
-}
-
 // AzureFileVolumeSource constructs an declarative configuration of the AzureFileVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func AzureFileVolumeSource() AzureFileVolumeSourceBuilder {
-	return AzureFileVolumeSourceBuilder{fields: &azureFileVolumeSourceFields{}}
+func AzureFileVolumeSource() *AzureFileVolumeSourceBuilder {
+	return &AzureFileVolumeSourceBuilder{}
 }
 
 // SetSecretName sets the SecretName field in the declarative configuration to the given value.
-func (b AzureFileVolumeSourceBuilder) SetSecretName(value string) AzureFileVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *AzureFileVolumeSourceBuilder) SetSecretName(value string) *AzureFileVolumeSourceBuilder {
 	b.fields.SecretName = &value
 	return b
 }
 
 // RemoveSecretName removes the SecretName field from the declarative configuration.
-func (b AzureFileVolumeSourceBuilder) RemoveSecretName() AzureFileVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *AzureFileVolumeSourceBuilder) RemoveSecretName() *AzureFileVolumeSourceBuilder {
 	b.fields.SecretName = nil
 	return b
 }
 
 // GetSecretName gets the SecretName field from the declarative configuration.
-func (b AzureFileVolumeSourceBuilder) GetSecretName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *AzureFileVolumeSourceBuilder) GetSecretName() (value string, ok bool) {
 	if v := b.fields.SecretName; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b AzureFileVolumeSourceBuilder) GetSecretName() (value string, ok bool) {
 }
 
 // SetShareName sets the ShareName field in the declarative configuration to the given value.
-func (b AzureFileVolumeSourceBuilder) SetShareName(value string) AzureFileVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *AzureFileVolumeSourceBuilder) SetShareName(value string) *AzureFileVolumeSourceBuilder {
 	b.fields.ShareName = &value
 	return b
 }
 
 // RemoveShareName removes the ShareName field from the declarative configuration.
-func (b AzureFileVolumeSourceBuilder) RemoveShareName() AzureFileVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *AzureFileVolumeSourceBuilder) RemoveShareName() *AzureFileVolumeSourceBuilder {
 	b.fields.ShareName = nil
 	return b
 }
 
 // GetShareName gets the ShareName field from the declarative configuration.
-func (b AzureFileVolumeSourceBuilder) GetShareName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *AzureFileVolumeSourceBuilder) GetShareName() (value string, ok bool) {
 	if v := b.fields.ShareName; v != nil {
 		return *v, true
 	}
@@ -101,22 +88,19 @@ func (b AzureFileVolumeSourceBuilder) GetShareName() (value string, ok bool) {
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b AzureFileVolumeSourceBuilder) SetReadOnly(value bool) AzureFileVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *AzureFileVolumeSourceBuilder) SetReadOnly(value bool) *AzureFileVolumeSourceBuilder {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b AzureFileVolumeSourceBuilder) RemoveReadOnly() AzureFileVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *AzureFileVolumeSourceBuilder) RemoveReadOnly() *AzureFileVolumeSourceBuilder {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b AzureFileVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *AzureFileVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
@@ -128,9 +112,8 @@ func (b *AzureFileVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +128,13 @@ func (b *AzureFileVolumeSourceBuilder) FromUnstructured(u map[string]interface{}
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals AzureFileVolumeSourceBuilder to JSON.
 func (b *AzureFileVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +142,7 @@ func (b *AzureFileVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into AzureFileVolumeSourceBuilder, replacing the contents of
 // AzureFileVolumeSourceBuilder.
 func (b *AzureFileVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +150,9 @@ func (b *AzureFileVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // AzureFileVolumeSourceList represents a list of AzureFileVolumeSourceBuilder.
-// Provided as a convenience.
-type AzureFileVolumeSourceList []AzureFileVolumeSourceBuilder
+type AzureFileVolumeSourceList []*AzureFileVolumeSourceBuilder
 
 // AzureFileVolumeSourceList represents a map of AzureFileVolumeSourceBuilder.
-// Provided as a convenience.
 type AzureFileVolumeSourceMap map[string]AzureFileVolumeSourceBuilder
 
 func (b *AzureFileVolumeSourceBuilder) preMarshal() {

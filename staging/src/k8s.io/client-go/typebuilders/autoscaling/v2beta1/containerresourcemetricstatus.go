@@ -29,14 +29,14 @@ import (
 // ContainerResourceMetricStatusBuilder represents an declarative configuration of the ContainerResourceMetricStatus type for use
 // with apply.
 type ContainerResourceMetricStatusBuilder struct {
-	fields *containerResourceMetricStatusFields
+	fields containerResourceMetricStatusFields
 }
 
-// containerResourceMetricStatusFields is used by ContainerResourceMetricStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ContainerResourceMetricStatusBuilder before marshalling, and
-// are copied out to the builder type in ContainerResourceMetricStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// containerResourceMetricStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ContainerResourceMetricStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type containerResourceMetricStatusFields struct {
 	Name                      *v1.ResourceName   `json:"name,omitempty"`
 	CurrentAverageUtilization *int32             `json:"currentAverageUtilization,omitempty"`
@@ -44,36 +44,26 @@ type containerResourceMetricStatusFields struct {
 	Container                 *string            `json:"container,omitempty"`
 }
 
-func (b *ContainerResourceMetricStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &containerResourceMetricStatusFields{}
-	}
-}
-
 // ContainerResourceMetricStatus constructs an declarative configuration of the ContainerResourceMetricStatus type for use with
 // apply.
-// Provided as a convenience.
-func ContainerResourceMetricStatus() ContainerResourceMetricStatusBuilder {
-	return ContainerResourceMetricStatusBuilder{fields: &containerResourceMetricStatusFields{}}
+func ContainerResourceMetricStatus() *ContainerResourceMetricStatusBuilder {
+	return &ContainerResourceMetricStatusBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b ContainerResourceMetricStatusBuilder) SetName(value v1.ResourceName) ContainerResourceMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerResourceMetricStatusBuilder) SetName(value v1.ResourceName) *ContainerResourceMetricStatusBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b ContainerResourceMetricStatusBuilder) RemoveName() ContainerResourceMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerResourceMetricStatusBuilder) RemoveName() *ContainerResourceMetricStatusBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b ContainerResourceMetricStatusBuilder) GetName() (value v1.ResourceName, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerResourceMetricStatusBuilder) GetName() (value v1.ResourceName, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -81,22 +71,19 @@ func (b ContainerResourceMetricStatusBuilder) GetName() (value v1.ResourceName, 
 }
 
 // SetCurrentAverageUtilization sets the CurrentAverageUtilization field in the declarative configuration to the given value.
-func (b ContainerResourceMetricStatusBuilder) SetCurrentAverageUtilization(value int32) ContainerResourceMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerResourceMetricStatusBuilder) SetCurrentAverageUtilization(value int32) *ContainerResourceMetricStatusBuilder {
 	b.fields.CurrentAverageUtilization = &value
 	return b
 }
 
 // RemoveCurrentAverageUtilization removes the CurrentAverageUtilization field from the declarative configuration.
-func (b ContainerResourceMetricStatusBuilder) RemoveCurrentAverageUtilization() ContainerResourceMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerResourceMetricStatusBuilder) RemoveCurrentAverageUtilization() *ContainerResourceMetricStatusBuilder {
 	b.fields.CurrentAverageUtilization = nil
 	return b
 }
 
 // GetCurrentAverageUtilization gets the CurrentAverageUtilization field from the declarative configuration.
-func (b ContainerResourceMetricStatusBuilder) GetCurrentAverageUtilization() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerResourceMetricStatusBuilder) GetCurrentAverageUtilization() (value int32, ok bool) {
 	if v := b.fields.CurrentAverageUtilization; v != nil {
 		return *v, true
 	}
@@ -104,22 +91,19 @@ func (b ContainerResourceMetricStatusBuilder) GetCurrentAverageUtilization() (va
 }
 
 // SetCurrentAverageValue sets the CurrentAverageValue field in the declarative configuration to the given value.
-func (b ContainerResourceMetricStatusBuilder) SetCurrentAverageValue(value resource.Quantity) ContainerResourceMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerResourceMetricStatusBuilder) SetCurrentAverageValue(value resource.Quantity) *ContainerResourceMetricStatusBuilder {
 	b.fields.CurrentAverageValue = &value
 	return b
 }
 
 // RemoveCurrentAverageValue removes the CurrentAverageValue field from the declarative configuration.
-func (b ContainerResourceMetricStatusBuilder) RemoveCurrentAverageValue() ContainerResourceMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerResourceMetricStatusBuilder) RemoveCurrentAverageValue() *ContainerResourceMetricStatusBuilder {
 	b.fields.CurrentAverageValue = nil
 	return b
 }
 
 // GetCurrentAverageValue gets the CurrentAverageValue field from the declarative configuration.
-func (b ContainerResourceMetricStatusBuilder) GetCurrentAverageValue() (value resource.Quantity, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerResourceMetricStatusBuilder) GetCurrentAverageValue() (value resource.Quantity, ok bool) {
 	if v := b.fields.CurrentAverageValue; v != nil {
 		return *v, true
 	}
@@ -127,22 +111,19 @@ func (b ContainerResourceMetricStatusBuilder) GetCurrentAverageValue() (value re
 }
 
 // SetContainer sets the Container field in the declarative configuration to the given value.
-func (b ContainerResourceMetricStatusBuilder) SetContainer(value string) ContainerResourceMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerResourceMetricStatusBuilder) SetContainer(value string) *ContainerResourceMetricStatusBuilder {
 	b.fields.Container = &value
 	return b
 }
 
 // RemoveContainer removes the Container field from the declarative configuration.
-func (b ContainerResourceMetricStatusBuilder) RemoveContainer() ContainerResourceMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *ContainerResourceMetricStatusBuilder) RemoveContainer() *ContainerResourceMetricStatusBuilder {
 	b.fields.Container = nil
 	return b
 }
 
 // GetContainer gets the Container field from the declarative configuration.
-func (b ContainerResourceMetricStatusBuilder) GetContainer() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerResourceMetricStatusBuilder) GetContainer() (value string, ok bool) {
 	if v := b.fields.Container; v != nil {
 		return *v, true
 	}
@@ -154,9 +135,8 @@ func (b *ContainerResourceMetricStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -171,14 +151,13 @@ func (b *ContainerResourceMetricStatusBuilder) FromUnstructured(u map[string]int
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ContainerResourceMetricStatusBuilder to JSON.
 func (b *ContainerResourceMetricStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -186,8 +165,7 @@ func (b *ContainerResourceMetricStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ContainerResourceMetricStatusBuilder, replacing the contents of
 // ContainerResourceMetricStatusBuilder.
 func (b *ContainerResourceMetricStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -195,11 +173,9 @@ func (b *ContainerResourceMetricStatusBuilder) UnmarshalJSON(data []byte) error 
 }
 
 // ContainerResourceMetricStatusList represents a list of ContainerResourceMetricStatusBuilder.
-// Provided as a convenience.
-type ContainerResourceMetricStatusList []ContainerResourceMetricStatusBuilder
+type ContainerResourceMetricStatusList []*ContainerResourceMetricStatusBuilder
 
 // ContainerResourceMetricStatusList represents a map of ContainerResourceMetricStatusBuilder.
-// Provided as a convenience.
 type ContainerResourceMetricStatusMap map[string]ContainerResourceMetricStatusBuilder
 
 func (b *ContainerResourceMetricStatusBuilder) preMarshal() {

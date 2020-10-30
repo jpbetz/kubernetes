@@ -28,15 +28,15 @@ import (
 // PriorityLevelConfigurationBuilder represents an declarative configuration of the PriorityLevelConfiguration type for use
 // with apply.
 type PriorityLevelConfigurationBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *priorityLevelConfigurationFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   priorityLevelConfigurationFields
 }
 
-// priorityLevelConfigurationFields is used by PriorityLevelConfigurationBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PriorityLevelConfigurationBuilder before marshalling, and
-// are copied out to the builder type in PriorityLevelConfigurationBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// priorityLevelConfigurationFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PriorityLevelConfigurationBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type priorityLevelConfigurationFields struct {
 	Kind       *string                                  `json:"kind,omitempty"`       // inlined PriorityLevelConfigurationBuilder.typeMeta.Kind field
 	APIVersion *string                                  `json:"apiVersion,omitempty"` // inlined PriorityLevelConfigurationBuilder.typeMeta.APIVersion field
@@ -45,106 +45,78 @@ type priorityLevelConfigurationFields struct {
 	Status     *PriorityLevelConfigurationStatusBuilder `json:"status,omitempty"`
 }
 
-func (b *PriorityLevelConfigurationBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &priorityLevelConfigurationFields{}
-	}
-}
-
 // PriorityLevelConfiguration constructs an declarative configuration of the PriorityLevelConfiguration type for use with
 // apply.
-// Provided as a convenience.
-func PriorityLevelConfiguration() PriorityLevelConfigurationBuilder {
-	return PriorityLevelConfigurationBuilder{fields: &priorityLevelConfigurationFields{}}
+func PriorityLevelConfiguration() *PriorityLevelConfigurationBuilder {
+	return &PriorityLevelConfigurationBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b PriorityLevelConfigurationBuilder) SetTypeMeta(value v1.TypeMetaBuilder) PriorityLevelConfigurationBuilder {
-	b.ensureInitialized()
+func (b *PriorityLevelConfigurationBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *PriorityLevelConfigurationBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b PriorityLevelConfigurationBuilder) RemoveTypeMeta() PriorityLevelConfigurationBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *PriorityLevelConfigurationBuilder) RemoveTypeMeta() *PriorityLevelConfigurationBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b PriorityLevelConfigurationBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *PriorityLevelConfigurationBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b PriorityLevelConfigurationBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) PriorityLevelConfigurationBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *PriorityLevelConfigurationBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *PriorityLevelConfigurationBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b PriorityLevelConfigurationBuilder) RemoveObjectMeta() PriorityLevelConfigurationBuilder {
-	b.ensureInitialized()
+func (b *PriorityLevelConfigurationBuilder) RemoveObjectMeta() *PriorityLevelConfigurationBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b PriorityLevelConfigurationBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PriorityLevelConfigurationBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b PriorityLevelConfigurationBuilder) SetSpec(value PriorityLevelConfigurationSpecBuilder) PriorityLevelConfigurationBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *PriorityLevelConfigurationBuilder) SetSpec(value *PriorityLevelConfigurationSpecBuilder) *PriorityLevelConfigurationBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b PriorityLevelConfigurationBuilder) RemoveSpec() PriorityLevelConfigurationBuilder {
-	b.ensureInitialized()
+func (b *PriorityLevelConfigurationBuilder) RemoveSpec() *PriorityLevelConfigurationBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b PriorityLevelConfigurationBuilder) GetSpec() (value PriorityLevelConfigurationSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PriorityLevelConfigurationBuilder) GetSpec() (value *PriorityLevelConfigurationSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b PriorityLevelConfigurationBuilder) SetStatus(value PriorityLevelConfigurationStatusBuilder) PriorityLevelConfigurationBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *PriorityLevelConfigurationBuilder) SetStatus(value *PriorityLevelConfigurationStatusBuilder) *PriorityLevelConfigurationBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b PriorityLevelConfigurationBuilder) RemoveStatus() PriorityLevelConfigurationBuilder {
-	b.ensureInitialized()
+func (b *PriorityLevelConfigurationBuilder) RemoveStatus() *PriorityLevelConfigurationBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b PriorityLevelConfigurationBuilder) GetStatus() (value PriorityLevelConfigurationStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *PriorityLevelConfigurationBuilder) GetStatus() (value *PriorityLevelConfigurationStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts PriorityLevelConfigurationBuilder to unstructured.
@@ -152,9 +124,8 @@ func (b *PriorityLevelConfigurationBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *PriorityLevelConfigurationBuilder) FromUnstructured(u map[string]interf
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PriorityLevelConfigurationBuilder to JSON.
 func (b *PriorityLevelConfigurationBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *PriorityLevelConfigurationBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PriorityLevelConfigurationBuilder, replacing the contents of
 // PriorityLevelConfigurationBuilder.
 func (b *PriorityLevelConfigurationBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +162,25 @@ func (b *PriorityLevelConfigurationBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PriorityLevelConfigurationList represents a list of PriorityLevelConfigurationBuilder.
-// Provided as a convenience.
-type PriorityLevelConfigurationList []PriorityLevelConfigurationBuilder
+type PriorityLevelConfigurationList []*PriorityLevelConfigurationBuilder
 
 // PriorityLevelConfigurationList represents a map of PriorityLevelConfigurationBuilder.
-// Provided as a convenience.
 type PriorityLevelConfigurationMap map[string]PriorityLevelConfigurationBuilder
 
 func (b *PriorityLevelConfigurationBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *PriorityLevelConfigurationBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

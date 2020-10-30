@@ -27,14 +27,14 @@ import (
 // FCVolumeSourceBuilder represents an declarative configuration of the FCVolumeSource type for use
 // with apply.
 type FCVolumeSourceBuilder struct {
-	fields *fCVolumeSourceFields
+	fields fCVolumeSourceFields
 }
 
-// fCVolumeSourceFields is used by FCVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in FCVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in FCVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// fCVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in FCVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type fCVolumeSourceFields struct {
 	TargetWWNs *[]string `json:"targetWWNs,omitempty"`
 	Lun        *int32    `json:"lun,omitempty"`
@@ -43,36 +43,26 @@ type fCVolumeSourceFields struct {
 	WWIDs      *[]string `json:"wwids,omitempty"`
 }
 
-func (b *FCVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &fCVolumeSourceFields{}
-	}
-}
-
 // FCVolumeSource constructs an declarative configuration of the FCVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func FCVolumeSource() FCVolumeSourceBuilder {
-	return FCVolumeSourceBuilder{fields: &fCVolumeSourceFields{}}
+func FCVolumeSource() *FCVolumeSourceBuilder {
+	return &FCVolumeSourceBuilder{}
 }
 
 // SetTargetWWNs sets the TargetWWNs field in the declarative configuration to the given value.
-func (b FCVolumeSourceBuilder) SetTargetWWNs(value []string) FCVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FCVolumeSourceBuilder) SetTargetWWNs(value []string) *FCVolumeSourceBuilder {
 	b.fields.TargetWWNs = &value
 	return b
 }
 
 // RemoveTargetWWNs removes the TargetWWNs field from the declarative configuration.
-func (b FCVolumeSourceBuilder) RemoveTargetWWNs() FCVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FCVolumeSourceBuilder) RemoveTargetWWNs() *FCVolumeSourceBuilder {
 	b.fields.TargetWWNs = nil
 	return b
 }
 
 // GetTargetWWNs gets the TargetWWNs field from the declarative configuration.
-func (b FCVolumeSourceBuilder) GetTargetWWNs() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *FCVolumeSourceBuilder) GetTargetWWNs() (value []string, ok bool) {
 	if v := b.fields.TargetWWNs; v != nil {
 		return *v, true
 	}
@@ -80,22 +70,19 @@ func (b FCVolumeSourceBuilder) GetTargetWWNs() (value []string, ok bool) {
 }
 
 // SetLun sets the Lun field in the declarative configuration to the given value.
-func (b FCVolumeSourceBuilder) SetLun(value int32) FCVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FCVolumeSourceBuilder) SetLun(value int32) *FCVolumeSourceBuilder {
 	b.fields.Lun = &value
 	return b
 }
 
 // RemoveLun removes the Lun field from the declarative configuration.
-func (b FCVolumeSourceBuilder) RemoveLun() FCVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FCVolumeSourceBuilder) RemoveLun() *FCVolumeSourceBuilder {
 	b.fields.Lun = nil
 	return b
 }
 
 // GetLun gets the Lun field from the declarative configuration.
-func (b FCVolumeSourceBuilder) GetLun() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *FCVolumeSourceBuilder) GetLun() (value int32, ok bool) {
 	if v := b.fields.Lun; v != nil {
 		return *v, true
 	}
@@ -103,22 +90,19 @@ func (b FCVolumeSourceBuilder) GetLun() (value int32, ok bool) {
 }
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
-func (b FCVolumeSourceBuilder) SetFSType(value string) FCVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FCVolumeSourceBuilder) SetFSType(value string) *FCVolumeSourceBuilder {
 	b.fields.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
-func (b FCVolumeSourceBuilder) RemoveFSType() FCVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FCVolumeSourceBuilder) RemoveFSType() *FCVolumeSourceBuilder {
 	b.fields.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
-func (b FCVolumeSourceBuilder) GetFSType() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *FCVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 	if v := b.fields.FSType; v != nil {
 		return *v, true
 	}
@@ -126,22 +110,19 @@ func (b FCVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b FCVolumeSourceBuilder) SetReadOnly(value bool) FCVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FCVolumeSourceBuilder) SetReadOnly(value bool) *FCVolumeSourceBuilder {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b FCVolumeSourceBuilder) RemoveReadOnly() FCVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FCVolumeSourceBuilder) RemoveReadOnly() *FCVolumeSourceBuilder {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b FCVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *FCVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
@@ -149,22 +130,19 @@ func (b FCVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
 }
 
 // SetWWIDs sets the WWIDs field in the declarative configuration to the given value.
-func (b FCVolumeSourceBuilder) SetWWIDs(value []string) FCVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FCVolumeSourceBuilder) SetWWIDs(value []string) *FCVolumeSourceBuilder {
 	b.fields.WWIDs = &value
 	return b
 }
 
 // RemoveWWIDs removes the WWIDs field from the declarative configuration.
-func (b FCVolumeSourceBuilder) RemoveWWIDs() FCVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *FCVolumeSourceBuilder) RemoveWWIDs() *FCVolumeSourceBuilder {
 	b.fields.WWIDs = nil
 	return b
 }
 
 // GetWWIDs gets the WWIDs field from the declarative configuration.
-func (b FCVolumeSourceBuilder) GetWWIDs() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *FCVolumeSourceBuilder) GetWWIDs() (value []string, ok bool) {
 	if v := b.fields.WWIDs; v != nil {
 		return *v, true
 	}
@@ -176,9 +154,8 @@ func (b *FCVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -193,14 +170,13 @@ func (b *FCVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) error
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals FCVolumeSourceBuilder to JSON.
 func (b *FCVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -208,8 +184,7 @@ func (b *FCVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into FCVolumeSourceBuilder, replacing the contents of
 // FCVolumeSourceBuilder.
 func (b *FCVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -217,11 +192,9 @@ func (b *FCVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // FCVolumeSourceList represents a list of FCVolumeSourceBuilder.
-// Provided as a convenience.
-type FCVolumeSourceList []FCVolumeSourceBuilder
+type FCVolumeSourceList []*FCVolumeSourceBuilder
 
 // FCVolumeSourceList represents a map of FCVolumeSourceBuilder.
-// Provided as a convenience.
 type FCVolumeSourceMap map[string]FCVolumeSourceBuilder
 
 func (b *FCVolumeSourceBuilder) preMarshal() {

@@ -30,14 +30,14 @@ import (
 // DeploymentConditionBuilder represents an declarative configuration of the DeploymentCondition type for use
 // with apply.
 type DeploymentConditionBuilder struct {
-	fields *deploymentConditionFields
+	fields deploymentConditionFields
 }
 
-// deploymentConditionFields is used by DeploymentConditionBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in DeploymentConditionBuilder before marshalling, and
-// are copied out to the builder type in DeploymentConditionBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// deploymentConditionFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in DeploymentConditionBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type deploymentConditionFields struct {
 	Type               *v1beta1.DeploymentConditionType `json:"type,omitempty"`
 	Status             *v1.ConditionStatus              `json:"status,omitempty"`
@@ -47,36 +47,26 @@ type deploymentConditionFields struct {
 	Message            *string                          `json:"message,omitempty"`
 }
 
-func (b *DeploymentConditionBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &deploymentConditionFields{}
-	}
-}
-
 // DeploymentCondition constructs an declarative configuration of the DeploymentCondition type for use with
 // apply.
-// Provided as a convenience.
-func DeploymentCondition() DeploymentConditionBuilder {
-	return DeploymentConditionBuilder{fields: &deploymentConditionFields{}}
+func DeploymentCondition() *DeploymentConditionBuilder {
+	return &DeploymentConditionBuilder{}
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b DeploymentConditionBuilder) SetType(value v1beta1.DeploymentConditionType) DeploymentConditionBuilder {
-	b.ensureInitialized()
+func (b *DeploymentConditionBuilder) SetType(value v1beta1.DeploymentConditionType) *DeploymentConditionBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b DeploymentConditionBuilder) RemoveType() DeploymentConditionBuilder {
-	b.ensureInitialized()
+func (b *DeploymentConditionBuilder) RemoveType() *DeploymentConditionBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b DeploymentConditionBuilder) GetType() (value v1beta1.DeploymentConditionType, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentConditionBuilder) GetType() (value v1beta1.DeploymentConditionType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -84,22 +74,19 @@ func (b DeploymentConditionBuilder) GetType() (value v1beta1.DeploymentCondition
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b DeploymentConditionBuilder) SetStatus(value v1.ConditionStatus) DeploymentConditionBuilder {
-	b.ensureInitialized()
+func (b *DeploymentConditionBuilder) SetStatus(value v1.ConditionStatus) *DeploymentConditionBuilder {
 	b.fields.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b DeploymentConditionBuilder) RemoveStatus() DeploymentConditionBuilder {
-	b.ensureInitialized()
+func (b *DeploymentConditionBuilder) RemoveStatus() *DeploymentConditionBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b DeploymentConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
 	if v := b.fields.Status; v != nil {
 		return *v, true
 	}
@@ -107,22 +94,19 @@ func (b DeploymentConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bo
 }
 
 // SetLastUpdateTime sets the LastUpdateTime field in the declarative configuration to the given value.
-func (b DeploymentConditionBuilder) SetLastUpdateTime(value metav1.Time) DeploymentConditionBuilder {
-	b.ensureInitialized()
+func (b *DeploymentConditionBuilder) SetLastUpdateTime(value metav1.Time) *DeploymentConditionBuilder {
 	b.fields.LastUpdateTime = &value
 	return b
 }
 
 // RemoveLastUpdateTime removes the LastUpdateTime field from the declarative configuration.
-func (b DeploymentConditionBuilder) RemoveLastUpdateTime() DeploymentConditionBuilder {
-	b.ensureInitialized()
+func (b *DeploymentConditionBuilder) RemoveLastUpdateTime() *DeploymentConditionBuilder {
 	b.fields.LastUpdateTime = nil
 	return b
 }
 
 // GetLastUpdateTime gets the LastUpdateTime field from the declarative configuration.
-func (b DeploymentConditionBuilder) GetLastUpdateTime() (value metav1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentConditionBuilder) GetLastUpdateTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastUpdateTime; v != nil {
 		return *v, true
 	}
@@ -130,22 +114,19 @@ func (b DeploymentConditionBuilder) GetLastUpdateTime() (value metav1.Time, ok b
 }
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
-func (b DeploymentConditionBuilder) SetLastTransitionTime(value metav1.Time) DeploymentConditionBuilder {
-	b.ensureInitialized()
+func (b *DeploymentConditionBuilder) SetLastTransitionTime(value metav1.Time) *DeploymentConditionBuilder {
 	b.fields.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
-func (b DeploymentConditionBuilder) RemoveLastTransitionTime() DeploymentConditionBuilder {
-	b.ensureInitialized()
+func (b *DeploymentConditionBuilder) RemoveLastTransitionTime() *DeploymentConditionBuilder {
 	b.fields.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
-func (b DeploymentConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastTransitionTime; v != nil {
 		return *v, true
 	}
@@ -153,22 +134,19 @@ func (b DeploymentConditionBuilder) GetLastTransitionTime() (value metav1.Time, 
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b DeploymentConditionBuilder) SetReason(value string) DeploymentConditionBuilder {
-	b.ensureInitialized()
+func (b *DeploymentConditionBuilder) SetReason(value string) *DeploymentConditionBuilder {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b DeploymentConditionBuilder) RemoveReason() DeploymentConditionBuilder {
-	b.ensureInitialized()
+func (b *DeploymentConditionBuilder) RemoveReason() *DeploymentConditionBuilder {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b DeploymentConditionBuilder) GetReason() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentConditionBuilder) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -176,22 +154,19 @@ func (b DeploymentConditionBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b DeploymentConditionBuilder) SetMessage(value string) DeploymentConditionBuilder {
-	b.ensureInitialized()
+func (b *DeploymentConditionBuilder) SetMessage(value string) *DeploymentConditionBuilder {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b DeploymentConditionBuilder) RemoveMessage() DeploymentConditionBuilder {
-	b.ensureInitialized()
+func (b *DeploymentConditionBuilder) RemoveMessage() *DeploymentConditionBuilder {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b DeploymentConditionBuilder) GetMessage() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *DeploymentConditionBuilder) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
@@ -203,9 +178,8 @@ func (b *DeploymentConditionBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -220,14 +194,13 @@ func (b *DeploymentConditionBuilder) FromUnstructured(u map[string]interface{}) 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals DeploymentConditionBuilder to JSON.
 func (b *DeploymentConditionBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -235,8 +208,7 @@ func (b *DeploymentConditionBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into DeploymentConditionBuilder, replacing the contents of
 // DeploymentConditionBuilder.
 func (b *DeploymentConditionBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -244,11 +216,9 @@ func (b *DeploymentConditionBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // DeploymentConditionList represents a list of DeploymentConditionBuilder.
-// Provided as a convenience.
-type DeploymentConditionList []DeploymentConditionBuilder
+type DeploymentConditionList []*DeploymentConditionBuilder
 
 // DeploymentConditionList represents a map of DeploymentConditionBuilder.
-// Provided as a convenience.
 type DeploymentConditionMap map[string]DeploymentConditionBuilder
 
 func (b *DeploymentConditionBuilder) preMarshal() {

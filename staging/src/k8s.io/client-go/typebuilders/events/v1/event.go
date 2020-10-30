@@ -30,15 +30,15 @@ import (
 // EventBuilder represents an declarative configuration of the Event type for use
 // with apply.
 type EventBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *eventFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   eventFields
 }
 
-// eventFields is used by EventBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in EventBuilder before marshalling, and
-// are copied out to the builder type in EventBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// eventFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in EventBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type eventFields struct {
 	Kind                     *string                        `json:"kind,omitempty"`       // inlined EventBuilder.typeMeta.Kind field
 	APIVersion               *string                        `json:"apiVersion,omitempty"` // inlined EventBuilder.typeMeta.APIVersion field
@@ -59,79 +59,60 @@ type eventFields struct {
 	DeprecatedCount          *int32                         `json:"deprecatedCount,omitempty"`
 }
 
-func (b *EventBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &eventFields{}
-	}
-}
-
 // Event constructs an declarative configuration of the Event type for use with
 // apply.
-// Provided as a convenience.
-func Event() EventBuilder {
-	return EventBuilder{fields: &eventFields{}}
+func Event() *EventBuilder {
+	return &EventBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b EventBuilder) SetTypeMeta(value v1.TypeMetaBuilder) EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *EventBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b EventBuilder) RemoveTypeMeta() EventBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *EventBuilder) RemoveTypeMeta() *EventBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b EventBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *EventBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b EventBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) EventBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *EventBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *EventBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b EventBuilder) RemoveObjectMeta() EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) RemoveObjectMeta() *EventBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b EventBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *EventBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetEventTime sets the EventTime field in the declarative configuration to the given value.
-func (b EventBuilder) SetEventTime(value metav1.MicroTime) EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) SetEventTime(value metav1.MicroTime) *EventBuilder {
 	b.fields.EventTime = &value
 	return b
 }
 
 // RemoveEventTime removes the EventTime field from the declarative configuration.
-func (b EventBuilder) RemoveEventTime() EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) RemoveEventTime() *EventBuilder {
 	b.fields.EventTime = nil
 	return b
 }
 
 // GetEventTime gets the EventTime field from the declarative configuration.
-func (b EventBuilder) GetEventTime() (value metav1.MicroTime, ok bool) {
-	b.ensureInitialized()
+func (b *EventBuilder) GetEventTime() (value metav1.MicroTime, ok bool) {
 	if v := b.fields.EventTime; v != nil {
 		return *v, true
 	}
@@ -139,45 +120,36 @@ func (b EventBuilder) GetEventTime() (value metav1.MicroTime, ok bool) {
 }
 
 // SetSeries sets the Series field in the declarative configuration to the given value.
-func (b EventBuilder) SetSeries(value EventSeriesBuilder) EventBuilder {
-	b.ensureInitialized()
-	b.fields.Series = &value
+func (b *EventBuilder) SetSeries(value *EventSeriesBuilder) *EventBuilder {
+	b.fields.Series = value
 	return b
 }
 
 // RemoveSeries removes the Series field from the declarative configuration.
-func (b EventBuilder) RemoveSeries() EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) RemoveSeries() *EventBuilder {
 	b.fields.Series = nil
 	return b
 }
 
 // GetSeries gets the Series field from the declarative configuration.
-func (b EventBuilder) GetSeries() (value EventSeriesBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Series; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *EventBuilder) GetSeries() (value *EventSeriesBuilder, ok bool) {
+	return b.fields.Series, b.fields.Series != nil
 }
 
 // SetReportingController sets the ReportingController field in the declarative configuration to the given value.
-func (b EventBuilder) SetReportingController(value string) EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) SetReportingController(value string) *EventBuilder {
 	b.fields.ReportingController = &value
 	return b
 }
 
 // RemoveReportingController removes the ReportingController field from the declarative configuration.
-func (b EventBuilder) RemoveReportingController() EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) RemoveReportingController() *EventBuilder {
 	b.fields.ReportingController = nil
 	return b
 }
 
 // GetReportingController gets the ReportingController field from the declarative configuration.
-func (b EventBuilder) GetReportingController() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *EventBuilder) GetReportingController() (value string, ok bool) {
 	if v := b.fields.ReportingController; v != nil {
 		return *v, true
 	}
@@ -185,22 +157,19 @@ func (b EventBuilder) GetReportingController() (value string, ok bool) {
 }
 
 // SetReportingInstance sets the ReportingInstance field in the declarative configuration to the given value.
-func (b EventBuilder) SetReportingInstance(value string) EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) SetReportingInstance(value string) *EventBuilder {
 	b.fields.ReportingInstance = &value
 	return b
 }
 
 // RemoveReportingInstance removes the ReportingInstance field from the declarative configuration.
-func (b EventBuilder) RemoveReportingInstance() EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) RemoveReportingInstance() *EventBuilder {
 	b.fields.ReportingInstance = nil
 	return b
 }
 
 // GetReportingInstance gets the ReportingInstance field from the declarative configuration.
-func (b EventBuilder) GetReportingInstance() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *EventBuilder) GetReportingInstance() (value string, ok bool) {
 	if v := b.fields.ReportingInstance; v != nil {
 		return *v, true
 	}
@@ -208,22 +177,19 @@ func (b EventBuilder) GetReportingInstance() (value string, ok bool) {
 }
 
 // SetAction sets the Action field in the declarative configuration to the given value.
-func (b EventBuilder) SetAction(value string) EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) SetAction(value string) *EventBuilder {
 	b.fields.Action = &value
 	return b
 }
 
 // RemoveAction removes the Action field from the declarative configuration.
-func (b EventBuilder) RemoveAction() EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) RemoveAction() *EventBuilder {
 	b.fields.Action = nil
 	return b
 }
 
 // GetAction gets the Action field from the declarative configuration.
-func (b EventBuilder) GetAction() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *EventBuilder) GetAction() (value string, ok bool) {
 	if v := b.fields.Action; v != nil {
 		return *v, true
 	}
@@ -231,22 +197,19 @@ func (b EventBuilder) GetAction() (value string, ok bool) {
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b EventBuilder) SetReason(value string) EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) SetReason(value string) *EventBuilder {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b EventBuilder) RemoveReason() EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) RemoveReason() *EventBuilder {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b EventBuilder) GetReason() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *EventBuilder) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -254,68 +217,53 @@ func (b EventBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetRegarding sets the Regarding field in the declarative configuration to the given value.
-func (b EventBuilder) SetRegarding(value corev1.ObjectReferenceBuilder) EventBuilder {
-	b.ensureInitialized()
-	b.fields.Regarding = &value
+func (b *EventBuilder) SetRegarding(value *corev1.ObjectReferenceBuilder) *EventBuilder {
+	b.fields.Regarding = value
 	return b
 }
 
 // RemoveRegarding removes the Regarding field from the declarative configuration.
-func (b EventBuilder) RemoveRegarding() EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) RemoveRegarding() *EventBuilder {
 	b.fields.Regarding = nil
 	return b
 }
 
 // GetRegarding gets the Regarding field from the declarative configuration.
-func (b EventBuilder) GetRegarding() (value corev1.ObjectReferenceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Regarding; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *EventBuilder) GetRegarding() (value *corev1.ObjectReferenceBuilder, ok bool) {
+	return b.fields.Regarding, b.fields.Regarding != nil
 }
 
 // SetRelated sets the Related field in the declarative configuration to the given value.
-func (b EventBuilder) SetRelated(value corev1.ObjectReferenceBuilder) EventBuilder {
-	b.ensureInitialized()
-	b.fields.Related = &value
+func (b *EventBuilder) SetRelated(value *corev1.ObjectReferenceBuilder) *EventBuilder {
+	b.fields.Related = value
 	return b
 }
 
 // RemoveRelated removes the Related field from the declarative configuration.
-func (b EventBuilder) RemoveRelated() EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) RemoveRelated() *EventBuilder {
 	b.fields.Related = nil
 	return b
 }
 
 // GetRelated gets the Related field from the declarative configuration.
-func (b EventBuilder) GetRelated() (value corev1.ObjectReferenceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Related; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *EventBuilder) GetRelated() (value *corev1.ObjectReferenceBuilder, ok bool) {
+	return b.fields.Related, b.fields.Related != nil
 }
 
 // SetNote sets the Note field in the declarative configuration to the given value.
-func (b EventBuilder) SetNote(value string) EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) SetNote(value string) *EventBuilder {
 	b.fields.Note = &value
 	return b
 }
 
 // RemoveNote removes the Note field from the declarative configuration.
-func (b EventBuilder) RemoveNote() EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) RemoveNote() *EventBuilder {
 	b.fields.Note = nil
 	return b
 }
 
 // GetNote gets the Note field from the declarative configuration.
-func (b EventBuilder) GetNote() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *EventBuilder) GetNote() (value string, ok bool) {
 	if v := b.fields.Note; v != nil {
 		return *v, true
 	}
@@ -323,22 +271,19 @@ func (b EventBuilder) GetNote() (value string, ok bool) {
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b EventBuilder) SetType(value string) EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) SetType(value string) *EventBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b EventBuilder) RemoveType() EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) RemoveType() *EventBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b EventBuilder) GetType() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *EventBuilder) GetType() (value string, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -346,45 +291,36 @@ func (b EventBuilder) GetType() (value string, ok bool) {
 }
 
 // SetDeprecatedSource sets the DeprecatedSource field in the declarative configuration to the given value.
-func (b EventBuilder) SetDeprecatedSource(value corev1.EventSourceBuilder) EventBuilder {
-	b.ensureInitialized()
-	b.fields.DeprecatedSource = &value
+func (b *EventBuilder) SetDeprecatedSource(value *corev1.EventSourceBuilder) *EventBuilder {
+	b.fields.DeprecatedSource = value
 	return b
 }
 
 // RemoveDeprecatedSource removes the DeprecatedSource field from the declarative configuration.
-func (b EventBuilder) RemoveDeprecatedSource() EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) RemoveDeprecatedSource() *EventBuilder {
 	b.fields.DeprecatedSource = nil
 	return b
 }
 
 // GetDeprecatedSource gets the DeprecatedSource field from the declarative configuration.
-func (b EventBuilder) GetDeprecatedSource() (value corev1.EventSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.DeprecatedSource; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *EventBuilder) GetDeprecatedSource() (value *corev1.EventSourceBuilder, ok bool) {
+	return b.fields.DeprecatedSource, b.fields.DeprecatedSource != nil
 }
 
 // SetDeprecatedFirstTimestamp sets the DeprecatedFirstTimestamp field in the declarative configuration to the given value.
-func (b EventBuilder) SetDeprecatedFirstTimestamp(value metav1.Time) EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) SetDeprecatedFirstTimestamp(value metav1.Time) *EventBuilder {
 	b.fields.DeprecatedFirstTimestamp = &value
 	return b
 }
 
 // RemoveDeprecatedFirstTimestamp removes the DeprecatedFirstTimestamp field from the declarative configuration.
-func (b EventBuilder) RemoveDeprecatedFirstTimestamp() EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) RemoveDeprecatedFirstTimestamp() *EventBuilder {
 	b.fields.DeprecatedFirstTimestamp = nil
 	return b
 }
 
 // GetDeprecatedFirstTimestamp gets the DeprecatedFirstTimestamp field from the declarative configuration.
-func (b EventBuilder) GetDeprecatedFirstTimestamp() (value metav1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *EventBuilder) GetDeprecatedFirstTimestamp() (value metav1.Time, ok bool) {
 	if v := b.fields.DeprecatedFirstTimestamp; v != nil {
 		return *v, true
 	}
@@ -392,22 +328,19 @@ func (b EventBuilder) GetDeprecatedFirstTimestamp() (value metav1.Time, ok bool)
 }
 
 // SetDeprecatedLastTimestamp sets the DeprecatedLastTimestamp field in the declarative configuration to the given value.
-func (b EventBuilder) SetDeprecatedLastTimestamp(value metav1.Time) EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) SetDeprecatedLastTimestamp(value metav1.Time) *EventBuilder {
 	b.fields.DeprecatedLastTimestamp = &value
 	return b
 }
 
 // RemoveDeprecatedLastTimestamp removes the DeprecatedLastTimestamp field from the declarative configuration.
-func (b EventBuilder) RemoveDeprecatedLastTimestamp() EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) RemoveDeprecatedLastTimestamp() *EventBuilder {
 	b.fields.DeprecatedLastTimestamp = nil
 	return b
 }
 
 // GetDeprecatedLastTimestamp gets the DeprecatedLastTimestamp field from the declarative configuration.
-func (b EventBuilder) GetDeprecatedLastTimestamp() (value metav1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *EventBuilder) GetDeprecatedLastTimestamp() (value metav1.Time, ok bool) {
 	if v := b.fields.DeprecatedLastTimestamp; v != nil {
 		return *v, true
 	}
@@ -415,22 +348,19 @@ func (b EventBuilder) GetDeprecatedLastTimestamp() (value metav1.Time, ok bool) 
 }
 
 // SetDeprecatedCount sets the DeprecatedCount field in the declarative configuration to the given value.
-func (b EventBuilder) SetDeprecatedCount(value int32) EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) SetDeprecatedCount(value int32) *EventBuilder {
 	b.fields.DeprecatedCount = &value
 	return b
 }
 
 // RemoveDeprecatedCount removes the DeprecatedCount field from the declarative configuration.
-func (b EventBuilder) RemoveDeprecatedCount() EventBuilder {
-	b.ensureInitialized()
+func (b *EventBuilder) RemoveDeprecatedCount() *EventBuilder {
 	b.fields.DeprecatedCount = nil
 	return b
 }
 
 // GetDeprecatedCount gets the DeprecatedCount field from the declarative configuration.
-func (b EventBuilder) GetDeprecatedCount() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *EventBuilder) GetDeprecatedCount() (value int32, ok bool) {
 	if v := b.fields.DeprecatedCount; v != nil {
 		return *v, true
 	}
@@ -442,9 +372,8 @@ func (b *EventBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -459,14 +388,13 @@ func (b *EventBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals EventBuilder to JSON.
 func (b *EventBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -474,8 +402,7 @@ func (b *EventBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into EventBuilder, replacing the contents of
 // EventBuilder.
 func (b *EventBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -483,22 +410,25 @@ func (b *EventBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // EventList represents a list of EventBuilder.
-// Provided as a convenience.
-type EventList []EventBuilder
+type EventList []*EventBuilder
 
 // EventList represents a map of EventBuilder.
-// Provided as a convenience.
 type EventMap map[string]EventBuilder
 
 func (b *EventBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *EventBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

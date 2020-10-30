@@ -28,15 +28,15 @@ import (
 // SelfSubjectAccessReviewBuilder represents an declarative configuration of the SelfSubjectAccessReview type for use
 // with apply.
 type SelfSubjectAccessReviewBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *selfSubjectAccessReviewFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   selfSubjectAccessReviewFields
 }
 
-// selfSubjectAccessReviewFields is used by SelfSubjectAccessReviewBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in SelfSubjectAccessReviewBuilder before marshalling, and
-// are copied out to the builder type in SelfSubjectAccessReviewBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// selfSubjectAccessReviewFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in SelfSubjectAccessReviewBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type selfSubjectAccessReviewFields struct {
 	Kind       *string                             `json:"kind,omitempty"`       // inlined SelfSubjectAccessReviewBuilder.typeMeta.Kind field
 	APIVersion *string                             `json:"apiVersion,omitempty"` // inlined SelfSubjectAccessReviewBuilder.typeMeta.APIVersion field
@@ -45,106 +45,78 @@ type selfSubjectAccessReviewFields struct {
 	Status     *SubjectAccessReviewStatusBuilder   `json:"status,omitempty"`
 }
 
-func (b *SelfSubjectAccessReviewBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &selfSubjectAccessReviewFields{}
-	}
-}
-
 // SelfSubjectAccessReview constructs an declarative configuration of the SelfSubjectAccessReview type for use with
 // apply.
-// Provided as a convenience.
-func SelfSubjectAccessReview() SelfSubjectAccessReviewBuilder {
-	return SelfSubjectAccessReviewBuilder{fields: &selfSubjectAccessReviewFields{}}
+func SelfSubjectAccessReview() *SelfSubjectAccessReviewBuilder {
+	return &SelfSubjectAccessReviewBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b SelfSubjectAccessReviewBuilder) SetTypeMeta(value v1.TypeMetaBuilder) SelfSubjectAccessReviewBuilder {
-	b.ensureInitialized()
+func (b *SelfSubjectAccessReviewBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *SelfSubjectAccessReviewBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b SelfSubjectAccessReviewBuilder) RemoveTypeMeta() SelfSubjectAccessReviewBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *SelfSubjectAccessReviewBuilder) RemoveTypeMeta() *SelfSubjectAccessReviewBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b SelfSubjectAccessReviewBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *SelfSubjectAccessReviewBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b SelfSubjectAccessReviewBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) SelfSubjectAccessReviewBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *SelfSubjectAccessReviewBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *SelfSubjectAccessReviewBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b SelfSubjectAccessReviewBuilder) RemoveObjectMeta() SelfSubjectAccessReviewBuilder {
-	b.ensureInitialized()
+func (b *SelfSubjectAccessReviewBuilder) RemoveObjectMeta() *SelfSubjectAccessReviewBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b SelfSubjectAccessReviewBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *SelfSubjectAccessReviewBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b SelfSubjectAccessReviewBuilder) SetSpec(value SelfSubjectAccessReviewSpecBuilder) SelfSubjectAccessReviewBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *SelfSubjectAccessReviewBuilder) SetSpec(value *SelfSubjectAccessReviewSpecBuilder) *SelfSubjectAccessReviewBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b SelfSubjectAccessReviewBuilder) RemoveSpec() SelfSubjectAccessReviewBuilder {
-	b.ensureInitialized()
+func (b *SelfSubjectAccessReviewBuilder) RemoveSpec() *SelfSubjectAccessReviewBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b SelfSubjectAccessReviewBuilder) GetSpec() (value SelfSubjectAccessReviewSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *SelfSubjectAccessReviewBuilder) GetSpec() (value *SelfSubjectAccessReviewSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b SelfSubjectAccessReviewBuilder) SetStatus(value SubjectAccessReviewStatusBuilder) SelfSubjectAccessReviewBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *SelfSubjectAccessReviewBuilder) SetStatus(value *SubjectAccessReviewStatusBuilder) *SelfSubjectAccessReviewBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b SelfSubjectAccessReviewBuilder) RemoveStatus() SelfSubjectAccessReviewBuilder {
-	b.ensureInitialized()
+func (b *SelfSubjectAccessReviewBuilder) RemoveStatus() *SelfSubjectAccessReviewBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b SelfSubjectAccessReviewBuilder) GetStatus() (value SubjectAccessReviewStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *SelfSubjectAccessReviewBuilder) GetStatus() (value *SubjectAccessReviewStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts SelfSubjectAccessReviewBuilder to unstructured.
@@ -152,9 +124,8 @@ func (b *SelfSubjectAccessReviewBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *SelfSubjectAccessReviewBuilder) FromUnstructured(u map[string]interface
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals SelfSubjectAccessReviewBuilder to JSON.
 func (b *SelfSubjectAccessReviewBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *SelfSubjectAccessReviewBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into SelfSubjectAccessReviewBuilder, replacing the contents of
 // SelfSubjectAccessReviewBuilder.
 func (b *SelfSubjectAccessReviewBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +162,25 @@ func (b *SelfSubjectAccessReviewBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // SelfSubjectAccessReviewList represents a list of SelfSubjectAccessReviewBuilder.
-// Provided as a convenience.
-type SelfSubjectAccessReviewList []SelfSubjectAccessReviewBuilder
+type SelfSubjectAccessReviewList []*SelfSubjectAccessReviewBuilder
 
 // SelfSubjectAccessReviewList represents a map of SelfSubjectAccessReviewBuilder.
-// Provided as a convenience.
 type SelfSubjectAccessReviewMap map[string]SelfSubjectAccessReviewBuilder
 
 func (b *SelfSubjectAccessReviewBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *SelfSubjectAccessReviewBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

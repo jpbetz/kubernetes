@@ -28,49 +28,39 @@ import (
 // TCPSocketActionBuilder represents an declarative configuration of the TCPSocketAction type for use
 // with apply.
 type TCPSocketActionBuilder struct {
-	fields *tCPSocketActionFields
+	fields tCPSocketActionFields
 }
 
-// tCPSocketActionFields is used by TCPSocketActionBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in TCPSocketActionBuilder before marshalling, and
-// are copied out to the builder type in TCPSocketActionBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// tCPSocketActionFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in TCPSocketActionBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type tCPSocketActionFields struct {
 	Port *intstr.IntOrString `json:"port,omitempty"`
 	Host *string             `json:"host,omitempty"`
 }
 
-func (b *TCPSocketActionBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &tCPSocketActionFields{}
-	}
-}
-
 // TCPSocketAction constructs an declarative configuration of the TCPSocketAction type for use with
 // apply.
-// Provided as a convenience.
-func TCPSocketAction() TCPSocketActionBuilder {
-	return TCPSocketActionBuilder{fields: &tCPSocketActionFields{}}
+func TCPSocketAction() *TCPSocketActionBuilder {
+	return &TCPSocketActionBuilder{}
 }
 
 // SetPort sets the Port field in the declarative configuration to the given value.
-func (b TCPSocketActionBuilder) SetPort(value intstr.IntOrString) TCPSocketActionBuilder {
-	b.ensureInitialized()
+func (b *TCPSocketActionBuilder) SetPort(value intstr.IntOrString) *TCPSocketActionBuilder {
 	b.fields.Port = &value
 	return b
 }
 
 // RemovePort removes the Port field from the declarative configuration.
-func (b TCPSocketActionBuilder) RemovePort() TCPSocketActionBuilder {
-	b.ensureInitialized()
+func (b *TCPSocketActionBuilder) RemovePort() *TCPSocketActionBuilder {
 	b.fields.Port = nil
 	return b
 }
 
 // GetPort gets the Port field from the declarative configuration.
-func (b TCPSocketActionBuilder) GetPort() (value intstr.IntOrString, ok bool) {
-	b.ensureInitialized()
+func (b *TCPSocketActionBuilder) GetPort() (value intstr.IntOrString, ok bool) {
 	if v := b.fields.Port; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b TCPSocketActionBuilder) GetPort() (value intstr.IntOrString, ok bool) {
 }
 
 // SetHost sets the Host field in the declarative configuration to the given value.
-func (b TCPSocketActionBuilder) SetHost(value string) TCPSocketActionBuilder {
-	b.ensureInitialized()
+func (b *TCPSocketActionBuilder) SetHost(value string) *TCPSocketActionBuilder {
 	b.fields.Host = &value
 	return b
 }
 
 // RemoveHost removes the Host field from the declarative configuration.
-func (b TCPSocketActionBuilder) RemoveHost() TCPSocketActionBuilder {
-	b.ensureInitialized()
+func (b *TCPSocketActionBuilder) RemoveHost() *TCPSocketActionBuilder {
 	b.fields.Host = nil
 	return b
 }
 
 // GetHost gets the Host field from the declarative configuration.
-func (b TCPSocketActionBuilder) GetHost() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *TCPSocketActionBuilder) GetHost() (value string, ok bool) {
 	if v := b.fields.Host; v != nil {
 		return *v, true
 	}
@@ -105,9 +92,8 @@ func (b *TCPSocketActionBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +108,13 @@ func (b *TCPSocketActionBuilder) FromUnstructured(u map[string]interface{}) erro
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals TCPSocketActionBuilder to JSON.
 func (b *TCPSocketActionBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +122,7 @@ func (b *TCPSocketActionBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into TCPSocketActionBuilder, replacing the contents of
 // TCPSocketActionBuilder.
 func (b *TCPSocketActionBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +130,9 @@ func (b *TCPSocketActionBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // TCPSocketActionList represents a list of TCPSocketActionBuilder.
-// Provided as a convenience.
-type TCPSocketActionList []TCPSocketActionBuilder
+type TCPSocketActionList []*TCPSocketActionBuilder
 
 // TCPSocketActionList represents a map of TCPSocketActionBuilder.
-// Provided as a convenience.
 type TCPSocketActionMap map[string]TCPSocketActionBuilder
 
 func (b *TCPSocketActionBuilder) preMarshal() {

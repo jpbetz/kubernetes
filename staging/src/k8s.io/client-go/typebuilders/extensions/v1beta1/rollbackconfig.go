@@ -27,48 +27,38 @@ import (
 // RollbackConfigBuilder represents an declarative configuration of the RollbackConfig type for use
 // with apply.
 type RollbackConfigBuilder struct {
-	fields *rollbackConfigFields
+	fields rollbackConfigFields
 }
 
-// rollbackConfigFields is used by RollbackConfigBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in RollbackConfigBuilder before marshalling, and
-// are copied out to the builder type in RollbackConfigBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// rollbackConfigFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in RollbackConfigBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type rollbackConfigFields struct {
 	Revision *int64 `json:"revision,omitempty"`
 }
 
-func (b *RollbackConfigBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &rollbackConfigFields{}
-	}
-}
-
 // RollbackConfig constructs an declarative configuration of the RollbackConfig type for use with
 // apply.
-// Provided as a convenience.
-func RollbackConfig() RollbackConfigBuilder {
-	return RollbackConfigBuilder{fields: &rollbackConfigFields{}}
+func RollbackConfig() *RollbackConfigBuilder {
+	return &RollbackConfigBuilder{}
 }
 
 // SetRevision sets the Revision field in the declarative configuration to the given value.
-func (b RollbackConfigBuilder) SetRevision(value int64) RollbackConfigBuilder {
-	b.ensureInitialized()
+func (b *RollbackConfigBuilder) SetRevision(value int64) *RollbackConfigBuilder {
 	b.fields.Revision = &value
 	return b
 }
 
 // RemoveRevision removes the Revision field from the declarative configuration.
-func (b RollbackConfigBuilder) RemoveRevision() RollbackConfigBuilder {
-	b.ensureInitialized()
+func (b *RollbackConfigBuilder) RemoveRevision() *RollbackConfigBuilder {
 	b.fields.Revision = nil
 	return b
 }
 
 // GetRevision gets the Revision field from the declarative configuration.
-func (b RollbackConfigBuilder) GetRevision() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *RollbackConfigBuilder) GetRevision() (value int64, ok bool) {
 	if v := b.fields.Revision; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *RollbackConfigBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *RollbackConfigBuilder) FromUnstructured(u map[string]interface{}) error
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals RollbackConfigBuilder to JSON.
 func (b *RollbackConfigBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *RollbackConfigBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into RollbackConfigBuilder, replacing the contents of
 // RollbackConfigBuilder.
 func (b *RollbackConfigBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *RollbackConfigBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // RollbackConfigList represents a list of RollbackConfigBuilder.
-// Provided as a convenience.
-type RollbackConfigList []RollbackConfigBuilder
+type RollbackConfigList []*RollbackConfigBuilder
 
 // RollbackConfigList represents a map of RollbackConfigBuilder.
-// Provided as a convenience.
 type RollbackConfigMap map[string]RollbackConfigBuilder
 
 func (b *RollbackConfigBuilder) preMarshal() {

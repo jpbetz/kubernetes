@@ -27,48 +27,38 @@ import (
 // SelfSubjectRulesReviewSpecBuilder represents an declarative configuration of the SelfSubjectRulesReviewSpec type for use
 // with apply.
 type SelfSubjectRulesReviewSpecBuilder struct {
-	fields *selfSubjectRulesReviewSpecFields
+	fields selfSubjectRulesReviewSpecFields
 }
 
-// selfSubjectRulesReviewSpecFields is used by SelfSubjectRulesReviewSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in SelfSubjectRulesReviewSpecBuilder before marshalling, and
-// are copied out to the builder type in SelfSubjectRulesReviewSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// selfSubjectRulesReviewSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in SelfSubjectRulesReviewSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type selfSubjectRulesReviewSpecFields struct {
 	Namespace *string `json:"namespace,omitempty"`
 }
 
-func (b *SelfSubjectRulesReviewSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &selfSubjectRulesReviewSpecFields{}
-	}
-}
-
 // SelfSubjectRulesReviewSpec constructs an declarative configuration of the SelfSubjectRulesReviewSpec type for use with
 // apply.
-// Provided as a convenience.
-func SelfSubjectRulesReviewSpec() SelfSubjectRulesReviewSpecBuilder {
-	return SelfSubjectRulesReviewSpecBuilder{fields: &selfSubjectRulesReviewSpecFields{}}
+func SelfSubjectRulesReviewSpec() *SelfSubjectRulesReviewSpecBuilder {
+	return &SelfSubjectRulesReviewSpecBuilder{}
 }
 
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
-func (b SelfSubjectRulesReviewSpecBuilder) SetNamespace(value string) SelfSubjectRulesReviewSpecBuilder {
-	b.ensureInitialized()
+func (b *SelfSubjectRulesReviewSpecBuilder) SetNamespace(value string) *SelfSubjectRulesReviewSpecBuilder {
 	b.fields.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
-func (b SelfSubjectRulesReviewSpecBuilder) RemoveNamespace() SelfSubjectRulesReviewSpecBuilder {
-	b.ensureInitialized()
+func (b *SelfSubjectRulesReviewSpecBuilder) RemoveNamespace() *SelfSubjectRulesReviewSpecBuilder {
 	b.fields.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
-func (b SelfSubjectRulesReviewSpecBuilder) GetNamespace() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *SelfSubjectRulesReviewSpecBuilder) GetNamespace() (value string, ok bool) {
 	if v := b.fields.Namespace; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *SelfSubjectRulesReviewSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *SelfSubjectRulesReviewSpecBuilder) FromUnstructured(u map[string]interf
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals SelfSubjectRulesReviewSpecBuilder to JSON.
 func (b *SelfSubjectRulesReviewSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *SelfSubjectRulesReviewSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into SelfSubjectRulesReviewSpecBuilder, replacing the contents of
 // SelfSubjectRulesReviewSpecBuilder.
 func (b *SelfSubjectRulesReviewSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *SelfSubjectRulesReviewSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // SelfSubjectRulesReviewSpecList represents a list of SelfSubjectRulesReviewSpecBuilder.
-// Provided as a convenience.
-type SelfSubjectRulesReviewSpecList []SelfSubjectRulesReviewSpecBuilder
+type SelfSubjectRulesReviewSpecList []*SelfSubjectRulesReviewSpecBuilder
 
 // SelfSubjectRulesReviewSpecList represents a map of SelfSubjectRulesReviewSpecBuilder.
-// Provided as a convenience.
 type SelfSubjectRulesReviewSpecMap map[string]SelfSubjectRulesReviewSpecBuilder
 
 func (b *SelfSubjectRulesReviewSpecBuilder) preMarshal() {

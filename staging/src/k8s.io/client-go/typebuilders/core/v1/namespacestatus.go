@@ -28,49 +28,39 @@ import (
 // NamespaceStatusBuilder represents an declarative configuration of the NamespaceStatus type for use
 // with apply.
 type NamespaceStatusBuilder struct {
-	fields *namespaceStatusFields
+	fields namespaceStatusFields
 }
 
-// namespaceStatusFields is used by NamespaceStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in NamespaceStatusBuilder before marshalling, and
-// are copied out to the builder type in NamespaceStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// namespaceStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in NamespaceStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type namespaceStatusFields struct {
 	Phase      *v1.NamespacePhase      `json:"phase,omitempty"`
 	Conditions *NamespaceConditionList `json:"conditions,omitempty"`
 }
 
-func (b *NamespaceStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &namespaceStatusFields{}
-	}
-}
-
 // NamespaceStatus constructs an declarative configuration of the NamespaceStatus type for use with
 // apply.
-// Provided as a convenience.
-func NamespaceStatus() NamespaceStatusBuilder {
-	return NamespaceStatusBuilder{fields: &namespaceStatusFields{}}
+func NamespaceStatus() *NamespaceStatusBuilder {
+	return &NamespaceStatusBuilder{}
 }
 
 // SetPhase sets the Phase field in the declarative configuration to the given value.
-func (b NamespaceStatusBuilder) SetPhase(value v1.NamespacePhase) NamespaceStatusBuilder {
-	b.ensureInitialized()
+func (b *NamespaceStatusBuilder) SetPhase(value v1.NamespacePhase) *NamespaceStatusBuilder {
 	b.fields.Phase = &value
 	return b
 }
 
 // RemovePhase removes the Phase field from the declarative configuration.
-func (b NamespaceStatusBuilder) RemovePhase() NamespaceStatusBuilder {
-	b.ensureInitialized()
+func (b *NamespaceStatusBuilder) RemovePhase() *NamespaceStatusBuilder {
 	b.fields.Phase = nil
 	return b
 }
 
 // GetPhase gets the Phase field from the declarative configuration.
-func (b NamespaceStatusBuilder) GetPhase() (value v1.NamespacePhase, ok bool) {
-	b.ensureInitialized()
+func (b *NamespaceStatusBuilder) GetPhase() (value v1.NamespacePhase, ok bool) {
 	if v := b.fields.Phase; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b NamespaceStatusBuilder) GetPhase() (value v1.NamespacePhase, ok bool) {
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b NamespaceStatusBuilder) SetConditions(value NamespaceConditionList) NamespaceStatusBuilder {
-	b.ensureInitialized()
+func (b *NamespaceStatusBuilder) SetConditions(value NamespaceConditionList) *NamespaceStatusBuilder {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b NamespaceStatusBuilder) RemoveConditions() NamespaceStatusBuilder {
-	b.ensureInitialized()
+func (b *NamespaceStatusBuilder) RemoveConditions() *NamespaceStatusBuilder {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b NamespaceStatusBuilder) GetConditions() (value NamespaceConditionList, ok bool) {
-	b.ensureInitialized()
+func (b *NamespaceStatusBuilder) GetConditions() (value NamespaceConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
@@ -105,9 +92,8 @@ func (b *NamespaceStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +108,13 @@ func (b *NamespaceStatusBuilder) FromUnstructured(u map[string]interface{}) erro
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals NamespaceStatusBuilder to JSON.
 func (b *NamespaceStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +122,7 @@ func (b *NamespaceStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into NamespaceStatusBuilder, replacing the contents of
 // NamespaceStatusBuilder.
 func (b *NamespaceStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +130,9 @@ func (b *NamespaceStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // NamespaceStatusList represents a list of NamespaceStatusBuilder.
-// Provided as a convenience.
-type NamespaceStatusList []NamespaceStatusBuilder
+type NamespaceStatusList []*NamespaceStatusBuilder
 
 // NamespaceStatusList represents a map of NamespaceStatusBuilder.
-// Provided as a convenience.
 type NamespaceStatusMap map[string]NamespaceStatusBuilder
 
 func (b *NamespaceStatusBuilder) preMarshal() {

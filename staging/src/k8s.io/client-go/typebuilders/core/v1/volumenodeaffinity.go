@@ -27,52 +27,39 @@ import (
 // VolumeNodeAffinityBuilder represents an declarative configuration of the VolumeNodeAffinity type for use
 // with apply.
 type VolumeNodeAffinityBuilder struct {
-	fields *volumeNodeAffinityFields
+	fields volumeNodeAffinityFields
 }
 
-// volumeNodeAffinityFields is used by VolumeNodeAffinityBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in VolumeNodeAffinityBuilder before marshalling, and
-// are copied out to the builder type in VolumeNodeAffinityBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// volumeNodeAffinityFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in VolumeNodeAffinityBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type volumeNodeAffinityFields struct {
 	Required *NodeSelectorBuilder `json:"required,omitempty"`
 }
 
-func (b *VolumeNodeAffinityBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &volumeNodeAffinityFields{}
-	}
-}
-
 // VolumeNodeAffinity constructs an declarative configuration of the VolumeNodeAffinity type for use with
 // apply.
-// Provided as a convenience.
-func VolumeNodeAffinity() VolumeNodeAffinityBuilder {
-	return VolumeNodeAffinityBuilder{fields: &volumeNodeAffinityFields{}}
+func VolumeNodeAffinity() *VolumeNodeAffinityBuilder {
+	return &VolumeNodeAffinityBuilder{}
 }
 
 // SetRequired sets the Required field in the declarative configuration to the given value.
-func (b VolumeNodeAffinityBuilder) SetRequired(value NodeSelectorBuilder) VolumeNodeAffinityBuilder {
-	b.ensureInitialized()
-	b.fields.Required = &value
+func (b *VolumeNodeAffinityBuilder) SetRequired(value *NodeSelectorBuilder) *VolumeNodeAffinityBuilder {
+	b.fields.Required = value
 	return b
 }
 
 // RemoveRequired removes the Required field from the declarative configuration.
-func (b VolumeNodeAffinityBuilder) RemoveRequired() VolumeNodeAffinityBuilder {
-	b.ensureInitialized()
+func (b *VolumeNodeAffinityBuilder) RemoveRequired() *VolumeNodeAffinityBuilder {
 	b.fields.Required = nil
 	return b
 }
 
 // GetRequired gets the Required field from the declarative configuration.
-func (b VolumeNodeAffinityBuilder) GetRequired() (value NodeSelectorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Required; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *VolumeNodeAffinityBuilder) GetRequired() (value *NodeSelectorBuilder, ok bool) {
+	return b.fields.Required, b.fields.Required != nil
 }
 
 // ToUnstructured converts VolumeNodeAffinityBuilder to unstructured.
@@ -80,9 +67,8 @@ func (b *VolumeNodeAffinityBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +83,13 @@ func (b *VolumeNodeAffinityBuilder) FromUnstructured(u map[string]interface{}) e
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals VolumeNodeAffinityBuilder to JSON.
 func (b *VolumeNodeAffinityBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +97,7 @@ func (b *VolumeNodeAffinityBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into VolumeNodeAffinityBuilder, replacing the contents of
 // VolumeNodeAffinityBuilder.
 func (b *VolumeNodeAffinityBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +105,9 @@ func (b *VolumeNodeAffinityBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // VolumeNodeAffinityList represents a list of VolumeNodeAffinityBuilder.
-// Provided as a convenience.
-type VolumeNodeAffinityList []VolumeNodeAffinityBuilder
+type VolumeNodeAffinityList []*VolumeNodeAffinityBuilder
 
 // VolumeNodeAffinityList represents a map of VolumeNodeAffinityBuilder.
-// Provided as a convenience.
 type VolumeNodeAffinityMap map[string]VolumeNodeAffinityBuilder
 
 func (b *VolumeNodeAffinityBuilder) preMarshal() {

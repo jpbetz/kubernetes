@@ -27,49 +27,39 @@ import (
 // CertificateSigningRequestStatusBuilder represents an declarative configuration of the CertificateSigningRequestStatus type for use
 // with apply.
 type CertificateSigningRequestStatusBuilder struct {
-	fields *certificateSigningRequestStatusFields
+	fields certificateSigningRequestStatusFields
 }
 
-// certificateSigningRequestStatusFields is used by CertificateSigningRequestStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in CertificateSigningRequestStatusBuilder before marshalling, and
-// are copied out to the builder type in CertificateSigningRequestStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// certificateSigningRequestStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in CertificateSigningRequestStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type certificateSigningRequestStatusFields struct {
 	Conditions  *CertificateSigningRequestConditionList `json:"conditions,omitempty"`
 	Certificate *[]byte                                 `json:"certificate,omitempty"`
 }
 
-func (b *CertificateSigningRequestStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &certificateSigningRequestStatusFields{}
-	}
-}
-
 // CertificateSigningRequestStatus constructs an declarative configuration of the CertificateSigningRequestStatus type for use with
 // apply.
-// Provided as a convenience.
-func CertificateSigningRequestStatus() CertificateSigningRequestStatusBuilder {
-	return CertificateSigningRequestStatusBuilder{fields: &certificateSigningRequestStatusFields{}}
+func CertificateSigningRequestStatus() *CertificateSigningRequestStatusBuilder {
+	return &CertificateSigningRequestStatusBuilder{}
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b CertificateSigningRequestStatusBuilder) SetConditions(value CertificateSigningRequestConditionList) CertificateSigningRequestStatusBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestStatusBuilder) SetConditions(value CertificateSigningRequestConditionList) *CertificateSigningRequestStatusBuilder {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b CertificateSigningRequestStatusBuilder) RemoveConditions() CertificateSigningRequestStatusBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestStatusBuilder) RemoveConditions() *CertificateSigningRequestStatusBuilder {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b CertificateSigningRequestStatusBuilder) GetConditions() (value CertificateSigningRequestConditionList, ok bool) {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestStatusBuilder) GetConditions() (value CertificateSigningRequestConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b CertificateSigningRequestStatusBuilder) GetConditions() (value Certifica
 }
 
 // SetCertificate sets the Certificate field in the declarative configuration to the given value.
-func (b CertificateSigningRequestStatusBuilder) SetCertificate(value []byte) CertificateSigningRequestStatusBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestStatusBuilder) SetCertificate(value []byte) *CertificateSigningRequestStatusBuilder {
 	b.fields.Certificate = &value
 	return b
 }
 
 // RemoveCertificate removes the Certificate field from the declarative configuration.
-func (b CertificateSigningRequestStatusBuilder) RemoveCertificate() CertificateSigningRequestStatusBuilder {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestStatusBuilder) RemoveCertificate() *CertificateSigningRequestStatusBuilder {
 	b.fields.Certificate = nil
 	return b
 }
 
 // GetCertificate gets the Certificate field from the declarative configuration.
-func (b CertificateSigningRequestStatusBuilder) GetCertificate() (value []byte, ok bool) {
-	b.ensureInitialized()
+func (b *CertificateSigningRequestStatusBuilder) GetCertificate() (value []byte, ok bool) {
 	if v := b.fields.Certificate; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *CertificateSigningRequestStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *CertificateSigningRequestStatusBuilder) FromUnstructured(u map[string]i
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals CertificateSigningRequestStatusBuilder to JSON.
 func (b *CertificateSigningRequestStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *CertificateSigningRequestStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into CertificateSigningRequestStatusBuilder, replacing the contents of
 // CertificateSigningRequestStatusBuilder.
 func (b *CertificateSigningRequestStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *CertificateSigningRequestStatusBuilder) UnmarshalJSON(data []byte) erro
 }
 
 // CertificateSigningRequestStatusList represents a list of CertificateSigningRequestStatusBuilder.
-// Provided as a convenience.
-type CertificateSigningRequestStatusList []CertificateSigningRequestStatusBuilder
+type CertificateSigningRequestStatusList []*CertificateSigningRequestStatusBuilder
 
 // CertificateSigningRequestStatusList represents a map of CertificateSigningRequestStatusBuilder.
-// Provided as a convenience.
 type CertificateSigningRequestStatusMap map[string]CertificateSigningRequestStatusBuilder
 
 func (b *CertificateSigningRequestStatusBuilder) preMarshal() {

@@ -27,49 +27,39 @@ import (
 // ObjectFieldSelectorBuilder represents an declarative configuration of the ObjectFieldSelector type for use
 // with apply.
 type ObjectFieldSelectorBuilder struct {
-	fields *objectFieldSelectorFields
+	fields objectFieldSelectorFields
 }
 
-// objectFieldSelectorFields is used by ObjectFieldSelectorBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ObjectFieldSelectorBuilder before marshalling, and
-// are copied out to the builder type in ObjectFieldSelectorBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// objectFieldSelectorFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ObjectFieldSelectorBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type objectFieldSelectorFields struct {
 	APIVersion *string `json:"apiVersion,omitempty"`
 	FieldPath  *string `json:"fieldPath,omitempty"`
 }
 
-func (b *ObjectFieldSelectorBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &objectFieldSelectorFields{}
-	}
-}
-
 // ObjectFieldSelector constructs an declarative configuration of the ObjectFieldSelector type for use with
 // apply.
-// Provided as a convenience.
-func ObjectFieldSelector() ObjectFieldSelectorBuilder {
-	return ObjectFieldSelectorBuilder{fields: &objectFieldSelectorFields{}}
+func ObjectFieldSelector() *ObjectFieldSelectorBuilder {
+	return &ObjectFieldSelectorBuilder{}
 }
 
 // SetAPIVersion sets the APIVersion field in the declarative configuration to the given value.
-func (b ObjectFieldSelectorBuilder) SetAPIVersion(value string) ObjectFieldSelectorBuilder {
-	b.ensureInitialized()
+func (b *ObjectFieldSelectorBuilder) SetAPIVersion(value string) *ObjectFieldSelectorBuilder {
 	b.fields.APIVersion = &value
 	return b
 }
 
 // RemoveAPIVersion removes the APIVersion field from the declarative configuration.
-func (b ObjectFieldSelectorBuilder) RemoveAPIVersion() ObjectFieldSelectorBuilder {
-	b.ensureInitialized()
+func (b *ObjectFieldSelectorBuilder) RemoveAPIVersion() *ObjectFieldSelectorBuilder {
 	b.fields.APIVersion = nil
 	return b
 }
 
 // GetAPIVersion gets the APIVersion field from the declarative configuration.
-func (b ObjectFieldSelectorBuilder) GetAPIVersion() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectFieldSelectorBuilder) GetAPIVersion() (value string, ok bool) {
 	if v := b.fields.APIVersion; v != nil {
 		return *v, true
 	}
@@ -77,22 +67,19 @@ func (b ObjectFieldSelectorBuilder) GetAPIVersion() (value string, ok bool) {
 }
 
 // SetFieldPath sets the FieldPath field in the declarative configuration to the given value.
-func (b ObjectFieldSelectorBuilder) SetFieldPath(value string) ObjectFieldSelectorBuilder {
-	b.ensureInitialized()
+func (b *ObjectFieldSelectorBuilder) SetFieldPath(value string) *ObjectFieldSelectorBuilder {
 	b.fields.FieldPath = &value
 	return b
 }
 
 // RemoveFieldPath removes the FieldPath field from the declarative configuration.
-func (b ObjectFieldSelectorBuilder) RemoveFieldPath() ObjectFieldSelectorBuilder {
-	b.ensureInitialized()
+func (b *ObjectFieldSelectorBuilder) RemoveFieldPath() *ObjectFieldSelectorBuilder {
 	b.fields.FieldPath = nil
 	return b
 }
 
 // GetFieldPath gets the FieldPath field from the declarative configuration.
-func (b ObjectFieldSelectorBuilder) GetFieldPath() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectFieldSelectorBuilder) GetFieldPath() (value string, ok bool) {
 	if v := b.fields.FieldPath; v != nil {
 		return *v, true
 	}
@@ -104,9 +91,8 @@ func (b *ObjectFieldSelectorBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +107,13 @@ func (b *ObjectFieldSelectorBuilder) FromUnstructured(u map[string]interface{}) 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ObjectFieldSelectorBuilder to JSON.
 func (b *ObjectFieldSelectorBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +121,7 @@ func (b *ObjectFieldSelectorBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ObjectFieldSelectorBuilder, replacing the contents of
 // ObjectFieldSelectorBuilder.
 func (b *ObjectFieldSelectorBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +129,9 @@ func (b *ObjectFieldSelectorBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ObjectFieldSelectorList represents a list of ObjectFieldSelectorBuilder.
-// Provided as a convenience.
-type ObjectFieldSelectorList []ObjectFieldSelectorBuilder
+type ObjectFieldSelectorList []*ObjectFieldSelectorBuilder
 
 // ObjectFieldSelectorList represents a map of ObjectFieldSelectorBuilder.
-// Provided as a convenience.
 type ObjectFieldSelectorMap map[string]ObjectFieldSelectorBuilder
 
 func (b *ObjectFieldSelectorBuilder) preMarshal() {

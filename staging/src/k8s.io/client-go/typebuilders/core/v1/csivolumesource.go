@@ -27,14 +27,14 @@ import (
 // CSIVolumeSourceBuilder represents an declarative configuration of the CSIVolumeSource type for use
 // with apply.
 type CSIVolumeSourceBuilder struct {
-	fields *cSIVolumeSourceFields
+	fields cSIVolumeSourceFields
 }
 
-// cSIVolumeSourceFields is used by CSIVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in CSIVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in CSIVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// cSIVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in CSIVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type cSIVolumeSourceFields struct {
 	Driver               *string                      `json:"driver,omitempty"`
 	ReadOnly             *bool                        `json:"readOnly,omitempty"`
@@ -43,36 +43,26 @@ type cSIVolumeSourceFields struct {
 	NodePublishSecretRef *LocalObjectReferenceBuilder `json:"nodePublishSecretRef,omitempty"`
 }
 
-func (b *CSIVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &cSIVolumeSourceFields{}
-	}
-}
-
 // CSIVolumeSource constructs an declarative configuration of the CSIVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func CSIVolumeSource() CSIVolumeSourceBuilder {
-	return CSIVolumeSourceBuilder{fields: &cSIVolumeSourceFields{}}
+func CSIVolumeSource() *CSIVolumeSourceBuilder {
+	return &CSIVolumeSourceBuilder{}
 }
 
 // SetDriver sets the Driver field in the declarative configuration to the given value.
-func (b CSIVolumeSourceBuilder) SetDriver(value string) CSIVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *CSIVolumeSourceBuilder) SetDriver(value string) *CSIVolumeSourceBuilder {
 	b.fields.Driver = &value
 	return b
 }
 
 // RemoveDriver removes the Driver field from the declarative configuration.
-func (b CSIVolumeSourceBuilder) RemoveDriver() CSIVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *CSIVolumeSourceBuilder) RemoveDriver() *CSIVolumeSourceBuilder {
 	b.fields.Driver = nil
 	return b
 }
 
 // GetDriver gets the Driver field from the declarative configuration.
-func (b CSIVolumeSourceBuilder) GetDriver() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *CSIVolumeSourceBuilder) GetDriver() (value string, ok bool) {
 	if v := b.fields.Driver; v != nil {
 		return *v, true
 	}
@@ -80,22 +70,19 @@ func (b CSIVolumeSourceBuilder) GetDriver() (value string, ok bool) {
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b CSIVolumeSourceBuilder) SetReadOnly(value bool) CSIVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *CSIVolumeSourceBuilder) SetReadOnly(value bool) *CSIVolumeSourceBuilder {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b CSIVolumeSourceBuilder) RemoveReadOnly() CSIVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *CSIVolumeSourceBuilder) RemoveReadOnly() *CSIVolumeSourceBuilder {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b CSIVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *CSIVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
@@ -103,22 +90,19 @@ func (b CSIVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
 }
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
-func (b CSIVolumeSourceBuilder) SetFSType(value string) CSIVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *CSIVolumeSourceBuilder) SetFSType(value string) *CSIVolumeSourceBuilder {
 	b.fields.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
-func (b CSIVolumeSourceBuilder) RemoveFSType() CSIVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *CSIVolumeSourceBuilder) RemoveFSType() *CSIVolumeSourceBuilder {
 	b.fields.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
-func (b CSIVolumeSourceBuilder) GetFSType() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *CSIVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 	if v := b.fields.FSType; v != nil {
 		return *v, true
 	}
@@ -126,22 +110,19 @@ func (b CSIVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 }
 
 // SetVolumeAttributes sets the VolumeAttributes field in the declarative configuration to the given value.
-func (b CSIVolumeSourceBuilder) SetVolumeAttributes(value map[string]string) CSIVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *CSIVolumeSourceBuilder) SetVolumeAttributes(value map[string]string) *CSIVolumeSourceBuilder {
 	b.fields.VolumeAttributes = &value
 	return b
 }
 
 // RemoveVolumeAttributes removes the VolumeAttributes field from the declarative configuration.
-func (b CSIVolumeSourceBuilder) RemoveVolumeAttributes() CSIVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *CSIVolumeSourceBuilder) RemoveVolumeAttributes() *CSIVolumeSourceBuilder {
 	b.fields.VolumeAttributes = nil
 	return b
 }
 
 // GetVolumeAttributes gets the VolumeAttributes field from the declarative configuration.
-func (b CSIVolumeSourceBuilder) GetVolumeAttributes() (value map[string]string, ok bool) {
-	b.ensureInitialized()
+func (b *CSIVolumeSourceBuilder) GetVolumeAttributes() (value map[string]string, ok bool) {
 	if v := b.fields.VolumeAttributes; v != nil {
 		return *v, true
 	}
@@ -149,26 +130,20 @@ func (b CSIVolumeSourceBuilder) GetVolumeAttributes() (value map[string]string, 
 }
 
 // SetNodePublishSecretRef sets the NodePublishSecretRef field in the declarative configuration to the given value.
-func (b CSIVolumeSourceBuilder) SetNodePublishSecretRef(value LocalObjectReferenceBuilder) CSIVolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.NodePublishSecretRef = &value
+func (b *CSIVolumeSourceBuilder) SetNodePublishSecretRef(value *LocalObjectReferenceBuilder) *CSIVolumeSourceBuilder {
+	b.fields.NodePublishSecretRef = value
 	return b
 }
 
 // RemoveNodePublishSecretRef removes the NodePublishSecretRef field from the declarative configuration.
-func (b CSIVolumeSourceBuilder) RemoveNodePublishSecretRef() CSIVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *CSIVolumeSourceBuilder) RemoveNodePublishSecretRef() *CSIVolumeSourceBuilder {
 	b.fields.NodePublishSecretRef = nil
 	return b
 }
 
 // GetNodePublishSecretRef gets the NodePublishSecretRef field from the declarative configuration.
-func (b CSIVolumeSourceBuilder) GetNodePublishSecretRef() (value LocalObjectReferenceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.NodePublishSecretRef; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *CSIVolumeSourceBuilder) GetNodePublishSecretRef() (value *LocalObjectReferenceBuilder, ok bool) {
+	return b.fields.NodePublishSecretRef, b.fields.NodePublishSecretRef != nil
 }
 
 // ToUnstructured converts CSIVolumeSourceBuilder to unstructured.
@@ -176,9 +151,8 @@ func (b *CSIVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -193,14 +167,13 @@ func (b *CSIVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) erro
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals CSIVolumeSourceBuilder to JSON.
 func (b *CSIVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -208,8 +181,7 @@ func (b *CSIVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into CSIVolumeSourceBuilder, replacing the contents of
 // CSIVolumeSourceBuilder.
 func (b *CSIVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -217,11 +189,9 @@ func (b *CSIVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // CSIVolumeSourceList represents a list of CSIVolumeSourceBuilder.
-// Provided as a convenience.
-type CSIVolumeSourceList []CSIVolumeSourceBuilder
+type CSIVolumeSourceList []*CSIVolumeSourceBuilder
 
 // CSIVolumeSourceList represents a map of CSIVolumeSourceBuilder.
-// Provided as a convenience.
 type CSIVolumeSourceMap map[string]CSIVolumeSourceBuilder
 
 func (b *CSIVolumeSourceBuilder) preMarshal() {

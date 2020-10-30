@@ -27,14 +27,14 @@ import (
 // RBDPersistentVolumeSourceBuilder represents an declarative configuration of the RBDPersistentVolumeSource type for use
 // with apply.
 type RBDPersistentVolumeSourceBuilder struct {
-	fields *rBDPersistentVolumeSourceFields
+	fields rBDPersistentVolumeSourceFields
 }
 
-// rBDPersistentVolumeSourceFields is used by RBDPersistentVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in RBDPersistentVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in RBDPersistentVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// rBDPersistentVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in RBDPersistentVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type rBDPersistentVolumeSourceFields struct {
 	CephMonitors *[]string               `json:"monitors,omitempty"`
 	RBDImage     *string                 `json:"image,omitempty"`
@@ -46,36 +46,26 @@ type rBDPersistentVolumeSourceFields struct {
 	ReadOnly     *bool                   `json:"readOnly,omitempty"`
 }
 
-func (b *RBDPersistentVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &rBDPersistentVolumeSourceFields{}
-	}
-}
-
 // RBDPersistentVolumeSource constructs an declarative configuration of the RBDPersistentVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func RBDPersistentVolumeSource() RBDPersistentVolumeSourceBuilder {
-	return RBDPersistentVolumeSourceBuilder{fields: &rBDPersistentVolumeSourceFields{}}
+func RBDPersistentVolumeSource() *RBDPersistentVolumeSourceBuilder {
+	return &RBDPersistentVolumeSourceBuilder{}
 }
 
 // SetCephMonitors sets the CephMonitors field in the declarative configuration to the given value.
-func (b RBDPersistentVolumeSourceBuilder) SetCephMonitors(value []string) RBDPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) SetCephMonitors(value []string) *RBDPersistentVolumeSourceBuilder {
 	b.fields.CephMonitors = &value
 	return b
 }
 
 // RemoveCephMonitors removes the CephMonitors field from the declarative configuration.
-func (b RBDPersistentVolumeSourceBuilder) RemoveCephMonitors() RBDPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) RemoveCephMonitors() *RBDPersistentVolumeSourceBuilder {
 	b.fields.CephMonitors = nil
 	return b
 }
 
 // GetCephMonitors gets the CephMonitors field from the declarative configuration.
-func (b RBDPersistentVolumeSourceBuilder) GetCephMonitors() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) GetCephMonitors() (value []string, ok bool) {
 	if v := b.fields.CephMonitors; v != nil {
 		return *v, true
 	}
@@ -83,22 +73,19 @@ func (b RBDPersistentVolumeSourceBuilder) GetCephMonitors() (value []string, ok 
 }
 
 // SetRBDImage sets the RBDImage field in the declarative configuration to the given value.
-func (b RBDPersistentVolumeSourceBuilder) SetRBDImage(value string) RBDPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) SetRBDImage(value string) *RBDPersistentVolumeSourceBuilder {
 	b.fields.RBDImage = &value
 	return b
 }
 
 // RemoveRBDImage removes the RBDImage field from the declarative configuration.
-func (b RBDPersistentVolumeSourceBuilder) RemoveRBDImage() RBDPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) RemoveRBDImage() *RBDPersistentVolumeSourceBuilder {
 	b.fields.RBDImage = nil
 	return b
 }
 
 // GetRBDImage gets the RBDImage field from the declarative configuration.
-func (b RBDPersistentVolumeSourceBuilder) GetRBDImage() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) GetRBDImage() (value string, ok bool) {
 	if v := b.fields.RBDImage; v != nil {
 		return *v, true
 	}
@@ -106,22 +93,19 @@ func (b RBDPersistentVolumeSourceBuilder) GetRBDImage() (value string, ok bool) 
 }
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
-func (b RBDPersistentVolumeSourceBuilder) SetFSType(value string) RBDPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) SetFSType(value string) *RBDPersistentVolumeSourceBuilder {
 	b.fields.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
-func (b RBDPersistentVolumeSourceBuilder) RemoveFSType() RBDPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) RemoveFSType() *RBDPersistentVolumeSourceBuilder {
 	b.fields.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
-func (b RBDPersistentVolumeSourceBuilder) GetFSType() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 	if v := b.fields.FSType; v != nil {
 		return *v, true
 	}
@@ -129,22 +113,19 @@ func (b RBDPersistentVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 }
 
 // SetRBDPool sets the RBDPool field in the declarative configuration to the given value.
-func (b RBDPersistentVolumeSourceBuilder) SetRBDPool(value string) RBDPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) SetRBDPool(value string) *RBDPersistentVolumeSourceBuilder {
 	b.fields.RBDPool = &value
 	return b
 }
 
 // RemoveRBDPool removes the RBDPool field from the declarative configuration.
-func (b RBDPersistentVolumeSourceBuilder) RemoveRBDPool() RBDPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) RemoveRBDPool() *RBDPersistentVolumeSourceBuilder {
 	b.fields.RBDPool = nil
 	return b
 }
 
 // GetRBDPool gets the RBDPool field from the declarative configuration.
-func (b RBDPersistentVolumeSourceBuilder) GetRBDPool() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) GetRBDPool() (value string, ok bool) {
 	if v := b.fields.RBDPool; v != nil {
 		return *v, true
 	}
@@ -152,22 +133,19 @@ func (b RBDPersistentVolumeSourceBuilder) GetRBDPool() (value string, ok bool) {
 }
 
 // SetRadosUser sets the RadosUser field in the declarative configuration to the given value.
-func (b RBDPersistentVolumeSourceBuilder) SetRadosUser(value string) RBDPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) SetRadosUser(value string) *RBDPersistentVolumeSourceBuilder {
 	b.fields.RadosUser = &value
 	return b
 }
 
 // RemoveRadosUser removes the RadosUser field from the declarative configuration.
-func (b RBDPersistentVolumeSourceBuilder) RemoveRadosUser() RBDPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) RemoveRadosUser() *RBDPersistentVolumeSourceBuilder {
 	b.fields.RadosUser = nil
 	return b
 }
 
 // GetRadosUser gets the RadosUser field from the declarative configuration.
-func (b RBDPersistentVolumeSourceBuilder) GetRadosUser() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) GetRadosUser() (value string, ok bool) {
 	if v := b.fields.RadosUser; v != nil {
 		return *v, true
 	}
@@ -175,22 +153,19 @@ func (b RBDPersistentVolumeSourceBuilder) GetRadosUser() (value string, ok bool)
 }
 
 // SetKeyring sets the Keyring field in the declarative configuration to the given value.
-func (b RBDPersistentVolumeSourceBuilder) SetKeyring(value string) RBDPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) SetKeyring(value string) *RBDPersistentVolumeSourceBuilder {
 	b.fields.Keyring = &value
 	return b
 }
 
 // RemoveKeyring removes the Keyring field from the declarative configuration.
-func (b RBDPersistentVolumeSourceBuilder) RemoveKeyring() RBDPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) RemoveKeyring() *RBDPersistentVolumeSourceBuilder {
 	b.fields.Keyring = nil
 	return b
 }
 
 // GetKeyring gets the Keyring field from the declarative configuration.
-func (b RBDPersistentVolumeSourceBuilder) GetKeyring() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) GetKeyring() (value string, ok bool) {
 	if v := b.fields.Keyring; v != nil {
 		return *v, true
 	}
@@ -198,45 +173,36 @@ func (b RBDPersistentVolumeSourceBuilder) GetKeyring() (value string, ok bool) {
 }
 
 // SetSecretRef sets the SecretRef field in the declarative configuration to the given value.
-func (b RBDPersistentVolumeSourceBuilder) SetSecretRef(value SecretReferenceBuilder) RBDPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.SecretRef = &value
+func (b *RBDPersistentVolumeSourceBuilder) SetSecretRef(value *SecretReferenceBuilder) *RBDPersistentVolumeSourceBuilder {
+	b.fields.SecretRef = value
 	return b
 }
 
 // RemoveSecretRef removes the SecretRef field from the declarative configuration.
-func (b RBDPersistentVolumeSourceBuilder) RemoveSecretRef() RBDPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) RemoveSecretRef() *RBDPersistentVolumeSourceBuilder {
 	b.fields.SecretRef = nil
 	return b
 }
 
 // GetSecretRef gets the SecretRef field from the declarative configuration.
-func (b RBDPersistentVolumeSourceBuilder) GetSecretRef() (value SecretReferenceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.SecretRef; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *RBDPersistentVolumeSourceBuilder) GetSecretRef() (value *SecretReferenceBuilder, ok bool) {
+	return b.fields.SecretRef, b.fields.SecretRef != nil
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b RBDPersistentVolumeSourceBuilder) SetReadOnly(value bool) RBDPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) SetReadOnly(value bool) *RBDPersistentVolumeSourceBuilder {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b RBDPersistentVolumeSourceBuilder) RemoveReadOnly() RBDPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) RemoveReadOnly() *RBDPersistentVolumeSourceBuilder {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b RBDPersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *RBDPersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
@@ -248,9 +214,8 @@ func (b *RBDPersistentVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -265,14 +230,13 @@ func (b *RBDPersistentVolumeSourceBuilder) FromUnstructured(u map[string]interfa
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals RBDPersistentVolumeSourceBuilder to JSON.
 func (b *RBDPersistentVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -280,8 +244,7 @@ func (b *RBDPersistentVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into RBDPersistentVolumeSourceBuilder, replacing the contents of
 // RBDPersistentVolumeSourceBuilder.
 func (b *RBDPersistentVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -289,11 +252,9 @@ func (b *RBDPersistentVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // RBDPersistentVolumeSourceList represents a list of RBDPersistentVolumeSourceBuilder.
-// Provided as a convenience.
-type RBDPersistentVolumeSourceList []RBDPersistentVolumeSourceBuilder
+type RBDPersistentVolumeSourceList []*RBDPersistentVolumeSourceBuilder
 
 // RBDPersistentVolumeSourceList represents a map of RBDPersistentVolumeSourceBuilder.
-// Provided as a convenience.
 type RBDPersistentVolumeSourceMap map[string]RBDPersistentVolumeSourceBuilder
 
 func (b *RBDPersistentVolumeSourceBuilder) preMarshal() {

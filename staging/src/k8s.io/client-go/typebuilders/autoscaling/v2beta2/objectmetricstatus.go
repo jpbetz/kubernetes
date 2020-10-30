@@ -27,100 +27,75 @@ import (
 // ObjectMetricStatusBuilder represents an declarative configuration of the ObjectMetricStatus type for use
 // with apply.
 type ObjectMetricStatusBuilder struct {
-	fields *objectMetricStatusFields
+	fields objectMetricStatusFields
 }
 
-// objectMetricStatusFields is used by ObjectMetricStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ObjectMetricStatusBuilder before marshalling, and
-// are copied out to the builder type in ObjectMetricStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// objectMetricStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ObjectMetricStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type objectMetricStatusFields struct {
 	Metric          *MetricIdentifierBuilder            `json:"metric,omitempty"`
 	Current         *MetricValueStatusBuilder           `json:"current,omitempty"`
 	DescribedObject *CrossVersionObjectReferenceBuilder `json:"describedObject,omitempty"`
 }
 
-func (b *ObjectMetricStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &objectMetricStatusFields{}
-	}
-}
-
 // ObjectMetricStatus constructs an declarative configuration of the ObjectMetricStatus type for use with
 // apply.
-// Provided as a convenience.
-func ObjectMetricStatus() ObjectMetricStatusBuilder {
-	return ObjectMetricStatusBuilder{fields: &objectMetricStatusFields{}}
+func ObjectMetricStatus() *ObjectMetricStatusBuilder {
+	return &ObjectMetricStatusBuilder{}
 }
 
 // SetMetric sets the Metric field in the declarative configuration to the given value.
-func (b ObjectMetricStatusBuilder) SetMetric(value MetricIdentifierBuilder) ObjectMetricStatusBuilder {
-	b.ensureInitialized()
-	b.fields.Metric = &value
+func (b *ObjectMetricStatusBuilder) SetMetric(value *MetricIdentifierBuilder) *ObjectMetricStatusBuilder {
+	b.fields.Metric = value
 	return b
 }
 
 // RemoveMetric removes the Metric field from the declarative configuration.
-func (b ObjectMetricStatusBuilder) RemoveMetric() ObjectMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetricStatusBuilder) RemoveMetric() *ObjectMetricStatusBuilder {
 	b.fields.Metric = nil
 	return b
 }
 
 // GetMetric gets the Metric field from the declarative configuration.
-func (b ObjectMetricStatusBuilder) GetMetric() (value MetricIdentifierBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Metric; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ObjectMetricStatusBuilder) GetMetric() (value *MetricIdentifierBuilder, ok bool) {
+	return b.fields.Metric, b.fields.Metric != nil
 }
 
 // SetCurrent sets the Current field in the declarative configuration to the given value.
-func (b ObjectMetricStatusBuilder) SetCurrent(value MetricValueStatusBuilder) ObjectMetricStatusBuilder {
-	b.ensureInitialized()
-	b.fields.Current = &value
+func (b *ObjectMetricStatusBuilder) SetCurrent(value *MetricValueStatusBuilder) *ObjectMetricStatusBuilder {
+	b.fields.Current = value
 	return b
 }
 
 // RemoveCurrent removes the Current field from the declarative configuration.
-func (b ObjectMetricStatusBuilder) RemoveCurrent() ObjectMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetricStatusBuilder) RemoveCurrent() *ObjectMetricStatusBuilder {
 	b.fields.Current = nil
 	return b
 }
 
 // GetCurrent gets the Current field from the declarative configuration.
-func (b ObjectMetricStatusBuilder) GetCurrent() (value MetricValueStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Current; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ObjectMetricStatusBuilder) GetCurrent() (value *MetricValueStatusBuilder, ok bool) {
+	return b.fields.Current, b.fields.Current != nil
 }
 
 // SetDescribedObject sets the DescribedObject field in the declarative configuration to the given value.
-func (b ObjectMetricStatusBuilder) SetDescribedObject(value CrossVersionObjectReferenceBuilder) ObjectMetricStatusBuilder {
-	b.ensureInitialized()
-	b.fields.DescribedObject = &value
+func (b *ObjectMetricStatusBuilder) SetDescribedObject(value *CrossVersionObjectReferenceBuilder) *ObjectMetricStatusBuilder {
+	b.fields.DescribedObject = value
 	return b
 }
 
 // RemoveDescribedObject removes the DescribedObject field from the declarative configuration.
-func (b ObjectMetricStatusBuilder) RemoveDescribedObject() ObjectMetricStatusBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetricStatusBuilder) RemoveDescribedObject() *ObjectMetricStatusBuilder {
 	b.fields.DescribedObject = nil
 	return b
 }
 
 // GetDescribedObject gets the DescribedObject field from the declarative configuration.
-func (b ObjectMetricStatusBuilder) GetDescribedObject() (value CrossVersionObjectReferenceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.DescribedObject; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ObjectMetricStatusBuilder) GetDescribedObject() (value *CrossVersionObjectReferenceBuilder, ok bool) {
+	return b.fields.DescribedObject, b.fields.DescribedObject != nil
 }
 
 // ToUnstructured converts ObjectMetricStatusBuilder to unstructured.
@@ -128,9 +103,8 @@ func (b *ObjectMetricStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +119,13 @@ func (b *ObjectMetricStatusBuilder) FromUnstructured(u map[string]interface{}) e
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ObjectMetricStatusBuilder to JSON.
 func (b *ObjectMetricStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +133,7 @@ func (b *ObjectMetricStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ObjectMetricStatusBuilder, replacing the contents of
 // ObjectMetricStatusBuilder.
 func (b *ObjectMetricStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,11 +141,9 @@ func (b *ObjectMetricStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ObjectMetricStatusList represents a list of ObjectMetricStatusBuilder.
-// Provided as a convenience.
-type ObjectMetricStatusList []ObjectMetricStatusBuilder
+type ObjectMetricStatusList []*ObjectMetricStatusBuilder
 
 // ObjectMetricStatusList represents a map of ObjectMetricStatusBuilder.
-// Provided as a convenience.
 type ObjectMetricStatusMap map[string]ObjectMetricStatusBuilder
 
 func (b *ObjectMetricStatusBuilder) preMarshal() {

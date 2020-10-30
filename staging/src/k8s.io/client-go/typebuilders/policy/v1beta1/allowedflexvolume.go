@@ -27,48 +27,38 @@ import (
 // AllowedFlexVolumeBuilder represents an declarative configuration of the AllowedFlexVolume type for use
 // with apply.
 type AllowedFlexVolumeBuilder struct {
-	fields *allowedFlexVolumeFields
+	fields allowedFlexVolumeFields
 }
 
-// allowedFlexVolumeFields is used by AllowedFlexVolumeBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in AllowedFlexVolumeBuilder before marshalling, and
-// are copied out to the builder type in AllowedFlexVolumeBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// allowedFlexVolumeFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in AllowedFlexVolumeBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type allowedFlexVolumeFields struct {
 	Driver *string `json:"driver,omitempty"`
 }
 
-func (b *AllowedFlexVolumeBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &allowedFlexVolumeFields{}
-	}
-}
-
 // AllowedFlexVolume constructs an declarative configuration of the AllowedFlexVolume type for use with
 // apply.
-// Provided as a convenience.
-func AllowedFlexVolume() AllowedFlexVolumeBuilder {
-	return AllowedFlexVolumeBuilder{fields: &allowedFlexVolumeFields{}}
+func AllowedFlexVolume() *AllowedFlexVolumeBuilder {
+	return &AllowedFlexVolumeBuilder{}
 }
 
 // SetDriver sets the Driver field in the declarative configuration to the given value.
-func (b AllowedFlexVolumeBuilder) SetDriver(value string) AllowedFlexVolumeBuilder {
-	b.ensureInitialized()
+func (b *AllowedFlexVolumeBuilder) SetDriver(value string) *AllowedFlexVolumeBuilder {
 	b.fields.Driver = &value
 	return b
 }
 
 // RemoveDriver removes the Driver field from the declarative configuration.
-func (b AllowedFlexVolumeBuilder) RemoveDriver() AllowedFlexVolumeBuilder {
-	b.ensureInitialized()
+func (b *AllowedFlexVolumeBuilder) RemoveDriver() *AllowedFlexVolumeBuilder {
 	b.fields.Driver = nil
 	return b
 }
 
 // GetDriver gets the Driver field from the declarative configuration.
-func (b AllowedFlexVolumeBuilder) GetDriver() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *AllowedFlexVolumeBuilder) GetDriver() (value string, ok bool) {
 	if v := b.fields.Driver; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *AllowedFlexVolumeBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *AllowedFlexVolumeBuilder) FromUnstructured(u map[string]interface{}) er
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals AllowedFlexVolumeBuilder to JSON.
 func (b *AllowedFlexVolumeBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *AllowedFlexVolumeBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into AllowedFlexVolumeBuilder, replacing the contents of
 // AllowedFlexVolumeBuilder.
 func (b *AllowedFlexVolumeBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *AllowedFlexVolumeBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // AllowedFlexVolumeList represents a list of AllowedFlexVolumeBuilder.
-// Provided as a convenience.
-type AllowedFlexVolumeList []AllowedFlexVolumeBuilder
+type AllowedFlexVolumeList []*AllowedFlexVolumeBuilder
 
 // AllowedFlexVolumeList represents a map of AllowedFlexVolumeBuilder.
-// Provided as a convenience.
 type AllowedFlexVolumeMap map[string]AllowedFlexVolumeBuilder
 
 func (b *AllowedFlexVolumeBuilder) preMarshal() {

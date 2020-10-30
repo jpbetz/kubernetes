@@ -27,14 +27,14 @@ import (
 // HorizontalPodAutoscalerSpecBuilder represents an declarative configuration of the HorizontalPodAutoscalerSpec type for use
 // with apply.
 type HorizontalPodAutoscalerSpecBuilder struct {
-	fields *horizontalPodAutoscalerSpecFields
+	fields horizontalPodAutoscalerSpecFields
 }
 
-// horizontalPodAutoscalerSpecFields is used by HorizontalPodAutoscalerSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in HorizontalPodAutoscalerSpecBuilder before marshalling, and
-// are copied out to the builder type in HorizontalPodAutoscalerSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// horizontalPodAutoscalerSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in HorizontalPodAutoscalerSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type horizontalPodAutoscalerSpecFields struct {
 	ScaleTargetRef                 *CrossVersionObjectReferenceBuilder `json:"scaleTargetRef,omitempty"`
 	MinReplicas                    *int32                              `json:"minReplicas,omitempty"`
@@ -42,59 +42,43 @@ type horizontalPodAutoscalerSpecFields struct {
 	TargetCPUUtilizationPercentage *int32                              `json:"targetCPUUtilizationPercentage,omitempty"`
 }
 
-func (b *HorizontalPodAutoscalerSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &horizontalPodAutoscalerSpecFields{}
-	}
-}
-
 // HorizontalPodAutoscalerSpec constructs an declarative configuration of the HorizontalPodAutoscalerSpec type for use with
 // apply.
-// Provided as a convenience.
-func HorizontalPodAutoscalerSpec() HorizontalPodAutoscalerSpecBuilder {
-	return HorizontalPodAutoscalerSpecBuilder{fields: &horizontalPodAutoscalerSpecFields{}}
+func HorizontalPodAutoscalerSpec() *HorizontalPodAutoscalerSpecBuilder {
+	return &HorizontalPodAutoscalerSpecBuilder{}
 }
 
 // SetScaleTargetRef sets the ScaleTargetRef field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerSpecBuilder) SetScaleTargetRef(value CrossVersionObjectReferenceBuilder) HorizontalPodAutoscalerSpecBuilder {
-	b.ensureInitialized()
-	b.fields.ScaleTargetRef = &value
+func (b *HorizontalPodAutoscalerSpecBuilder) SetScaleTargetRef(value *CrossVersionObjectReferenceBuilder) *HorizontalPodAutoscalerSpecBuilder {
+	b.fields.ScaleTargetRef = value
 	return b
 }
 
 // RemoveScaleTargetRef removes the ScaleTargetRef field from the declarative configuration.
-func (b HorizontalPodAutoscalerSpecBuilder) RemoveScaleTargetRef() HorizontalPodAutoscalerSpecBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerSpecBuilder) RemoveScaleTargetRef() *HorizontalPodAutoscalerSpecBuilder {
 	b.fields.ScaleTargetRef = nil
 	return b
 }
 
 // GetScaleTargetRef gets the ScaleTargetRef field from the declarative configuration.
-func (b HorizontalPodAutoscalerSpecBuilder) GetScaleTargetRef() (value CrossVersionObjectReferenceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ScaleTargetRef; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *HorizontalPodAutoscalerSpecBuilder) GetScaleTargetRef() (value *CrossVersionObjectReferenceBuilder, ok bool) {
+	return b.fields.ScaleTargetRef, b.fields.ScaleTargetRef != nil
 }
 
 // SetMinReplicas sets the MinReplicas field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerSpecBuilder) SetMinReplicas(value int32) HorizontalPodAutoscalerSpecBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerSpecBuilder) SetMinReplicas(value int32) *HorizontalPodAutoscalerSpecBuilder {
 	b.fields.MinReplicas = &value
 	return b
 }
 
 // RemoveMinReplicas removes the MinReplicas field from the declarative configuration.
-func (b HorizontalPodAutoscalerSpecBuilder) RemoveMinReplicas() HorizontalPodAutoscalerSpecBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerSpecBuilder) RemoveMinReplicas() *HorizontalPodAutoscalerSpecBuilder {
 	b.fields.MinReplicas = nil
 	return b
 }
 
 // GetMinReplicas gets the MinReplicas field from the declarative configuration.
-func (b HorizontalPodAutoscalerSpecBuilder) GetMinReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerSpecBuilder) GetMinReplicas() (value int32, ok bool) {
 	if v := b.fields.MinReplicas; v != nil {
 		return *v, true
 	}
@@ -102,22 +86,19 @@ func (b HorizontalPodAutoscalerSpecBuilder) GetMinReplicas() (value int32, ok bo
 }
 
 // SetMaxReplicas sets the MaxReplicas field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerSpecBuilder) SetMaxReplicas(value int32) HorizontalPodAutoscalerSpecBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerSpecBuilder) SetMaxReplicas(value int32) *HorizontalPodAutoscalerSpecBuilder {
 	b.fields.MaxReplicas = &value
 	return b
 }
 
 // RemoveMaxReplicas removes the MaxReplicas field from the declarative configuration.
-func (b HorizontalPodAutoscalerSpecBuilder) RemoveMaxReplicas() HorizontalPodAutoscalerSpecBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerSpecBuilder) RemoveMaxReplicas() *HorizontalPodAutoscalerSpecBuilder {
 	b.fields.MaxReplicas = nil
 	return b
 }
 
 // GetMaxReplicas gets the MaxReplicas field from the declarative configuration.
-func (b HorizontalPodAutoscalerSpecBuilder) GetMaxReplicas() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerSpecBuilder) GetMaxReplicas() (value int32, ok bool) {
 	if v := b.fields.MaxReplicas; v != nil {
 		return *v, true
 	}
@@ -125,22 +106,19 @@ func (b HorizontalPodAutoscalerSpecBuilder) GetMaxReplicas() (value int32, ok bo
 }
 
 // SetTargetCPUUtilizationPercentage sets the TargetCPUUtilizationPercentage field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerSpecBuilder) SetTargetCPUUtilizationPercentage(value int32) HorizontalPodAutoscalerSpecBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerSpecBuilder) SetTargetCPUUtilizationPercentage(value int32) *HorizontalPodAutoscalerSpecBuilder {
 	b.fields.TargetCPUUtilizationPercentage = &value
 	return b
 }
 
 // RemoveTargetCPUUtilizationPercentage removes the TargetCPUUtilizationPercentage field from the declarative configuration.
-func (b HorizontalPodAutoscalerSpecBuilder) RemoveTargetCPUUtilizationPercentage() HorizontalPodAutoscalerSpecBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerSpecBuilder) RemoveTargetCPUUtilizationPercentage() *HorizontalPodAutoscalerSpecBuilder {
 	b.fields.TargetCPUUtilizationPercentage = nil
 	return b
 }
 
 // GetTargetCPUUtilizationPercentage gets the TargetCPUUtilizationPercentage field from the declarative configuration.
-func (b HorizontalPodAutoscalerSpecBuilder) GetTargetCPUUtilizationPercentage() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerSpecBuilder) GetTargetCPUUtilizationPercentage() (value int32, ok bool) {
 	if v := b.fields.TargetCPUUtilizationPercentage; v != nil {
 		return *v, true
 	}
@@ -152,9 +130,8 @@ func (b *HorizontalPodAutoscalerSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +146,13 @@ func (b *HorizontalPodAutoscalerSpecBuilder) FromUnstructured(u map[string]inter
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals HorizontalPodAutoscalerSpecBuilder to JSON.
 func (b *HorizontalPodAutoscalerSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +160,7 @@ func (b *HorizontalPodAutoscalerSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into HorizontalPodAutoscalerSpecBuilder, replacing the contents of
 // HorizontalPodAutoscalerSpecBuilder.
 func (b *HorizontalPodAutoscalerSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,11 +168,9 @@ func (b *HorizontalPodAutoscalerSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // HorizontalPodAutoscalerSpecList represents a list of HorizontalPodAutoscalerSpecBuilder.
-// Provided as a convenience.
-type HorizontalPodAutoscalerSpecList []HorizontalPodAutoscalerSpecBuilder
+type HorizontalPodAutoscalerSpecList []*HorizontalPodAutoscalerSpecBuilder
 
 // HorizontalPodAutoscalerSpecList represents a map of HorizontalPodAutoscalerSpecBuilder.
-// Provided as a convenience.
 type HorizontalPodAutoscalerSpecMap map[string]HorizontalPodAutoscalerSpecBuilder
 
 func (b *HorizontalPodAutoscalerSpecBuilder) preMarshal() {

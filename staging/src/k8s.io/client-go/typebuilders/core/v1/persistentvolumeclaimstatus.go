@@ -28,14 +28,14 @@ import (
 // PersistentVolumeClaimStatusBuilder represents an declarative configuration of the PersistentVolumeClaimStatus type for use
 // with apply.
 type PersistentVolumeClaimStatusBuilder struct {
-	fields *persistentVolumeClaimStatusFields
+	fields persistentVolumeClaimStatusFields
 }
 
-// persistentVolumeClaimStatusFields is used by PersistentVolumeClaimStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in PersistentVolumeClaimStatusBuilder before marshalling, and
-// are copied out to the builder type in PersistentVolumeClaimStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// persistentVolumeClaimStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in PersistentVolumeClaimStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type persistentVolumeClaimStatusFields struct {
 	Phase       *v1.PersistentVolumeClaimPhase      `json:"phase,omitempty"`
 	AccessModes *[]v1.PersistentVolumeAccessMode    `json:"accessModes,omitempty"`
@@ -43,36 +43,26 @@ type persistentVolumeClaimStatusFields struct {
 	Conditions  *PersistentVolumeClaimConditionList `json:"conditions,omitempty"`
 }
 
-func (b *PersistentVolumeClaimStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &persistentVolumeClaimStatusFields{}
-	}
-}
-
 // PersistentVolumeClaimStatus constructs an declarative configuration of the PersistentVolumeClaimStatus type for use with
 // apply.
-// Provided as a convenience.
-func PersistentVolumeClaimStatus() PersistentVolumeClaimStatusBuilder {
-	return PersistentVolumeClaimStatusBuilder{fields: &persistentVolumeClaimStatusFields{}}
+func PersistentVolumeClaimStatus() *PersistentVolumeClaimStatusBuilder {
+	return &PersistentVolumeClaimStatusBuilder{}
 }
 
 // SetPhase sets the Phase field in the declarative configuration to the given value.
-func (b PersistentVolumeClaimStatusBuilder) SetPhase(value v1.PersistentVolumeClaimPhase) PersistentVolumeClaimStatusBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimStatusBuilder) SetPhase(value v1.PersistentVolumeClaimPhase) *PersistentVolumeClaimStatusBuilder {
 	b.fields.Phase = &value
 	return b
 }
 
 // RemovePhase removes the Phase field from the declarative configuration.
-func (b PersistentVolumeClaimStatusBuilder) RemovePhase() PersistentVolumeClaimStatusBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimStatusBuilder) RemovePhase() *PersistentVolumeClaimStatusBuilder {
 	b.fields.Phase = nil
 	return b
 }
 
 // GetPhase gets the Phase field from the declarative configuration.
-func (b PersistentVolumeClaimStatusBuilder) GetPhase() (value v1.PersistentVolumeClaimPhase, ok bool) {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimStatusBuilder) GetPhase() (value v1.PersistentVolumeClaimPhase, ok bool) {
 	if v := b.fields.Phase; v != nil {
 		return *v, true
 	}
@@ -80,22 +70,19 @@ func (b PersistentVolumeClaimStatusBuilder) GetPhase() (value v1.PersistentVolum
 }
 
 // SetAccessModes sets the AccessModes field in the declarative configuration to the given value.
-func (b PersistentVolumeClaimStatusBuilder) SetAccessModes(value []v1.PersistentVolumeAccessMode) PersistentVolumeClaimStatusBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimStatusBuilder) SetAccessModes(value []v1.PersistentVolumeAccessMode) *PersistentVolumeClaimStatusBuilder {
 	b.fields.AccessModes = &value
 	return b
 }
 
 // RemoveAccessModes removes the AccessModes field from the declarative configuration.
-func (b PersistentVolumeClaimStatusBuilder) RemoveAccessModes() PersistentVolumeClaimStatusBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimStatusBuilder) RemoveAccessModes() *PersistentVolumeClaimStatusBuilder {
 	b.fields.AccessModes = nil
 	return b
 }
 
 // GetAccessModes gets the AccessModes field from the declarative configuration.
-func (b PersistentVolumeClaimStatusBuilder) GetAccessModes() (value []v1.PersistentVolumeAccessMode, ok bool) {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimStatusBuilder) GetAccessModes() (value []v1.PersistentVolumeAccessMode, ok bool) {
 	if v := b.fields.AccessModes; v != nil {
 		return *v, true
 	}
@@ -103,22 +90,19 @@ func (b PersistentVolumeClaimStatusBuilder) GetAccessModes() (value []v1.Persist
 }
 
 // SetCapacity sets the Capacity field in the declarative configuration to the given value.
-func (b PersistentVolumeClaimStatusBuilder) SetCapacity(value v1.ResourceList) PersistentVolumeClaimStatusBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimStatusBuilder) SetCapacity(value v1.ResourceList) *PersistentVolumeClaimStatusBuilder {
 	b.fields.Capacity = &value
 	return b
 }
 
 // RemoveCapacity removes the Capacity field from the declarative configuration.
-func (b PersistentVolumeClaimStatusBuilder) RemoveCapacity() PersistentVolumeClaimStatusBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimStatusBuilder) RemoveCapacity() *PersistentVolumeClaimStatusBuilder {
 	b.fields.Capacity = nil
 	return b
 }
 
 // GetCapacity gets the Capacity field from the declarative configuration.
-func (b PersistentVolumeClaimStatusBuilder) GetCapacity() (value v1.ResourceList, ok bool) {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimStatusBuilder) GetCapacity() (value v1.ResourceList, ok bool) {
 	if v := b.fields.Capacity; v != nil {
 		return *v, true
 	}
@@ -126,22 +110,19 @@ func (b PersistentVolumeClaimStatusBuilder) GetCapacity() (value v1.ResourceList
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b PersistentVolumeClaimStatusBuilder) SetConditions(value PersistentVolumeClaimConditionList) PersistentVolumeClaimStatusBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimStatusBuilder) SetConditions(value PersistentVolumeClaimConditionList) *PersistentVolumeClaimStatusBuilder {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b PersistentVolumeClaimStatusBuilder) RemoveConditions() PersistentVolumeClaimStatusBuilder {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimStatusBuilder) RemoveConditions() *PersistentVolumeClaimStatusBuilder {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b PersistentVolumeClaimStatusBuilder) GetConditions() (value PersistentVolumeClaimConditionList, ok bool) {
-	b.ensureInitialized()
+func (b *PersistentVolumeClaimStatusBuilder) GetConditions() (value PersistentVolumeClaimConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
@@ -153,9 +134,8 @@ func (b *PersistentVolumeClaimStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -170,14 +150,13 @@ func (b *PersistentVolumeClaimStatusBuilder) FromUnstructured(u map[string]inter
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals PersistentVolumeClaimStatusBuilder to JSON.
 func (b *PersistentVolumeClaimStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -185,8 +164,7 @@ func (b *PersistentVolumeClaimStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into PersistentVolumeClaimStatusBuilder, replacing the contents of
 // PersistentVolumeClaimStatusBuilder.
 func (b *PersistentVolumeClaimStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -194,11 +172,9 @@ func (b *PersistentVolumeClaimStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // PersistentVolumeClaimStatusList represents a list of PersistentVolumeClaimStatusBuilder.
-// Provided as a convenience.
-type PersistentVolumeClaimStatusList []PersistentVolumeClaimStatusBuilder
+type PersistentVolumeClaimStatusList []*PersistentVolumeClaimStatusBuilder
 
 // PersistentVolumeClaimStatusList represents a map of PersistentVolumeClaimStatusBuilder.
-// Provided as a convenience.
 type PersistentVolumeClaimStatusMap map[string]PersistentVolumeClaimStatusBuilder
 
 func (b *PersistentVolumeClaimStatusBuilder) preMarshal() {

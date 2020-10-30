@@ -28,14 +28,14 @@ import (
 // ContainerStateTerminatedBuilder represents an declarative configuration of the ContainerStateTerminated type for use
 // with apply.
 type ContainerStateTerminatedBuilder struct {
-	fields *containerStateTerminatedFields
+	fields containerStateTerminatedFields
 }
 
-// containerStateTerminatedFields is used by ContainerStateTerminatedBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ContainerStateTerminatedBuilder before marshalling, and
-// are copied out to the builder type in ContainerStateTerminatedBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// containerStateTerminatedFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ContainerStateTerminatedBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type containerStateTerminatedFields struct {
 	ExitCode    *int32   `json:"exitCode,omitempty"`
 	Signal      *int32   `json:"signal,omitempty"`
@@ -46,36 +46,26 @@ type containerStateTerminatedFields struct {
 	ContainerID *string  `json:"containerID,omitempty"`
 }
 
-func (b *ContainerStateTerminatedBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &containerStateTerminatedFields{}
-	}
-}
-
 // ContainerStateTerminated constructs an declarative configuration of the ContainerStateTerminated type for use with
 // apply.
-// Provided as a convenience.
-func ContainerStateTerminated() ContainerStateTerminatedBuilder {
-	return ContainerStateTerminatedBuilder{fields: &containerStateTerminatedFields{}}
+func ContainerStateTerminated() *ContainerStateTerminatedBuilder {
+	return &ContainerStateTerminatedBuilder{}
 }
 
 // SetExitCode sets the ExitCode field in the declarative configuration to the given value.
-func (b ContainerStateTerminatedBuilder) SetExitCode(value int32) ContainerStateTerminatedBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) SetExitCode(value int32) *ContainerStateTerminatedBuilder {
 	b.fields.ExitCode = &value
 	return b
 }
 
 // RemoveExitCode removes the ExitCode field from the declarative configuration.
-func (b ContainerStateTerminatedBuilder) RemoveExitCode() ContainerStateTerminatedBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) RemoveExitCode() *ContainerStateTerminatedBuilder {
 	b.fields.ExitCode = nil
 	return b
 }
 
 // GetExitCode gets the ExitCode field from the declarative configuration.
-func (b ContainerStateTerminatedBuilder) GetExitCode() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) GetExitCode() (value int32, ok bool) {
 	if v := b.fields.ExitCode; v != nil {
 		return *v, true
 	}
@@ -83,22 +73,19 @@ func (b ContainerStateTerminatedBuilder) GetExitCode() (value int32, ok bool) {
 }
 
 // SetSignal sets the Signal field in the declarative configuration to the given value.
-func (b ContainerStateTerminatedBuilder) SetSignal(value int32) ContainerStateTerminatedBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) SetSignal(value int32) *ContainerStateTerminatedBuilder {
 	b.fields.Signal = &value
 	return b
 }
 
 // RemoveSignal removes the Signal field from the declarative configuration.
-func (b ContainerStateTerminatedBuilder) RemoveSignal() ContainerStateTerminatedBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) RemoveSignal() *ContainerStateTerminatedBuilder {
 	b.fields.Signal = nil
 	return b
 }
 
 // GetSignal gets the Signal field from the declarative configuration.
-func (b ContainerStateTerminatedBuilder) GetSignal() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) GetSignal() (value int32, ok bool) {
 	if v := b.fields.Signal; v != nil {
 		return *v, true
 	}
@@ -106,22 +93,19 @@ func (b ContainerStateTerminatedBuilder) GetSignal() (value int32, ok bool) {
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b ContainerStateTerminatedBuilder) SetReason(value string) ContainerStateTerminatedBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) SetReason(value string) *ContainerStateTerminatedBuilder {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b ContainerStateTerminatedBuilder) RemoveReason() ContainerStateTerminatedBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) RemoveReason() *ContainerStateTerminatedBuilder {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b ContainerStateTerminatedBuilder) GetReason() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -129,22 +113,19 @@ func (b ContainerStateTerminatedBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b ContainerStateTerminatedBuilder) SetMessage(value string) ContainerStateTerminatedBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) SetMessage(value string) *ContainerStateTerminatedBuilder {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b ContainerStateTerminatedBuilder) RemoveMessage() ContainerStateTerminatedBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) RemoveMessage() *ContainerStateTerminatedBuilder {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b ContainerStateTerminatedBuilder) GetMessage() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
@@ -152,22 +133,19 @@ func (b ContainerStateTerminatedBuilder) GetMessage() (value string, ok bool) {
 }
 
 // SetStartedAt sets the StartedAt field in the declarative configuration to the given value.
-func (b ContainerStateTerminatedBuilder) SetStartedAt(value v1.Time) ContainerStateTerminatedBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) SetStartedAt(value v1.Time) *ContainerStateTerminatedBuilder {
 	b.fields.StartedAt = &value
 	return b
 }
 
 // RemoveStartedAt removes the StartedAt field from the declarative configuration.
-func (b ContainerStateTerminatedBuilder) RemoveStartedAt() ContainerStateTerminatedBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) RemoveStartedAt() *ContainerStateTerminatedBuilder {
 	b.fields.StartedAt = nil
 	return b
 }
 
 // GetStartedAt gets the StartedAt field from the declarative configuration.
-func (b ContainerStateTerminatedBuilder) GetStartedAt() (value v1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) GetStartedAt() (value v1.Time, ok bool) {
 	if v := b.fields.StartedAt; v != nil {
 		return *v, true
 	}
@@ -175,22 +153,19 @@ func (b ContainerStateTerminatedBuilder) GetStartedAt() (value v1.Time, ok bool)
 }
 
 // SetFinishedAt sets the FinishedAt field in the declarative configuration to the given value.
-func (b ContainerStateTerminatedBuilder) SetFinishedAt(value v1.Time) ContainerStateTerminatedBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) SetFinishedAt(value v1.Time) *ContainerStateTerminatedBuilder {
 	b.fields.FinishedAt = &value
 	return b
 }
 
 // RemoveFinishedAt removes the FinishedAt field from the declarative configuration.
-func (b ContainerStateTerminatedBuilder) RemoveFinishedAt() ContainerStateTerminatedBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) RemoveFinishedAt() *ContainerStateTerminatedBuilder {
 	b.fields.FinishedAt = nil
 	return b
 }
 
 // GetFinishedAt gets the FinishedAt field from the declarative configuration.
-func (b ContainerStateTerminatedBuilder) GetFinishedAt() (value v1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) GetFinishedAt() (value v1.Time, ok bool) {
 	if v := b.fields.FinishedAt; v != nil {
 		return *v, true
 	}
@@ -198,22 +173,19 @@ func (b ContainerStateTerminatedBuilder) GetFinishedAt() (value v1.Time, ok bool
 }
 
 // SetContainerID sets the ContainerID field in the declarative configuration to the given value.
-func (b ContainerStateTerminatedBuilder) SetContainerID(value string) ContainerStateTerminatedBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) SetContainerID(value string) *ContainerStateTerminatedBuilder {
 	b.fields.ContainerID = &value
 	return b
 }
 
 // RemoveContainerID removes the ContainerID field from the declarative configuration.
-func (b ContainerStateTerminatedBuilder) RemoveContainerID() ContainerStateTerminatedBuilder {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) RemoveContainerID() *ContainerStateTerminatedBuilder {
 	b.fields.ContainerID = nil
 	return b
 }
 
 // GetContainerID gets the ContainerID field from the declarative configuration.
-func (b ContainerStateTerminatedBuilder) GetContainerID() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerStateTerminatedBuilder) GetContainerID() (value string, ok bool) {
 	if v := b.fields.ContainerID; v != nil {
 		return *v, true
 	}
@@ -225,9 +197,8 @@ func (b *ContainerStateTerminatedBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -242,14 +213,13 @@ func (b *ContainerStateTerminatedBuilder) FromUnstructured(u map[string]interfac
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ContainerStateTerminatedBuilder to JSON.
 func (b *ContainerStateTerminatedBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -257,8 +227,7 @@ func (b *ContainerStateTerminatedBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ContainerStateTerminatedBuilder, replacing the contents of
 // ContainerStateTerminatedBuilder.
 func (b *ContainerStateTerminatedBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -266,11 +235,9 @@ func (b *ContainerStateTerminatedBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ContainerStateTerminatedList represents a list of ContainerStateTerminatedBuilder.
-// Provided as a convenience.
-type ContainerStateTerminatedList []ContainerStateTerminatedBuilder
+type ContainerStateTerminatedList []*ContainerStateTerminatedBuilder
 
 // ContainerStateTerminatedList represents a map of ContainerStateTerminatedBuilder.
-// Provided as a convenience.
 type ContainerStateTerminatedMap map[string]ContainerStateTerminatedBuilder
 
 func (b *ContainerStateTerminatedBuilder) preMarshal() {

@@ -28,49 +28,39 @@ import (
 // ResourceQuotaStatusBuilder represents an declarative configuration of the ResourceQuotaStatus type for use
 // with apply.
 type ResourceQuotaStatusBuilder struct {
-	fields *resourceQuotaStatusFields
+	fields resourceQuotaStatusFields
 }
 
-// resourceQuotaStatusFields is used by ResourceQuotaStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ResourceQuotaStatusBuilder before marshalling, and
-// are copied out to the builder type in ResourceQuotaStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// resourceQuotaStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ResourceQuotaStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type resourceQuotaStatusFields struct {
 	Hard *v1.ResourceList `json:"hard,omitempty"`
 	Used *v1.ResourceList `json:"used,omitempty"`
 }
 
-func (b *ResourceQuotaStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &resourceQuotaStatusFields{}
-	}
-}
-
 // ResourceQuotaStatus constructs an declarative configuration of the ResourceQuotaStatus type for use with
 // apply.
-// Provided as a convenience.
-func ResourceQuotaStatus() ResourceQuotaStatusBuilder {
-	return ResourceQuotaStatusBuilder{fields: &resourceQuotaStatusFields{}}
+func ResourceQuotaStatus() *ResourceQuotaStatusBuilder {
+	return &ResourceQuotaStatusBuilder{}
 }
 
 // SetHard sets the Hard field in the declarative configuration to the given value.
-func (b ResourceQuotaStatusBuilder) SetHard(value v1.ResourceList) ResourceQuotaStatusBuilder {
-	b.ensureInitialized()
+func (b *ResourceQuotaStatusBuilder) SetHard(value v1.ResourceList) *ResourceQuotaStatusBuilder {
 	b.fields.Hard = &value
 	return b
 }
 
 // RemoveHard removes the Hard field from the declarative configuration.
-func (b ResourceQuotaStatusBuilder) RemoveHard() ResourceQuotaStatusBuilder {
-	b.ensureInitialized()
+func (b *ResourceQuotaStatusBuilder) RemoveHard() *ResourceQuotaStatusBuilder {
 	b.fields.Hard = nil
 	return b
 }
 
 // GetHard gets the Hard field from the declarative configuration.
-func (b ResourceQuotaStatusBuilder) GetHard() (value v1.ResourceList, ok bool) {
-	b.ensureInitialized()
+func (b *ResourceQuotaStatusBuilder) GetHard() (value v1.ResourceList, ok bool) {
 	if v := b.fields.Hard; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b ResourceQuotaStatusBuilder) GetHard() (value v1.ResourceList, ok bool) {
 }
 
 // SetUsed sets the Used field in the declarative configuration to the given value.
-func (b ResourceQuotaStatusBuilder) SetUsed(value v1.ResourceList) ResourceQuotaStatusBuilder {
-	b.ensureInitialized()
+func (b *ResourceQuotaStatusBuilder) SetUsed(value v1.ResourceList) *ResourceQuotaStatusBuilder {
 	b.fields.Used = &value
 	return b
 }
 
 // RemoveUsed removes the Used field from the declarative configuration.
-func (b ResourceQuotaStatusBuilder) RemoveUsed() ResourceQuotaStatusBuilder {
-	b.ensureInitialized()
+func (b *ResourceQuotaStatusBuilder) RemoveUsed() *ResourceQuotaStatusBuilder {
 	b.fields.Used = nil
 	return b
 }
 
 // GetUsed gets the Used field from the declarative configuration.
-func (b ResourceQuotaStatusBuilder) GetUsed() (value v1.ResourceList, ok bool) {
-	b.ensureInitialized()
+func (b *ResourceQuotaStatusBuilder) GetUsed() (value v1.ResourceList, ok bool) {
 	if v := b.fields.Used; v != nil {
 		return *v, true
 	}
@@ -105,9 +92,8 @@ func (b *ResourceQuotaStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +108,13 @@ func (b *ResourceQuotaStatusBuilder) FromUnstructured(u map[string]interface{}) 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ResourceQuotaStatusBuilder to JSON.
 func (b *ResourceQuotaStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +122,7 @@ func (b *ResourceQuotaStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ResourceQuotaStatusBuilder, replacing the contents of
 // ResourceQuotaStatusBuilder.
 func (b *ResourceQuotaStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +130,9 @@ func (b *ResourceQuotaStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ResourceQuotaStatusList represents a list of ResourceQuotaStatusBuilder.
-// Provided as a convenience.
-type ResourceQuotaStatusList []ResourceQuotaStatusBuilder
+type ResourceQuotaStatusList []*ResourceQuotaStatusBuilder
 
 // ResourceQuotaStatusList represents a map of ResourceQuotaStatusBuilder.
-// Provided as a convenience.
 type ResourceQuotaStatusMap map[string]ResourceQuotaStatusBuilder
 
 func (b *ResourceQuotaStatusBuilder) preMarshal() {

@@ -27,48 +27,38 @@ import (
 // DaemonEndpointBuilder represents an declarative configuration of the DaemonEndpoint type for use
 // with apply.
 type DaemonEndpointBuilder struct {
-	fields *daemonEndpointFields
+	fields daemonEndpointFields
 }
 
-// daemonEndpointFields is used by DaemonEndpointBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in DaemonEndpointBuilder before marshalling, and
-// are copied out to the builder type in DaemonEndpointBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// daemonEndpointFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in DaemonEndpointBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type daemonEndpointFields struct {
 	Port *int32 `json:"Port,omitempty"`
 }
 
-func (b *DaemonEndpointBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &daemonEndpointFields{}
-	}
-}
-
 // DaemonEndpoint constructs an declarative configuration of the DaemonEndpoint type for use with
 // apply.
-// Provided as a convenience.
-func DaemonEndpoint() DaemonEndpointBuilder {
-	return DaemonEndpointBuilder{fields: &daemonEndpointFields{}}
+func DaemonEndpoint() *DaemonEndpointBuilder {
+	return &DaemonEndpointBuilder{}
 }
 
 // SetPort sets the Port field in the declarative configuration to the given value.
-func (b DaemonEndpointBuilder) SetPort(value int32) DaemonEndpointBuilder {
-	b.ensureInitialized()
+func (b *DaemonEndpointBuilder) SetPort(value int32) *DaemonEndpointBuilder {
 	b.fields.Port = &value
 	return b
 }
 
 // RemovePort removes the Port field from the declarative configuration.
-func (b DaemonEndpointBuilder) RemovePort() DaemonEndpointBuilder {
-	b.ensureInitialized()
+func (b *DaemonEndpointBuilder) RemovePort() *DaemonEndpointBuilder {
 	b.fields.Port = nil
 	return b
 }
 
 // GetPort gets the Port field from the declarative configuration.
-func (b DaemonEndpointBuilder) GetPort() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *DaemonEndpointBuilder) GetPort() (value int32, ok bool) {
 	if v := b.fields.Port; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *DaemonEndpointBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *DaemonEndpointBuilder) FromUnstructured(u map[string]interface{}) error
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals DaemonEndpointBuilder to JSON.
 func (b *DaemonEndpointBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *DaemonEndpointBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into DaemonEndpointBuilder, replacing the contents of
 // DaemonEndpointBuilder.
 func (b *DaemonEndpointBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *DaemonEndpointBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // DaemonEndpointList represents a list of DaemonEndpointBuilder.
-// Provided as a convenience.
-type DaemonEndpointList []DaemonEndpointBuilder
+type DaemonEndpointList []*DaemonEndpointBuilder
 
 // DaemonEndpointList represents a map of DaemonEndpointBuilder.
-// Provided as a convenience.
 type DaemonEndpointMap map[string]DaemonEndpointBuilder
 
 func (b *DaemonEndpointBuilder) preMarshal() {

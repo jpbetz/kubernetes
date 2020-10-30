@@ -28,14 +28,14 @@ import (
 // ContainerBuilder represents an declarative configuration of the Container type for use
 // with apply.
 type ContainerBuilder struct {
-	fields *containerFields
+	fields containerFields
 }
 
-// containerFields is used by ContainerBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ContainerBuilder before marshalling, and
-// are copied out to the builder type in ContainerBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// containerFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ContainerBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type containerFields struct {
 	Name                     *string                          `json:"name,omitempty"`
 	Image                    *string                          `json:"image,omitempty"`
@@ -61,36 +61,26 @@ type containerFields struct {
 	TTY                      *bool                            `json:"tty,omitempty"`
 }
 
-func (b *ContainerBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &containerFields{}
-	}
-}
-
 // Container constructs an declarative configuration of the Container type for use with
 // apply.
-// Provided as a convenience.
-func Container() ContainerBuilder {
-	return ContainerBuilder{fields: &containerFields{}}
+func Container() *ContainerBuilder {
+	return &ContainerBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetName(value string) ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) SetName(value string) *ContainerBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b ContainerBuilder) RemoveName() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveName() *ContainerBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b ContainerBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -98,22 +88,19 @@ func (b ContainerBuilder) GetName() (value string, ok bool) {
 }
 
 // SetImage sets the Image field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetImage(value string) ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) SetImage(value string) *ContainerBuilder {
 	b.fields.Image = &value
 	return b
 }
 
 // RemoveImage removes the Image field from the declarative configuration.
-func (b ContainerBuilder) RemoveImage() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveImage() *ContainerBuilder {
 	b.fields.Image = nil
 	return b
 }
 
 // GetImage gets the Image field from the declarative configuration.
-func (b ContainerBuilder) GetImage() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerBuilder) GetImage() (value string, ok bool) {
 	if v := b.fields.Image; v != nil {
 		return *v, true
 	}
@@ -121,22 +108,19 @@ func (b ContainerBuilder) GetImage() (value string, ok bool) {
 }
 
 // SetCommand sets the Command field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetCommand(value []string) ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) SetCommand(value []string) *ContainerBuilder {
 	b.fields.Command = &value
 	return b
 }
 
 // RemoveCommand removes the Command field from the declarative configuration.
-func (b ContainerBuilder) RemoveCommand() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveCommand() *ContainerBuilder {
 	b.fields.Command = nil
 	return b
 }
 
 // GetCommand gets the Command field from the declarative configuration.
-func (b ContainerBuilder) GetCommand() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerBuilder) GetCommand() (value []string, ok bool) {
 	if v := b.fields.Command; v != nil {
 		return *v, true
 	}
@@ -144,22 +128,19 @@ func (b ContainerBuilder) GetCommand() (value []string, ok bool) {
 }
 
 // SetArgs sets the Args field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetArgs(value []string) ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) SetArgs(value []string) *ContainerBuilder {
 	b.fields.Args = &value
 	return b
 }
 
 // RemoveArgs removes the Args field from the declarative configuration.
-func (b ContainerBuilder) RemoveArgs() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveArgs() *ContainerBuilder {
 	b.fields.Args = nil
 	return b
 }
 
 // GetArgs gets the Args field from the declarative configuration.
-func (b ContainerBuilder) GetArgs() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerBuilder) GetArgs() (value []string, ok bool) {
 	if v := b.fields.Args; v != nil {
 		return *v, true
 	}
@@ -167,22 +148,19 @@ func (b ContainerBuilder) GetArgs() (value []string, ok bool) {
 }
 
 // SetWorkingDir sets the WorkingDir field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetWorkingDir(value string) ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) SetWorkingDir(value string) *ContainerBuilder {
 	b.fields.WorkingDir = &value
 	return b
 }
 
 // RemoveWorkingDir removes the WorkingDir field from the declarative configuration.
-func (b ContainerBuilder) RemoveWorkingDir() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveWorkingDir() *ContainerBuilder {
 	b.fields.WorkingDir = nil
 	return b
 }
 
 // GetWorkingDir gets the WorkingDir field from the declarative configuration.
-func (b ContainerBuilder) GetWorkingDir() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerBuilder) GetWorkingDir() (value string, ok bool) {
 	if v := b.fields.WorkingDir; v != nil {
 		return *v, true
 	}
@@ -190,22 +168,19 @@ func (b ContainerBuilder) GetWorkingDir() (value string, ok bool) {
 }
 
 // SetPorts sets the Ports field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetPorts(value ContainerPortList) ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) SetPorts(value ContainerPortList) *ContainerBuilder {
 	b.fields.Ports = &value
 	return b
 }
 
 // RemovePorts removes the Ports field from the declarative configuration.
-func (b ContainerBuilder) RemovePorts() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemovePorts() *ContainerBuilder {
 	b.fields.Ports = nil
 	return b
 }
 
 // GetPorts gets the Ports field from the declarative configuration.
-func (b ContainerBuilder) GetPorts() (value ContainerPortList, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerBuilder) GetPorts() (value ContainerPortList, ok bool) {
 	if v := b.fields.Ports; v != nil {
 		return *v, true
 	}
@@ -213,22 +188,19 @@ func (b ContainerBuilder) GetPorts() (value ContainerPortList, ok bool) {
 }
 
 // SetEnvFrom sets the EnvFrom field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetEnvFrom(value EnvFromSourceList) ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) SetEnvFrom(value EnvFromSourceList) *ContainerBuilder {
 	b.fields.EnvFrom = &value
 	return b
 }
 
 // RemoveEnvFrom removes the EnvFrom field from the declarative configuration.
-func (b ContainerBuilder) RemoveEnvFrom() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveEnvFrom() *ContainerBuilder {
 	b.fields.EnvFrom = nil
 	return b
 }
 
 // GetEnvFrom gets the EnvFrom field from the declarative configuration.
-func (b ContainerBuilder) GetEnvFrom() (value EnvFromSourceList, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerBuilder) GetEnvFrom() (value EnvFromSourceList, ok bool) {
 	if v := b.fields.EnvFrom; v != nil {
 		return *v, true
 	}
@@ -236,22 +208,19 @@ func (b ContainerBuilder) GetEnvFrom() (value EnvFromSourceList, ok bool) {
 }
 
 // SetEnv sets the Env field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetEnv(value EnvVarList) ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) SetEnv(value EnvVarList) *ContainerBuilder {
 	b.fields.Env = &value
 	return b
 }
 
 // RemoveEnv removes the Env field from the declarative configuration.
-func (b ContainerBuilder) RemoveEnv() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveEnv() *ContainerBuilder {
 	b.fields.Env = nil
 	return b
 }
 
 // GetEnv gets the Env field from the declarative configuration.
-func (b ContainerBuilder) GetEnv() (value EnvVarList, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerBuilder) GetEnv() (value EnvVarList, ok bool) {
 	if v := b.fields.Env; v != nil {
 		return *v, true
 	}
@@ -259,45 +228,36 @@ func (b ContainerBuilder) GetEnv() (value EnvVarList, ok bool) {
 }
 
 // SetResources sets the Resources field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetResources(value ResourceRequirementsBuilder) ContainerBuilder {
-	b.ensureInitialized()
-	b.fields.Resources = &value
+func (b *ContainerBuilder) SetResources(value *ResourceRequirementsBuilder) *ContainerBuilder {
+	b.fields.Resources = value
 	return b
 }
 
 // RemoveResources removes the Resources field from the declarative configuration.
-func (b ContainerBuilder) RemoveResources() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveResources() *ContainerBuilder {
 	b.fields.Resources = nil
 	return b
 }
 
 // GetResources gets the Resources field from the declarative configuration.
-func (b ContainerBuilder) GetResources() (value ResourceRequirementsBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Resources; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ContainerBuilder) GetResources() (value *ResourceRequirementsBuilder, ok bool) {
+	return b.fields.Resources, b.fields.Resources != nil
 }
 
 // SetVolumeMounts sets the VolumeMounts field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetVolumeMounts(value VolumeMountList) ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) SetVolumeMounts(value VolumeMountList) *ContainerBuilder {
 	b.fields.VolumeMounts = &value
 	return b
 }
 
 // RemoveVolumeMounts removes the VolumeMounts field from the declarative configuration.
-func (b ContainerBuilder) RemoveVolumeMounts() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveVolumeMounts() *ContainerBuilder {
 	b.fields.VolumeMounts = nil
 	return b
 }
 
 // GetVolumeMounts gets the VolumeMounts field from the declarative configuration.
-func (b ContainerBuilder) GetVolumeMounts() (value VolumeMountList, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerBuilder) GetVolumeMounts() (value VolumeMountList, ok bool) {
 	if v := b.fields.VolumeMounts; v != nil {
 		return *v, true
 	}
@@ -305,22 +265,19 @@ func (b ContainerBuilder) GetVolumeMounts() (value VolumeMountList, ok bool) {
 }
 
 // SetVolumeDevices sets the VolumeDevices field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetVolumeDevices(value VolumeDeviceList) ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) SetVolumeDevices(value VolumeDeviceList) *ContainerBuilder {
 	b.fields.VolumeDevices = &value
 	return b
 }
 
 // RemoveVolumeDevices removes the VolumeDevices field from the declarative configuration.
-func (b ContainerBuilder) RemoveVolumeDevices() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveVolumeDevices() *ContainerBuilder {
 	b.fields.VolumeDevices = nil
 	return b
 }
 
 // GetVolumeDevices gets the VolumeDevices field from the declarative configuration.
-func (b ContainerBuilder) GetVolumeDevices() (value VolumeDeviceList, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerBuilder) GetVolumeDevices() (value VolumeDeviceList, ok bool) {
 	if v := b.fields.VolumeDevices; v != nil {
 		return *v, true
 	}
@@ -328,114 +285,87 @@ func (b ContainerBuilder) GetVolumeDevices() (value VolumeDeviceList, ok bool) {
 }
 
 // SetLivenessProbe sets the LivenessProbe field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetLivenessProbe(value ProbeBuilder) ContainerBuilder {
-	b.ensureInitialized()
-	b.fields.LivenessProbe = &value
+func (b *ContainerBuilder) SetLivenessProbe(value *ProbeBuilder) *ContainerBuilder {
+	b.fields.LivenessProbe = value
 	return b
 }
 
 // RemoveLivenessProbe removes the LivenessProbe field from the declarative configuration.
-func (b ContainerBuilder) RemoveLivenessProbe() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveLivenessProbe() *ContainerBuilder {
 	b.fields.LivenessProbe = nil
 	return b
 }
 
 // GetLivenessProbe gets the LivenessProbe field from the declarative configuration.
-func (b ContainerBuilder) GetLivenessProbe() (value ProbeBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.LivenessProbe; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ContainerBuilder) GetLivenessProbe() (value *ProbeBuilder, ok bool) {
+	return b.fields.LivenessProbe, b.fields.LivenessProbe != nil
 }
 
 // SetReadinessProbe sets the ReadinessProbe field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetReadinessProbe(value ProbeBuilder) ContainerBuilder {
-	b.ensureInitialized()
-	b.fields.ReadinessProbe = &value
+func (b *ContainerBuilder) SetReadinessProbe(value *ProbeBuilder) *ContainerBuilder {
+	b.fields.ReadinessProbe = value
 	return b
 }
 
 // RemoveReadinessProbe removes the ReadinessProbe field from the declarative configuration.
-func (b ContainerBuilder) RemoveReadinessProbe() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveReadinessProbe() *ContainerBuilder {
 	b.fields.ReadinessProbe = nil
 	return b
 }
 
 // GetReadinessProbe gets the ReadinessProbe field from the declarative configuration.
-func (b ContainerBuilder) GetReadinessProbe() (value ProbeBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ReadinessProbe; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ContainerBuilder) GetReadinessProbe() (value *ProbeBuilder, ok bool) {
+	return b.fields.ReadinessProbe, b.fields.ReadinessProbe != nil
 }
 
 // SetStartupProbe sets the StartupProbe field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetStartupProbe(value ProbeBuilder) ContainerBuilder {
-	b.ensureInitialized()
-	b.fields.StartupProbe = &value
+func (b *ContainerBuilder) SetStartupProbe(value *ProbeBuilder) *ContainerBuilder {
+	b.fields.StartupProbe = value
 	return b
 }
 
 // RemoveStartupProbe removes the StartupProbe field from the declarative configuration.
-func (b ContainerBuilder) RemoveStartupProbe() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveStartupProbe() *ContainerBuilder {
 	b.fields.StartupProbe = nil
 	return b
 }
 
 // GetStartupProbe gets the StartupProbe field from the declarative configuration.
-func (b ContainerBuilder) GetStartupProbe() (value ProbeBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.StartupProbe; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ContainerBuilder) GetStartupProbe() (value *ProbeBuilder, ok bool) {
+	return b.fields.StartupProbe, b.fields.StartupProbe != nil
 }
 
 // SetLifecycle sets the Lifecycle field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetLifecycle(value LifecycleBuilder) ContainerBuilder {
-	b.ensureInitialized()
-	b.fields.Lifecycle = &value
+func (b *ContainerBuilder) SetLifecycle(value *LifecycleBuilder) *ContainerBuilder {
+	b.fields.Lifecycle = value
 	return b
 }
 
 // RemoveLifecycle removes the Lifecycle field from the declarative configuration.
-func (b ContainerBuilder) RemoveLifecycle() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveLifecycle() *ContainerBuilder {
 	b.fields.Lifecycle = nil
 	return b
 }
 
 // GetLifecycle gets the Lifecycle field from the declarative configuration.
-func (b ContainerBuilder) GetLifecycle() (value LifecycleBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Lifecycle; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ContainerBuilder) GetLifecycle() (value *LifecycleBuilder, ok bool) {
+	return b.fields.Lifecycle, b.fields.Lifecycle != nil
 }
 
 // SetTerminationMessagePath sets the TerminationMessagePath field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetTerminationMessagePath(value string) ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) SetTerminationMessagePath(value string) *ContainerBuilder {
 	b.fields.TerminationMessagePath = &value
 	return b
 }
 
 // RemoveTerminationMessagePath removes the TerminationMessagePath field from the declarative configuration.
-func (b ContainerBuilder) RemoveTerminationMessagePath() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveTerminationMessagePath() *ContainerBuilder {
 	b.fields.TerminationMessagePath = nil
 	return b
 }
 
 // GetTerminationMessagePath gets the TerminationMessagePath field from the declarative configuration.
-func (b ContainerBuilder) GetTerminationMessagePath() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerBuilder) GetTerminationMessagePath() (value string, ok bool) {
 	if v := b.fields.TerminationMessagePath; v != nil {
 		return *v, true
 	}
@@ -443,22 +373,19 @@ func (b ContainerBuilder) GetTerminationMessagePath() (value string, ok bool) {
 }
 
 // SetTerminationMessagePolicy sets the TerminationMessagePolicy field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetTerminationMessagePolicy(value corev1.TerminationMessagePolicy) ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) SetTerminationMessagePolicy(value corev1.TerminationMessagePolicy) *ContainerBuilder {
 	b.fields.TerminationMessagePolicy = &value
 	return b
 }
 
 // RemoveTerminationMessagePolicy removes the TerminationMessagePolicy field from the declarative configuration.
-func (b ContainerBuilder) RemoveTerminationMessagePolicy() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveTerminationMessagePolicy() *ContainerBuilder {
 	b.fields.TerminationMessagePolicy = nil
 	return b
 }
 
 // GetTerminationMessagePolicy gets the TerminationMessagePolicy field from the declarative configuration.
-func (b ContainerBuilder) GetTerminationMessagePolicy() (value corev1.TerminationMessagePolicy, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerBuilder) GetTerminationMessagePolicy() (value corev1.TerminationMessagePolicy, ok bool) {
 	if v := b.fields.TerminationMessagePolicy; v != nil {
 		return *v, true
 	}
@@ -466,22 +393,19 @@ func (b ContainerBuilder) GetTerminationMessagePolicy() (value corev1.Terminatio
 }
 
 // SetImagePullPolicy sets the ImagePullPolicy field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetImagePullPolicy(value corev1.PullPolicy) ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) SetImagePullPolicy(value corev1.PullPolicy) *ContainerBuilder {
 	b.fields.ImagePullPolicy = &value
 	return b
 }
 
 // RemoveImagePullPolicy removes the ImagePullPolicy field from the declarative configuration.
-func (b ContainerBuilder) RemoveImagePullPolicy() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveImagePullPolicy() *ContainerBuilder {
 	b.fields.ImagePullPolicy = nil
 	return b
 }
 
 // GetImagePullPolicy gets the ImagePullPolicy field from the declarative configuration.
-func (b ContainerBuilder) GetImagePullPolicy() (value corev1.PullPolicy, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerBuilder) GetImagePullPolicy() (value corev1.PullPolicy, ok bool) {
 	if v := b.fields.ImagePullPolicy; v != nil {
 		return *v, true
 	}
@@ -489,45 +413,36 @@ func (b ContainerBuilder) GetImagePullPolicy() (value corev1.PullPolicy, ok bool
 }
 
 // SetSecurityContext sets the SecurityContext field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetSecurityContext(value SecurityContextBuilder) ContainerBuilder {
-	b.ensureInitialized()
-	b.fields.SecurityContext = &value
+func (b *ContainerBuilder) SetSecurityContext(value *SecurityContextBuilder) *ContainerBuilder {
+	b.fields.SecurityContext = value
 	return b
 }
 
 // RemoveSecurityContext removes the SecurityContext field from the declarative configuration.
-func (b ContainerBuilder) RemoveSecurityContext() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveSecurityContext() *ContainerBuilder {
 	b.fields.SecurityContext = nil
 	return b
 }
 
 // GetSecurityContext gets the SecurityContext field from the declarative configuration.
-func (b ContainerBuilder) GetSecurityContext() (value SecurityContextBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.SecurityContext; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ContainerBuilder) GetSecurityContext() (value *SecurityContextBuilder, ok bool) {
+	return b.fields.SecurityContext, b.fields.SecurityContext != nil
 }
 
 // SetStdin sets the Stdin field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetStdin(value bool) ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) SetStdin(value bool) *ContainerBuilder {
 	b.fields.Stdin = &value
 	return b
 }
 
 // RemoveStdin removes the Stdin field from the declarative configuration.
-func (b ContainerBuilder) RemoveStdin() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveStdin() *ContainerBuilder {
 	b.fields.Stdin = nil
 	return b
 }
 
 // GetStdin gets the Stdin field from the declarative configuration.
-func (b ContainerBuilder) GetStdin() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerBuilder) GetStdin() (value bool, ok bool) {
 	if v := b.fields.Stdin; v != nil {
 		return *v, true
 	}
@@ -535,22 +450,19 @@ func (b ContainerBuilder) GetStdin() (value bool, ok bool) {
 }
 
 // SetStdinOnce sets the StdinOnce field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetStdinOnce(value bool) ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) SetStdinOnce(value bool) *ContainerBuilder {
 	b.fields.StdinOnce = &value
 	return b
 }
 
 // RemoveStdinOnce removes the StdinOnce field from the declarative configuration.
-func (b ContainerBuilder) RemoveStdinOnce() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveStdinOnce() *ContainerBuilder {
 	b.fields.StdinOnce = nil
 	return b
 }
 
 // GetStdinOnce gets the StdinOnce field from the declarative configuration.
-func (b ContainerBuilder) GetStdinOnce() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerBuilder) GetStdinOnce() (value bool, ok bool) {
 	if v := b.fields.StdinOnce; v != nil {
 		return *v, true
 	}
@@ -558,22 +470,19 @@ func (b ContainerBuilder) GetStdinOnce() (value bool, ok bool) {
 }
 
 // SetTTY sets the TTY field in the declarative configuration to the given value.
-func (b ContainerBuilder) SetTTY(value bool) ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) SetTTY(value bool) *ContainerBuilder {
 	b.fields.TTY = &value
 	return b
 }
 
 // RemoveTTY removes the TTY field from the declarative configuration.
-func (b ContainerBuilder) RemoveTTY() ContainerBuilder {
-	b.ensureInitialized()
+func (b *ContainerBuilder) RemoveTTY() *ContainerBuilder {
 	b.fields.TTY = nil
 	return b
 }
 
 // GetTTY gets the TTY field from the declarative configuration.
-func (b ContainerBuilder) GetTTY() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *ContainerBuilder) GetTTY() (value bool, ok bool) {
 	if v := b.fields.TTY; v != nil {
 		return *v, true
 	}
@@ -585,9 +494,8 @@ func (b *ContainerBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -602,14 +510,13 @@ func (b *ContainerBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ContainerBuilder to JSON.
 func (b *ContainerBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -617,8 +524,7 @@ func (b *ContainerBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ContainerBuilder, replacing the contents of
 // ContainerBuilder.
 func (b *ContainerBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -626,11 +532,9 @@ func (b *ContainerBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ContainerList represents a list of ContainerBuilder.
-// Provided as a convenience.
-type ContainerList []ContainerBuilder
+type ContainerList []*ContainerBuilder
 
 // ContainerList represents a map of ContainerBuilder.
-// Provided as a convenience.
 type ContainerMap map[string]ContainerBuilder
 
 func (b *ContainerBuilder) preMarshal() {

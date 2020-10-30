@@ -28,49 +28,39 @@ import (
 // CapabilitiesBuilder represents an declarative configuration of the Capabilities type for use
 // with apply.
 type CapabilitiesBuilder struct {
-	fields *capabilitiesFields
+	fields capabilitiesFields
 }
 
-// capabilitiesFields is used by CapabilitiesBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in CapabilitiesBuilder before marshalling, and
-// are copied out to the builder type in CapabilitiesBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// capabilitiesFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in CapabilitiesBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type capabilitiesFields struct {
 	Add  *[]v1.Capability `json:"add,omitempty"`
 	Drop *[]v1.Capability `json:"drop,omitempty"`
 }
 
-func (b *CapabilitiesBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &capabilitiesFields{}
-	}
-}
-
 // Capabilities constructs an declarative configuration of the Capabilities type for use with
 // apply.
-// Provided as a convenience.
-func Capabilities() CapabilitiesBuilder {
-	return CapabilitiesBuilder{fields: &capabilitiesFields{}}
+func Capabilities() *CapabilitiesBuilder {
+	return &CapabilitiesBuilder{}
 }
 
 // SetAdd sets the Add field in the declarative configuration to the given value.
-func (b CapabilitiesBuilder) SetAdd(value []v1.Capability) CapabilitiesBuilder {
-	b.ensureInitialized()
+func (b *CapabilitiesBuilder) SetAdd(value []v1.Capability) *CapabilitiesBuilder {
 	b.fields.Add = &value
 	return b
 }
 
 // RemoveAdd removes the Add field from the declarative configuration.
-func (b CapabilitiesBuilder) RemoveAdd() CapabilitiesBuilder {
-	b.ensureInitialized()
+func (b *CapabilitiesBuilder) RemoveAdd() *CapabilitiesBuilder {
 	b.fields.Add = nil
 	return b
 }
 
 // GetAdd gets the Add field from the declarative configuration.
-func (b CapabilitiesBuilder) GetAdd() (value []v1.Capability, ok bool) {
-	b.ensureInitialized()
+func (b *CapabilitiesBuilder) GetAdd() (value []v1.Capability, ok bool) {
 	if v := b.fields.Add; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b CapabilitiesBuilder) GetAdd() (value []v1.Capability, ok bool) {
 }
 
 // SetDrop sets the Drop field in the declarative configuration to the given value.
-func (b CapabilitiesBuilder) SetDrop(value []v1.Capability) CapabilitiesBuilder {
-	b.ensureInitialized()
+func (b *CapabilitiesBuilder) SetDrop(value []v1.Capability) *CapabilitiesBuilder {
 	b.fields.Drop = &value
 	return b
 }
 
 // RemoveDrop removes the Drop field from the declarative configuration.
-func (b CapabilitiesBuilder) RemoveDrop() CapabilitiesBuilder {
-	b.ensureInitialized()
+func (b *CapabilitiesBuilder) RemoveDrop() *CapabilitiesBuilder {
 	b.fields.Drop = nil
 	return b
 }
 
 // GetDrop gets the Drop field from the declarative configuration.
-func (b CapabilitiesBuilder) GetDrop() (value []v1.Capability, ok bool) {
-	b.ensureInitialized()
+func (b *CapabilitiesBuilder) GetDrop() (value []v1.Capability, ok bool) {
 	if v := b.fields.Drop; v != nil {
 		return *v, true
 	}
@@ -105,9 +92,8 @@ func (b *CapabilitiesBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +108,13 @@ func (b *CapabilitiesBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals CapabilitiesBuilder to JSON.
 func (b *CapabilitiesBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +122,7 @@ func (b *CapabilitiesBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into CapabilitiesBuilder, replacing the contents of
 // CapabilitiesBuilder.
 func (b *CapabilitiesBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +130,9 @@ func (b *CapabilitiesBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // CapabilitiesList represents a list of CapabilitiesBuilder.
-// Provided as a convenience.
-type CapabilitiesList []CapabilitiesBuilder
+type CapabilitiesList []*CapabilitiesBuilder
 
 // CapabilitiesList represents a map of CapabilitiesBuilder.
-// Provided as a convenience.
 type CapabilitiesMap map[string]CapabilitiesBuilder
 
 func (b *CapabilitiesBuilder) preMarshal() {

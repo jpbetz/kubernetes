@@ -29,15 +29,15 @@ import (
 // StorageVersionBuilder represents an declarative configuration of the StorageVersion type for use
 // with apply.
 type StorageVersionBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *storageVersionFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   storageVersionFields
 }
 
-// storageVersionFields is used by StorageVersionBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in StorageVersionBuilder before marshalling, and
-// are copied out to the builder type in StorageVersionBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// storageVersionFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in StorageVersionBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type storageVersionFields struct {
 	Kind       *string                      `json:"kind,omitempty"`       // inlined StorageVersionBuilder.typeMeta.Kind field
 	APIVersion *string                      `json:"apiVersion,omitempty"` // inlined StorageVersionBuilder.typeMeta.APIVersion field
@@ -46,79 +46,60 @@ type storageVersionFields struct {
 	Status     *StorageVersionStatusBuilder `json:"status,omitempty"`
 }
 
-func (b *StorageVersionBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &storageVersionFields{}
-	}
-}
-
 // StorageVersion constructs an declarative configuration of the StorageVersion type for use with
 // apply.
-// Provided as a convenience.
-func StorageVersion() StorageVersionBuilder {
-	return StorageVersionBuilder{fields: &storageVersionFields{}}
+func StorageVersion() *StorageVersionBuilder {
+	return &StorageVersionBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b StorageVersionBuilder) SetTypeMeta(value v1.TypeMetaBuilder) StorageVersionBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *StorageVersionBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b StorageVersionBuilder) RemoveTypeMeta() StorageVersionBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *StorageVersionBuilder) RemoveTypeMeta() *StorageVersionBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b StorageVersionBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *StorageVersionBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b StorageVersionBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) StorageVersionBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *StorageVersionBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *StorageVersionBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b StorageVersionBuilder) RemoveObjectMeta() StorageVersionBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionBuilder) RemoveObjectMeta() *StorageVersionBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b StorageVersionBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *StorageVersionBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b StorageVersionBuilder) SetSpec(value v1alpha1.StorageVersionSpec) StorageVersionBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionBuilder) SetSpec(value v1alpha1.StorageVersionSpec) *StorageVersionBuilder {
 	b.fields.Spec = &value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b StorageVersionBuilder) RemoveSpec() StorageVersionBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionBuilder) RemoveSpec() *StorageVersionBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b StorageVersionBuilder) GetSpec() (value v1alpha1.StorageVersionSpec, ok bool) {
-	b.ensureInitialized()
+func (b *StorageVersionBuilder) GetSpec() (value v1alpha1.StorageVersionSpec, ok bool) {
 	if v := b.fields.Spec; v != nil {
 		return *v, true
 	}
@@ -126,26 +107,20 @@ func (b StorageVersionBuilder) GetSpec() (value v1alpha1.StorageVersionSpec, ok 
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b StorageVersionBuilder) SetStatus(value StorageVersionStatusBuilder) StorageVersionBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *StorageVersionBuilder) SetStatus(value *StorageVersionStatusBuilder) *StorageVersionBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b StorageVersionBuilder) RemoveStatus() StorageVersionBuilder {
-	b.ensureInitialized()
+func (b *StorageVersionBuilder) RemoveStatus() *StorageVersionBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b StorageVersionBuilder) GetStatus() (value StorageVersionStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *StorageVersionBuilder) GetStatus() (value *StorageVersionStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts StorageVersionBuilder to unstructured.
@@ -153,9 +128,8 @@ func (b *StorageVersionBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -170,14 +144,13 @@ func (b *StorageVersionBuilder) FromUnstructured(u map[string]interface{}) error
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals StorageVersionBuilder to JSON.
 func (b *StorageVersionBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -185,8 +158,7 @@ func (b *StorageVersionBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into StorageVersionBuilder, replacing the contents of
 // StorageVersionBuilder.
 func (b *StorageVersionBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -194,22 +166,25 @@ func (b *StorageVersionBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // StorageVersionList represents a list of StorageVersionBuilder.
-// Provided as a convenience.
-type StorageVersionList []StorageVersionBuilder
+type StorageVersionList []*StorageVersionBuilder
 
 // StorageVersionList represents a map of StorageVersionBuilder.
-// Provided as a convenience.
 type StorageVersionMap map[string]StorageVersionBuilder
 
 func (b *StorageVersionBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *StorageVersionBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

@@ -28,15 +28,15 @@ import (
 // ComponentStatusBuilder represents an declarative configuration of the ComponentStatus type for use
 // with apply.
 type ComponentStatusBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *componentStatusFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   componentStatusFields
 }
 
-// componentStatusFields is used by ComponentStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ComponentStatusBuilder before marshalling, and
-// are copied out to the builder type in ComponentStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// componentStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ComponentStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type componentStatusFields struct {
 	Kind       *string                 `json:"kind,omitempty"`       // inlined ComponentStatusBuilder.typeMeta.Kind field
 	APIVersion *string                 `json:"apiVersion,omitempty"` // inlined ComponentStatusBuilder.typeMeta.APIVersion field
@@ -44,79 +44,60 @@ type componentStatusFields struct {
 	Conditions *ComponentConditionList `json:"conditions,omitempty"`
 }
 
-func (b *ComponentStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &componentStatusFields{}
-	}
-}
-
 // ComponentStatus constructs an declarative configuration of the ComponentStatus type for use with
 // apply.
-// Provided as a convenience.
-func ComponentStatus() ComponentStatusBuilder {
-	return ComponentStatusBuilder{fields: &componentStatusFields{}}
+func ComponentStatus() *ComponentStatusBuilder {
+	return &ComponentStatusBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b ComponentStatusBuilder) SetTypeMeta(value v1.TypeMetaBuilder) ComponentStatusBuilder {
-	b.ensureInitialized()
+func (b *ComponentStatusBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *ComponentStatusBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b ComponentStatusBuilder) RemoveTypeMeta() ComponentStatusBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *ComponentStatusBuilder) RemoveTypeMeta() *ComponentStatusBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b ComponentStatusBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *ComponentStatusBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b ComponentStatusBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) ComponentStatusBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *ComponentStatusBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *ComponentStatusBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b ComponentStatusBuilder) RemoveObjectMeta() ComponentStatusBuilder {
-	b.ensureInitialized()
+func (b *ComponentStatusBuilder) RemoveObjectMeta() *ComponentStatusBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b ComponentStatusBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ComponentStatusBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b ComponentStatusBuilder) SetConditions(value ComponentConditionList) ComponentStatusBuilder {
-	b.ensureInitialized()
+func (b *ComponentStatusBuilder) SetConditions(value ComponentConditionList) *ComponentStatusBuilder {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b ComponentStatusBuilder) RemoveConditions() ComponentStatusBuilder {
-	b.ensureInitialized()
+func (b *ComponentStatusBuilder) RemoveConditions() *ComponentStatusBuilder {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b ComponentStatusBuilder) GetConditions() (value ComponentConditionList, ok bool) {
-	b.ensureInitialized()
+func (b *ComponentStatusBuilder) GetConditions() (value ComponentConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
@@ -128,9 +109,8 @@ func (b *ComponentStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +125,13 @@ func (b *ComponentStatusBuilder) FromUnstructured(u map[string]interface{}) erro
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ComponentStatusBuilder to JSON.
 func (b *ComponentStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +139,7 @@ func (b *ComponentStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ComponentStatusBuilder, replacing the contents of
 // ComponentStatusBuilder.
 func (b *ComponentStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,22 +147,25 @@ func (b *ComponentStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ComponentStatusList represents a list of ComponentStatusBuilder.
-// Provided as a convenience.
-type ComponentStatusList []ComponentStatusBuilder
+type ComponentStatusList []*ComponentStatusBuilder
 
 // ComponentStatusList represents a map of ComponentStatusBuilder.
-// Provided as a convenience.
 type ComponentStatusMap map[string]ComponentStatusBuilder
 
 func (b *ComponentStatusBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *ComponentStatusBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

@@ -28,15 +28,15 @@ import (
 // NodeBuilder represents an declarative configuration of the Node type for use
 // with apply.
 type NodeBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *nodeFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   nodeFields
 }
 
-// nodeFields is used by NodeBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in NodeBuilder before marshalling, and
-// are copied out to the builder type in NodeBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// nodeFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in NodeBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type nodeFields struct {
 	Kind       *string               `json:"kind,omitempty"`       // inlined NodeBuilder.typeMeta.Kind field
 	APIVersion *string               `json:"apiVersion,omitempty"` // inlined NodeBuilder.typeMeta.APIVersion field
@@ -45,106 +45,78 @@ type nodeFields struct {
 	Status     *NodeStatusBuilder    `json:"status,omitempty"`
 }
 
-func (b *NodeBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &nodeFields{}
-	}
-}
-
 // Node constructs an declarative configuration of the Node type for use with
 // apply.
-// Provided as a convenience.
-func Node() NodeBuilder {
-	return NodeBuilder{fields: &nodeFields{}}
+func Node() *NodeBuilder {
+	return &NodeBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b NodeBuilder) SetTypeMeta(value v1.TypeMetaBuilder) NodeBuilder {
-	b.ensureInitialized()
+func (b *NodeBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *NodeBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b NodeBuilder) RemoveTypeMeta() NodeBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *NodeBuilder) RemoveTypeMeta() *NodeBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b NodeBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *NodeBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b NodeBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) NodeBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *NodeBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *NodeBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b NodeBuilder) RemoveObjectMeta() NodeBuilder {
-	b.ensureInitialized()
+func (b *NodeBuilder) RemoveObjectMeta() *NodeBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b NodeBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *NodeBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b NodeBuilder) SetSpec(value NodeSpecBuilder) NodeBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *NodeBuilder) SetSpec(value *NodeSpecBuilder) *NodeBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b NodeBuilder) RemoveSpec() NodeBuilder {
-	b.ensureInitialized()
+func (b *NodeBuilder) RemoveSpec() *NodeBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b NodeBuilder) GetSpec() (value NodeSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *NodeBuilder) GetSpec() (value *NodeSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b NodeBuilder) SetStatus(value NodeStatusBuilder) NodeBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *NodeBuilder) SetStatus(value *NodeStatusBuilder) *NodeBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b NodeBuilder) RemoveStatus() NodeBuilder {
-	b.ensureInitialized()
+func (b *NodeBuilder) RemoveStatus() *NodeBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b NodeBuilder) GetStatus() (value NodeStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *NodeBuilder) GetStatus() (value *NodeStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts NodeBuilder to unstructured.
@@ -152,9 +124,8 @@ func (b *NodeBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *NodeBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals NodeBuilder to JSON.
 func (b *NodeBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *NodeBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into NodeBuilder, replacing the contents of
 // NodeBuilder.
 func (b *NodeBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +162,25 @@ func (b *NodeBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // NodeList represents a list of NodeBuilder.
-// Provided as a convenience.
-type NodeList []NodeBuilder
+type NodeList []*NodeBuilder
 
 // NodeList represents a map of NodeBuilder.
-// Provided as a convenience.
 type NodeMap map[string]NodeBuilder
 
 func (b *NodeBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *NodeBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

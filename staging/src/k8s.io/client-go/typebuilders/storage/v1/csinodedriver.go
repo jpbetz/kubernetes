@@ -27,14 +27,14 @@ import (
 // CSINodeDriverBuilder represents an declarative configuration of the CSINodeDriver type for use
 // with apply.
 type CSINodeDriverBuilder struct {
-	fields *cSINodeDriverFields
+	fields cSINodeDriverFields
 }
 
-// cSINodeDriverFields is used by CSINodeDriverBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in CSINodeDriverBuilder before marshalling, and
-// are copied out to the builder type in CSINodeDriverBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// cSINodeDriverFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in CSINodeDriverBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type cSINodeDriverFields struct {
 	Name         *string                     `json:"name,omitempty"`
 	NodeID       *string                     `json:"nodeID,omitempty"`
@@ -42,36 +42,26 @@ type cSINodeDriverFields struct {
 	Allocatable  *VolumeNodeResourcesBuilder `json:"allocatable,omitempty"`
 }
 
-func (b *CSINodeDriverBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &cSINodeDriverFields{}
-	}
-}
-
 // CSINodeDriver constructs an declarative configuration of the CSINodeDriver type for use with
 // apply.
-// Provided as a convenience.
-func CSINodeDriver() CSINodeDriverBuilder {
-	return CSINodeDriverBuilder{fields: &cSINodeDriverFields{}}
+func CSINodeDriver() *CSINodeDriverBuilder {
+	return &CSINodeDriverBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b CSINodeDriverBuilder) SetName(value string) CSINodeDriverBuilder {
-	b.ensureInitialized()
+func (b *CSINodeDriverBuilder) SetName(value string) *CSINodeDriverBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b CSINodeDriverBuilder) RemoveName() CSINodeDriverBuilder {
-	b.ensureInitialized()
+func (b *CSINodeDriverBuilder) RemoveName() *CSINodeDriverBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b CSINodeDriverBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *CSINodeDriverBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b CSINodeDriverBuilder) GetName() (value string, ok bool) {
 }
 
 // SetNodeID sets the NodeID field in the declarative configuration to the given value.
-func (b CSINodeDriverBuilder) SetNodeID(value string) CSINodeDriverBuilder {
-	b.ensureInitialized()
+func (b *CSINodeDriverBuilder) SetNodeID(value string) *CSINodeDriverBuilder {
 	b.fields.NodeID = &value
 	return b
 }
 
 // RemoveNodeID removes the NodeID field from the declarative configuration.
-func (b CSINodeDriverBuilder) RemoveNodeID() CSINodeDriverBuilder {
-	b.ensureInitialized()
+func (b *CSINodeDriverBuilder) RemoveNodeID() *CSINodeDriverBuilder {
 	b.fields.NodeID = nil
 	return b
 }
 
 // GetNodeID gets the NodeID field from the declarative configuration.
-func (b CSINodeDriverBuilder) GetNodeID() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *CSINodeDriverBuilder) GetNodeID() (value string, ok bool) {
 	if v := b.fields.NodeID; v != nil {
 		return *v, true
 	}
@@ -102,22 +89,19 @@ func (b CSINodeDriverBuilder) GetNodeID() (value string, ok bool) {
 }
 
 // SetTopologyKeys sets the TopologyKeys field in the declarative configuration to the given value.
-func (b CSINodeDriverBuilder) SetTopologyKeys(value []string) CSINodeDriverBuilder {
-	b.ensureInitialized()
+func (b *CSINodeDriverBuilder) SetTopologyKeys(value []string) *CSINodeDriverBuilder {
 	b.fields.TopologyKeys = &value
 	return b
 }
 
 // RemoveTopologyKeys removes the TopologyKeys field from the declarative configuration.
-func (b CSINodeDriverBuilder) RemoveTopologyKeys() CSINodeDriverBuilder {
-	b.ensureInitialized()
+func (b *CSINodeDriverBuilder) RemoveTopologyKeys() *CSINodeDriverBuilder {
 	b.fields.TopologyKeys = nil
 	return b
 }
 
 // GetTopologyKeys gets the TopologyKeys field from the declarative configuration.
-func (b CSINodeDriverBuilder) GetTopologyKeys() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *CSINodeDriverBuilder) GetTopologyKeys() (value []string, ok bool) {
 	if v := b.fields.TopologyKeys; v != nil {
 		return *v, true
 	}
@@ -125,26 +109,20 @@ func (b CSINodeDriverBuilder) GetTopologyKeys() (value []string, ok bool) {
 }
 
 // SetAllocatable sets the Allocatable field in the declarative configuration to the given value.
-func (b CSINodeDriverBuilder) SetAllocatable(value VolumeNodeResourcesBuilder) CSINodeDriverBuilder {
-	b.ensureInitialized()
-	b.fields.Allocatable = &value
+func (b *CSINodeDriverBuilder) SetAllocatable(value *VolumeNodeResourcesBuilder) *CSINodeDriverBuilder {
+	b.fields.Allocatable = value
 	return b
 }
 
 // RemoveAllocatable removes the Allocatable field from the declarative configuration.
-func (b CSINodeDriverBuilder) RemoveAllocatable() CSINodeDriverBuilder {
-	b.ensureInitialized()
+func (b *CSINodeDriverBuilder) RemoveAllocatable() *CSINodeDriverBuilder {
 	b.fields.Allocatable = nil
 	return b
 }
 
 // GetAllocatable gets the Allocatable field from the declarative configuration.
-func (b CSINodeDriverBuilder) GetAllocatable() (value VolumeNodeResourcesBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Allocatable; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *CSINodeDriverBuilder) GetAllocatable() (value *VolumeNodeResourcesBuilder, ok bool) {
+	return b.fields.Allocatable, b.fields.Allocatable != nil
 }
 
 // ToUnstructured converts CSINodeDriverBuilder to unstructured.
@@ -152,9 +130,8 @@ func (b *CSINodeDriverBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +146,13 @@ func (b *CSINodeDriverBuilder) FromUnstructured(u map[string]interface{}) error 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals CSINodeDriverBuilder to JSON.
 func (b *CSINodeDriverBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +160,7 @@ func (b *CSINodeDriverBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into CSINodeDriverBuilder, replacing the contents of
 // CSINodeDriverBuilder.
 func (b *CSINodeDriverBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,11 +168,9 @@ func (b *CSINodeDriverBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // CSINodeDriverList represents a list of CSINodeDriverBuilder.
-// Provided as a convenience.
-type CSINodeDriverList []CSINodeDriverBuilder
+type CSINodeDriverList []*CSINodeDriverBuilder
 
 // CSINodeDriverList represents a map of CSINodeDriverBuilder.
-// Provided as a convenience.
 type CSINodeDriverMap map[string]CSINodeDriverBuilder
 
 func (b *CSINodeDriverBuilder) preMarshal() {

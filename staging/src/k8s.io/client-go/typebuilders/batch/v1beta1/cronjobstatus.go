@@ -29,49 +29,39 @@ import (
 // CronJobStatusBuilder represents an declarative configuration of the CronJobStatus type for use
 // with apply.
 type CronJobStatusBuilder struct {
-	fields *cronJobStatusFields
+	fields cronJobStatusFields
 }
 
-// cronJobStatusFields is used by CronJobStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in CronJobStatusBuilder before marshalling, and
-// are copied out to the builder type in CronJobStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// cronJobStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in CronJobStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type cronJobStatusFields struct {
 	Active           *v1.ObjectReferenceList `json:"active,omitempty"`
 	LastScheduleTime *metav1.Time            `json:"lastScheduleTime,omitempty"`
 }
 
-func (b *CronJobStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &cronJobStatusFields{}
-	}
-}
-
 // CronJobStatus constructs an declarative configuration of the CronJobStatus type for use with
 // apply.
-// Provided as a convenience.
-func CronJobStatus() CronJobStatusBuilder {
-	return CronJobStatusBuilder{fields: &cronJobStatusFields{}}
+func CronJobStatus() *CronJobStatusBuilder {
+	return &CronJobStatusBuilder{}
 }
 
 // SetActive sets the Active field in the declarative configuration to the given value.
-func (b CronJobStatusBuilder) SetActive(value v1.ObjectReferenceList) CronJobStatusBuilder {
-	b.ensureInitialized()
+func (b *CronJobStatusBuilder) SetActive(value v1.ObjectReferenceList) *CronJobStatusBuilder {
 	b.fields.Active = &value
 	return b
 }
 
 // RemoveActive removes the Active field from the declarative configuration.
-func (b CronJobStatusBuilder) RemoveActive() CronJobStatusBuilder {
-	b.ensureInitialized()
+func (b *CronJobStatusBuilder) RemoveActive() *CronJobStatusBuilder {
 	b.fields.Active = nil
 	return b
 }
 
 // GetActive gets the Active field from the declarative configuration.
-func (b CronJobStatusBuilder) GetActive() (value v1.ObjectReferenceList, ok bool) {
-	b.ensureInitialized()
+func (b *CronJobStatusBuilder) GetActive() (value v1.ObjectReferenceList, ok bool) {
 	if v := b.fields.Active; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b CronJobStatusBuilder) GetActive() (value v1.ObjectReferenceList, ok bool
 }
 
 // SetLastScheduleTime sets the LastScheduleTime field in the declarative configuration to the given value.
-func (b CronJobStatusBuilder) SetLastScheduleTime(value metav1.Time) CronJobStatusBuilder {
-	b.ensureInitialized()
+func (b *CronJobStatusBuilder) SetLastScheduleTime(value metav1.Time) *CronJobStatusBuilder {
 	b.fields.LastScheduleTime = &value
 	return b
 }
 
 // RemoveLastScheduleTime removes the LastScheduleTime field from the declarative configuration.
-func (b CronJobStatusBuilder) RemoveLastScheduleTime() CronJobStatusBuilder {
-	b.ensureInitialized()
+func (b *CronJobStatusBuilder) RemoveLastScheduleTime() *CronJobStatusBuilder {
 	b.fields.LastScheduleTime = nil
 	return b
 }
 
 // GetLastScheduleTime gets the LastScheduleTime field from the declarative configuration.
-func (b CronJobStatusBuilder) GetLastScheduleTime() (value metav1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *CronJobStatusBuilder) GetLastScheduleTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastScheduleTime; v != nil {
 		return *v, true
 	}
@@ -106,9 +93,8 @@ func (b *CronJobStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -123,14 +109,13 @@ func (b *CronJobStatusBuilder) FromUnstructured(u map[string]interface{}) error 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals CronJobStatusBuilder to JSON.
 func (b *CronJobStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -138,8 +123,7 @@ func (b *CronJobStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into CronJobStatusBuilder, replacing the contents of
 // CronJobStatusBuilder.
 func (b *CronJobStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -147,11 +131,9 @@ func (b *CronJobStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // CronJobStatusList represents a list of CronJobStatusBuilder.
-// Provided as a convenience.
-type CronJobStatusList []CronJobStatusBuilder
+type CronJobStatusList []*CronJobStatusBuilder
 
 // CronJobStatusList represents a map of CronJobStatusBuilder.
-// Provided as a convenience.
 type CronJobStatusMap map[string]CronJobStatusBuilder
 
 func (b *CronJobStatusBuilder) preMarshal() {

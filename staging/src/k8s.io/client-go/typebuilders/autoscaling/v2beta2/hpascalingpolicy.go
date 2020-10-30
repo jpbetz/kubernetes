@@ -28,50 +28,40 @@ import (
 // HPAScalingPolicyBuilder represents an declarative configuration of the HPAScalingPolicy type for use
 // with apply.
 type HPAScalingPolicyBuilder struct {
-	fields *hPAScalingPolicyFields
+	fields hPAScalingPolicyFields
 }
 
-// hPAScalingPolicyFields is used by HPAScalingPolicyBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in HPAScalingPolicyBuilder before marshalling, and
-// are copied out to the builder type in HPAScalingPolicyBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// hPAScalingPolicyFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in HPAScalingPolicyBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type hPAScalingPolicyFields struct {
 	Type          *v2beta2.HPAScalingPolicyType `json:"type,omitempty"`
 	Value         *int32                        `json:"value,omitempty"`
 	PeriodSeconds *int32                        `json:"periodSeconds,omitempty"`
 }
 
-func (b *HPAScalingPolicyBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &hPAScalingPolicyFields{}
-	}
-}
-
 // HPAScalingPolicy constructs an declarative configuration of the HPAScalingPolicy type for use with
 // apply.
-// Provided as a convenience.
-func HPAScalingPolicy() HPAScalingPolicyBuilder {
-	return HPAScalingPolicyBuilder{fields: &hPAScalingPolicyFields{}}
+func HPAScalingPolicy() *HPAScalingPolicyBuilder {
+	return &HPAScalingPolicyBuilder{}
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b HPAScalingPolicyBuilder) SetType(value v2beta2.HPAScalingPolicyType) HPAScalingPolicyBuilder {
-	b.ensureInitialized()
+func (b *HPAScalingPolicyBuilder) SetType(value v2beta2.HPAScalingPolicyType) *HPAScalingPolicyBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b HPAScalingPolicyBuilder) RemoveType() HPAScalingPolicyBuilder {
-	b.ensureInitialized()
+func (b *HPAScalingPolicyBuilder) RemoveType() *HPAScalingPolicyBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b HPAScalingPolicyBuilder) GetType() (value v2beta2.HPAScalingPolicyType, ok bool) {
-	b.ensureInitialized()
+func (b *HPAScalingPolicyBuilder) GetType() (value v2beta2.HPAScalingPolicyType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b HPAScalingPolicyBuilder) GetType() (value v2beta2.HPAScalingPolicyType, 
 }
 
 // SetValue sets the Value field in the declarative configuration to the given value.
-func (b HPAScalingPolicyBuilder) SetValue(value int32) HPAScalingPolicyBuilder {
-	b.ensureInitialized()
+func (b *HPAScalingPolicyBuilder) SetValue(value int32) *HPAScalingPolicyBuilder {
 	b.fields.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
-func (b HPAScalingPolicyBuilder) RemoveValue() HPAScalingPolicyBuilder {
-	b.ensureInitialized()
+func (b *HPAScalingPolicyBuilder) RemoveValue() *HPAScalingPolicyBuilder {
 	b.fields.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
-func (b HPAScalingPolicyBuilder) GetValue() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *HPAScalingPolicyBuilder) GetValue() (value int32, ok bool) {
 	if v := b.fields.Value; v != nil {
 		return *v, true
 	}
@@ -102,22 +89,19 @@ func (b HPAScalingPolicyBuilder) GetValue() (value int32, ok bool) {
 }
 
 // SetPeriodSeconds sets the PeriodSeconds field in the declarative configuration to the given value.
-func (b HPAScalingPolicyBuilder) SetPeriodSeconds(value int32) HPAScalingPolicyBuilder {
-	b.ensureInitialized()
+func (b *HPAScalingPolicyBuilder) SetPeriodSeconds(value int32) *HPAScalingPolicyBuilder {
 	b.fields.PeriodSeconds = &value
 	return b
 }
 
 // RemovePeriodSeconds removes the PeriodSeconds field from the declarative configuration.
-func (b HPAScalingPolicyBuilder) RemovePeriodSeconds() HPAScalingPolicyBuilder {
-	b.ensureInitialized()
+func (b *HPAScalingPolicyBuilder) RemovePeriodSeconds() *HPAScalingPolicyBuilder {
 	b.fields.PeriodSeconds = nil
 	return b
 }
 
 // GetPeriodSeconds gets the PeriodSeconds field from the declarative configuration.
-func (b HPAScalingPolicyBuilder) GetPeriodSeconds() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *HPAScalingPolicyBuilder) GetPeriodSeconds() (value int32, ok bool) {
 	if v := b.fields.PeriodSeconds; v != nil {
 		return *v, true
 	}
@@ -129,9 +113,8 @@ func (b *HPAScalingPolicyBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -146,14 +129,13 @@ func (b *HPAScalingPolicyBuilder) FromUnstructured(u map[string]interface{}) err
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals HPAScalingPolicyBuilder to JSON.
 func (b *HPAScalingPolicyBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -161,8 +143,7 @@ func (b *HPAScalingPolicyBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into HPAScalingPolicyBuilder, replacing the contents of
 // HPAScalingPolicyBuilder.
 func (b *HPAScalingPolicyBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -170,11 +151,9 @@ func (b *HPAScalingPolicyBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // HPAScalingPolicyList represents a list of HPAScalingPolicyBuilder.
-// Provided as a convenience.
-type HPAScalingPolicyList []HPAScalingPolicyBuilder
+type HPAScalingPolicyList []*HPAScalingPolicyBuilder
 
 // HPAScalingPolicyList represents a map of HPAScalingPolicyBuilder.
-// Provided as a convenience.
 type HPAScalingPolicyMap map[string]HPAScalingPolicyBuilder
 
 func (b *HPAScalingPolicyBuilder) preMarshal() {

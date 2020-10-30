@@ -28,14 +28,14 @@ import (
 // TolerationBuilder represents an declarative configuration of the Toleration type for use
 // with apply.
 type TolerationBuilder struct {
-	fields *tolerationFields
+	fields tolerationFields
 }
 
-// tolerationFields is used by TolerationBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in TolerationBuilder before marshalling, and
-// are copied out to the builder type in TolerationBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// tolerationFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in TolerationBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type tolerationFields struct {
 	Key               *string                `json:"key,omitempty"`
 	Operator          *v1.TolerationOperator `json:"operator,omitempty"`
@@ -44,36 +44,26 @@ type tolerationFields struct {
 	TolerationSeconds *int64                 `json:"tolerationSeconds,omitempty"`
 }
 
-func (b *TolerationBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &tolerationFields{}
-	}
-}
-
 // Toleration constructs an declarative configuration of the Toleration type for use with
 // apply.
-// Provided as a convenience.
-func Toleration() TolerationBuilder {
-	return TolerationBuilder{fields: &tolerationFields{}}
+func Toleration() *TolerationBuilder {
+	return &TolerationBuilder{}
 }
 
 // SetKey sets the Key field in the declarative configuration to the given value.
-func (b TolerationBuilder) SetKey(value string) TolerationBuilder {
-	b.ensureInitialized()
+func (b *TolerationBuilder) SetKey(value string) *TolerationBuilder {
 	b.fields.Key = &value
 	return b
 }
 
 // RemoveKey removes the Key field from the declarative configuration.
-func (b TolerationBuilder) RemoveKey() TolerationBuilder {
-	b.ensureInitialized()
+func (b *TolerationBuilder) RemoveKey() *TolerationBuilder {
 	b.fields.Key = nil
 	return b
 }
 
 // GetKey gets the Key field from the declarative configuration.
-func (b TolerationBuilder) GetKey() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *TolerationBuilder) GetKey() (value string, ok bool) {
 	if v := b.fields.Key; v != nil {
 		return *v, true
 	}
@@ -81,22 +71,19 @@ func (b TolerationBuilder) GetKey() (value string, ok bool) {
 }
 
 // SetOperator sets the Operator field in the declarative configuration to the given value.
-func (b TolerationBuilder) SetOperator(value v1.TolerationOperator) TolerationBuilder {
-	b.ensureInitialized()
+func (b *TolerationBuilder) SetOperator(value v1.TolerationOperator) *TolerationBuilder {
 	b.fields.Operator = &value
 	return b
 }
 
 // RemoveOperator removes the Operator field from the declarative configuration.
-func (b TolerationBuilder) RemoveOperator() TolerationBuilder {
-	b.ensureInitialized()
+func (b *TolerationBuilder) RemoveOperator() *TolerationBuilder {
 	b.fields.Operator = nil
 	return b
 }
 
 // GetOperator gets the Operator field from the declarative configuration.
-func (b TolerationBuilder) GetOperator() (value v1.TolerationOperator, ok bool) {
-	b.ensureInitialized()
+func (b *TolerationBuilder) GetOperator() (value v1.TolerationOperator, ok bool) {
 	if v := b.fields.Operator; v != nil {
 		return *v, true
 	}
@@ -104,22 +91,19 @@ func (b TolerationBuilder) GetOperator() (value v1.TolerationOperator, ok bool) 
 }
 
 // SetValue sets the Value field in the declarative configuration to the given value.
-func (b TolerationBuilder) SetValue(value string) TolerationBuilder {
-	b.ensureInitialized()
+func (b *TolerationBuilder) SetValue(value string) *TolerationBuilder {
 	b.fields.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
-func (b TolerationBuilder) RemoveValue() TolerationBuilder {
-	b.ensureInitialized()
+func (b *TolerationBuilder) RemoveValue() *TolerationBuilder {
 	b.fields.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
-func (b TolerationBuilder) GetValue() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *TolerationBuilder) GetValue() (value string, ok bool) {
 	if v := b.fields.Value; v != nil {
 		return *v, true
 	}
@@ -127,22 +111,19 @@ func (b TolerationBuilder) GetValue() (value string, ok bool) {
 }
 
 // SetEffect sets the Effect field in the declarative configuration to the given value.
-func (b TolerationBuilder) SetEffect(value v1.TaintEffect) TolerationBuilder {
-	b.ensureInitialized()
+func (b *TolerationBuilder) SetEffect(value v1.TaintEffect) *TolerationBuilder {
 	b.fields.Effect = &value
 	return b
 }
 
 // RemoveEffect removes the Effect field from the declarative configuration.
-func (b TolerationBuilder) RemoveEffect() TolerationBuilder {
-	b.ensureInitialized()
+func (b *TolerationBuilder) RemoveEffect() *TolerationBuilder {
 	b.fields.Effect = nil
 	return b
 }
 
 // GetEffect gets the Effect field from the declarative configuration.
-func (b TolerationBuilder) GetEffect() (value v1.TaintEffect, ok bool) {
-	b.ensureInitialized()
+func (b *TolerationBuilder) GetEffect() (value v1.TaintEffect, ok bool) {
 	if v := b.fields.Effect; v != nil {
 		return *v, true
 	}
@@ -150,22 +131,19 @@ func (b TolerationBuilder) GetEffect() (value v1.TaintEffect, ok bool) {
 }
 
 // SetTolerationSeconds sets the TolerationSeconds field in the declarative configuration to the given value.
-func (b TolerationBuilder) SetTolerationSeconds(value int64) TolerationBuilder {
-	b.ensureInitialized()
+func (b *TolerationBuilder) SetTolerationSeconds(value int64) *TolerationBuilder {
 	b.fields.TolerationSeconds = &value
 	return b
 }
 
 // RemoveTolerationSeconds removes the TolerationSeconds field from the declarative configuration.
-func (b TolerationBuilder) RemoveTolerationSeconds() TolerationBuilder {
-	b.ensureInitialized()
+func (b *TolerationBuilder) RemoveTolerationSeconds() *TolerationBuilder {
 	b.fields.TolerationSeconds = nil
 	return b
 }
 
 // GetTolerationSeconds gets the TolerationSeconds field from the declarative configuration.
-func (b TolerationBuilder) GetTolerationSeconds() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *TolerationBuilder) GetTolerationSeconds() (value int64, ok bool) {
 	if v := b.fields.TolerationSeconds; v != nil {
 		return *v, true
 	}
@@ -177,9 +155,8 @@ func (b *TolerationBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -194,14 +171,13 @@ func (b *TolerationBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals TolerationBuilder to JSON.
 func (b *TolerationBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -209,8 +185,7 @@ func (b *TolerationBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into TolerationBuilder, replacing the contents of
 // TolerationBuilder.
 func (b *TolerationBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -218,11 +193,9 @@ func (b *TolerationBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // TolerationList represents a list of TolerationBuilder.
-// Provided as a convenience.
-type TolerationList []TolerationBuilder
+type TolerationList []*TolerationBuilder
 
 // TolerationList represents a map of TolerationBuilder.
-// Provided as a convenience.
 type TolerationMap map[string]TolerationBuilder
 
 func (b *TolerationBuilder) preMarshal() {

@@ -28,48 +28,38 @@ import (
 // RollingUpdateDaemonSetBuilder represents an declarative configuration of the RollingUpdateDaemonSet type for use
 // with apply.
 type RollingUpdateDaemonSetBuilder struct {
-	fields *rollingUpdateDaemonSetFields
+	fields rollingUpdateDaemonSetFields
 }
 
-// rollingUpdateDaemonSetFields is used by RollingUpdateDaemonSetBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in RollingUpdateDaemonSetBuilder before marshalling, and
-// are copied out to the builder type in RollingUpdateDaemonSetBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// rollingUpdateDaemonSetFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in RollingUpdateDaemonSetBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type rollingUpdateDaemonSetFields struct {
 	MaxUnavailable *intstr.IntOrString `json:"maxUnavailable,omitempty"`
 }
 
-func (b *RollingUpdateDaemonSetBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &rollingUpdateDaemonSetFields{}
-	}
-}
-
 // RollingUpdateDaemonSet constructs an declarative configuration of the RollingUpdateDaemonSet type for use with
 // apply.
-// Provided as a convenience.
-func RollingUpdateDaemonSet() RollingUpdateDaemonSetBuilder {
-	return RollingUpdateDaemonSetBuilder{fields: &rollingUpdateDaemonSetFields{}}
+func RollingUpdateDaemonSet() *RollingUpdateDaemonSetBuilder {
+	return &RollingUpdateDaemonSetBuilder{}
 }
 
 // SetMaxUnavailable sets the MaxUnavailable field in the declarative configuration to the given value.
-func (b RollingUpdateDaemonSetBuilder) SetMaxUnavailable(value intstr.IntOrString) RollingUpdateDaemonSetBuilder {
-	b.ensureInitialized()
+func (b *RollingUpdateDaemonSetBuilder) SetMaxUnavailable(value intstr.IntOrString) *RollingUpdateDaemonSetBuilder {
 	b.fields.MaxUnavailable = &value
 	return b
 }
 
 // RemoveMaxUnavailable removes the MaxUnavailable field from the declarative configuration.
-func (b RollingUpdateDaemonSetBuilder) RemoveMaxUnavailable() RollingUpdateDaemonSetBuilder {
-	b.ensureInitialized()
+func (b *RollingUpdateDaemonSetBuilder) RemoveMaxUnavailable() *RollingUpdateDaemonSetBuilder {
 	b.fields.MaxUnavailable = nil
 	return b
 }
 
 // GetMaxUnavailable gets the MaxUnavailable field from the declarative configuration.
-func (b RollingUpdateDaemonSetBuilder) GetMaxUnavailable() (value intstr.IntOrString, ok bool) {
-	b.ensureInitialized()
+func (b *RollingUpdateDaemonSetBuilder) GetMaxUnavailable() (value intstr.IntOrString, ok bool) {
 	if v := b.fields.MaxUnavailable; v != nil {
 		return *v, true
 	}
@@ -81,9 +71,8 @@ func (b *RollingUpdateDaemonSetBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -98,14 +87,13 @@ func (b *RollingUpdateDaemonSetBuilder) FromUnstructured(u map[string]interface{
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals RollingUpdateDaemonSetBuilder to JSON.
 func (b *RollingUpdateDaemonSetBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -113,8 +101,7 @@ func (b *RollingUpdateDaemonSetBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into RollingUpdateDaemonSetBuilder, replacing the contents of
 // RollingUpdateDaemonSetBuilder.
 func (b *RollingUpdateDaemonSetBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -122,11 +109,9 @@ func (b *RollingUpdateDaemonSetBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // RollingUpdateDaemonSetList represents a list of RollingUpdateDaemonSetBuilder.
-// Provided as a convenience.
-type RollingUpdateDaemonSetList []RollingUpdateDaemonSetBuilder
+type RollingUpdateDaemonSetList []*RollingUpdateDaemonSetBuilder
 
 // RollingUpdateDaemonSetList represents a map of RollingUpdateDaemonSetBuilder.
-// Provided as a convenience.
 type RollingUpdateDaemonSetMap map[string]RollingUpdateDaemonSetBuilder
 
 func (b *RollingUpdateDaemonSetBuilder) preMarshal() {

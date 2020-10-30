@@ -28,49 +28,39 @@ import (
 // AttachedVolumeBuilder represents an declarative configuration of the AttachedVolume type for use
 // with apply.
 type AttachedVolumeBuilder struct {
-	fields *attachedVolumeFields
+	fields attachedVolumeFields
 }
 
-// attachedVolumeFields is used by AttachedVolumeBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in AttachedVolumeBuilder before marshalling, and
-// are copied out to the builder type in AttachedVolumeBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// attachedVolumeFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in AttachedVolumeBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type attachedVolumeFields struct {
 	Name       *v1.UniqueVolumeName `json:"name,omitempty"`
 	DevicePath *string              `json:"devicePath,omitempty"`
 }
 
-func (b *AttachedVolumeBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &attachedVolumeFields{}
-	}
-}
-
 // AttachedVolume constructs an declarative configuration of the AttachedVolume type for use with
 // apply.
-// Provided as a convenience.
-func AttachedVolume() AttachedVolumeBuilder {
-	return AttachedVolumeBuilder{fields: &attachedVolumeFields{}}
+func AttachedVolume() *AttachedVolumeBuilder {
+	return &AttachedVolumeBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b AttachedVolumeBuilder) SetName(value v1.UniqueVolumeName) AttachedVolumeBuilder {
-	b.ensureInitialized()
+func (b *AttachedVolumeBuilder) SetName(value v1.UniqueVolumeName) *AttachedVolumeBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b AttachedVolumeBuilder) RemoveName() AttachedVolumeBuilder {
-	b.ensureInitialized()
+func (b *AttachedVolumeBuilder) RemoveName() *AttachedVolumeBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b AttachedVolumeBuilder) GetName() (value v1.UniqueVolumeName, ok bool) {
-	b.ensureInitialized()
+func (b *AttachedVolumeBuilder) GetName() (value v1.UniqueVolumeName, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b AttachedVolumeBuilder) GetName() (value v1.UniqueVolumeName, ok bool) {
 }
 
 // SetDevicePath sets the DevicePath field in the declarative configuration to the given value.
-func (b AttachedVolumeBuilder) SetDevicePath(value string) AttachedVolumeBuilder {
-	b.ensureInitialized()
+func (b *AttachedVolumeBuilder) SetDevicePath(value string) *AttachedVolumeBuilder {
 	b.fields.DevicePath = &value
 	return b
 }
 
 // RemoveDevicePath removes the DevicePath field from the declarative configuration.
-func (b AttachedVolumeBuilder) RemoveDevicePath() AttachedVolumeBuilder {
-	b.ensureInitialized()
+func (b *AttachedVolumeBuilder) RemoveDevicePath() *AttachedVolumeBuilder {
 	b.fields.DevicePath = nil
 	return b
 }
 
 // GetDevicePath gets the DevicePath field from the declarative configuration.
-func (b AttachedVolumeBuilder) GetDevicePath() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *AttachedVolumeBuilder) GetDevicePath() (value string, ok bool) {
 	if v := b.fields.DevicePath; v != nil {
 		return *v, true
 	}
@@ -105,9 +92,8 @@ func (b *AttachedVolumeBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +108,13 @@ func (b *AttachedVolumeBuilder) FromUnstructured(u map[string]interface{}) error
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals AttachedVolumeBuilder to JSON.
 func (b *AttachedVolumeBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +122,7 @@ func (b *AttachedVolumeBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into AttachedVolumeBuilder, replacing the contents of
 // AttachedVolumeBuilder.
 func (b *AttachedVolumeBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +130,9 @@ func (b *AttachedVolumeBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // AttachedVolumeList represents a list of AttachedVolumeBuilder.
-// Provided as a convenience.
-type AttachedVolumeList []AttachedVolumeBuilder
+type AttachedVolumeList []*AttachedVolumeBuilder
 
 // AttachedVolumeList represents a map of AttachedVolumeBuilder.
-// Provided as a convenience.
 type AttachedVolumeMap map[string]AttachedVolumeBuilder
 
 func (b *AttachedVolumeBuilder) preMarshal() {

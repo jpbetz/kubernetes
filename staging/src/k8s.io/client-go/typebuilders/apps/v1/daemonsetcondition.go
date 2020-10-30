@@ -30,14 +30,14 @@ import (
 // DaemonSetConditionBuilder represents an declarative configuration of the DaemonSetCondition type for use
 // with apply.
 type DaemonSetConditionBuilder struct {
-	fields *daemonSetConditionFields
+	fields daemonSetConditionFields
 }
 
-// daemonSetConditionFields is used by DaemonSetConditionBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in DaemonSetConditionBuilder before marshalling, and
-// are copied out to the builder type in DaemonSetConditionBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// daemonSetConditionFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in DaemonSetConditionBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type daemonSetConditionFields struct {
 	Type               *v1.DaemonSetConditionType `json:"type,omitempty"`
 	Status             *corev1.ConditionStatus    `json:"status,omitempty"`
@@ -46,36 +46,26 @@ type daemonSetConditionFields struct {
 	Message            *string                    `json:"message,omitempty"`
 }
 
-func (b *DaemonSetConditionBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &daemonSetConditionFields{}
-	}
-}
-
 // DaemonSetCondition constructs an declarative configuration of the DaemonSetCondition type for use with
 // apply.
-// Provided as a convenience.
-func DaemonSetCondition() DaemonSetConditionBuilder {
-	return DaemonSetConditionBuilder{fields: &daemonSetConditionFields{}}
+func DaemonSetCondition() *DaemonSetConditionBuilder {
+	return &DaemonSetConditionBuilder{}
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b DaemonSetConditionBuilder) SetType(value v1.DaemonSetConditionType) DaemonSetConditionBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetConditionBuilder) SetType(value v1.DaemonSetConditionType) *DaemonSetConditionBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b DaemonSetConditionBuilder) RemoveType() DaemonSetConditionBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetConditionBuilder) RemoveType() *DaemonSetConditionBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b DaemonSetConditionBuilder) GetType() (value v1.DaemonSetConditionType, ok bool) {
-	b.ensureInitialized()
+func (b *DaemonSetConditionBuilder) GetType() (value v1.DaemonSetConditionType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -83,22 +73,19 @@ func (b DaemonSetConditionBuilder) GetType() (value v1.DaemonSetConditionType, o
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b DaemonSetConditionBuilder) SetStatus(value corev1.ConditionStatus) DaemonSetConditionBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetConditionBuilder) SetStatus(value corev1.ConditionStatus) *DaemonSetConditionBuilder {
 	b.fields.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b DaemonSetConditionBuilder) RemoveStatus() DaemonSetConditionBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetConditionBuilder) RemoveStatus() *DaemonSetConditionBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b DaemonSetConditionBuilder) GetStatus() (value corev1.ConditionStatus, ok bool) {
-	b.ensureInitialized()
+func (b *DaemonSetConditionBuilder) GetStatus() (value corev1.ConditionStatus, ok bool) {
 	if v := b.fields.Status; v != nil {
 		return *v, true
 	}
@@ -106,22 +93,19 @@ func (b DaemonSetConditionBuilder) GetStatus() (value corev1.ConditionStatus, ok
 }
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
-func (b DaemonSetConditionBuilder) SetLastTransitionTime(value metav1.Time) DaemonSetConditionBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetConditionBuilder) SetLastTransitionTime(value metav1.Time) *DaemonSetConditionBuilder {
 	b.fields.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
-func (b DaemonSetConditionBuilder) RemoveLastTransitionTime() DaemonSetConditionBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetConditionBuilder) RemoveLastTransitionTime() *DaemonSetConditionBuilder {
 	b.fields.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
-func (b DaemonSetConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *DaemonSetConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastTransitionTime; v != nil {
 		return *v, true
 	}
@@ -129,22 +113,19 @@ func (b DaemonSetConditionBuilder) GetLastTransitionTime() (value metav1.Time, o
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b DaemonSetConditionBuilder) SetReason(value string) DaemonSetConditionBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetConditionBuilder) SetReason(value string) *DaemonSetConditionBuilder {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b DaemonSetConditionBuilder) RemoveReason() DaemonSetConditionBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetConditionBuilder) RemoveReason() *DaemonSetConditionBuilder {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b DaemonSetConditionBuilder) GetReason() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *DaemonSetConditionBuilder) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -152,22 +133,19 @@ func (b DaemonSetConditionBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b DaemonSetConditionBuilder) SetMessage(value string) DaemonSetConditionBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetConditionBuilder) SetMessage(value string) *DaemonSetConditionBuilder {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b DaemonSetConditionBuilder) RemoveMessage() DaemonSetConditionBuilder {
-	b.ensureInitialized()
+func (b *DaemonSetConditionBuilder) RemoveMessage() *DaemonSetConditionBuilder {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b DaemonSetConditionBuilder) GetMessage() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *DaemonSetConditionBuilder) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
@@ -179,9 +157,8 @@ func (b *DaemonSetConditionBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -196,14 +173,13 @@ func (b *DaemonSetConditionBuilder) FromUnstructured(u map[string]interface{}) e
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals DaemonSetConditionBuilder to JSON.
 func (b *DaemonSetConditionBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -211,8 +187,7 @@ func (b *DaemonSetConditionBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into DaemonSetConditionBuilder, replacing the contents of
 // DaemonSetConditionBuilder.
 func (b *DaemonSetConditionBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -220,11 +195,9 @@ func (b *DaemonSetConditionBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // DaemonSetConditionList represents a list of DaemonSetConditionBuilder.
-// Provided as a convenience.
-type DaemonSetConditionList []DaemonSetConditionBuilder
+type DaemonSetConditionList []*DaemonSetConditionBuilder
 
 // DaemonSetConditionList represents a map of DaemonSetConditionBuilder.
-// Provided as a convenience.
 type DaemonSetConditionMap map[string]DaemonSetConditionBuilder
 
 func (b *DaemonSetConditionBuilder) preMarshal() {

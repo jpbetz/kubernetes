@@ -27,76 +27,57 @@ import (
 // HorizontalPodAutoscalerBehaviorBuilder represents an declarative configuration of the HorizontalPodAutoscalerBehavior type for use
 // with apply.
 type HorizontalPodAutoscalerBehaviorBuilder struct {
-	fields *horizontalPodAutoscalerBehaviorFields
+	fields horizontalPodAutoscalerBehaviorFields
 }
 
-// horizontalPodAutoscalerBehaviorFields is used by HorizontalPodAutoscalerBehaviorBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in HorizontalPodAutoscalerBehaviorBuilder before marshalling, and
-// are copied out to the builder type in HorizontalPodAutoscalerBehaviorBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// horizontalPodAutoscalerBehaviorFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in HorizontalPodAutoscalerBehaviorBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type horizontalPodAutoscalerBehaviorFields struct {
 	ScaleUp   *HPAScalingRulesBuilder `json:"scaleUp,omitempty"`
 	ScaleDown *HPAScalingRulesBuilder `json:"scaleDown,omitempty"`
 }
 
-func (b *HorizontalPodAutoscalerBehaviorBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &horizontalPodAutoscalerBehaviorFields{}
-	}
-}
-
 // HorizontalPodAutoscalerBehavior constructs an declarative configuration of the HorizontalPodAutoscalerBehavior type for use with
 // apply.
-// Provided as a convenience.
-func HorizontalPodAutoscalerBehavior() HorizontalPodAutoscalerBehaviorBuilder {
-	return HorizontalPodAutoscalerBehaviorBuilder{fields: &horizontalPodAutoscalerBehaviorFields{}}
+func HorizontalPodAutoscalerBehavior() *HorizontalPodAutoscalerBehaviorBuilder {
+	return &HorizontalPodAutoscalerBehaviorBuilder{}
 }
 
 // SetScaleUp sets the ScaleUp field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerBehaviorBuilder) SetScaleUp(value HPAScalingRulesBuilder) HorizontalPodAutoscalerBehaviorBuilder {
-	b.ensureInitialized()
-	b.fields.ScaleUp = &value
+func (b *HorizontalPodAutoscalerBehaviorBuilder) SetScaleUp(value *HPAScalingRulesBuilder) *HorizontalPodAutoscalerBehaviorBuilder {
+	b.fields.ScaleUp = value
 	return b
 }
 
 // RemoveScaleUp removes the ScaleUp field from the declarative configuration.
-func (b HorizontalPodAutoscalerBehaviorBuilder) RemoveScaleUp() HorizontalPodAutoscalerBehaviorBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerBehaviorBuilder) RemoveScaleUp() *HorizontalPodAutoscalerBehaviorBuilder {
 	b.fields.ScaleUp = nil
 	return b
 }
 
 // GetScaleUp gets the ScaleUp field from the declarative configuration.
-func (b HorizontalPodAutoscalerBehaviorBuilder) GetScaleUp() (value HPAScalingRulesBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ScaleUp; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *HorizontalPodAutoscalerBehaviorBuilder) GetScaleUp() (value *HPAScalingRulesBuilder, ok bool) {
+	return b.fields.ScaleUp, b.fields.ScaleUp != nil
 }
 
 // SetScaleDown sets the ScaleDown field in the declarative configuration to the given value.
-func (b HorizontalPodAutoscalerBehaviorBuilder) SetScaleDown(value HPAScalingRulesBuilder) HorizontalPodAutoscalerBehaviorBuilder {
-	b.ensureInitialized()
-	b.fields.ScaleDown = &value
+func (b *HorizontalPodAutoscalerBehaviorBuilder) SetScaleDown(value *HPAScalingRulesBuilder) *HorizontalPodAutoscalerBehaviorBuilder {
+	b.fields.ScaleDown = value
 	return b
 }
 
 // RemoveScaleDown removes the ScaleDown field from the declarative configuration.
-func (b HorizontalPodAutoscalerBehaviorBuilder) RemoveScaleDown() HorizontalPodAutoscalerBehaviorBuilder {
-	b.ensureInitialized()
+func (b *HorizontalPodAutoscalerBehaviorBuilder) RemoveScaleDown() *HorizontalPodAutoscalerBehaviorBuilder {
 	b.fields.ScaleDown = nil
 	return b
 }
 
 // GetScaleDown gets the ScaleDown field from the declarative configuration.
-func (b HorizontalPodAutoscalerBehaviorBuilder) GetScaleDown() (value HPAScalingRulesBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ScaleDown; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *HorizontalPodAutoscalerBehaviorBuilder) GetScaleDown() (value *HPAScalingRulesBuilder, ok bool) {
+	return b.fields.ScaleDown, b.fields.ScaleDown != nil
 }
 
 // ToUnstructured converts HorizontalPodAutoscalerBehaviorBuilder to unstructured.
@@ -104,9 +85,8 @@ func (b *HorizontalPodAutoscalerBehaviorBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -121,14 +101,13 @@ func (b *HorizontalPodAutoscalerBehaviorBuilder) FromUnstructured(u map[string]i
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals HorizontalPodAutoscalerBehaviorBuilder to JSON.
 func (b *HorizontalPodAutoscalerBehaviorBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -136,8 +115,7 @@ func (b *HorizontalPodAutoscalerBehaviorBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into HorizontalPodAutoscalerBehaviorBuilder, replacing the contents of
 // HorizontalPodAutoscalerBehaviorBuilder.
 func (b *HorizontalPodAutoscalerBehaviorBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -145,11 +123,9 @@ func (b *HorizontalPodAutoscalerBehaviorBuilder) UnmarshalJSON(data []byte) erro
 }
 
 // HorizontalPodAutoscalerBehaviorList represents a list of HorizontalPodAutoscalerBehaviorBuilder.
-// Provided as a convenience.
-type HorizontalPodAutoscalerBehaviorList []HorizontalPodAutoscalerBehaviorBuilder
+type HorizontalPodAutoscalerBehaviorList []*HorizontalPodAutoscalerBehaviorBuilder
 
 // HorizontalPodAutoscalerBehaviorList represents a map of HorizontalPodAutoscalerBehaviorBuilder.
-// Provided as a convenience.
 type HorizontalPodAutoscalerBehaviorMap map[string]HorizontalPodAutoscalerBehaviorBuilder
 
 func (b *HorizontalPodAutoscalerBehaviorBuilder) preMarshal() {

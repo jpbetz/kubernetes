@@ -27,15 +27,15 @@ import (
 // ConfigMapVolumeSourceBuilder represents an declarative configuration of the ConfigMapVolumeSource type for use
 // with apply.
 type ConfigMapVolumeSourceBuilder struct {
-	localObjectReference LocalObjectReferenceBuilder // inlined type
-	fields               *configMapVolumeSourceFields
+	localObjectReference *LocalObjectReferenceBuilder // inlined type
+	fields               configMapVolumeSourceFields
 }
 
-// configMapVolumeSourceFields is used by ConfigMapVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ConfigMapVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in ConfigMapVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// configMapVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ConfigMapVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type configMapVolumeSourceFields struct {
 	Name        *string        `json:"name,omitempty"` // inlined ConfigMapVolumeSourceBuilder.localObjectReference.Name field
 	Items       *KeyToPathList `json:"items,omitempty"`
@@ -43,56 +43,43 @@ type configMapVolumeSourceFields struct {
 	Optional    *bool          `json:"optional,omitempty"`
 }
 
-func (b *ConfigMapVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &configMapVolumeSourceFields{}
-	}
-}
-
 // ConfigMapVolumeSource constructs an declarative configuration of the ConfigMapVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func ConfigMapVolumeSource() ConfigMapVolumeSourceBuilder {
-	return ConfigMapVolumeSourceBuilder{fields: &configMapVolumeSourceFields{}}
+func ConfigMapVolumeSource() *ConfigMapVolumeSourceBuilder {
+	return &ConfigMapVolumeSourceBuilder{}
 }
 
 // SetLocalObjectReference sets the LocalObjectReference field in the declarative configuration to the given value.
-func (b ConfigMapVolumeSourceBuilder) SetLocalObjectReference(value LocalObjectReferenceBuilder) ConfigMapVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapVolumeSourceBuilder) SetLocalObjectReference(value *LocalObjectReferenceBuilder) *ConfigMapVolumeSourceBuilder {
 	b.localObjectReference = value
 	return b
 }
 
 // RemoveLocalObjectReference removes the LocalObjectReference field from the declarative configuration.
-func (b ConfigMapVolumeSourceBuilder) RemoveLocalObjectReference() ConfigMapVolumeSourceBuilder {
-	b.ensureInitialized()
-	b.localObjectReference = LocalObjectReferenceBuilder{}
+func (b *ConfigMapVolumeSourceBuilder) RemoveLocalObjectReference() *ConfigMapVolumeSourceBuilder {
+	b.localObjectReference = nil
 	return b
 }
 
 // GetLocalObjectReference gets the LocalObjectReference field from the declarative configuration.
-func (b ConfigMapVolumeSourceBuilder) GetLocalObjectReference() (value LocalObjectReferenceBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapVolumeSourceBuilder) GetLocalObjectReference() (value *LocalObjectReferenceBuilder, ok bool) {
 	return b.localObjectReference, true
 }
 
 // SetItems sets the Items field in the declarative configuration to the given value.
-func (b ConfigMapVolumeSourceBuilder) SetItems(value KeyToPathList) ConfigMapVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapVolumeSourceBuilder) SetItems(value KeyToPathList) *ConfigMapVolumeSourceBuilder {
 	b.fields.Items = &value
 	return b
 }
 
 // RemoveItems removes the Items field from the declarative configuration.
-func (b ConfigMapVolumeSourceBuilder) RemoveItems() ConfigMapVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapVolumeSourceBuilder) RemoveItems() *ConfigMapVolumeSourceBuilder {
 	b.fields.Items = nil
 	return b
 }
 
 // GetItems gets the Items field from the declarative configuration.
-func (b ConfigMapVolumeSourceBuilder) GetItems() (value KeyToPathList, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapVolumeSourceBuilder) GetItems() (value KeyToPathList, ok bool) {
 	if v := b.fields.Items; v != nil {
 		return *v, true
 	}
@@ -100,22 +87,19 @@ func (b ConfigMapVolumeSourceBuilder) GetItems() (value KeyToPathList, ok bool) 
 }
 
 // SetDefaultMode sets the DefaultMode field in the declarative configuration to the given value.
-func (b ConfigMapVolumeSourceBuilder) SetDefaultMode(value int32) ConfigMapVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapVolumeSourceBuilder) SetDefaultMode(value int32) *ConfigMapVolumeSourceBuilder {
 	b.fields.DefaultMode = &value
 	return b
 }
 
 // RemoveDefaultMode removes the DefaultMode field from the declarative configuration.
-func (b ConfigMapVolumeSourceBuilder) RemoveDefaultMode() ConfigMapVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapVolumeSourceBuilder) RemoveDefaultMode() *ConfigMapVolumeSourceBuilder {
 	b.fields.DefaultMode = nil
 	return b
 }
 
 // GetDefaultMode gets the DefaultMode field from the declarative configuration.
-func (b ConfigMapVolumeSourceBuilder) GetDefaultMode() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapVolumeSourceBuilder) GetDefaultMode() (value int32, ok bool) {
 	if v := b.fields.DefaultMode; v != nil {
 		return *v, true
 	}
@@ -123,22 +107,19 @@ func (b ConfigMapVolumeSourceBuilder) GetDefaultMode() (value int32, ok bool) {
 }
 
 // SetOptional sets the Optional field in the declarative configuration to the given value.
-func (b ConfigMapVolumeSourceBuilder) SetOptional(value bool) ConfigMapVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapVolumeSourceBuilder) SetOptional(value bool) *ConfigMapVolumeSourceBuilder {
 	b.fields.Optional = &value
 	return b
 }
 
 // RemoveOptional removes the Optional field from the declarative configuration.
-func (b ConfigMapVolumeSourceBuilder) RemoveOptional() ConfigMapVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *ConfigMapVolumeSourceBuilder) RemoveOptional() *ConfigMapVolumeSourceBuilder {
 	b.fields.Optional = nil
 	return b
 }
 
 // GetOptional gets the Optional field from the declarative configuration.
-func (b ConfigMapVolumeSourceBuilder) GetOptional() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *ConfigMapVolumeSourceBuilder) GetOptional() (value bool, ok bool) {
 	if v := b.fields.Optional; v != nil {
 		return *v, true
 	}
@@ -150,9 +131,8 @@ func (b *ConfigMapVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -167,14 +147,13 @@ func (b *ConfigMapVolumeSourceBuilder) FromUnstructured(u map[string]interface{}
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ConfigMapVolumeSourceBuilder to JSON.
 func (b *ConfigMapVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -182,8 +161,7 @@ func (b *ConfigMapVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ConfigMapVolumeSourceBuilder, replacing the contents of
 // ConfigMapVolumeSourceBuilder.
 func (b *ConfigMapVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -191,19 +169,22 @@ func (b *ConfigMapVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ConfigMapVolumeSourceList represents a list of ConfigMapVolumeSourceBuilder.
-// Provided as a convenience.
-type ConfigMapVolumeSourceList []ConfigMapVolumeSourceBuilder
+type ConfigMapVolumeSourceList []*ConfigMapVolumeSourceBuilder
 
 // ConfigMapVolumeSourceList represents a map of ConfigMapVolumeSourceBuilder.
-// Provided as a convenience.
 type ConfigMapVolumeSourceMap map[string]ConfigMapVolumeSourceBuilder
 
 func (b *ConfigMapVolumeSourceBuilder) preMarshal() {
-	if v, ok := b.localObjectReference.GetName(); ok {
-		b.fields.Name = &v
+	if b.localObjectReference != nil {
+		if v, ok := b.localObjectReference.GetName(); ok {
+			b.fields.Name = &v
+		}
 	}
 }
 func (b *ConfigMapVolumeSourceBuilder) postUnmarshal() {
+	if b.localObjectReference == nil {
+		b.localObjectReference = &LocalObjectReferenceBuilder{}
+	}
 	if b.fields.Name != nil {
 		b.localObjectReference.SetName(*b.fields.Name)
 	}

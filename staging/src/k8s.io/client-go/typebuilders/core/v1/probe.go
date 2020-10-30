@@ -27,15 +27,15 @@ import (
 // ProbeBuilder represents an declarative configuration of the Probe type for use
 // with apply.
 type ProbeBuilder struct {
-	handler HandlerBuilder // inlined type
-	fields  *probeFields
+	handler *HandlerBuilder // inlined type
+	fields  probeFields
 }
 
-// probeFields is used by ProbeBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ProbeBuilder before marshalling, and
-// are copied out to the builder type in ProbeBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// probeFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ProbeBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type probeFields struct {
 	Exec                *ExecActionBuilder      `json:"exec,omitempty"`      // inlined ProbeBuilder.handler.Exec field
 	HTTPGet             *HTTPGetActionBuilder   `json:"httpGet,omitempty"`   // inlined ProbeBuilder.handler.HTTPGet field
@@ -47,56 +47,43 @@ type probeFields struct {
 	FailureThreshold    *int32                  `json:"failureThreshold,omitempty"`
 }
 
-func (b *ProbeBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &probeFields{}
-	}
-}
-
 // Probe constructs an declarative configuration of the Probe type for use with
 // apply.
-// Provided as a convenience.
-func Probe() ProbeBuilder {
-	return ProbeBuilder{fields: &probeFields{}}
+func Probe() *ProbeBuilder {
+	return &ProbeBuilder{}
 }
 
 // SetHandler sets the Handler field in the declarative configuration to the given value.
-func (b ProbeBuilder) SetHandler(value HandlerBuilder) ProbeBuilder {
-	b.ensureInitialized()
+func (b *ProbeBuilder) SetHandler(value *HandlerBuilder) *ProbeBuilder {
 	b.handler = value
 	return b
 }
 
 // RemoveHandler removes the Handler field from the declarative configuration.
-func (b ProbeBuilder) RemoveHandler() ProbeBuilder {
-	b.ensureInitialized()
-	b.handler = HandlerBuilder{}
+func (b *ProbeBuilder) RemoveHandler() *ProbeBuilder {
+	b.handler = nil
 	return b
 }
 
 // GetHandler gets the Handler field from the declarative configuration.
-func (b ProbeBuilder) GetHandler() (value HandlerBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *ProbeBuilder) GetHandler() (value *HandlerBuilder, ok bool) {
 	return b.handler, true
 }
 
 // SetInitialDelaySeconds sets the InitialDelaySeconds field in the declarative configuration to the given value.
-func (b ProbeBuilder) SetInitialDelaySeconds(value int32) ProbeBuilder {
-	b.ensureInitialized()
+func (b *ProbeBuilder) SetInitialDelaySeconds(value int32) *ProbeBuilder {
 	b.fields.InitialDelaySeconds = &value
 	return b
 }
 
 // RemoveInitialDelaySeconds removes the InitialDelaySeconds field from the declarative configuration.
-func (b ProbeBuilder) RemoveInitialDelaySeconds() ProbeBuilder {
-	b.ensureInitialized()
+func (b *ProbeBuilder) RemoveInitialDelaySeconds() *ProbeBuilder {
 	b.fields.InitialDelaySeconds = nil
 	return b
 }
 
 // GetInitialDelaySeconds gets the InitialDelaySeconds field from the declarative configuration.
-func (b ProbeBuilder) GetInitialDelaySeconds() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ProbeBuilder) GetInitialDelaySeconds() (value int32, ok bool) {
 	if v := b.fields.InitialDelaySeconds; v != nil {
 		return *v, true
 	}
@@ -104,22 +91,19 @@ func (b ProbeBuilder) GetInitialDelaySeconds() (value int32, ok bool) {
 }
 
 // SetTimeoutSeconds sets the TimeoutSeconds field in the declarative configuration to the given value.
-func (b ProbeBuilder) SetTimeoutSeconds(value int32) ProbeBuilder {
-	b.ensureInitialized()
+func (b *ProbeBuilder) SetTimeoutSeconds(value int32) *ProbeBuilder {
 	b.fields.TimeoutSeconds = &value
 	return b
 }
 
 // RemoveTimeoutSeconds removes the TimeoutSeconds field from the declarative configuration.
-func (b ProbeBuilder) RemoveTimeoutSeconds() ProbeBuilder {
-	b.ensureInitialized()
+func (b *ProbeBuilder) RemoveTimeoutSeconds() *ProbeBuilder {
 	b.fields.TimeoutSeconds = nil
 	return b
 }
 
 // GetTimeoutSeconds gets the TimeoutSeconds field from the declarative configuration.
-func (b ProbeBuilder) GetTimeoutSeconds() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ProbeBuilder) GetTimeoutSeconds() (value int32, ok bool) {
 	if v := b.fields.TimeoutSeconds; v != nil {
 		return *v, true
 	}
@@ -127,22 +111,19 @@ func (b ProbeBuilder) GetTimeoutSeconds() (value int32, ok bool) {
 }
 
 // SetPeriodSeconds sets the PeriodSeconds field in the declarative configuration to the given value.
-func (b ProbeBuilder) SetPeriodSeconds(value int32) ProbeBuilder {
-	b.ensureInitialized()
+func (b *ProbeBuilder) SetPeriodSeconds(value int32) *ProbeBuilder {
 	b.fields.PeriodSeconds = &value
 	return b
 }
 
 // RemovePeriodSeconds removes the PeriodSeconds field from the declarative configuration.
-func (b ProbeBuilder) RemovePeriodSeconds() ProbeBuilder {
-	b.ensureInitialized()
+func (b *ProbeBuilder) RemovePeriodSeconds() *ProbeBuilder {
 	b.fields.PeriodSeconds = nil
 	return b
 }
 
 // GetPeriodSeconds gets the PeriodSeconds field from the declarative configuration.
-func (b ProbeBuilder) GetPeriodSeconds() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ProbeBuilder) GetPeriodSeconds() (value int32, ok bool) {
 	if v := b.fields.PeriodSeconds; v != nil {
 		return *v, true
 	}
@@ -150,22 +131,19 @@ func (b ProbeBuilder) GetPeriodSeconds() (value int32, ok bool) {
 }
 
 // SetSuccessThreshold sets the SuccessThreshold field in the declarative configuration to the given value.
-func (b ProbeBuilder) SetSuccessThreshold(value int32) ProbeBuilder {
-	b.ensureInitialized()
+func (b *ProbeBuilder) SetSuccessThreshold(value int32) *ProbeBuilder {
 	b.fields.SuccessThreshold = &value
 	return b
 }
 
 // RemoveSuccessThreshold removes the SuccessThreshold field from the declarative configuration.
-func (b ProbeBuilder) RemoveSuccessThreshold() ProbeBuilder {
-	b.ensureInitialized()
+func (b *ProbeBuilder) RemoveSuccessThreshold() *ProbeBuilder {
 	b.fields.SuccessThreshold = nil
 	return b
 }
 
 // GetSuccessThreshold gets the SuccessThreshold field from the declarative configuration.
-func (b ProbeBuilder) GetSuccessThreshold() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ProbeBuilder) GetSuccessThreshold() (value int32, ok bool) {
 	if v := b.fields.SuccessThreshold; v != nil {
 		return *v, true
 	}
@@ -173,22 +151,19 @@ func (b ProbeBuilder) GetSuccessThreshold() (value int32, ok bool) {
 }
 
 // SetFailureThreshold sets the FailureThreshold field in the declarative configuration to the given value.
-func (b ProbeBuilder) SetFailureThreshold(value int32) ProbeBuilder {
-	b.ensureInitialized()
+func (b *ProbeBuilder) SetFailureThreshold(value int32) *ProbeBuilder {
 	b.fields.FailureThreshold = &value
 	return b
 }
 
 // RemoveFailureThreshold removes the FailureThreshold field from the declarative configuration.
-func (b ProbeBuilder) RemoveFailureThreshold() ProbeBuilder {
-	b.ensureInitialized()
+func (b *ProbeBuilder) RemoveFailureThreshold() *ProbeBuilder {
 	b.fields.FailureThreshold = nil
 	return b
 }
 
 // GetFailureThreshold gets the FailureThreshold field from the declarative configuration.
-func (b ProbeBuilder) GetFailureThreshold() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *ProbeBuilder) GetFailureThreshold() (value int32, ok bool) {
 	if v := b.fields.FailureThreshold; v != nil {
 		return *v, true
 	}
@@ -200,9 +175,8 @@ func (b *ProbeBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -217,14 +191,13 @@ func (b *ProbeBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ProbeBuilder to JSON.
 func (b *ProbeBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -232,8 +205,7 @@ func (b *ProbeBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ProbeBuilder, replacing the contents of
 // ProbeBuilder.
 func (b *ProbeBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -241,32 +213,35 @@ func (b *ProbeBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ProbeList represents a list of ProbeBuilder.
-// Provided as a convenience.
-type ProbeList []ProbeBuilder
+type ProbeList []*ProbeBuilder
 
 // ProbeList represents a map of ProbeBuilder.
-// Provided as a convenience.
 type ProbeMap map[string]ProbeBuilder
 
 func (b *ProbeBuilder) preMarshal() {
-	if v, ok := b.handler.GetExec(); ok {
-		b.fields.Exec = &v
-	}
-	if v, ok := b.handler.GetHTTPGet(); ok {
-		b.fields.HTTPGet = &v
-	}
-	if v, ok := b.handler.GetTCPSocket(); ok {
-		b.fields.TCPSocket = &v
+	if b.handler != nil {
+		if v, ok := b.handler.GetExec(); ok {
+			b.fields.Exec = v
+		}
+		if v, ok := b.handler.GetHTTPGet(); ok {
+			b.fields.HTTPGet = v
+		}
+		if v, ok := b.handler.GetTCPSocket(); ok {
+			b.fields.TCPSocket = v
+		}
 	}
 }
 func (b *ProbeBuilder) postUnmarshal() {
+	if b.handler == nil {
+		b.handler = &HandlerBuilder{}
+	}
 	if b.fields.Exec != nil {
-		b.handler.SetExec(*b.fields.Exec)
+		b.handler.SetExec(b.fields.Exec)
 	}
 	if b.fields.HTTPGet != nil {
-		b.handler.SetHTTPGet(*b.fields.HTTPGet)
+		b.handler.SetHTTPGet(b.fields.HTTPGet)
 	}
 	if b.fields.TCPSocket != nil {
-		b.handler.SetTCPSocket(*b.fields.TCPSocket)
+		b.handler.SetTCPSocket(b.fields.TCPSocket)
 	}
 }

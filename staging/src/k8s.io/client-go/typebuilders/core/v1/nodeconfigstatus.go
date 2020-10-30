@@ -27,14 +27,14 @@ import (
 // NodeConfigStatusBuilder represents an declarative configuration of the NodeConfigStatus type for use
 // with apply.
 type NodeConfigStatusBuilder struct {
-	fields *nodeConfigStatusFields
+	fields nodeConfigStatusFields
 }
 
-// nodeConfigStatusFields is used by NodeConfigStatusBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in NodeConfigStatusBuilder before marshalling, and
-// are copied out to the builder type in NodeConfigStatusBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// nodeConfigStatusFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in NodeConfigStatusBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type nodeConfigStatusFields struct {
 	Assigned      *NodeConfigSourceBuilder `json:"assigned,omitempty"`
 	Active        *NodeConfigSourceBuilder `json:"active,omitempty"`
@@ -42,105 +42,77 @@ type nodeConfigStatusFields struct {
 	Error         *string                  `json:"error,omitempty"`
 }
 
-func (b *NodeConfigStatusBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &nodeConfigStatusFields{}
-	}
-}
-
 // NodeConfigStatus constructs an declarative configuration of the NodeConfigStatus type for use with
 // apply.
-// Provided as a convenience.
-func NodeConfigStatus() NodeConfigStatusBuilder {
-	return NodeConfigStatusBuilder{fields: &nodeConfigStatusFields{}}
+func NodeConfigStatus() *NodeConfigStatusBuilder {
+	return &NodeConfigStatusBuilder{}
 }
 
 // SetAssigned sets the Assigned field in the declarative configuration to the given value.
-func (b NodeConfigStatusBuilder) SetAssigned(value NodeConfigSourceBuilder) NodeConfigStatusBuilder {
-	b.ensureInitialized()
-	b.fields.Assigned = &value
+func (b *NodeConfigStatusBuilder) SetAssigned(value *NodeConfigSourceBuilder) *NodeConfigStatusBuilder {
+	b.fields.Assigned = value
 	return b
 }
 
 // RemoveAssigned removes the Assigned field from the declarative configuration.
-func (b NodeConfigStatusBuilder) RemoveAssigned() NodeConfigStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeConfigStatusBuilder) RemoveAssigned() *NodeConfigStatusBuilder {
 	b.fields.Assigned = nil
 	return b
 }
 
 // GetAssigned gets the Assigned field from the declarative configuration.
-func (b NodeConfigStatusBuilder) GetAssigned() (value NodeConfigSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Assigned; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *NodeConfigStatusBuilder) GetAssigned() (value *NodeConfigSourceBuilder, ok bool) {
+	return b.fields.Assigned, b.fields.Assigned != nil
 }
 
 // SetActive sets the Active field in the declarative configuration to the given value.
-func (b NodeConfigStatusBuilder) SetActive(value NodeConfigSourceBuilder) NodeConfigStatusBuilder {
-	b.ensureInitialized()
-	b.fields.Active = &value
+func (b *NodeConfigStatusBuilder) SetActive(value *NodeConfigSourceBuilder) *NodeConfigStatusBuilder {
+	b.fields.Active = value
 	return b
 }
 
 // RemoveActive removes the Active field from the declarative configuration.
-func (b NodeConfigStatusBuilder) RemoveActive() NodeConfigStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeConfigStatusBuilder) RemoveActive() *NodeConfigStatusBuilder {
 	b.fields.Active = nil
 	return b
 }
 
 // GetActive gets the Active field from the declarative configuration.
-func (b NodeConfigStatusBuilder) GetActive() (value NodeConfigSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Active; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *NodeConfigStatusBuilder) GetActive() (value *NodeConfigSourceBuilder, ok bool) {
+	return b.fields.Active, b.fields.Active != nil
 }
 
 // SetLastKnownGood sets the LastKnownGood field in the declarative configuration to the given value.
-func (b NodeConfigStatusBuilder) SetLastKnownGood(value NodeConfigSourceBuilder) NodeConfigStatusBuilder {
-	b.ensureInitialized()
-	b.fields.LastKnownGood = &value
+func (b *NodeConfigStatusBuilder) SetLastKnownGood(value *NodeConfigSourceBuilder) *NodeConfigStatusBuilder {
+	b.fields.LastKnownGood = value
 	return b
 }
 
 // RemoveLastKnownGood removes the LastKnownGood field from the declarative configuration.
-func (b NodeConfigStatusBuilder) RemoveLastKnownGood() NodeConfigStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeConfigStatusBuilder) RemoveLastKnownGood() *NodeConfigStatusBuilder {
 	b.fields.LastKnownGood = nil
 	return b
 }
 
 // GetLastKnownGood gets the LastKnownGood field from the declarative configuration.
-func (b NodeConfigStatusBuilder) GetLastKnownGood() (value NodeConfigSourceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.LastKnownGood; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *NodeConfigStatusBuilder) GetLastKnownGood() (value *NodeConfigSourceBuilder, ok bool) {
+	return b.fields.LastKnownGood, b.fields.LastKnownGood != nil
 }
 
 // SetError sets the Error field in the declarative configuration to the given value.
-func (b NodeConfigStatusBuilder) SetError(value string) NodeConfigStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeConfigStatusBuilder) SetError(value string) *NodeConfigStatusBuilder {
 	b.fields.Error = &value
 	return b
 }
 
 // RemoveError removes the Error field from the declarative configuration.
-func (b NodeConfigStatusBuilder) RemoveError() NodeConfigStatusBuilder {
-	b.ensureInitialized()
+func (b *NodeConfigStatusBuilder) RemoveError() *NodeConfigStatusBuilder {
 	b.fields.Error = nil
 	return b
 }
 
 // GetError gets the Error field from the declarative configuration.
-func (b NodeConfigStatusBuilder) GetError() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *NodeConfigStatusBuilder) GetError() (value string, ok bool) {
 	if v := b.fields.Error; v != nil {
 		return *v, true
 	}
@@ -152,9 +124,8 @@ func (b *NodeConfigStatusBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *NodeConfigStatusBuilder) FromUnstructured(u map[string]interface{}) err
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals NodeConfigStatusBuilder to JSON.
 func (b *NodeConfigStatusBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *NodeConfigStatusBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into NodeConfigStatusBuilder, replacing the contents of
 // NodeConfigStatusBuilder.
 func (b *NodeConfigStatusBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,11 +162,9 @@ func (b *NodeConfigStatusBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // NodeConfigStatusList represents a list of NodeConfigStatusBuilder.
-// Provided as a convenience.
-type NodeConfigStatusList []NodeConfigStatusBuilder
+type NodeConfigStatusList []*NodeConfigStatusBuilder
 
 // NodeConfigStatusList represents a map of NodeConfigStatusBuilder.
-// Provided as a convenience.
 type NodeConfigStatusMap map[string]NodeConfigStatusBuilder
 
 func (b *NodeConfigStatusBuilder) preMarshal() {

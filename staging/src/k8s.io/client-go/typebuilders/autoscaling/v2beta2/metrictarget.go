@@ -29,14 +29,14 @@ import (
 // MetricTargetBuilder represents an declarative configuration of the MetricTarget type for use
 // with apply.
 type MetricTargetBuilder struct {
-	fields *metricTargetFields
+	fields metricTargetFields
 }
 
-// metricTargetFields is used by MetricTargetBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in MetricTargetBuilder before marshalling, and
-// are copied out to the builder type in MetricTargetBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// metricTargetFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in MetricTargetBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type metricTargetFields struct {
 	Type               *v2beta2.MetricTargetType `json:"type,omitempty"`
 	Value              *resource.Quantity        `json:"value,omitempty"`
@@ -44,36 +44,26 @@ type metricTargetFields struct {
 	AverageUtilization *int32                    `json:"averageUtilization,omitempty"`
 }
 
-func (b *MetricTargetBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &metricTargetFields{}
-	}
-}
-
 // MetricTarget constructs an declarative configuration of the MetricTarget type for use with
 // apply.
-// Provided as a convenience.
-func MetricTarget() MetricTargetBuilder {
-	return MetricTargetBuilder{fields: &metricTargetFields{}}
+func MetricTarget() *MetricTargetBuilder {
+	return &MetricTargetBuilder{}
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b MetricTargetBuilder) SetType(value v2beta2.MetricTargetType) MetricTargetBuilder {
-	b.ensureInitialized()
+func (b *MetricTargetBuilder) SetType(value v2beta2.MetricTargetType) *MetricTargetBuilder {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b MetricTargetBuilder) RemoveType() MetricTargetBuilder {
-	b.ensureInitialized()
+func (b *MetricTargetBuilder) RemoveType() *MetricTargetBuilder {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b MetricTargetBuilder) GetType() (value v2beta2.MetricTargetType, ok bool) {
-	b.ensureInitialized()
+func (b *MetricTargetBuilder) GetType() (value v2beta2.MetricTargetType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -81,22 +71,19 @@ func (b MetricTargetBuilder) GetType() (value v2beta2.MetricTargetType, ok bool)
 }
 
 // SetValue sets the Value field in the declarative configuration to the given value.
-func (b MetricTargetBuilder) SetValue(value resource.Quantity) MetricTargetBuilder {
-	b.ensureInitialized()
+func (b *MetricTargetBuilder) SetValue(value resource.Quantity) *MetricTargetBuilder {
 	b.fields.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
-func (b MetricTargetBuilder) RemoveValue() MetricTargetBuilder {
-	b.ensureInitialized()
+func (b *MetricTargetBuilder) RemoveValue() *MetricTargetBuilder {
 	b.fields.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
-func (b MetricTargetBuilder) GetValue() (value resource.Quantity, ok bool) {
-	b.ensureInitialized()
+func (b *MetricTargetBuilder) GetValue() (value resource.Quantity, ok bool) {
 	if v := b.fields.Value; v != nil {
 		return *v, true
 	}
@@ -104,22 +91,19 @@ func (b MetricTargetBuilder) GetValue() (value resource.Quantity, ok bool) {
 }
 
 // SetAverageValue sets the AverageValue field in the declarative configuration to the given value.
-func (b MetricTargetBuilder) SetAverageValue(value resource.Quantity) MetricTargetBuilder {
-	b.ensureInitialized()
+func (b *MetricTargetBuilder) SetAverageValue(value resource.Quantity) *MetricTargetBuilder {
 	b.fields.AverageValue = &value
 	return b
 }
 
 // RemoveAverageValue removes the AverageValue field from the declarative configuration.
-func (b MetricTargetBuilder) RemoveAverageValue() MetricTargetBuilder {
-	b.ensureInitialized()
+func (b *MetricTargetBuilder) RemoveAverageValue() *MetricTargetBuilder {
 	b.fields.AverageValue = nil
 	return b
 }
 
 // GetAverageValue gets the AverageValue field from the declarative configuration.
-func (b MetricTargetBuilder) GetAverageValue() (value resource.Quantity, ok bool) {
-	b.ensureInitialized()
+func (b *MetricTargetBuilder) GetAverageValue() (value resource.Quantity, ok bool) {
 	if v := b.fields.AverageValue; v != nil {
 		return *v, true
 	}
@@ -127,22 +111,19 @@ func (b MetricTargetBuilder) GetAverageValue() (value resource.Quantity, ok bool
 }
 
 // SetAverageUtilization sets the AverageUtilization field in the declarative configuration to the given value.
-func (b MetricTargetBuilder) SetAverageUtilization(value int32) MetricTargetBuilder {
-	b.ensureInitialized()
+func (b *MetricTargetBuilder) SetAverageUtilization(value int32) *MetricTargetBuilder {
 	b.fields.AverageUtilization = &value
 	return b
 }
 
 // RemoveAverageUtilization removes the AverageUtilization field from the declarative configuration.
-func (b MetricTargetBuilder) RemoveAverageUtilization() MetricTargetBuilder {
-	b.ensureInitialized()
+func (b *MetricTargetBuilder) RemoveAverageUtilization() *MetricTargetBuilder {
 	b.fields.AverageUtilization = nil
 	return b
 }
 
 // GetAverageUtilization gets the AverageUtilization field from the declarative configuration.
-func (b MetricTargetBuilder) GetAverageUtilization() (value int32, ok bool) {
-	b.ensureInitialized()
+func (b *MetricTargetBuilder) GetAverageUtilization() (value int32, ok bool) {
 	if v := b.fields.AverageUtilization; v != nil {
 		return *v, true
 	}
@@ -154,9 +135,8 @@ func (b *MetricTargetBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -171,14 +151,13 @@ func (b *MetricTargetBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals MetricTargetBuilder to JSON.
 func (b *MetricTargetBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -186,8 +165,7 @@ func (b *MetricTargetBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into MetricTargetBuilder, replacing the contents of
 // MetricTargetBuilder.
 func (b *MetricTargetBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -195,11 +173,9 @@ func (b *MetricTargetBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // MetricTargetList represents a list of MetricTargetBuilder.
-// Provided as a convenience.
-type MetricTargetList []MetricTargetBuilder
+type MetricTargetList []*MetricTargetBuilder
 
 // MetricTargetList represents a map of MetricTargetBuilder.
-// Provided as a convenience.
 type MetricTargetMap map[string]MetricTargetBuilder
 
 func (b *MetricTargetBuilder) preMarshal() {

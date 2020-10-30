@@ -28,15 +28,15 @@ import (
 // StatefulSetBuilder represents an declarative configuration of the StatefulSet type for use
 // with apply.
 type StatefulSetBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *statefulSetFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   statefulSetFields
 }
 
-// statefulSetFields is used by StatefulSetBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in StatefulSetBuilder before marshalling, and
-// are copied out to the builder type in StatefulSetBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// statefulSetFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in StatefulSetBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type statefulSetFields struct {
 	Kind       *string                   `json:"kind,omitempty"`       // inlined StatefulSetBuilder.typeMeta.Kind field
 	APIVersion *string                   `json:"apiVersion,omitempty"` // inlined StatefulSetBuilder.typeMeta.APIVersion field
@@ -45,106 +45,78 @@ type statefulSetFields struct {
 	Status     *StatefulSetStatusBuilder `json:"status,omitempty"`
 }
 
-func (b *StatefulSetBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &statefulSetFields{}
-	}
-}
-
 // StatefulSet constructs an declarative configuration of the StatefulSet type for use with
 // apply.
-// Provided as a convenience.
-func StatefulSet() StatefulSetBuilder {
-	return StatefulSetBuilder{fields: &statefulSetFields{}}
+func StatefulSet() *StatefulSetBuilder {
+	return &StatefulSetBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b StatefulSetBuilder) SetTypeMeta(value v1.TypeMetaBuilder) StatefulSetBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *StatefulSetBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b StatefulSetBuilder) RemoveTypeMeta() StatefulSetBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *StatefulSetBuilder) RemoveTypeMeta() *StatefulSetBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b StatefulSetBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *StatefulSetBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b StatefulSetBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) StatefulSetBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *StatefulSetBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *StatefulSetBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b StatefulSetBuilder) RemoveObjectMeta() StatefulSetBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetBuilder) RemoveObjectMeta() *StatefulSetBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b StatefulSetBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *StatefulSetBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b StatefulSetBuilder) SetSpec(value StatefulSetSpecBuilder) StatefulSetBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *StatefulSetBuilder) SetSpec(value *StatefulSetSpecBuilder) *StatefulSetBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b StatefulSetBuilder) RemoveSpec() StatefulSetBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetBuilder) RemoveSpec() *StatefulSetBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b StatefulSetBuilder) GetSpec() (value StatefulSetSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *StatefulSetBuilder) GetSpec() (value *StatefulSetSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b StatefulSetBuilder) SetStatus(value StatefulSetStatusBuilder) StatefulSetBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *StatefulSetBuilder) SetStatus(value *StatefulSetStatusBuilder) *StatefulSetBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b StatefulSetBuilder) RemoveStatus() StatefulSetBuilder {
-	b.ensureInitialized()
+func (b *StatefulSetBuilder) RemoveStatus() *StatefulSetBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b StatefulSetBuilder) GetStatus() (value StatefulSetStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *StatefulSetBuilder) GetStatus() (value *StatefulSetStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts StatefulSetBuilder to unstructured.
@@ -152,9 +124,8 @@ func (b *StatefulSetBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *StatefulSetBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals StatefulSetBuilder to JSON.
 func (b *StatefulSetBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *StatefulSetBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into StatefulSetBuilder, replacing the contents of
 // StatefulSetBuilder.
 func (b *StatefulSetBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +162,25 @@ func (b *StatefulSetBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // StatefulSetList represents a list of StatefulSetBuilder.
-// Provided as a convenience.
-type StatefulSetList []StatefulSetBuilder
+type StatefulSetList []*StatefulSetBuilder
 
 // StatefulSetList represents a map of StatefulSetBuilder.
-// Provided as a convenience.
 type StatefulSetMap map[string]StatefulSetBuilder
 
 func (b *StatefulSetBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *StatefulSetBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

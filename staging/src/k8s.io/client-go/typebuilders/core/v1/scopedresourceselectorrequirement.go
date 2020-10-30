@@ -28,50 +28,40 @@ import (
 // ScopedResourceSelectorRequirementBuilder represents an declarative configuration of the ScopedResourceSelectorRequirement type for use
 // with apply.
 type ScopedResourceSelectorRequirementBuilder struct {
-	fields *scopedResourceSelectorRequirementFields
+	fields scopedResourceSelectorRequirementFields
 }
 
-// scopedResourceSelectorRequirementFields is used by ScopedResourceSelectorRequirementBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ScopedResourceSelectorRequirementBuilder before marshalling, and
-// are copied out to the builder type in ScopedResourceSelectorRequirementBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// scopedResourceSelectorRequirementFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ScopedResourceSelectorRequirementBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type scopedResourceSelectorRequirementFields struct {
 	ScopeName *v1.ResourceQuotaScope    `json:"scopeName,omitempty"`
 	Operator  *v1.ScopeSelectorOperator `json:"operator,omitempty"`
 	Values    *[]string                 `json:"values,omitempty"`
 }
 
-func (b *ScopedResourceSelectorRequirementBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &scopedResourceSelectorRequirementFields{}
-	}
-}
-
 // ScopedResourceSelectorRequirement constructs an declarative configuration of the ScopedResourceSelectorRequirement type for use with
 // apply.
-// Provided as a convenience.
-func ScopedResourceSelectorRequirement() ScopedResourceSelectorRequirementBuilder {
-	return ScopedResourceSelectorRequirementBuilder{fields: &scopedResourceSelectorRequirementFields{}}
+func ScopedResourceSelectorRequirement() *ScopedResourceSelectorRequirementBuilder {
+	return &ScopedResourceSelectorRequirementBuilder{}
 }
 
 // SetScopeName sets the ScopeName field in the declarative configuration to the given value.
-func (b ScopedResourceSelectorRequirementBuilder) SetScopeName(value v1.ResourceQuotaScope) ScopedResourceSelectorRequirementBuilder {
-	b.ensureInitialized()
+func (b *ScopedResourceSelectorRequirementBuilder) SetScopeName(value v1.ResourceQuotaScope) *ScopedResourceSelectorRequirementBuilder {
 	b.fields.ScopeName = &value
 	return b
 }
 
 // RemoveScopeName removes the ScopeName field from the declarative configuration.
-func (b ScopedResourceSelectorRequirementBuilder) RemoveScopeName() ScopedResourceSelectorRequirementBuilder {
-	b.ensureInitialized()
+func (b *ScopedResourceSelectorRequirementBuilder) RemoveScopeName() *ScopedResourceSelectorRequirementBuilder {
 	b.fields.ScopeName = nil
 	return b
 }
 
 // GetScopeName gets the ScopeName field from the declarative configuration.
-func (b ScopedResourceSelectorRequirementBuilder) GetScopeName() (value v1.ResourceQuotaScope, ok bool) {
-	b.ensureInitialized()
+func (b *ScopedResourceSelectorRequirementBuilder) GetScopeName() (value v1.ResourceQuotaScope, ok bool) {
 	if v := b.fields.ScopeName; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b ScopedResourceSelectorRequirementBuilder) GetScopeName() (value v1.Resou
 }
 
 // SetOperator sets the Operator field in the declarative configuration to the given value.
-func (b ScopedResourceSelectorRequirementBuilder) SetOperator(value v1.ScopeSelectorOperator) ScopedResourceSelectorRequirementBuilder {
-	b.ensureInitialized()
+func (b *ScopedResourceSelectorRequirementBuilder) SetOperator(value v1.ScopeSelectorOperator) *ScopedResourceSelectorRequirementBuilder {
 	b.fields.Operator = &value
 	return b
 }
 
 // RemoveOperator removes the Operator field from the declarative configuration.
-func (b ScopedResourceSelectorRequirementBuilder) RemoveOperator() ScopedResourceSelectorRequirementBuilder {
-	b.ensureInitialized()
+func (b *ScopedResourceSelectorRequirementBuilder) RemoveOperator() *ScopedResourceSelectorRequirementBuilder {
 	b.fields.Operator = nil
 	return b
 }
 
 // GetOperator gets the Operator field from the declarative configuration.
-func (b ScopedResourceSelectorRequirementBuilder) GetOperator() (value v1.ScopeSelectorOperator, ok bool) {
-	b.ensureInitialized()
+func (b *ScopedResourceSelectorRequirementBuilder) GetOperator() (value v1.ScopeSelectorOperator, ok bool) {
 	if v := b.fields.Operator; v != nil {
 		return *v, true
 	}
@@ -102,22 +89,19 @@ func (b ScopedResourceSelectorRequirementBuilder) GetOperator() (value v1.ScopeS
 }
 
 // SetValues sets the Values field in the declarative configuration to the given value.
-func (b ScopedResourceSelectorRequirementBuilder) SetValues(value []string) ScopedResourceSelectorRequirementBuilder {
-	b.ensureInitialized()
+func (b *ScopedResourceSelectorRequirementBuilder) SetValues(value []string) *ScopedResourceSelectorRequirementBuilder {
 	b.fields.Values = &value
 	return b
 }
 
 // RemoveValues removes the Values field from the declarative configuration.
-func (b ScopedResourceSelectorRequirementBuilder) RemoveValues() ScopedResourceSelectorRequirementBuilder {
-	b.ensureInitialized()
+func (b *ScopedResourceSelectorRequirementBuilder) RemoveValues() *ScopedResourceSelectorRequirementBuilder {
 	b.fields.Values = nil
 	return b
 }
 
 // GetValues gets the Values field from the declarative configuration.
-func (b ScopedResourceSelectorRequirementBuilder) GetValues() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *ScopedResourceSelectorRequirementBuilder) GetValues() (value []string, ok bool) {
 	if v := b.fields.Values; v != nil {
 		return *v, true
 	}
@@ -129,9 +113,8 @@ func (b *ScopedResourceSelectorRequirementBuilder) ToUnstructured() interface{} 
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -146,14 +129,13 @@ func (b *ScopedResourceSelectorRequirementBuilder) FromUnstructured(u map[string
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ScopedResourceSelectorRequirementBuilder to JSON.
 func (b *ScopedResourceSelectorRequirementBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -161,8 +143,7 @@ func (b *ScopedResourceSelectorRequirementBuilder) MarshalJSON() ([]byte, error)
 // UnmarshalJSON unmarshals JSON into ScopedResourceSelectorRequirementBuilder, replacing the contents of
 // ScopedResourceSelectorRequirementBuilder.
 func (b *ScopedResourceSelectorRequirementBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -170,11 +151,9 @@ func (b *ScopedResourceSelectorRequirementBuilder) UnmarshalJSON(data []byte) er
 }
 
 // ScopedResourceSelectorRequirementList represents a list of ScopedResourceSelectorRequirementBuilder.
-// Provided as a convenience.
-type ScopedResourceSelectorRequirementList []ScopedResourceSelectorRequirementBuilder
+type ScopedResourceSelectorRequirementList []*ScopedResourceSelectorRequirementBuilder
 
 // ScopedResourceSelectorRequirementList represents a map of ScopedResourceSelectorRequirementBuilder.
-// Provided as a convenience.
 type ScopedResourceSelectorRequirementMap map[string]ScopedResourceSelectorRequirementBuilder
 
 func (b *ScopedResourceSelectorRequirementBuilder) preMarshal() {

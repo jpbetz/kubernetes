@@ -28,49 +28,39 @@ import (
 // FSGroupStrategyOptionsBuilder represents an declarative configuration of the FSGroupStrategyOptions type for use
 // with apply.
 type FSGroupStrategyOptionsBuilder struct {
-	fields *fSGroupStrategyOptionsFields
+	fields fSGroupStrategyOptionsFields
 }
 
-// fSGroupStrategyOptionsFields is used by FSGroupStrategyOptionsBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in FSGroupStrategyOptionsBuilder before marshalling, and
-// are copied out to the builder type in FSGroupStrategyOptionsBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// fSGroupStrategyOptionsFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in FSGroupStrategyOptionsBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type fSGroupStrategyOptionsFields struct {
 	Rule   *v1beta1.FSGroupStrategyType `json:"rule,omitempty"`
 	Ranges *IDRangeList                 `json:"ranges,omitempty"`
 }
 
-func (b *FSGroupStrategyOptionsBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &fSGroupStrategyOptionsFields{}
-	}
-}
-
 // FSGroupStrategyOptions constructs an declarative configuration of the FSGroupStrategyOptions type for use with
 // apply.
-// Provided as a convenience.
-func FSGroupStrategyOptions() FSGroupStrategyOptionsBuilder {
-	return FSGroupStrategyOptionsBuilder{fields: &fSGroupStrategyOptionsFields{}}
+func FSGroupStrategyOptions() *FSGroupStrategyOptionsBuilder {
+	return &FSGroupStrategyOptionsBuilder{}
 }
 
 // SetRule sets the Rule field in the declarative configuration to the given value.
-func (b FSGroupStrategyOptionsBuilder) SetRule(value v1beta1.FSGroupStrategyType) FSGroupStrategyOptionsBuilder {
-	b.ensureInitialized()
+func (b *FSGroupStrategyOptionsBuilder) SetRule(value v1beta1.FSGroupStrategyType) *FSGroupStrategyOptionsBuilder {
 	b.fields.Rule = &value
 	return b
 }
 
 // RemoveRule removes the Rule field from the declarative configuration.
-func (b FSGroupStrategyOptionsBuilder) RemoveRule() FSGroupStrategyOptionsBuilder {
-	b.ensureInitialized()
+func (b *FSGroupStrategyOptionsBuilder) RemoveRule() *FSGroupStrategyOptionsBuilder {
 	b.fields.Rule = nil
 	return b
 }
 
 // GetRule gets the Rule field from the declarative configuration.
-func (b FSGroupStrategyOptionsBuilder) GetRule() (value v1beta1.FSGroupStrategyType, ok bool) {
-	b.ensureInitialized()
+func (b *FSGroupStrategyOptionsBuilder) GetRule() (value v1beta1.FSGroupStrategyType, ok bool) {
 	if v := b.fields.Rule; v != nil {
 		return *v, true
 	}
@@ -78,22 +68,19 @@ func (b FSGroupStrategyOptionsBuilder) GetRule() (value v1beta1.FSGroupStrategyT
 }
 
 // SetRanges sets the Ranges field in the declarative configuration to the given value.
-func (b FSGroupStrategyOptionsBuilder) SetRanges(value IDRangeList) FSGroupStrategyOptionsBuilder {
-	b.ensureInitialized()
+func (b *FSGroupStrategyOptionsBuilder) SetRanges(value IDRangeList) *FSGroupStrategyOptionsBuilder {
 	b.fields.Ranges = &value
 	return b
 }
 
 // RemoveRanges removes the Ranges field from the declarative configuration.
-func (b FSGroupStrategyOptionsBuilder) RemoveRanges() FSGroupStrategyOptionsBuilder {
-	b.ensureInitialized()
+func (b *FSGroupStrategyOptionsBuilder) RemoveRanges() *FSGroupStrategyOptionsBuilder {
 	b.fields.Ranges = nil
 	return b
 }
 
 // GetRanges gets the Ranges field from the declarative configuration.
-func (b FSGroupStrategyOptionsBuilder) GetRanges() (value IDRangeList, ok bool) {
-	b.ensureInitialized()
+func (b *FSGroupStrategyOptionsBuilder) GetRanges() (value IDRangeList, ok bool) {
 	if v := b.fields.Ranges; v != nil {
 		return *v, true
 	}
@@ -105,9 +92,8 @@ func (b *FSGroupStrategyOptionsBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -122,14 +108,13 @@ func (b *FSGroupStrategyOptionsBuilder) FromUnstructured(u map[string]interface{
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals FSGroupStrategyOptionsBuilder to JSON.
 func (b *FSGroupStrategyOptionsBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -137,8 +122,7 @@ func (b *FSGroupStrategyOptionsBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into FSGroupStrategyOptionsBuilder, replacing the contents of
 // FSGroupStrategyOptionsBuilder.
 func (b *FSGroupStrategyOptionsBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -146,11 +130,9 @@ func (b *FSGroupStrategyOptionsBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // FSGroupStrategyOptionsList represents a list of FSGroupStrategyOptionsBuilder.
-// Provided as a convenience.
-type FSGroupStrategyOptionsList []FSGroupStrategyOptionsBuilder
+type FSGroupStrategyOptionsList []*FSGroupStrategyOptionsBuilder
 
 // FSGroupStrategyOptionsList represents a map of FSGroupStrategyOptionsBuilder.
-// Provided as a convenience.
 type FSGroupStrategyOptionsMap map[string]FSGroupStrategyOptionsBuilder
 
 func (b *FSGroupStrategyOptionsBuilder) preMarshal() {

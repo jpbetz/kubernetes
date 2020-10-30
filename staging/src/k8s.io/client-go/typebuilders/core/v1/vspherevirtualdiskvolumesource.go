@@ -27,14 +27,14 @@ import (
 // VsphereVirtualDiskVolumeSourceBuilder represents an declarative configuration of the VsphereVirtualDiskVolumeSource type for use
 // with apply.
 type VsphereVirtualDiskVolumeSourceBuilder struct {
-	fields *vsphereVirtualDiskVolumeSourceFields
+	fields vsphereVirtualDiskVolumeSourceFields
 }
 
-// vsphereVirtualDiskVolumeSourceFields is used by VsphereVirtualDiskVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in VsphereVirtualDiskVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in VsphereVirtualDiskVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// vsphereVirtualDiskVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in VsphereVirtualDiskVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type vsphereVirtualDiskVolumeSourceFields struct {
 	VolumePath        *string `json:"volumePath,omitempty"`
 	FSType            *string `json:"fsType,omitempty"`
@@ -42,36 +42,26 @@ type vsphereVirtualDiskVolumeSourceFields struct {
 	StoragePolicyID   *string `json:"storagePolicyID,omitempty"`
 }
 
-func (b *VsphereVirtualDiskVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &vsphereVirtualDiskVolumeSourceFields{}
-	}
-}
-
 // VsphereVirtualDiskVolumeSource constructs an declarative configuration of the VsphereVirtualDiskVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func VsphereVirtualDiskVolumeSource() VsphereVirtualDiskVolumeSourceBuilder {
-	return VsphereVirtualDiskVolumeSourceBuilder{fields: &vsphereVirtualDiskVolumeSourceFields{}}
+func VsphereVirtualDiskVolumeSource() *VsphereVirtualDiskVolumeSourceBuilder {
+	return &VsphereVirtualDiskVolumeSourceBuilder{}
 }
 
 // SetVolumePath sets the VolumePath field in the declarative configuration to the given value.
-func (b VsphereVirtualDiskVolumeSourceBuilder) SetVolumePath(value string) VsphereVirtualDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VsphereVirtualDiskVolumeSourceBuilder) SetVolumePath(value string) *VsphereVirtualDiskVolumeSourceBuilder {
 	b.fields.VolumePath = &value
 	return b
 }
 
 // RemoveVolumePath removes the VolumePath field from the declarative configuration.
-func (b VsphereVirtualDiskVolumeSourceBuilder) RemoveVolumePath() VsphereVirtualDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VsphereVirtualDiskVolumeSourceBuilder) RemoveVolumePath() *VsphereVirtualDiskVolumeSourceBuilder {
 	b.fields.VolumePath = nil
 	return b
 }
 
 // GetVolumePath gets the VolumePath field from the declarative configuration.
-func (b VsphereVirtualDiskVolumeSourceBuilder) GetVolumePath() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *VsphereVirtualDiskVolumeSourceBuilder) GetVolumePath() (value string, ok bool) {
 	if v := b.fields.VolumePath; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b VsphereVirtualDiskVolumeSourceBuilder) GetVolumePath() (value string, ok
 }
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
-func (b VsphereVirtualDiskVolumeSourceBuilder) SetFSType(value string) VsphereVirtualDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VsphereVirtualDiskVolumeSourceBuilder) SetFSType(value string) *VsphereVirtualDiskVolumeSourceBuilder {
 	b.fields.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
-func (b VsphereVirtualDiskVolumeSourceBuilder) RemoveFSType() VsphereVirtualDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VsphereVirtualDiskVolumeSourceBuilder) RemoveFSType() *VsphereVirtualDiskVolumeSourceBuilder {
 	b.fields.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
-func (b VsphereVirtualDiskVolumeSourceBuilder) GetFSType() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *VsphereVirtualDiskVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 	if v := b.fields.FSType; v != nil {
 		return *v, true
 	}
@@ -102,22 +89,19 @@ func (b VsphereVirtualDiskVolumeSourceBuilder) GetFSType() (value string, ok boo
 }
 
 // SetStoragePolicyName sets the StoragePolicyName field in the declarative configuration to the given value.
-func (b VsphereVirtualDiskVolumeSourceBuilder) SetStoragePolicyName(value string) VsphereVirtualDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VsphereVirtualDiskVolumeSourceBuilder) SetStoragePolicyName(value string) *VsphereVirtualDiskVolumeSourceBuilder {
 	b.fields.StoragePolicyName = &value
 	return b
 }
 
 // RemoveStoragePolicyName removes the StoragePolicyName field from the declarative configuration.
-func (b VsphereVirtualDiskVolumeSourceBuilder) RemoveStoragePolicyName() VsphereVirtualDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VsphereVirtualDiskVolumeSourceBuilder) RemoveStoragePolicyName() *VsphereVirtualDiskVolumeSourceBuilder {
 	b.fields.StoragePolicyName = nil
 	return b
 }
 
 // GetStoragePolicyName gets the StoragePolicyName field from the declarative configuration.
-func (b VsphereVirtualDiskVolumeSourceBuilder) GetStoragePolicyName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *VsphereVirtualDiskVolumeSourceBuilder) GetStoragePolicyName() (value string, ok bool) {
 	if v := b.fields.StoragePolicyName; v != nil {
 		return *v, true
 	}
@@ -125,22 +109,19 @@ func (b VsphereVirtualDiskVolumeSourceBuilder) GetStoragePolicyName() (value str
 }
 
 // SetStoragePolicyID sets the StoragePolicyID field in the declarative configuration to the given value.
-func (b VsphereVirtualDiskVolumeSourceBuilder) SetStoragePolicyID(value string) VsphereVirtualDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VsphereVirtualDiskVolumeSourceBuilder) SetStoragePolicyID(value string) *VsphereVirtualDiskVolumeSourceBuilder {
 	b.fields.StoragePolicyID = &value
 	return b
 }
 
 // RemoveStoragePolicyID removes the StoragePolicyID field from the declarative configuration.
-func (b VsphereVirtualDiskVolumeSourceBuilder) RemoveStoragePolicyID() VsphereVirtualDiskVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *VsphereVirtualDiskVolumeSourceBuilder) RemoveStoragePolicyID() *VsphereVirtualDiskVolumeSourceBuilder {
 	b.fields.StoragePolicyID = nil
 	return b
 }
 
 // GetStoragePolicyID gets the StoragePolicyID field from the declarative configuration.
-func (b VsphereVirtualDiskVolumeSourceBuilder) GetStoragePolicyID() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *VsphereVirtualDiskVolumeSourceBuilder) GetStoragePolicyID() (value string, ok bool) {
 	if v := b.fields.StoragePolicyID; v != nil {
 		return *v, true
 	}
@@ -152,9 +133,8 @@ func (b *VsphereVirtualDiskVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +149,13 @@ func (b *VsphereVirtualDiskVolumeSourceBuilder) FromUnstructured(u map[string]in
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals VsphereVirtualDiskVolumeSourceBuilder to JSON.
 func (b *VsphereVirtualDiskVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +163,7 @@ func (b *VsphereVirtualDiskVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into VsphereVirtualDiskVolumeSourceBuilder, replacing the contents of
 // VsphereVirtualDiskVolumeSourceBuilder.
 func (b *VsphereVirtualDiskVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,11 +171,9 @@ func (b *VsphereVirtualDiskVolumeSourceBuilder) UnmarshalJSON(data []byte) error
 }
 
 // VsphereVirtualDiskVolumeSourceList represents a list of VsphereVirtualDiskVolumeSourceBuilder.
-// Provided as a convenience.
-type VsphereVirtualDiskVolumeSourceList []VsphereVirtualDiskVolumeSourceBuilder
+type VsphereVirtualDiskVolumeSourceList []*VsphereVirtualDiskVolumeSourceBuilder
 
 // VsphereVirtualDiskVolumeSourceList represents a map of VsphereVirtualDiskVolumeSourceBuilder.
-// Provided as a convenience.
 type VsphereVirtualDiskVolumeSourceMap map[string]VsphereVirtualDiskVolumeSourceBuilder
 
 func (b *VsphereVirtualDiskVolumeSourceBuilder) preMarshal() {

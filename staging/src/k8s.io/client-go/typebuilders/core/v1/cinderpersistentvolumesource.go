@@ -27,14 +27,14 @@ import (
 // CinderPersistentVolumeSourceBuilder represents an declarative configuration of the CinderPersistentVolumeSource type for use
 // with apply.
 type CinderPersistentVolumeSourceBuilder struct {
-	fields *cinderPersistentVolumeSourceFields
+	fields cinderPersistentVolumeSourceFields
 }
 
-// cinderPersistentVolumeSourceFields is used by CinderPersistentVolumeSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in CinderPersistentVolumeSourceBuilder before marshalling, and
-// are copied out to the builder type in CinderPersistentVolumeSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// cinderPersistentVolumeSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in CinderPersistentVolumeSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type cinderPersistentVolumeSourceFields struct {
 	VolumeID  *string                 `json:"volumeID,omitempty"`
 	FSType    *string                 `json:"fsType,omitempty"`
@@ -42,36 +42,26 @@ type cinderPersistentVolumeSourceFields struct {
 	SecretRef *SecretReferenceBuilder `json:"secretRef,omitempty"`
 }
 
-func (b *CinderPersistentVolumeSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &cinderPersistentVolumeSourceFields{}
-	}
-}
-
 // CinderPersistentVolumeSource constructs an declarative configuration of the CinderPersistentVolumeSource type for use with
 // apply.
-// Provided as a convenience.
-func CinderPersistentVolumeSource() CinderPersistentVolumeSourceBuilder {
-	return CinderPersistentVolumeSourceBuilder{fields: &cinderPersistentVolumeSourceFields{}}
+func CinderPersistentVolumeSource() *CinderPersistentVolumeSourceBuilder {
+	return &CinderPersistentVolumeSourceBuilder{}
 }
 
 // SetVolumeID sets the VolumeID field in the declarative configuration to the given value.
-func (b CinderPersistentVolumeSourceBuilder) SetVolumeID(value string) CinderPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *CinderPersistentVolumeSourceBuilder) SetVolumeID(value string) *CinderPersistentVolumeSourceBuilder {
 	b.fields.VolumeID = &value
 	return b
 }
 
 // RemoveVolumeID removes the VolumeID field from the declarative configuration.
-func (b CinderPersistentVolumeSourceBuilder) RemoveVolumeID() CinderPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *CinderPersistentVolumeSourceBuilder) RemoveVolumeID() *CinderPersistentVolumeSourceBuilder {
 	b.fields.VolumeID = nil
 	return b
 }
 
 // GetVolumeID gets the VolumeID field from the declarative configuration.
-func (b CinderPersistentVolumeSourceBuilder) GetVolumeID() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *CinderPersistentVolumeSourceBuilder) GetVolumeID() (value string, ok bool) {
 	if v := b.fields.VolumeID; v != nil {
 		return *v, true
 	}
@@ -79,22 +69,19 @@ func (b CinderPersistentVolumeSourceBuilder) GetVolumeID() (value string, ok boo
 }
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
-func (b CinderPersistentVolumeSourceBuilder) SetFSType(value string) CinderPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *CinderPersistentVolumeSourceBuilder) SetFSType(value string) *CinderPersistentVolumeSourceBuilder {
 	b.fields.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
-func (b CinderPersistentVolumeSourceBuilder) RemoveFSType() CinderPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *CinderPersistentVolumeSourceBuilder) RemoveFSType() *CinderPersistentVolumeSourceBuilder {
 	b.fields.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
-func (b CinderPersistentVolumeSourceBuilder) GetFSType() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *CinderPersistentVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 	if v := b.fields.FSType; v != nil {
 		return *v, true
 	}
@@ -102,22 +89,19 @@ func (b CinderPersistentVolumeSourceBuilder) GetFSType() (value string, ok bool)
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b CinderPersistentVolumeSourceBuilder) SetReadOnly(value bool) CinderPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *CinderPersistentVolumeSourceBuilder) SetReadOnly(value bool) *CinderPersistentVolumeSourceBuilder {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b CinderPersistentVolumeSourceBuilder) RemoveReadOnly() CinderPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *CinderPersistentVolumeSourceBuilder) RemoveReadOnly() *CinderPersistentVolumeSourceBuilder {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b CinderPersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
-	b.ensureInitialized()
+func (b *CinderPersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
@@ -125,26 +109,20 @@ func (b CinderPersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok bool)
 }
 
 // SetSecretRef sets the SecretRef field in the declarative configuration to the given value.
-func (b CinderPersistentVolumeSourceBuilder) SetSecretRef(value SecretReferenceBuilder) CinderPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
-	b.fields.SecretRef = &value
+func (b *CinderPersistentVolumeSourceBuilder) SetSecretRef(value *SecretReferenceBuilder) *CinderPersistentVolumeSourceBuilder {
+	b.fields.SecretRef = value
 	return b
 }
 
 // RemoveSecretRef removes the SecretRef field from the declarative configuration.
-func (b CinderPersistentVolumeSourceBuilder) RemoveSecretRef() CinderPersistentVolumeSourceBuilder {
-	b.ensureInitialized()
+func (b *CinderPersistentVolumeSourceBuilder) RemoveSecretRef() *CinderPersistentVolumeSourceBuilder {
 	b.fields.SecretRef = nil
 	return b
 }
 
 // GetSecretRef gets the SecretRef field from the declarative configuration.
-func (b CinderPersistentVolumeSourceBuilder) GetSecretRef() (value SecretReferenceBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.SecretRef; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *CinderPersistentVolumeSourceBuilder) GetSecretRef() (value *SecretReferenceBuilder, ok bool) {
+	return b.fields.SecretRef, b.fields.SecretRef != nil
 }
 
 // ToUnstructured converts CinderPersistentVolumeSourceBuilder to unstructured.
@@ -152,9 +130,8 @@ func (b *CinderPersistentVolumeSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +146,13 @@ func (b *CinderPersistentVolumeSourceBuilder) FromUnstructured(u map[string]inte
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals CinderPersistentVolumeSourceBuilder to JSON.
 func (b *CinderPersistentVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +160,7 @@ func (b *CinderPersistentVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into CinderPersistentVolumeSourceBuilder, replacing the contents of
 // CinderPersistentVolumeSourceBuilder.
 func (b *CinderPersistentVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,11 +168,9 @@ func (b *CinderPersistentVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // CinderPersistentVolumeSourceList represents a list of CinderPersistentVolumeSourceBuilder.
-// Provided as a convenience.
-type CinderPersistentVolumeSourceList []CinderPersistentVolumeSourceBuilder
+type CinderPersistentVolumeSourceList []*CinderPersistentVolumeSourceBuilder
 
 // CinderPersistentVolumeSourceList represents a map of CinderPersistentVolumeSourceBuilder.
-// Provided as a convenience.
 type CinderPersistentVolumeSourceMap map[string]CinderPersistentVolumeSourceBuilder
 
 func (b *CinderPersistentVolumeSourceBuilder) preMarshal() {

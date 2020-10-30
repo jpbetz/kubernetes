@@ -28,15 +28,15 @@ import (
 // NetworkPolicyBuilder represents an declarative configuration of the NetworkPolicy type for use
 // with apply.
 type NetworkPolicyBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *networkPolicyFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   networkPolicyFields
 }
 
-// networkPolicyFields is used by NetworkPolicyBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in NetworkPolicyBuilder before marshalling, and
-// are copied out to the builder type in NetworkPolicyBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// networkPolicyFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in NetworkPolicyBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type networkPolicyFields struct {
 	Kind       *string                   `json:"kind,omitempty"`       // inlined NetworkPolicyBuilder.typeMeta.Kind field
 	APIVersion *string                   `json:"apiVersion,omitempty"` // inlined NetworkPolicyBuilder.typeMeta.APIVersion field
@@ -44,83 +44,61 @@ type networkPolicyFields struct {
 	Spec       *NetworkPolicySpecBuilder `json:"spec,omitempty"`
 }
 
-func (b *NetworkPolicyBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &networkPolicyFields{}
-	}
-}
-
 // NetworkPolicy constructs an declarative configuration of the NetworkPolicy type for use with
 // apply.
-// Provided as a convenience.
-func NetworkPolicy() NetworkPolicyBuilder {
-	return NetworkPolicyBuilder{fields: &networkPolicyFields{}}
+func NetworkPolicy() *NetworkPolicyBuilder {
+	return &NetworkPolicyBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b NetworkPolicyBuilder) SetTypeMeta(value v1.TypeMetaBuilder) NetworkPolicyBuilder {
-	b.ensureInitialized()
+func (b *NetworkPolicyBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *NetworkPolicyBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b NetworkPolicyBuilder) RemoveTypeMeta() NetworkPolicyBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *NetworkPolicyBuilder) RemoveTypeMeta() *NetworkPolicyBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b NetworkPolicyBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *NetworkPolicyBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b NetworkPolicyBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) NetworkPolicyBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *NetworkPolicyBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *NetworkPolicyBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b NetworkPolicyBuilder) RemoveObjectMeta() NetworkPolicyBuilder {
-	b.ensureInitialized()
+func (b *NetworkPolicyBuilder) RemoveObjectMeta() *NetworkPolicyBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b NetworkPolicyBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *NetworkPolicyBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b NetworkPolicyBuilder) SetSpec(value NetworkPolicySpecBuilder) NetworkPolicyBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *NetworkPolicyBuilder) SetSpec(value *NetworkPolicySpecBuilder) *NetworkPolicyBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b NetworkPolicyBuilder) RemoveSpec() NetworkPolicyBuilder {
-	b.ensureInitialized()
+func (b *NetworkPolicyBuilder) RemoveSpec() *NetworkPolicyBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b NetworkPolicyBuilder) GetSpec() (value NetworkPolicySpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *NetworkPolicyBuilder) GetSpec() (value *NetworkPolicySpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // ToUnstructured converts NetworkPolicyBuilder to unstructured.
@@ -128,9 +106,8 @@ func (b *NetworkPolicyBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -145,14 +122,13 @@ func (b *NetworkPolicyBuilder) FromUnstructured(u map[string]interface{}) error 
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals NetworkPolicyBuilder to JSON.
 func (b *NetworkPolicyBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -160,8 +136,7 @@ func (b *NetworkPolicyBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into NetworkPolicyBuilder, replacing the contents of
 // NetworkPolicyBuilder.
 func (b *NetworkPolicyBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -169,22 +144,25 @@ func (b *NetworkPolicyBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // NetworkPolicyList represents a list of NetworkPolicyBuilder.
-// Provided as a convenience.
-type NetworkPolicyList []NetworkPolicyBuilder
+type NetworkPolicyList []*NetworkPolicyBuilder
 
 // NetworkPolicyList represents a map of NetworkPolicyBuilder.
-// Provided as a convenience.
 type NetworkPolicyMap map[string]NetworkPolicyBuilder
 
 func (b *NetworkPolicyBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *NetworkPolicyBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

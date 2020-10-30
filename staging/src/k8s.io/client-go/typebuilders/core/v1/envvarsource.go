@@ -27,14 +27,14 @@ import (
 // EnvVarSourceBuilder represents an declarative configuration of the EnvVarSource type for use
 // with apply.
 type EnvVarSourceBuilder struct {
-	fields *envVarSourceFields
+	fields envVarSourceFields
 }
 
-// envVarSourceFields is used by EnvVarSourceBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in EnvVarSourceBuilder before marshalling, and
-// are copied out to the builder type in EnvVarSourceBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// envVarSourceFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in EnvVarSourceBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type envVarSourceFields struct {
 	FieldRef         *ObjectFieldSelectorBuilder   `json:"fieldRef,omitempty"`
 	ResourceFieldRef *ResourceFieldSelectorBuilder `json:"resourceFieldRef,omitempty"`
@@ -42,109 +42,78 @@ type envVarSourceFields struct {
 	SecretKeyRef     *SecretKeySelectorBuilder     `json:"secretKeyRef,omitempty"`
 }
 
-func (b *EnvVarSourceBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &envVarSourceFields{}
-	}
-}
-
 // EnvVarSource constructs an declarative configuration of the EnvVarSource type for use with
 // apply.
-// Provided as a convenience.
-func EnvVarSource() EnvVarSourceBuilder {
-	return EnvVarSourceBuilder{fields: &envVarSourceFields{}}
+func EnvVarSource() *EnvVarSourceBuilder {
+	return &EnvVarSourceBuilder{}
 }
 
 // SetFieldRef sets the FieldRef field in the declarative configuration to the given value.
-func (b EnvVarSourceBuilder) SetFieldRef(value ObjectFieldSelectorBuilder) EnvVarSourceBuilder {
-	b.ensureInitialized()
-	b.fields.FieldRef = &value
+func (b *EnvVarSourceBuilder) SetFieldRef(value *ObjectFieldSelectorBuilder) *EnvVarSourceBuilder {
+	b.fields.FieldRef = value
 	return b
 }
 
 // RemoveFieldRef removes the FieldRef field from the declarative configuration.
-func (b EnvVarSourceBuilder) RemoveFieldRef() EnvVarSourceBuilder {
-	b.ensureInitialized()
+func (b *EnvVarSourceBuilder) RemoveFieldRef() *EnvVarSourceBuilder {
 	b.fields.FieldRef = nil
 	return b
 }
 
 // GetFieldRef gets the FieldRef field from the declarative configuration.
-func (b EnvVarSourceBuilder) GetFieldRef() (value ObjectFieldSelectorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.FieldRef; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *EnvVarSourceBuilder) GetFieldRef() (value *ObjectFieldSelectorBuilder, ok bool) {
+	return b.fields.FieldRef, b.fields.FieldRef != nil
 }
 
 // SetResourceFieldRef sets the ResourceFieldRef field in the declarative configuration to the given value.
-func (b EnvVarSourceBuilder) SetResourceFieldRef(value ResourceFieldSelectorBuilder) EnvVarSourceBuilder {
-	b.ensureInitialized()
-	b.fields.ResourceFieldRef = &value
+func (b *EnvVarSourceBuilder) SetResourceFieldRef(value *ResourceFieldSelectorBuilder) *EnvVarSourceBuilder {
+	b.fields.ResourceFieldRef = value
 	return b
 }
 
 // RemoveResourceFieldRef removes the ResourceFieldRef field from the declarative configuration.
-func (b EnvVarSourceBuilder) RemoveResourceFieldRef() EnvVarSourceBuilder {
-	b.ensureInitialized()
+func (b *EnvVarSourceBuilder) RemoveResourceFieldRef() *EnvVarSourceBuilder {
 	b.fields.ResourceFieldRef = nil
 	return b
 }
 
 // GetResourceFieldRef gets the ResourceFieldRef field from the declarative configuration.
-func (b EnvVarSourceBuilder) GetResourceFieldRef() (value ResourceFieldSelectorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ResourceFieldRef; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *EnvVarSourceBuilder) GetResourceFieldRef() (value *ResourceFieldSelectorBuilder, ok bool) {
+	return b.fields.ResourceFieldRef, b.fields.ResourceFieldRef != nil
 }
 
 // SetConfigMapKeyRef sets the ConfigMapKeyRef field in the declarative configuration to the given value.
-func (b EnvVarSourceBuilder) SetConfigMapKeyRef(value ConfigMapKeySelectorBuilder) EnvVarSourceBuilder {
-	b.ensureInitialized()
-	b.fields.ConfigMapKeyRef = &value
+func (b *EnvVarSourceBuilder) SetConfigMapKeyRef(value *ConfigMapKeySelectorBuilder) *EnvVarSourceBuilder {
+	b.fields.ConfigMapKeyRef = value
 	return b
 }
 
 // RemoveConfigMapKeyRef removes the ConfigMapKeyRef field from the declarative configuration.
-func (b EnvVarSourceBuilder) RemoveConfigMapKeyRef() EnvVarSourceBuilder {
-	b.ensureInitialized()
+func (b *EnvVarSourceBuilder) RemoveConfigMapKeyRef() *EnvVarSourceBuilder {
 	b.fields.ConfigMapKeyRef = nil
 	return b
 }
 
 // GetConfigMapKeyRef gets the ConfigMapKeyRef field from the declarative configuration.
-func (b EnvVarSourceBuilder) GetConfigMapKeyRef() (value ConfigMapKeySelectorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ConfigMapKeyRef; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *EnvVarSourceBuilder) GetConfigMapKeyRef() (value *ConfigMapKeySelectorBuilder, ok bool) {
+	return b.fields.ConfigMapKeyRef, b.fields.ConfigMapKeyRef != nil
 }
 
 // SetSecretKeyRef sets the SecretKeyRef field in the declarative configuration to the given value.
-func (b EnvVarSourceBuilder) SetSecretKeyRef(value SecretKeySelectorBuilder) EnvVarSourceBuilder {
-	b.ensureInitialized()
-	b.fields.SecretKeyRef = &value
+func (b *EnvVarSourceBuilder) SetSecretKeyRef(value *SecretKeySelectorBuilder) *EnvVarSourceBuilder {
+	b.fields.SecretKeyRef = value
 	return b
 }
 
 // RemoveSecretKeyRef removes the SecretKeyRef field from the declarative configuration.
-func (b EnvVarSourceBuilder) RemoveSecretKeyRef() EnvVarSourceBuilder {
-	b.ensureInitialized()
+func (b *EnvVarSourceBuilder) RemoveSecretKeyRef() *EnvVarSourceBuilder {
 	b.fields.SecretKeyRef = nil
 	return b
 }
 
 // GetSecretKeyRef gets the SecretKeyRef field from the declarative configuration.
-func (b EnvVarSourceBuilder) GetSecretKeyRef() (value SecretKeySelectorBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.SecretKeyRef; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *EnvVarSourceBuilder) GetSecretKeyRef() (value *SecretKeySelectorBuilder, ok bool) {
+	return b.fields.SecretKeyRef, b.fields.SecretKeyRef != nil
 }
 
 // ToUnstructured converts EnvVarSourceBuilder to unstructured.
@@ -152,9 +121,8 @@ func (b *EnvVarSourceBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +137,13 @@ func (b *EnvVarSourceBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals EnvVarSourceBuilder to JSON.
 func (b *EnvVarSourceBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +151,7 @@ func (b *EnvVarSourceBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into EnvVarSourceBuilder, replacing the contents of
 // EnvVarSourceBuilder.
 func (b *EnvVarSourceBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,11 +159,9 @@ func (b *EnvVarSourceBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // EnvVarSourceList represents a list of EnvVarSourceBuilder.
-// Provided as a convenience.
-type EnvVarSourceList []EnvVarSourceBuilder
+type EnvVarSourceList []*EnvVarSourceBuilder
 
 // EnvVarSourceList represents a map of EnvVarSourceBuilder.
-// Provided as a convenience.
 type EnvVarSourceMap map[string]EnvVarSourceBuilder
 
 func (b *EnvVarSourceBuilder) preMarshal() {

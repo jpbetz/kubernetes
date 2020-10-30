@@ -28,15 +28,15 @@ import (
 // ImageReviewBuilder represents an declarative configuration of the ImageReview type for use
 // with apply.
 type ImageReviewBuilder struct {
-	typeMeta v1.TypeMetaBuilder // inlined type
-	fields   *imageReviewFields
+	typeMeta *v1.TypeMetaBuilder // inlined type
+	fields   imageReviewFields
 }
 
-// imageReviewFields is used by ImageReviewBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ImageReviewBuilder before marshalling, and
-// are copied out to the builder type in ImageReviewBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// imageReviewFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ImageReviewBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type imageReviewFields struct {
 	Kind       *string                   `json:"kind,omitempty"`       // inlined ImageReviewBuilder.typeMeta.Kind field
 	APIVersion *string                   `json:"apiVersion,omitempty"` // inlined ImageReviewBuilder.typeMeta.APIVersion field
@@ -45,106 +45,78 @@ type imageReviewFields struct {
 	Status     *ImageReviewStatusBuilder `json:"status,omitempty"`
 }
 
-func (b *ImageReviewBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &imageReviewFields{}
-	}
-}
-
 // ImageReview constructs an declarative configuration of the ImageReview type for use with
 // apply.
-// Provided as a convenience.
-func ImageReview() ImageReviewBuilder {
-	return ImageReviewBuilder{fields: &imageReviewFields{}}
+func ImageReview() *ImageReviewBuilder {
+	return &ImageReviewBuilder{}
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b ImageReviewBuilder) SetTypeMeta(value v1.TypeMetaBuilder) ImageReviewBuilder {
-	b.ensureInitialized()
+func (b *ImageReviewBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *ImageReviewBuilder {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b ImageReviewBuilder) RemoveTypeMeta() ImageReviewBuilder {
-	b.ensureInitialized()
-	b.typeMeta = v1.TypeMetaBuilder{}
+func (b *ImageReviewBuilder) RemoveTypeMeta() *ImageReviewBuilder {
+	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b ImageReviewBuilder) GetTypeMeta() (value v1.TypeMetaBuilder, ok bool) {
-	b.ensureInitialized()
+func (b *ImageReviewBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b ImageReviewBuilder) SetObjectMeta(value v1.ObjectMetaBuilder) ImageReviewBuilder {
-	b.ensureInitialized()
-	b.fields.ObjectMeta = &value
+func (b *ImageReviewBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *ImageReviewBuilder {
+	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b ImageReviewBuilder) RemoveObjectMeta() ImageReviewBuilder {
-	b.ensureInitialized()
+func (b *ImageReviewBuilder) RemoveObjectMeta() *ImageReviewBuilder {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b ImageReviewBuilder) GetObjectMeta() (value v1.ObjectMetaBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.ObjectMeta; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ImageReviewBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b ImageReviewBuilder) SetSpec(value ImageReviewSpecBuilder) ImageReviewBuilder {
-	b.ensureInitialized()
-	b.fields.Spec = &value
+func (b *ImageReviewBuilder) SetSpec(value *ImageReviewSpecBuilder) *ImageReviewBuilder {
+	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b ImageReviewBuilder) RemoveSpec() ImageReviewBuilder {
-	b.ensureInitialized()
+func (b *ImageReviewBuilder) RemoveSpec() *ImageReviewBuilder {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b ImageReviewBuilder) GetSpec() (value ImageReviewSpecBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Spec; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ImageReviewBuilder) GetSpec() (value *ImageReviewSpecBuilder, ok bool) {
+	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b ImageReviewBuilder) SetStatus(value ImageReviewStatusBuilder) ImageReviewBuilder {
-	b.ensureInitialized()
-	b.fields.Status = &value
+func (b *ImageReviewBuilder) SetStatus(value *ImageReviewStatusBuilder) *ImageReviewBuilder {
+	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b ImageReviewBuilder) RemoveStatus() ImageReviewBuilder {
-	b.ensureInitialized()
+func (b *ImageReviewBuilder) RemoveStatus() *ImageReviewBuilder {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b ImageReviewBuilder) GetStatus() (value ImageReviewStatusBuilder, ok bool) {
-	b.ensureInitialized()
-	if v := b.fields.Status; v != nil {
-		return *v, true
-	}
-	return value, false
+func (b *ImageReviewBuilder) GetStatus() (value *ImageReviewStatusBuilder, ok bool) {
+	return b.fields.Status, b.fields.Status != nil
 }
 
 // ToUnstructured converts ImageReviewBuilder to unstructured.
@@ -152,9 +124,8 @@ func (b *ImageReviewBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -169,14 +140,13 @@ func (b *ImageReviewBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ImageReviewBuilder to JSON.
 func (b *ImageReviewBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -184,8 +154,7 @@ func (b *ImageReviewBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ImageReviewBuilder, replacing the contents of
 // ImageReviewBuilder.
 func (b *ImageReviewBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -193,22 +162,25 @@ func (b *ImageReviewBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ImageReviewList represents a list of ImageReviewBuilder.
-// Provided as a convenience.
-type ImageReviewList []ImageReviewBuilder
+type ImageReviewList []*ImageReviewBuilder
 
 // ImageReviewList represents a map of ImageReviewBuilder.
-// Provided as a convenience.
 type ImageReviewMap map[string]ImageReviewBuilder
 
 func (b *ImageReviewBuilder) preMarshal() {
-	if v, ok := b.typeMeta.GetKind(); ok {
-		b.fields.Kind = &v
-	}
-	if v, ok := b.typeMeta.GetAPIVersion(); ok {
-		b.fields.APIVersion = &v
+	if b.typeMeta != nil {
+		if v, ok := b.typeMeta.GetKind(); ok {
+			b.fields.Kind = &v
+		}
+		if v, ok := b.typeMeta.GetAPIVersion(); ok {
+			b.fields.APIVersion = &v
+		}
 	}
 }
 func (b *ImageReviewBuilder) postUnmarshal() {
+	if b.typeMeta == nil {
+		b.typeMeta = &v1.TypeMetaBuilder{}
+	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)
 	}

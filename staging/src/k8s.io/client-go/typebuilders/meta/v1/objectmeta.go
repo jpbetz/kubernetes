@@ -29,14 +29,14 @@ import (
 // ObjectMetaBuilder represents an declarative configuration of the ObjectMeta type for use
 // with apply.
 type ObjectMetaBuilder struct {
-	fields *objectMetaFields
+	fields objectMetaFields
 }
 
-// objectMetaFields is used by ObjectMetaBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in ObjectMetaBuilder before marshalling, and
-// are copied out to the builder type in ObjectMetaBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// objectMetaFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in ObjectMetaBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type objectMetaFields struct {
 	Name                       *string                 `json:"name,omitempty"`
 	GenerateName               *string                 `json:"generateName,omitempty"`
@@ -56,36 +56,26 @@ type objectMetaFields struct {
 	ManagedFields              *ManagedFieldsEntryList `json:"managedFields,omitempty"`
 }
 
-func (b *ObjectMetaBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &objectMetaFields{}
-	}
-}
-
 // ObjectMeta constructs an declarative configuration of the ObjectMeta type for use with
 // apply.
-// Provided as a convenience.
-func ObjectMeta() ObjectMetaBuilder {
-	return ObjectMetaBuilder{fields: &objectMetaFields{}}
+func ObjectMeta() *ObjectMetaBuilder {
+	return &ObjectMetaBuilder{}
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b ObjectMetaBuilder) SetName(value string) ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) SetName(value string) *ObjectMetaBuilder {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b ObjectMetaBuilder) RemoveName() ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) RemoveName() *ObjectMetaBuilder {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b ObjectMetaBuilder) GetName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -93,22 +83,19 @@ func (b ObjectMetaBuilder) GetName() (value string, ok bool) {
 }
 
 // SetGenerateName sets the GenerateName field in the declarative configuration to the given value.
-func (b ObjectMetaBuilder) SetGenerateName(value string) ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) SetGenerateName(value string) *ObjectMetaBuilder {
 	b.fields.GenerateName = &value
 	return b
 }
 
 // RemoveGenerateName removes the GenerateName field from the declarative configuration.
-func (b ObjectMetaBuilder) RemoveGenerateName() ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) RemoveGenerateName() *ObjectMetaBuilder {
 	b.fields.GenerateName = nil
 	return b
 }
 
 // GetGenerateName gets the GenerateName field from the declarative configuration.
-func (b ObjectMetaBuilder) GetGenerateName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) GetGenerateName() (value string, ok bool) {
 	if v := b.fields.GenerateName; v != nil {
 		return *v, true
 	}
@@ -116,22 +103,19 @@ func (b ObjectMetaBuilder) GetGenerateName() (value string, ok bool) {
 }
 
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
-func (b ObjectMetaBuilder) SetNamespace(value string) ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) SetNamespace(value string) *ObjectMetaBuilder {
 	b.fields.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
-func (b ObjectMetaBuilder) RemoveNamespace() ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) RemoveNamespace() *ObjectMetaBuilder {
 	b.fields.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
-func (b ObjectMetaBuilder) GetNamespace() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) GetNamespace() (value string, ok bool) {
 	if v := b.fields.Namespace; v != nil {
 		return *v, true
 	}
@@ -139,22 +123,19 @@ func (b ObjectMetaBuilder) GetNamespace() (value string, ok bool) {
 }
 
 // SetSelfLink sets the SelfLink field in the declarative configuration to the given value.
-func (b ObjectMetaBuilder) SetSelfLink(value string) ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) SetSelfLink(value string) *ObjectMetaBuilder {
 	b.fields.SelfLink = &value
 	return b
 }
 
 // RemoveSelfLink removes the SelfLink field from the declarative configuration.
-func (b ObjectMetaBuilder) RemoveSelfLink() ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) RemoveSelfLink() *ObjectMetaBuilder {
 	b.fields.SelfLink = nil
 	return b
 }
 
 // GetSelfLink gets the SelfLink field from the declarative configuration.
-func (b ObjectMetaBuilder) GetSelfLink() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) GetSelfLink() (value string, ok bool) {
 	if v := b.fields.SelfLink; v != nil {
 		return *v, true
 	}
@@ -162,22 +143,19 @@ func (b ObjectMetaBuilder) GetSelfLink() (value string, ok bool) {
 }
 
 // SetUID sets the UID field in the declarative configuration to the given value.
-func (b ObjectMetaBuilder) SetUID(value types.UID) ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) SetUID(value types.UID) *ObjectMetaBuilder {
 	b.fields.UID = &value
 	return b
 }
 
 // RemoveUID removes the UID field from the declarative configuration.
-func (b ObjectMetaBuilder) RemoveUID() ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) RemoveUID() *ObjectMetaBuilder {
 	b.fields.UID = nil
 	return b
 }
 
 // GetUID gets the UID field from the declarative configuration.
-func (b ObjectMetaBuilder) GetUID() (value types.UID, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) GetUID() (value types.UID, ok bool) {
 	if v := b.fields.UID; v != nil {
 		return *v, true
 	}
@@ -185,22 +163,19 @@ func (b ObjectMetaBuilder) GetUID() (value types.UID, ok bool) {
 }
 
 // SetResourceVersion sets the ResourceVersion field in the declarative configuration to the given value.
-func (b ObjectMetaBuilder) SetResourceVersion(value string) ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) SetResourceVersion(value string) *ObjectMetaBuilder {
 	b.fields.ResourceVersion = &value
 	return b
 }
 
 // RemoveResourceVersion removes the ResourceVersion field from the declarative configuration.
-func (b ObjectMetaBuilder) RemoveResourceVersion() ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) RemoveResourceVersion() *ObjectMetaBuilder {
 	b.fields.ResourceVersion = nil
 	return b
 }
 
 // GetResourceVersion gets the ResourceVersion field from the declarative configuration.
-func (b ObjectMetaBuilder) GetResourceVersion() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) GetResourceVersion() (value string, ok bool) {
 	if v := b.fields.ResourceVersion; v != nil {
 		return *v, true
 	}
@@ -208,22 +183,19 @@ func (b ObjectMetaBuilder) GetResourceVersion() (value string, ok bool) {
 }
 
 // SetGeneration sets the Generation field in the declarative configuration to the given value.
-func (b ObjectMetaBuilder) SetGeneration(value int64) ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) SetGeneration(value int64) *ObjectMetaBuilder {
 	b.fields.Generation = &value
 	return b
 }
 
 // RemoveGeneration removes the Generation field from the declarative configuration.
-func (b ObjectMetaBuilder) RemoveGeneration() ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) RemoveGeneration() *ObjectMetaBuilder {
 	b.fields.Generation = nil
 	return b
 }
 
 // GetGeneration gets the Generation field from the declarative configuration.
-func (b ObjectMetaBuilder) GetGeneration() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) GetGeneration() (value int64, ok bool) {
 	if v := b.fields.Generation; v != nil {
 		return *v, true
 	}
@@ -231,22 +203,19 @@ func (b ObjectMetaBuilder) GetGeneration() (value int64, ok bool) {
 }
 
 // SetCreationTimestamp sets the CreationTimestamp field in the declarative configuration to the given value.
-func (b ObjectMetaBuilder) SetCreationTimestamp(value v1.Time) ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) SetCreationTimestamp(value v1.Time) *ObjectMetaBuilder {
 	b.fields.CreationTimestamp = &value
 	return b
 }
 
 // RemoveCreationTimestamp removes the CreationTimestamp field from the declarative configuration.
-func (b ObjectMetaBuilder) RemoveCreationTimestamp() ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) RemoveCreationTimestamp() *ObjectMetaBuilder {
 	b.fields.CreationTimestamp = nil
 	return b
 }
 
 // GetCreationTimestamp gets the CreationTimestamp field from the declarative configuration.
-func (b ObjectMetaBuilder) GetCreationTimestamp() (value v1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) GetCreationTimestamp() (value v1.Time, ok bool) {
 	if v := b.fields.CreationTimestamp; v != nil {
 		return *v, true
 	}
@@ -254,22 +223,19 @@ func (b ObjectMetaBuilder) GetCreationTimestamp() (value v1.Time, ok bool) {
 }
 
 // SetDeletionTimestamp sets the DeletionTimestamp field in the declarative configuration to the given value.
-func (b ObjectMetaBuilder) SetDeletionTimestamp(value v1.Time) ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) SetDeletionTimestamp(value v1.Time) *ObjectMetaBuilder {
 	b.fields.DeletionTimestamp = &value
 	return b
 }
 
 // RemoveDeletionTimestamp removes the DeletionTimestamp field from the declarative configuration.
-func (b ObjectMetaBuilder) RemoveDeletionTimestamp() ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) RemoveDeletionTimestamp() *ObjectMetaBuilder {
 	b.fields.DeletionTimestamp = nil
 	return b
 }
 
 // GetDeletionTimestamp gets the DeletionTimestamp field from the declarative configuration.
-func (b ObjectMetaBuilder) GetDeletionTimestamp() (value v1.Time, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) GetDeletionTimestamp() (value v1.Time, ok bool) {
 	if v := b.fields.DeletionTimestamp; v != nil {
 		return *v, true
 	}
@@ -277,22 +243,19 @@ func (b ObjectMetaBuilder) GetDeletionTimestamp() (value v1.Time, ok bool) {
 }
 
 // SetDeletionGracePeriodSeconds sets the DeletionGracePeriodSeconds field in the declarative configuration to the given value.
-func (b ObjectMetaBuilder) SetDeletionGracePeriodSeconds(value int64) ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) SetDeletionGracePeriodSeconds(value int64) *ObjectMetaBuilder {
 	b.fields.DeletionGracePeriodSeconds = &value
 	return b
 }
 
 // RemoveDeletionGracePeriodSeconds removes the DeletionGracePeriodSeconds field from the declarative configuration.
-func (b ObjectMetaBuilder) RemoveDeletionGracePeriodSeconds() ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) RemoveDeletionGracePeriodSeconds() *ObjectMetaBuilder {
 	b.fields.DeletionGracePeriodSeconds = nil
 	return b
 }
 
 // GetDeletionGracePeriodSeconds gets the DeletionGracePeriodSeconds field from the declarative configuration.
-func (b ObjectMetaBuilder) GetDeletionGracePeriodSeconds() (value int64, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) GetDeletionGracePeriodSeconds() (value int64, ok bool) {
 	if v := b.fields.DeletionGracePeriodSeconds; v != nil {
 		return *v, true
 	}
@@ -300,22 +263,19 @@ func (b ObjectMetaBuilder) GetDeletionGracePeriodSeconds() (value int64, ok bool
 }
 
 // SetLabels sets the Labels field in the declarative configuration to the given value.
-func (b ObjectMetaBuilder) SetLabels(value map[string]string) ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) SetLabels(value map[string]string) *ObjectMetaBuilder {
 	b.fields.Labels = &value
 	return b
 }
 
 // RemoveLabels removes the Labels field from the declarative configuration.
-func (b ObjectMetaBuilder) RemoveLabels() ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) RemoveLabels() *ObjectMetaBuilder {
 	b.fields.Labels = nil
 	return b
 }
 
 // GetLabels gets the Labels field from the declarative configuration.
-func (b ObjectMetaBuilder) GetLabels() (value map[string]string, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) GetLabels() (value map[string]string, ok bool) {
 	if v := b.fields.Labels; v != nil {
 		return *v, true
 	}
@@ -323,22 +283,19 @@ func (b ObjectMetaBuilder) GetLabels() (value map[string]string, ok bool) {
 }
 
 // SetAnnotations sets the Annotations field in the declarative configuration to the given value.
-func (b ObjectMetaBuilder) SetAnnotations(value map[string]string) ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) SetAnnotations(value map[string]string) *ObjectMetaBuilder {
 	b.fields.Annotations = &value
 	return b
 }
 
 // RemoveAnnotations removes the Annotations field from the declarative configuration.
-func (b ObjectMetaBuilder) RemoveAnnotations() ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) RemoveAnnotations() *ObjectMetaBuilder {
 	b.fields.Annotations = nil
 	return b
 }
 
 // GetAnnotations gets the Annotations field from the declarative configuration.
-func (b ObjectMetaBuilder) GetAnnotations() (value map[string]string, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) GetAnnotations() (value map[string]string, ok bool) {
 	if v := b.fields.Annotations; v != nil {
 		return *v, true
 	}
@@ -346,22 +303,19 @@ func (b ObjectMetaBuilder) GetAnnotations() (value map[string]string, ok bool) {
 }
 
 // SetOwnerReferences sets the OwnerReferences field in the declarative configuration to the given value.
-func (b ObjectMetaBuilder) SetOwnerReferences(value OwnerReferenceList) ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) SetOwnerReferences(value OwnerReferenceList) *ObjectMetaBuilder {
 	b.fields.OwnerReferences = &value
 	return b
 }
 
 // RemoveOwnerReferences removes the OwnerReferences field from the declarative configuration.
-func (b ObjectMetaBuilder) RemoveOwnerReferences() ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) RemoveOwnerReferences() *ObjectMetaBuilder {
 	b.fields.OwnerReferences = nil
 	return b
 }
 
 // GetOwnerReferences gets the OwnerReferences field from the declarative configuration.
-func (b ObjectMetaBuilder) GetOwnerReferences() (value OwnerReferenceList, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) GetOwnerReferences() (value OwnerReferenceList, ok bool) {
 	if v := b.fields.OwnerReferences; v != nil {
 		return *v, true
 	}
@@ -369,22 +323,19 @@ func (b ObjectMetaBuilder) GetOwnerReferences() (value OwnerReferenceList, ok bo
 }
 
 // SetFinalizers sets the Finalizers field in the declarative configuration to the given value.
-func (b ObjectMetaBuilder) SetFinalizers(value []string) ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) SetFinalizers(value []string) *ObjectMetaBuilder {
 	b.fields.Finalizers = &value
 	return b
 }
 
 // RemoveFinalizers removes the Finalizers field from the declarative configuration.
-func (b ObjectMetaBuilder) RemoveFinalizers() ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) RemoveFinalizers() *ObjectMetaBuilder {
 	b.fields.Finalizers = nil
 	return b
 }
 
 // GetFinalizers gets the Finalizers field from the declarative configuration.
-func (b ObjectMetaBuilder) GetFinalizers() (value []string, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) GetFinalizers() (value []string, ok bool) {
 	if v := b.fields.Finalizers; v != nil {
 		return *v, true
 	}
@@ -392,22 +343,19 @@ func (b ObjectMetaBuilder) GetFinalizers() (value []string, ok bool) {
 }
 
 // SetClusterName sets the ClusterName field in the declarative configuration to the given value.
-func (b ObjectMetaBuilder) SetClusterName(value string) ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) SetClusterName(value string) *ObjectMetaBuilder {
 	b.fields.ClusterName = &value
 	return b
 }
 
 // RemoveClusterName removes the ClusterName field from the declarative configuration.
-func (b ObjectMetaBuilder) RemoveClusterName() ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) RemoveClusterName() *ObjectMetaBuilder {
 	b.fields.ClusterName = nil
 	return b
 }
 
 // GetClusterName gets the ClusterName field from the declarative configuration.
-func (b ObjectMetaBuilder) GetClusterName() (value string, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) GetClusterName() (value string, ok bool) {
 	if v := b.fields.ClusterName; v != nil {
 		return *v, true
 	}
@@ -415,22 +363,19 @@ func (b ObjectMetaBuilder) GetClusterName() (value string, ok bool) {
 }
 
 // SetManagedFields sets the ManagedFields field in the declarative configuration to the given value.
-func (b ObjectMetaBuilder) SetManagedFields(value ManagedFieldsEntryList) ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) SetManagedFields(value ManagedFieldsEntryList) *ObjectMetaBuilder {
 	b.fields.ManagedFields = &value
 	return b
 }
 
 // RemoveManagedFields removes the ManagedFields field from the declarative configuration.
-func (b ObjectMetaBuilder) RemoveManagedFields() ObjectMetaBuilder {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) RemoveManagedFields() *ObjectMetaBuilder {
 	b.fields.ManagedFields = nil
 	return b
 }
 
 // GetManagedFields gets the ManagedFields field from the declarative configuration.
-func (b ObjectMetaBuilder) GetManagedFields() (value ManagedFieldsEntryList, ok bool) {
-	b.ensureInitialized()
+func (b *ObjectMetaBuilder) GetManagedFields() (value ManagedFieldsEntryList, ok bool) {
 	if v := b.fields.ManagedFields; v != nil {
 		return *v, true
 	}
@@ -442,9 +387,8 @@ func (b *ObjectMetaBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -459,14 +403,13 @@ func (b *ObjectMetaBuilder) FromUnstructured(u map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals ObjectMetaBuilder to JSON.
 func (b *ObjectMetaBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -474,8 +417,7 @@ func (b *ObjectMetaBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into ObjectMetaBuilder, replacing the contents of
 // ObjectMetaBuilder.
 func (b *ObjectMetaBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -483,11 +425,9 @@ func (b *ObjectMetaBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // ObjectMetaList represents a list of ObjectMetaBuilder.
-// Provided as a convenience.
-type ObjectMetaList []ObjectMetaBuilder
+type ObjectMetaList []*ObjectMetaBuilder
 
 // ObjectMetaList represents a map of ObjectMetaBuilder.
-// Provided as a convenience.
 type ObjectMetaMap map[string]ObjectMetaBuilder
 
 func (b *ObjectMetaBuilder) preMarshal() {

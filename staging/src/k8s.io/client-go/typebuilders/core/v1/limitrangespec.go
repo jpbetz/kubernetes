@@ -27,48 +27,38 @@ import (
 // LimitRangeSpecBuilder represents an declarative configuration of the LimitRangeSpec type for use
 // with apply.
 type LimitRangeSpecBuilder struct {
-	fields *limitRangeSpecFields
+	fields limitRangeSpecFields
 }
 
-// limitRangeSpecFields is used by LimitRangeSpecBuilder for json marshalling and unmarshalling.
-// Is the source-of-truth for all fields except inlined fields.
-// Inline fields are copied in from their builder type in LimitRangeSpecBuilder before marshalling, and
-// are copied out to the builder type in LimitRangeSpecBuilder after unmarshalling.
-// Inlined builder types cannot be embedded because they do not expose their fields directly.
+// limitRangeSpecFields owns all fields except inlined fields.
+// Inline fields are owned by their respective inline type in LimitRangeSpecBuilder.
+// They are copied to this type before marshalling, and are copied out
+// after unmarshalling. The inlined types cannot be embedded because they do
+// not expose their fields directly.
 type limitRangeSpecFields struct {
 	Limits *LimitRangeItemList `json:"limits,omitempty"`
 }
 
-func (b *LimitRangeSpecBuilder) ensureInitialized() {
-	if b.fields == nil {
-		b.fields = &limitRangeSpecFields{}
-	}
-}
-
 // LimitRangeSpec constructs an declarative configuration of the LimitRangeSpec type for use with
 // apply.
-// Provided as a convenience.
-func LimitRangeSpec() LimitRangeSpecBuilder {
-	return LimitRangeSpecBuilder{fields: &limitRangeSpecFields{}}
+func LimitRangeSpec() *LimitRangeSpecBuilder {
+	return &LimitRangeSpecBuilder{}
 }
 
 // SetLimits sets the Limits field in the declarative configuration to the given value.
-func (b LimitRangeSpecBuilder) SetLimits(value LimitRangeItemList) LimitRangeSpecBuilder {
-	b.ensureInitialized()
+func (b *LimitRangeSpecBuilder) SetLimits(value LimitRangeItemList) *LimitRangeSpecBuilder {
 	b.fields.Limits = &value
 	return b
 }
 
 // RemoveLimits removes the Limits field from the declarative configuration.
-func (b LimitRangeSpecBuilder) RemoveLimits() LimitRangeSpecBuilder {
-	b.ensureInitialized()
+func (b *LimitRangeSpecBuilder) RemoveLimits() *LimitRangeSpecBuilder {
 	b.fields.Limits = nil
 	return b
 }
 
 // GetLimits gets the Limits field from the declarative configuration.
-func (b LimitRangeSpecBuilder) GetLimits() (value LimitRangeItemList, ok bool) {
-	b.ensureInitialized()
+func (b *LimitRangeSpecBuilder) GetLimits() (value LimitRangeItemList, ok bool) {
 	if v := b.fields.Limits; v != nil {
 		return *v, true
 	}
@@ -80,9 +70,8 @@ func (b *LimitRangeSpecBuilder) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
-	b.ensureInitialized()
 	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(b.fields)
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
 	if err != nil {
 		panic(err)
 	}
@@ -97,14 +86,13 @@ func (b *LimitRangeSpecBuilder) FromUnstructured(u map[string]interface{}) error
 	if err != nil {
 		return err
 	}
-	b.fields = m
+	b.fields = *m
 	b.postUnmarshal()
 	return nil
 }
 
 // MarshalJSON marshals LimitRangeSpecBuilder to JSON.
 func (b *LimitRangeSpecBuilder) MarshalJSON() ([]byte, error) {
-	b.ensureInitialized()
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
@@ -112,8 +100,7 @@ func (b *LimitRangeSpecBuilder) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals JSON into LimitRangeSpecBuilder, replacing the contents of
 // LimitRangeSpecBuilder.
 func (b *LimitRangeSpecBuilder) UnmarshalJSON(data []byte) error {
-	b.ensureInitialized()
-	if err := json.Unmarshal(data, b.fields); err != nil {
+	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
 	b.postUnmarshal()
@@ -121,11 +108,9 @@ func (b *LimitRangeSpecBuilder) UnmarshalJSON(data []byte) error {
 }
 
 // LimitRangeSpecList represents a list of LimitRangeSpecBuilder.
-// Provided as a convenience.
-type LimitRangeSpecList []LimitRangeSpecBuilder
+type LimitRangeSpecList []*LimitRangeSpecBuilder
 
 // LimitRangeSpecList represents a map of LimitRangeSpecBuilder.
-// Provided as a convenience.
 type LimitRangeSpecMap map[string]LimitRangeSpecBuilder
 
 func (b *LimitRangeSpecBuilder) preMarshal() {
