@@ -17,6 +17,7 @@ limitations under the License.
 package runtime
 
 import (
+	"encoding/json"
 	"io"
 	"net/url"
 
@@ -341,4 +342,16 @@ type Unstructured interface {
 	// error should terminate the iteration. If IsList() returns false, this method should return an error
 	// instead of calling the provided function.
 	EachListItem(func(Object) error) error
+}
+
+// ApplyConfiguration identifies a declarative apply configuration of an object.
+type ApplyConfiguration interface {
+	json.Marshaler
+	json.Unmarshaler
+
+	// TODO(jpbetz): GetObjectKind() schema.ObjectKind ?
+	// TODO(jpbetz): DeepCopy?
+
+	ToUnstructured() interface{}
+	FromUnstructured(u map[string]interface{}) error
 }

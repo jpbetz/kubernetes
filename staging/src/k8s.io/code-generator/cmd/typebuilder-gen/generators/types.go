@@ -19,6 +19,7 @@ package generators
 import "k8s.io/gengo/types"
 
 var (
+	applyConfiguration    = types.Ref("k8s.io/apimachinery/pkg/runtime", "ApplyConfiguration")
 	groupVersionKind      = types.Ref("k8s.io/apimachinery/pkg/runtime/schema", "GroupVersionKind")
 	rawExtension          = types.Ref("k8s.io/apimachinery/pkg/runtime", "RawExtension")
 	unknown               = types.Ref("k8s.io/apimachinery/pkg/runtime", "Unknown")

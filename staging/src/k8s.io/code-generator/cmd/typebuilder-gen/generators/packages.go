@@ -101,8 +101,8 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 		groupVersions[groupPackageName] = groupVersionsEntry
 	}
 
-	// generate interface and ForKind() function
-	packageList = append(packageList, generatorForInterface(arguments.OutputPackagePath, boilerplate, groupVersions, buildersForGroupVersion, groupGoNames))
+	// generate ForKind() utility function
+	packageList = append(packageList, generatorForUtils(arguments.OutputPackagePath, boilerplate, groupVersions, buildersForGroupVersion, groupGoNames))
 
 	return packageList
 }
@@ -131,15 +131,15 @@ func generatorForBuilderPackage(outputPackagePath string, boilerplate []byte, pa
 	}
 }
 
-func generatorForInterface(outPackagePath string, boilerplate []byte, groupVersions map[string]clientgentypes.GroupVersions, buildersForGroupVersion map[clientgentypes.GroupVersion][]builder, groupGoNames map[string]string) *generator.DefaultPackage {
+func generatorForUtils(outPackagePath string, boilerplate []byte, groupVersions map[string]clientgentypes.GroupVersions, buildersForGroupVersion map[clientgentypes.GroupVersion][]builder, groupGoNames map[string]string) *generator.DefaultPackage {
 	return &generator.DefaultPackage{
 		PackageName: filepath.Base(outPackagePath),
 		PackagePath: outPackagePath,
 		HeaderText:  boilerplate,
 		GeneratorFunc: func(c *generator.Context) (generators []generator.Generator) {
-			generators = append(generators, &interfaceGenerator{
+			generators = append(generators, &utilGenerator{
 				DefaultGen: generator.DefaultGen{
-					OptionalName: "interface",
+					OptionalName: "utils",
 				},
 				outputPackage:        outPackagePath,
 				imports:              generator.NewImportTracker(),

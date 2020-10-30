@@ -62,6 +62,7 @@ import (
 	storagev1alpha1 "k8s.io/api/storage/v1alpha1"
 	storagev1beta1 "k8s.io/api/storage/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	admissionregistrationv1 "k8s.io/client-go/typebuilders/admissionregistration/v1"
 	admissionregistrationv1beta1 "k8s.io/client-go/typebuilders/admissionregistration/v1beta1"
@@ -108,14 +109,7 @@ import (
 	typebuildersstoragev1beta1 "k8s.io/client-go/typebuilders/storage/v1beta1"
 )
 
-type Interface interface {
-	ToUnstructured() interface{}
-	FromUnstructured(u map[string]interface{}) error
-	MarshalJSON() ([]byte, error)
-	UnmarshalJSON(data []byte) error
-}
-
-func ForKind(kind schema.GroupVersionKind) Interface {
+func ForKind(kind schema.GroupVersionKind) runtime.ApplyConfiguration {
 	switch kind {
 	// Group=admissionregistration, Version=v1
 	case v1.SchemeGroupVersion.WithKind("MutatingWebhook"):

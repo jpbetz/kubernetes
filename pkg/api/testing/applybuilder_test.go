@@ -34,7 +34,7 @@ import (
 	api "k8s.io/kubernetes/pkg/apis/core"
 )
 
-func doRoundTripBuilders(t *testing.T, internalVersion schema.GroupVersion, externalVersion schema.GroupVersion, kind string, builder typebuilders.Interface) {
+func doRoundTripBuilders(t *testing.T, internalVersion schema.GroupVersion, externalVersion schema.GroupVersion, kind string, builder runtime.ApplyConfiguration) {
 	// We do fuzzing on the internal version of the object, and only then
 	// convert to the external version. This is because custom fuzzing
 	// function are only supported for internal objects.

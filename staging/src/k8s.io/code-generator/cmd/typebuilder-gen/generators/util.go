@@ -28,8 +28,8 @@ import (
 	"k8s.io/gengo/types"
 )
 
-// interfaceGenerator generates the apply builder interface and ForKind() utility function.
-type interfaceGenerator struct {
+// utilGenerator generates the ForKind() utility function.
+type utilGenerator struct {
 	generator.DefaultGen
 	outputPackage        string
 	imports              namer.ImportTracker
@@ -39,9 +39,9 @@ type interfaceGenerator struct {
 	filtered             bool
 }
 
-var _ generator.Generator = &interfaceGenerator{}
+var _ generator.Generator = &utilGenerator{}
 
-func (g *interfaceGenerator) Filter(*generator.Context, *types.Type) bool {
+func (g *utilGenerator) Filter(*generator.Context, *types.Type) bool {
 	// generate file exactly once
 	if !g.filtered {
 		g.filtered = true
@@ -50,14 +50,14 @@ func (g *interfaceGenerator) Filter(*generator.Context, *types.Type) bool {
 	return false
 }
 
-func (g *interfaceGenerator) Namers(*generator.Context) namer.NameSystems {
+func (g *utilGenerator) Namers(*generator.Context) namer.NameSystems {
 	return namer.NameSystems{
 		"raw":          namer.NewRawNamer(g.outputPackage, g.imports),
 		"singularKind": namer.NewPublicNamer(0),
 	}
 }
 
-func (g *interfaceGenerator) Imports(*generator.Context) (imports []string) {
+func (g *utilGenerator) Imports(*generator.Context) (imports []string) {
 	return g.imports.ImportLines()
 }
 
@@ -102,7 +102,7 @@ func (v builderSort) Less(i, j int) bool {
 }
 func (v builderSort) Swap(i, j int) { v[i], v[j] = v[j], v[i] }
 
-func (g *interfaceGenerator) GenerateType(c *generator.Context, _ *types.Type, w io.Writer) error {
+func (g *utilGenerator) GenerateType(c *generator.Context, _ *types.Type, w io.Writer) error {
 	sw := generator.NewSnippetWriter(w, c, "{{", "}}")
 
 	var groups []group
@@ -136,24 +136,15 @@ func (g *interfaceGenerator) GenerateType(c *generator.Context, _ *types.Type, w
 		"groups":                 groups,
 		"schemeGVs":              schemeGVs,
 		"schemaGroupVersionKind": groupVersionKind,
+		"applyConfiguration":     applyConfiguration,
 	}
-	sw.Do(builderInterface, m)
 	sw.Do(forKindFunc, m)
 
 	return sw.Error()
 }
 
-var builderInterface = `
-type Interface interface {
-	ToUnstructured() interface{}
-	FromUnstructured(u map[string]interface{}) error
-	MarshalJSON() ([]byte, error)
-	UnmarshalJSON(data []byte) error
-}
-`
-
 var forKindFunc = `
-func ForKind(kind {{.schemaGroupVersionKind|raw}}) Interface {
+func ForKind(kind {{.schemaGroupVersionKind|raw}}) {{.applyConfiguration|raw}} {
 	switch kind {
 		{{range $group := .groups -}}{{$GroupGoName := .GroupGoName -}}
 			{{range $version := .Versions -}}
