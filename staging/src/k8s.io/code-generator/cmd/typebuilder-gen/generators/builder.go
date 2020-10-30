@@ -35,7 +35,7 @@ type builderTypeGenerator struct {
 	groupVersion   clientgentypes.GroupVersion
 	typeToGenerate *types.Type
 	imports        namer.ImportTracker
-	builderRefs    refGraph
+	refGraph       refGraph
 }
 
 var _ generator.Generator = &builderTypeGenerator{}
@@ -66,10 +66,9 @@ func (g *builderTypeGenerator) GenerateType(c *generator.Context, t *types.Type,
 		"jsonMarshal":           jsonMarshal,
 	}
 	
-	g.generateBuilderStruct(c, t, sw)
-	g.generateFieldsStruct(c, t, sw)
+	g.generateBuilderStruct(t, sw)
+	g.generateFieldsStruct(t, sw)
 
-	sw.Do(typeBuilderEnsureInitialized, m)
 	sw.Do(typeBuilderConstructor, m)
 
 	for _, member := range t.Members {
@@ -90,7 +89,7 @@ func (g *builderTypeGenerator) GenerateType(c *generator.Context, t *types.Type,
 	return sw.Error()
 }
 
-func (g *builderTypeGenerator) generateBuilderStruct(c *generator.Context, t *types.Type, sw *generator.SnippetWriter) {
+func (g *builderTypeGenerator) generateBuilderStruct(t *types.Type, sw *generator.SnippetWriter) {
 	m := map[string]interface{}{
 		"type": t,
 	}
@@ -104,26 +103,26 @@ func (g *builderTypeGenerator) generateBuilderStruct(c *generator.Context, t *ty
 			}
 			m := map[string]interface{}{
 				"member":     member,
-				"memberType": g.builderRefs.builderFieldType(member.Type),
+				"memberType": g.refGraph.builderFieldType(member.Type),
 			}
 			// Inlined types cannot be embedded because they do not expose the fields of the
 			// type they represent.
-			sw.Do("$.member.Type|private$ $.memberType|raw$ // inlined type\n", m)
+			sw.Do("$.member.Type|private$ *$.memberType|raw$ // inlined type\n", m)
 		}
 	}
-	sw.Do("  fields *$.type|private$Fields\n", m)
+	sw.Do("  fields $.type|private$Fields\n", m)
 	sw.Do("}\n", m)
 }
 
-func (g *builderTypeGenerator) generateFieldsStruct(c *generator.Context, t *types.Type, sw *generator.SnippetWriter) {
+func (g *builderTypeGenerator) generateFieldsStruct(t *types.Type, sw *generator.SnippetWriter) {
 	m := map[string]interface{}{
 		"type": t,
 	}
-	sw.Do("// $.type|private$Fields is used by $.type|public$Builder for json marshalling and unmarshalling.\n", m)
-	sw.Do("// Is the source-of-truth for all fields except inlined fields.\n", m)
-	sw.Do("// Inline fields are copied in from their builder type in $.type|public$Builder before marshalling, and\n", m)
-	sw.Do("// are copied out to the builder type in $.type|public$Builder after unmarshalling.\n", m)
-	sw.Do("// Inlined builder types cannot be embedded because they do not expose their fields directly.\n", m)
+	sw.Do("// $.type|private$Fields owns all fields except inlined fields.\n", m)
+	sw.Do("// Inline fields are owned by their respective inline type in $.type|public$Builder.\n", m)
+	sw.Do("// They are copied to this type before marshalling, and are copied out\n", m)
+	sw.Do("// after unmarshalling. The inlined types cannot be embedded because they do\n", m)
+	sw.Do("// not expose their fields directly.\n", m)
 	sw.Do("type $.type|private$Fields struct {\n", m)
 	for _, member := range t.Members {
 		if memberTags, ok := lookupJsonTags(member); ok {
@@ -132,7 +131,7 @@ func (g *builderTypeGenerator) generateFieldsStruct(c *generator.Context, t *typ
 			}
 			m := map[string]interface{}{
 				"member":     member,
-				"memberType": g.builderRefs.builderFieldType(member.Type),
+				"memberType": g.refGraph.builderFieldType(member.Type),
 				"memberTags":   memberTags,
 			}
 			if memberTags.inline {
@@ -144,9 +143,9 @@ func (g *builderTypeGenerator) generateFieldsStruct(c *generator.Context, t *typ
 						m := map[string]interface{}{
 							"type": t,
 							"member":     member,
-							"memberType": g.builderRefs.builderFieldType(member.Type),
+							"memberType": g.refGraph.builderFieldType(member.Type),
 							"inlinedMember":         inlineMember,
-							"inlinedMemberType":     g.builderRefs.builderFieldType(inlineMember.Type),
+							"inlinedMemberType":     g.refGraph.builderFieldType(inlineMember.Type),
 							"inlineMemberTags":      inlineMemberTags,
 						}
 						sw.Do("$.inlinedMember.Name$ *$.inlinedMemberType|raw$ `json:\"$.inlineMemberTags$\"` // inlined $.type|public$Builder.$.member.Type|private$.$.inlinedMember.Name$ field\n", m)
@@ -161,17 +160,104 @@ func (g *builderTypeGenerator) generateFieldsStruct(c *generator.Context, t *typ
 }
 
 func (g *builderTypeGenerator) generateMemberSet(t *types.Type, member types.Member, sw *generator.SnippetWriter) {
+	memberType := g.refGraph.builderFieldType(member.Type)
+	isBuilder := false
+	if g.refGraph.isBuilder(member.Type) {
+		memberType = &types.Type{Kind: types.Pointer, Elem: memberType}
+		isBuilder = true
+	}
 	m := map[string]interface{}{
 		"type":       t,
 		"member":     member,
-		"memberType": g.builderRefs.builderFieldType(member.Type),
+		"memberType": memberType,
 	}
 	sw.Do("// Set$.member.Name$ sets the $.member.Name$ field in the declarative configuration to the given value.\n", m)
-	sw.Do("func (b $.type|public$Builder) Set$.member.Name$(value $.memberType|raw$) $.type|public$Builder {\n", m)
-	sw.Do("  b.ensureInitialized()\n", m)
-	g.generateMemberSetExpressions(member, false, sw)
+	sw.Do("func (b *$.type|public$Builder) Set$.member.Name$(value $.memberType|raw$) *$.type|public$Builder {\n", m)
+	g.generateMemberSetExpressions(member, isBuilder, sw)
 	sw.Do("  return b\n", m)
 	sw.Do("}\n", m)
+}
+
+func (g *builderTypeGenerator) generateMemberSetExpressions(member types.Member, isBuilder bool, sw *generator.SnippetWriter) {
+	if jsonTags, ok := lookupJsonTags(member); ok {
+		m := map[string]interface{}{
+			"memberJsonName": jsonTags.name,
+			"member":         member,
+		}
+		if jsonTags.inline {
+			sw.Do("b.$.member.Type|private$ = value\n", m)
+		} else if isBuilder {
+			sw.Do("b.fields.$.member.Name$ = value\n", m)
+		} else {
+			sw.Do("b.fields.$.member.Name$ = &value\n", m)
+		}
+	}
+}
+
+func (g *builderTypeGenerator) generateMemberRemove(t *types.Type, member types.Member, sw *generator.SnippetWriter) {
+	m := map[string]interface{}{
+		"type":       t,
+		"member":     member,
+		"memberType": g.refGraph.builderFieldType(member.Type),
+	}
+	sw.Do("// Remove$.member.Name$ removes the $.member.Name$ field from the declarative configuration.\n", m)
+	sw.Do("func (b *$.type|public$Builder) Remove$.member.Name$() *$.type|public$Builder {\n", m)
+	g.generateMemberRemoveExpressions(member, sw)
+	sw.Do("  return b\n", m)
+	sw.Do("}\n", m)
+}
+
+func (g *builderTypeGenerator) generateMemberRemoveExpressions(member types.Member, sw *generator.SnippetWriter) {
+	if jsonTags, ok := lookupJsonTags(member); ok {
+		m := map[string]interface{}{
+			"memberJsonName": jsonTags.name,
+			"member":         member,
+			"memberType": g.refGraph.builderFieldType(member.Type),
+		}
+		if jsonTags.inline {
+			sw.Do("b.$.member.Type|private$ = nil\n", m)
+		} else {
+			sw.Do("b.fields.$.member.Name$ = nil\n", m)
+		}
+	}
+}
+
+func (g *builderTypeGenerator) generateMemberGet(t *types.Type, member types.Member, sw *generator.SnippetWriter) {
+	memberType := g.refGraph.builderFieldType(member.Type)
+	isBuilder := false
+	if g.refGraph.isBuilder(member.Type) {
+		memberType = &types.Type{Kind: types.Pointer, Elem: memberType}
+		isBuilder = true
+	}
+	m := map[string]interface{}{
+		"type":       t,
+		"member":     member,
+		"memberType": memberType,
+	}
+	sw.Do("// Get$.member.Name$ gets the $.member.Name$ field from the declarative configuration.\n", m)
+	sw.Do("func (b *$.type|public$Builder) Get$.member.Name$() (value $.memberType|raw$, ok bool) {\n", m)
+	g.generateMemberGetExpressions(member, isBuilder, sw)
+	sw.Do("}\n", m)
+}
+
+func (g *builderTypeGenerator) generateMemberGetExpressions(member types.Member, isBuilder bool, sw *generator.SnippetWriter) {
+	if jsonTags, ok := lookupJsonTags(member); ok {
+		m := map[string]interface{}{
+			"memberJsonName": jsonTags.name,
+			"memberType":     g.refGraph.builderFieldType(member.Type),
+			"member":         member,
+		}
+		if jsonTags.inline {
+			sw.Do("return b.$.member.Type|private$, true\n", m)
+		} else if isBuilder {
+			sw.Do("return b.fields.$.member.Name$, b.fields.$.member.Name$ != nil\n", m)
+		} else {
+			sw.Do("if v := b.fields.$.member.Name$; v != nil {\n", m)
+			sw.Do("  return *v, true\n", m)
+			sw.Do("}\n", m)
+			sw.Do("return value, false\n", m)
+		}
+	}
 }
 
 func (g *builderTypeGenerator) generatePrePostFunctions(t *types.Type, sw *generator.SnippetWriter) {
@@ -184,6 +270,10 @@ func (g *builderTypeGenerator) generatePrePostFunctions(t *types.Type, sw *gener
 			if !jsonTags.inline {
 				continue
 			}
+			m := map[string]interface{}{
+				"inlineMember": inlineMember,
+			}
+			sw.Do("if b.$.inlineMember.Type|private$ != nil {\n", m)
 			for _, member := range inlineMember.Type.Members {
 				if _, ok := lookupJsonTags(member); ok {
 					m := map[string]interface{}{
@@ -191,10 +281,15 @@ func (g *builderTypeGenerator) generatePrePostFunctions(t *types.Type, sw *gener
 						"member": member,
 					}
 					sw.Do("if v, ok := b.$.inlineMember.Type|private$.Get$.member.Name$(); ok { \n", m)
-					sw.Do("  b.fields.$.member.Name$ = &v\n", m)
+					if g.refGraph.isBuilder(member.Type) {
+						sw.Do("  b.fields.$.member.Name$ = v\n", m)
+					} else {
+						sw.Do("  b.fields.$.member.Name$ = &v\n", m)
+					}
 					sw.Do("}\n", m)
 				}
 			}
+			sw.Do("}\n", m)
 		}
 	}
 	sw.Do("}\n", m)
@@ -205,6 +300,13 @@ func (g *builderTypeGenerator) generatePrePostFunctions(t *types.Type, sw *gener
 			if !jsonTags.inline {
 				continue
 			}
+			m := map[string]interface{}{
+				"inlineMember": inlineMember,
+				"inlineMemberType": g.refGraph.builderFieldType(inlineMember.Type),
+			}
+			sw.Do("if b.$.inlineMember.Type|private$ == nil {\n", m)
+			sw.Do("  b.$.inlineMember.Type|private$ = &$.inlineMemberType|raw${}\n", m)
+			sw.Do("}\n", m)
 			for _, member := range inlineMember.Type.Members {
 				if _, ok := lookupJsonTags(member); ok {
 					m := map[string]interface{}{
@@ -212,7 +314,11 @@ func (g *builderTypeGenerator) generatePrePostFunctions(t *types.Type, sw *gener
 						"member": member,
 					}
 					sw.Do("if b.fields.$.member.Name$ != nil { \n", m)
-					sw.Do("  b.$.inlineMember.Type|private$.Set$.member.Name$(*b.fields.$.member.Name$)\n", m)
+					if g.refGraph.isBuilder(member.Type) {
+						sw.Do("  b.$.inlineMember.Type|private$.Set$.member.Name$(b.fields.$.member.Name$)\n", m)
+					} else {
+						sw.Do("  b.$.inlineMember.Type|private$.Set$.member.Name$(*b.fields.$.member.Name$)\n", m)
+					}
 					sw.Do("}\n", m)
 				}
 			}
@@ -221,98 +327,11 @@ func (g *builderTypeGenerator) generatePrePostFunctions(t *types.Type, sw *gener
 	sw.Do("}\n", m)
 }
 
-func (g *builderTypeGenerator) generateMemberSetExpressions(member types.Member, inlined bool, sw *generator.SnippetWriter) {
-	if jsonTags, ok := lookupJsonTags(member); ok {
-		m := map[string]interface{}{
-			"memberJsonName": jsonTags.name,
-			"member":         member,
-		}
-		if jsonTags.inline {
-			sw.Do("b.$.member.Type|private$ = value\n", m)
-		} else {
-			sw.Do("b.fields.$.member.Name$ = &value\n", m)
-		}
-	}
-}
-
-func (g *builderTypeGenerator) generateMemberRemove(t *types.Type, member types.Member, sw *generator.SnippetWriter) {
-	m := map[string]interface{}{
-		"type":       t,
-		"member":     member,
-		"memberType": g.builderRefs.builderFieldType(member.Type),
-	}
-	sw.Do("// Remove$.member.Name$ removes the $.member.Name$ field from the declarative configuration.\n", m)
-	sw.Do("func (b $.type|public$Builder) Remove$.member.Name$() $.type|public$Builder {\n", m)
-	sw.Do("  b.ensureInitialized()\n", m)
-	g.generateMemberRemoveExpressions(member, sw)
-	sw.Do("  return b\n", m)
-	sw.Do("}\n", m)
-}
-
-func (g *builderTypeGenerator) generateMemberRemoveExpressions(member types.Member, sw *generator.SnippetWriter) {
-	if jsonTags, ok := lookupJsonTags(member); ok {
-		m := map[string]interface{}{
-			"memberJsonName": jsonTags.name,
-			"member":         member,
-			"memberType": g.builderRefs.builderFieldType(member.Type),
-		}
-		if jsonTags.inline {
-			sw.Do("b.$.member.Type|private$ = $.memberType|raw${}\n", m)
-		} else {
-			sw.Do("b.fields.$.member.Name$ = nil\n", m)
-		}
-	}
-}
-
-func (g *builderTypeGenerator) generateMemberGet(t *types.Type, member types.Member, sw *generator.SnippetWriter) {
-	memberType := g.builderRefs.builderFieldType(member.Type)
-	m := map[string]interface{}{
-		"type":       t,
-		"member":     member,
-		"memberType": memberType,
-	}
-	sw.Do("// Get$.member.Name$ gets the $.member.Name$ field from the declarative configuration.\n", m)
-	sw.Do("func (b $.type|public$Builder) Get$.member.Name$() (value $.memberType|raw$, ok bool) {\n", m)
-	sw.Do("  b.ensureInitialized()\n", m)
-	g.generateMemberGetExpressions(member, false, sw)
-	sw.Do("}\n", m)
-}
-
-func (g *builderTypeGenerator) generateMemberGetExpressions(member types.Member, inlined bool, sw *generator.SnippetWriter) {
-	if jsonTags, ok := lookupJsonTags(member); ok {
-		m := map[string]interface{}{
-			"memberJsonName": jsonTags.name,
-			"memberType":     g.builderRefs.builderFieldType(member.Type),
-			"member":         member,
-		}
-		if jsonTags.inline {
-			sw.Do("return b.$.member.Type|private$, true\n", m)
-		} else {
-			sw.Do("if v := b.fields.$.member.Name$; v != nil {\n", m)
-			sw.Do("  return *v, true\n", m)
-			sw.Do("}\n", m)
-			sw.Do("return value, false\n", m)
-		}
-	}
-}
-
-// ensureInitialized ensures the builder is initialized. This must be called on
-// all generated functions that access the fields map of the builder since the builder type
-// is exported but the wrapped map is not.
-var typeBuilderEnsureInitialized = `
-func (b *$.type|public$Builder) ensureInitialized() {
-  if b.fields == nil {
-    b.fields = &$.type|private$Fields{}
-  }
-}
-`
-
 var typeBuilderConstructor = `
 // $.type|public$ constructs an declarative configuration of the $.type|public$ type for use with
 // apply.
-// Provided as a convenience.
-func $.type|public$() $.type|public$Builder {
-  return $.type|public$Builder{fields: &$.type|private$Fields{}}
+func $.type|public$() *$.type|public$Builder {
+  return &$.type|public$Builder{}
 }
 `
 
@@ -322,9 +341,8 @@ func (b *$.type|public$Builder) ToUnstructured() interface{} {
   if b == nil {
     return nil
   }
-  b.ensureInitialized()
   b.preMarshal()
-  u, err := $.unstructuredConverter|raw$.ToUnstructured(b.fields)
+  u, err := $.unstructuredConverter|raw$.ToUnstructured(&b.fields)
   if err != nil {
     panic(err)
   }
@@ -341,31 +359,25 @@ func (b *$.type|public$Builder) FromUnstructured(u map[string]interface{}) error
   if err != nil {
     return err
   }
-  b.fields = m
+  b.fields = *m
   b.postUnmarshal()
   return nil
 }
 `
 
-// TODO: use jsonMarshal directly and skip ToUnstructured
 var typeBuilderMarshal = `
 // MarshalJSON marshals $.type|public$Builder to JSON.
 func (b *$.type|public$Builder) MarshalJSON() ([]byte, error) {
-  b.ensureInitialized()
   b.preMarshal()
   return $.jsonMarshal|raw$(b.fields)
 }
 `
 
-// Does not work to use unstructured.UnmarshalJSON or UnstructuredJSONScheme because it expects a top level object with a Kind
-// It looks like if I want to inline, I really do need to embed as well for the json to work
-// which implies that I also need to get the conversion functions dropped or hidden from embedded types somehow
 var typeBuilderUnmarshal = `
 // UnmarshalJSON unmarshals JSON into $.type|public$Builder, replacing the contents of
 // $.type|public$Builder.
 func (b *$.type|public$Builder) UnmarshalJSON(data []byte) error {
-  b.ensureInitialized()
-  if err := $.jsonUnmarshal|raw$(data, b.fields); err != nil {
+  if err := $.jsonUnmarshal|raw$(data, &b.fields); err != nil {
     return err
   }
   b.postUnmarshal()
@@ -375,12 +387,10 @@ func (b *$.type|public$Builder) UnmarshalJSON(data []byte) error {
 
 var typeBuilderList = `
 // $.type|public$List represents a list of $.type|public$Builder.
-// Provided as a convenience.
-type $.type|public$List []$.type|public$Builder
+type $.type|public$List []*$.type|public$Builder
 `
 
 var typeBuilderMap = `
 // $.type|public$List represents a map of $.type|public$Builder.
-// Provided as a convenience.
 type $.type|public$Map map[string]$.type|public$Builder
 `

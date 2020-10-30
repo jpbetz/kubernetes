@@ -123,7 +123,7 @@ func generatorForBuilderPackage(outputPackagePath string, boilerplate []byte, pa
 					groupVersion:   gv,
 					typeToGenerate: t.Type,
 					imports:        generator.NewImportTracker(),
-					builderRefs:    builderRefs,
+					refGraph:       builderRefs,
 				})
 			}
 			return generators

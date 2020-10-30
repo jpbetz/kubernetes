@@ -249,7 +249,7 @@ func (c conversionClient) Patch(ctx context.Context, name string, pt types.Patch
 	return nil, errors.New("Patch() is not implemented for conversionClient")
 }
 
-func (c conversionClient) Apply(context.Context, string, appsav1pply.ReplicaSetBuilder, string, metav1.ApplyOptions, ...string) (result *apps.ReplicaSet, err error) {
+func (c conversionClient) Apply(context.Context, appsav1pply.ReplicaSetBuilder, string, metav1.ApplyOptions, ...string) (result *apps.ReplicaSet, err error) {
 	// This is not used by RSC.
 	return nil, errors.New("Apply() is not implemented for conversionClient")
 }

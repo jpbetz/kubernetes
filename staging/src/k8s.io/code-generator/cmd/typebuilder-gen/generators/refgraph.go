@@ -61,6 +61,7 @@ func (t refGraph) builderFieldType(field *types.Type) *types.Type {
 	switch field.Kind {
 	case types.Struct:
 		if pkg, ok := t[field.Name]; ok {
+			//return &types.Type{Kind: types.Pointer, Elem: types.Ref(pkg, field.Name.Name+"Builder")}
 			return types.Ref(pkg, field.Name.Name+"Builder")
 		}
 		return field
@@ -79,6 +80,17 @@ func (t refGraph) builderFieldType(field *types.Type) *types.Type {
 	default:
 		return field
 	}
+}
+
+func (t refGraph) isBuilder(field *types.Type) bool {
+	switch field.Kind {
+	case types.Struct:
+		_, ok := t[field.Name]
+		return ok
+	case types.Pointer:
+		return t.isBuilder(field.Elem)
+	}
+	return false
 }
 
 // isClientgenType returns true if the type is has the +clientgen annotation.
