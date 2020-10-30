@@ -25,80 +25,80 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// ControllerRevisionBuilder represents an declarative configuration of the ControllerRevision type for use
+// ControllerRevisionApplyConfiguration represents an declarative configuration of the ControllerRevision type for use
 // with apply.
-type ControllerRevisionBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type ControllerRevisionApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   controllerRevisionFields
 }
 
+// ControllerRevisionApplyConfiguration constructs an declarative configuration of the ControllerRevision type for use with
+// apply.
+func ControllerRevision() *ControllerRevisionApplyConfiguration {
+	return &ControllerRevisionApplyConfiguration{}
+}
+
 // controllerRevisionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ControllerRevisionBuilder.
+// Inline fields are owned by their respective inline type in ControllerRevisionApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type controllerRevisionFields struct {
-	Kind       *string               `json:"kind,omitempty"`       // inlined ControllerRevisionBuilder.typeMeta.Kind field
-	APIVersion *string               `json:"apiVersion,omitempty"` // inlined ControllerRevisionBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder `json:"metadata,omitempty"`
-	Data       *runtime.RawExtension `json:"data,omitempty"`
-	Revision   *int64                `json:"revision,omitempty"`
-}
-
-// ControllerRevision constructs an declarative configuration of the ControllerRevision type for use with
-// apply.
-func ControllerRevision() *ControllerRevisionBuilder {
-	return &ControllerRevisionBuilder{}
+	Kind       *string                          `json:"kind,omitempty"`       // inlined ControllerRevisionApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                          `json:"apiVersion,omitempty"` // inlined ControllerRevisionApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Data       *runtime.RawExtension            `json:"data,omitempty"`
+	Revision   *int64                           `json:"revision,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *ControllerRevisionBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *ControllerRevisionBuilder {
+func (b *ControllerRevisionApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *ControllerRevisionApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *ControllerRevisionBuilder) RemoveTypeMeta() *ControllerRevisionBuilder {
+func (b *ControllerRevisionApplyConfiguration) RemoveTypeMeta() *ControllerRevisionApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *ControllerRevisionBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *ControllerRevisionApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *ControllerRevisionBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *ControllerRevisionBuilder {
+func (b *ControllerRevisionApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *ControllerRevisionApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *ControllerRevisionBuilder) RemoveObjectMeta() *ControllerRevisionBuilder {
+func (b *ControllerRevisionApplyConfiguration) RemoveObjectMeta() *ControllerRevisionApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *ControllerRevisionBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *ControllerRevisionApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetData sets the Data field in the declarative configuration to the given value.
-func (b *ControllerRevisionBuilder) SetData(value runtime.RawExtension) *ControllerRevisionBuilder {
+func (b *ControllerRevisionApplyConfiguration) SetData(value runtime.RawExtension) *ControllerRevisionApplyConfiguration {
 	b.fields.Data = &value
 	return b
 }
 
 // RemoveData removes the Data field from the declarative configuration.
-func (b *ControllerRevisionBuilder) RemoveData() *ControllerRevisionBuilder {
+func (b *ControllerRevisionApplyConfiguration) RemoveData() *ControllerRevisionApplyConfiguration {
 	b.fields.Data = nil
 	return b
 }
 
 // GetData gets the Data field from the declarative configuration.
-func (b *ControllerRevisionBuilder) GetData() (value runtime.RawExtension, ok bool) {
+func (b *ControllerRevisionApplyConfiguration) GetData() (value runtime.RawExtension, ok bool) {
 	if v := b.fields.Data; v != nil {
 		return *v, true
 	}
@@ -106,27 +106,27 @@ func (b *ControllerRevisionBuilder) GetData() (value runtime.RawExtension, ok bo
 }
 
 // SetRevision sets the Revision field in the declarative configuration to the given value.
-func (b *ControllerRevisionBuilder) SetRevision(value int64) *ControllerRevisionBuilder {
+func (b *ControllerRevisionApplyConfiguration) SetRevision(value int64) *ControllerRevisionApplyConfiguration {
 	b.fields.Revision = &value
 	return b
 }
 
 // RemoveRevision removes the Revision field from the declarative configuration.
-func (b *ControllerRevisionBuilder) RemoveRevision() *ControllerRevisionBuilder {
+func (b *ControllerRevisionApplyConfiguration) RemoveRevision() *ControllerRevisionApplyConfiguration {
 	b.fields.Revision = nil
 	return b
 }
 
 // GetRevision gets the Revision field from the declarative configuration.
-func (b *ControllerRevisionBuilder) GetRevision() (value int64, ok bool) {
+func (b *ControllerRevisionApplyConfiguration) GetRevision() (value int64, ok bool) {
 	if v := b.fields.Revision; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ControllerRevisionBuilder to unstructured.
-func (b *ControllerRevisionBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ControllerRevisionApplyConfiguration to unstructured.
+func (b *ControllerRevisionApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -138,9 +138,9 @@ func (b *ControllerRevisionBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ControllerRevisionBuilder, replacing the contents
-// of ControllerRevisionBuilder.
-func (b *ControllerRevisionBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ControllerRevisionApplyConfiguration, replacing the contents
+// of ControllerRevisionApplyConfiguration.
+func (b *ControllerRevisionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &controllerRevisionFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -151,15 +151,15 @@ func (b *ControllerRevisionBuilder) FromUnstructured(u map[string]interface{}) e
 	return nil
 }
 
-// MarshalJSON marshals ControllerRevisionBuilder to JSON.
-func (b *ControllerRevisionBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ControllerRevisionApplyConfiguration to JSON.
+func (b *ControllerRevisionApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ControllerRevisionBuilder, replacing the contents of
-// ControllerRevisionBuilder.
-func (b *ControllerRevisionBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ControllerRevisionApplyConfiguration, replacing the contents of
+// ControllerRevisionApplyConfiguration.
+func (b *ControllerRevisionApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -167,13 +167,13 @@ func (b *ControllerRevisionBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ControllerRevisionList represents a list of ControllerRevisionBuilder.
-type ControllerRevisionList []*ControllerRevisionBuilder
+// ControllerRevisionList represents a listAlias of ControllerRevisionApplyConfiguration.
+type ControllerRevisionList []*ControllerRevisionApplyConfiguration
 
-// ControllerRevisionList represents a map of ControllerRevisionBuilder.
-type ControllerRevisionMap map[string]ControllerRevisionBuilder
+// ControllerRevisionList represents a map of ControllerRevisionApplyConfiguration.
+type ControllerRevisionMap map[string]ControllerRevisionApplyConfiguration
 
-func (b *ControllerRevisionBuilder) preMarshal() {
+func (b *ControllerRevisionApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -183,9 +183,9 @@ func (b *ControllerRevisionBuilder) preMarshal() {
 		}
 	}
 }
-func (b *ControllerRevisionBuilder) postUnmarshal() {
+func (b *ControllerRevisionApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

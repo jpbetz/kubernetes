@@ -25,62 +25,62 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// EphemeralContainerCommonBuilder represents an declarative configuration of the EphemeralContainerCommon type for use
+// EphemeralContainerCommonApplyConfiguration represents an declarative configuration of the EphemeralContainerCommon type for use
 // with apply.
-type EphemeralContainerCommonBuilder struct {
+type EphemeralContainerCommonApplyConfiguration struct {
 	fields ephemeralContainerCommonFields
 }
 
+// EphemeralContainerCommonApplyConfiguration constructs an declarative configuration of the EphemeralContainerCommon type for use with
+// apply.
+func EphemeralContainerCommon() *EphemeralContainerCommonApplyConfiguration {
+	return &EphemeralContainerCommonApplyConfiguration{}
+}
+
 // ephemeralContainerCommonFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in EphemeralContainerCommonBuilder.
+// Inline fields are owned by their respective inline type in EphemeralContainerCommonApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type ephemeralContainerCommonFields struct {
-	Name                     *string                          `json:"name,omitempty"`
-	Image                    *string                          `json:"image,omitempty"`
-	Command                  *[]string                        `json:"command,omitempty"`
-	Args                     *[]string                        `json:"args,omitempty"`
-	WorkingDir               *string                          `json:"workingDir,omitempty"`
-	Ports                    *ContainerPortList               `json:"ports,omitempty"`
-	EnvFrom                  *EnvFromSourceList               `json:"envFrom,omitempty"`
-	Env                      *EnvVarList                      `json:"env,omitempty"`
-	Resources                *ResourceRequirementsBuilder     `json:"resources,omitempty"`
-	VolumeMounts             *VolumeMountList                 `json:"volumeMounts,omitempty"`
-	VolumeDevices            *VolumeDeviceList                `json:"volumeDevices,omitempty"`
-	LivenessProbe            *ProbeBuilder                    `json:"livenessProbe,omitempty"`
-	ReadinessProbe           *ProbeBuilder                    `json:"readinessProbe,omitempty"`
-	StartupProbe             *ProbeBuilder                    `json:"startupProbe,omitempty"`
-	Lifecycle                *LifecycleBuilder                `json:"lifecycle,omitempty"`
-	TerminationMessagePath   *string                          `json:"terminationMessagePath,omitempty"`
-	TerminationMessagePolicy *corev1.TerminationMessagePolicy `json:"terminationMessagePolicy,omitempty"`
-	ImagePullPolicy          *corev1.PullPolicy               `json:"imagePullPolicy,omitempty"`
-	SecurityContext          *SecurityContextBuilder          `json:"securityContext,omitempty"`
-	Stdin                    *bool                            `json:"stdin,omitempty"`
-	StdinOnce                *bool                            `json:"stdinOnce,omitempty"`
-	TTY                      *bool                            `json:"tty,omitempty"`
-}
-
-// EphemeralContainerCommon constructs an declarative configuration of the EphemeralContainerCommon type for use with
-// apply.
-func EphemeralContainerCommon() *EphemeralContainerCommonBuilder {
-	return &EphemeralContainerCommonBuilder{}
+	Name                     *string                                 `json:"name,omitempty"`
+	Image                    *string                                 `json:"image,omitempty"`
+	Command                  *[]string                               `json:"command,omitempty"`
+	Args                     *[]string                               `json:"args,omitempty"`
+	WorkingDir               *string                                 `json:"workingDir,omitempty"`
+	Ports                    *ContainerPortList                      `json:"ports,omitempty"`
+	EnvFrom                  *EnvFromSourceList                      `json:"envFrom,omitempty"`
+	Env                      *EnvVarList                             `json:"env,omitempty"`
+	Resources                *ResourceRequirementsApplyConfiguration `json:"resources,omitempty"`
+	VolumeMounts             *VolumeMountList                        `json:"volumeMounts,omitempty"`
+	VolumeDevices            *VolumeDeviceList                       `json:"volumeDevices,omitempty"`
+	LivenessProbe            *ProbeApplyConfiguration                `json:"livenessProbe,omitempty"`
+	ReadinessProbe           *ProbeApplyConfiguration                `json:"readinessProbe,omitempty"`
+	StartupProbe             *ProbeApplyConfiguration                `json:"startupProbe,omitempty"`
+	Lifecycle                *LifecycleApplyConfiguration            `json:"lifecycle,omitempty"`
+	TerminationMessagePath   *string                                 `json:"terminationMessagePath,omitempty"`
+	TerminationMessagePolicy *corev1.TerminationMessagePolicy        `json:"terminationMessagePolicy,omitempty"`
+	ImagePullPolicy          *corev1.PullPolicy                      `json:"imagePullPolicy,omitempty"`
+	SecurityContext          *SecurityContextApplyConfiguration      `json:"securityContext,omitempty"`
+	Stdin                    *bool                                   `json:"stdin,omitempty"`
+	StdinOnce                *bool                                   `json:"stdinOnce,omitempty"`
+	TTY                      *bool                                   `json:"tty,omitempty"`
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetName(value string) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetName(value string) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveName() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveName() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetName() (value string, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -88,19 +88,19 @@ func (b *EphemeralContainerCommonBuilder) GetName() (value string, ok bool) {
 }
 
 // SetImage sets the Image field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetImage(value string) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetImage(value string) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.Image = &value
 	return b
 }
 
 // RemoveImage removes the Image field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveImage() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveImage() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.Image = nil
 	return b
 }
 
 // GetImage gets the Image field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetImage() (value string, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetImage() (value string, ok bool) {
 	if v := b.fields.Image; v != nil {
 		return *v, true
 	}
@@ -108,19 +108,19 @@ func (b *EphemeralContainerCommonBuilder) GetImage() (value string, ok bool) {
 }
 
 // SetCommand sets the Command field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetCommand(value []string) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetCommand(value []string) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.Command = &value
 	return b
 }
 
 // RemoveCommand removes the Command field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveCommand() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveCommand() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.Command = nil
 	return b
 }
 
 // GetCommand gets the Command field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetCommand() (value []string, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetCommand() (value []string, ok bool) {
 	if v := b.fields.Command; v != nil {
 		return *v, true
 	}
@@ -128,19 +128,19 @@ func (b *EphemeralContainerCommonBuilder) GetCommand() (value []string, ok bool)
 }
 
 // SetArgs sets the Args field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetArgs(value []string) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetArgs(value []string) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.Args = &value
 	return b
 }
 
 // RemoveArgs removes the Args field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveArgs() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveArgs() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.Args = nil
 	return b
 }
 
 // GetArgs gets the Args field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetArgs() (value []string, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetArgs() (value []string, ok bool) {
 	if v := b.fields.Args; v != nil {
 		return *v, true
 	}
@@ -148,19 +148,19 @@ func (b *EphemeralContainerCommonBuilder) GetArgs() (value []string, ok bool) {
 }
 
 // SetWorkingDir sets the WorkingDir field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetWorkingDir(value string) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetWorkingDir(value string) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.WorkingDir = &value
 	return b
 }
 
 // RemoveWorkingDir removes the WorkingDir field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveWorkingDir() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveWorkingDir() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.WorkingDir = nil
 	return b
 }
 
 // GetWorkingDir gets the WorkingDir field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetWorkingDir() (value string, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetWorkingDir() (value string, ok bool) {
 	if v := b.fields.WorkingDir; v != nil {
 		return *v, true
 	}
@@ -168,19 +168,19 @@ func (b *EphemeralContainerCommonBuilder) GetWorkingDir() (value string, ok bool
 }
 
 // SetPorts sets the Ports field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetPorts(value ContainerPortList) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetPorts(value ContainerPortList) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.Ports = &value
 	return b
 }
 
 // RemovePorts removes the Ports field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemovePorts() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemovePorts() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.Ports = nil
 	return b
 }
 
 // GetPorts gets the Ports field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetPorts() (value ContainerPortList, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetPorts() (value ContainerPortList, ok bool) {
 	if v := b.fields.Ports; v != nil {
 		return *v, true
 	}
@@ -188,19 +188,19 @@ func (b *EphemeralContainerCommonBuilder) GetPorts() (value ContainerPortList, o
 }
 
 // SetEnvFrom sets the EnvFrom field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetEnvFrom(value EnvFromSourceList) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetEnvFrom(value EnvFromSourceList) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.EnvFrom = &value
 	return b
 }
 
 // RemoveEnvFrom removes the EnvFrom field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveEnvFrom() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveEnvFrom() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.EnvFrom = nil
 	return b
 }
 
 // GetEnvFrom gets the EnvFrom field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetEnvFrom() (value EnvFromSourceList, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetEnvFrom() (value EnvFromSourceList, ok bool) {
 	if v := b.fields.EnvFrom; v != nil {
 		return *v, true
 	}
@@ -208,19 +208,19 @@ func (b *EphemeralContainerCommonBuilder) GetEnvFrom() (value EnvFromSourceList,
 }
 
 // SetEnv sets the Env field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetEnv(value EnvVarList) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetEnv(value EnvVarList) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.Env = &value
 	return b
 }
 
 // RemoveEnv removes the Env field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveEnv() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveEnv() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.Env = nil
 	return b
 }
 
 // GetEnv gets the Env field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetEnv() (value EnvVarList, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetEnv() (value EnvVarList, ok bool) {
 	if v := b.fields.Env; v != nil {
 		return *v, true
 	}
@@ -228,36 +228,36 @@ func (b *EphemeralContainerCommonBuilder) GetEnv() (value EnvVarList, ok bool) {
 }
 
 // SetResources sets the Resources field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetResources(value *ResourceRequirementsBuilder) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetResources(value *ResourceRequirementsApplyConfiguration) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.Resources = value
 	return b
 }
 
 // RemoveResources removes the Resources field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveResources() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveResources() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.Resources = nil
 	return b
 }
 
 // GetResources gets the Resources field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetResources() (value *ResourceRequirementsBuilder, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetResources() (value *ResourceRequirementsApplyConfiguration, ok bool) {
 	return b.fields.Resources, b.fields.Resources != nil
 }
 
 // SetVolumeMounts sets the VolumeMounts field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetVolumeMounts(value VolumeMountList) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetVolumeMounts(value VolumeMountList) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.VolumeMounts = &value
 	return b
 }
 
 // RemoveVolumeMounts removes the VolumeMounts field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveVolumeMounts() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveVolumeMounts() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.VolumeMounts = nil
 	return b
 }
 
 // GetVolumeMounts gets the VolumeMounts field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetVolumeMounts() (value VolumeMountList, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetVolumeMounts() (value VolumeMountList, ok bool) {
 	if v := b.fields.VolumeMounts; v != nil {
 		return *v, true
 	}
@@ -265,19 +265,19 @@ func (b *EphemeralContainerCommonBuilder) GetVolumeMounts() (value VolumeMountLi
 }
 
 // SetVolumeDevices sets the VolumeDevices field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetVolumeDevices(value VolumeDeviceList) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetVolumeDevices(value VolumeDeviceList) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.VolumeDevices = &value
 	return b
 }
 
 // RemoveVolumeDevices removes the VolumeDevices field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveVolumeDevices() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveVolumeDevices() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.VolumeDevices = nil
 	return b
 }
 
 // GetVolumeDevices gets the VolumeDevices field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetVolumeDevices() (value VolumeDeviceList, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetVolumeDevices() (value VolumeDeviceList, ok bool) {
 	if v := b.fields.VolumeDevices; v != nil {
 		return *v, true
 	}
@@ -285,87 +285,87 @@ func (b *EphemeralContainerCommonBuilder) GetVolumeDevices() (value VolumeDevice
 }
 
 // SetLivenessProbe sets the LivenessProbe field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetLivenessProbe(value *ProbeBuilder) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetLivenessProbe(value *ProbeApplyConfiguration) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.LivenessProbe = value
 	return b
 }
 
 // RemoveLivenessProbe removes the LivenessProbe field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveLivenessProbe() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveLivenessProbe() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.LivenessProbe = nil
 	return b
 }
 
 // GetLivenessProbe gets the LivenessProbe field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetLivenessProbe() (value *ProbeBuilder, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetLivenessProbe() (value *ProbeApplyConfiguration, ok bool) {
 	return b.fields.LivenessProbe, b.fields.LivenessProbe != nil
 }
 
 // SetReadinessProbe sets the ReadinessProbe field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetReadinessProbe(value *ProbeBuilder) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetReadinessProbe(value *ProbeApplyConfiguration) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.ReadinessProbe = value
 	return b
 }
 
 // RemoveReadinessProbe removes the ReadinessProbe field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveReadinessProbe() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveReadinessProbe() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.ReadinessProbe = nil
 	return b
 }
 
 // GetReadinessProbe gets the ReadinessProbe field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetReadinessProbe() (value *ProbeBuilder, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetReadinessProbe() (value *ProbeApplyConfiguration, ok bool) {
 	return b.fields.ReadinessProbe, b.fields.ReadinessProbe != nil
 }
 
 // SetStartupProbe sets the StartupProbe field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetStartupProbe(value *ProbeBuilder) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetStartupProbe(value *ProbeApplyConfiguration) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.StartupProbe = value
 	return b
 }
 
 // RemoveStartupProbe removes the StartupProbe field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveStartupProbe() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveStartupProbe() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.StartupProbe = nil
 	return b
 }
 
 // GetStartupProbe gets the StartupProbe field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetStartupProbe() (value *ProbeBuilder, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetStartupProbe() (value *ProbeApplyConfiguration, ok bool) {
 	return b.fields.StartupProbe, b.fields.StartupProbe != nil
 }
 
 // SetLifecycle sets the Lifecycle field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetLifecycle(value *LifecycleBuilder) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetLifecycle(value *LifecycleApplyConfiguration) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.Lifecycle = value
 	return b
 }
 
 // RemoveLifecycle removes the Lifecycle field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveLifecycle() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveLifecycle() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.Lifecycle = nil
 	return b
 }
 
 // GetLifecycle gets the Lifecycle field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetLifecycle() (value *LifecycleBuilder, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetLifecycle() (value *LifecycleApplyConfiguration, ok bool) {
 	return b.fields.Lifecycle, b.fields.Lifecycle != nil
 }
 
 // SetTerminationMessagePath sets the TerminationMessagePath field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetTerminationMessagePath(value string) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetTerminationMessagePath(value string) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.TerminationMessagePath = &value
 	return b
 }
 
 // RemoveTerminationMessagePath removes the TerminationMessagePath field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveTerminationMessagePath() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveTerminationMessagePath() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.TerminationMessagePath = nil
 	return b
 }
 
 // GetTerminationMessagePath gets the TerminationMessagePath field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetTerminationMessagePath() (value string, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetTerminationMessagePath() (value string, ok bool) {
 	if v := b.fields.TerminationMessagePath; v != nil {
 		return *v, true
 	}
@@ -373,19 +373,19 @@ func (b *EphemeralContainerCommonBuilder) GetTerminationMessagePath() (value str
 }
 
 // SetTerminationMessagePolicy sets the TerminationMessagePolicy field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetTerminationMessagePolicy(value corev1.TerminationMessagePolicy) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetTerminationMessagePolicy(value corev1.TerminationMessagePolicy) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.TerminationMessagePolicy = &value
 	return b
 }
 
 // RemoveTerminationMessagePolicy removes the TerminationMessagePolicy field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveTerminationMessagePolicy() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveTerminationMessagePolicy() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.TerminationMessagePolicy = nil
 	return b
 }
 
 // GetTerminationMessagePolicy gets the TerminationMessagePolicy field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetTerminationMessagePolicy() (value corev1.TerminationMessagePolicy, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetTerminationMessagePolicy() (value corev1.TerminationMessagePolicy, ok bool) {
 	if v := b.fields.TerminationMessagePolicy; v != nil {
 		return *v, true
 	}
@@ -393,19 +393,19 @@ func (b *EphemeralContainerCommonBuilder) GetTerminationMessagePolicy() (value c
 }
 
 // SetImagePullPolicy sets the ImagePullPolicy field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetImagePullPolicy(value corev1.PullPolicy) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetImagePullPolicy(value corev1.PullPolicy) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.ImagePullPolicy = &value
 	return b
 }
 
 // RemoveImagePullPolicy removes the ImagePullPolicy field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveImagePullPolicy() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveImagePullPolicy() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.ImagePullPolicy = nil
 	return b
 }
 
 // GetImagePullPolicy gets the ImagePullPolicy field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetImagePullPolicy() (value corev1.PullPolicy, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetImagePullPolicy() (value corev1.PullPolicy, ok bool) {
 	if v := b.fields.ImagePullPolicy; v != nil {
 		return *v, true
 	}
@@ -413,36 +413,36 @@ func (b *EphemeralContainerCommonBuilder) GetImagePullPolicy() (value corev1.Pul
 }
 
 // SetSecurityContext sets the SecurityContext field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetSecurityContext(value *SecurityContextBuilder) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetSecurityContext(value *SecurityContextApplyConfiguration) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.SecurityContext = value
 	return b
 }
 
 // RemoveSecurityContext removes the SecurityContext field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveSecurityContext() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveSecurityContext() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.SecurityContext = nil
 	return b
 }
 
 // GetSecurityContext gets the SecurityContext field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetSecurityContext() (value *SecurityContextBuilder, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetSecurityContext() (value *SecurityContextApplyConfiguration, ok bool) {
 	return b.fields.SecurityContext, b.fields.SecurityContext != nil
 }
 
 // SetStdin sets the Stdin field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetStdin(value bool) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetStdin(value bool) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.Stdin = &value
 	return b
 }
 
 // RemoveStdin removes the Stdin field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveStdin() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveStdin() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.Stdin = nil
 	return b
 }
 
 // GetStdin gets the Stdin field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetStdin() (value bool, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetStdin() (value bool, ok bool) {
 	if v := b.fields.Stdin; v != nil {
 		return *v, true
 	}
@@ -450,19 +450,19 @@ func (b *EphemeralContainerCommonBuilder) GetStdin() (value bool, ok bool) {
 }
 
 // SetStdinOnce sets the StdinOnce field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetStdinOnce(value bool) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetStdinOnce(value bool) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.StdinOnce = &value
 	return b
 }
 
 // RemoveStdinOnce removes the StdinOnce field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveStdinOnce() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveStdinOnce() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.StdinOnce = nil
 	return b
 }
 
 // GetStdinOnce gets the StdinOnce field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetStdinOnce() (value bool, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetStdinOnce() (value bool, ok bool) {
 	if v := b.fields.StdinOnce; v != nil {
 		return *v, true
 	}
@@ -470,27 +470,27 @@ func (b *EphemeralContainerCommonBuilder) GetStdinOnce() (value bool, ok bool) {
 }
 
 // SetTTY sets the TTY field in the declarative configuration to the given value.
-func (b *EphemeralContainerCommonBuilder) SetTTY(value bool) *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) SetTTY(value bool) *EphemeralContainerCommonApplyConfiguration {
 	b.fields.TTY = &value
 	return b
 }
 
 // RemoveTTY removes the TTY field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) RemoveTTY() *EphemeralContainerCommonBuilder {
+func (b *EphemeralContainerCommonApplyConfiguration) RemoveTTY() *EphemeralContainerCommonApplyConfiguration {
 	b.fields.TTY = nil
 	return b
 }
 
 // GetTTY gets the TTY field from the declarative configuration.
-func (b *EphemeralContainerCommonBuilder) GetTTY() (value bool, ok bool) {
+func (b *EphemeralContainerCommonApplyConfiguration) GetTTY() (value bool, ok bool) {
 	if v := b.fields.TTY; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts EphemeralContainerCommonBuilder to unstructured.
-func (b *EphemeralContainerCommonBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts EphemeralContainerCommonApplyConfiguration to unstructured.
+func (b *EphemeralContainerCommonApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -502,9 +502,9 @@ func (b *EphemeralContainerCommonBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to EphemeralContainerCommonBuilder, replacing the contents
-// of EphemeralContainerCommonBuilder.
-func (b *EphemeralContainerCommonBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to EphemeralContainerCommonApplyConfiguration, replacing the contents
+// of EphemeralContainerCommonApplyConfiguration.
+func (b *EphemeralContainerCommonApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &ephemeralContainerCommonFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -515,15 +515,15 @@ func (b *EphemeralContainerCommonBuilder) FromUnstructured(u map[string]interfac
 	return nil
 }
 
-// MarshalJSON marshals EphemeralContainerCommonBuilder to JSON.
-func (b *EphemeralContainerCommonBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals EphemeralContainerCommonApplyConfiguration to JSON.
+func (b *EphemeralContainerCommonApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into EphemeralContainerCommonBuilder, replacing the contents of
-// EphemeralContainerCommonBuilder.
-func (b *EphemeralContainerCommonBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into EphemeralContainerCommonApplyConfiguration, replacing the contents of
+// EphemeralContainerCommonApplyConfiguration.
+func (b *EphemeralContainerCommonApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -531,13 +531,13 @@ func (b *EphemeralContainerCommonBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// EphemeralContainerCommonList represents a list of EphemeralContainerCommonBuilder.
-type EphemeralContainerCommonList []*EphemeralContainerCommonBuilder
+// EphemeralContainerCommonList represents a listAlias of EphemeralContainerCommonApplyConfiguration.
+type EphemeralContainerCommonList []*EphemeralContainerCommonApplyConfiguration
 
-// EphemeralContainerCommonList represents a map of EphemeralContainerCommonBuilder.
-type EphemeralContainerCommonMap map[string]EphemeralContainerCommonBuilder
+// EphemeralContainerCommonList represents a map of EphemeralContainerCommonApplyConfiguration.
+type EphemeralContainerCommonMap map[string]EphemeralContainerCommonApplyConfiguration
 
-func (b *EphemeralContainerCommonBuilder) preMarshal() {
+func (b *EphemeralContainerCommonApplyConfiguration) preMarshal() {
 }
-func (b *EphemeralContainerCommonBuilder) postUnmarshal() {
+func (b *EphemeralContainerCommonApplyConfiguration) postUnmarshal() {
 }

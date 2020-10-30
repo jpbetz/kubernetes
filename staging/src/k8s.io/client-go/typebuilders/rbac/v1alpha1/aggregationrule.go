@@ -25,14 +25,20 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// AggregationRuleBuilder represents an declarative configuration of the AggregationRule type for use
+// AggregationRuleApplyConfiguration represents an declarative configuration of the AggregationRule type for use
 // with apply.
-type AggregationRuleBuilder struct {
+type AggregationRuleApplyConfiguration struct {
 	fields aggregationRuleFields
 }
 
+// AggregationRuleApplyConfiguration constructs an declarative configuration of the AggregationRule type for use with
+// apply.
+func AggregationRule() *AggregationRuleApplyConfiguration {
+	return &AggregationRuleApplyConfiguration{}
+}
+
 // aggregationRuleFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in AggregationRuleBuilder.
+// Inline fields are owned by their respective inline type in AggregationRuleApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,34 +46,28 @@ type aggregationRuleFields struct {
 	ClusterRoleSelectors *v1.LabelSelectorList `json:"clusterRoleSelectors,omitempty"`
 }
 
-// AggregationRule constructs an declarative configuration of the AggregationRule type for use with
-// apply.
-func AggregationRule() *AggregationRuleBuilder {
-	return &AggregationRuleBuilder{}
-}
-
 // SetClusterRoleSelectors sets the ClusterRoleSelectors field in the declarative configuration to the given value.
-func (b *AggregationRuleBuilder) SetClusterRoleSelectors(value v1.LabelSelectorList) *AggregationRuleBuilder {
+func (b *AggregationRuleApplyConfiguration) SetClusterRoleSelectors(value v1.LabelSelectorList) *AggregationRuleApplyConfiguration {
 	b.fields.ClusterRoleSelectors = &value
 	return b
 }
 
 // RemoveClusterRoleSelectors removes the ClusterRoleSelectors field from the declarative configuration.
-func (b *AggregationRuleBuilder) RemoveClusterRoleSelectors() *AggregationRuleBuilder {
+func (b *AggregationRuleApplyConfiguration) RemoveClusterRoleSelectors() *AggregationRuleApplyConfiguration {
 	b.fields.ClusterRoleSelectors = nil
 	return b
 }
 
 // GetClusterRoleSelectors gets the ClusterRoleSelectors field from the declarative configuration.
-func (b *AggregationRuleBuilder) GetClusterRoleSelectors() (value v1.LabelSelectorList, ok bool) {
+func (b *AggregationRuleApplyConfiguration) GetClusterRoleSelectors() (value v1.LabelSelectorList, ok bool) {
 	if v := b.fields.ClusterRoleSelectors; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts AggregationRuleBuilder to unstructured.
-func (b *AggregationRuleBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts AggregationRuleApplyConfiguration to unstructured.
+func (b *AggregationRuleApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -79,9 +79,9 @@ func (b *AggregationRuleBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to AggregationRuleBuilder, replacing the contents
-// of AggregationRuleBuilder.
-func (b *AggregationRuleBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to AggregationRuleApplyConfiguration, replacing the contents
+// of AggregationRuleApplyConfiguration.
+func (b *AggregationRuleApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &aggregationRuleFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -92,15 +92,15 @@ func (b *AggregationRuleBuilder) FromUnstructured(u map[string]interface{}) erro
 	return nil
 }
 
-// MarshalJSON marshals AggregationRuleBuilder to JSON.
-func (b *AggregationRuleBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals AggregationRuleApplyConfiguration to JSON.
+func (b *AggregationRuleApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into AggregationRuleBuilder, replacing the contents of
-// AggregationRuleBuilder.
-func (b *AggregationRuleBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into AggregationRuleApplyConfiguration, replacing the contents of
+// AggregationRuleApplyConfiguration.
+func (b *AggregationRuleApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -108,13 +108,13 @@ func (b *AggregationRuleBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// AggregationRuleList represents a list of AggregationRuleBuilder.
-type AggregationRuleList []*AggregationRuleBuilder
+// AggregationRuleList represents a listAlias of AggregationRuleApplyConfiguration.
+type AggregationRuleList []*AggregationRuleApplyConfiguration
 
-// AggregationRuleList represents a map of AggregationRuleBuilder.
-type AggregationRuleMap map[string]AggregationRuleBuilder
+// AggregationRuleList represents a map of AggregationRuleApplyConfiguration.
+type AggregationRuleMap map[string]AggregationRuleApplyConfiguration
 
-func (b *AggregationRuleBuilder) preMarshal() {
+func (b *AggregationRuleApplyConfiguration) preMarshal() {
 }
-func (b *AggregationRuleBuilder) postUnmarshal() {
+func (b *AggregationRuleApplyConfiguration) postUnmarshal() {
 }

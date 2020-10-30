@@ -24,47 +24,47 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// NodeSpecBuilder represents an declarative configuration of the NodeSpec type for use
+// NodeSpecApplyConfiguration represents an declarative configuration of the NodeSpec type for use
 // with apply.
-type NodeSpecBuilder struct {
+type NodeSpecApplyConfiguration struct {
 	fields nodeSpecFields
 }
 
+// NodeSpecApplyConfiguration constructs an declarative configuration of the NodeSpec type for use with
+// apply.
+func NodeSpec() *NodeSpecApplyConfiguration {
+	return &NodeSpecApplyConfiguration{}
+}
+
 // nodeSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NodeSpecBuilder.
+// Inline fields are owned by their respective inline type in NodeSpecApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type nodeSpecFields struct {
-	PodCIDR            *string                  `json:"podCIDR,omitempty"`
-	PodCIDRs           *[]string                `json:"podCIDRs,omitempty"`
-	ProviderID         *string                  `json:"providerID,omitempty"`
-	Unschedulable      *bool                    `json:"unschedulable,omitempty"`
-	Taints             *TaintList               `json:"taints,omitempty"`
-	ConfigSource       *NodeConfigSourceBuilder `json:"configSource,omitempty"`
-	DoNotUseExternalID *string                  `json:"externalID,omitempty"`
-}
-
-// NodeSpec constructs an declarative configuration of the NodeSpec type for use with
-// apply.
-func NodeSpec() *NodeSpecBuilder {
-	return &NodeSpecBuilder{}
+	PodCIDR            *string                             `json:"podCIDR,omitempty"`
+	PodCIDRs           *[]string                           `json:"podCIDRs,omitempty"`
+	ProviderID         *string                             `json:"providerID,omitempty"`
+	Unschedulable      *bool                               `json:"unschedulable,omitempty"`
+	Taints             *TaintList                          `json:"taints,omitempty"`
+	ConfigSource       *NodeConfigSourceApplyConfiguration `json:"configSource,omitempty"`
+	DoNotUseExternalID *string                             `json:"externalID,omitempty"`
 }
 
 // SetPodCIDR sets the PodCIDR field in the declarative configuration to the given value.
-func (b *NodeSpecBuilder) SetPodCIDR(value string) *NodeSpecBuilder {
+func (b *NodeSpecApplyConfiguration) SetPodCIDR(value string) *NodeSpecApplyConfiguration {
 	b.fields.PodCIDR = &value
 	return b
 }
 
 // RemovePodCIDR removes the PodCIDR field from the declarative configuration.
-func (b *NodeSpecBuilder) RemovePodCIDR() *NodeSpecBuilder {
+func (b *NodeSpecApplyConfiguration) RemovePodCIDR() *NodeSpecApplyConfiguration {
 	b.fields.PodCIDR = nil
 	return b
 }
 
 // GetPodCIDR gets the PodCIDR field from the declarative configuration.
-func (b *NodeSpecBuilder) GetPodCIDR() (value string, ok bool) {
+func (b *NodeSpecApplyConfiguration) GetPodCIDR() (value string, ok bool) {
 	if v := b.fields.PodCIDR; v != nil {
 		return *v, true
 	}
@@ -72,19 +72,19 @@ func (b *NodeSpecBuilder) GetPodCIDR() (value string, ok bool) {
 }
 
 // SetPodCIDRs sets the PodCIDRs field in the declarative configuration to the given value.
-func (b *NodeSpecBuilder) SetPodCIDRs(value []string) *NodeSpecBuilder {
+func (b *NodeSpecApplyConfiguration) SetPodCIDRs(value []string) *NodeSpecApplyConfiguration {
 	b.fields.PodCIDRs = &value
 	return b
 }
 
 // RemovePodCIDRs removes the PodCIDRs field from the declarative configuration.
-func (b *NodeSpecBuilder) RemovePodCIDRs() *NodeSpecBuilder {
+func (b *NodeSpecApplyConfiguration) RemovePodCIDRs() *NodeSpecApplyConfiguration {
 	b.fields.PodCIDRs = nil
 	return b
 }
 
 // GetPodCIDRs gets the PodCIDRs field from the declarative configuration.
-func (b *NodeSpecBuilder) GetPodCIDRs() (value []string, ok bool) {
+func (b *NodeSpecApplyConfiguration) GetPodCIDRs() (value []string, ok bool) {
 	if v := b.fields.PodCIDRs; v != nil {
 		return *v, true
 	}
@@ -92,19 +92,19 @@ func (b *NodeSpecBuilder) GetPodCIDRs() (value []string, ok bool) {
 }
 
 // SetProviderID sets the ProviderID field in the declarative configuration to the given value.
-func (b *NodeSpecBuilder) SetProviderID(value string) *NodeSpecBuilder {
+func (b *NodeSpecApplyConfiguration) SetProviderID(value string) *NodeSpecApplyConfiguration {
 	b.fields.ProviderID = &value
 	return b
 }
 
 // RemoveProviderID removes the ProviderID field from the declarative configuration.
-func (b *NodeSpecBuilder) RemoveProviderID() *NodeSpecBuilder {
+func (b *NodeSpecApplyConfiguration) RemoveProviderID() *NodeSpecApplyConfiguration {
 	b.fields.ProviderID = nil
 	return b
 }
 
 // GetProviderID gets the ProviderID field from the declarative configuration.
-func (b *NodeSpecBuilder) GetProviderID() (value string, ok bool) {
+func (b *NodeSpecApplyConfiguration) GetProviderID() (value string, ok bool) {
 	if v := b.fields.ProviderID; v != nil {
 		return *v, true
 	}
@@ -112,19 +112,19 @@ func (b *NodeSpecBuilder) GetProviderID() (value string, ok bool) {
 }
 
 // SetUnschedulable sets the Unschedulable field in the declarative configuration to the given value.
-func (b *NodeSpecBuilder) SetUnschedulable(value bool) *NodeSpecBuilder {
+func (b *NodeSpecApplyConfiguration) SetUnschedulable(value bool) *NodeSpecApplyConfiguration {
 	b.fields.Unschedulable = &value
 	return b
 }
 
 // RemoveUnschedulable removes the Unschedulable field from the declarative configuration.
-func (b *NodeSpecBuilder) RemoveUnschedulable() *NodeSpecBuilder {
+func (b *NodeSpecApplyConfiguration) RemoveUnschedulable() *NodeSpecApplyConfiguration {
 	b.fields.Unschedulable = nil
 	return b
 }
 
 // GetUnschedulable gets the Unschedulable field from the declarative configuration.
-func (b *NodeSpecBuilder) GetUnschedulable() (value bool, ok bool) {
+func (b *NodeSpecApplyConfiguration) GetUnschedulable() (value bool, ok bool) {
 	if v := b.fields.Unschedulable; v != nil {
 		return *v, true
 	}
@@ -132,19 +132,19 @@ func (b *NodeSpecBuilder) GetUnschedulable() (value bool, ok bool) {
 }
 
 // SetTaints sets the Taints field in the declarative configuration to the given value.
-func (b *NodeSpecBuilder) SetTaints(value TaintList) *NodeSpecBuilder {
+func (b *NodeSpecApplyConfiguration) SetTaints(value TaintList) *NodeSpecApplyConfiguration {
 	b.fields.Taints = &value
 	return b
 }
 
 // RemoveTaints removes the Taints field from the declarative configuration.
-func (b *NodeSpecBuilder) RemoveTaints() *NodeSpecBuilder {
+func (b *NodeSpecApplyConfiguration) RemoveTaints() *NodeSpecApplyConfiguration {
 	b.fields.Taints = nil
 	return b
 }
 
 // GetTaints gets the Taints field from the declarative configuration.
-func (b *NodeSpecBuilder) GetTaints() (value TaintList, ok bool) {
+func (b *NodeSpecApplyConfiguration) GetTaints() (value TaintList, ok bool) {
 	if v := b.fields.Taints; v != nil {
 		return *v, true
 	}
@@ -152,44 +152,44 @@ func (b *NodeSpecBuilder) GetTaints() (value TaintList, ok bool) {
 }
 
 // SetConfigSource sets the ConfigSource field in the declarative configuration to the given value.
-func (b *NodeSpecBuilder) SetConfigSource(value *NodeConfigSourceBuilder) *NodeSpecBuilder {
+func (b *NodeSpecApplyConfiguration) SetConfigSource(value *NodeConfigSourceApplyConfiguration) *NodeSpecApplyConfiguration {
 	b.fields.ConfigSource = value
 	return b
 }
 
 // RemoveConfigSource removes the ConfigSource field from the declarative configuration.
-func (b *NodeSpecBuilder) RemoveConfigSource() *NodeSpecBuilder {
+func (b *NodeSpecApplyConfiguration) RemoveConfigSource() *NodeSpecApplyConfiguration {
 	b.fields.ConfigSource = nil
 	return b
 }
 
 // GetConfigSource gets the ConfigSource field from the declarative configuration.
-func (b *NodeSpecBuilder) GetConfigSource() (value *NodeConfigSourceBuilder, ok bool) {
+func (b *NodeSpecApplyConfiguration) GetConfigSource() (value *NodeConfigSourceApplyConfiguration, ok bool) {
 	return b.fields.ConfigSource, b.fields.ConfigSource != nil
 }
 
 // SetDoNotUseExternalID sets the DoNotUseExternalID field in the declarative configuration to the given value.
-func (b *NodeSpecBuilder) SetDoNotUseExternalID(value string) *NodeSpecBuilder {
+func (b *NodeSpecApplyConfiguration) SetDoNotUseExternalID(value string) *NodeSpecApplyConfiguration {
 	b.fields.DoNotUseExternalID = &value
 	return b
 }
 
 // RemoveDoNotUseExternalID removes the DoNotUseExternalID field from the declarative configuration.
-func (b *NodeSpecBuilder) RemoveDoNotUseExternalID() *NodeSpecBuilder {
+func (b *NodeSpecApplyConfiguration) RemoveDoNotUseExternalID() *NodeSpecApplyConfiguration {
 	b.fields.DoNotUseExternalID = nil
 	return b
 }
 
 // GetDoNotUseExternalID gets the DoNotUseExternalID field from the declarative configuration.
-func (b *NodeSpecBuilder) GetDoNotUseExternalID() (value string, ok bool) {
+func (b *NodeSpecApplyConfiguration) GetDoNotUseExternalID() (value string, ok bool) {
 	if v := b.fields.DoNotUseExternalID; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts NodeSpecBuilder to unstructured.
-func (b *NodeSpecBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NodeSpecApplyConfiguration to unstructured.
+func (b *NodeSpecApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -201,9 +201,9 @@ func (b *NodeSpecBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NodeSpecBuilder, replacing the contents
-// of NodeSpecBuilder.
-func (b *NodeSpecBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NodeSpecApplyConfiguration, replacing the contents
+// of NodeSpecApplyConfiguration.
+func (b *NodeSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &nodeSpecFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -214,15 +214,15 @@ func (b *NodeSpecBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals NodeSpecBuilder to JSON.
-func (b *NodeSpecBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NodeSpecApplyConfiguration to JSON.
+func (b *NodeSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NodeSpecBuilder, replacing the contents of
-// NodeSpecBuilder.
-func (b *NodeSpecBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NodeSpecApplyConfiguration, replacing the contents of
+// NodeSpecApplyConfiguration.
+func (b *NodeSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -230,13 +230,13 @@ func (b *NodeSpecBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NodeSpecList represents a list of NodeSpecBuilder.
-type NodeSpecList []*NodeSpecBuilder
+// NodeSpecList represents a listAlias of NodeSpecApplyConfiguration.
+type NodeSpecList []*NodeSpecApplyConfiguration
 
-// NodeSpecList represents a map of NodeSpecBuilder.
-type NodeSpecMap map[string]NodeSpecBuilder
+// NodeSpecList represents a map of NodeSpecApplyConfiguration.
+type NodeSpecMap map[string]NodeSpecApplyConfiguration
 
-func (b *NodeSpecBuilder) preMarshal() {
+func (b *NodeSpecApplyConfiguration) preMarshal() {
 }
-func (b *NodeSpecBuilder) postUnmarshal() {
+func (b *NodeSpecApplyConfiguration) postUnmarshal() {
 }

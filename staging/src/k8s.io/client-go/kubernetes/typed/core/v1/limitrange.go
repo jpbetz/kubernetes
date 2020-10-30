@@ -48,7 +48,7 @@ type LimitRangeInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.LimitRangeList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.LimitRange, err error)
-	Apply(ctx context.Context, limitRange corev1.LimitRangeBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.LimitRange, err error)
+	Apply(ctx context.Context, limitRange *corev1.LimitRangeApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.LimitRange, err error)
 	LimitRangeExpansion
 }
 
@@ -181,7 +181,7 @@ func (c *limitRanges) Patch(ctx context.Context, name string, pt types.PatchType
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied limitRange.
-func (c *limitRanges) Apply(ctx context.Context, limitRange corev1.LimitRangeBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.LimitRange, err error) {
+func (c *limitRanges) Apply(ctx context.Context, limitRange *corev1.LimitRangeApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.LimitRange, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := limitRange.MarshalJSON()
 	if err != nil {

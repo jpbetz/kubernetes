@@ -25,84 +25,84 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// CSINodeBuilder represents an declarative configuration of the CSINode type for use
+// CSINodeApplyConfiguration represents an declarative configuration of the CSINode type for use
 // with apply.
-type CSINodeBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type CSINodeApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   cSINodeFields
 }
 
+// CSINodeApplyConfiguration constructs an declarative configuration of the CSINode type for use with
+// apply.
+func CSINode() *CSINodeApplyConfiguration {
+	return &CSINodeApplyConfiguration{}
+}
+
 // cSINodeFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in CSINodeBuilder.
+// Inline fields are owned by their respective inline type in CSINodeApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type cSINodeFields struct {
-	Kind       *string               `json:"kind,omitempty"`       // inlined CSINodeBuilder.typeMeta.Kind field
-	APIVersion *string               `json:"apiVersion,omitempty"` // inlined CSINodeBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder `json:"metadata,omitempty"`
-	Spec       *CSINodeSpecBuilder   `json:"spec,omitempty"`
-}
-
-// CSINode constructs an declarative configuration of the CSINode type for use with
-// apply.
-func CSINode() *CSINodeBuilder {
-	return &CSINodeBuilder{}
+	Kind       *string                          `json:"kind,omitempty"`       // inlined CSINodeApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                          `json:"apiVersion,omitempty"` // inlined CSINodeApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Spec       *CSINodeSpecApplyConfiguration   `json:"spec,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *CSINodeBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *CSINodeBuilder {
+func (b *CSINodeApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *CSINodeApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *CSINodeBuilder) RemoveTypeMeta() *CSINodeBuilder {
+func (b *CSINodeApplyConfiguration) RemoveTypeMeta() *CSINodeApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *CSINodeBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *CSINodeApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *CSINodeBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *CSINodeBuilder {
+func (b *CSINodeApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *CSINodeApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *CSINodeBuilder) RemoveObjectMeta() *CSINodeBuilder {
+func (b *CSINodeApplyConfiguration) RemoveObjectMeta() *CSINodeApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *CSINodeBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *CSINodeApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *CSINodeBuilder) SetSpec(value *CSINodeSpecBuilder) *CSINodeBuilder {
+func (b *CSINodeApplyConfiguration) SetSpec(value *CSINodeSpecApplyConfiguration) *CSINodeApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *CSINodeBuilder) RemoveSpec() *CSINodeBuilder {
+func (b *CSINodeApplyConfiguration) RemoveSpec() *CSINodeApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *CSINodeBuilder) GetSpec() (value *CSINodeSpecBuilder, ok bool) {
+func (b *CSINodeApplyConfiguration) GetSpec() (value *CSINodeSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
-// ToUnstructured converts CSINodeBuilder to unstructured.
-func (b *CSINodeBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts CSINodeApplyConfiguration to unstructured.
+func (b *CSINodeApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -114,9 +114,9 @@ func (b *CSINodeBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to CSINodeBuilder, replacing the contents
-// of CSINodeBuilder.
-func (b *CSINodeBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to CSINodeApplyConfiguration, replacing the contents
+// of CSINodeApplyConfiguration.
+func (b *CSINodeApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &cSINodeFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -127,15 +127,15 @@ func (b *CSINodeBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals CSINodeBuilder to JSON.
-func (b *CSINodeBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals CSINodeApplyConfiguration to JSON.
+func (b *CSINodeApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into CSINodeBuilder, replacing the contents of
-// CSINodeBuilder.
-func (b *CSINodeBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into CSINodeApplyConfiguration, replacing the contents of
+// CSINodeApplyConfiguration.
+func (b *CSINodeApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -143,13 +143,13 @@ func (b *CSINodeBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// CSINodeList represents a list of CSINodeBuilder.
-type CSINodeList []*CSINodeBuilder
+// CSINodeList represents a listAlias of CSINodeApplyConfiguration.
+type CSINodeList []*CSINodeApplyConfiguration
 
-// CSINodeList represents a map of CSINodeBuilder.
-type CSINodeMap map[string]CSINodeBuilder
+// CSINodeList represents a map of CSINodeApplyConfiguration.
+type CSINodeMap map[string]CSINodeApplyConfiguration
 
-func (b *CSINodeBuilder) preMarshal() {
+func (b *CSINodeApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -159,9 +159,9 @@ func (b *CSINodeBuilder) preMarshal() {
 		}
 	}
 }
-func (b *CSINodeBuilder) postUnmarshal() {
+func (b *CSINodeApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// AWSElasticBlockStoreVolumeSourceBuilder represents an declarative configuration of the AWSElasticBlockStoreVolumeSource type for use
+// AWSElasticBlockStoreVolumeSourceApplyConfiguration represents an declarative configuration of the AWSElasticBlockStoreVolumeSource type for use
 // with apply.
-type AWSElasticBlockStoreVolumeSourceBuilder struct {
+type AWSElasticBlockStoreVolumeSourceApplyConfiguration struct {
 	fields aWSElasticBlockStoreVolumeSourceFields
 }
 
+// AWSElasticBlockStoreVolumeSourceApplyConfiguration constructs an declarative configuration of the AWSElasticBlockStoreVolumeSource type for use with
+// apply.
+func AWSElasticBlockStoreVolumeSource() *AWSElasticBlockStoreVolumeSourceApplyConfiguration {
+	return &AWSElasticBlockStoreVolumeSourceApplyConfiguration{}
+}
+
 // aWSElasticBlockStoreVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in AWSElasticBlockStoreVolumeSourceBuilder.
+// Inline fields are owned by their respective inline type in AWSElasticBlockStoreVolumeSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -42,26 +48,20 @@ type aWSElasticBlockStoreVolumeSourceFields struct {
 	ReadOnly  *bool   `json:"readOnly,omitempty"`
 }
 
-// AWSElasticBlockStoreVolumeSource constructs an declarative configuration of the AWSElasticBlockStoreVolumeSource type for use with
-// apply.
-func AWSElasticBlockStoreVolumeSource() *AWSElasticBlockStoreVolumeSourceBuilder {
-	return &AWSElasticBlockStoreVolumeSourceBuilder{}
-}
-
 // SetVolumeID sets the VolumeID field in the declarative configuration to the given value.
-func (b *AWSElasticBlockStoreVolumeSourceBuilder) SetVolumeID(value string) *AWSElasticBlockStoreVolumeSourceBuilder {
+func (b *AWSElasticBlockStoreVolumeSourceApplyConfiguration) SetVolumeID(value string) *AWSElasticBlockStoreVolumeSourceApplyConfiguration {
 	b.fields.VolumeID = &value
 	return b
 }
 
 // RemoveVolumeID removes the VolumeID field from the declarative configuration.
-func (b *AWSElasticBlockStoreVolumeSourceBuilder) RemoveVolumeID() *AWSElasticBlockStoreVolumeSourceBuilder {
+func (b *AWSElasticBlockStoreVolumeSourceApplyConfiguration) RemoveVolumeID() *AWSElasticBlockStoreVolumeSourceApplyConfiguration {
 	b.fields.VolumeID = nil
 	return b
 }
 
 // GetVolumeID gets the VolumeID field from the declarative configuration.
-func (b *AWSElasticBlockStoreVolumeSourceBuilder) GetVolumeID() (value string, ok bool) {
+func (b *AWSElasticBlockStoreVolumeSourceApplyConfiguration) GetVolumeID() (value string, ok bool) {
 	if v := b.fields.VolumeID; v != nil {
 		return *v, true
 	}
@@ -69,19 +69,19 @@ func (b *AWSElasticBlockStoreVolumeSourceBuilder) GetVolumeID() (value string, o
 }
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
-func (b *AWSElasticBlockStoreVolumeSourceBuilder) SetFSType(value string) *AWSElasticBlockStoreVolumeSourceBuilder {
+func (b *AWSElasticBlockStoreVolumeSourceApplyConfiguration) SetFSType(value string) *AWSElasticBlockStoreVolumeSourceApplyConfiguration {
 	b.fields.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
-func (b *AWSElasticBlockStoreVolumeSourceBuilder) RemoveFSType() *AWSElasticBlockStoreVolumeSourceBuilder {
+func (b *AWSElasticBlockStoreVolumeSourceApplyConfiguration) RemoveFSType() *AWSElasticBlockStoreVolumeSourceApplyConfiguration {
 	b.fields.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
-func (b *AWSElasticBlockStoreVolumeSourceBuilder) GetFSType() (value string, ok bool) {
+func (b *AWSElasticBlockStoreVolumeSourceApplyConfiguration) GetFSType() (value string, ok bool) {
 	if v := b.fields.FSType; v != nil {
 		return *v, true
 	}
@@ -89,19 +89,19 @@ func (b *AWSElasticBlockStoreVolumeSourceBuilder) GetFSType() (value string, ok 
 }
 
 // SetPartition sets the Partition field in the declarative configuration to the given value.
-func (b *AWSElasticBlockStoreVolumeSourceBuilder) SetPartition(value int32) *AWSElasticBlockStoreVolumeSourceBuilder {
+func (b *AWSElasticBlockStoreVolumeSourceApplyConfiguration) SetPartition(value int32) *AWSElasticBlockStoreVolumeSourceApplyConfiguration {
 	b.fields.Partition = &value
 	return b
 }
 
 // RemovePartition removes the Partition field from the declarative configuration.
-func (b *AWSElasticBlockStoreVolumeSourceBuilder) RemovePartition() *AWSElasticBlockStoreVolumeSourceBuilder {
+func (b *AWSElasticBlockStoreVolumeSourceApplyConfiguration) RemovePartition() *AWSElasticBlockStoreVolumeSourceApplyConfiguration {
 	b.fields.Partition = nil
 	return b
 }
 
 // GetPartition gets the Partition field from the declarative configuration.
-func (b *AWSElasticBlockStoreVolumeSourceBuilder) GetPartition() (value int32, ok bool) {
+func (b *AWSElasticBlockStoreVolumeSourceApplyConfiguration) GetPartition() (value int32, ok bool) {
 	if v := b.fields.Partition; v != nil {
 		return *v, true
 	}
@@ -109,27 +109,27 @@ func (b *AWSElasticBlockStoreVolumeSourceBuilder) GetPartition() (value int32, o
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b *AWSElasticBlockStoreVolumeSourceBuilder) SetReadOnly(value bool) *AWSElasticBlockStoreVolumeSourceBuilder {
+func (b *AWSElasticBlockStoreVolumeSourceApplyConfiguration) SetReadOnly(value bool) *AWSElasticBlockStoreVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b *AWSElasticBlockStoreVolumeSourceBuilder) RemoveReadOnly() *AWSElasticBlockStoreVolumeSourceBuilder {
+func (b *AWSElasticBlockStoreVolumeSourceApplyConfiguration) RemoveReadOnly() *AWSElasticBlockStoreVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b *AWSElasticBlockStoreVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
+func (b *AWSElasticBlockStoreVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts AWSElasticBlockStoreVolumeSourceBuilder to unstructured.
-func (b *AWSElasticBlockStoreVolumeSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts AWSElasticBlockStoreVolumeSourceApplyConfiguration to unstructured.
+func (b *AWSElasticBlockStoreVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -141,9 +141,9 @@ func (b *AWSElasticBlockStoreVolumeSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to AWSElasticBlockStoreVolumeSourceBuilder, replacing the contents
-// of AWSElasticBlockStoreVolumeSourceBuilder.
-func (b *AWSElasticBlockStoreVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to AWSElasticBlockStoreVolumeSourceApplyConfiguration, replacing the contents
+// of AWSElasticBlockStoreVolumeSourceApplyConfiguration.
+func (b *AWSElasticBlockStoreVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &aWSElasticBlockStoreVolumeSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -154,15 +154,15 @@ func (b *AWSElasticBlockStoreVolumeSourceBuilder) FromUnstructured(u map[string]
 	return nil
 }
 
-// MarshalJSON marshals AWSElasticBlockStoreVolumeSourceBuilder to JSON.
-func (b *AWSElasticBlockStoreVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals AWSElasticBlockStoreVolumeSourceApplyConfiguration to JSON.
+func (b *AWSElasticBlockStoreVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into AWSElasticBlockStoreVolumeSourceBuilder, replacing the contents of
-// AWSElasticBlockStoreVolumeSourceBuilder.
-func (b *AWSElasticBlockStoreVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into AWSElasticBlockStoreVolumeSourceApplyConfiguration, replacing the contents of
+// AWSElasticBlockStoreVolumeSourceApplyConfiguration.
+func (b *AWSElasticBlockStoreVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -170,13 +170,13 @@ func (b *AWSElasticBlockStoreVolumeSourceBuilder) UnmarshalJSON(data []byte) err
 	return nil
 }
 
-// AWSElasticBlockStoreVolumeSourceList represents a list of AWSElasticBlockStoreVolumeSourceBuilder.
-type AWSElasticBlockStoreVolumeSourceList []*AWSElasticBlockStoreVolumeSourceBuilder
+// AWSElasticBlockStoreVolumeSourceList represents a listAlias of AWSElasticBlockStoreVolumeSourceApplyConfiguration.
+type AWSElasticBlockStoreVolumeSourceList []*AWSElasticBlockStoreVolumeSourceApplyConfiguration
 
-// AWSElasticBlockStoreVolumeSourceList represents a map of AWSElasticBlockStoreVolumeSourceBuilder.
-type AWSElasticBlockStoreVolumeSourceMap map[string]AWSElasticBlockStoreVolumeSourceBuilder
+// AWSElasticBlockStoreVolumeSourceList represents a map of AWSElasticBlockStoreVolumeSourceApplyConfiguration.
+type AWSElasticBlockStoreVolumeSourceMap map[string]AWSElasticBlockStoreVolumeSourceApplyConfiguration
 
-func (b *AWSElasticBlockStoreVolumeSourceBuilder) preMarshal() {
+func (b *AWSElasticBlockStoreVolumeSourceApplyConfiguration) preMarshal() {
 }
-func (b *AWSElasticBlockStoreVolumeSourceBuilder) postUnmarshal() {
+func (b *AWSElasticBlockStoreVolumeSourceApplyConfiguration) postUnmarshal() {
 }

@@ -48,7 +48,7 @@ type PodSecurityPolicyInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1beta1.PodSecurityPolicyList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.PodSecurityPolicy, err error)
-	Apply(ctx context.Context, podSecurityPolicy policyv1beta1.PodSecurityPolicyBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PodSecurityPolicy, err error)
+	Apply(ctx context.Context, podSecurityPolicy *policyv1beta1.PodSecurityPolicyApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PodSecurityPolicy, err error)
 	PodSecurityPolicyExpansion
 }
 
@@ -171,7 +171,7 @@ func (c *podSecurityPolicies) Patch(ctx context.Context, name string, pt types.P
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied podSecurityPolicy.
-func (c *podSecurityPolicies) Apply(ctx context.Context, podSecurityPolicy policyv1beta1.PodSecurityPolicyBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PodSecurityPolicy, err error) {
+func (c *podSecurityPolicies) Apply(ctx context.Context, podSecurityPolicy *policyv1beta1.PodSecurityPolicyApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PodSecurityPolicy, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := podSecurityPolicy.MarshalJSON()
 	if err != nil {

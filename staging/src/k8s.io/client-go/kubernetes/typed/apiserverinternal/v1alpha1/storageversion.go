@@ -49,7 +49,7 @@ type StorageVersionInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.StorageVersionList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.StorageVersion, err error)
-	Apply(ctx context.Context, storageVersion apiserverinternalv1alpha1.StorageVersionBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.StorageVersion, err error)
+	Apply(ctx context.Context, storageVersion *apiserverinternalv1alpha1.StorageVersionApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.StorageVersion, err error)
 	StorageVersionExpansion
 }
 
@@ -187,7 +187,7 @@ func (c *storageVersions) Patch(ctx context.Context, name string, pt types.Patch
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied storageVersion.
-func (c *storageVersions) Apply(ctx context.Context, storageVersion apiserverinternalv1alpha1.StorageVersionBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.StorageVersion, err error) {
+func (c *storageVersions) Apply(ctx context.Context, storageVersion *apiserverinternalv1alpha1.StorageVersionApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.StorageVersion, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := storageVersion.MarshalJSON()
 	if err != nil {

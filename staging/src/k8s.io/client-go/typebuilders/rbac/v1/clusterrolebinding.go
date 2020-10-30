@@ -25,80 +25,80 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// ClusterRoleBindingBuilder represents an declarative configuration of the ClusterRoleBinding type for use
+// ClusterRoleBindingApplyConfiguration represents an declarative configuration of the ClusterRoleBinding type for use
 // with apply.
-type ClusterRoleBindingBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type ClusterRoleBindingApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   clusterRoleBindingFields
 }
 
+// ClusterRoleBindingApplyConfiguration constructs an declarative configuration of the ClusterRoleBinding type for use with
+// apply.
+func ClusterRoleBinding() *ClusterRoleBindingApplyConfiguration {
+	return &ClusterRoleBindingApplyConfiguration{}
+}
+
 // clusterRoleBindingFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ClusterRoleBindingBuilder.
+// Inline fields are owned by their respective inline type in ClusterRoleBindingApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type clusterRoleBindingFields struct {
-	Kind       *string               `json:"kind,omitempty"`       // inlined ClusterRoleBindingBuilder.typeMeta.Kind field
-	APIVersion *string               `json:"apiVersion,omitempty"` // inlined ClusterRoleBindingBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder `json:"metadata,omitempty"`
-	Subjects   *SubjectList          `json:"subjects,omitempty"`
-	RoleRef    *RoleRefBuilder       `json:"roleRef,omitempty"`
-}
-
-// ClusterRoleBinding constructs an declarative configuration of the ClusterRoleBinding type for use with
-// apply.
-func ClusterRoleBinding() *ClusterRoleBindingBuilder {
-	return &ClusterRoleBindingBuilder{}
+	Kind       *string                          `json:"kind,omitempty"`       // inlined ClusterRoleBindingApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                          `json:"apiVersion,omitempty"` // inlined ClusterRoleBindingApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Subjects   *SubjectList                     `json:"subjects,omitempty"`
+	RoleRef    *RoleRefApplyConfiguration       `json:"roleRef,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *ClusterRoleBindingBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *ClusterRoleBindingBuilder {
+func (b *ClusterRoleBindingApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *ClusterRoleBindingApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *ClusterRoleBindingBuilder) RemoveTypeMeta() *ClusterRoleBindingBuilder {
+func (b *ClusterRoleBindingApplyConfiguration) RemoveTypeMeta() *ClusterRoleBindingApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *ClusterRoleBindingBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *ClusterRoleBindingApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *ClusterRoleBindingBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *ClusterRoleBindingBuilder {
+func (b *ClusterRoleBindingApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *ClusterRoleBindingApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *ClusterRoleBindingBuilder) RemoveObjectMeta() *ClusterRoleBindingBuilder {
+func (b *ClusterRoleBindingApplyConfiguration) RemoveObjectMeta() *ClusterRoleBindingApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *ClusterRoleBindingBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *ClusterRoleBindingApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSubjects sets the Subjects field in the declarative configuration to the given value.
-func (b *ClusterRoleBindingBuilder) SetSubjects(value SubjectList) *ClusterRoleBindingBuilder {
+func (b *ClusterRoleBindingApplyConfiguration) SetSubjects(value SubjectList) *ClusterRoleBindingApplyConfiguration {
 	b.fields.Subjects = &value
 	return b
 }
 
 // RemoveSubjects removes the Subjects field from the declarative configuration.
-func (b *ClusterRoleBindingBuilder) RemoveSubjects() *ClusterRoleBindingBuilder {
+func (b *ClusterRoleBindingApplyConfiguration) RemoveSubjects() *ClusterRoleBindingApplyConfiguration {
 	b.fields.Subjects = nil
 	return b
 }
 
 // GetSubjects gets the Subjects field from the declarative configuration.
-func (b *ClusterRoleBindingBuilder) GetSubjects() (value SubjectList, ok bool) {
+func (b *ClusterRoleBindingApplyConfiguration) GetSubjects() (value SubjectList, ok bool) {
 	if v := b.fields.Subjects; v != nil {
 		return *v, true
 	}
@@ -106,24 +106,24 @@ func (b *ClusterRoleBindingBuilder) GetSubjects() (value SubjectList, ok bool) {
 }
 
 // SetRoleRef sets the RoleRef field in the declarative configuration to the given value.
-func (b *ClusterRoleBindingBuilder) SetRoleRef(value *RoleRefBuilder) *ClusterRoleBindingBuilder {
+func (b *ClusterRoleBindingApplyConfiguration) SetRoleRef(value *RoleRefApplyConfiguration) *ClusterRoleBindingApplyConfiguration {
 	b.fields.RoleRef = value
 	return b
 }
 
 // RemoveRoleRef removes the RoleRef field from the declarative configuration.
-func (b *ClusterRoleBindingBuilder) RemoveRoleRef() *ClusterRoleBindingBuilder {
+func (b *ClusterRoleBindingApplyConfiguration) RemoveRoleRef() *ClusterRoleBindingApplyConfiguration {
 	b.fields.RoleRef = nil
 	return b
 }
 
 // GetRoleRef gets the RoleRef field from the declarative configuration.
-func (b *ClusterRoleBindingBuilder) GetRoleRef() (value *RoleRefBuilder, ok bool) {
+func (b *ClusterRoleBindingApplyConfiguration) GetRoleRef() (value *RoleRefApplyConfiguration, ok bool) {
 	return b.fields.RoleRef, b.fields.RoleRef != nil
 }
 
-// ToUnstructured converts ClusterRoleBindingBuilder to unstructured.
-func (b *ClusterRoleBindingBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ClusterRoleBindingApplyConfiguration to unstructured.
+func (b *ClusterRoleBindingApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -135,9 +135,9 @@ func (b *ClusterRoleBindingBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ClusterRoleBindingBuilder, replacing the contents
-// of ClusterRoleBindingBuilder.
-func (b *ClusterRoleBindingBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ClusterRoleBindingApplyConfiguration, replacing the contents
+// of ClusterRoleBindingApplyConfiguration.
+func (b *ClusterRoleBindingApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &clusterRoleBindingFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -148,15 +148,15 @@ func (b *ClusterRoleBindingBuilder) FromUnstructured(u map[string]interface{}) e
 	return nil
 }
 
-// MarshalJSON marshals ClusterRoleBindingBuilder to JSON.
-func (b *ClusterRoleBindingBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ClusterRoleBindingApplyConfiguration to JSON.
+func (b *ClusterRoleBindingApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ClusterRoleBindingBuilder, replacing the contents of
-// ClusterRoleBindingBuilder.
-func (b *ClusterRoleBindingBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ClusterRoleBindingApplyConfiguration, replacing the contents of
+// ClusterRoleBindingApplyConfiguration.
+func (b *ClusterRoleBindingApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -164,13 +164,13 @@ func (b *ClusterRoleBindingBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ClusterRoleBindingList represents a list of ClusterRoleBindingBuilder.
-type ClusterRoleBindingList []*ClusterRoleBindingBuilder
+// ClusterRoleBindingList represents a listAlias of ClusterRoleBindingApplyConfiguration.
+type ClusterRoleBindingList []*ClusterRoleBindingApplyConfiguration
 
-// ClusterRoleBindingList represents a map of ClusterRoleBindingBuilder.
-type ClusterRoleBindingMap map[string]ClusterRoleBindingBuilder
+// ClusterRoleBindingList represents a map of ClusterRoleBindingApplyConfiguration.
+type ClusterRoleBindingMap map[string]ClusterRoleBindingApplyConfiguration
 
-func (b *ClusterRoleBindingBuilder) preMarshal() {
+func (b *ClusterRoleBindingApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -180,9 +180,9 @@ func (b *ClusterRoleBindingBuilder) preMarshal() {
 		}
 	}
 }
-func (b *ClusterRoleBindingBuilder) postUnmarshal() {
+func (b *ClusterRoleBindingApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

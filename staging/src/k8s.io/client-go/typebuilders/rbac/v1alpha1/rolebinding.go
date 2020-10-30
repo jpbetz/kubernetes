@@ -25,80 +25,80 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// RoleBindingBuilder represents an declarative configuration of the RoleBinding type for use
+// RoleBindingApplyConfiguration represents an declarative configuration of the RoleBinding type for use
 // with apply.
-type RoleBindingBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type RoleBindingApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   roleBindingFields
 }
 
+// RoleBindingApplyConfiguration constructs an declarative configuration of the RoleBinding type for use with
+// apply.
+func RoleBinding() *RoleBindingApplyConfiguration {
+	return &RoleBindingApplyConfiguration{}
+}
+
 // roleBindingFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in RoleBindingBuilder.
+// Inline fields are owned by their respective inline type in RoleBindingApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type roleBindingFields struct {
-	Kind       *string               `json:"kind,omitempty"`       // inlined RoleBindingBuilder.typeMeta.Kind field
-	APIVersion *string               `json:"apiVersion,omitempty"` // inlined RoleBindingBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder `json:"metadata,omitempty"`
-	Subjects   *SubjectList          `json:"subjects,omitempty"`
-	RoleRef    *RoleRefBuilder       `json:"roleRef,omitempty"`
-}
-
-// RoleBinding constructs an declarative configuration of the RoleBinding type for use with
-// apply.
-func RoleBinding() *RoleBindingBuilder {
-	return &RoleBindingBuilder{}
+	Kind       *string                          `json:"kind,omitempty"`       // inlined RoleBindingApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                          `json:"apiVersion,omitempty"` // inlined RoleBindingApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Subjects   *SubjectList                     `json:"subjects,omitempty"`
+	RoleRef    *RoleRefApplyConfiguration       `json:"roleRef,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *RoleBindingBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *RoleBindingBuilder {
+func (b *RoleBindingApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *RoleBindingApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *RoleBindingBuilder) RemoveTypeMeta() *RoleBindingBuilder {
+func (b *RoleBindingApplyConfiguration) RemoveTypeMeta() *RoleBindingApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *RoleBindingBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *RoleBindingApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *RoleBindingBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *RoleBindingBuilder {
+func (b *RoleBindingApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *RoleBindingApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *RoleBindingBuilder) RemoveObjectMeta() *RoleBindingBuilder {
+func (b *RoleBindingApplyConfiguration) RemoveObjectMeta() *RoleBindingApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *RoleBindingBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *RoleBindingApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSubjects sets the Subjects field in the declarative configuration to the given value.
-func (b *RoleBindingBuilder) SetSubjects(value SubjectList) *RoleBindingBuilder {
+func (b *RoleBindingApplyConfiguration) SetSubjects(value SubjectList) *RoleBindingApplyConfiguration {
 	b.fields.Subjects = &value
 	return b
 }
 
 // RemoveSubjects removes the Subjects field from the declarative configuration.
-func (b *RoleBindingBuilder) RemoveSubjects() *RoleBindingBuilder {
+func (b *RoleBindingApplyConfiguration) RemoveSubjects() *RoleBindingApplyConfiguration {
 	b.fields.Subjects = nil
 	return b
 }
 
 // GetSubjects gets the Subjects field from the declarative configuration.
-func (b *RoleBindingBuilder) GetSubjects() (value SubjectList, ok bool) {
+func (b *RoleBindingApplyConfiguration) GetSubjects() (value SubjectList, ok bool) {
 	if v := b.fields.Subjects; v != nil {
 		return *v, true
 	}
@@ -106,24 +106,24 @@ func (b *RoleBindingBuilder) GetSubjects() (value SubjectList, ok bool) {
 }
 
 // SetRoleRef sets the RoleRef field in the declarative configuration to the given value.
-func (b *RoleBindingBuilder) SetRoleRef(value *RoleRefBuilder) *RoleBindingBuilder {
+func (b *RoleBindingApplyConfiguration) SetRoleRef(value *RoleRefApplyConfiguration) *RoleBindingApplyConfiguration {
 	b.fields.RoleRef = value
 	return b
 }
 
 // RemoveRoleRef removes the RoleRef field from the declarative configuration.
-func (b *RoleBindingBuilder) RemoveRoleRef() *RoleBindingBuilder {
+func (b *RoleBindingApplyConfiguration) RemoveRoleRef() *RoleBindingApplyConfiguration {
 	b.fields.RoleRef = nil
 	return b
 }
 
 // GetRoleRef gets the RoleRef field from the declarative configuration.
-func (b *RoleBindingBuilder) GetRoleRef() (value *RoleRefBuilder, ok bool) {
+func (b *RoleBindingApplyConfiguration) GetRoleRef() (value *RoleRefApplyConfiguration, ok bool) {
 	return b.fields.RoleRef, b.fields.RoleRef != nil
 }
 
-// ToUnstructured converts RoleBindingBuilder to unstructured.
-func (b *RoleBindingBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts RoleBindingApplyConfiguration to unstructured.
+func (b *RoleBindingApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -135,9 +135,9 @@ func (b *RoleBindingBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to RoleBindingBuilder, replacing the contents
-// of RoleBindingBuilder.
-func (b *RoleBindingBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to RoleBindingApplyConfiguration, replacing the contents
+// of RoleBindingApplyConfiguration.
+func (b *RoleBindingApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &roleBindingFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -148,15 +148,15 @@ func (b *RoleBindingBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals RoleBindingBuilder to JSON.
-func (b *RoleBindingBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals RoleBindingApplyConfiguration to JSON.
+func (b *RoleBindingApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into RoleBindingBuilder, replacing the contents of
-// RoleBindingBuilder.
-func (b *RoleBindingBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into RoleBindingApplyConfiguration, replacing the contents of
+// RoleBindingApplyConfiguration.
+func (b *RoleBindingApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -164,13 +164,13 @@ func (b *RoleBindingBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// RoleBindingList represents a list of RoleBindingBuilder.
-type RoleBindingList []*RoleBindingBuilder
+// RoleBindingList represents a listAlias of RoleBindingApplyConfiguration.
+type RoleBindingList []*RoleBindingApplyConfiguration
 
-// RoleBindingList represents a map of RoleBindingBuilder.
-type RoleBindingMap map[string]RoleBindingBuilder
+// RoleBindingList represents a map of RoleBindingApplyConfiguration.
+type RoleBindingMap map[string]RoleBindingApplyConfiguration
 
-func (b *RoleBindingBuilder) preMarshal() {
+func (b *RoleBindingApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -180,9 +180,9 @@ func (b *RoleBindingBuilder) preMarshal() {
 		}
 	}
 }
-func (b *RoleBindingBuilder) postUnmarshal() {
+func (b *RoleBindingApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

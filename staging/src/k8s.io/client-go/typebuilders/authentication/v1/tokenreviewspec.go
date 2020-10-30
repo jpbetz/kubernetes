@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// TokenReviewSpecBuilder represents an declarative configuration of the TokenReviewSpec type for use
+// TokenReviewSpecApplyConfiguration represents an declarative configuration of the TokenReviewSpec type for use
 // with apply.
-type TokenReviewSpecBuilder struct {
+type TokenReviewSpecApplyConfiguration struct {
 	fields tokenReviewSpecFields
 }
 
+// TokenReviewSpecApplyConfiguration constructs an declarative configuration of the TokenReviewSpec type for use with
+// apply.
+func TokenReviewSpec() *TokenReviewSpecApplyConfiguration {
+	return &TokenReviewSpecApplyConfiguration{}
+}
+
 // tokenReviewSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in TokenReviewSpecBuilder.
+// Inline fields are owned by their respective inline type in TokenReviewSpecApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type tokenReviewSpecFields struct {
 	Audiences *[]string `json:"audiences,omitempty"`
 }
 
-// TokenReviewSpec constructs an declarative configuration of the TokenReviewSpec type for use with
-// apply.
-func TokenReviewSpec() *TokenReviewSpecBuilder {
-	return &TokenReviewSpecBuilder{}
-}
-
 // SetToken sets the Token field in the declarative configuration to the given value.
-func (b *TokenReviewSpecBuilder) SetToken(value string) *TokenReviewSpecBuilder {
+func (b *TokenReviewSpecApplyConfiguration) SetToken(value string) *TokenReviewSpecApplyConfiguration {
 	b.fields.Token = &value
 	return b
 }
 
 // RemoveToken removes the Token field from the declarative configuration.
-func (b *TokenReviewSpecBuilder) RemoveToken() *TokenReviewSpecBuilder {
+func (b *TokenReviewSpecApplyConfiguration) RemoveToken() *TokenReviewSpecApplyConfiguration {
 	b.fields.Token = nil
 	return b
 }
 
 // GetToken gets the Token field from the declarative configuration.
-func (b *TokenReviewSpecBuilder) GetToken() (value string, ok bool) {
+func (b *TokenReviewSpecApplyConfiguration) GetToken() (value string, ok bool) {
 	if v := b.fields.Token; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *TokenReviewSpecBuilder) GetToken() (value string, ok bool) {
 }
 
 // SetAudiences sets the Audiences field in the declarative configuration to the given value.
-func (b *TokenReviewSpecBuilder) SetAudiences(value []string) *TokenReviewSpecBuilder {
+func (b *TokenReviewSpecApplyConfiguration) SetAudiences(value []string) *TokenReviewSpecApplyConfiguration {
 	b.fields.Audiences = &value
 	return b
 }
 
 // RemoveAudiences removes the Audiences field from the declarative configuration.
-func (b *TokenReviewSpecBuilder) RemoveAudiences() *TokenReviewSpecBuilder {
+func (b *TokenReviewSpecApplyConfiguration) RemoveAudiences() *TokenReviewSpecApplyConfiguration {
 	b.fields.Audiences = nil
 	return b
 }
 
 // GetAudiences gets the Audiences field from the declarative configuration.
-func (b *TokenReviewSpecBuilder) GetAudiences() (value []string, ok bool) {
+func (b *TokenReviewSpecApplyConfiguration) GetAudiences() (value []string, ok bool) {
 	if v := b.fields.Audiences; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts TokenReviewSpecBuilder to unstructured.
-func (b *TokenReviewSpecBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts TokenReviewSpecApplyConfiguration to unstructured.
+func (b *TokenReviewSpecApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *TokenReviewSpecBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to TokenReviewSpecBuilder, replacing the contents
-// of TokenReviewSpecBuilder.
-func (b *TokenReviewSpecBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to TokenReviewSpecApplyConfiguration, replacing the contents
+// of TokenReviewSpecApplyConfiguration.
+func (b *TokenReviewSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &tokenReviewSpecFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *TokenReviewSpecBuilder) FromUnstructured(u map[string]interface{}) erro
 	return nil
 }
 
-// MarshalJSON marshals TokenReviewSpecBuilder to JSON.
-func (b *TokenReviewSpecBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals TokenReviewSpecApplyConfiguration to JSON.
+func (b *TokenReviewSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into TokenReviewSpecBuilder, replacing the contents of
-// TokenReviewSpecBuilder.
-func (b *TokenReviewSpecBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into TokenReviewSpecApplyConfiguration, replacing the contents of
+// TokenReviewSpecApplyConfiguration.
+func (b *TokenReviewSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *TokenReviewSpecBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// TokenReviewSpecList represents a list of TokenReviewSpecBuilder.
-type TokenReviewSpecList []*TokenReviewSpecBuilder
+// TokenReviewSpecList represents a listAlias of TokenReviewSpecApplyConfiguration.
+type TokenReviewSpecList []*TokenReviewSpecApplyConfiguration
 
-// TokenReviewSpecList represents a map of TokenReviewSpecBuilder.
-type TokenReviewSpecMap map[string]TokenReviewSpecBuilder
+// TokenReviewSpecList represents a map of TokenReviewSpecApplyConfiguration.
+type TokenReviewSpecMap map[string]TokenReviewSpecApplyConfiguration
 
-func (b *TokenReviewSpecBuilder) preMarshal() {
+func (b *TokenReviewSpecApplyConfiguration) preMarshal() {
 }
-func (b *TokenReviewSpecBuilder) postUnmarshal() {
+func (b *TokenReviewSpecApplyConfiguration) postUnmarshal() {
 }

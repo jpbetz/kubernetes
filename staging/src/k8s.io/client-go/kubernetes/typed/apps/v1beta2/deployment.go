@@ -49,7 +49,7 @@ type DeploymentInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1beta2.DeploymentList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta2.Deployment, err error)
-	Apply(ctx context.Context, deployment appsv1beta2.DeploymentBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta2.Deployment, err error)
+	Apply(ctx context.Context, deployment *appsv1beta2.DeploymentApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta2.Deployment, err error)
 	DeploymentExpansion
 }
 
@@ -198,7 +198,7 @@ func (c *deployments) Patch(ctx context.Context, name string, pt types.PatchType
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied deployment.
-func (c *deployments) Apply(ctx context.Context, deployment appsv1beta2.DeploymentBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta2.Deployment, err error) {
+func (c *deployments) Apply(ctx context.Context, deployment *appsv1beta2.DeploymentApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta2.Deployment, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := deployment.MarshalJSON()
 	if err != nil {

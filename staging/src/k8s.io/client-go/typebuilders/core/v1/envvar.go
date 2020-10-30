@@ -24,43 +24,43 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// EnvVarBuilder represents an declarative configuration of the EnvVar type for use
+// EnvVarApplyConfiguration represents an declarative configuration of the EnvVar type for use
 // with apply.
-type EnvVarBuilder struct {
+type EnvVarApplyConfiguration struct {
 	fields envVarFields
 }
 
+// EnvVarApplyConfiguration constructs an declarative configuration of the EnvVar type for use with
+// apply.
+func EnvVar() *EnvVarApplyConfiguration {
+	return &EnvVarApplyConfiguration{}
+}
+
 // envVarFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in EnvVarBuilder.
+// Inline fields are owned by their respective inline type in EnvVarApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type envVarFields struct {
-	Name      *string              `json:"name,omitempty"`
-	Value     *string              `json:"value,omitempty"`
-	ValueFrom *EnvVarSourceBuilder `json:"valueFrom,omitempty"`
-}
-
-// EnvVar constructs an declarative configuration of the EnvVar type for use with
-// apply.
-func EnvVar() *EnvVarBuilder {
-	return &EnvVarBuilder{}
+	Name      *string                         `json:"name,omitempty"`
+	Value     *string                         `json:"value,omitempty"`
+	ValueFrom *EnvVarSourceApplyConfiguration `json:"valueFrom,omitempty"`
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *EnvVarBuilder) SetName(value string) *EnvVarBuilder {
+func (b *EnvVarApplyConfiguration) SetName(value string) *EnvVarApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *EnvVarBuilder) RemoveName() *EnvVarBuilder {
+func (b *EnvVarApplyConfiguration) RemoveName() *EnvVarApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *EnvVarBuilder) GetName() (value string, ok bool) {
+func (b *EnvVarApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -68,19 +68,19 @@ func (b *EnvVarBuilder) GetName() (value string, ok bool) {
 }
 
 // SetValue sets the Value field in the declarative configuration to the given value.
-func (b *EnvVarBuilder) SetValue(value string) *EnvVarBuilder {
+func (b *EnvVarApplyConfiguration) SetValue(value string) *EnvVarApplyConfiguration {
 	b.fields.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
-func (b *EnvVarBuilder) RemoveValue() *EnvVarBuilder {
+func (b *EnvVarApplyConfiguration) RemoveValue() *EnvVarApplyConfiguration {
 	b.fields.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
-func (b *EnvVarBuilder) GetValue() (value string, ok bool) {
+func (b *EnvVarApplyConfiguration) GetValue() (value string, ok bool) {
 	if v := b.fields.Value; v != nil {
 		return *v, true
 	}
@@ -88,24 +88,24 @@ func (b *EnvVarBuilder) GetValue() (value string, ok bool) {
 }
 
 // SetValueFrom sets the ValueFrom field in the declarative configuration to the given value.
-func (b *EnvVarBuilder) SetValueFrom(value *EnvVarSourceBuilder) *EnvVarBuilder {
+func (b *EnvVarApplyConfiguration) SetValueFrom(value *EnvVarSourceApplyConfiguration) *EnvVarApplyConfiguration {
 	b.fields.ValueFrom = value
 	return b
 }
 
 // RemoveValueFrom removes the ValueFrom field from the declarative configuration.
-func (b *EnvVarBuilder) RemoveValueFrom() *EnvVarBuilder {
+func (b *EnvVarApplyConfiguration) RemoveValueFrom() *EnvVarApplyConfiguration {
 	b.fields.ValueFrom = nil
 	return b
 }
 
 // GetValueFrom gets the ValueFrom field from the declarative configuration.
-func (b *EnvVarBuilder) GetValueFrom() (value *EnvVarSourceBuilder, ok bool) {
+func (b *EnvVarApplyConfiguration) GetValueFrom() (value *EnvVarSourceApplyConfiguration, ok bool) {
 	return b.fields.ValueFrom, b.fields.ValueFrom != nil
 }
 
-// ToUnstructured converts EnvVarBuilder to unstructured.
-func (b *EnvVarBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts EnvVarApplyConfiguration to unstructured.
+func (b *EnvVarApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -117,9 +117,9 @@ func (b *EnvVarBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to EnvVarBuilder, replacing the contents
-// of EnvVarBuilder.
-func (b *EnvVarBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to EnvVarApplyConfiguration, replacing the contents
+// of EnvVarApplyConfiguration.
+func (b *EnvVarApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &envVarFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -130,15 +130,15 @@ func (b *EnvVarBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals EnvVarBuilder to JSON.
-func (b *EnvVarBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals EnvVarApplyConfiguration to JSON.
+func (b *EnvVarApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into EnvVarBuilder, replacing the contents of
-// EnvVarBuilder.
-func (b *EnvVarBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into EnvVarApplyConfiguration, replacing the contents of
+// EnvVarApplyConfiguration.
+func (b *EnvVarApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -146,13 +146,13 @@ func (b *EnvVarBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// EnvVarList represents a list of EnvVarBuilder.
-type EnvVarList []*EnvVarBuilder
+// EnvVarList represents a listAlias of EnvVarApplyConfiguration.
+type EnvVarList []*EnvVarApplyConfiguration
 
-// EnvVarList represents a map of EnvVarBuilder.
-type EnvVarMap map[string]EnvVarBuilder
+// EnvVarList represents a map of EnvVarApplyConfiguration.
+type EnvVarMap map[string]EnvVarApplyConfiguration
 
-func (b *EnvVarBuilder) preMarshal() {
+func (b *EnvVarApplyConfiguration) preMarshal() {
 }
-func (b *EnvVarBuilder) postUnmarshal() {
+func (b *EnvVarApplyConfiguration) postUnmarshal() {
 }

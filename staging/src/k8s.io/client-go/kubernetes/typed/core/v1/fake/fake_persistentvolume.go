@@ -135,7 +135,7 @@ func (c *FakePersistentVolumes) Patch(ctx context.Context, name string, pt types
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied persistentVolume.
-func (c *FakePersistentVolumes) Apply(ctx context.Context, persistentVolume typebuilderscorev1.PersistentVolumeBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.PersistentVolume, err error) {
+func (c *FakePersistentVolumes) Apply(ctx context.Context, persistentVolume *typebuilderscorev1.PersistentVolumeApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.PersistentVolume, err error) {
 	data, err := persistentVolume.MarshalJSON()
 	if err != nil {
 		return nil, err

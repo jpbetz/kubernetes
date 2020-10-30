@@ -24,61 +24,61 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// SecretProjectionBuilder represents an declarative configuration of the SecretProjection type for use
+// SecretProjectionApplyConfiguration represents an declarative configuration of the SecretProjection type for use
 // with apply.
-type SecretProjectionBuilder struct {
-	localObjectReference *LocalObjectReferenceBuilder // inlined type
+type SecretProjectionApplyConfiguration struct {
+	localObjectReference *LocalObjectReferenceApplyConfiguration // inlined type
 	fields               secretProjectionFields
 }
 
+// SecretProjectionApplyConfiguration constructs an declarative configuration of the SecretProjection type for use with
+// apply.
+func SecretProjection() *SecretProjectionApplyConfiguration {
+	return &SecretProjectionApplyConfiguration{}
+}
+
 // secretProjectionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SecretProjectionBuilder.
+// Inline fields are owned by their respective inline type in SecretProjectionApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type secretProjectionFields struct {
-	Name     *string        `json:"name,omitempty"` // inlined SecretProjectionBuilder.localObjectReference.Name field
+	Name     *string        `json:"name,omitempty"` // inlined SecretProjectionApplyConfiguration.localObjectReference.Name field
 	Items    *KeyToPathList `json:"items,omitempty"`
 	Optional *bool          `json:"optional,omitempty"`
 }
 
-// SecretProjection constructs an declarative configuration of the SecretProjection type for use with
-// apply.
-func SecretProjection() *SecretProjectionBuilder {
-	return &SecretProjectionBuilder{}
-}
-
 // SetLocalObjectReference sets the LocalObjectReference field in the declarative configuration to the given value.
-func (b *SecretProjectionBuilder) SetLocalObjectReference(value *LocalObjectReferenceBuilder) *SecretProjectionBuilder {
+func (b *SecretProjectionApplyConfiguration) SetLocalObjectReference(value *LocalObjectReferenceApplyConfiguration) *SecretProjectionApplyConfiguration {
 	b.localObjectReference = value
 	return b
 }
 
 // RemoveLocalObjectReference removes the LocalObjectReference field from the declarative configuration.
-func (b *SecretProjectionBuilder) RemoveLocalObjectReference() *SecretProjectionBuilder {
+func (b *SecretProjectionApplyConfiguration) RemoveLocalObjectReference() *SecretProjectionApplyConfiguration {
 	b.localObjectReference = nil
 	return b
 }
 
 // GetLocalObjectReference gets the LocalObjectReference field from the declarative configuration.
-func (b *SecretProjectionBuilder) GetLocalObjectReference() (value *LocalObjectReferenceBuilder, ok bool) {
+func (b *SecretProjectionApplyConfiguration) GetLocalObjectReference() (value *LocalObjectReferenceApplyConfiguration, ok bool) {
 	return b.localObjectReference, true
 }
 
 // SetItems sets the Items field in the declarative configuration to the given value.
-func (b *SecretProjectionBuilder) SetItems(value KeyToPathList) *SecretProjectionBuilder {
+func (b *SecretProjectionApplyConfiguration) SetItems(value KeyToPathList) *SecretProjectionApplyConfiguration {
 	b.fields.Items = &value
 	return b
 }
 
 // RemoveItems removes the Items field from the declarative configuration.
-func (b *SecretProjectionBuilder) RemoveItems() *SecretProjectionBuilder {
+func (b *SecretProjectionApplyConfiguration) RemoveItems() *SecretProjectionApplyConfiguration {
 	b.fields.Items = nil
 	return b
 }
 
 // GetItems gets the Items field from the declarative configuration.
-func (b *SecretProjectionBuilder) GetItems() (value KeyToPathList, ok bool) {
+func (b *SecretProjectionApplyConfiguration) GetItems() (value KeyToPathList, ok bool) {
 	if v := b.fields.Items; v != nil {
 		return *v, true
 	}
@@ -86,27 +86,27 @@ func (b *SecretProjectionBuilder) GetItems() (value KeyToPathList, ok bool) {
 }
 
 // SetOptional sets the Optional field in the declarative configuration to the given value.
-func (b *SecretProjectionBuilder) SetOptional(value bool) *SecretProjectionBuilder {
+func (b *SecretProjectionApplyConfiguration) SetOptional(value bool) *SecretProjectionApplyConfiguration {
 	b.fields.Optional = &value
 	return b
 }
 
 // RemoveOptional removes the Optional field from the declarative configuration.
-func (b *SecretProjectionBuilder) RemoveOptional() *SecretProjectionBuilder {
+func (b *SecretProjectionApplyConfiguration) RemoveOptional() *SecretProjectionApplyConfiguration {
 	b.fields.Optional = nil
 	return b
 }
 
 // GetOptional gets the Optional field from the declarative configuration.
-func (b *SecretProjectionBuilder) GetOptional() (value bool, ok bool) {
+func (b *SecretProjectionApplyConfiguration) GetOptional() (value bool, ok bool) {
 	if v := b.fields.Optional; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts SecretProjectionBuilder to unstructured.
-func (b *SecretProjectionBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts SecretProjectionApplyConfiguration to unstructured.
+func (b *SecretProjectionApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -118,9 +118,9 @@ func (b *SecretProjectionBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to SecretProjectionBuilder, replacing the contents
-// of SecretProjectionBuilder.
-func (b *SecretProjectionBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to SecretProjectionApplyConfiguration, replacing the contents
+// of SecretProjectionApplyConfiguration.
+func (b *SecretProjectionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &secretProjectionFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -131,15 +131,15 @@ func (b *SecretProjectionBuilder) FromUnstructured(u map[string]interface{}) err
 	return nil
 }
 
-// MarshalJSON marshals SecretProjectionBuilder to JSON.
-func (b *SecretProjectionBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals SecretProjectionApplyConfiguration to JSON.
+func (b *SecretProjectionApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into SecretProjectionBuilder, replacing the contents of
-// SecretProjectionBuilder.
-func (b *SecretProjectionBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into SecretProjectionApplyConfiguration, replacing the contents of
+// SecretProjectionApplyConfiguration.
+func (b *SecretProjectionApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -147,22 +147,22 @@ func (b *SecretProjectionBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// SecretProjectionList represents a list of SecretProjectionBuilder.
-type SecretProjectionList []*SecretProjectionBuilder
+// SecretProjectionList represents a listAlias of SecretProjectionApplyConfiguration.
+type SecretProjectionList []*SecretProjectionApplyConfiguration
 
-// SecretProjectionList represents a map of SecretProjectionBuilder.
-type SecretProjectionMap map[string]SecretProjectionBuilder
+// SecretProjectionList represents a map of SecretProjectionApplyConfiguration.
+type SecretProjectionMap map[string]SecretProjectionApplyConfiguration
 
-func (b *SecretProjectionBuilder) preMarshal() {
+func (b *SecretProjectionApplyConfiguration) preMarshal() {
 	if b.localObjectReference != nil {
 		if v, ok := b.localObjectReference.GetName(); ok {
 			b.fields.Name = &v
 		}
 	}
 }
-func (b *SecretProjectionBuilder) postUnmarshal() {
+func (b *SecretProjectionApplyConfiguration) postUnmarshal() {
 	if b.localObjectReference == nil {
-		b.localObjectReference = &LocalObjectReferenceBuilder{}
+		b.localObjectReference = &LocalObjectReferenceApplyConfiguration{}
 	}
 	if b.fields.Name != nil {
 		b.localObjectReference.SetName(*b.fields.Name)

@@ -25,42 +25,42 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// DeploymentStrategyBuilder represents an declarative configuration of the DeploymentStrategy type for use
+// DeploymentStrategyApplyConfiguration represents an declarative configuration of the DeploymentStrategy type for use
 // with apply.
-type DeploymentStrategyBuilder struct {
+type DeploymentStrategyApplyConfiguration struct {
 	fields deploymentStrategyFields
 }
 
+// DeploymentStrategyApplyConfiguration constructs an declarative configuration of the DeploymentStrategy type for use with
+// apply.
+func DeploymentStrategy() *DeploymentStrategyApplyConfiguration {
+	return &DeploymentStrategyApplyConfiguration{}
+}
+
 // deploymentStrategyFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in DeploymentStrategyBuilder.
+// Inline fields are owned by their respective inline type in DeploymentStrategyApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type deploymentStrategyFields struct {
-	Type          *v1beta1.DeploymentStrategyType `json:"type,omitempty"`
-	RollingUpdate *RollingUpdateDeploymentBuilder `json:"rollingUpdate,omitempty"`
-}
-
-// DeploymentStrategy constructs an declarative configuration of the DeploymentStrategy type for use with
-// apply.
-func DeploymentStrategy() *DeploymentStrategyBuilder {
-	return &DeploymentStrategyBuilder{}
+	Type          *v1beta1.DeploymentStrategyType            `json:"type,omitempty"`
+	RollingUpdate *RollingUpdateDeploymentApplyConfiguration `json:"rollingUpdate,omitempty"`
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b *DeploymentStrategyBuilder) SetType(value v1beta1.DeploymentStrategyType) *DeploymentStrategyBuilder {
+func (b *DeploymentStrategyApplyConfiguration) SetType(value v1beta1.DeploymentStrategyType) *DeploymentStrategyApplyConfiguration {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b *DeploymentStrategyBuilder) RemoveType() *DeploymentStrategyBuilder {
+func (b *DeploymentStrategyApplyConfiguration) RemoveType() *DeploymentStrategyApplyConfiguration {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b *DeploymentStrategyBuilder) GetType() (value v1beta1.DeploymentStrategyType, ok bool) {
+func (b *DeploymentStrategyApplyConfiguration) GetType() (value v1beta1.DeploymentStrategyType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -68,24 +68,24 @@ func (b *DeploymentStrategyBuilder) GetType() (value v1beta1.DeploymentStrategyT
 }
 
 // SetRollingUpdate sets the RollingUpdate field in the declarative configuration to the given value.
-func (b *DeploymentStrategyBuilder) SetRollingUpdate(value *RollingUpdateDeploymentBuilder) *DeploymentStrategyBuilder {
+func (b *DeploymentStrategyApplyConfiguration) SetRollingUpdate(value *RollingUpdateDeploymentApplyConfiguration) *DeploymentStrategyApplyConfiguration {
 	b.fields.RollingUpdate = value
 	return b
 }
 
 // RemoveRollingUpdate removes the RollingUpdate field from the declarative configuration.
-func (b *DeploymentStrategyBuilder) RemoveRollingUpdate() *DeploymentStrategyBuilder {
+func (b *DeploymentStrategyApplyConfiguration) RemoveRollingUpdate() *DeploymentStrategyApplyConfiguration {
 	b.fields.RollingUpdate = nil
 	return b
 }
 
 // GetRollingUpdate gets the RollingUpdate field from the declarative configuration.
-func (b *DeploymentStrategyBuilder) GetRollingUpdate() (value *RollingUpdateDeploymentBuilder, ok bool) {
+func (b *DeploymentStrategyApplyConfiguration) GetRollingUpdate() (value *RollingUpdateDeploymentApplyConfiguration, ok bool) {
 	return b.fields.RollingUpdate, b.fields.RollingUpdate != nil
 }
 
-// ToUnstructured converts DeploymentStrategyBuilder to unstructured.
-func (b *DeploymentStrategyBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts DeploymentStrategyApplyConfiguration to unstructured.
+func (b *DeploymentStrategyApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -97,9 +97,9 @@ func (b *DeploymentStrategyBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to DeploymentStrategyBuilder, replacing the contents
-// of DeploymentStrategyBuilder.
-func (b *DeploymentStrategyBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to DeploymentStrategyApplyConfiguration, replacing the contents
+// of DeploymentStrategyApplyConfiguration.
+func (b *DeploymentStrategyApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &deploymentStrategyFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -110,15 +110,15 @@ func (b *DeploymentStrategyBuilder) FromUnstructured(u map[string]interface{}) e
 	return nil
 }
 
-// MarshalJSON marshals DeploymentStrategyBuilder to JSON.
-func (b *DeploymentStrategyBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals DeploymentStrategyApplyConfiguration to JSON.
+func (b *DeploymentStrategyApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into DeploymentStrategyBuilder, replacing the contents of
-// DeploymentStrategyBuilder.
-func (b *DeploymentStrategyBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into DeploymentStrategyApplyConfiguration, replacing the contents of
+// DeploymentStrategyApplyConfiguration.
+func (b *DeploymentStrategyApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -126,13 +126,13 @@ func (b *DeploymentStrategyBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// DeploymentStrategyList represents a list of DeploymentStrategyBuilder.
-type DeploymentStrategyList []*DeploymentStrategyBuilder
+// DeploymentStrategyList represents a listAlias of DeploymentStrategyApplyConfiguration.
+type DeploymentStrategyList []*DeploymentStrategyApplyConfiguration
 
-// DeploymentStrategyList represents a map of DeploymentStrategyBuilder.
-type DeploymentStrategyMap map[string]DeploymentStrategyBuilder
+// DeploymentStrategyList represents a map of DeploymentStrategyApplyConfiguration.
+type DeploymentStrategyMap map[string]DeploymentStrategyApplyConfiguration
 
-func (b *DeploymentStrategyBuilder) preMarshal() {
+func (b *DeploymentStrategyApplyConfiguration) preMarshal() {
 }
-func (b *DeploymentStrategyBuilder) postUnmarshal() {
+func (b *DeploymentStrategyApplyConfiguration) postUnmarshal() {
 }

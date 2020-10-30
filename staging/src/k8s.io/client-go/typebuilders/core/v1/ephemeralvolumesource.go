@@ -24,67 +24,67 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// EphemeralVolumeSourceBuilder represents an declarative configuration of the EphemeralVolumeSource type for use
+// EphemeralVolumeSourceApplyConfiguration represents an declarative configuration of the EphemeralVolumeSource type for use
 // with apply.
-type EphemeralVolumeSourceBuilder struct {
+type EphemeralVolumeSourceApplyConfiguration struct {
 	fields ephemeralVolumeSourceFields
 }
 
+// EphemeralVolumeSourceApplyConfiguration constructs an declarative configuration of the EphemeralVolumeSource type for use with
+// apply.
+func EphemeralVolumeSource() *EphemeralVolumeSourceApplyConfiguration {
+	return &EphemeralVolumeSourceApplyConfiguration{}
+}
+
 // ephemeralVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in EphemeralVolumeSourceBuilder.
+// Inline fields are owned by their respective inline type in EphemeralVolumeSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type ephemeralVolumeSourceFields struct {
-	VolumeClaimTemplate *PersistentVolumeClaimTemplateBuilder `json:"volumeClaimTemplate,omitempty"`
-	ReadOnly            *bool                                 `json:"readOnly,omitempty"`
-}
-
-// EphemeralVolumeSource constructs an declarative configuration of the EphemeralVolumeSource type for use with
-// apply.
-func EphemeralVolumeSource() *EphemeralVolumeSourceBuilder {
-	return &EphemeralVolumeSourceBuilder{}
+	VolumeClaimTemplate *PersistentVolumeClaimTemplateApplyConfiguration `json:"volumeClaimTemplate,omitempty"`
+	ReadOnly            *bool                                            `json:"readOnly,omitempty"`
 }
 
 // SetVolumeClaimTemplate sets the VolumeClaimTemplate field in the declarative configuration to the given value.
-func (b *EphemeralVolumeSourceBuilder) SetVolumeClaimTemplate(value *PersistentVolumeClaimTemplateBuilder) *EphemeralVolumeSourceBuilder {
+func (b *EphemeralVolumeSourceApplyConfiguration) SetVolumeClaimTemplate(value *PersistentVolumeClaimTemplateApplyConfiguration) *EphemeralVolumeSourceApplyConfiguration {
 	b.fields.VolumeClaimTemplate = value
 	return b
 }
 
 // RemoveVolumeClaimTemplate removes the VolumeClaimTemplate field from the declarative configuration.
-func (b *EphemeralVolumeSourceBuilder) RemoveVolumeClaimTemplate() *EphemeralVolumeSourceBuilder {
+func (b *EphemeralVolumeSourceApplyConfiguration) RemoveVolumeClaimTemplate() *EphemeralVolumeSourceApplyConfiguration {
 	b.fields.VolumeClaimTemplate = nil
 	return b
 }
 
 // GetVolumeClaimTemplate gets the VolumeClaimTemplate field from the declarative configuration.
-func (b *EphemeralVolumeSourceBuilder) GetVolumeClaimTemplate() (value *PersistentVolumeClaimTemplateBuilder, ok bool) {
+func (b *EphemeralVolumeSourceApplyConfiguration) GetVolumeClaimTemplate() (value *PersistentVolumeClaimTemplateApplyConfiguration, ok bool) {
 	return b.fields.VolumeClaimTemplate, b.fields.VolumeClaimTemplate != nil
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b *EphemeralVolumeSourceBuilder) SetReadOnly(value bool) *EphemeralVolumeSourceBuilder {
+func (b *EphemeralVolumeSourceApplyConfiguration) SetReadOnly(value bool) *EphemeralVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b *EphemeralVolumeSourceBuilder) RemoveReadOnly() *EphemeralVolumeSourceBuilder {
+func (b *EphemeralVolumeSourceApplyConfiguration) RemoveReadOnly() *EphemeralVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b *EphemeralVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
+func (b *EphemeralVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts EphemeralVolumeSourceBuilder to unstructured.
-func (b *EphemeralVolumeSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts EphemeralVolumeSourceApplyConfiguration to unstructured.
+func (b *EphemeralVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -96,9 +96,9 @@ func (b *EphemeralVolumeSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to EphemeralVolumeSourceBuilder, replacing the contents
-// of EphemeralVolumeSourceBuilder.
-func (b *EphemeralVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to EphemeralVolumeSourceApplyConfiguration, replacing the contents
+// of EphemeralVolumeSourceApplyConfiguration.
+func (b *EphemeralVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &ephemeralVolumeSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -109,15 +109,15 @@ func (b *EphemeralVolumeSourceBuilder) FromUnstructured(u map[string]interface{}
 	return nil
 }
 
-// MarshalJSON marshals EphemeralVolumeSourceBuilder to JSON.
-func (b *EphemeralVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals EphemeralVolumeSourceApplyConfiguration to JSON.
+func (b *EphemeralVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into EphemeralVolumeSourceBuilder, replacing the contents of
-// EphemeralVolumeSourceBuilder.
-func (b *EphemeralVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into EphemeralVolumeSourceApplyConfiguration, replacing the contents of
+// EphemeralVolumeSourceApplyConfiguration.
+func (b *EphemeralVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -125,13 +125,13 @@ func (b *EphemeralVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// EphemeralVolumeSourceList represents a list of EphemeralVolumeSourceBuilder.
-type EphemeralVolumeSourceList []*EphemeralVolumeSourceBuilder
+// EphemeralVolumeSourceList represents a listAlias of EphemeralVolumeSourceApplyConfiguration.
+type EphemeralVolumeSourceList []*EphemeralVolumeSourceApplyConfiguration
 
-// EphemeralVolumeSourceList represents a map of EphemeralVolumeSourceBuilder.
-type EphemeralVolumeSourceMap map[string]EphemeralVolumeSourceBuilder
+// EphemeralVolumeSourceList represents a map of EphemeralVolumeSourceApplyConfiguration.
+type EphemeralVolumeSourceMap map[string]EphemeralVolumeSourceApplyConfiguration
 
-func (b *EphemeralVolumeSourceBuilder) preMarshal() {
+func (b *EphemeralVolumeSourceApplyConfiguration) preMarshal() {
 }
-func (b *EphemeralVolumeSourceBuilder) postUnmarshal() {
+func (b *EphemeralVolumeSourceApplyConfiguration) postUnmarshal() {
 }

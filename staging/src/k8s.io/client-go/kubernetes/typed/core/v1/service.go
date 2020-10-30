@@ -48,7 +48,7 @@ type ServiceInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.ServiceList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.Service, err error)
-	Apply(ctx context.Context, service corev1.ServiceBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Service, err error)
+	Apply(ctx context.Context, service *corev1.ServiceApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Service, err error)
 	ServiceExpansion
 }
 
@@ -181,7 +181,7 @@ func (c *services) Patch(ctx context.Context, name string, pt types.PatchType, d
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied service.
-func (c *services) Apply(ctx context.Context, service corev1.ServiceBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Service, err error) {
+func (c *services) Apply(ctx context.Context, service *corev1.ServiceApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Service, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := service.MarshalJSON()
 	if err != nil {

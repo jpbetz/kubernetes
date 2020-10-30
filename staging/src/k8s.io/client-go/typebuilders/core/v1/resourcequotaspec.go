@@ -25,43 +25,43 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ResourceQuotaSpecBuilder represents an declarative configuration of the ResourceQuotaSpec type for use
+// ResourceQuotaSpecApplyConfiguration represents an declarative configuration of the ResourceQuotaSpec type for use
 // with apply.
-type ResourceQuotaSpecBuilder struct {
+type ResourceQuotaSpecApplyConfiguration struct {
 	fields resourceQuotaSpecFields
 }
 
+// ResourceQuotaSpecApplyConfiguration constructs an declarative configuration of the ResourceQuotaSpec type for use with
+// apply.
+func ResourceQuotaSpec() *ResourceQuotaSpecApplyConfiguration {
+	return &ResourceQuotaSpecApplyConfiguration{}
+}
+
 // resourceQuotaSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ResourceQuotaSpecBuilder.
+// Inline fields are owned by their respective inline type in ResourceQuotaSpecApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type resourceQuotaSpecFields struct {
-	Hard          *v1.ResourceList         `json:"hard,omitempty"`
-	Scopes        *[]v1.ResourceQuotaScope `json:"scopes,omitempty"`
-	ScopeSelector *ScopeSelectorBuilder    `json:"scopeSelector,omitempty"`
-}
-
-// ResourceQuotaSpec constructs an declarative configuration of the ResourceQuotaSpec type for use with
-// apply.
-func ResourceQuotaSpec() *ResourceQuotaSpecBuilder {
-	return &ResourceQuotaSpecBuilder{}
+	Hard          *v1.ResourceList                 `json:"hard,omitempty"`
+	Scopes        *[]v1.ResourceQuotaScope         `json:"scopes,omitempty"`
+	ScopeSelector *ScopeSelectorApplyConfiguration `json:"scopeSelector,omitempty"`
 }
 
 // SetHard sets the Hard field in the declarative configuration to the given value.
-func (b *ResourceQuotaSpecBuilder) SetHard(value v1.ResourceList) *ResourceQuotaSpecBuilder {
+func (b *ResourceQuotaSpecApplyConfiguration) SetHard(value v1.ResourceList) *ResourceQuotaSpecApplyConfiguration {
 	b.fields.Hard = &value
 	return b
 }
 
 // RemoveHard removes the Hard field from the declarative configuration.
-func (b *ResourceQuotaSpecBuilder) RemoveHard() *ResourceQuotaSpecBuilder {
+func (b *ResourceQuotaSpecApplyConfiguration) RemoveHard() *ResourceQuotaSpecApplyConfiguration {
 	b.fields.Hard = nil
 	return b
 }
 
 // GetHard gets the Hard field from the declarative configuration.
-func (b *ResourceQuotaSpecBuilder) GetHard() (value v1.ResourceList, ok bool) {
+func (b *ResourceQuotaSpecApplyConfiguration) GetHard() (value v1.ResourceList, ok bool) {
 	if v := b.fields.Hard; v != nil {
 		return *v, true
 	}
@@ -69,19 +69,19 @@ func (b *ResourceQuotaSpecBuilder) GetHard() (value v1.ResourceList, ok bool) {
 }
 
 // SetScopes sets the Scopes field in the declarative configuration to the given value.
-func (b *ResourceQuotaSpecBuilder) SetScopes(value []v1.ResourceQuotaScope) *ResourceQuotaSpecBuilder {
+func (b *ResourceQuotaSpecApplyConfiguration) SetScopes(value []v1.ResourceQuotaScope) *ResourceQuotaSpecApplyConfiguration {
 	b.fields.Scopes = &value
 	return b
 }
 
 // RemoveScopes removes the Scopes field from the declarative configuration.
-func (b *ResourceQuotaSpecBuilder) RemoveScopes() *ResourceQuotaSpecBuilder {
+func (b *ResourceQuotaSpecApplyConfiguration) RemoveScopes() *ResourceQuotaSpecApplyConfiguration {
 	b.fields.Scopes = nil
 	return b
 }
 
 // GetScopes gets the Scopes field from the declarative configuration.
-func (b *ResourceQuotaSpecBuilder) GetScopes() (value []v1.ResourceQuotaScope, ok bool) {
+func (b *ResourceQuotaSpecApplyConfiguration) GetScopes() (value []v1.ResourceQuotaScope, ok bool) {
 	if v := b.fields.Scopes; v != nil {
 		return *v, true
 	}
@@ -89,24 +89,24 @@ func (b *ResourceQuotaSpecBuilder) GetScopes() (value []v1.ResourceQuotaScope, o
 }
 
 // SetScopeSelector sets the ScopeSelector field in the declarative configuration to the given value.
-func (b *ResourceQuotaSpecBuilder) SetScopeSelector(value *ScopeSelectorBuilder) *ResourceQuotaSpecBuilder {
+func (b *ResourceQuotaSpecApplyConfiguration) SetScopeSelector(value *ScopeSelectorApplyConfiguration) *ResourceQuotaSpecApplyConfiguration {
 	b.fields.ScopeSelector = value
 	return b
 }
 
 // RemoveScopeSelector removes the ScopeSelector field from the declarative configuration.
-func (b *ResourceQuotaSpecBuilder) RemoveScopeSelector() *ResourceQuotaSpecBuilder {
+func (b *ResourceQuotaSpecApplyConfiguration) RemoveScopeSelector() *ResourceQuotaSpecApplyConfiguration {
 	b.fields.ScopeSelector = nil
 	return b
 }
 
 // GetScopeSelector gets the ScopeSelector field from the declarative configuration.
-func (b *ResourceQuotaSpecBuilder) GetScopeSelector() (value *ScopeSelectorBuilder, ok bool) {
+func (b *ResourceQuotaSpecApplyConfiguration) GetScopeSelector() (value *ScopeSelectorApplyConfiguration, ok bool) {
 	return b.fields.ScopeSelector, b.fields.ScopeSelector != nil
 }
 
-// ToUnstructured converts ResourceQuotaSpecBuilder to unstructured.
-func (b *ResourceQuotaSpecBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ResourceQuotaSpecApplyConfiguration to unstructured.
+func (b *ResourceQuotaSpecApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -118,9 +118,9 @@ func (b *ResourceQuotaSpecBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ResourceQuotaSpecBuilder, replacing the contents
-// of ResourceQuotaSpecBuilder.
-func (b *ResourceQuotaSpecBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ResourceQuotaSpecApplyConfiguration, replacing the contents
+// of ResourceQuotaSpecApplyConfiguration.
+func (b *ResourceQuotaSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &resourceQuotaSpecFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -131,15 +131,15 @@ func (b *ResourceQuotaSpecBuilder) FromUnstructured(u map[string]interface{}) er
 	return nil
 }
 
-// MarshalJSON marshals ResourceQuotaSpecBuilder to JSON.
-func (b *ResourceQuotaSpecBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ResourceQuotaSpecApplyConfiguration to JSON.
+func (b *ResourceQuotaSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ResourceQuotaSpecBuilder, replacing the contents of
-// ResourceQuotaSpecBuilder.
-func (b *ResourceQuotaSpecBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ResourceQuotaSpecApplyConfiguration, replacing the contents of
+// ResourceQuotaSpecApplyConfiguration.
+func (b *ResourceQuotaSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -147,13 +147,13 @@ func (b *ResourceQuotaSpecBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ResourceQuotaSpecList represents a list of ResourceQuotaSpecBuilder.
-type ResourceQuotaSpecList []*ResourceQuotaSpecBuilder
+// ResourceQuotaSpecList represents a listAlias of ResourceQuotaSpecApplyConfiguration.
+type ResourceQuotaSpecList []*ResourceQuotaSpecApplyConfiguration
 
-// ResourceQuotaSpecList represents a map of ResourceQuotaSpecBuilder.
-type ResourceQuotaSpecMap map[string]ResourceQuotaSpecBuilder
+// ResourceQuotaSpecList represents a map of ResourceQuotaSpecApplyConfiguration.
+type ResourceQuotaSpecMap map[string]ResourceQuotaSpecApplyConfiguration
 
-func (b *ResourceQuotaSpecBuilder) preMarshal() {
+func (b *ResourceQuotaSpecApplyConfiguration) preMarshal() {
 }
-func (b *ResourceQuotaSpecBuilder) postUnmarshal() {
+func (b *ResourceQuotaSpecApplyConfiguration) postUnmarshal() {
 }

@@ -25,102 +25,102 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// SelfSubjectRulesReviewBuilder represents an declarative configuration of the SelfSubjectRulesReview type for use
+// SelfSubjectRulesReviewApplyConfiguration represents an declarative configuration of the SelfSubjectRulesReview type for use
 // with apply.
-type SelfSubjectRulesReviewBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type SelfSubjectRulesReviewApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   selfSubjectRulesReviewFields
 }
 
+// SelfSubjectRulesReviewApplyConfiguration constructs an declarative configuration of the SelfSubjectRulesReview type for use with
+// apply.
+func SelfSubjectRulesReview() *SelfSubjectRulesReviewApplyConfiguration {
+	return &SelfSubjectRulesReviewApplyConfiguration{}
+}
+
 // selfSubjectRulesReviewFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SelfSubjectRulesReviewBuilder.
+// Inline fields are owned by their respective inline type in SelfSubjectRulesReviewApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type selfSubjectRulesReviewFields struct {
-	Kind       *string                            `json:"kind,omitempty"`       // inlined SelfSubjectRulesReviewBuilder.typeMeta.Kind field
-	APIVersion *string                            `json:"apiVersion,omitempty"` // inlined SelfSubjectRulesReviewBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder              `json:"metadata,omitempty"`
-	Spec       *SelfSubjectRulesReviewSpecBuilder `json:"spec,omitempty"`
-	Status     *SubjectRulesReviewStatusBuilder   `json:"status,omitempty"`
-}
-
-// SelfSubjectRulesReview constructs an declarative configuration of the SelfSubjectRulesReview type for use with
-// apply.
-func SelfSubjectRulesReview() *SelfSubjectRulesReviewBuilder {
-	return &SelfSubjectRulesReviewBuilder{}
+	Kind       *string                                       `json:"kind,omitempty"`       // inlined SelfSubjectRulesReviewApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                                       `json:"apiVersion,omitempty"` // inlined SelfSubjectRulesReviewApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration              `json:"metadata,omitempty"`
+	Spec       *SelfSubjectRulesReviewSpecApplyConfiguration `json:"spec,omitempty"`
+	Status     *SubjectRulesReviewStatusApplyConfiguration   `json:"status,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *SelfSubjectRulesReviewBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *SelfSubjectRulesReviewBuilder {
+func (b *SelfSubjectRulesReviewApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *SelfSubjectRulesReviewApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *SelfSubjectRulesReviewBuilder) RemoveTypeMeta() *SelfSubjectRulesReviewBuilder {
+func (b *SelfSubjectRulesReviewApplyConfiguration) RemoveTypeMeta() *SelfSubjectRulesReviewApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *SelfSubjectRulesReviewBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *SelfSubjectRulesReviewApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *SelfSubjectRulesReviewBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *SelfSubjectRulesReviewBuilder {
+func (b *SelfSubjectRulesReviewApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *SelfSubjectRulesReviewApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *SelfSubjectRulesReviewBuilder) RemoveObjectMeta() *SelfSubjectRulesReviewBuilder {
+func (b *SelfSubjectRulesReviewApplyConfiguration) RemoveObjectMeta() *SelfSubjectRulesReviewApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *SelfSubjectRulesReviewBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *SelfSubjectRulesReviewApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *SelfSubjectRulesReviewBuilder) SetSpec(value *SelfSubjectRulesReviewSpecBuilder) *SelfSubjectRulesReviewBuilder {
+func (b *SelfSubjectRulesReviewApplyConfiguration) SetSpec(value *SelfSubjectRulesReviewSpecApplyConfiguration) *SelfSubjectRulesReviewApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *SelfSubjectRulesReviewBuilder) RemoveSpec() *SelfSubjectRulesReviewBuilder {
+func (b *SelfSubjectRulesReviewApplyConfiguration) RemoveSpec() *SelfSubjectRulesReviewApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *SelfSubjectRulesReviewBuilder) GetSpec() (value *SelfSubjectRulesReviewSpecBuilder, ok bool) {
+func (b *SelfSubjectRulesReviewApplyConfiguration) GetSpec() (value *SelfSubjectRulesReviewSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *SelfSubjectRulesReviewBuilder) SetStatus(value *SubjectRulesReviewStatusBuilder) *SelfSubjectRulesReviewBuilder {
+func (b *SelfSubjectRulesReviewApplyConfiguration) SetStatus(value *SubjectRulesReviewStatusApplyConfiguration) *SelfSubjectRulesReviewApplyConfiguration {
 	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *SelfSubjectRulesReviewBuilder) RemoveStatus() *SelfSubjectRulesReviewBuilder {
+func (b *SelfSubjectRulesReviewApplyConfiguration) RemoveStatus() *SelfSubjectRulesReviewApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *SelfSubjectRulesReviewBuilder) GetStatus() (value *SubjectRulesReviewStatusBuilder, ok bool) {
+func (b *SelfSubjectRulesReviewApplyConfiguration) GetStatus() (value *SubjectRulesReviewStatusApplyConfiguration, ok bool) {
 	return b.fields.Status, b.fields.Status != nil
 }
 
-// ToUnstructured converts SelfSubjectRulesReviewBuilder to unstructured.
-func (b *SelfSubjectRulesReviewBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts SelfSubjectRulesReviewApplyConfiguration to unstructured.
+func (b *SelfSubjectRulesReviewApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -132,9 +132,9 @@ func (b *SelfSubjectRulesReviewBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to SelfSubjectRulesReviewBuilder, replacing the contents
-// of SelfSubjectRulesReviewBuilder.
-func (b *SelfSubjectRulesReviewBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to SelfSubjectRulesReviewApplyConfiguration, replacing the contents
+// of SelfSubjectRulesReviewApplyConfiguration.
+func (b *SelfSubjectRulesReviewApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &selfSubjectRulesReviewFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -145,15 +145,15 @@ func (b *SelfSubjectRulesReviewBuilder) FromUnstructured(u map[string]interface{
 	return nil
 }
 
-// MarshalJSON marshals SelfSubjectRulesReviewBuilder to JSON.
-func (b *SelfSubjectRulesReviewBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals SelfSubjectRulesReviewApplyConfiguration to JSON.
+func (b *SelfSubjectRulesReviewApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into SelfSubjectRulesReviewBuilder, replacing the contents of
-// SelfSubjectRulesReviewBuilder.
-func (b *SelfSubjectRulesReviewBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into SelfSubjectRulesReviewApplyConfiguration, replacing the contents of
+// SelfSubjectRulesReviewApplyConfiguration.
+func (b *SelfSubjectRulesReviewApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -161,13 +161,13 @@ func (b *SelfSubjectRulesReviewBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// SelfSubjectRulesReviewList represents a list of SelfSubjectRulesReviewBuilder.
-type SelfSubjectRulesReviewList []*SelfSubjectRulesReviewBuilder
+// SelfSubjectRulesReviewList represents a listAlias of SelfSubjectRulesReviewApplyConfiguration.
+type SelfSubjectRulesReviewList []*SelfSubjectRulesReviewApplyConfiguration
 
-// SelfSubjectRulesReviewList represents a map of SelfSubjectRulesReviewBuilder.
-type SelfSubjectRulesReviewMap map[string]SelfSubjectRulesReviewBuilder
+// SelfSubjectRulesReviewList represents a map of SelfSubjectRulesReviewApplyConfiguration.
+type SelfSubjectRulesReviewMap map[string]SelfSubjectRulesReviewApplyConfiguration
 
-func (b *SelfSubjectRulesReviewBuilder) preMarshal() {
+func (b *SelfSubjectRulesReviewApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -177,9 +177,9 @@ func (b *SelfSubjectRulesReviewBuilder) preMarshal() {
 		}
 	}
 }
-func (b *SelfSubjectRulesReviewBuilder) postUnmarshal() {
+func (b *SelfSubjectRulesReviewApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

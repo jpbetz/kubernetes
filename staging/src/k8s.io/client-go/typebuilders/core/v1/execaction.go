@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ExecActionBuilder represents an declarative configuration of the ExecAction type for use
+// ExecActionApplyConfiguration represents an declarative configuration of the ExecAction type for use
 // with apply.
-type ExecActionBuilder struct {
+type ExecActionApplyConfiguration struct {
 	fields execActionFields
 }
 
+// ExecActionApplyConfiguration constructs an declarative configuration of the ExecAction type for use with
+// apply.
+func ExecAction() *ExecActionApplyConfiguration {
+	return &ExecActionApplyConfiguration{}
+}
+
 // execActionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ExecActionBuilder.
+// Inline fields are owned by their respective inline type in ExecActionApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type execActionFields struct {
 	Command *[]string `json:"command,omitempty"`
 }
 
-// ExecAction constructs an declarative configuration of the ExecAction type for use with
-// apply.
-func ExecAction() *ExecActionBuilder {
-	return &ExecActionBuilder{}
-}
-
 // SetCommand sets the Command field in the declarative configuration to the given value.
-func (b *ExecActionBuilder) SetCommand(value []string) *ExecActionBuilder {
+func (b *ExecActionApplyConfiguration) SetCommand(value []string) *ExecActionApplyConfiguration {
 	b.fields.Command = &value
 	return b
 }
 
 // RemoveCommand removes the Command field from the declarative configuration.
-func (b *ExecActionBuilder) RemoveCommand() *ExecActionBuilder {
+func (b *ExecActionApplyConfiguration) RemoveCommand() *ExecActionApplyConfiguration {
 	b.fields.Command = nil
 	return b
 }
 
 // GetCommand gets the Command field from the declarative configuration.
-func (b *ExecActionBuilder) GetCommand() (value []string, ok bool) {
+func (b *ExecActionApplyConfiguration) GetCommand() (value []string, ok bool) {
 	if v := b.fields.Command; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ExecActionBuilder to unstructured.
-func (b *ExecActionBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ExecActionApplyConfiguration to unstructured.
+func (b *ExecActionApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *ExecActionBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ExecActionBuilder, replacing the contents
-// of ExecActionBuilder.
-func (b *ExecActionBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ExecActionApplyConfiguration, replacing the contents
+// of ExecActionApplyConfiguration.
+func (b *ExecActionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &execActionFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *ExecActionBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals ExecActionBuilder to JSON.
-func (b *ExecActionBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ExecActionApplyConfiguration to JSON.
+func (b *ExecActionApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ExecActionBuilder, replacing the contents of
-// ExecActionBuilder.
-func (b *ExecActionBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ExecActionApplyConfiguration, replacing the contents of
+// ExecActionApplyConfiguration.
+func (b *ExecActionApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *ExecActionBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ExecActionList represents a list of ExecActionBuilder.
-type ExecActionList []*ExecActionBuilder
+// ExecActionList represents a listAlias of ExecActionApplyConfiguration.
+type ExecActionList []*ExecActionApplyConfiguration
 
-// ExecActionList represents a map of ExecActionBuilder.
-type ExecActionMap map[string]ExecActionBuilder
+// ExecActionList represents a map of ExecActionApplyConfiguration.
+type ExecActionMap map[string]ExecActionApplyConfiguration
 
-func (b *ExecActionBuilder) preMarshal() {
+func (b *ExecActionApplyConfiguration) preMarshal() {
 }
-func (b *ExecActionBuilder) postUnmarshal() {
+func (b *ExecActionApplyConfiguration) postUnmarshal() {
 }

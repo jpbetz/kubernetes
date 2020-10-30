@@ -25,14 +25,20 @@ import (
 	intstr "k8s.io/apimachinery/pkg/util/intstr"
 )
 
-// TCPSocketActionBuilder represents an declarative configuration of the TCPSocketAction type for use
+// TCPSocketActionApplyConfiguration represents an declarative configuration of the TCPSocketAction type for use
 // with apply.
-type TCPSocketActionBuilder struct {
+type TCPSocketActionApplyConfiguration struct {
 	fields tCPSocketActionFields
 }
 
+// TCPSocketActionApplyConfiguration constructs an declarative configuration of the TCPSocketAction type for use with
+// apply.
+func TCPSocketAction() *TCPSocketActionApplyConfiguration {
+	return &TCPSocketActionApplyConfiguration{}
+}
+
 // tCPSocketActionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in TCPSocketActionBuilder.
+// Inline fields are owned by their respective inline type in TCPSocketActionApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type tCPSocketActionFields struct {
 	Host *string             `json:"host,omitempty"`
 }
 
-// TCPSocketAction constructs an declarative configuration of the TCPSocketAction type for use with
-// apply.
-func TCPSocketAction() *TCPSocketActionBuilder {
-	return &TCPSocketActionBuilder{}
-}
-
 // SetPort sets the Port field in the declarative configuration to the given value.
-func (b *TCPSocketActionBuilder) SetPort(value intstr.IntOrString) *TCPSocketActionBuilder {
+func (b *TCPSocketActionApplyConfiguration) SetPort(value intstr.IntOrString) *TCPSocketActionApplyConfiguration {
 	b.fields.Port = &value
 	return b
 }
 
 // RemovePort removes the Port field from the declarative configuration.
-func (b *TCPSocketActionBuilder) RemovePort() *TCPSocketActionBuilder {
+func (b *TCPSocketActionApplyConfiguration) RemovePort() *TCPSocketActionApplyConfiguration {
 	b.fields.Port = nil
 	return b
 }
 
 // GetPort gets the Port field from the declarative configuration.
-func (b *TCPSocketActionBuilder) GetPort() (value intstr.IntOrString, ok bool) {
+func (b *TCPSocketActionApplyConfiguration) GetPort() (value intstr.IntOrString, ok bool) {
 	if v := b.fields.Port; v != nil {
 		return *v, true
 	}
@@ -68,27 +68,27 @@ func (b *TCPSocketActionBuilder) GetPort() (value intstr.IntOrString, ok bool) {
 }
 
 // SetHost sets the Host field in the declarative configuration to the given value.
-func (b *TCPSocketActionBuilder) SetHost(value string) *TCPSocketActionBuilder {
+func (b *TCPSocketActionApplyConfiguration) SetHost(value string) *TCPSocketActionApplyConfiguration {
 	b.fields.Host = &value
 	return b
 }
 
 // RemoveHost removes the Host field from the declarative configuration.
-func (b *TCPSocketActionBuilder) RemoveHost() *TCPSocketActionBuilder {
+func (b *TCPSocketActionApplyConfiguration) RemoveHost() *TCPSocketActionApplyConfiguration {
 	b.fields.Host = nil
 	return b
 }
 
 // GetHost gets the Host field from the declarative configuration.
-func (b *TCPSocketActionBuilder) GetHost() (value string, ok bool) {
+func (b *TCPSocketActionApplyConfiguration) GetHost() (value string, ok bool) {
 	if v := b.fields.Host; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts TCPSocketActionBuilder to unstructured.
-func (b *TCPSocketActionBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts TCPSocketActionApplyConfiguration to unstructured.
+func (b *TCPSocketActionApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -100,9 +100,9 @@ func (b *TCPSocketActionBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to TCPSocketActionBuilder, replacing the contents
-// of TCPSocketActionBuilder.
-func (b *TCPSocketActionBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to TCPSocketActionApplyConfiguration, replacing the contents
+// of TCPSocketActionApplyConfiguration.
+func (b *TCPSocketActionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &tCPSocketActionFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -113,15 +113,15 @@ func (b *TCPSocketActionBuilder) FromUnstructured(u map[string]interface{}) erro
 	return nil
 }
 
-// MarshalJSON marshals TCPSocketActionBuilder to JSON.
-func (b *TCPSocketActionBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals TCPSocketActionApplyConfiguration to JSON.
+func (b *TCPSocketActionApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into TCPSocketActionBuilder, replacing the contents of
-// TCPSocketActionBuilder.
-func (b *TCPSocketActionBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into TCPSocketActionApplyConfiguration, replacing the contents of
+// TCPSocketActionApplyConfiguration.
+func (b *TCPSocketActionApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -129,13 +129,13 @@ func (b *TCPSocketActionBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// TCPSocketActionList represents a list of TCPSocketActionBuilder.
-type TCPSocketActionList []*TCPSocketActionBuilder
+// TCPSocketActionList represents a listAlias of TCPSocketActionApplyConfiguration.
+type TCPSocketActionList []*TCPSocketActionApplyConfiguration
 
-// TCPSocketActionList represents a map of TCPSocketActionBuilder.
-type TCPSocketActionMap map[string]TCPSocketActionBuilder
+// TCPSocketActionList represents a map of TCPSocketActionApplyConfiguration.
+type TCPSocketActionMap map[string]TCPSocketActionApplyConfiguration
 
-func (b *TCPSocketActionBuilder) preMarshal() {
+func (b *TCPSocketActionApplyConfiguration) preMarshal() {
 }
-func (b *TCPSocketActionBuilder) postUnmarshal() {
+func (b *TCPSocketActionApplyConfiguration) postUnmarshal() {
 }

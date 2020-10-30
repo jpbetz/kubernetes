@@ -49,7 +49,7 @@ type VolumeAttachmentInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.VolumeAttachmentList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.VolumeAttachment, err error)
-	Apply(ctx context.Context, volumeAttachment storagev1.VolumeAttachmentBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.VolumeAttachment, err error)
+	Apply(ctx context.Context, volumeAttachment *storagev1.VolumeAttachmentApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.VolumeAttachment, err error)
 	VolumeAttachmentExpansion
 }
 
@@ -187,7 +187,7 @@ func (c *volumeAttachments) Patch(ctx context.Context, name string, pt types.Pat
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied volumeAttachment.
-func (c *volumeAttachments) Apply(ctx context.Context, volumeAttachment storagev1.VolumeAttachmentBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.VolumeAttachment, err error) {
+func (c *volumeAttachments) Apply(ctx context.Context, volumeAttachment *storagev1.VolumeAttachmentApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.VolumeAttachment, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := volumeAttachment.MarshalJSON()
 	if err != nil {

@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// StatefulSetStatusBuilder represents an declarative configuration of the StatefulSetStatus type for use
+// StatefulSetStatusApplyConfiguration represents an declarative configuration of the StatefulSetStatus type for use
 // with apply.
-type StatefulSetStatusBuilder struct {
+type StatefulSetStatusApplyConfiguration struct {
 	fields statefulSetStatusFields
 }
 
+// StatefulSetStatusApplyConfiguration constructs an declarative configuration of the StatefulSetStatus type for use with
+// apply.
+func StatefulSetStatus() *StatefulSetStatusApplyConfiguration {
+	return &StatefulSetStatusApplyConfiguration{}
+}
+
 // statefulSetStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in StatefulSetStatusBuilder.
+// Inline fields are owned by their respective inline type in StatefulSetStatusApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -47,26 +53,20 @@ type statefulSetStatusFields struct {
 	Conditions         *StatefulSetConditionList `json:"conditions,omitempty"`
 }
 
-// StatefulSetStatus constructs an declarative configuration of the StatefulSetStatus type for use with
-// apply.
-func StatefulSetStatus() *StatefulSetStatusBuilder {
-	return &StatefulSetStatusBuilder{}
-}
-
 // SetObservedGeneration sets the ObservedGeneration field in the declarative configuration to the given value.
-func (b *StatefulSetStatusBuilder) SetObservedGeneration(value int64) *StatefulSetStatusBuilder {
+func (b *StatefulSetStatusApplyConfiguration) SetObservedGeneration(value int64) *StatefulSetStatusApplyConfiguration {
 	b.fields.ObservedGeneration = &value
 	return b
 }
 
 // RemoveObservedGeneration removes the ObservedGeneration field from the declarative configuration.
-func (b *StatefulSetStatusBuilder) RemoveObservedGeneration() *StatefulSetStatusBuilder {
+func (b *StatefulSetStatusApplyConfiguration) RemoveObservedGeneration() *StatefulSetStatusApplyConfiguration {
 	b.fields.ObservedGeneration = nil
 	return b
 }
 
 // GetObservedGeneration gets the ObservedGeneration field from the declarative configuration.
-func (b *StatefulSetStatusBuilder) GetObservedGeneration() (value int64, ok bool) {
+func (b *StatefulSetStatusApplyConfiguration) GetObservedGeneration() (value int64, ok bool) {
 	if v := b.fields.ObservedGeneration; v != nil {
 		return *v, true
 	}
@@ -74,19 +74,19 @@ func (b *StatefulSetStatusBuilder) GetObservedGeneration() (value int64, ok bool
 }
 
 // SetReplicas sets the Replicas field in the declarative configuration to the given value.
-func (b *StatefulSetStatusBuilder) SetReplicas(value int32) *StatefulSetStatusBuilder {
+func (b *StatefulSetStatusApplyConfiguration) SetReplicas(value int32) *StatefulSetStatusApplyConfiguration {
 	b.fields.Replicas = &value
 	return b
 }
 
 // RemoveReplicas removes the Replicas field from the declarative configuration.
-func (b *StatefulSetStatusBuilder) RemoveReplicas() *StatefulSetStatusBuilder {
+func (b *StatefulSetStatusApplyConfiguration) RemoveReplicas() *StatefulSetStatusApplyConfiguration {
 	b.fields.Replicas = nil
 	return b
 }
 
 // GetReplicas gets the Replicas field from the declarative configuration.
-func (b *StatefulSetStatusBuilder) GetReplicas() (value int32, ok bool) {
+func (b *StatefulSetStatusApplyConfiguration) GetReplicas() (value int32, ok bool) {
 	if v := b.fields.Replicas; v != nil {
 		return *v, true
 	}
@@ -94,19 +94,19 @@ func (b *StatefulSetStatusBuilder) GetReplicas() (value int32, ok bool) {
 }
 
 // SetReadyReplicas sets the ReadyReplicas field in the declarative configuration to the given value.
-func (b *StatefulSetStatusBuilder) SetReadyReplicas(value int32) *StatefulSetStatusBuilder {
+func (b *StatefulSetStatusApplyConfiguration) SetReadyReplicas(value int32) *StatefulSetStatusApplyConfiguration {
 	b.fields.ReadyReplicas = &value
 	return b
 }
 
 // RemoveReadyReplicas removes the ReadyReplicas field from the declarative configuration.
-func (b *StatefulSetStatusBuilder) RemoveReadyReplicas() *StatefulSetStatusBuilder {
+func (b *StatefulSetStatusApplyConfiguration) RemoveReadyReplicas() *StatefulSetStatusApplyConfiguration {
 	b.fields.ReadyReplicas = nil
 	return b
 }
 
 // GetReadyReplicas gets the ReadyReplicas field from the declarative configuration.
-func (b *StatefulSetStatusBuilder) GetReadyReplicas() (value int32, ok bool) {
+func (b *StatefulSetStatusApplyConfiguration) GetReadyReplicas() (value int32, ok bool) {
 	if v := b.fields.ReadyReplicas; v != nil {
 		return *v, true
 	}
@@ -114,19 +114,19 @@ func (b *StatefulSetStatusBuilder) GetReadyReplicas() (value int32, ok bool) {
 }
 
 // SetCurrentReplicas sets the CurrentReplicas field in the declarative configuration to the given value.
-func (b *StatefulSetStatusBuilder) SetCurrentReplicas(value int32) *StatefulSetStatusBuilder {
+func (b *StatefulSetStatusApplyConfiguration) SetCurrentReplicas(value int32) *StatefulSetStatusApplyConfiguration {
 	b.fields.CurrentReplicas = &value
 	return b
 }
 
 // RemoveCurrentReplicas removes the CurrentReplicas field from the declarative configuration.
-func (b *StatefulSetStatusBuilder) RemoveCurrentReplicas() *StatefulSetStatusBuilder {
+func (b *StatefulSetStatusApplyConfiguration) RemoveCurrentReplicas() *StatefulSetStatusApplyConfiguration {
 	b.fields.CurrentReplicas = nil
 	return b
 }
 
 // GetCurrentReplicas gets the CurrentReplicas field from the declarative configuration.
-func (b *StatefulSetStatusBuilder) GetCurrentReplicas() (value int32, ok bool) {
+func (b *StatefulSetStatusApplyConfiguration) GetCurrentReplicas() (value int32, ok bool) {
 	if v := b.fields.CurrentReplicas; v != nil {
 		return *v, true
 	}
@@ -134,19 +134,19 @@ func (b *StatefulSetStatusBuilder) GetCurrentReplicas() (value int32, ok bool) {
 }
 
 // SetUpdatedReplicas sets the UpdatedReplicas field in the declarative configuration to the given value.
-func (b *StatefulSetStatusBuilder) SetUpdatedReplicas(value int32) *StatefulSetStatusBuilder {
+func (b *StatefulSetStatusApplyConfiguration) SetUpdatedReplicas(value int32) *StatefulSetStatusApplyConfiguration {
 	b.fields.UpdatedReplicas = &value
 	return b
 }
 
 // RemoveUpdatedReplicas removes the UpdatedReplicas field from the declarative configuration.
-func (b *StatefulSetStatusBuilder) RemoveUpdatedReplicas() *StatefulSetStatusBuilder {
+func (b *StatefulSetStatusApplyConfiguration) RemoveUpdatedReplicas() *StatefulSetStatusApplyConfiguration {
 	b.fields.UpdatedReplicas = nil
 	return b
 }
 
 // GetUpdatedReplicas gets the UpdatedReplicas field from the declarative configuration.
-func (b *StatefulSetStatusBuilder) GetUpdatedReplicas() (value int32, ok bool) {
+func (b *StatefulSetStatusApplyConfiguration) GetUpdatedReplicas() (value int32, ok bool) {
 	if v := b.fields.UpdatedReplicas; v != nil {
 		return *v, true
 	}
@@ -154,19 +154,19 @@ func (b *StatefulSetStatusBuilder) GetUpdatedReplicas() (value int32, ok bool) {
 }
 
 // SetCurrentRevision sets the CurrentRevision field in the declarative configuration to the given value.
-func (b *StatefulSetStatusBuilder) SetCurrentRevision(value string) *StatefulSetStatusBuilder {
+func (b *StatefulSetStatusApplyConfiguration) SetCurrentRevision(value string) *StatefulSetStatusApplyConfiguration {
 	b.fields.CurrentRevision = &value
 	return b
 }
 
 // RemoveCurrentRevision removes the CurrentRevision field from the declarative configuration.
-func (b *StatefulSetStatusBuilder) RemoveCurrentRevision() *StatefulSetStatusBuilder {
+func (b *StatefulSetStatusApplyConfiguration) RemoveCurrentRevision() *StatefulSetStatusApplyConfiguration {
 	b.fields.CurrentRevision = nil
 	return b
 }
 
 // GetCurrentRevision gets the CurrentRevision field from the declarative configuration.
-func (b *StatefulSetStatusBuilder) GetCurrentRevision() (value string, ok bool) {
+func (b *StatefulSetStatusApplyConfiguration) GetCurrentRevision() (value string, ok bool) {
 	if v := b.fields.CurrentRevision; v != nil {
 		return *v, true
 	}
@@ -174,19 +174,19 @@ func (b *StatefulSetStatusBuilder) GetCurrentRevision() (value string, ok bool) 
 }
 
 // SetUpdateRevision sets the UpdateRevision field in the declarative configuration to the given value.
-func (b *StatefulSetStatusBuilder) SetUpdateRevision(value string) *StatefulSetStatusBuilder {
+func (b *StatefulSetStatusApplyConfiguration) SetUpdateRevision(value string) *StatefulSetStatusApplyConfiguration {
 	b.fields.UpdateRevision = &value
 	return b
 }
 
 // RemoveUpdateRevision removes the UpdateRevision field from the declarative configuration.
-func (b *StatefulSetStatusBuilder) RemoveUpdateRevision() *StatefulSetStatusBuilder {
+func (b *StatefulSetStatusApplyConfiguration) RemoveUpdateRevision() *StatefulSetStatusApplyConfiguration {
 	b.fields.UpdateRevision = nil
 	return b
 }
 
 // GetUpdateRevision gets the UpdateRevision field from the declarative configuration.
-func (b *StatefulSetStatusBuilder) GetUpdateRevision() (value string, ok bool) {
+func (b *StatefulSetStatusApplyConfiguration) GetUpdateRevision() (value string, ok bool) {
 	if v := b.fields.UpdateRevision; v != nil {
 		return *v, true
 	}
@@ -194,19 +194,19 @@ func (b *StatefulSetStatusBuilder) GetUpdateRevision() (value string, ok bool) {
 }
 
 // SetCollisionCount sets the CollisionCount field in the declarative configuration to the given value.
-func (b *StatefulSetStatusBuilder) SetCollisionCount(value int32) *StatefulSetStatusBuilder {
+func (b *StatefulSetStatusApplyConfiguration) SetCollisionCount(value int32) *StatefulSetStatusApplyConfiguration {
 	b.fields.CollisionCount = &value
 	return b
 }
 
 // RemoveCollisionCount removes the CollisionCount field from the declarative configuration.
-func (b *StatefulSetStatusBuilder) RemoveCollisionCount() *StatefulSetStatusBuilder {
+func (b *StatefulSetStatusApplyConfiguration) RemoveCollisionCount() *StatefulSetStatusApplyConfiguration {
 	b.fields.CollisionCount = nil
 	return b
 }
 
 // GetCollisionCount gets the CollisionCount field from the declarative configuration.
-func (b *StatefulSetStatusBuilder) GetCollisionCount() (value int32, ok bool) {
+func (b *StatefulSetStatusApplyConfiguration) GetCollisionCount() (value int32, ok bool) {
 	if v := b.fields.CollisionCount; v != nil {
 		return *v, true
 	}
@@ -214,27 +214,27 @@ func (b *StatefulSetStatusBuilder) GetCollisionCount() (value int32, ok bool) {
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b *StatefulSetStatusBuilder) SetConditions(value StatefulSetConditionList) *StatefulSetStatusBuilder {
+func (b *StatefulSetStatusApplyConfiguration) SetConditions(value StatefulSetConditionList) *StatefulSetStatusApplyConfiguration {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b *StatefulSetStatusBuilder) RemoveConditions() *StatefulSetStatusBuilder {
+func (b *StatefulSetStatusApplyConfiguration) RemoveConditions() *StatefulSetStatusApplyConfiguration {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b *StatefulSetStatusBuilder) GetConditions() (value StatefulSetConditionList, ok bool) {
+func (b *StatefulSetStatusApplyConfiguration) GetConditions() (value StatefulSetConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts StatefulSetStatusBuilder to unstructured.
-func (b *StatefulSetStatusBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts StatefulSetStatusApplyConfiguration to unstructured.
+func (b *StatefulSetStatusApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -246,9 +246,9 @@ func (b *StatefulSetStatusBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to StatefulSetStatusBuilder, replacing the contents
-// of StatefulSetStatusBuilder.
-func (b *StatefulSetStatusBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to StatefulSetStatusApplyConfiguration, replacing the contents
+// of StatefulSetStatusApplyConfiguration.
+func (b *StatefulSetStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &statefulSetStatusFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -259,15 +259,15 @@ func (b *StatefulSetStatusBuilder) FromUnstructured(u map[string]interface{}) er
 	return nil
 }
 
-// MarshalJSON marshals StatefulSetStatusBuilder to JSON.
-func (b *StatefulSetStatusBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals StatefulSetStatusApplyConfiguration to JSON.
+func (b *StatefulSetStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into StatefulSetStatusBuilder, replacing the contents of
-// StatefulSetStatusBuilder.
-func (b *StatefulSetStatusBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into StatefulSetStatusApplyConfiguration, replacing the contents of
+// StatefulSetStatusApplyConfiguration.
+func (b *StatefulSetStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -275,13 +275,13 @@ func (b *StatefulSetStatusBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// StatefulSetStatusList represents a list of StatefulSetStatusBuilder.
-type StatefulSetStatusList []*StatefulSetStatusBuilder
+// StatefulSetStatusList represents a listAlias of StatefulSetStatusApplyConfiguration.
+type StatefulSetStatusList []*StatefulSetStatusApplyConfiguration
 
-// StatefulSetStatusList represents a map of StatefulSetStatusBuilder.
-type StatefulSetStatusMap map[string]StatefulSetStatusBuilder
+// StatefulSetStatusList represents a map of StatefulSetStatusApplyConfiguration.
+type StatefulSetStatusMap map[string]StatefulSetStatusApplyConfiguration
 
-func (b *StatefulSetStatusBuilder) preMarshal() {
+func (b *StatefulSetStatusApplyConfiguration) preMarshal() {
 }
-func (b *StatefulSetStatusBuilder) postUnmarshal() {
+func (b *StatefulSetStatusApplyConfiguration) postUnmarshal() {
 }

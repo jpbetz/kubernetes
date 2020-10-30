@@ -49,7 +49,7 @@ type PodInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.PodList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.Pod, err error)
-	Apply(ctx context.Context, pod corev1.PodBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Pod, err error)
+	Apply(ctx context.Context, pod *corev1.PodApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Pod, err error)
 	GetEphemeralContainers(ctx context.Context, podName string, options metav1.GetOptions) (*v1.EphemeralContainers, error)
 	UpdateEphemeralContainers(ctx context.Context, podName string, ephemeralContainers *v1.EphemeralContainers, opts metav1.UpdateOptions) (*v1.EphemeralContainers, error)
 
@@ -201,7 +201,7 @@ func (c *pods) Patch(ctx context.Context, name string, pt types.PatchType, data 
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied pod.
-func (c *pods) Apply(ctx context.Context, pod corev1.PodBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Pod, err error) {
+func (c *pods) Apply(ctx context.Context, pod *corev1.PodApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Pod, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := pod.MarshalJSON()
 	if err != nil {

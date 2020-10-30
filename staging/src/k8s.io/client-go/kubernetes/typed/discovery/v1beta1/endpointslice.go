@@ -48,7 +48,7 @@ type EndpointSliceInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1beta1.EndpointSliceList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.EndpointSlice, err error)
-	Apply(ctx context.Context, endpointSlice discoveryv1beta1.EndpointSliceBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.EndpointSlice, err error)
+	Apply(ctx context.Context, endpointSlice *discoveryv1beta1.EndpointSliceApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.EndpointSlice, err error)
 	EndpointSliceExpansion
 }
 
@@ -181,7 +181,7 @@ func (c *endpointSlices) Patch(ctx context.Context, name string, pt types.PatchT
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied endpointSlice.
-func (c *endpointSlices) Apply(ctx context.Context, endpointSlice discoveryv1beta1.EndpointSliceBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.EndpointSlice, err error) {
+func (c *endpointSlices) Apply(ctx context.Context, endpointSlice *discoveryv1beta1.EndpointSliceApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.EndpointSlice, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := endpointSlice.MarshalJSON()
 	if err != nil {

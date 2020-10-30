@@ -27,14 +27,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// StatefulSetConditionBuilder represents an declarative configuration of the StatefulSetCondition type for use
+// StatefulSetConditionApplyConfiguration represents an declarative configuration of the StatefulSetCondition type for use
 // with apply.
-type StatefulSetConditionBuilder struct {
+type StatefulSetConditionApplyConfiguration struct {
 	fields statefulSetConditionFields
 }
 
+// StatefulSetConditionApplyConfiguration constructs an declarative configuration of the StatefulSetCondition type for use with
+// apply.
+func StatefulSetCondition() *StatefulSetConditionApplyConfiguration {
+	return &StatefulSetConditionApplyConfiguration{}
+}
+
 // statefulSetConditionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in StatefulSetConditionBuilder.
+// Inline fields are owned by their respective inline type in StatefulSetConditionApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -46,26 +52,20 @@ type statefulSetConditionFields struct {
 	Message            *string                           `json:"message,omitempty"`
 }
 
-// StatefulSetCondition constructs an declarative configuration of the StatefulSetCondition type for use with
-// apply.
-func StatefulSetCondition() *StatefulSetConditionBuilder {
-	return &StatefulSetConditionBuilder{}
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b *StatefulSetConditionBuilder) SetType(value v1beta1.StatefulSetConditionType) *StatefulSetConditionBuilder {
+func (b *StatefulSetConditionApplyConfiguration) SetType(value v1beta1.StatefulSetConditionType) *StatefulSetConditionApplyConfiguration {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b *StatefulSetConditionBuilder) RemoveType() *StatefulSetConditionBuilder {
+func (b *StatefulSetConditionApplyConfiguration) RemoveType() *StatefulSetConditionApplyConfiguration {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b *StatefulSetConditionBuilder) GetType() (value v1beta1.StatefulSetConditionType, ok bool) {
+func (b *StatefulSetConditionApplyConfiguration) GetType() (value v1beta1.StatefulSetConditionType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -73,19 +73,19 @@ func (b *StatefulSetConditionBuilder) GetType() (value v1beta1.StatefulSetCondit
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *StatefulSetConditionBuilder) SetStatus(value v1.ConditionStatus) *StatefulSetConditionBuilder {
+func (b *StatefulSetConditionApplyConfiguration) SetStatus(value v1.ConditionStatus) *StatefulSetConditionApplyConfiguration {
 	b.fields.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *StatefulSetConditionBuilder) RemoveStatus() *StatefulSetConditionBuilder {
+func (b *StatefulSetConditionApplyConfiguration) RemoveStatus() *StatefulSetConditionApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *StatefulSetConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
+func (b *StatefulSetConditionApplyConfiguration) GetStatus() (value v1.ConditionStatus, ok bool) {
 	if v := b.fields.Status; v != nil {
 		return *v, true
 	}
@@ -93,19 +93,19 @@ func (b *StatefulSetConditionBuilder) GetStatus() (value v1.ConditionStatus, ok 
 }
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
-func (b *StatefulSetConditionBuilder) SetLastTransitionTime(value metav1.Time) *StatefulSetConditionBuilder {
+func (b *StatefulSetConditionApplyConfiguration) SetLastTransitionTime(value metav1.Time) *StatefulSetConditionApplyConfiguration {
 	b.fields.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
-func (b *StatefulSetConditionBuilder) RemoveLastTransitionTime() *StatefulSetConditionBuilder {
+func (b *StatefulSetConditionApplyConfiguration) RemoveLastTransitionTime() *StatefulSetConditionApplyConfiguration {
 	b.fields.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
-func (b *StatefulSetConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
+func (b *StatefulSetConditionApplyConfiguration) GetLastTransitionTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastTransitionTime; v != nil {
 		return *v, true
 	}
@@ -113,19 +113,19 @@ func (b *StatefulSetConditionBuilder) GetLastTransitionTime() (value metav1.Time
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b *StatefulSetConditionBuilder) SetReason(value string) *StatefulSetConditionBuilder {
+func (b *StatefulSetConditionApplyConfiguration) SetReason(value string) *StatefulSetConditionApplyConfiguration {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b *StatefulSetConditionBuilder) RemoveReason() *StatefulSetConditionBuilder {
+func (b *StatefulSetConditionApplyConfiguration) RemoveReason() *StatefulSetConditionApplyConfiguration {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b *StatefulSetConditionBuilder) GetReason() (value string, ok bool) {
+func (b *StatefulSetConditionApplyConfiguration) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -133,27 +133,27 @@ func (b *StatefulSetConditionBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b *StatefulSetConditionBuilder) SetMessage(value string) *StatefulSetConditionBuilder {
+func (b *StatefulSetConditionApplyConfiguration) SetMessage(value string) *StatefulSetConditionApplyConfiguration {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b *StatefulSetConditionBuilder) RemoveMessage() *StatefulSetConditionBuilder {
+func (b *StatefulSetConditionApplyConfiguration) RemoveMessage() *StatefulSetConditionApplyConfiguration {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b *StatefulSetConditionBuilder) GetMessage() (value string, ok bool) {
+func (b *StatefulSetConditionApplyConfiguration) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts StatefulSetConditionBuilder to unstructured.
-func (b *StatefulSetConditionBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts StatefulSetConditionApplyConfiguration to unstructured.
+func (b *StatefulSetConditionApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -165,9 +165,9 @@ func (b *StatefulSetConditionBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to StatefulSetConditionBuilder, replacing the contents
-// of StatefulSetConditionBuilder.
-func (b *StatefulSetConditionBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to StatefulSetConditionApplyConfiguration, replacing the contents
+// of StatefulSetConditionApplyConfiguration.
+func (b *StatefulSetConditionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &statefulSetConditionFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -178,15 +178,15 @@ func (b *StatefulSetConditionBuilder) FromUnstructured(u map[string]interface{})
 	return nil
 }
 
-// MarshalJSON marshals StatefulSetConditionBuilder to JSON.
-func (b *StatefulSetConditionBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals StatefulSetConditionApplyConfiguration to JSON.
+func (b *StatefulSetConditionApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into StatefulSetConditionBuilder, replacing the contents of
-// StatefulSetConditionBuilder.
-func (b *StatefulSetConditionBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into StatefulSetConditionApplyConfiguration, replacing the contents of
+// StatefulSetConditionApplyConfiguration.
+func (b *StatefulSetConditionApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -194,13 +194,13 @@ func (b *StatefulSetConditionBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// StatefulSetConditionList represents a list of StatefulSetConditionBuilder.
-type StatefulSetConditionList []*StatefulSetConditionBuilder
+// StatefulSetConditionList represents a listAlias of StatefulSetConditionApplyConfiguration.
+type StatefulSetConditionList []*StatefulSetConditionApplyConfiguration
 
-// StatefulSetConditionList represents a map of StatefulSetConditionBuilder.
-type StatefulSetConditionMap map[string]StatefulSetConditionBuilder
+// StatefulSetConditionList represents a map of StatefulSetConditionApplyConfiguration.
+type StatefulSetConditionMap map[string]StatefulSetConditionApplyConfiguration
 
-func (b *StatefulSetConditionBuilder) preMarshal() {
+func (b *StatefulSetConditionApplyConfiguration) preMarshal() {
 }
-func (b *StatefulSetConditionBuilder) postUnmarshal() {
+func (b *StatefulSetConditionApplyConfiguration) postUnmarshal() {
 }

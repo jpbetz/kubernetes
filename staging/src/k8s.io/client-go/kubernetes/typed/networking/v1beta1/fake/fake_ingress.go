@@ -144,7 +144,7 @@ func (c *FakeIngresses) Patch(ctx context.Context, name string, pt types.PatchTy
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied ingress.
-func (c *FakeIngresses) Apply(ctx context.Context, ingress networkingv1beta1.IngressBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.Ingress, err error) {
+func (c *FakeIngresses) Apply(ctx context.Context, ingress *networkingv1beta1.IngressApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.Ingress, err error) {
 	data, err := ingress.MarshalJSON()
 	if err != nil {
 		return nil, err

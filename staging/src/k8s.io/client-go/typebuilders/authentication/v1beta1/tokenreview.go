@@ -25,102 +25,102 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// TokenReviewBuilder represents an declarative configuration of the TokenReview type for use
+// TokenReviewApplyConfiguration represents an declarative configuration of the TokenReview type for use
 // with apply.
-type TokenReviewBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type TokenReviewApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   tokenReviewFields
 }
 
+// TokenReviewApplyConfiguration constructs an declarative configuration of the TokenReview type for use with
+// apply.
+func TokenReview() *TokenReviewApplyConfiguration {
+	return &TokenReviewApplyConfiguration{}
+}
+
 // tokenReviewFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in TokenReviewBuilder.
+// Inline fields are owned by their respective inline type in TokenReviewApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type tokenReviewFields struct {
-	Kind       *string                   `json:"kind,omitempty"`       // inlined TokenReviewBuilder.typeMeta.Kind field
-	APIVersion *string                   `json:"apiVersion,omitempty"` // inlined TokenReviewBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder     `json:"metadata,omitempty"`
-	Spec       *TokenReviewSpecBuilder   `json:"spec,omitempty"`
-	Status     *TokenReviewStatusBuilder `json:"status,omitempty"`
-}
-
-// TokenReview constructs an declarative configuration of the TokenReview type for use with
-// apply.
-func TokenReview() *TokenReviewBuilder {
-	return &TokenReviewBuilder{}
+	Kind       *string                              `json:"kind,omitempty"`       // inlined TokenReviewApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                              `json:"apiVersion,omitempty"` // inlined TokenReviewApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration     `json:"metadata,omitempty"`
+	Spec       *TokenReviewSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status     *TokenReviewStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *TokenReviewBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *TokenReviewBuilder {
+func (b *TokenReviewApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *TokenReviewApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *TokenReviewBuilder) RemoveTypeMeta() *TokenReviewBuilder {
+func (b *TokenReviewApplyConfiguration) RemoveTypeMeta() *TokenReviewApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *TokenReviewBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *TokenReviewApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *TokenReviewBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *TokenReviewBuilder {
+func (b *TokenReviewApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *TokenReviewApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *TokenReviewBuilder) RemoveObjectMeta() *TokenReviewBuilder {
+func (b *TokenReviewApplyConfiguration) RemoveObjectMeta() *TokenReviewApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *TokenReviewBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *TokenReviewApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *TokenReviewBuilder) SetSpec(value *TokenReviewSpecBuilder) *TokenReviewBuilder {
+func (b *TokenReviewApplyConfiguration) SetSpec(value *TokenReviewSpecApplyConfiguration) *TokenReviewApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *TokenReviewBuilder) RemoveSpec() *TokenReviewBuilder {
+func (b *TokenReviewApplyConfiguration) RemoveSpec() *TokenReviewApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *TokenReviewBuilder) GetSpec() (value *TokenReviewSpecBuilder, ok bool) {
+func (b *TokenReviewApplyConfiguration) GetSpec() (value *TokenReviewSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *TokenReviewBuilder) SetStatus(value *TokenReviewStatusBuilder) *TokenReviewBuilder {
+func (b *TokenReviewApplyConfiguration) SetStatus(value *TokenReviewStatusApplyConfiguration) *TokenReviewApplyConfiguration {
 	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *TokenReviewBuilder) RemoveStatus() *TokenReviewBuilder {
+func (b *TokenReviewApplyConfiguration) RemoveStatus() *TokenReviewApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *TokenReviewBuilder) GetStatus() (value *TokenReviewStatusBuilder, ok bool) {
+func (b *TokenReviewApplyConfiguration) GetStatus() (value *TokenReviewStatusApplyConfiguration, ok bool) {
 	return b.fields.Status, b.fields.Status != nil
 }
 
-// ToUnstructured converts TokenReviewBuilder to unstructured.
-func (b *TokenReviewBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts TokenReviewApplyConfiguration to unstructured.
+func (b *TokenReviewApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -132,9 +132,9 @@ func (b *TokenReviewBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to TokenReviewBuilder, replacing the contents
-// of TokenReviewBuilder.
-func (b *TokenReviewBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to TokenReviewApplyConfiguration, replacing the contents
+// of TokenReviewApplyConfiguration.
+func (b *TokenReviewApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &tokenReviewFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -145,15 +145,15 @@ func (b *TokenReviewBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals TokenReviewBuilder to JSON.
-func (b *TokenReviewBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals TokenReviewApplyConfiguration to JSON.
+func (b *TokenReviewApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into TokenReviewBuilder, replacing the contents of
-// TokenReviewBuilder.
-func (b *TokenReviewBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into TokenReviewApplyConfiguration, replacing the contents of
+// TokenReviewApplyConfiguration.
+func (b *TokenReviewApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -161,13 +161,13 @@ func (b *TokenReviewBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// TokenReviewList represents a list of TokenReviewBuilder.
-type TokenReviewList []*TokenReviewBuilder
+// TokenReviewList represents a listAlias of TokenReviewApplyConfiguration.
+type TokenReviewList []*TokenReviewApplyConfiguration
 
-// TokenReviewList represents a map of TokenReviewBuilder.
-type TokenReviewMap map[string]TokenReviewBuilder
+// TokenReviewList represents a map of TokenReviewApplyConfiguration.
+type TokenReviewMap map[string]TokenReviewApplyConfiguration
 
-func (b *TokenReviewBuilder) preMarshal() {
+func (b *TokenReviewApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -177,9 +177,9 @@ func (b *TokenReviewBuilder) preMarshal() {
 		}
 	}
 }
-func (b *TokenReviewBuilder) postUnmarshal() {
+func (b *TokenReviewApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

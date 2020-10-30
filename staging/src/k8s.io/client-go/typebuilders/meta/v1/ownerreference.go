@@ -25,14 +25,20 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 )
 
-// OwnerReferenceBuilder represents an declarative configuration of the OwnerReference type for use
+// OwnerReferenceApplyConfiguration represents an declarative configuration of the OwnerReference type for use
 // with apply.
-type OwnerReferenceBuilder struct {
+type OwnerReferenceApplyConfiguration struct {
 	fields ownerReferenceFields
 }
 
+// OwnerReferenceApplyConfiguration constructs an declarative configuration of the OwnerReference type for use with
+// apply.
+func OwnerReference() *OwnerReferenceApplyConfiguration {
+	return &OwnerReferenceApplyConfiguration{}
+}
+
 // ownerReferenceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in OwnerReferenceBuilder.
+// Inline fields are owned by their respective inline type in OwnerReferenceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -45,26 +51,20 @@ type ownerReferenceFields struct {
 	BlockOwnerDeletion *bool      `json:"blockOwnerDeletion,omitempty"`
 }
 
-// OwnerReference constructs an declarative configuration of the OwnerReference type for use with
-// apply.
-func OwnerReference() *OwnerReferenceBuilder {
-	return &OwnerReferenceBuilder{}
-}
-
 // SetAPIVersion sets the APIVersion field in the declarative configuration to the given value.
-func (b *OwnerReferenceBuilder) SetAPIVersion(value string) *OwnerReferenceBuilder {
+func (b *OwnerReferenceApplyConfiguration) SetAPIVersion(value string) *OwnerReferenceApplyConfiguration {
 	b.fields.APIVersion = &value
 	return b
 }
 
 // RemoveAPIVersion removes the APIVersion field from the declarative configuration.
-func (b *OwnerReferenceBuilder) RemoveAPIVersion() *OwnerReferenceBuilder {
+func (b *OwnerReferenceApplyConfiguration) RemoveAPIVersion() *OwnerReferenceApplyConfiguration {
 	b.fields.APIVersion = nil
 	return b
 }
 
 // GetAPIVersion gets the APIVersion field from the declarative configuration.
-func (b *OwnerReferenceBuilder) GetAPIVersion() (value string, ok bool) {
+func (b *OwnerReferenceApplyConfiguration) GetAPIVersion() (value string, ok bool) {
 	if v := b.fields.APIVersion; v != nil {
 		return *v, true
 	}
@@ -72,19 +72,19 @@ func (b *OwnerReferenceBuilder) GetAPIVersion() (value string, ok bool) {
 }
 
 // SetKind sets the Kind field in the declarative configuration to the given value.
-func (b *OwnerReferenceBuilder) SetKind(value string) *OwnerReferenceBuilder {
+func (b *OwnerReferenceApplyConfiguration) SetKind(value string) *OwnerReferenceApplyConfiguration {
 	b.fields.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
-func (b *OwnerReferenceBuilder) RemoveKind() *OwnerReferenceBuilder {
+func (b *OwnerReferenceApplyConfiguration) RemoveKind() *OwnerReferenceApplyConfiguration {
 	b.fields.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
-func (b *OwnerReferenceBuilder) GetKind() (value string, ok bool) {
+func (b *OwnerReferenceApplyConfiguration) GetKind() (value string, ok bool) {
 	if v := b.fields.Kind; v != nil {
 		return *v, true
 	}
@@ -92,19 +92,19 @@ func (b *OwnerReferenceBuilder) GetKind() (value string, ok bool) {
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *OwnerReferenceBuilder) SetName(value string) *OwnerReferenceBuilder {
+func (b *OwnerReferenceApplyConfiguration) SetName(value string) *OwnerReferenceApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *OwnerReferenceBuilder) RemoveName() *OwnerReferenceBuilder {
+func (b *OwnerReferenceApplyConfiguration) RemoveName() *OwnerReferenceApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *OwnerReferenceBuilder) GetName() (value string, ok bool) {
+func (b *OwnerReferenceApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -112,19 +112,19 @@ func (b *OwnerReferenceBuilder) GetName() (value string, ok bool) {
 }
 
 // SetUID sets the UID field in the declarative configuration to the given value.
-func (b *OwnerReferenceBuilder) SetUID(value types.UID) *OwnerReferenceBuilder {
+func (b *OwnerReferenceApplyConfiguration) SetUID(value types.UID) *OwnerReferenceApplyConfiguration {
 	b.fields.UID = &value
 	return b
 }
 
 // RemoveUID removes the UID field from the declarative configuration.
-func (b *OwnerReferenceBuilder) RemoveUID() *OwnerReferenceBuilder {
+func (b *OwnerReferenceApplyConfiguration) RemoveUID() *OwnerReferenceApplyConfiguration {
 	b.fields.UID = nil
 	return b
 }
 
 // GetUID gets the UID field from the declarative configuration.
-func (b *OwnerReferenceBuilder) GetUID() (value types.UID, ok bool) {
+func (b *OwnerReferenceApplyConfiguration) GetUID() (value types.UID, ok bool) {
 	if v := b.fields.UID; v != nil {
 		return *v, true
 	}
@@ -132,19 +132,19 @@ func (b *OwnerReferenceBuilder) GetUID() (value types.UID, ok bool) {
 }
 
 // SetController sets the Controller field in the declarative configuration to the given value.
-func (b *OwnerReferenceBuilder) SetController(value bool) *OwnerReferenceBuilder {
+func (b *OwnerReferenceApplyConfiguration) SetController(value bool) *OwnerReferenceApplyConfiguration {
 	b.fields.Controller = &value
 	return b
 }
 
 // RemoveController removes the Controller field from the declarative configuration.
-func (b *OwnerReferenceBuilder) RemoveController() *OwnerReferenceBuilder {
+func (b *OwnerReferenceApplyConfiguration) RemoveController() *OwnerReferenceApplyConfiguration {
 	b.fields.Controller = nil
 	return b
 }
 
 // GetController gets the Controller field from the declarative configuration.
-func (b *OwnerReferenceBuilder) GetController() (value bool, ok bool) {
+func (b *OwnerReferenceApplyConfiguration) GetController() (value bool, ok bool) {
 	if v := b.fields.Controller; v != nil {
 		return *v, true
 	}
@@ -152,27 +152,27 @@ func (b *OwnerReferenceBuilder) GetController() (value bool, ok bool) {
 }
 
 // SetBlockOwnerDeletion sets the BlockOwnerDeletion field in the declarative configuration to the given value.
-func (b *OwnerReferenceBuilder) SetBlockOwnerDeletion(value bool) *OwnerReferenceBuilder {
+func (b *OwnerReferenceApplyConfiguration) SetBlockOwnerDeletion(value bool) *OwnerReferenceApplyConfiguration {
 	b.fields.BlockOwnerDeletion = &value
 	return b
 }
 
 // RemoveBlockOwnerDeletion removes the BlockOwnerDeletion field from the declarative configuration.
-func (b *OwnerReferenceBuilder) RemoveBlockOwnerDeletion() *OwnerReferenceBuilder {
+func (b *OwnerReferenceApplyConfiguration) RemoveBlockOwnerDeletion() *OwnerReferenceApplyConfiguration {
 	b.fields.BlockOwnerDeletion = nil
 	return b
 }
 
 // GetBlockOwnerDeletion gets the BlockOwnerDeletion field from the declarative configuration.
-func (b *OwnerReferenceBuilder) GetBlockOwnerDeletion() (value bool, ok bool) {
+func (b *OwnerReferenceApplyConfiguration) GetBlockOwnerDeletion() (value bool, ok bool) {
 	if v := b.fields.BlockOwnerDeletion; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts OwnerReferenceBuilder to unstructured.
-func (b *OwnerReferenceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts OwnerReferenceApplyConfiguration to unstructured.
+func (b *OwnerReferenceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -184,9 +184,9 @@ func (b *OwnerReferenceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to OwnerReferenceBuilder, replacing the contents
-// of OwnerReferenceBuilder.
-func (b *OwnerReferenceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to OwnerReferenceApplyConfiguration, replacing the contents
+// of OwnerReferenceApplyConfiguration.
+func (b *OwnerReferenceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &ownerReferenceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -197,15 +197,15 @@ func (b *OwnerReferenceBuilder) FromUnstructured(u map[string]interface{}) error
 	return nil
 }
 
-// MarshalJSON marshals OwnerReferenceBuilder to JSON.
-func (b *OwnerReferenceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals OwnerReferenceApplyConfiguration to JSON.
+func (b *OwnerReferenceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into OwnerReferenceBuilder, replacing the contents of
-// OwnerReferenceBuilder.
-func (b *OwnerReferenceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into OwnerReferenceApplyConfiguration, replacing the contents of
+// OwnerReferenceApplyConfiguration.
+func (b *OwnerReferenceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -213,13 +213,13 @@ func (b *OwnerReferenceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// OwnerReferenceList represents a list of OwnerReferenceBuilder.
-type OwnerReferenceList []*OwnerReferenceBuilder
+// OwnerReferenceList represents a listAlias of OwnerReferenceApplyConfiguration.
+type OwnerReferenceList []*OwnerReferenceApplyConfiguration
 
-// OwnerReferenceList represents a map of OwnerReferenceBuilder.
-type OwnerReferenceMap map[string]OwnerReferenceBuilder
+// OwnerReferenceList represents a map of OwnerReferenceApplyConfiguration.
+type OwnerReferenceMap map[string]OwnerReferenceApplyConfiguration
 
-func (b *OwnerReferenceBuilder) preMarshal() {
+func (b *OwnerReferenceApplyConfiguration) preMarshal() {
 }
-func (b *OwnerReferenceBuilder) postUnmarshal() {
+func (b *OwnerReferenceApplyConfiguration) postUnmarshal() {
 }

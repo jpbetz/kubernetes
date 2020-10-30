@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ReplicationControllerStatusBuilder represents an declarative configuration of the ReplicationControllerStatus type for use
+// ReplicationControllerStatusApplyConfiguration represents an declarative configuration of the ReplicationControllerStatus type for use
 // with apply.
-type ReplicationControllerStatusBuilder struct {
+type ReplicationControllerStatusApplyConfiguration struct {
 	fields replicationControllerStatusFields
 }
 
+// ReplicationControllerStatusApplyConfiguration constructs an declarative configuration of the ReplicationControllerStatus type for use with
+// apply.
+func ReplicationControllerStatus() *ReplicationControllerStatusApplyConfiguration {
+	return &ReplicationControllerStatusApplyConfiguration{}
+}
+
 // replicationControllerStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ReplicationControllerStatusBuilder.
+// Inline fields are owned by their respective inline type in ReplicationControllerStatusApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -44,26 +50,20 @@ type replicationControllerStatusFields struct {
 	Conditions           *ReplicationControllerConditionList `json:"conditions,omitempty"`
 }
 
-// ReplicationControllerStatus constructs an declarative configuration of the ReplicationControllerStatus type for use with
-// apply.
-func ReplicationControllerStatus() *ReplicationControllerStatusBuilder {
-	return &ReplicationControllerStatusBuilder{}
-}
-
 // SetReplicas sets the Replicas field in the declarative configuration to the given value.
-func (b *ReplicationControllerStatusBuilder) SetReplicas(value int32) *ReplicationControllerStatusBuilder {
+func (b *ReplicationControllerStatusApplyConfiguration) SetReplicas(value int32) *ReplicationControllerStatusApplyConfiguration {
 	b.fields.Replicas = &value
 	return b
 }
 
 // RemoveReplicas removes the Replicas field from the declarative configuration.
-func (b *ReplicationControllerStatusBuilder) RemoveReplicas() *ReplicationControllerStatusBuilder {
+func (b *ReplicationControllerStatusApplyConfiguration) RemoveReplicas() *ReplicationControllerStatusApplyConfiguration {
 	b.fields.Replicas = nil
 	return b
 }
 
 // GetReplicas gets the Replicas field from the declarative configuration.
-func (b *ReplicationControllerStatusBuilder) GetReplicas() (value int32, ok bool) {
+func (b *ReplicationControllerStatusApplyConfiguration) GetReplicas() (value int32, ok bool) {
 	if v := b.fields.Replicas; v != nil {
 		return *v, true
 	}
@@ -71,19 +71,19 @@ func (b *ReplicationControllerStatusBuilder) GetReplicas() (value int32, ok bool
 }
 
 // SetFullyLabeledReplicas sets the FullyLabeledReplicas field in the declarative configuration to the given value.
-func (b *ReplicationControllerStatusBuilder) SetFullyLabeledReplicas(value int32) *ReplicationControllerStatusBuilder {
+func (b *ReplicationControllerStatusApplyConfiguration) SetFullyLabeledReplicas(value int32) *ReplicationControllerStatusApplyConfiguration {
 	b.fields.FullyLabeledReplicas = &value
 	return b
 }
 
 // RemoveFullyLabeledReplicas removes the FullyLabeledReplicas field from the declarative configuration.
-func (b *ReplicationControllerStatusBuilder) RemoveFullyLabeledReplicas() *ReplicationControllerStatusBuilder {
+func (b *ReplicationControllerStatusApplyConfiguration) RemoveFullyLabeledReplicas() *ReplicationControllerStatusApplyConfiguration {
 	b.fields.FullyLabeledReplicas = nil
 	return b
 }
 
 // GetFullyLabeledReplicas gets the FullyLabeledReplicas field from the declarative configuration.
-func (b *ReplicationControllerStatusBuilder) GetFullyLabeledReplicas() (value int32, ok bool) {
+func (b *ReplicationControllerStatusApplyConfiguration) GetFullyLabeledReplicas() (value int32, ok bool) {
 	if v := b.fields.FullyLabeledReplicas; v != nil {
 		return *v, true
 	}
@@ -91,19 +91,19 @@ func (b *ReplicationControllerStatusBuilder) GetFullyLabeledReplicas() (value in
 }
 
 // SetReadyReplicas sets the ReadyReplicas field in the declarative configuration to the given value.
-func (b *ReplicationControllerStatusBuilder) SetReadyReplicas(value int32) *ReplicationControllerStatusBuilder {
+func (b *ReplicationControllerStatusApplyConfiguration) SetReadyReplicas(value int32) *ReplicationControllerStatusApplyConfiguration {
 	b.fields.ReadyReplicas = &value
 	return b
 }
 
 // RemoveReadyReplicas removes the ReadyReplicas field from the declarative configuration.
-func (b *ReplicationControllerStatusBuilder) RemoveReadyReplicas() *ReplicationControllerStatusBuilder {
+func (b *ReplicationControllerStatusApplyConfiguration) RemoveReadyReplicas() *ReplicationControllerStatusApplyConfiguration {
 	b.fields.ReadyReplicas = nil
 	return b
 }
 
 // GetReadyReplicas gets the ReadyReplicas field from the declarative configuration.
-func (b *ReplicationControllerStatusBuilder) GetReadyReplicas() (value int32, ok bool) {
+func (b *ReplicationControllerStatusApplyConfiguration) GetReadyReplicas() (value int32, ok bool) {
 	if v := b.fields.ReadyReplicas; v != nil {
 		return *v, true
 	}
@@ -111,19 +111,19 @@ func (b *ReplicationControllerStatusBuilder) GetReadyReplicas() (value int32, ok
 }
 
 // SetAvailableReplicas sets the AvailableReplicas field in the declarative configuration to the given value.
-func (b *ReplicationControllerStatusBuilder) SetAvailableReplicas(value int32) *ReplicationControllerStatusBuilder {
+func (b *ReplicationControllerStatusApplyConfiguration) SetAvailableReplicas(value int32) *ReplicationControllerStatusApplyConfiguration {
 	b.fields.AvailableReplicas = &value
 	return b
 }
 
 // RemoveAvailableReplicas removes the AvailableReplicas field from the declarative configuration.
-func (b *ReplicationControllerStatusBuilder) RemoveAvailableReplicas() *ReplicationControllerStatusBuilder {
+func (b *ReplicationControllerStatusApplyConfiguration) RemoveAvailableReplicas() *ReplicationControllerStatusApplyConfiguration {
 	b.fields.AvailableReplicas = nil
 	return b
 }
 
 // GetAvailableReplicas gets the AvailableReplicas field from the declarative configuration.
-func (b *ReplicationControllerStatusBuilder) GetAvailableReplicas() (value int32, ok bool) {
+func (b *ReplicationControllerStatusApplyConfiguration) GetAvailableReplicas() (value int32, ok bool) {
 	if v := b.fields.AvailableReplicas; v != nil {
 		return *v, true
 	}
@@ -131,19 +131,19 @@ func (b *ReplicationControllerStatusBuilder) GetAvailableReplicas() (value int32
 }
 
 // SetObservedGeneration sets the ObservedGeneration field in the declarative configuration to the given value.
-func (b *ReplicationControllerStatusBuilder) SetObservedGeneration(value int64) *ReplicationControllerStatusBuilder {
+func (b *ReplicationControllerStatusApplyConfiguration) SetObservedGeneration(value int64) *ReplicationControllerStatusApplyConfiguration {
 	b.fields.ObservedGeneration = &value
 	return b
 }
 
 // RemoveObservedGeneration removes the ObservedGeneration field from the declarative configuration.
-func (b *ReplicationControllerStatusBuilder) RemoveObservedGeneration() *ReplicationControllerStatusBuilder {
+func (b *ReplicationControllerStatusApplyConfiguration) RemoveObservedGeneration() *ReplicationControllerStatusApplyConfiguration {
 	b.fields.ObservedGeneration = nil
 	return b
 }
 
 // GetObservedGeneration gets the ObservedGeneration field from the declarative configuration.
-func (b *ReplicationControllerStatusBuilder) GetObservedGeneration() (value int64, ok bool) {
+func (b *ReplicationControllerStatusApplyConfiguration) GetObservedGeneration() (value int64, ok bool) {
 	if v := b.fields.ObservedGeneration; v != nil {
 		return *v, true
 	}
@@ -151,27 +151,27 @@ func (b *ReplicationControllerStatusBuilder) GetObservedGeneration() (value int6
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b *ReplicationControllerStatusBuilder) SetConditions(value ReplicationControllerConditionList) *ReplicationControllerStatusBuilder {
+func (b *ReplicationControllerStatusApplyConfiguration) SetConditions(value ReplicationControllerConditionList) *ReplicationControllerStatusApplyConfiguration {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b *ReplicationControllerStatusBuilder) RemoveConditions() *ReplicationControllerStatusBuilder {
+func (b *ReplicationControllerStatusApplyConfiguration) RemoveConditions() *ReplicationControllerStatusApplyConfiguration {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b *ReplicationControllerStatusBuilder) GetConditions() (value ReplicationControllerConditionList, ok bool) {
+func (b *ReplicationControllerStatusApplyConfiguration) GetConditions() (value ReplicationControllerConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ReplicationControllerStatusBuilder to unstructured.
-func (b *ReplicationControllerStatusBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ReplicationControllerStatusApplyConfiguration to unstructured.
+func (b *ReplicationControllerStatusApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -183,9 +183,9 @@ func (b *ReplicationControllerStatusBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ReplicationControllerStatusBuilder, replacing the contents
-// of ReplicationControllerStatusBuilder.
-func (b *ReplicationControllerStatusBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ReplicationControllerStatusApplyConfiguration, replacing the contents
+// of ReplicationControllerStatusApplyConfiguration.
+func (b *ReplicationControllerStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &replicationControllerStatusFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -196,15 +196,15 @@ func (b *ReplicationControllerStatusBuilder) FromUnstructured(u map[string]inter
 	return nil
 }
 
-// MarshalJSON marshals ReplicationControllerStatusBuilder to JSON.
-func (b *ReplicationControllerStatusBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ReplicationControllerStatusApplyConfiguration to JSON.
+func (b *ReplicationControllerStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ReplicationControllerStatusBuilder, replacing the contents of
-// ReplicationControllerStatusBuilder.
-func (b *ReplicationControllerStatusBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ReplicationControllerStatusApplyConfiguration, replacing the contents of
+// ReplicationControllerStatusApplyConfiguration.
+func (b *ReplicationControllerStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -212,13 +212,13 @@ func (b *ReplicationControllerStatusBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ReplicationControllerStatusList represents a list of ReplicationControllerStatusBuilder.
-type ReplicationControllerStatusList []*ReplicationControllerStatusBuilder
+// ReplicationControllerStatusList represents a listAlias of ReplicationControllerStatusApplyConfiguration.
+type ReplicationControllerStatusList []*ReplicationControllerStatusApplyConfiguration
 
-// ReplicationControllerStatusList represents a map of ReplicationControllerStatusBuilder.
-type ReplicationControllerStatusMap map[string]ReplicationControllerStatusBuilder
+// ReplicationControllerStatusList represents a map of ReplicationControllerStatusApplyConfiguration.
+type ReplicationControllerStatusMap map[string]ReplicationControllerStatusApplyConfiguration
 
-func (b *ReplicationControllerStatusBuilder) preMarshal() {
+func (b *ReplicationControllerStatusApplyConfiguration) preMarshal() {
 }
-func (b *ReplicationControllerStatusBuilder) postUnmarshal() {
+func (b *ReplicationControllerStatusApplyConfiguration) postUnmarshal() {
 }

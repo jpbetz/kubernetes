@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// TolerationBuilder represents an declarative configuration of the Toleration type for use
+// TolerationApplyConfiguration represents an declarative configuration of the Toleration type for use
 // with apply.
-type TolerationBuilder struct {
+type TolerationApplyConfiguration struct {
 	fields tolerationFields
 }
 
+// TolerationApplyConfiguration constructs an declarative configuration of the Toleration type for use with
+// apply.
+func Toleration() *TolerationApplyConfiguration {
+	return &TolerationApplyConfiguration{}
+}
+
 // tolerationFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in TolerationBuilder.
+// Inline fields are owned by their respective inline type in TolerationApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -44,26 +50,20 @@ type tolerationFields struct {
 	TolerationSeconds *int64                 `json:"tolerationSeconds,omitempty"`
 }
 
-// Toleration constructs an declarative configuration of the Toleration type for use with
-// apply.
-func Toleration() *TolerationBuilder {
-	return &TolerationBuilder{}
-}
-
 // SetKey sets the Key field in the declarative configuration to the given value.
-func (b *TolerationBuilder) SetKey(value string) *TolerationBuilder {
+func (b *TolerationApplyConfiguration) SetKey(value string) *TolerationApplyConfiguration {
 	b.fields.Key = &value
 	return b
 }
 
 // RemoveKey removes the Key field from the declarative configuration.
-func (b *TolerationBuilder) RemoveKey() *TolerationBuilder {
+func (b *TolerationApplyConfiguration) RemoveKey() *TolerationApplyConfiguration {
 	b.fields.Key = nil
 	return b
 }
 
 // GetKey gets the Key field from the declarative configuration.
-func (b *TolerationBuilder) GetKey() (value string, ok bool) {
+func (b *TolerationApplyConfiguration) GetKey() (value string, ok bool) {
 	if v := b.fields.Key; v != nil {
 		return *v, true
 	}
@@ -71,19 +71,19 @@ func (b *TolerationBuilder) GetKey() (value string, ok bool) {
 }
 
 // SetOperator sets the Operator field in the declarative configuration to the given value.
-func (b *TolerationBuilder) SetOperator(value v1.TolerationOperator) *TolerationBuilder {
+func (b *TolerationApplyConfiguration) SetOperator(value v1.TolerationOperator) *TolerationApplyConfiguration {
 	b.fields.Operator = &value
 	return b
 }
 
 // RemoveOperator removes the Operator field from the declarative configuration.
-func (b *TolerationBuilder) RemoveOperator() *TolerationBuilder {
+func (b *TolerationApplyConfiguration) RemoveOperator() *TolerationApplyConfiguration {
 	b.fields.Operator = nil
 	return b
 }
 
 // GetOperator gets the Operator field from the declarative configuration.
-func (b *TolerationBuilder) GetOperator() (value v1.TolerationOperator, ok bool) {
+func (b *TolerationApplyConfiguration) GetOperator() (value v1.TolerationOperator, ok bool) {
 	if v := b.fields.Operator; v != nil {
 		return *v, true
 	}
@@ -91,19 +91,19 @@ func (b *TolerationBuilder) GetOperator() (value v1.TolerationOperator, ok bool)
 }
 
 // SetValue sets the Value field in the declarative configuration to the given value.
-func (b *TolerationBuilder) SetValue(value string) *TolerationBuilder {
+func (b *TolerationApplyConfiguration) SetValue(value string) *TolerationApplyConfiguration {
 	b.fields.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
-func (b *TolerationBuilder) RemoveValue() *TolerationBuilder {
+func (b *TolerationApplyConfiguration) RemoveValue() *TolerationApplyConfiguration {
 	b.fields.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
-func (b *TolerationBuilder) GetValue() (value string, ok bool) {
+func (b *TolerationApplyConfiguration) GetValue() (value string, ok bool) {
 	if v := b.fields.Value; v != nil {
 		return *v, true
 	}
@@ -111,19 +111,19 @@ func (b *TolerationBuilder) GetValue() (value string, ok bool) {
 }
 
 // SetEffect sets the Effect field in the declarative configuration to the given value.
-func (b *TolerationBuilder) SetEffect(value v1.TaintEffect) *TolerationBuilder {
+func (b *TolerationApplyConfiguration) SetEffect(value v1.TaintEffect) *TolerationApplyConfiguration {
 	b.fields.Effect = &value
 	return b
 }
 
 // RemoveEffect removes the Effect field from the declarative configuration.
-func (b *TolerationBuilder) RemoveEffect() *TolerationBuilder {
+func (b *TolerationApplyConfiguration) RemoveEffect() *TolerationApplyConfiguration {
 	b.fields.Effect = nil
 	return b
 }
 
 // GetEffect gets the Effect field from the declarative configuration.
-func (b *TolerationBuilder) GetEffect() (value v1.TaintEffect, ok bool) {
+func (b *TolerationApplyConfiguration) GetEffect() (value v1.TaintEffect, ok bool) {
 	if v := b.fields.Effect; v != nil {
 		return *v, true
 	}
@@ -131,27 +131,27 @@ func (b *TolerationBuilder) GetEffect() (value v1.TaintEffect, ok bool) {
 }
 
 // SetTolerationSeconds sets the TolerationSeconds field in the declarative configuration to the given value.
-func (b *TolerationBuilder) SetTolerationSeconds(value int64) *TolerationBuilder {
+func (b *TolerationApplyConfiguration) SetTolerationSeconds(value int64) *TolerationApplyConfiguration {
 	b.fields.TolerationSeconds = &value
 	return b
 }
 
 // RemoveTolerationSeconds removes the TolerationSeconds field from the declarative configuration.
-func (b *TolerationBuilder) RemoveTolerationSeconds() *TolerationBuilder {
+func (b *TolerationApplyConfiguration) RemoveTolerationSeconds() *TolerationApplyConfiguration {
 	b.fields.TolerationSeconds = nil
 	return b
 }
 
 // GetTolerationSeconds gets the TolerationSeconds field from the declarative configuration.
-func (b *TolerationBuilder) GetTolerationSeconds() (value int64, ok bool) {
+func (b *TolerationApplyConfiguration) GetTolerationSeconds() (value int64, ok bool) {
 	if v := b.fields.TolerationSeconds; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts TolerationBuilder to unstructured.
-func (b *TolerationBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts TolerationApplyConfiguration to unstructured.
+func (b *TolerationApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -163,9 +163,9 @@ func (b *TolerationBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to TolerationBuilder, replacing the contents
-// of TolerationBuilder.
-func (b *TolerationBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to TolerationApplyConfiguration, replacing the contents
+// of TolerationApplyConfiguration.
+func (b *TolerationApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &tolerationFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -176,15 +176,15 @@ func (b *TolerationBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals TolerationBuilder to JSON.
-func (b *TolerationBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals TolerationApplyConfiguration to JSON.
+func (b *TolerationApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into TolerationBuilder, replacing the contents of
-// TolerationBuilder.
-func (b *TolerationBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into TolerationApplyConfiguration, replacing the contents of
+// TolerationApplyConfiguration.
+func (b *TolerationApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -192,13 +192,13 @@ func (b *TolerationBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// TolerationList represents a list of TolerationBuilder.
-type TolerationList []*TolerationBuilder
+// TolerationList represents a listAlias of TolerationApplyConfiguration.
+type TolerationList []*TolerationApplyConfiguration
 
-// TolerationList represents a map of TolerationBuilder.
-type TolerationMap map[string]TolerationBuilder
+// TolerationList represents a map of TolerationApplyConfiguration.
+type TolerationMap map[string]TolerationApplyConfiguration
 
-func (b *TolerationBuilder) preMarshal() {
+func (b *TolerationApplyConfiguration) preMarshal() {
 }
-func (b *TolerationBuilder) postUnmarshal() {
+func (b *TolerationApplyConfiguration) postUnmarshal() {
 }

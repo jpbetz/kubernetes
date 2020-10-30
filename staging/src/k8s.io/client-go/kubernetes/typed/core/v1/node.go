@@ -49,7 +49,7 @@ type NodeInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.NodeList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.Node, err error)
-	Apply(ctx context.Context, node corev1.NodeBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Node, err error)
+	Apply(ctx context.Context, node *corev1.NodeApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Node, err error)
 	NodeExpansion
 }
 
@@ -187,7 +187,7 @@ func (c *nodes) Patch(ctx context.Context, name string, pt types.PatchType, data
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied node.
-func (c *nodes) Apply(ctx context.Context, node corev1.NodeBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Node, err error) {
+func (c *nodes) Apply(ctx context.Context, node *corev1.NodeApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Node, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := node.MarshalJSON()
 	if err != nil {

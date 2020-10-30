@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// WindowsSecurityContextOptionsBuilder represents an declarative configuration of the WindowsSecurityContextOptions type for use
+// WindowsSecurityContextOptionsApplyConfiguration represents an declarative configuration of the WindowsSecurityContextOptions type for use
 // with apply.
-type WindowsSecurityContextOptionsBuilder struct {
+type WindowsSecurityContextOptionsApplyConfiguration struct {
 	fields windowsSecurityContextOptionsFields
 }
 
+// WindowsSecurityContextOptionsApplyConfiguration constructs an declarative configuration of the WindowsSecurityContextOptions type for use with
+// apply.
+func WindowsSecurityContextOptions() *WindowsSecurityContextOptionsApplyConfiguration {
+	return &WindowsSecurityContextOptionsApplyConfiguration{}
+}
+
 // windowsSecurityContextOptionsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in WindowsSecurityContextOptionsBuilder.
+// Inline fields are owned by their respective inline type in WindowsSecurityContextOptionsApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type windowsSecurityContextOptionsFields struct {
 	RunAsUserName          *string `json:"runAsUserName,omitempty"`
 }
 
-// WindowsSecurityContextOptions constructs an declarative configuration of the WindowsSecurityContextOptions type for use with
-// apply.
-func WindowsSecurityContextOptions() *WindowsSecurityContextOptionsBuilder {
-	return &WindowsSecurityContextOptionsBuilder{}
-}
-
 // SetGMSACredentialSpecName sets the GMSACredentialSpecName field in the declarative configuration to the given value.
-func (b *WindowsSecurityContextOptionsBuilder) SetGMSACredentialSpecName(value string) *WindowsSecurityContextOptionsBuilder {
+func (b *WindowsSecurityContextOptionsApplyConfiguration) SetGMSACredentialSpecName(value string) *WindowsSecurityContextOptionsApplyConfiguration {
 	b.fields.GMSACredentialSpecName = &value
 	return b
 }
 
 // RemoveGMSACredentialSpecName removes the GMSACredentialSpecName field from the declarative configuration.
-func (b *WindowsSecurityContextOptionsBuilder) RemoveGMSACredentialSpecName() *WindowsSecurityContextOptionsBuilder {
+func (b *WindowsSecurityContextOptionsApplyConfiguration) RemoveGMSACredentialSpecName() *WindowsSecurityContextOptionsApplyConfiguration {
 	b.fields.GMSACredentialSpecName = nil
 	return b
 }
 
 // GetGMSACredentialSpecName gets the GMSACredentialSpecName field from the declarative configuration.
-func (b *WindowsSecurityContextOptionsBuilder) GetGMSACredentialSpecName() (value string, ok bool) {
+func (b *WindowsSecurityContextOptionsApplyConfiguration) GetGMSACredentialSpecName() (value string, ok bool) {
 	if v := b.fields.GMSACredentialSpecName; v != nil {
 		return *v, true
 	}
@@ -68,19 +68,19 @@ func (b *WindowsSecurityContextOptionsBuilder) GetGMSACredentialSpecName() (valu
 }
 
 // SetGMSACredentialSpec sets the GMSACredentialSpec field in the declarative configuration to the given value.
-func (b *WindowsSecurityContextOptionsBuilder) SetGMSACredentialSpec(value string) *WindowsSecurityContextOptionsBuilder {
+func (b *WindowsSecurityContextOptionsApplyConfiguration) SetGMSACredentialSpec(value string) *WindowsSecurityContextOptionsApplyConfiguration {
 	b.fields.GMSACredentialSpec = &value
 	return b
 }
 
 // RemoveGMSACredentialSpec removes the GMSACredentialSpec field from the declarative configuration.
-func (b *WindowsSecurityContextOptionsBuilder) RemoveGMSACredentialSpec() *WindowsSecurityContextOptionsBuilder {
+func (b *WindowsSecurityContextOptionsApplyConfiguration) RemoveGMSACredentialSpec() *WindowsSecurityContextOptionsApplyConfiguration {
 	b.fields.GMSACredentialSpec = nil
 	return b
 }
 
 // GetGMSACredentialSpec gets the GMSACredentialSpec field from the declarative configuration.
-func (b *WindowsSecurityContextOptionsBuilder) GetGMSACredentialSpec() (value string, ok bool) {
+func (b *WindowsSecurityContextOptionsApplyConfiguration) GetGMSACredentialSpec() (value string, ok bool) {
 	if v := b.fields.GMSACredentialSpec; v != nil {
 		return *v, true
 	}
@@ -88,27 +88,27 @@ func (b *WindowsSecurityContextOptionsBuilder) GetGMSACredentialSpec() (value st
 }
 
 // SetRunAsUserName sets the RunAsUserName field in the declarative configuration to the given value.
-func (b *WindowsSecurityContextOptionsBuilder) SetRunAsUserName(value string) *WindowsSecurityContextOptionsBuilder {
+func (b *WindowsSecurityContextOptionsApplyConfiguration) SetRunAsUserName(value string) *WindowsSecurityContextOptionsApplyConfiguration {
 	b.fields.RunAsUserName = &value
 	return b
 }
 
 // RemoveRunAsUserName removes the RunAsUserName field from the declarative configuration.
-func (b *WindowsSecurityContextOptionsBuilder) RemoveRunAsUserName() *WindowsSecurityContextOptionsBuilder {
+func (b *WindowsSecurityContextOptionsApplyConfiguration) RemoveRunAsUserName() *WindowsSecurityContextOptionsApplyConfiguration {
 	b.fields.RunAsUserName = nil
 	return b
 }
 
 // GetRunAsUserName gets the RunAsUserName field from the declarative configuration.
-func (b *WindowsSecurityContextOptionsBuilder) GetRunAsUserName() (value string, ok bool) {
+func (b *WindowsSecurityContextOptionsApplyConfiguration) GetRunAsUserName() (value string, ok bool) {
 	if v := b.fields.RunAsUserName; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts WindowsSecurityContextOptionsBuilder to unstructured.
-func (b *WindowsSecurityContextOptionsBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts WindowsSecurityContextOptionsApplyConfiguration to unstructured.
+func (b *WindowsSecurityContextOptionsApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -120,9 +120,9 @@ func (b *WindowsSecurityContextOptionsBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to WindowsSecurityContextOptionsBuilder, replacing the contents
-// of WindowsSecurityContextOptionsBuilder.
-func (b *WindowsSecurityContextOptionsBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to WindowsSecurityContextOptionsApplyConfiguration, replacing the contents
+// of WindowsSecurityContextOptionsApplyConfiguration.
+func (b *WindowsSecurityContextOptionsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &windowsSecurityContextOptionsFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -133,15 +133,15 @@ func (b *WindowsSecurityContextOptionsBuilder) FromUnstructured(u map[string]int
 	return nil
 }
 
-// MarshalJSON marshals WindowsSecurityContextOptionsBuilder to JSON.
-func (b *WindowsSecurityContextOptionsBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals WindowsSecurityContextOptionsApplyConfiguration to JSON.
+func (b *WindowsSecurityContextOptionsApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into WindowsSecurityContextOptionsBuilder, replacing the contents of
-// WindowsSecurityContextOptionsBuilder.
-func (b *WindowsSecurityContextOptionsBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into WindowsSecurityContextOptionsApplyConfiguration, replacing the contents of
+// WindowsSecurityContextOptionsApplyConfiguration.
+func (b *WindowsSecurityContextOptionsApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -149,13 +149,13 @@ func (b *WindowsSecurityContextOptionsBuilder) UnmarshalJSON(data []byte) error 
 	return nil
 }
 
-// WindowsSecurityContextOptionsList represents a list of WindowsSecurityContextOptionsBuilder.
-type WindowsSecurityContextOptionsList []*WindowsSecurityContextOptionsBuilder
+// WindowsSecurityContextOptionsList represents a listAlias of WindowsSecurityContextOptionsApplyConfiguration.
+type WindowsSecurityContextOptionsList []*WindowsSecurityContextOptionsApplyConfiguration
 
-// WindowsSecurityContextOptionsList represents a map of WindowsSecurityContextOptionsBuilder.
-type WindowsSecurityContextOptionsMap map[string]WindowsSecurityContextOptionsBuilder
+// WindowsSecurityContextOptionsList represents a map of WindowsSecurityContextOptionsApplyConfiguration.
+type WindowsSecurityContextOptionsMap map[string]WindowsSecurityContextOptionsApplyConfiguration
 
-func (b *WindowsSecurityContextOptionsBuilder) preMarshal() {
+func (b *WindowsSecurityContextOptionsApplyConfiguration) preMarshal() {
 }
-func (b *WindowsSecurityContextOptionsBuilder) postUnmarshal() {
+func (b *WindowsSecurityContextOptionsApplyConfiguration) postUnmarshal() {
 }

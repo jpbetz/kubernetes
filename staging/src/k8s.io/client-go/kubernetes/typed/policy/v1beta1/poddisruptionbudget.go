@@ -49,7 +49,7 @@ type PodDisruptionBudgetInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1beta1.PodDisruptionBudgetList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.PodDisruptionBudget, err error)
-	Apply(ctx context.Context, podDisruptionBudget policyv1beta1.PodDisruptionBudgetBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PodDisruptionBudget, err error)
+	Apply(ctx context.Context, podDisruptionBudget *policyv1beta1.PodDisruptionBudgetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PodDisruptionBudget, err error)
 	PodDisruptionBudgetExpansion
 }
 
@@ -198,7 +198,7 @@ func (c *podDisruptionBudgets) Patch(ctx context.Context, name string, pt types.
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied podDisruptionBudget.
-func (c *podDisruptionBudgets) Apply(ctx context.Context, podDisruptionBudget policyv1beta1.PodDisruptionBudgetBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PodDisruptionBudget, err error) {
+func (c *podDisruptionBudgets) Apply(ctx context.Context, podDisruptionBudget *policyv1beta1.PodDisruptionBudgetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PodDisruptionBudget, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := podDisruptionBudget.MarshalJSON()
 	if err != nil {

@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// TypeMetaBuilder represents an declarative configuration of the TypeMeta type for use
+// TypeMetaApplyConfiguration represents an declarative configuration of the TypeMeta type for use
 // with apply.
-type TypeMetaBuilder struct {
+type TypeMetaApplyConfiguration struct {
 	fields typeMetaFields
 }
 
+// TypeMetaApplyConfiguration constructs an declarative configuration of the TypeMeta type for use with
+// apply.
+func TypeMeta() *TypeMetaApplyConfiguration {
+	return &TypeMetaApplyConfiguration{}
+}
+
 // typeMetaFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in TypeMetaBuilder.
+// Inline fields are owned by their respective inline type in TypeMetaApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type typeMetaFields struct {
 	APIVersion *string `json:"apiVersion,omitempty"`
 }
 
-// TypeMeta constructs an declarative configuration of the TypeMeta type for use with
-// apply.
-func TypeMeta() *TypeMetaBuilder {
-	return &TypeMetaBuilder{}
-}
-
 // SetKind sets the Kind field in the declarative configuration to the given value.
-func (b *TypeMetaBuilder) SetKind(value string) *TypeMetaBuilder {
+func (b *TypeMetaApplyConfiguration) SetKind(value string) *TypeMetaApplyConfiguration {
 	b.fields.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
-func (b *TypeMetaBuilder) RemoveKind() *TypeMetaBuilder {
+func (b *TypeMetaApplyConfiguration) RemoveKind() *TypeMetaApplyConfiguration {
 	b.fields.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
-func (b *TypeMetaBuilder) GetKind() (value string, ok bool) {
+func (b *TypeMetaApplyConfiguration) GetKind() (value string, ok bool) {
 	if v := b.fields.Kind; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *TypeMetaBuilder) GetKind() (value string, ok bool) {
 }
 
 // SetAPIVersion sets the APIVersion field in the declarative configuration to the given value.
-func (b *TypeMetaBuilder) SetAPIVersion(value string) *TypeMetaBuilder {
+func (b *TypeMetaApplyConfiguration) SetAPIVersion(value string) *TypeMetaApplyConfiguration {
 	b.fields.APIVersion = &value
 	return b
 }
 
 // RemoveAPIVersion removes the APIVersion field from the declarative configuration.
-func (b *TypeMetaBuilder) RemoveAPIVersion() *TypeMetaBuilder {
+func (b *TypeMetaApplyConfiguration) RemoveAPIVersion() *TypeMetaApplyConfiguration {
 	b.fields.APIVersion = nil
 	return b
 }
 
 // GetAPIVersion gets the APIVersion field from the declarative configuration.
-func (b *TypeMetaBuilder) GetAPIVersion() (value string, ok bool) {
+func (b *TypeMetaApplyConfiguration) GetAPIVersion() (value string, ok bool) {
 	if v := b.fields.APIVersion; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts TypeMetaBuilder to unstructured.
-func (b *TypeMetaBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts TypeMetaApplyConfiguration to unstructured.
+func (b *TypeMetaApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *TypeMetaBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to TypeMetaBuilder, replacing the contents
-// of TypeMetaBuilder.
-func (b *TypeMetaBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to TypeMetaApplyConfiguration, replacing the contents
+// of TypeMetaApplyConfiguration.
+func (b *TypeMetaApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &typeMetaFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *TypeMetaBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals TypeMetaBuilder to JSON.
-func (b *TypeMetaBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals TypeMetaApplyConfiguration to JSON.
+func (b *TypeMetaApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into TypeMetaBuilder, replacing the contents of
-// TypeMetaBuilder.
-func (b *TypeMetaBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into TypeMetaApplyConfiguration, replacing the contents of
+// TypeMetaApplyConfiguration.
+func (b *TypeMetaApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *TypeMetaBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// TypeMetaList represents a list of TypeMetaBuilder.
-type TypeMetaList []*TypeMetaBuilder
+// TypeMetaList represents a listAlias of TypeMetaApplyConfiguration.
+type TypeMetaList []*TypeMetaApplyConfiguration
 
-// TypeMetaList represents a map of TypeMetaBuilder.
-type TypeMetaMap map[string]TypeMetaBuilder
+// TypeMetaList represents a map of TypeMetaApplyConfiguration.
+type TypeMetaMap map[string]TypeMetaApplyConfiguration
 
-func (b *TypeMetaBuilder) preMarshal() {
+func (b *TypeMetaApplyConfiguration) preMarshal() {
 }
-func (b *TypeMetaBuilder) postUnmarshal() {
+func (b *TypeMetaApplyConfiguration) postUnmarshal() {
 }

@@ -26,82 +26,82 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// SecretBuilder represents an declarative configuration of the Secret type for use
+// SecretApplyConfiguration represents an declarative configuration of the Secret type for use
 // with apply.
-type SecretBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type SecretApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   secretFields
 }
 
+// SecretApplyConfiguration constructs an declarative configuration of the Secret type for use with
+// apply.
+func Secret() *SecretApplyConfiguration {
+	return &SecretApplyConfiguration{}
+}
+
 // secretFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SecretBuilder.
+// Inline fields are owned by their respective inline type in SecretApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type secretFields struct {
-	Kind       *string               `json:"kind,omitempty"`       // inlined SecretBuilder.typeMeta.Kind field
-	APIVersion *string               `json:"apiVersion,omitempty"` // inlined SecretBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder `json:"metadata,omitempty"`
-	Immutable  *bool                 `json:"immutable,omitempty"`
-	Data       *map[string][]byte    `json:"data,omitempty"`
-	StringData *map[string]string    `json:"stringData,omitempty"`
-	Type       *corev1.SecretType    `json:"type,omitempty"`
-}
-
-// Secret constructs an declarative configuration of the Secret type for use with
-// apply.
-func Secret() *SecretBuilder {
-	return &SecretBuilder{}
+	Kind       *string                          `json:"kind,omitempty"`       // inlined SecretApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                          `json:"apiVersion,omitempty"` // inlined SecretApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Immutable  *bool                            `json:"immutable,omitempty"`
+	Data       *map[string][]byte               `json:"data,omitempty"`
+	StringData *map[string]string               `json:"stringData,omitempty"`
+	Type       *corev1.SecretType               `json:"type,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *SecretBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *SecretBuilder {
+func (b *SecretApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *SecretApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *SecretBuilder) RemoveTypeMeta() *SecretBuilder {
+func (b *SecretApplyConfiguration) RemoveTypeMeta() *SecretApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *SecretBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *SecretApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *SecretBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *SecretBuilder {
+func (b *SecretApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *SecretApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *SecretBuilder) RemoveObjectMeta() *SecretBuilder {
+func (b *SecretApplyConfiguration) RemoveObjectMeta() *SecretApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *SecretBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *SecretApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetImmutable sets the Immutable field in the declarative configuration to the given value.
-func (b *SecretBuilder) SetImmutable(value bool) *SecretBuilder {
+func (b *SecretApplyConfiguration) SetImmutable(value bool) *SecretApplyConfiguration {
 	b.fields.Immutable = &value
 	return b
 }
 
 // RemoveImmutable removes the Immutable field from the declarative configuration.
-func (b *SecretBuilder) RemoveImmutable() *SecretBuilder {
+func (b *SecretApplyConfiguration) RemoveImmutable() *SecretApplyConfiguration {
 	b.fields.Immutable = nil
 	return b
 }
 
 // GetImmutable gets the Immutable field from the declarative configuration.
-func (b *SecretBuilder) GetImmutable() (value bool, ok bool) {
+func (b *SecretApplyConfiguration) GetImmutable() (value bool, ok bool) {
 	if v := b.fields.Immutable; v != nil {
 		return *v, true
 	}
@@ -109,19 +109,19 @@ func (b *SecretBuilder) GetImmutable() (value bool, ok bool) {
 }
 
 // SetData sets the Data field in the declarative configuration to the given value.
-func (b *SecretBuilder) SetData(value map[string][]byte) *SecretBuilder {
+func (b *SecretApplyConfiguration) SetData(value map[string][]byte) *SecretApplyConfiguration {
 	b.fields.Data = &value
 	return b
 }
 
 // RemoveData removes the Data field from the declarative configuration.
-func (b *SecretBuilder) RemoveData() *SecretBuilder {
+func (b *SecretApplyConfiguration) RemoveData() *SecretApplyConfiguration {
 	b.fields.Data = nil
 	return b
 }
 
 // GetData gets the Data field from the declarative configuration.
-func (b *SecretBuilder) GetData() (value map[string][]byte, ok bool) {
+func (b *SecretApplyConfiguration) GetData() (value map[string][]byte, ok bool) {
 	if v := b.fields.Data; v != nil {
 		return *v, true
 	}
@@ -129,19 +129,19 @@ func (b *SecretBuilder) GetData() (value map[string][]byte, ok bool) {
 }
 
 // SetStringData sets the StringData field in the declarative configuration to the given value.
-func (b *SecretBuilder) SetStringData(value map[string]string) *SecretBuilder {
+func (b *SecretApplyConfiguration) SetStringData(value map[string]string) *SecretApplyConfiguration {
 	b.fields.StringData = &value
 	return b
 }
 
 // RemoveStringData removes the StringData field from the declarative configuration.
-func (b *SecretBuilder) RemoveStringData() *SecretBuilder {
+func (b *SecretApplyConfiguration) RemoveStringData() *SecretApplyConfiguration {
 	b.fields.StringData = nil
 	return b
 }
 
 // GetStringData gets the StringData field from the declarative configuration.
-func (b *SecretBuilder) GetStringData() (value map[string]string, ok bool) {
+func (b *SecretApplyConfiguration) GetStringData() (value map[string]string, ok bool) {
 	if v := b.fields.StringData; v != nil {
 		return *v, true
 	}
@@ -149,27 +149,27 @@ func (b *SecretBuilder) GetStringData() (value map[string]string, ok bool) {
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b *SecretBuilder) SetType(value corev1.SecretType) *SecretBuilder {
+func (b *SecretApplyConfiguration) SetType(value corev1.SecretType) *SecretApplyConfiguration {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b *SecretBuilder) RemoveType() *SecretBuilder {
+func (b *SecretApplyConfiguration) RemoveType() *SecretApplyConfiguration {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b *SecretBuilder) GetType() (value corev1.SecretType, ok bool) {
+func (b *SecretApplyConfiguration) GetType() (value corev1.SecretType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts SecretBuilder to unstructured.
-func (b *SecretBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts SecretApplyConfiguration to unstructured.
+func (b *SecretApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -181,9 +181,9 @@ func (b *SecretBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to SecretBuilder, replacing the contents
-// of SecretBuilder.
-func (b *SecretBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to SecretApplyConfiguration, replacing the contents
+// of SecretApplyConfiguration.
+func (b *SecretApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &secretFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -194,15 +194,15 @@ func (b *SecretBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals SecretBuilder to JSON.
-func (b *SecretBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals SecretApplyConfiguration to JSON.
+func (b *SecretApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into SecretBuilder, replacing the contents of
-// SecretBuilder.
-func (b *SecretBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into SecretApplyConfiguration, replacing the contents of
+// SecretApplyConfiguration.
+func (b *SecretApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -210,13 +210,13 @@ func (b *SecretBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// SecretList represents a list of SecretBuilder.
-type SecretList []*SecretBuilder
+// SecretList represents a listAlias of SecretApplyConfiguration.
+type SecretList []*SecretApplyConfiguration
 
-// SecretList represents a map of SecretBuilder.
-type SecretMap map[string]SecretBuilder
+// SecretList represents a map of SecretApplyConfiguration.
+type SecretMap map[string]SecretApplyConfiguration
 
-func (b *SecretBuilder) preMarshal() {
+func (b *SecretApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -226,9 +226,9 @@ func (b *SecretBuilder) preMarshal() {
 		}
 	}
 }
-func (b *SecretBuilder) postUnmarshal() {
+func (b *SecretApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ContainerStateTerminatedBuilder represents an declarative configuration of the ContainerStateTerminated type for use
+// ContainerStateTerminatedApplyConfiguration represents an declarative configuration of the ContainerStateTerminated type for use
 // with apply.
-type ContainerStateTerminatedBuilder struct {
+type ContainerStateTerminatedApplyConfiguration struct {
 	fields containerStateTerminatedFields
 }
 
+// ContainerStateTerminatedApplyConfiguration constructs an declarative configuration of the ContainerStateTerminated type for use with
+// apply.
+func ContainerStateTerminated() *ContainerStateTerminatedApplyConfiguration {
+	return &ContainerStateTerminatedApplyConfiguration{}
+}
+
 // containerStateTerminatedFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ContainerStateTerminatedBuilder.
+// Inline fields are owned by their respective inline type in ContainerStateTerminatedApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -46,26 +52,20 @@ type containerStateTerminatedFields struct {
 	ContainerID *string  `json:"containerID,omitempty"`
 }
 
-// ContainerStateTerminated constructs an declarative configuration of the ContainerStateTerminated type for use with
-// apply.
-func ContainerStateTerminated() *ContainerStateTerminatedBuilder {
-	return &ContainerStateTerminatedBuilder{}
-}
-
 // SetExitCode sets the ExitCode field in the declarative configuration to the given value.
-func (b *ContainerStateTerminatedBuilder) SetExitCode(value int32) *ContainerStateTerminatedBuilder {
+func (b *ContainerStateTerminatedApplyConfiguration) SetExitCode(value int32) *ContainerStateTerminatedApplyConfiguration {
 	b.fields.ExitCode = &value
 	return b
 }
 
 // RemoveExitCode removes the ExitCode field from the declarative configuration.
-func (b *ContainerStateTerminatedBuilder) RemoveExitCode() *ContainerStateTerminatedBuilder {
+func (b *ContainerStateTerminatedApplyConfiguration) RemoveExitCode() *ContainerStateTerminatedApplyConfiguration {
 	b.fields.ExitCode = nil
 	return b
 }
 
 // GetExitCode gets the ExitCode field from the declarative configuration.
-func (b *ContainerStateTerminatedBuilder) GetExitCode() (value int32, ok bool) {
+func (b *ContainerStateTerminatedApplyConfiguration) GetExitCode() (value int32, ok bool) {
 	if v := b.fields.ExitCode; v != nil {
 		return *v, true
 	}
@@ -73,19 +73,19 @@ func (b *ContainerStateTerminatedBuilder) GetExitCode() (value int32, ok bool) {
 }
 
 // SetSignal sets the Signal field in the declarative configuration to the given value.
-func (b *ContainerStateTerminatedBuilder) SetSignal(value int32) *ContainerStateTerminatedBuilder {
+func (b *ContainerStateTerminatedApplyConfiguration) SetSignal(value int32) *ContainerStateTerminatedApplyConfiguration {
 	b.fields.Signal = &value
 	return b
 }
 
 // RemoveSignal removes the Signal field from the declarative configuration.
-func (b *ContainerStateTerminatedBuilder) RemoveSignal() *ContainerStateTerminatedBuilder {
+func (b *ContainerStateTerminatedApplyConfiguration) RemoveSignal() *ContainerStateTerminatedApplyConfiguration {
 	b.fields.Signal = nil
 	return b
 }
 
 // GetSignal gets the Signal field from the declarative configuration.
-func (b *ContainerStateTerminatedBuilder) GetSignal() (value int32, ok bool) {
+func (b *ContainerStateTerminatedApplyConfiguration) GetSignal() (value int32, ok bool) {
 	if v := b.fields.Signal; v != nil {
 		return *v, true
 	}
@@ -93,19 +93,19 @@ func (b *ContainerStateTerminatedBuilder) GetSignal() (value int32, ok bool) {
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b *ContainerStateTerminatedBuilder) SetReason(value string) *ContainerStateTerminatedBuilder {
+func (b *ContainerStateTerminatedApplyConfiguration) SetReason(value string) *ContainerStateTerminatedApplyConfiguration {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b *ContainerStateTerminatedBuilder) RemoveReason() *ContainerStateTerminatedBuilder {
+func (b *ContainerStateTerminatedApplyConfiguration) RemoveReason() *ContainerStateTerminatedApplyConfiguration {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b *ContainerStateTerminatedBuilder) GetReason() (value string, ok bool) {
+func (b *ContainerStateTerminatedApplyConfiguration) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -113,19 +113,19 @@ func (b *ContainerStateTerminatedBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b *ContainerStateTerminatedBuilder) SetMessage(value string) *ContainerStateTerminatedBuilder {
+func (b *ContainerStateTerminatedApplyConfiguration) SetMessage(value string) *ContainerStateTerminatedApplyConfiguration {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b *ContainerStateTerminatedBuilder) RemoveMessage() *ContainerStateTerminatedBuilder {
+func (b *ContainerStateTerminatedApplyConfiguration) RemoveMessage() *ContainerStateTerminatedApplyConfiguration {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b *ContainerStateTerminatedBuilder) GetMessage() (value string, ok bool) {
+func (b *ContainerStateTerminatedApplyConfiguration) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
@@ -133,19 +133,19 @@ func (b *ContainerStateTerminatedBuilder) GetMessage() (value string, ok bool) {
 }
 
 // SetStartedAt sets the StartedAt field in the declarative configuration to the given value.
-func (b *ContainerStateTerminatedBuilder) SetStartedAt(value v1.Time) *ContainerStateTerminatedBuilder {
+func (b *ContainerStateTerminatedApplyConfiguration) SetStartedAt(value v1.Time) *ContainerStateTerminatedApplyConfiguration {
 	b.fields.StartedAt = &value
 	return b
 }
 
 // RemoveStartedAt removes the StartedAt field from the declarative configuration.
-func (b *ContainerStateTerminatedBuilder) RemoveStartedAt() *ContainerStateTerminatedBuilder {
+func (b *ContainerStateTerminatedApplyConfiguration) RemoveStartedAt() *ContainerStateTerminatedApplyConfiguration {
 	b.fields.StartedAt = nil
 	return b
 }
 
 // GetStartedAt gets the StartedAt field from the declarative configuration.
-func (b *ContainerStateTerminatedBuilder) GetStartedAt() (value v1.Time, ok bool) {
+func (b *ContainerStateTerminatedApplyConfiguration) GetStartedAt() (value v1.Time, ok bool) {
 	if v := b.fields.StartedAt; v != nil {
 		return *v, true
 	}
@@ -153,19 +153,19 @@ func (b *ContainerStateTerminatedBuilder) GetStartedAt() (value v1.Time, ok bool
 }
 
 // SetFinishedAt sets the FinishedAt field in the declarative configuration to the given value.
-func (b *ContainerStateTerminatedBuilder) SetFinishedAt(value v1.Time) *ContainerStateTerminatedBuilder {
+func (b *ContainerStateTerminatedApplyConfiguration) SetFinishedAt(value v1.Time) *ContainerStateTerminatedApplyConfiguration {
 	b.fields.FinishedAt = &value
 	return b
 }
 
 // RemoveFinishedAt removes the FinishedAt field from the declarative configuration.
-func (b *ContainerStateTerminatedBuilder) RemoveFinishedAt() *ContainerStateTerminatedBuilder {
+func (b *ContainerStateTerminatedApplyConfiguration) RemoveFinishedAt() *ContainerStateTerminatedApplyConfiguration {
 	b.fields.FinishedAt = nil
 	return b
 }
 
 // GetFinishedAt gets the FinishedAt field from the declarative configuration.
-func (b *ContainerStateTerminatedBuilder) GetFinishedAt() (value v1.Time, ok bool) {
+func (b *ContainerStateTerminatedApplyConfiguration) GetFinishedAt() (value v1.Time, ok bool) {
 	if v := b.fields.FinishedAt; v != nil {
 		return *v, true
 	}
@@ -173,27 +173,27 @@ func (b *ContainerStateTerminatedBuilder) GetFinishedAt() (value v1.Time, ok boo
 }
 
 // SetContainerID sets the ContainerID field in the declarative configuration to the given value.
-func (b *ContainerStateTerminatedBuilder) SetContainerID(value string) *ContainerStateTerminatedBuilder {
+func (b *ContainerStateTerminatedApplyConfiguration) SetContainerID(value string) *ContainerStateTerminatedApplyConfiguration {
 	b.fields.ContainerID = &value
 	return b
 }
 
 // RemoveContainerID removes the ContainerID field from the declarative configuration.
-func (b *ContainerStateTerminatedBuilder) RemoveContainerID() *ContainerStateTerminatedBuilder {
+func (b *ContainerStateTerminatedApplyConfiguration) RemoveContainerID() *ContainerStateTerminatedApplyConfiguration {
 	b.fields.ContainerID = nil
 	return b
 }
 
 // GetContainerID gets the ContainerID field from the declarative configuration.
-func (b *ContainerStateTerminatedBuilder) GetContainerID() (value string, ok bool) {
+func (b *ContainerStateTerminatedApplyConfiguration) GetContainerID() (value string, ok bool) {
 	if v := b.fields.ContainerID; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ContainerStateTerminatedBuilder to unstructured.
-func (b *ContainerStateTerminatedBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ContainerStateTerminatedApplyConfiguration to unstructured.
+func (b *ContainerStateTerminatedApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -205,9 +205,9 @@ func (b *ContainerStateTerminatedBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ContainerStateTerminatedBuilder, replacing the contents
-// of ContainerStateTerminatedBuilder.
-func (b *ContainerStateTerminatedBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ContainerStateTerminatedApplyConfiguration, replacing the contents
+// of ContainerStateTerminatedApplyConfiguration.
+func (b *ContainerStateTerminatedApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &containerStateTerminatedFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -218,15 +218,15 @@ func (b *ContainerStateTerminatedBuilder) FromUnstructured(u map[string]interfac
 	return nil
 }
 
-// MarshalJSON marshals ContainerStateTerminatedBuilder to JSON.
-func (b *ContainerStateTerminatedBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ContainerStateTerminatedApplyConfiguration to JSON.
+func (b *ContainerStateTerminatedApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ContainerStateTerminatedBuilder, replacing the contents of
-// ContainerStateTerminatedBuilder.
-func (b *ContainerStateTerminatedBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ContainerStateTerminatedApplyConfiguration, replacing the contents of
+// ContainerStateTerminatedApplyConfiguration.
+func (b *ContainerStateTerminatedApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -234,13 +234,13 @@ func (b *ContainerStateTerminatedBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ContainerStateTerminatedList represents a list of ContainerStateTerminatedBuilder.
-type ContainerStateTerminatedList []*ContainerStateTerminatedBuilder
+// ContainerStateTerminatedList represents a listAlias of ContainerStateTerminatedApplyConfiguration.
+type ContainerStateTerminatedList []*ContainerStateTerminatedApplyConfiguration
 
-// ContainerStateTerminatedList represents a map of ContainerStateTerminatedBuilder.
-type ContainerStateTerminatedMap map[string]ContainerStateTerminatedBuilder
+// ContainerStateTerminatedList represents a map of ContainerStateTerminatedApplyConfiguration.
+type ContainerStateTerminatedMap map[string]ContainerStateTerminatedApplyConfiguration
 
-func (b *ContainerStateTerminatedBuilder) preMarshal() {
+func (b *ContainerStateTerminatedApplyConfiguration) preMarshal() {
 }
-func (b *ContainerStateTerminatedBuilder) postUnmarshal() {
+func (b *ContainerStateTerminatedApplyConfiguration) postUnmarshal() {
 }

@@ -124,7 +124,7 @@ func (c *FakeMutatingWebhookConfigurations) Patch(ctx context.Context, name stri
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied mutatingWebhookConfiguration.
-func (c *FakeMutatingWebhookConfigurations) Apply(ctx context.Context, mutatingWebhookConfiguration typebuildersadmissionregistrationv1.MutatingWebhookConfigurationBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *admissionregistrationv1.MutatingWebhookConfiguration, err error) {
+func (c *FakeMutatingWebhookConfigurations) Apply(ctx context.Context, mutatingWebhookConfiguration *typebuildersadmissionregistrationv1.MutatingWebhookConfigurationApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *admissionregistrationv1.MutatingWebhookConfiguration, err error) {
 	data, err := mutatingWebhookConfiguration.MarshalJSON()
 	if err != nil {
 		return nil, err

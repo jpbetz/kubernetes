@@ -24,68 +24,68 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// SecretEnvSourceBuilder represents an declarative configuration of the SecretEnvSource type for use
+// SecretEnvSourceApplyConfiguration represents an declarative configuration of the SecretEnvSource type for use
 // with apply.
-type SecretEnvSourceBuilder struct {
-	localObjectReference *LocalObjectReferenceBuilder // inlined type
+type SecretEnvSourceApplyConfiguration struct {
+	localObjectReference *LocalObjectReferenceApplyConfiguration // inlined type
 	fields               secretEnvSourceFields
 }
 
+// SecretEnvSourceApplyConfiguration constructs an declarative configuration of the SecretEnvSource type for use with
+// apply.
+func SecretEnvSource() *SecretEnvSourceApplyConfiguration {
+	return &SecretEnvSourceApplyConfiguration{}
+}
+
 // secretEnvSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SecretEnvSourceBuilder.
+// Inline fields are owned by their respective inline type in SecretEnvSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type secretEnvSourceFields struct {
-	Name     *string `json:"name,omitempty"` // inlined SecretEnvSourceBuilder.localObjectReference.Name field
+	Name     *string `json:"name,omitempty"` // inlined SecretEnvSourceApplyConfiguration.localObjectReference.Name field
 	Optional *bool   `json:"optional,omitempty"`
 }
 
-// SecretEnvSource constructs an declarative configuration of the SecretEnvSource type for use with
-// apply.
-func SecretEnvSource() *SecretEnvSourceBuilder {
-	return &SecretEnvSourceBuilder{}
-}
-
 // SetLocalObjectReference sets the LocalObjectReference field in the declarative configuration to the given value.
-func (b *SecretEnvSourceBuilder) SetLocalObjectReference(value *LocalObjectReferenceBuilder) *SecretEnvSourceBuilder {
+func (b *SecretEnvSourceApplyConfiguration) SetLocalObjectReference(value *LocalObjectReferenceApplyConfiguration) *SecretEnvSourceApplyConfiguration {
 	b.localObjectReference = value
 	return b
 }
 
 // RemoveLocalObjectReference removes the LocalObjectReference field from the declarative configuration.
-func (b *SecretEnvSourceBuilder) RemoveLocalObjectReference() *SecretEnvSourceBuilder {
+func (b *SecretEnvSourceApplyConfiguration) RemoveLocalObjectReference() *SecretEnvSourceApplyConfiguration {
 	b.localObjectReference = nil
 	return b
 }
 
 // GetLocalObjectReference gets the LocalObjectReference field from the declarative configuration.
-func (b *SecretEnvSourceBuilder) GetLocalObjectReference() (value *LocalObjectReferenceBuilder, ok bool) {
+func (b *SecretEnvSourceApplyConfiguration) GetLocalObjectReference() (value *LocalObjectReferenceApplyConfiguration, ok bool) {
 	return b.localObjectReference, true
 }
 
 // SetOptional sets the Optional field in the declarative configuration to the given value.
-func (b *SecretEnvSourceBuilder) SetOptional(value bool) *SecretEnvSourceBuilder {
+func (b *SecretEnvSourceApplyConfiguration) SetOptional(value bool) *SecretEnvSourceApplyConfiguration {
 	b.fields.Optional = &value
 	return b
 }
 
 // RemoveOptional removes the Optional field from the declarative configuration.
-func (b *SecretEnvSourceBuilder) RemoveOptional() *SecretEnvSourceBuilder {
+func (b *SecretEnvSourceApplyConfiguration) RemoveOptional() *SecretEnvSourceApplyConfiguration {
 	b.fields.Optional = nil
 	return b
 }
 
 // GetOptional gets the Optional field from the declarative configuration.
-func (b *SecretEnvSourceBuilder) GetOptional() (value bool, ok bool) {
+func (b *SecretEnvSourceApplyConfiguration) GetOptional() (value bool, ok bool) {
 	if v := b.fields.Optional; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts SecretEnvSourceBuilder to unstructured.
-func (b *SecretEnvSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts SecretEnvSourceApplyConfiguration to unstructured.
+func (b *SecretEnvSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -97,9 +97,9 @@ func (b *SecretEnvSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to SecretEnvSourceBuilder, replacing the contents
-// of SecretEnvSourceBuilder.
-func (b *SecretEnvSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to SecretEnvSourceApplyConfiguration, replacing the contents
+// of SecretEnvSourceApplyConfiguration.
+func (b *SecretEnvSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &secretEnvSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -110,15 +110,15 @@ func (b *SecretEnvSourceBuilder) FromUnstructured(u map[string]interface{}) erro
 	return nil
 }
 
-// MarshalJSON marshals SecretEnvSourceBuilder to JSON.
-func (b *SecretEnvSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals SecretEnvSourceApplyConfiguration to JSON.
+func (b *SecretEnvSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into SecretEnvSourceBuilder, replacing the contents of
-// SecretEnvSourceBuilder.
-func (b *SecretEnvSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into SecretEnvSourceApplyConfiguration, replacing the contents of
+// SecretEnvSourceApplyConfiguration.
+func (b *SecretEnvSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -126,22 +126,22 @@ func (b *SecretEnvSourceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// SecretEnvSourceList represents a list of SecretEnvSourceBuilder.
-type SecretEnvSourceList []*SecretEnvSourceBuilder
+// SecretEnvSourceList represents a listAlias of SecretEnvSourceApplyConfiguration.
+type SecretEnvSourceList []*SecretEnvSourceApplyConfiguration
 
-// SecretEnvSourceList represents a map of SecretEnvSourceBuilder.
-type SecretEnvSourceMap map[string]SecretEnvSourceBuilder
+// SecretEnvSourceList represents a map of SecretEnvSourceApplyConfiguration.
+type SecretEnvSourceMap map[string]SecretEnvSourceApplyConfiguration
 
-func (b *SecretEnvSourceBuilder) preMarshal() {
+func (b *SecretEnvSourceApplyConfiguration) preMarshal() {
 	if b.localObjectReference != nil {
 		if v, ok := b.localObjectReference.GetName(); ok {
 			b.fields.Name = &v
 		}
 	}
 }
-func (b *SecretEnvSourceBuilder) postUnmarshal() {
+func (b *SecretEnvSourceApplyConfiguration) postUnmarshal() {
 	if b.localObjectReference == nil {
-		b.localObjectReference = &LocalObjectReferenceBuilder{}
+		b.localObjectReference = &LocalObjectReferenceApplyConfiguration{}
 	}
 	if b.fields.Name != nil {
 		b.localObjectReference.SetName(*b.fields.Name)

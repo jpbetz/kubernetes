@@ -26,44 +26,44 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// ExternalMetricSourceBuilder represents an declarative configuration of the ExternalMetricSource type for use
+// ExternalMetricSourceApplyConfiguration represents an declarative configuration of the ExternalMetricSource type for use
 // with apply.
-type ExternalMetricSourceBuilder struct {
+type ExternalMetricSourceApplyConfiguration struct {
 	fields externalMetricSourceFields
 }
 
+// ExternalMetricSourceApplyConfiguration constructs an declarative configuration of the ExternalMetricSource type for use with
+// apply.
+func ExternalMetricSource() *ExternalMetricSourceApplyConfiguration {
+	return &ExternalMetricSourceApplyConfiguration{}
+}
+
 // externalMetricSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ExternalMetricSourceBuilder.
+// Inline fields are owned by their respective inline type in ExternalMetricSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type externalMetricSourceFields struct {
-	MetricName         *string                  `json:"metricName,omitempty"`
-	MetricSelector     *v1.LabelSelectorBuilder `json:"metricSelector,omitempty"`
-	TargetValue        *resource.Quantity       `json:"targetValue,omitempty"`
-	TargetAverageValue *resource.Quantity       `json:"targetAverageValue,omitempty"`
-}
-
-// ExternalMetricSource constructs an declarative configuration of the ExternalMetricSource type for use with
-// apply.
-func ExternalMetricSource() *ExternalMetricSourceBuilder {
-	return &ExternalMetricSourceBuilder{}
+	MetricName         *string                             `json:"metricName,omitempty"`
+	MetricSelector     *v1.LabelSelectorApplyConfiguration `json:"metricSelector,omitempty"`
+	TargetValue        *resource.Quantity                  `json:"targetValue,omitempty"`
+	TargetAverageValue *resource.Quantity                  `json:"targetAverageValue,omitempty"`
 }
 
 // SetMetricName sets the MetricName field in the declarative configuration to the given value.
-func (b *ExternalMetricSourceBuilder) SetMetricName(value string) *ExternalMetricSourceBuilder {
+func (b *ExternalMetricSourceApplyConfiguration) SetMetricName(value string) *ExternalMetricSourceApplyConfiguration {
 	b.fields.MetricName = &value
 	return b
 }
 
 // RemoveMetricName removes the MetricName field from the declarative configuration.
-func (b *ExternalMetricSourceBuilder) RemoveMetricName() *ExternalMetricSourceBuilder {
+func (b *ExternalMetricSourceApplyConfiguration) RemoveMetricName() *ExternalMetricSourceApplyConfiguration {
 	b.fields.MetricName = nil
 	return b
 }
 
 // GetMetricName gets the MetricName field from the declarative configuration.
-func (b *ExternalMetricSourceBuilder) GetMetricName() (value string, ok bool) {
+func (b *ExternalMetricSourceApplyConfiguration) GetMetricName() (value string, ok bool) {
 	if v := b.fields.MetricName; v != nil {
 		return *v, true
 	}
@@ -71,36 +71,36 @@ func (b *ExternalMetricSourceBuilder) GetMetricName() (value string, ok bool) {
 }
 
 // SetMetricSelector sets the MetricSelector field in the declarative configuration to the given value.
-func (b *ExternalMetricSourceBuilder) SetMetricSelector(value *v1.LabelSelectorBuilder) *ExternalMetricSourceBuilder {
+func (b *ExternalMetricSourceApplyConfiguration) SetMetricSelector(value *v1.LabelSelectorApplyConfiguration) *ExternalMetricSourceApplyConfiguration {
 	b.fields.MetricSelector = value
 	return b
 }
 
 // RemoveMetricSelector removes the MetricSelector field from the declarative configuration.
-func (b *ExternalMetricSourceBuilder) RemoveMetricSelector() *ExternalMetricSourceBuilder {
+func (b *ExternalMetricSourceApplyConfiguration) RemoveMetricSelector() *ExternalMetricSourceApplyConfiguration {
 	b.fields.MetricSelector = nil
 	return b
 }
 
 // GetMetricSelector gets the MetricSelector field from the declarative configuration.
-func (b *ExternalMetricSourceBuilder) GetMetricSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+func (b *ExternalMetricSourceApplyConfiguration) GetMetricSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
 	return b.fields.MetricSelector, b.fields.MetricSelector != nil
 }
 
 // SetTargetValue sets the TargetValue field in the declarative configuration to the given value.
-func (b *ExternalMetricSourceBuilder) SetTargetValue(value resource.Quantity) *ExternalMetricSourceBuilder {
+func (b *ExternalMetricSourceApplyConfiguration) SetTargetValue(value resource.Quantity) *ExternalMetricSourceApplyConfiguration {
 	b.fields.TargetValue = &value
 	return b
 }
 
 // RemoveTargetValue removes the TargetValue field from the declarative configuration.
-func (b *ExternalMetricSourceBuilder) RemoveTargetValue() *ExternalMetricSourceBuilder {
+func (b *ExternalMetricSourceApplyConfiguration) RemoveTargetValue() *ExternalMetricSourceApplyConfiguration {
 	b.fields.TargetValue = nil
 	return b
 }
 
 // GetTargetValue gets the TargetValue field from the declarative configuration.
-func (b *ExternalMetricSourceBuilder) GetTargetValue() (value resource.Quantity, ok bool) {
+func (b *ExternalMetricSourceApplyConfiguration) GetTargetValue() (value resource.Quantity, ok bool) {
 	if v := b.fields.TargetValue; v != nil {
 		return *v, true
 	}
@@ -108,27 +108,27 @@ func (b *ExternalMetricSourceBuilder) GetTargetValue() (value resource.Quantity,
 }
 
 // SetTargetAverageValue sets the TargetAverageValue field in the declarative configuration to the given value.
-func (b *ExternalMetricSourceBuilder) SetTargetAverageValue(value resource.Quantity) *ExternalMetricSourceBuilder {
+func (b *ExternalMetricSourceApplyConfiguration) SetTargetAverageValue(value resource.Quantity) *ExternalMetricSourceApplyConfiguration {
 	b.fields.TargetAverageValue = &value
 	return b
 }
 
 // RemoveTargetAverageValue removes the TargetAverageValue field from the declarative configuration.
-func (b *ExternalMetricSourceBuilder) RemoveTargetAverageValue() *ExternalMetricSourceBuilder {
+func (b *ExternalMetricSourceApplyConfiguration) RemoveTargetAverageValue() *ExternalMetricSourceApplyConfiguration {
 	b.fields.TargetAverageValue = nil
 	return b
 }
 
 // GetTargetAverageValue gets the TargetAverageValue field from the declarative configuration.
-func (b *ExternalMetricSourceBuilder) GetTargetAverageValue() (value resource.Quantity, ok bool) {
+func (b *ExternalMetricSourceApplyConfiguration) GetTargetAverageValue() (value resource.Quantity, ok bool) {
 	if v := b.fields.TargetAverageValue; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ExternalMetricSourceBuilder to unstructured.
-func (b *ExternalMetricSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ExternalMetricSourceApplyConfiguration to unstructured.
+func (b *ExternalMetricSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -140,9 +140,9 @@ func (b *ExternalMetricSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ExternalMetricSourceBuilder, replacing the contents
-// of ExternalMetricSourceBuilder.
-func (b *ExternalMetricSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ExternalMetricSourceApplyConfiguration, replacing the contents
+// of ExternalMetricSourceApplyConfiguration.
+func (b *ExternalMetricSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &externalMetricSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -153,15 +153,15 @@ func (b *ExternalMetricSourceBuilder) FromUnstructured(u map[string]interface{})
 	return nil
 }
 
-// MarshalJSON marshals ExternalMetricSourceBuilder to JSON.
-func (b *ExternalMetricSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ExternalMetricSourceApplyConfiguration to JSON.
+func (b *ExternalMetricSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ExternalMetricSourceBuilder, replacing the contents of
-// ExternalMetricSourceBuilder.
-func (b *ExternalMetricSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ExternalMetricSourceApplyConfiguration, replacing the contents of
+// ExternalMetricSourceApplyConfiguration.
+func (b *ExternalMetricSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -169,13 +169,13 @@ func (b *ExternalMetricSourceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ExternalMetricSourceList represents a list of ExternalMetricSourceBuilder.
-type ExternalMetricSourceList []*ExternalMetricSourceBuilder
+// ExternalMetricSourceList represents a listAlias of ExternalMetricSourceApplyConfiguration.
+type ExternalMetricSourceList []*ExternalMetricSourceApplyConfiguration
 
-// ExternalMetricSourceList represents a map of ExternalMetricSourceBuilder.
-type ExternalMetricSourceMap map[string]ExternalMetricSourceBuilder
+// ExternalMetricSourceList represents a map of ExternalMetricSourceApplyConfiguration.
+type ExternalMetricSourceMap map[string]ExternalMetricSourceApplyConfiguration
 
-func (b *ExternalMetricSourceBuilder) preMarshal() {
+func (b *ExternalMetricSourceApplyConfiguration) preMarshal() {
 }
-func (b *ExternalMetricSourceBuilder) postUnmarshal() {
+func (b *ExternalMetricSourceApplyConfiguration) postUnmarshal() {
 }

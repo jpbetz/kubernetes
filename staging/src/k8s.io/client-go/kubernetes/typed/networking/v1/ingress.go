@@ -49,7 +49,7 @@ type IngressInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.IngressList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.Ingress, err error)
-	Apply(ctx context.Context, ingress networkingv1.IngressBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Ingress, err error)
+	Apply(ctx context.Context, ingress *networkingv1.IngressApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Ingress, err error)
 	IngressExpansion
 }
 
@@ -198,7 +198,7 @@ func (c *ingresses) Patch(ctx context.Context, name string, pt types.PatchType, 
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied ingress.
-func (c *ingresses) Apply(ctx context.Context, ingress networkingv1.IngressBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Ingress, err error) {
+func (c *ingresses) Apply(ctx context.Context, ingress *networkingv1.IngressApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Ingress, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := ingress.MarshalJSON()
 	if err != nil {

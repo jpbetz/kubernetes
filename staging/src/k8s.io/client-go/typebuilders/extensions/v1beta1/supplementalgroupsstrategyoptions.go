@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// SupplementalGroupsStrategyOptionsBuilder represents an declarative configuration of the SupplementalGroupsStrategyOptions type for use
+// SupplementalGroupsStrategyOptionsApplyConfiguration represents an declarative configuration of the SupplementalGroupsStrategyOptions type for use
 // with apply.
-type SupplementalGroupsStrategyOptionsBuilder struct {
+type SupplementalGroupsStrategyOptionsApplyConfiguration struct {
 	fields supplementalGroupsStrategyOptionsFields
 }
 
+// SupplementalGroupsStrategyOptionsApplyConfiguration constructs an declarative configuration of the SupplementalGroupsStrategyOptions type for use with
+// apply.
+func SupplementalGroupsStrategyOptions() *SupplementalGroupsStrategyOptionsApplyConfiguration {
+	return &SupplementalGroupsStrategyOptionsApplyConfiguration{}
+}
+
 // supplementalGroupsStrategyOptionsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SupplementalGroupsStrategyOptionsBuilder.
+// Inline fields are owned by their respective inline type in SupplementalGroupsStrategyOptionsApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type supplementalGroupsStrategyOptionsFields struct {
 	Ranges *IDRangeList                            `json:"ranges,omitempty"`
 }
 
-// SupplementalGroupsStrategyOptions constructs an declarative configuration of the SupplementalGroupsStrategyOptions type for use with
-// apply.
-func SupplementalGroupsStrategyOptions() *SupplementalGroupsStrategyOptionsBuilder {
-	return &SupplementalGroupsStrategyOptionsBuilder{}
-}
-
 // SetRule sets the Rule field in the declarative configuration to the given value.
-func (b *SupplementalGroupsStrategyOptionsBuilder) SetRule(value v1beta1.SupplementalGroupsStrategyType) *SupplementalGroupsStrategyOptionsBuilder {
+func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) SetRule(value v1beta1.SupplementalGroupsStrategyType) *SupplementalGroupsStrategyOptionsApplyConfiguration {
 	b.fields.Rule = &value
 	return b
 }
 
 // RemoveRule removes the Rule field from the declarative configuration.
-func (b *SupplementalGroupsStrategyOptionsBuilder) RemoveRule() *SupplementalGroupsStrategyOptionsBuilder {
+func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) RemoveRule() *SupplementalGroupsStrategyOptionsApplyConfiguration {
 	b.fields.Rule = nil
 	return b
 }
 
 // GetRule gets the Rule field from the declarative configuration.
-func (b *SupplementalGroupsStrategyOptionsBuilder) GetRule() (value v1beta1.SupplementalGroupsStrategyType, ok bool) {
+func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) GetRule() (value v1beta1.SupplementalGroupsStrategyType, ok bool) {
 	if v := b.fields.Rule; v != nil {
 		return *v, true
 	}
@@ -68,27 +68,27 @@ func (b *SupplementalGroupsStrategyOptionsBuilder) GetRule() (value v1beta1.Supp
 }
 
 // SetRanges sets the Ranges field in the declarative configuration to the given value.
-func (b *SupplementalGroupsStrategyOptionsBuilder) SetRanges(value IDRangeList) *SupplementalGroupsStrategyOptionsBuilder {
+func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) SetRanges(value IDRangeList) *SupplementalGroupsStrategyOptionsApplyConfiguration {
 	b.fields.Ranges = &value
 	return b
 }
 
 // RemoveRanges removes the Ranges field from the declarative configuration.
-func (b *SupplementalGroupsStrategyOptionsBuilder) RemoveRanges() *SupplementalGroupsStrategyOptionsBuilder {
+func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) RemoveRanges() *SupplementalGroupsStrategyOptionsApplyConfiguration {
 	b.fields.Ranges = nil
 	return b
 }
 
 // GetRanges gets the Ranges field from the declarative configuration.
-func (b *SupplementalGroupsStrategyOptionsBuilder) GetRanges() (value IDRangeList, ok bool) {
+func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) GetRanges() (value IDRangeList, ok bool) {
 	if v := b.fields.Ranges; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts SupplementalGroupsStrategyOptionsBuilder to unstructured.
-func (b *SupplementalGroupsStrategyOptionsBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts SupplementalGroupsStrategyOptionsApplyConfiguration to unstructured.
+func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -100,9 +100,9 @@ func (b *SupplementalGroupsStrategyOptionsBuilder) ToUnstructured() interface{} 
 	return u
 }
 
-// FromUnstructured converts unstructured to SupplementalGroupsStrategyOptionsBuilder, replacing the contents
-// of SupplementalGroupsStrategyOptionsBuilder.
-func (b *SupplementalGroupsStrategyOptionsBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to SupplementalGroupsStrategyOptionsApplyConfiguration, replacing the contents
+// of SupplementalGroupsStrategyOptionsApplyConfiguration.
+func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &supplementalGroupsStrategyOptionsFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -113,15 +113,15 @@ func (b *SupplementalGroupsStrategyOptionsBuilder) FromUnstructured(u map[string
 	return nil
 }
 
-// MarshalJSON marshals SupplementalGroupsStrategyOptionsBuilder to JSON.
-func (b *SupplementalGroupsStrategyOptionsBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals SupplementalGroupsStrategyOptionsApplyConfiguration to JSON.
+func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into SupplementalGroupsStrategyOptionsBuilder, replacing the contents of
-// SupplementalGroupsStrategyOptionsBuilder.
-func (b *SupplementalGroupsStrategyOptionsBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into SupplementalGroupsStrategyOptionsApplyConfiguration, replacing the contents of
+// SupplementalGroupsStrategyOptionsApplyConfiguration.
+func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -129,13 +129,13 @@ func (b *SupplementalGroupsStrategyOptionsBuilder) UnmarshalJSON(data []byte) er
 	return nil
 }
 
-// SupplementalGroupsStrategyOptionsList represents a list of SupplementalGroupsStrategyOptionsBuilder.
-type SupplementalGroupsStrategyOptionsList []*SupplementalGroupsStrategyOptionsBuilder
+// SupplementalGroupsStrategyOptionsList represents a listAlias of SupplementalGroupsStrategyOptionsApplyConfiguration.
+type SupplementalGroupsStrategyOptionsList []*SupplementalGroupsStrategyOptionsApplyConfiguration
 
-// SupplementalGroupsStrategyOptionsList represents a map of SupplementalGroupsStrategyOptionsBuilder.
-type SupplementalGroupsStrategyOptionsMap map[string]SupplementalGroupsStrategyOptionsBuilder
+// SupplementalGroupsStrategyOptionsList represents a map of SupplementalGroupsStrategyOptionsApplyConfiguration.
+type SupplementalGroupsStrategyOptionsMap map[string]SupplementalGroupsStrategyOptionsApplyConfiguration
 
-func (b *SupplementalGroupsStrategyOptionsBuilder) preMarshal() {
+func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) preMarshal() {
 }
-func (b *SupplementalGroupsStrategyOptionsBuilder) postUnmarshal() {
+func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) postUnmarshal() {
 }

@@ -49,7 +49,7 @@ type JobInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.JobList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.Job, err error)
-	Apply(ctx context.Context, job batchv1.JobBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Job, err error)
+	Apply(ctx context.Context, job *batchv1.JobApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Job, err error)
 	JobExpansion
 }
 
@@ -198,7 +198,7 @@ func (c *jobs) Patch(ctx context.Context, name string, pt types.PatchType, data 
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied job.
-func (c *jobs) Apply(ctx context.Context, job batchv1.JobBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Job, err error) {
+func (c *jobs) Apply(ctx context.Context, job *batchv1.JobApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Job, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := job.MarshalJSON()
 	if err != nil {

@@ -145,7 +145,7 @@ func (c *FakeDeployments) Patch(ctx context.Context, name string, pt types.Patch
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied deployment.
-func (c *FakeDeployments) Apply(ctx context.Context, deployment typebuildersappsv1.DeploymentBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *appsv1.Deployment, err error) {
+func (c *FakeDeployments) Apply(ctx context.Context, deployment *typebuildersappsv1.DeploymentApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *appsv1.Deployment, err error) {
 	data, err := deployment.MarshalJSON()
 	if err != nil {
 		return nil, err

@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// SELinuxOptionsBuilder represents an declarative configuration of the SELinuxOptions type for use
+// SELinuxOptionsApplyConfiguration represents an declarative configuration of the SELinuxOptions type for use
 // with apply.
-type SELinuxOptionsBuilder struct {
+type SELinuxOptionsApplyConfiguration struct {
 	fields sELinuxOptionsFields
 }
 
+// SELinuxOptionsApplyConfiguration constructs an declarative configuration of the SELinuxOptions type for use with
+// apply.
+func SELinuxOptions() *SELinuxOptionsApplyConfiguration {
+	return &SELinuxOptionsApplyConfiguration{}
+}
+
 // sELinuxOptionsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SELinuxOptionsBuilder.
+// Inline fields are owned by their respective inline type in SELinuxOptionsApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -42,26 +48,20 @@ type sELinuxOptionsFields struct {
 	Level *string `json:"level,omitempty"`
 }
 
-// SELinuxOptions constructs an declarative configuration of the SELinuxOptions type for use with
-// apply.
-func SELinuxOptions() *SELinuxOptionsBuilder {
-	return &SELinuxOptionsBuilder{}
-}
-
 // SetUser sets the User field in the declarative configuration to the given value.
-func (b *SELinuxOptionsBuilder) SetUser(value string) *SELinuxOptionsBuilder {
+func (b *SELinuxOptionsApplyConfiguration) SetUser(value string) *SELinuxOptionsApplyConfiguration {
 	b.fields.User = &value
 	return b
 }
 
 // RemoveUser removes the User field from the declarative configuration.
-func (b *SELinuxOptionsBuilder) RemoveUser() *SELinuxOptionsBuilder {
+func (b *SELinuxOptionsApplyConfiguration) RemoveUser() *SELinuxOptionsApplyConfiguration {
 	b.fields.User = nil
 	return b
 }
 
 // GetUser gets the User field from the declarative configuration.
-func (b *SELinuxOptionsBuilder) GetUser() (value string, ok bool) {
+func (b *SELinuxOptionsApplyConfiguration) GetUser() (value string, ok bool) {
 	if v := b.fields.User; v != nil {
 		return *v, true
 	}
@@ -69,19 +69,19 @@ func (b *SELinuxOptionsBuilder) GetUser() (value string, ok bool) {
 }
 
 // SetRole sets the Role field in the declarative configuration to the given value.
-func (b *SELinuxOptionsBuilder) SetRole(value string) *SELinuxOptionsBuilder {
+func (b *SELinuxOptionsApplyConfiguration) SetRole(value string) *SELinuxOptionsApplyConfiguration {
 	b.fields.Role = &value
 	return b
 }
 
 // RemoveRole removes the Role field from the declarative configuration.
-func (b *SELinuxOptionsBuilder) RemoveRole() *SELinuxOptionsBuilder {
+func (b *SELinuxOptionsApplyConfiguration) RemoveRole() *SELinuxOptionsApplyConfiguration {
 	b.fields.Role = nil
 	return b
 }
 
 // GetRole gets the Role field from the declarative configuration.
-func (b *SELinuxOptionsBuilder) GetRole() (value string, ok bool) {
+func (b *SELinuxOptionsApplyConfiguration) GetRole() (value string, ok bool) {
 	if v := b.fields.Role; v != nil {
 		return *v, true
 	}
@@ -89,19 +89,19 @@ func (b *SELinuxOptionsBuilder) GetRole() (value string, ok bool) {
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b *SELinuxOptionsBuilder) SetType(value string) *SELinuxOptionsBuilder {
+func (b *SELinuxOptionsApplyConfiguration) SetType(value string) *SELinuxOptionsApplyConfiguration {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b *SELinuxOptionsBuilder) RemoveType() *SELinuxOptionsBuilder {
+func (b *SELinuxOptionsApplyConfiguration) RemoveType() *SELinuxOptionsApplyConfiguration {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b *SELinuxOptionsBuilder) GetType() (value string, ok bool) {
+func (b *SELinuxOptionsApplyConfiguration) GetType() (value string, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -109,27 +109,27 @@ func (b *SELinuxOptionsBuilder) GetType() (value string, ok bool) {
 }
 
 // SetLevel sets the Level field in the declarative configuration to the given value.
-func (b *SELinuxOptionsBuilder) SetLevel(value string) *SELinuxOptionsBuilder {
+func (b *SELinuxOptionsApplyConfiguration) SetLevel(value string) *SELinuxOptionsApplyConfiguration {
 	b.fields.Level = &value
 	return b
 }
 
 // RemoveLevel removes the Level field from the declarative configuration.
-func (b *SELinuxOptionsBuilder) RemoveLevel() *SELinuxOptionsBuilder {
+func (b *SELinuxOptionsApplyConfiguration) RemoveLevel() *SELinuxOptionsApplyConfiguration {
 	b.fields.Level = nil
 	return b
 }
 
 // GetLevel gets the Level field from the declarative configuration.
-func (b *SELinuxOptionsBuilder) GetLevel() (value string, ok bool) {
+func (b *SELinuxOptionsApplyConfiguration) GetLevel() (value string, ok bool) {
 	if v := b.fields.Level; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts SELinuxOptionsBuilder to unstructured.
-func (b *SELinuxOptionsBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts SELinuxOptionsApplyConfiguration to unstructured.
+func (b *SELinuxOptionsApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -141,9 +141,9 @@ func (b *SELinuxOptionsBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to SELinuxOptionsBuilder, replacing the contents
-// of SELinuxOptionsBuilder.
-func (b *SELinuxOptionsBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to SELinuxOptionsApplyConfiguration, replacing the contents
+// of SELinuxOptionsApplyConfiguration.
+func (b *SELinuxOptionsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &sELinuxOptionsFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -154,15 +154,15 @@ func (b *SELinuxOptionsBuilder) FromUnstructured(u map[string]interface{}) error
 	return nil
 }
 
-// MarshalJSON marshals SELinuxOptionsBuilder to JSON.
-func (b *SELinuxOptionsBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals SELinuxOptionsApplyConfiguration to JSON.
+func (b *SELinuxOptionsApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into SELinuxOptionsBuilder, replacing the contents of
-// SELinuxOptionsBuilder.
-func (b *SELinuxOptionsBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into SELinuxOptionsApplyConfiguration, replacing the contents of
+// SELinuxOptionsApplyConfiguration.
+func (b *SELinuxOptionsApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -170,13 +170,13 @@ func (b *SELinuxOptionsBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// SELinuxOptionsList represents a list of SELinuxOptionsBuilder.
-type SELinuxOptionsList []*SELinuxOptionsBuilder
+// SELinuxOptionsList represents a listAlias of SELinuxOptionsApplyConfiguration.
+type SELinuxOptionsList []*SELinuxOptionsApplyConfiguration
 
-// SELinuxOptionsList represents a map of SELinuxOptionsBuilder.
-type SELinuxOptionsMap map[string]SELinuxOptionsBuilder
+// SELinuxOptionsList represents a map of SELinuxOptionsApplyConfiguration.
+type SELinuxOptionsMap map[string]SELinuxOptionsApplyConfiguration
 
-func (b *SELinuxOptionsBuilder) preMarshal() {
+func (b *SELinuxOptionsApplyConfiguration) preMarshal() {
 }
-func (b *SELinuxOptionsBuilder) postUnmarshal() {
+func (b *SELinuxOptionsApplyConfiguration) postUnmarshal() {
 }

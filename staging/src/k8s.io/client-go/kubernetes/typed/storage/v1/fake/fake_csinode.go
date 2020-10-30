@@ -124,7 +124,7 @@ func (c *FakeCSINodes) Patch(ctx context.Context, name string, pt types.PatchTyp
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied cSINode.
-func (c *FakeCSINodes) Apply(ctx context.Context, cSINode typebuildersstoragev1.CSINodeBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *storagev1.CSINode, err error) {
+func (c *FakeCSINodes) Apply(ctx context.Context, cSINode *typebuildersstoragev1.CSINodeApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *storagev1.CSINode, err error) {
 	data, err := cSINode.MarshalJSON()
 	if err != nil {
 		return nil, err

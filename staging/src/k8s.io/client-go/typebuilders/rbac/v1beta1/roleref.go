@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// RoleRefBuilder represents an declarative configuration of the RoleRef type for use
+// RoleRefApplyConfiguration represents an declarative configuration of the RoleRef type for use
 // with apply.
-type RoleRefBuilder struct {
+type RoleRefApplyConfiguration struct {
 	fields roleRefFields
 }
 
+// RoleRefApplyConfiguration constructs an declarative configuration of the RoleRef type for use with
+// apply.
+func RoleRef() *RoleRefApplyConfiguration {
+	return &RoleRefApplyConfiguration{}
+}
+
 // roleRefFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in RoleRefBuilder.
+// Inline fields are owned by their respective inline type in RoleRefApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type roleRefFields struct {
 	Name     *string `json:"name,omitempty"`
 }
 
-// RoleRef constructs an declarative configuration of the RoleRef type for use with
-// apply.
-func RoleRef() *RoleRefBuilder {
-	return &RoleRefBuilder{}
-}
-
 // SetAPIGroup sets the APIGroup field in the declarative configuration to the given value.
-func (b *RoleRefBuilder) SetAPIGroup(value string) *RoleRefBuilder {
+func (b *RoleRefApplyConfiguration) SetAPIGroup(value string) *RoleRefApplyConfiguration {
 	b.fields.APIGroup = &value
 	return b
 }
 
 // RemoveAPIGroup removes the APIGroup field from the declarative configuration.
-func (b *RoleRefBuilder) RemoveAPIGroup() *RoleRefBuilder {
+func (b *RoleRefApplyConfiguration) RemoveAPIGroup() *RoleRefApplyConfiguration {
 	b.fields.APIGroup = nil
 	return b
 }
 
 // GetAPIGroup gets the APIGroup field from the declarative configuration.
-func (b *RoleRefBuilder) GetAPIGroup() (value string, ok bool) {
+func (b *RoleRefApplyConfiguration) GetAPIGroup() (value string, ok bool) {
 	if v := b.fields.APIGroup; v != nil {
 		return *v, true
 	}
@@ -68,19 +68,19 @@ func (b *RoleRefBuilder) GetAPIGroup() (value string, ok bool) {
 }
 
 // SetKind sets the Kind field in the declarative configuration to the given value.
-func (b *RoleRefBuilder) SetKind(value string) *RoleRefBuilder {
+func (b *RoleRefApplyConfiguration) SetKind(value string) *RoleRefApplyConfiguration {
 	b.fields.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
-func (b *RoleRefBuilder) RemoveKind() *RoleRefBuilder {
+func (b *RoleRefApplyConfiguration) RemoveKind() *RoleRefApplyConfiguration {
 	b.fields.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
-func (b *RoleRefBuilder) GetKind() (value string, ok bool) {
+func (b *RoleRefApplyConfiguration) GetKind() (value string, ok bool) {
 	if v := b.fields.Kind; v != nil {
 		return *v, true
 	}
@@ -88,27 +88,27 @@ func (b *RoleRefBuilder) GetKind() (value string, ok bool) {
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *RoleRefBuilder) SetName(value string) *RoleRefBuilder {
+func (b *RoleRefApplyConfiguration) SetName(value string) *RoleRefApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *RoleRefBuilder) RemoveName() *RoleRefBuilder {
+func (b *RoleRefApplyConfiguration) RemoveName() *RoleRefApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *RoleRefBuilder) GetName() (value string, ok bool) {
+func (b *RoleRefApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts RoleRefBuilder to unstructured.
-func (b *RoleRefBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts RoleRefApplyConfiguration to unstructured.
+func (b *RoleRefApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -120,9 +120,9 @@ func (b *RoleRefBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to RoleRefBuilder, replacing the contents
-// of RoleRefBuilder.
-func (b *RoleRefBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to RoleRefApplyConfiguration, replacing the contents
+// of RoleRefApplyConfiguration.
+func (b *RoleRefApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &roleRefFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -133,15 +133,15 @@ func (b *RoleRefBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals RoleRefBuilder to JSON.
-func (b *RoleRefBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals RoleRefApplyConfiguration to JSON.
+func (b *RoleRefApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into RoleRefBuilder, replacing the contents of
-// RoleRefBuilder.
-func (b *RoleRefBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into RoleRefApplyConfiguration, replacing the contents of
+// RoleRefApplyConfiguration.
+func (b *RoleRefApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -149,13 +149,13 @@ func (b *RoleRefBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// RoleRefList represents a list of RoleRefBuilder.
-type RoleRefList []*RoleRefBuilder
+// RoleRefList represents a listAlias of RoleRefApplyConfiguration.
+type RoleRefList []*RoleRefApplyConfiguration
 
-// RoleRefList represents a map of RoleRefBuilder.
-type RoleRefMap map[string]RoleRefBuilder
+// RoleRefList represents a map of RoleRefApplyConfiguration.
+type RoleRefMap map[string]RoleRefApplyConfiguration
 
-func (b *RoleRefBuilder) preMarshal() {
+func (b *RoleRefApplyConfiguration) preMarshal() {
 }
-func (b *RoleRefBuilder) postUnmarshal() {
+func (b *RoleRefApplyConfiguration) postUnmarshal() {
 }

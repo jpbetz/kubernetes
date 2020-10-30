@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// PolicyRuleBuilder represents an declarative configuration of the PolicyRule type for use
+// PolicyRuleApplyConfiguration represents an declarative configuration of the PolicyRule type for use
 // with apply.
-type PolicyRuleBuilder struct {
+type PolicyRuleApplyConfiguration struct {
 	fields policyRuleFields
 }
 
+// PolicyRuleApplyConfiguration constructs an declarative configuration of the PolicyRule type for use with
+// apply.
+func PolicyRule() *PolicyRuleApplyConfiguration {
+	return &PolicyRuleApplyConfiguration{}
+}
+
 // policyRuleFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PolicyRuleBuilder.
+// Inline fields are owned by their respective inline type in PolicyRuleApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -43,26 +49,20 @@ type policyRuleFields struct {
 	NonResourceURLs *[]string `json:"nonResourceURLs,omitempty"`
 }
 
-// PolicyRule constructs an declarative configuration of the PolicyRule type for use with
-// apply.
-func PolicyRule() *PolicyRuleBuilder {
-	return &PolicyRuleBuilder{}
-}
-
 // SetVerbs sets the Verbs field in the declarative configuration to the given value.
-func (b *PolicyRuleBuilder) SetVerbs(value []string) *PolicyRuleBuilder {
+func (b *PolicyRuleApplyConfiguration) SetVerbs(value []string) *PolicyRuleApplyConfiguration {
 	b.fields.Verbs = &value
 	return b
 }
 
 // RemoveVerbs removes the Verbs field from the declarative configuration.
-func (b *PolicyRuleBuilder) RemoveVerbs() *PolicyRuleBuilder {
+func (b *PolicyRuleApplyConfiguration) RemoveVerbs() *PolicyRuleApplyConfiguration {
 	b.fields.Verbs = nil
 	return b
 }
 
 // GetVerbs gets the Verbs field from the declarative configuration.
-func (b *PolicyRuleBuilder) GetVerbs() (value []string, ok bool) {
+func (b *PolicyRuleApplyConfiguration) GetVerbs() (value []string, ok bool) {
 	if v := b.fields.Verbs; v != nil {
 		return *v, true
 	}
@@ -70,19 +70,19 @@ func (b *PolicyRuleBuilder) GetVerbs() (value []string, ok bool) {
 }
 
 // SetAPIGroups sets the APIGroups field in the declarative configuration to the given value.
-func (b *PolicyRuleBuilder) SetAPIGroups(value []string) *PolicyRuleBuilder {
+func (b *PolicyRuleApplyConfiguration) SetAPIGroups(value []string) *PolicyRuleApplyConfiguration {
 	b.fields.APIGroups = &value
 	return b
 }
 
 // RemoveAPIGroups removes the APIGroups field from the declarative configuration.
-func (b *PolicyRuleBuilder) RemoveAPIGroups() *PolicyRuleBuilder {
+func (b *PolicyRuleApplyConfiguration) RemoveAPIGroups() *PolicyRuleApplyConfiguration {
 	b.fields.APIGroups = nil
 	return b
 }
 
 // GetAPIGroups gets the APIGroups field from the declarative configuration.
-func (b *PolicyRuleBuilder) GetAPIGroups() (value []string, ok bool) {
+func (b *PolicyRuleApplyConfiguration) GetAPIGroups() (value []string, ok bool) {
 	if v := b.fields.APIGroups; v != nil {
 		return *v, true
 	}
@@ -90,19 +90,19 @@ func (b *PolicyRuleBuilder) GetAPIGroups() (value []string, ok bool) {
 }
 
 // SetResources sets the Resources field in the declarative configuration to the given value.
-func (b *PolicyRuleBuilder) SetResources(value []string) *PolicyRuleBuilder {
+func (b *PolicyRuleApplyConfiguration) SetResources(value []string) *PolicyRuleApplyConfiguration {
 	b.fields.Resources = &value
 	return b
 }
 
 // RemoveResources removes the Resources field from the declarative configuration.
-func (b *PolicyRuleBuilder) RemoveResources() *PolicyRuleBuilder {
+func (b *PolicyRuleApplyConfiguration) RemoveResources() *PolicyRuleApplyConfiguration {
 	b.fields.Resources = nil
 	return b
 }
 
 // GetResources gets the Resources field from the declarative configuration.
-func (b *PolicyRuleBuilder) GetResources() (value []string, ok bool) {
+func (b *PolicyRuleApplyConfiguration) GetResources() (value []string, ok bool) {
 	if v := b.fields.Resources; v != nil {
 		return *v, true
 	}
@@ -110,19 +110,19 @@ func (b *PolicyRuleBuilder) GetResources() (value []string, ok bool) {
 }
 
 // SetResourceNames sets the ResourceNames field in the declarative configuration to the given value.
-func (b *PolicyRuleBuilder) SetResourceNames(value []string) *PolicyRuleBuilder {
+func (b *PolicyRuleApplyConfiguration) SetResourceNames(value []string) *PolicyRuleApplyConfiguration {
 	b.fields.ResourceNames = &value
 	return b
 }
 
 // RemoveResourceNames removes the ResourceNames field from the declarative configuration.
-func (b *PolicyRuleBuilder) RemoveResourceNames() *PolicyRuleBuilder {
+func (b *PolicyRuleApplyConfiguration) RemoveResourceNames() *PolicyRuleApplyConfiguration {
 	b.fields.ResourceNames = nil
 	return b
 }
 
 // GetResourceNames gets the ResourceNames field from the declarative configuration.
-func (b *PolicyRuleBuilder) GetResourceNames() (value []string, ok bool) {
+func (b *PolicyRuleApplyConfiguration) GetResourceNames() (value []string, ok bool) {
 	if v := b.fields.ResourceNames; v != nil {
 		return *v, true
 	}
@@ -130,27 +130,27 @@ func (b *PolicyRuleBuilder) GetResourceNames() (value []string, ok bool) {
 }
 
 // SetNonResourceURLs sets the NonResourceURLs field in the declarative configuration to the given value.
-func (b *PolicyRuleBuilder) SetNonResourceURLs(value []string) *PolicyRuleBuilder {
+func (b *PolicyRuleApplyConfiguration) SetNonResourceURLs(value []string) *PolicyRuleApplyConfiguration {
 	b.fields.NonResourceURLs = &value
 	return b
 }
 
 // RemoveNonResourceURLs removes the NonResourceURLs field from the declarative configuration.
-func (b *PolicyRuleBuilder) RemoveNonResourceURLs() *PolicyRuleBuilder {
+func (b *PolicyRuleApplyConfiguration) RemoveNonResourceURLs() *PolicyRuleApplyConfiguration {
 	b.fields.NonResourceURLs = nil
 	return b
 }
 
 // GetNonResourceURLs gets the NonResourceURLs field from the declarative configuration.
-func (b *PolicyRuleBuilder) GetNonResourceURLs() (value []string, ok bool) {
+func (b *PolicyRuleApplyConfiguration) GetNonResourceURLs() (value []string, ok bool) {
 	if v := b.fields.NonResourceURLs; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts PolicyRuleBuilder to unstructured.
-func (b *PolicyRuleBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PolicyRuleApplyConfiguration to unstructured.
+func (b *PolicyRuleApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -162,9 +162,9 @@ func (b *PolicyRuleBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to PolicyRuleBuilder, replacing the contents
-// of PolicyRuleBuilder.
-func (b *PolicyRuleBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PolicyRuleApplyConfiguration, replacing the contents
+// of PolicyRuleApplyConfiguration.
+func (b *PolicyRuleApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &policyRuleFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -175,15 +175,15 @@ func (b *PolicyRuleBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals PolicyRuleBuilder to JSON.
-func (b *PolicyRuleBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PolicyRuleApplyConfiguration to JSON.
+func (b *PolicyRuleApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PolicyRuleBuilder, replacing the contents of
-// PolicyRuleBuilder.
-func (b *PolicyRuleBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PolicyRuleApplyConfiguration, replacing the contents of
+// PolicyRuleApplyConfiguration.
+func (b *PolicyRuleApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -191,13 +191,13 @@ func (b *PolicyRuleBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// PolicyRuleList represents a list of PolicyRuleBuilder.
-type PolicyRuleList []*PolicyRuleBuilder
+// PolicyRuleList represents a listAlias of PolicyRuleApplyConfiguration.
+type PolicyRuleList []*PolicyRuleApplyConfiguration
 
-// PolicyRuleList represents a map of PolicyRuleBuilder.
-type PolicyRuleMap map[string]PolicyRuleBuilder
+// PolicyRuleList represents a map of PolicyRuleApplyConfiguration.
+type PolicyRuleMap map[string]PolicyRuleApplyConfiguration
 
-func (b *PolicyRuleBuilder) preMarshal() {
+func (b *PolicyRuleApplyConfiguration) preMarshal() {
 }
-func (b *PolicyRuleBuilder) postUnmarshal() {
+func (b *PolicyRuleApplyConfiguration) postUnmarshal() {
 }

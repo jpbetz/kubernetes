@@ -24,43 +24,43 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// VolumeAttachmentSpecBuilder represents an declarative configuration of the VolumeAttachmentSpec type for use
+// VolumeAttachmentSpecApplyConfiguration represents an declarative configuration of the VolumeAttachmentSpec type for use
 // with apply.
-type VolumeAttachmentSpecBuilder struct {
+type VolumeAttachmentSpecApplyConfiguration struct {
 	fields volumeAttachmentSpecFields
 }
 
+// VolumeAttachmentSpecApplyConfiguration constructs an declarative configuration of the VolumeAttachmentSpec type for use with
+// apply.
+func VolumeAttachmentSpec() *VolumeAttachmentSpecApplyConfiguration {
+	return &VolumeAttachmentSpecApplyConfiguration{}
+}
+
 // volumeAttachmentSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in VolumeAttachmentSpecBuilder.
+// Inline fields are owned by their respective inline type in VolumeAttachmentSpecApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type volumeAttachmentSpecFields struct {
-	Attacher *string                        `json:"attacher,omitempty"`
-	Source   *VolumeAttachmentSourceBuilder `json:"source,omitempty"`
-	NodeName *string                        `json:"nodeName,omitempty"`
-}
-
-// VolumeAttachmentSpec constructs an declarative configuration of the VolumeAttachmentSpec type for use with
-// apply.
-func VolumeAttachmentSpec() *VolumeAttachmentSpecBuilder {
-	return &VolumeAttachmentSpecBuilder{}
+	Attacher *string                                   `json:"attacher,omitempty"`
+	Source   *VolumeAttachmentSourceApplyConfiguration `json:"source,omitempty"`
+	NodeName *string                                   `json:"nodeName,omitempty"`
 }
 
 // SetAttacher sets the Attacher field in the declarative configuration to the given value.
-func (b *VolumeAttachmentSpecBuilder) SetAttacher(value string) *VolumeAttachmentSpecBuilder {
+func (b *VolumeAttachmentSpecApplyConfiguration) SetAttacher(value string) *VolumeAttachmentSpecApplyConfiguration {
 	b.fields.Attacher = &value
 	return b
 }
 
 // RemoveAttacher removes the Attacher field from the declarative configuration.
-func (b *VolumeAttachmentSpecBuilder) RemoveAttacher() *VolumeAttachmentSpecBuilder {
+func (b *VolumeAttachmentSpecApplyConfiguration) RemoveAttacher() *VolumeAttachmentSpecApplyConfiguration {
 	b.fields.Attacher = nil
 	return b
 }
 
 // GetAttacher gets the Attacher field from the declarative configuration.
-func (b *VolumeAttachmentSpecBuilder) GetAttacher() (value string, ok bool) {
+func (b *VolumeAttachmentSpecApplyConfiguration) GetAttacher() (value string, ok bool) {
 	if v := b.fields.Attacher; v != nil {
 		return *v, true
 	}
@@ -68,44 +68,44 @@ func (b *VolumeAttachmentSpecBuilder) GetAttacher() (value string, ok bool) {
 }
 
 // SetSource sets the Source field in the declarative configuration to the given value.
-func (b *VolumeAttachmentSpecBuilder) SetSource(value *VolumeAttachmentSourceBuilder) *VolumeAttachmentSpecBuilder {
+func (b *VolumeAttachmentSpecApplyConfiguration) SetSource(value *VolumeAttachmentSourceApplyConfiguration) *VolumeAttachmentSpecApplyConfiguration {
 	b.fields.Source = value
 	return b
 }
 
 // RemoveSource removes the Source field from the declarative configuration.
-func (b *VolumeAttachmentSpecBuilder) RemoveSource() *VolumeAttachmentSpecBuilder {
+func (b *VolumeAttachmentSpecApplyConfiguration) RemoveSource() *VolumeAttachmentSpecApplyConfiguration {
 	b.fields.Source = nil
 	return b
 }
 
 // GetSource gets the Source field from the declarative configuration.
-func (b *VolumeAttachmentSpecBuilder) GetSource() (value *VolumeAttachmentSourceBuilder, ok bool) {
+func (b *VolumeAttachmentSpecApplyConfiguration) GetSource() (value *VolumeAttachmentSourceApplyConfiguration, ok bool) {
 	return b.fields.Source, b.fields.Source != nil
 }
 
 // SetNodeName sets the NodeName field in the declarative configuration to the given value.
-func (b *VolumeAttachmentSpecBuilder) SetNodeName(value string) *VolumeAttachmentSpecBuilder {
+func (b *VolumeAttachmentSpecApplyConfiguration) SetNodeName(value string) *VolumeAttachmentSpecApplyConfiguration {
 	b.fields.NodeName = &value
 	return b
 }
 
 // RemoveNodeName removes the NodeName field from the declarative configuration.
-func (b *VolumeAttachmentSpecBuilder) RemoveNodeName() *VolumeAttachmentSpecBuilder {
+func (b *VolumeAttachmentSpecApplyConfiguration) RemoveNodeName() *VolumeAttachmentSpecApplyConfiguration {
 	b.fields.NodeName = nil
 	return b
 }
 
 // GetNodeName gets the NodeName field from the declarative configuration.
-func (b *VolumeAttachmentSpecBuilder) GetNodeName() (value string, ok bool) {
+func (b *VolumeAttachmentSpecApplyConfiguration) GetNodeName() (value string, ok bool) {
 	if v := b.fields.NodeName; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts VolumeAttachmentSpecBuilder to unstructured.
-func (b *VolumeAttachmentSpecBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts VolumeAttachmentSpecApplyConfiguration to unstructured.
+func (b *VolumeAttachmentSpecApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -117,9 +117,9 @@ func (b *VolumeAttachmentSpecBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to VolumeAttachmentSpecBuilder, replacing the contents
-// of VolumeAttachmentSpecBuilder.
-func (b *VolumeAttachmentSpecBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to VolumeAttachmentSpecApplyConfiguration, replacing the contents
+// of VolumeAttachmentSpecApplyConfiguration.
+func (b *VolumeAttachmentSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &volumeAttachmentSpecFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -130,15 +130,15 @@ func (b *VolumeAttachmentSpecBuilder) FromUnstructured(u map[string]interface{})
 	return nil
 }
 
-// MarshalJSON marshals VolumeAttachmentSpecBuilder to JSON.
-func (b *VolumeAttachmentSpecBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals VolumeAttachmentSpecApplyConfiguration to JSON.
+func (b *VolumeAttachmentSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into VolumeAttachmentSpecBuilder, replacing the contents of
-// VolumeAttachmentSpecBuilder.
-func (b *VolumeAttachmentSpecBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into VolumeAttachmentSpecApplyConfiguration, replacing the contents of
+// VolumeAttachmentSpecApplyConfiguration.
+func (b *VolumeAttachmentSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -146,13 +146,13 @@ func (b *VolumeAttachmentSpecBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// VolumeAttachmentSpecList represents a list of VolumeAttachmentSpecBuilder.
-type VolumeAttachmentSpecList []*VolumeAttachmentSpecBuilder
+// VolumeAttachmentSpecList represents a listAlias of VolumeAttachmentSpecApplyConfiguration.
+type VolumeAttachmentSpecList []*VolumeAttachmentSpecApplyConfiguration
 
-// VolumeAttachmentSpecList represents a map of VolumeAttachmentSpecBuilder.
-type VolumeAttachmentSpecMap map[string]VolumeAttachmentSpecBuilder
+// VolumeAttachmentSpecList represents a map of VolumeAttachmentSpecApplyConfiguration.
+type VolumeAttachmentSpecMap map[string]VolumeAttachmentSpecApplyConfiguration
 
-func (b *VolumeAttachmentSpecBuilder) preMarshal() {
+func (b *VolumeAttachmentSpecApplyConfiguration) preMarshal() {
 }
-func (b *VolumeAttachmentSpecBuilder) postUnmarshal() {
+func (b *VolumeAttachmentSpecApplyConfiguration) postUnmarshal() {
 }

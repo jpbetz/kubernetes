@@ -132,7 +132,7 @@ func (c *FakeRoleBindings) Patch(ctx context.Context, name string, pt types.Patc
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied roleBinding.
-func (c *FakeRoleBindings) Apply(ctx context.Context, roleBinding typebuildersrbacv1.RoleBindingBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *rbacv1.RoleBinding, err error) {
+func (c *FakeRoleBindings) Apply(ctx context.Context, roleBinding *typebuildersrbacv1.RoleBindingApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *rbacv1.RoleBinding, err error) {
 	data, err := roleBinding.MarshalJSON()
 	if err != nil {
 		return nil, err

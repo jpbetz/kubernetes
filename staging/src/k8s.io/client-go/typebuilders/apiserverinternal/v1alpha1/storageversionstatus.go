@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// StorageVersionStatusBuilder represents an declarative configuration of the StorageVersionStatus type for use
+// StorageVersionStatusApplyConfiguration represents an declarative configuration of the StorageVersionStatus type for use
 // with apply.
-type StorageVersionStatusBuilder struct {
+type StorageVersionStatusApplyConfiguration struct {
 	fields storageVersionStatusFields
 }
 
+// StorageVersionStatusApplyConfiguration constructs an declarative configuration of the StorageVersionStatus type for use with
+// apply.
+func StorageVersionStatus() *StorageVersionStatusApplyConfiguration {
+	return &StorageVersionStatusApplyConfiguration{}
+}
+
 // storageVersionStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in StorageVersionStatusBuilder.
+// Inline fields are owned by their respective inline type in StorageVersionStatusApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type storageVersionStatusFields struct {
 	Conditions            *StorageVersionConditionList `json:"conditions,omitempty"`
 }
 
-// StorageVersionStatus constructs an declarative configuration of the StorageVersionStatus type for use with
-// apply.
-func StorageVersionStatus() *StorageVersionStatusBuilder {
-	return &StorageVersionStatusBuilder{}
-}
-
 // SetStorageVersions sets the StorageVersions field in the declarative configuration to the given value.
-func (b *StorageVersionStatusBuilder) SetStorageVersions(value ServerStorageVersionList) *StorageVersionStatusBuilder {
+func (b *StorageVersionStatusApplyConfiguration) SetStorageVersions(value ServerStorageVersionList) *StorageVersionStatusApplyConfiguration {
 	b.fields.StorageVersions = &value
 	return b
 }
 
 // RemoveStorageVersions removes the StorageVersions field from the declarative configuration.
-func (b *StorageVersionStatusBuilder) RemoveStorageVersions() *StorageVersionStatusBuilder {
+func (b *StorageVersionStatusApplyConfiguration) RemoveStorageVersions() *StorageVersionStatusApplyConfiguration {
 	b.fields.StorageVersions = nil
 	return b
 }
 
 // GetStorageVersions gets the StorageVersions field from the declarative configuration.
-func (b *StorageVersionStatusBuilder) GetStorageVersions() (value ServerStorageVersionList, ok bool) {
+func (b *StorageVersionStatusApplyConfiguration) GetStorageVersions() (value ServerStorageVersionList, ok bool) {
 	if v := b.fields.StorageVersions; v != nil {
 		return *v, true
 	}
@@ -68,19 +68,19 @@ func (b *StorageVersionStatusBuilder) GetStorageVersions() (value ServerStorageV
 }
 
 // SetCommonEncodingVersion sets the CommonEncodingVersion field in the declarative configuration to the given value.
-func (b *StorageVersionStatusBuilder) SetCommonEncodingVersion(value string) *StorageVersionStatusBuilder {
+func (b *StorageVersionStatusApplyConfiguration) SetCommonEncodingVersion(value string) *StorageVersionStatusApplyConfiguration {
 	b.fields.CommonEncodingVersion = &value
 	return b
 }
 
 // RemoveCommonEncodingVersion removes the CommonEncodingVersion field from the declarative configuration.
-func (b *StorageVersionStatusBuilder) RemoveCommonEncodingVersion() *StorageVersionStatusBuilder {
+func (b *StorageVersionStatusApplyConfiguration) RemoveCommonEncodingVersion() *StorageVersionStatusApplyConfiguration {
 	b.fields.CommonEncodingVersion = nil
 	return b
 }
 
 // GetCommonEncodingVersion gets the CommonEncodingVersion field from the declarative configuration.
-func (b *StorageVersionStatusBuilder) GetCommonEncodingVersion() (value string, ok bool) {
+func (b *StorageVersionStatusApplyConfiguration) GetCommonEncodingVersion() (value string, ok bool) {
 	if v := b.fields.CommonEncodingVersion; v != nil {
 		return *v, true
 	}
@@ -88,27 +88,27 @@ func (b *StorageVersionStatusBuilder) GetCommonEncodingVersion() (value string, 
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b *StorageVersionStatusBuilder) SetConditions(value StorageVersionConditionList) *StorageVersionStatusBuilder {
+func (b *StorageVersionStatusApplyConfiguration) SetConditions(value StorageVersionConditionList) *StorageVersionStatusApplyConfiguration {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b *StorageVersionStatusBuilder) RemoveConditions() *StorageVersionStatusBuilder {
+func (b *StorageVersionStatusApplyConfiguration) RemoveConditions() *StorageVersionStatusApplyConfiguration {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b *StorageVersionStatusBuilder) GetConditions() (value StorageVersionConditionList, ok bool) {
+func (b *StorageVersionStatusApplyConfiguration) GetConditions() (value StorageVersionConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts StorageVersionStatusBuilder to unstructured.
-func (b *StorageVersionStatusBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts StorageVersionStatusApplyConfiguration to unstructured.
+func (b *StorageVersionStatusApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -120,9 +120,9 @@ func (b *StorageVersionStatusBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to StorageVersionStatusBuilder, replacing the contents
-// of StorageVersionStatusBuilder.
-func (b *StorageVersionStatusBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to StorageVersionStatusApplyConfiguration, replacing the contents
+// of StorageVersionStatusApplyConfiguration.
+func (b *StorageVersionStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &storageVersionStatusFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -133,15 +133,15 @@ func (b *StorageVersionStatusBuilder) FromUnstructured(u map[string]interface{})
 	return nil
 }
 
-// MarshalJSON marshals StorageVersionStatusBuilder to JSON.
-func (b *StorageVersionStatusBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals StorageVersionStatusApplyConfiguration to JSON.
+func (b *StorageVersionStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into StorageVersionStatusBuilder, replacing the contents of
-// StorageVersionStatusBuilder.
-func (b *StorageVersionStatusBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into StorageVersionStatusApplyConfiguration, replacing the contents of
+// StorageVersionStatusApplyConfiguration.
+func (b *StorageVersionStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -149,13 +149,13 @@ func (b *StorageVersionStatusBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// StorageVersionStatusList represents a list of StorageVersionStatusBuilder.
-type StorageVersionStatusList []*StorageVersionStatusBuilder
+// StorageVersionStatusList represents a listAlias of StorageVersionStatusApplyConfiguration.
+type StorageVersionStatusList []*StorageVersionStatusApplyConfiguration
 
-// StorageVersionStatusList represents a map of StorageVersionStatusBuilder.
-type StorageVersionStatusMap map[string]StorageVersionStatusBuilder
+// StorageVersionStatusList represents a map of StorageVersionStatusApplyConfiguration.
+type StorageVersionStatusMap map[string]StorageVersionStatusApplyConfiguration
 
-func (b *StorageVersionStatusBuilder) preMarshal() {
+func (b *StorageVersionStatusApplyConfiguration) preMarshal() {
 }
-func (b *StorageVersionStatusBuilder) postUnmarshal() {
+func (b *StorageVersionStatusApplyConfiguration) postUnmarshal() {
 }

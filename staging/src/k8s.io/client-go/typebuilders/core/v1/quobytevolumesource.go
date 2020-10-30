@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// QuobyteVolumeSourceBuilder represents an declarative configuration of the QuobyteVolumeSource type for use
+// QuobyteVolumeSourceApplyConfiguration represents an declarative configuration of the QuobyteVolumeSource type for use
 // with apply.
-type QuobyteVolumeSourceBuilder struct {
+type QuobyteVolumeSourceApplyConfiguration struct {
 	fields quobyteVolumeSourceFields
 }
 
+// QuobyteVolumeSourceApplyConfiguration constructs an declarative configuration of the QuobyteVolumeSource type for use with
+// apply.
+func QuobyteVolumeSource() *QuobyteVolumeSourceApplyConfiguration {
+	return &QuobyteVolumeSourceApplyConfiguration{}
+}
+
 // quobyteVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in QuobyteVolumeSourceBuilder.
+// Inline fields are owned by their respective inline type in QuobyteVolumeSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -44,26 +50,20 @@ type quobyteVolumeSourceFields struct {
 	Tenant   *string `json:"tenant,omitempty"`
 }
 
-// QuobyteVolumeSource constructs an declarative configuration of the QuobyteVolumeSource type for use with
-// apply.
-func QuobyteVolumeSource() *QuobyteVolumeSourceBuilder {
-	return &QuobyteVolumeSourceBuilder{}
-}
-
 // SetRegistry sets the Registry field in the declarative configuration to the given value.
-func (b *QuobyteVolumeSourceBuilder) SetRegistry(value string) *QuobyteVolumeSourceBuilder {
+func (b *QuobyteVolumeSourceApplyConfiguration) SetRegistry(value string) *QuobyteVolumeSourceApplyConfiguration {
 	b.fields.Registry = &value
 	return b
 }
 
 // RemoveRegistry removes the Registry field from the declarative configuration.
-func (b *QuobyteVolumeSourceBuilder) RemoveRegistry() *QuobyteVolumeSourceBuilder {
+func (b *QuobyteVolumeSourceApplyConfiguration) RemoveRegistry() *QuobyteVolumeSourceApplyConfiguration {
 	b.fields.Registry = nil
 	return b
 }
 
 // GetRegistry gets the Registry field from the declarative configuration.
-func (b *QuobyteVolumeSourceBuilder) GetRegistry() (value string, ok bool) {
+func (b *QuobyteVolumeSourceApplyConfiguration) GetRegistry() (value string, ok bool) {
 	if v := b.fields.Registry; v != nil {
 		return *v, true
 	}
@@ -71,19 +71,19 @@ func (b *QuobyteVolumeSourceBuilder) GetRegistry() (value string, ok bool) {
 }
 
 // SetVolume sets the Volume field in the declarative configuration to the given value.
-func (b *QuobyteVolumeSourceBuilder) SetVolume(value string) *QuobyteVolumeSourceBuilder {
+func (b *QuobyteVolumeSourceApplyConfiguration) SetVolume(value string) *QuobyteVolumeSourceApplyConfiguration {
 	b.fields.Volume = &value
 	return b
 }
 
 // RemoveVolume removes the Volume field from the declarative configuration.
-func (b *QuobyteVolumeSourceBuilder) RemoveVolume() *QuobyteVolumeSourceBuilder {
+func (b *QuobyteVolumeSourceApplyConfiguration) RemoveVolume() *QuobyteVolumeSourceApplyConfiguration {
 	b.fields.Volume = nil
 	return b
 }
 
 // GetVolume gets the Volume field from the declarative configuration.
-func (b *QuobyteVolumeSourceBuilder) GetVolume() (value string, ok bool) {
+func (b *QuobyteVolumeSourceApplyConfiguration) GetVolume() (value string, ok bool) {
 	if v := b.fields.Volume; v != nil {
 		return *v, true
 	}
@@ -91,19 +91,19 @@ func (b *QuobyteVolumeSourceBuilder) GetVolume() (value string, ok bool) {
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b *QuobyteVolumeSourceBuilder) SetReadOnly(value bool) *QuobyteVolumeSourceBuilder {
+func (b *QuobyteVolumeSourceApplyConfiguration) SetReadOnly(value bool) *QuobyteVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b *QuobyteVolumeSourceBuilder) RemoveReadOnly() *QuobyteVolumeSourceBuilder {
+func (b *QuobyteVolumeSourceApplyConfiguration) RemoveReadOnly() *QuobyteVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b *QuobyteVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
+func (b *QuobyteVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
@@ -111,19 +111,19 @@ func (b *QuobyteVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
 }
 
 // SetUser sets the User field in the declarative configuration to the given value.
-func (b *QuobyteVolumeSourceBuilder) SetUser(value string) *QuobyteVolumeSourceBuilder {
+func (b *QuobyteVolumeSourceApplyConfiguration) SetUser(value string) *QuobyteVolumeSourceApplyConfiguration {
 	b.fields.User = &value
 	return b
 }
 
 // RemoveUser removes the User field from the declarative configuration.
-func (b *QuobyteVolumeSourceBuilder) RemoveUser() *QuobyteVolumeSourceBuilder {
+func (b *QuobyteVolumeSourceApplyConfiguration) RemoveUser() *QuobyteVolumeSourceApplyConfiguration {
 	b.fields.User = nil
 	return b
 }
 
 // GetUser gets the User field from the declarative configuration.
-func (b *QuobyteVolumeSourceBuilder) GetUser() (value string, ok bool) {
+func (b *QuobyteVolumeSourceApplyConfiguration) GetUser() (value string, ok bool) {
 	if v := b.fields.User; v != nil {
 		return *v, true
 	}
@@ -131,19 +131,19 @@ func (b *QuobyteVolumeSourceBuilder) GetUser() (value string, ok bool) {
 }
 
 // SetGroup sets the Group field in the declarative configuration to the given value.
-func (b *QuobyteVolumeSourceBuilder) SetGroup(value string) *QuobyteVolumeSourceBuilder {
+func (b *QuobyteVolumeSourceApplyConfiguration) SetGroup(value string) *QuobyteVolumeSourceApplyConfiguration {
 	b.fields.Group = &value
 	return b
 }
 
 // RemoveGroup removes the Group field from the declarative configuration.
-func (b *QuobyteVolumeSourceBuilder) RemoveGroup() *QuobyteVolumeSourceBuilder {
+func (b *QuobyteVolumeSourceApplyConfiguration) RemoveGroup() *QuobyteVolumeSourceApplyConfiguration {
 	b.fields.Group = nil
 	return b
 }
 
 // GetGroup gets the Group field from the declarative configuration.
-func (b *QuobyteVolumeSourceBuilder) GetGroup() (value string, ok bool) {
+func (b *QuobyteVolumeSourceApplyConfiguration) GetGroup() (value string, ok bool) {
 	if v := b.fields.Group; v != nil {
 		return *v, true
 	}
@@ -151,27 +151,27 @@ func (b *QuobyteVolumeSourceBuilder) GetGroup() (value string, ok bool) {
 }
 
 // SetTenant sets the Tenant field in the declarative configuration to the given value.
-func (b *QuobyteVolumeSourceBuilder) SetTenant(value string) *QuobyteVolumeSourceBuilder {
+func (b *QuobyteVolumeSourceApplyConfiguration) SetTenant(value string) *QuobyteVolumeSourceApplyConfiguration {
 	b.fields.Tenant = &value
 	return b
 }
 
 // RemoveTenant removes the Tenant field from the declarative configuration.
-func (b *QuobyteVolumeSourceBuilder) RemoveTenant() *QuobyteVolumeSourceBuilder {
+func (b *QuobyteVolumeSourceApplyConfiguration) RemoveTenant() *QuobyteVolumeSourceApplyConfiguration {
 	b.fields.Tenant = nil
 	return b
 }
 
 // GetTenant gets the Tenant field from the declarative configuration.
-func (b *QuobyteVolumeSourceBuilder) GetTenant() (value string, ok bool) {
+func (b *QuobyteVolumeSourceApplyConfiguration) GetTenant() (value string, ok bool) {
 	if v := b.fields.Tenant; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts QuobyteVolumeSourceBuilder to unstructured.
-func (b *QuobyteVolumeSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts QuobyteVolumeSourceApplyConfiguration to unstructured.
+func (b *QuobyteVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -183,9 +183,9 @@ func (b *QuobyteVolumeSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to QuobyteVolumeSourceBuilder, replacing the contents
-// of QuobyteVolumeSourceBuilder.
-func (b *QuobyteVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to QuobyteVolumeSourceApplyConfiguration, replacing the contents
+// of QuobyteVolumeSourceApplyConfiguration.
+func (b *QuobyteVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &quobyteVolumeSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -196,15 +196,15 @@ func (b *QuobyteVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) 
 	return nil
 }
 
-// MarshalJSON marshals QuobyteVolumeSourceBuilder to JSON.
-func (b *QuobyteVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals QuobyteVolumeSourceApplyConfiguration to JSON.
+func (b *QuobyteVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into QuobyteVolumeSourceBuilder, replacing the contents of
-// QuobyteVolumeSourceBuilder.
-func (b *QuobyteVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into QuobyteVolumeSourceApplyConfiguration, replacing the contents of
+// QuobyteVolumeSourceApplyConfiguration.
+func (b *QuobyteVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -212,13 +212,13 @@ func (b *QuobyteVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// QuobyteVolumeSourceList represents a list of QuobyteVolumeSourceBuilder.
-type QuobyteVolumeSourceList []*QuobyteVolumeSourceBuilder
+// QuobyteVolumeSourceList represents a listAlias of QuobyteVolumeSourceApplyConfiguration.
+type QuobyteVolumeSourceList []*QuobyteVolumeSourceApplyConfiguration
 
-// QuobyteVolumeSourceList represents a map of QuobyteVolumeSourceBuilder.
-type QuobyteVolumeSourceMap map[string]QuobyteVolumeSourceBuilder
+// QuobyteVolumeSourceList represents a map of QuobyteVolumeSourceApplyConfiguration.
+type QuobyteVolumeSourceMap map[string]QuobyteVolumeSourceApplyConfiguration
 
-func (b *QuobyteVolumeSourceBuilder) preMarshal() {
+func (b *QuobyteVolumeSourceApplyConfiguration) preMarshal() {
 }
-func (b *QuobyteVolumeSourceBuilder) postUnmarshal() {
+func (b *QuobyteVolumeSourceApplyConfiguration) postUnmarshal() {
 }

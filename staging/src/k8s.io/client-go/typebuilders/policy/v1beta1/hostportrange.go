@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// HostPortRangeBuilder represents an declarative configuration of the HostPortRange type for use
+// HostPortRangeApplyConfiguration represents an declarative configuration of the HostPortRange type for use
 // with apply.
-type HostPortRangeBuilder struct {
+type HostPortRangeApplyConfiguration struct {
 	fields hostPortRangeFields
 }
 
+// HostPortRangeApplyConfiguration constructs an declarative configuration of the HostPortRange type for use with
+// apply.
+func HostPortRange() *HostPortRangeApplyConfiguration {
+	return &HostPortRangeApplyConfiguration{}
+}
+
 // hostPortRangeFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in HostPortRangeBuilder.
+// Inline fields are owned by their respective inline type in HostPortRangeApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type hostPortRangeFields struct {
 	Max *int32 `json:"max,omitempty"`
 }
 
-// HostPortRange constructs an declarative configuration of the HostPortRange type for use with
-// apply.
-func HostPortRange() *HostPortRangeBuilder {
-	return &HostPortRangeBuilder{}
-}
-
 // SetMin sets the Min field in the declarative configuration to the given value.
-func (b *HostPortRangeBuilder) SetMin(value int32) *HostPortRangeBuilder {
+func (b *HostPortRangeApplyConfiguration) SetMin(value int32) *HostPortRangeApplyConfiguration {
 	b.fields.Min = &value
 	return b
 }
 
 // RemoveMin removes the Min field from the declarative configuration.
-func (b *HostPortRangeBuilder) RemoveMin() *HostPortRangeBuilder {
+func (b *HostPortRangeApplyConfiguration) RemoveMin() *HostPortRangeApplyConfiguration {
 	b.fields.Min = nil
 	return b
 }
 
 // GetMin gets the Min field from the declarative configuration.
-func (b *HostPortRangeBuilder) GetMin() (value int32, ok bool) {
+func (b *HostPortRangeApplyConfiguration) GetMin() (value int32, ok bool) {
 	if v := b.fields.Min; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *HostPortRangeBuilder) GetMin() (value int32, ok bool) {
 }
 
 // SetMax sets the Max field in the declarative configuration to the given value.
-func (b *HostPortRangeBuilder) SetMax(value int32) *HostPortRangeBuilder {
+func (b *HostPortRangeApplyConfiguration) SetMax(value int32) *HostPortRangeApplyConfiguration {
 	b.fields.Max = &value
 	return b
 }
 
 // RemoveMax removes the Max field from the declarative configuration.
-func (b *HostPortRangeBuilder) RemoveMax() *HostPortRangeBuilder {
+func (b *HostPortRangeApplyConfiguration) RemoveMax() *HostPortRangeApplyConfiguration {
 	b.fields.Max = nil
 	return b
 }
 
 // GetMax gets the Max field from the declarative configuration.
-func (b *HostPortRangeBuilder) GetMax() (value int32, ok bool) {
+func (b *HostPortRangeApplyConfiguration) GetMax() (value int32, ok bool) {
 	if v := b.fields.Max; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts HostPortRangeBuilder to unstructured.
-func (b *HostPortRangeBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts HostPortRangeApplyConfiguration to unstructured.
+func (b *HostPortRangeApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *HostPortRangeBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to HostPortRangeBuilder, replacing the contents
-// of HostPortRangeBuilder.
-func (b *HostPortRangeBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to HostPortRangeApplyConfiguration, replacing the contents
+// of HostPortRangeApplyConfiguration.
+func (b *HostPortRangeApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &hostPortRangeFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *HostPortRangeBuilder) FromUnstructured(u map[string]interface{}) error 
 	return nil
 }
 
-// MarshalJSON marshals HostPortRangeBuilder to JSON.
-func (b *HostPortRangeBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals HostPortRangeApplyConfiguration to JSON.
+func (b *HostPortRangeApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into HostPortRangeBuilder, replacing the contents of
-// HostPortRangeBuilder.
-func (b *HostPortRangeBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into HostPortRangeApplyConfiguration, replacing the contents of
+// HostPortRangeApplyConfiguration.
+func (b *HostPortRangeApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *HostPortRangeBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// HostPortRangeList represents a list of HostPortRangeBuilder.
-type HostPortRangeList []*HostPortRangeBuilder
+// HostPortRangeList represents a listAlias of HostPortRangeApplyConfiguration.
+type HostPortRangeList []*HostPortRangeApplyConfiguration
 
-// HostPortRangeList represents a map of HostPortRangeBuilder.
-type HostPortRangeMap map[string]HostPortRangeBuilder
+// HostPortRangeList represents a map of HostPortRangeApplyConfiguration.
+type HostPortRangeMap map[string]HostPortRangeApplyConfiguration
 
-func (b *HostPortRangeBuilder) preMarshal() {
+func (b *HostPortRangeApplyConfiguration) preMarshal() {
 }
-func (b *HostPortRangeBuilder) postUnmarshal() {
+func (b *HostPortRangeApplyConfiguration) postUnmarshal() {
 }

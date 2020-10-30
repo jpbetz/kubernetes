@@ -24,48 +24,48 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// RBDVolumeSourceBuilder represents an declarative configuration of the RBDVolumeSource type for use
+// RBDVolumeSourceApplyConfiguration represents an declarative configuration of the RBDVolumeSource type for use
 // with apply.
-type RBDVolumeSourceBuilder struct {
+type RBDVolumeSourceApplyConfiguration struct {
 	fields rBDVolumeSourceFields
 }
 
+// RBDVolumeSourceApplyConfiguration constructs an declarative configuration of the RBDVolumeSource type for use with
+// apply.
+func RBDVolumeSource() *RBDVolumeSourceApplyConfiguration {
+	return &RBDVolumeSourceApplyConfiguration{}
+}
+
 // rBDVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in RBDVolumeSourceBuilder.
+// Inline fields are owned by their respective inline type in RBDVolumeSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type rBDVolumeSourceFields struct {
-	CephMonitors *[]string                    `json:"monitors,omitempty"`
-	RBDImage     *string                      `json:"image,omitempty"`
-	FSType       *string                      `json:"fsType,omitempty"`
-	RBDPool      *string                      `json:"pool,omitempty"`
-	RadosUser    *string                      `json:"user,omitempty"`
-	Keyring      *string                      `json:"keyring,omitempty"`
-	SecretRef    *LocalObjectReferenceBuilder `json:"secretRef,omitempty"`
-	ReadOnly     *bool                        `json:"readOnly,omitempty"`
-}
-
-// RBDVolumeSource constructs an declarative configuration of the RBDVolumeSource type for use with
-// apply.
-func RBDVolumeSource() *RBDVolumeSourceBuilder {
-	return &RBDVolumeSourceBuilder{}
+	CephMonitors *[]string                               `json:"monitors,omitempty"`
+	RBDImage     *string                                 `json:"image,omitempty"`
+	FSType       *string                                 `json:"fsType,omitempty"`
+	RBDPool      *string                                 `json:"pool,omitempty"`
+	RadosUser    *string                                 `json:"user,omitempty"`
+	Keyring      *string                                 `json:"keyring,omitempty"`
+	SecretRef    *LocalObjectReferenceApplyConfiguration `json:"secretRef,omitempty"`
+	ReadOnly     *bool                                   `json:"readOnly,omitempty"`
 }
 
 // SetCephMonitors sets the CephMonitors field in the declarative configuration to the given value.
-func (b *RBDVolumeSourceBuilder) SetCephMonitors(value []string) *RBDVolumeSourceBuilder {
+func (b *RBDVolumeSourceApplyConfiguration) SetCephMonitors(value []string) *RBDVolumeSourceApplyConfiguration {
 	b.fields.CephMonitors = &value
 	return b
 }
 
 // RemoveCephMonitors removes the CephMonitors field from the declarative configuration.
-func (b *RBDVolumeSourceBuilder) RemoveCephMonitors() *RBDVolumeSourceBuilder {
+func (b *RBDVolumeSourceApplyConfiguration) RemoveCephMonitors() *RBDVolumeSourceApplyConfiguration {
 	b.fields.CephMonitors = nil
 	return b
 }
 
 // GetCephMonitors gets the CephMonitors field from the declarative configuration.
-func (b *RBDVolumeSourceBuilder) GetCephMonitors() (value []string, ok bool) {
+func (b *RBDVolumeSourceApplyConfiguration) GetCephMonitors() (value []string, ok bool) {
 	if v := b.fields.CephMonitors; v != nil {
 		return *v, true
 	}
@@ -73,19 +73,19 @@ func (b *RBDVolumeSourceBuilder) GetCephMonitors() (value []string, ok bool) {
 }
 
 // SetRBDImage sets the RBDImage field in the declarative configuration to the given value.
-func (b *RBDVolumeSourceBuilder) SetRBDImage(value string) *RBDVolumeSourceBuilder {
+func (b *RBDVolumeSourceApplyConfiguration) SetRBDImage(value string) *RBDVolumeSourceApplyConfiguration {
 	b.fields.RBDImage = &value
 	return b
 }
 
 // RemoveRBDImage removes the RBDImage field from the declarative configuration.
-func (b *RBDVolumeSourceBuilder) RemoveRBDImage() *RBDVolumeSourceBuilder {
+func (b *RBDVolumeSourceApplyConfiguration) RemoveRBDImage() *RBDVolumeSourceApplyConfiguration {
 	b.fields.RBDImage = nil
 	return b
 }
 
 // GetRBDImage gets the RBDImage field from the declarative configuration.
-func (b *RBDVolumeSourceBuilder) GetRBDImage() (value string, ok bool) {
+func (b *RBDVolumeSourceApplyConfiguration) GetRBDImage() (value string, ok bool) {
 	if v := b.fields.RBDImage; v != nil {
 		return *v, true
 	}
@@ -93,19 +93,19 @@ func (b *RBDVolumeSourceBuilder) GetRBDImage() (value string, ok bool) {
 }
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
-func (b *RBDVolumeSourceBuilder) SetFSType(value string) *RBDVolumeSourceBuilder {
+func (b *RBDVolumeSourceApplyConfiguration) SetFSType(value string) *RBDVolumeSourceApplyConfiguration {
 	b.fields.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
-func (b *RBDVolumeSourceBuilder) RemoveFSType() *RBDVolumeSourceBuilder {
+func (b *RBDVolumeSourceApplyConfiguration) RemoveFSType() *RBDVolumeSourceApplyConfiguration {
 	b.fields.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
-func (b *RBDVolumeSourceBuilder) GetFSType() (value string, ok bool) {
+func (b *RBDVolumeSourceApplyConfiguration) GetFSType() (value string, ok bool) {
 	if v := b.fields.FSType; v != nil {
 		return *v, true
 	}
@@ -113,19 +113,19 @@ func (b *RBDVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 }
 
 // SetRBDPool sets the RBDPool field in the declarative configuration to the given value.
-func (b *RBDVolumeSourceBuilder) SetRBDPool(value string) *RBDVolumeSourceBuilder {
+func (b *RBDVolumeSourceApplyConfiguration) SetRBDPool(value string) *RBDVolumeSourceApplyConfiguration {
 	b.fields.RBDPool = &value
 	return b
 }
 
 // RemoveRBDPool removes the RBDPool field from the declarative configuration.
-func (b *RBDVolumeSourceBuilder) RemoveRBDPool() *RBDVolumeSourceBuilder {
+func (b *RBDVolumeSourceApplyConfiguration) RemoveRBDPool() *RBDVolumeSourceApplyConfiguration {
 	b.fields.RBDPool = nil
 	return b
 }
 
 // GetRBDPool gets the RBDPool field from the declarative configuration.
-func (b *RBDVolumeSourceBuilder) GetRBDPool() (value string, ok bool) {
+func (b *RBDVolumeSourceApplyConfiguration) GetRBDPool() (value string, ok bool) {
 	if v := b.fields.RBDPool; v != nil {
 		return *v, true
 	}
@@ -133,19 +133,19 @@ func (b *RBDVolumeSourceBuilder) GetRBDPool() (value string, ok bool) {
 }
 
 // SetRadosUser sets the RadosUser field in the declarative configuration to the given value.
-func (b *RBDVolumeSourceBuilder) SetRadosUser(value string) *RBDVolumeSourceBuilder {
+func (b *RBDVolumeSourceApplyConfiguration) SetRadosUser(value string) *RBDVolumeSourceApplyConfiguration {
 	b.fields.RadosUser = &value
 	return b
 }
 
 // RemoveRadosUser removes the RadosUser field from the declarative configuration.
-func (b *RBDVolumeSourceBuilder) RemoveRadosUser() *RBDVolumeSourceBuilder {
+func (b *RBDVolumeSourceApplyConfiguration) RemoveRadosUser() *RBDVolumeSourceApplyConfiguration {
 	b.fields.RadosUser = nil
 	return b
 }
 
 // GetRadosUser gets the RadosUser field from the declarative configuration.
-func (b *RBDVolumeSourceBuilder) GetRadosUser() (value string, ok bool) {
+func (b *RBDVolumeSourceApplyConfiguration) GetRadosUser() (value string, ok bool) {
 	if v := b.fields.RadosUser; v != nil {
 		return *v, true
 	}
@@ -153,19 +153,19 @@ func (b *RBDVolumeSourceBuilder) GetRadosUser() (value string, ok bool) {
 }
 
 // SetKeyring sets the Keyring field in the declarative configuration to the given value.
-func (b *RBDVolumeSourceBuilder) SetKeyring(value string) *RBDVolumeSourceBuilder {
+func (b *RBDVolumeSourceApplyConfiguration) SetKeyring(value string) *RBDVolumeSourceApplyConfiguration {
 	b.fields.Keyring = &value
 	return b
 }
 
 // RemoveKeyring removes the Keyring field from the declarative configuration.
-func (b *RBDVolumeSourceBuilder) RemoveKeyring() *RBDVolumeSourceBuilder {
+func (b *RBDVolumeSourceApplyConfiguration) RemoveKeyring() *RBDVolumeSourceApplyConfiguration {
 	b.fields.Keyring = nil
 	return b
 }
 
 // GetKeyring gets the Keyring field from the declarative configuration.
-func (b *RBDVolumeSourceBuilder) GetKeyring() (value string, ok bool) {
+func (b *RBDVolumeSourceApplyConfiguration) GetKeyring() (value string, ok bool) {
 	if v := b.fields.Keyring; v != nil {
 		return *v, true
 	}
@@ -173,44 +173,44 @@ func (b *RBDVolumeSourceBuilder) GetKeyring() (value string, ok bool) {
 }
 
 // SetSecretRef sets the SecretRef field in the declarative configuration to the given value.
-func (b *RBDVolumeSourceBuilder) SetSecretRef(value *LocalObjectReferenceBuilder) *RBDVolumeSourceBuilder {
+func (b *RBDVolumeSourceApplyConfiguration) SetSecretRef(value *LocalObjectReferenceApplyConfiguration) *RBDVolumeSourceApplyConfiguration {
 	b.fields.SecretRef = value
 	return b
 }
 
 // RemoveSecretRef removes the SecretRef field from the declarative configuration.
-func (b *RBDVolumeSourceBuilder) RemoveSecretRef() *RBDVolumeSourceBuilder {
+func (b *RBDVolumeSourceApplyConfiguration) RemoveSecretRef() *RBDVolumeSourceApplyConfiguration {
 	b.fields.SecretRef = nil
 	return b
 }
 
 // GetSecretRef gets the SecretRef field from the declarative configuration.
-func (b *RBDVolumeSourceBuilder) GetSecretRef() (value *LocalObjectReferenceBuilder, ok bool) {
+func (b *RBDVolumeSourceApplyConfiguration) GetSecretRef() (value *LocalObjectReferenceApplyConfiguration, ok bool) {
 	return b.fields.SecretRef, b.fields.SecretRef != nil
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b *RBDVolumeSourceBuilder) SetReadOnly(value bool) *RBDVolumeSourceBuilder {
+func (b *RBDVolumeSourceApplyConfiguration) SetReadOnly(value bool) *RBDVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b *RBDVolumeSourceBuilder) RemoveReadOnly() *RBDVolumeSourceBuilder {
+func (b *RBDVolumeSourceApplyConfiguration) RemoveReadOnly() *RBDVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b *RBDVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
+func (b *RBDVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts RBDVolumeSourceBuilder to unstructured.
-func (b *RBDVolumeSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts RBDVolumeSourceApplyConfiguration to unstructured.
+func (b *RBDVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -222,9 +222,9 @@ func (b *RBDVolumeSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to RBDVolumeSourceBuilder, replacing the contents
-// of RBDVolumeSourceBuilder.
-func (b *RBDVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to RBDVolumeSourceApplyConfiguration, replacing the contents
+// of RBDVolumeSourceApplyConfiguration.
+func (b *RBDVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &rBDVolumeSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -235,15 +235,15 @@ func (b *RBDVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) erro
 	return nil
 }
 
-// MarshalJSON marshals RBDVolumeSourceBuilder to JSON.
-func (b *RBDVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals RBDVolumeSourceApplyConfiguration to JSON.
+func (b *RBDVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into RBDVolumeSourceBuilder, replacing the contents of
-// RBDVolumeSourceBuilder.
-func (b *RBDVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into RBDVolumeSourceApplyConfiguration, replacing the contents of
+// RBDVolumeSourceApplyConfiguration.
+func (b *RBDVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -251,13 +251,13 @@ func (b *RBDVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// RBDVolumeSourceList represents a list of RBDVolumeSourceBuilder.
-type RBDVolumeSourceList []*RBDVolumeSourceBuilder
+// RBDVolumeSourceList represents a listAlias of RBDVolumeSourceApplyConfiguration.
+type RBDVolumeSourceList []*RBDVolumeSourceApplyConfiguration
 
-// RBDVolumeSourceList represents a map of RBDVolumeSourceBuilder.
-type RBDVolumeSourceMap map[string]RBDVolumeSourceBuilder
+// RBDVolumeSourceList represents a map of RBDVolumeSourceApplyConfiguration.
+type RBDVolumeSourceMap map[string]RBDVolumeSourceApplyConfiguration
 
-func (b *RBDVolumeSourceBuilder) preMarshal() {
+func (b *RBDVolumeSourceApplyConfiguration) preMarshal() {
 }
-func (b *RBDVolumeSourceBuilder) postUnmarshal() {
+func (b *RBDVolumeSourceApplyConfiguration) postUnmarshal() {
 }

@@ -25,46 +25,46 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// RuleWithOperationsBuilder represents an declarative configuration of the RuleWithOperations type for use
+// RuleWithOperationsApplyConfiguration represents an declarative configuration of the RuleWithOperations type for use
 // with apply.
-type RuleWithOperationsBuilder struct {
-	rule   *RuleBuilder // inlined type
+type RuleWithOperationsApplyConfiguration struct {
+	rule   *RuleApplyConfiguration // inlined type
 	fields ruleWithOperationsFields
 }
 
+// RuleWithOperationsApplyConfiguration constructs an declarative configuration of the RuleWithOperations type for use with
+// apply.
+func RuleWithOperations() *RuleWithOperationsApplyConfiguration {
+	return &RuleWithOperationsApplyConfiguration{}
+}
+
 // ruleWithOperationsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in RuleWithOperationsBuilder.
+// Inline fields are owned by their respective inline type in RuleWithOperationsApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type ruleWithOperationsFields struct {
 	Operations  *[]admissionregistrationv1beta1.OperationType `json:"operations,omitempty"`
-	APIGroups   *[]string                                     `json:"apiGroups,omitempty"`   // inlined RuleWithOperationsBuilder.rule.APIGroups field
-	APIVersions *[]string                                     `json:"apiVersions,omitempty"` // inlined RuleWithOperationsBuilder.rule.APIVersions field
-	Resources   *[]string                                     `json:"resources,omitempty"`   // inlined RuleWithOperationsBuilder.rule.Resources field
-	Scope       *admissionregistrationv1beta1.ScopeType       `json:"scope,omitempty"`       // inlined RuleWithOperationsBuilder.rule.Scope field
-}
-
-// RuleWithOperations constructs an declarative configuration of the RuleWithOperations type for use with
-// apply.
-func RuleWithOperations() *RuleWithOperationsBuilder {
-	return &RuleWithOperationsBuilder{}
+	APIGroups   *[]string                                     `json:"apiGroups,omitempty"`   // inlined RuleWithOperationsApplyConfiguration.rule.APIGroups field
+	APIVersions *[]string                                     `json:"apiVersions,omitempty"` // inlined RuleWithOperationsApplyConfiguration.rule.APIVersions field
+	Resources   *[]string                                     `json:"resources,omitempty"`   // inlined RuleWithOperationsApplyConfiguration.rule.Resources field
+	Scope       *admissionregistrationv1beta1.ScopeType       `json:"scope,omitempty"`       // inlined RuleWithOperationsApplyConfiguration.rule.Scope field
 }
 
 // SetOperations sets the Operations field in the declarative configuration to the given value.
-func (b *RuleWithOperationsBuilder) SetOperations(value []admissionregistrationv1beta1.OperationType) *RuleWithOperationsBuilder {
+func (b *RuleWithOperationsApplyConfiguration) SetOperations(value []admissionregistrationv1beta1.OperationType) *RuleWithOperationsApplyConfiguration {
 	b.fields.Operations = &value
 	return b
 }
 
 // RemoveOperations removes the Operations field from the declarative configuration.
-func (b *RuleWithOperationsBuilder) RemoveOperations() *RuleWithOperationsBuilder {
+func (b *RuleWithOperationsApplyConfiguration) RemoveOperations() *RuleWithOperationsApplyConfiguration {
 	b.fields.Operations = nil
 	return b
 }
 
 // GetOperations gets the Operations field from the declarative configuration.
-func (b *RuleWithOperationsBuilder) GetOperations() (value []admissionregistrationv1beta1.OperationType, ok bool) {
+func (b *RuleWithOperationsApplyConfiguration) GetOperations() (value []admissionregistrationv1beta1.OperationType, ok bool) {
 	if v := b.fields.Operations; v != nil {
 		return *v, true
 	}
@@ -72,24 +72,24 @@ func (b *RuleWithOperationsBuilder) GetOperations() (value []admissionregistrati
 }
 
 // SetRule sets the Rule field in the declarative configuration to the given value.
-func (b *RuleWithOperationsBuilder) SetRule(value *RuleBuilder) *RuleWithOperationsBuilder {
+func (b *RuleWithOperationsApplyConfiguration) SetRule(value *RuleApplyConfiguration) *RuleWithOperationsApplyConfiguration {
 	b.rule = value
 	return b
 }
 
 // RemoveRule removes the Rule field from the declarative configuration.
-func (b *RuleWithOperationsBuilder) RemoveRule() *RuleWithOperationsBuilder {
+func (b *RuleWithOperationsApplyConfiguration) RemoveRule() *RuleWithOperationsApplyConfiguration {
 	b.rule = nil
 	return b
 }
 
 // GetRule gets the Rule field from the declarative configuration.
-func (b *RuleWithOperationsBuilder) GetRule() (value *RuleBuilder, ok bool) {
+func (b *RuleWithOperationsApplyConfiguration) GetRule() (value *RuleApplyConfiguration, ok bool) {
 	return b.rule, true
 }
 
-// ToUnstructured converts RuleWithOperationsBuilder to unstructured.
-func (b *RuleWithOperationsBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts RuleWithOperationsApplyConfiguration to unstructured.
+func (b *RuleWithOperationsApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -101,9 +101,9 @@ func (b *RuleWithOperationsBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to RuleWithOperationsBuilder, replacing the contents
-// of RuleWithOperationsBuilder.
-func (b *RuleWithOperationsBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to RuleWithOperationsApplyConfiguration, replacing the contents
+// of RuleWithOperationsApplyConfiguration.
+func (b *RuleWithOperationsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &ruleWithOperationsFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -114,15 +114,15 @@ func (b *RuleWithOperationsBuilder) FromUnstructured(u map[string]interface{}) e
 	return nil
 }
 
-// MarshalJSON marshals RuleWithOperationsBuilder to JSON.
-func (b *RuleWithOperationsBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals RuleWithOperationsApplyConfiguration to JSON.
+func (b *RuleWithOperationsApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into RuleWithOperationsBuilder, replacing the contents of
-// RuleWithOperationsBuilder.
-func (b *RuleWithOperationsBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into RuleWithOperationsApplyConfiguration, replacing the contents of
+// RuleWithOperationsApplyConfiguration.
+func (b *RuleWithOperationsApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -130,13 +130,13 @@ func (b *RuleWithOperationsBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// RuleWithOperationsList represents a list of RuleWithOperationsBuilder.
-type RuleWithOperationsList []*RuleWithOperationsBuilder
+// RuleWithOperationsList represents a listAlias of RuleWithOperationsApplyConfiguration.
+type RuleWithOperationsList []*RuleWithOperationsApplyConfiguration
 
-// RuleWithOperationsList represents a map of RuleWithOperationsBuilder.
-type RuleWithOperationsMap map[string]RuleWithOperationsBuilder
+// RuleWithOperationsList represents a map of RuleWithOperationsApplyConfiguration.
+type RuleWithOperationsMap map[string]RuleWithOperationsApplyConfiguration
 
-func (b *RuleWithOperationsBuilder) preMarshal() {
+func (b *RuleWithOperationsApplyConfiguration) preMarshal() {
 	if b.rule != nil {
 		if v, ok := b.rule.GetAPIGroups(); ok {
 			b.fields.APIGroups = &v
@@ -152,9 +152,9 @@ func (b *RuleWithOperationsBuilder) preMarshal() {
 		}
 	}
 }
-func (b *RuleWithOperationsBuilder) postUnmarshal() {
+func (b *RuleWithOperationsApplyConfiguration) postUnmarshal() {
 	if b.rule == nil {
-		b.rule = &RuleBuilder{}
+		b.rule = &RuleApplyConfiguration{}
 	}
 	if b.fields.APIGroups != nil {
 		b.rule.SetAPIGroups(*b.fields.APIGroups)

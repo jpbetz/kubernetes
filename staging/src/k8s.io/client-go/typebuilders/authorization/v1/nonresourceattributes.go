@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// NonResourceAttributesBuilder represents an declarative configuration of the NonResourceAttributes type for use
+// NonResourceAttributesApplyConfiguration represents an declarative configuration of the NonResourceAttributes type for use
 // with apply.
-type NonResourceAttributesBuilder struct {
+type NonResourceAttributesApplyConfiguration struct {
 	fields nonResourceAttributesFields
 }
 
+// NonResourceAttributesApplyConfiguration constructs an declarative configuration of the NonResourceAttributes type for use with
+// apply.
+func NonResourceAttributes() *NonResourceAttributesApplyConfiguration {
+	return &NonResourceAttributesApplyConfiguration{}
+}
+
 // nonResourceAttributesFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NonResourceAttributesBuilder.
+// Inline fields are owned by their respective inline type in NonResourceAttributesApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type nonResourceAttributesFields struct {
 	Verb *string `json:"verb,omitempty"`
 }
 
-// NonResourceAttributes constructs an declarative configuration of the NonResourceAttributes type for use with
-// apply.
-func NonResourceAttributes() *NonResourceAttributesBuilder {
-	return &NonResourceAttributesBuilder{}
-}
-
 // SetPath sets the Path field in the declarative configuration to the given value.
-func (b *NonResourceAttributesBuilder) SetPath(value string) *NonResourceAttributesBuilder {
+func (b *NonResourceAttributesApplyConfiguration) SetPath(value string) *NonResourceAttributesApplyConfiguration {
 	b.fields.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
-func (b *NonResourceAttributesBuilder) RemovePath() *NonResourceAttributesBuilder {
+func (b *NonResourceAttributesApplyConfiguration) RemovePath() *NonResourceAttributesApplyConfiguration {
 	b.fields.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
-func (b *NonResourceAttributesBuilder) GetPath() (value string, ok bool) {
+func (b *NonResourceAttributesApplyConfiguration) GetPath() (value string, ok bool) {
 	if v := b.fields.Path; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *NonResourceAttributesBuilder) GetPath() (value string, ok bool) {
 }
 
 // SetVerb sets the Verb field in the declarative configuration to the given value.
-func (b *NonResourceAttributesBuilder) SetVerb(value string) *NonResourceAttributesBuilder {
+func (b *NonResourceAttributesApplyConfiguration) SetVerb(value string) *NonResourceAttributesApplyConfiguration {
 	b.fields.Verb = &value
 	return b
 }
 
 // RemoveVerb removes the Verb field from the declarative configuration.
-func (b *NonResourceAttributesBuilder) RemoveVerb() *NonResourceAttributesBuilder {
+func (b *NonResourceAttributesApplyConfiguration) RemoveVerb() *NonResourceAttributesApplyConfiguration {
 	b.fields.Verb = nil
 	return b
 }
 
 // GetVerb gets the Verb field from the declarative configuration.
-func (b *NonResourceAttributesBuilder) GetVerb() (value string, ok bool) {
+func (b *NonResourceAttributesApplyConfiguration) GetVerb() (value string, ok bool) {
 	if v := b.fields.Verb; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts NonResourceAttributesBuilder to unstructured.
-func (b *NonResourceAttributesBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NonResourceAttributesApplyConfiguration to unstructured.
+func (b *NonResourceAttributesApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *NonResourceAttributesBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NonResourceAttributesBuilder, replacing the contents
-// of NonResourceAttributesBuilder.
-func (b *NonResourceAttributesBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NonResourceAttributesApplyConfiguration, replacing the contents
+// of NonResourceAttributesApplyConfiguration.
+func (b *NonResourceAttributesApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &nonResourceAttributesFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *NonResourceAttributesBuilder) FromUnstructured(u map[string]interface{}
 	return nil
 }
 
-// MarshalJSON marshals NonResourceAttributesBuilder to JSON.
-func (b *NonResourceAttributesBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NonResourceAttributesApplyConfiguration to JSON.
+func (b *NonResourceAttributesApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NonResourceAttributesBuilder, replacing the contents of
-// NonResourceAttributesBuilder.
-func (b *NonResourceAttributesBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NonResourceAttributesApplyConfiguration, replacing the contents of
+// NonResourceAttributesApplyConfiguration.
+func (b *NonResourceAttributesApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *NonResourceAttributesBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NonResourceAttributesList represents a list of NonResourceAttributesBuilder.
-type NonResourceAttributesList []*NonResourceAttributesBuilder
+// NonResourceAttributesList represents a listAlias of NonResourceAttributesApplyConfiguration.
+type NonResourceAttributesList []*NonResourceAttributesApplyConfiguration
 
-// NonResourceAttributesList represents a map of NonResourceAttributesBuilder.
-type NonResourceAttributesMap map[string]NonResourceAttributesBuilder
+// NonResourceAttributesList represents a map of NonResourceAttributesApplyConfiguration.
+type NonResourceAttributesMap map[string]NonResourceAttributesApplyConfiguration
 
-func (b *NonResourceAttributesBuilder) preMarshal() {
+func (b *NonResourceAttributesApplyConfiguration) preMarshal() {
 }
-func (b *NonResourceAttributesBuilder) postUnmarshal() {
+func (b *NonResourceAttributesApplyConfiguration) postUnmarshal() {
 }

@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// DaemonEndpointBuilder represents an declarative configuration of the DaemonEndpoint type for use
+// DaemonEndpointApplyConfiguration represents an declarative configuration of the DaemonEndpoint type for use
 // with apply.
-type DaemonEndpointBuilder struct {
+type DaemonEndpointApplyConfiguration struct {
 	fields daemonEndpointFields
 }
 
+// DaemonEndpointApplyConfiguration constructs an declarative configuration of the DaemonEndpoint type for use with
+// apply.
+func DaemonEndpoint() *DaemonEndpointApplyConfiguration {
+	return &DaemonEndpointApplyConfiguration{}
+}
+
 // daemonEndpointFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in DaemonEndpointBuilder.
+// Inline fields are owned by their respective inline type in DaemonEndpointApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type daemonEndpointFields struct {
 	Port *int32 `json:"Port,omitempty"`
 }
 
-// DaemonEndpoint constructs an declarative configuration of the DaemonEndpoint type for use with
-// apply.
-func DaemonEndpoint() *DaemonEndpointBuilder {
-	return &DaemonEndpointBuilder{}
-}
-
 // SetPort sets the Port field in the declarative configuration to the given value.
-func (b *DaemonEndpointBuilder) SetPort(value int32) *DaemonEndpointBuilder {
+func (b *DaemonEndpointApplyConfiguration) SetPort(value int32) *DaemonEndpointApplyConfiguration {
 	b.fields.Port = &value
 	return b
 }
 
 // RemovePort removes the Port field from the declarative configuration.
-func (b *DaemonEndpointBuilder) RemovePort() *DaemonEndpointBuilder {
+func (b *DaemonEndpointApplyConfiguration) RemovePort() *DaemonEndpointApplyConfiguration {
 	b.fields.Port = nil
 	return b
 }
 
 // GetPort gets the Port field from the declarative configuration.
-func (b *DaemonEndpointBuilder) GetPort() (value int32, ok bool) {
+func (b *DaemonEndpointApplyConfiguration) GetPort() (value int32, ok bool) {
 	if v := b.fields.Port; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts DaemonEndpointBuilder to unstructured.
-func (b *DaemonEndpointBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts DaemonEndpointApplyConfiguration to unstructured.
+func (b *DaemonEndpointApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *DaemonEndpointBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to DaemonEndpointBuilder, replacing the contents
-// of DaemonEndpointBuilder.
-func (b *DaemonEndpointBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to DaemonEndpointApplyConfiguration, replacing the contents
+// of DaemonEndpointApplyConfiguration.
+func (b *DaemonEndpointApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &daemonEndpointFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *DaemonEndpointBuilder) FromUnstructured(u map[string]interface{}) error
 	return nil
 }
 
-// MarshalJSON marshals DaemonEndpointBuilder to JSON.
-func (b *DaemonEndpointBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals DaemonEndpointApplyConfiguration to JSON.
+func (b *DaemonEndpointApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into DaemonEndpointBuilder, replacing the contents of
-// DaemonEndpointBuilder.
-func (b *DaemonEndpointBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into DaemonEndpointApplyConfiguration, replacing the contents of
+// DaemonEndpointApplyConfiguration.
+func (b *DaemonEndpointApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *DaemonEndpointBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// DaemonEndpointList represents a list of DaemonEndpointBuilder.
-type DaemonEndpointList []*DaemonEndpointBuilder
+// DaemonEndpointList represents a listAlias of DaemonEndpointApplyConfiguration.
+type DaemonEndpointList []*DaemonEndpointApplyConfiguration
 
-// DaemonEndpointList represents a map of DaemonEndpointBuilder.
-type DaemonEndpointMap map[string]DaemonEndpointBuilder
+// DaemonEndpointList represents a map of DaemonEndpointApplyConfiguration.
+type DaemonEndpointMap map[string]DaemonEndpointApplyConfiguration
 
-func (b *DaemonEndpointBuilder) preMarshal() {
+func (b *DaemonEndpointApplyConfiguration) preMarshal() {
 }
-func (b *DaemonEndpointBuilder) postUnmarshal() {
+func (b *DaemonEndpointApplyConfiguration) postUnmarshal() {
 }

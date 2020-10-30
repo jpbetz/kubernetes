@@ -25,102 +25,102 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// ImageReviewBuilder represents an declarative configuration of the ImageReview type for use
+// ImageReviewApplyConfiguration represents an declarative configuration of the ImageReview type for use
 // with apply.
-type ImageReviewBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type ImageReviewApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   imageReviewFields
 }
 
+// ImageReviewApplyConfiguration constructs an declarative configuration of the ImageReview type for use with
+// apply.
+func ImageReview() *ImageReviewApplyConfiguration {
+	return &ImageReviewApplyConfiguration{}
+}
+
 // imageReviewFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ImageReviewBuilder.
+// Inline fields are owned by their respective inline type in ImageReviewApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type imageReviewFields struct {
-	Kind       *string                   `json:"kind,omitempty"`       // inlined ImageReviewBuilder.typeMeta.Kind field
-	APIVersion *string                   `json:"apiVersion,omitempty"` // inlined ImageReviewBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder     `json:"metadata,omitempty"`
-	Spec       *ImageReviewSpecBuilder   `json:"spec,omitempty"`
-	Status     *ImageReviewStatusBuilder `json:"status,omitempty"`
-}
-
-// ImageReview constructs an declarative configuration of the ImageReview type for use with
-// apply.
-func ImageReview() *ImageReviewBuilder {
-	return &ImageReviewBuilder{}
+	Kind       *string                              `json:"kind,omitempty"`       // inlined ImageReviewApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                              `json:"apiVersion,omitempty"` // inlined ImageReviewApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration     `json:"metadata,omitempty"`
+	Spec       *ImageReviewSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status     *ImageReviewStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *ImageReviewBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *ImageReviewBuilder {
+func (b *ImageReviewApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *ImageReviewApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *ImageReviewBuilder) RemoveTypeMeta() *ImageReviewBuilder {
+func (b *ImageReviewApplyConfiguration) RemoveTypeMeta() *ImageReviewApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *ImageReviewBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *ImageReviewApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *ImageReviewBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *ImageReviewBuilder {
+func (b *ImageReviewApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *ImageReviewApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *ImageReviewBuilder) RemoveObjectMeta() *ImageReviewBuilder {
+func (b *ImageReviewApplyConfiguration) RemoveObjectMeta() *ImageReviewApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *ImageReviewBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *ImageReviewApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *ImageReviewBuilder) SetSpec(value *ImageReviewSpecBuilder) *ImageReviewBuilder {
+func (b *ImageReviewApplyConfiguration) SetSpec(value *ImageReviewSpecApplyConfiguration) *ImageReviewApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *ImageReviewBuilder) RemoveSpec() *ImageReviewBuilder {
+func (b *ImageReviewApplyConfiguration) RemoveSpec() *ImageReviewApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *ImageReviewBuilder) GetSpec() (value *ImageReviewSpecBuilder, ok bool) {
+func (b *ImageReviewApplyConfiguration) GetSpec() (value *ImageReviewSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *ImageReviewBuilder) SetStatus(value *ImageReviewStatusBuilder) *ImageReviewBuilder {
+func (b *ImageReviewApplyConfiguration) SetStatus(value *ImageReviewStatusApplyConfiguration) *ImageReviewApplyConfiguration {
 	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *ImageReviewBuilder) RemoveStatus() *ImageReviewBuilder {
+func (b *ImageReviewApplyConfiguration) RemoveStatus() *ImageReviewApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *ImageReviewBuilder) GetStatus() (value *ImageReviewStatusBuilder, ok bool) {
+func (b *ImageReviewApplyConfiguration) GetStatus() (value *ImageReviewStatusApplyConfiguration, ok bool) {
 	return b.fields.Status, b.fields.Status != nil
 }
 
-// ToUnstructured converts ImageReviewBuilder to unstructured.
-func (b *ImageReviewBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ImageReviewApplyConfiguration to unstructured.
+func (b *ImageReviewApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -132,9 +132,9 @@ func (b *ImageReviewBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ImageReviewBuilder, replacing the contents
-// of ImageReviewBuilder.
-func (b *ImageReviewBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ImageReviewApplyConfiguration, replacing the contents
+// of ImageReviewApplyConfiguration.
+func (b *ImageReviewApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &imageReviewFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -145,15 +145,15 @@ func (b *ImageReviewBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals ImageReviewBuilder to JSON.
-func (b *ImageReviewBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ImageReviewApplyConfiguration to JSON.
+func (b *ImageReviewApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ImageReviewBuilder, replacing the contents of
-// ImageReviewBuilder.
-func (b *ImageReviewBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ImageReviewApplyConfiguration, replacing the contents of
+// ImageReviewApplyConfiguration.
+func (b *ImageReviewApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -161,13 +161,13 @@ func (b *ImageReviewBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ImageReviewList represents a list of ImageReviewBuilder.
-type ImageReviewList []*ImageReviewBuilder
+// ImageReviewList represents a listAlias of ImageReviewApplyConfiguration.
+type ImageReviewList []*ImageReviewApplyConfiguration
 
-// ImageReviewList represents a map of ImageReviewBuilder.
-type ImageReviewMap map[string]ImageReviewBuilder
+// ImageReviewList represents a map of ImageReviewApplyConfiguration.
+type ImageReviewMap map[string]ImageReviewApplyConfiguration
 
-func (b *ImageReviewBuilder) preMarshal() {
+func (b *ImageReviewApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -177,9 +177,9 @@ func (b *ImageReviewBuilder) preMarshal() {
 		}
 	}
 }
-func (b *ImageReviewBuilder) postUnmarshal() {
+func (b *ImageReviewApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

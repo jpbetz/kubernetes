@@ -24,46 +24,46 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// NodeConfigSourceBuilder represents an declarative configuration of the NodeConfigSource type for use
+// NodeConfigSourceApplyConfiguration represents an declarative configuration of the NodeConfigSource type for use
 // with apply.
-type NodeConfigSourceBuilder struct {
+type NodeConfigSourceApplyConfiguration struct {
 	fields nodeConfigSourceFields
 }
 
+// NodeConfigSourceApplyConfiguration constructs an declarative configuration of the NodeConfigSource type for use with
+// apply.
+func NodeConfigSource() *NodeConfigSourceApplyConfiguration {
+	return &NodeConfigSourceApplyConfiguration{}
+}
+
 // nodeConfigSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NodeConfigSourceBuilder.
+// Inline fields are owned by their respective inline type in NodeConfigSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type nodeConfigSourceFields struct {
-	ConfigMap *ConfigMapNodeConfigSourceBuilder `json:"configMap,omitempty"`
-}
-
-// NodeConfigSource constructs an declarative configuration of the NodeConfigSource type for use with
-// apply.
-func NodeConfigSource() *NodeConfigSourceBuilder {
-	return &NodeConfigSourceBuilder{}
+	ConfigMap *ConfigMapNodeConfigSourceApplyConfiguration `json:"configMap,omitempty"`
 }
 
 // SetConfigMap sets the ConfigMap field in the declarative configuration to the given value.
-func (b *NodeConfigSourceBuilder) SetConfigMap(value *ConfigMapNodeConfigSourceBuilder) *NodeConfigSourceBuilder {
+func (b *NodeConfigSourceApplyConfiguration) SetConfigMap(value *ConfigMapNodeConfigSourceApplyConfiguration) *NodeConfigSourceApplyConfiguration {
 	b.fields.ConfigMap = value
 	return b
 }
 
 // RemoveConfigMap removes the ConfigMap field from the declarative configuration.
-func (b *NodeConfigSourceBuilder) RemoveConfigMap() *NodeConfigSourceBuilder {
+func (b *NodeConfigSourceApplyConfiguration) RemoveConfigMap() *NodeConfigSourceApplyConfiguration {
 	b.fields.ConfigMap = nil
 	return b
 }
 
 // GetConfigMap gets the ConfigMap field from the declarative configuration.
-func (b *NodeConfigSourceBuilder) GetConfigMap() (value *ConfigMapNodeConfigSourceBuilder, ok bool) {
+func (b *NodeConfigSourceApplyConfiguration) GetConfigMap() (value *ConfigMapNodeConfigSourceApplyConfiguration, ok bool) {
 	return b.fields.ConfigMap, b.fields.ConfigMap != nil
 }
 
-// ToUnstructured converts NodeConfigSourceBuilder to unstructured.
-func (b *NodeConfigSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NodeConfigSourceApplyConfiguration to unstructured.
+func (b *NodeConfigSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -75,9 +75,9 @@ func (b *NodeConfigSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NodeConfigSourceBuilder, replacing the contents
-// of NodeConfigSourceBuilder.
-func (b *NodeConfigSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NodeConfigSourceApplyConfiguration, replacing the contents
+// of NodeConfigSourceApplyConfiguration.
+func (b *NodeConfigSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &nodeConfigSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -88,15 +88,15 @@ func (b *NodeConfigSourceBuilder) FromUnstructured(u map[string]interface{}) err
 	return nil
 }
 
-// MarshalJSON marshals NodeConfigSourceBuilder to JSON.
-func (b *NodeConfigSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NodeConfigSourceApplyConfiguration to JSON.
+func (b *NodeConfigSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NodeConfigSourceBuilder, replacing the contents of
-// NodeConfigSourceBuilder.
-func (b *NodeConfigSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NodeConfigSourceApplyConfiguration, replacing the contents of
+// NodeConfigSourceApplyConfiguration.
+func (b *NodeConfigSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -104,13 +104,13 @@ func (b *NodeConfigSourceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NodeConfigSourceList represents a list of NodeConfigSourceBuilder.
-type NodeConfigSourceList []*NodeConfigSourceBuilder
+// NodeConfigSourceList represents a listAlias of NodeConfigSourceApplyConfiguration.
+type NodeConfigSourceList []*NodeConfigSourceApplyConfiguration
 
-// NodeConfigSourceList represents a map of NodeConfigSourceBuilder.
-type NodeConfigSourceMap map[string]NodeConfigSourceBuilder
+// NodeConfigSourceList represents a map of NodeConfigSourceApplyConfiguration.
+type NodeConfigSourceMap map[string]NodeConfigSourceApplyConfiguration
 
-func (b *NodeConfigSourceBuilder) preMarshal() {
+func (b *NodeConfigSourceApplyConfiguration) preMarshal() {
 }
-func (b *NodeConfigSourceBuilder) postUnmarshal() {
+func (b *NodeConfigSourceApplyConfiguration) postUnmarshal() {
 }

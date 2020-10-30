@@ -124,7 +124,7 @@ func (c *FakeClusterRoleBindings) Patch(ctx context.Context, name string, pt typ
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied clusterRoleBinding.
-func (c *FakeClusterRoleBindings) Apply(ctx context.Context, clusterRoleBinding rbacv1alpha1.ClusterRoleBindingBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.ClusterRoleBinding, err error) {
+func (c *FakeClusterRoleBindings) Apply(ctx context.Context, clusterRoleBinding *rbacv1alpha1.ClusterRoleBindingApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.ClusterRoleBinding, err error) {
 	data, err := clusterRoleBinding.MarshalJSON()
 	if err != nil {
 		return nil, err

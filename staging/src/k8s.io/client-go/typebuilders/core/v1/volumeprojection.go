@@ -24,100 +24,100 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// VolumeProjectionBuilder represents an declarative configuration of the VolumeProjection type for use
+// VolumeProjectionApplyConfiguration represents an declarative configuration of the VolumeProjection type for use
 // with apply.
-type VolumeProjectionBuilder struct {
+type VolumeProjectionApplyConfiguration struct {
 	fields volumeProjectionFields
 }
 
+// VolumeProjectionApplyConfiguration constructs an declarative configuration of the VolumeProjection type for use with
+// apply.
+func VolumeProjection() *VolumeProjectionApplyConfiguration {
+	return &VolumeProjectionApplyConfiguration{}
+}
+
 // volumeProjectionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in VolumeProjectionBuilder.
+// Inline fields are owned by their respective inline type in VolumeProjectionApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type volumeProjectionFields struct {
-	Secret              *SecretProjectionBuilder              `json:"secret,omitempty"`
-	DownwardAPI         *DownwardAPIProjectionBuilder         `json:"downwardAPI,omitempty"`
-	ConfigMap           *ConfigMapProjectionBuilder           `json:"configMap,omitempty"`
-	ServiceAccountToken *ServiceAccountTokenProjectionBuilder `json:"serviceAccountToken,omitempty"`
-}
-
-// VolumeProjection constructs an declarative configuration of the VolumeProjection type for use with
-// apply.
-func VolumeProjection() *VolumeProjectionBuilder {
-	return &VolumeProjectionBuilder{}
+	Secret              *SecretProjectionApplyConfiguration              `json:"secret,omitempty"`
+	DownwardAPI         *DownwardAPIProjectionApplyConfiguration         `json:"downwardAPI,omitempty"`
+	ConfigMap           *ConfigMapProjectionApplyConfiguration           `json:"configMap,omitempty"`
+	ServiceAccountToken *ServiceAccountTokenProjectionApplyConfiguration `json:"serviceAccountToken,omitempty"`
 }
 
 // SetSecret sets the Secret field in the declarative configuration to the given value.
-func (b *VolumeProjectionBuilder) SetSecret(value *SecretProjectionBuilder) *VolumeProjectionBuilder {
+func (b *VolumeProjectionApplyConfiguration) SetSecret(value *SecretProjectionApplyConfiguration) *VolumeProjectionApplyConfiguration {
 	b.fields.Secret = value
 	return b
 }
 
 // RemoveSecret removes the Secret field from the declarative configuration.
-func (b *VolumeProjectionBuilder) RemoveSecret() *VolumeProjectionBuilder {
+func (b *VolumeProjectionApplyConfiguration) RemoveSecret() *VolumeProjectionApplyConfiguration {
 	b.fields.Secret = nil
 	return b
 }
 
 // GetSecret gets the Secret field from the declarative configuration.
-func (b *VolumeProjectionBuilder) GetSecret() (value *SecretProjectionBuilder, ok bool) {
+func (b *VolumeProjectionApplyConfiguration) GetSecret() (value *SecretProjectionApplyConfiguration, ok bool) {
 	return b.fields.Secret, b.fields.Secret != nil
 }
 
 // SetDownwardAPI sets the DownwardAPI field in the declarative configuration to the given value.
-func (b *VolumeProjectionBuilder) SetDownwardAPI(value *DownwardAPIProjectionBuilder) *VolumeProjectionBuilder {
+func (b *VolumeProjectionApplyConfiguration) SetDownwardAPI(value *DownwardAPIProjectionApplyConfiguration) *VolumeProjectionApplyConfiguration {
 	b.fields.DownwardAPI = value
 	return b
 }
 
 // RemoveDownwardAPI removes the DownwardAPI field from the declarative configuration.
-func (b *VolumeProjectionBuilder) RemoveDownwardAPI() *VolumeProjectionBuilder {
+func (b *VolumeProjectionApplyConfiguration) RemoveDownwardAPI() *VolumeProjectionApplyConfiguration {
 	b.fields.DownwardAPI = nil
 	return b
 }
 
 // GetDownwardAPI gets the DownwardAPI field from the declarative configuration.
-func (b *VolumeProjectionBuilder) GetDownwardAPI() (value *DownwardAPIProjectionBuilder, ok bool) {
+func (b *VolumeProjectionApplyConfiguration) GetDownwardAPI() (value *DownwardAPIProjectionApplyConfiguration, ok bool) {
 	return b.fields.DownwardAPI, b.fields.DownwardAPI != nil
 }
 
 // SetConfigMap sets the ConfigMap field in the declarative configuration to the given value.
-func (b *VolumeProjectionBuilder) SetConfigMap(value *ConfigMapProjectionBuilder) *VolumeProjectionBuilder {
+func (b *VolumeProjectionApplyConfiguration) SetConfigMap(value *ConfigMapProjectionApplyConfiguration) *VolumeProjectionApplyConfiguration {
 	b.fields.ConfigMap = value
 	return b
 }
 
 // RemoveConfigMap removes the ConfigMap field from the declarative configuration.
-func (b *VolumeProjectionBuilder) RemoveConfigMap() *VolumeProjectionBuilder {
+func (b *VolumeProjectionApplyConfiguration) RemoveConfigMap() *VolumeProjectionApplyConfiguration {
 	b.fields.ConfigMap = nil
 	return b
 }
 
 // GetConfigMap gets the ConfigMap field from the declarative configuration.
-func (b *VolumeProjectionBuilder) GetConfigMap() (value *ConfigMapProjectionBuilder, ok bool) {
+func (b *VolumeProjectionApplyConfiguration) GetConfigMap() (value *ConfigMapProjectionApplyConfiguration, ok bool) {
 	return b.fields.ConfigMap, b.fields.ConfigMap != nil
 }
 
 // SetServiceAccountToken sets the ServiceAccountToken field in the declarative configuration to the given value.
-func (b *VolumeProjectionBuilder) SetServiceAccountToken(value *ServiceAccountTokenProjectionBuilder) *VolumeProjectionBuilder {
+func (b *VolumeProjectionApplyConfiguration) SetServiceAccountToken(value *ServiceAccountTokenProjectionApplyConfiguration) *VolumeProjectionApplyConfiguration {
 	b.fields.ServiceAccountToken = value
 	return b
 }
 
 // RemoveServiceAccountToken removes the ServiceAccountToken field from the declarative configuration.
-func (b *VolumeProjectionBuilder) RemoveServiceAccountToken() *VolumeProjectionBuilder {
+func (b *VolumeProjectionApplyConfiguration) RemoveServiceAccountToken() *VolumeProjectionApplyConfiguration {
 	b.fields.ServiceAccountToken = nil
 	return b
 }
 
 // GetServiceAccountToken gets the ServiceAccountToken field from the declarative configuration.
-func (b *VolumeProjectionBuilder) GetServiceAccountToken() (value *ServiceAccountTokenProjectionBuilder, ok bool) {
+func (b *VolumeProjectionApplyConfiguration) GetServiceAccountToken() (value *ServiceAccountTokenProjectionApplyConfiguration, ok bool) {
 	return b.fields.ServiceAccountToken, b.fields.ServiceAccountToken != nil
 }
 
-// ToUnstructured converts VolumeProjectionBuilder to unstructured.
-func (b *VolumeProjectionBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts VolumeProjectionApplyConfiguration to unstructured.
+func (b *VolumeProjectionApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -129,9 +129,9 @@ func (b *VolumeProjectionBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to VolumeProjectionBuilder, replacing the contents
-// of VolumeProjectionBuilder.
-func (b *VolumeProjectionBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to VolumeProjectionApplyConfiguration, replacing the contents
+// of VolumeProjectionApplyConfiguration.
+func (b *VolumeProjectionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &volumeProjectionFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -142,15 +142,15 @@ func (b *VolumeProjectionBuilder) FromUnstructured(u map[string]interface{}) err
 	return nil
 }
 
-// MarshalJSON marshals VolumeProjectionBuilder to JSON.
-func (b *VolumeProjectionBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals VolumeProjectionApplyConfiguration to JSON.
+func (b *VolumeProjectionApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into VolumeProjectionBuilder, replacing the contents of
-// VolumeProjectionBuilder.
-func (b *VolumeProjectionBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into VolumeProjectionApplyConfiguration, replacing the contents of
+// VolumeProjectionApplyConfiguration.
+func (b *VolumeProjectionApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -158,13 +158,13 @@ func (b *VolumeProjectionBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// VolumeProjectionList represents a list of VolumeProjectionBuilder.
-type VolumeProjectionList []*VolumeProjectionBuilder
+// VolumeProjectionList represents a listAlias of VolumeProjectionApplyConfiguration.
+type VolumeProjectionList []*VolumeProjectionApplyConfiguration
 
-// VolumeProjectionList represents a map of VolumeProjectionBuilder.
-type VolumeProjectionMap map[string]VolumeProjectionBuilder
+// VolumeProjectionList represents a map of VolumeProjectionApplyConfiguration.
+type VolumeProjectionMap map[string]VolumeProjectionApplyConfiguration
 
-func (b *VolumeProjectionBuilder) preMarshal() {
+func (b *VolumeProjectionApplyConfiguration) preMarshal() {
 }
-func (b *VolumeProjectionBuilder) postUnmarshal() {
+func (b *VolumeProjectionApplyConfiguration) postUnmarshal() {
 }

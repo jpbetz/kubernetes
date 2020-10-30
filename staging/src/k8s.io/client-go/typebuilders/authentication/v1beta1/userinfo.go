@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// UserInfoBuilder represents an declarative configuration of the UserInfo type for use
+// UserInfoApplyConfiguration represents an declarative configuration of the UserInfo type for use
 // with apply.
-type UserInfoBuilder struct {
+type UserInfoApplyConfiguration struct {
 	fields userInfoFields
 }
 
+// UserInfoApplyConfiguration constructs an declarative configuration of the UserInfo type for use with
+// apply.
+func UserInfo() *UserInfoApplyConfiguration {
+	return &UserInfoApplyConfiguration{}
+}
+
 // userInfoFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in UserInfoBuilder.
+// Inline fields are owned by their respective inline type in UserInfoApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -43,26 +49,20 @@ type userInfoFields struct {
 	Extra    *map[string]v1beta1.ExtraValue `json:"extra,omitempty"`
 }
 
-// UserInfo constructs an declarative configuration of the UserInfo type for use with
-// apply.
-func UserInfo() *UserInfoBuilder {
-	return &UserInfoBuilder{}
-}
-
 // SetUsername sets the Username field in the declarative configuration to the given value.
-func (b *UserInfoBuilder) SetUsername(value string) *UserInfoBuilder {
+func (b *UserInfoApplyConfiguration) SetUsername(value string) *UserInfoApplyConfiguration {
 	b.fields.Username = &value
 	return b
 }
 
 // RemoveUsername removes the Username field from the declarative configuration.
-func (b *UserInfoBuilder) RemoveUsername() *UserInfoBuilder {
+func (b *UserInfoApplyConfiguration) RemoveUsername() *UserInfoApplyConfiguration {
 	b.fields.Username = nil
 	return b
 }
 
 // GetUsername gets the Username field from the declarative configuration.
-func (b *UserInfoBuilder) GetUsername() (value string, ok bool) {
+func (b *UserInfoApplyConfiguration) GetUsername() (value string, ok bool) {
 	if v := b.fields.Username; v != nil {
 		return *v, true
 	}
@@ -70,19 +70,19 @@ func (b *UserInfoBuilder) GetUsername() (value string, ok bool) {
 }
 
 // SetUID sets the UID field in the declarative configuration to the given value.
-func (b *UserInfoBuilder) SetUID(value string) *UserInfoBuilder {
+func (b *UserInfoApplyConfiguration) SetUID(value string) *UserInfoApplyConfiguration {
 	b.fields.UID = &value
 	return b
 }
 
 // RemoveUID removes the UID field from the declarative configuration.
-func (b *UserInfoBuilder) RemoveUID() *UserInfoBuilder {
+func (b *UserInfoApplyConfiguration) RemoveUID() *UserInfoApplyConfiguration {
 	b.fields.UID = nil
 	return b
 }
 
 // GetUID gets the UID field from the declarative configuration.
-func (b *UserInfoBuilder) GetUID() (value string, ok bool) {
+func (b *UserInfoApplyConfiguration) GetUID() (value string, ok bool) {
 	if v := b.fields.UID; v != nil {
 		return *v, true
 	}
@@ -90,19 +90,19 @@ func (b *UserInfoBuilder) GetUID() (value string, ok bool) {
 }
 
 // SetGroups sets the Groups field in the declarative configuration to the given value.
-func (b *UserInfoBuilder) SetGroups(value []string) *UserInfoBuilder {
+func (b *UserInfoApplyConfiguration) SetGroups(value []string) *UserInfoApplyConfiguration {
 	b.fields.Groups = &value
 	return b
 }
 
 // RemoveGroups removes the Groups field from the declarative configuration.
-func (b *UserInfoBuilder) RemoveGroups() *UserInfoBuilder {
+func (b *UserInfoApplyConfiguration) RemoveGroups() *UserInfoApplyConfiguration {
 	b.fields.Groups = nil
 	return b
 }
 
 // GetGroups gets the Groups field from the declarative configuration.
-func (b *UserInfoBuilder) GetGroups() (value []string, ok bool) {
+func (b *UserInfoApplyConfiguration) GetGroups() (value []string, ok bool) {
 	if v := b.fields.Groups; v != nil {
 		return *v, true
 	}
@@ -110,27 +110,27 @@ func (b *UserInfoBuilder) GetGroups() (value []string, ok bool) {
 }
 
 // SetExtra sets the Extra field in the declarative configuration to the given value.
-func (b *UserInfoBuilder) SetExtra(value map[string]v1beta1.ExtraValue) *UserInfoBuilder {
+func (b *UserInfoApplyConfiguration) SetExtra(value map[string]v1beta1.ExtraValue) *UserInfoApplyConfiguration {
 	b.fields.Extra = &value
 	return b
 }
 
 // RemoveExtra removes the Extra field from the declarative configuration.
-func (b *UserInfoBuilder) RemoveExtra() *UserInfoBuilder {
+func (b *UserInfoApplyConfiguration) RemoveExtra() *UserInfoApplyConfiguration {
 	b.fields.Extra = nil
 	return b
 }
 
 // GetExtra gets the Extra field from the declarative configuration.
-func (b *UserInfoBuilder) GetExtra() (value map[string]v1beta1.ExtraValue, ok bool) {
+func (b *UserInfoApplyConfiguration) GetExtra() (value map[string]v1beta1.ExtraValue, ok bool) {
 	if v := b.fields.Extra; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts UserInfoBuilder to unstructured.
-func (b *UserInfoBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts UserInfoApplyConfiguration to unstructured.
+func (b *UserInfoApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -142,9 +142,9 @@ func (b *UserInfoBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to UserInfoBuilder, replacing the contents
-// of UserInfoBuilder.
-func (b *UserInfoBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to UserInfoApplyConfiguration, replacing the contents
+// of UserInfoApplyConfiguration.
+func (b *UserInfoApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &userInfoFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -155,15 +155,15 @@ func (b *UserInfoBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals UserInfoBuilder to JSON.
-func (b *UserInfoBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals UserInfoApplyConfiguration to JSON.
+func (b *UserInfoApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into UserInfoBuilder, replacing the contents of
-// UserInfoBuilder.
-func (b *UserInfoBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into UserInfoApplyConfiguration, replacing the contents of
+// UserInfoApplyConfiguration.
+func (b *UserInfoApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -171,13 +171,13 @@ func (b *UserInfoBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// UserInfoList represents a list of UserInfoBuilder.
-type UserInfoList []*UserInfoBuilder
+// UserInfoList represents a listAlias of UserInfoApplyConfiguration.
+type UserInfoList []*UserInfoApplyConfiguration
 
-// UserInfoList represents a map of UserInfoBuilder.
-type UserInfoMap map[string]UserInfoBuilder
+// UserInfoList represents a map of UserInfoApplyConfiguration.
+type UserInfoMap map[string]UserInfoApplyConfiguration
 
-func (b *UserInfoBuilder) preMarshal() {
+func (b *UserInfoApplyConfiguration) preMarshal() {
 }
-func (b *UserInfoBuilder) postUnmarshal() {
+func (b *UserInfoApplyConfiguration) postUnmarshal() {
 }

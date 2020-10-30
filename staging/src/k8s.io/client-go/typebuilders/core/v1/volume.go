@@ -24,71 +24,71 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// VolumeBuilder represents an declarative configuration of the Volume type for use
+// VolumeApplyConfiguration represents an declarative configuration of the Volume type for use
 // with apply.
-type VolumeBuilder struct {
-	volumeSource *VolumeSourceBuilder // inlined type
+type VolumeApplyConfiguration struct {
+	volumeSource *VolumeSourceApplyConfiguration // inlined type
 	fields       volumeFields
 }
 
+// VolumeApplyConfiguration constructs an declarative configuration of the Volume type for use with
+// apply.
+func Volume() *VolumeApplyConfiguration {
+	return &VolumeApplyConfiguration{}
+}
+
 // volumeFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in VolumeBuilder.
+// Inline fields are owned by their respective inline type in VolumeApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type volumeFields struct {
-	Name                  *string                                   `json:"name,omitempty"`
-	HostPath              *HostPathVolumeSourceBuilder              `json:"hostPath,omitempty"`              // inlined VolumeBuilder.volumeSource.HostPath field
-	EmptyDir              *EmptyDirVolumeSourceBuilder              `json:"emptyDir,omitempty"`              // inlined VolumeBuilder.volumeSource.EmptyDir field
-	GCEPersistentDisk     *GCEPersistentDiskVolumeSourceBuilder     `json:"gcePersistentDisk,omitempty"`     // inlined VolumeBuilder.volumeSource.GCEPersistentDisk field
-	AWSElasticBlockStore  *AWSElasticBlockStoreVolumeSourceBuilder  `json:"awsElasticBlockStore,omitempty"`  // inlined VolumeBuilder.volumeSource.AWSElasticBlockStore field
-	GitRepo               *GitRepoVolumeSourceBuilder               `json:"gitRepo,omitempty"`               // inlined VolumeBuilder.volumeSource.GitRepo field
-	Secret                *SecretVolumeSourceBuilder                `json:"secret,omitempty"`                // inlined VolumeBuilder.volumeSource.Secret field
-	NFS                   *NFSVolumeSourceBuilder                   `json:"nfs,omitempty"`                   // inlined VolumeBuilder.volumeSource.NFS field
-	ISCSI                 *ISCSIVolumeSourceBuilder                 `json:"iscsi,omitempty"`                 // inlined VolumeBuilder.volumeSource.ISCSI field
-	Glusterfs             *GlusterfsVolumeSourceBuilder             `json:"glusterfs,omitempty"`             // inlined VolumeBuilder.volumeSource.Glusterfs field
-	PersistentVolumeClaim *PersistentVolumeClaimVolumeSourceBuilder `json:"persistentVolumeClaim,omitempty"` // inlined VolumeBuilder.volumeSource.PersistentVolumeClaim field
-	RBD                   *RBDVolumeSourceBuilder                   `json:"rbd,omitempty"`                   // inlined VolumeBuilder.volumeSource.RBD field
-	FlexVolume            *FlexVolumeSourceBuilder                  `json:"flexVolume,omitempty"`            // inlined VolumeBuilder.volumeSource.FlexVolume field
-	Cinder                *CinderVolumeSourceBuilder                `json:"cinder,omitempty"`                // inlined VolumeBuilder.volumeSource.Cinder field
-	CephFS                *CephFSVolumeSourceBuilder                `json:"cephfs,omitempty"`                // inlined VolumeBuilder.volumeSource.CephFS field
-	Flocker               *FlockerVolumeSourceBuilder               `json:"flocker,omitempty"`               // inlined VolumeBuilder.volumeSource.Flocker field
-	DownwardAPI           *DownwardAPIVolumeSourceBuilder           `json:"downwardAPI,omitempty"`           // inlined VolumeBuilder.volumeSource.DownwardAPI field
-	FC                    *FCVolumeSourceBuilder                    `json:"fc,omitempty"`                    // inlined VolumeBuilder.volumeSource.FC field
-	AzureFile             *AzureFileVolumeSourceBuilder             `json:"azureFile,omitempty"`             // inlined VolumeBuilder.volumeSource.AzureFile field
-	ConfigMap             *ConfigMapVolumeSourceBuilder             `json:"configMap,omitempty"`             // inlined VolumeBuilder.volumeSource.ConfigMap field
-	VsphereVolume         *VsphereVirtualDiskVolumeSourceBuilder    `json:"vsphereVolume,omitempty"`         // inlined VolumeBuilder.volumeSource.VsphereVolume field
-	Quobyte               *QuobyteVolumeSourceBuilder               `json:"quobyte,omitempty"`               // inlined VolumeBuilder.volumeSource.Quobyte field
-	AzureDisk             *AzureDiskVolumeSourceBuilder             `json:"azureDisk,omitempty"`             // inlined VolumeBuilder.volumeSource.AzureDisk field
-	PhotonPersistentDisk  *PhotonPersistentDiskVolumeSourceBuilder  `json:"photonPersistentDisk,omitempty"`  // inlined VolumeBuilder.volumeSource.PhotonPersistentDisk field
-	Projected             *ProjectedVolumeSourceBuilder             `json:"projected,omitempty"`             // inlined VolumeBuilder.volumeSource.Projected field
-	PortworxVolume        *PortworxVolumeSourceBuilder              `json:"portworxVolume,omitempty"`        // inlined VolumeBuilder.volumeSource.PortworxVolume field
-	ScaleIO               *ScaleIOVolumeSourceBuilder               `json:"scaleIO,omitempty"`               // inlined VolumeBuilder.volumeSource.ScaleIO field
-	StorageOS             *StorageOSVolumeSourceBuilder             `json:"storageos,omitempty"`             // inlined VolumeBuilder.volumeSource.StorageOS field
-	CSI                   *CSIVolumeSourceBuilder                   `json:"csi,omitempty"`                   // inlined VolumeBuilder.volumeSource.CSI field
-	Ephemeral             *EphemeralVolumeSourceBuilder             `json:"ephemeral,omitempty"`             // inlined VolumeBuilder.volumeSource.Ephemeral field
-}
-
-// Volume constructs an declarative configuration of the Volume type for use with
-// apply.
-func Volume() *VolumeBuilder {
-	return &VolumeBuilder{}
+	Name                  *string                                              `json:"name,omitempty"`
+	HostPath              *HostPathVolumeSourceApplyConfiguration              `json:"hostPath,omitempty"`              // inlined VolumeApplyConfiguration.volumeSource.HostPath field
+	EmptyDir              *EmptyDirVolumeSourceApplyConfiguration              `json:"emptyDir,omitempty"`              // inlined VolumeApplyConfiguration.volumeSource.EmptyDir field
+	GCEPersistentDisk     *GCEPersistentDiskVolumeSourceApplyConfiguration     `json:"gcePersistentDisk,omitempty"`     // inlined VolumeApplyConfiguration.volumeSource.GCEPersistentDisk field
+	AWSElasticBlockStore  *AWSElasticBlockStoreVolumeSourceApplyConfiguration  `json:"awsElasticBlockStore,omitempty"`  // inlined VolumeApplyConfiguration.volumeSource.AWSElasticBlockStore field
+	GitRepo               *GitRepoVolumeSourceApplyConfiguration               `json:"gitRepo,omitempty"`               // inlined VolumeApplyConfiguration.volumeSource.GitRepo field
+	Secret                *SecretVolumeSourceApplyConfiguration                `json:"secret,omitempty"`                // inlined VolumeApplyConfiguration.volumeSource.Secret field
+	NFS                   *NFSVolumeSourceApplyConfiguration                   `json:"nfs,omitempty"`                   // inlined VolumeApplyConfiguration.volumeSource.NFS field
+	ISCSI                 *ISCSIVolumeSourceApplyConfiguration                 `json:"iscsi,omitempty"`                 // inlined VolumeApplyConfiguration.volumeSource.ISCSI field
+	Glusterfs             *GlusterfsVolumeSourceApplyConfiguration             `json:"glusterfs,omitempty"`             // inlined VolumeApplyConfiguration.volumeSource.Glusterfs field
+	PersistentVolumeClaim *PersistentVolumeClaimVolumeSourceApplyConfiguration `json:"persistentVolumeClaim,omitempty"` // inlined VolumeApplyConfiguration.volumeSource.PersistentVolumeClaim field
+	RBD                   *RBDVolumeSourceApplyConfiguration                   `json:"rbd,omitempty"`                   // inlined VolumeApplyConfiguration.volumeSource.RBD field
+	FlexVolume            *FlexVolumeSourceApplyConfiguration                  `json:"flexVolume,omitempty"`            // inlined VolumeApplyConfiguration.volumeSource.FlexVolume field
+	Cinder                *CinderVolumeSourceApplyConfiguration                `json:"cinder,omitempty"`                // inlined VolumeApplyConfiguration.volumeSource.Cinder field
+	CephFS                *CephFSVolumeSourceApplyConfiguration                `json:"cephfs,omitempty"`                // inlined VolumeApplyConfiguration.volumeSource.CephFS field
+	Flocker               *FlockerVolumeSourceApplyConfiguration               `json:"flocker,omitempty"`               // inlined VolumeApplyConfiguration.volumeSource.Flocker field
+	DownwardAPI           *DownwardAPIVolumeSourceApplyConfiguration           `json:"downwardAPI,omitempty"`           // inlined VolumeApplyConfiguration.volumeSource.DownwardAPI field
+	FC                    *FCVolumeSourceApplyConfiguration                    `json:"fc,omitempty"`                    // inlined VolumeApplyConfiguration.volumeSource.FC field
+	AzureFile             *AzureFileVolumeSourceApplyConfiguration             `json:"azureFile,omitempty"`             // inlined VolumeApplyConfiguration.volumeSource.AzureFile field
+	ConfigMap             *ConfigMapVolumeSourceApplyConfiguration             `json:"configMap,omitempty"`             // inlined VolumeApplyConfiguration.volumeSource.ConfigMap field
+	VsphereVolume         *VsphereVirtualDiskVolumeSourceApplyConfiguration    `json:"vsphereVolume,omitempty"`         // inlined VolumeApplyConfiguration.volumeSource.VsphereVolume field
+	Quobyte               *QuobyteVolumeSourceApplyConfiguration               `json:"quobyte,omitempty"`               // inlined VolumeApplyConfiguration.volumeSource.Quobyte field
+	AzureDisk             *AzureDiskVolumeSourceApplyConfiguration             `json:"azureDisk,omitempty"`             // inlined VolumeApplyConfiguration.volumeSource.AzureDisk field
+	PhotonPersistentDisk  *PhotonPersistentDiskVolumeSourceApplyConfiguration  `json:"photonPersistentDisk,omitempty"`  // inlined VolumeApplyConfiguration.volumeSource.PhotonPersistentDisk field
+	Projected             *ProjectedVolumeSourceApplyConfiguration             `json:"projected,omitempty"`             // inlined VolumeApplyConfiguration.volumeSource.Projected field
+	PortworxVolume        *PortworxVolumeSourceApplyConfiguration              `json:"portworxVolume,omitempty"`        // inlined VolumeApplyConfiguration.volumeSource.PortworxVolume field
+	ScaleIO               *ScaleIOVolumeSourceApplyConfiguration               `json:"scaleIO,omitempty"`               // inlined VolumeApplyConfiguration.volumeSource.ScaleIO field
+	StorageOS             *StorageOSVolumeSourceApplyConfiguration             `json:"storageos,omitempty"`             // inlined VolumeApplyConfiguration.volumeSource.StorageOS field
+	CSI                   *CSIVolumeSourceApplyConfiguration                   `json:"csi,omitempty"`                   // inlined VolumeApplyConfiguration.volumeSource.CSI field
+	Ephemeral             *EphemeralVolumeSourceApplyConfiguration             `json:"ephemeral,omitempty"`             // inlined VolumeApplyConfiguration.volumeSource.Ephemeral field
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *VolumeBuilder) SetName(value string) *VolumeBuilder {
+func (b *VolumeApplyConfiguration) SetName(value string) *VolumeApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *VolumeBuilder) RemoveName() *VolumeBuilder {
+func (b *VolumeApplyConfiguration) RemoveName() *VolumeApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *VolumeBuilder) GetName() (value string, ok bool) {
+func (b *VolumeApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -96,24 +96,24 @@ func (b *VolumeBuilder) GetName() (value string, ok bool) {
 }
 
 // SetVolumeSource sets the VolumeSource field in the declarative configuration to the given value.
-func (b *VolumeBuilder) SetVolumeSource(value *VolumeSourceBuilder) *VolumeBuilder {
+func (b *VolumeApplyConfiguration) SetVolumeSource(value *VolumeSourceApplyConfiguration) *VolumeApplyConfiguration {
 	b.volumeSource = value
 	return b
 }
 
 // RemoveVolumeSource removes the VolumeSource field from the declarative configuration.
-func (b *VolumeBuilder) RemoveVolumeSource() *VolumeBuilder {
+func (b *VolumeApplyConfiguration) RemoveVolumeSource() *VolumeApplyConfiguration {
 	b.volumeSource = nil
 	return b
 }
 
 // GetVolumeSource gets the VolumeSource field from the declarative configuration.
-func (b *VolumeBuilder) GetVolumeSource() (value *VolumeSourceBuilder, ok bool) {
+func (b *VolumeApplyConfiguration) GetVolumeSource() (value *VolumeSourceApplyConfiguration, ok bool) {
 	return b.volumeSource, true
 }
 
-// ToUnstructured converts VolumeBuilder to unstructured.
-func (b *VolumeBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts VolumeApplyConfiguration to unstructured.
+func (b *VolumeApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -125,9 +125,9 @@ func (b *VolumeBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to VolumeBuilder, replacing the contents
-// of VolumeBuilder.
-func (b *VolumeBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to VolumeApplyConfiguration, replacing the contents
+// of VolumeApplyConfiguration.
+func (b *VolumeApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &volumeFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -138,15 +138,15 @@ func (b *VolumeBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals VolumeBuilder to JSON.
-func (b *VolumeBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals VolumeApplyConfiguration to JSON.
+func (b *VolumeApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into VolumeBuilder, replacing the contents of
-// VolumeBuilder.
-func (b *VolumeBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into VolumeApplyConfiguration, replacing the contents of
+// VolumeApplyConfiguration.
+func (b *VolumeApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -154,13 +154,13 @@ func (b *VolumeBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// VolumeList represents a list of VolumeBuilder.
-type VolumeList []*VolumeBuilder
+// VolumeList represents a listAlias of VolumeApplyConfiguration.
+type VolumeList []*VolumeApplyConfiguration
 
-// VolumeList represents a map of VolumeBuilder.
-type VolumeMap map[string]VolumeBuilder
+// VolumeList represents a map of VolumeApplyConfiguration.
+type VolumeMap map[string]VolumeApplyConfiguration
 
-func (b *VolumeBuilder) preMarshal() {
+func (b *VolumeApplyConfiguration) preMarshal() {
 	if b.volumeSource != nil {
 		if v, ok := b.volumeSource.GetHostPath(); ok {
 			b.fields.HostPath = v
@@ -251,9 +251,9 @@ func (b *VolumeBuilder) preMarshal() {
 		}
 	}
 }
-func (b *VolumeBuilder) postUnmarshal() {
+func (b *VolumeApplyConfiguration) postUnmarshal() {
 	if b.volumeSource == nil {
-		b.volumeSource = &VolumeSourceBuilder{}
+		b.volumeSource = &VolumeSourceApplyConfiguration{}
 	}
 	if b.fields.HostPath != nil {
 		b.volumeSource.SetHostPath(b.fields.HostPath)

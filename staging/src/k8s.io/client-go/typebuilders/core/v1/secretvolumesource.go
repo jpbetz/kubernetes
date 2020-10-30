@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// SecretVolumeSourceBuilder represents an declarative configuration of the SecretVolumeSource type for use
+// SecretVolumeSourceApplyConfiguration represents an declarative configuration of the SecretVolumeSource type for use
 // with apply.
-type SecretVolumeSourceBuilder struct {
+type SecretVolumeSourceApplyConfiguration struct {
 	fields secretVolumeSourceFields
 }
 
+// SecretVolumeSourceApplyConfiguration constructs an declarative configuration of the SecretVolumeSource type for use with
+// apply.
+func SecretVolumeSource() *SecretVolumeSourceApplyConfiguration {
+	return &SecretVolumeSourceApplyConfiguration{}
+}
+
 // secretVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SecretVolumeSourceBuilder.
+// Inline fields are owned by their respective inline type in SecretVolumeSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -42,26 +48,20 @@ type secretVolumeSourceFields struct {
 	Optional    *bool          `json:"optional,omitempty"`
 }
 
-// SecretVolumeSource constructs an declarative configuration of the SecretVolumeSource type for use with
-// apply.
-func SecretVolumeSource() *SecretVolumeSourceBuilder {
-	return &SecretVolumeSourceBuilder{}
-}
-
 // SetSecretName sets the SecretName field in the declarative configuration to the given value.
-func (b *SecretVolumeSourceBuilder) SetSecretName(value string) *SecretVolumeSourceBuilder {
+func (b *SecretVolumeSourceApplyConfiguration) SetSecretName(value string) *SecretVolumeSourceApplyConfiguration {
 	b.fields.SecretName = &value
 	return b
 }
 
 // RemoveSecretName removes the SecretName field from the declarative configuration.
-func (b *SecretVolumeSourceBuilder) RemoveSecretName() *SecretVolumeSourceBuilder {
+func (b *SecretVolumeSourceApplyConfiguration) RemoveSecretName() *SecretVolumeSourceApplyConfiguration {
 	b.fields.SecretName = nil
 	return b
 }
 
 // GetSecretName gets the SecretName field from the declarative configuration.
-func (b *SecretVolumeSourceBuilder) GetSecretName() (value string, ok bool) {
+func (b *SecretVolumeSourceApplyConfiguration) GetSecretName() (value string, ok bool) {
 	if v := b.fields.SecretName; v != nil {
 		return *v, true
 	}
@@ -69,19 +69,19 @@ func (b *SecretVolumeSourceBuilder) GetSecretName() (value string, ok bool) {
 }
 
 // SetItems sets the Items field in the declarative configuration to the given value.
-func (b *SecretVolumeSourceBuilder) SetItems(value KeyToPathList) *SecretVolumeSourceBuilder {
+func (b *SecretVolumeSourceApplyConfiguration) SetItems(value KeyToPathList) *SecretVolumeSourceApplyConfiguration {
 	b.fields.Items = &value
 	return b
 }
 
 // RemoveItems removes the Items field from the declarative configuration.
-func (b *SecretVolumeSourceBuilder) RemoveItems() *SecretVolumeSourceBuilder {
+func (b *SecretVolumeSourceApplyConfiguration) RemoveItems() *SecretVolumeSourceApplyConfiguration {
 	b.fields.Items = nil
 	return b
 }
 
 // GetItems gets the Items field from the declarative configuration.
-func (b *SecretVolumeSourceBuilder) GetItems() (value KeyToPathList, ok bool) {
+func (b *SecretVolumeSourceApplyConfiguration) GetItems() (value KeyToPathList, ok bool) {
 	if v := b.fields.Items; v != nil {
 		return *v, true
 	}
@@ -89,19 +89,19 @@ func (b *SecretVolumeSourceBuilder) GetItems() (value KeyToPathList, ok bool) {
 }
 
 // SetDefaultMode sets the DefaultMode field in the declarative configuration to the given value.
-func (b *SecretVolumeSourceBuilder) SetDefaultMode(value int32) *SecretVolumeSourceBuilder {
+func (b *SecretVolumeSourceApplyConfiguration) SetDefaultMode(value int32) *SecretVolumeSourceApplyConfiguration {
 	b.fields.DefaultMode = &value
 	return b
 }
 
 // RemoveDefaultMode removes the DefaultMode field from the declarative configuration.
-func (b *SecretVolumeSourceBuilder) RemoveDefaultMode() *SecretVolumeSourceBuilder {
+func (b *SecretVolumeSourceApplyConfiguration) RemoveDefaultMode() *SecretVolumeSourceApplyConfiguration {
 	b.fields.DefaultMode = nil
 	return b
 }
 
 // GetDefaultMode gets the DefaultMode field from the declarative configuration.
-func (b *SecretVolumeSourceBuilder) GetDefaultMode() (value int32, ok bool) {
+func (b *SecretVolumeSourceApplyConfiguration) GetDefaultMode() (value int32, ok bool) {
 	if v := b.fields.DefaultMode; v != nil {
 		return *v, true
 	}
@@ -109,27 +109,27 @@ func (b *SecretVolumeSourceBuilder) GetDefaultMode() (value int32, ok bool) {
 }
 
 // SetOptional sets the Optional field in the declarative configuration to the given value.
-func (b *SecretVolumeSourceBuilder) SetOptional(value bool) *SecretVolumeSourceBuilder {
+func (b *SecretVolumeSourceApplyConfiguration) SetOptional(value bool) *SecretVolumeSourceApplyConfiguration {
 	b.fields.Optional = &value
 	return b
 }
 
 // RemoveOptional removes the Optional field from the declarative configuration.
-func (b *SecretVolumeSourceBuilder) RemoveOptional() *SecretVolumeSourceBuilder {
+func (b *SecretVolumeSourceApplyConfiguration) RemoveOptional() *SecretVolumeSourceApplyConfiguration {
 	b.fields.Optional = nil
 	return b
 }
 
 // GetOptional gets the Optional field from the declarative configuration.
-func (b *SecretVolumeSourceBuilder) GetOptional() (value bool, ok bool) {
+func (b *SecretVolumeSourceApplyConfiguration) GetOptional() (value bool, ok bool) {
 	if v := b.fields.Optional; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts SecretVolumeSourceBuilder to unstructured.
-func (b *SecretVolumeSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts SecretVolumeSourceApplyConfiguration to unstructured.
+func (b *SecretVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -141,9 +141,9 @@ func (b *SecretVolumeSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to SecretVolumeSourceBuilder, replacing the contents
-// of SecretVolumeSourceBuilder.
-func (b *SecretVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to SecretVolumeSourceApplyConfiguration, replacing the contents
+// of SecretVolumeSourceApplyConfiguration.
+func (b *SecretVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &secretVolumeSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -154,15 +154,15 @@ func (b *SecretVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) e
 	return nil
 }
 
-// MarshalJSON marshals SecretVolumeSourceBuilder to JSON.
-func (b *SecretVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals SecretVolumeSourceApplyConfiguration to JSON.
+func (b *SecretVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into SecretVolumeSourceBuilder, replacing the contents of
-// SecretVolumeSourceBuilder.
-func (b *SecretVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into SecretVolumeSourceApplyConfiguration, replacing the contents of
+// SecretVolumeSourceApplyConfiguration.
+func (b *SecretVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -170,13 +170,13 @@ func (b *SecretVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// SecretVolumeSourceList represents a list of SecretVolumeSourceBuilder.
-type SecretVolumeSourceList []*SecretVolumeSourceBuilder
+// SecretVolumeSourceList represents a listAlias of SecretVolumeSourceApplyConfiguration.
+type SecretVolumeSourceList []*SecretVolumeSourceApplyConfiguration
 
-// SecretVolumeSourceList represents a map of SecretVolumeSourceBuilder.
-type SecretVolumeSourceMap map[string]SecretVolumeSourceBuilder
+// SecretVolumeSourceList represents a map of SecretVolumeSourceApplyConfiguration.
+type SecretVolumeSourceMap map[string]SecretVolumeSourceApplyConfiguration
 
-func (b *SecretVolumeSourceBuilder) preMarshal() {
+func (b *SecretVolumeSourceApplyConfiguration) preMarshal() {
 }
-func (b *SecretVolumeSourceBuilder) postUnmarshal() {
+func (b *SecretVolumeSourceApplyConfiguration) postUnmarshal() {
 }

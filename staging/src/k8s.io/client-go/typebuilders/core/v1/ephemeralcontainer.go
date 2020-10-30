@@ -25,89 +25,89 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// EphemeralContainerBuilder represents an declarative configuration of the EphemeralContainer type for use
+// EphemeralContainerApplyConfiguration represents an declarative configuration of the EphemeralContainer type for use
 // with apply.
-type EphemeralContainerBuilder struct {
-	ephemeralContainerCommon *EphemeralContainerCommonBuilder // inlined type
+type EphemeralContainerApplyConfiguration struct {
+	ephemeralContainerCommon *EphemeralContainerCommonApplyConfiguration // inlined type
 	fields                   ephemeralContainerFields
 }
 
+// EphemeralContainerApplyConfiguration constructs an declarative configuration of the EphemeralContainer type for use with
+// apply.
+func EphemeralContainer() *EphemeralContainerApplyConfiguration {
+	return &EphemeralContainerApplyConfiguration{}
+}
+
 // ephemeralContainerFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in EphemeralContainerBuilder.
+// Inline fields are owned by their respective inline type in EphemeralContainerApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type ephemeralContainerFields struct {
-	Name                     *string                          `json:"name,omitempty"`                     // inlined EphemeralContainerBuilder.ephemeralContainerCommon.Name field
-	Image                    *string                          `json:"image,omitempty"`                    // inlined EphemeralContainerBuilder.ephemeralContainerCommon.Image field
-	Command                  *[]string                        `json:"command,omitempty"`                  // inlined EphemeralContainerBuilder.ephemeralContainerCommon.Command field
-	Args                     *[]string                        `json:"args,omitempty"`                     // inlined EphemeralContainerBuilder.ephemeralContainerCommon.Args field
-	WorkingDir               *string                          `json:"workingDir,omitempty"`               // inlined EphemeralContainerBuilder.ephemeralContainerCommon.WorkingDir field
-	Ports                    *ContainerPortList               `json:"ports,omitempty"`                    // inlined EphemeralContainerBuilder.ephemeralContainerCommon.Ports field
-	EnvFrom                  *EnvFromSourceList               `json:"envFrom,omitempty"`                  // inlined EphemeralContainerBuilder.ephemeralContainerCommon.EnvFrom field
-	Env                      *EnvVarList                      `json:"env,omitempty"`                      // inlined EphemeralContainerBuilder.ephemeralContainerCommon.Env field
-	Resources                *ResourceRequirementsBuilder     `json:"resources,omitempty"`                // inlined EphemeralContainerBuilder.ephemeralContainerCommon.Resources field
-	VolumeMounts             *VolumeMountList                 `json:"volumeMounts,omitempty"`             // inlined EphemeralContainerBuilder.ephemeralContainerCommon.VolumeMounts field
-	VolumeDevices            *VolumeDeviceList                `json:"volumeDevices,omitempty"`            // inlined EphemeralContainerBuilder.ephemeralContainerCommon.VolumeDevices field
-	LivenessProbe            *ProbeBuilder                    `json:"livenessProbe,omitempty"`            // inlined EphemeralContainerBuilder.ephemeralContainerCommon.LivenessProbe field
-	ReadinessProbe           *ProbeBuilder                    `json:"readinessProbe,omitempty"`           // inlined EphemeralContainerBuilder.ephemeralContainerCommon.ReadinessProbe field
-	StartupProbe             *ProbeBuilder                    `json:"startupProbe,omitempty"`             // inlined EphemeralContainerBuilder.ephemeralContainerCommon.StartupProbe field
-	Lifecycle                *LifecycleBuilder                `json:"lifecycle,omitempty"`                // inlined EphemeralContainerBuilder.ephemeralContainerCommon.Lifecycle field
-	TerminationMessagePath   *string                          `json:"terminationMessagePath,omitempty"`   // inlined EphemeralContainerBuilder.ephemeralContainerCommon.TerminationMessagePath field
-	TerminationMessagePolicy *corev1.TerminationMessagePolicy `json:"terminationMessagePolicy,omitempty"` // inlined EphemeralContainerBuilder.ephemeralContainerCommon.TerminationMessagePolicy field
-	ImagePullPolicy          *corev1.PullPolicy               `json:"imagePullPolicy,omitempty"`          // inlined EphemeralContainerBuilder.ephemeralContainerCommon.ImagePullPolicy field
-	SecurityContext          *SecurityContextBuilder          `json:"securityContext,omitempty"`          // inlined EphemeralContainerBuilder.ephemeralContainerCommon.SecurityContext field
-	Stdin                    *bool                            `json:"stdin,omitempty"`                    // inlined EphemeralContainerBuilder.ephemeralContainerCommon.Stdin field
-	StdinOnce                *bool                            `json:"stdinOnce,omitempty"`                // inlined EphemeralContainerBuilder.ephemeralContainerCommon.StdinOnce field
-	TTY                      *bool                            `json:"tty,omitempty"`                      // inlined EphemeralContainerBuilder.ephemeralContainerCommon.TTY field
-	TargetContainerName      *string                          `json:"targetContainerName,omitempty"`
-}
-
-// EphemeralContainer constructs an declarative configuration of the EphemeralContainer type for use with
-// apply.
-func EphemeralContainer() *EphemeralContainerBuilder {
-	return &EphemeralContainerBuilder{}
+	Name                     *string                                 `json:"name,omitempty"`                     // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.Name field
+	Image                    *string                                 `json:"image,omitempty"`                    // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.Image field
+	Command                  *[]string                               `json:"command,omitempty"`                  // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.Command field
+	Args                     *[]string                               `json:"args,omitempty"`                     // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.Args field
+	WorkingDir               *string                                 `json:"workingDir,omitempty"`               // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.WorkingDir field
+	Ports                    *ContainerPortList                      `json:"ports,omitempty"`                    // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.Ports field
+	EnvFrom                  *EnvFromSourceList                      `json:"envFrom,omitempty"`                  // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.EnvFrom field
+	Env                      *EnvVarList                             `json:"env,omitempty"`                      // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.Env field
+	Resources                *ResourceRequirementsApplyConfiguration `json:"resources,omitempty"`                // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.Resources field
+	VolumeMounts             *VolumeMountList                        `json:"volumeMounts,omitempty"`             // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.VolumeMounts field
+	VolumeDevices            *VolumeDeviceList                       `json:"volumeDevices,omitempty"`            // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.VolumeDevices field
+	LivenessProbe            *ProbeApplyConfiguration                `json:"livenessProbe,omitempty"`            // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.LivenessProbe field
+	ReadinessProbe           *ProbeApplyConfiguration                `json:"readinessProbe,omitempty"`           // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.ReadinessProbe field
+	StartupProbe             *ProbeApplyConfiguration                `json:"startupProbe,omitempty"`             // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.StartupProbe field
+	Lifecycle                *LifecycleApplyConfiguration            `json:"lifecycle,omitempty"`                // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.Lifecycle field
+	TerminationMessagePath   *string                                 `json:"terminationMessagePath,omitempty"`   // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.TerminationMessagePath field
+	TerminationMessagePolicy *corev1.TerminationMessagePolicy        `json:"terminationMessagePolicy,omitempty"` // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.TerminationMessagePolicy field
+	ImagePullPolicy          *corev1.PullPolicy                      `json:"imagePullPolicy,omitempty"`          // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.ImagePullPolicy field
+	SecurityContext          *SecurityContextApplyConfiguration      `json:"securityContext,omitempty"`          // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.SecurityContext field
+	Stdin                    *bool                                   `json:"stdin,omitempty"`                    // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.Stdin field
+	StdinOnce                *bool                                   `json:"stdinOnce,omitempty"`                // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.StdinOnce field
+	TTY                      *bool                                   `json:"tty,omitempty"`                      // inlined EphemeralContainerApplyConfiguration.ephemeralContainerCommon.TTY field
+	TargetContainerName      *string                                 `json:"targetContainerName,omitempty"`
 }
 
 // SetEphemeralContainerCommon sets the EphemeralContainerCommon field in the declarative configuration to the given value.
-func (b *EphemeralContainerBuilder) SetEphemeralContainerCommon(value *EphemeralContainerCommonBuilder) *EphemeralContainerBuilder {
+func (b *EphemeralContainerApplyConfiguration) SetEphemeralContainerCommon(value *EphemeralContainerCommonApplyConfiguration) *EphemeralContainerApplyConfiguration {
 	b.ephemeralContainerCommon = value
 	return b
 }
 
 // RemoveEphemeralContainerCommon removes the EphemeralContainerCommon field from the declarative configuration.
-func (b *EphemeralContainerBuilder) RemoveEphemeralContainerCommon() *EphemeralContainerBuilder {
+func (b *EphemeralContainerApplyConfiguration) RemoveEphemeralContainerCommon() *EphemeralContainerApplyConfiguration {
 	b.ephemeralContainerCommon = nil
 	return b
 }
 
 // GetEphemeralContainerCommon gets the EphemeralContainerCommon field from the declarative configuration.
-func (b *EphemeralContainerBuilder) GetEphemeralContainerCommon() (value *EphemeralContainerCommonBuilder, ok bool) {
+func (b *EphemeralContainerApplyConfiguration) GetEphemeralContainerCommon() (value *EphemeralContainerCommonApplyConfiguration, ok bool) {
 	return b.ephemeralContainerCommon, true
 }
 
 // SetTargetContainerName sets the TargetContainerName field in the declarative configuration to the given value.
-func (b *EphemeralContainerBuilder) SetTargetContainerName(value string) *EphemeralContainerBuilder {
+func (b *EphemeralContainerApplyConfiguration) SetTargetContainerName(value string) *EphemeralContainerApplyConfiguration {
 	b.fields.TargetContainerName = &value
 	return b
 }
 
 // RemoveTargetContainerName removes the TargetContainerName field from the declarative configuration.
-func (b *EphemeralContainerBuilder) RemoveTargetContainerName() *EphemeralContainerBuilder {
+func (b *EphemeralContainerApplyConfiguration) RemoveTargetContainerName() *EphemeralContainerApplyConfiguration {
 	b.fields.TargetContainerName = nil
 	return b
 }
 
 // GetTargetContainerName gets the TargetContainerName field from the declarative configuration.
-func (b *EphemeralContainerBuilder) GetTargetContainerName() (value string, ok bool) {
+func (b *EphemeralContainerApplyConfiguration) GetTargetContainerName() (value string, ok bool) {
 	if v := b.fields.TargetContainerName; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts EphemeralContainerBuilder to unstructured.
-func (b *EphemeralContainerBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts EphemeralContainerApplyConfiguration to unstructured.
+func (b *EphemeralContainerApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -119,9 +119,9 @@ func (b *EphemeralContainerBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to EphemeralContainerBuilder, replacing the contents
-// of EphemeralContainerBuilder.
-func (b *EphemeralContainerBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to EphemeralContainerApplyConfiguration, replacing the contents
+// of EphemeralContainerApplyConfiguration.
+func (b *EphemeralContainerApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &ephemeralContainerFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -132,15 +132,15 @@ func (b *EphemeralContainerBuilder) FromUnstructured(u map[string]interface{}) e
 	return nil
 }
 
-// MarshalJSON marshals EphemeralContainerBuilder to JSON.
-func (b *EphemeralContainerBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals EphemeralContainerApplyConfiguration to JSON.
+func (b *EphemeralContainerApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into EphemeralContainerBuilder, replacing the contents of
-// EphemeralContainerBuilder.
-func (b *EphemeralContainerBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into EphemeralContainerApplyConfiguration, replacing the contents of
+// EphemeralContainerApplyConfiguration.
+func (b *EphemeralContainerApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -148,13 +148,13 @@ func (b *EphemeralContainerBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// EphemeralContainerList represents a list of EphemeralContainerBuilder.
-type EphemeralContainerList []*EphemeralContainerBuilder
+// EphemeralContainerList represents a listAlias of EphemeralContainerApplyConfiguration.
+type EphemeralContainerList []*EphemeralContainerApplyConfiguration
 
-// EphemeralContainerList represents a map of EphemeralContainerBuilder.
-type EphemeralContainerMap map[string]EphemeralContainerBuilder
+// EphemeralContainerList represents a map of EphemeralContainerApplyConfiguration.
+type EphemeralContainerMap map[string]EphemeralContainerApplyConfiguration
 
-func (b *EphemeralContainerBuilder) preMarshal() {
+func (b *EphemeralContainerApplyConfiguration) preMarshal() {
 	if b.ephemeralContainerCommon != nil {
 		if v, ok := b.ephemeralContainerCommon.GetName(); ok {
 			b.fields.Name = &v
@@ -224,9 +224,9 @@ func (b *EphemeralContainerBuilder) preMarshal() {
 		}
 	}
 }
-func (b *EphemeralContainerBuilder) postUnmarshal() {
+func (b *EphemeralContainerApplyConfiguration) postUnmarshal() {
 	if b.ephemeralContainerCommon == nil {
-		b.ephemeralContainerCommon = &EphemeralContainerCommonBuilder{}
+		b.ephemeralContainerCommon = &EphemeralContainerCommonApplyConfiguration{}
 	}
 	if b.fields.Name != nil {
 		b.ephemeralContainerCommon.SetName(*b.fields.Name)

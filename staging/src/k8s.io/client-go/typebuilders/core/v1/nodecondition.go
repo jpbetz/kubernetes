@@ -26,14 +26,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// NodeConditionBuilder represents an declarative configuration of the NodeCondition type for use
+// NodeConditionApplyConfiguration represents an declarative configuration of the NodeCondition type for use
 // with apply.
-type NodeConditionBuilder struct {
+type NodeConditionApplyConfiguration struct {
 	fields nodeConditionFields
 }
 
+// NodeConditionApplyConfiguration constructs an declarative configuration of the NodeCondition type for use with
+// apply.
+func NodeCondition() *NodeConditionApplyConfiguration {
+	return &NodeConditionApplyConfiguration{}
+}
+
 // nodeConditionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NodeConditionBuilder.
+// Inline fields are owned by their respective inline type in NodeConditionApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -46,26 +52,20 @@ type nodeConditionFields struct {
 	Message            *string               `json:"message,omitempty"`
 }
 
-// NodeCondition constructs an declarative configuration of the NodeCondition type for use with
-// apply.
-func NodeCondition() *NodeConditionBuilder {
-	return &NodeConditionBuilder{}
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b *NodeConditionBuilder) SetType(value v1.NodeConditionType) *NodeConditionBuilder {
+func (b *NodeConditionApplyConfiguration) SetType(value v1.NodeConditionType) *NodeConditionApplyConfiguration {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b *NodeConditionBuilder) RemoveType() *NodeConditionBuilder {
+func (b *NodeConditionApplyConfiguration) RemoveType() *NodeConditionApplyConfiguration {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b *NodeConditionBuilder) GetType() (value v1.NodeConditionType, ok bool) {
+func (b *NodeConditionApplyConfiguration) GetType() (value v1.NodeConditionType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -73,19 +73,19 @@ func (b *NodeConditionBuilder) GetType() (value v1.NodeConditionType, ok bool) {
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *NodeConditionBuilder) SetStatus(value v1.ConditionStatus) *NodeConditionBuilder {
+func (b *NodeConditionApplyConfiguration) SetStatus(value v1.ConditionStatus) *NodeConditionApplyConfiguration {
 	b.fields.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *NodeConditionBuilder) RemoveStatus() *NodeConditionBuilder {
+func (b *NodeConditionApplyConfiguration) RemoveStatus() *NodeConditionApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *NodeConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
+func (b *NodeConditionApplyConfiguration) GetStatus() (value v1.ConditionStatus, ok bool) {
 	if v := b.fields.Status; v != nil {
 		return *v, true
 	}
@@ -93,19 +93,19 @@ func (b *NodeConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
 }
 
 // SetLastHeartbeatTime sets the LastHeartbeatTime field in the declarative configuration to the given value.
-func (b *NodeConditionBuilder) SetLastHeartbeatTime(value metav1.Time) *NodeConditionBuilder {
+func (b *NodeConditionApplyConfiguration) SetLastHeartbeatTime(value metav1.Time) *NodeConditionApplyConfiguration {
 	b.fields.LastHeartbeatTime = &value
 	return b
 }
 
 // RemoveLastHeartbeatTime removes the LastHeartbeatTime field from the declarative configuration.
-func (b *NodeConditionBuilder) RemoveLastHeartbeatTime() *NodeConditionBuilder {
+func (b *NodeConditionApplyConfiguration) RemoveLastHeartbeatTime() *NodeConditionApplyConfiguration {
 	b.fields.LastHeartbeatTime = nil
 	return b
 }
 
 // GetLastHeartbeatTime gets the LastHeartbeatTime field from the declarative configuration.
-func (b *NodeConditionBuilder) GetLastHeartbeatTime() (value metav1.Time, ok bool) {
+func (b *NodeConditionApplyConfiguration) GetLastHeartbeatTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastHeartbeatTime; v != nil {
 		return *v, true
 	}
@@ -113,19 +113,19 @@ func (b *NodeConditionBuilder) GetLastHeartbeatTime() (value metav1.Time, ok boo
 }
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
-func (b *NodeConditionBuilder) SetLastTransitionTime(value metav1.Time) *NodeConditionBuilder {
+func (b *NodeConditionApplyConfiguration) SetLastTransitionTime(value metav1.Time) *NodeConditionApplyConfiguration {
 	b.fields.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
-func (b *NodeConditionBuilder) RemoveLastTransitionTime() *NodeConditionBuilder {
+func (b *NodeConditionApplyConfiguration) RemoveLastTransitionTime() *NodeConditionApplyConfiguration {
 	b.fields.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
-func (b *NodeConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
+func (b *NodeConditionApplyConfiguration) GetLastTransitionTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastTransitionTime; v != nil {
 		return *v, true
 	}
@@ -133,19 +133,19 @@ func (b *NodeConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bo
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b *NodeConditionBuilder) SetReason(value string) *NodeConditionBuilder {
+func (b *NodeConditionApplyConfiguration) SetReason(value string) *NodeConditionApplyConfiguration {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b *NodeConditionBuilder) RemoveReason() *NodeConditionBuilder {
+func (b *NodeConditionApplyConfiguration) RemoveReason() *NodeConditionApplyConfiguration {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b *NodeConditionBuilder) GetReason() (value string, ok bool) {
+func (b *NodeConditionApplyConfiguration) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -153,27 +153,27 @@ func (b *NodeConditionBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b *NodeConditionBuilder) SetMessage(value string) *NodeConditionBuilder {
+func (b *NodeConditionApplyConfiguration) SetMessage(value string) *NodeConditionApplyConfiguration {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b *NodeConditionBuilder) RemoveMessage() *NodeConditionBuilder {
+func (b *NodeConditionApplyConfiguration) RemoveMessage() *NodeConditionApplyConfiguration {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b *NodeConditionBuilder) GetMessage() (value string, ok bool) {
+func (b *NodeConditionApplyConfiguration) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts NodeConditionBuilder to unstructured.
-func (b *NodeConditionBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NodeConditionApplyConfiguration to unstructured.
+func (b *NodeConditionApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -185,9 +185,9 @@ func (b *NodeConditionBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NodeConditionBuilder, replacing the contents
-// of NodeConditionBuilder.
-func (b *NodeConditionBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NodeConditionApplyConfiguration, replacing the contents
+// of NodeConditionApplyConfiguration.
+func (b *NodeConditionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &nodeConditionFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -198,15 +198,15 @@ func (b *NodeConditionBuilder) FromUnstructured(u map[string]interface{}) error 
 	return nil
 }
 
-// MarshalJSON marshals NodeConditionBuilder to JSON.
-func (b *NodeConditionBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NodeConditionApplyConfiguration to JSON.
+func (b *NodeConditionApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NodeConditionBuilder, replacing the contents of
-// NodeConditionBuilder.
-func (b *NodeConditionBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NodeConditionApplyConfiguration, replacing the contents of
+// NodeConditionApplyConfiguration.
+func (b *NodeConditionApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -214,13 +214,13 @@ func (b *NodeConditionBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NodeConditionList represents a list of NodeConditionBuilder.
-type NodeConditionList []*NodeConditionBuilder
+// NodeConditionList represents a listAlias of NodeConditionApplyConfiguration.
+type NodeConditionList []*NodeConditionApplyConfiguration
 
-// NodeConditionList represents a map of NodeConditionBuilder.
-type NodeConditionMap map[string]NodeConditionBuilder
+// NodeConditionList represents a map of NodeConditionApplyConfiguration.
+type NodeConditionMap map[string]NodeConditionApplyConfiguration
 
-func (b *NodeConditionBuilder) preMarshal() {
+func (b *NodeConditionApplyConfiguration) preMarshal() {
 }
-func (b *NodeConditionBuilder) postUnmarshal() {
+func (b *NodeConditionApplyConfiguration) postUnmarshal() {
 }

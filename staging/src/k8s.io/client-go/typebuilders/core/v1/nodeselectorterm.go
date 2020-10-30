@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// NodeSelectorTermBuilder represents an declarative configuration of the NodeSelectorTerm type for use
+// NodeSelectorTermApplyConfiguration represents an declarative configuration of the NodeSelectorTerm type for use
 // with apply.
-type NodeSelectorTermBuilder struct {
+type NodeSelectorTermApplyConfiguration struct {
 	fields nodeSelectorTermFields
 }
 
+// NodeSelectorTermApplyConfiguration constructs an declarative configuration of the NodeSelectorTerm type for use with
+// apply.
+func NodeSelectorTerm() *NodeSelectorTermApplyConfiguration {
+	return &NodeSelectorTermApplyConfiguration{}
+}
+
 // nodeSelectorTermFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NodeSelectorTermBuilder.
+// Inline fields are owned by their respective inline type in NodeSelectorTermApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type nodeSelectorTermFields struct {
 	MatchFields      *NodeSelectorRequirementList `json:"matchFields,omitempty"`
 }
 
-// NodeSelectorTerm constructs an declarative configuration of the NodeSelectorTerm type for use with
-// apply.
-func NodeSelectorTerm() *NodeSelectorTermBuilder {
-	return &NodeSelectorTermBuilder{}
-}
-
 // SetMatchExpressions sets the MatchExpressions field in the declarative configuration to the given value.
-func (b *NodeSelectorTermBuilder) SetMatchExpressions(value NodeSelectorRequirementList) *NodeSelectorTermBuilder {
+func (b *NodeSelectorTermApplyConfiguration) SetMatchExpressions(value NodeSelectorRequirementList) *NodeSelectorTermApplyConfiguration {
 	b.fields.MatchExpressions = &value
 	return b
 }
 
 // RemoveMatchExpressions removes the MatchExpressions field from the declarative configuration.
-func (b *NodeSelectorTermBuilder) RemoveMatchExpressions() *NodeSelectorTermBuilder {
+func (b *NodeSelectorTermApplyConfiguration) RemoveMatchExpressions() *NodeSelectorTermApplyConfiguration {
 	b.fields.MatchExpressions = nil
 	return b
 }
 
 // GetMatchExpressions gets the MatchExpressions field from the declarative configuration.
-func (b *NodeSelectorTermBuilder) GetMatchExpressions() (value NodeSelectorRequirementList, ok bool) {
+func (b *NodeSelectorTermApplyConfiguration) GetMatchExpressions() (value NodeSelectorRequirementList, ok bool) {
 	if v := b.fields.MatchExpressions; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *NodeSelectorTermBuilder) GetMatchExpressions() (value NodeSelectorRequi
 }
 
 // SetMatchFields sets the MatchFields field in the declarative configuration to the given value.
-func (b *NodeSelectorTermBuilder) SetMatchFields(value NodeSelectorRequirementList) *NodeSelectorTermBuilder {
+func (b *NodeSelectorTermApplyConfiguration) SetMatchFields(value NodeSelectorRequirementList) *NodeSelectorTermApplyConfiguration {
 	b.fields.MatchFields = &value
 	return b
 }
 
 // RemoveMatchFields removes the MatchFields field from the declarative configuration.
-func (b *NodeSelectorTermBuilder) RemoveMatchFields() *NodeSelectorTermBuilder {
+func (b *NodeSelectorTermApplyConfiguration) RemoveMatchFields() *NodeSelectorTermApplyConfiguration {
 	b.fields.MatchFields = nil
 	return b
 }
 
 // GetMatchFields gets the MatchFields field from the declarative configuration.
-func (b *NodeSelectorTermBuilder) GetMatchFields() (value NodeSelectorRequirementList, ok bool) {
+func (b *NodeSelectorTermApplyConfiguration) GetMatchFields() (value NodeSelectorRequirementList, ok bool) {
 	if v := b.fields.MatchFields; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts NodeSelectorTermBuilder to unstructured.
-func (b *NodeSelectorTermBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NodeSelectorTermApplyConfiguration to unstructured.
+func (b *NodeSelectorTermApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *NodeSelectorTermBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NodeSelectorTermBuilder, replacing the contents
-// of NodeSelectorTermBuilder.
-func (b *NodeSelectorTermBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NodeSelectorTermApplyConfiguration, replacing the contents
+// of NodeSelectorTermApplyConfiguration.
+func (b *NodeSelectorTermApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &nodeSelectorTermFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *NodeSelectorTermBuilder) FromUnstructured(u map[string]interface{}) err
 	return nil
 }
 
-// MarshalJSON marshals NodeSelectorTermBuilder to JSON.
-func (b *NodeSelectorTermBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NodeSelectorTermApplyConfiguration to JSON.
+func (b *NodeSelectorTermApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NodeSelectorTermBuilder, replacing the contents of
-// NodeSelectorTermBuilder.
-func (b *NodeSelectorTermBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NodeSelectorTermApplyConfiguration, replacing the contents of
+// NodeSelectorTermApplyConfiguration.
+func (b *NodeSelectorTermApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *NodeSelectorTermBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NodeSelectorTermList represents a list of NodeSelectorTermBuilder.
-type NodeSelectorTermList []*NodeSelectorTermBuilder
+// NodeSelectorTermList represents a listAlias of NodeSelectorTermApplyConfiguration.
+type NodeSelectorTermList []*NodeSelectorTermApplyConfiguration
 
-// NodeSelectorTermList represents a map of NodeSelectorTermBuilder.
-type NodeSelectorTermMap map[string]NodeSelectorTermBuilder
+// NodeSelectorTermList represents a map of NodeSelectorTermApplyConfiguration.
+type NodeSelectorTermMap map[string]NodeSelectorTermApplyConfiguration
 
-func (b *NodeSelectorTermBuilder) preMarshal() {
+func (b *NodeSelectorTermApplyConfiguration) preMarshal() {
 }
-func (b *NodeSelectorTermBuilder) postUnmarshal() {
+func (b *NodeSelectorTermApplyConfiguration) postUnmarshal() {
 }

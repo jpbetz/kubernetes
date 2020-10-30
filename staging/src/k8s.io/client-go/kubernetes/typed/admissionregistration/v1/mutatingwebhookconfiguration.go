@@ -48,7 +48,7 @@ type MutatingWebhookConfigurationInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.MutatingWebhookConfigurationList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.MutatingWebhookConfiguration, err error)
-	Apply(ctx context.Context, mutatingWebhookConfiguration admissionregistrationv1.MutatingWebhookConfigurationBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.MutatingWebhookConfiguration, err error)
+	Apply(ctx context.Context, mutatingWebhookConfiguration *admissionregistrationv1.MutatingWebhookConfigurationApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.MutatingWebhookConfiguration, err error)
 	MutatingWebhookConfigurationExpansion
 }
 
@@ -171,7 +171,7 @@ func (c *mutatingWebhookConfigurations) Patch(ctx context.Context, name string, 
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied mutatingWebhookConfiguration.
-func (c *mutatingWebhookConfigurations) Apply(ctx context.Context, mutatingWebhookConfiguration admissionregistrationv1.MutatingWebhookConfigurationBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.MutatingWebhookConfiguration, err error) {
+func (c *mutatingWebhookConfigurations) Apply(ctx context.Context, mutatingWebhookConfiguration *admissionregistrationv1.MutatingWebhookConfigurationApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.MutatingWebhookConfiguration, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := mutatingWebhookConfiguration.MarshalJSON()
 	if err != nil {

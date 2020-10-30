@@ -49,7 +49,7 @@ type CertificateSigningRequestInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.CertificateSigningRequestList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.CertificateSigningRequest, err error)
-	Apply(ctx context.Context, certificateSigningRequest certificatesv1.CertificateSigningRequestBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.CertificateSigningRequest, err error)
+	Apply(ctx context.Context, certificateSigningRequest *certificatesv1.CertificateSigningRequestApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.CertificateSigningRequest, err error)
 	UpdateApproval(ctx context.Context, certificateSigningRequestName string, certificateSigningRequest *v1.CertificateSigningRequest, opts metav1.UpdateOptions) (*v1.CertificateSigningRequest, error)
 
 	CertificateSigningRequestExpansion
@@ -189,7 +189,7 @@ func (c *certificateSigningRequests) Patch(ctx context.Context, name string, pt 
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied certificateSigningRequest.
-func (c *certificateSigningRequests) Apply(ctx context.Context, certificateSigningRequest certificatesv1.CertificateSigningRequestBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.CertificateSigningRequest, err error) {
+func (c *certificateSigningRequests) Apply(ctx context.Context, certificateSigningRequest *certificatesv1.CertificateSigningRequestApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.CertificateSigningRequest, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := certificateSigningRequest.MarshalJSON()
 	if err != nil {

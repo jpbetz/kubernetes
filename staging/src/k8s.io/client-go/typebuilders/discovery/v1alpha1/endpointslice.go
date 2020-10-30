@@ -26,81 +26,81 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// EndpointSliceBuilder represents an declarative configuration of the EndpointSlice type for use
+// EndpointSliceApplyConfiguration represents an declarative configuration of the EndpointSlice type for use
 // with apply.
-type EndpointSliceBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type EndpointSliceApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   endpointSliceFields
 }
 
+// EndpointSliceApplyConfiguration constructs an declarative configuration of the EndpointSlice type for use with
+// apply.
+func EndpointSlice() *EndpointSliceApplyConfiguration {
+	return &EndpointSliceApplyConfiguration{}
+}
+
 // endpointSliceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in EndpointSliceBuilder.
+// Inline fields are owned by their respective inline type in EndpointSliceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type endpointSliceFields struct {
-	Kind        *string               `json:"kind,omitempty"`       // inlined EndpointSliceBuilder.typeMeta.Kind field
-	APIVersion  *string               `json:"apiVersion,omitempty"` // inlined EndpointSliceBuilder.typeMeta.APIVersion field
-	ObjectMeta  *v1.ObjectMetaBuilder `json:"metadata,omitempty"`
-	AddressType *v1alpha1.AddressType `json:"addressType,omitempty"`
-	Endpoints   *EndpointList         `json:"endpoints,omitempty"`
-	Ports       *EndpointPortList     `json:"ports,omitempty"`
-}
-
-// EndpointSlice constructs an declarative configuration of the EndpointSlice type for use with
-// apply.
-func EndpointSlice() *EndpointSliceBuilder {
-	return &EndpointSliceBuilder{}
+	Kind        *string                          `json:"kind,omitempty"`       // inlined EndpointSliceApplyConfiguration.typeMeta.Kind field
+	APIVersion  *string                          `json:"apiVersion,omitempty"` // inlined EndpointSliceApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta  *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	AddressType *v1alpha1.AddressType            `json:"addressType,omitempty"`
+	Endpoints   *EndpointList                    `json:"endpoints,omitempty"`
+	Ports       *EndpointPortList                `json:"ports,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *EndpointSliceBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *EndpointSliceBuilder {
+func (b *EndpointSliceApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *EndpointSliceApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *EndpointSliceBuilder) RemoveTypeMeta() *EndpointSliceBuilder {
+func (b *EndpointSliceApplyConfiguration) RemoveTypeMeta() *EndpointSliceApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *EndpointSliceBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *EndpointSliceApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *EndpointSliceBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *EndpointSliceBuilder {
+func (b *EndpointSliceApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *EndpointSliceApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *EndpointSliceBuilder) RemoveObjectMeta() *EndpointSliceBuilder {
+func (b *EndpointSliceApplyConfiguration) RemoveObjectMeta() *EndpointSliceApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *EndpointSliceBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *EndpointSliceApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetAddressType sets the AddressType field in the declarative configuration to the given value.
-func (b *EndpointSliceBuilder) SetAddressType(value v1alpha1.AddressType) *EndpointSliceBuilder {
+func (b *EndpointSliceApplyConfiguration) SetAddressType(value v1alpha1.AddressType) *EndpointSliceApplyConfiguration {
 	b.fields.AddressType = &value
 	return b
 }
 
 // RemoveAddressType removes the AddressType field from the declarative configuration.
-func (b *EndpointSliceBuilder) RemoveAddressType() *EndpointSliceBuilder {
+func (b *EndpointSliceApplyConfiguration) RemoveAddressType() *EndpointSliceApplyConfiguration {
 	b.fields.AddressType = nil
 	return b
 }
 
 // GetAddressType gets the AddressType field from the declarative configuration.
-func (b *EndpointSliceBuilder) GetAddressType() (value v1alpha1.AddressType, ok bool) {
+func (b *EndpointSliceApplyConfiguration) GetAddressType() (value v1alpha1.AddressType, ok bool) {
 	if v := b.fields.AddressType; v != nil {
 		return *v, true
 	}
@@ -108,19 +108,19 @@ func (b *EndpointSliceBuilder) GetAddressType() (value v1alpha1.AddressType, ok 
 }
 
 // SetEndpoints sets the Endpoints field in the declarative configuration to the given value.
-func (b *EndpointSliceBuilder) SetEndpoints(value EndpointList) *EndpointSliceBuilder {
+func (b *EndpointSliceApplyConfiguration) SetEndpoints(value EndpointList) *EndpointSliceApplyConfiguration {
 	b.fields.Endpoints = &value
 	return b
 }
 
 // RemoveEndpoints removes the Endpoints field from the declarative configuration.
-func (b *EndpointSliceBuilder) RemoveEndpoints() *EndpointSliceBuilder {
+func (b *EndpointSliceApplyConfiguration) RemoveEndpoints() *EndpointSliceApplyConfiguration {
 	b.fields.Endpoints = nil
 	return b
 }
 
 // GetEndpoints gets the Endpoints field from the declarative configuration.
-func (b *EndpointSliceBuilder) GetEndpoints() (value EndpointList, ok bool) {
+func (b *EndpointSliceApplyConfiguration) GetEndpoints() (value EndpointList, ok bool) {
 	if v := b.fields.Endpoints; v != nil {
 		return *v, true
 	}
@@ -128,27 +128,27 @@ func (b *EndpointSliceBuilder) GetEndpoints() (value EndpointList, ok bool) {
 }
 
 // SetPorts sets the Ports field in the declarative configuration to the given value.
-func (b *EndpointSliceBuilder) SetPorts(value EndpointPortList) *EndpointSliceBuilder {
+func (b *EndpointSliceApplyConfiguration) SetPorts(value EndpointPortList) *EndpointSliceApplyConfiguration {
 	b.fields.Ports = &value
 	return b
 }
 
 // RemovePorts removes the Ports field from the declarative configuration.
-func (b *EndpointSliceBuilder) RemovePorts() *EndpointSliceBuilder {
+func (b *EndpointSliceApplyConfiguration) RemovePorts() *EndpointSliceApplyConfiguration {
 	b.fields.Ports = nil
 	return b
 }
 
 // GetPorts gets the Ports field from the declarative configuration.
-func (b *EndpointSliceBuilder) GetPorts() (value EndpointPortList, ok bool) {
+func (b *EndpointSliceApplyConfiguration) GetPorts() (value EndpointPortList, ok bool) {
 	if v := b.fields.Ports; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts EndpointSliceBuilder to unstructured.
-func (b *EndpointSliceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts EndpointSliceApplyConfiguration to unstructured.
+func (b *EndpointSliceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -160,9 +160,9 @@ func (b *EndpointSliceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to EndpointSliceBuilder, replacing the contents
-// of EndpointSliceBuilder.
-func (b *EndpointSliceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to EndpointSliceApplyConfiguration, replacing the contents
+// of EndpointSliceApplyConfiguration.
+func (b *EndpointSliceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &endpointSliceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -173,15 +173,15 @@ func (b *EndpointSliceBuilder) FromUnstructured(u map[string]interface{}) error 
 	return nil
 }
 
-// MarshalJSON marshals EndpointSliceBuilder to JSON.
-func (b *EndpointSliceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals EndpointSliceApplyConfiguration to JSON.
+func (b *EndpointSliceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into EndpointSliceBuilder, replacing the contents of
-// EndpointSliceBuilder.
-func (b *EndpointSliceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into EndpointSliceApplyConfiguration, replacing the contents of
+// EndpointSliceApplyConfiguration.
+func (b *EndpointSliceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -189,13 +189,13 @@ func (b *EndpointSliceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// EndpointSliceList represents a list of EndpointSliceBuilder.
-type EndpointSliceList []*EndpointSliceBuilder
+// EndpointSliceList represents a listAlias of EndpointSliceApplyConfiguration.
+type EndpointSliceList []*EndpointSliceApplyConfiguration
 
-// EndpointSliceList represents a map of EndpointSliceBuilder.
-type EndpointSliceMap map[string]EndpointSliceBuilder
+// EndpointSliceList represents a map of EndpointSliceApplyConfiguration.
+type EndpointSliceMap map[string]EndpointSliceApplyConfiguration
 
-func (b *EndpointSliceBuilder) preMarshal() {
+func (b *EndpointSliceApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -205,9 +205,9 @@ func (b *EndpointSliceBuilder) preMarshal() {
 		}
 	}
 }
-func (b *EndpointSliceBuilder) postUnmarshal() {
+func (b *EndpointSliceApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

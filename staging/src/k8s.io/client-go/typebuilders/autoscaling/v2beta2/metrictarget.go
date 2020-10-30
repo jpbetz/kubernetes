@@ -26,14 +26,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// MetricTargetBuilder represents an declarative configuration of the MetricTarget type for use
+// MetricTargetApplyConfiguration represents an declarative configuration of the MetricTarget type for use
 // with apply.
-type MetricTargetBuilder struct {
+type MetricTargetApplyConfiguration struct {
 	fields metricTargetFields
 }
 
+// MetricTargetApplyConfiguration constructs an declarative configuration of the MetricTarget type for use with
+// apply.
+func MetricTarget() *MetricTargetApplyConfiguration {
+	return &MetricTargetApplyConfiguration{}
+}
+
 // metricTargetFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in MetricTargetBuilder.
+// Inline fields are owned by their respective inline type in MetricTargetApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -44,26 +50,20 @@ type metricTargetFields struct {
 	AverageUtilization *int32                    `json:"averageUtilization,omitempty"`
 }
 
-// MetricTarget constructs an declarative configuration of the MetricTarget type for use with
-// apply.
-func MetricTarget() *MetricTargetBuilder {
-	return &MetricTargetBuilder{}
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b *MetricTargetBuilder) SetType(value v2beta2.MetricTargetType) *MetricTargetBuilder {
+func (b *MetricTargetApplyConfiguration) SetType(value v2beta2.MetricTargetType) *MetricTargetApplyConfiguration {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b *MetricTargetBuilder) RemoveType() *MetricTargetBuilder {
+func (b *MetricTargetApplyConfiguration) RemoveType() *MetricTargetApplyConfiguration {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b *MetricTargetBuilder) GetType() (value v2beta2.MetricTargetType, ok bool) {
+func (b *MetricTargetApplyConfiguration) GetType() (value v2beta2.MetricTargetType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -71,19 +71,19 @@ func (b *MetricTargetBuilder) GetType() (value v2beta2.MetricTargetType, ok bool
 }
 
 // SetValue sets the Value field in the declarative configuration to the given value.
-func (b *MetricTargetBuilder) SetValue(value resource.Quantity) *MetricTargetBuilder {
+func (b *MetricTargetApplyConfiguration) SetValue(value resource.Quantity) *MetricTargetApplyConfiguration {
 	b.fields.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
-func (b *MetricTargetBuilder) RemoveValue() *MetricTargetBuilder {
+func (b *MetricTargetApplyConfiguration) RemoveValue() *MetricTargetApplyConfiguration {
 	b.fields.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
-func (b *MetricTargetBuilder) GetValue() (value resource.Quantity, ok bool) {
+func (b *MetricTargetApplyConfiguration) GetValue() (value resource.Quantity, ok bool) {
 	if v := b.fields.Value; v != nil {
 		return *v, true
 	}
@@ -91,19 +91,19 @@ func (b *MetricTargetBuilder) GetValue() (value resource.Quantity, ok bool) {
 }
 
 // SetAverageValue sets the AverageValue field in the declarative configuration to the given value.
-func (b *MetricTargetBuilder) SetAverageValue(value resource.Quantity) *MetricTargetBuilder {
+func (b *MetricTargetApplyConfiguration) SetAverageValue(value resource.Quantity) *MetricTargetApplyConfiguration {
 	b.fields.AverageValue = &value
 	return b
 }
 
 // RemoveAverageValue removes the AverageValue field from the declarative configuration.
-func (b *MetricTargetBuilder) RemoveAverageValue() *MetricTargetBuilder {
+func (b *MetricTargetApplyConfiguration) RemoveAverageValue() *MetricTargetApplyConfiguration {
 	b.fields.AverageValue = nil
 	return b
 }
 
 // GetAverageValue gets the AverageValue field from the declarative configuration.
-func (b *MetricTargetBuilder) GetAverageValue() (value resource.Quantity, ok bool) {
+func (b *MetricTargetApplyConfiguration) GetAverageValue() (value resource.Quantity, ok bool) {
 	if v := b.fields.AverageValue; v != nil {
 		return *v, true
 	}
@@ -111,27 +111,27 @@ func (b *MetricTargetBuilder) GetAverageValue() (value resource.Quantity, ok boo
 }
 
 // SetAverageUtilization sets the AverageUtilization field in the declarative configuration to the given value.
-func (b *MetricTargetBuilder) SetAverageUtilization(value int32) *MetricTargetBuilder {
+func (b *MetricTargetApplyConfiguration) SetAverageUtilization(value int32) *MetricTargetApplyConfiguration {
 	b.fields.AverageUtilization = &value
 	return b
 }
 
 // RemoveAverageUtilization removes the AverageUtilization field from the declarative configuration.
-func (b *MetricTargetBuilder) RemoveAverageUtilization() *MetricTargetBuilder {
+func (b *MetricTargetApplyConfiguration) RemoveAverageUtilization() *MetricTargetApplyConfiguration {
 	b.fields.AverageUtilization = nil
 	return b
 }
 
 // GetAverageUtilization gets the AverageUtilization field from the declarative configuration.
-func (b *MetricTargetBuilder) GetAverageUtilization() (value int32, ok bool) {
+func (b *MetricTargetApplyConfiguration) GetAverageUtilization() (value int32, ok bool) {
 	if v := b.fields.AverageUtilization; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts MetricTargetBuilder to unstructured.
-func (b *MetricTargetBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts MetricTargetApplyConfiguration to unstructured.
+func (b *MetricTargetApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -143,9 +143,9 @@ func (b *MetricTargetBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to MetricTargetBuilder, replacing the contents
-// of MetricTargetBuilder.
-func (b *MetricTargetBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to MetricTargetApplyConfiguration, replacing the contents
+// of MetricTargetApplyConfiguration.
+func (b *MetricTargetApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &metricTargetFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -156,15 +156,15 @@ func (b *MetricTargetBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals MetricTargetBuilder to JSON.
-func (b *MetricTargetBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals MetricTargetApplyConfiguration to JSON.
+func (b *MetricTargetApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into MetricTargetBuilder, replacing the contents of
-// MetricTargetBuilder.
-func (b *MetricTargetBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into MetricTargetApplyConfiguration, replacing the contents of
+// MetricTargetApplyConfiguration.
+func (b *MetricTargetApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -172,13 +172,13 @@ func (b *MetricTargetBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MetricTargetList represents a list of MetricTargetBuilder.
-type MetricTargetList []*MetricTargetBuilder
+// MetricTargetList represents a listAlias of MetricTargetApplyConfiguration.
+type MetricTargetList []*MetricTargetApplyConfiguration
 
-// MetricTargetList represents a map of MetricTargetBuilder.
-type MetricTargetMap map[string]MetricTargetBuilder
+// MetricTargetList represents a map of MetricTargetApplyConfiguration.
+type MetricTargetMap map[string]MetricTargetApplyConfiguration
 
-func (b *MetricTargetBuilder) preMarshal() {
+func (b *MetricTargetApplyConfiguration) preMarshal() {
 }
-func (b *MetricTargetBuilder) postUnmarshal() {
+func (b *MetricTargetApplyConfiguration) postUnmarshal() {
 }

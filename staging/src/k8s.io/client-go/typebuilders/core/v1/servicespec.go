@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ServiceSpecBuilder represents an declarative configuration of the ServiceSpec type for use
+// ServiceSpecApplyConfiguration represents an declarative configuration of the ServiceSpec type for use
 // with apply.
-type ServiceSpecBuilder struct {
+type ServiceSpecApplyConfiguration struct {
 	fields serviceSpecFields
 }
 
+// ServiceSpecApplyConfiguration constructs an declarative configuration of the ServiceSpec type for use with
+// apply.
+func ServiceSpec() *ServiceSpecApplyConfiguration {
+	return &ServiceSpecApplyConfiguration{}
+}
+
 // serviceSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ServiceSpecBuilder.
+// Inline fields are owned by their respective inline type in ServiceSpecApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -50,32 +56,26 @@ type serviceSpecFields struct {
 	ExternalTrafficPolicy    *corev1.ServiceExternalTrafficPolicyType `json:"externalTrafficPolicy,omitempty"`
 	HealthCheckNodePort      *int32                                   `json:"healthCheckNodePort,omitempty"`
 	PublishNotReadyAddresses *bool                                    `json:"publishNotReadyAddresses,omitempty"`
-	SessionAffinityConfig    *SessionAffinityConfigBuilder            `json:"sessionAffinityConfig,omitempty"`
+	SessionAffinityConfig    *SessionAffinityConfigApplyConfiguration `json:"sessionAffinityConfig,omitempty"`
 	IPFamilies               *[]corev1.IPFamily                       `json:"ipFamilies,omitempty"`
 	TopologyKeys             *[]string                                `json:"topologyKeys,omitempty"`
 	IPFamilyPolicy           *corev1.IPFamilyPolicyType               `json:"ipFamilyPolicy,omitempty"`
 }
 
-// ServiceSpec constructs an declarative configuration of the ServiceSpec type for use with
-// apply.
-func ServiceSpec() *ServiceSpecBuilder {
-	return &ServiceSpecBuilder{}
-}
-
 // SetPorts sets the Ports field in the declarative configuration to the given value.
-func (b *ServiceSpecBuilder) SetPorts(value ServicePortList) *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) SetPorts(value ServicePortList) *ServiceSpecApplyConfiguration {
 	b.fields.Ports = &value
 	return b
 }
 
 // RemovePorts removes the Ports field from the declarative configuration.
-func (b *ServiceSpecBuilder) RemovePorts() *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) RemovePorts() *ServiceSpecApplyConfiguration {
 	b.fields.Ports = nil
 	return b
 }
 
 // GetPorts gets the Ports field from the declarative configuration.
-func (b *ServiceSpecBuilder) GetPorts() (value ServicePortList, ok bool) {
+func (b *ServiceSpecApplyConfiguration) GetPorts() (value ServicePortList, ok bool) {
 	if v := b.fields.Ports; v != nil {
 		return *v, true
 	}
@@ -83,19 +83,19 @@ func (b *ServiceSpecBuilder) GetPorts() (value ServicePortList, ok bool) {
 }
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
-func (b *ServiceSpecBuilder) SetSelector(value map[string]string) *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) SetSelector(value map[string]string) *ServiceSpecApplyConfiguration {
 	b.fields.Selector = &value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
-func (b *ServiceSpecBuilder) RemoveSelector() *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) RemoveSelector() *ServiceSpecApplyConfiguration {
 	b.fields.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
-func (b *ServiceSpecBuilder) GetSelector() (value map[string]string, ok bool) {
+func (b *ServiceSpecApplyConfiguration) GetSelector() (value map[string]string, ok bool) {
 	if v := b.fields.Selector; v != nil {
 		return *v, true
 	}
@@ -103,19 +103,19 @@ func (b *ServiceSpecBuilder) GetSelector() (value map[string]string, ok bool) {
 }
 
 // SetClusterIP sets the ClusterIP field in the declarative configuration to the given value.
-func (b *ServiceSpecBuilder) SetClusterIP(value string) *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) SetClusterIP(value string) *ServiceSpecApplyConfiguration {
 	b.fields.ClusterIP = &value
 	return b
 }
 
 // RemoveClusterIP removes the ClusterIP field from the declarative configuration.
-func (b *ServiceSpecBuilder) RemoveClusterIP() *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) RemoveClusterIP() *ServiceSpecApplyConfiguration {
 	b.fields.ClusterIP = nil
 	return b
 }
 
 // GetClusterIP gets the ClusterIP field from the declarative configuration.
-func (b *ServiceSpecBuilder) GetClusterIP() (value string, ok bool) {
+func (b *ServiceSpecApplyConfiguration) GetClusterIP() (value string, ok bool) {
 	if v := b.fields.ClusterIP; v != nil {
 		return *v, true
 	}
@@ -123,19 +123,19 @@ func (b *ServiceSpecBuilder) GetClusterIP() (value string, ok bool) {
 }
 
 // SetClusterIPs sets the ClusterIPs field in the declarative configuration to the given value.
-func (b *ServiceSpecBuilder) SetClusterIPs(value []string) *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) SetClusterIPs(value []string) *ServiceSpecApplyConfiguration {
 	b.fields.ClusterIPs = &value
 	return b
 }
 
 // RemoveClusterIPs removes the ClusterIPs field from the declarative configuration.
-func (b *ServiceSpecBuilder) RemoveClusterIPs() *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) RemoveClusterIPs() *ServiceSpecApplyConfiguration {
 	b.fields.ClusterIPs = nil
 	return b
 }
 
 // GetClusterIPs gets the ClusterIPs field from the declarative configuration.
-func (b *ServiceSpecBuilder) GetClusterIPs() (value []string, ok bool) {
+func (b *ServiceSpecApplyConfiguration) GetClusterIPs() (value []string, ok bool) {
 	if v := b.fields.ClusterIPs; v != nil {
 		return *v, true
 	}
@@ -143,19 +143,19 @@ func (b *ServiceSpecBuilder) GetClusterIPs() (value []string, ok bool) {
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b *ServiceSpecBuilder) SetType(value corev1.ServiceType) *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) SetType(value corev1.ServiceType) *ServiceSpecApplyConfiguration {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b *ServiceSpecBuilder) RemoveType() *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) RemoveType() *ServiceSpecApplyConfiguration {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b *ServiceSpecBuilder) GetType() (value corev1.ServiceType, ok bool) {
+func (b *ServiceSpecApplyConfiguration) GetType() (value corev1.ServiceType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -163,19 +163,19 @@ func (b *ServiceSpecBuilder) GetType() (value corev1.ServiceType, ok bool) {
 }
 
 // SetExternalIPs sets the ExternalIPs field in the declarative configuration to the given value.
-func (b *ServiceSpecBuilder) SetExternalIPs(value []string) *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) SetExternalIPs(value []string) *ServiceSpecApplyConfiguration {
 	b.fields.ExternalIPs = &value
 	return b
 }
 
 // RemoveExternalIPs removes the ExternalIPs field from the declarative configuration.
-func (b *ServiceSpecBuilder) RemoveExternalIPs() *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) RemoveExternalIPs() *ServiceSpecApplyConfiguration {
 	b.fields.ExternalIPs = nil
 	return b
 }
 
 // GetExternalIPs gets the ExternalIPs field from the declarative configuration.
-func (b *ServiceSpecBuilder) GetExternalIPs() (value []string, ok bool) {
+func (b *ServiceSpecApplyConfiguration) GetExternalIPs() (value []string, ok bool) {
 	if v := b.fields.ExternalIPs; v != nil {
 		return *v, true
 	}
@@ -183,19 +183,19 @@ func (b *ServiceSpecBuilder) GetExternalIPs() (value []string, ok bool) {
 }
 
 // SetSessionAffinity sets the SessionAffinity field in the declarative configuration to the given value.
-func (b *ServiceSpecBuilder) SetSessionAffinity(value corev1.ServiceAffinity) *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) SetSessionAffinity(value corev1.ServiceAffinity) *ServiceSpecApplyConfiguration {
 	b.fields.SessionAffinity = &value
 	return b
 }
 
 // RemoveSessionAffinity removes the SessionAffinity field from the declarative configuration.
-func (b *ServiceSpecBuilder) RemoveSessionAffinity() *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) RemoveSessionAffinity() *ServiceSpecApplyConfiguration {
 	b.fields.SessionAffinity = nil
 	return b
 }
 
 // GetSessionAffinity gets the SessionAffinity field from the declarative configuration.
-func (b *ServiceSpecBuilder) GetSessionAffinity() (value corev1.ServiceAffinity, ok bool) {
+func (b *ServiceSpecApplyConfiguration) GetSessionAffinity() (value corev1.ServiceAffinity, ok bool) {
 	if v := b.fields.SessionAffinity; v != nil {
 		return *v, true
 	}
@@ -203,19 +203,19 @@ func (b *ServiceSpecBuilder) GetSessionAffinity() (value corev1.ServiceAffinity,
 }
 
 // SetLoadBalancerIP sets the LoadBalancerIP field in the declarative configuration to the given value.
-func (b *ServiceSpecBuilder) SetLoadBalancerIP(value string) *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) SetLoadBalancerIP(value string) *ServiceSpecApplyConfiguration {
 	b.fields.LoadBalancerIP = &value
 	return b
 }
 
 // RemoveLoadBalancerIP removes the LoadBalancerIP field from the declarative configuration.
-func (b *ServiceSpecBuilder) RemoveLoadBalancerIP() *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) RemoveLoadBalancerIP() *ServiceSpecApplyConfiguration {
 	b.fields.LoadBalancerIP = nil
 	return b
 }
 
 // GetLoadBalancerIP gets the LoadBalancerIP field from the declarative configuration.
-func (b *ServiceSpecBuilder) GetLoadBalancerIP() (value string, ok bool) {
+func (b *ServiceSpecApplyConfiguration) GetLoadBalancerIP() (value string, ok bool) {
 	if v := b.fields.LoadBalancerIP; v != nil {
 		return *v, true
 	}
@@ -223,19 +223,19 @@ func (b *ServiceSpecBuilder) GetLoadBalancerIP() (value string, ok bool) {
 }
 
 // SetLoadBalancerSourceRanges sets the LoadBalancerSourceRanges field in the declarative configuration to the given value.
-func (b *ServiceSpecBuilder) SetLoadBalancerSourceRanges(value []string) *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) SetLoadBalancerSourceRanges(value []string) *ServiceSpecApplyConfiguration {
 	b.fields.LoadBalancerSourceRanges = &value
 	return b
 }
 
 // RemoveLoadBalancerSourceRanges removes the LoadBalancerSourceRanges field from the declarative configuration.
-func (b *ServiceSpecBuilder) RemoveLoadBalancerSourceRanges() *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) RemoveLoadBalancerSourceRanges() *ServiceSpecApplyConfiguration {
 	b.fields.LoadBalancerSourceRanges = nil
 	return b
 }
 
 // GetLoadBalancerSourceRanges gets the LoadBalancerSourceRanges field from the declarative configuration.
-func (b *ServiceSpecBuilder) GetLoadBalancerSourceRanges() (value []string, ok bool) {
+func (b *ServiceSpecApplyConfiguration) GetLoadBalancerSourceRanges() (value []string, ok bool) {
 	if v := b.fields.LoadBalancerSourceRanges; v != nil {
 		return *v, true
 	}
@@ -243,19 +243,19 @@ func (b *ServiceSpecBuilder) GetLoadBalancerSourceRanges() (value []string, ok b
 }
 
 // SetExternalName sets the ExternalName field in the declarative configuration to the given value.
-func (b *ServiceSpecBuilder) SetExternalName(value string) *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) SetExternalName(value string) *ServiceSpecApplyConfiguration {
 	b.fields.ExternalName = &value
 	return b
 }
 
 // RemoveExternalName removes the ExternalName field from the declarative configuration.
-func (b *ServiceSpecBuilder) RemoveExternalName() *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) RemoveExternalName() *ServiceSpecApplyConfiguration {
 	b.fields.ExternalName = nil
 	return b
 }
 
 // GetExternalName gets the ExternalName field from the declarative configuration.
-func (b *ServiceSpecBuilder) GetExternalName() (value string, ok bool) {
+func (b *ServiceSpecApplyConfiguration) GetExternalName() (value string, ok bool) {
 	if v := b.fields.ExternalName; v != nil {
 		return *v, true
 	}
@@ -263,19 +263,19 @@ func (b *ServiceSpecBuilder) GetExternalName() (value string, ok bool) {
 }
 
 // SetExternalTrafficPolicy sets the ExternalTrafficPolicy field in the declarative configuration to the given value.
-func (b *ServiceSpecBuilder) SetExternalTrafficPolicy(value corev1.ServiceExternalTrafficPolicyType) *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) SetExternalTrafficPolicy(value corev1.ServiceExternalTrafficPolicyType) *ServiceSpecApplyConfiguration {
 	b.fields.ExternalTrafficPolicy = &value
 	return b
 }
 
 // RemoveExternalTrafficPolicy removes the ExternalTrafficPolicy field from the declarative configuration.
-func (b *ServiceSpecBuilder) RemoveExternalTrafficPolicy() *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) RemoveExternalTrafficPolicy() *ServiceSpecApplyConfiguration {
 	b.fields.ExternalTrafficPolicy = nil
 	return b
 }
 
 // GetExternalTrafficPolicy gets the ExternalTrafficPolicy field from the declarative configuration.
-func (b *ServiceSpecBuilder) GetExternalTrafficPolicy() (value corev1.ServiceExternalTrafficPolicyType, ok bool) {
+func (b *ServiceSpecApplyConfiguration) GetExternalTrafficPolicy() (value corev1.ServiceExternalTrafficPolicyType, ok bool) {
 	if v := b.fields.ExternalTrafficPolicy; v != nil {
 		return *v, true
 	}
@@ -283,19 +283,19 @@ func (b *ServiceSpecBuilder) GetExternalTrafficPolicy() (value corev1.ServiceExt
 }
 
 // SetHealthCheckNodePort sets the HealthCheckNodePort field in the declarative configuration to the given value.
-func (b *ServiceSpecBuilder) SetHealthCheckNodePort(value int32) *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) SetHealthCheckNodePort(value int32) *ServiceSpecApplyConfiguration {
 	b.fields.HealthCheckNodePort = &value
 	return b
 }
 
 // RemoveHealthCheckNodePort removes the HealthCheckNodePort field from the declarative configuration.
-func (b *ServiceSpecBuilder) RemoveHealthCheckNodePort() *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) RemoveHealthCheckNodePort() *ServiceSpecApplyConfiguration {
 	b.fields.HealthCheckNodePort = nil
 	return b
 }
 
 // GetHealthCheckNodePort gets the HealthCheckNodePort field from the declarative configuration.
-func (b *ServiceSpecBuilder) GetHealthCheckNodePort() (value int32, ok bool) {
+func (b *ServiceSpecApplyConfiguration) GetHealthCheckNodePort() (value int32, ok bool) {
 	if v := b.fields.HealthCheckNodePort; v != nil {
 		return *v, true
 	}
@@ -303,19 +303,19 @@ func (b *ServiceSpecBuilder) GetHealthCheckNodePort() (value int32, ok bool) {
 }
 
 // SetPublishNotReadyAddresses sets the PublishNotReadyAddresses field in the declarative configuration to the given value.
-func (b *ServiceSpecBuilder) SetPublishNotReadyAddresses(value bool) *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) SetPublishNotReadyAddresses(value bool) *ServiceSpecApplyConfiguration {
 	b.fields.PublishNotReadyAddresses = &value
 	return b
 }
 
 // RemovePublishNotReadyAddresses removes the PublishNotReadyAddresses field from the declarative configuration.
-func (b *ServiceSpecBuilder) RemovePublishNotReadyAddresses() *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) RemovePublishNotReadyAddresses() *ServiceSpecApplyConfiguration {
 	b.fields.PublishNotReadyAddresses = nil
 	return b
 }
 
 // GetPublishNotReadyAddresses gets the PublishNotReadyAddresses field from the declarative configuration.
-func (b *ServiceSpecBuilder) GetPublishNotReadyAddresses() (value bool, ok bool) {
+func (b *ServiceSpecApplyConfiguration) GetPublishNotReadyAddresses() (value bool, ok bool) {
 	if v := b.fields.PublishNotReadyAddresses; v != nil {
 		return *v, true
 	}
@@ -323,36 +323,36 @@ func (b *ServiceSpecBuilder) GetPublishNotReadyAddresses() (value bool, ok bool)
 }
 
 // SetSessionAffinityConfig sets the SessionAffinityConfig field in the declarative configuration to the given value.
-func (b *ServiceSpecBuilder) SetSessionAffinityConfig(value *SessionAffinityConfigBuilder) *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) SetSessionAffinityConfig(value *SessionAffinityConfigApplyConfiguration) *ServiceSpecApplyConfiguration {
 	b.fields.SessionAffinityConfig = value
 	return b
 }
 
 // RemoveSessionAffinityConfig removes the SessionAffinityConfig field from the declarative configuration.
-func (b *ServiceSpecBuilder) RemoveSessionAffinityConfig() *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) RemoveSessionAffinityConfig() *ServiceSpecApplyConfiguration {
 	b.fields.SessionAffinityConfig = nil
 	return b
 }
 
 // GetSessionAffinityConfig gets the SessionAffinityConfig field from the declarative configuration.
-func (b *ServiceSpecBuilder) GetSessionAffinityConfig() (value *SessionAffinityConfigBuilder, ok bool) {
+func (b *ServiceSpecApplyConfiguration) GetSessionAffinityConfig() (value *SessionAffinityConfigApplyConfiguration, ok bool) {
 	return b.fields.SessionAffinityConfig, b.fields.SessionAffinityConfig != nil
 }
 
 // SetIPFamilies sets the IPFamilies field in the declarative configuration to the given value.
-func (b *ServiceSpecBuilder) SetIPFamilies(value []corev1.IPFamily) *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) SetIPFamilies(value []corev1.IPFamily) *ServiceSpecApplyConfiguration {
 	b.fields.IPFamilies = &value
 	return b
 }
 
 // RemoveIPFamilies removes the IPFamilies field from the declarative configuration.
-func (b *ServiceSpecBuilder) RemoveIPFamilies() *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) RemoveIPFamilies() *ServiceSpecApplyConfiguration {
 	b.fields.IPFamilies = nil
 	return b
 }
 
 // GetIPFamilies gets the IPFamilies field from the declarative configuration.
-func (b *ServiceSpecBuilder) GetIPFamilies() (value []corev1.IPFamily, ok bool) {
+func (b *ServiceSpecApplyConfiguration) GetIPFamilies() (value []corev1.IPFamily, ok bool) {
 	if v := b.fields.IPFamilies; v != nil {
 		return *v, true
 	}
@@ -360,19 +360,19 @@ func (b *ServiceSpecBuilder) GetIPFamilies() (value []corev1.IPFamily, ok bool) 
 }
 
 // SetTopologyKeys sets the TopologyKeys field in the declarative configuration to the given value.
-func (b *ServiceSpecBuilder) SetTopologyKeys(value []string) *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) SetTopologyKeys(value []string) *ServiceSpecApplyConfiguration {
 	b.fields.TopologyKeys = &value
 	return b
 }
 
 // RemoveTopologyKeys removes the TopologyKeys field from the declarative configuration.
-func (b *ServiceSpecBuilder) RemoveTopologyKeys() *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) RemoveTopologyKeys() *ServiceSpecApplyConfiguration {
 	b.fields.TopologyKeys = nil
 	return b
 }
 
 // GetTopologyKeys gets the TopologyKeys field from the declarative configuration.
-func (b *ServiceSpecBuilder) GetTopologyKeys() (value []string, ok bool) {
+func (b *ServiceSpecApplyConfiguration) GetTopologyKeys() (value []string, ok bool) {
 	if v := b.fields.TopologyKeys; v != nil {
 		return *v, true
 	}
@@ -380,27 +380,27 @@ func (b *ServiceSpecBuilder) GetTopologyKeys() (value []string, ok bool) {
 }
 
 // SetIPFamilyPolicy sets the IPFamilyPolicy field in the declarative configuration to the given value.
-func (b *ServiceSpecBuilder) SetIPFamilyPolicy(value corev1.IPFamilyPolicyType) *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) SetIPFamilyPolicy(value corev1.IPFamilyPolicyType) *ServiceSpecApplyConfiguration {
 	b.fields.IPFamilyPolicy = &value
 	return b
 }
 
 // RemoveIPFamilyPolicy removes the IPFamilyPolicy field from the declarative configuration.
-func (b *ServiceSpecBuilder) RemoveIPFamilyPolicy() *ServiceSpecBuilder {
+func (b *ServiceSpecApplyConfiguration) RemoveIPFamilyPolicy() *ServiceSpecApplyConfiguration {
 	b.fields.IPFamilyPolicy = nil
 	return b
 }
 
 // GetIPFamilyPolicy gets the IPFamilyPolicy field from the declarative configuration.
-func (b *ServiceSpecBuilder) GetIPFamilyPolicy() (value corev1.IPFamilyPolicyType, ok bool) {
+func (b *ServiceSpecApplyConfiguration) GetIPFamilyPolicy() (value corev1.IPFamilyPolicyType, ok bool) {
 	if v := b.fields.IPFamilyPolicy; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ServiceSpecBuilder to unstructured.
-func (b *ServiceSpecBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ServiceSpecApplyConfiguration to unstructured.
+func (b *ServiceSpecApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -412,9 +412,9 @@ func (b *ServiceSpecBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ServiceSpecBuilder, replacing the contents
-// of ServiceSpecBuilder.
-func (b *ServiceSpecBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ServiceSpecApplyConfiguration, replacing the contents
+// of ServiceSpecApplyConfiguration.
+func (b *ServiceSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &serviceSpecFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -425,15 +425,15 @@ func (b *ServiceSpecBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals ServiceSpecBuilder to JSON.
-func (b *ServiceSpecBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ServiceSpecApplyConfiguration to JSON.
+func (b *ServiceSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ServiceSpecBuilder, replacing the contents of
-// ServiceSpecBuilder.
-func (b *ServiceSpecBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ServiceSpecApplyConfiguration, replacing the contents of
+// ServiceSpecApplyConfiguration.
+func (b *ServiceSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -441,13 +441,13 @@ func (b *ServiceSpecBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ServiceSpecList represents a list of ServiceSpecBuilder.
-type ServiceSpecList []*ServiceSpecBuilder
+// ServiceSpecList represents a listAlias of ServiceSpecApplyConfiguration.
+type ServiceSpecList []*ServiceSpecApplyConfiguration
 
-// ServiceSpecList represents a map of ServiceSpecBuilder.
-type ServiceSpecMap map[string]ServiceSpecBuilder
+// ServiceSpecList represents a map of ServiceSpecApplyConfiguration.
+type ServiceSpecMap map[string]ServiceSpecApplyConfiguration
 
-func (b *ServiceSpecBuilder) preMarshal() {
+func (b *ServiceSpecApplyConfiguration) preMarshal() {
 }
-func (b *ServiceSpecBuilder) postUnmarshal() {
+func (b *ServiceSpecApplyConfiguration) postUnmarshal() {
 }

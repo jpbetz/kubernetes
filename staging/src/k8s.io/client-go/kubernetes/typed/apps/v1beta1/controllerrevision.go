@@ -48,7 +48,7 @@ type ControllerRevisionInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1beta1.ControllerRevisionList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.ControllerRevision, err error)
-	Apply(ctx context.Context, controllerRevision appsv1beta1.ControllerRevisionBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ControllerRevision, err error)
+	Apply(ctx context.Context, controllerRevision *appsv1beta1.ControllerRevisionApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ControllerRevision, err error)
 	ControllerRevisionExpansion
 }
 
@@ -181,7 +181,7 @@ func (c *controllerRevisions) Patch(ctx context.Context, name string, pt types.P
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied controllerRevision.
-func (c *controllerRevisions) Apply(ctx context.Context, controllerRevision appsv1beta1.ControllerRevisionBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ControllerRevision, err error) {
+func (c *controllerRevisions) Apply(ctx context.Context, controllerRevision *appsv1beta1.ControllerRevisionApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ControllerRevision, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := controllerRevision.MarshalJSON()
 	if err != nil {

@@ -25,47 +25,47 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// CronJobSpecBuilder represents an declarative configuration of the CronJobSpec type for use
+// CronJobSpecApplyConfiguration represents an declarative configuration of the CronJobSpec type for use
 // with apply.
-type CronJobSpecBuilder struct {
+type CronJobSpecApplyConfiguration struct {
 	fields cronJobSpecFields
 }
 
+// CronJobSpecApplyConfiguration constructs an declarative configuration of the CronJobSpec type for use with
+// apply.
+func CronJobSpec() *CronJobSpecApplyConfiguration {
+	return &CronJobSpecApplyConfiguration{}
+}
+
 // cronJobSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in CronJobSpecBuilder.
+// Inline fields are owned by their respective inline type in CronJobSpecApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type cronJobSpecFields struct {
-	Schedule                   *string                    `json:"schedule,omitempty"`
-	StartingDeadlineSeconds    *int64                     `json:"startingDeadlineSeconds,omitempty"`
-	ConcurrencyPolicy          *v1beta1.ConcurrencyPolicy `json:"concurrencyPolicy,omitempty"`
-	Suspend                    *bool                      `json:"suspend,omitempty"`
-	JobTemplate                *JobTemplateSpecBuilder    `json:"jobTemplate,omitempty"`
-	SuccessfulJobsHistoryLimit *int32                     `json:"successfulJobsHistoryLimit,omitempty"`
-	FailedJobsHistoryLimit     *int32                     `json:"failedJobsHistoryLimit,omitempty"`
-}
-
-// CronJobSpec constructs an declarative configuration of the CronJobSpec type for use with
-// apply.
-func CronJobSpec() *CronJobSpecBuilder {
-	return &CronJobSpecBuilder{}
+	Schedule                   *string                            `json:"schedule,omitempty"`
+	StartingDeadlineSeconds    *int64                             `json:"startingDeadlineSeconds,omitempty"`
+	ConcurrencyPolicy          *v1beta1.ConcurrencyPolicy         `json:"concurrencyPolicy,omitempty"`
+	Suspend                    *bool                              `json:"suspend,omitempty"`
+	JobTemplate                *JobTemplateSpecApplyConfiguration `json:"jobTemplate,omitempty"`
+	SuccessfulJobsHistoryLimit *int32                             `json:"successfulJobsHistoryLimit,omitempty"`
+	FailedJobsHistoryLimit     *int32                             `json:"failedJobsHistoryLimit,omitempty"`
 }
 
 // SetSchedule sets the Schedule field in the declarative configuration to the given value.
-func (b *CronJobSpecBuilder) SetSchedule(value string) *CronJobSpecBuilder {
+func (b *CronJobSpecApplyConfiguration) SetSchedule(value string) *CronJobSpecApplyConfiguration {
 	b.fields.Schedule = &value
 	return b
 }
 
 // RemoveSchedule removes the Schedule field from the declarative configuration.
-func (b *CronJobSpecBuilder) RemoveSchedule() *CronJobSpecBuilder {
+func (b *CronJobSpecApplyConfiguration) RemoveSchedule() *CronJobSpecApplyConfiguration {
 	b.fields.Schedule = nil
 	return b
 }
 
 // GetSchedule gets the Schedule field from the declarative configuration.
-func (b *CronJobSpecBuilder) GetSchedule() (value string, ok bool) {
+func (b *CronJobSpecApplyConfiguration) GetSchedule() (value string, ok bool) {
 	if v := b.fields.Schedule; v != nil {
 		return *v, true
 	}
@@ -73,19 +73,19 @@ func (b *CronJobSpecBuilder) GetSchedule() (value string, ok bool) {
 }
 
 // SetStartingDeadlineSeconds sets the StartingDeadlineSeconds field in the declarative configuration to the given value.
-func (b *CronJobSpecBuilder) SetStartingDeadlineSeconds(value int64) *CronJobSpecBuilder {
+func (b *CronJobSpecApplyConfiguration) SetStartingDeadlineSeconds(value int64) *CronJobSpecApplyConfiguration {
 	b.fields.StartingDeadlineSeconds = &value
 	return b
 }
 
 // RemoveStartingDeadlineSeconds removes the StartingDeadlineSeconds field from the declarative configuration.
-func (b *CronJobSpecBuilder) RemoveStartingDeadlineSeconds() *CronJobSpecBuilder {
+func (b *CronJobSpecApplyConfiguration) RemoveStartingDeadlineSeconds() *CronJobSpecApplyConfiguration {
 	b.fields.StartingDeadlineSeconds = nil
 	return b
 }
 
 // GetStartingDeadlineSeconds gets the StartingDeadlineSeconds field from the declarative configuration.
-func (b *CronJobSpecBuilder) GetStartingDeadlineSeconds() (value int64, ok bool) {
+func (b *CronJobSpecApplyConfiguration) GetStartingDeadlineSeconds() (value int64, ok bool) {
 	if v := b.fields.StartingDeadlineSeconds; v != nil {
 		return *v, true
 	}
@@ -93,19 +93,19 @@ func (b *CronJobSpecBuilder) GetStartingDeadlineSeconds() (value int64, ok bool)
 }
 
 // SetConcurrencyPolicy sets the ConcurrencyPolicy field in the declarative configuration to the given value.
-func (b *CronJobSpecBuilder) SetConcurrencyPolicy(value v1beta1.ConcurrencyPolicy) *CronJobSpecBuilder {
+func (b *CronJobSpecApplyConfiguration) SetConcurrencyPolicy(value v1beta1.ConcurrencyPolicy) *CronJobSpecApplyConfiguration {
 	b.fields.ConcurrencyPolicy = &value
 	return b
 }
 
 // RemoveConcurrencyPolicy removes the ConcurrencyPolicy field from the declarative configuration.
-func (b *CronJobSpecBuilder) RemoveConcurrencyPolicy() *CronJobSpecBuilder {
+func (b *CronJobSpecApplyConfiguration) RemoveConcurrencyPolicy() *CronJobSpecApplyConfiguration {
 	b.fields.ConcurrencyPolicy = nil
 	return b
 }
 
 // GetConcurrencyPolicy gets the ConcurrencyPolicy field from the declarative configuration.
-func (b *CronJobSpecBuilder) GetConcurrencyPolicy() (value v1beta1.ConcurrencyPolicy, ok bool) {
+func (b *CronJobSpecApplyConfiguration) GetConcurrencyPolicy() (value v1beta1.ConcurrencyPolicy, ok bool) {
 	if v := b.fields.ConcurrencyPolicy; v != nil {
 		return *v, true
 	}
@@ -113,19 +113,19 @@ func (b *CronJobSpecBuilder) GetConcurrencyPolicy() (value v1beta1.ConcurrencyPo
 }
 
 // SetSuspend sets the Suspend field in the declarative configuration to the given value.
-func (b *CronJobSpecBuilder) SetSuspend(value bool) *CronJobSpecBuilder {
+func (b *CronJobSpecApplyConfiguration) SetSuspend(value bool) *CronJobSpecApplyConfiguration {
 	b.fields.Suspend = &value
 	return b
 }
 
 // RemoveSuspend removes the Suspend field from the declarative configuration.
-func (b *CronJobSpecBuilder) RemoveSuspend() *CronJobSpecBuilder {
+func (b *CronJobSpecApplyConfiguration) RemoveSuspend() *CronJobSpecApplyConfiguration {
 	b.fields.Suspend = nil
 	return b
 }
 
 // GetSuspend gets the Suspend field from the declarative configuration.
-func (b *CronJobSpecBuilder) GetSuspend() (value bool, ok bool) {
+func (b *CronJobSpecApplyConfiguration) GetSuspend() (value bool, ok bool) {
 	if v := b.fields.Suspend; v != nil {
 		return *v, true
 	}
@@ -133,36 +133,36 @@ func (b *CronJobSpecBuilder) GetSuspend() (value bool, ok bool) {
 }
 
 // SetJobTemplate sets the JobTemplate field in the declarative configuration to the given value.
-func (b *CronJobSpecBuilder) SetJobTemplate(value *JobTemplateSpecBuilder) *CronJobSpecBuilder {
+func (b *CronJobSpecApplyConfiguration) SetJobTemplate(value *JobTemplateSpecApplyConfiguration) *CronJobSpecApplyConfiguration {
 	b.fields.JobTemplate = value
 	return b
 }
 
 // RemoveJobTemplate removes the JobTemplate field from the declarative configuration.
-func (b *CronJobSpecBuilder) RemoveJobTemplate() *CronJobSpecBuilder {
+func (b *CronJobSpecApplyConfiguration) RemoveJobTemplate() *CronJobSpecApplyConfiguration {
 	b.fields.JobTemplate = nil
 	return b
 }
 
 // GetJobTemplate gets the JobTemplate field from the declarative configuration.
-func (b *CronJobSpecBuilder) GetJobTemplate() (value *JobTemplateSpecBuilder, ok bool) {
+func (b *CronJobSpecApplyConfiguration) GetJobTemplate() (value *JobTemplateSpecApplyConfiguration, ok bool) {
 	return b.fields.JobTemplate, b.fields.JobTemplate != nil
 }
 
 // SetSuccessfulJobsHistoryLimit sets the SuccessfulJobsHistoryLimit field in the declarative configuration to the given value.
-func (b *CronJobSpecBuilder) SetSuccessfulJobsHistoryLimit(value int32) *CronJobSpecBuilder {
+func (b *CronJobSpecApplyConfiguration) SetSuccessfulJobsHistoryLimit(value int32) *CronJobSpecApplyConfiguration {
 	b.fields.SuccessfulJobsHistoryLimit = &value
 	return b
 }
 
 // RemoveSuccessfulJobsHistoryLimit removes the SuccessfulJobsHistoryLimit field from the declarative configuration.
-func (b *CronJobSpecBuilder) RemoveSuccessfulJobsHistoryLimit() *CronJobSpecBuilder {
+func (b *CronJobSpecApplyConfiguration) RemoveSuccessfulJobsHistoryLimit() *CronJobSpecApplyConfiguration {
 	b.fields.SuccessfulJobsHistoryLimit = nil
 	return b
 }
 
 // GetSuccessfulJobsHistoryLimit gets the SuccessfulJobsHistoryLimit field from the declarative configuration.
-func (b *CronJobSpecBuilder) GetSuccessfulJobsHistoryLimit() (value int32, ok bool) {
+func (b *CronJobSpecApplyConfiguration) GetSuccessfulJobsHistoryLimit() (value int32, ok bool) {
 	if v := b.fields.SuccessfulJobsHistoryLimit; v != nil {
 		return *v, true
 	}
@@ -170,27 +170,27 @@ func (b *CronJobSpecBuilder) GetSuccessfulJobsHistoryLimit() (value int32, ok bo
 }
 
 // SetFailedJobsHistoryLimit sets the FailedJobsHistoryLimit field in the declarative configuration to the given value.
-func (b *CronJobSpecBuilder) SetFailedJobsHistoryLimit(value int32) *CronJobSpecBuilder {
+func (b *CronJobSpecApplyConfiguration) SetFailedJobsHistoryLimit(value int32) *CronJobSpecApplyConfiguration {
 	b.fields.FailedJobsHistoryLimit = &value
 	return b
 }
 
 // RemoveFailedJobsHistoryLimit removes the FailedJobsHistoryLimit field from the declarative configuration.
-func (b *CronJobSpecBuilder) RemoveFailedJobsHistoryLimit() *CronJobSpecBuilder {
+func (b *CronJobSpecApplyConfiguration) RemoveFailedJobsHistoryLimit() *CronJobSpecApplyConfiguration {
 	b.fields.FailedJobsHistoryLimit = nil
 	return b
 }
 
 // GetFailedJobsHistoryLimit gets the FailedJobsHistoryLimit field from the declarative configuration.
-func (b *CronJobSpecBuilder) GetFailedJobsHistoryLimit() (value int32, ok bool) {
+func (b *CronJobSpecApplyConfiguration) GetFailedJobsHistoryLimit() (value int32, ok bool) {
 	if v := b.fields.FailedJobsHistoryLimit; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts CronJobSpecBuilder to unstructured.
-func (b *CronJobSpecBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts CronJobSpecApplyConfiguration to unstructured.
+func (b *CronJobSpecApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -202,9 +202,9 @@ func (b *CronJobSpecBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to CronJobSpecBuilder, replacing the contents
-// of CronJobSpecBuilder.
-func (b *CronJobSpecBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to CronJobSpecApplyConfiguration, replacing the contents
+// of CronJobSpecApplyConfiguration.
+func (b *CronJobSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &cronJobSpecFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -215,15 +215,15 @@ func (b *CronJobSpecBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals CronJobSpecBuilder to JSON.
-func (b *CronJobSpecBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals CronJobSpecApplyConfiguration to JSON.
+func (b *CronJobSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into CronJobSpecBuilder, replacing the contents of
-// CronJobSpecBuilder.
-func (b *CronJobSpecBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into CronJobSpecApplyConfiguration, replacing the contents of
+// CronJobSpecApplyConfiguration.
+func (b *CronJobSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -231,13 +231,13 @@ func (b *CronJobSpecBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// CronJobSpecList represents a list of CronJobSpecBuilder.
-type CronJobSpecList []*CronJobSpecBuilder
+// CronJobSpecList represents a listAlias of CronJobSpecApplyConfiguration.
+type CronJobSpecList []*CronJobSpecApplyConfiguration
 
-// CronJobSpecList represents a map of CronJobSpecBuilder.
-type CronJobSpecMap map[string]CronJobSpecBuilder
+// CronJobSpecList represents a map of CronJobSpecApplyConfiguration.
+type CronJobSpecMap map[string]CronJobSpecApplyConfiguration
 
-func (b *CronJobSpecBuilder) preMarshal() {
+func (b *CronJobSpecApplyConfiguration) preMarshal() {
 }
-func (b *CronJobSpecBuilder) postUnmarshal() {
+func (b *CronJobSpecApplyConfiguration) postUnmarshal() {
 }

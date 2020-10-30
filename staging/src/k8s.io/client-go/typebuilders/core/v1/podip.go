@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// PodIPBuilder represents an declarative configuration of the PodIP type for use
+// PodIPApplyConfiguration represents an declarative configuration of the PodIP type for use
 // with apply.
-type PodIPBuilder struct {
+type PodIPApplyConfiguration struct {
 	fields podIPFields
 }
 
+// PodIPApplyConfiguration constructs an declarative configuration of the PodIP type for use with
+// apply.
+func PodIP() *PodIPApplyConfiguration {
+	return &PodIPApplyConfiguration{}
+}
+
 // podIPFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodIPBuilder.
+// Inline fields are owned by their respective inline type in PodIPApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type podIPFields struct {
 	IP *string `json:"ip,omitempty"`
 }
 
-// PodIP constructs an declarative configuration of the PodIP type for use with
-// apply.
-func PodIP() *PodIPBuilder {
-	return &PodIPBuilder{}
-}
-
 // SetIP sets the IP field in the declarative configuration to the given value.
-func (b *PodIPBuilder) SetIP(value string) *PodIPBuilder {
+func (b *PodIPApplyConfiguration) SetIP(value string) *PodIPApplyConfiguration {
 	b.fields.IP = &value
 	return b
 }
 
 // RemoveIP removes the IP field from the declarative configuration.
-func (b *PodIPBuilder) RemoveIP() *PodIPBuilder {
+func (b *PodIPApplyConfiguration) RemoveIP() *PodIPApplyConfiguration {
 	b.fields.IP = nil
 	return b
 }
 
 // GetIP gets the IP field from the declarative configuration.
-func (b *PodIPBuilder) GetIP() (value string, ok bool) {
+func (b *PodIPApplyConfiguration) GetIP() (value string, ok bool) {
 	if v := b.fields.IP; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts PodIPBuilder to unstructured.
-func (b *PodIPBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PodIPApplyConfiguration to unstructured.
+func (b *PodIPApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *PodIPBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to PodIPBuilder, replacing the contents
-// of PodIPBuilder.
-func (b *PodIPBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PodIPApplyConfiguration, replacing the contents
+// of PodIPApplyConfiguration.
+func (b *PodIPApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &podIPFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *PodIPBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals PodIPBuilder to JSON.
-func (b *PodIPBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PodIPApplyConfiguration to JSON.
+func (b *PodIPApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PodIPBuilder, replacing the contents of
-// PodIPBuilder.
-func (b *PodIPBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PodIPApplyConfiguration, replacing the contents of
+// PodIPApplyConfiguration.
+func (b *PodIPApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *PodIPBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// PodIPList represents a list of PodIPBuilder.
-type PodIPList []*PodIPBuilder
+// PodIPList represents a listAlias of PodIPApplyConfiguration.
+type PodIPList []*PodIPApplyConfiguration
 
-// PodIPList represents a map of PodIPBuilder.
-type PodIPMap map[string]PodIPBuilder
+// PodIPList represents a map of PodIPApplyConfiguration.
+type PodIPMap map[string]PodIPApplyConfiguration
 
-func (b *PodIPBuilder) preMarshal() {
+func (b *PodIPApplyConfiguration) preMarshal() {
 }
-func (b *PodIPBuilder) postUnmarshal() {
+func (b *PodIPApplyConfiguration) postUnmarshal() {
 }

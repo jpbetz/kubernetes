@@ -48,7 +48,7 @@ type PodTemplateInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.PodTemplateList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.PodTemplate, err error)
-	Apply(ctx context.Context, podTemplate corev1.PodTemplateBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.PodTemplate, err error)
+	Apply(ctx context.Context, podTemplate *corev1.PodTemplateApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.PodTemplate, err error)
 	PodTemplateExpansion
 }
 
@@ -181,7 +181,7 @@ func (c *podTemplates) Patch(ctx context.Context, name string, pt types.PatchTyp
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied podTemplate.
-func (c *podTemplates) Apply(ctx context.Context, podTemplate corev1.PodTemplateBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.PodTemplate, err error) {
+func (c *podTemplates) Apply(ctx context.Context, podTemplate *corev1.PodTemplateApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.PodTemplate, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := podTemplate.MarshalJSON()
 	if err != nil {

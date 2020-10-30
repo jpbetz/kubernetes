@@ -132,7 +132,7 @@ func (c *FakeRoles) Patch(ctx context.Context, name string, pt types.PatchType, 
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied role.
-func (c *FakeRoles) Apply(ctx context.Context, role typebuildersrbacv1.RoleBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *rbacv1.Role, err error) {
+func (c *FakeRoles) Apply(ctx context.Context, role *typebuildersrbacv1.RoleApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *rbacv1.Role, err error) {
 	data, err := role.MarshalJSON()
 	if err != nil {
 		return nil, err

@@ -25,102 +25,102 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// PodBuilder represents an declarative configuration of the Pod type for use
+// PodApplyConfiguration represents an declarative configuration of the Pod type for use
 // with apply.
-type PodBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type PodApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   podFields
 }
 
+// PodApplyConfiguration constructs an declarative configuration of the Pod type for use with
+// apply.
+func Pod() *PodApplyConfiguration {
+	return &PodApplyConfiguration{}
+}
+
 // podFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodBuilder.
+// Inline fields are owned by their respective inline type in PodApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type podFields struct {
-	Kind       *string               `json:"kind,omitempty"`       // inlined PodBuilder.typeMeta.Kind field
-	APIVersion *string               `json:"apiVersion,omitempty"` // inlined PodBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder `json:"metadata,omitempty"`
-	Spec       *PodSpecBuilder       `json:"spec,omitempty"`
-	Status     *PodStatusBuilder     `json:"status,omitempty"`
-}
-
-// Pod constructs an declarative configuration of the Pod type for use with
-// apply.
-func Pod() *PodBuilder {
-	return &PodBuilder{}
+	Kind       *string                          `json:"kind,omitempty"`       // inlined PodApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                          `json:"apiVersion,omitempty"` // inlined PodApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Spec       *PodSpecApplyConfiguration       `json:"spec,omitempty"`
+	Status     *PodStatusApplyConfiguration     `json:"status,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *PodBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *PodBuilder {
+func (b *PodApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *PodApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *PodBuilder) RemoveTypeMeta() *PodBuilder {
+func (b *PodApplyConfiguration) RemoveTypeMeta() *PodApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *PodBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *PodApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *PodBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *PodBuilder {
+func (b *PodApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *PodApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *PodBuilder) RemoveObjectMeta() *PodBuilder {
+func (b *PodApplyConfiguration) RemoveObjectMeta() *PodApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *PodBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *PodApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *PodBuilder) SetSpec(value *PodSpecBuilder) *PodBuilder {
+func (b *PodApplyConfiguration) SetSpec(value *PodSpecApplyConfiguration) *PodApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *PodBuilder) RemoveSpec() *PodBuilder {
+func (b *PodApplyConfiguration) RemoveSpec() *PodApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *PodBuilder) GetSpec() (value *PodSpecBuilder, ok bool) {
+func (b *PodApplyConfiguration) GetSpec() (value *PodSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *PodBuilder) SetStatus(value *PodStatusBuilder) *PodBuilder {
+func (b *PodApplyConfiguration) SetStatus(value *PodStatusApplyConfiguration) *PodApplyConfiguration {
 	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *PodBuilder) RemoveStatus() *PodBuilder {
+func (b *PodApplyConfiguration) RemoveStatus() *PodApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *PodBuilder) GetStatus() (value *PodStatusBuilder, ok bool) {
+func (b *PodApplyConfiguration) GetStatus() (value *PodStatusApplyConfiguration, ok bool) {
 	return b.fields.Status, b.fields.Status != nil
 }
 
-// ToUnstructured converts PodBuilder to unstructured.
-func (b *PodBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PodApplyConfiguration to unstructured.
+func (b *PodApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -132,9 +132,9 @@ func (b *PodBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to PodBuilder, replacing the contents
-// of PodBuilder.
-func (b *PodBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PodApplyConfiguration, replacing the contents
+// of PodApplyConfiguration.
+func (b *PodApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &podFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -145,15 +145,15 @@ func (b *PodBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals PodBuilder to JSON.
-func (b *PodBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PodApplyConfiguration to JSON.
+func (b *PodApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PodBuilder, replacing the contents of
-// PodBuilder.
-func (b *PodBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PodApplyConfiguration, replacing the contents of
+// PodApplyConfiguration.
+func (b *PodApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -161,13 +161,13 @@ func (b *PodBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// PodList represents a list of PodBuilder.
-type PodList []*PodBuilder
+// PodList represents a listAlias of PodApplyConfiguration.
+type PodList []*PodApplyConfiguration
 
-// PodList represents a map of PodBuilder.
-type PodMap map[string]PodBuilder
+// PodList represents a map of PodApplyConfiguration.
+type PodMap map[string]PodApplyConfiguration
 
-func (b *PodBuilder) preMarshal() {
+func (b *PodApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -177,9 +177,9 @@ func (b *PodBuilder) preMarshal() {
 		}
 	}
 }
-func (b *PodBuilder) postUnmarshal() {
+func (b *PodApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

@@ -132,7 +132,7 @@ func (c *FakeEndpointSlices) Patch(ctx context.Context, name string, pt types.Pa
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied endpointSlice.
-func (c *FakeEndpointSlices) Apply(ctx context.Context, endpointSlice discoveryv1alpha1.EndpointSliceBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.EndpointSlice, err error) {
+func (c *FakeEndpointSlices) Apply(ctx context.Context, endpointSlice *discoveryv1alpha1.EndpointSliceApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.EndpointSlice, err error) {
 	data, err := endpointSlice.MarshalJSON()
 	if err != nil {
 		return nil, err

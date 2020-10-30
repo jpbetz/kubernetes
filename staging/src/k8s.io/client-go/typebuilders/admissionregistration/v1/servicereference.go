@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ServiceReferenceBuilder represents an declarative configuration of the ServiceReference type for use
+// ServiceReferenceApplyConfiguration represents an declarative configuration of the ServiceReference type for use
 // with apply.
-type ServiceReferenceBuilder struct {
+type ServiceReferenceApplyConfiguration struct {
 	fields serviceReferenceFields
 }
 
+// ServiceReferenceApplyConfiguration constructs an declarative configuration of the ServiceReference type for use with
+// apply.
+func ServiceReference() *ServiceReferenceApplyConfiguration {
+	return &ServiceReferenceApplyConfiguration{}
+}
+
 // serviceReferenceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ServiceReferenceBuilder.
+// Inline fields are owned by their respective inline type in ServiceReferenceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -42,26 +48,20 @@ type serviceReferenceFields struct {
 	Port      *int32  `json:"port,omitempty"`
 }
 
-// ServiceReference constructs an declarative configuration of the ServiceReference type for use with
-// apply.
-func ServiceReference() *ServiceReferenceBuilder {
-	return &ServiceReferenceBuilder{}
-}
-
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
-func (b *ServiceReferenceBuilder) SetNamespace(value string) *ServiceReferenceBuilder {
+func (b *ServiceReferenceApplyConfiguration) SetNamespace(value string) *ServiceReferenceApplyConfiguration {
 	b.fields.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
-func (b *ServiceReferenceBuilder) RemoveNamespace() *ServiceReferenceBuilder {
+func (b *ServiceReferenceApplyConfiguration) RemoveNamespace() *ServiceReferenceApplyConfiguration {
 	b.fields.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
-func (b *ServiceReferenceBuilder) GetNamespace() (value string, ok bool) {
+func (b *ServiceReferenceApplyConfiguration) GetNamespace() (value string, ok bool) {
 	if v := b.fields.Namespace; v != nil {
 		return *v, true
 	}
@@ -69,19 +69,19 @@ func (b *ServiceReferenceBuilder) GetNamespace() (value string, ok bool) {
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *ServiceReferenceBuilder) SetName(value string) *ServiceReferenceBuilder {
+func (b *ServiceReferenceApplyConfiguration) SetName(value string) *ServiceReferenceApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *ServiceReferenceBuilder) RemoveName() *ServiceReferenceBuilder {
+func (b *ServiceReferenceApplyConfiguration) RemoveName() *ServiceReferenceApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *ServiceReferenceBuilder) GetName() (value string, ok bool) {
+func (b *ServiceReferenceApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -89,19 +89,19 @@ func (b *ServiceReferenceBuilder) GetName() (value string, ok bool) {
 }
 
 // SetPath sets the Path field in the declarative configuration to the given value.
-func (b *ServiceReferenceBuilder) SetPath(value string) *ServiceReferenceBuilder {
+func (b *ServiceReferenceApplyConfiguration) SetPath(value string) *ServiceReferenceApplyConfiguration {
 	b.fields.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
-func (b *ServiceReferenceBuilder) RemovePath() *ServiceReferenceBuilder {
+func (b *ServiceReferenceApplyConfiguration) RemovePath() *ServiceReferenceApplyConfiguration {
 	b.fields.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
-func (b *ServiceReferenceBuilder) GetPath() (value string, ok bool) {
+func (b *ServiceReferenceApplyConfiguration) GetPath() (value string, ok bool) {
 	if v := b.fields.Path; v != nil {
 		return *v, true
 	}
@@ -109,27 +109,27 @@ func (b *ServiceReferenceBuilder) GetPath() (value string, ok bool) {
 }
 
 // SetPort sets the Port field in the declarative configuration to the given value.
-func (b *ServiceReferenceBuilder) SetPort(value int32) *ServiceReferenceBuilder {
+func (b *ServiceReferenceApplyConfiguration) SetPort(value int32) *ServiceReferenceApplyConfiguration {
 	b.fields.Port = &value
 	return b
 }
 
 // RemovePort removes the Port field from the declarative configuration.
-func (b *ServiceReferenceBuilder) RemovePort() *ServiceReferenceBuilder {
+func (b *ServiceReferenceApplyConfiguration) RemovePort() *ServiceReferenceApplyConfiguration {
 	b.fields.Port = nil
 	return b
 }
 
 // GetPort gets the Port field from the declarative configuration.
-func (b *ServiceReferenceBuilder) GetPort() (value int32, ok bool) {
+func (b *ServiceReferenceApplyConfiguration) GetPort() (value int32, ok bool) {
 	if v := b.fields.Port; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ServiceReferenceBuilder to unstructured.
-func (b *ServiceReferenceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ServiceReferenceApplyConfiguration to unstructured.
+func (b *ServiceReferenceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -141,9 +141,9 @@ func (b *ServiceReferenceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ServiceReferenceBuilder, replacing the contents
-// of ServiceReferenceBuilder.
-func (b *ServiceReferenceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ServiceReferenceApplyConfiguration, replacing the contents
+// of ServiceReferenceApplyConfiguration.
+func (b *ServiceReferenceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &serviceReferenceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -154,15 +154,15 @@ func (b *ServiceReferenceBuilder) FromUnstructured(u map[string]interface{}) err
 	return nil
 }
 
-// MarshalJSON marshals ServiceReferenceBuilder to JSON.
-func (b *ServiceReferenceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ServiceReferenceApplyConfiguration to JSON.
+func (b *ServiceReferenceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ServiceReferenceBuilder, replacing the contents of
-// ServiceReferenceBuilder.
-func (b *ServiceReferenceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ServiceReferenceApplyConfiguration, replacing the contents of
+// ServiceReferenceApplyConfiguration.
+func (b *ServiceReferenceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -170,13 +170,13 @@ func (b *ServiceReferenceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ServiceReferenceList represents a list of ServiceReferenceBuilder.
-type ServiceReferenceList []*ServiceReferenceBuilder
+// ServiceReferenceList represents a listAlias of ServiceReferenceApplyConfiguration.
+type ServiceReferenceList []*ServiceReferenceApplyConfiguration
 
-// ServiceReferenceList represents a map of ServiceReferenceBuilder.
-type ServiceReferenceMap map[string]ServiceReferenceBuilder
+// ServiceReferenceList represents a map of ServiceReferenceApplyConfiguration.
+type ServiceReferenceMap map[string]ServiceReferenceApplyConfiguration
 
-func (b *ServiceReferenceBuilder) preMarshal() {
+func (b *ServiceReferenceApplyConfiguration) preMarshal() {
 }
-func (b *ServiceReferenceBuilder) postUnmarshal() {
+func (b *ServiceReferenceApplyConfiguration) postUnmarshal() {
 }

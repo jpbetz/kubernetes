@@ -48,7 +48,7 @@ type ConfigMapInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.ConfigMapList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.ConfigMap, err error)
-	Apply(ctx context.Context, configMap corev1.ConfigMapBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ConfigMap, err error)
+	Apply(ctx context.Context, configMap *corev1.ConfigMapApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ConfigMap, err error)
 	ConfigMapExpansion
 }
 
@@ -181,7 +181,7 @@ func (c *configMaps) Patch(ctx context.Context, name string, pt types.PatchType,
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied configMap.
-func (c *configMaps) Apply(ctx context.Context, configMap corev1.ConfigMapBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ConfigMap, err error) {
+func (c *configMaps) Apply(ctx context.Context, configMap *corev1.ConfigMapApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ConfigMap, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := configMap.MarshalJSON()
 	if err != nil {

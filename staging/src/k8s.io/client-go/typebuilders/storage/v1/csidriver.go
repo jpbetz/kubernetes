@@ -25,84 +25,84 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// CSIDriverBuilder represents an declarative configuration of the CSIDriver type for use
+// CSIDriverApplyConfiguration represents an declarative configuration of the CSIDriver type for use
 // with apply.
-type CSIDriverBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type CSIDriverApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   cSIDriverFields
 }
 
+// CSIDriverApplyConfiguration constructs an declarative configuration of the CSIDriver type for use with
+// apply.
+func CSIDriver() *CSIDriverApplyConfiguration {
+	return &CSIDriverApplyConfiguration{}
+}
+
 // cSIDriverFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in CSIDriverBuilder.
+// Inline fields are owned by their respective inline type in CSIDriverApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type cSIDriverFields struct {
-	Kind       *string               `json:"kind,omitempty"`       // inlined CSIDriverBuilder.typeMeta.Kind field
-	APIVersion *string               `json:"apiVersion,omitempty"` // inlined CSIDriverBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder `json:"metadata,omitempty"`
-	Spec       *CSIDriverSpecBuilder `json:"spec,omitempty"`
-}
-
-// CSIDriver constructs an declarative configuration of the CSIDriver type for use with
-// apply.
-func CSIDriver() *CSIDriverBuilder {
-	return &CSIDriverBuilder{}
+	Kind       *string                          `json:"kind,omitempty"`       // inlined CSIDriverApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                          `json:"apiVersion,omitempty"` // inlined CSIDriverApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Spec       *CSIDriverSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *CSIDriverBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *CSIDriverBuilder {
+func (b *CSIDriverApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *CSIDriverApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *CSIDriverBuilder) RemoveTypeMeta() *CSIDriverBuilder {
+func (b *CSIDriverApplyConfiguration) RemoveTypeMeta() *CSIDriverApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *CSIDriverBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *CSIDriverApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *CSIDriverBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *CSIDriverBuilder {
+func (b *CSIDriverApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *CSIDriverApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *CSIDriverBuilder) RemoveObjectMeta() *CSIDriverBuilder {
+func (b *CSIDriverApplyConfiguration) RemoveObjectMeta() *CSIDriverApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *CSIDriverBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *CSIDriverApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *CSIDriverBuilder) SetSpec(value *CSIDriverSpecBuilder) *CSIDriverBuilder {
+func (b *CSIDriverApplyConfiguration) SetSpec(value *CSIDriverSpecApplyConfiguration) *CSIDriverApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *CSIDriverBuilder) RemoveSpec() *CSIDriverBuilder {
+func (b *CSIDriverApplyConfiguration) RemoveSpec() *CSIDriverApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *CSIDriverBuilder) GetSpec() (value *CSIDriverSpecBuilder, ok bool) {
+func (b *CSIDriverApplyConfiguration) GetSpec() (value *CSIDriverSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
-// ToUnstructured converts CSIDriverBuilder to unstructured.
-func (b *CSIDriverBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts CSIDriverApplyConfiguration to unstructured.
+func (b *CSIDriverApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -114,9 +114,9 @@ func (b *CSIDriverBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to CSIDriverBuilder, replacing the contents
-// of CSIDriverBuilder.
-func (b *CSIDriverBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to CSIDriverApplyConfiguration, replacing the contents
+// of CSIDriverApplyConfiguration.
+func (b *CSIDriverApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &cSIDriverFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -127,15 +127,15 @@ func (b *CSIDriverBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals CSIDriverBuilder to JSON.
-func (b *CSIDriverBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals CSIDriverApplyConfiguration to JSON.
+func (b *CSIDriverApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into CSIDriverBuilder, replacing the contents of
-// CSIDriverBuilder.
-func (b *CSIDriverBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into CSIDriverApplyConfiguration, replacing the contents of
+// CSIDriverApplyConfiguration.
+func (b *CSIDriverApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -143,13 +143,13 @@ func (b *CSIDriverBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// CSIDriverList represents a list of CSIDriverBuilder.
-type CSIDriverList []*CSIDriverBuilder
+// CSIDriverList represents a listAlias of CSIDriverApplyConfiguration.
+type CSIDriverList []*CSIDriverApplyConfiguration
 
-// CSIDriverList represents a map of CSIDriverBuilder.
-type CSIDriverMap map[string]CSIDriverBuilder
+// CSIDriverList represents a map of CSIDriverApplyConfiguration.
+type CSIDriverMap map[string]CSIDriverApplyConfiguration
 
-func (b *CSIDriverBuilder) preMarshal() {
+func (b *CSIDriverApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -159,9 +159,9 @@ func (b *CSIDriverBuilder) preMarshal() {
 		}
 	}
 }
-func (b *CSIDriverBuilder) postUnmarshal() {
+func (b *CSIDriverApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

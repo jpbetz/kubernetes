@@ -26,42 +26,42 @@ import (
 	v1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
-// SELinuxStrategyOptionsBuilder represents an declarative configuration of the SELinuxStrategyOptions type for use
+// SELinuxStrategyOptionsApplyConfiguration represents an declarative configuration of the SELinuxStrategyOptions type for use
 // with apply.
-type SELinuxStrategyOptionsBuilder struct {
+type SELinuxStrategyOptionsApplyConfiguration struct {
 	fields sELinuxStrategyOptionsFields
 }
 
+// SELinuxStrategyOptionsApplyConfiguration constructs an declarative configuration of the SELinuxStrategyOptions type for use with
+// apply.
+func SELinuxStrategyOptions() *SELinuxStrategyOptionsApplyConfiguration {
+	return &SELinuxStrategyOptionsApplyConfiguration{}
+}
+
 // sELinuxStrategyOptionsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SELinuxStrategyOptionsBuilder.
+// Inline fields are owned by their respective inline type in SELinuxStrategyOptionsApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type sELinuxStrategyOptionsFields struct {
-	Rule           *v1beta1.SELinuxStrategy  `json:"rule,omitempty"`
-	SELinuxOptions *v1.SELinuxOptionsBuilder `json:"seLinuxOptions,omitempty"`
-}
-
-// SELinuxStrategyOptions constructs an declarative configuration of the SELinuxStrategyOptions type for use with
-// apply.
-func SELinuxStrategyOptions() *SELinuxStrategyOptionsBuilder {
-	return &SELinuxStrategyOptionsBuilder{}
+	Rule           *v1beta1.SELinuxStrategy             `json:"rule,omitempty"`
+	SELinuxOptions *v1.SELinuxOptionsApplyConfiguration `json:"seLinuxOptions,omitempty"`
 }
 
 // SetRule sets the Rule field in the declarative configuration to the given value.
-func (b *SELinuxStrategyOptionsBuilder) SetRule(value v1beta1.SELinuxStrategy) *SELinuxStrategyOptionsBuilder {
+func (b *SELinuxStrategyOptionsApplyConfiguration) SetRule(value v1beta1.SELinuxStrategy) *SELinuxStrategyOptionsApplyConfiguration {
 	b.fields.Rule = &value
 	return b
 }
 
 // RemoveRule removes the Rule field from the declarative configuration.
-func (b *SELinuxStrategyOptionsBuilder) RemoveRule() *SELinuxStrategyOptionsBuilder {
+func (b *SELinuxStrategyOptionsApplyConfiguration) RemoveRule() *SELinuxStrategyOptionsApplyConfiguration {
 	b.fields.Rule = nil
 	return b
 }
 
 // GetRule gets the Rule field from the declarative configuration.
-func (b *SELinuxStrategyOptionsBuilder) GetRule() (value v1beta1.SELinuxStrategy, ok bool) {
+func (b *SELinuxStrategyOptionsApplyConfiguration) GetRule() (value v1beta1.SELinuxStrategy, ok bool) {
 	if v := b.fields.Rule; v != nil {
 		return *v, true
 	}
@@ -69,24 +69,24 @@ func (b *SELinuxStrategyOptionsBuilder) GetRule() (value v1beta1.SELinuxStrategy
 }
 
 // SetSELinuxOptions sets the SELinuxOptions field in the declarative configuration to the given value.
-func (b *SELinuxStrategyOptionsBuilder) SetSELinuxOptions(value *v1.SELinuxOptionsBuilder) *SELinuxStrategyOptionsBuilder {
+func (b *SELinuxStrategyOptionsApplyConfiguration) SetSELinuxOptions(value *v1.SELinuxOptionsApplyConfiguration) *SELinuxStrategyOptionsApplyConfiguration {
 	b.fields.SELinuxOptions = value
 	return b
 }
 
 // RemoveSELinuxOptions removes the SELinuxOptions field from the declarative configuration.
-func (b *SELinuxStrategyOptionsBuilder) RemoveSELinuxOptions() *SELinuxStrategyOptionsBuilder {
+func (b *SELinuxStrategyOptionsApplyConfiguration) RemoveSELinuxOptions() *SELinuxStrategyOptionsApplyConfiguration {
 	b.fields.SELinuxOptions = nil
 	return b
 }
 
 // GetSELinuxOptions gets the SELinuxOptions field from the declarative configuration.
-func (b *SELinuxStrategyOptionsBuilder) GetSELinuxOptions() (value *v1.SELinuxOptionsBuilder, ok bool) {
+func (b *SELinuxStrategyOptionsApplyConfiguration) GetSELinuxOptions() (value *v1.SELinuxOptionsApplyConfiguration, ok bool) {
 	return b.fields.SELinuxOptions, b.fields.SELinuxOptions != nil
 }
 
-// ToUnstructured converts SELinuxStrategyOptionsBuilder to unstructured.
-func (b *SELinuxStrategyOptionsBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts SELinuxStrategyOptionsApplyConfiguration to unstructured.
+func (b *SELinuxStrategyOptionsApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -98,9 +98,9 @@ func (b *SELinuxStrategyOptionsBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to SELinuxStrategyOptionsBuilder, replacing the contents
-// of SELinuxStrategyOptionsBuilder.
-func (b *SELinuxStrategyOptionsBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to SELinuxStrategyOptionsApplyConfiguration, replacing the contents
+// of SELinuxStrategyOptionsApplyConfiguration.
+func (b *SELinuxStrategyOptionsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &sELinuxStrategyOptionsFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -111,15 +111,15 @@ func (b *SELinuxStrategyOptionsBuilder) FromUnstructured(u map[string]interface{
 	return nil
 }
 
-// MarshalJSON marshals SELinuxStrategyOptionsBuilder to JSON.
-func (b *SELinuxStrategyOptionsBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals SELinuxStrategyOptionsApplyConfiguration to JSON.
+func (b *SELinuxStrategyOptionsApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into SELinuxStrategyOptionsBuilder, replacing the contents of
-// SELinuxStrategyOptionsBuilder.
-func (b *SELinuxStrategyOptionsBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into SELinuxStrategyOptionsApplyConfiguration, replacing the contents of
+// SELinuxStrategyOptionsApplyConfiguration.
+func (b *SELinuxStrategyOptionsApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -127,13 +127,13 @@ func (b *SELinuxStrategyOptionsBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// SELinuxStrategyOptionsList represents a list of SELinuxStrategyOptionsBuilder.
-type SELinuxStrategyOptionsList []*SELinuxStrategyOptionsBuilder
+// SELinuxStrategyOptionsList represents a listAlias of SELinuxStrategyOptionsApplyConfiguration.
+type SELinuxStrategyOptionsList []*SELinuxStrategyOptionsApplyConfiguration
 
-// SELinuxStrategyOptionsList represents a map of SELinuxStrategyOptionsBuilder.
-type SELinuxStrategyOptionsMap map[string]SELinuxStrategyOptionsBuilder
+// SELinuxStrategyOptionsList represents a map of SELinuxStrategyOptionsApplyConfiguration.
+type SELinuxStrategyOptionsMap map[string]SELinuxStrategyOptionsApplyConfiguration
 
-func (b *SELinuxStrategyOptionsBuilder) preMarshal() {
+func (b *SELinuxStrategyOptionsApplyConfiguration) preMarshal() {
 }
-func (b *SELinuxStrategyOptionsBuilder) postUnmarshal() {
+func (b *SELinuxStrategyOptionsApplyConfiguration) postUnmarshal() {
 }

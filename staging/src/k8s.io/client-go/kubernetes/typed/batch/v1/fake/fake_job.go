@@ -144,7 +144,7 @@ func (c *FakeJobs) Patch(ctx context.Context, name string, pt types.PatchType, d
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied job.
-func (c *FakeJobs) Apply(ctx context.Context, job typebuildersbatchv1.JobBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *batchv1.Job, err error) {
+func (c *FakeJobs) Apply(ctx context.Context, job *typebuildersbatchv1.JobApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *batchv1.Job, err error) {
 	data, err := job.MarshalJSON()
 	if err != nil {
 		return nil, err

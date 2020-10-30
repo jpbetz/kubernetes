@@ -48,7 +48,7 @@ type CSIDriverInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.CSIDriverList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.CSIDriver, err error)
-	Apply(ctx context.Context, cSIDriver storagev1.CSIDriverBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.CSIDriver, err error)
+	Apply(ctx context.Context, cSIDriver *storagev1.CSIDriverApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.CSIDriver, err error)
 	CSIDriverExpansion
 }
 
@@ -171,7 +171,7 @@ func (c *cSIDrivers) Patch(ctx context.Context, name string, pt types.PatchType,
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied cSIDriver.
-func (c *cSIDrivers) Apply(ctx context.Context, cSIDriver storagev1.CSIDriverBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.CSIDriver, err error) {
+func (c *cSIDrivers) Apply(ctx context.Context, cSIDriver *storagev1.CSIDriverApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.CSIDriver, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := cSIDriver.MarshalJSON()
 	if err != nil {

@@ -25,43 +25,43 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ContainerResourceMetricStatusBuilder represents an declarative configuration of the ContainerResourceMetricStatus type for use
+// ContainerResourceMetricStatusApplyConfiguration represents an declarative configuration of the ContainerResourceMetricStatus type for use
 // with apply.
-type ContainerResourceMetricStatusBuilder struct {
+type ContainerResourceMetricStatusApplyConfiguration struct {
 	fields containerResourceMetricStatusFields
 }
 
+// ContainerResourceMetricStatusApplyConfiguration constructs an declarative configuration of the ContainerResourceMetricStatus type for use with
+// apply.
+func ContainerResourceMetricStatus() *ContainerResourceMetricStatusApplyConfiguration {
+	return &ContainerResourceMetricStatusApplyConfiguration{}
+}
+
 // containerResourceMetricStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ContainerResourceMetricStatusBuilder.
+// Inline fields are owned by their respective inline type in ContainerResourceMetricStatusApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type containerResourceMetricStatusFields struct {
-	Name      *v1.ResourceName          `json:"name,omitempty"`
-	Current   *MetricValueStatusBuilder `json:"current,omitempty"`
-	Container *string                   `json:"container,omitempty"`
-}
-
-// ContainerResourceMetricStatus constructs an declarative configuration of the ContainerResourceMetricStatus type for use with
-// apply.
-func ContainerResourceMetricStatus() *ContainerResourceMetricStatusBuilder {
-	return &ContainerResourceMetricStatusBuilder{}
+	Name      *v1.ResourceName                     `json:"name,omitempty"`
+	Current   *MetricValueStatusApplyConfiguration `json:"current,omitempty"`
+	Container *string                              `json:"container,omitempty"`
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *ContainerResourceMetricStatusBuilder) SetName(value v1.ResourceName) *ContainerResourceMetricStatusBuilder {
+func (b *ContainerResourceMetricStatusApplyConfiguration) SetName(value v1.ResourceName) *ContainerResourceMetricStatusApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *ContainerResourceMetricStatusBuilder) RemoveName() *ContainerResourceMetricStatusBuilder {
+func (b *ContainerResourceMetricStatusApplyConfiguration) RemoveName() *ContainerResourceMetricStatusApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *ContainerResourceMetricStatusBuilder) GetName() (value v1.ResourceName, ok bool) {
+func (b *ContainerResourceMetricStatusApplyConfiguration) GetName() (value v1.ResourceName, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -69,44 +69,44 @@ func (b *ContainerResourceMetricStatusBuilder) GetName() (value v1.ResourceName,
 }
 
 // SetCurrent sets the Current field in the declarative configuration to the given value.
-func (b *ContainerResourceMetricStatusBuilder) SetCurrent(value *MetricValueStatusBuilder) *ContainerResourceMetricStatusBuilder {
+func (b *ContainerResourceMetricStatusApplyConfiguration) SetCurrent(value *MetricValueStatusApplyConfiguration) *ContainerResourceMetricStatusApplyConfiguration {
 	b.fields.Current = value
 	return b
 }
 
 // RemoveCurrent removes the Current field from the declarative configuration.
-func (b *ContainerResourceMetricStatusBuilder) RemoveCurrent() *ContainerResourceMetricStatusBuilder {
+func (b *ContainerResourceMetricStatusApplyConfiguration) RemoveCurrent() *ContainerResourceMetricStatusApplyConfiguration {
 	b.fields.Current = nil
 	return b
 }
 
 // GetCurrent gets the Current field from the declarative configuration.
-func (b *ContainerResourceMetricStatusBuilder) GetCurrent() (value *MetricValueStatusBuilder, ok bool) {
+func (b *ContainerResourceMetricStatusApplyConfiguration) GetCurrent() (value *MetricValueStatusApplyConfiguration, ok bool) {
 	return b.fields.Current, b.fields.Current != nil
 }
 
 // SetContainer sets the Container field in the declarative configuration to the given value.
-func (b *ContainerResourceMetricStatusBuilder) SetContainer(value string) *ContainerResourceMetricStatusBuilder {
+func (b *ContainerResourceMetricStatusApplyConfiguration) SetContainer(value string) *ContainerResourceMetricStatusApplyConfiguration {
 	b.fields.Container = &value
 	return b
 }
 
 // RemoveContainer removes the Container field from the declarative configuration.
-func (b *ContainerResourceMetricStatusBuilder) RemoveContainer() *ContainerResourceMetricStatusBuilder {
+func (b *ContainerResourceMetricStatusApplyConfiguration) RemoveContainer() *ContainerResourceMetricStatusApplyConfiguration {
 	b.fields.Container = nil
 	return b
 }
 
 // GetContainer gets the Container field from the declarative configuration.
-func (b *ContainerResourceMetricStatusBuilder) GetContainer() (value string, ok bool) {
+func (b *ContainerResourceMetricStatusApplyConfiguration) GetContainer() (value string, ok bool) {
 	if v := b.fields.Container; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ContainerResourceMetricStatusBuilder to unstructured.
-func (b *ContainerResourceMetricStatusBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ContainerResourceMetricStatusApplyConfiguration to unstructured.
+func (b *ContainerResourceMetricStatusApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -118,9 +118,9 @@ func (b *ContainerResourceMetricStatusBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ContainerResourceMetricStatusBuilder, replacing the contents
-// of ContainerResourceMetricStatusBuilder.
-func (b *ContainerResourceMetricStatusBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ContainerResourceMetricStatusApplyConfiguration, replacing the contents
+// of ContainerResourceMetricStatusApplyConfiguration.
+func (b *ContainerResourceMetricStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &containerResourceMetricStatusFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -131,15 +131,15 @@ func (b *ContainerResourceMetricStatusBuilder) FromUnstructured(u map[string]int
 	return nil
 }
 
-// MarshalJSON marshals ContainerResourceMetricStatusBuilder to JSON.
-func (b *ContainerResourceMetricStatusBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ContainerResourceMetricStatusApplyConfiguration to JSON.
+func (b *ContainerResourceMetricStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ContainerResourceMetricStatusBuilder, replacing the contents of
-// ContainerResourceMetricStatusBuilder.
-func (b *ContainerResourceMetricStatusBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ContainerResourceMetricStatusApplyConfiguration, replacing the contents of
+// ContainerResourceMetricStatusApplyConfiguration.
+func (b *ContainerResourceMetricStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -147,13 +147,13 @@ func (b *ContainerResourceMetricStatusBuilder) UnmarshalJSON(data []byte) error 
 	return nil
 }
 
-// ContainerResourceMetricStatusList represents a list of ContainerResourceMetricStatusBuilder.
-type ContainerResourceMetricStatusList []*ContainerResourceMetricStatusBuilder
+// ContainerResourceMetricStatusList represents a listAlias of ContainerResourceMetricStatusApplyConfiguration.
+type ContainerResourceMetricStatusList []*ContainerResourceMetricStatusApplyConfiguration
 
-// ContainerResourceMetricStatusList represents a map of ContainerResourceMetricStatusBuilder.
-type ContainerResourceMetricStatusMap map[string]ContainerResourceMetricStatusBuilder
+// ContainerResourceMetricStatusList represents a map of ContainerResourceMetricStatusApplyConfiguration.
+type ContainerResourceMetricStatusMap map[string]ContainerResourceMetricStatusApplyConfiguration
 
-func (b *ContainerResourceMetricStatusBuilder) preMarshal() {
+func (b *ContainerResourceMetricStatusApplyConfiguration) preMarshal() {
 }
-func (b *ContainerResourceMetricStatusBuilder) postUnmarshal() {
+func (b *ContainerResourceMetricStatusApplyConfiguration) postUnmarshal() {
 }

@@ -24,82 +24,82 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// HandlerBuilder represents an declarative configuration of the Handler type for use
+// HandlerApplyConfiguration represents an declarative configuration of the Handler type for use
 // with apply.
-type HandlerBuilder struct {
+type HandlerApplyConfiguration struct {
 	fields handlerFields
 }
 
+// HandlerApplyConfiguration constructs an declarative configuration of the Handler type for use with
+// apply.
+func Handler() *HandlerApplyConfiguration {
+	return &HandlerApplyConfiguration{}
+}
+
 // handlerFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in HandlerBuilder.
+// Inline fields are owned by their respective inline type in HandlerApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type handlerFields struct {
-	Exec      *ExecActionBuilder      `json:"exec,omitempty"`
-	HTTPGet   *HTTPGetActionBuilder   `json:"httpGet,omitempty"`
-	TCPSocket *TCPSocketActionBuilder `json:"tcpSocket,omitempty"`
-}
-
-// Handler constructs an declarative configuration of the Handler type for use with
-// apply.
-func Handler() *HandlerBuilder {
-	return &HandlerBuilder{}
+	Exec      *ExecActionApplyConfiguration      `json:"exec,omitempty"`
+	HTTPGet   *HTTPGetActionApplyConfiguration   `json:"httpGet,omitempty"`
+	TCPSocket *TCPSocketActionApplyConfiguration `json:"tcpSocket,omitempty"`
 }
 
 // SetExec sets the Exec field in the declarative configuration to the given value.
-func (b *HandlerBuilder) SetExec(value *ExecActionBuilder) *HandlerBuilder {
+func (b *HandlerApplyConfiguration) SetExec(value *ExecActionApplyConfiguration) *HandlerApplyConfiguration {
 	b.fields.Exec = value
 	return b
 }
 
 // RemoveExec removes the Exec field from the declarative configuration.
-func (b *HandlerBuilder) RemoveExec() *HandlerBuilder {
+func (b *HandlerApplyConfiguration) RemoveExec() *HandlerApplyConfiguration {
 	b.fields.Exec = nil
 	return b
 }
 
 // GetExec gets the Exec field from the declarative configuration.
-func (b *HandlerBuilder) GetExec() (value *ExecActionBuilder, ok bool) {
+func (b *HandlerApplyConfiguration) GetExec() (value *ExecActionApplyConfiguration, ok bool) {
 	return b.fields.Exec, b.fields.Exec != nil
 }
 
 // SetHTTPGet sets the HTTPGet field in the declarative configuration to the given value.
-func (b *HandlerBuilder) SetHTTPGet(value *HTTPGetActionBuilder) *HandlerBuilder {
+func (b *HandlerApplyConfiguration) SetHTTPGet(value *HTTPGetActionApplyConfiguration) *HandlerApplyConfiguration {
 	b.fields.HTTPGet = value
 	return b
 }
 
 // RemoveHTTPGet removes the HTTPGet field from the declarative configuration.
-func (b *HandlerBuilder) RemoveHTTPGet() *HandlerBuilder {
+func (b *HandlerApplyConfiguration) RemoveHTTPGet() *HandlerApplyConfiguration {
 	b.fields.HTTPGet = nil
 	return b
 }
 
 // GetHTTPGet gets the HTTPGet field from the declarative configuration.
-func (b *HandlerBuilder) GetHTTPGet() (value *HTTPGetActionBuilder, ok bool) {
+func (b *HandlerApplyConfiguration) GetHTTPGet() (value *HTTPGetActionApplyConfiguration, ok bool) {
 	return b.fields.HTTPGet, b.fields.HTTPGet != nil
 }
 
 // SetTCPSocket sets the TCPSocket field in the declarative configuration to the given value.
-func (b *HandlerBuilder) SetTCPSocket(value *TCPSocketActionBuilder) *HandlerBuilder {
+func (b *HandlerApplyConfiguration) SetTCPSocket(value *TCPSocketActionApplyConfiguration) *HandlerApplyConfiguration {
 	b.fields.TCPSocket = value
 	return b
 }
 
 // RemoveTCPSocket removes the TCPSocket field from the declarative configuration.
-func (b *HandlerBuilder) RemoveTCPSocket() *HandlerBuilder {
+func (b *HandlerApplyConfiguration) RemoveTCPSocket() *HandlerApplyConfiguration {
 	b.fields.TCPSocket = nil
 	return b
 }
 
 // GetTCPSocket gets the TCPSocket field from the declarative configuration.
-func (b *HandlerBuilder) GetTCPSocket() (value *TCPSocketActionBuilder, ok bool) {
+func (b *HandlerApplyConfiguration) GetTCPSocket() (value *TCPSocketActionApplyConfiguration, ok bool) {
 	return b.fields.TCPSocket, b.fields.TCPSocket != nil
 }
 
-// ToUnstructured converts HandlerBuilder to unstructured.
-func (b *HandlerBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts HandlerApplyConfiguration to unstructured.
+func (b *HandlerApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -111,9 +111,9 @@ func (b *HandlerBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to HandlerBuilder, replacing the contents
-// of HandlerBuilder.
-func (b *HandlerBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to HandlerApplyConfiguration, replacing the contents
+// of HandlerApplyConfiguration.
+func (b *HandlerApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &handlerFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -124,15 +124,15 @@ func (b *HandlerBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals HandlerBuilder to JSON.
-func (b *HandlerBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals HandlerApplyConfiguration to JSON.
+func (b *HandlerApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into HandlerBuilder, replacing the contents of
-// HandlerBuilder.
-func (b *HandlerBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into HandlerApplyConfiguration, replacing the contents of
+// HandlerApplyConfiguration.
+func (b *HandlerApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -140,13 +140,13 @@ func (b *HandlerBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// HandlerList represents a list of HandlerBuilder.
-type HandlerList []*HandlerBuilder
+// HandlerList represents a listAlias of HandlerApplyConfiguration.
+type HandlerList []*HandlerApplyConfiguration
 
-// HandlerList represents a map of HandlerBuilder.
-type HandlerMap map[string]HandlerBuilder
+// HandlerList represents a map of HandlerApplyConfiguration.
+type HandlerMap map[string]HandlerApplyConfiguration
 
-func (b *HandlerBuilder) preMarshal() {
+func (b *HandlerApplyConfiguration) preMarshal() {
 }
-func (b *HandlerBuilder) postUnmarshal() {
+func (b *HandlerApplyConfiguration) postUnmarshal() {
 }

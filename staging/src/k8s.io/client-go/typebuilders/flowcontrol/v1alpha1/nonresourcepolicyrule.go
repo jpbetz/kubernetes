@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// NonResourcePolicyRuleBuilder represents an declarative configuration of the NonResourcePolicyRule type for use
+// NonResourcePolicyRuleApplyConfiguration represents an declarative configuration of the NonResourcePolicyRule type for use
 // with apply.
-type NonResourcePolicyRuleBuilder struct {
+type NonResourcePolicyRuleApplyConfiguration struct {
 	fields nonResourcePolicyRuleFields
 }
 
+// NonResourcePolicyRuleApplyConfiguration constructs an declarative configuration of the NonResourcePolicyRule type for use with
+// apply.
+func NonResourcePolicyRule() *NonResourcePolicyRuleApplyConfiguration {
+	return &NonResourcePolicyRuleApplyConfiguration{}
+}
+
 // nonResourcePolicyRuleFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NonResourcePolicyRuleBuilder.
+// Inline fields are owned by their respective inline type in NonResourcePolicyRuleApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type nonResourcePolicyRuleFields struct {
 	NonResourceURLs *[]string `json:"nonResourceURLs,omitempty"`
 }
 
-// NonResourcePolicyRule constructs an declarative configuration of the NonResourcePolicyRule type for use with
-// apply.
-func NonResourcePolicyRule() *NonResourcePolicyRuleBuilder {
-	return &NonResourcePolicyRuleBuilder{}
-}
-
 // SetVerbs sets the Verbs field in the declarative configuration to the given value.
-func (b *NonResourcePolicyRuleBuilder) SetVerbs(value []string) *NonResourcePolicyRuleBuilder {
+func (b *NonResourcePolicyRuleApplyConfiguration) SetVerbs(value []string) *NonResourcePolicyRuleApplyConfiguration {
 	b.fields.Verbs = &value
 	return b
 }
 
 // RemoveVerbs removes the Verbs field from the declarative configuration.
-func (b *NonResourcePolicyRuleBuilder) RemoveVerbs() *NonResourcePolicyRuleBuilder {
+func (b *NonResourcePolicyRuleApplyConfiguration) RemoveVerbs() *NonResourcePolicyRuleApplyConfiguration {
 	b.fields.Verbs = nil
 	return b
 }
 
 // GetVerbs gets the Verbs field from the declarative configuration.
-func (b *NonResourcePolicyRuleBuilder) GetVerbs() (value []string, ok bool) {
+func (b *NonResourcePolicyRuleApplyConfiguration) GetVerbs() (value []string, ok bool) {
 	if v := b.fields.Verbs; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *NonResourcePolicyRuleBuilder) GetVerbs() (value []string, ok bool) {
 }
 
 // SetNonResourceURLs sets the NonResourceURLs field in the declarative configuration to the given value.
-func (b *NonResourcePolicyRuleBuilder) SetNonResourceURLs(value []string) *NonResourcePolicyRuleBuilder {
+func (b *NonResourcePolicyRuleApplyConfiguration) SetNonResourceURLs(value []string) *NonResourcePolicyRuleApplyConfiguration {
 	b.fields.NonResourceURLs = &value
 	return b
 }
 
 // RemoveNonResourceURLs removes the NonResourceURLs field from the declarative configuration.
-func (b *NonResourcePolicyRuleBuilder) RemoveNonResourceURLs() *NonResourcePolicyRuleBuilder {
+func (b *NonResourcePolicyRuleApplyConfiguration) RemoveNonResourceURLs() *NonResourcePolicyRuleApplyConfiguration {
 	b.fields.NonResourceURLs = nil
 	return b
 }
 
 // GetNonResourceURLs gets the NonResourceURLs field from the declarative configuration.
-func (b *NonResourcePolicyRuleBuilder) GetNonResourceURLs() (value []string, ok bool) {
+func (b *NonResourcePolicyRuleApplyConfiguration) GetNonResourceURLs() (value []string, ok bool) {
 	if v := b.fields.NonResourceURLs; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts NonResourcePolicyRuleBuilder to unstructured.
-func (b *NonResourcePolicyRuleBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NonResourcePolicyRuleApplyConfiguration to unstructured.
+func (b *NonResourcePolicyRuleApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *NonResourcePolicyRuleBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NonResourcePolicyRuleBuilder, replacing the contents
-// of NonResourcePolicyRuleBuilder.
-func (b *NonResourcePolicyRuleBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NonResourcePolicyRuleApplyConfiguration, replacing the contents
+// of NonResourcePolicyRuleApplyConfiguration.
+func (b *NonResourcePolicyRuleApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &nonResourcePolicyRuleFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *NonResourcePolicyRuleBuilder) FromUnstructured(u map[string]interface{}
 	return nil
 }
 
-// MarshalJSON marshals NonResourcePolicyRuleBuilder to JSON.
-func (b *NonResourcePolicyRuleBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NonResourcePolicyRuleApplyConfiguration to JSON.
+func (b *NonResourcePolicyRuleApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NonResourcePolicyRuleBuilder, replacing the contents of
-// NonResourcePolicyRuleBuilder.
-func (b *NonResourcePolicyRuleBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NonResourcePolicyRuleApplyConfiguration, replacing the contents of
+// NonResourcePolicyRuleApplyConfiguration.
+func (b *NonResourcePolicyRuleApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *NonResourcePolicyRuleBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NonResourcePolicyRuleList represents a list of NonResourcePolicyRuleBuilder.
-type NonResourcePolicyRuleList []*NonResourcePolicyRuleBuilder
+// NonResourcePolicyRuleList represents a listAlias of NonResourcePolicyRuleApplyConfiguration.
+type NonResourcePolicyRuleList []*NonResourcePolicyRuleApplyConfiguration
 
-// NonResourcePolicyRuleList represents a map of NonResourcePolicyRuleBuilder.
-type NonResourcePolicyRuleMap map[string]NonResourcePolicyRuleBuilder
+// NonResourcePolicyRuleList represents a map of NonResourcePolicyRuleApplyConfiguration.
+type NonResourcePolicyRuleMap map[string]NonResourcePolicyRuleApplyConfiguration
 
-func (b *NonResourcePolicyRuleBuilder) preMarshal() {
+func (b *NonResourcePolicyRuleApplyConfiguration) preMarshal() {
 }
-func (b *NonResourcePolicyRuleBuilder) postUnmarshal() {
+func (b *NonResourcePolicyRuleApplyConfiguration) postUnmarshal() {
 }

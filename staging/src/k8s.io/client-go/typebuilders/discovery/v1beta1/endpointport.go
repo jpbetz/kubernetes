@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// EndpointPortBuilder represents an declarative configuration of the EndpointPort type for use
+// EndpointPortApplyConfiguration represents an declarative configuration of the EndpointPort type for use
 // with apply.
-type EndpointPortBuilder struct {
+type EndpointPortApplyConfiguration struct {
 	fields endpointPortFields
 }
 
+// EndpointPortApplyConfiguration constructs an declarative configuration of the EndpointPort type for use with
+// apply.
+func EndpointPort() *EndpointPortApplyConfiguration {
+	return &EndpointPortApplyConfiguration{}
+}
+
 // endpointPortFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in EndpointPortBuilder.
+// Inline fields are owned by their respective inline type in EndpointPortApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -43,26 +49,20 @@ type endpointPortFields struct {
 	AppProtocol *string      `json:"appProtocol,omitempty"`
 }
 
-// EndpointPort constructs an declarative configuration of the EndpointPort type for use with
-// apply.
-func EndpointPort() *EndpointPortBuilder {
-	return &EndpointPortBuilder{}
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *EndpointPortBuilder) SetName(value string) *EndpointPortBuilder {
+func (b *EndpointPortApplyConfiguration) SetName(value string) *EndpointPortApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *EndpointPortBuilder) RemoveName() *EndpointPortBuilder {
+func (b *EndpointPortApplyConfiguration) RemoveName() *EndpointPortApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *EndpointPortBuilder) GetName() (value string, ok bool) {
+func (b *EndpointPortApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -70,19 +70,19 @@ func (b *EndpointPortBuilder) GetName() (value string, ok bool) {
 }
 
 // SetProtocol sets the Protocol field in the declarative configuration to the given value.
-func (b *EndpointPortBuilder) SetProtocol(value v1.Protocol) *EndpointPortBuilder {
+func (b *EndpointPortApplyConfiguration) SetProtocol(value v1.Protocol) *EndpointPortApplyConfiguration {
 	b.fields.Protocol = &value
 	return b
 }
 
 // RemoveProtocol removes the Protocol field from the declarative configuration.
-func (b *EndpointPortBuilder) RemoveProtocol() *EndpointPortBuilder {
+func (b *EndpointPortApplyConfiguration) RemoveProtocol() *EndpointPortApplyConfiguration {
 	b.fields.Protocol = nil
 	return b
 }
 
 // GetProtocol gets the Protocol field from the declarative configuration.
-func (b *EndpointPortBuilder) GetProtocol() (value v1.Protocol, ok bool) {
+func (b *EndpointPortApplyConfiguration) GetProtocol() (value v1.Protocol, ok bool) {
 	if v := b.fields.Protocol; v != nil {
 		return *v, true
 	}
@@ -90,19 +90,19 @@ func (b *EndpointPortBuilder) GetProtocol() (value v1.Protocol, ok bool) {
 }
 
 // SetPort sets the Port field in the declarative configuration to the given value.
-func (b *EndpointPortBuilder) SetPort(value int32) *EndpointPortBuilder {
+func (b *EndpointPortApplyConfiguration) SetPort(value int32) *EndpointPortApplyConfiguration {
 	b.fields.Port = &value
 	return b
 }
 
 // RemovePort removes the Port field from the declarative configuration.
-func (b *EndpointPortBuilder) RemovePort() *EndpointPortBuilder {
+func (b *EndpointPortApplyConfiguration) RemovePort() *EndpointPortApplyConfiguration {
 	b.fields.Port = nil
 	return b
 }
 
 // GetPort gets the Port field from the declarative configuration.
-func (b *EndpointPortBuilder) GetPort() (value int32, ok bool) {
+func (b *EndpointPortApplyConfiguration) GetPort() (value int32, ok bool) {
 	if v := b.fields.Port; v != nil {
 		return *v, true
 	}
@@ -110,27 +110,27 @@ func (b *EndpointPortBuilder) GetPort() (value int32, ok bool) {
 }
 
 // SetAppProtocol sets the AppProtocol field in the declarative configuration to the given value.
-func (b *EndpointPortBuilder) SetAppProtocol(value string) *EndpointPortBuilder {
+func (b *EndpointPortApplyConfiguration) SetAppProtocol(value string) *EndpointPortApplyConfiguration {
 	b.fields.AppProtocol = &value
 	return b
 }
 
 // RemoveAppProtocol removes the AppProtocol field from the declarative configuration.
-func (b *EndpointPortBuilder) RemoveAppProtocol() *EndpointPortBuilder {
+func (b *EndpointPortApplyConfiguration) RemoveAppProtocol() *EndpointPortApplyConfiguration {
 	b.fields.AppProtocol = nil
 	return b
 }
 
 // GetAppProtocol gets the AppProtocol field from the declarative configuration.
-func (b *EndpointPortBuilder) GetAppProtocol() (value string, ok bool) {
+func (b *EndpointPortApplyConfiguration) GetAppProtocol() (value string, ok bool) {
 	if v := b.fields.AppProtocol; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts EndpointPortBuilder to unstructured.
-func (b *EndpointPortBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts EndpointPortApplyConfiguration to unstructured.
+func (b *EndpointPortApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -142,9 +142,9 @@ func (b *EndpointPortBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to EndpointPortBuilder, replacing the contents
-// of EndpointPortBuilder.
-func (b *EndpointPortBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to EndpointPortApplyConfiguration, replacing the contents
+// of EndpointPortApplyConfiguration.
+func (b *EndpointPortApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &endpointPortFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -155,15 +155,15 @@ func (b *EndpointPortBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals EndpointPortBuilder to JSON.
-func (b *EndpointPortBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals EndpointPortApplyConfiguration to JSON.
+func (b *EndpointPortApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into EndpointPortBuilder, replacing the contents of
-// EndpointPortBuilder.
-func (b *EndpointPortBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into EndpointPortApplyConfiguration, replacing the contents of
+// EndpointPortApplyConfiguration.
+func (b *EndpointPortApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -171,13 +171,13 @@ func (b *EndpointPortBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// EndpointPortList represents a list of EndpointPortBuilder.
-type EndpointPortList []*EndpointPortBuilder
+// EndpointPortList represents a listAlias of EndpointPortApplyConfiguration.
+type EndpointPortList []*EndpointPortApplyConfiguration
 
-// EndpointPortList represents a map of EndpointPortBuilder.
-type EndpointPortMap map[string]EndpointPortBuilder
+// EndpointPortList represents a map of EndpointPortApplyConfiguration.
+type EndpointPortMap map[string]EndpointPortApplyConfiguration
 
-func (b *EndpointPortBuilder) preMarshal() {
+func (b *EndpointPortApplyConfiguration) preMarshal() {
 }
-func (b *EndpointPortBuilder) postUnmarshal() {
+func (b *EndpointPortApplyConfiguration) postUnmarshal() {
 }

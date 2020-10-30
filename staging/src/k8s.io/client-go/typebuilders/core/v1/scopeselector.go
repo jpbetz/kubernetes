@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ScopeSelectorBuilder represents an declarative configuration of the ScopeSelector type for use
+// ScopeSelectorApplyConfiguration represents an declarative configuration of the ScopeSelector type for use
 // with apply.
-type ScopeSelectorBuilder struct {
+type ScopeSelectorApplyConfiguration struct {
 	fields scopeSelectorFields
 }
 
+// ScopeSelectorApplyConfiguration constructs an declarative configuration of the ScopeSelector type for use with
+// apply.
+func ScopeSelector() *ScopeSelectorApplyConfiguration {
+	return &ScopeSelectorApplyConfiguration{}
+}
+
 // scopeSelectorFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ScopeSelectorBuilder.
+// Inline fields are owned by their respective inline type in ScopeSelectorApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type scopeSelectorFields struct {
 	MatchExpressions *ScopedResourceSelectorRequirementList `json:"matchExpressions,omitempty"`
 }
 
-// ScopeSelector constructs an declarative configuration of the ScopeSelector type for use with
-// apply.
-func ScopeSelector() *ScopeSelectorBuilder {
-	return &ScopeSelectorBuilder{}
-}
-
 // SetMatchExpressions sets the MatchExpressions field in the declarative configuration to the given value.
-func (b *ScopeSelectorBuilder) SetMatchExpressions(value ScopedResourceSelectorRequirementList) *ScopeSelectorBuilder {
+func (b *ScopeSelectorApplyConfiguration) SetMatchExpressions(value ScopedResourceSelectorRequirementList) *ScopeSelectorApplyConfiguration {
 	b.fields.MatchExpressions = &value
 	return b
 }
 
 // RemoveMatchExpressions removes the MatchExpressions field from the declarative configuration.
-func (b *ScopeSelectorBuilder) RemoveMatchExpressions() *ScopeSelectorBuilder {
+func (b *ScopeSelectorApplyConfiguration) RemoveMatchExpressions() *ScopeSelectorApplyConfiguration {
 	b.fields.MatchExpressions = nil
 	return b
 }
 
 // GetMatchExpressions gets the MatchExpressions field from the declarative configuration.
-func (b *ScopeSelectorBuilder) GetMatchExpressions() (value ScopedResourceSelectorRequirementList, ok bool) {
+func (b *ScopeSelectorApplyConfiguration) GetMatchExpressions() (value ScopedResourceSelectorRequirementList, ok bool) {
 	if v := b.fields.MatchExpressions; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ScopeSelectorBuilder to unstructured.
-func (b *ScopeSelectorBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ScopeSelectorApplyConfiguration to unstructured.
+func (b *ScopeSelectorApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *ScopeSelectorBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ScopeSelectorBuilder, replacing the contents
-// of ScopeSelectorBuilder.
-func (b *ScopeSelectorBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ScopeSelectorApplyConfiguration, replacing the contents
+// of ScopeSelectorApplyConfiguration.
+func (b *ScopeSelectorApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &scopeSelectorFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *ScopeSelectorBuilder) FromUnstructured(u map[string]interface{}) error 
 	return nil
 }
 
-// MarshalJSON marshals ScopeSelectorBuilder to JSON.
-func (b *ScopeSelectorBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ScopeSelectorApplyConfiguration to JSON.
+func (b *ScopeSelectorApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ScopeSelectorBuilder, replacing the contents of
-// ScopeSelectorBuilder.
-func (b *ScopeSelectorBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ScopeSelectorApplyConfiguration, replacing the contents of
+// ScopeSelectorApplyConfiguration.
+func (b *ScopeSelectorApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *ScopeSelectorBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ScopeSelectorList represents a list of ScopeSelectorBuilder.
-type ScopeSelectorList []*ScopeSelectorBuilder
+// ScopeSelectorList represents a listAlias of ScopeSelectorApplyConfiguration.
+type ScopeSelectorList []*ScopeSelectorApplyConfiguration
 
-// ScopeSelectorList represents a map of ScopeSelectorBuilder.
-type ScopeSelectorMap map[string]ScopeSelectorBuilder
+// ScopeSelectorList represents a map of ScopeSelectorApplyConfiguration.
+type ScopeSelectorMap map[string]ScopeSelectorApplyConfiguration
 
-func (b *ScopeSelectorBuilder) preMarshal() {
+func (b *ScopeSelectorApplyConfiguration) preMarshal() {
 }
-func (b *ScopeSelectorBuilder) postUnmarshal() {
+func (b *ScopeSelectorApplyConfiguration) postUnmarshal() {
 }

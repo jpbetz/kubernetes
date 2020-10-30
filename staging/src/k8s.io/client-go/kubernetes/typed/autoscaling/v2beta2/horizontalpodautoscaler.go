@@ -49,7 +49,7 @@ type HorizontalPodAutoscalerInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v2beta2.HorizontalPodAutoscalerList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v2beta2.HorizontalPodAutoscaler, err error)
-	Apply(ctx context.Context, horizontalPodAutoscaler autoscalingv2beta2.HorizontalPodAutoscalerBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v2beta2.HorizontalPodAutoscaler, err error)
+	Apply(ctx context.Context, horizontalPodAutoscaler *autoscalingv2beta2.HorizontalPodAutoscalerApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v2beta2.HorizontalPodAutoscaler, err error)
 	HorizontalPodAutoscalerExpansion
 }
 
@@ -198,7 +198,7 @@ func (c *horizontalPodAutoscalers) Patch(ctx context.Context, name string, pt ty
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied horizontalPodAutoscaler.
-func (c *horizontalPodAutoscalers) Apply(ctx context.Context, horizontalPodAutoscaler autoscalingv2beta2.HorizontalPodAutoscalerBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v2beta2.HorizontalPodAutoscaler, err error) {
+func (c *horizontalPodAutoscalers) Apply(ctx context.Context, horizontalPodAutoscaler *autoscalingv2beta2.HorizontalPodAutoscalerApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v2beta2.HorizontalPodAutoscaler, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := horizontalPodAutoscaler.MarshalJSON()
 	if err != nil {

@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ContainerStateRunningBuilder represents an declarative configuration of the ContainerStateRunning type for use
+// ContainerStateRunningApplyConfiguration represents an declarative configuration of the ContainerStateRunning type for use
 // with apply.
-type ContainerStateRunningBuilder struct {
+type ContainerStateRunningApplyConfiguration struct {
 	fields containerStateRunningFields
 }
 
+// ContainerStateRunningApplyConfiguration constructs an declarative configuration of the ContainerStateRunning type for use with
+// apply.
+func ContainerStateRunning() *ContainerStateRunningApplyConfiguration {
+	return &ContainerStateRunningApplyConfiguration{}
+}
+
 // containerStateRunningFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ContainerStateRunningBuilder.
+// Inline fields are owned by their respective inline type in ContainerStateRunningApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,34 +46,28 @@ type containerStateRunningFields struct {
 	StartedAt *v1.Time `json:"startedAt,omitempty"`
 }
 
-// ContainerStateRunning constructs an declarative configuration of the ContainerStateRunning type for use with
-// apply.
-func ContainerStateRunning() *ContainerStateRunningBuilder {
-	return &ContainerStateRunningBuilder{}
-}
-
 // SetStartedAt sets the StartedAt field in the declarative configuration to the given value.
-func (b *ContainerStateRunningBuilder) SetStartedAt(value v1.Time) *ContainerStateRunningBuilder {
+func (b *ContainerStateRunningApplyConfiguration) SetStartedAt(value v1.Time) *ContainerStateRunningApplyConfiguration {
 	b.fields.StartedAt = &value
 	return b
 }
 
 // RemoveStartedAt removes the StartedAt field from the declarative configuration.
-func (b *ContainerStateRunningBuilder) RemoveStartedAt() *ContainerStateRunningBuilder {
+func (b *ContainerStateRunningApplyConfiguration) RemoveStartedAt() *ContainerStateRunningApplyConfiguration {
 	b.fields.StartedAt = nil
 	return b
 }
 
 // GetStartedAt gets the StartedAt field from the declarative configuration.
-func (b *ContainerStateRunningBuilder) GetStartedAt() (value v1.Time, ok bool) {
+func (b *ContainerStateRunningApplyConfiguration) GetStartedAt() (value v1.Time, ok bool) {
 	if v := b.fields.StartedAt; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ContainerStateRunningBuilder to unstructured.
-func (b *ContainerStateRunningBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ContainerStateRunningApplyConfiguration to unstructured.
+func (b *ContainerStateRunningApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -79,9 +79,9 @@ func (b *ContainerStateRunningBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ContainerStateRunningBuilder, replacing the contents
-// of ContainerStateRunningBuilder.
-func (b *ContainerStateRunningBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ContainerStateRunningApplyConfiguration, replacing the contents
+// of ContainerStateRunningApplyConfiguration.
+func (b *ContainerStateRunningApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &containerStateRunningFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -92,15 +92,15 @@ func (b *ContainerStateRunningBuilder) FromUnstructured(u map[string]interface{}
 	return nil
 }
 
-// MarshalJSON marshals ContainerStateRunningBuilder to JSON.
-func (b *ContainerStateRunningBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ContainerStateRunningApplyConfiguration to JSON.
+func (b *ContainerStateRunningApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ContainerStateRunningBuilder, replacing the contents of
-// ContainerStateRunningBuilder.
-func (b *ContainerStateRunningBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ContainerStateRunningApplyConfiguration, replacing the contents of
+// ContainerStateRunningApplyConfiguration.
+func (b *ContainerStateRunningApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -108,13 +108,13 @@ func (b *ContainerStateRunningBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ContainerStateRunningList represents a list of ContainerStateRunningBuilder.
-type ContainerStateRunningList []*ContainerStateRunningBuilder
+// ContainerStateRunningList represents a listAlias of ContainerStateRunningApplyConfiguration.
+type ContainerStateRunningList []*ContainerStateRunningApplyConfiguration
 
-// ContainerStateRunningList represents a map of ContainerStateRunningBuilder.
-type ContainerStateRunningMap map[string]ContainerStateRunningBuilder
+// ContainerStateRunningList represents a map of ContainerStateRunningApplyConfiguration.
+type ContainerStateRunningMap map[string]ContainerStateRunningApplyConfiguration
 
-func (b *ContainerStateRunningBuilder) preMarshal() {
+func (b *ContainerStateRunningApplyConfiguration) preMarshal() {
 }
-func (b *ContainerStateRunningBuilder) postUnmarshal() {
+func (b *ContainerStateRunningApplyConfiguration) postUnmarshal() {
 }

@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// LimitRangeSpecBuilder represents an declarative configuration of the LimitRangeSpec type for use
+// LimitRangeSpecApplyConfiguration represents an declarative configuration of the LimitRangeSpec type for use
 // with apply.
-type LimitRangeSpecBuilder struct {
+type LimitRangeSpecApplyConfiguration struct {
 	fields limitRangeSpecFields
 }
 
+// LimitRangeSpecApplyConfiguration constructs an declarative configuration of the LimitRangeSpec type for use with
+// apply.
+func LimitRangeSpec() *LimitRangeSpecApplyConfiguration {
+	return &LimitRangeSpecApplyConfiguration{}
+}
+
 // limitRangeSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LimitRangeSpecBuilder.
+// Inline fields are owned by their respective inline type in LimitRangeSpecApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type limitRangeSpecFields struct {
 	Limits *LimitRangeItemList `json:"limits,omitempty"`
 }
 
-// LimitRangeSpec constructs an declarative configuration of the LimitRangeSpec type for use with
-// apply.
-func LimitRangeSpec() *LimitRangeSpecBuilder {
-	return &LimitRangeSpecBuilder{}
-}
-
 // SetLimits sets the Limits field in the declarative configuration to the given value.
-func (b *LimitRangeSpecBuilder) SetLimits(value LimitRangeItemList) *LimitRangeSpecBuilder {
+func (b *LimitRangeSpecApplyConfiguration) SetLimits(value LimitRangeItemList) *LimitRangeSpecApplyConfiguration {
 	b.fields.Limits = &value
 	return b
 }
 
 // RemoveLimits removes the Limits field from the declarative configuration.
-func (b *LimitRangeSpecBuilder) RemoveLimits() *LimitRangeSpecBuilder {
+func (b *LimitRangeSpecApplyConfiguration) RemoveLimits() *LimitRangeSpecApplyConfiguration {
 	b.fields.Limits = nil
 	return b
 }
 
 // GetLimits gets the Limits field from the declarative configuration.
-func (b *LimitRangeSpecBuilder) GetLimits() (value LimitRangeItemList, ok bool) {
+func (b *LimitRangeSpecApplyConfiguration) GetLimits() (value LimitRangeItemList, ok bool) {
 	if v := b.fields.Limits; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts LimitRangeSpecBuilder to unstructured.
-func (b *LimitRangeSpecBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts LimitRangeSpecApplyConfiguration to unstructured.
+func (b *LimitRangeSpecApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *LimitRangeSpecBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to LimitRangeSpecBuilder, replacing the contents
-// of LimitRangeSpecBuilder.
-func (b *LimitRangeSpecBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to LimitRangeSpecApplyConfiguration, replacing the contents
+// of LimitRangeSpecApplyConfiguration.
+func (b *LimitRangeSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &limitRangeSpecFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *LimitRangeSpecBuilder) FromUnstructured(u map[string]interface{}) error
 	return nil
 }
 
-// MarshalJSON marshals LimitRangeSpecBuilder to JSON.
-func (b *LimitRangeSpecBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals LimitRangeSpecApplyConfiguration to JSON.
+func (b *LimitRangeSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into LimitRangeSpecBuilder, replacing the contents of
-// LimitRangeSpecBuilder.
-func (b *LimitRangeSpecBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into LimitRangeSpecApplyConfiguration, replacing the contents of
+// LimitRangeSpecApplyConfiguration.
+func (b *LimitRangeSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *LimitRangeSpecBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// LimitRangeSpecList represents a list of LimitRangeSpecBuilder.
-type LimitRangeSpecList []*LimitRangeSpecBuilder
+// LimitRangeSpecList represents a listAlias of LimitRangeSpecApplyConfiguration.
+type LimitRangeSpecList []*LimitRangeSpecApplyConfiguration
 
-// LimitRangeSpecList represents a map of LimitRangeSpecBuilder.
-type LimitRangeSpecMap map[string]LimitRangeSpecBuilder
+// LimitRangeSpecList represents a map of LimitRangeSpecApplyConfiguration.
+type LimitRangeSpecMap map[string]LimitRangeSpecApplyConfiguration
 
-func (b *LimitRangeSpecBuilder) preMarshal() {
+func (b *LimitRangeSpecApplyConfiguration) preMarshal() {
 }
-func (b *LimitRangeSpecBuilder) postUnmarshal() {
+func (b *LimitRangeSpecApplyConfiguration) postUnmarshal() {
 }

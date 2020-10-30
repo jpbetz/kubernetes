@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// VolumeErrorBuilder represents an declarative configuration of the VolumeError type for use
+// VolumeErrorApplyConfiguration represents an declarative configuration of the VolumeError type for use
 // with apply.
-type VolumeErrorBuilder struct {
+type VolumeErrorApplyConfiguration struct {
 	fields volumeErrorFields
 }
 
+// VolumeErrorApplyConfiguration constructs an declarative configuration of the VolumeError type for use with
+// apply.
+func VolumeError() *VolumeErrorApplyConfiguration {
+	return &VolumeErrorApplyConfiguration{}
+}
+
 // volumeErrorFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in VolumeErrorBuilder.
+// Inline fields are owned by their respective inline type in VolumeErrorApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type volumeErrorFields struct {
 	Message *string  `json:"message,omitempty"`
 }
 
-// VolumeError constructs an declarative configuration of the VolumeError type for use with
-// apply.
-func VolumeError() *VolumeErrorBuilder {
-	return &VolumeErrorBuilder{}
-}
-
 // SetTime sets the Time field in the declarative configuration to the given value.
-func (b *VolumeErrorBuilder) SetTime(value v1.Time) *VolumeErrorBuilder {
+func (b *VolumeErrorApplyConfiguration) SetTime(value v1.Time) *VolumeErrorApplyConfiguration {
 	b.fields.Time = &value
 	return b
 }
 
 // RemoveTime removes the Time field from the declarative configuration.
-func (b *VolumeErrorBuilder) RemoveTime() *VolumeErrorBuilder {
+func (b *VolumeErrorApplyConfiguration) RemoveTime() *VolumeErrorApplyConfiguration {
 	b.fields.Time = nil
 	return b
 }
 
 // GetTime gets the Time field from the declarative configuration.
-func (b *VolumeErrorBuilder) GetTime() (value v1.Time, ok bool) {
+func (b *VolumeErrorApplyConfiguration) GetTime() (value v1.Time, ok bool) {
 	if v := b.fields.Time; v != nil {
 		return *v, true
 	}
@@ -68,27 +68,27 @@ func (b *VolumeErrorBuilder) GetTime() (value v1.Time, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b *VolumeErrorBuilder) SetMessage(value string) *VolumeErrorBuilder {
+func (b *VolumeErrorApplyConfiguration) SetMessage(value string) *VolumeErrorApplyConfiguration {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b *VolumeErrorBuilder) RemoveMessage() *VolumeErrorBuilder {
+func (b *VolumeErrorApplyConfiguration) RemoveMessage() *VolumeErrorApplyConfiguration {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b *VolumeErrorBuilder) GetMessage() (value string, ok bool) {
+func (b *VolumeErrorApplyConfiguration) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts VolumeErrorBuilder to unstructured.
-func (b *VolumeErrorBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts VolumeErrorApplyConfiguration to unstructured.
+func (b *VolumeErrorApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -100,9 +100,9 @@ func (b *VolumeErrorBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to VolumeErrorBuilder, replacing the contents
-// of VolumeErrorBuilder.
-func (b *VolumeErrorBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to VolumeErrorApplyConfiguration, replacing the contents
+// of VolumeErrorApplyConfiguration.
+func (b *VolumeErrorApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &volumeErrorFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -113,15 +113,15 @@ func (b *VolumeErrorBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals VolumeErrorBuilder to JSON.
-func (b *VolumeErrorBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals VolumeErrorApplyConfiguration to JSON.
+func (b *VolumeErrorApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into VolumeErrorBuilder, replacing the contents of
-// VolumeErrorBuilder.
-func (b *VolumeErrorBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into VolumeErrorApplyConfiguration, replacing the contents of
+// VolumeErrorApplyConfiguration.
+func (b *VolumeErrorApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -129,13 +129,13 @@ func (b *VolumeErrorBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// VolumeErrorList represents a list of VolumeErrorBuilder.
-type VolumeErrorList []*VolumeErrorBuilder
+// VolumeErrorList represents a listAlias of VolumeErrorApplyConfiguration.
+type VolumeErrorList []*VolumeErrorApplyConfiguration
 
-// VolumeErrorList represents a map of VolumeErrorBuilder.
-type VolumeErrorMap map[string]VolumeErrorBuilder
+// VolumeErrorList represents a map of VolumeErrorApplyConfiguration.
+type VolumeErrorMap map[string]VolumeErrorApplyConfiguration
 
-func (b *VolumeErrorBuilder) preMarshal() {
+func (b *VolumeErrorApplyConfiguration) preMarshal() {
 }
-func (b *VolumeErrorBuilder) postUnmarshal() {
+func (b *VolumeErrorApplyConfiguration) postUnmarshal() {
 }

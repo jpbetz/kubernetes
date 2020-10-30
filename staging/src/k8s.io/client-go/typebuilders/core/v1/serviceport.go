@@ -26,14 +26,20 @@ import (
 	intstr "k8s.io/apimachinery/pkg/util/intstr"
 )
 
-// ServicePortBuilder represents an declarative configuration of the ServicePort type for use
+// ServicePortApplyConfiguration represents an declarative configuration of the ServicePort type for use
 // with apply.
-type ServicePortBuilder struct {
+type ServicePortApplyConfiguration struct {
 	fields servicePortFields
 }
 
+// ServicePortApplyConfiguration constructs an declarative configuration of the ServicePort type for use with
+// apply.
+func ServicePort() *ServicePortApplyConfiguration {
+	return &ServicePortApplyConfiguration{}
+}
+
 // servicePortFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ServicePortBuilder.
+// Inline fields are owned by their respective inline type in ServicePortApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -46,26 +52,20 @@ type servicePortFields struct {
 	NodePort    *int32              `json:"nodePort,omitempty"`
 }
 
-// ServicePort constructs an declarative configuration of the ServicePort type for use with
-// apply.
-func ServicePort() *ServicePortBuilder {
-	return &ServicePortBuilder{}
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *ServicePortBuilder) SetName(value string) *ServicePortBuilder {
+func (b *ServicePortApplyConfiguration) SetName(value string) *ServicePortApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *ServicePortBuilder) RemoveName() *ServicePortBuilder {
+func (b *ServicePortApplyConfiguration) RemoveName() *ServicePortApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *ServicePortBuilder) GetName() (value string, ok bool) {
+func (b *ServicePortApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -73,19 +73,19 @@ func (b *ServicePortBuilder) GetName() (value string, ok bool) {
 }
 
 // SetProtocol sets the Protocol field in the declarative configuration to the given value.
-func (b *ServicePortBuilder) SetProtocol(value v1.Protocol) *ServicePortBuilder {
+func (b *ServicePortApplyConfiguration) SetProtocol(value v1.Protocol) *ServicePortApplyConfiguration {
 	b.fields.Protocol = &value
 	return b
 }
 
 // RemoveProtocol removes the Protocol field from the declarative configuration.
-func (b *ServicePortBuilder) RemoveProtocol() *ServicePortBuilder {
+func (b *ServicePortApplyConfiguration) RemoveProtocol() *ServicePortApplyConfiguration {
 	b.fields.Protocol = nil
 	return b
 }
 
 // GetProtocol gets the Protocol field from the declarative configuration.
-func (b *ServicePortBuilder) GetProtocol() (value v1.Protocol, ok bool) {
+func (b *ServicePortApplyConfiguration) GetProtocol() (value v1.Protocol, ok bool) {
 	if v := b.fields.Protocol; v != nil {
 		return *v, true
 	}
@@ -93,19 +93,19 @@ func (b *ServicePortBuilder) GetProtocol() (value v1.Protocol, ok bool) {
 }
 
 // SetAppProtocol sets the AppProtocol field in the declarative configuration to the given value.
-func (b *ServicePortBuilder) SetAppProtocol(value string) *ServicePortBuilder {
+func (b *ServicePortApplyConfiguration) SetAppProtocol(value string) *ServicePortApplyConfiguration {
 	b.fields.AppProtocol = &value
 	return b
 }
 
 // RemoveAppProtocol removes the AppProtocol field from the declarative configuration.
-func (b *ServicePortBuilder) RemoveAppProtocol() *ServicePortBuilder {
+func (b *ServicePortApplyConfiguration) RemoveAppProtocol() *ServicePortApplyConfiguration {
 	b.fields.AppProtocol = nil
 	return b
 }
 
 // GetAppProtocol gets the AppProtocol field from the declarative configuration.
-func (b *ServicePortBuilder) GetAppProtocol() (value string, ok bool) {
+func (b *ServicePortApplyConfiguration) GetAppProtocol() (value string, ok bool) {
 	if v := b.fields.AppProtocol; v != nil {
 		return *v, true
 	}
@@ -113,19 +113,19 @@ func (b *ServicePortBuilder) GetAppProtocol() (value string, ok bool) {
 }
 
 // SetPort sets the Port field in the declarative configuration to the given value.
-func (b *ServicePortBuilder) SetPort(value int32) *ServicePortBuilder {
+func (b *ServicePortApplyConfiguration) SetPort(value int32) *ServicePortApplyConfiguration {
 	b.fields.Port = &value
 	return b
 }
 
 // RemovePort removes the Port field from the declarative configuration.
-func (b *ServicePortBuilder) RemovePort() *ServicePortBuilder {
+func (b *ServicePortApplyConfiguration) RemovePort() *ServicePortApplyConfiguration {
 	b.fields.Port = nil
 	return b
 }
 
 // GetPort gets the Port field from the declarative configuration.
-func (b *ServicePortBuilder) GetPort() (value int32, ok bool) {
+func (b *ServicePortApplyConfiguration) GetPort() (value int32, ok bool) {
 	if v := b.fields.Port; v != nil {
 		return *v, true
 	}
@@ -133,19 +133,19 @@ func (b *ServicePortBuilder) GetPort() (value int32, ok bool) {
 }
 
 // SetTargetPort sets the TargetPort field in the declarative configuration to the given value.
-func (b *ServicePortBuilder) SetTargetPort(value intstr.IntOrString) *ServicePortBuilder {
+func (b *ServicePortApplyConfiguration) SetTargetPort(value intstr.IntOrString) *ServicePortApplyConfiguration {
 	b.fields.TargetPort = &value
 	return b
 }
 
 // RemoveTargetPort removes the TargetPort field from the declarative configuration.
-func (b *ServicePortBuilder) RemoveTargetPort() *ServicePortBuilder {
+func (b *ServicePortApplyConfiguration) RemoveTargetPort() *ServicePortApplyConfiguration {
 	b.fields.TargetPort = nil
 	return b
 }
 
 // GetTargetPort gets the TargetPort field from the declarative configuration.
-func (b *ServicePortBuilder) GetTargetPort() (value intstr.IntOrString, ok bool) {
+func (b *ServicePortApplyConfiguration) GetTargetPort() (value intstr.IntOrString, ok bool) {
 	if v := b.fields.TargetPort; v != nil {
 		return *v, true
 	}
@@ -153,27 +153,27 @@ func (b *ServicePortBuilder) GetTargetPort() (value intstr.IntOrString, ok bool)
 }
 
 // SetNodePort sets the NodePort field in the declarative configuration to the given value.
-func (b *ServicePortBuilder) SetNodePort(value int32) *ServicePortBuilder {
+func (b *ServicePortApplyConfiguration) SetNodePort(value int32) *ServicePortApplyConfiguration {
 	b.fields.NodePort = &value
 	return b
 }
 
 // RemoveNodePort removes the NodePort field from the declarative configuration.
-func (b *ServicePortBuilder) RemoveNodePort() *ServicePortBuilder {
+func (b *ServicePortApplyConfiguration) RemoveNodePort() *ServicePortApplyConfiguration {
 	b.fields.NodePort = nil
 	return b
 }
 
 // GetNodePort gets the NodePort field from the declarative configuration.
-func (b *ServicePortBuilder) GetNodePort() (value int32, ok bool) {
+func (b *ServicePortApplyConfiguration) GetNodePort() (value int32, ok bool) {
 	if v := b.fields.NodePort; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ServicePortBuilder to unstructured.
-func (b *ServicePortBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ServicePortApplyConfiguration to unstructured.
+func (b *ServicePortApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -185,9 +185,9 @@ func (b *ServicePortBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ServicePortBuilder, replacing the contents
-// of ServicePortBuilder.
-func (b *ServicePortBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ServicePortApplyConfiguration, replacing the contents
+// of ServicePortApplyConfiguration.
+func (b *ServicePortApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &servicePortFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -198,15 +198,15 @@ func (b *ServicePortBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals ServicePortBuilder to JSON.
-func (b *ServicePortBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ServicePortApplyConfiguration to JSON.
+func (b *ServicePortApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ServicePortBuilder, replacing the contents of
-// ServicePortBuilder.
-func (b *ServicePortBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ServicePortApplyConfiguration, replacing the contents of
+// ServicePortApplyConfiguration.
+func (b *ServicePortApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -214,13 +214,13 @@ func (b *ServicePortBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ServicePortList represents a list of ServicePortBuilder.
-type ServicePortList []*ServicePortBuilder
+// ServicePortList represents a listAlias of ServicePortApplyConfiguration.
+type ServicePortList []*ServicePortApplyConfiguration
 
-// ServicePortList represents a map of ServicePortBuilder.
-type ServicePortMap map[string]ServicePortBuilder
+// ServicePortList represents a map of ServicePortApplyConfiguration.
+type ServicePortMap map[string]ServicePortApplyConfiguration
 
-func (b *ServicePortBuilder) preMarshal() {
+func (b *ServicePortApplyConfiguration) preMarshal() {
 }
-func (b *ServicePortBuilder) postUnmarshal() {
+func (b *ServicePortApplyConfiguration) postUnmarshal() {
 }

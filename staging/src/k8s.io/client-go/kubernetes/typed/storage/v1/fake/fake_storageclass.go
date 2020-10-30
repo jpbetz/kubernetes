@@ -124,7 +124,7 @@ func (c *FakeStorageClasses) Patch(ctx context.Context, name string, pt types.Pa
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied storageClass.
-func (c *FakeStorageClasses) Apply(ctx context.Context, storageClass typebuildersstoragev1.StorageClassBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *storagev1.StorageClass, err error) {
+func (c *FakeStorageClasses) Apply(ctx context.Context, storageClass *typebuildersstoragev1.StorageClassApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *storagev1.StorageClass, err error) {
 	data, err := storageClass.MarshalJSON()
 	if err != nil {
 		return nil, err

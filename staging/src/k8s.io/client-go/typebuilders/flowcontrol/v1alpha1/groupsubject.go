@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// GroupSubjectBuilder represents an declarative configuration of the GroupSubject type for use
+// GroupSubjectApplyConfiguration represents an declarative configuration of the GroupSubject type for use
 // with apply.
-type GroupSubjectBuilder struct {
+type GroupSubjectApplyConfiguration struct {
 	fields groupSubjectFields
 }
 
+// GroupSubjectApplyConfiguration constructs an declarative configuration of the GroupSubject type for use with
+// apply.
+func GroupSubject() *GroupSubjectApplyConfiguration {
+	return &GroupSubjectApplyConfiguration{}
+}
+
 // groupSubjectFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in GroupSubjectBuilder.
+// Inline fields are owned by their respective inline type in GroupSubjectApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type groupSubjectFields struct {
 	Name *string `json:"name,omitempty"`
 }
 
-// GroupSubject constructs an declarative configuration of the GroupSubject type for use with
-// apply.
-func GroupSubject() *GroupSubjectBuilder {
-	return &GroupSubjectBuilder{}
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *GroupSubjectBuilder) SetName(value string) *GroupSubjectBuilder {
+func (b *GroupSubjectApplyConfiguration) SetName(value string) *GroupSubjectApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *GroupSubjectBuilder) RemoveName() *GroupSubjectBuilder {
+func (b *GroupSubjectApplyConfiguration) RemoveName() *GroupSubjectApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *GroupSubjectBuilder) GetName() (value string, ok bool) {
+func (b *GroupSubjectApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts GroupSubjectBuilder to unstructured.
-func (b *GroupSubjectBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts GroupSubjectApplyConfiguration to unstructured.
+func (b *GroupSubjectApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *GroupSubjectBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to GroupSubjectBuilder, replacing the contents
-// of GroupSubjectBuilder.
-func (b *GroupSubjectBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to GroupSubjectApplyConfiguration, replacing the contents
+// of GroupSubjectApplyConfiguration.
+func (b *GroupSubjectApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &groupSubjectFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *GroupSubjectBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals GroupSubjectBuilder to JSON.
-func (b *GroupSubjectBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals GroupSubjectApplyConfiguration to JSON.
+func (b *GroupSubjectApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into GroupSubjectBuilder, replacing the contents of
-// GroupSubjectBuilder.
-func (b *GroupSubjectBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into GroupSubjectApplyConfiguration, replacing the contents of
+// GroupSubjectApplyConfiguration.
+func (b *GroupSubjectApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *GroupSubjectBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// GroupSubjectList represents a list of GroupSubjectBuilder.
-type GroupSubjectList []*GroupSubjectBuilder
+// GroupSubjectList represents a listAlias of GroupSubjectApplyConfiguration.
+type GroupSubjectList []*GroupSubjectApplyConfiguration
 
-// GroupSubjectList represents a map of GroupSubjectBuilder.
-type GroupSubjectMap map[string]GroupSubjectBuilder
+// GroupSubjectList represents a map of GroupSubjectApplyConfiguration.
+type GroupSubjectMap map[string]GroupSubjectApplyConfiguration
 
-func (b *GroupSubjectBuilder) preMarshal() {
+func (b *GroupSubjectApplyConfiguration) preMarshal() {
 }
-func (b *GroupSubjectBuilder) postUnmarshal() {
+func (b *GroupSubjectApplyConfiguration) postUnmarshal() {
 }

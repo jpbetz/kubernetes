@@ -26,61 +26,61 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// NetworkPolicySpecBuilder represents an declarative configuration of the NetworkPolicySpec type for use
+// NetworkPolicySpecApplyConfiguration represents an declarative configuration of the NetworkPolicySpec type for use
 // with apply.
-type NetworkPolicySpecBuilder struct {
+type NetworkPolicySpecApplyConfiguration struct {
 	fields networkPolicySpecFields
 }
 
+// NetworkPolicySpecApplyConfiguration constructs an declarative configuration of the NetworkPolicySpec type for use with
+// apply.
+func NetworkPolicySpec() *NetworkPolicySpecApplyConfiguration {
+	return &NetworkPolicySpecApplyConfiguration{}
+}
+
 // networkPolicySpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NetworkPolicySpecBuilder.
+// Inline fields are owned by their respective inline type in NetworkPolicySpecApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type networkPolicySpecFields struct {
-	PodSelector *v1.LabelSelectorBuilder      `json:"podSelector,omitempty"`
-	Ingress     *NetworkPolicyIngressRuleList `json:"ingress,omitempty"`
-	Egress      *NetworkPolicyEgressRuleList  `json:"egress,omitempty"`
-	PolicyTypes *[]apinetworkingv1.PolicyType `json:"policyTypes,omitempty"`
-}
-
-// NetworkPolicySpec constructs an declarative configuration of the NetworkPolicySpec type for use with
-// apply.
-func NetworkPolicySpec() *NetworkPolicySpecBuilder {
-	return &NetworkPolicySpecBuilder{}
+	PodSelector *v1.LabelSelectorApplyConfiguration `json:"podSelector,omitempty"`
+	Ingress     *NetworkPolicyIngressRuleList       `json:"ingress,omitempty"`
+	Egress      *NetworkPolicyEgressRuleList        `json:"egress,omitempty"`
+	PolicyTypes *[]apinetworkingv1.PolicyType       `json:"policyTypes,omitempty"`
 }
 
 // SetPodSelector sets the PodSelector field in the declarative configuration to the given value.
-func (b *NetworkPolicySpecBuilder) SetPodSelector(value *v1.LabelSelectorBuilder) *NetworkPolicySpecBuilder {
+func (b *NetworkPolicySpecApplyConfiguration) SetPodSelector(value *v1.LabelSelectorApplyConfiguration) *NetworkPolicySpecApplyConfiguration {
 	b.fields.PodSelector = value
 	return b
 }
 
 // RemovePodSelector removes the PodSelector field from the declarative configuration.
-func (b *NetworkPolicySpecBuilder) RemovePodSelector() *NetworkPolicySpecBuilder {
+func (b *NetworkPolicySpecApplyConfiguration) RemovePodSelector() *NetworkPolicySpecApplyConfiguration {
 	b.fields.PodSelector = nil
 	return b
 }
 
 // GetPodSelector gets the PodSelector field from the declarative configuration.
-func (b *NetworkPolicySpecBuilder) GetPodSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+func (b *NetworkPolicySpecApplyConfiguration) GetPodSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
 	return b.fields.PodSelector, b.fields.PodSelector != nil
 }
 
 // SetIngress sets the Ingress field in the declarative configuration to the given value.
-func (b *NetworkPolicySpecBuilder) SetIngress(value NetworkPolicyIngressRuleList) *NetworkPolicySpecBuilder {
+func (b *NetworkPolicySpecApplyConfiguration) SetIngress(value NetworkPolicyIngressRuleList) *NetworkPolicySpecApplyConfiguration {
 	b.fields.Ingress = &value
 	return b
 }
 
 // RemoveIngress removes the Ingress field from the declarative configuration.
-func (b *NetworkPolicySpecBuilder) RemoveIngress() *NetworkPolicySpecBuilder {
+func (b *NetworkPolicySpecApplyConfiguration) RemoveIngress() *NetworkPolicySpecApplyConfiguration {
 	b.fields.Ingress = nil
 	return b
 }
 
 // GetIngress gets the Ingress field from the declarative configuration.
-func (b *NetworkPolicySpecBuilder) GetIngress() (value NetworkPolicyIngressRuleList, ok bool) {
+func (b *NetworkPolicySpecApplyConfiguration) GetIngress() (value NetworkPolicyIngressRuleList, ok bool) {
 	if v := b.fields.Ingress; v != nil {
 		return *v, true
 	}
@@ -88,19 +88,19 @@ func (b *NetworkPolicySpecBuilder) GetIngress() (value NetworkPolicyIngressRuleL
 }
 
 // SetEgress sets the Egress field in the declarative configuration to the given value.
-func (b *NetworkPolicySpecBuilder) SetEgress(value NetworkPolicyEgressRuleList) *NetworkPolicySpecBuilder {
+func (b *NetworkPolicySpecApplyConfiguration) SetEgress(value NetworkPolicyEgressRuleList) *NetworkPolicySpecApplyConfiguration {
 	b.fields.Egress = &value
 	return b
 }
 
 // RemoveEgress removes the Egress field from the declarative configuration.
-func (b *NetworkPolicySpecBuilder) RemoveEgress() *NetworkPolicySpecBuilder {
+func (b *NetworkPolicySpecApplyConfiguration) RemoveEgress() *NetworkPolicySpecApplyConfiguration {
 	b.fields.Egress = nil
 	return b
 }
 
 // GetEgress gets the Egress field from the declarative configuration.
-func (b *NetworkPolicySpecBuilder) GetEgress() (value NetworkPolicyEgressRuleList, ok bool) {
+func (b *NetworkPolicySpecApplyConfiguration) GetEgress() (value NetworkPolicyEgressRuleList, ok bool) {
 	if v := b.fields.Egress; v != nil {
 		return *v, true
 	}
@@ -108,27 +108,27 @@ func (b *NetworkPolicySpecBuilder) GetEgress() (value NetworkPolicyEgressRuleLis
 }
 
 // SetPolicyTypes sets the PolicyTypes field in the declarative configuration to the given value.
-func (b *NetworkPolicySpecBuilder) SetPolicyTypes(value []apinetworkingv1.PolicyType) *NetworkPolicySpecBuilder {
+func (b *NetworkPolicySpecApplyConfiguration) SetPolicyTypes(value []apinetworkingv1.PolicyType) *NetworkPolicySpecApplyConfiguration {
 	b.fields.PolicyTypes = &value
 	return b
 }
 
 // RemovePolicyTypes removes the PolicyTypes field from the declarative configuration.
-func (b *NetworkPolicySpecBuilder) RemovePolicyTypes() *NetworkPolicySpecBuilder {
+func (b *NetworkPolicySpecApplyConfiguration) RemovePolicyTypes() *NetworkPolicySpecApplyConfiguration {
 	b.fields.PolicyTypes = nil
 	return b
 }
 
 // GetPolicyTypes gets the PolicyTypes field from the declarative configuration.
-func (b *NetworkPolicySpecBuilder) GetPolicyTypes() (value []apinetworkingv1.PolicyType, ok bool) {
+func (b *NetworkPolicySpecApplyConfiguration) GetPolicyTypes() (value []apinetworkingv1.PolicyType, ok bool) {
 	if v := b.fields.PolicyTypes; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts NetworkPolicySpecBuilder to unstructured.
-func (b *NetworkPolicySpecBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NetworkPolicySpecApplyConfiguration to unstructured.
+func (b *NetworkPolicySpecApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -140,9 +140,9 @@ func (b *NetworkPolicySpecBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NetworkPolicySpecBuilder, replacing the contents
-// of NetworkPolicySpecBuilder.
-func (b *NetworkPolicySpecBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NetworkPolicySpecApplyConfiguration, replacing the contents
+// of NetworkPolicySpecApplyConfiguration.
+func (b *NetworkPolicySpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &networkPolicySpecFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -153,15 +153,15 @@ func (b *NetworkPolicySpecBuilder) FromUnstructured(u map[string]interface{}) er
 	return nil
 }
 
-// MarshalJSON marshals NetworkPolicySpecBuilder to JSON.
-func (b *NetworkPolicySpecBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NetworkPolicySpecApplyConfiguration to JSON.
+func (b *NetworkPolicySpecApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NetworkPolicySpecBuilder, replacing the contents of
-// NetworkPolicySpecBuilder.
-func (b *NetworkPolicySpecBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NetworkPolicySpecApplyConfiguration, replacing the contents of
+// NetworkPolicySpecApplyConfiguration.
+func (b *NetworkPolicySpecApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -169,13 +169,13 @@ func (b *NetworkPolicySpecBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NetworkPolicySpecList represents a list of NetworkPolicySpecBuilder.
-type NetworkPolicySpecList []*NetworkPolicySpecBuilder
+// NetworkPolicySpecList represents a listAlias of NetworkPolicySpecApplyConfiguration.
+type NetworkPolicySpecList []*NetworkPolicySpecApplyConfiguration
 
-// NetworkPolicySpecList represents a map of NetworkPolicySpecBuilder.
-type NetworkPolicySpecMap map[string]NetworkPolicySpecBuilder
+// NetworkPolicySpecList represents a map of NetworkPolicySpecApplyConfiguration.
+type NetworkPolicySpecMap map[string]NetworkPolicySpecApplyConfiguration
 
-func (b *NetworkPolicySpecBuilder) preMarshal() {
+func (b *NetworkPolicySpecApplyConfiguration) preMarshal() {
 }
-func (b *NetworkPolicySpecBuilder) postUnmarshal() {
+func (b *NetworkPolicySpecApplyConfiguration) postUnmarshal() {
 }

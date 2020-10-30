@@ -25,46 +25,46 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// MetricStatusBuilder represents an declarative configuration of the MetricStatus type for use
+// MetricStatusApplyConfiguration represents an declarative configuration of the MetricStatus type for use
 // with apply.
-type MetricStatusBuilder struct {
+type MetricStatusApplyConfiguration struct {
 	fields metricStatusFields
 }
 
+// MetricStatusApplyConfiguration constructs an declarative configuration of the MetricStatus type for use with
+// apply.
+func MetricStatus() *MetricStatusApplyConfiguration {
+	return &MetricStatusApplyConfiguration{}
+}
+
 // metricStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in MetricStatusBuilder.
+// Inline fields are owned by their respective inline type in MetricStatusApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type metricStatusFields struct {
-	Type              *v2beta1.MetricSourceType             `json:"type,omitempty"`
-	Object            *ObjectMetricStatusBuilder            `json:"object,omitempty"`
-	Pods              *PodsMetricStatusBuilder              `json:"pods,omitempty"`
-	Resource          *ResourceMetricStatusBuilder          `json:"resource,omitempty"`
-	ContainerResource *ContainerResourceMetricStatusBuilder `json:"containerResource,omitempty"`
-	External          *ExternalMetricStatusBuilder          `json:"external,omitempty"`
-}
-
-// MetricStatus constructs an declarative configuration of the MetricStatus type for use with
-// apply.
-func MetricStatus() *MetricStatusBuilder {
-	return &MetricStatusBuilder{}
+	Type              *v2beta1.MetricSourceType                        `json:"type,omitempty"`
+	Object            *ObjectMetricStatusApplyConfiguration            `json:"object,omitempty"`
+	Pods              *PodsMetricStatusApplyConfiguration              `json:"pods,omitempty"`
+	Resource          *ResourceMetricStatusApplyConfiguration          `json:"resource,omitempty"`
+	ContainerResource *ContainerResourceMetricStatusApplyConfiguration `json:"containerResource,omitempty"`
+	External          *ExternalMetricStatusApplyConfiguration          `json:"external,omitempty"`
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b *MetricStatusBuilder) SetType(value v2beta1.MetricSourceType) *MetricStatusBuilder {
+func (b *MetricStatusApplyConfiguration) SetType(value v2beta1.MetricSourceType) *MetricStatusApplyConfiguration {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b *MetricStatusBuilder) RemoveType() *MetricStatusBuilder {
+func (b *MetricStatusApplyConfiguration) RemoveType() *MetricStatusApplyConfiguration {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b *MetricStatusBuilder) GetType() (value v2beta1.MetricSourceType, ok bool) {
+func (b *MetricStatusApplyConfiguration) GetType() (value v2beta1.MetricSourceType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -72,92 +72,92 @@ func (b *MetricStatusBuilder) GetType() (value v2beta1.MetricSourceType, ok bool
 }
 
 // SetObject sets the Object field in the declarative configuration to the given value.
-func (b *MetricStatusBuilder) SetObject(value *ObjectMetricStatusBuilder) *MetricStatusBuilder {
+func (b *MetricStatusApplyConfiguration) SetObject(value *ObjectMetricStatusApplyConfiguration) *MetricStatusApplyConfiguration {
 	b.fields.Object = value
 	return b
 }
 
 // RemoveObject removes the Object field from the declarative configuration.
-func (b *MetricStatusBuilder) RemoveObject() *MetricStatusBuilder {
+func (b *MetricStatusApplyConfiguration) RemoveObject() *MetricStatusApplyConfiguration {
 	b.fields.Object = nil
 	return b
 }
 
 // GetObject gets the Object field from the declarative configuration.
-func (b *MetricStatusBuilder) GetObject() (value *ObjectMetricStatusBuilder, ok bool) {
+func (b *MetricStatusApplyConfiguration) GetObject() (value *ObjectMetricStatusApplyConfiguration, ok bool) {
 	return b.fields.Object, b.fields.Object != nil
 }
 
 // SetPods sets the Pods field in the declarative configuration to the given value.
-func (b *MetricStatusBuilder) SetPods(value *PodsMetricStatusBuilder) *MetricStatusBuilder {
+func (b *MetricStatusApplyConfiguration) SetPods(value *PodsMetricStatusApplyConfiguration) *MetricStatusApplyConfiguration {
 	b.fields.Pods = value
 	return b
 }
 
 // RemovePods removes the Pods field from the declarative configuration.
-func (b *MetricStatusBuilder) RemovePods() *MetricStatusBuilder {
+func (b *MetricStatusApplyConfiguration) RemovePods() *MetricStatusApplyConfiguration {
 	b.fields.Pods = nil
 	return b
 }
 
 // GetPods gets the Pods field from the declarative configuration.
-func (b *MetricStatusBuilder) GetPods() (value *PodsMetricStatusBuilder, ok bool) {
+func (b *MetricStatusApplyConfiguration) GetPods() (value *PodsMetricStatusApplyConfiguration, ok bool) {
 	return b.fields.Pods, b.fields.Pods != nil
 }
 
 // SetResource sets the Resource field in the declarative configuration to the given value.
-func (b *MetricStatusBuilder) SetResource(value *ResourceMetricStatusBuilder) *MetricStatusBuilder {
+func (b *MetricStatusApplyConfiguration) SetResource(value *ResourceMetricStatusApplyConfiguration) *MetricStatusApplyConfiguration {
 	b.fields.Resource = value
 	return b
 }
 
 // RemoveResource removes the Resource field from the declarative configuration.
-func (b *MetricStatusBuilder) RemoveResource() *MetricStatusBuilder {
+func (b *MetricStatusApplyConfiguration) RemoveResource() *MetricStatusApplyConfiguration {
 	b.fields.Resource = nil
 	return b
 }
 
 // GetResource gets the Resource field from the declarative configuration.
-func (b *MetricStatusBuilder) GetResource() (value *ResourceMetricStatusBuilder, ok bool) {
+func (b *MetricStatusApplyConfiguration) GetResource() (value *ResourceMetricStatusApplyConfiguration, ok bool) {
 	return b.fields.Resource, b.fields.Resource != nil
 }
 
 // SetContainerResource sets the ContainerResource field in the declarative configuration to the given value.
-func (b *MetricStatusBuilder) SetContainerResource(value *ContainerResourceMetricStatusBuilder) *MetricStatusBuilder {
+func (b *MetricStatusApplyConfiguration) SetContainerResource(value *ContainerResourceMetricStatusApplyConfiguration) *MetricStatusApplyConfiguration {
 	b.fields.ContainerResource = value
 	return b
 }
 
 // RemoveContainerResource removes the ContainerResource field from the declarative configuration.
-func (b *MetricStatusBuilder) RemoveContainerResource() *MetricStatusBuilder {
+func (b *MetricStatusApplyConfiguration) RemoveContainerResource() *MetricStatusApplyConfiguration {
 	b.fields.ContainerResource = nil
 	return b
 }
 
 // GetContainerResource gets the ContainerResource field from the declarative configuration.
-func (b *MetricStatusBuilder) GetContainerResource() (value *ContainerResourceMetricStatusBuilder, ok bool) {
+func (b *MetricStatusApplyConfiguration) GetContainerResource() (value *ContainerResourceMetricStatusApplyConfiguration, ok bool) {
 	return b.fields.ContainerResource, b.fields.ContainerResource != nil
 }
 
 // SetExternal sets the External field in the declarative configuration to the given value.
-func (b *MetricStatusBuilder) SetExternal(value *ExternalMetricStatusBuilder) *MetricStatusBuilder {
+func (b *MetricStatusApplyConfiguration) SetExternal(value *ExternalMetricStatusApplyConfiguration) *MetricStatusApplyConfiguration {
 	b.fields.External = value
 	return b
 }
 
 // RemoveExternal removes the External field from the declarative configuration.
-func (b *MetricStatusBuilder) RemoveExternal() *MetricStatusBuilder {
+func (b *MetricStatusApplyConfiguration) RemoveExternal() *MetricStatusApplyConfiguration {
 	b.fields.External = nil
 	return b
 }
 
 // GetExternal gets the External field from the declarative configuration.
-func (b *MetricStatusBuilder) GetExternal() (value *ExternalMetricStatusBuilder, ok bool) {
+func (b *MetricStatusApplyConfiguration) GetExternal() (value *ExternalMetricStatusApplyConfiguration, ok bool) {
 	return b.fields.External, b.fields.External != nil
 }
 
-// ToUnstructured converts MetricStatusBuilder to unstructured.
-func (b *MetricStatusBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts MetricStatusApplyConfiguration to unstructured.
+func (b *MetricStatusApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -169,9 +169,9 @@ func (b *MetricStatusBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to MetricStatusBuilder, replacing the contents
-// of MetricStatusBuilder.
-func (b *MetricStatusBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to MetricStatusApplyConfiguration, replacing the contents
+// of MetricStatusApplyConfiguration.
+func (b *MetricStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &metricStatusFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -182,15 +182,15 @@ func (b *MetricStatusBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals MetricStatusBuilder to JSON.
-func (b *MetricStatusBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals MetricStatusApplyConfiguration to JSON.
+func (b *MetricStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into MetricStatusBuilder, replacing the contents of
-// MetricStatusBuilder.
-func (b *MetricStatusBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into MetricStatusApplyConfiguration, replacing the contents of
+// MetricStatusApplyConfiguration.
+func (b *MetricStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -198,13 +198,13 @@ func (b *MetricStatusBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MetricStatusList represents a list of MetricStatusBuilder.
-type MetricStatusList []*MetricStatusBuilder
+// MetricStatusList represents a listAlias of MetricStatusApplyConfiguration.
+type MetricStatusList []*MetricStatusApplyConfiguration
 
-// MetricStatusList represents a map of MetricStatusBuilder.
-type MetricStatusMap map[string]MetricStatusBuilder
+// MetricStatusList represents a map of MetricStatusApplyConfiguration.
+type MetricStatusMap map[string]MetricStatusApplyConfiguration
 
-func (b *MetricStatusBuilder) preMarshal() {
+func (b *MetricStatusApplyConfiguration) preMarshal() {
 }
-func (b *MetricStatusBuilder) postUnmarshal() {
+func (b *MetricStatusApplyConfiguration) postUnmarshal() {
 }

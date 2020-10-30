@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// LoadBalancerIngressBuilder represents an declarative configuration of the LoadBalancerIngress type for use
+// LoadBalancerIngressApplyConfiguration represents an declarative configuration of the LoadBalancerIngress type for use
 // with apply.
-type LoadBalancerIngressBuilder struct {
+type LoadBalancerIngressApplyConfiguration struct {
 	fields loadBalancerIngressFields
 }
 
+// LoadBalancerIngressApplyConfiguration constructs an declarative configuration of the LoadBalancerIngress type for use with
+// apply.
+func LoadBalancerIngress() *LoadBalancerIngressApplyConfiguration {
+	return &LoadBalancerIngressApplyConfiguration{}
+}
+
 // loadBalancerIngressFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LoadBalancerIngressBuilder.
+// Inline fields are owned by their respective inline type in LoadBalancerIngressApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type loadBalancerIngressFields struct {
 	Hostname *string `json:"hostname,omitempty"`
 }
 
-// LoadBalancerIngress constructs an declarative configuration of the LoadBalancerIngress type for use with
-// apply.
-func LoadBalancerIngress() *LoadBalancerIngressBuilder {
-	return &LoadBalancerIngressBuilder{}
-}
-
 // SetIP sets the IP field in the declarative configuration to the given value.
-func (b *LoadBalancerIngressBuilder) SetIP(value string) *LoadBalancerIngressBuilder {
+func (b *LoadBalancerIngressApplyConfiguration) SetIP(value string) *LoadBalancerIngressApplyConfiguration {
 	b.fields.IP = &value
 	return b
 }
 
 // RemoveIP removes the IP field from the declarative configuration.
-func (b *LoadBalancerIngressBuilder) RemoveIP() *LoadBalancerIngressBuilder {
+func (b *LoadBalancerIngressApplyConfiguration) RemoveIP() *LoadBalancerIngressApplyConfiguration {
 	b.fields.IP = nil
 	return b
 }
 
 // GetIP gets the IP field from the declarative configuration.
-func (b *LoadBalancerIngressBuilder) GetIP() (value string, ok bool) {
+func (b *LoadBalancerIngressApplyConfiguration) GetIP() (value string, ok bool) {
 	if v := b.fields.IP; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *LoadBalancerIngressBuilder) GetIP() (value string, ok bool) {
 }
 
 // SetHostname sets the Hostname field in the declarative configuration to the given value.
-func (b *LoadBalancerIngressBuilder) SetHostname(value string) *LoadBalancerIngressBuilder {
+func (b *LoadBalancerIngressApplyConfiguration) SetHostname(value string) *LoadBalancerIngressApplyConfiguration {
 	b.fields.Hostname = &value
 	return b
 }
 
 // RemoveHostname removes the Hostname field from the declarative configuration.
-func (b *LoadBalancerIngressBuilder) RemoveHostname() *LoadBalancerIngressBuilder {
+func (b *LoadBalancerIngressApplyConfiguration) RemoveHostname() *LoadBalancerIngressApplyConfiguration {
 	b.fields.Hostname = nil
 	return b
 }
 
 // GetHostname gets the Hostname field from the declarative configuration.
-func (b *LoadBalancerIngressBuilder) GetHostname() (value string, ok bool) {
+func (b *LoadBalancerIngressApplyConfiguration) GetHostname() (value string, ok bool) {
 	if v := b.fields.Hostname; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts LoadBalancerIngressBuilder to unstructured.
-func (b *LoadBalancerIngressBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts LoadBalancerIngressApplyConfiguration to unstructured.
+func (b *LoadBalancerIngressApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *LoadBalancerIngressBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to LoadBalancerIngressBuilder, replacing the contents
-// of LoadBalancerIngressBuilder.
-func (b *LoadBalancerIngressBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to LoadBalancerIngressApplyConfiguration, replacing the contents
+// of LoadBalancerIngressApplyConfiguration.
+func (b *LoadBalancerIngressApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &loadBalancerIngressFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *LoadBalancerIngressBuilder) FromUnstructured(u map[string]interface{}) 
 	return nil
 }
 
-// MarshalJSON marshals LoadBalancerIngressBuilder to JSON.
-func (b *LoadBalancerIngressBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals LoadBalancerIngressApplyConfiguration to JSON.
+func (b *LoadBalancerIngressApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into LoadBalancerIngressBuilder, replacing the contents of
-// LoadBalancerIngressBuilder.
-func (b *LoadBalancerIngressBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into LoadBalancerIngressApplyConfiguration, replacing the contents of
+// LoadBalancerIngressApplyConfiguration.
+func (b *LoadBalancerIngressApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *LoadBalancerIngressBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// LoadBalancerIngressList represents a list of LoadBalancerIngressBuilder.
-type LoadBalancerIngressList []*LoadBalancerIngressBuilder
+// LoadBalancerIngressList represents a listAlias of LoadBalancerIngressApplyConfiguration.
+type LoadBalancerIngressList []*LoadBalancerIngressApplyConfiguration
 
-// LoadBalancerIngressList represents a map of LoadBalancerIngressBuilder.
-type LoadBalancerIngressMap map[string]LoadBalancerIngressBuilder
+// LoadBalancerIngressList represents a map of LoadBalancerIngressApplyConfiguration.
+type LoadBalancerIngressMap map[string]LoadBalancerIngressApplyConfiguration
 
-func (b *LoadBalancerIngressBuilder) preMarshal() {
+func (b *LoadBalancerIngressApplyConfiguration) preMarshal() {
 }
-func (b *LoadBalancerIngressBuilder) postUnmarshal() {
+func (b *LoadBalancerIngressApplyConfiguration) postUnmarshal() {
 }

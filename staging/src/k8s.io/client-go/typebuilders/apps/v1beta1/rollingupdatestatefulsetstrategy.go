@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// RollingUpdateStatefulSetStrategyBuilder represents an declarative configuration of the RollingUpdateStatefulSetStrategy type for use
+// RollingUpdateStatefulSetStrategyApplyConfiguration represents an declarative configuration of the RollingUpdateStatefulSetStrategy type for use
 // with apply.
-type RollingUpdateStatefulSetStrategyBuilder struct {
+type RollingUpdateStatefulSetStrategyApplyConfiguration struct {
 	fields rollingUpdateStatefulSetStrategyFields
 }
 
+// RollingUpdateStatefulSetStrategyApplyConfiguration constructs an declarative configuration of the RollingUpdateStatefulSetStrategy type for use with
+// apply.
+func RollingUpdateStatefulSetStrategy() *RollingUpdateStatefulSetStrategyApplyConfiguration {
+	return &RollingUpdateStatefulSetStrategyApplyConfiguration{}
+}
+
 // rollingUpdateStatefulSetStrategyFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in RollingUpdateStatefulSetStrategyBuilder.
+// Inline fields are owned by their respective inline type in RollingUpdateStatefulSetStrategyApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type rollingUpdateStatefulSetStrategyFields struct {
 	Partition *int32 `json:"partition,omitempty"`
 }
 
-// RollingUpdateStatefulSetStrategy constructs an declarative configuration of the RollingUpdateStatefulSetStrategy type for use with
-// apply.
-func RollingUpdateStatefulSetStrategy() *RollingUpdateStatefulSetStrategyBuilder {
-	return &RollingUpdateStatefulSetStrategyBuilder{}
-}
-
 // SetPartition sets the Partition field in the declarative configuration to the given value.
-func (b *RollingUpdateStatefulSetStrategyBuilder) SetPartition(value int32) *RollingUpdateStatefulSetStrategyBuilder {
+func (b *RollingUpdateStatefulSetStrategyApplyConfiguration) SetPartition(value int32) *RollingUpdateStatefulSetStrategyApplyConfiguration {
 	b.fields.Partition = &value
 	return b
 }
 
 // RemovePartition removes the Partition field from the declarative configuration.
-func (b *RollingUpdateStatefulSetStrategyBuilder) RemovePartition() *RollingUpdateStatefulSetStrategyBuilder {
+func (b *RollingUpdateStatefulSetStrategyApplyConfiguration) RemovePartition() *RollingUpdateStatefulSetStrategyApplyConfiguration {
 	b.fields.Partition = nil
 	return b
 }
 
 // GetPartition gets the Partition field from the declarative configuration.
-func (b *RollingUpdateStatefulSetStrategyBuilder) GetPartition() (value int32, ok bool) {
+func (b *RollingUpdateStatefulSetStrategyApplyConfiguration) GetPartition() (value int32, ok bool) {
 	if v := b.fields.Partition; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts RollingUpdateStatefulSetStrategyBuilder to unstructured.
-func (b *RollingUpdateStatefulSetStrategyBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts RollingUpdateStatefulSetStrategyApplyConfiguration to unstructured.
+func (b *RollingUpdateStatefulSetStrategyApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *RollingUpdateStatefulSetStrategyBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to RollingUpdateStatefulSetStrategyBuilder, replacing the contents
-// of RollingUpdateStatefulSetStrategyBuilder.
-func (b *RollingUpdateStatefulSetStrategyBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to RollingUpdateStatefulSetStrategyApplyConfiguration, replacing the contents
+// of RollingUpdateStatefulSetStrategyApplyConfiguration.
+func (b *RollingUpdateStatefulSetStrategyApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &rollingUpdateStatefulSetStrategyFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *RollingUpdateStatefulSetStrategyBuilder) FromUnstructured(u map[string]
 	return nil
 }
 
-// MarshalJSON marshals RollingUpdateStatefulSetStrategyBuilder to JSON.
-func (b *RollingUpdateStatefulSetStrategyBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals RollingUpdateStatefulSetStrategyApplyConfiguration to JSON.
+func (b *RollingUpdateStatefulSetStrategyApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into RollingUpdateStatefulSetStrategyBuilder, replacing the contents of
-// RollingUpdateStatefulSetStrategyBuilder.
-func (b *RollingUpdateStatefulSetStrategyBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into RollingUpdateStatefulSetStrategyApplyConfiguration, replacing the contents of
+// RollingUpdateStatefulSetStrategyApplyConfiguration.
+func (b *RollingUpdateStatefulSetStrategyApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *RollingUpdateStatefulSetStrategyBuilder) UnmarshalJSON(data []byte) err
 	return nil
 }
 
-// RollingUpdateStatefulSetStrategyList represents a list of RollingUpdateStatefulSetStrategyBuilder.
-type RollingUpdateStatefulSetStrategyList []*RollingUpdateStatefulSetStrategyBuilder
+// RollingUpdateStatefulSetStrategyList represents a listAlias of RollingUpdateStatefulSetStrategyApplyConfiguration.
+type RollingUpdateStatefulSetStrategyList []*RollingUpdateStatefulSetStrategyApplyConfiguration
 
-// RollingUpdateStatefulSetStrategyList represents a map of RollingUpdateStatefulSetStrategyBuilder.
-type RollingUpdateStatefulSetStrategyMap map[string]RollingUpdateStatefulSetStrategyBuilder
+// RollingUpdateStatefulSetStrategyList represents a map of RollingUpdateStatefulSetStrategyApplyConfiguration.
+type RollingUpdateStatefulSetStrategyMap map[string]RollingUpdateStatefulSetStrategyApplyConfiguration
 
-func (b *RollingUpdateStatefulSetStrategyBuilder) preMarshal() {
+func (b *RollingUpdateStatefulSetStrategyApplyConfiguration) preMarshal() {
 }
-func (b *RollingUpdateStatefulSetStrategyBuilder) postUnmarshal() {
+func (b *RollingUpdateStatefulSetStrategyApplyConfiguration) postUnmarshal() {
 }

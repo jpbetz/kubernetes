@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// NodeAddressBuilder represents an declarative configuration of the NodeAddress type for use
+// NodeAddressApplyConfiguration represents an declarative configuration of the NodeAddress type for use
 // with apply.
-type NodeAddressBuilder struct {
+type NodeAddressApplyConfiguration struct {
 	fields nodeAddressFields
 }
 
+// NodeAddressApplyConfiguration constructs an declarative configuration of the NodeAddress type for use with
+// apply.
+func NodeAddress() *NodeAddressApplyConfiguration {
+	return &NodeAddressApplyConfiguration{}
+}
+
 // nodeAddressFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NodeAddressBuilder.
+// Inline fields are owned by their respective inline type in NodeAddressApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type nodeAddressFields struct {
 	Address *string             `json:"address,omitempty"`
 }
 
-// NodeAddress constructs an declarative configuration of the NodeAddress type for use with
-// apply.
-func NodeAddress() *NodeAddressBuilder {
-	return &NodeAddressBuilder{}
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b *NodeAddressBuilder) SetType(value v1.NodeAddressType) *NodeAddressBuilder {
+func (b *NodeAddressApplyConfiguration) SetType(value v1.NodeAddressType) *NodeAddressApplyConfiguration {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b *NodeAddressBuilder) RemoveType() *NodeAddressBuilder {
+func (b *NodeAddressApplyConfiguration) RemoveType() *NodeAddressApplyConfiguration {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b *NodeAddressBuilder) GetType() (value v1.NodeAddressType, ok bool) {
+func (b *NodeAddressApplyConfiguration) GetType() (value v1.NodeAddressType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -68,27 +68,27 @@ func (b *NodeAddressBuilder) GetType() (value v1.NodeAddressType, ok bool) {
 }
 
 // SetAddress sets the Address field in the declarative configuration to the given value.
-func (b *NodeAddressBuilder) SetAddress(value string) *NodeAddressBuilder {
+func (b *NodeAddressApplyConfiguration) SetAddress(value string) *NodeAddressApplyConfiguration {
 	b.fields.Address = &value
 	return b
 }
 
 // RemoveAddress removes the Address field from the declarative configuration.
-func (b *NodeAddressBuilder) RemoveAddress() *NodeAddressBuilder {
+func (b *NodeAddressApplyConfiguration) RemoveAddress() *NodeAddressApplyConfiguration {
 	b.fields.Address = nil
 	return b
 }
 
 // GetAddress gets the Address field from the declarative configuration.
-func (b *NodeAddressBuilder) GetAddress() (value string, ok bool) {
+func (b *NodeAddressApplyConfiguration) GetAddress() (value string, ok bool) {
 	if v := b.fields.Address; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts NodeAddressBuilder to unstructured.
-func (b *NodeAddressBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NodeAddressApplyConfiguration to unstructured.
+func (b *NodeAddressApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -100,9 +100,9 @@ func (b *NodeAddressBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NodeAddressBuilder, replacing the contents
-// of NodeAddressBuilder.
-func (b *NodeAddressBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NodeAddressApplyConfiguration, replacing the contents
+// of NodeAddressApplyConfiguration.
+func (b *NodeAddressApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &nodeAddressFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -113,15 +113,15 @@ func (b *NodeAddressBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals NodeAddressBuilder to JSON.
-func (b *NodeAddressBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NodeAddressApplyConfiguration to JSON.
+func (b *NodeAddressApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NodeAddressBuilder, replacing the contents of
-// NodeAddressBuilder.
-func (b *NodeAddressBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NodeAddressApplyConfiguration, replacing the contents of
+// NodeAddressApplyConfiguration.
+func (b *NodeAddressApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -129,13 +129,13 @@ func (b *NodeAddressBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NodeAddressList represents a list of NodeAddressBuilder.
-type NodeAddressList []*NodeAddressBuilder
+// NodeAddressList represents a listAlias of NodeAddressApplyConfiguration.
+type NodeAddressList []*NodeAddressApplyConfiguration
 
-// NodeAddressList represents a map of NodeAddressBuilder.
-type NodeAddressMap map[string]NodeAddressBuilder
+// NodeAddressList represents a map of NodeAddressApplyConfiguration.
+type NodeAddressMap map[string]NodeAddressApplyConfiguration
 
-func (b *NodeAddressBuilder) preMarshal() {
+func (b *NodeAddressApplyConfiguration) preMarshal() {
 }
-func (b *NodeAddressBuilder) postUnmarshal() {
+func (b *NodeAddressApplyConfiguration) postUnmarshal() {
 }

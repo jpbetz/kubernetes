@@ -26,14 +26,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ResourceMetricStatusBuilder represents an declarative configuration of the ResourceMetricStatus type for use
+// ResourceMetricStatusApplyConfiguration represents an declarative configuration of the ResourceMetricStatus type for use
 // with apply.
-type ResourceMetricStatusBuilder struct {
+type ResourceMetricStatusApplyConfiguration struct {
 	fields resourceMetricStatusFields
 }
 
+// ResourceMetricStatusApplyConfiguration constructs an declarative configuration of the ResourceMetricStatus type for use with
+// apply.
+func ResourceMetricStatus() *ResourceMetricStatusApplyConfiguration {
+	return &ResourceMetricStatusApplyConfiguration{}
+}
+
 // resourceMetricStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ResourceMetricStatusBuilder.
+// Inline fields are owned by their respective inline type in ResourceMetricStatusApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -43,26 +49,20 @@ type resourceMetricStatusFields struct {
 	CurrentAverageValue       *resource.Quantity `json:"currentAverageValue,omitempty"`
 }
 
-// ResourceMetricStatus constructs an declarative configuration of the ResourceMetricStatus type for use with
-// apply.
-func ResourceMetricStatus() *ResourceMetricStatusBuilder {
-	return &ResourceMetricStatusBuilder{}
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *ResourceMetricStatusBuilder) SetName(value v1.ResourceName) *ResourceMetricStatusBuilder {
+func (b *ResourceMetricStatusApplyConfiguration) SetName(value v1.ResourceName) *ResourceMetricStatusApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *ResourceMetricStatusBuilder) RemoveName() *ResourceMetricStatusBuilder {
+func (b *ResourceMetricStatusApplyConfiguration) RemoveName() *ResourceMetricStatusApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *ResourceMetricStatusBuilder) GetName() (value v1.ResourceName, ok bool) {
+func (b *ResourceMetricStatusApplyConfiguration) GetName() (value v1.ResourceName, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -70,19 +70,19 @@ func (b *ResourceMetricStatusBuilder) GetName() (value v1.ResourceName, ok bool)
 }
 
 // SetCurrentAverageUtilization sets the CurrentAverageUtilization field in the declarative configuration to the given value.
-func (b *ResourceMetricStatusBuilder) SetCurrentAverageUtilization(value int32) *ResourceMetricStatusBuilder {
+func (b *ResourceMetricStatusApplyConfiguration) SetCurrentAverageUtilization(value int32) *ResourceMetricStatusApplyConfiguration {
 	b.fields.CurrentAverageUtilization = &value
 	return b
 }
 
 // RemoveCurrentAverageUtilization removes the CurrentAverageUtilization field from the declarative configuration.
-func (b *ResourceMetricStatusBuilder) RemoveCurrentAverageUtilization() *ResourceMetricStatusBuilder {
+func (b *ResourceMetricStatusApplyConfiguration) RemoveCurrentAverageUtilization() *ResourceMetricStatusApplyConfiguration {
 	b.fields.CurrentAverageUtilization = nil
 	return b
 }
 
 // GetCurrentAverageUtilization gets the CurrentAverageUtilization field from the declarative configuration.
-func (b *ResourceMetricStatusBuilder) GetCurrentAverageUtilization() (value int32, ok bool) {
+func (b *ResourceMetricStatusApplyConfiguration) GetCurrentAverageUtilization() (value int32, ok bool) {
 	if v := b.fields.CurrentAverageUtilization; v != nil {
 		return *v, true
 	}
@@ -90,27 +90,27 @@ func (b *ResourceMetricStatusBuilder) GetCurrentAverageUtilization() (value int3
 }
 
 // SetCurrentAverageValue sets the CurrentAverageValue field in the declarative configuration to the given value.
-func (b *ResourceMetricStatusBuilder) SetCurrentAverageValue(value resource.Quantity) *ResourceMetricStatusBuilder {
+func (b *ResourceMetricStatusApplyConfiguration) SetCurrentAverageValue(value resource.Quantity) *ResourceMetricStatusApplyConfiguration {
 	b.fields.CurrentAverageValue = &value
 	return b
 }
 
 // RemoveCurrentAverageValue removes the CurrentAverageValue field from the declarative configuration.
-func (b *ResourceMetricStatusBuilder) RemoveCurrentAverageValue() *ResourceMetricStatusBuilder {
+func (b *ResourceMetricStatusApplyConfiguration) RemoveCurrentAverageValue() *ResourceMetricStatusApplyConfiguration {
 	b.fields.CurrentAverageValue = nil
 	return b
 }
 
 // GetCurrentAverageValue gets the CurrentAverageValue field from the declarative configuration.
-func (b *ResourceMetricStatusBuilder) GetCurrentAverageValue() (value resource.Quantity, ok bool) {
+func (b *ResourceMetricStatusApplyConfiguration) GetCurrentAverageValue() (value resource.Quantity, ok bool) {
 	if v := b.fields.CurrentAverageValue; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ResourceMetricStatusBuilder to unstructured.
-func (b *ResourceMetricStatusBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ResourceMetricStatusApplyConfiguration to unstructured.
+func (b *ResourceMetricStatusApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -122,9 +122,9 @@ func (b *ResourceMetricStatusBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ResourceMetricStatusBuilder, replacing the contents
-// of ResourceMetricStatusBuilder.
-func (b *ResourceMetricStatusBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ResourceMetricStatusApplyConfiguration, replacing the contents
+// of ResourceMetricStatusApplyConfiguration.
+func (b *ResourceMetricStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &resourceMetricStatusFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -135,15 +135,15 @@ func (b *ResourceMetricStatusBuilder) FromUnstructured(u map[string]interface{})
 	return nil
 }
 
-// MarshalJSON marshals ResourceMetricStatusBuilder to JSON.
-func (b *ResourceMetricStatusBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ResourceMetricStatusApplyConfiguration to JSON.
+func (b *ResourceMetricStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ResourceMetricStatusBuilder, replacing the contents of
-// ResourceMetricStatusBuilder.
-func (b *ResourceMetricStatusBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ResourceMetricStatusApplyConfiguration, replacing the contents of
+// ResourceMetricStatusApplyConfiguration.
+func (b *ResourceMetricStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -151,13 +151,13 @@ func (b *ResourceMetricStatusBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ResourceMetricStatusList represents a list of ResourceMetricStatusBuilder.
-type ResourceMetricStatusList []*ResourceMetricStatusBuilder
+// ResourceMetricStatusList represents a listAlias of ResourceMetricStatusApplyConfiguration.
+type ResourceMetricStatusList []*ResourceMetricStatusApplyConfiguration
 
-// ResourceMetricStatusList represents a map of ResourceMetricStatusBuilder.
-type ResourceMetricStatusMap map[string]ResourceMetricStatusBuilder
+// ResourceMetricStatusList represents a map of ResourceMetricStatusApplyConfiguration.
+type ResourceMetricStatusMap map[string]ResourceMetricStatusApplyConfiguration
 
-func (b *ResourceMetricStatusBuilder) preMarshal() {
+func (b *ResourceMetricStatusApplyConfiguration) preMarshal() {
 }
-func (b *ResourceMetricStatusBuilder) postUnmarshal() {
+func (b *ResourceMetricStatusApplyConfiguration) postUnmarshal() {
 }

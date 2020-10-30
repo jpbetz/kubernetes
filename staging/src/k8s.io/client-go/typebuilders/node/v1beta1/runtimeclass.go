@@ -25,81 +25,81 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// RuntimeClassBuilder represents an declarative configuration of the RuntimeClass type for use
+// RuntimeClassApplyConfiguration represents an declarative configuration of the RuntimeClass type for use
 // with apply.
-type RuntimeClassBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type RuntimeClassApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   runtimeClassFields
 }
 
+// RuntimeClassApplyConfiguration constructs an declarative configuration of the RuntimeClass type for use with
+// apply.
+func RuntimeClass() *RuntimeClassApplyConfiguration {
+	return &RuntimeClassApplyConfiguration{}
+}
+
 // runtimeClassFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in RuntimeClassBuilder.
+// Inline fields are owned by their respective inline type in RuntimeClassApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type runtimeClassFields struct {
-	Kind       *string               `json:"kind,omitempty"`       // inlined RuntimeClassBuilder.typeMeta.Kind field
-	APIVersion *string               `json:"apiVersion,omitempty"` // inlined RuntimeClassBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder `json:"metadata,omitempty"`
-	Handler    *string               `json:"handler,omitempty"`
-	Overhead   *OverheadBuilder      `json:"overhead,omitempty"`
-	Scheduling *SchedulingBuilder    `json:"scheduling,omitempty"`
-}
-
-// RuntimeClass constructs an declarative configuration of the RuntimeClass type for use with
-// apply.
-func RuntimeClass() *RuntimeClassBuilder {
-	return &RuntimeClassBuilder{}
+	Kind       *string                          `json:"kind,omitempty"`       // inlined RuntimeClassApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                          `json:"apiVersion,omitempty"` // inlined RuntimeClassApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Handler    *string                          `json:"handler,omitempty"`
+	Overhead   *OverheadApplyConfiguration      `json:"overhead,omitempty"`
+	Scheduling *SchedulingApplyConfiguration    `json:"scheduling,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *RuntimeClassBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *RuntimeClassBuilder {
+func (b *RuntimeClassApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *RuntimeClassApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *RuntimeClassBuilder) RemoveTypeMeta() *RuntimeClassBuilder {
+func (b *RuntimeClassApplyConfiguration) RemoveTypeMeta() *RuntimeClassApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *RuntimeClassBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *RuntimeClassApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *RuntimeClassBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *RuntimeClassBuilder {
+func (b *RuntimeClassApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *RuntimeClassApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *RuntimeClassBuilder) RemoveObjectMeta() *RuntimeClassBuilder {
+func (b *RuntimeClassApplyConfiguration) RemoveObjectMeta() *RuntimeClassApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *RuntimeClassBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *RuntimeClassApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetHandler sets the Handler field in the declarative configuration to the given value.
-func (b *RuntimeClassBuilder) SetHandler(value string) *RuntimeClassBuilder {
+func (b *RuntimeClassApplyConfiguration) SetHandler(value string) *RuntimeClassApplyConfiguration {
 	b.fields.Handler = &value
 	return b
 }
 
 // RemoveHandler removes the Handler field from the declarative configuration.
-func (b *RuntimeClassBuilder) RemoveHandler() *RuntimeClassBuilder {
+func (b *RuntimeClassApplyConfiguration) RemoveHandler() *RuntimeClassApplyConfiguration {
 	b.fields.Handler = nil
 	return b
 }
 
 // GetHandler gets the Handler field from the declarative configuration.
-func (b *RuntimeClassBuilder) GetHandler() (value string, ok bool) {
+func (b *RuntimeClassApplyConfiguration) GetHandler() (value string, ok bool) {
 	if v := b.fields.Handler; v != nil {
 		return *v, true
 	}
@@ -107,41 +107,41 @@ func (b *RuntimeClassBuilder) GetHandler() (value string, ok bool) {
 }
 
 // SetOverhead sets the Overhead field in the declarative configuration to the given value.
-func (b *RuntimeClassBuilder) SetOverhead(value *OverheadBuilder) *RuntimeClassBuilder {
+func (b *RuntimeClassApplyConfiguration) SetOverhead(value *OverheadApplyConfiguration) *RuntimeClassApplyConfiguration {
 	b.fields.Overhead = value
 	return b
 }
 
 // RemoveOverhead removes the Overhead field from the declarative configuration.
-func (b *RuntimeClassBuilder) RemoveOverhead() *RuntimeClassBuilder {
+func (b *RuntimeClassApplyConfiguration) RemoveOverhead() *RuntimeClassApplyConfiguration {
 	b.fields.Overhead = nil
 	return b
 }
 
 // GetOverhead gets the Overhead field from the declarative configuration.
-func (b *RuntimeClassBuilder) GetOverhead() (value *OverheadBuilder, ok bool) {
+func (b *RuntimeClassApplyConfiguration) GetOverhead() (value *OverheadApplyConfiguration, ok bool) {
 	return b.fields.Overhead, b.fields.Overhead != nil
 }
 
 // SetScheduling sets the Scheduling field in the declarative configuration to the given value.
-func (b *RuntimeClassBuilder) SetScheduling(value *SchedulingBuilder) *RuntimeClassBuilder {
+func (b *RuntimeClassApplyConfiguration) SetScheduling(value *SchedulingApplyConfiguration) *RuntimeClassApplyConfiguration {
 	b.fields.Scheduling = value
 	return b
 }
 
 // RemoveScheduling removes the Scheduling field from the declarative configuration.
-func (b *RuntimeClassBuilder) RemoveScheduling() *RuntimeClassBuilder {
+func (b *RuntimeClassApplyConfiguration) RemoveScheduling() *RuntimeClassApplyConfiguration {
 	b.fields.Scheduling = nil
 	return b
 }
 
 // GetScheduling gets the Scheduling field from the declarative configuration.
-func (b *RuntimeClassBuilder) GetScheduling() (value *SchedulingBuilder, ok bool) {
+func (b *RuntimeClassApplyConfiguration) GetScheduling() (value *SchedulingApplyConfiguration, ok bool) {
 	return b.fields.Scheduling, b.fields.Scheduling != nil
 }
 
-// ToUnstructured converts RuntimeClassBuilder to unstructured.
-func (b *RuntimeClassBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts RuntimeClassApplyConfiguration to unstructured.
+func (b *RuntimeClassApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -153,9 +153,9 @@ func (b *RuntimeClassBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to RuntimeClassBuilder, replacing the contents
-// of RuntimeClassBuilder.
-func (b *RuntimeClassBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to RuntimeClassApplyConfiguration, replacing the contents
+// of RuntimeClassApplyConfiguration.
+func (b *RuntimeClassApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &runtimeClassFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -166,15 +166,15 @@ func (b *RuntimeClassBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals RuntimeClassBuilder to JSON.
-func (b *RuntimeClassBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals RuntimeClassApplyConfiguration to JSON.
+func (b *RuntimeClassApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into RuntimeClassBuilder, replacing the contents of
-// RuntimeClassBuilder.
-func (b *RuntimeClassBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into RuntimeClassApplyConfiguration, replacing the contents of
+// RuntimeClassApplyConfiguration.
+func (b *RuntimeClassApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -182,13 +182,13 @@ func (b *RuntimeClassBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// RuntimeClassList represents a list of RuntimeClassBuilder.
-type RuntimeClassList []*RuntimeClassBuilder
+// RuntimeClassList represents a listAlias of RuntimeClassApplyConfiguration.
+type RuntimeClassList []*RuntimeClassApplyConfiguration
 
-// RuntimeClassList represents a map of RuntimeClassBuilder.
-type RuntimeClassMap map[string]RuntimeClassBuilder
+// RuntimeClassList represents a map of RuntimeClassApplyConfiguration.
+type RuntimeClassMap map[string]RuntimeClassApplyConfiguration
 
-func (b *RuntimeClassBuilder) preMarshal() {
+func (b *RuntimeClassApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -198,9 +198,9 @@ func (b *RuntimeClassBuilder) preMarshal() {
 		}
 	}
 }
-func (b *RuntimeClassBuilder) postUnmarshal() {
+func (b *RuntimeClassApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

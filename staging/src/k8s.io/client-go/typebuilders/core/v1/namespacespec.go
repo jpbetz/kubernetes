@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// NamespaceSpecBuilder represents an declarative configuration of the NamespaceSpec type for use
+// NamespaceSpecApplyConfiguration represents an declarative configuration of the NamespaceSpec type for use
 // with apply.
-type NamespaceSpecBuilder struct {
+type NamespaceSpecApplyConfiguration struct {
 	fields namespaceSpecFields
 }
 
+// NamespaceSpecApplyConfiguration constructs an declarative configuration of the NamespaceSpec type for use with
+// apply.
+func NamespaceSpec() *NamespaceSpecApplyConfiguration {
+	return &NamespaceSpecApplyConfiguration{}
+}
+
 // namespaceSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NamespaceSpecBuilder.
+// Inline fields are owned by their respective inline type in NamespaceSpecApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,34 +46,28 @@ type namespaceSpecFields struct {
 	Finalizers *[]v1.FinalizerName `json:"finalizers,omitempty"`
 }
 
-// NamespaceSpec constructs an declarative configuration of the NamespaceSpec type for use with
-// apply.
-func NamespaceSpec() *NamespaceSpecBuilder {
-	return &NamespaceSpecBuilder{}
-}
-
 // SetFinalizers sets the Finalizers field in the declarative configuration to the given value.
-func (b *NamespaceSpecBuilder) SetFinalizers(value []v1.FinalizerName) *NamespaceSpecBuilder {
+func (b *NamespaceSpecApplyConfiguration) SetFinalizers(value []v1.FinalizerName) *NamespaceSpecApplyConfiguration {
 	b.fields.Finalizers = &value
 	return b
 }
 
 // RemoveFinalizers removes the Finalizers field from the declarative configuration.
-func (b *NamespaceSpecBuilder) RemoveFinalizers() *NamespaceSpecBuilder {
+func (b *NamespaceSpecApplyConfiguration) RemoveFinalizers() *NamespaceSpecApplyConfiguration {
 	b.fields.Finalizers = nil
 	return b
 }
 
 // GetFinalizers gets the Finalizers field from the declarative configuration.
-func (b *NamespaceSpecBuilder) GetFinalizers() (value []v1.FinalizerName, ok bool) {
+func (b *NamespaceSpecApplyConfiguration) GetFinalizers() (value []v1.FinalizerName, ok bool) {
 	if v := b.fields.Finalizers; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts NamespaceSpecBuilder to unstructured.
-func (b *NamespaceSpecBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NamespaceSpecApplyConfiguration to unstructured.
+func (b *NamespaceSpecApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -79,9 +79,9 @@ func (b *NamespaceSpecBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NamespaceSpecBuilder, replacing the contents
-// of NamespaceSpecBuilder.
-func (b *NamespaceSpecBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NamespaceSpecApplyConfiguration, replacing the contents
+// of NamespaceSpecApplyConfiguration.
+func (b *NamespaceSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &namespaceSpecFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -92,15 +92,15 @@ func (b *NamespaceSpecBuilder) FromUnstructured(u map[string]interface{}) error 
 	return nil
 }
 
-// MarshalJSON marshals NamespaceSpecBuilder to JSON.
-func (b *NamespaceSpecBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NamespaceSpecApplyConfiguration to JSON.
+func (b *NamespaceSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NamespaceSpecBuilder, replacing the contents of
-// NamespaceSpecBuilder.
-func (b *NamespaceSpecBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NamespaceSpecApplyConfiguration, replacing the contents of
+// NamespaceSpecApplyConfiguration.
+func (b *NamespaceSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -108,13 +108,13 @@ func (b *NamespaceSpecBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NamespaceSpecList represents a list of NamespaceSpecBuilder.
-type NamespaceSpecList []*NamespaceSpecBuilder
+// NamespaceSpecList represents a listAlias of NamespaceSpecApplyConfiguration.
+type NamespaceSpecList []*NamespaceSpecApplyConfiguration
 
-// NamespaceSpecList represents a map of NamespaceSpecBuilder.
-type NamespaceSpecMap map[string]NamespaceSpecBuilder
+// NamespaceSpecList represents a map of NamespaceSpecApplyConfiguration.
+type NamespaceSpecMap map[string]NamespaceSpecApplyConfiguration
 
-func (b *NamespaceSpecBuilder) preMarshal() {
+func (b *NamespaceSpecApplyConfiguration) preMarshal() {
 }
-func (b *NamespaceSpecBuilder) postUnmarshal() {
+func (b *NamespaceSpecApplyConfiguration) postUnmarshal() {
 }

@@ -24,67 +24,67 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// NodeAffinityBuilder represents an declarative configuration of the NodeAffinity type for use
+// NodeAffinityApplyConfiguration represents an declarative configuration of the NodeAffinity type for use
 // with apply.
-type NodeAffinityBuilder struct {
+type NodeAffinityApplyConfiguration struct {
 	fields nodeAffinityFields
 }
 
+// NodeAffinityApplyConfiguration constructs an declarative configuration of the NodeAffinity type for use with
+// apply.
+func NodeAffinity() *NodeAffinityApplyConfiguration {
+	return &NodeAffinityApplyConfiguration{}
+}
+
 // nodeAffinityFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NodeAffinityBuilder.
+// Inline fields are owned by their respective inline type in NodeAffinityApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type nodeAffinityFields struct {
-	RequiredDuringSchedulingIgnoredDuringExecution  *NodeSelectorBuilder         `json:"requiredDuringSchedulingIgnoredDuringExecution,omitempty"`
-	PreferredDuringSchedulingIgnoredDuringExecution *PreferredSchedulingTermList `json:"preferredDuringSchedulingIgnoredDuringExecution,omitempty"`
-}
-
-// NodeAffinity constructs an declarative configuration of the NodeAffinity type for use with
-// apply.
-func NodeAffinity() *NodeAffinityBuilder {
-	return &NodeAffinityBuilder{}
+	RequiredDuringSchedulingIgnoredDuringExecution  *NodeSelectorApplyConfiguration `json:"requiredDuringSchedulingIgnoredDuringExecution,omitempty"`
+	PreferredDuringSchedulingIgnoredDuringExecution *PreferredSchedulingTermList    `json:"preferredDuringSchedulingIgnoredDuringExecution,omitempty"`
 }
 
 // SetRequiredDuringSchedulingIgnoredDuringExecution sets the RequiredDuringSchedulingIgnoredDuringExecution field in the declarative configuration to the given value.
-func (b *NodeAffinityBuilder) SetRequiredDuringSchedulingIgnoredDuringExecution(value *NodeSelectorBuilder) *NodeAffinityBuilder {
+func (b *NodeAffinityApplyConfiguration) SetRequiredDuringSchedulingIgnoredDuringExecution(value *NodeSelectorApplyConfiguration) *NodeAffinityApplyConfiguration {
 	b.fields.RequiredDuringSchedulingIgnoredDuringExecution = value
 	return b
 }
 
 // RemoveRequiredDuringSchedulingIgnoredDuringExecution removes the RequiredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
-func (b *NodeAffinityBuilder) RemoveRequiredDuringSchedulingIgnoredDuringExecution() *NodeAffinityBuilder {
+func (b *NodeAffinityApplyConfiguration) RemoveRequiredDuringSchedulingIgnoredDuringExecution() *NodeAffinityApplyConfiguration {
 	b.fields.RequiredDuringSchedulingIgnoredDuringExecution = nil
 	return b
 }
 
 // GetRequiredDuringSchedulingIgnoredDuringExecution gets the RequiredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
-func (b *NodeAffinityBuilder) GetRequiredDuringSchedulingIgnoredDuringExecution() (value *NodeSelectorBuilder, ok bool) {
+func (b *NodeAffinityApplyConfiguration) GetRequiredDuringSchedulingIgnoredDuringExecution() (value *NodeSelectorApplyConfiguration, ok bool) {
 	return b.fields.RequiredDuringSchedulingIgnoredDuringExecution, b.fields.RequiredDuringSchedulingIgnoredDuringExecution != nil
 }
 
 // SetPreferredDuringSchedulingIgnoredDuringExecution sets the PreferredDuringSchedulingIgnoredDuringExecution field in the declarative configuration to the given value.
-func (b *NodeAffinityBuilder) SetPreferredDuringSchedulingIgnoredDuringExecution(value PreferredSchedulingTermList) *NodeAffinityBuilder {
+func (b *NodeAffinityApplyConfiguration) SetPreferredDuringSchedulingIgnoredDuringExecution(value PreferredSchedulingTermList) *NodeAffinityApplyConfiguration {
 	b.fields.PreferredDuringSchedulingIgnoredDuringExecution = &value
 	return b
 }
 
 // RemovePreferredDuringSchedulingIgnoredDuringExecution removes the PreferredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
-func (b *NodeAffinityBuilder) RemovePreferredDuringSchedulingIgnoredDuringExecution() *NodeAffinityBuilder {
+func (b *NodeAffinityApplyConfiguration) RemovePreferredDuringSchedulingIgnoredDuringExecution() *NodeAffinityApplyConfiguration {
 	b.fields.PreferredDuringSchedulingIgnoredDuringExecution = nil
 	return b
 }
 
 // GetPreferredDuringSchedulingIgnoredDuringExecution gets the PreferredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
-func (b *NodeAffinityBuilder) GetPreferredDuringSchedulingIgnoredDuringExecution() (value PreferredSchedulingTermList, ok bool) {
+func (b *NodeAffinityApplyConfiguration) GetPreferredDuringSchedulingIgnoredDuringExecution() (value PreferredSchedulingTermList, ok bool) {
 	if v := b.fields.PreferredDuringSchedulingIgnoredDuringExecution; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts NodeAffinityBuilder to unstructured.
-func (b *NodeAffinityBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NodeAffinityApplyConfiguration to unstructured.
+func (b *NodeAffinityApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -96,9 +96,9 @@ func (b *NodeAffinityBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NodeAffinityBuilder, replacing the contents
-// of NodeAffinityBuilder.
-func (b *NodeAffinityBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NodeAffinityApplyConfiguration, replacing the contents
+// of NodeAffinityApplyConfiguration.
+func (b *NodeAffinityApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &nodeAffinityFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -109,15 +109,15 @@ func (b *NodeAffinityBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals NodeAffinityBuilder to JSON.
-func (b *NodeAffinityBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NodeAffinityApplyConfiguration to JSON.
+func (b *NodeAffinityApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NodeAffinityBuilder, replacing the contents of
-// NodeAffinityBuilder.
-func (b *NodeAffinityBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NodeAffinityApplyConfiguration, replacing the contents of
+// NodeAffinityApplyConfiguration.
+func (b *NodeAffinityApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -125,13 +125,13 @@ func (b *NodeAffinityBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NodeAffinityList represents a list of NodeAffinityBuilder.
-type NodeAffinityList []*NodeAffinityBuilder
+// NodeAffinityList represents a listAlias of NodeAffinityApplyConfiguration.
+type NodeAffinityList []*NodeAffinityApplyConfiguration
 
-// NodeAffinityList represents a map of NodeAffinityBuilder.
-type NodeAffinityMap map[string]NodeAffinityBuilder
+// NodeAffinityList represents a map of NodeAffinityApplyConfiguration.
+type NodeAffinityMap map[string]NodeAffinityApplyConfiguration
 
-func (b *NodeAffinityBuilder) preMarshal() {
+func (b *NodeAffinityApplyConfiguration) preMarshal() {
 }
-func (b *NodeAffinityBuilder) postUnmarshal() {
+func (b *NodeAffinityApplyConfiguration) postUnmarshal() {
 }

@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// CSINodeSpecBuilder represents an declarative configuration of the CSINodeSpec type for use
+// CSINodeSpecApplyConfiguration represents an declarative configuration of the CSINodeSpec type for use
 // with apply.
-type CSINodeSpecBuilder struct {
+type CSINodeSpecApplyConfiguration struct {
 	fields cSINodeSpecFields
 }
 
+// CSINodeSpecApplyConfiguration constructs an declarative configuration of the CSINodeSpec type for use with
+// apply.
+func CSINodeSpec() *CSINodeSpecApplyConfiguration {
+	return &CSINodeSpecApplyConfiguration{}
+}
+
 // cSINodeSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in CSINodeSpecBuilder.
+// Inline fields are owned by their respective inline type in CSINodeSpecApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type cSINodeSpecFields struct {
 	Drivers *CSINodeDriverList `json:"drivers,omitempty"`
 }
 
-// CSINodeSpec constructs an declarative configuration of the CSINodeSpec type for use with
-// apply.
-func CSINodeSpec() *CSINodeSpecBuilder {
-	return &CSINodeSpecBuilder{}
-}
-
 // SetDrivers sets the Drivers field in the declarative configuration to the given value.
-func (b *CSINodeSpecBuilder) SetDrivers(value CSINodeDriverList) *CSINodeSpecBuilder {
+func (b *CSINodeSpecApplyConfiguration) SetDrivers(value CSINodeDriverList) *CSINodeSpecApplyConfiguration {
 	b.fields.Drivers = &value
 	return b
 }
 
 // RemoveDrivers removes the Drivers field from the declarative configuration.
-func (b *CSINodeSpecBuilder) RemoveDrivers() *CSINodeSpecBuilder {
+func (b *CSINodeSpecApplyConfiguration) RemoveDrivers() *CSINodeSpecApplyConfiguration {
 	b.fields.Drivers = nil
 	return b
 }
 
 // GetDrivers gets the Drivers field from the declarative configuration.
-func (b *CSINodeSpecBuilder) GetDrivers() (value CSINodeDriverList, ok bool) {
+func (b *CSINodeSpecApplyConfiguration) GetDrivers() (value CSINodeDriverList, ok bool) {
 	if v := b.fields.Drivers; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts CSINodeSpecBuilder to unstructured.
-func (b *CSINodeSpecBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts CSINodeSpecApplyConfiguration to unstructured.
+func (b *CSINodeSpecApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *CSINodeSpecBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to CSINodeSpecBuilder, replacing the contents
-// of CSINodeSpecBuilder.
-func (b *CSINodeSpecBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to CSINodeSpecApplyConfiguration, replacing the contents
+// of CSINodeSpecApplyConfiguration.
+func (b *CSINodeSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &cSINodeSpecFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *CSINodeSpecBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals CSINodeSpecBuilder to JSON.
-func (b *CSINodeSpecBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals CSINodeSpecApplyConfiguration to JSON.
+func (b *CSINodeSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into CSINodeSpecBuilder, replacing the contents of
-// CSINodeSpecBuilder.
-func (b *CSINodeSpecBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into CSINodeSpecApplyConfiguration, replacing the contents of
+// CSINodeSpecApplyConfiguration.
+func (b *CSINodeSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *CSINodeSpecBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// CSINodeSpecList represents a list of CSINodeSpecBuilder.
-type CSINodeSpecList []*CSINodeSpecBuilder
+// CSINodeSpecList represents a listAlias of CSINodeSpecApplyConfiguration.
+type CSINodeSpecList []*CSINodeSpecApplyConfiguration
 
-// CSINodeSpecList represents a map of CSINodeSpecBuilder.
-type CSINodeSpecMap map[string]CSINodeSpecBuilder
+// CSINodeSpecList represents a map of CSINodeSpecApplyConfiguration.
+type CSINodeSpecMap map[string]CSINodeSpecApplyConfiguration
 
-func (b *CSINodeSpecBuilder) preMarshal() {
+func (b *CSINodeSpecApplyConfiguration) preMarshal() {
 }
-func (b *CSINodeSpecBuilder) postUnmarshal() {
+func (b *CSINodeSpecApplyConfiguration) postUnmarshal() {
 }

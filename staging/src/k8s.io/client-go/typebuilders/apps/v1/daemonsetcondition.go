@@ -27,14 +27,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// DaemonSetConditionBuilder represents an declarative configuration of the DaemonSetCondition type for use
+// DaemonSetConditionApplyConfiguration represents an declarative configuration of the DaemonSetCondition type for use
 // with apply.
-type DaemonSetConditionBuilder struct {
+type DaemonSetConditionApplyConfiguration struct {
 	fields daemonSetConditionFields
 }
 
+// DaemonSetConditionApplyConfiguration constructs an declarative configuration of the DaemonSetCondition type for use with
+// apply.
+func DaemonSetCondition() *DaemonSetConditionApplyConfiguration {
+	return &DaemonSetConditionApplyConfiguration{}
+}
+
 // daemonSetConditionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in DaemonSetConditionBuilder.
+// Inline fields are owned by their respective inline type in DaemonSetConditionApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -46,26 +52,20 @@ type daemonSetConditionFields struct {
 	Message            *string                    `json:"message,omitempty"`
 }
 
-// DaemonSetCondition constructs an declarative configuration of the DaemonSetCondition type for use with
-// apply.
-func DaemonSetCondition() *DaemonSetConditionBuilder {
-	return &DaemonSetConditionBuilder{}
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b *DaemonSetConditionBuilder) SetType(value v1.DaemonSetConditionType) *DaemonSetConditionBuilder {
+func (b *DaemonSetConditionApplyConfiguration) SetType(value v1.DaemonSetConditionType) *DaemonSetConditionApplyConfiguration {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b *DaemonSetConditionBuilder) RemoveType() *DaemonSetConditionBuilder {
+func (b *DaemonSetConditionApplyConfiguration) RemoveType() *DaemonSetConditionApplyConfiguration {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b *DaemonSetConditionBuilder) GetType() (value v1.DaemonSetConditionType, ok bool) {
+func (b *DaemonSetConditionApplyConfiguration) GetType() (value v1.DaemonSetConditionType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -73,19 +73,19 @@ func (b *DaemonSetConditionBuilder) GetType() (value v1.DaemonSetConditionType, 
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *DaemonSetConditionBuilder) SetStatus(value corev1.ConditionStatus) *DaemonSetConditionBuilder {
+func (b *DaemonSetConditionApplyConfiguration) SetStatus(value corev1.ConditionStatus) *DaemonSetConditionApplyConfiguration {
 	b.fields.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *DaemonSetConditionBuilder) RemoveStatus() *DaemonSetConditionBuilder {
+func (b *DaemonSetConditionApplyConfiguration) RemoveStatus() *DaemonSetConditionApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *DaemonSetConditionBuilder) GetStatus() (value corev1.ConditionStatus, ok bool) {
+func (b *DaemonSetConditionApplyConfiguration) GetStatus() (value corev1.ConditionStatus, ok bool) {
 	if v := b.fields.Status; v != nil {
 		return *v, true
 	}
@@ -93,19 +93,19 @@ func (b *DaemonSetConditionBuilder) GetStatus() (value corev1.ConditionStatus, o
 }
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
-func (b *DaemonSetConditionBuilder) SetLastTransitionTime(value metav1.Time) *DaemonSetConditionBuilder {
+func (b *DaemonSetConditionApplyConfiguration) SetLastTransitionTime(value metav1.Time) *DaemonSetConditionApplyConfiguration {
 	b.fields.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
-func (b *DaemonSetConditionBuilder) RemoveLastTransitionTime() *DaemonSetConditionBuilder {
+func (b *DaemonSetConditionApplyConfiguration) RemoveLastTransitionTime() *DaemonSetConditionApplyConfiguration {
 	b.fields.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
-func (b *DaemonSetConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
+func (b *DaemonSetConditionApplyConfiguration) GetLastTransitionTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastTransitionTime; v != nil {
 		return *v, true
 	}
@@ -113,19 +113,19 @@ func (b *DaemonSetConditionBuilder) GetLastTransitionTime() (value metav1.Time, 
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b *DaemonSetConditionBuilder) SetReason(value string) *DaemonSetConditionBuilder {
+func (b *DaemonSetConditionApplyConfiguration) SetReason(value string) *DaemonSetConditionApplyConfiguration {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b *DaemonSetConditionBuilder) RemoveReason() *DaemonSetConditionBuilder {
+func (b *DaemonSetConditionApplyConfiguration) RemoveReason() *DaemonSetConditionApplyConfiguration {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b *DaemonSetConditionBuilder) GetReason() (value string, ok bool) {
+func (b *DaemonSetConditionApplyConfiguration) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -133,27 +133,27 @@ func (b *DaemonSetConditionBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b *DaemonSetConditionBuilder) SetMessage(value string) *DaemonSetConditionBuilder {
+func (b *DaemonSetConditionApplyConfiguration) SetMessage(value string) *DaemonSetConditionApplyConfiguration {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b *DaemonSetConditionBuilder) RemoveMessage() *DaemonSetConditionBuilder {
+func (b *DaemonSetConditionApplyConfiguration) RemoveMessage() *DaemonSetConditionApplyConfiguration {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b *DaemonSetConditionBuilder) GetMessage() (value string, ok bool) {
+func (b *DaemonSetConditionApplyConfiguration) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts DaemonSetConditionBuilder to unstructured.
-func (b *DaemonSetConditionBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts DaemonSetConditionApplyConfiguration to unstructured.
+func (b *DaemonSetConditionApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -165,9 +165,9 @@ func (b *DaemonSetConditionBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to DaemonSetConditionBuilder, replacing the contents
-// of DaemonSetConditionBuilder.
-func (b *DaemonSetConditionBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to DaemonSetConditionApplyConfiguration, replacing the contents
+// of DaemonSetConditionApplyConfiguration.
+func (b *DaemonSetConditionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &daemonSetConditionFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -178,15 +178,15 @@ func (b *DaemonSetConditionBuilder) FromUnstructured(u map[string]interface{}) e
 	return nil
 }
 
-// MarshalJSON marshals DaemonSetConditionBuilder to JSON.
-func (b *DaemonSetConditionBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals DaemonSetConditionApplyConfiguration to JSON.
+func (b *DaemonSetConditionApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into DaemonSetConditionBuilder, replacing the contents of
-// DaemonSetConditionBuilder.
-func (b *DaemonSetConditionBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into DaemonSetConditionApplyConfiguration, replacing the contents of
+// DaemonSetConditionApplyConfiguration.
+func (b *DaemonSetConditionApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -194,13 +194,13 @@ func (b *DaemonSetConditionBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// DaemonSetConditionList represents a list of DaemonSetConditionBuilder.
-type DaemonSetConditionList []*DaemonSetConditionBuilder
+// DaemonSetConditionList represents a listAlias of DaemonSetConditionApplyConfiguration.
+type DaemonSetConditionList []*DaemonSetConditionApplyConfiguration
 
-// DaemonSetConditionList represents a map of DaemonSetConditionBuilder.
-type DaemonSetConditionMap map[string]DaemonSetConditionBuilder
+// DaemonSetConditionList represents a map of DaemonSetConditionApplyConfiguration.
+type DaemonSetConditionMap map[string]DaemonSetConditionApplyConfiguration
 
-func (b *DaemonSetConditionBuilder) preMarshal() {
+func (b *DaemonSetConditionApplyConfiguration) preMarshal() {
 }
-func (b *DaemonSetConditionBuilder) postUnmarshal() {
+func (b *DaemonSetConditionApplyConfiguration) postUnmarshal() {
 }

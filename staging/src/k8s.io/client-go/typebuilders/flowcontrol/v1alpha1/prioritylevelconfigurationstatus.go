@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// PriorityLevelConfigurationStatusBuilder represents an declarative configuration of the PriorityLevelConfigurationStatus type for use
+// PriorityLevelConfigurationStatusApplyConfiguration represents an declarative configuration of the PriorityLevelConfigurationStatus type for use
 // with apply.
-type PriorityLevelConfigurationStatusBuilder struct {
+type PriorityLevelConfigurationStatusApplyConfiguration struct {
 	fields priorityLevelConfigurationStatusFields
 }
 
+// PriorityLevelConfigurationStatusApplyConfiguration constructs an declarative configuration of the PriorityLevelConfigurationStatus type for use with
+// apply.
+func PriorityLevelConfigurationStatus() *PriorityLevelConfigurationStatusApplyConfiguration {
+	return &PriorityLevelConfigurationStatusApplyConfiguration{}
+}
+
 // priorityLevelConfigurationStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PriorityLevelConfigurationStatusBuilder.
+// Inline fields are owned by their respective inline type in PriorityLevelConfigurationStatusApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type priorityLevelConfigurationStatusFields struct {
 	Conditions *PriorityLevelConfigurationConditionList `json:"conditions,omitempty"`
 }
 
-// PriorityLevelConfigurationStatus constructs an declarative configuration of the PriorityLevelConfigurationStatus type for use with
-// apply.
-func PriorityLevelConfigurationStatus() *PriorityLevelConfigurationStatusBuilder {
-	return &PriorityLevelConfigurationStatusBuilder{}
-}
-
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b *PriorityLevelConfigurationStatusBuilder) SetConditions(value PriorityLevelConfigurationConditionList) *PriorityLevelConfigurationStatusBuilder {
+func (b *PriorityLevelConfigurationStatusApplyConfiguration) SetConditions(value PriorityLevelConfigurationConditionList) *PriorityLevelConfigurationStatusApplyConfiguration {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b *PriorityLevelConfigurationStatusBuilder) RemoveConditions() *PriorityLevelConfigurationStatusBuilder {
+func (b *PriorityLevelConfigurationStatusApplyConfiguration) RemoveConditions() *PriorityLevelConfigurationStatusApplyConfiguration {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b *PriorityLevelConfigurationStatusBuilder) GetConditions() (value PriorityLevelConfigurationConditionList, ok bool) {
+func (b *PriorityLevelConfigurationStatusApplyConfiguration) GetConditions() (value PriorityLevelConfigurationConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts PriorityLevelConfigurationStatusBuilder to unstructured.
-func (b *PriorityLevelConfigurationStatusBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PriorityLevelConfigurationStatusApplyConfiguration to unstructured.
+func (b *PriorityLevelConfigurationStatusApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *PriorityLevelConfigurationStatusBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to PriorityLevelConfigurationStatusBuilder, replacing the contents
-// of PriorityLevelConfigurationStatusBuilder.
-func (b *PriorityLevelConfigurationStatusBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PriorityLevelConfigurationStatusApplyConfiguration, replacing the contents
+// of PriorityLevelConfigurationStatusApplyConfiguration.
+func (b *PriorityLevelConfigurationStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &priorityLevelConfigurationStatusFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *PriorityLevelConfigurationStatusBuilder) FromUnstructured(u map[string]
 	return nil
 }
 
-// MarshalJSON marshals PriorityLevelConfigurationStatusBuilder to JSON.
-func (b *PriorityLevelConfigurationStatusBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PriorityLevelConfigurationStatusApplyConfiguration to JSON.
+func (b *PriorityLevelConfigurationStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PriorityLevelConfigurationStatusBuilder, replacing the contents of
-// PriorityLevelConfigurationStatusBuilder.
-func (b *PriorityLevelConfigurationStatusBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PriorityLevelConfigurationStatusApplyConfiguration, replacing the contents of
+// PriorityLevelConfigurationStatusApplyConfiguration.
+func (b *PriorityLevelConfigurationStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *PriorityLevelConfigurationStatusBuilder) UnmarshalJSON(data []byte) err
 	return nil
 }
 
-// PriorityLevelConfigurationStatusList represents a list of PriorityLevelConfigurationStatusBuilder.
-type PriorityLevelConfigurationStatusList []*PriorityLevelConfigurationStatusBuilder
+// PriorityLevelConfigurationStatusList represents a listAlias of PriorityLevelConfigurationStatusApplyConfiguration.
+type PriorityLevelConfigurationStatusList []*PriorityLevelConfigurationStatusApplyConfiguration
 
-// PriorityLevelConfigurationStatusList represents a map of PriorityLevelConfigurationStatusBuilder.
-type PriorityLevelConfigurationStatusMap map[string]PriorityLevelConfigurationStatusBuilder
+// PriorityLevelConfigurationStatusList represents a map of PriorityLevelConfigurationStatusApplyConfiguration.
+type PriorityLevelConfigurationStatusMap map[string]PriorityLevelConfigurationStatusApplyConfiguration
 
-func (b *PriorityLevelConfigurationStatusBuilder) preMarshal() {
+func (b *PriorityLevelConfigurationStatusApplyConfiguration) preMarshal() {
 }
-func (b *PriorityLevelConfigurationStatusBuilder) postUnmarshal() {
+func (b *PriorityLevelConfigurationStatusApplyConfiguration) postUnmarshal() {
 }

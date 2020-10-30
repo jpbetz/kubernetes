@@ -25,42 +25,42 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// MetricIdentifierBuilder represents an declarative configuration of the MetricIdentifier type for use
+// MetricIdentifierApplyConfiguration represents an declarative configuration of the MetricIdentifier type for use
 // with apply.
-type MetricIdentifierBuilder struct {
+type MetricIdentifierApplyConfiguration struct {
 	fields metricIdentifierFields
 }
 
+// MetricIdentifierApplyConfiguration constructs an declarative configuration of the MetricIdentifier type for use with
+// apply.
+func MetricIdentifier() *MetricIdentifierApplyConfiguration {
+	return &MetricIdentifierApplyConfiguration{}
+}
+
 // metricIdentifierFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in MetricIdentifierBuilder.
+// Inline fields are owned by their respective inline type in MetricIdentifierApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type metricIdentifierFields struct {
-	Name     *string                  `json:"name,omitempty"`
-	Selector *v1.LabelSelectorBuilder `json:"selector,omitempty"`
-}
-
-// MetricIdentifier constructs an declarative configuration of the MetricIdentifier type for use with
-// apply.
-func MetricIdentifier() *MetricIdentifierBuilder {
-	return &MetricIdentifierBuilder{}
+	Name     *string                             `json:"name,omitempty"`
+	Selector *v1.LabelSelectorApplyConfiguration `json:"selector,omitempty"`
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *MetricIdentifierBuilder) SetName(value string) *MetricIdentifierBuilder {
+func (b *MetricIdentifierApplyConfiguration) SetName(value string) *MetricIdentifierApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *MetricIdentifierBuilder) RemoveName() *MetricIdentifierBuilder {
+func (b *MetricIdentifierApplyConfiguration) RemoveName() *MetricIdentifierApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *MetricIdentifierBuilder) GetName() (value string, ok bool) {
+func (b *MetricIdentifierApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -68,24 +68,24 @@ func (b *MetricIdentifierBuilder) GetName() (value string, ok bool) {
 }
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
-func (b *MetricIdentifierBuilder) SetSelector(value *v1.LabelSelectorBuilder) *MetricIdentifierBuilder {
+func (b *MetricIdentifierApplyConfiguration) SetSelector(value *v1.LabelSelectorApplyConfiguration) *MetricIdentifierApplyConfiguration {
 	b.fields.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
-func (b *MetricIdentifierBuilder) RemoveSelector() *MetricIdentifierBuilder {
+func (b *MetricIdentifierApplyConfiguration) RemoveSelector() *MetricIdentifierApplyConfiguration {
 	b.fields.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
-func (b *MetricIdentifierBuilder) GetSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+func (b *MetricIdentifierApplyConfiguration) GetSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
 	return b.fields.Selector, b.fields.Selector != nil
 }
 
-// ToUnstructured converts MetricIdentifierBuilder to unstructured.
-func (b *MetricIdentifierBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts MetricIdentifierApplyConfiguration to unstructured.
+func (b *MetricIdentifierApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -97,9 +97,9 @@ func (b *MetricIdentifierBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to MetricIdentifierBuilder, replacing the contents
-// of MetricIdentifierBuilder.
-func (b *MetricIdentifierBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to MetricIdentifierApplyConfiguration, replacing the contents
+// of MetricIdentifierApplyConfiguration.
+func (b *MetricIdentifierApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &metricIdentifierFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -110,15 +110,15 @@ func (b *MetricIdentifierBuilder) FromUnstructured(u map[string]interface{}) err
 	return nil
 }
 
-// MarshalJSON marshals MetricIdentifierBuilder to JSON.
-func (b *MetricIdentifierBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals MetricIdentifierApplyConfiguration to JSON.
+func (b *MetricIdentifierApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into MetricIdentifierBuilder, replacing the contents of
-// MetricIdentifierBuilder.
-func (b *MetricIdentifierBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into MetricIdentifierApplyConfiguration, replacing the contents of
+// MetricIdentifierApplyConfiguration.
+func (b *MetricIdentifierApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -126,13 +126,13 @@ func (b *MetricIdentifierBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MetricIdentifierList represents a list of MetricIdentifierBuilder.
-type MetricIdentifierList []*MetricIdentifierBuilder
+// MetricIdentifierList represents a listAlias of MetricIdentifierApplyConfiguration.
+type MetricIdentifierList []*MetricIdentifierApplyConfiguration
 
-// MetricIdentifierList represents a map of MetricIdentifierBuilder.
-type MetricIdentifierMap map[string]MetricIdentifierBuilder
+// MetricIdentifierList represents a map of MetricIdentifierApplyConfiguration.
+type MetricIdentifierMap map[string]MetricIdentifierApplyConfiguration
 
-func (b *MetricIdentifierBuilder) preMarshal() {
+func (b *MetricIdentifierApplyConfiguration) preMarshal() {
 }
-func (b *MetricIdentifierBuilder) postUnmarshal() {
+func (b *MetricIdentifierApplyConfiguration) postUnmarshal() {
 }

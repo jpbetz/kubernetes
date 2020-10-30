@@ -25,102 +25,102 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// NodeBuilder represents an declarative configuration of the Node type for use
+// NodeApplyConfiguration represents an declarative configuration of the Node type for use
 // with apply.
-type NodeBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type NodeApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   nodeFields
 }
 
+// NodeApplyConfiguration constructs an declarative configuration of the Node type for use with
+// apply.
+func Node() *NodeApplyConfiguration {
+	return &NodeApplyConfiguration{}
+}
+
 // nodeFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NodeBuilder.
+// Inline fields are owned by their respective inline type in NodeApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type nodeFields struct {
-	Kind       *string               `json:"kind,omitempty"`       // inlined NodeBuilder.typeMeta.Kind field
-	APIVersion *string               `json:"apiVersion,omitempty"` // inlined NodeBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder `json:"metadata,omitempty"`
-	Spec       *NodeSpecBuilder      `json:"spec,omitempty"`
-	Status     *NodeStatusBuilder    `json:"status,omitempty"`
-}
-
-// Node constructs an declarative configuration of the Node type for use with
-// apply.
-func Node() *NodeBuilder {
-	return &NodeBuilder{}
+	Kind       *string                          `json:"kind,omitempty"`       // inlined NodeApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                          `json:"apiVersion,omitempty"` // inlined NodeApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Spec       *NodeSpecApplyConfiguration      `json:"spec,omitempty"`
+	Status     *NodeStatusApplyConfiguration    `json:"status,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *NodeBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *NodeBuilder {
+func (b *NodeApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *NodeApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *NodeBuilder) RemoveTypeMeta() *NodeBuilder {
+func (b *NodeApplyConfiguration) RemoveTypeMeta() *NodeApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *NodeBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *NodeApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *NodeBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *NodeBuilder {
+func (b *NodeApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *NodeApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *NodeBuilder) RemoveObjectMeta() *NodeBuilder {
+func (b *NodeApplyConfiguration) RemoveObjectMeta() *NodeApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *NodeBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *NodeApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *NodeBuilder) SetSpec(value *NodeSpecBuilder) *NodeBuilder {
+func (b *NodeApplyConfiguration) SetSpec(value *NodeSpecApplyConfiguration) *NodeApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *NodeBuilder) RemoveSpec() *NodeBuilder {
+func (b *NodeApplyConfiguration) RemoveSpec() *NodeApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *NodeBuilder) GetSpec() (value *NodeSpecBuilder, ok bool) {
+func (b *NodeApplyConfiguration) GetSpec() (value *NodeSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *NodeBuilder) SetStatus(value *NodeStatusBuilder) *NodeBuilder {
+func (b *NodeApplyConfiguration) SetStatus(value *NodeStatusApplyConfiguration) *NodeApplyConfiguration {
 	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *NodeBuilder) RemoveStatus() *NodeBuilder {
+func (b *NodeApplyConfiguration) RemoveStatus() *NodeApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *NodeBuilder) GetStatus() (value *NodeStatusBuilder, ok bool) {
+func (b *NodeApplyConfiguration) GetStatus() (value *NodeStatusApplyConfiguration, ok bool) {
 	return b.fields.Status, b.fields.Status != nil
 }
 
-// ToUnstructured converts NodeBuilder to unstructured.
-func (b *NodeBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NodeApplyConfiguration to unstructured.
+func (b *NodeApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -132,9 +132,9 @@ func (b *NodeBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NodeBuilder, replacing the contents
-// of NodeBuilder.
-func (b *NodeBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NodeApplyConfiguration, replacing the contents
+// of NodeApplyConfiguration.
+func (b *NodeApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &nodeFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -145,15 +145,15 @@ func (b *NodeBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals NodeBuilder to JSON.
-func (b *NodeBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NodeApplyConfiguration to JSON.
+func (b *NodeApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NodeBuilder, replacing the contents of
-// NodeBuilder.
-func (b *NodeBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NodeApplyConfiguration, replacing the contents of
+// NodeApplyConfiguration.
+func (b *NodeApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -161,13 +161,13 @@ func (b *NodeBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NodeList represents a list of NodeBuilder.
-type NodeList []*NodeBuilder
+// NodeList represents a listAlias of NodeApplyConfiguration.
+type NodeList []*NodeApplyConfiguration
 
-// NodeList represents a map of NodeBuilder.
-type NodeMap map[string]NodeBuilder
+// NodeList represents a map of NodeApplyConfiguration.
+type NodeMap map[string]NodeApplyConfiguration
 
-func (b *NodeBuilder) preMarshal() {
+func (b *NodeApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -177,9 +177,9 @@ func (b *NodeBuilder) preMarshal() {
 		}
 	}
 }
-func (b *NodeBuilder) postUnmarshal() {
+func (b *NodeApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

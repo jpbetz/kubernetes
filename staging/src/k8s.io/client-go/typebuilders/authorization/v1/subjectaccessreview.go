@@ -25,102 +25,102 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// SubjectAccessReviewBuilder represents an declarative configuration of the SubjectAccessReview type for use
+// SubjectAccessReviewApplyConfiguration represents an declarative configuration of the SubjectAccessReview type for use
 // with apply.
-type SubjectAccessReviewBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type SubjectAccessReviewApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   subjectAccessReviewFields
 }
 
+// SubjectAccessReviewApplyConfiguration constructs an declarative configuration of the SubjectAccessReview type for use with
+// apply.
+func SubjectAccessReview() *SubjectAccessReviewApplyConfiguration {
+	return &SubjectAccessReviewApplyConfiguration{}
+}
+
 // subjectAccessReviewFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SubjectAccessReviewBuilder.
+// Inline fields are owned by their respective inline type in SubjectAccessReviewApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type subjectAccessReviewFields struct {
-	Kind       *string                           `json:"kind,omitempty"`       // inlined SubjectAccessReviewBuilder.typeMeta.Kind field
-	APIVersion *string                           `json:"apiVersion,omitempty"` // inlined SubjectAccessReviewBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder             `json:"metadata,omitempty"`
-	Spec       *SubjectAccessReviewSpecBuilder   `json:"spec,omitempty"`
-	Status     *SubjectAccessReviewStatusBuilder `json:"status,omitempty"`
-}
-
-// SubjectAccessReview constructs an declarative configuration of the SubjectAccessReview type for use with
-// apply.
-func SubjectAccessReview() *SubjectAccessReviewBuilder {
-	return &SubjectAccessReviewBuilder{}
+	Kind       *string                                      `json:"kind,omitempty"`       // inlined SubjectAccessReviewApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                                      `json:"apiVersion,omitempty"` // inlined SubjectAccessReviewApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration             `json:"metadata,omitempty"`
+	Spec       *SubjectAccessReviewSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status     *SubjectAccessReviewStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *SubjectAccessReviewBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *SubjectAccessReviewBuilder {
+func (b *SubjectAccessReviewApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *SubjectAccessReviewApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *SubjectAccessReviewBuilder) RemoveTypeMeta() *SubjectAccessReviewBuilder {
+func (b *SubjectAccessReviewApplyConfiguration) RemoveTypeMeta() *SubjectAccessReviewApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *SubjectAccessReviewBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *SubjectAccessReviewApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *SubjectAccessReviewBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *SubjectAccessReviewBuilder {
+func (b *SubjectAccessReviewApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *SubjectAccessReviewApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *SubjectAccessReviewBuilder) RemoveObjectMeta() *SubjectAccessReviewBuilder {
+func (b *SubjectAccessReviewApplyConfiguration) RemoveObjectMeta() *SubjectAccessReviewApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *SubjectAccessReviewBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *SubjectAccessReviewApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *SubjectAccessReviewBuilder) SetSpec(value *SubjectAccessReviewSpecBuilder) *SubjectAccessReviewBuilder {
+func (b *SubjectAccessReviewApplyConfiguration) SetSpec(value *SubjectAccessReviewSpecApplyConfiguration) *SubjectAccessReviewApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *SubjectAccessReviewBuilder) RemoveSpec() *SubjectAccessReviewBuilder {
+func (b *SubjectAccessReviewApplyConfiguration) RemoveSpec() *SubjectAccessReviewApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *SubjectAccessReviewBuilder) GetSpec() (value *SubjectAccessReviewSpecBuilder, ok bool) {
+func (b *SubjectAccessReviewApplyConfiguration) GetSpec() (value *SubjectAccessReviewSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *SubjectAccessReviewBuilder) SetStatus(value *SubjectAccessReviewStatusBuilder) *SubjectAccessReviewBuilder {
+func (b *SubjectAccessReviewApplyConfiguration) SetStatus(value *SubjectAccessReviewStatusApplyConfiguration) *SubjectAccessReviewApplyConfiguration {
 	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *SubjectAccessReviewBuilder) RemoveStatus() *SubjectAccessReviewBuilder {
+func (b *SubjectAccessReviewApplyConfiguration) RemoveStatus() *SubjectAccessReviewApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *SubjectAccessReviewBuilder) GetStatus() (value *SubjectAccessReviewStatusBuilder, ok bool) {
+func (b *SubjectAccessReviewApplyConfiguration) GetStatus() (value *SubjectAccessReviewStatusApplyConfiguration, ok bool) {
 	return b.fields.Status, b.fields.Status != nil
 }
 
-// ToUnstructured converts SubjectAccessReviewBuilder to unstructured.
-func (b *SubjectAccessReviewBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts SubjectAccessReviewApplyConfiguration to unstructured.
+func (b *SubjectAccessReviewApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -132,9 +132,9 @@ func (b *SubjectAccessReviewBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to SubjectAccessReviewBuilder, replacing the contents
-// of SubjectAccessReviewBuilder.
-func (b *SubjectAccessReviewBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to SubjectAccessReviewApplyConfiguration, replacing the contents
+// of SubjectAccessReviewApplyConfiguration.
+func (b *SubjectAccessReviewApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &subjectAccessReviewFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -145,15 +145,15 @@ func (b *SubjectAccessReviewBuilder) FromUnstructured(u map[string]interface{}) 
 	return nil
 }
 
-// MarshalJSON marshals SubjectAccessReviewBuilder to JSON.
-func (b *SubjectAccessReviewBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals SubjectAccessReviewApplyConfiguration to JSON.
+func (b *SubjectAccessReviewApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into SubjectAccessReviewBuilder, replacing the contents of
-// SubjectAccessReviewBuilder.
-func (b *SubjectAccessReviewBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into SubjectAccessReviewApplyConfiguration, replacing the contents of
+// SubjectAccessReviewApplyConfiguration.
+func (b *SubjectAccessReviewApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -161,13 +161,13 @@ func (b *SubjectAccessReviewBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// SubjectAccessReviewList represents a list of SubjectAccessReviewBuilder.
-type SubjectAccessReviewList []*SubjectAccessReviewBuilder
+// SubjectAccessReviewList represents a listAlias of SubjectAccessReviewApplyConfiguration.
+type SubjectAccessReviewList []*SubjectAccessReviewApplyConfiguration
 
-// SubjectAccessReviewList represents a map of SubjectAccessReviewBuilder.
-type SubjectAccessReviewMap map[string]SubjectAccessReviewBuilder
+// SubjectAccessReviewList represents a map of SubjectAccessReviewApplyConfiguration.
+type SubjectAccessReviewMap map[string]SubjectAccessReviewApplyConfiguration
 
-func (b *SubjectAccessReviewBuilder) preMarshal() {
+func (b *SubjectAccessReviewApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -177,9 +177,9 @@ func (b *SubjectAccessReviewBuilder) preMarshal() {
 		}
 	}
 }
-func (b *SubjectAccessReviewBuilder) postUnmarshal() {
+func (b *SubjectAccessReviewApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

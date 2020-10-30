@@ -48,7 +48,7 @@ type RoleBindingInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.RoleBindingList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.RoleBinding, err error)
-	Apply(ctx context.Context, roleBinding rbacv1.RoleBindingBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.RoleBinding, err error)
+	Apply(ctx context.Context, roleBinding *rbacv1.RoleBindingApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.RoleBinding, err error)
 	RoleBindingExpansion
 }
 
@@ -181,7 +181,7 @@ func (c *roleBindings) Patch(ctx context.Context, name string, pt types.PatchTyp
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied roleBinding.
-func (c *roleBindings) Apply(ctx context.Context, roleBinding rbacv1.RoleBindingBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.RoleBinding, err error) {
+func (c *roleBindings) Apply(ctx context.Context, roleBinding *rbacv1.RoleBindingApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.RoleBinding, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := roleBinding.MarshalJSON()
 	if err != nil {

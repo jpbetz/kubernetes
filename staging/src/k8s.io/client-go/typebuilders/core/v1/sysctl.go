@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// SysctlBuilder represents an declarative configuration of the Sysctl type for use
+// SysctlApplyConfiguration represents an declarative configuration of the Sysctl type for use
 // with apply.
-type SysctlBuilder struct {
+type SysctlApplyConfiguration struct {
 	fields sysctlFields
 }
 
+// SysctlApplyConfiguration constructs an declarative configuration of the Sysctl type for use with
+// apply.
+func Sysctl() *SysctlApplyConfiguration {
+	return &SysctlApplyConfiguration{}
+}
+
 // sysctlFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SysctlBuilder.
+// Inline fields are owned by their respective inline type in SysctlApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type sysctlFields struct {
 	Value *string `json:"value,omitempty"`
 }
 
-// Sysctl constructs an declarative configuration of the Sysctl type for use with
-// apply.
-func Sysctl() *SysctlBuilder {
-	return &SysctlBuilder{}
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *SysctlBuilder) SetName(value string) *SysctlBuilder {
+func (b *SysctlApplyConfiguration) SetName(value string) *SysctlApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *SysctlBuilder) RemoveName() *SysctlBuilder {
+func (b *SysctlApplyConfiguration) RemoveName() *SysctlApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *SysctlBuilder) GetName() (value string, ok bool) {
+func (b *SysctlApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *SysctlBuilder) GetName() (value string, ok bool) {
 }
 
 // SetValue sets the Value field in the declarative configuration to the given value.
-func (b *SysctlBuilder) SetValue(value string) *SysctlBuilder {
+func (b *SysctlApplyConfiguration) SetValue(value string) *SysctlApplyConfiguration {
 	b.fields.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
-func (b *SysctlBuilder) RemoveValue() *SysctlBuilder {
+func (b *SysctlApplyConfiguration) RemoveValue() *SysctlApplyConfiguration {
 	b.fields.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
-func (b *SysctlBuilder) GetValue() (value string, ok bool) {
+func (b *SysctlApplyConfiguration) GetValue() (value string, ok bool) {
 	if v := b.fields.Value; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts SysctlBuilder to unstructured.
-func (b *SysctlBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts SysctlApplyConfiguration to unstructured.
+func (b *SysctlApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *SysctlBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to SysctlBuilder, replacing the contents
-// of SysctlBuilder.
-func (b *SysctlBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to SysctlApplyConfiguration, replacing the contents
+// of SysctlApplyConfiguration.
+func (b *SysctlApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &sysctlFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *SysctlBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals SysctlBuilder to JSON.
-func (b *SysctlBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals SysctlApplyConfiguration to JSON.
+func (b *SysctlApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into SysctlBuilder, replacing the contents of
-// SysctlBuilder.
-func (b *SysctlBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into SysctlApplyConfiguration, replacing the contents of
+// SysctlApplyConfiguration.
+func (b *SysctlApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *SysctlBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// SysctlList represents a list of SysctlBuilder.
-type SysctlList []*SysctlBuilder
+// SysctlList represents a listAlias of SysctlApplyConfiguration.
+type SysctlList []*SysctlApplyConfiguration
 
-// SysctlList represents a map of SysctlBuilder.
-type SysctlMap map[string]SysctlBuilder
+// SysctlList represents a map of SysctlApplyConfiguration.
+type SysctlMap map[string]SysctlApplyConfiguration
 
-func (b *SysctlBuilder) preMarshal() {
+func (b *SysctlApplyConfiguration) preMarshal() {
 }
-func (b *SysctlBuilder) postUnmarshal() {
+func (b *SysctlApplyConfiguration) postUnmarshal() {
 }

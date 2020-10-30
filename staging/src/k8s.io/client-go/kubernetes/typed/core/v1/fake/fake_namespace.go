@@ -127,7 +127,7 @@ func (c *FakeNamespaces) Patch(ctx context.Context, name string, pt types.PatchT
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied namespace.
-func (c *FakeNamespaces) Apply(ctx context.Context, namespace typebuilderscorev1.NamespaceBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Namespace, err error) {
+func (c *FakeNamespaces) Apply(ctx context.Context, namespace *typebuilderscorev1.NamespaceApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Namespace, err error) {
 	data, err := namespace.MarshalJSON()
 	if err != nil {
 		return nil, err

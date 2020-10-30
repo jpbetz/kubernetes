@@ -25,102 +25,102 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// LocalSubjectAccessReviewBuilder represents an declarative configuration of the LocalSubjectAccessReview type for use
+// LocalSubjectAccessReviewApplyConfiguration represents an declarative configuration of the LocalSubjectAccessReview type for use
 // with apply.
-type LocalSubjectAccessReviewBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type LocalSubjectAccessReviewApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   localSubjectAccessReviewFields
 }
 
+// LocalSubjectAccessReviewApplyConfiguration constructs an declarative configuration of the LocalSubjectAccessReview type for use with
+// apply.
+func LocalSubjectAccessReview() *LocalSubjectAccessReviewApplyConfiguration {
+	return &LocalSubjectAccessReviewApplyConfiguration{}
+}
+
 // localSubjectAccessReviewFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LocalSubjectAccessReviewBuilder.
+// Inline fields are owned by their respective inline type in LocalSubjectAccessReviewApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type localSubjectAccessReviewFields struct {
-	Kind       *string                           `json:"kind,omitempty"`       // inlined LocalSubjectAccessReviewBuilder.typeMeta.Kind field
-	APIVersion *string                           `json:"apiVersion,omitempty"` // inlined LocalSubjectAccessReviewBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder             `json:"metadata,omitempty"`
-	Spec       *SubjectAccessReviewSpecBuilder   `json:"spec,omitempty"`
-	Status     *SubjectAccessReviewStatusBuilder `json:"status,omitempty"`
-}
-
-// LocalSubjectAccessReview constructs an declarative configuration of the LocalSubjectAccessReview type for use with
-// apply.
-func LocalSubjectAccessReview() *LocalSubjectAccessReviewBuilder {
-	return &LocalSubjectAccessReviewBuilder{}
+	Kind       *string                                      `json:"kind,omitempty"`       // inlined LocalSubjectAccessReviewApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                                      `json:"apiVersion,omitempty"` // inlined LocalSubjectAccessReviewApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration             `json:"metadata,omitempty"`
+	Spec       *SubjectAccessReviewSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status     *SubjectAccessReviewStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *LocalSubjectAccessReviewBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *LocalSubjectAccessReviewBuilder {
+func (b *LocalSubjectAccessReviewApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *LocalSubjectAccessReviewApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *LocalSubjectAccessReviewBuilder) RemoveTypeMeta() *LocalSubjectAccessReviewBuilder {
+func (b *LocalSubjectAccessReviewApplyConfiguration) RemoveTypeMeta() *LocalSubjectAccessReviewApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *LocalSubjectAccessReviewBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *LocalSubjectAccessReviewApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *LocalSubjectAccessReviewBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *LocalSubjectAccessReviewBuilder {
+func (b *LocalSubjectAccessReviewApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *LocalSubjectAccessReviewApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *LocalSubjectAccessReviewBuilder) RemoveObjectMeta() *LocalSubjectAccessReviewBuilder {
+func (b *LocalSubjectAccessReviewApplyConfiguration) RemoveObjectMeta() *LocalSubjectAccessReviewApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *LocalSubjectAccessReviewBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *LocalSubjectAccessReviewApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *LocalSubjectAccessReviewBuilder) SetSpec(value *SubjectAccessReviewSpecBuilder) *LocalSubjectAccessReviewBuilder {
+func (b *LocalSubjectAccessReviewApplyConfiguration) SetSpec(value *SubjectAccessReviewSpecApplyConfiguration) *LocalSubjectAccessReviewApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *LocalSubjectAccessReviewBuilder) RemoveSpec() *LocalSubjectAccessReviewBuilder {
+func (b *LocalSubjectAccessReviewApplyConfiguration) RemoveSpec() *LocalSubjectAccessReviewApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *LocalSubjectAccessReviewBuilder) GetSpec() (value *SubjectAccessReviewSpecBuilder, ok bool) {
+func (b *LocalSubjectAccessReviewApplyConfiguration) GetSpec() (value *SubjectAccessReviewSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *LocalSubjectAccessReviewBuilder) SetStatus(value *SubjectAccessReviewStatusBuilder) *LocalSubjectAccessReviewBuilder {
+func (b *LocalSubjectAccessReviewApplyConfiguration) SetStatus(value *SubjectAccessReviewStatusApplyConfiguration) *LocalSubjectAccessReviewApplyConfiguration {
 	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *LocalSubjectAccessReviewBuilder) RemoveStatus() *LocalSubjectAccessReviewBuilder {
+func (b *LocalSubjectAccessReviewApplyConfiguration) RemoveStatus() *LocalSubjectAccessReviewApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *LocalSubjectAccessReviewBuilder) GetStatus() (value *SubjectAccessReviewStatusBuilder, ok bool) {
+func (b *LocalSubjectAccessReviewApplyConfiguration) GetStatus() (value *SubjectAccessReviewStatusApplyConfiguration, ok bool) {
 	return b.fields.Status, b.fields.Status != nil
 }
 
-// ToUnstructured converts LocalSubjectAccessReviewBuilder to unstructured.
-func (b *LocalSubjectAccessReviewBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts LocalSubjectAccessReviewApplyConfiguration to unstructured.
+func (b *LocalSubjectAccessReviewApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -132,9 +132,9 @@ func (b *LocalSubjectAccessReviewBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to LocalSubjectAccessReviewBuilder, replacing the contents
-// of LocalSubjectAccessReviewBuilder.
-func (b *LocalSubjectAccessReviewBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to LocalSubjectAccessReviewApplyConfiguration, replacing the contents
+// of LocalSubjectAccessReviewApplyConfiguration.
+func (b *LocalSubjectAccessReviewApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &localSubjectAccessReviewFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -145,15 +145,15 @@ func (b *LocalSubjectAccessReviewBuilder) FromUnstructured(u map[string]interfac
 	return nil
 }
 
-// MarshalJSON marshals LocalSubjectAccessReviewBuilder to JSON.
-func (b *LocalSubjectAccessReviewBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals LocalSubjectAccessReviewApplyConfiguration to JSON.
+func (b *LocalSubjectAccessReviewApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into LocalSubjectAccessReviewBuilder, replacing the contents of
-// LocalSubjectAccessReviewBuilder.
-func (b *LocalSubjectAccessReviewBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into LocalSubjectAccessReviewApplyConfiguration, replacing the contents of
+// LocalSubjectAccessReviewApplyConfiguration.
+func (b *LocalSubjectAccessReviewApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -161,13 +161,13 @@ func (b *LocalSubjectAccessReviewBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// LocalSubjectAccessReviewList represents a list of LocalSubjectAccessReviewBuilder.
-type LocalSubjectAccessReviewList []*LocalSubjectAccessReviewBuilder
+// LocalSubjectAccessReviewList represents a listAlias of LocalSubjectAccessReviewApplyConfiguration.
+type LocalSubjectAccessReviewList []*LocalSubjectAccessReviewApplyConfiguration
 
-// LocalSubjectAccessReviewList represents a map of LocalSubjectAccessReviewBuilder.
-type LocalSubjectAccessReviewMap map[string]LocalSubjectAccessReviewBuilder
+// LocalSubjectAccessReviewList represents a map of LocalSubjectAccessReviewApplyConfiguration.
+type LocalSubjectAccessReviewMap map[string]LocalSubjectAccessReviewApplyConfiguration
 
-func (b *LocalSubjectAccessReviewBuilder) preMarshal() {
+func (b *LocalSubjectAccessReviewApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -177,9 +177,9 @@ func (b *LocalSubjectAccessReviewBuilder) preMarshal() {
 		}
 	}
 }
-func (b *LocalSubjectAccessReviewBuilder) postUnmarshal() {
+func (b *LocalSubjectAccessReviewApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

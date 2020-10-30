@@ -113,1203 +113,1203 @@ func ForKind(kind schema.GroupVersionKind) runtime.ApplyConfiguration {
 	switch kind {
 	// Group=admissionregistration, Version=v1
 	case v1.SchemeGroupVersion.WithKind("MutatingWebhook"):
-		return &admissionregistrationv1.MutatingWebhookBuilder{}
+		return &admissionregistrationv1.MutatingWebhookApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("MutatingWebhookConfiguration"):
-		return &admissionregistrationv1.MutatingWebhookConfigurationBuilder{}
+		return &admissionregistrationv1.MutatingWebhookConfigurationApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("Rule"):
-		return &admissionregistrationv1.RuleBuilder{}
+		return &admissionregistrationv1.RuleApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("RuleWithOperations"):
-		return &admissionregistrationv1.RuleWithOperationsBuilder{}
+		return &admissionregistrationv1.RuleWithOperationsApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ServiceReference"):
-		return &admissionregistrationv1.ServiceReferenceBuilder{}
+		return &admissionregistrationv1.ServiceReferenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ValidatingWebhook"):
-		return &admissionregistrationv1.ValidatingWebhookBuilder{}
+		return &admissionregistrationv1.ValidatingWebhookApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ValidatingWebhookConfiguration"):
-		return &admissionregistrationv1.ValidatingWebhookConfigurationBuilder{}
+		return &admissionregistrationv1.ValidatingWebhookConfigurationApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("WebhookClientConfig"):
-		return &admissionregistrationv1.WebhookClientConfigBuilder{}
+		return &admissionregistrationv1.WebhookClientConfigApplyConfiguration{}
 
 		// Group=admissionregistration, Version=v1beta1
 	case v1beta1.SchemeGroupVersion.WithKind("MutatingWebhook"):
-		return &admissionregistrationv1beta1.MutatingWebhookBuilder{}
+		return &admissionregistrationv1beta1.MutatingWebhookApplyConfiguration{}
 	case v1beta1.SchemeGroupVersion.WithKind("MutatingWebhookConfiguration"):
-		return &admissionregistrationv1beta1.MutatingWebhookConfigurationBuilder{}
+		return &admissionregistrationv1beta1.MutatingWebhookConfigurationApplyConfiguration{}
 	case v1beta1.SchemeGroupVersion.WithKind("Rule"):
-		return &admissionregistrationv1beta1.RuleBuilder{}
+		return &admissionregistrationv1beta1.RuleApplyConfiguration{}
 	case v1beta1.SchemeGroupVersion.WithKind("RuleWithOperations"):
-		return &admissionregistrationv1beta1.RuleWithOperationsBuilder{}
+		return &admissionregistrationv1beta1.RuleWithOperationsApplyConfiguration{}
 	case v1beta1.SchemeGroupVersion.WithKind("ServiceReference"):
-		return &admissionregistrationv1beta1.ServiceReferenceBuilder{}
+		return &admissionregistrationv1beta1.ServiceReferenceApplyConfiguration{}
 	case v1beta1.SchemeGroupVersion.WithKind("ValidatingWebhook"):
-		return &admissionregistrationv1beta1.ValidatingWebhookBuilder{}
+		return &admissionregistrationv1beta1.ValidatingWebhookApplyConfiguration{}
 	case v1beta1.SchemeGroupVersion.WithKind("ValidatingWebhookConfiguration"):
-		return &admissionregistrationv1beta1.ValidatingWebhookConfigurationBuilder{}
+		return &admissionregistrationv1beta1.ValidatingWebhookConfigurationApplyConfiguration{}
 	case v1beta1.SchemeGroupVersion.WithKind("WebhookClientConfig"):
-		return &admissionregistrationv1beta1.WebhookClientConfigBuilder{}
+		return &admissionregistrationv1beta1.WebhookClientConfigApplyConfiguration{}
 
 		// Group=apps, Version=v1
 	case appsv1.SchemeGroupVersion.WithKind("ControllerRevision"):
-		return &typebuildersappsv1.ControllerRevisionBuilder{}
+		return &typebuildersappsv1.ControllerRevisionApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("DaemonSet"):
-		return &typebuildersappsv1.DaemonSetBuilder{}
+		return &typebuildersappsv1.DaemonSetApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("DaemonSetCondition"):
-		return &typebuildersappsv1.DaemonSetConditionBuilder{}
+		return &typebuildersappsv1.DaemonSetConditionApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("DaemonSetSpec"):
-		return &typebuildersappsv1.DaemonSetSpecBuilder{}
+		return &typebuildersappsv1.DaemonSetSpecApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("DaemonSetStatus"):
-		return &typebuildersappsv1.DaemonSetStatusBuilder{}
+		return &typebuildersappsv1.DaemonSetStatusApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("DaemonSetUpdateStrategy"):
-		return &typebuildersappsv1.DaemonSetUpdateStrategyBuilder{}
+		return &typebuildersappsv1.DaemonSetUpdateStrategyApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("Deployment"):
-		return &typebuildersappsv1.DeploymentBuilder{}
+		return &typebuildersappsv1.DeploymentApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("DeploymentCondition"):
-		return &typebuildersappsv1.DeploymentConditionBuilder{}
+		return &typebuildersappsv1.DeploymentConditionApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("DeploymentSpec"):
-		return &typebuildersappsv1.DeploymentSpecBuilder{}
+		return &typebuildersappsv1.DeploymentSpecApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("DeploymentStatus"):
-		return &typebuildersappsv1.DeploymentStatusBuilder{}
+		return &typebuildersappsv1.DeploymentStatusApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("DeploymentStrategy"):
-		return &typebuildersappsv1.DeploymentStrategyBuilder{}
+		return &typebuildersappsv1.DeploymentStrategyApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("ReplicaSet"):
-		return &typebuildersappsv1.ReplicaSetBuilder{}
+		return &typebuildersappsv1.ReplicaSetApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("ReplicaSetCondition"):
-		return &typebuildersappsv1.ReplicaSetConditionBuilder{}
+		return &typebuildersappsv1.ReplicaSetConditionApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("ReplicaSetSpec"):
-		return &typebuildersappsv1.ReplicaSetSpecBuilder{}
+		return &typebuildersappsv1.ReplicaSetSpecApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("ReplicaSetStatus"):
-		return &typebuildersappsv1.ReplicaSetStatusBuilder{}
+		return &typebuildersappsv1.ReplicaSetStatusApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("RollingUpdateDaemonSet"):
-		return &typebuildersappsv1.RollingUpdateDaemonSetBuilder{}
+		return &typebuildersappsv1.RollingUpdateDaemonSetApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("RollingUpdateDeployment"):
-		return &typebuildersappsv1.RollingUpdateDeploymentBuilder{}
+		return &typebuildersappsv1.RollingUpdateDeploymentApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("RollingUpdateStatefulSetStrategy"):
-		return &typebuildersappsv1.RollingUpdateStatefulSetStrategyBuilder{}
+		return &typebuildersappsv1.RollingUpdateStatefulSetStrategyApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("StatefulSet"):
-		return &typebuildersappsv1.StatefulSetBuilder{}
+		return &typebuildersappsv1.StatefulSetApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("StatefulSetCondition"):
-		return &typebuildersappsv1.StatefulSetConditionBuilder{}
+		return &typebuildersappsv1.StatefulSetConditionApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("StatefulSetSpec"):
-		return &typebuildersappsv1.StatefulSetSpecBuilder{}
+		return &typebuildersappsv1.StatefulSetSpecApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("StatefulSetStatus"):
-		return &typebuildersappsv1.StatefulSetStatusBuilder{}
+		return &typebuildersappsv1.StatefulSetStatusApplyConfiguration{}
 	case appsv1.SchemeGroupVersion.WithKind("StatefulSetUpdateStrategy"):
-		return &typebuildersappsv1.StatefulSetUpdateStrategyBuilder{}
+		return &typebuildersappsv1.StatefulSetUpdateStrategyApplyConfiguration{}
 
 		// Group=apps, Version=v1beta1
 	case appsv1beta1.SchemeGroupVersion.WithKind("ControllerRevision"):
-		return &typebuildersappsv1beta1.ControllerRevisionBuilder{}
+		return &typebuildersappsv1beta1.ControllerRevisionApplyConfiguration{}
 	case appsv1beta1.SchemeGroupVersion.WithKind("Deployment"):
-		return &typebuildersappsv1beta1.DeploymentBuilder{}
+		return &typebuildersappsv1beta1.DeploymentApplyConfiguration{}
 	case appsv1beta1.SchemeGroupVersion.WithKind("DeploymentCondition"):
-		return &typebuildersappsv1beta1.DeploymentConditionBuilder{}
+		return &typebuildersappsv1beta1.DeploymentConditionApplyConfiguration{}
 	case appsv1beta1.SchemeGroupVersion.WithKind("DeploymentSpec"):
-		return &typebuildersappsv1beta1.DeploymentSpecBuilder{}
+		return &typebuildersappsv1beta1.DeploymentSpecApplyConfiguration{}
 	case appsv1beta1.SchemeGroupVersion.WithKind("DeploymentStatus"):
-		return &typebuildersappsv1beta1.DeploymentStatusBuilder{}
+		return &typebuildersappsv1beta1.DeploymentStatusApplyConfiguration{}
 	case appsv1beta1.SchemeGroupVersion.WithKind("DeploymentStrategy"):
-		return &typebuildersappsv1beta1.DeploymentStrategyBuilder{}
+		return &typebuildersappsv1beta1.DeploymentStrategyApplyConfiguration{}
 	case appsv1beta1.SchemeGroupVersion.WithKind("RollbackConfig"):
-		return &typebuildersappsv1beta1.RollbackConfigBuilder{}
+		return &typebuildersappsv1beta1.RollbackConfigApplyConfiguration{}
 	case appsv1beta1.SchemeGroupVersion.WithKind("RollingUpdateDeployment"):
-		return &typebuildersappsv1beta1.RollingUpdateDeploymentBuilder{}
+		return &typebuildersappsv1beta1.RollingUpdateDeploymentApplyConfiguration{}
 	case appsv1beta1.SchemeGroupVersion.WithKind("RollingUpdateStatefulSetStrategy"):
-		return &typebuildersappsv1beta1.RollingUpdateStatefulSetStrategyBuilder{}
+		return &typebuildersappsv1beta1.RollingUpdateStatefulSetStrategyApplyConfiguration{}
 	case appsv1beta1.SchemeGroupVersion.WithKind("StatefulSet"):
-		return &typebuildersappsv1beta1.StatefulSetBuilder{}
+		return &typebuildersappsv1beta1.StatefulSetApplyConfiguration{}
 	case appsv1beta1.SchemeGroupVersion.WithKind("StatefulSetCondition"):
-		return &typebuildersappsv1beta1.StatefulSetConditionBuilder{}
+		return &typebuildersappsv1beta1.StatefulSetConditionApplyConfiguration{}
 	case appsv1beta1.SchemeGroupVersion.WithKind("StatefulSetSpec"):
-		return &typebuildersappsv1beta1.StatefulSetSpecBuilder{}
+		return &typebuildersappsv1beta1.StatefulSetSpecApplyConfiguration{}
 	case appsv1beta1.SchemeGroupVersion.WithKind("StatefulSetStatus"):
-		return &typebuildersappsv1beta1.StatefulSetStatusBuilder{}
+		return &typebuildersappsv1beta1.StatefulSetStatusApplyConfiguration{}
 	case appsv1beta1.SchemeGroupVersion.WithKind("StatefulSetUpdateStrategy"):
-		return &typebuildersappsv1beta1.StatefulSetUpdateStrategyBuilder{}
+		return &typebuildersappsv1beta1.StatefulSetUpdateStrategyApplyConfiguration{}
 
 		// Group=apps, Version=v1beta2
 	case v1beta2.SchemeGroupVersion.WithKind("ControllerRevision"):
-		return &appsv1beta2.ControllerRevisionBuilder{}
+		return &appsv1beta2.ControllerRevisionApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("DaemonSet"):
-		return &appsv1beta2.DaemonSetBuilder{}
+		return &appsv1beta2.DaemonSetApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("DaemonSetCondition"):
-		return &appsv1beta2.DaemonSetConditionBuilder{}
+		return &appsv1beta2.DaemonSetConditionApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("DaemonSetSpec"):
-		return &appsv1beta2.DaemonSetSpecBuilder{}
+		return &appsv1beta2.DaemonSetSpecApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("DaemonSetStatus"):
-		return &appsv1beta2.DaemonSetStatusBuilder{}
+		return &appsv1beta2.DaemonSetStatusApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("DaemonSetUpdateStrategy"):
-		return &appsv1beta2.DaemonSetUpdateStrategyBuilder{}
+		return &appsv1beta2.DaemonSetUpdateStrategyApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("Deployment"):
-		return &appsv1beta2.DeploymentBuilder{}
+		return &appsv1beta2.DeploymentApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("DeploymentCondition"):
-		return &appsv1beta2.DeploymentConditionBuilder{}
+		return &appsv1beta2.DeploymentConditionApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("DeploymentSpec"):
-		return &appsv1beta2.DeploymentSpecBuilder{}
+		return &appsv1beta2.DeploymentSpecApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("DeploymentStatus"):
-		return &appsv1beta2.DeploymentStatusBuilder{}
+		return &appsv1beta2.DeploymentStatusApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("DeploymentStrategy"):
-		return &appsv1beta2.DeploymentStrategyBuilder{}
+		return &appsv1beta2.DeploymentStrategyApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("ReplicaSet"):
-		return &appsv1beta2.ReplicaSetBuilder{}
+		return &appsv1beta2.ReplicaSetApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("ReplicaSetCondition"):
-		return &appsv1beta2.ReplicaSetConditionBuilder{}
+		return &appsv1beta2.ReplicaSetConditionApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("ReplicaSetSpec"):
-		return &appsv1beta2.ReplicaSetSpecBuilder{}
+		return &appsv1beta2.ReplicaSetSpecApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("ReplicaSetStatus"):
-		return &appsv1beta2.ReplicaSetStatusBuilder{}
+		return &appsv1beta2.ReplicaSetStatusApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("RollingUpdateDaemonSet"):
-		return &appsv1beta2.RollingUpdateDaemonSetBuilder{}
+		return &appsv1beta2.RollingUpdateDaemonSetApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("RollingUpdateDeployment"):
-		return &appsv1beta2.RollingUpdateDeploymentBuilder{}
+		return &appsv1beta2.RollingUpdateDeploymentApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("RollingUpdateStatefulSetStrategy"):
-		return &appsv1beta2.RollingUpdateStatefulSetStrategyBuilder{}
+		return &appsv1beta2.RollingUpdateStatefulSetStrategyApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("StatefulSet"):
-		return &appsv1beta2.StatefulSetBuilder{}
+		return &appsv1beta2.StatefulSetApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("StatefulSetCondition"):
-		return &appsv1beta2.StatefulSetConditionBuilder{}
+		return &appsv1beta2.StatefulSetConditionApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("StatefulSetSpec"):
-		return &appsv1beta2.StatefulSetSpecBuilder{}
+		return &appsv1beta2.StatefulSetSpecApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("StatefulSetStatus"):
-		return &appsv1beta2.StatefulSetStatusBuilder{}
+		return &appsv1beta2.StatefulSetStatusApplyConfiguration{}
 	case v1beta2.SchemeGroupVersion.WithKind("StatefulSetUpdateStrategy"):
-		return &appsv1beta2.StatefulSetUpdateStrategyBuilder{}
+		return &appsv1beta2.StatefulSetUpdateStrategyApplyConfiguration{}
 
 		// Group=authentication, Version=v1
 	case authenticationv1.SchemeGroupVersion.WithKind("TokenReview"):
-		return &typebuildersauthenticationv1.TokenReviewBuilder{}
+		return &typebuildersauthenticationv1.TokenReviewApplyConfiguration{}
 	case authenticationv1.SchemeGroupVersion.WithKind("TokenReviewSpec"):
-		return &typebuildersauthenticationv1.TokenReviewSpecBuilder{}
+		return &typebuildersauthenticationv1.TokenReviewSpecApplyConfiguration{}
 	case authenticationv1.SchemeGroupVersion.WithKind("TokenReviewStatus"):
-		return &typebuildersauthenticationv1.TokenReviewStatusBuilder{}
+		return &typebuildersauthenticationv1.TokenReviewStatusApplyConfiguration{}
 	case authenticationv1.SchemeGroupVersion.WithKind("UserInfo"):
-		return &typebuildersauthenticationv1.UserInfoBuilder{}
+		return &typebuildersauthenticationv1.UserInfoApplyConfiguration{}
 
 		// Group=authentication, Version=v1beta1
 	case authenticationv1beta1.SchemeGroupVersion.WithKind("TokenReview"):
-		return &typebuildersauthenticationv1beta1.TokenReviewBuilder{}
+		return &typebuildersauthenticationv1beta1.TokenReviewApplyConfiguration{}
 	case authenticationv1beta1.SchemeGroupVersion.WithKind("TokenReviewSpec"):
-		return &typebuildersauthenticationv1beta1.TokenReviewSpecBuilder{}
+		return &typebuildersauthenticationv1beta1.TokenReviewSpecApplyConfiguration{}
 	case authenticationv1beta1.SchemeGroupVersion.WithKind("TokenReviewStatus"):
-		return &typebuildersauthenticationv1beta1.TokenReviewStatusBuilder{}
+		return &typebuildersauthenticationv1beta1.TokenReviewStatusApplyConfiguration{}
 	case authenticationv1beta1.SchemeGroupVersion.WithKind("UserInfo"):
-		return &typebuildersauthenticationv1beta1.UserInfoBuilder{}
+		return &typebuildersauthenticationv1beta1.UserInfoApplyConfiguration{}
 
 		// Group=authorization, Version=v1
 	case authorizationv1.SchemeGroupVersion.WithKind("LocalSubjectAccessReview"):
-		return &typebuildersauthorizationv1.LocalSubjectAccessReviewBuilder{}
+		return &typebuildersauthorizationv1.LocalSubjectAccessReviewApplyConfiguration{}
 	case authorizationv1.SchemeGroupVersion.WithKind("NonResourceAttributes"):
-		return &typebuildersauthorizationv1.NonResourceAttributesBuilder{}
+		return &typebuildersauthorizationv1.NonResourceAttributesApplyConfiguration{}
 	case authorizationv1.SchemeGroupVersion.WithKind("NonResourceRule"):
-		return &typebuildersauthorizationv1.NonResourceRuleBuilder{}
+		return &typebuildersauthorizationv1.NonResourceRuleApplyConfiguration{}
 	case authorizationv1.SchemeGroupVersion.WithKind("ResourceAttributes"):
-		return &typebuildersauthorizationv1.ResourceAttributesBuilder{}
+		return &typebuildersauthorizationv1.ResourceAttributesApplyConfiguration{}
 	case authorizationv1.SchemeGroupVersion.WithKind("ResourceRule"):
-		return &typebuildersauthorizationv1.ResourceRuleBuilder{}
+		return &typebuildersauthorizationv1.ResourceRuleApplyConfiguration{}
 	case authorizationv1.SchemeGroupVersion.WithKind("SelfSubjectAccessReview"):
-		return &typebuildersauthorizationv1.SelfSubjectAccessReviewBuilder{}
+		return &typebuildersauthorizationv1.SelfSubjectAccessReviewApplyConfiguration{}
 	case authorizationv1.SchemeGroupVersion.WithKind("SelfSubjectAccessReviewSpec"):
-		return &typebuildersauthorizationv1.SelfSubjectAccessReviewSpecBuilder{}
+		return &typebuildersauthorizationv1.SelfSubjectAccessReviewSpecApplyConfiguration{}
 	case authorizationv1.SchemeGroupVersion.WithKind("SelfSubjectRulesReview"):
-		return &typebuildersauthorizationv1.SelfSubjectRulesReviewBuilder{}
+		return &typebuildersauthorizationv1.SelfSubjectRulesReviewApplyConfiguration{}
 	case authorizationv1.SchemeGroupVersion.WithKind("SelfSubjectRulesReviewSpec"):
-		return &typebuildersauthorizationv1.SelfSubjectRulesReviewSpecBuilder{}
+		return &typebuildersauthorizationv1.SelfSubjectRulesReviewSpecApplyConfiguration{}
 	case authorizationv1.SchemeGroupVersion.WithKind("SubjectAccessReview"):
-		return &typebuildersauthorizationv1.SubjectAccessReviewBuilder{}
+		return &typebuildersauthorizationv1.SubjectAccessReviewApplyConfiguration{}
 	case authorizationv1.SchemeGroupVersion.WithKind("SubjectAccessReviewSpec"):
-		return &typebuildersauthorizationv1.SubjectAccessReviewSpecBuilder{}
+		return &typebuildersauthorizationv1.SubjectAccessReviewSpecApplyConfiguration{}
 	case authorizationv1.SchemeGroupVersion.WithKind("SubjectAccessReviewStatus"):
-		return &typebuildersauthorizationv1.SubjectAccessReviewStatusBuilder{}
+		return &typebuildersauthorizationv1.SubjectAccessReviewStatusApplyConfiguration{}
 	case authorizationv1.SchemeGroupVersion.WithKind("SubjectRulesReviewStatus"):
-		return &typebuildersauthorizationv1.SubjectRulesReviewStatusBuilder{}
+		return &typebuildersauthorizationv1.SubjectRulesReviewStatusApplyConfiguration{}
 
 		// Group=authorization, Version=v1beta1
 	case authorizationv1beta1.SchemeGroupVersion.WithKind("LocalSubjectAccessReview"):
-		return &typebuildersauthorizationv1beta1.LocalSubjectAccessReviewBuilder{}
+		return &typebuildersauthorizationv1beta1.LocalSubjectAccessReviewApplyConfiguration{}
 	case authorizationv1beta1.SchemeGroupVersion.WithKind("NonResourceAttributes"):
-		return &typebuildersauthorizationv1beta1.NonResourceAttributesBuilder{}
+		return &typebuildersauthorizationv1beta1.NonResourceAttributesApplyConfiguration{}
 	case authorizationv1beta1.SchemeGroupVersion.WithKind("NonResourceRule"):
-		return &typebuildersauthorizationv1beta1.NonResourceRuleBuilder{}
+		return &typebuildersauthorizationv1beta1.NonResourceRuleApplyConfiguration{}
 	case authorizationv1beta1.SchemeGroupVersion.WithKind("ResourceAttributes"):
-		return &typebuildersauthorizationv1beta1.ResourceAttributesBuilder{}
+		return &typebuildersauthorizationv1beta1.ResourceAttributesApplyConfiguration{}
 	case authorizationv1beta1.SchemeGroupVersion.WithKind("ResourceRule"):
-		return &typebuildersauthorizationv1beta1.ResourceRuleBuilder{}
+		return &typebuildersauthorizationv1beta1.ResourceRuleApplyConfiguration{}
 	case authorizationv1beta1.SchemeGroupVersion.WithKind("SelfSubjectAccessReview"):
-		return &typebuildersauthorizationv1beta1.SelfSubjectAccessReviewBuilder{}
+		return &typebuildersauthorizationv1beta1.SelfSubjectAccessReviewApplyConfiguration{}
 	case authorizationv1beta1.SchemeGroupVersion.WithKind("SelfSubjectAccessReviewSpec"):
-		return &typebuildersauthorizationv1beta1.SelfSubjectAccessReviewSpecBuilder{}
+		return &typebuildersauthorizationv1beta1.SelfSubjectAccessReviewSpecApplyConfiguration{}
 	case authorizationv1beta1.SchemeGroupVersion.WithKind("SelfSubjectRulesReview"):
-		return &typebuildersauthorizationv1beta1.SelfSubjectRulesReviewBuilder{}
+		return &typebuildersauthorizationv1beta1.SelfSubjectRulesReviewApplyConfiguration{}
 	case authorizationv1beta1.SchemeGroupVersion.WithKind("SelfSubjectRulesReviewSpec"):
-		return &typebuildersauthorizationv1beta1.SelfSubjectRulesReviewSpecBuilder{}
+		return &typebuildersauthorizationv1beta1.SelfSubjectRulesReviewSpecApplyConfiguration{}
 	case authorizationv1beta1.SchemeGroupVersion.WithKind("SubjectAccessReview"):
-		return &typebuildersauthorizationv1beta1.SubjectAccessReviewBuilder{}
+		return &typebuildersauthorizationv1beta1.SubjectAccessReviewApplyConfiguration{}
 	case authorizationv1beta1.SchemeGroupVersion.WithKind("SubjectAccessReviewSpec"):
-		return &typebuildersauthorizationv1beta1.SubjectAccessReviewSpecBuilder{}
+		return &typebuildersauthorizationv1beta1.SubjectAccessReviewSpecApplyConfiguration{}
 	case authorizationv1beta1.SchemeGroupVersion.WithKind("SubjectAccessReviewStatus"):
-		return &typebuildersauthorizationv1beta1.SubjectAccessReviewStatusBuilder{}
+		return &typebuildersauthorizationv1beta1.SubjectAccessReviewStatusApplyConfiguration{}
 	case authorizationv1beta1.SchemeGroupVersion.WithKind("SubjectRulesReviewStatus"):
-		return &typebuildersauthorizationv1beta1.SubjectRulesReviewStatusBuilder{}
+		return &typebuildersauthorizationv1beta1.SubjectRulesReviewStatusApplyConfiguration{}
 
 		// Group=autoscaling, Version=v1
 	case autoscalingv1.SchemeGroupVersion.WithKind("CrossVersionObjectReference"):
-		return &typebuildersautoscalingv1.CrossVersionObjectReferenceBuilder{}
+		return &typebuildersautoscalingv1.CrossVersionObjectReferenceApplyConfiguration{}
 	case autoscalingv1.SchemeGroupVersion.WithKind("HorizontalPodAutoscaler"):
-		return &typebuildersautoscalingv1.HorizontalPodAutoscalerBuilder{}
+		return &typebuildersautoscalingv1.HorizontalPodAutoscalerApplyConfiguration{}
 	case autoscalingv1.SchemeGroupVersion.WithKind("HorizontalPodAutoscalerSpec"):
-		return &typebuildersautoscalingv1.HorizontalPodAutoscalerSpecBuilder{}
+		return &typebuildersautoscalingv1.HorizontalPodAutoscalerSpecApplyConfiguration{}
 	case autoscalingv1.SchemeGroupVersion.WithKind("HorizontalPodAutoscalerStatus"):
-		return &typebuildersautoscalingv1.HorizontalPodAutoscalerStatusBuilder{}
+		return &typebuildersautoscalingv1.HorizontalPodAutoscalerStatusApplyConfiguration{}
 
 		// Group=autoscaling, Version=v2beta1
 	case v2beta1.SchemeGroupVersion.WithKind("ContainerResourceMetricSource"):
-		return &autoscalingv2beta1.ContainerResourceMetricSourceBuilder{}
+		return &autoscalingv2beta1.ContainerResourceMetricSourceApplyConfiguration{}
 	case v2beta1.SchemeGroupVersion.WithKind("ContainerResourceMetricStatus"):
-		return &autoscalingv2beta1.ContainerResourceMetricStatusBuilder{}
+		return &autoscalingv2beta1.ContainerResourceMetricStatusApplyConfiguration{}
 	case v2beta1.SchemeGroupVersion.WithKind("CrossVersionObjectReference"):
-		return &autoscalingv2beta1.CrossVersionObjectReferenceBuilder{}
+		return &autoscalingv2beta1.CrossVersionObjectReferenceApplyConfiguration{}
 	case v2beta1.SchemeGroupVersion.WithKind("ExternalMetricSource"):
-		return &autoscalingv2beta1.ExternalMetricSourceBuilder{}
+		return &autoscalingv2beta1.ExternalMetricSourceApplyConfiguration{}
 	case v2beta1.SchemeGroupVersion.WithKind("ExternalMetricStatus"):
-		return &autoscalingv2beta1.ExternalMetricStatusBuilder{}
+		return &autoscalingv2beta1.ExternalMetricStatusApplyConfiguration{}
 	case v2beta1.SchemeGroupVersion.WithKind("HorizontalPodAutoscaler"):
-		return &autoscalingv2beta1.HorizontalPodAutoscalerBuilder{}
+		return &autoscalingv2beta1.HorizontalPodAutoscalerApplyConfiguration{}
 	case v2beta1.SchemeGroupVersion.WithKind("HorizontalPodAutoscalerCondition"):
-		return &autoscalingv2beta1.HorizontalPodAutoscalerConditionBuilder{}
+		return &autoscalingv2beta1.HorizontalPodAutoscalerConditionApplyConfiguration{}
 	case v2beta1.SchemeGroupVersion.WithKind("HorizontalPodAutoscalerSpec"):
-		return &autoscalingv2beta1.HorizontalPodAutoscalerSpecBuilder{}
+		return &autoscalingv2beta1.HorizontalPodAutoscalerSpecApplyConfiguration{}
 	case v2beta1.SchemeGroupVersion.WithKind("HorizontalPodAutoscalerStatus"):
-		return &autoscalingv2beta1.HorizontalPodAutoscalerStatusBuilder{}
+		return &autoscalingv2beta1.HorizontalPodAutoscalerStatusApplyConfiguration{}
 	case v2beta1.SchemeGroupVersion.WithKind("MetricSpec"):
-		return &autoscalingv2beta1.MetricSpecBuilder{}
+		return &autoscalingv2beta1.MetricSpecApplyConfiguration{}
 	case v2beta1.SchemeGroupVersion.WithKind("MetricStatus"):
-		return &autoscalingv2beta1.MetricStatusBuilder{}
+		return &autoscalingv2beta1.MetricStatusApplyConfiguration{}
 	case v2beta1.SchemeGroupVersion.WithKind("ObjectMetricSource"):
-		return &autoscalingv2beta1.ObjectMetricSourceBuilder{}
+		return &autoscalingv2beta1.ObjectMetricSourceApplyConfiguration{}
 	case v2beta1.SchemeGroupVersion.WithKind("ObjectMetricStatus"):
-		return &autoscalingv2beta1.ObjectMetricStatusBuilder{}
+		return &autoscalingv2beta1.ObjectMetricStatusApplyConfiguration{}
 	case v2beta1.SchemeGroupVersion.WithKind("PodsMetricSource"):
-		return &autoscalingv2beta1.PodsMetricSourceBuilder{}
+		return &autoscalingv2beta1.PodsMetricSourceApplyConfiguration{}
 	case v2beta1.SchemeGroupVersion.WithKind("PodsMetricStatus"):
-		return &autoscalingv2beta1.PodsMetricStatusBuilder{}
+		return &autoscalingv2beta1.PodsMetricStatusApplyConfiguration{}
 	case v2beta1.SchemeGroupVersion.WithKind("ResourceMetricSource"):
-		return &autoscalingv2beta1.ResourceMetricSourceBuilder{}
+		return &autoscalingv2beta1.ResourceMetricSourceApplyConfiguration{}
 	case v2beta1.SchemeGroupVersion.WithKind("ResourceMetricStatus"):
-		return &autoscalingv2beta1.ResourceMetricStatusBuilder{}
+		return &autoscalingv2beta1.ResourceMetricStatusApplyConfiguration{}
 
 		// Group=autoscaling, Version=v2beta2
 	case v2beta2.SchemeGroupVersion.WithKind("ContainerResourceMetricSource"):
-		return &autoscalingv2beta2.ContainerResourceMetricSourceBuilder{}
+		return &autoscalingv2beta2.ContainerResourceMetricSourceApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("ContainerResourceMetricStatus"):
-		return &autoscalingv2beta2.ContainerResourceMetricStatusBuilder{}
+		return &autoscalingv2beta2.ContainerResourceMetricStatusApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("CrossVersionObjectReference"):
-		return &autoscalingv2beta2.CrossVersionObjectReferenceBuilder{}
+		return &autoscalingv2beta2.CrossVersionObjectReferenceApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("ExternalMetricSource"):
-		return &autoscalingv2beta2.ExternalMetricSourceBuilder{}
+		return &autoscalingv2beta2.ExternalMetricSourceApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("ExternalMetricStatus"):
-		return &autoscalingv2beta2.ExternalMetricStatusBuilder{}
+		return &autoscalingv2beta2.ExternalMetricStatusApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("HorizontalPodAutoscaler"):
-		return &autoscalingv2beta2.HorizontalPodAutoscalerBuilder{}
+		return &autoscalingv2beta2.HorizontalPodAutoscalerApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("HorizontalPodAutoscalerBehavior"):
-		return &autoscalingv2beta2.HorizontalPodAutoscalerBehaviorBuilder{}
+		return &autoscalingv2beta2.HorizontalPodAutoscalerBehaviorApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("HorizontalPodAutoscalerCondition"):
-		return &autoscalingv2beta2.HorizontalPodAutoscalerConditionBuilder{}
+		return &autoscalingv2beta2.HorizontalPodAutoscalerConditionApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("HorizontalPodAutoscalerSpec"):
-		return &autoscalingv2beta2.HorizontalPodAutoscalerSpecBuilder{}
+		return &autoscalingv2beta2.HorizontalPodAutoscalerSpecApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("HorizontalPodAutoscalerStatus"):
-		return &autoscalingv2beta2.HorizontalPodAutoscalerStatusBuilder{}
+		return &autoscalingv2beta2.HorizontalPodAutoscalerStatusApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("HPAScalingPolicy"):
-		return &autoscalingv2beta2.HPAScalingPolicyBuilder{}
+		return &autoscalingv2beta2.HPAScalingPolicyApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("HPAScalingRules"):
-		return &autoscalingv2beta2.HPAScalingRulesBuilder{}
+		return &autoscalingv2beta2.HPAScalingRulesApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("MetricIdentifier"):
-		return &autoscalingv2beta2.MetricIdentifierBuilder{}
+		return &autoscalingv2beta2.MetricIdentifierApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("MetricSpec"):
-		return &autoscalingv2beta2.MetricSpecBuilder{}
+		return &autoscalingv2beta2.MetricSpecApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("MetricStatus"):
-		return &autoscalingv2beta2.MetricStatusBuilder{}
+		return &autoscalingv2beta2.MetricStatusApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("MetricTarget"):
-		return &autoscalingv2beta2.MetricTargetBuilder{}
+		return &autoscalingv2beta2.MetricTargetApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("MetricValueStatus"):
-		return &autoscalingv2beta2.MetricValueStatusBuilder{}
+		return &autoscalingv2beta2.MetricValueStatusApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("ObjectMetricSource"):
-		return &autoscalingv2beta2.ObjectMetricSourceBuilder{}
+		return &autoscalingv2beta2.ObjectMetricSourceApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("ObjectMetricStatus"):
-		return &autoscalingv2beta2.ObjectMetricStatusBuilder{}
+		return &autoscalingv2beta2.ObjectMetricStatusApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("PodsMetricSource"):
-		return &autoscalingv2beta2.PodsMetricSourceBuilder{}
+		return &autoscalingv2beta2.PodsMetricSourceApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("PodsMetricStatus"):
-		return &autoscalingv2beta2.PodsMetricStatusBuilder{}
+		return &autoscalingv2beta2.PodsMetricStatusApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("ResourceMetricSource"):
-		return &autoscalingv2beta2.ResourceMetricSourceBuilder{}
+		return &autoscalingv2beta2.ResourceMetricSourceApplyConfiguration{}
 	case v2beta2.SchemeGroupVersion.WithKind("ResourceMetricStatus"):
-		return &autoscalingv2beta2.ResourceMetricStatusBuilder{}
+		return &autoscalingv2beta2.ResourceMetricStatusApplyConfiguration{}
 
 		// Group=batch, Version=v1
 	case batchv1.SchemeGroupVersion.WithKind("Job"):
-		return &typebuildersbatchv1.JobBuilder{}
+		return &typebuildersbatchv1.JobApplyConfiguration{}
 	case batchv1.SchemeGroupVersion.WithKind("JobCondition"):
-		return &typebuildersbatchv1.JobConditionBuilder{}
+		return &typebuildersbatchv1.JobConditionApplyConfiguration{}
 	case batchv1.SchemeGroupVersion.WithKind("JobSpec"):
-		return &typebuildersbatchv1.JobSpecBuilder{}
+		return &typebuildersbatchv1.JobSpecApplyConfiguration{}
 	case batchv1.SchemeGroupVersion.WithKind("JobStatus"):
-		return &typebuildersbatchv1.JobStatusBuilder{}
+		return &typebuildersbatchv1.JobStatusApplyConfiguration{}
 
 		// Group=batch, Version=v1beta1
 	case batchv1beta1.SchemeGroupVersion.WithKind("CronJob"):
-		return &typebuildersbatchv1beta1.CronJobBuilder{}
+		return &typebuildersbatchv1beta1.CronJobApplyConfiguration{}
 	case batchv1beta1.SchemeGroupVersion.WithKind("CronJobSpec"):
-		return &typebuildersbatchv1beta1.CronJobSpecBuilder{}
+		return &typebuildersbatchv1beta1.CronJobSpecApplyConfiguration{}
 	case batchv1beta1.SchemeGroupVersion.WithKind("CronJobStatus"):
-		return &typebuildersbatchv1beta1.CronJobStatusBuilder{}
+		return &typebuildersbatchv1beta1.CronJobStatusApplyConfiguration{}
 	case batchv1beta1.SchemeGroupVersion.WithKind("JobTemplateSpec"):
-		return &typebuildersbatchv1beta1.JobTemplateSpecBuilder{}
+		return &typebuildersbatchv1beta1.JobTemplateSpecApplyConfiguration{}
 
 		// Group=batch, Version=v2alpha1
 	case v2alpha1.SchemeGroupVersion.WithKind("CronJob"):
-		return &batchv2alpha1.CronJobBuilder{}
+		return &batchv2alpha1.CronJobApplyConfiguration{}
 	case v2alpha1.SchemeGroupVersion.WithKind("CronJobSpec"):
-		return &batchv2alpha1.CronJobSpecBuilder{}
+		return &batchv2alpha1.CronJobSpecApplyConfiguration{}
 	case v2alpha1.SchemeGroupVersion.WithKind("CronJobStatus"):
-		return &batchv2alpha1.CronJobStatusBuilder{}
+		return &batchv2alpha1.CronJobStatusApplyConfiguration{}
 	case v2alpha1.SchemeGroupVersion.WithKind("JobTemplateSpec"):
-		return &batchv2alpha1.JobTemplateSpecBuilder{}
+		return &batchv2alpha1.JobTemplateSpecApplyConfiguration{}
 
 		// Group=certificates, Version=v1
 	case certificatesv1.SchemeGroupVersion.WithKind("CertificateSigningRequest"):
-		return &typebuilderscertificatesv1.CertificateSigningRequestBuilder{}
+		return &typebuilderscertificatesv1.CertificateSigningRequestApplyConfiguration{}
 	case certificatesv1.SchemeGroupVersion.WithKind("CertificateSigningRequestCondition"):
-		return &typebuilderscertificatesv1.CertificateSigningRequestConditionBuilder{}
+		return &typebuilderscertificatesv1.CertificateSigningRequestConditionApplyConfiguration{}
 	case certificatesv1.SchemeGroupVersion.WithKind("CertificateSigningRequestSpec"):
-		return &typebuilderscertificatesv1.CertificateSigningRequestSpecBuilder{}
+		return &typebuilderscertificatesv1.CertificateSigningRequestSpecApplyConfiguration{}
 	case certificatesv1.SchemeGroupVersion.WithKind("CertificateSigningRequestStatus"):
-		return &typebuilderscertificatesv1.CertificateSigningRequestStatusBuilder{}
+		return &typebuilderscertificatesv1.CertificateSigningRequestStatusApplyConfiguration{}
 
 		// Group=certificates, Version=v1beta1
 	case certificatesv1beta1.SchemeGroupVersion.WithKind("CertificateSigningRequest"):
-		return &typebuilderscertificatesv1beta1.CertificateSigningRequestBuilder{}
+		return &typebuilderscertificatesv1beta1.CertificateSigningRequestApplyConfiguration{}
 	case certificatesv1beta1.SchemeGroupVersion.WithKind("CertificateSigningRequestCondition"):
-		return &typebuilderscertificatesv1beta1.CertificateSigningRequestConditionBuilder{}
+		return &typebuilderscertificatesv1beta1.CertificateSigningRequestConditionApplyConfiguration{}
 	case certificatesv1beta1.SchemeGroupVersion.WithKind("CertificateSigningRequestSpec"):
-		return &typebuilderscertificatesv1beta1.CertificateSigningRequestSpecBuilder{}
+		return &typebuilderscertificatesv1beta1.CertificateSigningRequestSpecApplyConfiguration{}
 	case certificatesv1beta1.SchemeGroupVersion.WithKind("CertificateSigningRequestStatus"):
-		return &typebuilderscertificatesv1beta1.CertificateSigningRequestStatusBuilder{}
+		return &typebuilderscertificatesv1beta1.CertificateSigningRequestStatusApplyConfiguration{}
 
 		// Group=coordination, Version=v1
 	case coordinationv1.SchemeGroupVersion.WithKind("Lease"):
-		return &typebuilderscoordinationv1.LeaseBuilder{}
+		return &typebuilderscoordinationv1.LeaseApplyConfiguration{}
 	case coordinationv1.SchemeGroupVersion.WithKind("LeaseSpec"):
-		return &typebuilderscoordinationv1.LeaseSpecBuilder{}
+		return &typebuilderscoordinationv1.LeaseSpecApplyConfiguration{}
 
 		// Group=coordination, Version=v1beta1
 	case coordinationv1beta1.SchemeGroupVersion.WithKind("Lease"):
-		return &typebuilderscoordinationv1beta1.LeaseBuilder{}
+		return &typebuilderscoordinationv1beta1.LeaseApplyConfiguration{}
 	case coordinationv1beta1.SchemeGroupVersion.WithKind("LeaseSpec"):
-		return &typebuilderscoordinationv1beta1.LeaseSpecBuilder{}
+		return &typebuilderscoordinationv1beta1.LeaseSpecApplyConfiguration{}
 
 		// Group=core, Version=v1
 	case corev1.SchemeGroupVersion.WithKind("Affinity"):
-		return &typebuilderscorev1.AffinityBuilder{}
+		return &typebuilderscorev1.AffinityApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("AttachedVolume"):
-		return &typebuilderscorev1.AttachedVolumeBuilder{}
+		return &typebuilderscorev1.AttachedVolumeApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("AWSElasticBlockStoreVolumeSource"):
-		return &typebuilderscorev1.AWSElasticBlockStoreVolumeSourceBuilder{}
+		return &typebuilderscorev1.AWSElasticBlockStoreVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("AzureDiskVolumeSource"):
-		return &typebuilderscorev1.AzureDiskVolumeSourceBuilder{}
+		return &typebuilderscorev1.AzureDiskVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("AzureFilePersistentVolumeSource"):
-		return &typebuilderscorev1.AzureFilePersistentVolumeSourceBuilder{}
+		return &typebuilderscorev1.AzureFilePersistentVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("AzureFileVolumeSource"):
-		return &typebuilderscorev1.AzureFileVolumeSourceBuilder{}
+		return &typebuilderscorev1.AzureFileVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("Capabilities"):
-		return &typebuilderscorev1.CapabilitiesBuilder{}
+		return &typebuilderscorev1.CapabilitiesApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("CephFSPersistentVolumeSource"):
-		return &typebuilderscorev1.CephFSPersistentVolumeSourceBuilder{}
+		return &typebuilderscorev1.CephFSPersistentVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("CephFSVolumeSource"):
-		return &typebuilderscorev1.CephFSVolumeSourceBuilder{}
+		return &typebuilderscorev1.CephFSVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("CinderPersistentVolumeSource"):
-		return &typebuilderscorev1.CinderPersistentVolumeSourceBuilder{}
+		return &typebuilderscorev1.CinderPersistentVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("CinderVolumeSource"):
-		return &typebuilderscorev1.CinderVolumeSourceBuilder{}
+		return &typebuilderscorev1.CinderVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ClientIPConfig"):
-		return &typebuilderscorev1.ClientIPConfigBuilder{}
+		return &typebuilderscorev1.ClientIPConfigApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ComponentCondition"):
-		return &typebuilderscorev1.ComponentConditionBuilder{}
+		return &typebuilderscorev1.ComponentConditionApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ComponentStatus"):
-		return &typebuilderscorev1.ComponentStatusBuilder{}
+		return &typebuilderscorev1.ComponentStatusApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ConfigMap"):
-		return &typebuilderscorev1.ConfigMapBuilder{}
+		return &typebuilderscorev1.ConfigMapApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ConfigMapEnvSource"):
-		return &typebuilderscorev1.ConfigMapEnvSourceBuilder{}
+		return &typebuilderscorev1.ConfigMapEnvSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ConfigMapKeySelector"):
-		return &typebuilderscorev1.ConfigMapKeySelectorBuilder{}
+		return &typebuilderscorev1.ConfigMapKeySelectorApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ConfigMapNodeConfigSource"):
-		return &typebuilderscorev1.ConfigMapNodeConfigSourceBuilder{}
+		return &typebuilderscorev1.ConfigMapNodeConfigSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ConfigMapProjection"):
-		return &typebuilderscorev1.ConfigMapProjectionBuilder{}
+		return &typebuilderscorev1.ConfigMapProjectionApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ConfigMapVolumeSource"):
-		return &typebuilderscorev1.ConfigMapVolumeSourceBuilder{}
+		return &typebuilderscorev1.ConfigMapVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("Container"):
-		return &typebuilderscorev1.ContainerBuilder{}
+		return &typebuilderscorev1.ContainerApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ContainerImage"):
-		return &typebuilderscorev1.ContainerImageBuilder{}
+		return &typebuilderscorev1.ContainerImageApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ContainerPort"):
-		return &typebuilderscorev1.ContainerPortBuilder{}
+		return &typebuilderscorev1.ContainerPortApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ContainerState"):
-		return &typebuilderscorev1.ContainerStateBuilder{}
+		return &typebuilderscorev1.ContainerStateApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ContainerStateRunning"):
-		return &typebuilderscorev1.ContainerStateRunningBuilder{}
+		return &typebuilderscorev1.ContainerStateRunningApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ContainerStateTerminated"):
-		return &typebuilderscorev1.ContainerStateTerminatedBuilder{}
+		return &typebuilderscorev1.ContainerStateTerminatedApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ContainerStateWaiting"):
-		return &typebuilderscorev1.ContainerStateWaitingBuilder{}
+		return &typebuilderscorev1.ContainerStateWaitingApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ContainerStatus"):
-		return &typebuilderscorev1.ContainerStatusBuilder{}
+		return &typebuilderscorev1.ContainerStatusApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("CSIPersistentVolumeSource"):
-		return &typebuilderscorev1.CSIPersistentVolumeSourceBuilder{}
+		return &typebuilderscorev1.CSIPersistentVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("CSIVolumeSource"):
-		return &typebuilderscorev1.CSIVolumeSourceBuilder{}
+		return &typebuilderscorev1.CSIVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("DaemonEndpoint"):
-		return &typebuilderscorev1.DaemonEndpointBuilder{}
+		return &typebuilderscorev1.DaemonEndpointApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("DownwardAPIProjection"):
-		return &typebuilderscorev1.DownwardAPIProjectionBuilder{}
+		return &typebuilderscorev1.DownwardAPIProjectionApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("DownwardAPIVolumeFile"):
-		return &typebuilderscorev1.DownwardAPIVolumeFileBuilder{}
+		return &typebuilderscorev1.DownwardAPIVolumeFileApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("DownwardAPIVolumeSource"):
-		return &typebuilderscorev1.DownwardAPIVolumeSourceBuilder{}
+		return &typebuilderscorev1.DownwardAPIVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("EmptyDirVolumeSource"):
-		return &typebuilderscorev1.EmptyDirVolumeSourceBuilder{}
+		return &typebuilderscorev1.EmptyDirVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("EndpointAddress"):
-		return &typebuilderscorev1.EndpointAddressBuilder{}
+		return &typebuilderscorev1.EndpointAddressApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("EndpointPort"):
-		return &typebuilderscorev1.EndpointPortBuilder{}
+		return &typebuilderscorev1.EndpointPortApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("Endpoints"):
-		return &typebuilderscorev1.EndpointsBuilder{}
+		return &typebuilderscorev1.EndpointsApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("EndpointSubset"):
-		return &typebuilderscorev1.EndpointSubsetBuilder{}
+		return &typebuilderscorev1.EndpointSubsetApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("EnvFromSource"):
-		return &typebuilderscorev1.EnvFromSourceBuilder{}
+		return &typebuilderscorev1.EnvFromSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("EnvVar"):
-		return &typebuilderscorev1.EnvVarBuilder{}
+		return &typebuilderscorev1.EnvVarApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("EnvVarSource"):
-		return &typebuilderscorev1.EnvVarSourceBuilder{}
+		return &typebuilderscorev1.EnvVarSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("EphemeralContainer"):
-		return &typebuilderscorev1.EphemeralContainerBuilder{}
+		return &typebuilderscorev1.EphemeralContainerApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("EphemeralContainerCommon"):
-		return &typebuilderscorev1.EphemeralContainerCommonBuilder{}
+		return &typebuilderscorev1.EphemeralContainerCommonApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("EphemeralVolumeSource"):
-		return &typebuilderscorev1.EphemeralVolumeSourceBuilder{}
+		return &typebuilderscorev1.EphemeralVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("Event"):
-		return &typebuilderscorev1.EventBuilder{}
+		return &typebuilderscorev1.EventApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("EventSeries"):
-		return &typebuilderscorev1.EventSeriesBuilder{}
+		return &typebuilderscorev1.EventSeriesApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("EventSource"):
-		return &typebuilderscorev1.EventSourceBuilder{}
+		return &typebuilderscorev1.EventSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ExecAction"):
-		return &typebuilderscorev1.ExecActionBuilder{}
+		return &typebuilderscorev1.ExecActionApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("FCVolumeSource"):
-		return &typebuilderscorev1.FCVolumeSourceBuilder{}
+		return &typebuilderscorev1.FCVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("FlexPersistentVolumeSource"):
-		return &typebuilderscorev1.FlexPersistentVolumeSourceBuilder{}
+		return &typebuilderscorev1.FlexPersistentVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("FlexVolumeSource"):
-		return &typebuilderscorev1.FlexVolumeSourceBuilder{}
+		return &typebuilderscorev1.FlexVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("FlockerVolumeSource"):
-		return &typebuilderscorev1.FlockerVolumeSourceBuilder{}
+		return &typebuilderscorev1.FlockerVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("GCEPersistentDiskVolumeSource"):
-		return &typebuilderscorev1.GCEPersistentDiskVolumeSourceBuilder{}
+		return &typebuilderscorev1.GCEPersistentDiskVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("GitRepoVolumeSource"):
-		return &typebuilderscorev1.GitRepoVolumeSourceBuilder{}
+		return &typebuilderscorev1.GitRepoVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("GlusterfsPersistentVolumeSource"):
-		return &typebuilderscorev1.GlusterfsPersistentVolumeSourceBuilder{}
+		return &typebuilderscorev1.GlusterfsPersistentVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("GlusterfsVolumeSource"):
-		return &typebuilderscorev1.GlusterfsVolumeSourceBuilder{}
+		return &typebuilderscorev1.GlusterfsVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("Handler"):
-		return &typebuilderscorev1.HandlerBuilder{}
+		return &typebuilderscorev1.HandlerApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("HostAlias"):
-		return &typebuilderscorev1.HostAliasBuilder{}
+		return &typebuilderscorev1.HostAliasApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("HostPathVolumeSource"):
-		return &typebuilderscorev1.HostPathVolumeSourceBuilder{}
+		return &typebuilderscorev1.HostPathVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("HTTPGetAction"):
-		return &typebuilderscorev1.HTTPGetActionBuilder{}
+		return &typebuilderscorev1.HTTPGetActionApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("HTTPHeader"):
-		return &typebuilderscorev1.HTTPHeaderBuilder{}
+		return &typebuilderscorev1.HTTPHeaderApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ISCSIPersistentVolumeSource"):
-		return &typebuilderscorev1.ISCSIPersistentVolumeSourceBuilder{}
+		return &typebuilderscorev1.ISCSIPersistentVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ISCSIVolumeSource"):
-		return &typebuilderscorev1.ISCSIVolumeSourceBuilder{}
+		return &typebuilderscorev1.ISCSIVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("KeyToPath"):
-		return &typebuilderscorev1.KeyToPathBuilder{}
+		return &typebuilderscorev1.KeyToPathApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("Lifecycle"):
-		return &typebuilderscorev1.LifecycleBuilder{}
+		return &typebuilderscorev1.LifecycleApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("LimitRange"):
-		return &typebuilderscorev1.LimitRangeBuilder{}
+		return &typebuilderscorev1.LimitRangeApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("LimitRangeItem"):
-		return &typebuilderscorev1.LimitRangeItemBuilder{}
+		return &typebuilderscorev1.LimitRangeItemApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("LimitRangeSpec"):
-		return &typebuilderscorev1.LimitRangeSpecBuilder{}
+		return &typebuilderscorev1.LimitRangeSpecApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("LoadBalancerIngress"):
-		return &typebuilderscorev1.LoadBalancerIngressBuilder{}
+		return &typebuilderscorev1.LoadBalancerIngressApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("LoadBalancerStatus"):
-		return &typebuilderscorev1.LoadBalancerStatusBuilder{}
+		return &typebuilderscorev1.LoadBalancerStatusApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("LocalObjectReference"):
-		return &typebuilderscorev1.LocalObjectReferenceBuilder{}
+		return &typebuilderscorev1.LocalObjectReferenceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("LocalVolumeSource"):
-		return &typebuilderscorev1.LocalVolumeSourceBuilder{}
+		return &typebuilderscorev1.LocalVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("Namespace"):
-		return &typebuilderscorev1.NamespaceBuilder{}
+		return &typebuilderscorev1.NamespaceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("NamespaceCondition"):
-		return &typebuilderscorev1.NamespaceConditionBuilder{}
+		return &typebuilderscorev1.NamespaceConditionApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("NamespaceSpec"):
-		return &typebuilderscorev1.NamespaceSpecBuilder{}
+		return &typebuilderscorev1.NamespaceSpecApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("NamespaceStatus"):
-		return &typebuilderscorev1.NamespaceStatusBuilder{}
+		return &typebuilderscorev1.NamespaceStatusApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("NFSVolumeSource"):
-		return &typebuilderscorev1.NFSVolumeSourceBuilder{}
+		return &typebuilderscorev1.NFSVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("Node"):
-		return &typebuilderscorev1.NodeBuilder{}
+		return &typebuilderscorev1.NodeApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("NodeAddress"):
-		return &typebuilderscorev1.NodeAddressBuilder{}
+		return &typebuilderscorev1.NodeAddressApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("NodeAffinity"):
-		return &typebuilderscorev1.NodeAffinityBuilder{}
+		return &typebuilderscorev1.NodeAffinityApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("NodeCondition"):
-		return &typebuilderscorev1.NodeConditionBuilder{}
+		return &typebuilderscorev1.NodeConditionApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("NodeConfigSource"):
-		return &typebuilderscorev1.NodeConfigSourceBuilder{}
+		return &typebuilderscorev1.NodeConfigSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("NodeConfigStatus"):
-		return &typebuilderscorev1.NodeConfigStatusBuilder{}
+		return &typebuilderscorev1.NodeConfigStatusApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("NodeDaemonEndpoints"):
-		return &typebuilderscorev1.NodeDaemonEndpointsBuilder{}
+		return &typebuilderscorev1.NodeDaemonEndpointsApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("NodeSelector"):
-		return &typebuilderscorev1.NodeSelectorBuilder{}
+		return &typebuilderscorev1.NodeSelectorApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("NodeSelectorRequirement"):
-		return &typebuilderscorev1.NodeSelectorRequirementBuilder{}
+		return &typebuilderscorev1.NodeSelectorRequirementApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("NodeSelectorTerm"):
-		return &typebuilderscorev1.NodeSelectorTermBuilder{}
+		return &typebuilderscorev1.NodeSelectorTermApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("NodeSpec"):
-		return &typebuilderscorev1.NodeSpecBuilder{}
+		return &typebuilderscorev1.NodeSpecApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("NodeStatus"):
-		return &typebuilderscorev1.NodeStatusBuilder{}
+		return &typebuilderscorev1.NodeStatusApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("NodeSystemInfo"):
-		return &typebuilderscorev1.NodeSystemInfoBuilder{}
+		return &typebuilderscorev1.NodeSystemInfoApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ObjectFieldSelector"):
-		return &typebuilderscorev1.ObjectFieldSelectorBuilder{}
+		return &typebuilderscorev1.ObjectFieldSelectorApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ObjectReference"):
-		return &typebuilderscorev1.ObjectReferenceBuilder{}
+		return &typebuilderscorev1.ObjectReferenceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PersistentVolume"):
-		return &typebuilderscorev1.PersistentVolumeBuilder{}
+		return &typebuilderscorev1.PersistentVolumeApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PersistentVolumeClaim"):
-		return &typebuilderscorev1.PersistentVolumeClaimBuilder{}
+		return &typebuilderscorev1.PersistentVolumeClaimApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PersistentVolumeClaimCondition"):
-		return &typebuilderscorev1.PersistentVolumeClaimConditionBuilder{}
+		return &typebuilderscorev1.PersistentVolumeClaimConditionApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PersistentVolumeClaimSpec"):
-		return &typebuilderscorev1.PersistentVolumeClaimSpecBuilder{}
+		return &typebuilderscorev1.PersistentVolumeClaimSpecApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PersistentVolumeClaimStatus"):
-		return &typebuilderscorev1.PersistentVolumeClaimStatusBuilder{}
+		return &typebuilderscorev1.PersistentVolumeClaimStatusApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PersistentVolumeClaimTemplate"):
-		return &typebuilderscorev1.PersistentVolumeClaimTemplateBuilder{}
+		return &typebuilderscorev1.PersistentVolumeClaimTemplateApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PersistentVolumeClaimVolumeSource"):
-		return &typebuilderscorev1.PersistentVolumeClaimVolumeSourceBuilder{}
+		return &typebuilderscorev1.PersistentVolumeClaimVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PersistentVolumeSource"):
-		return &typebuilderscorev1.PersistentVolumeSourceBuilder{}
+		return &typebuilderscorev1.PersistentVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PersistentVolumeSpec"):
-		return &typebuilderscorev1.PersistentVolumeSpecBuilder{}
+		return &typebuilderscorev1.PersistentVolumeSpecApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PersistentVolumeStatus"):
-		return &typebuilderscorev1.PersistentVolumeStatusBuilder{}
+		return &typebuilderscorev1.PersistentVolumeStatusApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PhotonPersistentDiskVolumeSource"):
-		return &typebuilderscorev1.PhotonPersistentDiskVolumeSourceBuilder{}
+		return &typebuilderscorev1.PhotonPersistentDiskVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("Pod"):
-		return &typebuilderscorev1.PodBuilder{}
+		return &typebuilderscorev1.PodApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PodAffinity"):
-		return &typebuilderscorev1.PodAffinityBuilder{}
+		return &typebuilderscorev1.PodAffinityApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PodAffinityTerm"):
-		return &typebuilderscorev1.PodAffinityTermBuilder{}
+		return &typebuilderscorev1.PodAffinityTermApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PodAntiAffinity"):
-		return &typebuilderscorev1.PodAntiAffinityBuilder{}
+		return &typebuilderscorev1.PodAntiAffinityApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PodCondition"):
-		return &typebuilderscorev1.PodConditionBuilder{}
+		return &typebuilderscorev1.PodConditionApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PodDNSConfig"):
-		return &typebuilderscorev1.PodDNSConfigBuilder{}
+		return &typebuilderscorev1.PodDNSConfigApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PodDNSConfigOption"):
-		return &typebuilderscorev1.PodDNSConfigOptionBuilder{}
+		return &typebuilderscorev1.PodDNSConfigOptionApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PodIP"):
-		return &typebuilderscorev1.PodIPBuilder{}
+		return &typebuilderscorev1.PodIPApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PodReadinessGate"):
-		return &typebuilderscorev1.PodReadinessGateBuilder{}
+		return &typebuilderscorev1.PodReadinessGateApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PodSecurityContext"):
-		return &typebuilderscorev1.PodSecurityContextBuilder{}
+		return &typebuilderscorev1.PodSecurityContextApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PodSpec"):
-		return &typebuilderscorev1.PodSpecBuilder{}
+		return &typebuilderscorev1.PodSpecApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PodStatus"):
-		return &typebuilderscorev1.PodStatusBuilder{}
+		return &typebuilderscorev1.PodStatusApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PodTemplate"):
-		return &typebuilderscorev1.PodTemplateBuilder{}
+		return &typebuilderscorev1.PodTemplateApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PodTemplateSpec"):
-		return &typebuilderscorev1.PodTemplateSpecBuilder{}
+		return &typebuilderscorev1.PodTemplateSpecApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PortworxVolumeSource"):
-		return &typebuilderscorev1.PortworxVolumeSourceBuilder{}
+		return &typebuilderscorev1.PortworxVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("PreferredSchedulingTerm"):
-		return &typebuilderscorev1.PreferredSchedulingTermBuilder{}
+		return &typebuilderscorev1.PreferredSchedulingTermApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("Probe"):
-		return &typebuilderscorev1.ProbeBuilder{}
+		return &typebuilderscorev1.ProbeApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ProjectedVolumeSource"):
-		return &typebuilderscorev1.ProjectedVolumeSourceBuilder{}
+		return &typebuilderscorev1.ProjectedVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("QuobyteVolumeSource"):
-		return &typebuilderscorev1.QuobyteVolumeSourceBuilder{}
+		return &typebuilderscorev1.QuobyteVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("RBDPersistentVolumeSource"):
-		return &typebuilderscorev1.RBDPersistentVolumeSourceBuilder{}
+		return &typebuilderscorev1.RBDPersistentVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("RBDVolumeSource"):
-		return &typebuilderscorev1.RBDVolumeSourceBuilder{}
+		return &typebuilderscorev1.RBDVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ReplicationController"):
-		return &typebuilderscorev1.ReplicationControllerBuilder{}
+		return &typebuilderscorev1.ReplicationControllerApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ReplicationControllerCondition"):
-		return &typebuilderscorev1.ReplicationControllerConditionBuilder{}
+		return &typebuilderscorev1.ReplicationControllerConditionApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ReplicationControllerSpec"):
-		return &typebuilderscorev1.ReplicationControllerSpecBuilder{}
+		return &typebuilderscorev1.ReplicationControllerSpecApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ReplicationControllerStatus"):
-		return &typebuilderscorev1.ReplicationControllerStatusBuilder{}
+		return &typebuilderscorev1.ReplicationControllerStatusApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ResourceFieldSelector"):
-		return &typebuilderscorev1.ResourceFieldSelectorBuilder{}
+		return &typebuilderscorev1.ResourceFieldSelectorApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ResourceQuota"):
-		return &typebuilderscorev1.ResourceQuotaBuilder{}
+		return &typebuilderscorev1.ResourceQuotaApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ResourceQuotaSpec"):
-		return &typebuilderscorev1.ResourceQuotaSpecBuilder{}
+		return &typebuilderscorev1.ResourceQuotaSpecApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ResourceQuotaStatus"):
-		return &typebuilderscorev1.ResourceQuotaStatusBuilder{}
+		return &typebuilderscorev1.ResourceQuotaStatusApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ResourceRequirements"):
-		return &typebuilderscorev1.ResourceRequirementsBuilder{}
+		return &typebuilderscorev1.ResourceRequirementsApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ScaleIOPersistentVolumeSource"):
-		return &typebuilderscorev1.ScaleIOPersistentVolumeSourceBuilder{}
+		return &typebuilderscorev1.ScaleIOPersistentVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ScaleIOVolumeSource"):
-		return &typebuilderscorev1.ScaleIOVolumeSourceBuilder{}
+		return &typebuilderscorev1.ScaleIOVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ScopedResourceSelectorRequirement"):
-		return &typebuilderscorev1.ScopedResourceSelectorRequirementBuilder{}
+		return &typebuilderscorev1.ScopedResourceSelectorRequirementApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ScopeSelector"):
-		return &typebuilderscorev1.ScopeSelectorBuilder{}
+		return &typebuilderscorev1.ScopeSelectorApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("SeccompProfile"):
-		return &typebuilderscorev1.SeccompProfileBuilder{}
+		return &typebuilderscorev1.SeccompProfileApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("Secret"):
-		return &typebuilderscorev1.SecretBuilder{}
+		return &typebuilderscorev1.SecretApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("SecretEnvSource"):
-		return &typebuilderscorev1.SecretEnvSourceBuilder{}
+		return &typebuilderscorev1.SecretEnvSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("SecretKeySelector"):
-		return &typebuilderscorev1.SecretKeySelectorBuilder{}
+		return &typebuilderscorev1.SecretKeySelectorApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("SecretProjection"):
-		return &typebuilderscorev1.SecretProjectionBuilder{}
+		return &typebuilderscorev1.SecretProjectionApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("SecretReference"):
-		return &typebuilderscorev1.SecretReferenceBuilder{}
+		return &typebuilderscorev1.SecretReferenceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("SecretVolumeSource"):
-		return &typebuilderscorev1.SecretVolumeSourceBuilder{}
+		return &typebuilderscorev1.SecretVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("SecurityContext"):
-		return &typebuilderscorev1.SecurityContextBuilder{}
+		return &typebuilderscorev1.SecurityContextApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("SELinuxOptions"):
-		return &typebuilderscorev1.SELinuxOptionsBuilder{}
+		return &typebuilderscorev1.SELinuxOptionsApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("Service"):
-		return &typebuilderscorev1.ServiceBuilder{}
+		return &typebuilderscorev1.ServiceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ServiceAccount"):
-		return &typebuilderscorev1.ServiceAccountBuilder{}
+		return &typebuilderscorev1.ServiceAccountApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ServiceAccountTokenProjection"):
-		return &typebuilderscorev1.ServiceAccountTokenProjectionBuilder{}
+		return &typebuilderscorev1.ServiceAccountTokenProjectionApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ServicePort"):
-		return &typebuilderscorev1.ServicePortBuilder{}
+		return &typebuilderscorev1.ServicePortApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ServiceSpec"):
-		return &typebuilderscorev1.ServiceSpecBuilder{}
+		return &typebuilderscorev1.ServiceSpecApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("ServiceStatus"):
-		return &typebuilderscorev1.ServiceStatusBuilder{}
+		return &typebuilderscorev1.ServiceStatusApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("SessionAffinityConfig"):
-		return &typebuilderscorev1.SessionAffinityConfigBuilder{}
+		return &typebuilderscorev1.SessionAffinityConfigApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("StorageOSPersistentVolumeSource"):
-		return &typebuilderscorev1.StorageOSPersistentVolumeSourceBuilder{}
+		return &typebuilderscorev1.StorageOSPersistentVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("StorageOSVolumeSource"):
-		return &typebuilderscorev1.StorageOSVolumeSourceBuilder{}
+		return &typebuilderscorev1.StorageOSVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("Sysctl"):
-		return &typebuilderscorev1.SysctlBuilder{}
+		return &typebuilderscorev1.SysctlApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("Taint"):
-		return &typebuilderscorev1.TaintBuilder{}
+		return &typebuilderscorev1.TaintApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("TCPSocketAction"):
-		return &typebuilderscorev1.TCPSocketActionBuilder{}
+		return &typebuilderscorev1.TCPSocketActionApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("Toleration"):
-		return &typebuilderscorev1.TolerationBuilder{}
+		return &typebuilderscorev1.TolerationApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("TopologySelectorLabelRequirement"):
-		return &typebuilderscorev1.TopologySelectorLabelRequirementBuilder{}
+		return &typebuilderscorev1.TopologySelectorLabelRequirementApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("TopologySelectorTerm"):
-		return &typebuilderscorev1.TopologySelectorTermBuilder{}
+		return &typebuilderscorev1.TopologySelectorTermApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("TopologySpreadConstraint"):
-		return &typebuilderscorev1.TopologySpreadConstraintBuilder{}
+		return &typebuilderscorev1.TopologySpreadConstraintApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("TypedLocalObjectReference"):
-		return &typebuilderscorev1.TypedLocalObjectReferenceBuilder{}
+		return &typebuilderscorev1.TypedLocalObjectReferenceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("Volume"):
-		return &typebuilderscorev1.VolumeBuilder{}
+		return &typebuilderscorev1.VolumeApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("VolumeDevice"):
-		return &typebuilderscorev1.VolumeDeviceBuilder{}
+		return &typebuilderscorev1.VolumeDeviceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("VolumeMount"):
-		return &typebuilderscorev1.VolumeMountBuilder{}
+		return &typebuilderscorev1.VolumeMountApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("VolumeNodeAffinity"):
-		return &typebuilderscorev1.VolumeNodeAffinityBuilder{}
+		return &typebuilderscorev1.VolumeNodeAffinityApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("VolumeProjection"):
-		return &typebuilderscorev1.VolumeProjectionBuilder{}
+		return &typebuilderscorev1.VolumeProjectionApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("VolumeSource"):
-		return &typebuilderscorev1.VolumeSourceBuilder{}
+		return &typebuilderscorev1.VolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("VsphereVirtualDiskVolumeSource"):
-		return &typebuilderscorev1.VsphereVirtualDiskVolumeSourceBuilder{}
+		return &typebuilderscorev1.VsphereVirtualDiskVolumeSourceApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("WeightedPodAffinityTerm"):
-		return &typebuilderscorev1.WeightedPodAffinityTermBuilder{}
+		return &typebuilderscorev1.WeightedPodAffinityTermApplyConfiguration{}
 	case corev1.SchemeGroupVersion.WithKind("WindowsSecurityContextOptions"):
-		return &typebuilderscorev1.WindowsSecurityContextOptionsBuilder{}
+		return &typebuilderscorev1.WindowsSecurityContextOptionsApplyConfiguration{}
 
 		// Group=discovery, Version=v1alpha1
 	case v1alpha1.SchemeGroupVersion.WithKind("Endpoint"):
-		return &discoveryv1alpha1.EndpointBuilder{}
+		return &discoveryv1alpha1.EndpointApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("EndpointConditions"):
-		return &discoveryv1alpha1.EndpointConditionsBuilder{}
+		return &discoveryv1alpha1.EndpointConditionsApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("EndpointPort"):
-		return &discoveryv1alpha1.EndpointPortBuilder{}
+		return &discoveryv1alpha1.EndpointPortApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("EndpointSlice"):
-		return &discoveryv1alpha1.EndpointSliceBuilder{}
+		return &discoveryv1alpha1.EndpointSliceApplyConfiguration{}
 
 		// Group=discovery, Version=v1beta1
 	case discoveryv1beta1.SchemeGroupVersion.WithKind("Endpoint"):
-		return &typebuildersdiscoveryv1beta1.EndpointBuilder{}
+		return &typebuildersdiscoveryv1beta1.EndpointApplyConfiguration{}
 	case discoveryv1beta1.SchemeGroupVersion.WithKind("EndpointConditions"):
-		return &typebuildersdiscoveryv1beta1.EndpointConditionsBuilder{}
+		return &typebuildersdiscoveryv1beta1.EndpointConditionsApplyConfiguration{}
 	case discoveryv1beta1.SchemeGroupVersion.WithKind("EndpointPort"):
-		return &typebuildersdiscoveryv1beta1.EndpointPortBuilder{}
+		return &typebuildersdiscoveryv1beta1.EndpointPortApplyConfiguration{}
 	case discoveryv1beta1.SchemeGroupVersion.WithKind("EndpointSlice"):
-		return &typebuildersdiscoveryv1beta1.EndpointSliceBuilder{}
+		return &typebuildersdiscoveryv1beta1.EndpointSliceApplyConfiguration{}
 
 		// Group=events, Version=v1
 	case eventsv1.SchemeGroupVersion.WithKind("Event"):
-		return &typebuilderseventsv1.EventBuilder{}
+		return &typebuilderseventsv1.EventApplyConfiguration{}
 	case eventsv1.SchemeGroupVersion.WithKind("EventSeries"):
-		return &typebuilderseventsv1.EventSeriesBuilder{}
+		return &typebuilderseventsv1.EventSeriesApplyConfiguration{}
 
 		// Group=events, Version=v1beta1
 	case eventsv1beta1.SchemeGroupVersion.WithKind("Event"):
-		return &typebuilderseventsv1beta1.EventBuilder{}
+		return &typebuilderseventsv1beta1.EventApplyConfiguration{}
 	case eventsv1beta1.SchemeGroupVersion.WithKind("EventSeries"):
-		return &typebuilderseventsv1beta1.EventSeriesBuilder{}
+		return &typebuilderseventsv1beta1.EventSeriesApplyConfiguration{}
 
 		// Group=extensions, Version=v1beta1
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("AllowedCSIDriver"):
-		return &typebuildersextensionsv1beta1.AllowedCSIDriverBuilder{}
+		return &typebuildersextensionsv1beta1.AllowedCSIDriverApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("AllowedFlexVolume"):
-		return &typebuildersextensionsv1beta1.AllowedFlexVolumeBuilder{}
+		return &typebuildersextensionsv1beta1.AllowedFlexVolumeApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("AllowedHostPath"):
-		return &typebuildersextensionsv1beta1.AllowedHostPathBuilder{}
+		return &typebuildersextensionsv1beta1.AllowedHostPathApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("DaemonSet"):
-		return &typebuildersextensionsv1beta1.DaemonSetBuilder{}
+		return &typebuildersextensionsv1beta1.DaemonSetApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("DaemonSetCondition"):
-		return &typebuildersextensionsv1beta1.DaemonSetConditionBuilder{}
+		return &typebuildersextensionsv1beta1.DaemonSetConditionApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("DaemonSetSpec"):
-		return &typebuildersextensionsv1beta1.DaemonSetSpecBuilder{}
+		return &typebuildersextensionsv1beta1.DaemonSetSpecApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("DaemonSetStatus"):
-		return &typebuildersextensionsv1beta1.DaemonSetStatusBuilder{}
+		return &typebuildersextensionsv1beta1.DaemonSetStatusApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("DaemonSetUpdateStrategy"):
-		return &typebuildersextensionsv1beta1.DaemonSetUpdateStrategyBuilder{}
+		return &typebuildersextensionsv1beta1.DaemonSetUpdateStrategyApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("Deployment"):
-		return &typebuildersextensionsv1beta1.DeploymentBuilder{}
+		return &typebuildersextensionsv1beta1.DeploymentApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("DeploymentCondition"):
-		return &typebuildersextensionsv1beta1.DeploymentConditionBuilder{}
+		return &typebuildersextensionsv1beta1.DeploymentConditionApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("DeploymentSpec"):
-		return &typebuildersextensionsv1beta1.DeploymentSpecBuilder{}
+		return &typebuildersextensionsv1beta1.DeploymentSpecApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("DeploymentStatus"):
-		return &typebuildersextensionsv1beta1.DeploymentStatusBuilder{}
+		return &typebuildersextensionsv1beta1.DeploymentStatusApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("DeploymentStrategy"):
-		return &typebuildersextensionsv1beta1.DeploymentStrategyBuilder{}
+		return &typebuildersextensionsv1beta1.DeploymentStrategyApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("FSGroupStrategyOptions"):
-		return &typebuildersextensionsv1beta1.FSGroupStrategyOptionsBuilder{}
+		return &typebuildersextensionsv1beta1.FSGroupStrategyOptionsApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("HostPortRange"):
-		return &typebuildersextensionsv1beta1.HostPortRangeBuilder{}
+		return &typebuildersextensionsv1beta1.HostPortRangeApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("HTTPIngressPath"):
-		return &typebuildersextensionsv1beta1.HTTPIngressPathBuilder{}
+		return &typebuildersextensionsv1beta1.HTTPIngressPathApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("HTTPIngressRuleValue"):
-		return &typebuildersextensionsv1beta1.HTTPIngressRuleValueBuilder{}
+		return &typebuildersextensionsv1beta1.HTTPIngressRuleValueApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("IDRange"):
-		return &typebuildersextensionsv1beta1.IDRangeBuilder{}
+		return &typebuildersextensionsv1beta1.IDRangeApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("Ingress"):
-		return &typebuildersextensionsv1beta1.IngressBuilder{}
+		return &typebuildersextensionsv1beta1.IngressApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("IngressBackend"):
-		return &typebuildersextensionsv1beta1.IngressBackendBuilder{}
+		return &typebuildersextensionsv1beta1.IngressBackendApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("IngressRule"):
-		return &typebuildersextensionsv1beta1.IngressRuleBuilder{}
+		return &typebuildersextensionsv1beta1.IngressRuleApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("IngressRuleValue"):
-		return &typebuildersextensionsv1beta1.IngressRuleValueBuilder{}
+		return &typebuildersextensionsv1beta1.IngressRuleValueApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("IngressSpec"):
-		return &typebuildersextensionsv1beta1.IngressSpecBuilder{}
+		return &typebuildersextensionsv1beta1.IngressSpecApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("IngressStatus"):
-		return &typebuildersextensionsv1beta1.IngressStatusBuilder{}
+		return &typebuildersextensionsv1beta1.IngressStatusApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("IngressTLS"):
-		return &typebuildersextensionsv1beta1.IngressTLSBuilder{}
+		return &typebuildersextensionsv1beta1.IngressTLSApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("IPBlock"):
-		return &typebuildersextensionsv1beta1.IPBlockBuilder{}
+		return &typebuildersextensionsv1beta1.IPBlockApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("NetworkPolicy"):
-		return &typebuildersextensionsv1beta1.NetworkPolicyBuilder{}
+		return &typebuildersextensionsv1beta1.NetworkPolicyApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("NetworkPolicyEgressRule"):
-		return &typebuildersextensionsv1beta1.NetworkPolicyEgressRuleBuilder{}
+		return &typebuildersextensionsv1beta1.NetworkPolicyEgressRuleApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("NetworkPolicyIngressRule"):
-		return &typebuildersextensionsv1beta1.NetworkPolicyIngressRuleBuilder{}
+		return &typebuildersextensionsv1beta1.NetworkPolicyIngressRuleApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("NetworkPolicyPeer"):
-		return &typebuildersextensionsv1beta1.NetworkPolicyPeerBuilder{}
+		return &typebuildersextensionsv1beta1.NetworkPolicyPeerApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("NetworkPolicyPort"):
-		return &typebuildersextensionsv1beta1.NetworkPolicyPortBuilder{}
+		return &typebuildersextensionsv1beta1.NetworkPolicyPortApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("NetworkPolicySpec"):
-		return &typebuildersextensionsv1beta1.NetworkPolicySpecBuilder{}
+		return &typebuildersextensionsv1beta1.NetworkPolicySpecApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("PodSecurityPolicy"):
-		return &typebuildersextensionsv1beta1.PodSecurityPolicyBuilder{}
+		return &typebuildersextensionsv1beta1.PodSecurityPolicyApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("PodSecurityPolicySpec"):
-		return &typebuildersextensionsv1beta1.PodSecurityPolicySpecBuilder{}
+		return &typebuildersextensionsv1beta1.PodSecurityPolicySpecApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("ReplicaSet"):
-		return &typebuildersextensionsv1beta1.ReplicaSetBuilder{}
+		return &typebuildersextensionsv1beta1.ReplicaSetApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("ReplicaSetCondition"):
-		return &typebuildersextensionsv1beta1.ReplicaSetConditionBuilder{}
+		return &typebuildersextensionsv1beta1.ReplicaSetConditionApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("ReplicaSetSpec"):
-		return &typebuildersextensionsv1beta1.ReplicaSetSpecBuilder{}
+		return &typebuildersextensionsv1beta1.ReplicaSetSpecApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("ReplicaSetStatus"):
-		return &typebuildersextensionsv1beta1.ReplicaSetStatusBuilder{}
+		return &typebuildersextensionsv1beta1.ReplicaSetStatusApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("RollbackConfig"):
-		return &typebuildersextensionsv1beta1.RollbackConfigBuilder{}
+		return &typebuildersextensionsv1beta1.RollbackConfigApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("RollingUpdateDaemonSet"):
-		return &typebuildersextensionsv1beta1.RollingUpdateDaemonSetBuilder{}
+		return &typebuildersextensionsv1beta1.RollingUpdateDaemonSetApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("RollingUpdateDeployment"):
-		return &typebuildersextensionsv1beta1.RollingUpdateDeploymentBuilder{}
+		return &typebuildersextensionsv1beta1.RollingUpdateDeploymentApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("RunAsGroupStrategyOptions"):
-		return &typebuildersextensionsv1beta1.RunAsGroupStrategyOptionsBuilder{}
+		return &typebuildersextensionsv1beta1.RunAsGroupStrategyOptionsApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("RunAsUserStrategyOptions"):
-		return &typebuildersextensionsv1beta1.RunAsUserStrategyOptionsBuilder{}
+		return &typebuildersextensionsv1beta1.RunAsUserStrategyOptionsApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("RuntimeClassStrategyOptions"):
-		return &typebuildersextensionsv1beta1.RuntimeClassStrategyOptionsBuilder{}
+		return &typebuildersextensionsv1beta1.RuntimeClassStrategyOptionsApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("SELinuxStrategyOptions"):
-		return &typebuildersextensionsv1beta1.SELinuxStrategyOptionsBuilder{}
+		return &typebuildersextensionsv1beta1.SELinuxStrategyOptionsApplyConfiguration{}
 	case extensionsv1beta1.SchemeGroupVersion.WithKind("SupplementalGroupsStrategyOptions"):
-		return &typebuildersextensionsv1beta1.SupplementalGroupsStrategyOptionsBuilder{}
+		return &typebuildersextensionsv1beta1.SupplementalGroupsStrategyOptionsApplyConfiguration{}
 
 		// Group=flowcontrol, Version=v1alpha1
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("FlowDistinguisherMethod"):
-		return &typebuildersflowcontrolv1alpha1.FlowDistinguisherMethodBuilder{}
+		return &typebuildersflowcontrolv1alpha1.FlowDistinguisherMethodApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("FlowSchema"):
-		return &typebuildersflowcontrolv1alpha1.FlowSchemaBuilder{}
+		return &typebuildersflowcontrolv1alpha1.FlowSchemaApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("FlowSchemaCondition"):
-		return &typebuildersflowcontrolv1alpha1.FlowSchemaConditionBuilder{}
+		return &typebuildersflowcontrolv1alpha1.FlowSchemaConditionApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("FlowSchemaSpec"):
-		return &typebuildersflowcontrolv1alpha1.FlowSchemaSpecBuilder{}
+		return &typebuildersflowcontrolv1alpha1.FlowSchemaSpecApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("FlowSchemaStatus"):
-		return &typebuildersflowcontrolv1alpha1.FlowSchemaStatusBuilder{}
+		return &typebuildersflowcontrolv1alpha1.FlowSchemaStatusApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("GroupSubject"):
-		return &typebuildersflowcontrolv1alpha1.GroupSubjectBuilder{}
+		return &typebuildersflowcontrolv1alpha1.GroupSubjectApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("LimitedPriorityLevelConfiguration"):
-		return &typebuildersflowcontrolv1alpha1.LimitedPriorityLevelConfigurationBuilder{}
+		return &typebuildersflowcontrolv1alpha1.LimitedPriorityLevelConfigurationApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("LimitResponse"):
-		return &typebuildersflowcontrolv1alpha1.LimitResponseBuilder{}
+		return &typebuildersflowcontrolv1alpha1.LimitResponseApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("NonResourcePolicyRule"):
-		return &typebuildersflowcontrolv1alpha1.NonResourcePolicyRuleBuilder{}
+		return &typebuildersflowcontrolv1alpha1.NonResourcePolicyRuleApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("PolicyRulesWithSubjects"):
-		return &typebuildersflowcontrolv1alpha1.PolicyRulesWithSubjectsBuilder{}
+		return &typebuildersflowcontrolv1alpha1.PolicyRulesWithSubjectsApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("PriorityLevelConfiguration"):
-		return &typebuildersflowcontrolv1alpha1.PriorityLevelConfigurationBuilder{}
+		return &typebuildersflowcontrolv1alpha1.PriorityLevelConfigurationApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("PriorityLevelConfigurationCondition"):
-		return &typebuildersflowcontrolv1alpha1.PriorityLevelConfigurationConditionBuilder{}
+		return &typebuildersflowcontrolv1alpha1.PriorityLevelConfigurationConditionApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("PriorityLevelConfigurationReference"):
-		return &typebuildersflowcontrolv1alpha1.PriorityLevelConfigurationReferenceBuilder{}
+		return &typebuildersflowcontrolv1alpha1.PriorityLevelConfigurationReferenceApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("PriorityLevelConfigurationSpec"):
-		return &typebuildersflowcontrolv1alpha1.PriorityLevelConfigurationSpecBuilder{}
+		return &typebuildersflowcontrolv1alpha1.PriorityLevelConfigurationSpecApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("PriorityLevelConfigurationStatus"):
-		return &typebuildersflowcontrolv1alpha1.PriorityLevelConfigurationStatusBuilder{}
+		return &typebuildersflowcontrolv1alpha1.PriorityLevelConfigurationStatusApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("QueuingConfiguration"):
-		return &typebuildersflowcontrolv1alpha1.QueuingConfigurationBuilder{}
+		return &typebuildersflowcontrolv1alpha1.QueuingConfigurationApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("ResourcePolicyRule"):
-		return &typebuildersflowcontrolv1alpha1.ResourcePolicyRuleBuilder{}
+		return &typebuildersflowcontrolv1alpha1.ResourcePolicyRuleApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("ServiceAccountSubject"):
-		return &typebuildersflowcontrolv1alpha1.ServiceAccountSubjectBuilder{}
+		return &typebuildersflowcontrolv1alpha1.ServiceAccountSubjectApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("Subject"):
-		return &typebuildersflowcontrolv1alpha1.SubjectBuilder{}
+		return &typebuildersflowcontrolv1alpha1.SubjectApplyConfiguration{}
 	case flowcontrolv1alpha1.SchemeGroupVersion.WithKind("UserSubject"):
-		return &typebuildersflowcontrolv1alpha1.UserSubjectBuilder{}
+		return &typebuildersflowcontrolv1alpha1.UserSubjectApplyConfiguration{}
 
 		// Group=imagepolicy, Version=v1alpha1
 	case imagepolicyv1alpha1.SchemeGroupVersion.WithKind("ImageReview"):
-		return &typebuildersimagepolicyv1alpha1.ImageReviewBuilder{}
+		return &typebuildersimagepolicyv1alpha1.ImageReviewApplyConfiguration{}
 	case imagepolicyv1alpha1.SchemeGroupVersion.WithKind("ImageReviewContainerSpec"):
-		return &typebuildersimagepolicyv1alpha1.ImageReviewContainerSpecBuilder{}
+		return &typebuildersimagepolicyv1alpha1.ImageReviewContainerSpecApplyConfiguration{}
 	case imagepolicyv1alpha1.SchemeGroupVersion.WithKind("ImageReviewSpec"):
-		return &typebuildersimagepolicyv1alpha1.ImageReviewSpecBuilder{}
+		return &typebuildersimagepolicyv1alpha1.ImageReviewSpecApplyConfiguration{}
 	case imagepolicyv1alpha1.SchemeGroupVersion.WithKind("ImageReviewStatus"):
-		return &typebuildersimagepolicyv1alpha1.ImageReviewStatusBuilder{}
+		return &typebuildersimagepolicyv1alpha1.ImageReviewStatusApplyConfiguration{}
 
 		// Group=internal, Version=v1alpha1
 	case apiserverinternalv1alpha1.SchemeGroupVersion.WithKind("ServerStorageVersion"):
-		return &typebuildersapiserverinternalv1alpha1.ServerStorageVersionBuilder{}
+		return &typebuildersapiserverinternalv1alpha1.ServerStorageVersionApplyConfiguration{}
 	case apiserverinternalv1alpha1.SchemeGroupVersion.WithKind("StorageVersion"):
-		return &typebuildersapiserverinternalv1alpha1.StorageVersionBuilder{}
+		return &typebuildersapiserverinternalv1alpha1.StorageVersionApplyConfiguration{}
 	case apiserverinternalv1alpha1.SchemeGroupVersion.WithKind("StorageVersionCondition"):
-		return &typebuildersapiserverinternalv1alpha1.StorageVersionConditionBuilder{}
+		return &typebuildersapiserverinternalv1alpha1.StorageVersionConditionApplyConfiguration{}
 	case apiserverinternalv1alpha1.SchemeGroupVersion.WithKind("StorageVersionStatus"):
-		return &typebuildersapiserverinternalv1alpha1.StorageVersionStatusBuilder{}
+		return &typebuildersapiserverinternalv1alpha1.StorageVersionStatusApplyConfiguration{}
 
 		// Group=meta, Version=v1
 	case metav1.SchemeGroupVersion.WithKind("DeleteOptions"):
-		return &typebuildersmetav1.DeleteOptionsBuilder{}
+		return &typebuildersmetav1.DeleteOptionsApplyConfiguration{}
 	case metav1.SchemeGroupVersion.WithKind("LabelSelector"):
-		return &typebuildersmetav1.LabelSelectorBuilder{}
+		return &typebuildersmetav1.LabelSelectorApplyConfiguration{}
 	case metav1.SchemeGroupVersion.WithKind("LabelSelectorRequirement"):
-		return &typebuildersmetav1.LabelSelectorRequirementBuilder{}
+		return &typebuildersmetav1.LabelSelectorRequirementApplyConfiguration{}
 	case metav1.SchemeGroupVersion.WithKind("ManagedFieldsEntry"):
-		return &typebuildersmetav1.ManagedFieldsEntryBuilder{}
+		return &typebuildersmetav1.ManagedFieldsEntryApplyConfiguration{}
 	case metav1.SchemeGroupVersion.WithKind("ObjectMeta"):
-		return &typebuildersmetav1.ObjectMetaBuilder{}
+		return &typebuildersmetav1.ObjectMetaApplyConfiguration{}
 	case metav1.SchemeGroupVersion.WithKind("OwnerReference"):
-		return &typebuildersmetav1.OwnerReferenceBuilder{}
+		return &typebuildersmetav1.OwnerReferenceApplyConfiguration{}
 	case metav1.SchemeGroupVersion.WithKind("Preconditions"):
-		return &typebuildersmetav1.PreconditionsBuilder{}
+		return &typebuildersmetav1.PreconditionsApplyConfiguration{}
 	case metav1.SchemeGroupVersion.WithKind("TypeMeta"):
-		return &typebuildersmetav1.TypeMetaBuilder{}
+		return &typebuildersmetav1.TypeMetaApplyConfiguration{}
 
 		// Group=networking, Version=v1
 	case networkingv1.SchemeGroupVersion.WithKind("HTTPIngressPath"):
-		return &typebuildersnetworkingv1.HTTPIngressPathBuilder{}
+		return &typebuildersnetworkingv1.HTTPIngressPathApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("HTTPIngressRuleValue"):
-		return &typebuildersnetworkingv1.HTTPIngressRuleValueBuilder{}
+		return &typebuildersnetworkingv1.HTTPIngressRuleValueApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("Ingress"):
-		return &typebuildersnetworkingv1.IngressBuilder{}
+		return &typebuildersnetworkingv1.IngressApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("IngressBackend"):
-		return &typebuildersnetworkingv1.IngressBackendBuilder{}
+		return &typebuildersnetworkingv1.IngressBackendApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("IngressClass"):
-		return &typebuildersnetworkingv1.IngressClassBuilder{}
+		return &typebuildersnetworkingv1.IngressClassApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("IngressClassSpec"):
-		return &typebuildersnetworkingv1.IngressClassSpecBuilder{}
+		return &typebuildersnetworkingv1.IngressClassSpecApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("IngressRule"):
-		return &typebuildersnetworkingv1.IngressRuleBuilder{}
+		return &typebuildersnetworkingv1.IngressRuleApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("IngressRuleValue"):
-		return &typebuildersnetworkingv1.IngressRuleValueBuilder{}
+		return &typebuildersnetworkingv1.IngressRuleValueApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("IngressServiceBackend"):
-		return &typebuildersnetworkingv1.IngressServiceBackendBuilder{}
+		return &typebuildersnetworkingv1.IngressServiceBackendApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("IngressSpec"):
-		return &typebuildersnetworkingv1.IngressSpecBuilder{}
+		return &typebuildersnetworkingv1.IngressSpecApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("IngressStatus"):
-		return &typebuildersnetworkingv1.IngressStatusBuilder{}
+		return &typebuildersnetworkingv1.IngressStatusApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("IngressTLS"):
-		return &typebuildersnetworkingv1.IngressTLSBuilder{}
+		return &typebuildersnetworkingv1.IngressTLSApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("IPBlock"):
-		return &typebuildersnetworkingv1.IPBlockBuilder{}
+		return &typebuildersnetworkingv1.IPBlockApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("NetworkPolicy"):
-		return &typebuildersnetworkingv1.NetworkPolicyBuilder{}
+		return &typebuildersnetworkingv1.NetworkPolicyApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("NetworkPolicyEgressRule"):
-		return &typebuildersnetworkingv1.NetworkPolicyEgressRuleBuilder{}
+		return &typebuildersnetworkingv1.NetworkPolicyEgressRuleApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("NetworkPolicyIngressRule"):
-		return &typebuildersnetworkingv1.NetworkPolicyIngressRuleBuilder{}
+		return &typebuildersnetworkingv1.NetworkPolicyIngressRuleApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("NetworkPolicyPeer"):
-		return &typebuildersnetworkingv1.NetworkPolicyPeerBuilder{}
+		return &typebuildersnetworkingv1.NetworkPolicyPeerApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("NetworkPolicyPort"):
-		return &typebuildersnetworkingv1.NetworkPolicyPortBuilder{}
+		return &typebuildersnetworkingv1.NetworkPolicyPortApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("NetworkPolicySpec"):
-		return &typebuildersnetworkingv1.NetworkPolicySpecBuilder{}
+		return &typebuildersnetworkingv1.NetworkPolicySpecApplyConfiguration{}
 	case networkingv1.SchemeGroupVersion.WithKind("ServiceBackendPort"):
-		return &typebuildersnetworkingv1.ServiceBackendPortBuilder{}
+		return &typebuildersnetworkingv1.ServiceBackendPortApplyConfiguration{}
 
 		// Group=networking, Version=v1beta1
 	case networkingv1beta1.SchemeGroupVersion.WithKind("HTTPIngressPath"):
-		return &typebuildersnetworkingv1beta1.HTTPIngressPathBuilder{}
+		return &typebuildersnetworkingv1beta1.HTTPIngressPathApplyConfiguration{}
 	case networkingv1beta1.SchemeGroupVersion.WithKind("HTTPIngressRuleValue"):
-		return &typebuildersnetworkingv1beta1.HTTPIngressRuleValueBuilder{}
+		return &typebuildersnetworkingv1beta1.HTTPIngressRuleValueApplyConfiguration{}
 	case networkingv1beta1.SchemeGroupVersion.WithKind("Ingress"):
-		return &typebuildersnetworkingv1beta1.IngressBuilder{}
+		return &typebuildersnetworkingv1beta1.IngressApplyConfiguration{}
 	case networkingv1beta1.SchemeGroupVersion.WithKind("IngressBackend"):
-		return &typebuildersnetworkingv1beta1.IngressBackendBuilder{}
+		return &typebuildersnetworkingv1beta1.IngressBackendApplyConfiguration{}
 	case networkingv1beta1.SchemeGroupVersion.WithKind("IngressClass"):
-		return &typebuildersnetworkingv1beta1.IngressClassBuilder{}
+		return &typebuildersnetworkingv1beta1.IngressClassApplyConfiguration{}
 	case networkingv1beta1.SchemeGroupVersion.WithKind("IngressClassSpec"):
-		return &typebuildersnetworkingv1beta1.IngressClassSpecBuilder{}
+		return &typebuildersnetworkingv1beta1.IngressClassSpecApplyConfiguration{}
 	case networkingv1beta1.SchemeGroupVersion.WithKind("IngressRule"):
-		return &typebuildersnetworkingv1beta1.IngressRuleBuilder{}
+		return &typebuildersnetworkingv1beta1.IngressRuleApplyConfiguration{}
 	case networkingv1beta1.SchemeGroupVersion.WithKind("IngressRuleValue"):
-		return &typebuildersnetworkingv1beta1.IngressRuleValueBuilder{}
+		return &typebuildersnetworkingv1beta1.IngressRuleValueApplyConfiguration{}
 	case networkingv1beta1.SchemeGroupVersion.WithKind("IngressSpec"):
-		return &typebuildersnetworkingv1beta1.IngressSpecBuilder{}
+		return &typebuildersnetworkingv1beta1.IngressSpecApplyConfiguration{}
 	case networkingv1beta1.SchemeGroupVersion.WithKind("IngressStatus"):
-		return &typebuildersnetworkingv1beta1.IngressStatusBuilder{}
+		return &typebuildersnetworkingv1beta1.IngressStatusApplyConfiguration{}
 	case networkingv1beta1.SchemeGroupVersion.WithKind("IngressTLS"):
-		return &typebuildersnetworkingv1beta1.IngressTLSBuilder{}
+		return &typebuildersnetworkingv1beta1.IngressTLSApplyConfiguration{}
 
 		// Group=node, Version=v1alpha1
 	case nodev1alpha1.SchemeGroupVersion.WithKind("Overhead"):
-		return &typebuildersnodev1alpha1.OverheadBuilder{}
+		return &typebuildersnodev1alpha1.OverheadApplyConfiguration{}
 	case nodev1alpha1.SchemeGroupVersion.WithKind("RuntimeClass"):
-		return &typebuildersnodev1alpha1.RuntimeClassBuilder{}
+		return &typebuildersnodev1alpha1.RuntimeClassApplyConfiguration{}
 	case nodev1alpha1.SchemeGroupVersion.WithKind("RuntimeClassSpec"):
-		return &typebuildersnodev1alpha1.RuntimeClassSpecBuilder{}
+		return &typebuildersnodev1alpha1.RuntimeClassSpecApplyConfiguration{}
 	case nodev1alpha1.SchemeGroupVersion.WithKind("Scheduling"):
-		return &typebuildersnodev1alpha1.SchedulingBuilder{}
+		return &typebuildersnodev1alpha1.SchedulingApplyConfiguration{}
 
 		// Group=node, Version=v1beta1
 	case nodev1beta1.SchemeGroupVersion.WithKind("Overhead"):
-		return &typebuildersnodev1beta1.OverheadBuilder{}
+		return &typebuildersnodev1beta1.OverheadApplyConfiguration{}
 	case nodev1beta1.SchemeGroupVersion.WithKind("RuntimeClass"):
-		return &typebuildersnodev1beta1.RuntimeClassBuilder{}
+		return &typebuildersnodev1beta1.RuntimeClassApplyConfiguration{}
 	case nodev1beta1.SchemeGroupVersion.WithKind("Scheduling"):
-		return &typebuildersnodev1beta1.SchedulingBuilder{}
+		return &typebuildersnodev1beta1.SchedulingApplyConfiguration{}
 
 		// Group=policy, Version=v1beta1
 	case policyv1beta1.SchemeGroupVersion.WithKind("AllowedCSIDriver"):
-		return &typebuilderspolicyv1beta1.AllowedCSIDriverBuilder{}
+		return &typebuilderspolicyv1beta1.AllowedCSIDriverApplyConfiguration{}
 	case policyv1beta1.SchemeGroupVersion.WithKind("AllowedFlexVolume"):
-		return &typebuilderspolicyv1beta1.AllowedFlexVolumeBuilder{}
+		return &typebuilderspolicyv1beta1.AllowedFlexVolumeApplyConfiguration{}
 	case policyv1beta1.SchemeGroupVersion.WithKind("AllowedHostPath"):
-		return &typebuilderspolicyv1beta1.AllowedHostPathBuilder{}
+		return &typebuilderspolicyv1beta1.AllowedHostPathApplyConfiguration{}
 	case policyv1beta1.SchemeGroupVersion.WithKind("Eviction"):
-		return &typebuilderspolicyv1beta1.EvictionBuilder{}
+		return &typebuilderspolicyv1beta1.EvictionApplyConfiguration{}
 	case policyv1beta1.SchemeGroupVersion.WithKind("FSGroupStrategyOptions"):
-		return &typebuilderspolicyv1beta1.FSGroupStrategyOptionsBuilder{}
+		return &typebuilderspolicyv1beta1.FSGroupStrategyOptionsApplyConfiguration{}
 	case policyv1beta1.SchemeGroupVersion.WithKind("HostPortRange"):
-		return &typebuilderspolicyv1beta1.HostPortRangeBuilder{}
+		return &typebuilderspolicyv1beta1.HostPortRangeApplyConfiguration{}
 	case policyv1beta1.SchemeGroupVersion.WithKind("IDRange"):
-		return &typebuilderspolicyv1beta1.IDRangeBuilder{}
+		return &typebuilderspolicyv1beta1.IDRangeApplyConfiguration{}
 	case policyv1beta1.SchemeGroupVersion.WithKind("PodDisruptionBudget"):
-		return &typebuilderspolicyv1beta1.PodDisruptionBudgetBuilder{}
+		return &typebuilderspolicyv1beta1.PodDisruptionBudgetApplyConfiguration{}
 	case policyv1beta1.SchemeGroupVersion.WithKind("PodDisruptionBudgetSpec"):
-		return &typebuilderspolicyv1beta1.PodDisruptionBudgetSpecBuilder{}
+		return &typebuilderspolicyv1beta1.PodDisruptionBudgetSpecApplyConfiguration{}
 	case policyv1beta1.SchemeGroupVersion.WithKind("PodDisruptionBudgetStatus"):
-		return &typebuilderspolicyv1beta1.PodDisruptionBudgetStatusBuilder{}
+		return &typebuilderspolicyv1beta1.PodDisruptionBudgetStatusApplyConfiguration{}
 	case policyv1beta1.SchemeGroupVersion.WithKind("PodSecurityPolicy"):
-		return &typebuilderspolicyv1beta1.PodSecurityPolicyBuilder{}
+		return &typebuilderspolicyv1beta1.PodSecurityPolicyApplyConfiguration{}
 	case policyv1beta1.SchemeGroupVersion.WithKind("PodSecurityPolicySpec"):
-		return &typebuilderspolicyv1beta1.PodSecurityPolicySpecBuilder{}
+		return &typebuilderspolicyv1beta1.PodSecurityPolicySpecApplyConfiguration{}
 	case policyv1beta1.SchemeGroupVersion.WithKind("RunAsGroupStrategyOptions"):
-		return &typebuilderspolicyv1beta1.RunAsGroupStrategyOptionsBuilder{}
+		return &typebuilderspolicyv1beta1.RunAsGroupStrategyOptionsApplyConfiguration{}
 	case policyv1beta1.SchemeGroupVersion.WithKind("RunAsUserStrategyOptions"):
-		return &typebuilderspolicyv1beta1.RunAsUserStrategyOptionsBuilder{}
+		return &typebuilderspolicyv1beta1.RunAsUserStrategyOptionsApplyConfiguration{}
 	case policyv1beta1.SchemeGroupVersion.WithKind("RuntimeClassStrategyOptions"):
-		return &typebuilderspolicyv1beta1.RuntimeClassStrategyOptionsBuilder{}
+		return &typebuilderspolicyv1beta1.RuntimeClassStrategyOptionsApplyConfiguration{}
 	case policyv1beta1.SchemeGroupVersion.WithKind("SELinuxStrategyOptions"):
-		return &typebuilderspolicyv1beta1.SELinuxStrategyOptionsBuilder{}
+		return &typebuilderspolicyv1beta1.SELinuxStrategyOptionsApplyConfiguration{}
 	case policyv1beta1.SchemeGroupVersion.WithKind("SupplementalGroupsStrategyOptions"):
-		return &typebuilderspolicyv1beta1.SupplementalGroupsStrategyOptionsBuilder{}
+		return &typebuilderspolicyv1beta1.SupplementalGroupsStrategyOptionsApplyConfiguration{}
 
 		// Group=rbac, Version=v1
 	case rbacv1.SchemeGroupVersion.WithKind("AggregationRule"):
-		return &typebuildersrbacv1.AggregationRuleBuilder{}
+		return &typebuildersrbacv1.AggregationRuleApplyConfiguration{}
 	case rbacv1.SchemeGroupVersion.WithKind("ClusterRole"):
-		return &typebuildersrbacv1.ClusterRoleBuilder{}
+		return &typebuildersrbacv1.ClusterRoleApplyConfiguration{}
 	case rbacv1.SchemeGroupVersion.WithKind("ClusterRoleBinding"):
-		return &typebuildersrbacv1.ClusterRoleBindingBuilder{}
+		return &typebuildersrbacv1.ClusterRoleBindingApplyConfiguration{}
 	case rbacv1.SchemeGroupVersion.WithKind("PolicyRule"):
-		return &typebuildersrbacv1.PolicyRuleBuilder{}
+		return &typebuildersrbacv1.PolicyRuleApplyConfiguration{}
 	case rbacv1.SchemeGroupVersion.WithKind("Role"):
-		return &typebuildersrbacv1.RoleBuilder{}
+		return &typebuildersrbacv1.RoleApplyConfiguration{}
 	case rbacv1.SchemeGroupVersion.WithKind("RoleBinding"):
-		return &typebuildersrbacv1.RoleBindingBuilder{}
+		return &typebuildersrbacv1.RoleBindingApplyConfiguration{}
 	case rbacv1.SchemeGroupVersion.WithKind("RoleRef"):
-		return &typebuildersrbacv1.RoleRefBuilder{}
+		return &typebuildersrbacv1.RoleRefApplyConfiguration{}
 	case rbacv1.SchemeGroupVersion.WithKind("Subject"):
-		return &typebuildersrbacv1.SubjectBuilder{}
+		return &typebuildersrbacv1.SubjectApplyConfiguration{}
 
 		// Group=rbac, Version=v1alpha1
 	case rbacv1alpha1.SchemeGroupVersion.WithKind("AggregationRule"):
-		return &typebuildersrbacv1alpha1.AggregationRuleBuilder{}
+		return &typebuildersrbacv1alpha1.AggregationRuleApplyConfiguration{}
 	case rbacv1alpha1.SchemeGroupVersion.WithKind("ClusterRole"):
-		return &typebuildersrbacv1alpha1.ClusterRoleBuilder{}
+		return &typebuildersrbacv1alpha1.ClusterRoleApplyConfiguration{}
 	case rbacv1alpha1.SchemeGroupVersion.WithKind("ClusterRoleBinding"):
-		return &typebuildersrbacv1alpha1.ClusterRoleBindingBuilder{}
+		return &typebuildersrbacv1alpha1.ClusterRoleBindingApplyConfiguration{}
 	case rbacv1alpha1.SchemeGroupVersion.WithKind("PolicyRule"):
-		return &typebuildersrbacv1alpha1.PolicyRuleBuilder{}
+		return &typebuildersrbacv1alpha1.PolicyRuleApplyConfiguration{}
 	case rbacv1alpha1.SchemeGroupVersion.WithKind("Role"):
-		return &typebuildersrbacv1alpha1.RoleBuilder{}
+		return &typebuildersrbacv1alpha1.RoleApplyConfiguration{}
 	case rbacv1alpha1.SchemeGroupVersion.WithKind("RoleBinding"):
-		return &typebuildersrbacv1alpha1.RoleBindingBuilder{}
+		return &typebuildersrbacv1alpha1.RoleBindingApplyConfiguration{}
 	case rbacv1alpha1.SchemeGroupVersion.WithKind("RoleRef"):
-		return &typebuildersrbacv1alpha1.RoleRefBuilder{}
+		return &typebuildersrbacv1alpha1.RoleRefApplyConfiguration{}
 	case rbacv1alpha1.SchemeGroupVersion.WithKind("Subject"):
-		return &typebuildersrbacv1alpha1.SubjectBuilder{}
+		return &typebuildersrbacv1alpha1.SubjectApplyConfiguration{}
 
 		// Group=rbac, Version=v1beta1
 	case rbacv1beta1.SchemeGroupVersion.WithKind("AggregationRule"):
-		return &typebuildersrbacv1beta1.AggregationRuleBuilder{}
+		return &typebuildersrbacv1beta1.AggregationRuleApplyConfiguration{}
 	case rbacv1beta1.SchemeGroupVersion.WithKind("ClusterRole"):
-		return &typebuildersrbacv1beta1.ClusterRoleBuilder{}
+		return &typebuildersrbacv1beta1.ClusterRoleApplyConfiguration{}
 	case rbacv1beta1.SchemeGroupVersion.WithKind("ClusterRoleBinding"):
-		return &typebuildersrbacv1beta1.ClusterRoleBindingBuilder{}
+		return &typebuildersrbacv1beta1.ClusterRoleBindingApplyConfiguration{}
 	case rbacv1beta1.SchemeGroupVersion.WithKind("PolicyRule"):
-		return &typebuildersrbacv1beta1.PolicyRuleBuilder{}
+		return &typebuildersrbacv1beta1.PolicyRuleApplyConfiguration{}
 	case rbacv1beta1.SchemeGroupVersion.WithKind("Role"):
-		return &typebuildersrbacv1beta1.RoleBuilder{}
+		return &typebuildersrbacv1beta1.RoleApplyConfiguration{}
 	case rbacv1beta1.SchemeGroupVersion.WithKind("RoleBinding"):
-		return &typebuildersrbacv1beta1.RoleBindingBuilder{}
+		return &typebuildersrbacv1beta1.RoleBindingApplyConfiguration{}
 	case rbacv1beta1.SchemeGroupVersion.WithKind("RoleRef"):
-		return &typebuildersrbacv1beta1.RoleRefBuilder{}
+		return &typebuildersrbacv1beta1.RoleRefApplyConfiguration{}
 	case rbacv1beta1.SchemeGroupVersion.WithKind("Subject"):
-		return &typebuildersrbacv1beta1.SubjectBuilder{}
+		return &typebuildersrbacv1beta1.SubjectApplyConfiguration{}
 
 		// Group=scheduling, Version=v1
 	case schedulingv1.SchemeGroupVersion.WithKind("PriorityClass"):
-		return &typebuildersschedulingv1.PriorityClassBuilder{}
+		return &typebuildersschedulingv1.PriorityClassApplyConfiguration{}
 
 		// Group=scheduling, Version=v1alpha1
 	case schedulingv1alpha1.SchemeGroupVersion.WithKind("PriorityClass"):
-		return &typebuildersschedulingv1alpha1.PriorityClassBuilder{}
+		return &typebuildersschedulingv1alpha1.PriorityClassApplyConfiguration{}
 
 		// Group=scheduling, Version=v1beta1
 	case schedulingv1beta1.SchemeGroupVersion.WithKind("PriorityClass"):
-		return &typebuildersschedulingv1beta1.PriorityClassBuilder{}
+		return &typebuildersschedulingv1beta1.PriorityClassApplyConfiguration{}
 
 		// Group=storage, Version=v1
 	case storagev1.SchemeGroupVersion.WithKind("CSIDriver"):
-		return &typebuildersstoragev1.CSIDriverBuilder{}
+		return &typebuildersstoragev1.CSIDriverApplyConfiguration{}
 	case storagev1.SchemeGroupVersion.WithKind("CSIDriverSpec"):
-		return &typebuildersstoragev1.CSIDriverSpecBuilder{}
+		return &typebuildersstoragev1.CSIDriverSpecApplyConfiguration{}
 	case storagev1.SchemeGroupVersion.WithKind("CSINode"):
-		return &typebuildersstoragev1.CSINodeBuilder{}
+		return &typebuildersstoragev1.CSINodeApplyConfiguration{}
 	case storagev1.SchemeGroupVersion.WithKind("CSINodeDriver"):
-		return &typebuildersstoragev1.CSINodeDriverBuilder{}
+		return &typebuildersstoragev1.CSINodeDriverApplyConfiguration{}
 	case storagev1.SchemeGroupVersion.WithKind("CSINodeSpec"):
-		return &typebuildersstoragev1.CSINodeSpecBuilder{}
+		return &typebuildersstoragev1.CSINodeSpecApplyConfiguration{}
 	case storagev1.SchemeGroupVersion.WithKind("StorageClass"):
-		return &typebuildersstoragev1.StorageClassBuilder{}
+		return &typebuildersstoragev1.StorageClassApplyConfiguration{}
 	case storagev1.SchemeGroupVersion.WithKind("VolumeAttachment"):
-		return &typebuildersstoragev1.VolumeAttachmentBuilder{}
+		return &typebuildersstoragev1.VolumeAttachmentApplyConfiguration{}
 	case storagev1.SchemeGroupVersion.WithKind("VolumeAttachmentSource"):
-		return &typebuildersstoragev1.VolumeAttachmentSourceBuilder{}
+		return &typebuildersstoragev1.VolumeAttachmentSourceApplyConfiguration{}
 	case storagev1.SchemeGroupVersion.WithKind("VolumeAttachmentSpec"):
-		return &typebuildersstoragev1.VolumeAttachmentSpecBuilder{}
+		return &typebuildersstoragev1.VolumeAttachmentSpecApplyConfiguration{}
 	case storagev1.SchemeGroupVersion.WithKind("VolumeAttachmentStatus"):
-		return &typebuildersstoragev1.VolumeAttachmentStatusBuilder{}
+		return &typebuildersstoragev1.VolumeAttachmentStatusApplyConfiguration{}
 	case storagev1.SchemeGroupVersion.WithKind("VolumeError"):
-		return &typebuildersstoragev1.VolumeErrorBuilder{}
+		return &typebuildersstoragev1.VolumeErrorApplyConfiguration{}
 	case storagev1.SchemeGroupVersion.WithKind("VolumeNodeResources"):
-		return &typebuildersstoragev1.VolumeNodeResourcesBuilder{}
+		return &typebuildersstoragev1.VolumeNodeResourcesApplyConfiguration{}
 
 		// Group=storage, Version=v1alpha1
 	case storagev1alpha1.SchemeGroupVersion.WithKind("CSIStorageCapacity"):
-		return &typebuildersstoragev1alpha1.CSIStorageCapacityBuilder{}
+		return &typebuildersstoragev1alpha1.CSIStorageCapacityApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeAttachment"):
-		return &typebuildersstoragev1alpha1.VolumeAttachmentBuilder{}
+		return &typebuildersstoragev1alpha1.VolumeAttachmentApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeAttachmentSource"):
-		return &typebuildersstoragev1alpha1.VolumeAttachmentSourceBuilder{}
+		return &typebuildersstoragev1alpha1.VolumeAttachmentSourceApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeAttachmentSpec"):
-		return &typebuildersstoragev1alpha1.VolumeAttachmentSpecBuilder{}
+		return &typebuildersstoragev1alpha1.VolumeAttachmentSpecApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeAttachmentStatus"):
-		return &typebuildersstoragev1alpha1.VolumeAttachmentStatusBuilder{}
+		return &typebuildersstoragev1alpha1.VolumeAttachmentStatusApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeError"):
-		return &typebuildersstoragev1alpha1.VolumeErrorBuilder{}
+		return &typebuildersstoragev1alpha1.VolumeErrorApplyConfiguration{}
 
 		// Group=storage, Version=v1beta1
 	case storagev1beta1.SchemeGroupVersion.WithKind("CSIDriver"):
-		return &typebuildersstoragev1beta1.CSIDriverBuilder{}
+		return &typebuildersstoragev1beta1.CSIDriverApplyConfiguration{}
 	case storagev1beta1.SchemeGroupVersion.WithKind("CSIDriverSpec"):
-		return &typebuildersstoragev1beta1.CSIDriverSpecBuilder{}
+		return &typebuildersstoragev1beta1.CSIDriverSpecApplyConfiguration{}
 	case storagev1beta1.SchemeGroupVersion.WithKind("CSINode"):
-		return &typebuildersstoragev1beta1.CSINodeBuilder{}
+		return &typebuildersstoragev1beta1.CSINodeApplyConfiguration{}
 	case storagev1beta1.SchemeGroupVersion.WithKind("CSINodeDriver"):
-		return &typebuildersstoragev1beta1.CSINodeDriverBuilder{}
+		return &typebuildersstoragev1beta1.CSINodeDriverApplyConfiguration{}
 	case storagev1beta1.SchemeGroupVersion.WithKind("CSINodeSpec"):
-		return &typebuildersstoragev1beta1.CSINodeSpecBuilder{}
+		return &typebuildersstoragev1beta1.CSINodeSpecApplyConfiguration{}
 	case storagev1beta1.SchemeGroupVersion.WithKind("StorageClass"):
-		return &typebuildersstoragev1beta1.StorageClassBuilder{}
+		return &typebuildersstoragev1beta1.StorageClassApplyConfiguration{}
 	case storagev1beta1.SchemeGroupVersion.WithKind("VolumeAttachment"):
-		return &typebuildersstoragev1beta1.VolumeAttachmentBuilder{}
+		return &typebuildersstoragev1beta1.VolumeAttachmentApplyConfiguration{}
 	case storagev1beta1.SchemeGroupVersion.WithKind("VolumeAttachmentSource"):
-		return &typebuildersstoragev1beta1.VolumeAttachmentSourceBuilder{}
+		return &typebuildersstoragev1beta1.VolumeAttachmentSourceApplyConfiguration{}
 	case storagev1beta1.SchemeGroupVersion.WithKind("VolumeAttachmentSpec"):
-		return &typebuildersstoragev1beta1.VolumeAttachmentSpecBuilder{}
+		return &typebuildersstoragev1beta1.VolumeAttachmentSpecApplyConfiguration{}
 	case storagev1beta1.SchemeGroupVersion.WithKind("VolumeAttachmentStatus"):
-		return &typebuildersstoragev1beta1.VolumeAttachmentStatusBuilder{}
+		return &typebuildersstoragev1beta1.VolumeAttachmentStatusApplyConfiguration{}
 	case storagev1beta1.SchemeGroupVersion.WithKind("VolumeError"):
-		return &typebuildersstoragev1beta1.VolumeErrorBuilder{}
+		return &typebuildersstoragev1beta1.VolumeErrorApplyConfiguration{}
 	case storagev1beta1.SchemeGroupVersion.WithKind("VolumeNodeResources"):
-		return &typebuildersstoragev1beta1.VolumeNodeResourcesBuilder{}
+		return &typebuildersstoragev1beta1.VolumeNodeResourcesApplyConfiguration{}
 
 	}
 	return nil

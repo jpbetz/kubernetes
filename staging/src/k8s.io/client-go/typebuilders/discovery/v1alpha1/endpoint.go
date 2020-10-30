@@ -25,45 +25,45 @@ import (
 	v1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
-// EndpointBuilder represents an declarative configuration of the Endpoint type for use
+// EndpointApplyConfiguration represents an declarative configuration of the Endpoint type for use
 // with apply.
-type EndpointBuilder struct {
+type EndpointApplyConfiguration struct {
 	fields endpointFields
 }
 
+// EndpointApplyConfiguration constructs an declarative configuration of the Endpoint type for use with
+// apply.
+func Endpoint() *EndpointApplyConfiguration {
+	return &EndpointApplyConfiguration{}
+}
+
 // endpointFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in EndpointBuilder.
+// Inline fields are owned by their respective inline type in EndpointApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type endpointFields struct {
-	Addresses  *[]string                  `json:"addresses,omitempty"`
-	Conditions *EndpointConditionsBuilder `json:"conditions,omitempty"`
-	Hostname   *string                    `json:"hostname,omitempty"`
-	TargetRef  *v1.ObjectReferenceBuilder `json:"targetRef,omitempty"`
-	Topology   *map[string]string         `json:"topology,omitempty"`
-}
-
-// Endpoint constructs an declarative configuration of the Endpoint type for use with
-// apply.
-func Endpoint() *EndpointBuilder {
-	return &EndpointBuilder{}
+	Addresses  *[]string                             `json:"addresses,omitempty"`
+	Conditions *EndpointConditionsApplyConfiguration `json:"conditions,omitempty"`
+	Hostname   *string                               `json:"hostname,omitempty"`
+	TargetRef  *v1.ObjectReferenceApplyConfiguration `json:"targetRef,omitempty"`
+	Topology   *map[string]string                    `json:"topology,omitempty"`
 }
 
 // SetAddresses sets the Addresses field in the declarative configuration to the given value.
-func (b *EndpointBuilder) SetAddresses(value []string) *EndpointBuilder {
+func (b *EndpointApplyConfiguration) SetAddresses(value []string) *EndpointApplyConfiguration {
 	b.fields.Addresses = &value
 	return b
 }
 
 // RemoveAddresses removes the Addresses field from the declarative configuration.
-func (b *EndpointBuilder) RemoveAddresses() *EndpointBuilder {
+func (b *EndpointApplyConfiguration) RemoveAddresses() *EndpointApplyConfiguration {
 	b.fields.Addresses = nil
 	return b
 }
 
 // GetAddresses gets the Addresses field from the declarative configuration.
-func (b *EndpointBuilder) GetAddresses() (value []string, ok bool) {
+func (b *EndpointApplyConfiguration) GetAddresses() (value []string, ok bool) {
 	if v := b.fields.Addresses; v != nil {
 		return *v, true
 	}
@@ -71,36 +71,36 @@ func (b *EndpointBuilder) GetAddresses() (value []string, ok bool) {
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b *EndpointBuilder) SetConditions(value *EndpointConditionsBuilder) *EndpointBuilder {
+func (b *EndpointApplyConfiguration) SetConditions(value *EndpointConditionsApplyConfiguration) *EndpointApplyConfiguration {
 	b.fields.Conditions = value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b *EndpointBuilder) RemoveConditions() *EndpointBuilder {
+func (b *EndpointApplyConfiguration) RemoveConditions() *EndpointApplyConfiguration {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b *EndpointBuilder) GetConditions() (value *EndpointConditionsBuilder, ok bool) {
+func (b *EndpointApplyConfiguration) GetConditions() (value *EndpointConditionsApplyConfiguration, ok bool) {
 	return b.fields.Conditions, b.fields.Conditions != nil
 }
 
 // SetHostname sets the Hostname field in the declarative configuration to the given value.
-func (b *EndpointBuilder) SetHostname(value string) *EndpointBuilder {
+func (b *EndpointApplyConfiguration) SetHostname(value string) *EndpointApplyConfiguration {
 	b.fields.Hostname = &value
 	return b
 }
 
 // RemoveHostname removes the Hostname field from the declarative configuration.
-func (b *EndpointBuilder) RemoveHostname() *EndpointBuilder {
+func (b *EndpointApplyConfiguration) RemoveHostname() *EndpointApplyConfiguration {
 	b.fields.Hostname = nil
 	return b
 }
 
 // GetHostname gets the Hostname field from the declarative configuration.
-func (b *EndpointBuilder) GetHostname() (value string, ok bool) {
+func (b *EndpointApplyConfiguration) GetHostname() (value string, ok bool) {
 	if v := b.fields.Hostname; v != nil {
 		return *v, true
 	}
@@ -108,44 +108,44 @@ func (b *EndpointBuilder) GetHostname() (value string, ok bool) {
 }
 
 // SetTargetRef sets the TargetRef field in the declarative configuration to the given value.
-func (b *EndpointBuilder) SetTargetRef(value *v1.ObjectReferenceBuilder) *EndpointBuilder {
+func (b *EndpointApplyConfiguration) SetTargetRef(value *v1.ObjectReferenceApplyConfiguration) *EndpointApplyConfiguration {
 	b.fields.TargetRef = value
 	return b
 }
 
 // RemoveTargetRef removes the TargetRef field from the declarative configuration.
-func (b *EndpointBuilder) RemoveTargetRef() *EndpointBuilder {
+func (b *EndpointApplyConfiguration) RemoveTargetRef() *EndpointApplyConfiguration {
 	b.fields.TargetRef = nil
 	return b
 }
 
 // GetTargetRef gets the TargetRef field from the declarative configuration.
-func (b *EndpointBuilder) GetTargetRef() (value *v1.ObjectReferenceBuilder, ok bool) {
+func (b *EndpointApplyConfiguration) GetTargetRef() (value *v1.ObjectReferenceApplyConfiguration, ok bool) {
 	return b.fields.TargetRef, b.fields.TargetRef != nil
 }
 
 // SetTopology sets the Topology field in the declarative configuration to the given value.
-func (b *EndpointBuilder) SetTopology(value map[string]string) *EndpointBuilder {
+func (b *EndpointApplyConfiguration) SetTopology(value map[string]string) *EndpointApplyConfiguration {
 	b.fields.Topology = &value
 	return b
 }
 
 // RemoveTopology removes the Topology field from the declarative configuration.
-func (b *EndpointBuilder) RemoveTopology() *EndpointBuilder {
+func (b *EndpointApplyConfiguration) RemoveTopology() *EndpointApplyConfiguration {
 	b.fields.Topology = nil
 	return b
 }
 
 // GetTopology gets the Topology field from the declarative configuration.
-func (b *EndpointBuilder) GetTopology() (value map[string]string, ok bool) {
+func (b *EndpointApplyConfiguration) GetTopology() (value map[string]string, ok bool) {
 	if v := b.fields.Topology; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts EndpointBuilder to unstructured.
-func (b *EndpointBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts EndpointApplyConfiguration to unstructured.
+func (b *EndpointApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -157,9 +157,9 @@ func (b *EndpointBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to EndpointBuilder, replacing the contents
-// of EndpointBuilder.
-func (b *EndpointBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to EndpointApplyConfiguration, replacing the contents
+// of EndpointApplyConfiguration.
+func (b *EndpointApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &endpointFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -170,15 +170,15 @@ func (b *EndpointBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals EndpointBuilder to JSON.
-func (b *EndpointBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals EndpointApplyConfiguration to JSON.
+func (b *EndpointApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into EndpointBuilder, replacing the contents of
-// EndpointBuilder.
-func (b *EndpointBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into EndpointApplyConfiguration, replacing the contents of
+// EndpointApplyConfiguration.
+func (b *EndpointApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -186,13 +186,13 @@ func (b *EndpointBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// EndpointList represents a list of EndpointBuilder.
-type EndpointList []*EndpointBuilder
+// EndpointList represents a listAlias of EndpointApplyConfiguration.
+type EndpointList []*EndpointApplyConfiguration
 
-// EndpointList represents a map of EndpointBuilder.
-type EndpointMap map[string]EndpointBuilder
+// EndpointList represents a map of EndpointApplyConfiguration.
+type EndpointMap map[string]EndpointApplyConfiguration
 
-func (b *EndpointBuilder) preMarshal() {
+func (b *EndpointApplyConfiguration) preMarshal() {
 }
-func (b *EndpointBuilder) postUnmarshal() {
+func (b *EndpointApplyConfiguration) postUnmarshal() {
 }

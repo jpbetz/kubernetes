@@ -26,48 +26,48 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// JobSpecBuilder represents an declarative configuration of the JobSpec type for use
+// JobSpecApplyConfiguration represents an declarative configuration of the JobSpec type for use
 // with apply.
-type JobSpecBuilder struct {
+type JobSpecApplyConfiguration struct {
 	fields jobSpecFields
 }
 
+// JobSpecApplyConfiguration constructs an declarative configuration of the JobSpec type for use with
+// apply.
+func JobSpec() *JobSpecApplyConfiguration {
+	return &JobSpecApplyConfiguration{}
+}
+
 // jobSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in JobSpecBuilder.
+// Inline fields are owned by their respective inline type in JobSpecApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type jobSpecFields struct {
-	Parallelism             *int32                         `json:"parallelism,omitempty"`
-	Completions             *int32                         `json:"completions,omitempty"`
-	ActiveDeadlineSeconds   *int64                         `json:"activeDeadlineSeconds,omitempty"`
-	BackoffLimit            *int32                         `json:"backoffLimit,omitempty"`
-	Selector                *v1.LabelSelectorBuilder       `json:"selector,omitempty"`
-	ManualSelector          *bool                          `json:"manualSelector,omitempty"`
-	Template                *corev1.PodTemplateSpecBuilder `json:"template,omitempty"`
-	TTLSecondsAfterFinished *int32                         `json:"ttlSecondsAfterFinished,omitempty"`
-}
-
-// JobSpec constructs an declarative configuration of the JobSpec type for use with
-// apply.
-func JobSpec() *JobSpecBuilder {
-	return &JobSpecBuilder{}
+	Parallelism             *int32                                    `json:"parallelism,omitempty"`
+	Completions             *int32                                    `json:"completions,omitempty"`
+	ActiveDeadlineSeconds   *int64                                    `json:"activeDeadlineSeconds,omitempty"`
+	BackoffLimit            *int32                                    `json:"backoffLimit,omitempty"`
+	Selector                *v1.LabelSelectorApplyConfiguration       `json:"selector,omitempty"`
+	ManualSelector          *bool                                     `json:"manualSelector,omitempty"`
+	Template                *corev1.PodTemplateSpecApplyConfiguration `json:"template,omitempty"`
+	TTLSecondsAfterFinished *int32                                    `json:"ttlSecondsAfterFinished,omitempty"`
 }
 
 // SetParallelism sets the Parallelism field in the declarative configuration to the given value.
-func (b *JobSpecBuilder) SetParallelism(value int32) *JobSpecBuilder {
+func (b *JobSpecApplyConfiguration) SetParallelism(value int32) *JobSpecApplyConfiguration {
 	b.fields.Parallelism = &value
 	return b
 }
 
 // RemoveParallelism removes the Parallelism field from the declarative configuration.
-func (b *JobSpecBuilder) RemoveParallelism() *JobSpecBuilder {
+func (b *JobSpecApplyConfiguration) RemoveParallelism() *JobSpecApplyConfiguration {
 	b.fields.Parallelism = nil
 	return b
 }
 
 // GetParallelism gets the Parallelism field from the declarative configuration.
-func (b *JobSpecBuilder) GetParallelism() (value int32, ok bool) {
+func (b *JobSpecApplyConfiguration) GetParallelism() (value int32, ok bool) {
 	if v := b.fields.Parallelism; v != nil {
 		return *v, true
 	}
@@ -75,19 +75,19 @@ func (b *JobSpecBuilder) GetParallelism() (value int32, ok bool) {
 }
 
 // SetCompletions sets the Completions field in the declarative configuration to the given value.
-func (b *JobSpecBuilder) SetCompletions(value int32) *JobSpecBuilder {
+func (b *JobSpecApplyConfiguration) SetCompletions(value int32) *JobSpecApplyConfiguration {
 	b.fields.Completions = &value
 	return b
 }
 
 // RemoveCompletions removes the Completions field from the declarative configuration.
-func (b *JobSpecBuilder) RemoveCompletions() *JobSpecBuilder {
+func (b *JobSpecApplyConfiguration) RemoveCompletions() *JobSpecApplyConfiguration {
 	b.fields.Completions = nil
 	return b
 }
 
 // GetCompletions gets the Completions field from the declarative configuration.
-func (b *JobSpecBuilder) GetCompletions() (value int32, ok bool) {
+func (b *JobSpecApplyConfiguration) GetCompletions() (value int32, ok bool) {
 	if v := b.fields.Completions; v != nil {
 		return *v, true
 	}
@@ -95,19 +95,19 @@ func (b *JobSpecBuilder) GetCompletions() (value int32, ok bool) {
 }
 
 // SetActiveDeadlineSeconds sets the ActiveDeadlineSeconds field in the declarative configuration to the given value.
-func (b *JobSpecBuilder) SetActiveDeadlineSeconds(value int64) *JobSpecBuilder {
+func (b *JobSpecApplyConfiguration) SetActiveDeadlineSeconds(value int64) *JobSpecApplyConfiguration {
 	b.fields.ActiveDeadlineSeconds = &value
 	return b
 }
 
 // RemoveActiveDeadlineSeconds removes the ActiveDeadlineSeconds field from the declarative configuration.
-func (b *JobSpecBuilder) RemoveActiveDeadlineSeconds() *JobSpecBuilder {
+func (b *JobSpecApplyConfiguration) RemoveActiveDeadlineSeconds() *JobSpecApplyConfiguration {
 	b.fields.ActiveDeadlineSeconds = nil
 	return b
 }
 
 // GetActiveDeadlineSeconds gets the ActiveDeadlineSeconds field from the declarative configuration.
-func (b *JobSpecBuilder) GetActiveDeadlineSeconds() (value int64, ok bool) {
+func (b *JobSpecApplyConfiguration) GetActiveDeadlineSeconds() (value int64, ok bool) {
 	if v := b.fields.ActiveDeadlineSeconds; v != nil {
 		return *v, true
 	}
@@ -115,19 +115,19 @@ func (b *JobSpecBuilder) GetActiveDeadlineSeconds() (value int64, ok bool) {
 }
 
 // SetBackoffLimit sets the BackoffLimit field in the declarative configuration to the given value.
-func (b *JobSpecBuilder) SetBackoffLimit(value int32) *JobSpecBuilder {
+func (b *JobSpecApplyConfiguration) SetBackoffLimit(value int32) *JobSpecApplyConfiguration {
 	b.fields.BackoffLimit = &value
 	return b
 }
 
 // RemoveBackoffLimit removes the BackoffLimit field from the declarative configuration.
-func (b *JobSpecBuilder) RemoveBackoffLimit() *JobSpecBuilder {
+func (b *JobSpecApplyConfiguration) RemoveBackoffLimit() *JobSpecApplyConfiguration {
 	b.fields.BackoffLimit = nil
 	return b
 }
 
 // GetBackoffLimit gets the BackoffLimit field from the declarative configuration.
-func (b *JobSpecBuilder) GetBackoffLimit() (value int32, ok bool) {
+func (b *JobSpecApplyConfiguration) GetBackoffLimit() (value int32, ok bool) {
 	if v := b.fields.BackoffLimit; v != nil {
 		return *v, true
 	}
@@ -135,36 +135,36 @@ func (b *JobSpecBuilder) GetBackoffLimit() (value int32, ok bool) {
 }
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
-func (b *JobSpecBuilder) SetSelector(value *v1.LabelSelectorBuilder) *JobSpecBuilder {
+func (b *JobSpecApplyConfiguration) SetSelector(value *v1.LabelSelectorApplyConfiguration) *JobSpecApplyConfiguration {
 	b.fields.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
-func (b *JobSpecBuilder) RemoveSelector() *JobSpecBuilder {
+func (b *JobSpecApplyConfiguration) RemoveSelector() *JobSpecApplyConfiguration {
 	b.fields.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
-func (b *JobSpecBuilder) GetSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+func (b *JobSpecApplyConfiguration) GetSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
 	return b.fields.Selector, b.fields.Selector != nil
 }
 
 // SetManualSelector sets the ManualSelector field in the declarative configuration to the given value.
-func (b *JobSpecBuilder) SetManualSelector(value bool) *JobSpecBuilder {
+func (b *JobSpecApplyConfiguration) SetManualSelector(value bool) *JobSpecApplyConfiguration {
 	b.fields.ManualSelector = &value
 	return b
 }
 
 // RemoveManualSelector removes the ManualSelector field from the declarative configuration.
-func (b *JobSpecBuilder) RemoveManualSelector() *JobSpecBuilder {
+func (b *JobSpecApplyConfiguration) RemoveManualSelector() *JobSpecApplyConfiguration {
 	b.fields.ManualSelector = nil
 	return b
 }
 
 // GetManualSelector gets the ManualSelector field from the declarative configuration.
-func (b *JobSpecBuilder) GetManualSelector() (value bool, ok bool) {
+func (b *JobSpecApplyConfiguration) GetManualSelector() (value bool, ok bool) {
 	if v := b.fields.ManualSelector; v != nil {
 		return *v, true
 	}
@@ -172,44 +172,44 @@ func (b *JobSpecBuilder) GetManualSelector() (value bool, ok bool) {
 }
 
 // SetTemplate sets the Template field in the declarative configuration to the given value.
-func (b *JobSpecBuilder) SetTemplate(value *corev1.PodTemplateSpecBuilder) *JobSpecBuilder {
+func (b *JobSpecApplyConfiguration) SetTemplate(value *corev1.PodTemplateSpecApplyConfiguration) *JobSpecApplyConfiguration {
 	b.fields.Template = value
 	return b
 }
 
 // RemoveTemplate removes the Template field from the declarative configuration.
-func (b *JobSpecBuilder) RemoveTemplate() *JobSpecBuilder {
+func (b *JobSpecApplyConfiguration) RemoveTemplate() *JobSpecApplyConfiguration {
 	b.fields.Template = nil
 	return b
 }
 
 // GetTemplate gets the Template field from the declarative configuration.
-func (b *JobSpecBuilder) GetTemplate() (value *corev1.PodTemplateSpecBuilder, ok bool) {
+func (b *JobSpecApplyConfiguration) GetTemplate() (value *corev1.PodTemplateSpecApplyConfiguration, ok bool) {
 	return b.fields.Template, b.fields.Template != nil
 }
 
 // SetTTLSecondsAfterFinished sets the TTLSecondsAfterFinished field in the declarative configuration to the given value.
-func (b *JobSpecBuilder) SetTTLSecondsAfterFinished(value int32) *JobSpecBuilder {
+func (b *JobSpecApplyConfiguration) SetTTLSecondsAfterFinished(value int32) *JobSpecApplyConfiguration {
 	b.fields.TTLSecondsAfterFinished = &value
 	return b
 }
 
 // RemoveTTLSecondsAfterFinished removes the TTLSecondsAfterFinished field from the declarative configuration.
-func (b *JobSpecBuilder) RemoveTTLSecondsAfterFinished() *JobSpecBuilder {
+func (b *JobSpecApplyConfiguration) RemoveTTLSecondsAfterFinished() *JobSpecApplyConfiguration {
 	b.fields.TTLSecondsAfterFinished = nil
 	return b
 }
 
 // GetTTLSecondsAfterFinished gets the TTLSecondsAfterFinished field from the declarative configuration.
-func (b *JobSpecBuilder) GetTTLSecondsAfterFinished() (value int32, ok bool) {
+func (b *JobSpecApplyConfiguration) GetTTLSecondsAfterFinished() (value int32, ok bool) {
 	if v := b.fields.TTLSecondsAfterFinished; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts JobSpecBuilder to unstructured.
-func (b *JobSpecBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts JobSpecApplyConfiguration to unstructured.
+func (b *JobSpecApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -221,9 +221,9 @@ func (b *JobSpecBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to JobSpecBuilder, replacing the contents
-// of JobSpecBuilder.
-func (b *JobSpecBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to JobSpecApplyConfiguration, replacing the contents
+// of JobSpecApplyConfiguration.
+func (b *JobSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &jobSpecFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -234,15 +234,15 @@ func (b *JobSpecBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals JobSpecBuilder to JSON.
-func (b *JobSpecBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals JobSpecApplyConfiguration to JSON.
+func (b *JobSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into JobSpecBuilder, replacing the contents of
-// JobSpecBuilder.
-func (b *JobSpecBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into JobSpecApplyConfiguration, replacing the contents of
+// JobSpecApplyConfiguration.
+func (b *JobSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -250,13 +250,13 @@ func (b *JobSpecBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// JobSpecList represents a list of JobSpecBuilder.
-type JobSpecList []*JobSpecBuilder
+// JobSpecList represents a listAlias of JobSpecApplyConfiguration.
+type JobSpecList []*JobSpecApplyConfiguration
 
-// JobSpecList represents a map of JobSpecBuilder.
-type JobSpecMap map[string]JobSpecBuilder
+// JobSpecList represents a map of JobSpecApplyConfiguration.
+type JobSpecMap map[string]JobSpecApplyConfiguration
 
-func (b *JobSpecBuilder) preMarshal() {
+func (b *JobSpecApplyConfiguration) preMarshal() {
 }
-func (b *JobSpecBuilder) postUnmarshal() {
+func (b *JobSpecApplyConfiguration) postUnmarshal() {
 }

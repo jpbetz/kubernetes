@@ -135,7 +135,7 @@ func (c *FakeFlowSchemas) Patch(ctx context.Context, name string, pt types.Patch
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied flowSchema.
-func (c *FakeFlowSchemas) Apply(ctx context.Context, flowSchema flowcontrolv1alpha1.FlowSchemaBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.FlowSchema, err error) {
+func (c *FakeFlowSchemas) Apply(ctx context.Context, flowSchema *flowcontrolv1alpha1.FlowSchemaApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.FlowSchema, err error) {
 	data, err := flowSchema.MarshalJSON()
 	if err != nil {
 		return nil, err

@@ -48,7 +48,7 @@ type CSINodeInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1beta1.CSINodeList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.CSINode, err error)
-	Apply(ctx context.Context, cSINode storagev1beta1.CSINodeBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.CSINode, err error)
+	Apply(ctx context.Context, cSINode *storagev1beta1.CSINodeApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.CSINode, err error)
 	CSINodeExpansion
 }
 
@@ -171,7 +171,7 @@ func (c *cSINodes) Patch(ctx context.Context, name string, pt types.PatchType, d
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied cSINode.
-func (c *cSINodes) Apply(ctx context.Context, cSINode storagev1beta1.CSINodeBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.CSINode, err error) {
+func (c *cSINodes) Apply(ctx context.Context, cSINode *storagev1beta1.CSINodeApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.CSINode, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := cSINode.MarshalJSON()
 	if err != nil {

@@ -25,87 +25,87 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// EndpointsBuilder represents an declarative configuration of the Endpoints type for use
+// EndpointsApplyConfiguration represents an declarative configuration of the Endpoints type for use
 // with apply.
-type EndpointsBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type EndpointsApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   endpointsFields
 }
 
+// EndpointsApplyConfiguration constructs an declarative configuration of the Endpoints type for use with
+// apply.
+func Endpoints() *EndpointsApplyConfiguration {
+	return &EndpointsApplyConfiguration{}
+}
+
 // endpointsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in EndpointsBuilder.
+// Inline fields are owned by their respective inline type in EndpointsApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type endpointsFields struct {
-	Kind       *string               `json:"kind,omitempty"`       // inlined EndpointsBuilder.typeMeta.Kind field
-	APIVersion *string               `json:"apiVersion,omitempty"` // inlined EndpointsBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder `json:"metadata,omitempty"`
-	Subsets    *EndpointSubsetList   `json:"subsets,omitempty"`
-}
-
-// Endpoints constructs an declarative configuration of the Endpoints type for use with
-// apply.
-func Endpoints() *EndpointsBuilder {
-	return &EndpointsBuilder{}
+	Kind       *string                          `json:"kind,omitempty"`       // inlined EndpointsApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                          `json:"apiVersion,omitempty"` // inlined EndpointsApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Subsets    *EndpointSubsetList              `json:"subsets,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *EndpointsBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *EndpointsBuilder {
+func (b *EndpointsApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *EndpointsApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *EndpointsBuilder) RemoveTypeMeta() *EndpointsBuilder {
+func (b *EndpointsApplyConfiguration) RemoveTypeMeta() *EndpointsApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *EndpointsBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *EndpointsApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *EndpointsBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *EndpointsBuilder {
+func (b *EndpointsApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *EndpointsApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *EndpointsBuilder) RemoveObjectMeta() *EndpointsBuilder {
+func (b *EndpointsApplyConfiguration) RemoveObjectMeta() *EndpointsApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *EndpointsBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *EndpointsApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSubsets sets the Subsets field in the declarative configuration to the given value.
-func (b *EndpointsBuilder) SetSubsets(value EndpointSubsetList) *EndpointsBuilder {
+func (b *EndpointsApplyConfiguration) SetSubsets(value EndpointSubsetList) *EndpointsApplyConfiguration {
 	b.fields.Subsets = &value
 	return b
 }
 
 // RemoveSubsets removes the Subsets field from the declarative configuration.
-func (b *EndpointsBuilder) RemoveSubsets() *EndpointsBuilder {
+func (b *EndpointsApplyConfiguration) RemoveSubsets() *EndpointsApplyConfiguration {
 	b.fields.Subsets = nil
 	return b
 }
 
 // GetSubsets gets the Subsets field from the declarative configuration.
-func (b *EndpointsBuilder) GetSubsets() (value EndpointSubsetList, ok bool) {
+func (b *EndpointsApplyConfiguration) GetSubsets() (value EndpointSubsetList, ok bool) {
 	if v := b.fields.Subsets; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts EndpointsBuilder to unstructured.
-func (b *EndpointsBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts EndpointsApplyConfiguration to unstructured.
+func (b *EndpointsApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -117,9 +117,9 @@ func (b *EndpointsBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to EndpointsBuilder, replacing the contents
-// of EndpointsBuilder.
-func (b *EndpointsBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to EndpointsApplyConfiguration, replacing the contents
+// of EndpointsApplyConfiguration.
+func (b *EndpointsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &endpointsFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -130,15 +130,15 @@ func (b *EndpointsBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals EndpointsBuilder to JSON.
-func (b *EndpointsBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals EndpointsApplyConfiguration to JSON.
+func (b *EndpointsApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into EndpointsBuilder, replacing the contents of
-// EndpointsBuilder.
-func (b *EndpointsBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into EndpointsApplyConfiguration, replacing the contents of
+// EndpointsApplyConfiguration.
+func (b *EndpointsApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -146,13 +146,13 @@ func (b *EndpointsBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// EndpointsList represents a list of EndpointsBuilder.
-type EndpointsList []*EndpointsBuilder
+// EndpointsList represents a listAlias of EndpointsApplyConfiguration.
+type EndpointsList []*EndpointsApplyConfiguration
 
-// EndpointsList represents a map of EndpointsBuilder.
-type EndpointsMap map[string]EndpointsBuilder
+// EndpointsList represents a map of EndpointsApplyConfiguration.
+type EndpointsMap map[string]EndpointsApplyConfiguration
 
-func (b *EndpointsBuilder) preMarshal() {
+func (b *EndpointsApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -162,9 +162,9 @@ func (b *EndpointsBuilder) preMarshal() {
 		}
 	}
 }
-func (b *EndpointsBuilder) postUnmarshal() {
+func (b *EndpointsApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

@@ -25,102 +25,102 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// StatefulSetBuilder represents an declarative configuration of the StatefulSet type for use
+// StatefulSetApplyConfiguration represents an declarative configuration of the StatefulSet type for use
 // with apply.
-type StatefulSetBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type StatefulSetApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   statefulSetFields
 }
 
+// StatefulSetApplyConfiguration constructs an declarative configuration of the StatefulSet type for use with
+// apply.
+func StatefulSet() *StatefulSetApplyConfiguration {
+	return &StatefulSetApplyConfiguration{}
+}
+
 // statefulSetFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in StatefulSetBuilder.
+// Inline fields are owned by their respective inline type in StatefulSetApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type statefulSetFields struct {
-	Kind       *string                   `json:"kind,omitempty"`       // inlined StatefulSetBuilder.typeMeta.Kind field
-	APIVersion *string                   `json:"apiVersion,omitempty"` // inlined StatefulSetBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder     `json:"metadata,omitempty"`
-	Spec       *StatefulSetSpecBuilder   `json:"spec,omitempty"`
-	Status     *StatefulSetStatusBuilder `json:"status,omitempty"`
-}
-
-// StatefulSet constructs an declarative configuration of the StatefulSet type for use with
-// apply.
-func StatefulSet() *StatefulSetBuilder {
-	return &StatefulSetBuilder{}
+	Kind       *string                              `json:"kind,omitempty"`       // inlined StatefulSetApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                              `json:"apiVersion,omitempty"` // inlined StatefulSetApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration     `json:"metadata,omitempty"`
+	Spec       *StatefulSetSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status     *StatefulSetStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *StatefulSetBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *StatefulSetBuilder {
+func (b *StatefulSetApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *StatefulSetApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *StatefulSetBuilder) RemoveTypeMeta() *StatefulSetBuilder {
+func (b *StatefulSetApplyConfiguration) RemoveTypeMeta() *StatefulSetApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *StatefulSetBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *StatefulSetApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *StatefulSetBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *StatefulSetBuilder {
+func (b *StatefulSetApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *StatefulSetApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *StatefulSetBuilder) RemoveObjectMeta() *StatefulSetBuilder {
+func (b *StatefulSetApplyConfiguration) RemoveObjectMeta() *StatefulSetApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *StatefulSetBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *StatefulSetApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *StatefulSetBuilder) SetSpec(value *StatefulSetSpecBuilder) *StatefulSetBuilder {
+func (b *StatefulSetApplyConfiguration) SetSpec(value *StatefulSetSpecApplyConfiguration) *StatefulSetApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *StatefulSetBuilder) RemoveSpec() *StatefulSetBuilder {
+func (b *StatefulSetApplyConfiguration) RemoveSpec() *StatefulSetApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *StatefulSetBuilder) GetSpec() (value *StatefulSetSpecBuilder, ok bool) {
+func (b *StatefulSetApplyConfiguration) GetSpec() (value *StatefulSetSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *StatefulSetBuilder) SetStatus(value *StatefulSetStatusBuilder) *StatefulSetBuilder {
+func (b *StatefulSetApplyConfiguration) SetStatus(value *StatefulSetStatusApplyConfiguration) *StatefulSetApplyConfiguration {
 	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *StatefulSetBuilder) RemoveStatus() *StatefulSetBuilder {
+func (b *StatefulSetApplyConfiguration) RemoveStatus() *StatefulSetApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *StatefulSetBuilder) GetStatus() (value *StatefulSetStatusBuilder, ok bool) {
+func (b *StatefulSetApplyConfiguration) GetStatus() (value *StatefulSetStatusApplyConfiguration, ok bool) {
 	return b.fields.Status, b.fields.Status != nil
 }
 
-// ToUnstructured converts StatefulSetBuilder to unstructured.
-func (b *StatefulSetBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts StatefulSetApplyConfiguration to unstructured.
+func (b *StatefulSetApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -132,9 +132,9 @@ func (b *StatefulSetBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to StatefulSetBuilder, replacing the contents
-// of StatefulSetBuilder.
-func (b *StatefulSetBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to StatefulSetApplyConfiguration, replacing the contents
+// of StatefulSetApplyConfiguration.
+func (b *StatefulSetApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &statefulSetFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -145,15 +145,15 @@ func (b *StatefulSetBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals StatefulSetBuilder to JSON.
-func (b *StatefulSetBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals StatefulSetApplyConfiguration to JSON.
+func (b *StatefulSetApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into StatefulSetBuilder, replacing the contents of
-// StatefulSetBuilder.
-func (b *StatefulSetBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into StatefulSetApplyConfiguration, replacing the contents of
+// StatefulSetApplyConfiguration.
+func (b *StatefulSetApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -161,13 +161,13 @@ func (b *StatefulSetBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// StatefulSetList represents a list of StatefulSetBuilder.
-type StatefulSetList []*StatefulSetBuilder
+// StatefulSetList represents a listAlias of StatefulSetApplyConfiguration.
+type StatefulSetList []*StatefulSetApplyConfiguration
 
-// StatefulSetList represents a map of StatefulSetBuilder.
-type StatefulSetMap map[string]StatefulSetBuilder
+// StatefulSetList represents a map of StatefulSetApplyConfiguration.
+type StatefulSetMap map[string]StatefulSetApplyConfiguration
 
-func (b *StatefulSetBuilder) preMarshal() {
+func (b *StatefulSetApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -177,9 +177,9 @@ func (b *StatefulSetBuilder) preMarshal() {
 		}
 	}
 }
-func (b *StatefulSetBuilder) postUnmarshal() {
+func (b *StatefulSetApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

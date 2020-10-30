@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// TopologySelectorTermBuilder represents an declarative configuration of the TopologySelectorTerm type for use
+// TopologySelectorTermApplyConfiguration represents an declarative configuration of the TopologySelectorTerm type for use
 // with apply.
-type TopologySelectorTermBuilder struct {
+type TopologySelectorTermApplyConfiguration struct {
 	fields topologySelectorTermFields
 }
 
+// TopologySelectorTermApplyConfiguration constructs an declarative configuration of the TopologySelectorTerm type for use with
+// apply.
+func TopologySelectorTerm() *TopologySelectorTermApplyConfiguration {
+	return &TopologySelectorTermApplyConfiguration{}
+}
+
 // topologySelectorTermFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in TopologySelectorTermBuilder.
+// Inline fields are owned by their respective inline type in TopologySelectorTermApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type topologySelectorTermFields struct {
 	MatchLabelExpressions *TopologySelectorLabelRequirementList `json:"matchLabelExpressions,omitempty"`
 }
 
-// TopologySelectorTerm constructs an declarative configuration of the TopologySelectorTerm type for use with
-// apply.
-func TopologySelectorTerm() *TopologySelectorTermBuilder {
-	return &TopologySelectorTermBuilder{}
-}
-
 // SetMatchLabelExpressions sets the MatchLabelExpressions field in the declarative configuration to the given value.
-func (b *TopologySelectorTermBuilder) SetMatchLabelExpressions(value TopologySelectorLabelRequirementList) *TopologySelectorTermBuilder {
+func (b *TopologySelectorTermApplyConfiguration) SetMatchLabelExpressions(value TopologySelectorLabelRequirementList) *TopologySelectorTermApplyConfiguration {
 	b.fields.MatchLabelExpressions = &value
 	return b
 }
 
 // RemoveMatchLabelExpressions removes the MatchLabelExpressions field from the declarative configuration.
-func (b *TopologySelectorTermBuilder) RemoveMatchLabelExpressions() *TopologySelectorTermBuilder {
+func (b *TopologySelectorTermApplyConfiguration) RemoveMatchLabelExpressions() *TopologySelectorTermApplyConfiguration {
 	b.fields.MatchLabelExpressions = nil
 	return b
 }
 
 // GetMatchLabelExpressions gets the MatchLabelExpressions field from the declarative configuration.
-func (b *TopologySelectorTermBuilder) GetMatchLabelExpressions() (value TopologySelectorLabelRequirementList, ok bool) {
+func (b *TopologySelectorTermApplyConfiguration) GetMatchLabelExpressions() (value TopologySelectorLabelRequirementList, ok bool) {
 	if v := b.fields.MatchLabelExpressions; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts TopologySelectorTermBuilder to unstructured.
-func (b *TopologySelectorTermBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts TopologySelectorTermApplyConfiguration to unstructured.
+func (b *TopologySelectorTermApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *TopologySelectorTermBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to TopologySelectorTermBuilder, replacing the contents
-// of TopologySelectorTermBuilder.
-func (b *TopologySelectorTermBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to TopologySelectorTermApplyConfiguration, replacing the contents
+// of TopologySelectorTermApplyConfiguration.
+func (b *TopologySelectorTermApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &topologySelectorTermFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *TopologySelectorTermBuilder) FromUnstructured(u map[string]interface{})
 	return nil
 }
 
-// MarshalJSON marshals TopologySelectorTermBuilder to JSON.
-func (b *TopologySelectorTermBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals TopologySelectorTermApplyConfiguration to JSON.
+func (b *TopologySelectorTermApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into TopologySelectorTermBuilder, replacing the contents of
-// TopologySelectorTermBuilder.
-func (b *TopologySelectorTermBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into TopologySelectorTermApplyConfiguration, replacing the contents of
+// TopologySelectorTermApplyConfiguration.
+func (b *TopologySelectorTermApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *TopologySelectorTermBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// TopologySelectorTermList represents a list of TopologySelectorTermBuilder.
-type TopologySelectorTermList []*TopologySelectorTermBuilder
+// TopologySelectorTermList represents a listAlias of TopologySelectorTermApplyConfiguration.
+type TopologySelectorTermList []*TopologySelectorTermApplyConfiguration
 
-// TopologySelectorTermList represents a map of TopologySelectorTermBuilder.
-type TopologySelectorTermMap map[string]TopologySelectorTermBuilder
+// TopologySelectorTermList represents a map of TopologySelectorTermApplyConfiguration.
+type TopologySelectorTermMap map[string]TopologySelectorTermApplyConfiguration
 
-func (b *TopologySelectorTermBuilder) preMarshal() {
+func (b *TopologySelectorTermApplyConfiguration) preMarshal() {
 }
-func (b *TopologySelectorTermBuilder) postUnmarshal() {
+func (b *TopologySelectorTermApplyConfiguration) postUnmarshal() {
 }

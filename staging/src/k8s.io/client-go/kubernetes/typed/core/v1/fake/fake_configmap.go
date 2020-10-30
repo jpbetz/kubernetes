@@ -132,7 +132,7 @@ func (c *FakeConfigMaps) Patch(ctx context.Context, name string, pt types.PatchT
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied configMap.
-func (c *FakeConfigMaps) Apply(ctx context.Context, configMap typebuilderscorev1.ConfigMapBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ConfigMap, err error) {
+func (c *FakeConfigMaps) Apply(ctx context.Context, configMap *typebuilderscorev1.ConfigMapApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ConfigMap, err error) {
 	data, err := configMap.MarshalJSON()
 	if err != nil {
 		return nil, err

@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ClientIPConfigBuilder represents an declarative configuration of the ClientIPConfig type for use
+// ClientIPConfigApplyConfiguration represents an declarative configuration of the ClientIPConfig type for use
 // with apply.
-type ClientIPConfigBuilder struct {
+type ClientIPConfigApplyConfiguration struct {
 	fields clientIPConfigFields
 }
 
+// ClientIPConfigApplyConfiguration constructs an declarative configuration of the ClientIPConfig type for use with
+// apply.
+func ClientIPConfig() *ClientIPConfigApplyConfiguration {
+	return &ClientIPConfigApplyConfiguration{}
+}
+
 // clientIPConfigFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ClientIPConfigBuilder.
+// Inline fields are owned by their respective inline type in ClientIPConfigApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type clientIPConfigFields struct {
 	TimeoutSeconds *int32 `json:"timeoutSeconds,omitempty"`
 }
 
-// ClientIPConfig constructs an declarative configuration of the ClientIPConfig type for use with
-// apply.
-func ClientIPConfig() *ClientIPConfigBuilder {
-	return &ClientIPConfigBuilder{}
-}
-
 // SetTimeoutSeconds sets the TimeoutSeconds field in the declarative configuration to the given value.
-func (b *ClientIPConfigBuilder) SetTimeoutSeconds(value int32) *ClientIPConfigBuilder {
+func (b *ClientIPConfigApplyConfiguration) SetTimeoutSeconds(value int32) *ClientIPConfigApplyConfiguration {
 	b.fields.TimeoutSeconds = &value
 	return b
 }
 
 // RemoveTimeoutSeconds removes the TimeoutSeconds field from the declarative configuration.
-func (b *ClientIPConfigBuilder) RemoveTimeoutSeconds() *ClientIPConfigBuilder {
+func (b *ClientIPConfigApplyConfiguration) RemoveTimeoutSeconds() *ClientIPConfigApplyConfiguration {
 	b.fields.TimeoutSeconds = nil
 	return b
 }
 
 // GetTimeoutSeconds gets the TimeoutSeconds field from the declarative configuration.
-func (b *ClientIPConfigBuilder) GetTimeoutSeconds() (value int32, ok bool) {
+func (b *ClientIPConfigApplyConfiguration) GetTimeoutSeconds() (value int32, ok bool) {
 	if v := b.fields.TimeoutSeconds; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ClientIPConfigBuilder to unstructured.
-func (b *ClientIPConfigBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ClientIPConfigApplyConfiguration to unstructured.
+func (b *ClientIPConfigApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *ClientIPConfigBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ClientIPConfigBuilder, replacing the contents
-// of ClientIPConfigBuilder.
-func (b *ClientIPConfigBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ClientIPConfigApplyConfiguration, replacing the contents
+// of ClientIPConfigApplyConfiguration.
+func (b *ClientIPConfigApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &clientIPConfigFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *ClientIPConfigBuilder) FromUnstructured(u map[string]interface{}) error
 	return nil
 }
 
-// MarshalJSON marshals ClientIPConfigBuilder to JSON.
-func (b *ClientIPConfigBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ClientIPConfigApplyConfiguration to JSON.
+func (b *ClientIPConfigApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ClientIPConfigBuilder, replacing the contents of
-// ClientIPConfigBuilder.
-func (b *ClientIPConfigBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ClientIPConfigApplyConfiguration, replacing the contents of
+// ClientIPConfigApplyConfiguration.
+func (b *ClientIPConfigApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *ClientIPConfigBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ClientIPConfigList represents a list of ClientIPConfigBuilder.
-type ClientIPConfigList []*ClientIPConfigBuilder
+// ClientIPConfigList represents a listAlias of ClientIPConfigApplyConfiguration.
+type ClientIPConfigList []*ClientIPConfigApplyConfiguration
 
-// ClientIPConfigList represents a map of ClientIPConfigBuilder.
-type ClientIPConfigMap map[string]ClientIPConfigBuilder
+// ClientIPConfigList represents a map of ClientIPConfigApplyConfiguration.
+type ClientIPConfigMap map[string]ClientIPConfigApplyConfiguration
 
-func (b *ClientIPConfigBuilder) preMarshal() {
+func (b *ClientIPConfigApplyConfiguration) preMarshal() {
 }
-func (b *ClientIPConfigBuilder) postUnmarshal() {
+func (b *ClientIPConfigApplyConfiguration) postUnmarshal() {
 }

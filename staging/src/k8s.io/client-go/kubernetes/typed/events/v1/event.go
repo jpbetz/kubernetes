@@ -48,7 +48,7 @@ type EventInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.EventList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.Event, err error)
-	Apply(ctx context.Context, event eventsv1.EventBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Event, err error)
+	Apply(ctx context.Context, event *eventsv1.EventApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Event, err error)
 	EventExpansion
 }
 
@@ -181,7 +181,7 @@ func (c *events) Patch(ctx context.Context, name string, pt types.PatchType, dat
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied event.
-func (c *events) Apply(ctx context.Context, event eventsv1.EventBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Event, err error) {
+func (c *events) Apply(ctx context.Context, event *eventsv1.EventApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Event, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := event.MarshalJSON()
 	if err != nil {

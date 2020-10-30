@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// AzureFilePersistentVolumeSourceBuilder represents an declarative configuration of the AzureFilePersistentVolumeSource type for use
+// AzureFilePersistentVolumeSourceApplyConfiguration represents an declarative configuration of the AzureFilePersistentVolumeSource type for use
 // with apply.
-type AzureFilePersistentVolumeSourceBuilder struct {
+type AzureFilePersistentVolumeSourceApplyConfiguration struct {
 	fields azureFilePersistentVolumeSourceFields
 }
 
+// AzureFilePersistentVolumeSourceApplyConfiguration constructs an declarative configuration of the AzureFilePersistentVolumeSource type for use with
+// apply.
+func AzureFilePersistentVolumeSource() *AzureFilePersistentVolumeSourceApplyConfiguration {
+	return &AzureFilePersistentVolumeSourceApplyConfiguration{}
+}
+
 // azureFilePersistentVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in AzureFilePersistentVolumeSourceBuilder.
+// Inline fields are owned by their respective inline type in AzureFilePersistentVolumeSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -42,26 +48,20 @@ type azureFilePersistentVolumeSourceFields struct {
 	SecretNamespace *string `json:"secretNamespace,omitempty"`
 }
 
-// AzureFilePersistentVolumeSource constructs an declarative configuration of the AzureFilePersistentVolumeSource type for use with
-// apply.
-func AzureFilePersistentVolumeSource() *AzureFilePersistentVolumeSourceBuilder {
-	return &AzureFilePersistentVolumeSourceBuilder{}
-}
-
 // SetSecretName sets the SecretName field in the declarative configuration to the given value.
-func (b *AzureFilePersistentVolumeSourceBuilder) SetSecretName(value string) *AzureFilePersistentVolumeSourceBuilder {
+func (b *AzureFilePersistentVolumeSourceApplyConfiguration) SetSecretName(value string) *AzureFilePersistentVolumeSourceApplyConfiguration {
 	b.fields.SecretName = &value
 	return b
 }
 
 // RemoveSecretName removes the SecretName field from the declarative configuration.
-func (b *AzureFilePersistentVolumeSourceBuilder) RemoveSecretName() *AzureFilePersistentVolumeSourceBuilder {
+func (b *AzureFilePersistentVolumeSourceApplyConfiguration) RemoveSecretName() *AzureFilePersistentVolumeSourceApplyConfiguration {
 	b.fields.SecretName = nil
 	return b
 }
 
 // GetSecretName gets the SecretName field from the declarative configuration.
-func (b *AzureFilePersistentVolumeSourceBuilder) GetSecretName() (value string, ok bool) {
+func (b *AzureFilePersistentVolumeSourceApplyConfiguration) GetSecretName() (value string, ok bool) {
 	if v := b.fields.SecretName; v != nil {
 		return *v, true
 	}
@@ -69,19 +69,19 @@ func (b *AzureFilePersistentVolumeSourceBuilder) GetSecretName() (value string, 
 }
 
 // SetShareName sets the ShareName field in the declarative configuration to the given value.
-func (b *AzureFilePersistentVolumeSourceBuilder) SetShareName(value string) *AzureFilePersistentVolumeSourceBuilder {
+func (b *AzureFilePersistentVolumeSourceApplyConfiguration) SetShareName(value string) *AzureFilePersistentVolumeSourceApplyConfiguration {
 	b.fields.ShareName = &value
 	return b
 }
 
 // RemoveShareName removes the ShareName field from the declarative configuration.
-func (b *AzureFilePersistentVolumeSourceBuilder) RemoveShareName() *AzureFilePersistentVolumeSourceBuilder {
+func (b *AzureFilePersistentVolumeSourceApplyConfiguration) RemoveShareName() *AzureFilePersistentVolumeSourceApplyConfiguration {
 	b.fields.ShareName = nil
 	return b
 }
 
 // GetShareName gets the ShareName field from the declarative configuration.
-func (b *AzureFilePersistentVolumeSourceBuilder) GetShareName() (value string, ok bool) {
+func (b *AzureFilePersistentVolumeSourceApplyConfiguration) GetShareName() (value string, ok bool) {
 	if v := b.fields.ShareName; v != nil {
 		return *v, true
 	}
@@ -89,19 +89,19 @@ func (b *AzureFilePersistentVolumeSourceBuilder) GetShareName() (value string, o
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b *AzureFilePersistentVolumeSourceBuilder) SetReadOnly(value bool) *AzureFilePersistentVolumeSourceBuilder {
+func (b *AzureFilePersistentVolumeSourceApplyConfiguration) SetReadOnly(value bool) *AzureFilePersistentVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b *AzureFilePersistentVolumeSourceBuilder) RemoveReadOnly() *AzureFilePersistentVolumeSourceBuilder {
+func (b *AzureFilePersistentVolumeSourceApplyConfiguration) RemoveReadOnly() *AzureFilePersistentVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b *AzureFilePersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
+func (b *AzureFilePersistentVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
@@ -109,27 +109,27 @@ func (b *AzureFilePersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok b
 }
 
 // SetSecretNamespace sets the SecretNamespace field in the declarative configuration to the given value.
-func (b *AzureFilePersistentVolumeSourceBuilder) SetSecretNamespace(value string) *AzureFilePersistentVolumeSourceBuilder {
+func (b *AzureFilePersistentVolumeSourceApplyConfiguration) SetSecretNamespace(value string) *AzureFilePersistentVolumeSourceApplyConfiguration {
 	b.fields.SecretNamespace = &value
 	return b
 }
 
 // RemoveSecretNamespace removes the SecretNamespace field from the declarative configuration.
-func (b *AzureFilePersistentVolumeSourceBuilder) RemoveSecretNamespace() *AzureFilePersistentVolumeSourceBuilder {
+func (b *AzureFilePersistentVolumeSourceApplyConfiguration) RemoveSecretNamespace() *AzureFilePersistentVolumeSourceApplyConfiguration {
 	b.fields.SecretNamespace = nil
 	return b
 }
 
 // GetSecretNamespace gets the SecretNamespace field from the declarative configuration.
-func (b *AzureFilePersistentVolumeSourceBuilder) GetSecretNamespace() (value string, ok bool) {
+func (b *AzureFilePersistentVolumeSourceApplyConfiguration) GetSecretNamespace() (value string, ok bool) {
 	if v := b.fields.SecretNamespace; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts AzureFilePersistentVolumeSourceBuilder to unstructured.
-func (b *AzureFilePersistentVolumeSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts AzureFilePersistentVolumeSourceApplyConfiguration to unstructured.
+func (b *AzureFilePersistentVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -141,9 +141,9 @@ func (b *AzureFilePersistentVolumeSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to AzureFilePersistentVolumeSourceBuilder, replacing the contents
-// of AzureFilePersistentVolumeSourceBuilder.
-func (b *AzureFilePersistentVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to AzureFilePersistentVolumeSourceApplyConfiguration, replacing the contents
+// of AzureFilePersistentVolumeSourceApplyConfiguration.
+func (b *AzureFilePersistentVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &azureFilePersistentVolumeSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -154,15 +154,15 @@ func (b *AzureFilePersistentVolumeSourceBuilder) FromUnstructured(u map[string]i
 	return nil
 }
 
-// MarshalJSON marshals AzureFilePersistentVolumeSourceBuilder to JSON.
-func (b *AzureFilePersistentVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals AzureFilePersistentVolumeSourceApplyConfiguration to JSON.
+func (b *AzureFilePersistentVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into AzureFilePersistentVolumeSourceBuilder, replacing the contents of
-// AzureFilePersistentVolumeSourceBuilder.
-func (b *AzureFilePersistentVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into AzureFilePersistentVolumeSourceApplyConfiguration, replacing the contents of
+// AzureFilePersistentVolumeSourceApplyConfiguration.
+func (b *AzureFilePersistentVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -170,13 +170,13 @@ func (b *AzureFilePersistentVolumeSourceBuilder) UnmarshalJSON(data []byte) erro
 	return nil
 }
 
-// AzureFilePersistentVolumeSourceList represents a list of AzureFilePersistentVolumeSourceBuilder.
-type AzureFilePersistentVolumeSourceList []*AzureFilePersistentVolumeSourceBuilder
+// AzureFilePersistentVolumeSourceList represents a listAlias of AzureFilePersistentVolumeSourceApplyConfiguration.
+type AzureFilePersistentVolumeSourceList []*AzureFilePersistentVolumeSourceApplyConfiguration
 
-// AzureFilePersistentVolumeSourceList represents a map of AzureFilePersistentVolumeSourceBuilder.
-type AzureFilePersistentVolumeSourceMap map[string]AzureFilePersistentVolumeSourceBuilder
+// AzureFilePersistentVolumeSourceList represents a map of AzureFilePersistentVolumeSourceApplyConfiguration.
+type AzureFilePersistentVolumeSourceMap map[string]AzureFilePersistentVolumeSourceApplyConfiguration
 
-func (b *AzureFilePersistentVolumeSourceBuilder) preMarshal() {
+func (b *AzureFilePersistentVolumeSourceApplyConfiguration) preMarshal() {
 }
-func (b *AzureFilePersistentVolumeSourceBuilder) postUnmarshal() {
+func (b *AzureFilePersistentVolumeSourceApplyConfiguration) postUnmarshal() {
 }

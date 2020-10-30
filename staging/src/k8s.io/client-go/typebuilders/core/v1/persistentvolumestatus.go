@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// PersistentVolumeStatusBuilder represents an declarative configuration of the PersistentVolumeStatus type for use
+// PersistentVolumeStatusApplyConfiguration represents an declarative configuration of the PersistentVolumeStatus type for use
 // with apply.
-type PersistentVolumeStatusBuilder struct {
+type PersistentVolumeStatusApplyConfiguration struct {
 	fields persistentVolumeStatusFields
 }
 
+// PersistentVolumeStatusApplyConfiguration constructs an declarative configuration of the PersistentVolumeStatus type for use with
+// apply.
+func PersistentVolumeStatus() *PersistentVolumeStatusApplyConfiguration {
+	return &PersistentVolumeStatusApplyConfiguration{}
+}
+
 // persistentVolumeStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PersistentVolumeStatusBuilder.
+// Inline fields are owned by their respective inline type in PersistentVolumeStatusApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -42,26 +48,20 @@ type persistentVolumeStatusFields struct {
 	Reason  *string                   `json:"reason,omitempty"`
 }
 
-// PersistentVolumeStatus constructs an declarative configuration of the PersistentVolumeStatus type for use with
-// apply.
-func PersistentVolumeStatus() *PersistentVolumeStatusBuilder {
-	return &PersistentVolumeStatusBuilder{}
-}
-
 // SetPhase sets the Phase field in the declarative configuration to the given value.
-func (b *PersistentVolumeStatusBuilder) SetPhase(value v1.PersistentVolumePhase) *PersistentVolumeStatusBuilder {
+func (b *PersistentVolumeStatusApplyConfiguration) SetPhase(value v1.PersistentVolumePhase) *PersistentVolumeStatusApplyConfiguration {
 	b.fields.Phase = &value
 	return b
 }
 
 // RemovePhase removes the Phase field from the declarative configuration.
-func (b *PersistentVolumeStatusBuilder) RemovePhase() *PersistentVolumeStatusBuilder {
+func (b *PersistentVolumeStatusApplyConfiguration) RemovePhase() *PersistentVolumeStatusApplyConfiguration {
 	b.fields.Phase = nil
 	return b
 }
 
 // GetPhase gets the Phase field from the declarative configuration.
-func (b *PersistentVolumeStatusBuilder) GetPhase() (value v1.PersistentVolumePhase, ok bool) {
+func (b *PersistentVolumeStatusApplyConfiguration) GetPhase() (value v1.PersistentVolumePhase, ok bool) {
 	if v := b.fields.Phase; v != nil {
 		return *v, true
 	}
@@ -69,19 +69,19 @@ func (b *PersistentVolumeStatusBuilder) GetPhase() (value v1.PersistentVolumePha
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b *PersistentVolumeStatusBuilder) SetMessage(value string) *PersistentVolumeStatusBuilder {
+func (b *PersistentVolumeStatusApplyConfiguration) SetMessage(value string) *PersistentVolumeStatusApplyConfiguration {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b *PersistentVolumeStatusBuilder) RemoveMessage() *PersistentVolumeStatusBuilder {
+func (b *PersistentVolumeStatusApplyConfiguration) RemoveMessage() *PersistentVolumeStatusApplyConfiguration {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b *PersistentVolumeStatusBuilder) GetMessage() (value string, ok bool) {
+func (b *PersistentVolumeStatusApplyConfiguration) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
@@ -89,27 +89,27 @@ func (b *PersistentVolumeStatusBuilder) GetMessage() (value string, ok bool) {
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b *PersistentVolumeStatusBuilder) SetReason(value string) *PersistentVolumeStatusBuilder {
+func (b *PersistentVolumeStatusApplyConfiguration) SetReason(value string) *PersistentVolumeStatusApplyConfiguration {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b *PersistentVolumeStatusBuilder) RemoveReason() *PersistentVolumeStatusBuilder {
+func (b *PersistentVolumeStatusApplyConfiguration) RemoveReason() *PersistentVolumeStatusApplyConfiguration {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b *PersistentVolumeStatusBuilder) GetReason() (value string, ok bool) {
+func (b *PersistentVolumeStatusApplyConfiguration) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts PersistentVolumeStatusBuilder to unstructured.
-func (b *PersistentVolumeStatusBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PersistentVolumeStatusApplyConfiguration to unstructured.
+func (b *PersistentVolumeStatusApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -121,9 +121,9 @@ func (b *PersistentVolumeStatusBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to PersistentVolumeStatusBuilder, replacing the contents
-// of PersistentVolumeStatusBuilder.
-func (b *PersistentVolumeStatusBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PersistentVolumeStatusApplyConfiguration, replacing the contents
+// of PersistentVolumeStatusApplyConfiguration.
+func (b *PersistentVolumeStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &persistentVolumeStatusFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -134,15 +134,15 @@ func (b *PersistentVolumeStatusBuilder) FromUnstructured(u map[string]interface{
 	return nil
 }
 
-// MarshalJSON marshals PersistentVolumeStatusBuilder to JSON.
-func (b *PersistentVolumeStatusBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PersistentVolumeStatusApplyConfiguration to JSON.
+func (b *PersistentVolumeStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PersistentVolumeStatusBuilder, replacing the contents of
-// PersistentVolumeStatusBuilder.
-func (b *PersistentVolumeStatusBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PersistentVolumeStatusApplyConfiguration, replacing the contents of
+// PersistentVolumeStatusApplyConfiguration.
+func (b *PersistentVolumeStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -150,13 +150,13 @@ func (b *PersistentVolumeStatusBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// PersistentVolumeStatusList represents a list of PersistentVolumeStatusBuilder.
-type PersistentVolumeStatusList []*PersistentVolumeStatusBuilder
+// PersistentVolumeStatusList represents a listAlias of PersistentVolumeStatusApplyConfiguration.
+type PersistentVolumeStatusList []*PersistentVolumeStatusApplyConfiguration
 
-// PersistentVolumeStatusList represents a map of PersistentVolumeStatusBuilder.
-type PersistentVolumeStatusMap map[string]PersistentVolumeStatusBuilder
+// PersistentVolumeStatusList represents a map of PersistentVolumeStatusApplyConfiguration.
+type PersistentVolumeStatusMap map[string]PersistentVolumeStatusApplyConfiguration
 
-func (b *PersistentVolumeStatusBuilder) preMarshal() {
+func (b *PersistentVolumeStatusApplyConfiguration) preMarshal() {
 }
-func (b *PersistentVolumeStatusBuilder) postUnmarshal() {
+func (b *PersistentVolumeStatusApplyConfiguration) postUnmarshal() {
 }

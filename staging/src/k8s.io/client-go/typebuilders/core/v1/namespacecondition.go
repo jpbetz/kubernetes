@@ -26,14 +26,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// NamespaceConditionBuilder represents an declarative configuration of the NamespaceCondition type for use
+// NamespaceConditionApplyConfiguration represents an declarative configuration of the NamespaceCondition type for use
 // with apply.
-type NamespaceConditionBuilder struct {
+type NamespaceConditionApplyConfiguration struct {
 	fields namespaceConditionFields
 }
 
+// NamespaceConditionApplyConfiguration constructs an declarative configuration of the NamespaceCondition type for use with
+// apply.
+func NamespaceCondition() *NamespaceConditionApplyConfiguration {
+	return &NamespaceConditionApplyConfiguration{}
+}
+
 // namespaceConditionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NamespaceConditionBuilder.
+// Inline fields are owned by their respective inline type in NamespaceConditionApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -45,26 +51,20 @@ type namespaceConditionFields struct {
 	Message            *string                    `json:"message,omitempty"`
 }
 
-// NamespaceCondition constructs an declarative configuration of the NamespaceCondition type for use with
-// apply.
-func NamespaceCondition() *NamespaceConditionBuilder {
-	return &NamespaceConditionBuilder{}
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b *NamespaceConditionBuilder) SetType(value v1.NamespaceConditionType) *NamespaceConditionBuilder {
+func (b *NamespaceConditionApplyConfiguration) SetType(value v1.NamespaceConditionType) *NamespaceConditionApplyConfiguration {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b *NamespaceConditionBuilder) RemoveType() *NamespaceConditionBuilder {
+func (b *NamespaceConditionApplyConfiguration) RemoveType() *NamespaceConditionApplyConfiguration {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b *NamespaceConditionBuilder) GetType() (value v1.NamespaceConditionType, ok bool) {
+func (b *NamespaceConditionApplyConfiguration) GetType() (value v1.NamespaceConditionType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -72,19 +72,19 @@ func (b *NamespaceConditionBuilder) GetType() (value v1.NamespaceConditionType, 
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *NamespaceConditionBuilder) SetStatus(value v1.ConditionStatus) *NamespaceConditionBuilder {
+func (b *NamespaceConditionApplyConfiguration) SetStatus(value v1.ConditionStatus) *NamespaceConditionApplyConfiguration {
 	b.fields.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *NamespaceConditionBuilder) RemoveStatus() *NamespaceConditionBuilder {
+func (b *NamespaceConditionApplyConfiguration) RemoveStatus() *NamespaceConditionApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *NamespaceConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
+func (b *NamespaceConditionApplyConfiguration) GetStatus() (value v1.ConditionStatus, ok bool) {
 	if v := b.fields.Status; v != nil {
 		return *v, true
 	}
@@ -92,19 +92,19 @@ func (b *NamespaceConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bo
 }
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
-func (b *NamespaceConditionBuilder) SetLastTransitionTime(value metav1.Time) *NamespaceConditionBuilder {
+func (b *NamespaceConditionApplyConfiguration) SetLastTransitionTime(value metav1.Time) *NamespaceConditionApplyConfiguration {
 	b.fields.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
-func (b *NamespaceConditionBuilder) RemoveLastTransitionTime() *NamespaceConditionBuilder {
+func (b *NamespaceConditionApplyConfiguration) RemoveLastTransitionTime() *NamespaceConditionApplyConfiguration {
 	b.fields.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
-func (b *NamespaceConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
+func (b *NamespaceConditionApplyConfiguration) GetLastTransitionTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastTransitionTime; v != nil {
 		return *v, true
 	}
@@ -112,19 +112,19 @@ func (b *NamespaceConditionBuilder) GetLastTransitionTime() (value metav1.Time, 
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b *NamespaceConditionBuilder) SetReason(value string) *NamespaceConditionBuilder {
+func (b *NamespaceConditionApplyConfiguration) SetReason(value string) *NamespaceConditionApplyConfiguration {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b *NamespaceConditionBuilder) RemoveReason() *NamespaceConditionBuilder {
+func (b *NamespaceConditionApplyConfiguration) RemoveReason() *NamespaceConditionApplyConfiguration {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b *NamespaceConditionBuilder) GetReason() (value string, ok bool) {
+func (b *NamespaceConditionApplyConfiguration) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -132,27 +132,27 @@ func (b *NamespaceConditionBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b *NamespaceConditionBuilder) SetMessage(value string) *NamespaceConditionBuilder {
+func (b *NamespaceConditionApplyConfiguration) SetMessage(value string) *NamespaceConditionApplyConfiguration {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b *NamespaceConditionBuilder) RemoveMessage() *NamespaceConditionBuilder {
+func (b *NamespaceConditionApplyConfiguration) RemoveMessage() *NamespaceConditionApplyConfiguration {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b *NamespaceConditionBuilder) GetMessage() (value string, ok bool) {
+func (b *NamespaceConditionApplyConfiguration) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts NamespaceConditionBuilder to unstructured.
-func (b *NamespaceConditionBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NamespaceConditionApplyConfiguration to unstructured.
+func (b *NamespaceConditionApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -164,9 +164,9 @@ func (b *NamespaceConditionBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NamespaceConditionBuilder, replacing the contents
-// of NamespaceConditionBuilder.
-func (b *NamespaceConditionBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NamespaceConditionApplyConfiguration, replacing the contents
+// of NamespaceConditionApplyConfiguration.
+func (b *NamespaceConditionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &namespaceConditionFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -177,15 +177,15 @@ func (b *NamespaceConditionBuilder) FromUnstructured(u map[string]interface{}) e
 	return nil
 }
 
-// MarshalJSON marshals NamespaceConditionBuilder to JSON.
-func (b *NamespaceConditionBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NamespaceConditionApplyConfiguration to JSON.
+func (b *NamespaceConditionApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NamespaceConditionBuilder, replacing the contents of
-// NamespaceConditionBuilder.
-func (b *NamespaceConditionBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NamespaceConditionApplyConfiguration, replacing the contents of
+// NamespaceConditionApplyConfiguration.
+func (b *NamespaceConditionApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -193,13 +193,13 @@ func (b *NamespaceConditionBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NamespaceConditionList represents a list of NamespaceConditionBuilder.
-type NamespaceConditionList []*NamespaceConditionBuilder
+// NamespaceConditionList represents a listAlias of NamespaceConditionApplyConfiguration.
+type NamespaceConditionList []*NamespaceConditionApplyConfiguration
 
-// NamespaceConditionList represents a map of NamespaceConditionBuilder.
-type NamespaceConditionMap map[string]NamespaceConditionBuilder
+// NamespaceConditionList represents a map of NamespaceConditionApplyConfiguration.
+type NamespaceConditionMap map[string]NamespaceConditionApplyConfiguration
 
-func (b *NamespaceConditionBuilder) preMarshal() {
+func (b *NamespaceConditionApplyConfiguration) preMarshal() {
 }
-func (b *NamespaceConditionBuilder) postUnmarshal() {
+func (b *NamespaceConditionApplyConfiguration) postUnmarshal() {
 }

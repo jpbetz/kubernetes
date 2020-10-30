@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// IPBlockBuilder represents an declarative configuration of the IPBlock type for use
+// IPBlockApplyConfiguration represents an declarative configuration of the IPBlock type for use
 // with apply.
-type IPBlockBuilder struct {
+type IPBlockApplyConfiguration struct {
 	fields iPBlockFields
 }
 
+// IPBlockApplyConfiguration constructs an declarative configuration of the IPBlock type for use with
+// apply.
+func IPBlock() *IPBlockApplyConfiguration {
+	return &IPBlockApplyConfiguration{}
+}
+
 // iPBlockFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in IPBlockBuilder.
+// Inline fields are owned by their respective inline type in IPBlockApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type iPBlockFields struct {
 	Except *[]string `json:"except,omitempty"`
 }
 
-// IPBlock constructs an declarative configuration of the IPBlock type for use with
-// apply.
-func IPBlock() *IPBlockBuilder {
-	return &IPBlockBuilder{}
-}
-
 // SetCIDR sets the CIDR field in the declarative configuration to the given value.
-func (b *IPBlockBuilder) SetCIDR(value string) *IPBlockBuilder {
+func (b *IPBlockApplyConfiguration) SetCIDR(value string) *IPBlockApplyConfiguration {
 	b.fields.CIDR = &value
 	return b
 }
 
 // RemoveCIDR removes the CIDR field from the declarative configuration.
-func (b *IPBlockBuilder) RemoveCIDR() *IPBlockBuilder {
+func (b *IPBlockApplyConfiguration) RemoveCIDR() *IPBlockApplyConfiguration {
 	b.fields.CIDR = nil
 	return b
 }
 
 // GetCIDR gets the CIDR field from the declarative configuration.
-func (b *IPBlockBuilder) GetCIDR() (value string, ok bool) {
+func (b *IPBlockApplyConfiguration) GetCIDR() (value string, ok bool) {
 	if v := b.fields.CIDR; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *IPBlockBuilder) GetCIDR() (value string, ok bool) {
 }
 
 // SetExcept sets the Except field in the declarative configuration to the given value.
-func (b *IPBlockBuilder) SetExcept(value []string) *IPBlockBuilder {
+func (b *IPBlockApplyConfiguration) SetExcept(value []string) *IPBlockApplyConfiguration {
 	b.fields.Except = &value
 	return b
 }
 
 // RemoveExcept removes the Except field from the declarative configuration.
-func (b *IPBlockBuilder) RemoveExcept() *IPBlockBuilder {
+func (b *IPBlockApplyConfiguration) RemoveExcept() *IPBlockApplyConfiguration {
 	b.fields.Except = nil
 	return b
 }
 
 // GetExcept gets the Except field from the declarative configuration.
-func (b *IPBlockBuilder) GetExcept() (value []string, ok bool) {
+func (b *IPBlockApplyConfiguration) GetExcept() (value []string, ok bool) {
 	if v := b.fields.Except; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts IPBlockBuilder to unstructured.
-func (b *IPBlockBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts IPBlockApplyConfiguration to unstructured.
+func (b *IPBlockApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *IPBlockBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to IPBlockBuilder, replacing the contents
-// of IPBlockBuilder.
-func (b *IPBlockBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to IPBlockApplyConfiguration, replacing the contents
+// of IPBlockApplyConfiguration.
+func (b *IPBlockApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &iPBlockFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *IPBlockBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals IPBlockBuilder to JSON.
-func (b *IPBlockBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals IPBlockApplyConfiguration to JSON.
+func (b *IPBlockApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into IPBlockBuilder, replacing the contents of
-// IPBlockBuilder.
-func (b *IPBlockBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into IPBlockApplyConfiguration, replacing the contents of
+// IPBlockApplyConfiguration.
+func (b *IPBlockApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *IPBlockBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// IPBlockList represents a list of IPBlockBuilder.
-type IPBlockList []*IPBlockBuilder
+// IPBlockList represents a listAlias of IPBlockApplyConfiguration.
+type IPBlockList []*IPBlockApplyConfiguration
 
-// IPBlockList represents a map of IPBlockBuilder.
-type IPBlockMap map[string]IPBlockBuilder
+// IPBlockList represents a map of IPBlockApplyConfiguration.
+type IPBlockMap map[string]IPBlockApplyConfiguration
 
-func (b *IPBlockBuilder) preMarshal() {
+func (b *IPBlockApplyConfiguration) preMarshal() {
 }
-func (b *IPBlockBuilder) postUnmarshal() {
+func (b *IPBlockApplyConfiguration) postUnmarshal() {
 }

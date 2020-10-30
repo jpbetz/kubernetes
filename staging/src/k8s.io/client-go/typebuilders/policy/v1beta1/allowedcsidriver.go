@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// AllowedCSIDriverBuilder represents an declarative configuration of the AllowedCSIDriver type for use
+// AllowedCSIDriverApplyConfiguration represents an declarative configuration of the AllowedCSIDriver type for use
 // with apply.
-type AllowedCSIDriverBuilder struct {
+type AllowedCSIDriverApplyConfiguration struct {
 	fields allowedCSIDriverFields
 }
 
+// AllowedCSIDriverApplyConfiguration constructs an declarative configuration of the AllowedCSIDriver type for use with
+// apply.
+func AllowedCSIDriver() *AllowedCSIDriverApplyConfiguration {
+	return &AllowedCSIDriverApplyConfiguration{}
+}
+
 // allowedCSIDriverFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in AllowedCSIDriverBuilder.
+// Inline fields are owned by their respective inline type in AllowedCSIDriverApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type allowedCSIDriverFields struct {
 	Name *string `json:"name,omitempty"`
 }
 
-// AllowedCSIDriver constructs an declarative configuration of the AllowedCSIDriver type for use with
-// apply.
-func AllowedCSIDriver() *AllowedCSIDriverBuilder {
-	return &AllowedCSIDriverBuilder{}
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *AllowedCSIDriverBuilder) SetName(value string) *AllowedCSIDriverBuilder {
+func (b *AllowedCSIDriverApplyConfiguration) SetName(value string) *AllowedCSIDriverApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *AllowedCSIDriverBuilder) RemoveName() *AllowedCSIDriverBuilder {
+func (b *AllowedCSIDriverApplyConfiguration) RemoveName() *AllowedCSIDriverApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *AllowedCSIDriverBuilder) GetName() (value string, ok bool) {
+func (b *AllowedCSIDriverApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts AllowedCSIDriverBuilder to unstructured.
-func (b *AllowedCSIDriverBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts AllowedCSIDriverApplyConfiguration to unstructured.
+func (b *AllowedCSIDriverApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *AllowedCSIDriverBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to AllowedCSIDriverBuilder, replacing the contents
-// of AllowedCSIDriverBuilder.
-func (b *AllowedCSIDriverBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to AllowedCSIDriverApplyConfiguration, replacing the contents
+// of AllowedCSIDriverApplyConfiguration.
+func (b *AllowedCSIDriverApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &allowedCSIDriverFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *AllowedCSIDriverBuilder) FromUnstructured(u map[string]interface{}) err
 	return nil
 }
 
-// MarshalJSON marshals AllowedCSIDriverBuilder to JSON.
-func (b *AllowedCSIDriverBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals AllowedCSIDriverApplyConfiguration to JSON.
+func (b *AllowedCSIDriverApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into AllowedCSIDriverBuilder, replacing the contents of
-// AllowedCSIDriverBuilder.
-func (b *AllowedCSIDriverBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into AllowedCSIDriverApplyConfiguration, replacing the contents of
+// AllowedCSIDriverApplyConfiguration.
+func (b *AllowedCSIDriverApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *AllowedCSIDriverBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// AllowedCSIDriverList represents a list of AllowedCSIDriverBuilder.
-type AllowedCSIDriverList []*AllowedCSIDriverBuilder
+// AllowedCSIDriverList represents a listAlias of AllowedCSIDriverApplyConfiguration.
+type AllowedCSIDriverList []*AllowedCSIDriverApplyConfiguration
 
-// AllowedCSIDriverList represents a map of AllowedCSIDriverBuilder.
-type AllowedCSIDriverMap map[string]AllowedCSIDriverBuilder
+// AllowedCSIDriverList represents a map of AllowedCSIDriverApplyConfiguration.
+type AllowedCSIDriverMap map[string]AllowedCSIDriverApplyConfiguration
 
-func (b *AllowedCSIDriverBuilder) preMarshal() {
+func (b *AllowedCSIDriverApplyConfiguration) preMarshal() {
 }
-func (b *AllowedCSIDriverBuilder) postUnmarshal() {
+func (b *AllowedCSIDriverApplyConfiguration) postUnmarshal() {
 }

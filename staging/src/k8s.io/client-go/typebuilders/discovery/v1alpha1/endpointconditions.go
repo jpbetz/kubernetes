@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// EndpointConditionsBuilder represents an declarative configuration of the EndpointConditions type for use
+// EndpointConditionsApplyConfiguration represents an declarative configuration of the EndpointConditions type for use
 // with apply.
-type EndpointConditionsBuilder struct {
+type EndpointConditionsApplyConfiguration struct {
 	fields endpointConditionsFields
 }
 
+// EndpointConditionsApplyConfiguration constructs an declarative configuration of the EndpointConditions type for use with
+// apply.
+func EndpointConditions() *EndpointConditionsApplyConfiguration {
+	return &EndpointConditionsApplyConfiguration{}
+}
+
 // endpointConditionsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in EndpointConditionsBuilder.
+// Inline fields are owned by their respective inline type in EndpointConditionsApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type endpointConditionsFields struct {
 	Ready *bool `json:"ready,omitempty"`
 }
 
-// EndpointConditions constructs an declarative configuration of the EndpointConditions type for use with
-// apply.
-func EndpointConditions() *EndpointConditionsBuilder {
-	return &EndpointConditionsBuilder{}
-}
-
 // SetReady sets the Ready field in the declarative configuration to the given value.
-func (b *EndpointConditionsBuilder) SetReady(value bool) *EndpointConditionsBuilder {
+func (b *EndpointConditionsApplyConfiguration) SetReady(value bool) *EndpointConditionsApplyConfiguration {
 	b.fields.Ready = &value
 	return b
 }
 
 // RemoveReady removes the Ready field from the declarative configuration.
-func (b *EndpointConditionsBuilder) RemoveReady() *EndpointConditionsBuilder {
+func (b *EndpointConditionsApplyConfiguration) RemoveReady() *EndpointConditionsApplyConfiguration {
 	b.fields.Ready = nil
 	return b
 }
 
 // GetReady gets the Ready field from the declarative configuration.
-func (b *EndpointConditionsBuilder) GetReady() (value bool, ok bool) {
+func (b *EndpointConditionsApplyConfiguration) GetReady() (value bool, ok bool) {
 	if v := b.fields.Ready; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts EndpointConditionsBuilder to unstructured.
-func (b *EndpointConditionsBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts EndpointConditionsApplyConfiguration to unstructured.
+func (b *EndpointConditionsApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *EndpointConditionsBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to EndpointConditionsBuilder, replacing the contents
-// of EndpointConditionsBuilder.
-func (b *EndpointConditionsBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to EndpointConditionsApplyConfiguration, replacing the contents
+// of EndpointConditionsApplyConfiguration.
+func (b *EndpointConditionsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &endpointConditionsFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *EndpointConditionsBuilder) FromUnstructured(u map[string]interface{}) e
 	return nil
 }
 
-// MarshalJSON marshals EndpointConditionsBuilder to JSON.
-func (b *EndpointConditionsBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals EndpointConditionsApplyConfiguration to JSON.
+func (b *EndpointConditionsApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into EndpointConditionsBuilder, replacing the contents of
-// EndpointConditionsBuilder.
-func (b *EndpointConditionsBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into EndpointConditionsApplyConfiguration, replacing the contents of
+// EndpointConditionsApplyConfiguration.
+func (b *EndpointConditionsApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *EndpointConditionsBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// EndpointConditionsList represents a list of EndpointConditionsBuilder.
-type EndpointConditionsList []*EndpointConditionsBuilder
+// EndpointConditionsList represents a listAlias of EndpointConditionsApplyConfiguration.
+type EndpointConditionsList []*EndpointConditionsApplyConfiguration
 
-// EndpointConditionsList represents a map of EndpointConditionsBuilder.
-type EndpointConditionsMap map[string]EndpointConditionsBuilder
+// EndpointConditionsList represents a map of EndpointConditionsApplyConfiguration.
+type EndpointConditionsMap map[string]EndpointConditionsApplyConfiguration
 
-func (b *EndpointConditionsBuilder) preMarshal() {
+func (b *EndpointConditionsApplyConfiguration) preMarshal() {
 }
-func (b *EndpointConditionsBuilder) postUnmarshal() {
+func (b *EndpointConditionsApplyConfiguration) postUnmarshal() {
 }

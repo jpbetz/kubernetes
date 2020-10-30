@@ -24,103 +24,103 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// NodeConfigStatusBuilder represents an declarative configuration of the NodeConfigStatus type for use
+// NodeConfigStatusApplyConfiguration represents an declarative configuration of the NodeConfigStatus type for use
 // with apply.
-type NodeConfigStatusBuilder struct {
+type NodeConfigStatusApplyConfiguration struct {
 	fields nodeConfigStatusFields
 }
 
+// NodeConfigStatusApplyConfiguration constructs an declarative configuration of the NodeConfigStatus type for use with
+// apply.
+func NodeConfigStatus() *NodeConfigStatusApplyConfiguration {
+	return &NodeConfigStatusApplyConfiguration{}
+}
+
 // nodeConfigStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NodeConfigStatusBuilder.
+// Inline fields are owned by their respective inline type in NodeConfigStatusApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type nodeConfigStatusFields struct {
-	Assigned      *NodeConfigSourceBuilder `json:"assigned,omitempty"`
-	Active        *NodeConfigSourceBuilder `json:"active,omitempty"`
-	LastKnownGood *NodeConfigSourceBuilder `json:"lastKnownGood,omitempty"`
-	Error         *string                  `json:"error,omitempty"`
-}
-
-// NodeConfigStatus constructs an declarative configuration of the NodeConfigStatus type for use with
-// apply.
-func NodeConfigStatus() *NodeConfigStatusBuilder {
-	return &NodeConfigStatusBuilder{}
+	Assigned      *NodeConfigSourceApplyConfiguration `json:"assigned,omitempty"`
+	Active        *NodeConfigSourceApplyConfiguration `json:"active,omitempty"`
+	LastKnownGood *NodeConfigSourceApplyConfiguration `json:"lastKnownGood,omitempty"`
+	Error         *string                             `json:"error,omitempty"`
 }
 
 // SetAssigned sets the Assigned field in the declarative configuration to the given value.
-func (b *NodeConfigStatusBuilder) SetAssigned(value *NodeConfigSourceBuilder) *NodeConfigStatusBuilder {
+func (b *NodeConfigStatusApplyConfiguration) SetAssigned(value *NodeConfigSourceApplyConfiguration) *NodeConfigStatusApplyConfiguration {
 	b.fields.Assigned = value
 	return b
 }
 
 // RemoveAssigned removes the Assigned field from the declarative configuration.
-func (b *NodeConfigStatusBuilder) RemoveAssigned() *NodeConfigStatusBuilder {
+func (b *NodeConfigStatusApplyConfiguration) RemoveAssigned() *NodeConfigStatusApplyConfiguration {
 	b.fields.Assigned = nil
 	return b
 }
 
 // GetAssigned gets the Assigned field from the declarative configuration.
-func (b *NodeConfigStatusBuilder) GetAssigned() (value *NodeConfigSourceBuilder, ok bool) {
+func (b *NodeConfigStatusApplyConfiguration) GetAssigned() (value *NodeConfigSourceApplyConfiguration, ok bool) {
 	return b.fields.Assigned, b.fields.Assigned != nil
 }
 
 // SetActive sets the Active field in the declarative configuration to the given value.
-func (b *NodeConfigStatusBuilder) SetActive(value *NodeConfigSourceBuilder) *NodeConfigStatusBuilder {
+func (b *NodeConfigStatusApplyConfiguration) SetActive(value *NodeConfigSourceApplyConfiguration) *NodeConfigStatusApplyConfiguration {
 	b.fields.Active = value
 	return b
 }
 
 // RemoveActive removes the Active field from the declarative configuration.
-func (b *NodeConfigStatusBuilder) RemoveActive() *NodeConfigStatusBuilder {
+func (b *NodeConfigStatusApplyConfiguration) RemoveActive() *NodeConfigStatusApplyConfiguration {
 	b.fields.Active = nil
 	return b
 }
 
 // GetActive gets the Active field from the declarative configuration.
-func (b *NodeConfigStatusBuilder) GetActive() (value *NodeConfigSourceBuilder, ok bool) {
+func (b *NodeConfigStatusApplyConfiguration) GetActive() (value *NodeConfigSourceApplyConfiguration, ok bool) {
 	return b.fields.Active, b.fields.Active != nil
 }
 
 // SetLastKnownGood sets the LastKnownGood field in the declarative configuration to the given value.
-func (b *NodeConfigStatusBuilder) SetLastKnownGood(value *NodeConfigSourceBuilder) *NodeConfigStatusBuilder {
+func (b *NodeConfigStatusApplyConfiguration) SetLastKnownGood(value *NodeConfigSourceApplyConfiguration) *NodeConfigStatusApplyConfiguration {
 	b.fields.LastKnownGood = value
 	return b
 }
 
 // RemoveLastKnownGood removes the LastKnownGood field from the declarative configuration.
-func (b *NodeConfigStatusBuilder) RemoveLastKnownGood() *NodeConfigStatusBuilder {
+func (b *NodeConfigStatusApplyConfiguration) RemoveLastKnownGood() *NodeConfigStatusApplyConfiguration {
 	b.fields.LastKnownGood = nil
 	return b
 }
 
 // GetLastKnownGood gets the LastKnownGood field from the declarative configuration.
-func (b *NodeConfigStatusBuilder) GetLastKnownGood() (value *NodeConfigSourceBuilder, ok bool) {
+func (b *NodeConfigStatusApplyConfiguration) GetLastKnownGood() (value *NodeConfigSourceApplyConfiguration, ok bool) {
 	return b.fields.LastKnownGood, b.fields.LastKnownGood != nil
 }
 
 // SetError sets the Error field in the declarative configuration to the given value.
-func (b *NodeConfigStatusBuilder) SetError(value string) *NodeConfigStatusBuilder {
+func (b *NodeConfigStatusApplyConfiguration) SetError(value string) *NodeConfigStatusApplyConfiguration {
 	b.fields.Error = &value
 	return b
 }
 
 // RemoveError removes the Error field from the declarative configuration.
-func (b *NodeConfigStatusBuilder) RemoveError() *NodeConfigStatusBuilder {
+func (b *NodeConfigStatusApplyConfiguration) RemoveError() *NodeConfigStatusApplyConfiguration {
 	b.fields.Error = nil
 	return b
 }
 
 // GetError gets the Error field from the declarative configuration.
-func (b *NodeConfigStatusBuilder) GetError() (value string, ok bool) {
+func (b *NodeConfigStatusApplyConfiguration) GetError() (value string, ok bool) {
 	if v := b.fields.Error; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts NodeConfigStatusBuilder to unstructured.
-func (b *NodeConfigStatusBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NodeConfigStatusApplyConfiguration to unstructured.
+func (b *NodeConfigStatusApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -132,9 +132,9 @@ func (b *NodeConfigStatusBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NodeConfigStatusBuilder, replacing the contents
-// of NodeConfigStatusBuilder.
-func (b *NodeConfigStatusBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NodeConfigStatusApplyConfiguration, replacing the contents
+// of NodeConfigStatusApplyConfiguration.
+func (b *NodeConfigStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &nodeConfigStatusFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -145,15 +145,15 @@ func (b *NodeConfigStatusBuilder) FromUnstructured(u map[string]interface{}) err
 	return nil
 }
 
-// MarshalJSON marshals NodeConfigStatusBuilder to JSON.
-func (b *NodeConfigStatusBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NodeConfigStatusApplyConfiguration to JSON.
+func (b *NodeConfigStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NodeConfigStatusBuilder, replacing the contents of
-// NodeConfigStatusBuilder.
-func (b *NodeConfigStatusBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NodeConfigStatusApplyConfiguration, replacing the contents of
+// NodeConfigStatusApplyConfiguration.
+func (b *NodeConfigStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -161,13 +161,13 @@ func (b *NodeConfigStatusBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NodeConfigStatusList represents a list of NodeConfigStatusBuilder.
-type NodeConfigStatusList []*NodeConfigStatusBuilder
+// NodeConfigStatusList represents a listAlias of NodeConfigStatusApplyConfiguration.
+type NodeConfigStatusList []*NodeConfigStatusApplyConfiguration
 
-// NodeConfigStatusList represents a map of NodeConfigStatusBuilder.
-type NodeConfigStatusMap map[string]NodeConfigStatusBuilder
+// NodeConfigStatusList represents a map of NodeConfigStatusApplyConfiguration.
+type NodeConfigStatusMap map[string]NodeConfigStatusApplyConfiguration
 
-func (b *NodeConfigStatusBuilder) preMarshal() {
+func (b *NodeConfigStatusApplyConfiguration) preMarshal() {
 }
-func (b *NodeConfigStatusBuilder) postUnmarshal() {
+func (b *NodeConfigStatusApplyConfiguration) postUnmarshal() {
 }

@@ -26,51 +26,51 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// MutatingWebhookBuilder represents an declarative configuration of the MutatingWebhook type for use
+// MutatingWebhookApplyConfiguration represents an declarative configuration of the MutatingWebhook type for use
 // with apply.
-type MutatingWebhookBuilder struct {
+type MutatingWebhookApplyConfiguration struct {
 	fields mutatingWebhookFields
 }
 
+// MutatingWebhookApplyConfiguration constructs an declarative configuration of the MutatingWebhook type for use with
+// apply.
+func MutatingWebhook() *MutatingWebhookApplyConfiguration {
+	return &MutatingWebhookApplyConfiguration{}
+}
+
 // mutatingWebhookFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in MutatingWebhookBuilder.
+// Inline fields are owned by their respective inline type in MutatingWebhookApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type mutatingWebhookFields struct {
 	Name                    *string                                              `json:"name,omitempty"`
-	ClientConfig            *WebhookClientConfigBuilder                          `json:"clientConfig,omitempty"`
+	ClientConfig            *WebhookClientConfigApplyConfiguration               `json:"clientConfig,omitempty"`
 	Rules                   *RuleWithOperationsList                              `json:"rules,omitempty"`
 	FailurePolicy           *admissionregistrationv1beta1.FailurePolicyType      `json:"failurePolicy,omitempty"`
 	MatchPolicy             *admissionregistrationv1beta1.MatchPolicyType        `json:"matchPolicy,omitempty"`
-	NamespaceSelector       *v1.LabelSelectorBuilder                             `json:"namespaceSelector,omitempty"`
-	ObjectSelector          *v1.LabelSelectorBuilder                             `json:"objectSelector,omitempty"`
+	NamespaceSelector       *v1.LabelSelectorApplyConfiguration                  `json:"namespaceSelector,omitempty"`
+	ObjectSelector          *v1.LabelSelectorApplyConfiguration                  `json:"objectSelector,omitempty"`
 	SideEffects             *admissionregistrationv1beta1.SideEffectClass        `json:"sideEffects,omitempty"`
 	TimeoutSeconds          *int32                                               `json:"timeoutSeconds,omitempty"`
 	AdmissionReviewVersions *[]string                                            `json:"admissionReviewVersions,omitempty"`
 	ReinvocationPolicy      *admissionregistrationv1beta1.ReinvocationPolicyType `json:"reinvocationPolicy,omitempty"`
 }
 
-// MutatingWebhook constructs an declarative configuration of the MutatingWebhook type for use with
-// apply.
-func MutatingWebhook() *MutatingWebhookBuilder {
-	return &MutatingWebhookBuilder{}
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *MutatingWebhookBuilder) SetName(value string) *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) SetName(value string) *MutatingWebhookApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *MutatingWebhookBuilder) RemoveName() *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) RemoveName() *MutatingWebhookApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *MutatingWebhookBuilder) GetName() (value string, ok bool) {
+func (b *MutatingWebhookApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -78,36 +78,36 @@ func (b *MutatingWebhookBuilder) GetName() (value string, ok bool) {
 }
 
 // SetClientConfig sets the ClientConfig field in the declarative configuration to the given value.
-func (b *MutatingWebhookBuilder) SetClientConfig(value *WebhookClientConfigBuilder) *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) SetClientConfig(value *WebhookClientConfigApplyConfiguration) *MutatingWebhookApplyConfiguration {
 	b.fields.ClientConfig = value
 	return b
 }
 
 // RemoveClientConfig removes the ClientConfig field from the declarative configuration.
-func (b *MutatingWebhookBuilder) RemoveClientConfig() *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) RemoveClientConfig() *MutatingWebhookApplyConfiguration {
 	b.fields.ClientConfig = nil
 	return b
 }
 
 // GetClientConfig gets the ClientConfig field from the declarative configuration.
-func (b *MutatingWebhookBuilder) GetClientConfig() (value *WebhookClientConfigBuilder, ok bool) {
+func (b *MutatingWebhookApplyConfiguration) GetClientConfig() (value *WebhookClientConfigApplyConfiguration, ok bool) {
 	return b.fields.ClientConfig, b.fields.ClientConfig != nil
 }
 
 // SetRules sets the Rules field in the declarative configuration to the given value.
-func (b *MutatingWebhookBuilder) SetRules(value RuleWithOperationsList) *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) SetRules(value RuleWithOperationsList) *MutatingWebhookApplyConfiguration {
 	b.fields.Rules = &value
 	return b
 }
 
 // RemoveRules removes the Rules field from the declarative configuration.
-func (b *MutatingWebhookBuilder) RemoveRules() *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) RemoveRules() *MutatingWebhookApplyConfiguration {
 	b.fields.Rules = nil
 	return b
 }
 
 // GetRules gets the Rules field from the declarative configuration.
-func (b *MutatingWebhookBuilder) GetRules() (value RuleWithOperationsList, ok bool) {
+func (b *MutatingWebhookApplyConfiguration) GetRules() (value RuleWithOperationsList, ok bool) {
 	if v := b.fields.Rules; v != nil {
 		return *v, true
 	}
@@ -115,19 +115,19 @@ func (b *MutatingWebhookBuilder) GetRules() (value RuleWithOperationsList, ok bo
 }
 
 // SetFailurePolicy sets the FailurePolicy field in the declarative configuration to the given value.
-func (b *MutatingWebhookBuilder) SetFailurePolicy(value admissionregistrationv1beta1.FailurePolicyType) *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) SetFailurePolicy(value admissionregistrationv1beta1.FailurePolicyType) *MutatingWebhookApplyConfiguration {
 	b.fields.FailurePolicy = &value
 	return b
 }
 
 // RemoveFailurePolicy removes the FailurePolicy field from the declarative configuration.
-func (b *MutatingWebhookBuilder) RemoveFailurePolicy() *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) RemoveFailurePolicy() *MutatingWebhookApplyConfiguration {
 	b.fields.FailurePolicy = nil
 	return b
 }
 
 // GetFailurePolicy gets the FailurePolicy field from the declarative configuration.
-func (b *MutatingWebhookBuilder) GetFailurePolicy() (value admissionregistrationv1beta1.FailurePolicyType, ok bool) {
+func (b *MutatingWebhookApplyConfiguration) GetFailurePolicy() (value admissionregistrationv1beta1.FailurePolicyType, ok bool) {
 	if v := b.fields.FailurePolicy; v != nil {
 		return *v, true
 	}
@@ -135,19 +135,19 @@ func (b *MutatingWebhookBuilder) GetFailurePolicy() (value admissionregistration
 }
 
 // SetMatchPolicy sets the MatchPolicy field in the declarative configuration to the given value.
-func (b *MutatingWebhookBuilder) SetMatchPolicy(value admissionregistrationv1beta1.MatchPolicyType) *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) SetMatchPolicy(value admissionregistrationv1beta1.MatchPolicyType) *MutatingWebhookApplyConfiguration {
 	b.fields.MatchPolicy = &value
 	return b
 }
 
 // RemoveMatchPolicy removes the MatchPolicy field from the declarative configuration.
-func (b *MutatingWebhookBuilder) RemoveMatchPolicy() *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) RemoveMatchPolicy() *MutatingWebhookApplyConfiguration {
 	b.fields.MatchPolicy = nil
 	return b
 }
 
 // GetMatchPolicy gets the MatchPolicy field from the declarative configuration.
-func (b *MutatingWebhookBuilder) GetMatchPolicy() (value admissionregistrationv1beta1.MatchPolicyType, ok bool) {
+func (b *MutatingWebhookApplyConfiguration) GetMatchPolicy() (value admissionregistrationv1beta1.MatchPolicyType, ok bool) {
 	if v := b.fields.MatchPolicy; v != nil {
 		return *v, true
 	}
@@ -155,53 +155,53 @@ func (b *MutatingWebhookBuilder) GetMatchPolicy() (value admissionregistrationv1
 }
 
 // SetNamespaceSelector sets the NamespaceSelector field in the declarative configuration to the given value.
-func (b *MutatingWebhookBuilder) SetNamespaceSelector(value *v1.LabelSelectorBuilder) *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) SetNamespaceSelector(value *v1.LabelSelectorApplyConfiguration) *MutatingWebhookApplyConfiguration {
 	b.fields.NamespaceSelector = value
 	return b
 }
 
 // RemoveNamespaceSelector removes the NamespaceSelector field from the declarative configuration.
-func (b *MutatingWebhookBuilder) RemoveNamespaceSelector() *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) RemoveNamespaceSelector() *MutatingWebhookApplyConfiguration {
 	b.fields.NamespaceSelector = nil
 	return b
 }
 
 // GetNamespaceSelector gets the NamespaceSelector field from the declarative configuration.
-func (b *MutatingWebhookBuilder) GetNamespaceSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+func (b *MutatingWebhookApplyConfiguration) GetNamespaceSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
 	return b.fields.NamespaceSelector, b.fields.NamespaceSelector != nil
 }
 
 // SetObjectSelector sets the ObjectSelector field in the declarative configuration to the given value.
-func (b *MutatingWebhookBuilder) SetObjectSelector(value *v1.LabelSelectorBuilder) *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) SetObjectSelector(value *v1.LabelSelectorApplyConfiguration) *MutatingWebhookApplyConfiguration {
 	b.fields.ObjectSelector = value
 	return b
 }
 
 // RemoveObjectSelector removes the ObjectSelector field from the declarative configuration.
-func (b *MutatingWebhookBuilder) RemoveObjectSelector() *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) RemoveObjectSelector() *MutatingWebhookApplyConfiguration {
 	b.fields.ObjectSelector = nil
 	return b
 }
 
 // GetObjectSelector gets the ObjectSelector field from the declarative configuration.
-func (b *MutatingWebhookBuilder) GetObjectSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+func (b *MutatingWebhookApplyConfiguration) GetObjectSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
 	return b.fields.ObjectSelector, b.fields.ObjectSelector != nil
 }
 
 // SetSideEffects sets the SideEffects field in the declarative configuration to the given value.
-func (b *MutatingWebhookBuilder) SetSideEffects(value admissionregistrationv1beta1.SideEffectClass) *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) SetSideEffects(value admissionregistrationv1beta1.SideEffectClass) *MutatingWebhookApplyConfiguration {
 	b.fields.SideEffects = &value
 	return b
 }
 
 // RemoveSideEffects removes the SideEffects field from the declarative configuration.
-func (b *MutatingWebhookBuilder) RemoveSideEffects() *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) RemoveSideEffects() *MutatingWebhookApplyConfiguration {
 	b.fields.SideEffects = nil
 	return b
 }
 
 // GetSideEffects gets the SideEffects field from the declarative configuration.
-func (b *MutatingWebhookBuilder) GetSideEffects() (value admissionregistrationv1beta1.SideEffectClass, ok bool) {
+func (b *MutatingWebhookApplyConfiguration) GetSideEffects() (value admissionregistrationv1beta1.SideEffectClass, ok bool) {
 	if v := b.fields.SideEffects; v != nil {
 		return *v, true
 	}
@@ -209,19 +209,19 @@ func (b *MutatingWebhookBuilder) GetSideEffects() (value admissionregistrationv1
 }
 
 // SetTimeoutSeconds sets the TimeoutSeconds field in the declarative configuration to the given value.
-func (b *MutatingWebhookBuilder) SetTimeoutSeconds(value int32) *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) SetTimeoutSeconds(value int32) *MutatingWebhookApplyConfiguration {
 	b.fields.TimeoutSeconds = &value
 	return b
 }
 
 // RemoveTimeoutSeconds removes the TimeoutSeconds field from the declarative configuration.
-func (b *MutatingWebhookBuilder) RemoveTimeoutSeconds() *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) RemoveTimeoutSeconds() *MutatingWebhookApplyConfiguration {
 	b.fields.TimeoutSeconds = nil
 	return b
 }
 
 // GetTimeoutSeconds gets the TimeoutSeconds field from the declarative configuration.
-func (b *MutatingWebhookBuilder) GetTimeoutSeconds() (value int32, ok bool) {
+func (b *MutatingWebhookApplyConfiguration) GetTimeoutSeconds() (value int32, ok bool) {
 	if v := b.fields.TimeoutSeconds; v != nil {
 		return *v, true
 	}
@@ -229,19 +229,19 @@ func (b *MutatingWebhookBuilder) GetTimeoutSeconds() (value int32, ok bool) {
 }
 
 // SetAdmissionReviewVersions sets the AdmissionReviewVersions field in the declarative configuration to the given value.
-func (b *MutatingWebhookBuilder) SetAdmissionReviewVersions(value []string) *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) SetAdmissionReviewVersions(value []string) *MutatingWebhookApplyConfiguration {
 	b.fields.AdmissionReviewVersions = &value
 	return b
 }
 
 // RemoveAdmissionReviewVersions removes the AdmissionReviewVersions field from the declarative configuration.
-func (b *MutatingWebhookBuilder) RemoveAdmissionReviewVersions() *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) RemoveAdmissionReviewVersions() *MutatingWebhookApplyConfiguration {
 	b.fields.AdmissionReviewVersions = nil
 	return b
 }
 
 // GetAdmissionReviewVersions gets the AdmissionReviewVersions field from the declarative configuration.
-func (b *MutatingWebhookBuilder) GetAdmissionReviewVersions() (value []string, ok bool) {
+func (b *MutatingWebhookApplyConfiguration) GetAdmissionReviewVersions() (value []string, ok bool) {
 	if v := b.fields.AdmissionReviewVersions; v != nil {
 		return *v, true
 	}
@@ -249,27 +249,27 @@ func (b *MutatingWebhookBuilder) GetAdmissionReviewVersions() (value []string, o
 }
 
 // SetReinvocationPolicy sets the ReinvocationPolicy field in the declarative configuration to the given value.
-func (b *MutatingWebhookBuilder) SetReinvocationPolicy(value admissionregistrationv1beta1.ReinvocationPolicyType) *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) SetReinvocationPolicy(value admissionregistrationv1beta1.ReinvocationPolicyType) *MutatingWebhookApplyConfiguration {
 	b.fields.ReinvocationPolicy = &value
 	return b
 }
 
 // RemoveReinvocationPolicy removes the ReinvocationPolicy field from the declarative configuration.
-func (b *MutatingWebhookBuilder) RemoveReinvocationPolicy() *MutatingWebhookBuilder {
+func (b *MutatingWebhookApplyConfiguration) RemoveReinvocationPolicy() *MutatingWebhookApplyConfiguration {
 	b.fields.ReinvocationPolicy = nil
 	return b
 }
 
 // GetReinvocationPolicy gets the ReinvocationPolicy field from the declarative configuration.
-func (b *MutatingWebhookBuilder) GetReinvocationPolicy() (value admissionregistrationv1beta1.ReinvocationPolicyType, ok bool) {
+func (b *MutatingWebhookApplyConfiguration) GetReinvocationPolicy() (value admissionregistrationv1beta1.ReinvocationPolicyType, ok bool) {
 	if v := b.fields.ReinvocationPolicy; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts MutatingWebhookBuilder to unstructured.
-func (b *MutatingWebhookBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts MutatingWebhookApplyConfiguration to unstructured.
+func (b *MutatingWebhookApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -281,9 +281,9 @@ func (b *MutatingWebhookBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to MutatingWebhookBuilder, replacing the contents
-// of MutatingWebhookBuilder.
-func (b *MutatingWebhookBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to MutatingWebhookApplyConfiguration, replacing the contents
+// of MutatingWebhookApplyConfiguration.
+func (b *MutatingWebhookApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &mutatingWebhookFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -294,15 +294,15 @@ func (b *MutatingWebhookBuilder) FromUnstructured(u map[string]interface{}) erro
 	return nil
 }
 
-// MarshalJSON marshals MutatingWebhookBuilder to JSON.
-func (b *MutatingWebhookBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals MutatingWebhookApplyConfiguration to JSON.
+func (b *MutatingWebhookApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into MutatingWebhookBuilder, replacing the contents of
-// MutatingWebhookBuilder.
-func (b *MutatingWebhookBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into MutatingWebhookApplyConfiguration, replacing the contents of
+// MutatingWebhookApplyConfiguration.
+func (b *MutatingWebhookApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -310,13 +310,13 @@ func (b *MutatingWebhookBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MutatingWebhookList represents a list of MutatingWebhookBuilder.
-type MutatingWebhookList []*MutatingWebhookBuilder
+// MutatingWebhookList represents a listAlias of MutatingWebhookApplyConfiguration.
+type MutatingWebhookList []*MutatingWebhookApplyConfiguration
 
-// MutatingWebhookList represents a map of MutatingWebhookBuilder.
-type MutatingWebhookMap map[string]MutatingWebhookBuilder
+// MutatingWebhookList represents a map of MutatingWebhookApplyConfiguration.
+type MutatingWebhookMap map[string]MutatingWebhookApplyConfiguration
 
-func (b *MutatingWebhookBuilder) preMarshal() {
+func (b *MutatingWebhookApplyConfiguration) preMarshal() {
 }
-func (b *MutatingWebhookBuilder) postUnmarshal() {
+func (b *MutatingWebhookApplyConfiguration) postUnmarshal() {
 }

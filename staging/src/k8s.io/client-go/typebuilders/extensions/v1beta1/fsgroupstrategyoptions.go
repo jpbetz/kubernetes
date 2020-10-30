@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// FSGroupStrategyOptionsBuilder represents an declarative configuration of the FSGroupStrategyOptions type for use
+// FSGroupStrategyOptionsApplyConfiguration represents an declarative configuration of the FSGroupStrategyOptions type for use
 // with apply.
-type FSGroupStrategyOptionsBuilder struct {
+type FSGroupStrategyOptionsApplyConfiguration struct {
 	fields fSGroupStrategyOptionsFields
 }
 
+// FSGroupStrategyOptionsApplyConfiguration constructs an declarative configuration of the FSGroupStrategyOptions type for use with
+// apply.
+func FSGroupStrategyOptions() *FSGroupStrategyOptionsApplyConfiguration {
+	return &FSGroupStrategyOptionsApplyConfiguration{}
+}
+
 // fSGroupStrategyOptionsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in FSGroupStrategyOptionsBuilder.
+// Inline fields are owned by their respective inline type in FSGroupStrategyOptionsApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type fSGroupStrategyOptionsFields struct {
 	Ranges *IDRangeList                 `json:"ranges,omitempty"`
 }
 
-// FSGroupStrategyOptions constructs an declarative configuration of the FSGroupStrategyOptions type for use with
-// apply.
-func FSGroupStrategyOptions() *FSGroupStrategyOptionsBuilder {
-	return &FSGroupStrategyOptionsBuilder{}
-}
-
 // SetRule sets the Rule field in the declarative configuration to the given value.
-func (b *FSGroupStrategyOptionsBuilder) SetRule(value v1beta1.FSGroupStrategyType) *FSGroupStrategyOptionsBuilder {
+func (b *FSGroupStrategyOptionsApplyConfiguration) SetRule(value v1beta1.FSGroupStrategyType) *FSGroupStrategyOptionsApplyConfiguration {
 	b.fields.Rule = &value
 	return b
 }
 
 // RemoveRule removes the Rule field from the declarative configuration.
-func (b *FSGroupStrategyOptionsBuilder) RemoveRule() *FSGroupStrategyOptionsBuilder {
+func (b *FSGroupStrategyOptionsApplyConfiguration) RemoveRule() *FSGroupStrategyOptionsApplyConfiguration {
 	b.fields.Rule = nil
 	return b
 }
 
 // GetRule gets the Rule field from the declarative configuration.
-func (b *FSGroupStrategyOptionsBuilder) GetRule() (value v1beta1.FSGroupStrategyType, ok bool) {
+func (b *FSGroupStrategyOptionsApplyConfiguration) GetRule() (value v1beta1.FSGroupStrategyType, ok bool) {
 	if v := b.fields.Rule; v != nil {
 		return *v, true
 	}
@@ -68,27 +68,27 @@ func (b *FSGroupStrategyOptionsBuilder) GetRule() (value v1beta1.FSGroupStrategy
 }
 
 // SetRanges sets the Ranges field in the declarative configuration to the given value.
-func (b *FSGroupStrategyOptionsBuilder) SetRanges(value IDRangeList) *FSGroupStrategyOptionsBuilder {
+func (b *FSGroupStrategyOptionsApplyConfiguration) SetRanges(value IDRangeList) *FSGroupStrategyOptionsApplyConfiguration {
 	b.fields.Ranges = &value
 	return b
 }
 
 // RemoveRanges removes the Ranges field from the declarative configuration.
-func (b *FSGroupStrategyOptionsBuilder) RemoveRanges() *FSGroupStrategyOptionsBuilder {
+func (b *FSGroupStrategyOptionsApplyConfiguration) RemoveRanges() *FSGroupStrategyOptionsApplyConfiguration {
 	b.fields.Ranges = nil
 	return b
 }
 
 // GetRanges gets the Ranges field from the declarative configuration.
-func (b *FSGroupStrategyOptionsBuilder) GetRanges() (value IDRangeList, ok bool) {
+func (b *FSGroupStrategyOptionsApplyConfiguration) GetRanges() (value IDRangeList, ok bool) {
 	if v := b.fields.Ranges; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts FSGroupStrategyOptionsBuilder to unstructured.
-func (b *FSGroupStrategyOptionsBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts FSGroupStrategyOptionsApplyConfiguration to unstructured.
+func (b *FSGroupStrategyOptionsApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -100,9 +100,9 @@ func (b *FSGroupStrategyOptionsBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to FSGroupStrategyOptionsBuilder, replacing the contents
-// of FSGroupStrategyOptionsBuilder.
-func (b *FSGroupStrategyOptionsBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to FSGroupStrategyOptionsApplyConfiguration, replacing the contents
+// of FSGroupStrategyOptionsApplyConfiguration.
+func (b *FSGroupStrategyOptionsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &fSGroupStrategyOptionsFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -113,15 +113,15 @@ func (b *FSGroupStrategyOptionsBuilder) FromUnstructured(u map[string]interface{
 	return nil
 }
 
-// MarshalJSON marshals FSGroupStrategyOptionsBuilder to JSON.
-func (b *FSGroupStrategyOptionsBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals FSGroupStrategyOptionsApplyConfiguration to JSON.
+func (b *FSGroupStrategyOptionsApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into FSGroupStrategyOptionsBuilder, replacing the contents of
-// FSGroupStrategyOptionsBuilder.
-func (b *FSGroupStrategyOptionsBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into FSGroupStrategyOptionsApplyConfiguration, replacing the contents of
+// FSGroupStrategyOptionsApplyConfiguration.
+func (b *FSGroupStrategyOptionsApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -129,13 +129,13 @@ func (b *FSGroupStrategyOptionsBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// FSGroupStrategyOptionsList represents a list of FSGroupStrategyOptionsBuilder.
-type FSGroupStrategyOptionsList []*FSGroupStrategyOptionsBuilder
+// FSGroupStrategyOptionsList represents a listAlias of FSGroupStrategyOptionsApplyConfiguration.
+type FSGroupStrategyOptionsList []*FSGroupStrategyOptionsApplyConfiguration
 
-// FSGroupStrategyOptionsList represents a map of FSGroupStrategyOptionsBuilder.
-type FSGroupStrategyOptionsMap map[string]FSGroupStrategyOptionsBuilder
+// FSGroupStrategyOptionsList represents a map of FSGroupStrategyOptionsApplyConfiguration.
+type FSGroupStrategyOptionsMap map[string]FSGroupStrategyOptionsApplyConfiguration
 
-func (b *FSGroupStrategyOptionsBuilder) preMarshal() {
+func (b *FSGroupStrategyOptionsApplyConfiguration) preMarshal() {
 }
-func (b *FSGroupStrategyOptionsBuilder) postUnmarshal() {
+func (b *FSGroupStrategyOptionsApplyConfiguration) postUnmarshal() {
 }

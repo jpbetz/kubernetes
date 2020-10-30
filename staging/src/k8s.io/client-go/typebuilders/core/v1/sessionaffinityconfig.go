@@ -24,46 +24,46 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// SessionAffinityConfigBuilder represents an declarative configuration of the SessionAffinityConfig type for use
+// SessionAffinityConfigApplyConfiguration represents an declarative configuration of the SessionAffinityConfig type for use
 // with apply.
-type SessionAffinityConfigBuilder struct {
+type SessionAffinityConfigApplyConfiguration struct {
 	fields sessionAffinityConfigFields
 }
 
+// SessionAffinityConfigApplyConfiguration constructs an declarative configuration of the SessionAffinityConfig type for use with
+// apply.
+func SessionAffinityConfig() *SessionAffinityConfigApplyConfiguration {
+	return &SessionAffinityConfigApplyConfiguration{}
+}
+
 // sessionAffinityConfigFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SessionAffinityConfigBuilder.
+// Inline fields are owned by their respective inline type in SessionAffinityConfigApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type sessionAffinityConfigFields struct {
-	ClientIP *ClientIPConfigBuilder `json:"clientIP,omitempty"`
-}
-
-// SessionAffinityConfig constructs an declarative configuration of the SessionAffinityConfig type for use with
-// apply.
-func SessionAffinityConfig() *SessionAffinityConfigBuilder {
-	return &SessionAffinityConfigBuilder{}
+	ClientIP *ClientIPConfigApplyConfiguration `json:"clientIP,omitempty"`
 }
 
 // SetClientIP sets the ClientIP field in the declarative configuration to the given value.
-func (b *SessionAffinityConfigBuilder) SetClientIP(value *ClientIPConfigBuilder) *SessionAffinityConfigBuilder {
+func (b *SessionAffinityConfigApplyConfiguration) SetClientIP(value *ClientIPConfigApplyConfiguration) *SessionAffinityConfigApplyConfiguration {
 	b.fields.ClientIP = value
 	return b
 }
 
 // RemoveClientIP removes the ClientIP field from the declarative configuration.
-func (b *SessionAffinityConfigBuilder) RemoveClientIP() *SessionAffinityConfigBuilder {
+func (b *SessionAffinityConfigApplyConfiguration) RemoveClientIP() *SessionAffinityConfigApplyConfiguration {
 	b.fields.ClientIP = nil
 	return b
 }
 
 // GetClientIP gets the ClientIP field from the declarative configuration.
-func (b *SessionAffinityConfigBuilder) GetClientIP() (value *ClientIPConfigBuilder, ok bool) {
+func (b *SessionAffinityConfigApplyConfiguration) GetClientIP() (value *ClientIPConfigApplyConfiguration, ok bool) {
 	return b.fields.ClientIP, b.fields.ClientIP != nil
 }
 
-// ToUnstructured converts SessionAffinityConfigBuilder to unstructured.
-func (b *SessionAffinityConfigBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts SessionAffinityConfigApplyConfiguration to unstructured.
+func (b *SessionAffinityConfigApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -75,9 +75,9 @@ func (b *SessionAffinityConfigBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to SessionAffinityConfigBuilder, replacing the contents
-// of SessionAffinityConfigBuilder.
-func (b *SessionAffinityConfigBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to SessionAffinityConfigApplyConfiguration, replacing the contents
+// of SessionAffinityConfigApplyConfiguration.
+func (b *SessionAffinityConfigApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &sessionAffinityConfigFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -88,15 +88,15 @@ func (b *SessionAffinityConfigBuilder) FromUnstructured(u map[string]interface{}
 	return nil
 }
 
-// MarshalJSON marshals SessionAffinityConfigBuilder to JSON.
-func (b *SessionAffinityConfigBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals SessionAffinityConfigApplyConfiguration to JSON.
+func (b *SessionAffinityConfigApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into SessionAffinityConfigBuilder, replacing the contents of
-// SessionAffinityConfigBuilder.
-func (b *SessionAffinityConfigBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into SessionAffinityConfigApplyConfiguration, replacing the contents of
+// SessionAffinityConfigApplyConfiguration.
+func (b *SessionAffinityConfigApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -104,13 +104,13 @@ func (b *SessionAffinityConfigBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// SessionAffinityConfigList represents a list of SessionAffinityConfigBuilder.
-type SessionAffinityConfigList []*SessionAffinityConfigBuilder
+// SessionAffinityConfigList represents a listAlias of SessionAffinityConfigApplyConfiguration.
+type SessionAffinityConfigList []*SessionAffinityConfigApplyConfiguration
 
-// SessionAffinityConfigList represents a map of SessionAffinityConfigBuilder.
-type SessionAffinityConfigMap map[string]SessionAffinityConfigBuilder
+// SessionAffinityConfigList represents a map of SessionAffinityConfigApplyConfiguration.
+type SessionAffinityConfigMap map[string]SessionAffinityConfigApplyConfiguration
 
-func (b *SessionAffinityConfigBuilder) preMarshal() {
+func (b *SessionAffinityConfigApplyConfiguration) preMarshal() {
 }
-func (b *SessionAffinityConfigBuilder) postUnmarshal() {
+func (b *SessionAffinityConfigApplyConfiguration) postUnmarshal() {
 }

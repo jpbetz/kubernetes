@@ -24,64 +24,64 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// PodsMetricSourceBuilder represents an declarative configuration of the PodsMetricSource type for use
+// PodsMetricSourceApplyConfiguration represents an declarative configuration of the PodsMetricSource type for use
 // with apply.
-type PodsMetricSourceBuilder struct {
+type PodsMetricSourceApplyConfiguration struct {
 	fields podsMetricSourceFields
 }
 
+// PodsMetricSourceApplyConfiguration constructs an declarative configuration of the PodsMetricSource type for use with
+// apply.
+func PodsMetricSource() *PodsMetricSourceApplyConfiguration {
+	return &PodsMetricSourceApplyConfiguration{}
+}
+
 // podsMetricSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodsMetricSourceBuilder.
+// Inline fields are owned by their respective inline type in PodsMetricSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type podsMetricSourceFields struct {
-	Metric *MetricIdentifierBuilder `json:"metric,omitempty"`
-	Target *MetricTargetBuilder     `json:"target,omitempty"`
-}
-
-// PodsMetricSource constructs an declarative configuration of the PodsMetricSource type for use with
-// apply.
-func PodsMetricSource() *PodsMetricSourceBuilder {
-	return &PodsMetricSourceBuilder{}
+	Metric *MetricIdentifierApplyConfiguration `json:"metric,omitempty"`
+	Target *MetricTargetApplyConfiguration     `json:"target,omitempty"`
 }
 
 // SetMetric sets the Metric field in the declarative configuration to the given value.
-func (b *PodsMetricSourceBuilder) SetMetric(value *MetricIdentifierBuilder) *PodsMetricSourceBuilder {
+func (b *PodsMetricSourceApplyConfiguration) SetMetric(value *MetricIdentifierApplyConfiguration) *PodsMetricSourceApplyConfiguration {
 	b.fields.Metric = value
 	return b
 }
 
 // RemoveMetric removes the Metric field from the declarative configuration.
-func (b *PodsMetricSourceBuilder) RemoveMetric() *PodsMetricSourceBuilder {
+func (b *PodsMetricSourceApplyConfiguration) RemoveMetric() *PodsMetricSourceApplyConfiguration {
 	b.fields.Metric = nil
 	return b
 }
 
 // GetMetric gets the Metric field from the declarative configuration.
-func (b *PodsMetricSourceBuilder) GetMetric() (value *MetricIdentifierBuilder, ok bool) {
+func (b *PodsMetricSourceApplyConfiguration) GetMetric() (value *MetricIdentifierApplyConfiguration, ok bool) {
 	return b.fields.Metric, b.fields.Metric != nil
 }
 
 // SetTarget sets the Target field in the declarative configuration to the given value.
-func (b *PodsMetricSourceBuilder) SetTarget(value *MetricTargetBuilder) *PodsMetricSourceBuilder {
+func (b *PodsMetricSourceApplyConfiguration) SetTarget(value *MetricTargetApplyConfiguration) *PodsMetricSourceApplyConfiguration {
 	b.fields.Target = value
 	return b
 }
 
 // RemoveTarget removes the Target field from the declarative configuration.
-func (b *PodsMetricSourceBuilder) RemoveTarget() *PodsMetricSourceBuilder {
+func (b *PodsMetricSourceApplyConfiguration) RemoveTarget() *PodsMetricSourceApplyConfiguration {
 	b.fields.Target = nil
 	return b
 }
 
 // GetTarget gets the Target field from the declarative configuration.
-func (b *PodsMetricSourceBuilder) GetTarget() (value *MetricTargetBuilder, ok bool) {
+func (b *PodsMetricSourceApplyConfiguration) GetTarget() (value *MetricTargetApplyConfiguration, ok bool) {
 	return b.fields.Target, b.fields.Target != nil
 }
 
-// ToUnstructured converts PodsMetricSourceBuilder to unstructured.
-func (b *PodsMetricSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PodsMetricSourceApplyConfiguration to unstructured.
+func (b *PodsMetricSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -93,9 +93,9 @@ func (b *PodsMetricSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to PodsMetricSourceBuilder, replacing the contents
-// of PodsMetricSourceBuilder.
-func (b *PodsMetricSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PodsMetricSourceApplyConfiguration, replacing the contents
+// of PodsMetricSourceApplyConfiguration.
+func (b *PodsMetricSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &podsMetricSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -106,15 +106,15 @@ func (b *PodsMetricSourceBuilder) FromUnstructured(u map[string]interface{}) err
 	return nil
 }
 
-// MarshalJSON marshals PodsMetricSourceBuilder to JSON.
-func (b *PodsMetricSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PodsMetricSourceApplyConfiguration to JSON.
+func (b *PodsMetricSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PodsMetricSourceBuilder, replacing the contents of
-// PodsMetricSourceBuilder.
-func (b *PodsMetricSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PodsMetricSourceApplyConfiguration, replacing the contents of
+// PodsMetricSourceApplyConfiguration.
+func (b *PodsMetricSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -122,13 +122,13 @@ func (b *PodsMetricSourceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// PodsMetricSourceList represents a list of PodsMetricSourceBuilder.
-type PodsMetricSourceList []*PodsMetricSourceBuilder
+// PodsMetricSourceList represents a listAlias of PodsMetricSourceApplyConfiguration.
+type PodsMetricSourceList []*PodsMetricSourceApplyConfiguration
 
-// PodsMetricSourceList represents a map of PodsMetricSourceBuilder.
-type PodsMetricSourceMap map[string]PodsMetricSourceBuilder
+// PodsMetricSourceList represents a map of PodsMetricSourceApplyConfiguration.
+type PodsMetricSourceMap map[string]PodsMetricSourceApplyConfiguration
 
-func (b *PodsMetricSourceBuilder) preMarshal() {
+func (b *PodsMetricSourceApplyConfiguration) preMarshal() {
 }
-func (b *PodsMetricSourceBuilder) postUnmarshal() {
+func (b *PodsMetricSourceApplyConfiguration) postUnmarshal() {
 }

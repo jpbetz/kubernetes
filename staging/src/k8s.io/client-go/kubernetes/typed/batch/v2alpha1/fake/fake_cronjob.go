@@ -144,7 +144,7 @@ func (c *FakeCronJobs) Patch(ctx context.Context, name string, pt types.PatchTyp
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied cronJob.
-func (c *FakeCronJobs) Apply(ctx context.Context, cronJob batchv2alpha1.CronJobBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v2alpha1.CronJob, err error) {
+func (c *FakeCronJobs) Apply(ctx context.Context, cronJob *batchv2alpha1.CronJobApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v2alpha1.CronJob, err error) {
 	data, err := cronJob.MarshalJSON()
 	if err != nil {
 		return nil, err

@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// PodAntiAffinityBuilder represents an declarative configuration of the PodAntiAffinity type for use
+// PodAntiAffinityApplyConfiguration represents an declarative configuration of the PodAntiAffinity type for use
 // with apply.
-type PodAntiAffinityBuilder struct {
+type PodAntiAffinityApplyConfiguration struct {
 	fields podAntiAffinityFields
 }
 
+// PodAntiAffinityApplyConfiguration constructs an declarative configuration of the PodAntiAffinity type for use with
+// apply.
+func PodAntiAffinity() *PodAntiAffinityApplyConfiguration {
+	return &PodAntiAffinityApplyConfiguration{}
+}
+
 // podAntiAffinityFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodAntiAffinityBuilder.
+// Inline fields are owned by their respective inline type in PodAntiAffinityApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type podAntiAffinityFields struct {
 	PreferredDuringSchedulingIgnoredDuringExecution *WeightedPodAffinityTermList `json:"preferredDuringSchedulingIgnoredDuringExecution,omitempty"`
 }
 
-// PodAntiAffinity constructs an declarative configuration of the PodAntiAffinity type for use with
-// apply.
-func PodAntiAffinity() *PodAntiAffinityBuilder {
-	return &PodAntiAffinityBuilder{}
-}
-
 // SetRequiredDuringSchedulingIgnoredDuringExecution sets the RequiredDuringSchedulingIgnoredDuringExecution field in the declarative configuration to the given value.
-func (b *PodAntiAffinityBuilder) SetRequiredDuringSchedulingIgnoredDuringExecution(value PodAffinityTermList) *PodAntiAffinityBuilder {
+func (b *PodAntiAffinityApplyConfiguration) SetRequiredDuringSchedulingIgnoredDuringExecution(value PodAffinityTermList) *PodAntiAffinityApplyConfiguration {
 	b.fields.RequiredDuringSchedulingIgnoredDuringExecution = &value
 	return b
 }
 
 // RemoveRequiredDuringSchedulingIgnoredDuringExecution removes the RequiredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
-func (b *PodAntiAffinityBuilder) RemoveRequiredDuringSchedulingIgnoredDuringExecution() *PodAntiAffinityBuilder {
+func (b *PodAntiAffinityApplyConfiguration) RemoveRequiredDuringSchedulingIgnoredDuringExecution() *PodAntiAffinityApplyConfiguration {
 	b.fields.RequiredDuringSchedulingIgnoredDuringExecution = nil
 	return b
 }
 
 // GetRequiredDuringSchedulingIgnoredDuringExecution gets the RequiredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
-func (b *PodAntiAffinityBuilder) GetRequiredDuringSchedulingIgnoredDuringExecution() (value PodAffinityTermList, ok bool) {
+func (b *PodAntiAffinityApplyConfiguration) GetRequiredDuringSchedulingIgnoredDuringExecution() (value PodAffinityTermList, ok bool) {
 	if v := b.fields.RequiredDuringSchedulingIgnoredDuringExecution; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *PodAntiAffinityBuilder) GetRequiredDuringSchedulingIgnoredDuringExecuti
 }
 
 // SetPreferredDuringSchedulingIgnoredDuringExecution sets the PreferredDuringSchedulingIgnoredDuringExecution field in the declarative configuration to the given value.
-func (b *PodAntiAffinityBuilder) SetPreferredDuringSchedulingIgnoredDuringExecution(value WeightedPodAffinityTermList) *PodAntiAffinityBuilder {
+func (b *PodAntiAffinityApplyConfiguration) SetPreferredDuringSchedulingIgnoredDuringExecution(value WeightedPodAffinityTermList) *PodAntiAffinityApplyConfiguration {
 	b.fields.PreferredDuringSchedulingIgnoredDuringExecution = &value
 	return b
 }
 
 // RemovePreferredDuringSchedulingIgnoredDuringExecution removes the PreferredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
-func (b *PodAntiAffinityBuilder) RemovePreferredDuringSchedulingIgnoredDuringExecution() *PodAntiAffinityBuilder {
+func (b *PodAntiAffinityApplyConfiguration) RemovePreferredDuringSchedulingIgnoredDuringExecution() *PodAntiAffinityApplyConfiguration {
 	b.fields.PreferredDuringSchedulingIgnoredDuringExecution = nil
 	return b
 }
 
 // GetPreferredDuringSchedulingIgnoredDuringExecution gets the PreferredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
-func (b *PodAntiAffinityBuilder) GetPreferredDuringSchedulingIgnoredDuringExecution() (value WeightedPodAffinityTermList, ok bool) {
+func (b *PodAntiAffinityApplyConfiguration) GetPreferredDuringSchedulingIgnoredDuringExecution() (value WeightedPodAffinityTermList, ok bool) {
 	if v := b.fields.PreferredDuringSchedulingIgnoredDuringExecution; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts PodAntiAffinityBuilder to unstructured.
-func (b *PodAntiAffinityBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PodAntiAffinityApplyConfiguration to unstructured.
+func (b *PodAntiAffinityApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *PodAntiAffinityBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to PodAntiAffinityBuilder, replacing the contents
-// of PodAntiAffinityBuilder.
-func (b *PodAntiAffinityBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PodAntiAffinityApplyConfiguration, replacing the contents
+// of PodAntiAffinityApplyConfiguration.
+func (b *PodAntiAffinityApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &podAntiAffinityFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *PodAntiAffinityBuilder) FromUnstructured(u map[string]interface{}) erro
 	return nil
 }
 
-// MarshalJSON marshals PodAntiAffinityBuilder to JSON.
-func (b *PodAntiAffinityBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PodAntiAffinityApplyConfiguration to JSON.
+func (b *PodAntiAffinityApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PodAntiAffinityBuilder, replacing the contents of
-// PodAntiAffinityBuilder.
-func (b *PodAntiAffinityBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PodAntiAffinityApplyConfiguration, replacing the contents of
+// PodAntiAffinityApplyConfiguration.
+func (b *PodAntiAffinityApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *PodAntiAffinityBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// PodAntiAffinityList represents a list of PodAntiAffinityBuilder.
-type PodAntiAffinityList []*PodAntiAffinityBuilder
+// PodAntiAffinityList represents a listAlias of PodAntiAffinityApplyConfiguration.
+type PodAntiAffinityList []*PodAntiAffinityApplyConfiguration
 
-// PodAntiAffinityList represents a map of PodAntiAffinityBuilder.
-type PodAntiAffinityMap map[string]PodAntiAffinityBuilder
+// PodAntiAffinityList represents a map of PodAntiAffinityApplyConfiguration.
+type PodAntiAffinityMap map[string]PodAntiAffinityApplyConfiguration
 
-func (b *PodAntiAffinityBuilder) preMarshal() {
+func (b *PodAntiAffinityApplyConfiguration) preMarshal() {
 }
-func (b *PodAntiAffinityBuilder) postUnmarshal() {
+func (b *PodAntiAffinityApplyConfiguration) postUnmarshal() {
 }

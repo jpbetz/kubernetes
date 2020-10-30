@@ -48,7 +48,7 @@ type ClusterRoleInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.ClusterRoleList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.ClusterRole, err error)
-	Apply(ctx context.Context, clusterRole rbacv1alpha1.ClusterRoleBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.ClusterRole, err error)
+	Apply(ctx context.Context, clusterRole *rbacv1alpha1.ClusterRoleApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.ClusterRole, err error)
 	ClusterRoleExpansion
 }
 
@@ -171,7 +171,7 @@ func (c *clusterRoles) Patch(ctx context.Context, name string, pt types.PatchTyp
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied clusterRole.
-func (c *clusterRoles) Apply(ctx context.Context, clusterRole rbacv1alpha1.ClusterRoleBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.ClusterRole, err error) {
+func (c *clusterRoles) Apply(ctx context.Context, clusterRole *rbacv1alpha1.ClusterRoleApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.ClusterRole, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := clusterRole.MarshalJSON()
 	if err != nil {

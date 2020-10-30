@@ -25,84 +25,84 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// NetworkPolicyBuilder represents an declarative configuration of the NetworkPolicy type for use
+// NetworkPolicyApplyConfiguration represents an declarative configuration of the NetworkPolicy type for use
 // with apply.
-type NetworkPolicyBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type NetworkPolicyApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   networkPolicyFields
 }
 
+// NetworkPolicyApplyConfiguration constructs an declarative configuration of the NetworkPolicy type for use with
+// apply.
+func NetworkPolicy() *NetworkPolicyApplyConfiguration {
+	return &NetworkPolicyApplyConfiguration{}
+}
+
 // networkPolicyFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NetworkPolicyBuilder.
+// Inline fields are owned by their respective inline type in NetworkPolicyApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type networkPolicyFields struct {
-	Kind       *string                   `json:"kind,omitempty"`       // inlined NetworkPolicyBuilder.typeMeta.Kind field
-	APIVersion *string                   `json:"apiVersion,omitempty"` // inlined NetworkPolicyBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder     `json:"metadata,omitempty"`
-	Spec       *NetworkPolicySpecBuilder `json:"spec,omitempty"`
-}
-
-// NetworkPolicy constructs an declarative configuration of the NetworkPolicy type for use with
-// apply.
-func NetworkPolicy() *NetworkPolicyBuilder {
-	return &NetworkPolicyBuilder{}
+	Kind       *string                              `json:"kind,omitempty"`       // inlined NetworkPolicyApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                              `json:"apiVersion,omitempty"` // inlined NetworkPolicyApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration     `json:"metadata,omitempty"`
+	Spec       *NetworkPolicySpecApplyConfiguration `json:"spec,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *NetworkPolicyBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *NetworkPolicyBuilder {
+func (b *NetworkPolicyApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *NetworkPolicyApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *NetworkPolicyBuilder) RemoveTypeMeta() *NetworkPolicyBuilder {
+func (b *NetworkPolicyApplyConfiguration) RemoveTypeMeta() *NetworkPolicyApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *NetworkPolicyBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *NetworkPolicyApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *NetworkPolicyBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *NetworkPolicyBuilder {
+func (b *NetworkPolicyApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *NetworkPolicyApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *NetworkPolicyBuilder) RemoveObjectMeta() *NetworkPolicyBuilder {
+func (b *NetworkPolicyApplyConfiguration) RemoveObjectMeta() *NetworkPolicyApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *NetworkPolicyBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *NetworkPolicyApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *NetworkPolicyBuilder) SetSpec(value *NetworkPolicySpecBuilder) *NetworkPolicyBuilder {
+func (b *NetworkPolicyApplyConfiguration) SetSpec(value *NetworkPolicySpecApplyConfiguration) *NetworkPolicyApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *NetworkPolicyBuilder) RemoveSpec() *NetworkPolicyBuilder {
+func (b *NetworkPolicyApplyConfiguration) RemoveSpec() *NetworkPolicyApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *NetworkPolicyBuilder) GetSpec() (value *NetworkPolicySpecBuilder, ok bool) {
+func (b *NetworkPolicyApplyConfiguration) GetSpec() (value *NetworkPolicySpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
-// ToUnstructured converts NetworkPolicyBuilder to unstructured.
-func (b *NetworkPolicyBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NetworkPolicyApplyConfiguration to unstructured.
+func (b *NetworkPolicyApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -114,9 +114,9 @@ func (b *NetworkPolicyBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NetworkPolicyBuilder, replacing the contents
-// of NetworkPolicyBuilder.
-func (b *NetworkPolicyBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NetworkPolicyApplyConfiguration, replacing the contents
+// of NetworkPolicyApplyConfiguration.
+func (b *NetworkPolicyApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &networkPolicyFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -127,15 +127,15 @@ func (b *NetworkPolicyBuilder) FromUnstructured(u map[string]interface{}) error 
 	return nil
 }
 
-// MarshalJSON marshals NetworkPolicyBuilder to JSON.
-func (b *NetworkPolicyBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NetworkPolicyApplyConfiguration to JSON.
+func (b *NetworkPolicyApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NetworkPolicyBuilder, replacing the contents of
-// NetworkPolicyBuilder.
-func (b *NetworkPolicyBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NetworkPolicyApplyConfiguration, replacing the contents of
+// NetworkPolicyApplyConfiguration.
+func (b *NetworkPolicyApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -143,13 +143,13 @@ func (b *NetworkPolicyBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NetworkPolicyList represents a list of NetworkPolicyBuilder.
-type NetworkPolicyList []*NetworkPolicyBuilder
+// NetworkPolicyList represents a listAlias of NetworkPolicyApplyConfiguration.
+type NetworkPolicyList []*NetworkPolicyApplyConfiguration
 
-// NetworkPolicyList represents a map of NetworkPolicyBuilder.
-type NetworkPolicyMap map[string]NetworkPolicyBuilder
+// NetworkPolicyList represents a map of NetworkPolicyApplyConfiguration.
+type NetworkPolicyMap map[string]NetworkPolicyApplyConfiguration
 
-func (b *NetworkPolicyBuilder) preMarshal() {
+func (b *NetworkPolicyApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -159,9 +159,9 @@ func (b *NetworkPolicyBuilder) preMarshal() {
 		}
 	}
 }
-func (b *NetworkPolicyBuilder) postUnmarshal() {
+func (b *NetworkPolicyApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

@@ -26,43 +26,43 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// PodDisruptionBudgetSpecBuilder represents an declarative configuration of the PodDisruptionBudgetSpec type for use
+// PodDisruptionBudgetSpecApplyConfiguration represents an declarative configuration of the PodDisruptionBudgetSpec type for use
 // with apply.
-type PodDisruptionBudgetSpecBuilder struct {
+type PodDisruptionBudgetSpecApplyConfiguration struct {
 	fields podDisruptionBudgetSpecFields
 }
 
+// PodDisruptionBudgetSpecApplyConfiguration constructs an declarative configuration of the PodDisruptionBudgetSpec type for use with
+// apply.
+func PodDisruptionBudgetSpec() *PodDisruptionBudgetSpecApplyConfiguration {
+	return &PodDisruptionBudgetSpecApplyConfiguration{}
+}
+
 // podDisruptionBudgetSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodDisruptionBudgetSpecBuilder.
+// Inline fields are owned by their respective inline type in PodDisruptionBudgetSpecApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type podDisruptionBudgetSpecFields struct {
-	MinAvailable   *intstr.IntOrString      `json:"minAvailable,omitempty"`
-	Selector       *v1.LabelSelectorBuilder `json:"selector,omitempty"`
-	MaxUnavailable *intstr.IntOrString      `json:"maxUnavailable,omitempty"`
-}
-
-// PodDisruptionBudgetSpec constructs an declarative configuration of the PodDisruptionBudgetSpec type for use with
-// apply.
-func PodDisruptionBudgetSpec() *PodDisruptionBudgetSpecBuilder {
-	return &PodDisruptionBudgetSpecBuilder{}
+	MinAvailable   *intstr.IntOrString                 `json:"minAvailable,omitempty"`
+	Selector       *v1.LabelSelectorApplyConfiguration `json:"selector,omitempty"`
+	MaxUnavailable *intstr.IntOrString                 `json:"maxUnavailable,omitempty"`
 }
 
 // SetMinAvailable sets the MinAvailable field in the declarative configuration to the given value.
-func (b *PodDisruptionBudgetSpecBuilder) SetMinAvailable(value intstr.IntOrString) *PodDisruptionBudgetSpecBuilder {
+func (b *PodDisruptionBudgetSpecApplyConfiguration) SetMinAvailable(value intstr.IntOrString) *PodDisruptionBudgetSpecApplyConfiguration {
 	b.fields.MinAvailable = &value
 	return b
 }
 
 // RemoveMinAvailable removes the MinAvailable field from the declarative configuration.
-func (b *PodDisruptionBudgetSpecBuilder) RemoveMinAvailable() *PodDisruptionBudgetSpecBuilder {
+func (b *PodDisruptionBudgetSpecApplyConfiguration) RemoveMinAvailable() *PodDisruptionBudgetSpecApplyConfiguration {
 	b.fields.MinAvailable = nil
 	return b
 }
 
 // GetMinAvailable gets the MinAvailable field from the declarative configuration.
-func (b *PodDisruptionBudgetSpecBuilder) GetMinAvailable() (value intstr.IntOrString, ok bool) {
+func (b *PodDisruptionBudgetSpecApplyConfiguration) GetMinAvailable() (value intstr.IntOrString, ok bool) {
 	if v := b.fields.MinAvailable; v != nil {
 		return *v, true
 	}
@@ -70,44 +70,44 @@ func (b *PodDisruptionBudgetSpecBuilder) GetMinAvailable() (value intstr.IntOrSt
 }
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
-func (b *PodDisruptionBudgetSpecBuilder) SetSelector(value *v1.LabelSelectorBuilder) *PodDisruptionBudgetSpecBuilder {
+func (b *PodDisruptionBudgetSpecApplyConfiguration) SetSelector(value *v1.LabelSelectorApplyConfiguration) *PodDisruptionBudgetSpecApplyConfiguration {
 	b.fields.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
-func (b *PodDisruptionBudgetSpecBuilder) RemoveSelector() *PodDisruptionBudgetSpecBuilder {
+func (b *PodDisruptionBudgetSpecApplyConfiguration) RemoveSelector() *PodDisruptionBudgetSpecApplyConfiguration {
 	b.fields.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
-func (b *PodDisruptionBudgetSpecBuilder) GetSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+func (b *PodDisruptionBudgetSpecApplyConfiguration) GetSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
 	return b.fields.Selector, b.fields.Selector != nil
 }
 
 // SetMaxUnavailable sets the MaxUnavailable field in the declarative configuration to the given value.
-func (b *PodDisruptionBudgetSpecBuilder) SetMaxUnavailable(value intstr.IntOrString) *PodDisruptionBudgetSpecBuilder {
+func (b *PodDisruptionBudgetSpecApplyConfiguration) SetMaxUnavailable(value intstr.IntOrString) *PodDisruptionBudgetSpecApplyConfiguration {
 	b.fields.MaxUnavailable = &value
 	return b
 }
 
 // RemoveMaxUnavailable removes the MaxUnavailable field from the declarative configuration.
-func (b *PodDisruptionBudgetSpecBuilder) RemoveMaxUnavailable() *PodDisruptionBudgetSpecBuilder {
+func (b *PodDisruptionBudgetSpecApplyConfiguration) RemoveMaxUnavailable() *PodDisruptionBudgetSpecApplyConfiguration {
 	b.fields.MaxUnavailable = nil
 	return b
 }
 
 // GetMaxUnavailable gets the MaxUnavailable field from the declarative configuration.
-func (b *PodDisruptionBudgetSpecBuilder) GetMaxUnavailable() (value intstr.IntOrString, ok bool) {
+func (b *PodDisruptionBudgetSpecApplyConfiguration) GetMaxUnavailable() (value intstr.IntOrString, ok bool) {
 	if v := b.fields.MaxUnavailable; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts PodDisruptionBudgetSpecBuilder to unstructured.
-func (b *PodDisruptionBudgetSpecBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PodDisruptionBudgetSpecApplyConfiguration to unstructured.
+func (b *PodDisruptionBudgetSpecApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -119,9 +119,9 @@ func (b *PodDisruptionBudgetSpecBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to PodDisruptionBudgetSpecBuilder, replacing the contents
-// of PodDisruptionBudgetSpecBuilder.
-func (b *PodDisruptionBudgetSpecBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PodDisruptionBudgetSpecApplyConfiguration, replacing the contents
+// of PodDisruptionBudgetSpecApplyConfiguration.
+func (b *PodDisruptionBudgetSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &podDisruptionBudgetSpecFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -132,15 +132,15 @@ func (b *PodDisruptionBudgetSpecBuilder) FromUnstructured(u map[string]interface
 	return nil
 }
 
-// MarshalJSON marshals PodDisruptionBudgetSpecBuilder to JSON.
-func (b *PodDisruptionBudgetSpecBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PodDisruptionBudgetSpecApplyConfiguration to JSON.
+func (b *PodDisruptionBudgetSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PodDisruptionBudgetSpecBuilder, replacing the contents of
-// PodDisruptionBudgetSpecBuilder.
-func (b *PodDisruptionBudgetSpecBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PodDisruptionBudgetSpecApplyConfiguration, replacing the contents of
+// PodDisruptionBudgetSpecApplyConfiguration.
+func (b *PodDisruptionBudgetSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -148,13 +148,13 @@ func (b *PodDisruptionBudgetSpecBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// PodDisruptionBudgetSpecList represents a list of PodDisruptionBudgetSpecBuilder.
-type PodDisruptionBudgetSpecList []*PodDisruptionBudgetSpecBuilder
+// PodDisruptionBudgetSpecList represents a listAlias of PodDisruptionBudgetSpecApplyConfiguration.
+type PodDisruptionBudgetSpecList []*PodDisruptionBudgetSpecApplyConfiguration
 
-// PodDisruptionBudgetSpecList represents a map of PodDisruptionBudgetSpecBuilder.
-type PodDisruptionBudgetSpecMap map[string]PodDisruptionBudgetSpecBuilder
+// PodDisruptionBudgetSpecList represents a map of PodDisruptionBudgetSpecApplyConfiguration.
+type PodDisruptionBudgetSpecMap map[string]PodDisruptionBudgetSpecApplyConfiguration
 
-func (b *PodDisruptionBudgetSpecBuilder) preMarshal() {
+func (b *PodDisruptionBudgetSpecApplyConfiguration) preMarshal() {
 }
-func (b *PodDisruptionBudgetSpecBuilder) postUnmarshal() {
+func (b *PodDisruptionBudgetSpecApplyConfiguration) postUnmarshal() {
 }

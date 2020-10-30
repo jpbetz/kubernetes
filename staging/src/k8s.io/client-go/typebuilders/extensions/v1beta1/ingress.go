@@ -25,102 +25,102 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// IngressBuilder represents an declarative configuration of the Ingress type for use
+// IngressApplyConfiguration represents an declarative configuration of the Ingress type for use
 // with apply.
-type IngressBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type IngressApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   ingressFields
 }
 
+// IngressApplyConfiguration constructs an declarative configuration of the Ingress type for use with
+// apply.
+func Ingress() *IngressApplyConfiguration {
+	return &IngressApplyConfiguration{}
+}
+
 // ingressFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in IngressBuilder.
+// Inline fields are owned by their respective inline type in IngressApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type ingressFields struct {
-	Kind       *string               `json:"kind,omitempty"`       // inlined IngressBuilder.typeMeta.Kind field
-	APIVersion *string               `json:"apiVersion,omitempty"` // inlined IngressBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder `json:"metadata,omitempty"`
-	Spec       *IngressSpecBuilder   `json:"spec,omitempty"`
-	Status     *IngressStatusBuilder `json:"status,omitempty"`
-}
-
-// Ingress constructs an declarative configuration of the Ingress type for use with
-// apply.
-func Ingress() *IngressBuilder {
-	return &IngressBuilder{}
+	Kind       *string                          `json:"kind,omitempty"`       // inlined IngressApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                          `json:"apiVersion,omitempty"` // inlined IngressApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Spec       *IngressSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status     *IngressStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *IngressBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *IngressBuilder {
+func (b *IngressApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *IngressApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *IngressBuilder) RemoveTypeMeta() *IngressBuilder {
+func (b *IngressApplyConfiguration) RemoveTypeMeta() *IngressApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *IngressBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *IngressApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *IngressBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *IngressBuilder {
+func (b *IngressApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *IngressApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *IngressBuilder) RemoveObjectMeta() *IngressBuilder {
+func (b *IngressApplyConfiguration) RemoveObjectMeta() *IngressApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *IngressBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *IngressApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *IngressBuilder) SetSpec(value *IngressSpecBuilder) *IngressBuilder {
+func (b *IngressApplyConfiguration) SetSpec(value *IngressSpecApplyConfiguration) *IngressApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *IngressBuilder) RemoveSpec() *IngressBuilder {
+func (b *IngressApplyConfiguration) RemoveSpec() *IngressApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *IngressBuilder) GetSpec() (value *IngressSpecBuilder, ok bool) {
+func (b *IngressApplyConfiguration) GetSpec() (value *IngressSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *IngressBuilder) SetStatus(value *IngressStatusBuilder) *IngressBuilder {
+func (b *IngressApplyConfiguration) SetStatus(value *IngressStatusApplyConfiguration) *IngressApplyConfiguration {
 	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *IngressBuilder) RemoveStatus() *IngressBuilder {
+func (b *IngressApplyConfiguration) RemoveStatus() *IngressApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *IngressBuilder) GetStatus() (value *IngressStatusBuilder, ok bool) {
+func (b *IngressApplyConfiguration) GetStatus() (value *IngressStatusApplyConfiguration, ok bool) {
 	return b.fields.Status, b.fields.Status != nil
 }
 
-// ToUnstructured converts IngressBuilder to unstructured.
-func (b *IngressBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts IngressApplyConfiguration to unstructured.
+func (b *IngressApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -132,9 +132,9 @@ func (b *IngressBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to IngressBuilder, replacing the contents
-// of IngressBuilder.
-func (b *IngressBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to IngressApplyConfiguration, replacing the contents
+// of IngressApplyConfiguration.
+func (b *IngressApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &ingressFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -145,15 +145,15 @@ func (b *IngressBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals IngressBuilder to JSON.
-func (b *IngressBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals IngressApplyConfiguration to JSON.
+func (b *IngressApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into IngressBuilder, replacing the contents of
-// IngressBuilder.
-func (b *IngressBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into IngressApplyConfiguration, replacing the contents of
+// IngressApplyConfiguration.
+func (b *IngressApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -161,13 +161,13 @@ func (b *IngressBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// IngressList represents a list of IngressBuilder.
-type IngressList []*IngressBuilder
+// IngressList represents a listAlias of IngressApplyConfiguration.
+type IngressList []*IngressApplyConfiguration
 
-// IngressList represents a map of IngressBuilder.
-type IngressMap map[string]IngressBuilder
+// IngressList represents a map of IngressApplyConfiguration.
+type IngressMap map[string]IngressApplyConfiguration
 
-func (b *IngressBuilder) preMarshal() {
+func (b *IngressApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -177,9 +177,9 @@ func (b *IngressBuilder) preMarshal() {
 		}
 	}
 }
-func (b *IngressBuilder) postUnmarshal() {
+func (b *IngressApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

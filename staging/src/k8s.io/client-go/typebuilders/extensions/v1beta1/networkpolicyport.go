@@ -26,14 +26,20 @@ import (
 	intstr "k8s.io/apimachinery/pkg/util/intstr"
 )
 
-// NetworkPolicyPortBuilder represents an declarative configuration of the NetworkPolicyPort type for use
+// NetworkPolicyPortApplyConfiguration represents an declarative configuration of the NetworkPolicyPort type for use
 // with apply.
-type NetworkPolicyPortBuilder struct {
+type NetworkPolicyPortApplyConfiguration struct {
 	fields networkPolicyPortFields
 }
 
+// NetworkPolicyPortApplyConfiguration constructs an declarative configuration of the NetworkPolicyPort type for use with
+// apply.
+func NetworkPolicyPort() *NetworkPolicyPortApplyConfiguration {
+	return &NetworkPolicyPortApplyConfiguration{}
+}
+
 // networkPolicyPortFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NetworkPolicyPortBuilder.
+// Inline fields are owned by their respective inline type in NetworkPolicyPortApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -42,26 +48,20 @@ type networkPolicyPortFields struct {
 	Port     *intstr.IntOrString `json:"port,omitempty"`
 }
 
-// NetworkPolicyPort constructs an declarative configuration of the NetworkPolicyPort type for use with
-// apply.
-func NetworkPolicyPort() *NetworkPolicyPortBuilder {
-	return &NetworkPolicyPortBuilder{}
-}
-
 // SetProtocol sets the Protocol field in the declarative configuration to the given value.
-func (b *NetworkPolicyPortBuilder) SetProtocol(value v1.Protocol) *NetworkPolicyPortBuilder {
+func (b *NetworkPolicyPortApplyConfiguration) SetProtocol(value v1.Protocol) *NetworkPolicyPortApplyConfiguration {
 	b.fields.Protocol = &value
 	return b
 }
 
 // RemoveProtocol removes the Protocol field from the declarative configuration.
-func (b *NetworkPolicyPortBuilder) RemoveProtocol() *NetworkPolicyPortBuilder {
+func (b *NetworkPolicyPortApplyConfiguration) RemoveProtocol() *NetworkPolicyPortApplyConfiguration {
 	b.fields.Protocol = nil
 	return b
 }
 
 // GetProtocol gets the Protocol field from the declarative configuration.
-func (b *NetworkPolicyPortBuilder) GetProtocol() (value v1.Protocol, ok bool) {
+func (b *NetworkPolicyPortApplyConfiguration) GetProtocol() (value v1.Protocol, ok bool) {
 	if v := b.fields.Protocol; v != nil {
 		return *v, true
 	}
@@ -69,27 +69,27 @@ func (b *NetworkPolicyPortBuilder) GetProtocol() (value v1.Protocol, ok bool) {
 }
 
 // SetPort sets the Port field in the declarative configuration to the given value.
-func (b *NetworkPolicyPortBuilder) SetPort(value intstr.IntOrString) *NetworkPolicyPortBuilder {
+func (b *NetworkPolicyPortApplyConfiguration) SetPort(value intstr.IntOrString) *NetworkPolicyPortApplyConfiguration {
 	b.fields.Port = &value
 	return b
 }
 
 // RemovePort removes the Port field from the declarative configuration.
-func (b *NetworkPolicyPortBuilder) RemovePort() *NetworkPolicyPortBuilder {
+func (b *NetworkPolicyPortApplyConfiguration) RemovePort() *NetworkPolicyPortApplyConfiguration {
 	b.fields.Port = nil
 	return b
 }
 
 // GetPort gets the Port field from the declarative configuration.
-func (b *NetworkPolicyPortBuilder) GetPort() (value intstr.IntOrString, ok bool) {
+func (b *NetworkPolicyPortApplyConfiguration) GetPort() (value intstr.IntOrString, ok bool) {
 	if v := b.fields.Port; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts NetworkPolicyPortBuilder to unstructured.
-func (b *NetworkPolicyPortBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NetworkPolicyPortApplyConfiguration to unstructured.
+func (b *NetworkPolicyPortApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -101,9 +101,9 @@ func (b *NetworkPolicyPortBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NetworkPolicyPortBuilder, replacing the contents
-// of NetworkPolicyPortBuilder.
-func (b *NetworkPolicyPortBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NetworkPolicyPortApplyConfiguration, replacing the contents
+// of NetworkPolicyPortApplyConfiguration.
+func (b *NetworkPolicyPortApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &networkPolicyPortFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -114,15 +114,15 @@ func (b *NetworkPolicyPortBuilder) FromUnstructured(u map[string]interface{}) er
 	return nil
 }
 
-// MarshalJSON marshals NetworkPolicyPortBuilder to JSON.
-func (b *NetworkPolicyPortBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NetworkPolicyPortApplyConfiguration to JSON.
+func (b *NetworkPolicyPortApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NetworkPolicyPortBuilder, replacing the contents of
-// NetworkPolicyPortBuilder.
-func (b *NetworkPolicyPortBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NetworkPolicyPortApplyConfiguration, replacing the contents of
+// NetworkPolicyPortApplyConfiguration.
+func (b *NetworkPolicyPortApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -130,13 +130,13 @@ func (b *NetworkPolicyPortBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NetworkPolicyPortList represents a list of NetworkPolicyPortBuilder.
-type NetworkPolicyPortList []*NetworkPolicyPortBuilder
+// NetworkPolicyPortList represents a listAlias of NetworkPolicyPortApplyConfiguration.
+type NetworkPolicyPortList []*NetworkPolicyPortApplyConfiguration
 
-// NetworkPolicyPortList represents a map of NetworkPolicyPortBuilder.
-type NetworkPolicyPortMap map[string]NetworkPolicyPortBuilder
+// NetworkPolicyPortList represents a map of NetworkPolicyPortApplyConfiguration.
+type NetworkPolicyPortMap map[string]NetworkPolicyPortApplyConfiguration
 
-func (b *NetworkPolicyPortBuilder) preMarshal() {
+func (b *NetworkPolicyPortApplyConfiguration) preMarshal() {
 }
-func (b *NetworkPolicyPortBuilder) postUnmarshal() {
+func (b *NetworkPolicyPortApplyConfiguration) postUnmarshal() {
 }

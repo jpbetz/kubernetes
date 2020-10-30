@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// IDRangeBuilder represents an declarative configuration of the IDRange type for use
+// IDRangeApplyConfiguration represents an declarative configuration of the IDRange type for use
 // with apply.
-type IDRangeBuilder struct {
+type IDRangeApplyConfiguration struct {
 	fields iDRangeFields
 }
 
+// IDRangeApplyConfiguration constructs an declarative configuration of the IDRange type for use with
+// apply.
+func IDRange() *IDRangeApplyConfiguration {
+	return &IDRangeApplyConfiguration{}
+}
+
 // iDRangeFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in IDRangeBuilder.
+// Inline fields are owned by their respective inline type in IDRangeApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type iDRangeFields struct {
 	Max *int64 `json:"max,omitempty"`
 }
 
-// IDRange constructs an declarative configuration of the IDRange type for use with
-// apply.
-func IDRange() *IDRangeBuilder {
-	return &IDRangeBuilder{}
-}
-
 // SetMin sets the Min field in the declarative configuration to the given value.
-func (b *IDRangeBuilder) SetMin(value int64) *IDRangeBuilder {
+func (b *IDRangeApplyConfiguration) SetMin(value int64) *IDRangeApplyConfiguration {
 	b.fields.Min = &value
 	return b
 }
 
 // RemoveMin removes the Min field from the declarative configuration.
-func (b *IDRangeBuilder) RemoveMin() *IDRangeBuilder {
+func (b *IDRangeApplyConfiguration) RemoveMin() *IDRangeApplyConfiguration {
 	b.fields.Min = nil
 	return b
 }
 
 // GetMin gets the Min field from the declarative configuration.
-func (b *IDRangeBuilder) GetMin() (value int64, ok bool) {
+func (b *IDRangeApplyConfiguration) GetMin() (value int64, ok bool) {
 	if v := b.fields.Min; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *IDRangeBuilder) GetMin() (value int64, ok bool) {
 }
 
 // SetMax sets the Max field in the declarative configuration to the given value.
-func (b *IDRangeBuilder) SetMax(value int64) *IDRangeBuilder {
+func (b *IDRangeApplyConfiguration) SetMax(value int64) *IDRangeApplyConfiguration {
 	b.fields.Max = &value
 	return b
 }
 
 // RemoveMax removes the Max field from the declarative configuration.
-func (b *IDRangeBuilder) RemoveMax() *IDRangeBuilder {
+func (b *IDRangeApplyConfiguration) RemoveMax() *IDRangeApplyConfiguration {
 	b.fields.Max = nil
 	return b
 }
 
 // GetMax gets the Max field from the declarative configuration.
-func (b *IDRangeBuilder) GetMax() (value int64, ok bool) {
+func (b *IDRangeApplyConfiguration) GetMax() (value int64, ok bool) {
 	if v := b.fields.Max; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts IDRangeBuilder to unstructured.
-func (b *IDRangeBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts IDRangeApplyConfiguration to unstructured.
+func (b *IDRangeApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *IDRangeBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to IDRangeBuilder, replacing the contents
-// of IDRangeBuilder.
-func (b *IDRangeBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to IDRangeApplyConfiguration, replacing the contents
+// of IDRangeApplyConfiguration.
+func (b *IDRangeApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &iDRangeFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *IDRangeBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals IDRangeBuilder to JSON.
-func (b *IDRangeBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals IDRangeApplyConfiguration to JSON.
+func (b *IDRangeApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into IDRangeBuilder, replacing the contents of
-// IDRangeBuilder.
-func (b *IDRangeBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into IDRangeApplyConfiguration, replacing the contents of
+// IDRangeApplyConfiguration.
+func (b *IDRangeApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *IDRangeBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// IDRangeList represents a list of IDRangeBuilder.
-type IDRangeList []*IDRangeBuilder
+// IDRangeList represents a listAlias of IDRangeApplyConfiguration.
+type IDRangeList []*IDRangeApplyConfiguration
 
-// IDRangeList represents a map of IDRangeBuilder.
-type IDRangeMap map[string]IDRangeBuilder
+// IDRangeList represents a map of IDRangeApplyConfiguration.
+type IDRangeMap map[string]IDRangeApplyConfiguration
 
-func (b *IDRangeBuilder) preMarshal() {
+func (b *IDRangeApplyConfiguration) preMarshal() {
 }
-func (b *IDRangeBuilder) postUnmarshal() {
+func (b *IDRangeApplyConfiguration) postUnmarshal() {
 }

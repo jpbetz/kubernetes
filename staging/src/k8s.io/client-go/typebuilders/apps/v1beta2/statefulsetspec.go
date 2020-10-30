@@ -27,48 +27,48 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// StatefulSetSpecBuilder represents an declarative configuration of the StatefulSetSpec type for use
+// StatefulSetSpecApplyConfiguration represents an declarative configuration of the StatefulSetSpec type for use
 // with apply.
-type StatefulSetSpecBuilder struct {
+type StatefulSetSpecApplyConfiguration struct {
 	fields statefulSetSpecFields
 }
 
+// StatefulSetSpecApplyConfiguration constructs an declarative configuration of the StatefulSetSpec type for use with
+// apply.
+func StatefulSetSpec() *StatefulSetSpecApplyConfiguration {
+	return &StatefulSetSpecApplyConfiguration{}
+}
+
 // statefulSetSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in StatefulSetSpecBuilder.
+// Inline fields are owned by their respective inline type in StatefulSetSpecApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type statefulSetSpecFields struct {
-	Replicas             *int32                            `json:"replicas,omitempty"`
-	Selector             *v1.LabelSelectorBuilder          `json:"selector,omitempty"`
-	Template             *corev1.PodTemplateSpecBuilder    `json:"template,omitempty"`
-	VolumeClaimTemplates *corev1.PersistentVolumeClaimList `json:"volumeClaimTemplates,omitempty"`
-	ServiceName          *string                           `json:"serviceName,omitempty"`
-	PodManagementPolicy  *v1beta2.PodManagementPolicyType  `json:"podManagementPolicy,omitempty"`
-	UpdateStrategy       *StatefulSetUpdateStrategyBuilder `json:"updateStrategy,omitempty"`
-	RevisionHistoryLimit *int32                            `json:"revisionHistoryLimit,omitempty"`
-}
-
-// StatefulSetSpec constructs an declarative configuration of the StatefulSetSpec type for use with
-// apply.
-func StatefulSetSpec() *StatefulSetSpecBuilder {
-	return &StatefulSetSpecBuilder{}
+	Replicas             *int32                                       `json:"replicas,omitempty"`
+	Selector             *v1.LabelSelectorApplyConfiguration          `json:"selector,omitempty"`
+	Template             *corev1.PodTemplateSpecApplyConfiguration    `json:"template,omitempty"`
+	VolumeClaimTemplates *corev1.PersistentVolumeClaimList            `json:"volumeClaimTemplates,omitempty"`
+	ServiceName          *string                                      `json:"serviceName,omitempty"`
+	PodManagementPolicy  *v1beta2.PodManagementPolicyType             `json:"podManagementPolicy,omitempty"`
+	UpdateStrategy       *StatefulSetUpdateStrategyApplyConfiguration `json:"updateStrategy,omitempty"`
+	RevisionHistoryLimit *int32                                       `json:"revisionHistoryLimit,omitempty"`
 }
 
 // SetReplicas sets the Replicas field in the declarative configuration to the given value.
-func (b *StatefulSetSpecBuilder) SetReplicas(value int32) *StatefulSetSpecBuilder {
+func (b *StatefulSetSpecApplyConfiguration) SetReplicas(value int32) *StatefulSetSpecApplyConfiguration {
 	b.fields.Replicas = &value
 	return b
 }
 
 // RemoveReplicas removes the Replicas field from the declarative configuration.
-func (b *StatefulSetSpecBuilder) RemoveReplicas() *StatefulSetSpecBuilder {
+func (b *StatefulSetSpecApplyConfiguration) RemoveReplicas() *StatefulSetSpecApplyConfiguration {
 	b.fields.Replicas = nil
 	return b
 }
 
 // GetReplicas gets the Replicas field from the declarative configuration.
-func (b *StatefulSetSpecBuilder) GetReplicas() (value int32, ok bool) {
+func (b *StatefulSetSpecApplyConfiguration) GetReplicas() (value int32, ok bool) {
 	if v := b.fields.Replicas; v != nil {
 		return *v, true
 	}
@@ -76,53 +76,53 @@ func (b *StatefulSetSpecBuilder) GetReplicas() (value int32, ok bool) {
 }
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
-func (b *StatefulSetSpecBuilder) SetSelector(value *v1.LabelSelectorBuilder) *StatefulSetSpecBuilder {
+func (b *StatefulSetSpecApplyConfiguration) SetSelector(value *v1.LabelSelectorApplyConfiguration) *StatefulSetSpecApplyConfiguration {
 	b.fields.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
-func (b *StatefulSetSpecBuilder) RemoveSelector() *StatefulSetSpecBuilder {
+func (b *StatefulSetSpecApplyConfiguration) RemoveSelector() *StatefulSetSpecApplyConfiguration {
 	b.fields.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
-func (b *StatefulSetSpecBuilder) GetSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+func (b *StatefulSetSpecApplyConfiguration) GetSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
 	return b.fields.Selector, b.fields.Selector != nil
 }
 
 // SetTemplate sets the Template field in the declarative configuration to the given value.
-func (b *StatefulSetSpecBuilder) SetTemplate(value *corev1.PodTemplateSpecBuilder) *StatefulSetSpecBuilder {
+func (b *StatefulSetSpecApplyConfiguration) SetTemplate(value *corev1.PodTemplateSpecApplyConfiguration) *StatefulSetSpecApplyConfiguration {
 	b.fields.Template = value
 	return b
 }
 
 // RemoveTemplate removes the Template field from the declarative configuration.
-func (b *StatefulSetSpecBuilder) RemoveTemplate() *StatefulSetSpecBuilder {
+func (b *StatefulSetSpecApplyConfiguration) RemoveTemplate() *StatefulSetSpecApplyConfiguration {
 	b.fields.Template = nil
 	return b
 }
 
 // GetTemplate gets the Template field from the declarative configuration.
-func (b *StatefulSetSpecBuilder) GetTemplate() (value *corev1.PodTemplateSpecBuilder, ok bool) {
+func (b *StatefulSetSpecApplyConfiguration) GetTemplate() (value *corev1.PodTemplateSpecApplyConfiguration, ok bool) {
 	return b.fields.Template, b.fields.Template != nil
 }
 
 // SetVolumeClaimTemplates sets the VolumeClaimTemplates field in the declarative configuration to the given value.
-func (b *StatefulSetSpecBuilder) SetVolumeClaimTemplates(value corev1.PersistentVolumeClaimList) *StatefulSetSpecBuilder {
+func (b *StatefulSetSpecApplyConfiguration) SetVolumeClaimTemplates(value corev1.PersistentVolumeClaimList) *StatefulSetSpecApplyConfiguration {
 	b.fields.VolumeClaimTemplates = &value
 	return b
 }
 
 // RemoveVolumeClaimTemplates removes the VolumeClaimTemplates field from the declarative configuration.
-func (b *StatefulSetSpecBuilder) RemoveVolumeClaimTemplates() *StatefulSetSpecBuilder {
+func (b *StatefulSetSpecApplyConfiguration) RemoveVolumeClaimTemplates() *StatefulSetSpecApplyConfiguration {
 	b.fields.VolumeClaimTemplates = nil
 	return b
 }
 
 // GetVolumeClaimTemplates gets the VolumeClaimTemplates field from the declarative configuration.
-func (b *StatefulSetSpecBuilder) GetVolumeClaimTemplates() (value corev1.PersistentVolumeClaimList, ok bool) {
+func (b *StatefulSetSpecApplyConfiguration) GetVolumeClaimTemplates() (value corev1.PersistentVolumeClaimList, ok bool) {
 	if v := b.fields.VolumeClaimTemplates; v != nil {
 		return *v, true
 	}
@@ -130,19 +130,19 @@ func (b *StatefulSetSpecBuilder) GetVolumeClaimTemplates() (value corev1.Persist
 }
 
 // SetServiceName sets the ServiceName field in the declarative configuration to the given value.
-func (b *StatefulSetSpecBuilder) SetServiceName(value string) *StatefulSetSpecBuilder {
+func (b *StatefulSetSpecApplyConfiguration) SetServiceName(value string) *StatefulSetSpecApplyConfiguration {
 	b.fields.ServiceName = &value
 	return b
 }
 
 // RemoveServiceName removes the ServiceName field from the declarative configuration.
-func (b *StatefulSetSpecBuilder) RemoveServiceName() *StatefulSetSpecBuilder {
+func (b *StatefulSetSpecApplyConfiguration) RemoveServiceName() *StatefulSetSpecApplyConfiguration {
 	b.fields.ServiceName = nil
 	return b
 }
 
 // GetServiceName gets the ServiceName field from the declarative configuration.
-func (b *StatefulSetSpecBuilder) GetServiceName() (value string, ok bool) {
+func (b *StatefulSetSpecApplyConfiguration) GetServiceName() (value string, ok bool) {
 	if v := b.fields.ServiceName; v != nil {
 		return *v, true
 	}
@@ -150,19 +150,19 @@ func (b *StatefulSetSpecBuilder) GetServiceName() (value string, ok bool) {
 }
 
 // SetPodManagementPolicy sets the PodManagementPolicy field in the declarative configuration to the given value.
-func (b *StatefulSetSpecBuilder) SetPodManagementPolicy(value v1beta2.PodManagementPolicyType) *StatefulSetSpecBuilder {
+func (b *StatefulSetSpecApplyConfiguration) SetPodManagementPolicy(value v1beta2.PodManagementPolicyType) *StatefulSetSpecApplyConfiguration {
 	b.fields.PodManagementPolicy = &value
 	return b
 }
 
 // RemovePodManagementPolicy removes the PodManagementPolicy field from the declarative configuration.
-func (b *StatefulSetSpecBuilder) RemovePodManagementPolicy() *StatefulSetSpecBuilder {
+func (b *StatefulSetSpecApplyConfiguration) RemovePodManagementPolicy() *StatefulSetSpecApplyConfiguration {
 	b.fields.PodManagementPolicy = nil
 	return b
 }
 
 // GetPodManagementPolicy gets the PodManagementPolicy field from the declarative configuration.
-func (b *StatefulSetSpecBuilder) GetPodManagementPolicy() (value v1beta2.PodManagementPolicyType, ok bool) {
+func (b *StatefulSetSpecApplyConfiguration) GetPodManagementPolicy() (value v1beta2.PodManagementPolicyType, ok bool) {
 	if v := b.fields.PodManagementPolicy; v != nil {
 		return *v, true
 	}
@@ -170,44 +170,44 @@ func (b *StatefulSetSpecBuilder) GetPodManagementPolicy() (value v1beta2.PodMana
 }
 
 // SetUpdateStrategy sets the UpdateStrategy field in the declarative configuration to the given value.
-func (b *StatefulSetSpecBuilder) SetUpdateStrategy(value *StatefulSetUpdateStrategyBuilder) *StatefulSetSpecBuilder {
+func (b *StatefulSetSpecApplyConfiguration) SetUpdateStrategy(value *StatefulSetUpdateStrategyApplyConfiguration) *StatefulSetSpecApplyConfiguration {
 	b.fields.UpdateStrategy = value
 	return b
 }
 
 // RemoveUpdateStrategy removes the UpdateStrategy field from the declarative configuration.
-func (b *StatefulSetSpecBuilder) RemoveUpdateStrategy() *StatefulSetSpecBuilder {
+func (b *StatefulSetSpecApplyConfiguration) RemoveUpdateStrategy() *StatefulSetSpecApplyConfiguration {
 	b.fields.UpdateStrategy = nil
 	return b
 }
 
 // GetUpdateStrategy gets the UpdateStrategy field from the declarative configuration.
-func (b *StatefulSetSpecBuilder) GetUpdateStrategy() (value *StatefulSetUpdateStrategyBuilder, ok bool) {
+func (b *StatefulSetSpecApplyConfiguration) GetUpdateStrategy() (value *StatefulSetUpdateStrategyApplyConfiguration, ok bool) {
 	return b.fields.UpdateStrategy, b.fields.UpdateStrategy != nil
 }
 
 // SetRevisionHistoryLimit sets the RevisionHistoryLimit field in the declarative configuration to the given value.
-func (b *StatefulSetSpecBuilder) SetRevisionHistoryLimit(value int32) *StatefulSetSpecBuilder {
+func (b *StatefulSetSpecApplyConfiguration) SetRevisionHistoryLimit(value int32) *StatefulSetSpecApplyConfiguration {
 	b.fields.RevisionHistoryLimit = &value
 	return b
 }
 
 // RemoveRevisionHistoryLimit removes the RevisionHistoryLimit field from the declarative configuration.
-func (b *StatefulSetSpecBuilder) RemoveRevisionHistoryLimit() *StatefulSetSpecBuilder {
+func (b *StatefulSetSpecApplyConfiguration) RemoveRevisionHistoryLimit() *StatefulSetSpecApplyConfiguration {
 	b.fields.RevisionHistoryLimit = nil
 	return b
 }
 
 // GetRevisionHistoryLimit gets the RevisionHistoryLimit field from the declarative configuration.
-func (b *StatefulSetSpecBuilder) GetRevisionHistoryLimit() (value int32, ok bool) {
+func (b *StatefulSetSpecApplyConfiguration) GetRevisionHistoryLimit() (value int32, ok bool) {
 	if v := b.fields.RevisionHistoryLimit; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts StatefulSetSpecBuilder to unstructured.
-func (b *StatefulSetSpecBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts StatefulSetSpecApplyConfiguration to unstructured.
+func (b *StatefulSetSpecApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -219,9 +219,9 @@ func (b *StatefulSetSpecBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to StatefulSetSpecBuilder, replacing the contents
-// of StatefulSetSpecBuilder.
-func (b *StatefulSetSpecBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to StatefulSetSpecApplyConfiguration, replacing the contents
+// of StatefulSetSpecApplyConfiguration.
+func (b *StatefulSetSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &statefulSetSpecFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -232,15 +232,15 @@ func (b *StatefulSetSpecBuilder) FromUnstructured(u map[string]interface{}) erro
 	return nil
 }
 
-// MarshalJSON marshals StatefulSetSpecBuilder to JSON.
-func (b *StatefulSetSpecBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals StatefulSetSpecApplyConfiguration to JSON.
+func (b *StatefulSetSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into StatefulSetSpecBuilder, replacing the contents of
-// StatefulSetSpecBuilder.
-func (b *StatefulSetSpecBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into StatefulSetSpecApplyConfiguration, replacing the contents of
+// StatefulSetSpecApplyConfiguration.
+func (b *StatefulSetSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -248,13 +248,13 @@ func (b *StatefulSetSpecBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// StatefulSetSpecList represents a list of StatefulSetSpecBuilder.
-type StatefulSetSpecList []*StatefulSetSpecBuilder
+// StatefulSetSpecList represents a listAlias of StatefulSetSpecApplyConfiguration.
+type StatefulSetSpecList []*StatefulSetSpecApplyConfiguration
 
-// StatefulSetSpecList represents a map of StatefulSetSpecBuilder.
-type StatefulSetSpecMap map[string]StatefulSetSpecBuilder
+// StatefulSetSpecList represents a map of StatefulSetSpecApplyConfiguration.
+type StatefulSetSpecMap map[string]StatefulSetSpecApplyConfiguration
 
-func (b *StatefulSetSpecBuilder) preMarshal() {
+func (b *StatefulSetSpecApplyConfiguration) preMarshal() {
 }
-func (b *StatefulSetSpecBuilder) postUnmarshal() {
+func (b *StatefulSetSpecApplyConfiguration) postUnmarshal() {
 }

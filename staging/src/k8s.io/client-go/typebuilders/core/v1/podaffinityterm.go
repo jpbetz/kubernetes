@@ -25,60 +25,60 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// PodAffinityTermBuilder represents an declarative configuration of the PodAffinityTerm type for use
+// PodAffinityTermApplyConfiguration represents an declarative configuration of the PodAffinityTerm type for use
 // with apply.
-type PodAffinityTermBuilder struct {
+type PodAffinityTermApplyConfiguration struct {
 	fields podAffinityTermFields
 }
 
+// PodAffinityTermApplyConfiguration constructs an declarative configuration of the PodAffinityTerm type for use with
+// apply.
+func PodAffinityTerm() *PodAffinityTermApplyConfiguration {
+	return &PodAffinityTermApplyConfiguration{}
+}
+
 // podAffinityTermFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodAffinityTermBuilder.
+// Inline fields are owned by their respective inline type in PodAffinityTermApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type podAffinityTermFields struct {
-	LabelSelector *v1.LabelSelectorBuilder `json:"labelSelector,omitempty"`
-	Namespaces    *[]string                `json:"namespaces,omitempty"`
-	TopologyKey   *string                  `json:"topologyKey,omitempty"`
-}
-
-// PodAffinityTerm constructs an declarative configuration of the PodAffinityTerm type for use with
-// apply.
-func PodAffinityTerm() *PodAffinityTermBuilder {
-	return &PodAffinityTermBuilder{}
+	LabelSelector *v1.LabelSelectorApplyConfiguration `json:"labelSelector,omitempty"`
+	Namespaces    *[]string                           `json:"namespaces,omitempty"`
+	TopologyKey   *string                             `json:"topologyKey,omitempty"`
 }
 
 // SetLabelSelector sets the LabelSelector field in the declarative configuration to the given value.
-func (b *PodAffinityTermBuilder) SetLabelSelector(value *v1.LabelSelectorBuilder) *PodAffinityTermBuilder {
+func (b *PodAffinityTermApplyConfiguration) SetLabelSelector(value *v1.LabelSelectorApplyConfiguration) *PodAffinityTermApplyConfiguration {
 	b.fields.LabelSelector = value
 	return b
 }
 
 // RemoveLabelSelector removes the LabelSelector field from the declarative configuration.
-func (b *PodAffinityTermBuilder) RemoveLabelSelector() *PodAffinityTermBuilder {
+func (b *PodAffinityTermApplyConfiguration) RemoveLabelSelector() *PodAffinityTermApplyConfiguration {
 	b.fields.LabelSelector = nil
 	return b
 }
 
 // GetLabelSelector gets the LabelSelector field from the declarative configuration.
-func (b *PodAffinityTermBuilder) GetLabelSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+func (b *PodAffinityTermApplyConfiguration) GetLabelSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
 	return b.fields.LabelSelector, b.fields.LabelSelector != nil
 }
 
 // SetNamespaces sets the Namespaces field in the declarative configuration to the given value.
-func (b *PodAffinityTermBuilder) SetNamespaces(value []string) *PodAffinityTermBuilder {
+func (b *PodAffinityTermApplyConfiguration) SetNamespaces(value []string) *PodAffinityTermApplyConfiguration {
 	b.fields.Namespaces = &value
 	return b
 }
 
 // RemoveNamespaces removes the Namespaces field from the declarative configuration.
-func (b *PodAffinityTermBuilder) RemoveNamespaces() *PodAffinityTermBuilder {
+func (b *PodAffinityTermApplyConfiguration) RemoveNamespaces() *PodAffinityTermApplyConfiguration {
 	b.fields.Namespaces = nil
 	return b
 }
 
 // GetNamespaces gets the Namespaces field from the declarative configuration.
-func (b *PodAffinityTermBuilder) GetNamespaces() (value []string, ok bool) {
+func (b *PodAffinityTermApplyConfiguration) GetNamespaces() (value []string, ok bool) {
 	if v := b.fields.Namespaces; v != nil {
 		return *v, true
 	}
@@ -86,27 +86,27 @@ func (b *PodAffinityTermBuilder) GetNamespaces() (value []string, ok bool) {
 }
 
 // SetTopologyKey sets the TopologyKey field in the declarative configuration to the given value.
-func (b *PodAffinityTermBuilder) SetTopologyKey(value string) *PodAffinityTermBuilder {
+func (b *PodAffinityTermApplyConfiguration) SetTopologyKey(value string) *PodAffinityTermApplyConfiguration {
 	b.fields.TopologyKey = &value
 	return b
 }
 
 // RemoveTopologyKey removes the TopologyKey field from the declarative configuration.
-func (b *PodAffinityTermBuilder) RemoveTopologyKey() *PodAffinityTermBuilder {
+func (b *PodAffinityTermApplyConfiguration) RemoveTopologyKey() *PodAffinityTermApplyConfiguration {
 	b.fields.TopologyKey = nil
 	return b
 }
 
 // GetTopologyKey gets the TopologyKey field from the declarative configuration.
-func (b *PodAffinityTermBuilder) GetTopologyKey() (value string, ok bool) {
+func (b *PodAffinityTermApplyConfiguration) GetTopologyKey() (value string, ok bool) {
 	if v := b.fields.TopologyKey; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts PodAffinityTermBuilder to unstructured.
-func (b *PodAffinityTermBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PodAffinityTermApplyConfiguration to unstructured.
+func (b *PodAffinityTermApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -118,9 +118,9 @@ func (b *PodAffinityTermBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to PodAffinityTermBuilder, replacing the contents
-// of PodAffinityTermBuilder.
-func (b *PodAffinityTermBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PodAffinityTermApplyConfiguration, replacing the contents
+// of PodAffinityTermApplyConfiguration.
+func (b *PodAffinityTermApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &podAffinityTermFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -131,15 +131,15 @@ func (b *PodAffinityTermBuilder) FromUnstructured(u map[string]interface{}) erro
 	return nil
 }
 
-// MarshalJSON marshals PodAffinityTermBuilder to JSON.
-func (b *PodAffinityTermBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PodAffinityTermApplyConfiguration to JSON.
+func (b *PodAffinityTermApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PodAffinityTermBuilder, replacing the contents of
-// PodAffinityTermBuilder.
-func (b *PodAffinityTermBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PodAffinityTermApplyConfiguration, replacing the contents of
+// PodAffinityTermApplyConfiguration.
+func (b *PodAffinityTermApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -147,13 +147,13 @@ func (b *PodAffinityTermBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// PodAffinityTermList represents a list of PodAffinityTermBuilder.
-type PodAffinityTermList []*PodAffinityTermBuilder
+// PodAffinityTermList represents a listAlias of PodAffinityTermApplyConfiguration.
+type PodAffinityTermList []*PodAffinityTermApplyConfiguration
 
-// PodAffinityTermList represents a map of PodAffinityTermBuilder.
-type PodAffinityTermMap map[string]PodAffinityTermBuilder
+// PodAffinityTermList represents a map of PodAffinityTermApplyConfiguration.
+type PodAffinityTermMap map[string]PodAffinityTermApplyConfiguration
 
-func (b *PodAffinityTermBuilder) preMarshal() {
+func (b *PodAffinityTermApplyConfiguration) preMarshal() {
 }
-func (b *PodAffinityTermBuilder) postUnmarshal() {
+func (b *PodAffinityTermApplyConfiguration) postUnmarshal() {
 }

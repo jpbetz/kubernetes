@@ -49,7 +49,7 @@ type PersistentVolumeInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.PersistentVolumeList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.PersistentVolume, err error)
-	Apply(ctx context.Context, persistentVolume corev1.PersistentVolumeBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.PersistentVolume, err error)
+	Apply(ctx context.Context, persistentVolume *corev1.PersistentVolumeApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.PersistentVolume, err error)
 	PersistentVolumeExpansion
 }
 
@@ -187,7 +187,7 @@ func (c *persistentVolumes) Patch(ctx context.Context, name string, pt types.Pat
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied persistentVolume.
-func (c *persistentVolumes) Apply(ctx context.Context, persistentVolume corev1.PersistentVolumeBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.PersistentVolume, err error) {
+func (c *persistentVolumes) Apply(ctx context.Context, persistentVolume *corev1.PersistentVolumeApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.PersistentVolume, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := persistentVolume.MarshalJSON()
 	if err != nil {

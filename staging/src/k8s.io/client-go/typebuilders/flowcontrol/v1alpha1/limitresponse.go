@@ -25,42 +25,42 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// LimitResponseBuilder represents an declarative configuration of the LimitResponse type for use
+// LimitResponseApplyConfiguration represents an declarative configuration of the LimitResponse type for use
 // with apply.
-type LimitResponseBuilder struct {
+type LimitResponseApplyConfiguration struct {
 	fields limitResponseFields
 }
 
+// LimitResponseApplyConfiguration constructs an declarative configuration of the LimitResponse type for use with
+// apply.
+func LimitResponse() *LimitResponseApplyConfiguration {
+	return &LimitResponseApplyConfiguration{}
+}
+
 // limitResponseFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LimitResponseBuilder.
+// Inline fields are owned by their respective inline type in LimitResponseApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type limitResponseFields struct {
-	Type    *v1alpha1.LimitResponseType  `json:"type,omitempty"`
-	Queuing *QueuingConfigurationBuilder `json:"queuing,omitempty"`
-}
-
-// LimitResponse constructs an declarative configuration of the LimitResponse type for use with
-// apply.
-func LimitResponse() *LimitResponseBuilder {
-	return &LimitResponseBuilder{}
+	Type    *v1alpha1.LimitResponseType             `json:"type,omitempty"`
+	Queuing *QueuingConfigurationApplyConfiguration `json:"queuing,omitempty"`
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b *LimitResponseBuilder) SetType(value v1alpha1.LimitResponseType) *LimitResponseBuilder {
+func (b *LimitResponseApplyConfiguration) SetType(value v1alpha1.LimitResponseType) *LimitResponseApplyConfiguration {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b *LimitResponseBuilder) RemoveType() *LimitResponseBuilder {
+func (b *LimitResponseApplyConfiguration) RemoveType() *LimitResponseApplyConfiguration {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b *LimitResponseBuilder) GetType() (value v1alpha1.LimitResponseType, ok bool) {
+func (b *LimitResponseApplyConfiguration) GetType() (value v1alpha1.LimitResponseType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -68,24 +68,24 @@ func (b *LimitResponseBuilder) GetType() (value v1alpha1.LimitResponseType, ok b
 }
 
 // SetQueuing sets the Queuing field in the declarative configuration to the given value.
-func (b *LimitResponseBuilder) SetQueuing(value *QueuingConfigurationBuilder) *LimitResponseBuilder {
+func (b *LimitResponseApplyConfiguration) SetQueuing(value *QueuingConfigurationApplyConfiguration) *LimitResponseApplyConfiguration {
 	b.fields.Queuing = value
 	return b
 }
 
 // RemoveQueuing removes the Queuing field from the declarative configuration.
-func (b *LimitResponseBuilder) RemoveQueuing() *LimitResponseBuilder {
+func (b *LimitResponseApplyConfiguration) RemoveQueuing() *LimitResponseApplyConfiguration {
 	b.fields.Queuing = nil
 	return b
 }
 
 // GetQueuing gets the Queuing field from the declarative configuration.
-func (b *LimitResponseBuilder) GetQueuing() (value *QueuingConfigurationBuilder, ok bool) {
+func (b *LimitResponseApplyConfiguration) GetQueuing() (value *QueuingConfigurationApplyConfiguration, ok bool) {
 	return b.fields.Queuing, b.fields.Queuing != nil
 }
 
-// ToUnstructured converts LimitResponseBuilder to unstructured.
-func (b *LimitResponseBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts LimitResponseApplyConfiguration to unstructured.
+func (b *LimitResponseApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -97,9 +97,9 @@ func (b *LimitResponseBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to LimitResponseBuilder, replacing the contents
-// of LimitResponseBuilder.
-func (b *LimitResponseBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to LimitResponseApplyConfiguration, replacing the contents
+// of LimitResponseApplyConfiguration.
+func (b *LimitResponseApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &limitResponseFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -110,15 +110,15 @@ func (b *LimitResponseBuilder) FromUnstructured(u map[string]interface{}) error 
 	return nil
 }
 
-// MarshalJSON marshals LimitResponseBuilder to JSON.
-func (b *LimitResponseBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals LimitResponseApplyConfiguration to JSON.
+func (b *LimitResponseApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into LimitResponseBuilder, replacing the contents of
-// LimitResponseBuilder.
-func (b *LimitResponseBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into LimitResponseApplyConfiguration, replacing the contents of
+// LimitResponseApplyConfiguration.
+func (b *LimitResponseApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -126,13 +126,13 @@ func (b *LimitResponseBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// LimitResponseList represents a list of LimitResponseBuilder.
-type LimitResponseList []*LimitResponseBuilder
+// LimitResponseList represents a listAlias of LimitResponseApplyConfiguration.
+type LimitResponseList []*LimitResponseApplyConfiguration
 
-// LimitResponseList represents a map of LimitResponseBuilder.
-type LimitResponseMap map[string]LimitResponseBuilder
+// LimitResponseList represents a map of LimitResponseApplyConfiguration.
+type LimitResponseMap map[string]LimitResponseApplyConfiguration
 
-func (b *LimitResponseBuilder) preMarshal() {
+func (b *LimitResponseApplyConfiguration) preMarshal() {
 }
-func (b *LimitResponseBuilder) postUnmarshal() {
+func (b *LimitResponseApplyConfiguration) postUnmarshal() {
 }

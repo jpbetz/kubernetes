@@ -50,7 +50,7 @@ type ReplicationControllerInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.ReplicationControllerList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.ReplicationController, err error)
-	Apply(ctx context.Context, replicationController corev1.ReplicationControllerBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ReplicationController, err error)
+	Apply(ctx context.Context, replicationController *corev1.ReplicationControllerApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ReplicationController, err error)
 	GetScale(ctx context.Context, replicationControllerName string, options metav1.GetOptions) (*autoscalingv1.Scale, error)
 	UpdateScale(ctx context.Context, replicationControllerName string, scale *autoscalingv1.Scale, opts metav1.UpdateOptions) (*autoscalingv1.Scale, error)
 
@@ -202,7 +202,7 @@ func (c *replicationControllers) Patch(ctx context.Context, name string, pt type
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied replicationController.
-func (c *replicationControllers) Apply(ctx context.Context, replicationController corev1.ReplicationControllerBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ReplicationController, err error) {
+func (c *replicationControllers) Apply(ctx context.Context, replicationController *corev1.ReplicationControllerApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ReplicationController, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := replicationController.MarshalJSON()
 	if err != nil {

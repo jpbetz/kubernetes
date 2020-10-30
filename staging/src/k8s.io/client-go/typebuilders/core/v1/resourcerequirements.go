@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ResourceRequirementsBuilder represents an declarative configuration of the ResourceRequirements type for use
+// ResourceRequirementsApplyConfiguration represents an declarative configuration of the ResourceRequirements type for use
 // with apply.
-type ResourceRequirementsBuilder struct {
+type ResourceRequirementsApplyConfiguration struct {
 	fields resourceRequirementsFields
 }
 
+// ResourceRequirementsApplyConfiguration constructs an declarative configuration of the ResourceRequirements type for use with
+// apply.
+func ResourceRequirements() *ResourceRequirementsApplyConfiguration {
+	return &ResourceRequirementsApplyConfiguration{}
+}
+
 // resourceRequirementsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ResourceRequirementsBuilder.
+// Inline fields are owned by their respective inline type in ResourceRequirementsApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type resourceRequirementsFields struct {
 	Requests *v1.ResourceList `json:"requests,omitempty"`
 }
 
-// ResourceRequirements constructs an declarative configuration of the ResourceRequirements type for use with
-// apply.
-func ResourceRequirements() *ResourceRequirementsBuilder {
-	return &ResourceRequirementsBuilder{}
-}
-
 // SetLimits sets the Limits field in the declarative configuration to the given value.
-func (b *ResourceRequirementsBuilder) SetLimits(value v1.ResourceList) *ResourceRequirementsBuilder {
+func (b *ResourceRequirementsApplyConfiguration) SetLimits(value v1.ResourceList) *ResourceRequirementsApplyConfiguration {
 	b.fields.Limits = &value
 	return b
 }
 
 // RemoveLimits removes the Limits field from the declarative configuration.
-func (b *ResourceRequirementsBuilder) RemoveLimits() *ResourceRequirementsBuilder {
+func (b *ResourceRequirementsApplyConfiguration) RemoveLimits() *ResourceRequirementsApplyConfiguration {
 	b.fields.Limits = nil
 	return b
 }
 
 // GetLimits gets the Limits field from the declarative configuration.
-func (b *ResourceRequirementsBuilder) GetLimits() (value v1.ResourceList, ok bool) {
+func (b *ResourceRequirementsApplyConfiguration) GetLimits() (value v1.ResourceList, ok bool) {
 	if v := b.fields.Limits; v != nil {
 		return *v, true
 	}
@@ -68,27 +68,27 @@ func (b *ResourceRequirementsBuilder) GetLimits() (value v1.ResourceList, ok boo
 }
 
 // SetRequests sets the Requests field in the declarative configuration to the given value.
-func (b *ResourceRequirementsBuilder) SetRequests(value v1.ResourceList) *ResourceRequirementsBuilder {
+func (b *ResourceRequirementsApplyConfiguration) SetRequests(value v1.ResourceList) *ResourceRequirementsApplyConfiguration {
 	b.fields.Requests = &value
 	return b
 }
 
 // RemoveRequests removes the Requests field from the declarative configuration.
-func (b *ResourceRequirementsBuilder) RemoveRequests() *ResourceRequirementsBuilder {
+func (b *ResourceRequirementsApplyConfiguration) RemoveRequests() *ResourceRequirementsApplyConfiguration {
 	b.fields.Requests = nil
 	return b
 }
 
 // GetRequests gets the Requests field from the declarative configuration.
-func (b *ResourceRequirementsBuilder) GetRequests() (value v1.ResourceList, ok bool) {
+func (b *ResourceRequirementsApplyConfiguration) GetRequests() (value v1.ResourceList, ok bool) {
 	if v := b.fields.Requests; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ResourceRequirementsBuilder to unstructured.
-func (b *ResourceRequirementsBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ResourceRequirementsApplyConfiguration to unstructured.
+func (b *ResourceRequirementsApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -100,9 +100,9 @@ func (b *ResourceRequirementsBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ResourceRequirementsBuilder, replacing the contents
-// of ResourceRequirementsBuilder.
-func (b *ResourceRequirementsBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ResourceRequirementsApplyConfiguration, replacing the contents
+// of ResourceRequirementsApplyConfiguration.
+func (b *ResourceRequirementsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &resourceRequirementsFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -113,15 +113,15 @@ func (b *ResourceRequirementsBuilder) FromUnstructured(u map[string]interface{})
 	return nil
 }
 
-// MarshalJSON marshals ResourceRequirementsBuilder to JSON.
-func (b *ResourceRequirementsBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ResourceRequirementsApplyConfiguration to JSON.
+func (b *ResourceRequirementsApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ResourceRequirementsBuilder, replacing the contents of
-// ResourceRequirementsBuilder.
-func (b *ResourceRequirementsBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ResourceRequirementsApplyConfiguration, replacing the contents of
+// ResourceRequirementsApplyConfiguration.
+func (b *ResourceRequirementsApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -129,13 +129,13 @@ func (b *ResourceRequirementsBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ResourceRequirementsList represents a list of ResourceRequirementsBuilder.
-type ResourceRequirementsList []*ResourceRequirementsBuilder
+// ResourceRequirementsList represents a listAlias of ResourceRequirementsApplyConfiguration.
+type ResourceRequirementsList []*ResourceRequirementsApplyConfiguration
 
-// ResourceRequirementsList represents a map of ResourceRequirementsBuilder.
-type ResourceRequirementsMap map[string]ResourceRequirementsBuilder
+// ResourceRequirementsList represents a map of ResourceRequirementsApplyConfiguration.
+type ResourceRequirementsMap map[string]ResourceRequirementsApplyConfiguration
 
-func (b *ResourceRequirementsBuilder) preMarshal() {
+func (b *ResourceRequirementsApplyConfiguration) preMarshal() {
 }
-func (b *ResourceRequirementsBuilder) postUnmarshal() {
+func (b *ResourceRequirementsApplyConfiguration) postUnmarshal() {
 }

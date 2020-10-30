@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// PodReadinessGateBuilder represents an declarative configuration of the PodReadinessGate type for use
+// PodReadinessGateApplyConfiguration represents an declarative configuration of the PodReadinessGate type for use
 // with apply.
-type PodReadinessGateBuilder struct {
+type PodReadinessGateApplyConfiguration struct {
 	fields podReadinessGateFields
 }
 
+// PodReadinessGateApplyConfiguration constructs an declarative configuration of the PodReadinessGate type for use with
+// apply.
+func PodReadinessGate() *PodReadinessGateApplyConfiguration {
+	return &PodReadinessGateApplyConfiguration{}
+}
+
 // podReadinessGateFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodReadinessGateBuilder.
+// Inline fields are owned by their respective inline type in PodReadinessGateApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,34 +46,28 @@ type podReadinessGateFields struct {
 	ConditionType *v1.PodConditionType `json:"conditionType,omitempty"`
 }
 
-// PodReadinessGate constructs an declarative configuration of the PodReadinessGate type for use with
-// apply.
-func PodReadinessGate() *PodReadinessGateBuilder {
-	return &PodReadinessGateBuilder{}
-}
-
 // SetConditionType sets the ConditionType field in the declarative configuration to the given value.
-func (b *PodReadinessGateBuilder) SetConditionType(value v1.PodConditionType) *PodReadinessGateBuilder {
+func (b *PodReadinessGateApplyConfiguration) SetConditionType(value v1.PodConditionType) *PodReadinessGateApplyConfiguration {
 	b.fields.ConditionType = &value
 	return b
 }
 
 // RemoveConditionType removes the ConditionType field from the declarative configuration.
-func (b *PodReadinessGateBuilder) RemoveConditionType() *PodReadinessGateBuilder {
+func (b *PodReadinessGateApplyConfiguration) RemoveConditionType() *PodReadinessGateApplyConfiguration {
 	b.fields.ConditionType = nil
 	return b
 }
 
 // GetConditionType gets the ConditionType field from the declarative configuration.
-func (b *PodReadinessGateBuilder) GetConditionType() (value v1.PodConditionType, ok bool) {
+func (b *PodReadinessGateApplyConfiguration) GetConditionType() (value v1.PodConditionType, ok bool) {
 	if v := b.fields.ConditionType; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts PodReadinessGateBuilder to unstructured.
-func (b *PodReadinessGateBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PodReadinessGateApplyConfiguration to unstructured.
+func (b *PodReadinessGateApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -79,9 +79,9 @@ func (b *PodReadinessGateBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to PodReadinessGateBuilder, replacing the contents
-// of PodReadinessGateBuilder.
-func (b *PodReadinessGateBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PodReadinessGateApplyConfiguration, replacing the contents
+// of PodReadinessGateApplyConfiguration.
+func (b *PodReadinessGateApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &podReadinessGateFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -92,15 +92,15 @@ func (b *PodReadinessGateBuilder) FromUnstructured(u map[string]interface{}) err
 	return nil
 }
 
-// MarshalJSON marshals PodReadinessGateBuilder to JSON.
-func (b *PodReadinessGateBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PodReadinessGateApplyConfiguration to JSON.
+func (b *PodReadinessGateApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PodReadinessGateBuilder, replacing the contents of
-// PodReadinessGateBuilder.
-func (b *PodReadinessGateBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PodReadinessGateApplyConfiguration, replacing the contents of
+// PodReadinessGateApplyConfiguration.
+func (b *PodReadinessGateApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -108,13 +108,13 @@ func (b *PodReadinessGateBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// PodReadinessGateList represents a list of PodReadinessGateBuilder.
-type PodReadinessGateList []*PodReadinessGateBuilder
+// PodReadinessGateList represents a listAlias of PodReadinessGateApplyConfiguration.
+type PodReadinessGateList []*PodReadinessGateApplyConfiguration
 
-// PodReadinessGateList represents a map of PodReadinessGateBuilder.
-type PodReadinessGateMap map[string]PodReadinessGateBuilder
+// PodReadinessGateList represents a map of PodReadinessGateApplyConfiguration.
+type PodReadinessGateMap map[string]PodReadinessGateApplyConfiguration
 
-func (b *PodReadinessGateBuilder) preMarshal() {
+func (b *PodReadinessGateApplyConfiguration) preMarshal() {
 }
-func (b *PodReadinessGateBuilder) postUnmarshal() {
+func (b *PodReadinessGateApplyConfiguration) postUnmarshal() {
 }

@@ -49,7 +49,7 @@ type StatefulSetInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1beta2.StatefulSetList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta2.StatefulSet, err error)
-	Apply(ctx context.Context, statefulSet appsv1beta2.StatefulSetBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta2.StatefulSet, err error)
+	Apply(ctx context.Context, statefulSet *appsv1beta2.StatefulSetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta2.StatefulSet, err error)
 	GetScale(ctx context.Context, statefulSetName string, options v1.GetOptions) (*v1beta2.Scale, error)
 	UpdateScale(ctx context.Context, statefulSetName string, scale *v1beta2.Scale, opts v1.UpdateOptions) (*v1beta2.Scale, error)
 
@@ -201,7 +201,7 @@ func (c *statefulSets) Patch(ctx context.Context, name string, pt types.PatchTyp
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied statefulSet.
-func (c *statefulSets) Apply(ctx context.Context, statefulSet appsv1beta2.StatefulSetBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta2.StatefulSet, err error) {
+func (c *statefulSets) Apply(ctx context.Context, statefulSet *appsv1beta2.StatefulSetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta2.StatefulSet, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := statefulSet.MarshalJSON()
 	if err != nil {

@@ -144,7 +144,7 @@ func (c *FakeHorizontalPodAutoscalers) Patch(ctx context.Context, name string, p
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied horizontalPodAutoscaler.
-func (c *FakeHorizontalPodAutoscalers) Apply(ctx context.Context, horizontalPodAutoscaler autoscalingv2beta2.HorizontalPodAutoscalerBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v2beta2.HorizontalPodAutoscaler, err error) {
+func (c *FakeHorizontalPodAutoscalers) Apply(ctx context.Context, horizontalPodAutoscaler *autoscalingv2beta2.HorizontalPodAutoscalerApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v2beta2.HorizontalPodAutoscaler, err error) {
 	data, err := horizontalPodAutoscaler.MarshalJSON()
 	if err != nil {
 		return nil, err

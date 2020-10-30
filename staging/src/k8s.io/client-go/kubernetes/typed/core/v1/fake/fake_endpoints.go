@@ -132,7 +132,7 @@ func (c *FakeEndpoints) Patch(ctx context.Context, name string, pt types.PatchTy
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied endpoints.
-func (c *FakeEndpoints) Apply(ctx context.Context, endpoints typebuilderscorev1.EndpointsBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Endpoints, err error) {
+func (c *FakeEndpoints) Apply(ctx context.Context, endpoints *typebuilderscorev1.EndpointsApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Endpoints, err error) {
 	data, err := endpoints.MarshalJSON()
 	if err != nil {
 		return nil, err

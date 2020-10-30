@@ -48,7 +48,7 @@ type RoleInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.RoleList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.Role, err error)
-	Apply(ctx context.Context, role rbacv1.RoleBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Role, err error)
+	Apply(ctx context.Context, role *rbacv1.RoleApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Role, err error)
 	RoleExpansion
 }
 
@@ -181,7 +181,7 @@ func (c *roles) Patch(ctx context.Context, name string, pt types.PatchType, data
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied role.
-func (c *roles) Apply(ctx context.Context, role rbacv1.RoleBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Role, err error) {
+func (c *roles) Apply(ctx context.Context, role *rbacv1.RoleApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Role, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := role.MarshalJSON()
 	if err != nil {

@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// CertificateSigningRequestSpecBuilder represents an declarative configuration of the CertificateSigningRequestSpec type for use
+// CertificateSigningRequestSpecApplyConfiguration represents an declarative configuration of the CertificateSigningRequestSpec type for use
 // with apply.
-type CertificateSigningRequestSpecBuilder struct {
+type CertificateSigningRequestSpecApplyConfiguration struct {
 	fields certificateSigningRequestSpecFields
 }
 
+// CertificateSigningRequestSpecApplyConfiguration constructs an declarative configuration of the CertificateSigningRequestSpec type for use with
+// apply.
+func CertificateSigningRequestSpec() *CertificateSigningRequestSpecApplyConfiguration {
+	return &CertificateSigningRequestSpecApplyConfiguration{}
+}
+
 // certificateSigningRequestSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in CertificateSigningRequestSpecBuilder.
+// Inline fields are owned by their respective inline type in CertificateSigningRequestSpecApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -46,26 +52,20 @@ type certificateSigningRequestSpecFields struct {
 	Extra      *map[string]v1.ExtraValue `json:"extra,omitempty"`
 }
 
-// CertificateSigningRequestSpec constructs an declarative configuration of the CertificateSigningRequestSpec type for use with
-// apply.
-func CertificateSigningRequestSpec() *CertificateSigningRequestSpecBuilder {
-	return &CertificateSigningRequestSpecBuilder{}
-}
-
 // SetRequest sets the Request field in the declarative configuration to the given value.
-func (b *CertificateSigningRequestSpecBuilder) SetRequest(value []byte) *CertificateSigningRequestSpecBuilder {
+func (b *CertificateSigningRequestSpecApplyConfiguration) SetRequest(value []byte) *CertificateSigningRequestSpecApplyConfiguration {
 	b.fields.Request = &value
 	return b
 }
 
 // RemoveRequest removes the Request field from the declarative configuration.
-func (b *CertificateSigningRequestSpecBuilder) RemoveRequest() *CertificateSigningRequestSpecBuilder {
+func (b *CertificateSigningRequestSpecApplyConfiguration) RemoveRequest() *CertificateSigningRequestSpecApplyConfiguration {
 	b.fields.Request = nil
 	return b
 }
 
 // GetRequest gets the Request field from the declarative configuration.
-func (b *CertificateSigningRequestSpecBuilder) GetRequest() (value []byte, ok bool) {
+func (b *CertificateSigningRequestSpecApplyConfiguration) GetRequest() (value []byte, ok bool) {
 	if v := b.fields.Request; v != nil {
 		return *v, true
 	}
@@ -73,19 +73,19 @@ func (b *CertificateSigningRequestSpecBuilder) GetRequest() (value []byte, ok bo
 }
 
 // SetSignerName sets the SignerName field in the declarative configuration to the given value.
-func (b *CertificateSigningRequestSpecBuilder) SetSignerName(value string) *CertificateSigningRequestSpecBuilder {
+func (b *CertificateSigningRequestSpecApplyConfiguration) SetSignerName(value string) *CertificateSigningRequestSpecApplyConfiguration {
 	b.fields.SignerName = &value
 	return b
 }
 
 // RemoveSignerName removes the SignerName field from the declarative configuration.
-func (b *CertificateSigningRequestSpecBuilder) RemoveSignerName() *CertificateSigningRequestSpecBuilder {
+func (b *CertificateSigningRequestSpecApplyConfiguration) RemoveSignerName() *CertificateSigningRequestSpecApplyConfiguration {
 	b.fields.SignerName = nil
 	return b
 }
 
 // GetSignerName gets the SignerName field from the declarative configuration.
-func (b *CertificateSigningRequestSpecBuilder) GetSignerName() (value string, ok bool) {
+func (b *CertificateSigningRequestSpecApplyConfiguration) GetSignerName() (value string, ok bool) {
 	if v := b.fields.SignerName; v != nil {
 		return *v, true
 	}
@@ -93,19 +93,19 @@ func (b *CertificateSigningRequestSpecBuilder) GetSignerName() (value string, ok
 }
 
 // SetUsages sets the Usages field in the declarative configuration to the given value.
-func (b *CertificateSigningRequestSpecBuilder) SetUsages(value []v1.KeyUsage) *CertificateSigningRequestSpecBuilder {
+func (b *CertificateSigningRequestSpecApplyConfiguration) SetUsages(value []v1.KeyUsage) *CertificateSigningRequestSpecApplyConfiguration {
 	b.fields.Usages = &value
 	return b
 }
 
 // RemoveUsages removes the Usages field from the declarative configuration.
-func (b *CertificateSigningRequestSpecBuilder) RemoveUsages() *CertificateSigningRequestSpecBuilder {
+func (b *CertificateSigningRequestSpecApplyConfiguration) RemoveUsages() *CertificateSigningRequestSpecApplyConfiguration {
 	b.fields.Usages = nil
 	return b
 }
 
 // GetUsages gets the Usages field from the declarative configuration.
-func (b *CertificateSigningRequestSpecBuilder) GetUsages() (value []v1.KeyUsage, ok bool) {
+func (b *CertificateSigningRequestSpecApplyConfiguration) GetUsages() (value []v1.KeyUsage, ok bool) {
 	if v := b.fields.Usages; v != nil {
 		return *v, true
 	}
@@ -113,19 +113,19 @@ func (b *CertificateSigningRequestSpecBuilder) GetUsages() (value []v1.KeyUsage,
 }
 
 // SetUsername sets the Username field in the declarative configuration to the given value.
-func (b *CertificateSigningRequestSpecBuilder) SetUsername(value string) *CertificateSigningRequestSpecBuilder {
+func (b *CertificateSigningRequestSpecApplyConfiguration) SetUsername(value string) *CertificateSigningRequestSpecApplyConfiguration {
 	b.fields.Username = &value
 	return b
 }
 
 // RemoveUsername removes the Username field from the declarative configuration.
-func (b *CertificateSigningRequestSpecBuilder) RemoveUsername() *CertificateSigningRequestSpecBuilder {
+func (b *CertificateSigningRequestSpecApplyConfiguration) RemoveUsername() *CertificateSigningRequestSpecApplyConfiguration {
 	b.fields.Username = nil
 	return b
 }
 
 // GetUsername gets the Username field from the declarative configuration.
-func (b *CertificateSigningRequestSpecBuilder) GetUsername() (value string, ok bool) {
+func (b *CertificateSigningRequestSpecApplyConfiguration) GetUsername() (value string, ok bool) {
 	if v := b.fields.Username; v != nil {
 		return *v, true
 	}
@@ -133,19 +133,19 @@ func (b *CertificateSigningRequestSpecBuilder) GetUsername() (value string, ok b
 }
 
 // SetUID sets the UID field in the declarative configuration to the given value.
-func (b *CertificateSigningRequestSpecBuilder) SetUID(value string) *CertificateSigningRequestSpecBuilder {
+func (b *CertificateSigningRequestSpecApplyConfiguration) SetUID(value string) *CertificateSigningRequestSpecApplyConfiguration {
 	b.fields.UID = &value
 	return b
 }
 
 // RemoveUID removes the UID field from the declarative configuration.
-func (b *CertificateSigningRequestSpecBuilder) RemoveUID() *CertificateSigningRequestSpecBuilder {
+func (b *CertificateSigningRequestSpecApplyConfiguration) RemoveUID() *CertificateSigningRequestSpecApplyConfiguration {
 	b.fields.UID = nil
 	return b
 }
 
 // GetUID gets the UID field from the declarative configuration.
-func (b *CertificateSigningRequestSpecBuilder) GetUID() (value string, ok bool) {
+func (b *CertificateSigningRequestSpecApplyConfiguration) GetUID() (value string, ok bool) {
 	if v := b.fields.UID; v != nil {
 		return *v, true
 	}
@@ -153,19 +153,19 @@ func (b *CertificateSigningRequestSpecBuilder) GetUID() (value string, ok bool) 
 }
 
 // SetGroups sets the Groups field in the declarative configuration to the given value.
-func (b *CertificateSigningRequestSpecBuilder) SetGroups(value []string) *CertificateSigningRequestSpecBuilder {
+func (b *CertificateSigningRequestSpecApplyConfiguration) SetGroups(value []string) *CertificateSigningRequestSpecApplyConfiguration {
 	b.fields.Groups = &value
 	return b
 }
 
 // RemoveGroups removes the Groups field from the declarative configuration.
-func (b *CertificateSigningRequestSpecBuilder) RemoveGroups() *CertificateSigningRequestSpecBuilder {
+func (b *CertificateSigningRequestSpecApplyConfiguration) RemoveGroups() *CertificateSigningRequestSpecApplyConfiguration {
 	b.fields.Groups = nil
 	return b
 }
 
 // GetGroups gets the Groups field from the declarative configuration.
-func (b *CertificateSigningRequestSpecBuilder) GetGroups() (value []string, ok bool) {
+func (b *CertificateSigningRequestSpecApplyConfiguration) GetGroups() (value []string, ok bool) {
 	if v := b.fields.Groups; v != nil {
 		return *v, true
 	}
@@ -173,27 +173,27 @@ func (b *CertificateSigningRequestSpecBuilder) GetGroups() (value []string, ok b
 }
 
 // SetExtra sets the Extra field in the declarative configuration to the given value.
-func (b *CertificateSigningRequestSpecBuilder) SetExtra(value map[string]v1.ExtraValue) *CertificateSigningRequestSpecBuilder {
+func (b *CertificateSigningRequestSpecApplyConfiguration) SetExtra(value map[string]v1.ExtraValue) *CertificateSigningRequestSpecApplyConfiguration {
 	b.fields.Extra = &value
 	return b
 }
 
 // RemoveExtra removes the Extra field from the declarative configuration.
-func (b *CertificateSigningRequestSpecBuilder) RemoveExtra() *CertificateSigningRequestSpecBuilder {
+func (b *CertificateSigningRequestSpecApplyConfiguration) RemoveExtra() *CertificateSigningRequestSpecApplyConfiguration {
 	b.fields.Extra = nil
 	return b
 }
 
 // GetExtra gets the Extra field from the declarative configuration.
-func (b *CertificateSigningRequestSpecBuilder) GetExtra() (value map[string]v1.ExtraValue, ok bool) {
+func (b *CertificateSigningRequestSpecApplyConfiguration) GetExtra() (value map[string]v1.ExtraValue, ok bool) {
 	if v := b.fields.Extra; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts CertificateSigningRequestSpecBuilder to unstructured.
-func (b *CertificateSigningRequestSpecBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts CertificateSigningRequestSpecApplyConfiguration to unstructured.
+func (b *CertificateSigningRequestSpecApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -205,9 +205,9 @@ func (b *CertificateSigningRequestSpecBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to CertificateSigningRequestSpecBuilder, replacing the contents
-// of CertificateSigningRequestSpecBuilder.
-func (b *CertificateSigningRequestSpecBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to CertificateSigningRequestSpecApplyConfiguration, replacing the contents
+// of CertificateSigningRequestSpecApplyConfiguration.
+func (b *CertificateSigningRequestSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &certificateSigningRequestSpecFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -218,15 +218,15 @@ func (b *CertificateSigningRequestSpecBuilder) FromUnstructured(u map[string]int
 	return nil
 }
 
-// MarshalJSON marshals CertificateSigningRequestSpecBuilder to JSON.
-func (b *CertificateSigningRequestSpecBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals CertificateSigningRequestSpecApplyConfiguration to JSON.
+func (b *CertificateSigningRequestSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into CertificateSigningRequestSpecBuilder, replacing the contents of
-// CertificateSigningRequestSpecBuilder.
-func (b *CertificateSigningRequestSpecBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into CertificateSigningRequestSpecApplyConfiguration, replacing the contents of
+// CertificateSigningRequestSpecApplyConfiguration.
+func (b *CertificateSigningRequestSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -234,13 +234,13 @@ func (b *CertificateSigningRequestSpecBuilder) UnmarshalJSON(data []byte) error 
 	return nil
 }
 
-// CertificateSigningRequestSpecList represents a list of CertificateSigningRequestSpecBuilder.
-type CertificateSigningRequestSpecList []*CertificateSigningRequestSpecBuilder
+// CertificateSigningRequestSpecList represents a listAlias of CertificateSigningRequestSpecApplyConfiguration.
+type CertificateSigningRequestSpecList []*CertificateSigningRequestSpecApplyConfiguration
 
-// CertificateSigningRequestSpecList represents a map of CertificateSigningRequestSpecBuilder.
-type CertificateSigningRequestSpecMap map[string]CertificateSigningRequestSpecBuilder
+// CertificateSigningRequestSpecList represents a map of CertificateSigningRequestSpecApplyConfiguration.
+type CertificateSigningRequestSpecMap map[string]CertificateSigningRequestSpecApplyConfiguration
 
-func (b *CertificateSigningRequestSpecBuilder) preMarshal() {
+func (b *CertificateSigningRequestSpecApplyConfiguration) preMarshal() {
 }
-func (b *CertificateSigningRequestSpecBuilder) postUnmarshal() {
+func (b *CertificateSigningRequestSpecApplyConfiguration) postUnmarshal() {
 }

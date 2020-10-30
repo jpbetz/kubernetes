@@ -26,14 +26,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ContainerResourceMetricSourceBuilder represents an declarative configuration of the ContainerResourceMetricSource type for use
+// ContainerResourceMetricSourceApplyConfiguration represents an declarative configuration of the ContainerResourceMetricSource type for use
 // with apply.
-type ContainerResourceMetricSourceBuilder struct {
+type ContainerResourceMetricSourceApplyConfiguration struct {
 	fields containerResourceMetricSourceFields
 }
 
+// ContainerResourceMetricSourceApplyConfiguration constructs an declarative configuration of the ContainerResourceMetricSource type for use with
+// apply.
+func ContainerResourceMetricSource() *ContainerResourceMetricSourceApplyConfiguration {
+	return &ContainerResourceMetricSourceApplyConfiguration{}
+}
+
 // containerResourceMetricSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ContainerResourceMetricSourceBuilder.
+// Inline fields are owned by their respective inline type in ContainerResourceMetricSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -44,26 +50,20 @@ type containerResourceMetricSourceFields struct {
 	Container                *string            `json:"container,omitempty"`
 }
 
-// ContainerResourceMetricSource constructs an declarative configuration of the ContainerResourceMetricSource type for use with
-// apply.
-func ContainerResourceMetricSource() *ContainerResourceMetricSourceBuilder {
-	return &ContainerResourceMetricSourceBuilder{}
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *ContainerResourceMetricSourceBuilder) SetName(value v1.ResourceName) *ContainerResourceMetricSourceBuilder {
+func (b *ContainerResourceMetricSourceApplyConfiguration) SetName(value v1.ResourceName) *ContainerResourceMetricSourceApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *ContainerResourceMetricSourceBuilder) RemoveName() *ContainerResourceMetricSourceBuilder {
+func (b *ContainerResourceMetricSourceApplyConfiguration) RemoveName() *ContainerResourceMetricSourceApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *ContainerResourceMetricSourceBuilder) GetName() (value v1.ResourceName, ok bool) {
+func (b *ContainerResourceMetricSourceApplyConfiguration) GetName() (value v1.ResourceName, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -71,19 +71,19 @@ func (b *ContainerResourceMetricSourceBuilder) GetName() (value v1.ResourceName,
 }
 
 // SetTargetAverageUtilization sets the TargetAverageUtilization field in the declarative configuration to the given value.
-func (b *ContainerResourceMetricSourceBuilder) SetTargetAverageUtilization(value int32) *ContainerResourceMetricSourceBuilder {
+func (b *ContainerResourceMetricSourceApplyConfiguration) SetTargetAverageUtilization(value int32) *ContainerResourceMetricSourceApplyConfiguration {
 	b.fields.TargetAverageUtilization = &value
 	return b
 }
 
 // RemoveTargetAverageUtilization removes the TargetAverageUtilization field from the declarative configuration.
-func (b *ContainerResourceMetricSourceBuilder) RemoveTargetAverageUtilization() *ContainerResourceMetricSourceBuilder {
+func (b *ContainerResourceMetricSourceApplyConfiguration) RemoveTargetAverageUtilization() *ContainerResourceMetricSourceApplyConfiguration {
 	b.fields.TargetAverageUtilization = nil
 	return b
 }
 
 // GetTargetAverageUtilization gets the TargetAverageUtilization field from the declarative configuration.
-func (b *ContainerResourceMetricSourceBuilder) GetTargetAverageUtilization() (value int32, ok bool) {
+func (b *ContainerResourceMetricSourceApplyConfiguration) GetTargetAverageUtilization() (value int32, ok bool) {
 	if v := b.fields.TargetAverageUtilization; v != nil {
 		return *v, true
 	}
@@ -91,19 +91,19 @@ func (b *ContainerResourceMetricSourceBuilder) GetTargetAverageUtilization() (va
 }
 
 // SetTargetAverageValue sets the TargetAverageValue field in the declarative configuration to the given value.
-func (b *ContainerResourceMetricSourceBuilder) SetTargetAverageValue(value resource.Quantity) *ContainerResourceMetricSourceBuilder {
+func (b *ContainerResourceMetricSourceApplyConfiguration) SetTargetAverageValue(value resource.Quantity) *ContainerResourceMetricSourceApplyConfiguration {
 	b.fields.TargetAverageValue = &value
 	return b
 }
 
 // RemoveTargetAverageValue removes the TargetAverageValue field from the declarative configuration.
-func (b *ContainerResourceMetricSourceBuilder) RemoveTargetAverageValue() *ContainerResourceMetricSourceBuilder {
+func (b *ContainerResourceMetricSourceApplyConfiguration) RemoveTargetAverageValue() *ContainerResourceMetricSourceApplyConfiguration {
 	b.fields.TargetAverageValue = nil
 	return b
 }
 
 // GetTargetAverageValue gets the TargetAverageValue field from the declarative configuration.
-func (b *ContainerResourceMetricSourceBuilder) GetTargetAverageValue() (value resource.Quantity, ok bool) {
+func (b *ContainerResourceMetricSourceApplyConfiguration) GetTargetAverageValue() (value resource.Quantity, ok bool) {
 	if v := b.fields.TargetAverageValue; v != nil {
 		return *v, true
 	}
@@ -111,27 +111,27 @@ func (b *ContainerResourceMetricSourceBuilder) GetTargetAverageValue() (value re
 }
 
 // SetContainer sets the Container field in the declarative configuration to the given value.
-func (b *ContainerResourceMetricSourceBuilder) SetContainer(value string) *ContainerResourceMetricSourceBuilder {
+func (b *ContainerResourceMetricSourceApplyConfiguration) SetContainer(value string) *ContainerResourceMetricSourceApplyConfiguration {
 	b.fields.Container = &value
 	return b
 }
 
 // RemoveContainer removes the Container field from the declarative configuration.
-func (b *ContainerResourceMetricSourceBuilder) RemoveContainer() *ContainerResourceMetricSourceBuilder {
+func (b *ContainerResourceMetricSourceApplyConfiguration) RemoveContainer() *ContainerResourceMetricSourceApplyConfiguration {
 	b.fields.Container = nil
 	return b
 }
 
 // GetContainer gets the Container field from the declarative configuration.
-func (b *ContainerResourceMetricSourceBuilder) GetContainer() (value string, ok bool) {
+func (b *ContainerResourceMetricSourceApplyConfiguration) GetContainer() (value string, ok bool) {
 	if v := b.fields.Container; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ContainerResourceMetricSourceBuilder to unstructured.
-func (b *ContainerResourceMetricSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ContainerResourceMetricSourceApplyConfiguration to unstructured.
+func (b *ContainerResourceMetricSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -143,9 +143,9 @@ func (b *ContainerResourceMetricSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ContainerResourceMetricSourceBuilder, replacing the contents
-// of ContainerResourceMetricSourceBuilder.
-func (b *ContainerResourceMetricSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ContainerResourceMetricSourceApplyConfiguration, replacing the contents
+// of ContainerResourceMetricSourceApplyConfiguration.
+func (b *ContainerResourceMetricSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &containerResourceMetricSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -156,15 +156,15 @@ func (b *ContainerResourceMetricSourceBuilder) FromUnstructured(u map[string]int
 	return nil
 }
 
-// MarshalJSON marshals ContainerResourceMetricSourceBuilder to JSON.
-func (b *ContainerResourceMetricSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ContainerResourceMetricSourceApplyConfiguration to JSON.
+func (b *ContainerResourceMetricSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ContainerResourceMetricSourceBuilder, replacing the contents of
-// ContainerResourceMetricSourceBuilder.
-func (b *ContainerResourceMetricSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ContainerResourceMetricSourceApplyConfiguration, replacing the contents of
+// ContainerResourceMetricSourceApplyConfiguration.
+func (b *ContainerResourceMetricSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -172,13 +172,13 @@ func (b *ContainerResourceMetricSourceBuilder) UnmarshalJSON(data []byte) error 
 	return nil
 }
 
-// ContainerResourceMetricSourceList represents a list of ContainerResourceMetricSourceBuilder.
-type ContainerResourceMetricSourceList []*ContainerResourceMetricSourceBuilder
+// ContainerResourceMetricSourceList represents a listAlias of ContainerResourceMetricSourceApplyConfiguration.
+type ContainerResourceMetricSourceList []*ContainerResourceMetricSourceApplyConfiguration
 
-// ContainerResourceMetricSourceList represents a map of ContainerResourceMetricSourceBuilder.
-type ContainerResourceMetricSourceMap map[string]ContainerResourceMetricSourceBuilder
+// ContainerResourceMetricSourceList represents a map of ContainerResourceMetricSourceApplyConfiguration.
+type ContainerResourceMetricSourceMap map[string]ContainerResourceMetricSourceApplyConfiguration
 
-func (b *ContainerResourceMetricSourceBuilder) preMarshal() {
+func (b *ContainerResourceMetricSourceApplyConfiguration) preMarshal() {
 }
-func (b *ContainerResourceMetricSourceBuilder) postUnmarshal() {
+func (b *ContainerResourceMetricSourceApplyConfiguration) postUnmarshal() {
 }

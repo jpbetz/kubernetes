@@ -25,64 +25,64 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// PodTemplateSpecBuilder represents an declarative configuration of the PodTemplateSpec type for use
+// PodTemplateSpecApplyConfiguration represents an declarative configuration of the PodTemplateSpec type for use
 // with apply.
-type PodTemplateSpecBuilder struct {
+type PodTemplateSpecApplyConfiguration struct {
 	fields podTemplateSpecFields
 }
 
+// PodTemplateSpecApplyConfiguration constructs an declarative configuration of the PodTemplateSpec type for use with
+// apply.
+func PodTemplateSpec() *PodTemplateSpecApplyConfiguration {
+	return &PodTemplateSpecApplyConfiguration{}
+}
+
 // podTemplateSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodTemplateSpecBuilder.
+// Inline fields are owned by their respective inline type in PodTemplateSpecApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type podTemplateSpecFields struct {
-	ObjectMeta *v1.ObjectMetaBuilder `json:"metadata,omitempty"`
-	Spec       *PodSpecBuilder       `json:"spec,omitempty"`
-}
-
-// PodTemplateSpec constructs an declarative configuration of the PodTemplateSpec type for use with
-// apply.
-func PodTemplateSpec() *PodTemplateSpecBuilder {
-	return &PodTemplateSpecBuilder{}
+	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Spec       *PodSpecApplyConfiguration       `json:"spec,omitempty"`
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *PodTemplateSpecBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *PodTemplateSpecBuilder {
+func (b *PodTemplateSpecApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *PodTemplateSpecApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *PodTemplateSpecBuilder) RemoveObjectMeta() *PodTemplateSpecBuilder {
+func (b *PodTemplateSpecApplyConfiguration) RemoveObjectMeta() *PodTemplateSpecApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *PodTemplateSpecBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *PodTemplateSpecApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *PodTemplateSpecBuilder) SetSpec(value *PodSpecBuilder) *PodTemplateSpecBuilder {
+func (b *PodTemplateSpecApplyConfiguration) SetSpec(value *PodSpecApplyConfiguration) *PodTemplateSpecApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *PodTemplateSpecBuilder) RemoveSpec() *PodTemplateSpecBuilder {
+func (b *PodTemplateSpecApplyConfiguration) RemoveSpec() *PodTemplateSpecApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *PodTemplateSpecBuilder) GetSpec() (value *PodSpecBuilder, ok bool) {
+func (b *PodTemplateSpecApplyConfiguration) GetSpec() (value *PodSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
-// ToUnstructured converts PodTemplateSpecBuilder to unstructured.
-func (b *PodTemplateSpecBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PodTemplateSpecApplyConfiguration to unstructured.
+func (b *PodTemplateSpecApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -94,9 +94,9 @@ func (b *PodTemplateSpecBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to PodTemplateSpecBuilder, replacing the contents
-// of PodTemplateSpecBuilder.
-func (b *PodTemplateSpecBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PodTemplateSpecApplyConfiguration, replacing the contents
+// of PodTemplateSpecApplyConfiguration.
+func (b *PodTemplateSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &podTemplateSpecFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -107,15 +107,15 @@ func (b *PodTemplateSpecBuilder) FromUnstructured(u map[string]interface{}) erro
 	return nil
 }
 
-// MarshalJSON marshals PodTemplateSpecBuilder to JSON.
-func (b *PodTemplateSpecBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PodTemplateSpecApplyConfiguration to JSON.
+func (b *PodTemplateSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PodTemplateSpecBuilder, replacing the contents of
-// PodTemplateSpecBuilder.
-func (b *PodTemplateSpecBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PodTemplateSpecApplyConfiguration, replacing the contents of
+// PodTemplateSpecApplyConfiguration.
+func (b *PodTemplateSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -123,13 +123,13 @@ func (b *PodTemplateSpecBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// PodTemplateSpecList represents a list of PodTemplateSpecBuilder.
-type PodTemplateSpecList []*PodTemplateSpecBuilder
+// PodTemplateSpecList represents a listAlias of PodTemplateSpecApplyConfiguration.
+type PodTemplateSpecList []*PodTemplateSpecApplyConfiguration
 
-// PodTemplateSpecList represents a map of PodTemplateSpecBuilder.
-type PodTemplateSpecMap map[string]PodTemplateSpecBuilder
+// PodTemplateSpecList represents a map of PodTemplateSpecApplyConfiguration.
+type PodTemplateSpecMap map[string]PodTemplateSpecApplyConfiguration
 
-func (b *PodTemplateSpecBuilder) preMarshal() {
+func (b *PodTemplateSpecApplyConfiguration) preMarshal() {
 }
-func (b *PodTemplateSpecBuilder) postUnmarshal() {
+func (b *PodTemplateSpecApplyConfiguration) postUnmarshal() {
 }

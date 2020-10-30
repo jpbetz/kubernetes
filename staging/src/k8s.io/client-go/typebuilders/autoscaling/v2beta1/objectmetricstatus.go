@@ -26,62 +26,62 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// ObjectMetricStatusBuilder represents an declarative configuration of the ObjectMetricStatus type for use
+// ObjectMetricStatusApplyConfiguration represents an declarative configuration of the ObjectMetricStatus type for use
 // with apply.
-type ObjectMetricStatusBuilder struct {
+type ObjectMetricStatusApplyConfiguration struct {
 	fields objectMetricStatusFields
 }
 
+// ObjectMetricStatusApplyConfiguration constructs an declarative configuration of the ObjectMetricStatus type for use with
+// apply.
+func ObjectMetricStatus() *ObjectMetricStatusApplyConfiguration {
+	return &ObjectMetricStatusApplyConfiguration{}
+}
+
 // objectMetricStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ObjectMetricStatusBuilder.
+// Inline fields are owned by their respective inline type in ObjectMetricStatusApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type objectMetricStatusFields struct {
-	Target       *CrossVersionObjectReferenceBuilder `json:"target,omitempty"`
-	MetricName   *string                             `json:"metricName,omitempty"`
-	CurrentValue *resource.Quantity                  `json:"currentValue,omitempty"`
-	Selector     *v1.LabelSelectorBuilder            `json:"selector,omitempty"`
-	AverageValue *resource.Quantity                  `json:"averageValue,omitempty"`
-}
-
-// ObjectMetricStatus constructs an declarative configuration of the ObjectMetricStatus type for use with
-// apply.
-func ObjectMetricStatus() *ObjectMetricStatusBuilder {
-	return &ObjectMetricStatusBuilder{}
+	Target       *CrossVersionObjectReferenceApplyConfiguration `json:"target,omitempty"`
+	MetricName   *string                                        `json:"metricName,omitempty"`
+	CurrentValue *resource.Quantity                             `json:"currentValue,omitempty"`
+	Selector     *v1.LabelSelectorApplyConfiguration            `json:"selector,omitempty"`
+	AverageValue *resource.Quantity                             `json:"averageValue,omitempty"`
 }
 
 // SetTarget sets the Target field in the declarative configuration to the given value.
-func (b *ObjectMetricStatusBuilder) SetTarget(value *CrossVersionObjectReferenceBuilder) *ObjectMetricStatusBuilder {
+func (b *ObjectMetricStatusApplyConfiguration) SetTarget(value *CrossVersionObjectReferenceApplyConfiguration) *ObjectMetricStatusApplyConfiguration {
 	b.fields.Target = value
 	return b
 }
 
 // RemoveTarget removes the Target field from the declarative configuration.
-func (b *ObjectMetricStatusBuilder) RemoveTarget() *ObjectMetricStatusBuilder {
+func (b *ObjectMetricStatusApplyConfiguration) RemoveTarget() *ObjectMetricStatusApplyConfiguration {
 	b.fields.Target = nil
 	return b
 }
 
 // GetTarget gets the Target field from the declarative configuration.
-func (b *ObjectMetricStatusBuilder) GetTarget() (value *CrossVersionObjectReferenceBuilder, ok bool) {
+func (b *ObjectMetricStatusApplyConfiguration) GetTarget() (value *CrossVersionObjectReferenceApplyConfiguration, ok bool) {
 	return b.fields.Target, b.fields.Target != nil
 }
 
 // SetMetricName sets the MetricName field in the declarative configuration to the given value.
-func (b *ObjectMetricStatusBuilder) SetMetricName(value string) *ObjectMetricStatusBuilder {
+func (b *ObjectMetricStatusApplyConfiguration) SetMetricName(value string) *ObjectMetricStatusApplyConfiguration {
 	b.fields.MetricName = &value
 	return b
 }
 
 // RemoveMetricName removes the MetricName field from the declarative configuration.
-func (b *ObjectMetricStatusBuilder) RemoveMetricName() *ObjectMetricStatusBuilder {
+func (b *ObjectMetricStatusApplyConfiguration) RemoveMetricName() *ObjectMetricStatusApplyConfiguration {
 	b.fields.MetricName = nil
 	return b
 }
 
 // GetMetricName gets the MetricName field from the declarative configuration.
-func (b *ObjectMetricStatusBuilder) GetMetricName() (value string, ok bool) {
+func (b *ObjectMetricStatusApplyConfiguration) GetMetricName() (value string, ok bool) {
 	if v := b.fields.MetricName; v != nil {
 		return *v, true
 	}
@@ -89,19 +89,19 @@ func (b *ObjectMetricStatusBuilder) GetMetricName() (value string, ok bool) {
 }
 
 // SetCurrentValue sets the CurrentValue field in the declarative configuration to the given value.
-func (b *ObjectMetricStatusBuilder) SetCurrentValue(value resource.Quantity) *ObjectMetricStatusBuilder {
+func (b *ObjectMetricStatusApplyConfiguration) SetCurrentValue(value resource.Quantity) *ObjectMetricStatusApplyConfiguration {
 	b.fields.CurrentValue = &value
 	return b
 }
 
 // RemoveCurrentValue removes the CurrentValue field from the declarative configuration.
-func (b *ObjectMetricStatusBuilder) RemoveCurrentValue() *ObjectMetricStatusBuilder {
+func (b *ObjectMetricStatusApplyConfiguration) RemoveCurrentValue() *ObjectMetricStatusApplyConfiguration {
 	b.fields.CurrentValue = nil
 	return b
 }
 
 // GetCurrentValue gets the CurrentValue field from the declarative configuration.
-func (b *ObjectMetricStatusBuilder) GetCurrentValue() (value resource.Quantity, ok bool) {
+func (b *ObjectMetricStatusApplyConfiguration) GetCurrentValue() (value resource.Quantity, ok bool) {
 	if v := b.fields.CurrentValue; v != nil {
 		return *v, true
 	}
@@ -109,44 +109,44 @@ func (b *ObjectMetricStatusBuilder) GetCurrentValue() (value resource.Quantity, 
 }
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
-func (b *ObjectMetricStatusBuilder) SetSelector(value *v1.LabelSelectorBuilder) *ObjectMetricStatusBuilder {
+func (b *ObjectMetricStatusApplyConfiguration) SetSelector(value *v1.LabelSelectorApplyConfiguration) *ObjectMetricStatusApplyConfiguration {
 	b.fields.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
-func (b *ObjectMetricStatusBuilder) RemoveSelector() *ObjectMetricStatusBuilder {
+func (b *ObjectMetricStatusApplyConfiguration) RemoveSelector() *ObjectMetricStatusApplyConfiguration {
 	b.fields.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
-func (b *ObjectMetricStatusBuilder) GetSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+func (b *ObjectMetricStatusApplyConfiguration) GetSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
 	return b.fields.Selector, b.fields.Selector != nil
 }
 
 // SetAverageValue sets the AverageValue field in the declarative configuration to the given value.
-func (b *ObjectMetricStatusBuilder) SetAverageValue(value resource.Quantity) *ObjectMetricStatusBuilder {
+func (b *ObjectMetricStatusApplyConfiguration) SetAverageValue(value resource.Quantity) *ObjectMetricStatusApplyConfiguration {
 	b.fields.AverageValue = &value
 	return b
 }
 
 // RemoveAverageValue removes the AverageValue field from the declarative configuration.
-func (b *ObjectMetricStatusBuilder) RemoveAverageValue() *ObjectMetricStatusBuilder {
+func (b *ObjectMetricStatusApplyConfiguration) RemoveAverageValue() *ObjectMetricStatusApplyConfiguration {
 	b.fields.AverageValue = nil
 	return b
 }
 
 // GetAverageValue gets the AverageValue field from the declarative configuration.
-func (b *ObjectMetricStatusBuilder) GetAverageValue() (value resource.Quantity, ok bool) {
+func (b *ObjectMetricStatusApplyConfiguration) GetAverageValue() (value resource.Quantity, ok bool) {
 	if v := b.fields.AverageValue; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ObjectMetricStatusBuilder to unstructured.
-func (b *ObjectMetricStatusBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ObjectMetricStatusApplyConfiguration to unstructured.
+func (b *ObjectMetricStatusApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -158,9 +158,9 @@ func (b *ObjectMetricStatusBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ObjectMetricStatusBuilder, replacing the contents
-// of ObjectMetricStatusBuilder.
-func (b *ObjectMetricStatusBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ObjectMetricStatusApplyConfiguration, replacing the contents
+// of ObjectMetricStatusApplyConfiguration.
+func (b *ObjectMetricStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &objectMetricStatusFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -171,15 +171,15 @@ func (b *ObjectMetricStatusBuilder) FromUnstructured(u map[string]interface{}) e
 	return nil
 }
 
-// MarshalJSON marshals ObjectMetricStatusBuilder to JSON.
-func (b *ObjectMetricStatusBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ObjectMetricStatusApplyConfiguration to JSON.
+func (b *ObjectMetricStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ObjectMetricStatusBuilder, replacing the contents of
-// ObjectMetricStatusBuilder.
-func (b *ObjectMetricStatusBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ObjectMetricStatusApplyConfiguration, replacing the contents of
+// ObjectMetricStatusApplyConfiguration.
+func (b *ObjectMetricStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -187,13 +187,13 @@ func (b *ObjectMetricStatusBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ObjectMetricStatusList represents a list of ObjectMetricStatusBuilder.
-type ObjectMetricStatusList []*ObjectMetricStatusBuilder
+// ObjectMetricStatusList represents a listAlias of ObjectMetricStatusApplyConfiguration.
+type ObjectMetricStatusList []*ObjectMetricStatusApplyConfiguration
 
-// ObjectMetricStatusList represents a map of ObjectMetricStatusBuilder.
-type ObjectMetricStatusMap map[string]ObjectMetricStatusBuilder
+// ObjectMetricStatusList represents a map of ObjectMetricStatusApplyConfiguration.
+type ObjectMetricStatusMap map[string]ObjectMetricStatusApplyConfiguration
 
-func (b *ObjectMetricStatusBuilder) preMarshal() {
+func (b *ObjectMetricStatusApplyConfiguration) preMarshal() {
 }
-func (b *ObjectMetricStatusBuilder) postUnmarshal() {
+func (b *ObjectMetricStatusApplyConfiguration) postUnmarshal() {
 }

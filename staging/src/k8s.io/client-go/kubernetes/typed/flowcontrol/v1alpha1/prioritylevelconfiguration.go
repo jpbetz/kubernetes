@@ -49,7 +49,7 @@ type PriorityLevelConfigurationInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.PriorityLevelConfigurationList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.PriorityLevelConfiguration, err error)
-	Apply(ctx context.Context, priorityLevelConfiguration flowcontrolv1alpha1.PriorityLevelConfigurationBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.PriorityLevelConfiguration, err error)
+	Apply(ctx context.Context, priorityLevelConfiguration *flowcontrolv1alpha1.PriorityLevelConfigurationApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.PriorityLevelConfiguration, err error)
 	PriorityLevelConfigurationExpansion
 }
 
@@ -187,7 +187,7 @@ func (c *priorityLevelConfigurations) Patch(ctx context.Context, name string, pt
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied priorityLevelConfiguration.
-func (c *priorityLevelConfigurations) Apply(ctx context.Context, priorityLevelConfiguration flowcontrolv1alpha1.PriorityLevelConfigurationBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.PriorityLevelConfiguration, err error) {
+func (c *priorityLevelConfigurations) Apply(ctx context.Context, priorityLevelConfiguration *flowcontrolv1alpha1.PriorityLevelConfigurationApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.PriorityLevelConfiguration, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := priorityLevelConfiguration.MarshalJSON()
 	if err != nil {

@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// PriorityLevelConfigurationReferenceBuilder represents an declarative configuration of the PriorityLevelConfigurationReference type for use
+// PriorityLevelConfigurationReferenceApplyConfiguration represents an declarative configuration of the PriorityLevelConfigurationReference type for use
 // with apply.
-type PriorityLevelConfigurationReferenceBuilder struct {
+type PriorityLevelConfigurationReferenceApplyConfiguration struct {
 	fields priorityLevelConfigurationReferenceFields
 }
 
+// PriorityLevelConfigurationReferenceApplyConfiguration constructs an declarative configuration of the PriorityLevelConfigurationReference type for use with
+// apply.
+func PriorityLevelConfigurationReference() *PriorityLevelConfigurationReferenceApplyConfiguration {
+	return &PriorityLevelConfigurationReferenceApplyConfiguration{}
+}
+
 // priorityLevelConfigurationReferenceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PriorityLevelConfigurationReferenceBuilder.
+// Inline fields are owned by their respective inline type in PriorityLevelConfigurationReferenceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type priorityLevelConfigurationReferenceFields struct {
 	Name *string `json:"name,omitempty"`
 }
 
-// PriorityLevelConfigurationReference constructs an declarative configuration of the PriorityLevelConfigurationReference type for use with
-// apply.
-func PriorityLevelConfigurationReference() *PriorityLevelConfigurationReferenceBuilder {
-	return &PriorityLevelConfigurationReferenceBuilder{}
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *PriorityLevelConfigurationReferenceBuilder) SetName(value string) *PriorityLevelConfigurationReferenceBuilder {
+func (b *PriorityLevelConfigurationReferenceApplyConfiguration) SetName(value string) *PriorityLevelConfigurationReferenceApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *PriorityLevelConfigurationReferenceBuilder) RemoveName() *PriorityLevelConfigurationReferenceBuilder {
+func (b *PriorityLevelConfigurationReferenceApplyConfiguration) RemoveName() *PriorityLevelConfigurationReferenceApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *PriorityLevelConfigurationReferenceBuilder) GetName() (value string, ok bool) {
+func (b *PriorityLevelConfigurationReferenceApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts PriorityLevelConfigurationReferenceBuilder to unstructured.
-func (b *PriorityLevelConfigurationReferenceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PriorityLevelConfigurationReferenceApplyConfiguration to unstructured.
+func (b *PriorityLevelConfigurationReferenceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *PriorityLevelConfigurationReferenceBuilder) ToUnstructured() interface{
 	return u
 }
 
-// FromUnstructured converts unstructured to PriorityLevelConfigurationReferenceBuilder, replacing the contents
-// of PriorityLevelConfigurationReferenceBuilder.
-func (b *PriorityLevelConfigurationReferenceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PriorityLevelConfigurationReferenceApplyConfiguration, replacing the contents
+// of PriorityLevelConfigurationReferenceApplyConfiguration.
+func (b *PriorityLevelConfigurationReferenceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &priorityLevelConfigurationReferenceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *PriorityLevelConfigurationReferenceBuilder) FromUnstructured(u map[stri
 	return nil
 }
 
-// MarshalJSON marshals PriorityLevelConfigurationReferenceBuilder to JSON.
-func (b *PriorityLevelConfigurationReferenceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PriorityLevelConfigurationReferenceApplyConfiguration to JSON.
+func (b *PriorityLevelConfigurationReferenceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PriorityLevelConfigurationReferenceBuilder, replacing the contents of
-// PriorityLevelConfigurationReferenceBuilder.
-func (b *PriorityLevelConfigurationReferenceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PriorityLevelConfigurationReferenceApplyConfiguration, replacing the contents of
+// PriorityLevelConfigurationReferenceApplyConfiguration.
+func (b *PriorityLevelConfigurationReferenceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *PriorityLevelConfigurationReferenceBuilder) UnmarshalJSON(data []byte) 
 	return nil
 }
 
-// PriorityLevelConfigurationReferenceList represents a list of PriorityLevelConfigurationReferenceBuilder.
-type PriorityLevelConfigurationReferenceList []*PriorityLevelConfigurationReferenceBuilder
+// PriorityLevelConfigurationReferenceList represents a listAlias of PriorityLevelConfigurationReferenceApplyConfiguration.
+type PriorityLevelConfigurationReferenceList []*PriorityLevelConfigurationReferenceApplyConfiguration
 
-// PriorityLevelConfigurationReferenceList represents a map of PriorityLevelConfigurationReferenceBuilder.
-type PriorityLevelConfigurationReferenceMap map[string]PriorityLevelConfigurationReferenceBuilder
+// PriorityLevelConfigurationReferenceList represents a map of PriorityLevelConfigurationReferenceApplyConfiguration.
+type PriorityLevelConfigurationReferenceMap map[string]PriorityLevelConfigurationReferenceApplyConfiguration
 
-func (b *PriorityLevelConfigurationReferenceBuilder) preMarshal() {
+func (b *PriorityLevelConfigurationReferenceApplyConfiguration) preMarshal() {
 }
-func (b *PriorityLevelConfigurationReferenceBuilder) postUnmarshal() {
+func (b *PriorityLevelConfigurationReferenceApplyConfiguration) postUnmarshal() {
 }

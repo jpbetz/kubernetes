@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ImageReviewSpecBuilder represents an declarative configuration of the ImageReviewSpec type for use
+// ImageReviewSpecApplyConfiguration represents an declarative configuration of the ImageReviewSpec type for use
 // with apply.
-type ImageReviewSpecBuilder struct {
+type ImageReviewSpecApplyConfiguration struct {
 	fields imageReviewSpecFields
 }
 
+// ImageReviewSpecApplyConfiguration constructs an declarative configuration of the ImageReviewSpec type for use with
+// apply.
+func ImageReviewSpec() *ImageReviewSpecApplyConfiguration {
+	return &ImageReviewSpecApplyConfiguration{}
+}
+
 // imageReviewSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ImageReviewSpecBuilder.
+// Inline fields are owned by their respective inline type in ImageReviewSpecApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type imageReviewSpecFields struct {
 	Namespace   *string                       `json:"namespace,omitempty"`
 }
 
-// ImageReviewSpec constructs an declarative configuration of the ImageReviewSpec type for use with
-// apply.
-func ImageReviewSpec() *ImageReviewSpecBuilder {
-	return &ImageReviewSpecBuilder{}
-}
-
 // SetContainers sets the Containers field in the declarative configuration to the given value.
-func (b *ImageReviewSpecBuilder) SetContainers(value ImageReviewContainerSpecList) *ImageReviewSpecBuilder {
+func (b *ImageReviewSpecApplyConfiguration) SetContainers(value ImageReviewContainerSpecList) *ImageReviewSpecApplyConfiguration {
 	b.fields.Containers = &value
 	return b
 }
 
 // RemoveContainers removes the Containers field from the declarative configuration.
-func (b *ImageReviewSpecBuilder) RemoveContainers() *ImageReviewSpecBuilder {
+func (b *ImageReviewSpecApplyConfiguration) RemoveContainers() *ImageReviewSpecApplyConfiguration {
 	b.fields.Containers = nil
 	return b
 }
 
 // GetContainers gets the Containers field from the declarative configuration.
-func (b *ImageReviewSpecBuilder) GetContainers() (value ImageReviewContainerSpecList, ok bool) {
+func (b *ImageReviewSpecApplyConfiguration) GetContainers() (value ImageReviewContainerSpecList, ok bool) {
 	if v := b.fields.Containers; v != nil {
 		return *v, true
 	}
@@ -68,19 +68,19 @@ func (b *ImageReviewSpecBuilder) GetContainers() (value ImageReviewContainerSpec
 }
 
 // SetAnnotations sets the Annotations field in the declarative configuration to the given value.
-func (b *ImageReviewSpecBuilder) SetAnnotations(value map[string]string) *ImageReviewSpecBuilder {
+func (b *ImageReviewSpecApplyConfiguration) SetAnnotations(value map[string]string) *ImageReviewSpecApplyConfiguration {
 	b.fields.Annotations = &value
 	return b
 }
 
 // RemoveAnnotations removes the Annotations field from the declarative configuration.
-func (b *ImageReviewSpecBuilder) RemoveAnnotations() *ImageReviewSpecBuilder {
+func (b *ImageReviewSpecApplyConfiguration) RemoveAnnotations() *ImageReviewSpecApplyConfiguration {
 	b.fields.Annotations = nil
 	return b
 }
 
 // GetAnnotations gets the Annotations field from the declarative configuration.
-func (b *ImageReviewSpecBuilder) GetAnnotations() (value map[string]string, ok bool) {
+func (b *ImageReviewSpecApplyConfiguration) GetAnnotations() (value map[string]string, ok bool) {
 	if v := b.fields.Annotations; v != nil {
 		return *v, true
 	}
@@ -88,27 +88,27 @@ func (b *ImageReviewSpecBuilder) GetAnnotations() (value map[string]string, ok b
 }
 
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
-func (b *ImageReviewSpecBuilder) SetNamespace(value string) *ImageReviewSpecBuilder {
+func (b *ImageReviewSpecApplyConfiguration) SetNamespace(value string) *ImageReviewSpecApplyConfiguration {
 	b.fields.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
-func (b *ImageReviewSpecBuilder) RemoveNamespace() *ImageReviewSpecBuilder {
+func (b *ImageReviewSpecApplyConfiguration) RemoveNamespace() *ImageReviewSpecApplyConfiguration {
 	b.fields.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
-func (b *ImageReviewSpecBuilder) GetNamespace() (value string, ok bool) {
+func (b *ImageReviewSpecApplyConfiguration) GetNamespace() (value string, ok bool) {
 	if v := b.fields.Namespace; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ImageReviewSpecBuilder to unstructured.
-func (b *ImageReviewSpecBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ImageReviewSpecApplyConfiguration to unstructured.
+func (b *ImageReviewSpecApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -120,9 +120,9 @@ func (b *ImageReviewSpecBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ImageReviewSpecBuilder, replacing the contents
-// of ImageReviewSpecBuilder.
-func (b *ImageReviewSpecBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ImageReviewSpecApplyConfiguration, replacing the contents
+// of ImageReviewSpecApplyConfiguration.
+func (b *ImageReviewSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &imageReviewSpecFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -133,15 +133,15 @@ func (b *ImageReviewSpecBuilder) FromUnstructured(u map[string]interface{}) erro
 	return nil
 }
 
-// MarshalJSON marshals ImageReviewSpecBuilder to JSON.
-func (b *ImageReviewSpecBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ImageReviewSpecApplyConfiguration to JSON.
+func (b *ImageReviewSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ImageReviewSpecBuilder, replacing the contents of
-// ImageReviewSpecBuilder.
-func (b *ImageReviewSpecBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ImageReviewSpecApplyConfiguration, replacing the contents of
+// ImageReviewSpecApplyConfiguration.
+func (b *ImageReviewSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -149,13 +149,13 @@ func (b *ImageReviewSpecBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ImageReviewSpecList represents a list of ImageReviewSpecBuilder.
-type ImageReviewSpecList []*ImageReviewSpecBuilder
+// ImageReviewSpecList represents a listAlias of ImageReviewSpecApplyConfiguration.
+type ImageReviewSpecList []*ImageReviewSpecApplyConfiguration
 
-// ImageReviewSpecList represents a map of ImageReviewSpecBuilder.
-type ImageReviewSpecMap map[string]ImageReviewSpecBuilder
+// ImageReviewSpecList represents a map of ImageReviewSpecApplyConfiguration.
+type ImageReviewSpecMap map[string]ImageReviewSpecApplyConfiguration
 
-func (b *ImageReviewSpecBuilder) preMarshal() {
+func (b *ImageReviewSpecApplyConfiguration) preMarshal() {
 }
-func (b *ImageReviewSpecBuilder) postUnmarshal() {
+func (b *ImageReviewSpecApplyConfiguration) postUnmarshal() {
 }

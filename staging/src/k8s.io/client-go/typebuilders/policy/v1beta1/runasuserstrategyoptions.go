@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// RunAsUserStrategyOptionsBuilder represents an declarative configuration of the RunAsUserStrategyOptions type for use
+// RunAsUserStrategyOptionsApplyConfiguration represents an declarative configuration of the RunAsUserStrategyOptions type for use
 // with apply.
-type RunAsUserStrategyOptionsBuilder struct {
+type RunAsUserStrategyOptionsApplyConfiguration struct {
 	fields runAsUserStrategyOptionsFields
 }
 
+// RunAsUserStrategyOptionsApplyConfiguration constructs an declarative configuration of the RunAsUserStrategyOptions type for use with
+// apply.
+func RunAsUserStrategyOptions() *RunAsUserStrategyOptionsApplyConfiguration {
+	return &RunAsUserStrategyOptionsApplyConfiguration{}
+}
+
 // runAsUserStrategyOptionsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in RunAsUserStrategyOptionsBuilder.
+// Inline fields are owned by their respective inline type in RunAsUserStrategyOptionsApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type runAsUserStrategyOptionsFields struct {
 	Ranges *IDRangeList               `json:"ranges,omitempty"`
 }
 
-// RunAsUserStrategyOptions constructs an declarative configuration of the RunAsUserStrategyOptions type for use with
-// apply.
-func RunAsUserStrategyOptions() *RunAsUserStrategyOptionsBuilder {
-	return &RunAsUserStrategyOptionsBuilder{}
-}
-
 // SetRule sets the Rule field in the declarative configuration to the given value.
-func (b *RunAsUserStrategyOptionsBuilder) SetRule(value v1beta1.RunAsUserStrategy) *RunAsUserStrategyOptionsBuilder {
+func (b *RunAsUserStrategyOptionsApplyConfiguration) SetRule(value v1beta1.RunAsUserStrategy) *RunAsUserStrategyOptionsApplyConfiguration {
 	b.fields.Rule = &value
 	return b
 }
 
 // RemoveRule removes the Rule field from the declarative configuration.
-func (b *RunAsUserStrategyOptionsBuilder) RemoveRule() *RunAsUserStrategyOptionsBuilder {
+func (b *RunAsUserStrategyOptionsApplyConfiguration) RemoveRule() *RunAsUserStrategyOptionsApplyConfiguration {
 	b.fields.Rule = nil
 	return b
 }
 
 // GetRule gets the Rule field from the declarative configuration.
-func (b *RunAsUserStrategyOptionsBuilder) GetRule() (value v1beta1.RunAsUserStrategy, ok bool) {
+func (b *RunAsUserStrategyOptionsApplyConfiguration) GetRule() (value v1beta1.RunAsUserStrategy, ok bool) {
 	if v := b.fields.Rule; v != nil {
 		return *v, true
 	}
@@ -68,27 +68,27 @@ func (b *RunAsUserStrategyOptionsBuilder) GetRule() (value v1beta1.RunAsUserStra
 }
 
 // SetRanges sets the Ranges field in the declarative configuration to the given value.
-func (b *RunAsUserStrategyOptionsBuilder) SetRanges(value IDRangeList) *RunAsUserStrategyOptionsBuilder {
+func (b *RunAsUserStrategyOptionsApplyConfiguration) SetRanges(value IDRangeList) *RunAsUserStrategyOptionsApplyConfiguration {
 	b.fields.Ranges = &value
 	return b
 }
 
 // RemoveRanges removes the Ranges field from the declarative configuration.
-func (b *RunAsUserStrategyOptionsBuilder) RemoveRanges() *RunAsUserStrategyOptionsBuilder {
+func (b *RunAsUserStrategyOptionsApplyConfiguration) RemoveRanges() *RunAsUserStrategyOptionsApplyConfiguration {
 	b.fields.Ranges = nil
 	return b
 }
 
 // GetRanges gets the Ranges field from the declarative configuration.
-func (b *RunAsUserStrategyOptionsBuilder) GetRanges() (value IDRangeList, ok bool) {
+func (b *RunAsUserStrategyOptionsApplyConfiguration) GetRanges() (value IDRangeList, ok bool) {
 	if v := b.fields.Ranges; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts RunAsUserStrategyOptionsBuilder to unstructured.
-func (b *RunAsUserStrategyOptionsBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts RunAsUserStrategyOptionsApplyConfiguration to unstructured.
+func (b *RunAsUserStrategyOptionsApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -100,9 +100,9 @@ func (b *RunAsUserStrategyOptionsBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to RunAsUserStrategyOptionsBuilder, replacing the contents
-// of RunAsUserStrategyOptionsBuilder.
-func (b *RunAsUserStrategyOptionsBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to RunAsUserStrategyOptionsApplyConfiguration, replacing the contents
+// of RunAsUserStrategyOptionsApplyConfiguration.
+func (b *RunAsUserStrategyOptionsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &runAsUserStrategyOptionsFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -113,15 +113,15 @@ func (b *RunAsUserStrategyOptionsBuilder) FromUnstructured(u map[string]interfac
 	return nil
 }
 
-// MarshalJSON marshals RunAsUserStrategyOptionsBuilder to JSON.
-func (b *RunAsUserStrategyOptionsBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals RunAsUserStrategyOptionsApplyConfiguration to JSON.
+func (b *RunAsUserStrategyOptionsApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into RunAsUserStrategyOptionsBuilder, replacing the contents of
-// RunAsUserStrategyOptionsBuilder.
-func (b *RunAsUserStrategyOptionsBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into RunAsUserStrategyOptionsApplyConfiguration, replacing the contents of
+// RunAsUserStrategyOptionsApplyConfiguration.
+func (b *RunAsUserStrategyOptionsApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -129,13 +129,13 @@ func (b *RunAsUserStrategyOptionsBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// RunAsUserStrategyOptionsList represents a list of RunAsUserStrategyOptionsBuilder.
-type RunAsUserStrategyOptionsList []*RunAsUserStrategyOptionsBuilder
+// RunAsUserStrategyOptionsList represents a listAlias of RunAsUserStrategyOptionsApplyConfiguration.
+type RunAsUserStrategyOptionsList []*RunAsUserStrategyOptionsApplyConfiguration
 
-// RunAsUserStrategyOptionsList represents a map of RunAsUserStrategyOptionsBuilder.
-type RunAsUserStrategyOptionsMap map[string]RunAsUserStrategyOptionsBuilder
+// RunAsUserStrategyOptionsList represents a map of RunAsUserStrategyOptionsApplyConfiguration.
+type RunAsUserStrategyOptionsMap map[string]RunAsUserStrategyOptionsApplyConfiguration
 
-func (b *RunAsUserStrategyOptionsBuilder) preMarshal() {
+func (b *RunAsUserStrategyOptionsApplyConfiguration) preMarshal() {
 }
-func (b *RunAsUserStrategyOptionsBuilder) postUnmarshal() {
+func (b *RunAsUserStrategyOptionsApplyConfiguration) postUnmarshal() {
 }

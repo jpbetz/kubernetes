@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// HTTPHeaderBuilder represents an declarative configuration of the HTTPHeader type for use
+// HTTPHeaderApplyConfiguration represents an declarative configuration of the HTTPHeader type for use
 // with apply.
-type HTTPHeaderBuilder struct {
+type HTTPHeaderApplyConfiguration struct {
 	fields hTTPHeaderFields
 }
 
+// HTTPHeaderApplyConfiguration constructs an declarative configuration of the HTTPHeader type for use with
+// apply.
+func HTTPHeader() *HTTPHeaderApplyConfiguration {
+	return &HTTPHeaderApplyConfiguration{}
+}
+
 // hTTPHeaderFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in HTTPHeaderBuilder.
+// Inline fields are owned by their respective inline type in HTTPHeaderApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type hTTPHeaderFields struct {
 	Value *string `json:"value,omitempty"`
 }
 
-// HTTPHeader constructs an declarative configuration of the HTTPHeader type for use with
-// apply.
-func HTTPHeader() *HTTPHeaderBuilder {
-	return &HTTPHeaderBuilder{}
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *HTTPHeaderBuilder) SetName(value string) *HTTPHeaderBuilder {
+func (b *HTTPHeaderApplyConfiguration) SetName(value string) *HTTPHeaderApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *HTTPHeaderBuilder) RemoveName() *HTTPHeaderBuilder {
+func (b *HTTPHeaderApplyConfiguration) RemoveName() *HTTPHeaderApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *HTTPHeaderBuilder) GetName() (value string, ok bool) {
+func (b *HTTPHeaderApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *HTTPHeaderBuilder) GetName() (value string, ok bool) {
 }
 
 // SetValue sets the Value field in the declarative configuration to the given value.
-func (b *HTTPHeaderBuilder) SetValue(value string) *HTTPHeaderBuilder {
+func (b *HTTPHeaderApplyConfiguration) SetValue(value string) *HTTPHeaderApplyConfiguration {
 	b.fields.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
-func (b *HTTPHeaderBuilder) RemoveValue() *HTTPHeaderBuilder {
+func (b *HTTPHeaderApplyConfiguration) RemoveValue() *HTTPHeaderApplyConfiguration {
 	b.fields.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
-func (b *HTTPHeaderBuilder) GetValue() (value string, ok bool) {
+func (b *HTTPHeaderApplyConfiguration) GetValue() (value string, ok bool) {
 	if v := b.fields.Value; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts HTTPHeaderBuilder to unstructured.
-func (b *HTTPHeaderBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts HTTPHeaderApplyConfiguration to unstructured.
+func (b *HTTPHeaderApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *HTTPHeaderBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to HTTPHeaderBuilder, replacing the contents
-// of HTTPHeaderBuilder.
-func (b *HTTPHeaderBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to HTTPHeaderApplyConfiguration, replacing the contents
+// of HTTPHeaderApplyConfiguration.
+func (b *HTTPHeaderApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &hTTPHeaderFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *HTTPHeaderBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals HTTPHeaderBuilder to JSON.
-func (b *HTTPHeaderBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals HTTPHeaderApplyConfiguration to JSON.
+func (b *HTTPHeaderApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into HTTPHeaderBuilder, replacing the contents of
-// HTTPHeaderBuilder.
-func (b *HTTPHeaderBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into HTTPHeaderApplyConfiguration, replacing the contents of
+// HTTPHeaderApplyConfiguration.
+func (b *HTTPHeaderApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *HTTPHeaderBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// HTTPHeaderList represents a list of HTTPHeaderBuilder.
-type HTTPHeaderList []*HTTPHeaderBuilder
+// HTTPHeaderList represents a listAlias of HTTPHeaderApplyConfiguration.
+type HTTPHeaderList []*HTTPHeaderApplyConfiguration
 
-// HTTPHeaderList represents a map of HTTPHeaderBuilder.
-type HTTPHeaderMap map[string]HTTPHeaderBuilder
+// HTTPHeaderList represents a map of HTTPHeaderApplyConfiguration.
+type HTTPHeaderMap map[string]HTTPHeaderApplyConfiguration
 
-func (b *HTTPHeaderBuilder) preMarshal() {
+func (b *HTTPHeaderApplyConfiguration) preMarshal() {
 }
-func (b *HTTPHeaderBuilder) postUnmarshal() {
+func (b *HTTPHeaderApplyConfiguration) postUnmarshal() {
 }

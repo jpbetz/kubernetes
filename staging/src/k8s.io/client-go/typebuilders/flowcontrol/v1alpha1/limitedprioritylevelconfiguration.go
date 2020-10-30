@@ -24,42 +24,42 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// LimitedPriorityLevelConfigurationBuilder represents an declarative configuration of the LimitedPriorityLevelConfiguration type for use
+// LimitedPriorityLevelConfigurationApplyConfiguration represents an declarative configuration of the LimitedPriorityLevelConfiguration type for use
 // with apply.
-type LimitedPriorityLevelConfigurationBuilder struct {
+type LimitedPriorityLevelConfigurationApplyConfiguration struct {
 	fields limitedPriorityLevelConfigurationFields
 }
 
+// LimitedPriorityLevelConfigurationApplyConfiguration constructs an declarative configuration of the LimitedPriorityLevelConfiguration type for use with
+// apply.
+func LimitedPriorityLevelConfiguration() *LimitedPriorityLevelConfigurationApplyConfiguration {
+	return &LimitedPriorityLevelConfigurationApplyConfiguration{}
+}
+
 // limitedPriorityLevelConfigurationFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LimitedPriorityLevelConfigurationBuilder.
+// Inline fields are owned by their respective inline type in LimitedPriorityLevelConfigurationApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type limitedPriorityLevelConfigurationFields struct {
-	AssuredConcurrencyShares *int32                `json:"assuredConcurrencyShares,omitempty"`
-	LimitResponse            *LimitResponseBuilder `json:"limitResponse,omitempty"`
-}
-
-// LimitedPriorityLevelConfiguration constructs an declarative configuration of the LimitedPriorityLevelConfiguration type for use with
-// apply.
-func LimitedPriorityLevelConfiguration() *LimitedPriorityLevelConfigurationBuilder {
-	return &LimitedPriorityLevelConfigurationBuilder{}
+	AssuredConcurrencyShares *int32                           `json:"assuredConcurrencyShares,omitempty"`
+	LimitResponse            *LimitResponseApplyConfiguration `json:"limitResponse,omitempty"`
 }
 
 // SetAssuredConcurrencyShares sets the AssuredConcurrencyShares field in the declarative configuration to the given value.
-func (b *LimitedPriorityLevelConfigurationBuilder) SetAssuredConcurrencyShares(value int32) *LimitedPriorityLevelConfigurationBuilder {
+func (b *LimitedPriorityLevelConfigurationApplyConfiguration) SetAssuredConcurrencyShares(value int32) *LimitedPriorityLevelConfigurationApplyConfiguration {
 	b.fields.AssuredConcurrencyShares = &value
 	return b
 }
 
 // RemoveAssuredConcurrencyShares removes the AssuredConcurrencyShares field from the declarative configuration.
-func (b *LimitedPriorityLevelConfigurationBuilder) RemoveAssuredConcurrencyShares() *LimitedPriorityLevelConfigurationBuilder {
+func (b *LimitedPriorityLevelConfigurationApplyConfiguration) RemoveAssuredConcurrencyShares() *LimitedPriorityLevelConfigurationApplyConfiguration {
 	b.fields.AssuredConcurrencyShares = nil
 	return b
 }
 
 // GetAssuredConcurrencyShares gets the AssuredConcurrencyShares field from the declarative configuration.
-func (b *LimitedPriorityLevelConfigurationBuilder) GetAssuredConcurrencyShares() (value int32, ok bool) {
+func (b *LimitedPriorityLevelConfigurationApplyConfiguration) GetAssuredConcurrencyShares() (value int32, ok bool) {
 	if v := b.fields.AssuredConcurrencyShares; v != nil {
 		return *v, true
 	}
@@ -67,24 +67,24 @@ func (b *LimitedPriorityLevelConfigurationBuilder) GetAssuredConcurrencyShares()
 }
 
 // SetLimitResponse sets the LimitResponse field in the declarative configuration to the given value.
-func (b *LimitedPriorityLevelConfigurationBuilder) SetLimitResponse(value *LimitResponseBuilder) *LimitedPriorityLevelConfigurationBuilder {
+func (b *LimitedPriorityLevelConfigurationApplyConfiguration) SetLimitResponse(value *LimitResponseApplyConfiguration) *LimitedPriorityLevelConfigurationApplyConfiguration {
 	b.fields.LimitResponse = value
 	return b
 }
 
 // RemoveLimitResponse removes the LimitResponse field from the declarative configuration.
-func (b *LimitedPriorityLevelConfigurationBuilder) RemoveLimitResponse() *LimitedPriorityLevelConfigurationBuilder {
+func (b *LimitedPriorityLevelConfigurationApplyConfiguration) RemoveLimitResponse() *LimitedPriorityLevelConfigurationApplyConfiguration {
 	b.fields.LimitResponse = nil
 	return b
 }
 
 // GetLimitResponse gets the LimitResponse field from the declarative configuration.
-func (b *LimitedPriorityLevelConfigurationBuilder) GetLimitResponse() (value *LimitResponseBuilder, ok bool) {
+func (b *LimitedPriorityLevelConfigurationApplyConfiguration) GetLimitResponse() (value *LimitResponseApplyConfiguration, ok bool) {
 	return b.fields.LimitResponse, b.fields.LimitResponse != nil
 }
 
-// ToUnstructured converts LimitedPriorityLevelConfigurationBuilder to unstructured.
-func (b *LimitedPriorityLevelConfigurationBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts LimitedPriorityLevelConfigurationApplyConfiguration to unstructured.
+func (b *LimitedPriorityLevelConfigurationApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -96,9 +96,9 @@ func (b *LimitedPriorityLevelConfigurationBuilder) ToUnstructured() interface{} 
 	return u
 }
 
-// FromUnstructured converts unstructured to LimitedPriorityLevelConfigurationBuilder, replacing the contents
-// of LimitedPriorityLevelConfigurationBuilder.
-func (b *LimitedPriorityLevelConfigurationBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to LimitedPriorityLevelConfigurationApplyConfiguration, replacing the contents
+// of LimitedPriorityLevelConfigurationApplyConfiguration.
+func (b *LimitedPriorityLevelConfigurationApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &limitedPriorityLevelConfigurationFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -109,15 +109,15 @@ func (b *LimitedPriorityLevelConfigurationBuilder) FromUnstructured(u map[string
 	return nil
 }
 
-// MarshalJSON marshals LimitedPriorityLevelConfigurationBuilder to JSON.
-func (b *LimitedPriorityLevelConfigurationBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals LimitedPriorityLevelConfigurationApplyConfiguration to JSON.
+func (b *LimitedPriorityLevelConfigurationApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into LimitedPriorityLevelConfigurationBuilder, replacing the contents of
-// LimitedPriorityLevelConfigurationBuilder.
-func (b *LimitedPriorityLevelConfigurationBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into LimitedPriorityLevelConfigurationApplyConfiguration, replacing the contents of
+// LimitedPriorityLevelConfigurationApplyConfiguration.
+func (b *LimitedPriorityLevelConfigurationApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -125,13 +125,13 @@ func (b *LimitedPriorityLevelConfigurationBuilder) UnmarshalJSON(data []byte) er
 	return nil
 }
 
-// LimitedPriorityLevelConfigurationList represents a list of LimitedPriorityLevelConfigurationBuilder.
-type LimitedPriorityLevelConfigurationList []*LimitedPriorityLevelConfigurationBuilder
+// LimitedPriorityLevelConfigurationList represents a listAlias of LimitedPriorityLevelConfigurationApplyConfiguration.
+type LimitedPriorityLevelConfigurationList []*LimitedPriorityLevelConfigurationApplyConfiguration
 
-// LimitedPriorityLevelConfigurationList represents a map of LimitedPriorityLevelConfigurationBuilder.
-type LimitedPriorityLevelConfigurationMap map[string]LimitedPriorityLevelConfigurationBuilder
+// LimitedPriorityLevelConfigurationList represents a map of LimitedPriorityLevelConfigurationApplyConfiguration.
+type LimitedPriorityLevelConfigurationMap map[string]LimitedPriorityLevelConfigurationApplyConfiguration
 
-func (b *LimitedPriorityLevelConfigurationBuilder) preMarshal() {
+func (b *LimitedPriorityLevelConfigurationApplyConfiguration) preMarshal() {
 }
-func (b *LimitedPriorityLevelConfigurationBuilder) postUnmarshal() {
+func (b *LimitedPriorityLevelConfigurationApplyConfiguration) postUnmarshal() {
 }

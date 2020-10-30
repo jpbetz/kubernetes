@@ -24,44 +24,44 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// IngressSpecBuilder represents an declarative configuration of the IngressSpec type for use
+// IngressSpecApplyConfiguration represents an declarative configuration of the IngressSpec type for use
 // with apply.
-type IngressSpecBuilder struct {
+type IngressSpecApplyConfiguration struct {
 	fields ingressSpecFields
 }
 
+// IngressSpecApplyConfiguration constructs an declarative configuration of the IngressSpec type for use with
+// apply.
+func IngressSpec() *IngressSpecApplyConfiguration {
+	return &IngressSpecApplyConfiguration{}
+}
+
 // ingressSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in IngressSpecBuilder.
+// Inline fields are owned by their respective inline type in IngressSpecApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type ingressSpecFields struct {
-	IngressClassName *string                `json:"ingressClassName,omitempty"`
-	Backend          *IngressBackendBuilder `json:"backend,omitempty"`
-	TLS              *IngressTLSList        `json:"tls,omitempty"`
-	Rules            *IngressRuleList       `json:"rules,omitempty"`
-}
-
-// IngressSpec constructs an declarative configuration of the IngressSpec type for use with
-// apply.
-func IngressSpec() *IngressSpecBuilder {
-	return &IngressSpecBuilder{}
+	IngressClassName *string                           `json:"ingressClassName,omitempty"`
+	Backend          *IngressBackendApplyConfiguration `json:"backend,omitempty"`
+	TLS              *IngressTLSList                   `json:"tls,omitempty"`
+	Rules            *IngressRuleList                  `json:"rules,omitempty"`
 }
 
 // SetIngressClassName sets the IngressClassName field in the declarative configuration to the given value.
-func (b *IngressSpecBuilder) SetIngressClassName(value string) *IngressSpecBuilder {
+func (b *IngressSpecApplyConfiguration) SetIngressClassName(value string) *IngressSpecApplyConfiguration {
 	b.fields.IngressClassName = &value
 	return b
 }
 
 // RemoveIngressClassName removes the IngressClassName field from the declarative configuration.
-func (b *IngressSpecBuilder) RemoveIngressClassName() *IngressSpecBuilder {
+func (b *IngressSpecApplyConfiguration) RemoveIngressClassName() *IngressSpecApplyConfiguration {
 	b.fields.IngressClassName = nil
 	return b
 }
 
 // GetIngressClassName gets the IngressClassName field from the declarative configuration.
-func (b *IngressSpecBuilder) GetIngressClassName() (value string, ok bool) {
+func (b *IngressSpecApplyConfiguration) GetIngressClassName() (value string, ok bool) {
 	if v := b.fields.IngressClassName; v != nil {
 		return *v, true
 	}
@@ -69,36 +69,36 @@ func (b *IngressSpecBuilder) GetIngressClassName() (value string, ok bool) {
 }
 
 // SetBackend sets the Backend field in the declarative configuration to the given value.
-func (b *IngressSpecBuilder) SetBackend(value *IngressBackendBuilder) *IngressSpecBuilder {
+func (b *IngressSpecApplyConfiguration) SetBackend(value *IngressBackendApplyConfiguration) *IngressSpecApplyConfiguration {
 	b.fields.Backend = value
 	return b
 }
 
 // RemoveBackend removes the Backend field from the declarative configuration.
-func (b *IngressSpecBuilder) RemoveBackend() *IngressSpecBuilder {
+func (b *IngressSpecApplyConfiguration) RemoveBackend() *IngressSpecApplyConfiguration {
 	b.fields.Backend = nil
 	return b
 }
 
 // GetBackend gets the Backend field from the declarative configuration.
-func (b *IngressSpecBuilder) GetBackend() (value *IngressBackendBuilder, ok bool) {
+func (b *IngressSpecApplyConfiguration) GetBackend() (value *IngressBackendApplyConfiguration, ok bool) {
 	return b.fields.Backend, b.fields.Backend != nil
 }
 
 // SetTLS sets the TLS field in the declarative configuration to the given value.
-func (b *IngressSpecBuilder) SetTLS(value IngressTLSList) *IngressSpecBuilder {
+func (b *IngressSpecApplyConfiguration) SetTLS(value IngressTLSList) *IngressSpecApplyConfiguration {
 	b.fields.TLS = &value
 	return b
 }
 
 // RemoveTLS removes the TLS field from the declarative configuration.
-func (b *IngressSpecBuilder) RemoveTLS() *IngressSpecBuilder {
+func (b *IngressSpecApplyConfiguration) RemoveTLS() *IngressSpecApplyConfiguration {
 	b.fields.TLS = nil
 	return b
 }
 
 // GetTLS gets the TLS field from the declarative configuration.
-func (b *IngressSpecBuilder) GetTLS() (value IngressTLSList, ok bool) {
+func (b *IngressSpecApplyConfiguration) GetTLS() (value IngressTLSList, ok bool) {
 	if v := b.fields.TLS; v != nil {
 		return *v, true
 	}
@@ -106,27 +106,27 @@ func (b *IngressSpecBuilder) GetTLS() (value IngressTLSList, ok bool) {
 }
 
 // SetRules sets the Rules field in the declarative configuration to the given value.
-func (b *IngressSpecBuilder) SetRules(value IngressRuleList) *IngressSpecBuilder {
+func (b *IngressSpecApplyConfiguration) SetRules(value IngressRuleList) *IngressSpecApplyConfiguration {
 	b.fields.Rules = &value
 	return b
 }
 
 // RemoveRules removes the Rules field from the declarative configuration.
-func (b *IngressSpecBuilder) RemoveRules() *IngressSpecBuilder {
+func (b *IngressSpecApplyConfiguration) RemoveRules() *IngressSpecApplyConfiguration {
 	b.fields.Rules = nil
 	return b
 }
 
 // GetRules gets the Rules field from the declarative configuration.
-func (b *IngressSpecBuilder) GetRules() (value IngressRuleList, ok bool) {
+func (b *IngressSpecApplyConfiguration) GetRules() (value IngressRuleList, ok bool) {
 	if v := b.fields.Rules; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts IngressSpecBuilder to unstructured.
-func (b *IngressSpecBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts IngressSpecApplyConfiguration to unstructured.
+func (b *IngressSpecApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -138,9 +138,9 @@ func (b *IngressSpecBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to IngressSpecBuilder, replacing the contents
-// of IngressSpecBuilder.
-func (b *IngressSpecBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to IngressSpecApplyConfiguration, replacing the contents
+// of IngressSpecApplyConfiguration.
+func (b *IngressSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &ingressSpecFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -151,15 +151,15 @@ func (b *IngressSpecBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals IngressSpecBuilder to JSON.
-func (b *IngressSpecBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals IngressSpecApplyConfiguration to JSON.
+func (b *IngressSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into IngressSpecBuilder, replacing the contents of
-// IngressSpecBuilder.
-func (b *IngressSpecBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into IngressSpecApplyConfiguration, replacing the contents of
+// IngressSpecApplyConfiguration.
+func (b *IngressSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -167,13 +167,13 @@ func (b *IngressSpecBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// IngressSpecList represents a list of IngressSpecBuilder.
-type IngressSpecList []*IngressSpecBuilder
+// IngressSpecList represents a listAlias of IngressSpecApplyConfiguration.
+type IngressSpecList []*IngressSpecApplyConfiguration
 
-// IngressSpecList represents a map of IngressSpecBuilder.
-type IngressSpecMap map[string]IngressSpecBuilder
+// IngressSpecList represents a map of IngressSpecApplyConfiguration.
+type IngressSpecMap map[string]IngressSpecApplyConfiguration
 
-func (b *IngressSpecBuilder) preMarshal() {
+func (b *IngressSpecApplyConfiguration) preMarshal() {
 }
-func (b *IngressSpecBuilder) postUnmarshal() {
+func (b *IngressSpecApplyConfiguration) postUnmarshal() {
 }

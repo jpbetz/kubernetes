@@ -50,7 +50,7 @@ type DeploymentInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.DeploymentList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.Deployment, err error)
-	Apply(ctx context.Context, deployment appsv1.DeploymentBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Deployment, err error)
+	Apply(ctx context.Context, deployment *appsv1.DeploymentApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Deployment, err error)
 	GetScale(ctx context.Context, deploymentName string, options metav1.GetOptions) (*autoscalingv1.Scale, error)
 	UpdateScale(ctx context.Context, deploymentName string, scale *autoscalingv1.Scale, opts metav1.UpdateOptions) (*autoscalingv1.Scale, error)
 
@@ -202,7 +202,7 @@ func (c *deployments) Patch(ctx context.Context, name string, pt types.PatchType
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied deployment.
-func (c *deployments) Apply(ctx context.Context, deployment appsv1.DeploymentBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Deployment, err error) {
+func (c *deployments) Apply(ctx context.Context, deployment *appsv1.DeploymentApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Deployment, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := deployment.MarshalJSON()
 	if err != nil {

@@ -135,7 +135,7 @@ func (c *FakeVolumeAttachments) Patch(ctx context.Context, name string, pt types
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied volumeAttachment.
-func (c *FakeVolumeAttachments) Apply(ctx context.Context, volumeAttachment typebuildersstoragev1.VolumeAttachmentBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *storagev1.VolumeAttachment, err error) {
+func (c *FakeVolumeAttachments) Apply(ctx context.Context, volumeAttachment *typebuildersstoragev1.VolumeAttachmentApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *storagev1.VolumeAttachment, err error) {
 	data, err := volumeAttachment.MarshalJSON()
 	if err != nil {
 		return nil, err

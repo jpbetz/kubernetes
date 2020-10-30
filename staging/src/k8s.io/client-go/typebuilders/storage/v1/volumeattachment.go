@@ -25,102 +25,102 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// VolumeAttachmentBuilder represents an declarative configuration of the VolumeAttachment type for use
+// VolumeAttachmentApplyConfiguration represents an declarative configuration of the VolumeAttachment type for use
 // with apply.
-type VolumeAttachmentBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type VolumeAttachmentApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   volumeAttachmentFields
 }
 
+// VolumeAttachmentApplyConfiguration constructs an declarative configuration of the VolumeAttachment type for use with
+// apply.
+func VolumeAttachment() *VolumeAttachmentApplyConfiguration {
+	return &VolumeAttachmentApplyConfiguration{}
+}
+
 // volumeAttachmentFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in VolumeAttachmentBuilder.
+// Inline fields are owned by their respective inline type in VolumeAttachmentApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type volumeAttachmentFields struct {
-	Kind       *string                        `json:"kind,omitempty"`       // inlined VolumeAttachmentBuilder.typeMeta.Kind field
-	APIVersion *string                        `json:"apiVersion,omitempty"` // inlined VolumeAttachmentBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder          `json:"metadata,omitempty"`
-	Spec       *VolumeAttachmentSpecBuilder   `json:"spec,omitempty"`
-	Status     *VolumeAttachmentStatusBuilder `json:"status,omitempty"`
-}
-
-// VolumeAttachment constructs an declarative configuration of the VolumeAttachment type for use with
-// apply.
-func VolumeAttachment() *VolumeAttachmentBuilder {
-	return &VolumeAttachmentBuilder{}
+	Kind       *string                                   `json:"kind,omitempty"`       // inlined VolumeAttachmentApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                                   `json:"apiVersion,omitempty"` // inlined VolumeAttachmentApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration          `json:"metadata,omitempty"`
+	Spec       *VolumeAttachmentSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status     *VolumeAttachmentStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *VolumeAttachmentBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *VolumeAttachmentBuilder {
+func (b *VolumeAttachmentApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *VolumeAttachmentApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *VolumeAttachmentBuilder) RemoveTypeMeta() *VolumeAttachmentBuilder {
+func (b *VolumeAttachmentApplyConfiguration) RemoveTypeMeta() *VolumeAttachmentApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *VolumeAttachmentBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *VolumeAttachmentApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *VolumeAttachmentBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *VolumeAttachmentBuilder {
+func (b *VolumeAttachmentApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *VolumeAttachmentApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *VolumeAttachmentBuilder) RemoveObjectMeta() *VolumeAttachmentBuilder {
+func (b *VolumeAttachmentApplyConfiguration) RemoveObjectMeta() *VolumeAttachmentApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *VolumeAttachmentBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *VolumeAttachmentApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *VolumeAttachmentBuilder) SetSpec(value *VolumeAttachmentSpecBuilder) *VolumeAttachmentBuilder {
+func (b *VolumeAttachmentApplyConfiguration) SetSpec(value *VolumeAttachmentSpecApplyConfiguration) *VolumeAttachmentApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *VolumeAttachmentBuilder) RemoveSpec() *VolumeAttachmentBuilder {
+func (b *VolumeAttachmentApplyConfiguration) RemoveSpec() *VolumeAttachmentApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *VolumeAttachmentBuilder) GetSpec() (value *VolumeAttachmentSpecBuilder, ok bool) {
+func (b *VolumeAttachmentApplyConfiguration) GetSpec() (value *VolumeAttachmentSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *VolumeAttachmentBuilder) SetStatus(value *VolumeAttachmentStatusBuilder) *VolumeAttachmentBuilder {
+func (b *VolumeAttachmentApplyConfiguration) SetStatus(value *VolumeAttachmentStatusApplyConfiguration) *VolumeAttachmentApplyConfiguration {
 	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *VolumeAttachmentBuilder) RemoveStatus() *VolumeAttachmentBuilder {
+func (b *VolumeAttachmentApplyConfiguration) RemoveStatus() *VolumeAttachmentApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *VolumeAttachmentBuilder) GetStatus() (value *VolumeAttachmentStatusBuilder, ok bool) {
+func (b *VolumeAttachmentApplyConfiguration) GetStatus() (value *VolumeAttachmentStatusApplyConfiguration, ok bool) {
 	return b.fields.Status, b.fields.Status != nil
 }
 
-// ToUnstructured converts VolumeAttachmentBuilder to unstructured.
-func (b *VolumeAttachmentBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts VolumeAttachmentApplyConfiguration to unstructured.
+func (b *VolumeAttachmentApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -132,9 +132,9 @@ func (b *VolumeAttachmentBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to VolumeAttachmentBuilder, replacing the contents
-// of VolumeAttachmentBuilder.
-func (b *VolumeAttachmentBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to VolumeAttachmentApplyConfiguration, replacing the contents
+// of VolumeAttachmentApplyConfiguration.
+func (b *VolumeAttachmentApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &volumeAttachmentFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -145,15 +145,15 @@ func (b *VolumeAttachmentBuilder) FromUnstructured(u map[string]interface{}) err
 	return nil
 }
 
-// MarshalJSON marshals VolumeAttachmentBuilder to JSON.
-func (b *VolumeAttachmentBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals VolumeAttachmentApplyConfiguration to JSON.
+func (b *VolumeAttachmentApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into VolumeAttachmentBuilder, replacing the contents of
-// VolumeAttachmentBuilder.
-func (b *VolumeAttachmentBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into VolumeAttachmentApplyConfiguration, replacing the contents of
+// VolumeAttachmentApplyConfiguration.
+func (b *VolumeAttachmentApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -161,13 +161,13 @@ func (b *VolumeAttachmentBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// VolumeAttachmentList represents a list of VolumeAttachmentBuilder.
-type VolumeAttachmentList []*VolumeAttachmentBuilder
+// VolumeAttachmentList represents a listAlias of VolumeAttachmentApplyConfiguration.
+type VolumeAttachmentList []*VolumeAttachmentApplyConfiguration
 
-// VolumeAttachmentList represents a map of VolumeAttachmentBuilder.
-type VolumeAttachmentMap map[string]VolumeAttachmentBuilder
+// VolumeAttachmentList represents a map of VolumeAttachmentApplyConfiguration.
+type VolumeAttachmentMap map[string]VolumeAttachmentApplyConfiguration
 
-func (b *VolumeAttachmentBuilder) preMarshal() {
+func (b *VolumeAttachmentApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -177,9 +177,9 @@ func (b *VolumeAttachmentBuilder) preMarshal() {
 		}
 	}
 }
-func (b *VolumeAttachmentBuilder) postUnmarshal() {
+func (b *VolumeAttachmentApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

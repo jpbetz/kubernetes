@@ -48,7 +48,7 @@ type NamespaceInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.NamespaceList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.Namespace, err error)
-	Apply(ctx context.Context, namespace corev1.NamespaceBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Namespace, err error)
+	Apply(ctx context.Context, namespace *corev1.NamespaceApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Namespace, err error)
 	NamespaceExpansion
 }
 
@@ -171,7 +171,7 @@ func (c *namespaces) Patch(ctx context.Context, name string, pt types.PatchType,
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied namespace.
-func (c *namespaces) Apply(ctx context.Context, namespace corev1.NamespaceBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Namespace, err error) {
+func (c *namespaces) Apply(ctx context.Context, namespace *corev1.NamespaceApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Namespace, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := namespace.MarshalJSON()
 	if err != nil {

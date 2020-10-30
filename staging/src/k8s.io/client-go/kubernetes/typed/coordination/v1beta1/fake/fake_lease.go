@@ -132,7 +132,7 @@ func (c *FakeLeases) Patch(ctx context.Context, name string, pt types.PatchType,
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied lease.
-func (c *FakeLeases) Apply(ctx context.Context, lease coordinationv1beta1.LeaseBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.Lease, err error) {
+func (c *FakeLeases) Apply(ctx context.Context, lease *coordinationv1beta1.LeaseApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.Lease, err error) {
 	data, err := lease.MarshalJSON()
 	if err != nil {
 		return nil, err

@@ -24,44 +24,44 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// CSINodeDriverBuilder represents an declarative configuration of the CSINodeDriver type for use
+// CSINodeDriverApplyConfiguration represents an declarative configuration of the CSINodeDriver type for use
 // with apply.
-type CSINodeDriverBuilder struct {
+type CSINodeDriverApplyConfiguration struct {
 	fields cSINodeDriverFields
 }
 
+// CSINodeDriverApplyConfiguration constructs an declarative configuration of the CSINodeDriver type for use with
+// apply.
+func CSINodeDriver() *CSINodeDriverApplyConfiguration {
+	return &CSINodeDriverApplyConfiguration{}
+}
+
 // cSINodeDriverFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in CSINodeDriverBuilder.
+// Inline fields are owned by their respective inline type in CSINodeDriverApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type cSINodeDriverFields struct {
-	Name         *string                     `json:"name,omitempty"`
-	NodeID       *string                     `json:"nodeID,omitempty"`
-	TopologyKeys *[]string                   `json:"topologyKeys,omitempty"`
-	Allocatable  *VolumeNodeResourcesBuilder `json:"allocatable,omitempty"`
-}
-
-// CSINodeDriver constructs an declarative configuration of the CSINodeDriver type for use with
-// apply.
-func CSINodeDriver() *CSINodeDriverBuilder {
-	return &CSINodeDriverBuilder{}
+	Name         *string                                `json:"name,omitempty"`
+	NodeID       *string                                `json:"nodeID,omitempty"`
+	TopologyKeys *[]string                              `json:"topologyKeys,omitempty"`
+	Allocatable  *VolumeNodeResourcesApplyConfiguration `json:"allocatable,omitempty"`
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *CSINodeDriverBuilder) SetName(value string) *CSINodeDriverBuilder {
+func (b *CSINodeDriverApplyConfiguration) SetName(value string) *CSINodeDriverApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *CSINodeDriverBuilder) RemoveName() *CSINodeDriverBuilder {
+func (b *CSINodeDriverApplyConfiguration) RemoveName() *CSINodeDriverApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *CSINodeDriverBuilder) GetName() (value string, ok bool) {
+func (b *CSINodeDriverApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -69,19 +69,19 @@ func (b *CSINodeDriverBuilder) GetName() (value string, ok bool) {
 }
 
 // SetNodeID sets the NodeID field in the declarative configuration to the given value.
-func (b *CSINodeDriverBuilder) SetNodeID(value string) *CSINodeDriverBuilder {
+func (b *CSINodeDriverApplyConfiguration) SetNodeID(value string) *CSINodeDriverApplyConfiguration {
 	b.fields.NodeID = &value
 	return b
 }
 
 // RemoveNodeID removes the NodeID field from the declarative configuration.
-func (b *CSINodeDriverBuilder) RemoveNodeID() *CSINodeDriverBuilder {
+func (b *CSINodeDriverApplyConfiguration) RemoveNodeID() *CSINodeDriverApplyConfiguration {
 	b.fields.NodeID = nil
 	return b
 }
 
 // GetNodeID gets the NodeID field from the declarative configuration.
-func (b *CSINodeDriverBuilder) GetNodeID() (value string, ok bool) {
+func (b *CSINodeDriverApplyConfiguration) GetNodeID() (value string, ok bool) {
 	if v := b.fields.NodeID; v != nil {
 		return *v, true
 	}
@@ -89,19 +89,19 @@ func (b *CSINodeDriverBuilder) GetNodeID() (value string, ok bool) {
 }
 
 // SetTopologyKeys sets the TopologyKeys field in the declarative configuration to the given value.
-func (b *CSINodeDriverBuilder) SetTopologyKeys(value []string) *CSINodeDriverBuilder {
+func (b *CSINodeDriverApplyConfiguration) SetTopologyKeys(value []string) *CSINodeDriverApplyConfiguration {
 	b.fields.TopologyKeys = &value
 	return b
 }
 
 // RemoveTopologyKeys removes the TopologyKeys field from the declarative configuration.
-func (b *CSINodeDriverBuilder) RemoveTopologyKeys() *CSINodeDriverBuilder {
+func (b *CSINodeDriverApplyConfiguration) RemoveTopologyKeys() *CSINodeDriverApplyConfiguration {
 	b.fields.TopologyKeys = nil
 	return b
 }
 
 // GetTopologyKeys gets the TopologyKeys field from the declarative configuration.
-func (b *CSINodeDriverBuilder) GetTopologyKeys() (value []string, ok bool) {
+func (b *CSINodeDriverApplyConfiguration) GetTopologyKeys() (value []string, ok bool) {
 	if v := b.fields.TopologyKeys; v != nil {
 		return *v, true
 	}
@@ -109,24 +109,24 @@ func (b *CSINodeDriverBuilder) GetTopologyKeys() (value []string, ok bool) {
 }
 
 // SetAllocatable sets the Allocatable field in the declarative configuration to the given value.
-func (b *CSINodeDriverBuilder) SetAllocatable(value *VolumeNodeResourcesBuilder) *CSINodeDriverBuilder {
+func (b *CSINodeDriverApplyConfiguration) SetAllocatable(value *VolumeNodeResourcesApplyConfiguration) *CSINodeDriverApplyConfiguration {
 	b.fields.Allocatable = value
 	return b
 }
 
 // RemoveAllocatable removes the Allocatable field from the declarative configuration.
-func (b *CSINodeDriverBuilder) RemoveAllocatable() *CSINodeDriverBuilder {
+func (b *CSINodeDriverApplyConfiguration) RemoveAllocatable() *CSINodeDriverApplyConfiguration {
 	b.fields.Allocatable = nil
 	return b
 }
 
 // GetAllocatable gets the Allocatable field from the declarative configuration.
-func (b *CSINodeDriverBuilder) GetAllocatable() (value *VolumeNodeResourcesBuilder, ok bool) {
+func (b *CSINodeDriverApplyConfiguration) GetAllocatable() (value *VolumeNodeResourcesApplyConfiguration, ok bool) {
 	return b.fields.Allocatable, b.fields.Allocatable != nil
 }
 
-// ToUnstructured converts CSINodeDriverBuilder to unstructured.
-func (b *CSINodeDriverBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts CSINodeDriverApplyConfiguration to unstructured.
+func (b *CSINodeDriverApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -138,9 +138,9 @@ func (b *CSINodeDriverBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to CSINodeDriverBuilder, replacing the contents
-// of CSINodeDriverBuilder.
-func (b *CSINodeDriverBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to CSINodeDriverApplyConfiguration, replacing the contents
+// of CSINodeDriverApplyConfiguration.
+func (b *CSINodeDriverApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &cSINodeDriverFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -151,15 +151,15 @@ func (b *CSINodeDriverBuilder) FromUnstructured(u map[string]interface{}) error 
 	return nil
 }
 
-// MarshalJSON marshals CSINodeDriverBuilder to JSON.
-func (b *CSINodeDriverBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals CSINodeDriverApplyConfiguration to JSON.
+func (b *CSINodeDriverApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into CSINodeDriverBuilder, replacing the contents of
-// CSINodeDriverBuilder.
-func (b *CSINodeDriverBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into CSINodeDriverApplyConfiguration, replacing the contents of
+// CSINodeDriverApplyConfiguration.
+func (b *CSINodeDriverApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -167,13 +167,13 @@ func (b *CSINodeDriverBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// CSINodeDriverList represents a list of CSINodeDriverBuilder.
-type CSINodeDriverList []*CSINodeDriverBuilder
+// CSINodeDriverList represents a listAlias of CSINodeDriverApplyConfiguration.
+type CSINodeDriverList []*CSINodeDriverApplyConfiguration
 
-// CSINodeDriverList represents a map of CSINodeDriverBuilder.
-type CSINodeDriverMap map[string]CSINodeDriverBuilder
+// CSINodeDriverList represents a map of CSINodeDriverApplyConfiguration.
+type CSINodeDriverMap map[string]CSINodeDriverApplyConfiguration
 
-func (b *CSINodeDriverBuilder) preMarshal() {
+func (b *CSINodeDriverApplyConfiguration) preMarshal() {
 }
-func (b *CSINodeDriverBuilder) postUnmarshal() {
+func (b *CSINodeDriverApplyConfiguration) postUnmarshal() {
 }

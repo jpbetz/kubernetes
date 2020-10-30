@@ -25,65 +25,65 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// DeleteOptionsBuilder represents an declarative configuration of the DeleteOptions type for use
+// DeleteOptionsApplyConfiguration represents an declarative configuration of the DeleteOptions type for use
 // with apply.
-type DeleteOptionsBuilder struct {
-	typeMeta *TypeMetaBuilder // inlined type
+type DeleteOptionsApplyConfiguration struct {
+	typeMeta *TypeMetaApplyConfiguration // inlined type
 	fields   deleteOptionsFields
 }
 
+// DeleteOptionsApplyConfiguration constructs an declarative configuration of the DeleteOptions type for use with
+// apply.
+func DeleteOptions() *DeleteOptionsApplyConfiguration {
+	return &DeleteOptionsApplyConfiguration{}
+}
+
 // deleteOptionsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in DeleteOptionsBuilder.
+// Inline fields are owned by their respective inline type in DeleteOptionsApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type deleteOptionsFields struct {
-	Kind               *string                     `json:"kind,omitempty"`       // inlined DeleteOptionsBuilder.typeMeta.Kind field
-	APIVersion         *string                     `json:"apiVersion,omitempty"` // inlined DeleteOptionsBuilder.typeMeta.APIVersion field
-	GracePeriodSeconds *int64                      `json:"gracePeriodSeconds,omitempty"`
-	Preconditions      *PreconditionsBuilder       `json:"preconditions,omitempty"`
-	OrphanDependents   *bool                       `json:"orphanDependents,omitempty"`
-	PropagationPolicy  *metav1.DeletionPropagation `json:"propagationPolicy,omitempty"`
-	DryRun             *[]string                   `json:"dryRun,omitempty"`
-}
-
-// DeleteOptions constructs an declarative configuration of the DeleteOptions type for use with
-// apply.
-func DeleteOptions() *DeleteOptionsBuilder {
-	return &DeleteOptionsBuilder{}
+	Kind               *string                          `json:"kind,omitempty"`       // inlined DeleteOptionsApplyConfiguration.typeMeta.Kind field
+	APIVersion         *string                          `json:"apiVersion,omitempty"` // inlined DeleteOptionsApplyConfiguration.typeMeta.APIVersion field
+	GracePeriodSeconds *int64                           `json:"gracePeriodSeconds,omitempty"`
+	Preconditions      *PreconditionsApplyConfiguration `json:"preconditions,omitempty"`
+	OrphanDependents   *bool                            `json:"orphanDependents,omitempty"`
+	PropagationPolicy  *metav1.DeletionPropagation      `json:"propagationPolicy,omitempty"`
+	DryRun             *[]string                        `json:"dryRun,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *DeleteOptionsBuilder) SetTypeMeta(value *TypeMetaBuilder) *DeleteOptionsBuilder {
+func (b *DeleteOptionsApplyConfiguration) SetTypeMeta(value *TypeMetaApplyConfiguration) *DeleteOptionsApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *DeleteOptionsBuilder) RemoveTypeMeta() *DeleteOptionsBuilder {
+func (b *DeleteOptionsApplyConfiguration) RemoveTypeMeta() *DeleteOptionsApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *DeleteOptionsBuilder) GetTypeMeta() (value *TypeMetaBuilder, ok bool) {
+func (b *DeleteOptionsApplyConfiguration) GetTypeMeta() (value *TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetGracePeriodSeconds sets the GracePeriodSeconds field in the declarative configuration to the given value.
-func (b *DeleteOptionsBuilder) SetGracePeriodSeconds(value int64) *DeleteOptionsBuilder {
+func (b *DeleteOptionsApplyConfiguration) SetGracePeriodSeconds(value int64) *DeleteOptionsApplyConfiguration {
 	b.fields.GracePeriodSeconds = &value
 	return b
 }
 
 // RemoveGracePeriodSeconds removes the GracePeriodSeconds field from the declarative configuration.
-func (b *DeleteOptionsBuilder) RemoveGracePeriodSeconds() *DeleteOptionsBuilder {
+func (b *DeleteOptionsApplyConfiguration) RemoveGracePeriodSeconds() *DeleteOptionsApplyConfiguration {
 	b.fields.GracePeriodSeconds = nil
 	return b
 }
 
 // GetGracePeriodSeconds gets the GracePeriodSeconds field from the declarative configuration.
-func (b *DeleteOptionsBuilder) GetGracePeriodSeconds() (value int64, ok bool) {
+func (b *DeleteOptionsApplyConfiguration) GetGracePeriodSeconds() (value int64, ok bool) {
 	if v := b.fields.GracePeriodSeconds; v != nil {
 		return *v, true
 	}
@@ -91,36 +91,36 @@ func (b *DeleteOptionsBuilder) GetGracePeriodSeconds() (value int64, ok bool) {
 }
 
 // SetPreconditions sets the Preconditions field in the declarative configuration to the given value.
-func (b *DeleteOptionsBuilder) SetPreconditions(value *PreconditionsBuilder) *DeleteOptionsBuilder {
+func (b *DeleteOptionsApplyConfiguration) SetPreconditions(value *PreconditionsApplyConfiguration) *DeleteOptionsApplyConfiguration {
 	b.fields.Preconditions = value
 	return b
 }
 
 // RemovePreconditions removes the Preconditions field from the declarative configuration.
-func (b *DeleteOptionsBuilder) RemovePreconditions() *DeleteOptionsBuilder {
+func (b *DeleteOptionsApplyConfiguration) RemovePreconditions() *DeleteOptionsApplyConfiguration {
 	b.fields.Preconditions = nil
 	return b
 }
 
 // GetPreconditions gets the Preconditions field from the declarative configuration.
-func (b *DeleteOptionsBuilder) GetPreconditions() (value *PreconditionsBuilder, ok bool) {
+func (b *DeleteOptionsApplyConfiguration) GetPreconditions() (value *PreconditionsApplyConfiguration, ok bool) {
 	return b.fields.Preconditions, b.fields.Preconditions != nil
 }
 
 // SetOrphanDependents sets the OrphanDependents field in the declarative configuration to the given value.
-func (b *DeleteOptionsBuilder) SetOrphanDependents(value bool) *DeleteOptionsBuilder {
+func (b *DeleteOptionsApplyConfiguration) SetOrphanDependents(value bool) *DeleteOptionsApplyConfiguration {
 	b.fields.OrphanDependents = &value
 	return b
 }
 
 // RemoveOrphanDependents removes the OrphanDependents field from the declarative configuration.
-func (b *DeleteOptionsBuilder) RemoveOrphanDependents() *DeleteOptionsBuilder {
+func (b *DeleteOptionsApplyConfiguration) RemoveOrphanDependents() *DeleteOptionsApplyConfiguration {
 	b.fields.OrphanDependents = nil
 	return b
 }
 
 // GetOrphanDependents gets the OrphanDependents field from the declarative configuration.
-func (b *DeleteOptionsBuilder) GetOrphanDependents() (value bool, ok bool) {
+func (b *DeleteOptionsApplyConfiguration) GetOrphanDependents() (value bool, ok bool) {
 	if v := b.fields.OrphanDependents; v != nil {
 		return *v, true
 	}
@@ -128,19 +128,19 @@ func (b *DeleteOptionsBuilder) GetOrphanDependents() (value bool, ok bool) {
 }
 
 // SetPropagationPolicy sets the PropagationPolicy field in the declarative configuration to the given value.
-func (b *DeleteOptionsBuilder) SetPropagationPolicy(value metav1.DeletionPropagation) *DeleteOptionsBuilder {
+func (b *DeleteOptionsApplyConfiguration) SetPropagationPolicy(value metav1.DeletionPropagation) *DeleteOptionsApplyConfiguration {
 	b.fields.PropagationPolicy = &value
 	return b
 }
 
 // RemovePropagationPolicy removes the PropagationPolicy field from the declarative configuration.
-func (b *DeleteOptionsBuilder) RemovePropagationPolicy() *DeleteOptionsBuilder {
+func (b *DeleteOptionsApplyConfiguration) RemovePropagationPolicy() *DeleteOptionsApplyConfiguration {
 	b.fields.PropagationPolicy = nil
 	return b
 }
 
 // GetPropagationPolicy gets the PropagationPolicy field from the declarative configuration.
-func (b *DeleteOptionsBuilder) GetPropagationPolicy() (value metav1.DeletionPropagation, ok bool) {
+func (b *DeleteOptionsApplyConfiguration) GetPropagationPolicy() (value metav1.DeletionPropagation, ok bool) {
 	if v := b.fields.PropagationPolicy; v != nil {
 		return *v, true
 	}
@@ -148,27 +148,27 @@ func (b *DeleteOptionsBuilder) GetPropagationPolicy() (value metav1.DeletionProp
 }
 
 // SetDryRun sets the DryRun field in the declarative configuration to the given value.
-func (b *DeleteOptionsBuilder) SetDryRun(value []string) *DeleteOptionsBuilder {
+func (b *DeleteOptionsApplyConfiguration) SetDryRun(value []string) *DeleteOptionsApplyConfiguration {
 	b.fields.DryRun = &value
 	return b
 }
 
 // RemoveDryRun removes the DryRun field from the declarative configuration.
-func (b *DeleteOptionsBuilder) RemoveDryRun() *DeleteOptionsBuilder {
+func (b *DeleteOptionsApplyConfiguration) RemoveDryRun() *DeleteOptionsApplyConfiguration {
 	b.fields.DryRun = nil
 	return b
 }
 
 // GetDryRun gets the DryRun field from the declarative configuration.
-func (b *DeleteOptionsBuilder) GetDryRun() (value []string, ok bool) {
+func (b *DeleteOptionsApplyConfiguration) GetDryRun() (value []string, ok bool) {
 	if v := b.fields.DryRun; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts DeleteOptionsBuilder to unstructured.
-func (b *DeleteOptionsBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts DeleteOptionsApplyConfiguration to unstructured.
+func (b *DeleteOptionsApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -180,9 +180,9 @@ func (b *DeleteOptionsBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to DeleteOptionsBuilder, replacing the contents
-// of DeleteOptionsBuilder.
-func (b *DeleteOptionsBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to DeleteOptionsApplyConfiguration, replacing the contents
+// of DeleteOptionsApplyConfiguration.
+func (b *DeleteOptionsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &deleteOptionsFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -193,15 +193,15 @@ func (b *DeleteOptionsBuilder) FromUnstructured(u map[string]interface{}) error 
 	return nil
 }
 
-// MarshalJSON marshals DeleteOptionsBuilder to JSON.
-func (b *DeleteOptionsBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals DeleteOptionsApplyConfiguration to JSON.
+func (b *DeleteOptionsApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into DeleteOptionsBuilder, replacing the contents of
-// DeleteOptionsBuilder.
-func (b *DeleteOptionsBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into DeleteOptionsApplyConfiguration, replacing the contents of
+// DeleteOptionsApplyConfiguration.
+func (b *DeleteOptionsApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -209,13 +209,13 @@ func (b *DeleteOptionsBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// DeleteOptionsList represents a list of DeleteOptionsBuilder.
-type DeleteOptionsList []*DeleteOptionsBuilder
+// DeleteOptionsList represents a listAlias of DeleteOptionsApplyConfiguration.
+type DeleteOptionsList []*DeleteOptionsApplyConfiguration
 
-// DeleteOptionsList represents a map of DeleteOptionsBuilder.
-type DeleteOptionsMap map[string]DeleteOptionsBuilder
+// DeleteOptionsList represents a map of DeleteOptionsApplyConfiguration.
+type DeleteOptionsMap map[string]DeleteOptionsApplyConfiguration
 
-func (b *DeleteOptionsBuilder) preMarshal() {
+func (b *DeleteOptionsApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -225,9 +225,9 @@ func (b *DeleteOptionsBuilder) preMarshal() {
 		}
 	}
 }
-func (b *DeleteOptionsBuilder) postUnmarshal() {
+func (b *DeleteOptionsApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &TypeMetaBuilder{}
+		b.typeMeta = &TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

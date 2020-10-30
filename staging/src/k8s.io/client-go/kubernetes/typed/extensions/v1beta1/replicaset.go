@@ -49,7 +49,7 @@ type ReplicaSetInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1beta1.ReplicaSetList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.ReplicaSet, err error)
-	Apply(ctx context.Context, replicaSet extensionsv1beta1.ReplicaSetBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ReplicaSet, err error)
+	Apply(ctx context.Context, replicaSet *extensionsv1beta1.ReplicaSetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ReplicaSet, err error)
 	GetScale(ctx context.Context, replicaSetName string, options v1.GetOptions) (*v1beta1.Scale, error)
 	UpdateScale(ctx context.Context, replicaSetName string, scale *v1beta1.Scale, opts v1.UpdateOptions) (*v1beta1.Scale, error)
 
@@ -201,7 +201,7 @@ func (c *replicaSets) Patch(ctx context.Context, name string, pt types.PatchType
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied replicaSet.
-func (c *replicaSets) Apply(ctx context.Context, replicaSet extensionsv1beta1.ReplicaSetBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ReplicaSet, err error) {
+func (c *replicaSets) Apply(ctx context.Context, replicaSet *extensionsv1beta1.ReplicaSetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ReplicaSet, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := replicaSet.MarshalJSON()
 	if err != nil {

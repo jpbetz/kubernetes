@@ -25,84 +25,84 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// LeaseBuilder represents an declarative configuration of the Lease type for use
+// LeaseApplyConfiguration represents an declarative configuration of the Lease type for use
 // with apply.
-type LeaseBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type LeaseApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   leaseFields
 }
 
+// LeaseApplyConfiguration constructs an declarative configuration of the Lease type for use with
+// apply.
+func Lease() *LeaseApplyConfiguration {
+	return &LeaseApplyConfiguration{}
+}
+
 // leaseFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LeaseBuilder.
+// Inline fields are owned by their respective inline type in LeaseApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type leaseFields struct {
-	Kind       *string               `json:"kind,omitempty"`       // inlined LeaseBuilder.typeMeta.Kind field
-	APIVersion *string               `json:"apiVersion,omitempty"` // inlined LeaseBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder `json:"metadata,omitempty"`
-	Spec       *LeaseSpecBuilder     `json:"spec,omitempty"`
-}
-
-// Lease constructs an declarative configuration of the Lease type for use with
-// apply.
-func Lease() *LeaseBuilder {
-	return &LeaseBuilder{}
+	Kind       *string                          `json:"kind,omitempty"`       // inlined LeaseApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                          `json:"apiVersion,omitempty"` // inlined LeaseApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Spec       *LeaseSpecApplyConfiguration     `json:"spec,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *LeaseBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *LeaseBuilder {
+func (b *LeaseApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *LeaseApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *LeaseBuilder) RemoveTypeMeta() *LeaseBuilder {
+func (b *LeaseApplyConfiguration) RemoveTypeMeta() *LeaseApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *LeaseBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *LeaseApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *LeaseBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *LeaseBuilder {
+func (b *LeaseApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *LeaseApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *LeaseBuilder) RemoveObjectMeta() *LeaseBuilder {
+func (b *LeaseApplyConfiguration) RemoveObjectMeta() *LeaseApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *LeaseBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *LeaseApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *LeaseBuilder) SetSpec(value *LeaseSpecBuilder) *LeaseBuilder {
+func (b *LeaseApplyConfiguration) SetSpec(value *LeaseSpecApplyConfiguration) *LeaseApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *LeaseBuilder) RemoveSpec() *LeaseBuilder {
+func (b *LeaseApplyConfiguration) RemoveSpec() *LeaseApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *LeaseBuilder) GetSpec() (value *LeaseSpecBuilder, ok bool) {
+func (b *LeaseApplyConfiguration) GetSpec() (value *LeaseSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
-// ToUnstructured converts LeaseBuilder to unstructured.
-func (b *LeaseBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts LeaseApplyConfiguration to unstructured.
+func (b *LeaseApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -114,9 +114,9 @@ func (b *LeaseBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to LeaseBuilder, replacing the contents
-// of LeaseBuilder.
-func (b *LeaseBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to LeaseApplyConfiguration, replacing the contents
+// of LeaseApplyConfiguration.
+func (b *LeaseApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &leaseFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -127,15 +127,15 @@ func (b *LeaseBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals LeaseBuilder to JSON.
-func (b *LeaseBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals LeaseApplyConfiguration to JSON.
+func (b *LeaseApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into LeaseBuilder, replacing the contents of
-// LeaseBuilder.
-func (b *LeaseBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into LeaseApplyConfiguration, replacing the contents of
+// LeaseApplyConfiguration.
+func (b *LeaseApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -143,13 +143,13 @@ func (b *LeaseBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// LeaseList represents a list of LeaseBuilder.
-type LeaseList []*LeaseBuilder
+// LeaseList represents a listAlias of LeaseApplyConfiguration.
+type LeaseList []*LeaseApplyConfiguration
 
-// LeaseList represents a map of LeaseBuilder.
-type LeaseMap map[string]LeaseBuilder
+// LeaseList represents a map of LeaseApplyConfiguration.
+type LeaseMap map[string]LeaseApplyConfiguration
 
-func (b *LeaseBuilder) preMarshal() {
+func (b *LeaseApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -159,9 +159,9 @@ func (b *LeaseBuilder) preMarshal() {
 		}
 	}
 }
-func (b *LeaseBuilder) postUnmarshal() {
+func (b *LeaseApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

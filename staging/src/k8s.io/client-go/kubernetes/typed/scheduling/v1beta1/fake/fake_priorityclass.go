@@ -124,7 +124,7 @@ func (c *FakePriorityClasses) Patch(ctx context.Context, name string, pt types.P
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied priorityClass.
-func (c *FakePriorityClasses) Apply(ctx context.Context, priorityClass schedulingv1beta1.PriorityClassBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PriorityClass, err error) {
+func (c *FakePriorityClasses) Apply(ctx context.Context, priorityClass *schedulingv1beta1.PriorityClassApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PriorityClass, err error) {
 	data, err := priorityClass.MarshalJSON()
 	if err != nil {
 		return nil, err

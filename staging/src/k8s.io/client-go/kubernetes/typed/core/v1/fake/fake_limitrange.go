@@ -132,7 +132,7 @@ func (c *FakeLimitRanges) Patch(ctx context.Context, name string, pt types.Patch
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied limitRange.
-func (c *FakeLimitRanges) Apply(ctx context.Context, limitRange typebuilderscorev1.LimitRangeBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.LimitRange, err error) {
+func (c *FakeLimitRanges) Apply(ctx context.Context, limitRange *typebuilderscorev1.LimitRangeApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.LimitRange, err error) {
 	data, err := limitRange.MarshalJSON()
 	if err != nil {
 		return nil, err

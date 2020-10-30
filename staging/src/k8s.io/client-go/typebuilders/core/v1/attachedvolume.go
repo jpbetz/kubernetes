@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// AttachedVolumeBuilder represents an declarative configuration of the AttachedVolume type for use
+// AttachedVolumeApplyConfiguration represents an declarative configuration of the AttachedVolume type for use
 // with apply.
-type AttachedVolumeBuilder struct {
+type AttachedVolumeApplyConfiguration struct {
 	fields attachedVolumeFields
 }
 
+// AttachedVolumeApplyConfiguration constructs an declarative configuration of the AttachedVolume type for use with
+// apply.
+func AttachedVolume() *AttachedVolumeApplyConfiguration {
+	return &AttachedVolumeApplyConfiguration{}
+}
+
 // attachedVolumeFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in AttachedVolumeBuilder.
+// Inline fields are owned by their respective inline type in AttachedVolumeApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type attachedVolumeFields struct {
 	DevicePath *string              `json:"devicePath,omitempty"`
 }
 
-// AttachedVolume constructs an declarative configuration of the AttachedVolume type for use with
-// apply.
-func AttachedVolume() *AttachedVolumeBuilder {
-	return &AttachedVolumeBuilder{}
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *AttachedVolumeBuilder) SetName(value v1.UniqueVolumeName) *AttachedVolumeBuilder {
+func (b *AttachedVolumeApplyConfiguration) SetName(value v1.UniqueVolumeName) *AttachedVolumeApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *AttachedVolumeBuilder) RemoveName() *AttachedVolumeBuilder {
+func (b *AttachedVolumeApplyConfiguration) RemoveName() *AttachedVolumeApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *AttachedVolumeBuilder) GetName() (value v1.UniqueVolumeName, ok bool) {
+func (b *AttachedVolumeApplyConfiguration) GetName() (value v1.UniqueVolumeName, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -68,27 +68,27 @@ func (b *AttachedVolumeBuilder) GetName() (value v1.UniqueVolumeName, ok bool) {
 }
 
 // SetDevicePath sets the DevicePath field in the declarative configuration to the given value.
-func (b *AttachedVolumeBuilder) SetDevicePath(value string) *AttachedVolumeBuilder {
+func (b *AttachedVolumeApplyConfiguration) SetDevicePath(value string) *AttachedVolumeApplyConfiguration {
 	b.fields.DevicePath = &value
 	return b
 }
 
 // RemoveDevicePath removes the DevicePath field from the declarative configuration.
-func (b *AttachedVolumeBuilder) RemoveDevicePath() *AttachedVolumeBuilder {
+func (b *AttachedVolumeApplyConfiguration) RemoveDevicePath() *AttachedVolumeApplyConfiguration {
 	b.fields.DevicePath = nil
 	return b
 }
 
 // GetDevicePath gets the DevicePath field from the declarative configuration.
-func (b *AttachedVolumeBuilder) GetDevicePath() (value string, ok bool) {
+func (b *AttachedVolumeApplyConfiguration) GetDevicePath() (value string, ok bool) {
 	if v := b.fields.DevicePath; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts AttachedVolumeBuilder to unstructured.
-func (b *AttachedVolumeBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts AttachedVolumeApplyConfiguration to unstructured.
+func (b *AttachedVolumeApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -100,9 +100,9 @@ func (b *AttachedVolumeBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to AttachedVolumeBuilder, replacing the contents
-// of AttachedVolumeBuilder.
-func (b *AttachedVolumeBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to AttachedVolumeApplyConfiguration, replacing the contents
+// of AttachedVolumeApplyConfiguration.
+func (b *AttachedVolumeApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &attachedVolumeFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -113,15 +113,15 @@ func (b *AttachedVolumeBuilder) FromUnstructured(u map[string]interface{}) error
 	return nil
 }
 
-// MarshalJSON marshals AttachedVolumeBuilder to JSON.
-func (b *AttachedVolumeBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals AttachedVolumeApplyConfiguration to JSON.
+func (b *AttachedVolumeApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into AttachedVolumeBuilder, replacing the contents of
-// AttachedVolumeBuilder.
-func (b *AttachedVolumeBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into AttachedVolumeApplyConfiguration, replacing the contents of
+// AttachedVolumeApplyConfiguration.
+func (b *AttachedVolumeApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -129,13 +129,13 @@ func (b *AttachedVolumeBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// AttachedVolumeList represents a list of AttachedVolumeBuilder.
-type AttachedVolumeList []*AttachedVolumeBuilder
+// AttachedVolumeList represents a listAlias of AttachedVolumeApplyConfiguration.
+type AttachedVolumeList []*AttachedVolumeApplyConfiguration
 
-// AttachedVolumeList represents a map of AttachedVolumeBuilder.
-type AttachedVolumeMap map[string]AttachedVolumeBuilder
+// AttachedVolumeList represents a map of AttachedVolumeApplyConfiguration.
+type AttachedVolumeMap map[string]AttachedVolumeApplyConfiguration
 
-func (b *AttachedVolumeBuilder) preMarshal() {
+func (b *AttachedVolumeApplyConfiguration) preMarshal() {
 }
-func (b *AttachedVolumeBuilder) postUnmarshal() {
+func (b *AttachedVolumeApplyConfiguration) postUnmarshal() {
 }

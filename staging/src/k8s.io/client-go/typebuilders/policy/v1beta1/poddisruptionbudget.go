@@ -25,102 +25,102 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// PodDisruptionBudgetBuilder represents an declarative configuration of the PodDisruptionBudget type for use
+// PodDisruptionBudgetApplyConfiguration represents an declarative configuration of the PodDisruptionBudget type for use
 // with apply.
-type PodDisruptionBudgetBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type PodDisruptionBudgetApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   podDisruptionBudgetFields
 }
 
+// PodDisruptionBudgetApplyConfiguration constructs an declarative configuration of the PodDisruptionBudget type for use with
+// apply.
+func PodDisruptionBudget() *PodDisruptionBudgetApplyConfiguration {
+	return &PodDisruptionBudgetApplyConfiguration{}
+}
+
 // podDisruptionBudgetFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodDisruptionBudgetBuilder.
+// Inline fields are owned by their respective inline type in PodDisruptionBudgetApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type podDisruptionBudgetFields struct {
-	Kind       *string                           `json:"kind,omitempty"`       // inlined PodDisruptionBudgetBuilder.typeMeta.Kind field
-	APIVersion *string                           `json:"apiVersion,omitempty"` // inlined PodDisruptionBudgetBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder             `json:"metadata,omitempty"`
-	Spec       *PodDisruptionBudgetSpecBuilder   `json:"spec,omitempty"`
-	Status     *PodDisruptionBudgetStatusBuilder `json:"status,omitempty"`
-}
-
-// PodDisruptionBudget constructs an declarative configuration of the PodDisruptionBudget type for use with
-// apply.
-func PodDisruptionBudget() *PodDisruptionBudgetBuilder {
-	return &PodDisruptionBudgetBuilder{}
+	Kind       *string                                      `json:"kind,omitempty"`       // inlined PodDisruptionBudgetApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                                      `json:"apiVersion,omitempty"` // inlined PodDisruptionBudgetApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration             `json:"metadata,omitempty"`
+	Spec       *PodDisruptionBudgetSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status     *PodDisruptionBudgetStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *PodDisruptionBudgetBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *PodDisruptionBudgetBuilder {
+func (b *PodDisruptionBudgetApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *PodDisruptionBudgetApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *PodDisruptionBudgetBuilder) RemoveTypeMeta() *PodDisruptionBudgetBuilder {
+func (b *PodDisruptionBudgetApplyConfiguration) RemoveTypeMeta() *PodDisruptionBudgetApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *PodDisruptionBudgetBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *PodDisruptionBudgetApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *PodDisruptionBudgetBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *PodDisruptionBudgetBuilder {
+func (b *PodDisruptionBudgetApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *PodDisruptionBudgetApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *PodDisruptionBudgetBuilder) RemoveObjectMeta() *PodDisruptionBudgetBuilder {
+func (b *PodDisruptionBudgetApplyConfiguration) RemoveObjectMeta() *PodDisruptionBudgetApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *PodDisruptionBudgetBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *PodDisruptionBudgetApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *PodDisruptionBudgetBuilder) SetSpec(value *PodDisruptionBudgetSpecBuilder) *PodDisruptionBudgetBuilder {
+func (b *PodDisruptionBudgetApplyConfiguration) SetSpec(value *PodDisruptionBudgetSpecApplyConfiguration) *PodDisruptionBudgetApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *PodDisruptionBudgetBuilder) RemoveSpec() *PodDisruptionBudgetBuilder {
+func (b *PodDisruptionBudgetApplyConfiguration) RemoveSpec() *PodDisruptionBudgetApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *PodDisruptionBudgetBuilder) GetSpec() (value *PodDisruptionBudgetSpecBuilder, ok bool) {
+func (b *PodDisruptionBudgetApplyConfiguration) GetSpec() (value *PodDisruptionBudgetSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *PodDisruptionBudgetBuilder) SetStatus(value *PodDisruptionBudgetStatusBuilder) *PodDisruptionBudgetBuilder {
+func (b *PodDisruptionBudgetApplyConfiguration) SetStatus(value *PodDisruptionBudgetStatusApplyConfiguration) *PodDisruptionBudgetApplyConfiguration {
 	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *PodDisruptionBudgetBuilder) RemoveStatus() *PodDisruptionBudgetBuilder {
+func (b *PodDisruptionBudgetApplyConfiguration) RemoveStatus() *PodDisruptionBudgetApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *PodDisruptionBudgetBuilder) GetStatus() (value *PodDisruptionBudgetStatusBuilder, ok bool) {
+func (b *PodDisruptionBudgetApplyConfiguration) GetStatus() (value *PodDisruptionBudgetStatusApplyConfiguration, ok bool) {
 	return b.fields.Status, b.fields.Status != nil
 }
 
-// ToUnstructured converts PodDisruptionBudgetBuilder to unstructured.
-func (b *PodDisruptionBudgetBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PodDisruptionBudgetApplyConfiguration to unstructured.
+func (b *PodDisruptionBudgetApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -132,9 +132,9 @@ func (b *PodDisruptionBudgetBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to PodDisruptionBudgetBuilder, replacing the contents
-// of PodDisruptionBudgetBuilder.
-func (b *PodDisruptionBudgetBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PodDisruptionBudgetApplyConfiguration, replacing the contents
+// of PodDisruptionBudgetApplyConfiguration.
+func (b *PodDisruptionBudgetApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &podDisruptionBudgetFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -145,15 +145,15 @@ func (b *PodDisruptionBudgetBuilder) FromUnstructured(u map[string]interface{}) 
 	return nil
 }
 
-// MarshalJSON marshals PodDisruptionBudgetBuilder to JSON.
-func (b *PodDisruptionBudgetBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PodDisruptionBudgetApplyConfiguration to JSON.
+func (b *PodDisruptionBudgetApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PodDisruptionBudgetBuilder, replacing the contents of
-// PodDisruptionBudgetBuilder.
-func (b *PodDisruptionBudgetBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PodDisruptionBudgetApplyConfiguration, replacing the contents of
+// PodDisruptionBudgetApplyConfiguration.
+func (b *PodDisruptionBudgetApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -161,13 +161,13 @@ func (b *PodDisruptionBudgetBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// PodDisruptionBudgetList represents a list of PodDisruptionBudgetBuilder.
-type PodDisruptionBudgetList []*PodDisruptionBudgetBuilder
+// PodDisruptionBudgetList represents a listAlias of PodDisruptionBudgetApplyConfiguration.
+type PodDisruptionBudgetList []*PodDisruptionBudgetApplyConfiguration
 
-// PodDisruptionBudgetList represents a map of PodDisruptionBudgetBuilder.
-type PodDisruptionBudgetMap map[string]PodDisruptionBudgetBuilder
+// PodDisruptionBudgetList represents a map of PodDisruptionBudgetApplyConfiguration.
+type PodDisruptionBudgetMap map[string]PodDisruptionBudgetApplyConfiguration
 
-func (b *PodDisruptionBudgetBuilder) preMarshal() {
+func (b *PodDisruptionBudgetApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -177,9 +177,9 @@ func (b *PodDisruptionBudgetBuilder) preMarshal() {
 		}
 	}
 }
-func (b *PodDisruptionBudgetBuilder) postUnmarshal() {
+func (b *PodDisruptionBudgetApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

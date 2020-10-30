@@ -24,424 +24,424 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// PersistentVolumeSourceBuilder represents an declarative configuration of the PersistentVolumeSource type for use
+// PersistentVolumeSourceApplyConfiguration represents an declarative configuration of the PersistentVolumeSource type for use
 // with apply.
-type PersistentVolumeSourceBuilder struct {
+type PersistentVolumeSourceApplyConfiguration struct {
 	fields persistentVolumeSourceFields
 }
 
+// PersistentVolumeSourceApplyConfiguration constructs an declarative configuration of the PersistentVolumeSource type for use with
+// apply.
+func PersistentVolumeSource() *PersistentVolumeSourceApplyConfiguration {
+	return &PersistentVolumeSourceApplyConfiguration{}
+}
+
 // persistentVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PersistentVolumeSourceBuilder.
+// Inline fields are owned by their respective inline type in PersistentVolumeSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type persistentVolumeSourceFields struct {
-	GCEPersistentDisk    *GCEPersistentDiskVolumeSourceBuilder    `json:"gcePersistentDisk,omitempty"`
-	AWSElasticBlockStore *AWSElasticBlockStoreVolumeSourceBuilder `json:"awsElasticBlockStore,omitempty"`
-	HostPath             *HostPathVolumeSourceBuilder             `json:"hostPath,omitempty"`
-	Glusterfs            *GlusterfsPersistentVolumeSourceBuilder  `json:"glusterfs,omitempty"`
-	NFS                  *NFSVolumeSourceBuilder                  `json:"nfs,omitempty"`
-	RBD                  *RBDPersistentVolumeSourceBuilder        `json:"rbd,omitempty"`
-	ISCSI                *ISCSIPersistentVolumeSourceBuilder      `json:"iscsi,omitempty"`
-	Cinder               *CinderPersistentVolumeSourceBuilder     `json:"cinder,omitempty"`
-	CephFS               *CephFSPersistentVolumeSourceBuilder     `json:"cephfs,omitempty"`
-	FC                   *FCVolumeSourceBuilder                   `json:"fc,omitempty"`
-	Flocker              *FlockerVolumeSourceBuilder              `json:"flocker,omitempty"`
-	FlexVolume           *FlexPersistentVolumeSourceBuilder       `json:"flexVolume,omitempty"`
-	AzureFile            *AzureFilePersistentVolumeSourceBuilder  `json:"azureFile,omitempty"`
-	VsphereVolume        *VsphereVirtualDiskVolumeSourceBuilder   `json:"vsphereVolume,omitempty"`
-	Quobyte              *QuobyteVolumeSourceBuilder              `json:"quobyte,omitempty"`
-	AzureDisk            *AzureDiskVolumeSourceBuilder            `json:"azureDisk,omitempty"`
-	PhotonPersistentDisk *PhotonPersistentDiskVolumeSourceBuilder `json:"photonPersistentDisk,omitempty"`
-	PortworxVolume       *PortworxVolumeSourceBuilder             `json:"portworxVolume,omitempty"`
-	ScaleIO              *ScaleIOPersistentVolumeSourceBuilder    `json:"scaleIO,omitempty"`
-	Local                *LocalVolumeSourceBuilder                `json:"local,omitempty"`
-	StorageOS            *StorageOSPersistentVolumeSourceBuilder  `json:"storageos,omitempty"`
-	CSI                  *CSIPersistentVolumeSourceBuilder        `json:"csi,omitempty"`
-}
-
-// PersistentVolumeSource constructs an declarative configuration of the PersistentVolumeSource type for use with
-// apply.
-func PersistentVolumeSource() *PersistentVolumeSourceBuilder {
-	return &PersistentVolumeSourceBuilder{}
+	GCEPersistentDisk    *GCEPersistentDiskVolumeSourceApplyConfiguration    `json:"gcePersistentDisk,omitempty"`
+	AWSElasticBlockStore *AWSElasticBlockStoreVolumeSourceApplyConfiguration `json:"awsElasticBlockStore,omitempty"`
+	HostPath             *HostPathVolumeSourceApplyConfiguration             `json:"hostPath,omitempty"`
+	Glusterfs            *GlusterfsPersistentVolumeSourceApplyConfiguration  `json:"glusterfs,omitempty"`
+	NFS                  *NFSVolumeSourceApplyConfiguration                  `json:"nfs,omitempty"`
+	RBD                  *RBDPersistentVolumeSourceApplyConfiguration        `json:"rbd,omitempty"`
+	ISCSI                *ISCSIPersistentVolumeSourceApplyConfiguration      `json:"iscsi,omitempty"`
+	Cinder               *CinderPersistentVolumeSourceApplyConfiguration     `json:"cinder,omitempty"`
+	CephFS               *CephFSPersistentVolumeSourceApplyConfiguration     `json:"cephfs,omitempty"`
+	FC                   *FCVolumeSourceApplyConfiguration                   `json:"fc,omitempty"`
+	Flocker              *FlockerVolumeSourceApplyConfiguration              `json:"flocker,omitempty"`
+	FlexVolume           *FlexPersistentVolumeSourceApplyConfiguration       `json:"flexVolume,omitempty"`
+	AzureFile            *AzureFilePersistentVolumeSourceApplyConfiguration  `json:"azureFile,omitempty"`
+	VsphereVolume        *VsphereVirtualDiskVolumeSourceApplyConfiguration   `json:"vsphereVolume,omitempty"`
+	Quobyte              *QuobyteVolumeSourceApplyConfiguration              `json:"quobyte,omitempty"`
+	AzureDisk            *AzureDiskVolumeSourceApplyConfiguration            `json:"azureDisk,omitempty"`
+	PhotonPersistentDisk *PhotonPersistentDiskVolumeSourceApplyConfiguration `json:"photonPersistentDisk,omitempty"`
+	PortworxVolume       *PortworxVolumeSourceApplyConfiguration             `json:"portworxVolume,omitempty"`
+	ScaleIO              *ScaleIOPersistentVolumeSourceApplyConfiguration    `json:"scaleIO,omitempty"`
+	Local                *LocalVolumeSourceApplyConfiguration                `json:"local,omitempty"`
+	StorageOS            *StorageOSPersistentVolumeSourceApplyConfiguration  `json:"storageos,omitempty"`
+	CSI                  *CSIPersistentVolumeSourceApplyConfiguration        `json:"csi,omitempty"`
 }
 
 // SetGCEPersistentDisk sets the GCEPersistentDisk field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetGCEPersistentDisk(value *GCEPersistentDiskVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetGCEPersistentDisk(value *GCEPersistentDiskVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.GCEPersistentDisk = value
 	return b
 }
 
 // RemoveGCEPersistentDisk removes the GCEPersistentDisk field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveGCEPersistentDisk() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveGCEPersistentDisk() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.GCEPersistentDisk = nil
 	return b
 }
 
 // GetGCEPersistentDisk gets the GCEPersistentDisk field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetGCEPersistentDisk() (value *GCEPersistentDiskVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetGCEPersistentDisk() (value *GCEPersistentDiskVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.GCEPersistentDisk, b.fields.GCEPersistentDisk != nil
 }
 
 // SetAWSElasticBlockStore sets the AWSElasticBlockStore field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetAWSElasticBlockStore(value *AWSElasticBlockStoreVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetAWSElasticBlockStore(value *AWSElasticBlockStoreVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.AWSElasticBlockStore = value
 	return b
 }
 
 // RemoveAWSElasticBlockStore removes the AWSElasticBlockStore field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveAWSElasticBlockStore() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveAWSElasticBlockStore() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.AWSElasticBlockStore = nil
 	return b
 }
 
 // GetAWSElasticBlockStore gets the AWSElasticBlockStore field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetAWSElasticBlockStore() (value *AWSElasticBlockStoreVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetAWSElasticBlockStore() (value *AWSElasticBlockStoreVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.AWSElasticBlockStore, b.fields.AWSElasticBlockStore != nil
 }
 
 // SetHostPath sets the HostPath field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetHostPath(value *HostPathVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetHostPath(value *HostPathVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.HostPath = value
 	return b
 }
 
 // RemoveHostPath removes the HostPath field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveHostPath() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveHostPath() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.HostPath = nil
 	return b
 }
 
 // GetHostPath gets the HostPath field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetHostPath() (value *HostPathVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetHostPath() (value *HostPathVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.HostPath, b.fields.HostPath != nil
 }
 
 // SetGlusterfs sets the Glusterfs field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetGlusterfs(value *GlusterfsPersistentVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetGlusterfs(value *GlusterfsPersistentVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.Glusterfs = value
 	return b
 }
 
 // RemoveGlusterfs removes the Glusterfs field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveGlusterfs() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveGlusterfs() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.Glusterfs = nil
 	return b
 }
 
 // GetGlusterfs gets the Glusterfs field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetGlusterfs() (value *GlusterfsPersistentVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetGlusterfs() (value *GlusterfsPersistentVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.Glusterfs, b.fields.Glusterfs != nil
 }
 
 // SetNFS sets the NFS field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetNFS(value *NFSVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetNFS(value *NFSVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.NFS = value
 	return b
 }
 
 // RemoveNFS removes the NFS field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveNFS() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveNFS() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.NFS = nil
 	return b
 }
 
 // GetNFS gets the NFS field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetNFS() (value *NFSVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetNFS() (value *NFSVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.NFS, b.fields.NFS != nil
 }
 
 // SetRBD sets the RBD field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetRBD(value *RBDPersistentVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetRBD(value *RBDPersistentVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.RBD = value
 	return b
 }
 
 // RemoveRBD removes the RBD field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveRBD() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveRBD() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.RBD = nil
 	return b
 }
 
 // GetRBD gets the RBD field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetRBD() (value *RBDPersistentVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetRBD() (value *RBDPersistentVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.RBD, b.fields.RBD != nil
 }
 
 // SetISCSI sets the ISCSI field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetISCSI(value *ISCSIPersistentVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetISCSI(value *ISCSIPersistentVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.ISCSI = value
 	return b
 }
 
 // RemoveISCSI removes the ISCSI field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveISCSI() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveISCSI() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.ISCSI = nil
 	return b
 }
 
 // GetISCSI gets the ISCSI field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetISCSI() (value *ISCSIPersistentVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetISCSI() (value *ISCSIPersistentVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.ISCSI, b.fields.ISCSI != nil
 }
 
 // SetCinder sets the Cinder field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetCinder(value *CinderPersistentVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetCinder(value *CinderPersistentVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.Cinder = value
 	return b
 }
 
 // RemoveCinder removes the Cinder field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveCinder() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveCinder() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.Cinder = nil
 	return b
 }
 
 // GetCinder gets the Cinder field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetCinder() (value *CinderPersistentVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetCinder() (value *CinderPersistentVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.Cinder, b.fields.Cinder != nil
 }
 
 // SetCephFS sets the CephFS field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetCephFS(value *CephFSPersistentVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetCephFS(value *CephFSPersistentVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.CephFS = value
 	return b
 }
 
 // RemoveCephFS removes the CephFS field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveCephFS() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveCephFS() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.CephFS = nil
 	return b
 }
 
 // GetCephFS gets the CephFS field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetCephFS() (value *CephFSPersistentVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetCephFS() (value *CephFSPersistentVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.CephFS, b.fields.CephFS != nil
 }
 
 // SetFC sets the FC field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetFC(value *FCVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetFC(value *FCVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.FC = value
 	return b
 }
 
 // RemoveFC removes the FC field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveFC() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveFC() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.FC = nil
 	return b
 }
 
 // GetFC gets the FC field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetFC() (value *FCVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetFC() (value *FCVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.FC, b.fields.FC != nil
 }
 
 // SetFlocker sets the Flocker field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetFlocker(value *FlockerVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetFlocker(value *FlockerVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.Flocker = value
 	return b
 }
 
 // RemoveFlocker removes the Flocker field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveFlocker() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveFlocker() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.Flocker = nil
 	return b
 }
 
 // GetFlocker gets the Flocker field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetFlocker() (value *FlockerVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetFlocker() (value *FlockerVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.Flocker, b.fields.Flocker != nil
 }
 
 // SetFlexVolume sets the FlexVolume field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetFlexVolume(value *FlexPersistentVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetFlexVolume(value *FlexPersistentVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.FlexVolume = value
 	return b
 }
 
 // RemoveFlexVolume removes the FlexVolume field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveFlexVolume() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveFlexVolume() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.FlexVolume = nil
 	return b
 }
 
 // GetFlexVolume gets the FlexVolume field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetFlexVolume() (value *FlexPersistentVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetFlexVolume() (value *FlexPersistentVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.FlexVolume, b.fields.FlexVolume != nil
 }
 
 // SetAzureFile sets the AzureFile field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetAzureFile(value *AzureFilePersistentVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetAzureFile(value *AzureFilePersistentVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.AzureFile = value
 	return b
 }
 
 // RemoveAzureFile removes the AzureFile field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveAzureFile() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveAzureFile() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.AzureFile = nil
 	return b
 }
 
 // GetAzureFile gets the AzureFile field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetAzureFile() (value *AzureFilePersistentVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetAzureFile() (value *AzureFilePersistentVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.AzureFile, b.fields.AzureFile != nil
 }
 
 // SetVsphereVolume sets the VsphereVolume field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetVsphereVolume(value *VsphereVirtualDiskVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetVsphereVolume(value *VsphereVirtualDiskVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.VsphereVolume = value
 	return b
 }
 
 // RemoveVsphereVolume removes the VsphereVolume field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveVsphereVolume() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveVsphereVolume() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.VsphereVolume = nil
 	return b
 }
 
 // GetVsphereVolume gets the VsphereVolume field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetVsphereVolume() (value *VsphereVirtualDiskVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetVsphereVolume() (value *VsphereVirtualDiskVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.VsphereVolume, b.fields.VsphereVolume != nil
 }
 
 // SetQuobyte sets the Quobyte field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetQuobyte(value *QuobyteVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetQuobyte(value *QuobyteVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.Quobyte = value
 	return b
 }
 
 // RemoveQuobyte removes the Quobyte field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveQuobyte() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveQuobyte() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.Quobyte = nil
 	return b
 }
 
 // GetQuobyte gets the Quobyte field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetQuobyte() (value *QuobyteVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetQuobyte() (value *QuobyteVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.Quobyte, b.fields.Quobyte != nil
 }
 
 // SetAzureDisk sets the AzureDisk field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetAzureDisk(value *AzureDiskVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetAzureDisk(value *AzureDiskVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.AzureDisk = value
 	return b
 }
 
 // RemoveAzureDisk removes the AzureDisk field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveAzureDisk() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveAzureDisk() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.AzureDisk = nil
 	return b
 }
 
 // GetAzureDisk gets the AzureDisk field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetAzureDisk() (value *AzureDiskVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetAzureDisk() (value *AzureDiskVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.AzureDisk, b.fields.AzureDisk != nil
 }
 
 // SetPhotonPersistentDisk sets the PhotonPersistentDisk field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetPhotonPersistentDisk(value *PhotonPersistentDiskVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetPhotonPersistentDisk(value *PhotonPersistentDiskVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.PhotonPersistentDisk = value
 	return b
 }
 
 // RemovePhotonPersistentDisk removes the PhotonPersistentDisk field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemovePhotonPersistentDisk() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemovePhotonPersistentDisk() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.PhotonPersistentDisk = nil
 	return b
 }
 
 // GetPhotonPersistentDisk gets the PhotonPersistentDisk field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetPhotonPersistentDisk() (value *PhotonPersistentDiskVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetPhotonPersistentDisk() (value *PhotonPersistentDiskVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.PhotonPersistentDisk, b.fields.PhotonPersistentDisk != nil
 }
 
 // SetPortworxVolume sets the PortworxVolume field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetPortworxVolume(value *PortworxVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetPortworxVolume(value *PortworxVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.PortworxVolume = value
 	return b
 }
 
 // RemovePortworxVolume removes the PortworxVolume field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemovePortworxVolume() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemovePortworxVolume() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.PortworxVolume = nil
 	return b
 }
 
 // GetPortworxVolume gets the PortworxVolume field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetPortworxVolume() (value *PortworxVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetPortworxVolume() (value *PortworxVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.PortworxVolume, b.fields.PortworxVolume != nil
 }
 
 // SetScaleIO sets the ScaleIO field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetScaleIO(value *ScaleIOPersistentVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetScaleIO(value *ScaleIOPersistentVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.ScaleIO = value
 	return b
 }
 
 // RemoveScaleIO removes the ScaleIO field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveScaleIO() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveScaleIO() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.ScaleIO = nil
 	return b
 }
 
 // GetScaleIO gets the ScaleIO field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetScaleIO() (value *ScaleIOPersistentVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetScaleIO() (value *ScaleIOPersistentVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.ScaleIO, b.fields.ScaleIO != nil
 }
 
 // SetLocal sets the Local field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetLocal(value *LocalVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetLocal(value *LocalVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.Local = value
 	return b
 }
 
 // RemoveLocal removes the Local field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveLocal() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveLocal() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.Local = nil
 	return b
 }
 
 // GetLocal gets the Local field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetLocal() (value *LocalVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetLocal() (value *LocalVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.Local, b.fields.Local != nil
 }
 
 // SetStorageOS sets the StorageOS field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetStorageOS(value *StorageOSPersistentVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetStorageOS(value *StorageOSPersistentVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.StorageOS = value
 	return b
 }
 
 // RemoveStorageOS removes the StorageOS field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveStorageOS() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveStorageOS() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.StorageOS = nil
 	return b
 }
 
 // GetStorageOS gets the StorageOS field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetStorageOS() (value *StorageOSPersistentVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetStorageOS() (value *StorageOSPersistentVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.StorageOS, b.fields.StorageOS != nil
 }
 
 // SetCSI sets the CSI field in the declarative configuration to the given value.
-func (b *PersistentVolumeSourceBuilder) SetCSI(value *CSIPersistentVolumeSourceBuilder) *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) SetCSI(value *CSIPersistentVolumeSourceApplyConfiguration) *PersistentVolumeSourceApplyConfiguration {
 	b.fields.CSI = value
 	return b
 }
 
 // RemoveCSI removes the CSI field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) RemoveCSI() *PersistentVolumeSourceBuilder {
+func (b *PersistentVolumeSourceApplyConfiguration) RemoveCSI() *PersistentVolumeSourceApplyConfiguration {
 	b.fields.CSI = nil
 	return b
 }
 
 // GetCSI gets the CSI field from the declarative configuration.
-func (b *PersistentVolumeSourceBuilder) GetCSI() (value *CSIPersistentVolumeSourceBuilder, ok bool) {
+func (b *PersistentVolumeSourceApplyConfiguration) GetCSI() (value *CSIPersistentVolumeSourceApplyConfiguration, ok bool) {
 	return b.fields.CSI, b.fields.CSI != nil
 }
 
-// ToUnstructured converts PersistentVolumeSourceBuilder to unstructured.
-func (b *PersistentVolumeSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PersistentVolumeSourceApplyConfiguration to unstructured.
+func (b *PersistentVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -453,9 +453,9 @@ func (b *PersistentVolumeSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to PersistentVolumeSourceBuilder, replacing the contents
-// of PersistentVolumeSourceBuilder.
-func (b *PersistentVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PersistentVolumeSourceApplyConfiguration, replacing the contents
+// of PersistentVolumeSourceApplyConfiguration.
+func (b *PersistentVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &persistentVolumeSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -466,15 +466,15 @@ func (b *PersistentVolumeSourceBuilder) FromUnstructured(u map[string]interface{
 	return nil
 }
 
-// MarshalJSON marshals PersistentVolumeSourceBuilder to JSON.
-func (b *PersistentVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PersistentVolumeSourceApplyConfiguration to JSON.
+func (b *PersistentVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PersistentVolumeSourceBuilder, replacing the contents of
-// PersistentVolumeSourceBuilder.
-func (b *PersistentVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PersistentVolumeSourceApplyConfiguration, replacing the contents of
+// PersistentVolumeSourceApplyConfiguration.
+func (b *PersistentVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -482,13 +482,13 @@ func (b *PersistentVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// PersistentVolumeSourceList represents a list of PersistentVolumeSourceBuilder.
-type PersistentVolumeSourceList []*PersistentVolumeSourceBuilder
+// PersistentVolumeSourceList represents a listAlias of PersistentVolumeSourceApplyConfiguration.
+type PersistentVolumeSourceList []*PersistentVolumeSourceApplyConfiguration
 
-// PersistentVolumeSourceList represents a map of PersistentVolumeSourceBuilder.
-type PersistentVolumeSourceMap map[string]PersistentVolumeSourceBuilder
+// PersistentVolumeSourceList represents a map of PersistentVolumeSourceApplyConfiguration.
+type PersistentVolumeSourceMap map[string]PersistentVolumeSourceApplyConfiguration
 
-func (b *PersistentVolumeSourceBuilder) preMarshal() {
+func (b *PersistentVolumeSourceApplyConfiguration) preMarshal() {
 }
-func (b *PersistentVolumeSourceBuilder) postUnmarshal() {
+func (b *PersistentVolumeSourceApplyConfiguration) postUnmarshal() {
 }

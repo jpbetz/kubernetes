@@ -25,84 +25,84 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// LimitRangeBuilder represents an declarative configuration of the LimitRange type for use
+// LimitRangeApplyConfiguration represents an declarative configuration of the LimitRange type for use
 // with apply.
-type LimitRangeBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type LimitRangeApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   limitRangeFields
 }
 
+// LimitRangeApplyConfiguration constructs an declarative configuration of the LimitRange type for use with
+// apply.
+func LimitRange() *LimitRangeApplyConfiguration {
+	return &LimitRangeApplyConfiguration{}
+}
+
 // limitRangeFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LimitRangeBuilder.
+// Inline fields are owned by their respective inline type in LimitRangeApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type limitRangeFields struct {
-	Kind       *string                `json:"kind,omitempty"`       // inlined LimitRangeBuilder.typeMeta.Kind field
-	APIVersion *string                `json:"apiVersion,omitempty"` // inlined LimitRangeBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder  `json:"metadata,omitempty"`
-	Spec       *LimitRangeSpecBuilder `json:"spec,omitempty"`
-}
-
-// LimitRange constructs an declarative configuration of the LimitRange type for use with
-// apply.
-func LimitRange() *LimitRangeBuilder {
-	return &LimitRangeBuilder{}
+	Kind       *string                           `json:"kind,omitempty"`       // inlined LimitRangeApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                           `json:"apiVersion,omitempty"` // inlined LimitRangeApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration  `json:"metadata,omitempty"`
+	Spec       *LimitRangeSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *LimitRangeBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *LimitRangeBuilder {
+func (b *LimitRangeApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *LimitRangeApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *LimitRangeBuilder) RemoveTypeMeta() *LimitRangeBuilder {
+func (b *LimitRangeApplyConfiguration) RemoveTypeMeta() *LimitRangeApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *LimitRangeBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *LimitRangeApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *LimitRangeBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *LimitRangeBuilder {
+func (b *LimitRangeApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *LimitRangeApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *LimitRangeBuilder) RemoveObjectMeta() *LimitRangeBuilder {
+func (b *LimitRangeApplyConfiguration) RemoveObjectMeta() *LimitRangeApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *LimitRangeBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *LimitRangeApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *LimitRangeBuilder) SetSpec(value *LimitRangeSpecBuilder) *LimitRangeBuilder {
+func (b *LimitRangeApplyConfiguration) SetSpec(value *LimitRangeSpecApplyConfiguration) *LimitRangeApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *LimitRangeBuilder) RemoveSpec() *LimitRangeBuilder {
+func (b *LimitRangeApplyConfiguration) RemoveSpec() *LimitRangeApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *LimitRangeBuilder) GetSpec() (value *LimitRangeSpecBuilder, ok bool) {
+func (b *LimitRangeApplyConfiguration) GetSpec() (value *LimitRangeSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
-// ToUnstructured converts LimitRangeBuilder to unstructured.
-func (b *LimitRangeBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts LimitRangeApplyConfiguration to unstructured.
+func (b *LimitRangeApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -114,9 +114,9 @@ func (b *LimitRangeBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to LimitRangeBuilder, replacing the contents
-// of LimitRangeBuilder.
-func (b *LimitRangeBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to LimitRangeApplyConfiguration, replacing the contents
+// of LimitRangeApplyConfiguration.
+func (b *LimitRangeApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &limitRangeFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -127,15 +127,15 @@ func (b *LimitRangeBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals LimitRangeBuilder to JSON.
-func (b *LimitRangeBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals LimitRangeApplyConfiguration to JSON.
+func (b *LimitRangeApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into LimitRangeBuilder, replacing the contents of
-// LimitRangeBuilder.
-func (b *LimitRangeBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into LimitRangeApplyConfiguration, replacing the contents of
+// LimitRangeApplyConfiguration.
+func (b *LimitRangeApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -143,13 +143,13 @@ func (b *LimitRangeBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// LimitRangeList represents a list of LimitRangeBuilder.
-type LimitRangeList []*LimitRangeBuilder
+// LimitRangeList represents a listAlias of LimitRangeApplyConfiguration.
+type LimitRangeList []*LimitRangeApplyConfiguration
 
-// LimitRangeList represents a map of LimitRangeBuilder.
-type LimitRangeMap map[string]LimitRangeBuilder
+// LimitRangeList represents a map of LimitRangeApplyConfiguration.
+type LimitRangeMap map[string]LimitRangeApplyConfiguration
 
-func (b *LimitRangeBuilder) preMarshal() {
+func (b *LimitRangeApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -159,9 +159,9 @@ func (b *LimitRangeBuilder) preMarshal() {
 		}
 	}
 }
-func (b *LimitRangeBuilder) postUnmarshal() {
+func (b *LimitRangeApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

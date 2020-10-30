@@ -135,7 +135,7 @@ func (c *FakePriorityLevelConfigurations) Patch(ctx context.Context, name string
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied priorityLevelConfiguration.
-func (c *FakePriorityLevelConfigurations) Apply(ctx context.Context, priorityLevelConfiguration flowcontrolv1alpha1.PriorityLevelConfigurationBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.PriorityLevelConfiguration, err error) {
+func (c *FakePriorityLevelConfigurations) Apply(ctx context.Context, priorityLevelConfiguration *flowcontrolv1alpha1.PriorityLevelConfigurationApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.PriorityLevelConfiguration, err error) {
 	data, err := priorityLevelConfiguration.MarshalJSON()
 	if err != nil {
 		return nil, err

@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// HTTPIngressRuleValueBuilder represents an declarative configuration of the HTTPIngressRuleValue type for use
+// HTTPIngressRuleValueApplyConfiguration represents an declarative configuration of the HTTPIngressRuleValue type for use
 // with apply.
-type HTTPIngressRuleValueBuilder struct {
+type HTTPIngressRuleValueApplyConfiguration struct {
 	fields hTTPIngressRuleValueFields
 }
 
+// HTTPIngressRuleValueApplyConfiguration constructs an declarative configuration of the HTTPIngressRuleValue type for use with
+// apply.
+func HTTPIngressRuleValue() *HTTPIngressRuleValueApplyConfiguration {
+	return &HTTPIngressRuleValueApplyConfiguration{}
+}
+
 // hTTPIngressRuleValueFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in HTTPIngressRuleValueBuilder.
+// Inline fields are owned by their respective inline type in HTTPIngressRuleValueApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type hTTPIngressRuleValueFields struct {
 	Paths *HTTPIngressPathList `json:"paths,omitempty"`
 }
 
-// HTTPIngressRuleValue constructs an declarative configuration of the HTTPIngressRuleValue type for use with
-// apply.
-func HTTPIngressRuleValue() *HTTPIngressRuleValueBuilder {
-	return &HTTPIngressRuleValueBuilder{}
-}
-
 // SetPaths sets the Paths field in the declarative configuration to the given value.
-func (b *HTTPIngressRuleValueBuilder) SetPaths(value HTTPIngressPathList) *HTTPIngressRuleValueBuilder {
+func (b *HTTPIngressRuleValueApplyConfiguration) SetPaths(value HTTPIngressPathList) *HTTPIngressRuleValueApplyConfiguration {
 	b.fields.Paths = &value
 	return b
 }
 
 // RemovePaths removes the Paths field from the declarative configuration.
-func (b *HTTPIngressRuleValueBuilder) RemovePaths() *HTTPIngressRuleValueBuilder {
+func (b *HTTPIngressRuleValueApplyConfiguration) RemovePaths() *HTTPIngressRuleValueApplyConfiguration {
 	b.fields.Paths = nil
 	return b
 }
 
 // GetPaths gets the Paths field from the declarative configuration.
-func (b *HTTPIngressRuleValueBuilder) GetPaths() (value HTTPIngressPathList, ok bool) {
+func (b *HTTPIngressRuleValueApplyConfiguration) GetPaths() (value HTTPIngressPathList, ok bool) {
 	if v := b.fields.Paths; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts HTTPIngressRuleValueBuilder to unstructured.
-func (b *HTTPIngressRuleValueBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts HTTPIngressRuleValueApplyConfiguration to unstructured.
+func (b *HTTPIngressRuleValueApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *HTTPIngressRuleValueBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to HTTPIngressRuleValueBuilder, replacing the contents
-// of HTTPIngressRuleValueBuilder.
-func (b *HTTPIngressRuleValueBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to HTTPIngressRuleValueApplyConfiguration, replacing the contents
+// of HTTPIngressRuleValueApplyConfiguration.
+func (b *HTTPIngressRuleValueApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &hTTPIngressRuleValueFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *HTTPIngressRuleValueBuilder) FromUnstructured(u map[string]interface{})
 	return nil
 }
 
-// MarshalJSON marshals HTTPIngressRuleValueBuilder to JSON.
-func (b *HTTPIngressRuleValueBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals HTTPIngressRuleValueApplyConfiguration to JSON.
+func (b *HTTPIngressRuleValueApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into HTTPIngressRuleValueBuilder, replacing the contents of
-// HTTPIngressRuleValueBuilder.
-func (b *HTTPIngressRuleValueBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into HTTPIngressRuleValueApplyConfiguration, replacing the contents of
+// HTTPIngressRuleValueApplyConfiguration.
+func (b *HTTPIngressRuleValueApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *HTTPIngressRuleValueBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// HTTPIngressRuleValueList represents a list of HTTPIngressRuleValueBuilder.
-type HTTPIngressRuleValueList []*HTTPIngressRuleValueBuilder
+// HTTPIngressRuleValueList represents a listAlias of HTTPIngressRuleValueApplyConfiguration.
+type HTTPIngressRuleValueList []*HTTPIngressRuleValueApplyConfiguration
 
-// HTTPIngressRuleValueList represents a map of HTTPIngressRuleValueBuilder.
-type HTTPIngressRuleValueMap map[string]HTTPIngressRuleValueBuilder
+// HTTPIngressRuleValueList represents a map of HTTPIngressRuleValueApplyConfiguration.
+type HTTPIngressRuleValueMap map[string]HTTPIngressRuleValueApplyConfiguration
 
-func (b *HTTPIngressRuleValueBuilder) preMarshal() {
+func (b *HTTPIngressRuleValueApplyConfiguration) preMarshal() {
 }
-func (b *HTTPIngressRuleValueBuilder) postUnmarshal() {
+func (b *HTTPIngressRuleValueApplyConfiguration) postUnmarshal() {
 }

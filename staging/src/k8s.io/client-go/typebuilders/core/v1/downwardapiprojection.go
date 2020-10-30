@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// DownwardAPIProjectionBuilder represents an declarative configuration of the DownwardAPIProjection type for use
+// DownwardAPIProjectionApplyConfiguration represents an declarative configuration of the DownwardAPIProjection type for use
 // with apply.
-type DownwardAPIProjectionBuilder struct {
+type DownwardAPIProjectionApplyConfiguration struct {
 	fields downwardAPIProjectionFields
 }
 
+// DownwardAPIProjectionApplyConfiguration constructs an declarative configuration of the DownwardAPIProjection type for use with
+// apply.
+func DownwardAPIProjection() *DownwardAPIProjectionApplyConfiguration {
+	return &DownwardAPIProjectionApplyConfiguration{}
+}
+
 // downwardAPIProjectionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in DownwardAPIProjectionBuilder.
+// Inline fields are owned by their respective inline type in DownwardAPIProjectionApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type downwardAPIProjectionFields struct {
 	Items *DownwardAPIVolumeFileList `json:"items,omitempty"`
 }
 
-// DownwardAPIProjection constructs an declarative configuration of the DownwardAPIProjection type for use with
-// apply.
-func DownwardAPIProjection() *DownwardAPIProjectionBuilder {
-	return &DownwardAPIProjectionBuilder{}
-}
-
 // SetItems sets the Items field in the declarative configuration to the given value.
-func (b *DownwardAPIProjectionBuilder) SetItems(value DownwardAPIVolumeFileList) *DownwardAPIProjectionBuilder {
+func (b *DownwardAPIProjectionApplyConfiguration) SetItems(value DownwardAPIVolumeFileList) *DownwardAPIProjectionApplyConfiguration {
 	b.fields.Items = &value
 	return b
 }
 
 // RemoveItems removes the Items field from the declarative configuration.
-func (b *DownwardAPIProjectionBuilder) RemoveItems() *DownwardAPIProjectionBuilder {
+func (b *DownwardAPIProjectionApplyConfiguration) RemoveItems() *DownwardAPIProjectionApplyConfiguration {
 	b.fields.Items = nil
 	return b
 }
 
 // GetItems gets the Items field from the declarative configuration.
-func (b *DownwardAPIProjectionBuilder) GetItems() (value DownwardAPIVolumeFileList, ok bool) {
+func (b *DownwardAPIProjectionApplyConfiguration) GetItems() (value DownwardAPIVolumeFileList, ok bool) {
 	if v := b.fields.Items; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts DownwardAPIProjectionBuilder to unstructured.
-func (b *DownwardAPIProjectionBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts DownwardAPIProjectionApplyConfiguration to unstructured.
+func (b *DownwardAPIProjectionApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *DownwardAPIProjectionBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to DownwardAPIProjectionBuilder, replacing the contents
-// of DownwardAPIProjectionBuilder.
-func (b *DownwardAPIProjectionBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to DownwardAPIProjectionApplyConfiguration, replacing the contents
+// of DownwardAPIProjectionApplyConfiguration.
+func (b *DownwardAPIProjectionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &downwardAPIProjectionFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *DownwardAPIProjectionBuilder) FromUnstructured(u map[string]interface{}
 	return nil
 }
 
-// MarshalJSON marshals DownwardAPIProjectionBuilder to JSON.
-func (b *DownwardAPIProjectionBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals DownwardAPIProjectionApplyConfiguration to JSON.
+func (b *DownwardAPIProjectionApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into DownwardAPIProjectionBuilder, replacing the contents of
-// DownwardAPIProjectionBuilder.
-func (b *DownwardAPIProjectionBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into DownwardAPIProjectionApplyConfiguration, replacing the contents of
+// DownwardAPIProjectionApplyConfiguration.
+func (b *DownwardAPIProjectionApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *DownwardAPIProjectionBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// DownwardAPIProjectionList represents a list of DownwardAPIProjectionBuilder.
-type DownwardAPIProjectionList []*DownwardAPIProjectionBuilder
+// DownwardAPIProjectionList represents a listAlias of DownwardAPIProjectionApplyConfiguration.
+type DownwardAPIProjectionList []*DownwardAPIProjectionApplyConfiguration
 
-// DownwardAPIProjectionList represents a map of DownwardAPIProjectionBuilder.
-type DownwardAPIProjectionMap map[string]DownwardAPIProjectionBuilder
+// DownwardAPIProjectionList represents a map of DownwardAPIProjectionApplyConfiguration.
+type DownwardAPIProjectionMap map[string]DownwardAPIProjectionApplyConfiguration
 
-func (b *DownwardAPIProjectionBuilder) preMarshal() {
+func (b *DownwardAPIProjectionApplyConfiguration) preMarshal() {
 }
-func (b *DownwardAPIProjectionBuilder) postUnmarshal() {
+func (b *DownwardAPIProjectionApplyConfiguration) postUnmarshal() {
 }

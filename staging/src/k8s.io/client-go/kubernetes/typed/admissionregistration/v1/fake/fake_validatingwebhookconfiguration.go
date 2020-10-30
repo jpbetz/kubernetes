@@ -124,7 +124,7 @@ func (c *FakeValidatingWebhookConfigurations) Patch(ctx context.Context, name st
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied validatingWebhookConfiguration.
-func (c *FakeValidatingWebhookConfigurations) Apply(ctx context.Context, validatingWebhookConfiguration typebuildersadmissionregistrationv1.ValidatingWebhookConfigurationBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *admissionregistrationv1.ValidatingWebhookConfiguration, err error) {
+func (c *FakeValidatingWebhookConfigurations) Apply(ctx context.Context, validatingWebhookConfiguration *typebuildersadmissionregistrationv1.ValidatingWebhookConfigurationApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *admissionregistrationv1.ValidatingWebhookConfiguration, err error) {
 	data, err := validatingWebhookConfiguration.MarshalJSON()
 	if err != nil {
 		return nil, err

@@ -48,7 +48,7 @@ type EndpointsInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.EndpointsList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.Endpoints, err error)
-	Apply(ctx context.Context, endpoints corev1.EndpointsBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Endpoints, err error)
+	Apply(ctx context.Context, endpoints *corev1.EndpointsApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Endpoints, err error)
 	EndpointsExpansion
 }
 
@@ -181,7 +181,7 @@ func (c *endpoints) Patch(ctx context.Context, name string, pt types.PatchType, 
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied endpoints.
-func (c *endpoints) Apply(ctx context.Context, endpoints corev1.EndpointsBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Endpoints, err error) {
+func (c *endpoints) Apply(ctx context.Context, endpoints *corev1.EndpointsApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Endpoints, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := endpoints.MarshalJSON()
 	if err != nil {

@@ -24,46 +24,46 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// CephFSVolumeSourceBuilder represents an declarative configuration of the CephFSVolumeSource type for use
+// CephFSVolumeSourceApplyConfiguration represents an declarative configuration of the CephFSVolumeSource type for use
 // with apply.
-type CephFSVolumeSourceBuilder struct {
+type CephFSVolumeSourceApplyConfiguration struct {
 	fields cephFSVolumeSourceFields
 }
 
+// CephFSVolumeSourceApplyConfiguration constructs an declarative configuration of the CephFSVolumeSource type for use with
+// apply.
+func CephFSVolumeSource() *CephFSVolumeSourceApplyConfiguration {
+	return &CephFSVolumeSourceApplyConfiguration{}
+}
+
 // cephFSVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in CephFSVolumeSourceBuilder.
+// Inline fields are owned by their respective inline type in CephFSVolumeSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type cephFSVolumeSourceFields struct {
-	Monitors   *[]string                    `json:"monitors,omitempty"`
-	Path       *string                      `json:"path,omitempty"`
-	User       *string                      `json:"user,omitempty"`
-	SecretFile *string                      `json:"secretFile,omitempty"`
-	SecretRef  *LocalObjectReferenceBuilder `json:"secretRef,omitempty"`
-	ReadOnly   *bool                        `json:"readOnly,omitempty"`
-}
-
-// CephFSVolumeSource constructs an declarative configuration of the CephFSVolumeSource type for use with
-// apply.
-func CephFSVolumeSource() *CephFSVolumeSourceBuilder {
-	return &CephFSVolumeSourceBuilder{}
+	Monitors   *[]string                               `json:"monitors,omitempty"`
+	Path       *string                                 `json:"path,omitempty"`
+	User       *string                                 `json:"user,omitempty"`
+	SecretFile *string                                 `json:"secretFile,omitempty"`
+	SecretRef  *LocalObjectReferenceApplyConfiguration `json:"secretRef,omitempty"`
+	ReadOnly   *bool                                   `json:"readOnly,omitempty"`
 }
 
 // SetMonitors sets the Monitors field in the declarative configuration to the given value.
-func (b *CephFSVolumeSourceBuilder) SetMonitors(value []string) *CephFSVolumeSourceBuilder {
+func (b *CephFSVolumeSourceApplyConfiguration) SetMonitors(value []string) *CephFSVolumeSourceApplyConfiguration {
 	b.fields.Monitors = &value
 	return b
 }
 
 // RemoveMonitors removes the Monitors field from the declarative configuration.
-func (b *CephFSVolumeSourceBuilder) RemoveMonitors() *CephFSVolumeSourceBuilder {
+func (b *CephFSVolumeSourceApplyConfiguration) RemoveMonitors() *CephFSVolumeSourceApplyConfiguration {
 	b.fields.Monitors = nil
 	return b
 }
 
 // GetMonitors gets the Monitors field from the declarative configuration.
-func (b *CephFSVolumeSourceBuilder) GetMonitors() (value []string, ok bool) {
+func (b *CephFSVolumeSourceApplyConfiguration) GetMonitors() (value []string, ok bool) {
 	if v := b.fields.Monitors; v != nil {
 		return *v, true
 	}
@@ -71,19 +71,19 @@ func (b *CephFSVolumeSourceBuilder) GetMonitors() (value []string, ok bool) {
 }
 
 // SetPath sets the Path field in the declarative configuration to the given value.
-func (b *CephFSVolumeSourceBuilder) SetPath(value string) *CephFSVolumeSourceBuilder {
+func (b *CephFSVolumeSourceApplyConfiguration) SetPath(value string) *CephFSVolumeSourceApplyConfiguration {
 	b.fields.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
-func (b *CephFSVolumeSourceBuilder) RemovePath() *CephFSVolumeSourceBuilder {
+func (b *CephFSVolumeSourceApplyConfiguration) RemovePath() *CephFSVolumeSourceApplyConfiguration {
 	b.fields.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
-func (b *CephFSVolumeSourceBuilder) GetPath() (value string, ok bool) {
+func (b *CephFSVolumeSourceApplyConfiguration) GetPath() (value string, ok bool) {
 	if v := b.fields.Path; v != nil {
 		return *v, true
 	}
@@ -91,19 +91,19 @@ func (b *CephFSVolumeSourceBuilder) GetPath() (value string, ok bool) {
 }
 
 // SetUser sets the User field in the declarative configuration to the given value.
-func (b *CephFSVolumeSourceBuilder) SetUser(value string) *CephFSVolumeSourceBuilder {
+func (b *CephFSVolumeSourceApplyConfiguration) SetUser(value string) *CephFSVolumeSourceApplyConfiguration {
 	b.fields.User = &value
 	return b
 }
 
 // RemoveUser removes the User field from the declarative configuration.
-func (b *CephFSVolumeSourceBuilder) RemoveUser() *CephFSVolumeSourceBuilder {
+func (b *CephFSVolumeSourceApplyConfiguration) RemoveUser() *CephFSVolumeSourceApplyConfiguration {
 	b.fields.User = nil
 	return b
 }
 
 // GetUser gets the User field from the declarative configuration.
-func (b *CephFSVolumeSourceBuilder) GetUser() (value string, ok bool) {
+func (b *CephFSVolumeSourceApplyConfiguration) GetUser() (value string, ok bool) {
 	if v := b.fields.User; v != nil {
 		return *v, true
 	}
@@ -111,19 +111,19 @@ func (b *CephFSVolumeSourceBuilder) GetUser() (value string, ok bool) {
 }
 
 // SetSecretFile sets the SecretFile field in the declarative configuration to the given value.
-func (b *CephFSVolumeSourceBuilder) SetSecretFile(value string) *CephFSVolumeSourceBuilder {
+func (b *CephFSVolumeSourceApplyConfiguration) SetSecretFile(value string) *CephFSVolumeSourceApplyConfiguration {
 	b.fields.SecretFile = &value
 	return b
 }
 
 // RemoveSecretFile removes the SecretFile field from the declarative configuration.
-func (b *CephFSVolumeSourceBuilder) RemoveSecretFile() *CephFSVolumeSourceBuilder {
+func (b *CephFSVolumeSourceApplyConfiguration) RemoveSecretFile() *CephFSVolumeSourceApplyConfiguration {
 	b.fields.SecretFile = nil
 	return b
 }
 
 // GetSecretFile gets the SecretFile field from the declarative configuration.
-func (b *CephFSVolumeSourceBuilder) GetSecretFile() (value string, ok bool) {
+func (b *CephFSVolumeSourceApplyConfiguration) GetSecretFile() (value string, ok bool) {
 	if v := b.fields.SecretFile; v != nil {
 		return *v, true
 	}
@@ -131,44 +131,44 @@ func (b *CephFSVolumeSourceBuilder) GetSecretFile() (value string, ok bool) {
 }
 
 // SetSecretRef sets the SecretRef field in the declarative configuration to the given value.
-func (b *CephFSVolumeSourceBuilder) SetSecretRef(value *LocalObjectReferenceBuilder) *CephFSVolumeSourceBuilder {
+func (b *CephFSVolumeSourceApplyConfiguration) SetSecretRef(value *LocalObjectReferenceApplyConfiguration) *CephFSVolumeSourceApplyConfiguration {
 	b.fields.SecretRef = value
 	return b
 }
 
 // RemoveSecretRef removes the SecretRef field from the declarative configuration.
-func (b *CephFSVolumeSourceBuilder) RemoveSecretRef() *CephFSVolumeSourceBuilder {
+func (b *CephFSVolumeSourceApplyConfiguration) RemoveSecretRef() *CephFSVolumeSourceApplyConfiguration {
 	b.fields.SecretRef = nil
 	return b
 }
 
 // GetSecretRef gets the SecretRef field from the declarative configuration.
-func (b *CephFSVolumeSourceBuilder) GetSecretRef() (value *LocalObjectReferenceBuilder, ok bool) {
+func (b *CephFSVolumeSourceApplyConfiguration) GetSecretRef() (value *LocalObjectReferenceApplyConfiguration, ok bool) {
 	return b.fields.SecretRef, b.fields.SecretRef != nil
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b *CephFSVolumeSourceBuilder) SetReadOnly(value bool) *CephFSVolumeSourceBuilder {
+func (b *CephFSVolumeSourceApplyConfiguration) SetReadOnly(value bool) *CephFSVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b *CephFSVolumeSourceBuilder) RemoveReadOnly() *CephFSVolumeSourceBuilder {
+func (b *CephFSVolumeSourceApplyConfiguration) RemoveReadOnly() *CephFSVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b *CephFSVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
+func (b *CephFSVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts CephFSVolumeSourceBuilder to unstructured.
-func (b *CephFSVolumeSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts CephFSVolumeSourceApplyConfiguration to unstructured.
+func (b *CephFSVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -180,9 +180,9 @@ func (b *CephFSVolumeSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to CephFSVolumeSourceBuilder, replacing the contents
-// of CephFSVolumeSourceBuilder.
-func (b *CephFSVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to CephFSVolumeSourceApplyConfiguration, replacing the contents
+// of CephFSVolumeSourceApplyConfiguration.
+func (b *CephFSVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &cephFSVolumeSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -193,15 +193,15 @@ func (b *CephFSVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) e
 	return nil
 }
 
-// MarshalJSON marshals CephFSVolumeSourceBuilder to JSON.
-func (b *CephFSVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals CephFSVolumeSourceApplyConfiguration to JSON.
+func (b *CephFSVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into CephFSVolumeSourceBuilder, replacing the contents of
-// CephFSVolumeSourceBuilder.
-func (b *CephFSVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into CephFSVolumeSourceApplyConfiguration, replacing the contents of
+// CephFSVolumeSourceApplyConfiguration.
+func (b *CephFSVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -209,13 +209,13 @@ func (b *CephFSVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// CephFSVolumeSourceList represents a list of CephFSVolumeSourceBuilder.
-type CephFSVolumeSourceList []*CephFSVolumeSourceBuilder
+// CephFSVolumeSourceList represents a listAlias of CephFSVolumeSourceApplyConfiguration.
+type CephFSVolumeSourceList []*CephFSVolumeSourceApplyConfiguration
 
-// CephFSVolumeSourceList represents a map of CephFSVolumeSourceBuilder.
-type CephFSVolumeSourceMap map[string]CephFSVolumeSourceBuilder
+// CephFSVolumeSourceList represents a map of CephFSVolumeSourceApplyConfiguration.
+type CephFSVolumeSourceMap map[string]CephFSVolumeSourceApplyConfiguration
 
-func (b *CephFSVolumeSourceBuilder) preMarshal() {
+func (b *CephFSVolumeSourceApplyConfiguration) preMarshal() {
 }
-func (b *CephFSVolumeSourceBuilder) postUnmarshal() {
+func (b *CephFSVolumeSourceApplyConfiguration) postUnmarshal() {
 }

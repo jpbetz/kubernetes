@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ResourceQuotaStatusBuilder represents an declarative configuration of the ResourceQuotaStatus type for use
+// ResourceQuotaStatusApplyConfiguration represents an declarative configuration of the ResourceQuotaStatus type for use
 // with apply.
-type ResourceQuotaStatusBuilder struct {
+type ResourceQuotaStatusApplyConfiguration struct {
 	fields resourceQuotaStatusFields
 }
 
+// ResourceQuotaStatusApplyConfiguration constructs an declarative configuration of the ResourceQuotaStatus type for use with
+// apply.
+func ResourceQuotaStatus() *ResourceQuotaStatusApplyConfiguration {
+	return &ResourceQuotaStatusApplyConfiguration{}
+}
+
 // resourceQuotaStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ResourceQuotaStatusBuilder.
+// Inline fields are owned by their respective inline type in ResourceQuotaStatusApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type resourceQuotaStatusFields struct {
 	Used *v1.ResourceList `json:"used,omitempty"`
 }
 
-// ResourceQuotaStatus constructs an declarative configuration of the ResourceQuotaStatus type for use with
-// apply.
-func ResourceQuotaStatus() *ResourceQuotaStatusBuilder {
-	return &ResourceQuotaStatusBuilder{}
-}
-
 // SetHard sets the Hard field in the declarative configuration to the given value.
-func (b *ResourceQuotaStatusBuilder) SetHard(value v1.ResourceList) *ResourceQuotaStatusBuilder {
+func (b *ResourceQuotaStatusApplyConfiguration) SetHard(value v1.ResourceList) *ResourceQuotaStatusApplyConfiguration {
 	b.fields.Hard = &value
 	return b
 }
 
 // RemoveHard removes the Hard field from the declarative configuration.
-func (b *ResourceQuotaStatusBuilder) RemoveHard() *ResourceQuotaStatusBuilder {
+func (b *ResourceQuotaStatusApplyConfiguration) RemoveHard() *ResourceQuotaStatusApplyConfiguration {
 	b.fields.Hard = nil
 	return b
 }
 
 // GetHard gets the Hard field from the declarative configuration.
-func (b *ResourceQuotaStatusBuilder) GetHard() (value v1.ResourceList, ok bool) {
+func (b *ResourceQuotaStatusApplyConfiguration) GetHard() (value v1.ResourceList, ok bool) {
 	if v := b.fields.Hard; v != nil {
 		return *v, true
 	}
@@ -68,27 +68,27 @@ func (b *ResourceQuotaStatusBuilder) GetHard() (value v1.ResourceList, ok bool) 
 }
 
 // SetUsed sets the Used field in the declarative configuration to the given value.
-func (b *ResourceQuotaStatusBuilder) SetUsed(value v1.ResourceList) *ResourceQuotaStatusBuilder {
+func (b *ResourceQuotaStatusApplyConfiguration) SetUsed(value v1.ResourceList) *ResourceQuotaStatusApplyConfiguration {
 	b.fields.Used = &value
 	return b
 }
 
 // RemoveUsed removes the Used field from the declarative configuration.
-func (b *ResourceQuotaStatusBuilder) RemoveUsed() *ResourceQuotaStatusBuilder {
+func (b *ResourceQuotaStatusApplyConfiguration) RemoveUsed() *ResourceQuotaStatusApplyConfiguration {
 	b.fields.Used = nil
 	return b
 }
 
 // GetUsed gets the Used field from the declarative configuration.
-func (b *ResourceQuotaStatusBuilder) GetUsed() (value v1.ResourceList, ok bool) {
+func (b *ResourceQuotaStatusApplyConfiguration) GetUsed() (value v1.ResourceList, ok bool) {
 	if v := b.fields.Used; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ResourceQuotaStatusBuilder to unstructured.
-func (b *ResourceQuotaStatusBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ResourceQuotaStatusApplyConfiguration to unstructured.
+func (b *ResourceQuotaStatusApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -100,9 +100,9 @@ func (b *ResourceQuotaStatusBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ResourceQuotaStatusBuilder, replacing the contents
-// of ResourceQuotaStatusBuilder.
-func (b *ResourceQuotaStatusBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ResourceQuotaStatusApplyConfiguration, replacing the contents
+// of ResourceQuotaStatusApplyConfiguration.
+func (b *ResourceQuotaStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &resourceQuotaStatusFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -113,15 +113,15 @@ func (b *ResourceQuotaStatusBuilder) FromUnstructured(u map[string]interface{}) 
 	return nil
 }
 
-// MarshalJSON marshals ResourceQuotaStatusBuilder to JSON.
-func (b *ResourceQuotaStatusBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ResourceQuotaStatusApplyConfiguration to JSON.
+func (b *ResourceQuotaStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ResourceQuotaStatusBuilder, replacing the contents of
-// ResourceQuotaStatusBuilder.
-func (b *ResourceQuotaStatusBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ResourceQuotaStatusApplyConfiguration, replacing the contents of
+// ResourceQuotaStatusApplyConfiguration.
+func (b *ResourceQuotaStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -129,13 +129,13 @@ func (b *ResourceQuotaStatusBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ResourceQuotaStatusList represents a list of ResourceQuotaStatusBuilder.
-type ResourceQuotaStatusList []*ResourceQuotaStatusBuilder
+// ResourceQuotaStatusList represents a listAlias of ResourceQuotaStatusApplyConfiguration.
+type ResourceQuotaStatusList []*ResourceQuotaStatusApplyConfiguration
 
-// ResourceQuotaStatusList represents a map of ResourceQuotaStatusBuilder.
-type ResourceQuotaStatusMap map[string]ResourceQuotaStatusBuilder
+// ResourceQuotaStatusList represents a map of ResourceQuotaStatusApplyConfiguration.
+type ResourceQuotaStatusMap map[string]ResourceQuotaStatusApplyConfiguration
 
-func (b *ResourceQuotaStatusBuilder) preMarshal() {
+func (b *ResourceQuotaStatusApplyConfiguration) preMarshal() {
 }
-func (b *ResourceQuotaStatusBuilder) postUnmarshal() {
+func (b *ResourceQuotaStatusApplyConfiguration) postUnmarshal() {
 }

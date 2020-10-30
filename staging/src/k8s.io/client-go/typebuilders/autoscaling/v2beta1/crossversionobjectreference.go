@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// CrossVersionObjectReferenceBuilder represents an declarative configuration of the CrossVersionObjectReference type for use
+// CrossVersionObjectReferenceApplyConfiguration represents an declarative configuration of the CrossVersionObjectReference type for use
 // with apply.
-type CrossVersionObjectReferenceBuilder struct {
+type CrossVersionObjectReferenceApplyConfiguration struct {
 	fields crossVersionObjectReferenceFields
 }
 
+// CrossVersionObjectReferenceApplyConfiguration constructs an declarative configuration of the CrossVersionObjectReference type for use with
+// apply.
+func CrossVersionObjectReference() *CrossVersionObjectReferenceApplyConfiguration {
+	return &CrossVersionObjectReferenceApplyConfiguration{}
+}
+
 // crossVersionObjectReferenceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in CrossVersionObjectReferenceBuilder.
+// Inline fields are owned by their respective inline type in CrossVersionObjectReferenceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type crossVersionObjectReferenceFields struct {
 	APIVersion *string `json:"apiVersion,omitempty"`
 }
 
-// CrossVersionObjectReference constructs an declarative configuration of the CrossVersionObjectReference type for use with
-// apply.
-func CrossVersionObjectReference() *CrossVersionObjectReferenceBuilder {
-	return &CrossVersionObjectReferenceBuilder{}
-}
-
 // SetKind sets the Kind field in the declarative configuration to the given value.
-func (b *CrossVersionObjectReferenceBuilder) SetKind(value string) *CrossVersionObjectReferenceBuilder {
+func (b *CrossVersionObjectReferenceApplyConfiguration) SetKind(value string) *CrossVersionObjectReferenceApplyConfiguration {
 	b.fields.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
-func (b *CrossVersionObjectReferenceBuilder) RemoveKind() *CrossVersionObjectReferenceBuilder {
+func (b *CrossVersionObjectReferenceApplyConfiguration) RemoveKind() *CrossVersionObjectReferenceApplyConfiguration {
 	b.fields.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
-func (b *CrossVersionObjectReferenceBuilder) GetKind() (value string, ok bool) {
+func (b *CrossVersionObjectReferenceApplyConfiguration) GetKind() (value string, ok bool) {
 	if v := b.fields.Kind; v != nil {
 		return *v, true
 	}
@@ -68,19 +68,19 @@ func (b *CrossVersionObjectReferenceBuilder) GetKind() (value string, ok bool) {
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *CrossVersionObjectReferenceBuilder) SetName(value string) *CrossVersionObjectReferenceBuilder {
+func (b *CrossVersionObjectReferenceApplyConfiguration) SetName(value string) *CrossVersionObjectReferenceApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *CrossVersionObjectReferenceBuilder) RemoveName() *CrossVersionObjectReferenceBuilder {
+func (b *CrossVersionObjectReferenceApplyConfiguration) RemoveName() *CrossVersionObjectReferenceApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *CrossVersionObjectReferenceBuilder) GetName() (value string, ok bool) {
+func (b *CrossVersionObjectReferenceApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -88,27 +88,27 @@ func (b *CrossVersionObjectReferenceBuilder) GetName() (value string, ok bool) {
 }
 
 // SetAPIVersion sets the APIVersion field in the declarative configuration to the given value.
-func (b *CrossVersionObjectReferenceBuilder) SetAPIVersion(value string) *CrossVersionObjectReferenceBuilder {
+func (b *CrossVersionObjectReferenceApplyConfiguration) SetAPIVersion(value string) *CrossVersionObjectReferenceApplyConfiguration {
 	b.fields.APIVersion = &value
 	return b
 }
 
 // RemoveAPIVersion removes the APIVersion field from the declarative configuration.
-func (b *CrossVersionObjectReferenceBuilder) RemoveAPIVersion() *CrossVersionObjectReferenceBuilder {
+func (b *CrossVersionObjectReferenceApplyConfiguration) RemoveAPIVersion() *CrossVersionObjectReferenceApplyConfiguration {
 	b.fields.APIVersion = nil
 	return b
 }
 
 // GetAPIVersion gets the APIVersion field from the declarative configuration.
-func (b *CrossVersionObjectReferenceBuilder) GetAPIVersion() (value string, ok bool) {
+func (b *CrossVersionObjectReferenceApplyConfiguration) GetAPIVersion() (value string, ok bool) {
 	if v := b.fields.APIVersion; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts CrossVersionObjectReferenceBuilder to unstructured.
-func (b *CrossVersionObjectReferenceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts CrossVersionObjectReferenceApplyConfiguration to unstructured.
+func (b *CrossVersionObjectReferenceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -120,9 +120,9 @@ func (b *CrossVersionObjectReferenceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to CrossVersionObjectReferenceBuilder, replacing the contents
-// of CrossVersionObjectReferenceBuilder.
-func (b *CrossVersionObjectReferenceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to CrossVersionObjectReferenceApplyConfiguration, replacing the contents
+// of CrossVersionObjectReferenceApplyConfiguration.
+func (b *CrossVersionObjectReferenceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &crossVersionObjectReferenceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -133,15 +133,15 @@ func (b *CrossVersionObjectReferenceBuilder) FromUnstructured(u map[string]inter
 	return nil
 }
 
-// MarshalJSON marshals CrossVersionObjectReferenceBuilder to JSON.
-func (b *CrossVersionObjectReferenceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals CrossVersionObjectReferenceApplyConfiguration to JSON.
+func (b *CrossVersionObjectReferenceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into CrossVersionObjectReferenceBuilder, replacing the contents of
-// CrossVersionObjectReferenceBuilder.
-func (b *CrossVersionObjectReferenceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into CrossVersionObjectReferenceApplyConfiguration, replacing the contents of
+// CrossVersionObjectReferenceApplyConfiguration.
+func (b *CrossVersionObjectReferenceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -149,13 +149,13 @@ func (b *CrossVersionObjectReferenceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// CrossVersionObjectReferenceList represents a list of CrossVersionObjectReferenceBuilder.
-type CrossVersionObjectReferenceList []*CrossVersionObjectReferenceBuilder
+// CrossVersionObjectReferenceList represents a listAlias of CrossVersionObjectReferenceApplyConfiguration.
+type CrossVersionObjectReferenceList []*CrossVersionObjectReferenceApplyConfiguration
 
-// CrossVersionObjectReferenceList represents a map of CrossVersionObjectReferenceBuilder.
-type CrossVersionObjectReferenceMap map[string]CrossVersionObjectReferenceBuilder
+// CrossVersionObjectReferenceList represents a map of CrossVersionObjectReferenceApplyConfiguration.
+type CrossVersionObjectReferenceMap map[string]CrossVersionObjectReferenceApplyConfiguration
 
-func (b *CrossVersionObjectReferenceBuilder) preMarshal() {
+func (b *CrossVersionObjectReferenceApplyConfiguration) preMarshal() {
 }
-func (b *CrossVersionObjectReferenceBuilder) postUnmarshal() {
+func (b *CrossVersionObjectReferenceApplyConfiguration) postUnmarshal() {
 }

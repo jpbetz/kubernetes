@@ -24,46 +24,46 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// IngressRuleValueBuilder represents an declarative configuration of the IngressRuleValue type for use
+// IngressRuleValueApplyConfiguration represents an declarative configuration of the IngressRuleValue type for use
 // with apply.
-type IngressRuleValueBuilder struct {
+type IngressRuleValueApplyConfiguration struct {
 	fields ingressRuleValueFields
 }
 
+// IngressRuleValueApplyConfiguration constructs an declarative configuration of the IngressRuleValue type for use with
+// apply.
+func IngressRuleValue() *IngressRuleValueApplyConfiguration {
+	return &IngressRuleValueApplyConfiguration{}
+}
+
 // ingressRuleValueFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in IngressRuleValueBuilder.
+// Inline fields are owned by their respective inline type in IngressRuleValueApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type ingressRuleValueFields struct {
-	HTTP *HTTPIngressRuleValueBuilder `json:"http,omitempty"`
-}
-
-// IngressRuleValue constructs an declarative configuration of the IngressRuleValue type for use with
-// apply.
-func IngressRuleValue() *IngressRuleValueBuilder {
-	return &IngressRuleValueBuilder{}
+	HTTP *HTTPIngressRuleValueApplyConfiguration `json:"http,omitempty"`
 }
 
 // SetHTTP sets the HTTP field in the declarative configuration to the given value.
-func (b *IngressRuleValueBuilder) SetHTTP(value *HTTPIngressRuleValueBuilder) *IngressRuleValueBuilder {
+func (b *IngressRuleValueApplyConfiguration) SetHTTP(value *HTTPIngressRuleValueApplyConfiguration) *IngressRuleValueApplyConfiguration {
 	b.fields.HTTP = value
 	return b
 }
 
 // RemoveHTTP removes the HTTP field from the declarative configuration.
-func (b *IngressRuleValueBuilder) RemoveHTTP() *IngressRuleValueBuilder {
+func (b *IngressRuleValueApplyConfiguration) RemoveHTTP() *IngressRuleValueApplyConfiguration {
 	b.fields.HTTP = nil
 	return b
 }
 
 // GetHTTP gets the HTTP field from the declarative configuration.
-func (b *IngressRuleValueBuilder) GetHTTP() (value *HTTPIngressRuleValueBuilder, ok bool) {
+func (b *IngressRuleValueApplyConfiguration) GetHTTP() (value *HTTPIngressRuleValueApplyConfiguration, ok bool) {
 	return b.fields.HTTP, b.fields.HTTP != nil
 }
 
-// ToUnstructured converts IngressRuleValueBuilder to unstructured.
-func (b *IngressRuleValueBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts IngressRuleValueApplyConfiguration to unstructured.
+func (b *IngressRuleValueApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -75,9 +75,9 @@ func (b *IngressRuleValueBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to IngressRuleValueBuilder, replacing the contents
-// of IngressRuleValueBuilder.
-func (b *IngressRuleValueBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to IngressRuleValueApplyConfiguration, replacing the contents
+// of IngressRuleValueApplyConfiguration.
+func (b *IngressRuleValueApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &ingressRuleValueFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -88,15 +88,15 @@ func (b *IngressRuleValueBuilder) FromUnstructured(u map[string]interface{}) err
 	return nil
 }
 
-// MarshalJSON marshals IngressRuleValueBuilder to JSON.
-func (b *IngressRuleValueBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals IngressRuleValueApplyConfiguration to JSON.
+func (b *IngressRuleValueApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into IngressRuleValueBuilder, replacing the contents of
-// IngressRuleValueBuilder.
-func (b *IngressRuleValueBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into IngressRuleValueApplyConfiguration, replacing the contents of
+// IngressRuleValueApplyConfiguration.
+func (b *IngressRuleValueApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -104,13 +104,13 @@ func (b *IngressRuleValueBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// IngressRuleValueList represents a list of IngressRuleValueBuilder.
-type IngressRuleValueList []*IngressRuleValueBuilder
+// IngressRuleValueList represents a listAlias of IngressRuleValueApplyConfiguration.
+type IngressRuleValueList []*IngressRuleValueApplyConfiguration
 
-// IngressRuleValueList represents a map of IngressRuleValueBuilder.
-type IngressRuleValueMap map[string]IngressRuleValueBuilder
+// IngressRuleValueList represents a map of IngressRuleValueApplyConfiguration.
+type IngressRuleValueMap map[string]IngressRuleValueApplyConfiguration
 
-func (b *IngressRuleValueBuilder) preMarshal() {
+func (b *IngressRuleValueApplyConfiguration) preMarshal() {
 }
-func (b *IngressRuleValueBuilder) postUnmarshal() {
+func (b *IngressRuleValueApplyConfiguration) postUnmarshal() {
 }

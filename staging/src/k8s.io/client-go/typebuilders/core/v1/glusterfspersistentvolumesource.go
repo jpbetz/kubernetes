@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// GlusterfsPersistentVolumeSourceBuilder represents an declarative configuration of the GlusterfsPersistentVolumeSource type for use
+// GlusterfsPersistentVolumeSourceApplyConfiguration represents an declarative configuration of the GlusterfsPersistentVolumeSource type for use
 // with apply.
-type GlusterfsPersistentVolumeSourceBuilder struct {
+type GlusterfsPersistentVolumeSourceApplyConfiguration struct {
 	fields glusterfsPersistentVolumeSourceFields
 }
 
+// GlusterfsPersistentVolumeSourceApplyConfiguration constructs an declarative configuration of the GlusterfsPersistentVolumeSource type for use with
+// apply.
+func GlusterfsPersistentVolumeSource() *GlusterfsPersistentVolumeSourceApplyConfiguration {
+	return &GlusterfsPersistentVolumeSourceApplyConfiguration{}
+}
+
 // glusterfsPersistentVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in GlusterfsPersistentVolumeSourceBuilder.
+// Inline fields are owned by their respective inline type in GlusterfsPersistentVolumeSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -42,26 +48,20 @@ type glusterfsPersistentVolumeSourceFields struct {
 	EndpointsNamespace *string `json:"endpointsNamespace,omitempty"`
 }
 
-// GlusterfsPersistentVolumeSource constructs an declarative configuration of the GlusterfsPersistentVolumeSource type for use with
-// apply.
-func GlusterfsPersistentVolumeSource() *GlusterfsPersistentVolumeSourceBuilder {
-	return &GlusterfsPersistentVolumeSourceBuilder{}
-}
-
 // SetEndpointsName sets the EndpointsName field in the declarative configuration to the given value.
-func (b *GlusterfsPersistentVolumeSourceBuilder) SetEndpointsName(value string) *GlusterfsPersistentVolumeSourceBuilder {
+func (b *GlusterfsPersistentVolumeSourceApplyConfiguration) SetEndpointsName(value string) *GlusterfsPersistentVolumeSourceApplyConfiguration {
 	b.fields.EndpointsName = &value
 	return b
 }
 
 // RemoveEndpointsName removes the EndpointsName field from the declarative configuration.
-func (b *GlusterfsPersistentVolumeSourceBuilder) RemoveEndpointsName() *GlusterfsPersistentVolumeSourceBuilder {
+func (b *GlusterfsPersistentVolumeSourceApplyConfiguration) RemoveEndpointsName() *GlusterfsPersistentVolumeSourceApplyConfiguration {
 	b.fields.EndpointsName = nil
 	return b
 }
 
 // GetEndpointsName gets the EndpointsName field from the declarative configuration.
-func (b *GlusterfsPersistentVolumeSourceBuilder) GetEndpointsName() (value string, ok bool) {
+func (b *GlusterfsPersistentVolumeSourceApplyConfiguration) GetEndpointsName() (value string, ok bool) {
 	if v := b.fields.EndpointsName; v != nil {
 		return *v, true
 	}
@@ -69,19 +69,19 @@ func (b *GlusterfsPersistentVolumeSourceBuilder) GetEndpointsName() (value strin
 }
 
 // SetPath sets the Path field in the declarative configuration to the given value.
-func (b *GlusterfsPersistentVolumeSourceBuilder) SetPath(value string) *GlusterfsPersistentVolumeSourceBuilder {
+func (b *GlusterfsPersistentVolumeSourceApplyConfiguration) SetPath(value string) *GlusterfsPersistentVolumeSourceApplyConfiguration {
 	b.fields.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
-func (b *GlusterfsPersistentVolumeSourceBuilder) RemovePath() *GlusterfsPersistentVolumeSourceBuilder {
+func (b *GlusterfsPersistentVolumeSourceApplyConfiguration) RemovePath() *GlusterfsPersistentVolumeSourceApplyConfiguration {
 	b.fields.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
-func (b *GlusterfsPersistentVolumeSourceBuilder) GetPath() (value string, ok bool) {
+func (b *GlusterfsPersistentVolumeSourceApplyConfiguration) GetPath() (value string, ok bool) {
 	if v := b.fields.Path; v != nil {
 		return *v, true
 	}
@@ -89,19 +89,19 @@ func (b *GlusterfsPersistentVolumeSourceBuilder) GetPath() (value string, ok boo
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b *GlusterfsPersistentVolumeSourceBuilder) SetReadOnly(value bool) *GlusterfsPersistentVolumeSourceBuilder {
+func (b *GlusterfsPersistentVolumeSourceApplyConfiguration) SetReadOnly(value bool) *GlusterfsPersistentVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b *GlusterfsPersistentVolumeSourceBuilder) RemoveReadOnly() *GlusterfsPersistentVolumeSourceBuilder {
+func (b *GlusterfsPersistentVolumeSourceApplyConfiguration) RemoveReadOnly() *GlusterfsPersistentVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b *GlusterfsPersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
+func (b *GlusterfsPersistentVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
@@ -109,27 +109,27 @@ func (b *GlusterfsPersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok b
 }
 
 // SetEndpointsNamespace sets the EndpointsNamespace field in the declarative configuration to the given value.
-func (b *GlusterfsPersistentVolumeSourceBuilder) SetEndpointsNamespace(value string) *GlusterfsPersistentVolumeSourceBuilder {
+func (b *GlusterfsPersistentVolumeSourceApplyConfiguration) SetEndpointsNamespace(value string) *GlusterfsPersistentVolumeSourceApplyConfiguration {
 	b.fields.EndpointsNamespace = &value
 	return b
 }
 
 // RemoveEndpointsNamespace removes the EndpointsNamespace field from the declarative configuration.
-func (b *GlusterfsPersistentVolumeSourceBuilder) RemoveEndpointsNamespace() *GlusterfsPersistentVolumeSourceBuilder {
+func (b *GlusterfsPersistentVolumeSourceApplyConfiguration) RemoveEndpointsNamespace() *GlusterfsPersistentVolumeSourceApplyConfiguration {
 	b.fields.EndpointsNamespace = nil
 	return b
 }
 
 // GetEndpointsNamespace gets the EndpointsNamespace field from the declarative configuration.
-func (b *GlusterfsPersistentVolumeSourceBuilder) GetEndpointsNamespace() (value string, ok bool) {
+func (b *GlusterfsPersistentVolumeSourceApplyConfiguration) GetEndpointsNamespace() (value string, ok bool) {
 	if v := b.fields.EndpointsNamespace; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts GlusterfsPersistentVolumeSourceBuilder to unstructured.
-func (b *GlusterfsPersistentVolumeSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts GlusterfsPersistentVolumeSourceApplyConfiguration to unstructured.
+func (b *GlusterfsPersistentVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -141,9 +141,9 @@ func (b *GlusterfsPersistentVolumeSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to GlusterfsPersistentVolumeSourceBuilder, replacing the contents
-// of GlusterfsPersistentVolumeSourceBuilder.
-func (b *GlusterfsPersistentVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to GlusterfsPersistentVolumeSourceApplyConfiguration, replacing the contents
+// of GlusterfsPersistentVolumeSourceApplyConfiguration.
+func (b *GlusterfsPersistentVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &glusterfsPersistentVolumeSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -154,15 +154,15 @@ func (b *GlusterfsPersistentVolumeSourceBuilder) FromUnstructured(u map[string]i
 	return nil
 }
 
-// MarshalJSON marshals GlusterfsPersistentVolumeSourceBuilder to JSON.
-func (b *GlusterfsPersistentVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals GlusterfsPersistentVolumeSourceApplyConfiguration to JSON.
+func (b *GlusterfsPersistentVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into GlusterfsPersistentVolumeSourceBuilder, replacing the contents of
-// GlusterfsPersistentVolumeSourceBuilder.
-func (b *GlusterfsPersistentVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into GlusterfsPersistentVolumeSourceApplyConfiguration, replacing the contents of
+// GlusterfsPersistentVolumeSourceApplyConfiguration.
+func (b *GlusterfsPersistentVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -170,13 +170,13 @@ func (b *GlusterfsPersistentVolumeSourceBuilder) UnmarshalJSON(data []byte) erro
 	return nil
 }
 
-// GlusterfsPersistentVolumeSourceList represents a list of GlusterfsPersistentVolumeSourceBuilder.
-type GlusterfsPersistentVolumeSourceList []*GlusterfsPersistentVolumeSourceBuilder
+// GlusterfsPersistentVolumeSourceList represents a listAlias of GlusterfsPersistentVolumeSourceApplyConfiguration.
+type GlusterfsPersistentVolumeSourceList []*GlusterfsPersistentVolumeSourceApplyConfiguration
 
-// GlusterfsPersistentVolumeSourceList represents a map of GlusterfsPersistentVolumeSourceBuilder.
-type GlusterfsPersistentVolumeSourceMap map[string]GlusterfsPersistentVolumeSourceBuilder
+// GlusterfsPersistentVolumeSourceList represents a map of GlusterfsPersistentVolumeSourceApplyConfiguration.
+type GlusterfsPersistentVolumeSourceMap map[string]GlusterfsPersistentVolumeSourceApplyConfiguration
 
-func (b *GlusterfsPersistentVolumeSourceBuilder) preMarshal() {
+func (b *GlusterfsPersistentVolumeSourceApplyConfiguration) preMarshal() {
 }
-func (b *GlusterfsPersistentVolumeSourceBuilder) postUnmarshal() {
+func (b *GlusterfsPersistentVolumeSourceApplyConfiguration) postUnmarshal() {
 }

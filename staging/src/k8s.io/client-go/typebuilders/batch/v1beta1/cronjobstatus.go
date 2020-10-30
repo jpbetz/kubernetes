@@ -26,14 +26,20 @@ import (
 	v1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
-// CronJobStatusBuilder represents an declarative configuration of the CronJobStatus type for use
+// CronJobStatusApplyConfiguration represents an declarative configuration of the CronJobStatus type for use
 // with apply.
-type CronJobStatusBuilder struct {
+type CronJobStatusApplyConfiguration struct {
 	fields cronJobStatusFields
 }
 
+// CronJobStatusApplyConfiguration constructs an declarative configuration of the CronJobStatus type for use with
+// apply.
+func CronJobStatus() *CronJobStatusApplyConfiguration {
+	return &CronJobStatusApplyConfiguration{}
+}
+
 // cronJobStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in CronJobStatusBuilder.
+// Inline fields are owned by their respective inline type in CronJobStatusApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -42,26 +48,20 @@ type cronJobStatusFields struct {
 	LastScheduleTime *metav1.Time            `json:"lastScheduleTime,omitempty"`
 }
 
-// CronJobStatus constructs an declarative configuration of the CronJobStatus type for use with
-// apply.
-func CronJobStatus() *CronJobStatusBuilder {
-	return &CronJobStatusBuilder{}
-}
-
 // SetActive sets the Active field in the declarative configuration to the given value.
-func (b *CronJobStatusBuilder) SetActive(value v1.ObjectReferenceList) *CronJobStatusBuilder {
+func (b *CronJobStatusApplyConfiguration) SetActive(value v1.ObjectReferenceList) *CronJobStatusApplyConfiguration {
 	b.fields.Active = &value
 	return b
 }
 
 // RemoveActive removes the Active field from the declarative configuration.
-func (b *CronJobStatusBuilder) RemoveActive() *CronJobStatusBuilder {
+func (b *CronJobStatusApplyConfiguration) RemoveActive() *CronJobStatusApplyConfiguration {
 	b.fields.Active = nil
 	return b
 }
 
 // GetActive gets the Active field from the declarative configuration.
-func (b *CronJobStatusBuilder) GetActive() (value v1.ObjectReferenceList, ok bool) {
+func (b *CronJobStatusApplyConfiguration) GetActive() (value v1.ObjectReferenceList, ok bool) {
 	if v := b.fields.Active; v != nil {
 		return *v, true
 	}
@@ -69,27 +69,27 @@ func (b *CronJobStatusBuilder) GetActive() (value v1.ObjectReferenceList, ok boo
 }
 
 // SetLastScheduleTime sets the LastScheduleTime field in the declarative configuration to the given value.
-func (b *CronJobStatusBuilder) SetLastScheduleTime(value metav1.Time) *CronJobStatusBuilder {
+func (b *CronJobStatusApplyConfiguration) SetLastScheduleTime(value metav1.Time) *CronJobStatusApplyConfiguration {
 	b.fields.LastScheduleTime = &value
 	return b
 }
 
 // RemoveLastScheduleTime removes the LastScheduleTime field from the declarative configuration.
-func (b *CronJobStatusBuilder) RemoveLastScheduleTime() *CronJobStatusBuilder {
+func (b *CronJobStatusApplyConfiguration) RemoveLastScheduleTime() *CronJobStatusApplyConfiguration {
 	b.fields.LastScheduleTime = nil
 	return b
 }
 
 // GetLastScheduleTime gets the LastScheduleTime field from the declarative configuration.
-func (b *CronJobStatusBuilder) GetLastScheduleTime() (value metav1.Time, ok bool) {
+func (b *CronJobStatusApplyConfiguration) GetLastScheduleTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastScheduleTime; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts CronJobStatusBuilder to unstructured.
-func (b *CronJobStatusBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts CronJobStatusApplyConfiguration to unstructured.
+func (b *CronJobStatusApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -101,9 +101,9 @@ func (b *CronJobStatusBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to CronJobStatusBuilder, replacing the contents
-// of CronJobStatusBuilder.
-func (b *CronJobStatusBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to CronJobStatusApplyConfiguration, replacing the contents
+// of CronJobStatusApplyConfiguration.
+func (b *CronJobStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &cronJobStatusFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -114,15 +114,15 @@ func (b *CronJobStatusBuilder) FromUnstructured(u map[string]interface{}) error 
 	return nil
 }
 
-// MarshalJSON marshals CronJobStatusBuilder to JSON.
-func (b *CronJobStatusBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals CronJobStatusApplyConfiguration to JSON.
+func (b *CronJobStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into CronJobStatusBuilder, replacing the contents of
-// CronJobStatusBuilder.
-func (b *CronJobStatusBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into CronJobStatusApplyConfiguration, replacing the contents of
+// CronJobStatusApplyConfiguration.
+func (b *CronJobStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -130,13 +130,13 @@ func (b *CronJobStatusBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// CronJobStatusList represents a list of CronJobStatusBuilder.
-type CronJobStatusList []*CronJobStatusBuilder
+// CronJobStatusList represents a listAlias of CronJobStatusApplyConfiguration.
+type CronJobStatusList []*CronJobStatusApplyConfiguration
 
-// CronJobStatusList represents a map of CronJobStatusBuilder.
-type CronJobStatusMap map[string]CronJobStatusBuilder
+// CronJobStatusList represents a map of CronJobStatusApplyConfiguration.
+type CronJobStatusMap map[string]CronJobStatusApplyConfiguration
 
-func (b *CronJobStatusBuilder) preMarshal() {
+func (b *CronJobStatusApplyConfiguration) preMarshal() {
 }
-func (b *CronJobStatusBuilder) postUnmarshal() {
+func (b *CronJobStatusApplyConfiguration) postUnmarshal() {
 }

@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// LocalObjectReferenceBuilder represents an declarative configuration of the LocalObjectReference type for use
+// LocalObjectReferenceApplyConfiguration represents an declarative configuration of the LocalObjectReference type for use
 // with apply.
-type LocalObjectReferenceBuilder struct {
+type LocalObjectReferenceApplyConfiguration struct {
 	fields localObjectReferenceFields
 }
 
+// LocalObjectReferenceApplyConfiguration constructs an declarative configuration of the LocalObjectReference type for use with
+// apply.
+func LocalObjectReference() *LocalObjectReferenceApplyConfiguration {
+	return &LocalObjectReferenceApplyConfiguration{}
+}
+
 // localObjectReferenceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LocalObjectReferenceBuilder.
+// Inline fields are owned by their respective inline type in LocalObjectReferenceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type localObjectReferenceFields struct {
 	Name *string `json:"name,omitempty"`
 }
 
-// LocalObjectReference constructs an declarative configuration of the LocalObjectReference type for use with
-// apply.
-func LocalObjectReference() *LocalObjectReferenceBuilder {
-	return &LocalObjectReferenceBuilder{}
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *LocalObjectReferenceBuilder) SetName(value string) *LocalObjectReferenceBuilder {
+func (b *LocalObjectReferenceApplyConfiguration) SetName(value string) *LocalObjectReferenceApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *LocalObjectReferenceBuilder) RemoveName() *LocalObjectReferenceBuilder {
+func (b *LocalObjectReferenceApplyConfiguration) RemoveName() *LocalObjectReferenceApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *LocalObjectReferenceBuilder) GetName() (value string, ok bool) {
+func (b *LocalObjectReferenceApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts LocalObjectReferenceBuilder to unstructured.
-func (b *LocalObjectReferenceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts LocalObjectReferenceApplyConfiguration to unstructured.
+func (b *LocalObjectReferenceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *LocalObjectReferenceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to LocalObjectReferenceBuilder, replacing the contents
-// of LocalObjectReferenceBuilder.
-func (b *LocalObjectReferenceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to LocalObjectReferenceApplyConfiguration, replacing the contents
+// of LocalObjectReferenceApplyConfiguration.
+func (b *LocalObjectReferenceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &localObjectReferenceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *LocalObjectReferenceBuilder) FromUnstructured(u map[string]interface{})
 	return nil
 }
 
-// MarshalJSON marshals LocalObjectReferenceBuilder to JSON.
-func (b *LocalObjectReferenceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals LocalObjectReferenceApplyConfiguration to JSON.
+func (b *LocalObjectReferenceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into LocalObjectReferenceBuilder, replacing the contents of
-// LocalObjectReferenceBuilder.
-func (b *LocalObjectReferenceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into LocalObjectReferenceApplyConfiguration, replacing the contents of
+// LocalObjectReferenceApplyConfiguration.
+func (b *LocalObjectReferenceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *LocalObjectReferenceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// LocalObjectReferenceList represents a list of LocalObjectReferenceBuilder.
-type LocalObjectReferenceList []*LocalObjectReferenceBuilder
+// LocalObjectReferenceList represents a listAlias of LocalObjectReferenceApplyConfiguration.
+type LocalObjectReferenceList []*LocalObjectReferenceApplyConfiguration
 
-// LocalObjectReferenceList represents a map of LocalObjectReferenceBuilder.
-type LocalObjectReferenceMap map[string]LocalObjectReferenceBuilder
+// LocalObjectReferenceList represents a map of LocalObjectReferenceApplyConfiguration.
+type LocalObjectReferenceMap map[string]LocalObjectReferenceApplyConfiguration
 
-func (b *LocalObjectReferenceBuilder) preMarshal() {
+func (b *LocalObjectReferenceApplyConfiguration) preMarshal() {
 }
-func (b *LocalObjectReferenceBuilder) postUnmarshal() {
+func (b *LocalObjectReferenceApplyConfiguration) postUnmarshal() {
 }

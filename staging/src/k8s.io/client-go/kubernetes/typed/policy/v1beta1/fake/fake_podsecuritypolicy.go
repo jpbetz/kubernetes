@@ -124,7 +124,7 @@ func (c *FakePodSecurityPolicies) Patch(ctx context.Context, name string, pt typ
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied podSecurityPolicy.
-func (c *FakePodSecurityPolicies) Apply(ctx context.Context, podSecurityPolicy policyv1beta1.PodSecurityPolicyBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PodSecurityPolicy, err error) {
+func (c *FakePodSecurityPolicies) Apply(ctx context.Context, podSecurityPolicy *policyv1beta1.PodSecurityPolicyApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PodSecurityPolicy, err error) {
 	data, err := podSecurityPolicy.MarshalJSON()
 	if err != nil {
 		return nil, err

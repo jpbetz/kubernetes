@@ -132,7 +132,7 @@ func (c *FakeEvents) Patch(ctx context.Context, name string, pt types.PatchType,
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied event.
-func (c *FakeEvents) Apply(ctx context.Context, event typebuilderseventsv1.EventBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *eventsv1.Event, err error) {
+func (c *FakeEvents) Apply(ctx context.Context, event *typebuilderseventsv1.EventApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *eventsv1.Event, err error) {
 	data, err := event.MarshalJSON()
 	if err != nil {
 		return nil, err

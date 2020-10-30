@@ -25,82 +25,82 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// NetworkPolicyPeerBuilder represents an declarative configuration of the NetworkPolicyPeer type for use
+// NetworkPolicyPeerApplyConfiguration represents an declarative configuration of the NetworkPolicyPeer type for use
 // with apply.
-type NetworkPolicyPeerBuilder struct {
+type NetworkPolicyPeerApplyConfiguration struct {
 	fields networkPolicyPeerFields
 }
 
+// NetworkPolicyPeerApplyConfiguration constructs an declarative configuration of the NetworkPolicyPeer type for use with
+// apply.
+func NetworkPolicyPeer() *NetworkPolicyPeerApplyConfiguration {
+	return &NetworkPolicyPeerApplyConfiguration{}
+}
+
 // networkPolicyPeerFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NetworkPolicyPeerBuilder.
+// Inline fields are owned by their respective inline type in NetworkPolicyPeerApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type networkPolicyPeerFields struct {
-	PodSelector       *v1.LabelSelectorBuilder `json:"podSelector,omitempty"`
-	NamespaceSelector *v1.LabelSelectorBuilder `json:"namespaceSelector,omitempty"`
-	IPBlock           *IPBlockBuilder          `json:"ipBlock,omitempty"`
-}
-
-// NetworkPolicyPeer constructs an declarative configuration of the NetworkPolicyPeer type for use with
-// apply.
-func NetworkPolicyPeer() *NetworkPolicyPeerBuilder {
-	return &NetworkPolicyPeerBuilder{}
+	PodSelector       *v1.LabelSelectorApplyConfiguration `json:"podSelector,omitempty"`
+	NamespaceSelector *v1.LabelSelectorApplyConfiguration `json:"namespaceSelector,omitempty"`
+	IPBlock           *IPBlockApplyConfiguration          `json:"ipBlock,omitempty"`
 }
 
 // SetPodSelector sets the PodSelector field in the declarative configuration to the given value.
-func (b *NetworkPolicyPeerBuilder) SetPodSelector(value *v1.LabelSelectorBuilder) *NetworkPolicyPeerBuilder {
+func (b *NetworkPolicyPeerApplyConfiguration) SetPodSelector(value *v1.LabelSelectorApplyConfiguration) *NetworkPolicyPeerApplyConfiguration {
 	b.fields.PodSelector = value
 	return b
 }
 
 // RemovePodSelector removes the PodSelector field from the declarative configuration.
-func (b *NetworkPolicyPeerBuilder) RemovePodSelector() *NetworkPolicyPeerBuilder {
+func (b *NetworkPolicyPeerApplyConfiguration) RemovePodSelector() *NetworkPolicyPeerApplyConfiguration {
 	b.fields.PodSelector = nil
 	return b
 }
 
 // GetPodSelector gets the PodSelector field from the declarative configuration.
-func (b *NetworkPolicyPeerBuilder) GetPodSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+func (b *NetworkPolicyPeerApplyConfiguration) GetPodSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
 	return b.fields.PodSelector, b.fields.PodSelector != nil
 }
 
 // SetNamespaceSelector sets the NamespaceSelector field in the declarative configuration to the given value.
-func (b *NetworkPolicyPeerBuilder) SetNamespaceSelector(value *v1.LabelSelectorBuilder) *NetworkPolicyPeerBuilder {
+func (b *NetworkPolicyPeerApplyConfiguration) SetNamespaceSelector(value *v1.LabelSelectorApplyConfiguration) *NetworkPolicyPeerApplyConfiguration {
 	b.fields.NamespaceSelector = value
 	return b
 }
 
 // RemoveNamespaceSelector removes the NamespaceSelector field from the declarative configuration.
-func (b *NetworkPolicyPeerBuilder) RemoveNamespaceSelector() *NetworkPolicyPeerBuilder {
+func (b *NetworkPolicyPeerApplyConfiguration) RemoveNamespaceSelector() *NetworkPolicyPeerApplyConfiguration {
 	b.fields.NamespaceSelector = nil
 	return b
 }
 
 // GetNamespaceSelector gets the NamespaceSelector field from the declarative configuration.
-func (b *NetworkPolicyPeerBuilder) GetNamespaceSelector() (value *v1.LabelSelectorBuilder, ok bool) {
+func (b *NetworkPolicyPeerApplyConfiguration) GetNamespaceSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
 	return b.fields.NamespaceSelector, b.fields.NamespaceSelector != nil
 }
 
 // SetIPBlock sets the IPBlock field in the declarative configuration to the given value.
-func (b *NetworkPolicyPeerBuilder) SetIPBlock(value *IPBlockBuilder) *NetworkPolicyPeerBuilder {
+func (b *NetworkPolicyPeerApplyConfiguration) SetIPBlock(value *IPBlockApplyConfiguration) *NetworkPolicyPeerApplyConfiguration {
 	b.fields.IPBlock = value
 	return b
 }
 
 // RemoveIPBlock removes the IPBlock field from the declarative configuration.
-func (b *NetworkPolicyPeerBuilder) RemoveIPBlock() *NetworkPolicyPeerBuilder {
+func (b *NetworkPolicyPeerApplyConfiguration) RemoveIPBlock() *NetworkPolicyPeerApplyConfiguration {
 	b.fields.IPBlock = nil
 	return b
 }
 
 // GetIPBlock gets the IPBlock field from the declarative configuration.
-func (b *NetworkPolicyPeerBuilder) GetIPBlock() (value *IPBlockBuilder, ok bool) {
+func (b *NetworkPolicyPeerApplyConfiguration) GetIPBlock() (value *IPBlockApplyConfiguration, ok bool) {
 	return b.fields.IPBlock, b.fields.IPBlock != nil
 }
 
-// ToUnstructured converts NetworkPolicyPeerBuilder to unstructured.
-func (b *NetworkPolicyPeerBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NetworkPolicyPeerApplyConfiguration to unstructured.
+func (b *NetworkPolicyPeerApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -112,9 +112,9 @@ func (b *NetworkPolicyPeerBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NetworkPolicyPeerBuilder, replacing the contents
-// of NetworkPolicyPeerBuilder.
-func (b *NetworkPolicyPeerBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NetworkPolicyPeerApplyConfiguration, replacing the contents
+// of NetworkPolicyPeerApplyConfiguration.
+func (b *NetworkPolicyPeerApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &networkPolicyPeerFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -125,15 +125,15 @@ func (b *NetworkPolicyPeerBuilder) FromUnstructured(u map[string]interface{}) er
 	return nil
 }
 
-// MarshalJSON marshals NetworkPolicyPeerBuilder to JSON.
-func (b *NetworkPolicyPeerBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NetworkPolicyPeerApplyConfiguration to JSON.
+func (b *NetworkPolicyPeerApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NetworkPolicyPeerBuilder, replacing the contents of
-// NetworkPolicyPeerBuilder.
-func (b *NetworkPolicyPeerBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NetworkPolicyPeerApplyConfiguration, replacing the contents of
+// NetworkPolicyPeerApplyConfiguration.
+func (b *NetworkPolicyPeerApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -141,13 +141,13 @@ func (b *NetworkPolicyPeerBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NetworkPolicyPeerList represents a list of NetworkPolicyPeerBuilder.
-type NetworkPolicyPeerList []*NetworkPolicyPeerBuilder
+// NetworkPolicyPeerList represents a listAlias of NetworkPolicyPeerApplyConfiguration.
+type NetworkPolicyPeerList []*NetworkPolicyPeerApplyConfiguration
 
-// NetworkPolicyPeerList represents a map of NetworkPolicyPeerBuilder.
-type NetworkPolicyPeerMap map[string]NetworkPolicyPeerBuilder
+// NetworkPolicyPeerList represents a map of NetworkPolicyPeerApplyConfiguration.
+type NetworkPolicyPeerMap map[string]NetworkPolicyPeerApplyConfiguration
 
-func (b *NetworkPolicyPeerBuilder) preMarshal() {
+func (b *NetworkPolicyPeerApplyConfiguration) preMarshal() {
 }
-func (b *NetworkPolicyPeerBuilder) postUnmarshal() {
+func (b *NetworkPolicyPeerApplyConfiguration) postUnmarshal() {
 }

@@ -24,82 +24,82 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ContainerStateBuilder represents an declarative configuration of the ContainerState type for use
+// ContainerStateApplyConfiguration represents an declarative configuration of the ContainerState type for use
 // with apply.
-type ContainerStateBuilder struct {
+type ContainerStateApplyConfiguration struct {
 	fields containerStateFields
 }
 
+// ContainerStateApplyConfiguration constructs an declarative configuration of the ContainerState type for use with
+// apply.
+func ContainerState() *ContainerStateApplyConfiguration {
+	return &ContainerStateApplyConfiguration{}
+}
+
 // containerStateFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ContainerStateBuilder.
+// Inline fields are owned by their respective inline type in ContainerStateApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type containerStateFields struct {
-	Waiting    *ContainerStateWaitingBuilder    `json:"waiting,omitempty"`
-	Running    *ContainerStateRunningBuilder    `json:"running,omitempty"`
-	Terminated *ContainerStateTerminatedBuilder `json:"terminated,omitempty"`
-}
-
-// ContainerState constructs an declarative configuration of the ContainerState type for use with
-// apply.
-func ContainerState() *ContainerStateBuilder {
-	return &ContainerStateBuilder{}
+	Waiting    *ContainerStateWaitingApplyConfiguration    `json:"waiting,omitempty"`
+	Running    *ContainerStateRunningApplyConfiguration    `json:"running,omitempty"`
+	Terminated *ContainerStateTerminatedApplyConfiguration `json:"terminated,omitempty"`
 }
 
 // SetWaiting sets the Waiting field in the declarative configuration to the given value.
-func (b *ContainerStateBuilder) SetWaiting(value *ContainerStateWaitingBuilder) *ContainerStateBuilder {
+func (b *ContainerStateApplyConfiguration) SetWaiting(value *ContainerStateWaitingApplyConfiguration) *ContainerStateApplyConfiguration {
 	b.fields.Waiting = value
 	return b
 }
 
 // RemoveWaiting removes the Waiting field from the declarative configuration.
-func (b *ContainerStateBuilder) RemoveWaiting() *ContainerStateBuilder {
+func (b *ContainerStateApplyConfiguration) RemoveWaiting() *ContainerStateApplyConfiguration {
 	b.fields.Waiting = nil
 	return b
 }
 
 // GetWaiting gets the Waiting field from the declarative configuration.
-func (b *ContainerStateBuilder) GetWaiting() (value *ContainerStateWaitingBuilder, ok bool) {
+func (b *ContainerStateApplyConfiguration) GetWaiting() (value *ContainerStateWaitingApplyConfiguration, ok bool) {
 	return b.fields.Waiting, b.fields.Waiting != nil
 }
 
 // SetRunning sets the Running field in the declarative configuration to the given value.
-func (b *ContainerStateBuilder) SetRunning(value *ContainerStateRunningBuilder) *ContainerStateBuilder {
+func (b *ContainerStateApplyConfiguration) SetRunning(value *ContainerStateRunningApplyConfiguration) *ContainerStateApplyConfiguration {
 	b.fields.Running = value
 	return b
 }
 
 // RemoveRunning removes the Running field from the declarative configuration.
-func (b *ContainerStateBuilder) RemoveRunning() *ContainerStateBuilder {
+func (b *ContainerStateApplyConfiguration) RemoveRunning() *ContainerStateApplyConfiguration {
 	b.fields.Running = nil
 	return b
 }
 
 // GetRunning gets the Running field from the declarative configuration.
-func (b *ContainerStateBuilder) GetRunning() (value *ContainerStateRunningBuilder, ok bool) {
+func (b *ContainerStateApplyConfiguration) GetRunning() (value *ContainerStateRunningApplyConfiguration, ok bool) {
 	return b.fields.Running, b.fields.Running != nil
 }
 
 // SetTerminated sets the Terminated field in the declarative configuration to the given value.
-func (b *ContainerStateBuilder) SetTerminated(value *ContainerStateTerminatedBuilder) *ContainerStateBuilder {
+func (b *ContainerStateApplyConfiguration) SetTerminated(value *ContainerStateTerminatedApplyConfiguration) *ContainerStateApplyConfiguration {
 	b.fields.Terminated = value
 	return b
 }
 
 // RemoveTerminated removes the Terminated field from the declarative configuration.
-func (b *ContainerStateBuilder) RemoveTerminated() *ContainerStateBuilder {
+func (b *ContainerStateApplyConfiguration) RemoveTerminated() *ContainerStateApplyConfiguration {
 	b.fields.Terminated = nil
 	return b
 }
 
 // GetTerminated gets the Terminated field from the declarative configuration.
-func (b *ContainerStateBuilder) GetTerminated() (value *ContainerStateTerminatedBuilder, ok bool) {
+func (b *ContainerStateApplyConfiguration) GetTerminated() (value *ContainerStateTerminatedApplyConfiguration, ok bool) {
 	return b.fields.Terminated, b.fields.Terminated != nil
 }
 
-// ToUnstructured converts ContainerStateBuilder to unstructured.
-func (b *ContainerStateBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ContainerStateApplyConfiguration to unstructured.
+func (b *ContainerStateApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -111,9 +111,9 @@ func (b *ContainerStateBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ContainerStateBuilder, replacing the contents
-// of ContainerStateBuilder.
-func (b *ContainerStateBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ContainerStateApplyConfiguration, replacing the contents
+// of ContainerStateApplyConfiguration.
+func (b *ContainerStateApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &containerStateFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -124,15 +124,15 @@ func (b *ContainerStateBuilder) FromUnstructured(u map[string]interface{}) error
 	return nil
 }
 
-// MarshalJSON marshals ContainerStateBuilder to JSON.
-func (b *ContainerStateBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ContainerStateApplyConfiguration to JSON.
+func (b *ContainerStateApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ContainerStateBuilder, replacing the contents of
-// ContainerStateBuilder.
-func (b *ContainerStateBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ContainerStateApplyConfiguration, replacing the contents of
+// ContainerStateApplyConfiguration.
+func (b *ContainerStateApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -140,13 +140,13 @@ func (b *ContainerStateBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ContainerStateList represents a list of ContainerStateBuilder.
-type ContainerStateList []*ContainerStateBuilder
+// ContainerStateList represents a listAlias of ContainerStateApplyConfiguration.
+type ContainerStateList []*ContainerStateApplyConfiguration
 
-// ContainerStateList represents a map of ContainerStateBuilder.
-type ContainerStateMap map[string]ContainerStateBuilder
+// ContainerStateList represents a map of ContainerStateApplyConfiguration.
+type ContainerStateMap map[string]ContainerStateApplyConfiguration
 
-func (b *ContainerStateBuilder) preMarshal() {
+func (b *ContainerStateApplyConfiguration) preMarshal() {
 }
-func (b *ContainerStateBuilder) postUnmarshal() {
+func (b *ContainerStateApplyConfiguration) postUnmarshal() {
 }

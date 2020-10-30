@@ -25,102 +25,102 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// FlowSchemaBuilder represents an declarative configuration of the FlowSchema type for use
+// FlowSchemaApplyConfiguration represents an declarative configuration of the FlowSchema type for use
 // with apply.
-type FlowSchemaBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type FlowSchemaApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   flowSchemaFields
 }
 
+// FlowSchemaApplyConfiguration constructs an declarative configuration of the FlowSchema type for use with
+// apply.
+func FlowSchema() *FlowSchemaApplyConfiguration {
+	return &FlowSchemaApplyConfiguration{}
+}
+
 // flowSchemaFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in FlowSchemaBuilder.
+// Inline fields are owned by their respective inline type in FlowSchemaApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type flowSchemaFields struct {
-	Kind       *string                  `json:"kind,omitempty"`       // inlined FlowSchemaBuilder.typeMeta.Kind field
-	APIVersion *string                  `json:"apiVersion,omitempty"` // inlined FlowSchemaBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder    `json:"metadata,omitempty"`
-	Spec       *FlowSchemaSpecBuilder   `json:"spec,omitempty"`
-	Status     *FlowSchemaStatusBuilder `json:"status,omitempty"`
-}
-
-// FlowSchema constructs an declarative configuration of the FlowSchema type for use with
-// apply.
-func FlowSchema() *FlowSchemaBuilder {
-	return &FlowSchemaBuilder{}
+	Kind       *string                             `json:"kind,omitempty"`       // inlined FlowSchemaApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                             `json:"apiVersion,omitempty"` // inlined FlowSchemaApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration    `json:"metadata,omitempty"`
+	Spec       *FlowSchemaSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status     *FlowSchemaStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *FlowSchemaBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *FlowSchemaBuilder {
+func (b *FlowSchemaApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *FlowSchemaApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *FlowSchemaBuilder) RemoveTypeMeta() *FlowSchemaBuilder {
+func (b *FlowSchemaApplyConfiguration) RemoveTypeMeta() *FlowSchemaApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *FlowSchemaBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *FlowSchemaApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *FlowSchemaBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *FlowSchemaBuilder {
+func (b *FlowSchemaApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *FlowSchemaApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *FlowSchemaBuilder) RemoveObjectMeta() *FlowSchemaBuilder {
+func (b *FlowSchemaApplyConfiguration) RemoveObjectMeta() *FlowSchemaApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *FlowSchemaBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *FlowSchemaApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *FlowSchemaBuilder) SetSpec(value *FlowSchemaSpecBuilder) *FlowSchemaBuilder {
+func (b *FlowSchemaApplyConfiguration) SetSpec(value *FlowSchemaSpecApplyConfiguration) *FlowSchemaApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *FlowSchemaBuilder) RemoveSpec() *FlowSchemaBuilder {
+func (b *FlowSchemaApplyConfiguration) RemoveSpec() *FlowSchemaApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *FlowSchemaBuilder) GetSpec() (value *FlowSchemaSpecBuilder, ok bool) {
+func (b *FlowSchemaApplyConfiguration) GetSpec() (value *FlowSchemaSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *FlowSchemaBuilder) SetStatus(value *FlowSchemaStatusBuilder) *FlowSchemaBuilder {
+func (b *FlowSchemaApplyConfiguration) SetStatus(value *FlowSchemaStatusApplyConfiguration) *FlowSchemaApplyConfiguration {
 	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *FlowSchemaBuilder) RemoveStatus() *FlowSchemaBuilder {
+func (b *FlowSchemaApplyConfiguration) RemoveStatus() *FlowSchemaApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *FlowSchemaBuilder) GetStatus() (value *FlowSchemaStatusBuilder, ok bool) {
+func (b *FlowSchemaApplyConfiguration) GetStatus() (value *FlowSchemaStatusApplyConfiguration, ok bool) {
 	return b.fields.Status, b.fields.Status != nil
 }
 
-// ToUnstructured converts FlowSchemaBuilder to unstructured.
-func (b *FlowSchemaBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts FlowSchemaApplyConfiguration to unstructured.
+func (b *FlowSchemaApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -132,9 +132,9 @@ func (b *FlowSchemaBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to FlowSchemaBuilder, replacing the contents
-// of FlowSchemaBuilder.
-func (b *FlowSchemaBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to FlowSchemaApplyConfiguration, replacing the contents
+// of FlowSchemaApplyConfiguration.
+func (b *FlowSchemaApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &flowSchemaFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -145,15 +145,15 @@ func (b *FlowSchemaBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals FlowSchemaBuilder to JSON.
-func (b *FlowSchemaBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals FlowSchemaApplyConfiguration to JSON.
+func (b *FlowSchemaApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into FlowSchemaBuilder, replacing the contents of
-// FlowSchemaBuilder.
-func (b *FlowSchemaBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into FlowSchemaApplyConfiguration, replacing the contents of
+// FlowSchemaApplyConfiguration.
+func (b *FlowSchemaApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -161,13 +161,13 @@ func (b *FlowSchemaBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// FlowSchemaList represents a list of FlowSchemaBuilder.
-type FlowSchemaList []*FlowSchemaBuilder
+// FlowSchemaList represents a listAlias of FlowSchemaApplyConfiguration.
+type FlowSchemaList []*FlowSchemaApplyConfiguration
 
-// FlowSchemaList represents a map of FlowSchemaBuilder.
-type FlowSchemaMap map[string]FlowSchemaBuilder
+// FlowSchemaList represents a map of FlowSchemaApplyConfiguration.
+type FlowSchemaMap map[string]FlowSchemaApplyConfiguration
 
-func (b *FlowSchemaBuilder) preMarshal() {
+func (b *FlowSchemaApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -177,9 +177,9 @@ func (b *FlowSchemaBuilder) preMarshal() {
 		}
 	}
 }
-func (b *FlowSchemaBuilder) postUnmarshal() {
+func (b *FlowSchemaApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

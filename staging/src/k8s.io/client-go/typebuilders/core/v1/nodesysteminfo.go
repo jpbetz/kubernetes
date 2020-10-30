@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// NodeSystemInfoBuilder represents an declarative configuration of the NodeSystemInfo type for use
+// NodeSystemInfoApplyConfiguration represents an declarative configuration of the NodeSystemInfo type for use
 // with apply.
-type NodeSystemInfoBuilder struct {
+type NodeSystemInfoApplyConfiguration struct {
 	fields nodeSystemInfoFields
 }
 
+// NodeSystemInfoApplyConfiguration constructs an declarative configuration of the NodeSystemInfo type for use with
+// apply.
+func NodeSystemInfo() *NodeSystemInfoApplyConfiguration {
+	return &NodeSystemInfoApplyConfiguration{}
+}
+
 // nodeSystemInfoFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NodeSystemInfoBuilder.
+// Inline fields are owned by their respective inline type in NodeSystemInfoApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -48,26 +54,20 @@ type nodeSystemInfoFields struct {
 	Architecture            *string `json:"architecture,omitempty"`
 }
 
-// NodeSystemInfo constructs an declarative configuration of the NodeSystemInfo type for use with
-// apply.
-func NodeSystemInfo() *NodeSystemInfoBuilder {
-	return &NodeSystemInfoBuilder{}
-}
-
 // SetMachineID sets the MachineID field in the declarative configuration to the given value.
-func (b *NodeSystemInfoBuilder) SetMachineID(value string) *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) SetMachineID(value string) *NodeSystemInfoApplyConfiguration {
 	b.fields.MachineID = &value
 	return b
 }
 
 // RemoveMachineID removes the MachineID field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) RemoveMachineID() *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) RemoveMachineID() *NodeSystemInfoApplyConfiguration {
 	b.fields.MachineID = nil
 	return b
 }
 
 // GetMachineID gets the MachineID field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) GetMachineID() (value string, ok bool) {
+func (b *NodeSystemInfoApplyConfiguration) GetMachineID() (value string, ok bool) {
 	if v := b.fields.MachineID; v != nil {
 		return *v, true
 	}
@@ -75,19 +75,19 @@ func (b *NodeSystemInfoBuilder) GetMachineID() (value string, ok bool) {
 }
 
 // SetSystemUUID sets the SystemUUID field in the declarative configuration to the given value.
-func (b *NodeSystemInfoBuilder) SetSystemUUID(value string) *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) SetSystemUUID(value string) *NodeSystemInfoApplyConfiguration {
 	b.fields.SystemUUID = &value
 	return b
 }
 
 // RemoveSystemUUID removes the SystemUUID field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) RemoveSystemUUID() *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) RemoveSystemUUID() *NodeSystemInfoApplyConfiguration {
 	b.fields.SystemUUID = nil
 	return b
 }
 
 // GetSystemUUID gets the SystemUUID field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) GetSystemUUID() (value string, ok bool) {
+func (b *NodeSystemInfoApplyConfiguration) GetSystemUUID() (value string, ok bool) {
 	if v := b.fields.SystemUUID; v != nil {
 		return *v, true
 	}
@@ -95,19 +95,19 @@ func (b *NodeSystemInfoBuilder) GetSystemUUID() (value string, ok bool) {
 }
 
 // SetBootID sets the BootID field in the declarative configuration to the given value.
-func (b *NodeSystemInfoBuilder) SetBootID(value string) *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) SetBootID(value string) *NodeSystemInfoApplyConfiguration {
 	b.fields.BootID = &value
 	return b
 }
 
 // RemoveBootID removes the BootID field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) RemoveBootID() *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) RemoveBootID() *NodeSystemInfoApplyConfiguration {
 	b.fields.BootID = nil
 	return b
 }
 
 // GetBootID gets the BootID field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) GetBootID() (value string, ok bool) {
+func (b *NodeSystemInfoApplyConfiguration) GetBootID() (value string, ok bool) {
 	if v := b.fields.BootID; v != nil {
 		return *v, true
 	}
@@ -115,19 +115,19 @@ func (b *NodeSystemInfoBuilder) GetBootID() (value string, ok bool) {
 }
 
 // SetKernelVersion sets the KernelVersion field in the declarative configuration to the given value.
-func (b *NodeSystemInfoBuilder) SetKernelVersion(value string) *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) SetKernelVersion(value string) *NodeSystemInfoApplyConfiguration {
 	b.fields.KernelVersion = &value
 	return b
 }
 
 // RemoveKernelVersion removes the KernelVersion field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) RemoveKernelVersion() *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) RemoveKernelVersion() *NodeSystemInfoApplyConfiguration {
 	b.fields.KernelVersion = nil
 	return b
 }
 
 // GetKernelVersion gets the KernelVersion field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) GetKernelVersion() (value string, ok bool) {
+func (b *NodeSystemInfoApplyConfiguration) GetKernelVersion() (value string, ok bool) {
 	if v := b.fields.KernelVersion; v != nil {
 		return *v, true
 	}
@@ -135,19 +135,19 @@ func (b *NodeSystemInfoBuilder) GetKernelVersion() (value string, ok bool) {
 }
 
 // SetOSImage sets the OSImage field in the declarative configuration to the given value.
-func (b *NodeSystemInfoBuilder) SetOSImage(value string) *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) SetOSImage(value string) *NodeSystemInfoApplyConfiguration {
 	b.fields.OSImage = &value
 	return b
 }
 
 // RemoveOSImage removes the OSImage field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) RemoveOSImage() *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) RemoveOSImage() *NodeSystemInfoApplyConfiguration {
 	b.fields.OSImage = nil
 	return b
 }
 
 // GetOSImage gets the OSImage field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) GetOSImage() (value string, ok bool) {
+func (b *NodeSystemInfoApplyConfiguration) GetOSImage() (value string, ok bool) {
 	if v := b.fields.OSImage; v != nil {
 		return *v, true
 	}
@@ -155,19 +155,19 @@ func (b *NodeSystemInfoBuilder) GetOSImage() (value string, ok bool) {
 }
 
 // SetContainerRuntimeVersion sets the ContainerRuntimeVersion field in the declarative configuration to the given value.
-func (b *NodeSystemInfoBuilder) SetContainerRuntimeVersion(value string) *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) SetContainerRuntimeVersion(value string) *NodeSystemInfoApplyConfiguration {
 	b.fields.ContainerRuntimeVersion = &value
 	return b
 }
 
 // RemoveContainerRuntimeVersion removes the ContainerRuntimeVersion field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) RemoveContainerRuntimeVersion() *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) RemoveContainerRuntimeVersion() *NodeSystemInfoApplyConfiguration {
 	b.fields.ContainerRuntimeVersion = nil
 	return b
 }
 
 // GetContainerRuntimeVersion gets the ContainerRuntimeVersion field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) GetContainerRuntimeVersion() (value string, ok bool) {
+func (b *NodeSystemInfoApplyConfiguration) GetContainerRuntimeVersion() (value string, ok bool) {
 	if v := b.fields.ContainerRuntimeVersion; v != nil {
 		return *v, true
 	}
@@ -175,19 +175,19 @@ func (b *NodeSystemInfoBuilder) GetContainerRuntimeVersion() (value string, ok b
 }
 
 // SetKubeletVersion sets the KubeletVersion field in the declarative configuration to the given value.
-func (b *NodeSystemInfoBuilder) SetKubeletVersion(value string) *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) SetKubeletVersion(value string) *NodeSystemInfoApplyConfiguration {
 	b.fields.KubeletVersion = &value
 	return b
 }
 
 // RemoveKubeletVersion removes the KubeletVersion field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) RemoveKubeletVersion() *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) RemoveKubeletVersion() *NodeSystemInfoApplyConfiguration {
 	b.fields.KubeletVersion = nil
 	return b
 }
 
 // GetKubeletVersion gets the KubeletVersion field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) GetKubeletVersion() (value string, ok bool) {
+func (b *NodeSystemInfoApplyConfiguration) GetKubeletVersion() (value string, ok bool) {
 	if v := b.fields.KubeletVersion; v != nil {
 		return *v, true
 	}
@@ -195,19 +195,19 @@ func (b *NodeSystemInfoBuilder) GetKubeletVersion() (value string, ok bool) {
 }
 
 // SetKubeProxyVersion sets the KubeProxyVersion field in the declarative configuration to the given value.
-func (b *NodeSystemInfoBuilder) SetKubeProxyVersion(value string) *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) SetKubeProxyVersion(value string) *NodeSystemInfoApplyConfiguration {
 	b.fields.KubeProxyVersion = &value
 	return b
 }
 
 // RemoveKubeProxyVersion removes the KubeProxyVersion field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) RemoveKubeProxyVersion() *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) RemoveKubeProxyVersion() *NodeSystemInfoApplyConfiguration {
 	b.fields.KubeProxyVersion = nil
 	return b
 }
 
 // GetKubeProxyVersion gets the KubeProxyVersion field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) GetKubeProxyVersion() (value string, ok bool) {
+func (b *NodeSystemInfoApplyConfiguration) GetKubeProxyVersion() (value string, ok bool) {
 	if v := b.fields.KubeProxyVersion; v != nil {
 		return *v, true
 	}
@@ -215,19 +215,19 @@ func (b *NodeSystemInfoBuilder) GetKubeProxyVersion() (value string, ok bool) {
 }
 
 // SetOperatingSystem sets the OperatingSystem field in the declarative configuration to the given value.
-func (b *NodeSystemInfoBuilder) SetOperatingSystem(value string) *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) SetOperatingSystem(value string) *NodeSystemInfoApplyConfiguration {
 	b.fields.OperatingSystem = &value
 	return b
 }
 
 // RemoveOperatingSystem removes the OperatingSystem field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) RemoveOperatingSystem() *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) RemoveOperatingSystem() *NodeSystemInfoApplyConfiguration {
 	b.fields.OperatingSystem = nil
 	return b
 }
 
 // GetOperatingSystem gets the OperatingSystem field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) GetOperatingSystem() (value string, ok bool) {
+func (b *NodeSystemInfoApplyConfiguration) GetOperatingSystem() (value string, ok bool) {
 	if v := b.fields.OperatingSystem; v != nil {
 		return *v, true
 	}
@@ -235,27 +235,27 @@ func (b *NodeSystemInfoBuilder) GetOperatingSystem() (value string, ok bool) {
 }
 
 // SetArchitecture sets the Architecture field in the declarative configuration to the given value.
-func (b *NodeSystemInfoBuilder) SetArchitecture(value string) *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) SetArchitecture(value string) *NodeSystemInfoApplyConfiguration {
 	b.fields.Architecture = &value
 	return b
 }
 
 // RemoveArchitecture removes the Architecture field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) RemoveArchitecture() *NodeSystemInfoBuilder {
+func (b *NodeSystemInfoApplyConfiguration) RemoveArchitecture() *NodeSystemInfoApplyConfiguration {
 	b.fields.Architecture = nil
 	return b
 }
 
 // GetArchitecture gets the Architecture field from the declarative configuration.
-func (b *NodeSystemInfoBuilder) GetArchitecture() (value string, ok bool) {
+func (b *NodeSystemInfoApplyConfiguration) GetArchitecture() (value string, ok bool) {
 	if v := b.fields.Architecture; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts NodeSystemInfoBuilder to unstructured.
-func (b *NodeSystemInfoBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NodeSystemInfoApplyConfiguration to unstructured.
+func (b *NodeSystemInfoApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -267,9 +267,9 @@ func (b *NodeSystemInfoBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NodeSystemInfoBuilder, replacing the contents
-// of NodeSystemInfoBuilder.
-func (b *NodeSystemInfoBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NodeSystemInfoApplyConfiguration, replacing the contents
+// of NodeSystemInfoApplyConfiguration.
+func (b *NodeSystemInfoApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &nodeSystemInfoFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -280,15 +280,15 @@ func (b *NodeSystemInfoBuilder) FromUnstructured(u map[string]interface{}) error
 	return nil
 }
 
-// MarshalJSON marshals NodeSystemInfoBuilder to JSON.
-func (b *NodeSystemInfoBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NodeSystemInfoApplyConfiguration to JSON.
+func (b *NodeSystemInfoApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NodeSystemInfoBuilder, replacing the contents of
-// NodeSystemInfoBuilder.
-func (b *NodeSystemInfoBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NodeSystemInfoApplyConfiguration, replacing the contents of
+// NodeSystemInfoApplyConfiguration.
+func (b *NodeSystemInfoApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -296,13 +296,13 @@ func (b *NodeSystemInfoBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NodeSystemInfoList represents a list of NodeSystemInfoBuilder.
-type NodeSystemInfoList []*NodeSystemInfoBuilder
+// NodeSystemInfoList represents a listAlias of NodeSystemInfoApplyConfiguration.
+type NodeSystemInfoList []*NodeSystemInfoApplyConfiguration
 
-// NodeSystemInfoList represents a map of NodeSystemInfoBuilder.
-type NodeSystemInfoMap map[string]NodeSystemInfoBuilder
+// NodeSystemInfoList represents a map of NodeSystemInfoApplyConfiguration.
+type NodeSystemInfoMap map[string]NodeSystemInfoApplyConfiguration
 
-func (b *NodeSystemInfoBuilder) preMarshal() {
+func (b *NodeSystemInfoApplyConfiguration) preMarshal() {
 }
-func (b *NodeSystemInfoBuilder) postUnmarshal() {
+func (b *NodeSystemInfoApplyConfiguration) postUnmarshal() {
 }

@@ -124,7 +124,7 @@ func (c *FakeClusterRoles) Patch(ctx context.Context, name string, pt types.Patc
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied clusterRole.
-func (c *FakeClusterRoles) Apply(ctx context.Context, clusterRole rbacv1alpha1.ClusterRoleBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.ClusterRole, err error) {
+func (c *FakeClusterRoles) Apply(ctx context.Context, clusterRole *rbacv1alpha1.ClusterRoleApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.ClusterRole, err error) {
 	data, err := clusterRole.MarshalJSON()
 	if err != nil {
 		return nil, err

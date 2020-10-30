@@ -48,7 +48,7 @@ type IngressClassInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.IngressClassList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.IngressClass, err error)
-	Apply(ctx context.Context, ingressClass networkingv1.IngressClassBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.IngressClass, err error)
+	Apply(ctx context.Context, ingressClass *networkingv1.IngressClassApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.IngressClass, err error)
 	IngressClassExpansion
 }
 
@@ -171,7 +171,7 @@ func (c *ingressClasses) Patch(ctx context.Context, name string, pt types.PatchT
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied ingressClass.
-func (c *ingressClasses) Apply(ctx context.Context, ingressClass networkingv1.IngressClassBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.IngressClass, err error) {
+func (c *ingressClasses) Apply(ctx context.Context, ingressClass *networkingv1.IngressClassApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.IngressClass, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := ingressClass.MarshalJSON()
 	if err != nil {

@@ -25,84 +25,84 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// PodTemplateBuilder represents an declarative configuration of the PodTemplate type for use
+// PodTemplateApplyConfiguration represents an declarative configuration of the PodTemplate type for use
 // with apply.
-type PodTemplateBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type PodTemplateApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   podTemplateFields
 }
 
+// PodTemplateApplyConfiguration constructs an declarative configuration of the PodTemplate type for use with
+// apply.
+func PodTemplate() *PodTemplateApplyConfiguration {
+	return &PodTemplateApplyConfiguration{}
+}
+
 // podTemplateFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodTemplateBuilder.
+// Inline fields are owned by their respective inline type in PodTemplateApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type podTemplateFields struct {
-	Kind       *string                 `json:"kind,omitempty"`       // inlined PodTemplateBuilder.typeMeta.Kind field
-	APIVersion *string                 `json:"apiVersion,omitempty"` // inlined PodTemplateBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder   `json:"metadata,omitempty"`
-	Template   *PodTemplateSpecBuilder `json:"template,omitempty"`
-}
-
-// PodTemplate constructs an declarative configuration of the PodTemplate type for use with
-// apply.
-func PodTemplate() *PodTemplateBuilder {
-	return &PodTemplateBuilder{}
+	Kind       *string                            `json:"kind,omitempty"`       // inlined PodTemplateApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                            `json:"apiVersion,omitempty"` // inlined PodTemplateApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration   `json:"metadata,omitempty"`
+	Template   *PodTemplateSpecApplyConfiguration `json:"template,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *PodTemplateBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *PodTemplateBuilder {
+func (b *PodTemplateApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *PodTemplateApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *PodTemplateBuilder) RemoveTypeMeta() *PodTemplateBuilder {
+func (b *PodTemplateApplyConfiguration) RemoveTypeMeta() *PodTemplateApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *PodTemplateBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *PodTemplateApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *PodTemplateBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *PodTemplateBuilder {
+func (b *PodTemplateApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *PodTemplateApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *PodTemplateBuilder) RemoveObjectMeta() *PodTemplateBuilder {
+func (b *PodTemplateApplyConfiguration) RemoveObjectMeta() *PodTemplateApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *PodTemplateBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *PodTemplateApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetTemplate sets the Template field in the declarative configuration to the given value.
-func (b *PodTemplateBuilder) SetTemplate(value *PodTemplateSpecBuilder) *PodTemplateBuilder {
+func (b *PodTemplateApplyConfiguration) SetTemplate(value *PodTemplateSpecApplyConfiguration) *PodTemplateApplyConfiguration {
 	b.fields.Template = value
 	return b
 }
 
 // RemoveTemplate removes the Template field from the declarative configuration.
-func (b *PodTemplateBuilder) RemoveTemplate() *PodTemplateBuilder {
+func (b *PodTemplateApplyConfiguration) RemoveTemplate() *PodTemplateApplyConfiguration {
 	b.fields.Template = nil
 	return b
 }
 
 // GetTemplate gets the Template field from the declarative configuration.
-func (b *PodTemplateBuilder) GetTemplate() (value *PodTemplateSpecBuilder, ok bool) {
+func (b *PodTemplateApplyConfiguration) GetTemplate() (value *PodTemplateSpecApplyConfiguration, ok bool) {
 	return b.fields.Template, b.fields.Template != nil
 }
 
-// ToUnstructured converts PodTemplateBuilder to unstructured.
-func (b *PodTemplateBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PodTemplateApplyConfiguration to unstructured.
+func (b *PodTemplateApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -114,9 +114,9 @@ func (b *PodTemplateBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to PodTemplateBuilder, replacing the contents
-// of PodTemplateBuilder.
-func (b *PodTemplateBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PodTemplateApplyConfiguration, replacing the contents
+// of PodTemplateApplyConfiguration.
+func (b *PodTemplateApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &podTemplateFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -127,15 +127,15 @@ func (b *PodTemplateBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals PodTemplateBuilder to JSON.
-func (b *PodTemplateBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PodTemplateApplyConfiguration to JSON.
+func (b *PodTemplateApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PodTemplateBuilder, replacing the contents of
-// PodTemplateBuilder.
-func (b *PodTemplateBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PodTemplateApplyConfiguration, replacing the contents of
+// PodTemplateApplyConfiguration.
+func (b *PodTemplateApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -143,13 +143,13 @@ func (b *PodTemplateBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// PodTemplateList represents a list of PodTemplateBuilder.
-type PodTemplateList []*PodTemplateBuilder
+// PodTemplateList represents a listAlias of PodTemplateApplyConfiguration.
+type PodTemplateList []*PodTemplateApplyConfiguration
 
-// PodTemplateList represents a map of PodTemplateBuilder.
-type PodTemplateMap map[string]PodTemplateBuilder
+// PodTemplateList represents a map of PodTemplateApplyConfiguration.
+type PodTemplateMap map[string]PodTemplateApplyConfiguration
 
-func (b *PodTemplateBuilder) preMarshal() {
+func (b *PodTemplateApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -159,9 +159,9 @@ func (b *PodTemplateBuilder) preMarshal() {
 		}
 	}
 }
-func (b *PodTemplateBuilder) postUnmarshal() {
+func (b *PodTemplateApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

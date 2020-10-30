@@ -27,14 +27,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// JobConditionBuilder represents an declarative configuration of the JobCondition type for use
+// JobConditionApplyConfiguration represents an declarative configuration of the JobCondition type for use
 // with apply.
-type JobConditionBuilder struct {
+type JobConditionApplyConfiguration struct {
 	fields jobConditionFields
 }
 
+// JobConditionApplyConfiguration constructs an declarative configuration of the JobCondition type for use with
+// apply.
+func JobCondition() *JobConditionApplyConfiguration {
+	return &JobConditionApplyConfiguration{}
+}
+
 // jobConditionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in JobConditionBuilder.
+// Inline fields are owned by their respective inline type in JobConditionApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -47,26 +53,20 @@ type jobConditionFields struct {
 	Message            *string                 `json:"message,omitempty"`
 }
 
-// JobCondition constructs an declarative configuration of the JobCondition type for use with
-// apply.
-func JobCondition() *JobConditionBuilder {
-	return &JobConditionBuilder{}
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b *JobConditionBuilder) SetType(value v1.JobConditionType) *JobConditionBuilder {
+func (b *JobConditionApplyConfiguration) SetType(value v1.JobConditionType) *JobConditionApplyConfiguration {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b *JobConditionBuilder) RemoveType() *JobConditionBuilder {
+func (b *JobConditionApplyConfiguration) RemoveType() *JobConditionApplyConfiguration {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b *JobConditionBuilder) GetType() (value v1.JobConditionType, ok bool) {
+func (b *JobConditionApplyConfiguration) GetType() (value v1.JobConditionType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -74,19 +74,19 @@ func (b *JobConditionBuilder) GetType() (value v1.JobConditionType, ok bool) {
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *JobConditionBuilder) SetStatus(value corev1.ConditionStatus) *JobConditionBuilder {
+func (b *JobConditionApplyConfiguration) SetStatus(value corev1.ConditionStatus) *JobConditionApplyConfiguration {
 	b.fields.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *JobConditionBuilder) RemoveStatus() *JobConditionBuilder {
+func (b *JobConditionApplyConfiguration) RemoveStatus() *JobConditionApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *JobConditionBuilder) GetStatus() (value corev1.ConditionStatus, ok bool) {
+func (b *JobConditionApplyConfiguration) GetStatus() (value corev1.ConditionStatus, ok bool) {
 	if v := b.fields.Status; v != nil {
 		return *v, true
 	}
@@ -94,19 +94,19 @@ func (b *JobConditionBuilder) GetStatus() (value corev1.ConditionStatus, ok bool
 }
 
 // SetLastProbeTime sets the LastProbeTime field in the declarative configuration to the given value.
-func (b *JobConditionBuilder) SetLastProbeTime(value metav1.Time) *JobConditionBuilder {
+func (b *JobConditionApplyConfiguration) SetLastProbeTime(value metav1.Time) *JobConditionApplyConfiguration {
 	b.fields.LastProbeTime = &value
 	return b
 }
 
 // RemoveLastProbeTime removes the LastProbeTime field from the declarative configuration.
-func (b *JobConditionBuilder) RemoveLastProbeTime() *JobConditionBuilder {
+func (b *JobConditionApplyConfiguration) RemoveLastProbeTime() *JobConditionApplyConfiguration {
 	b.fields.LastProbeTime = nil
 	return b
 }
 
 // GetLastProbeTime gets the LastProbeTime field from the declarative configuration.
-func (b *JobConditionBuilder) GetLastProbeTime() (value metav1.Time, ok bool) {
+func (b *JobConditionApplyConfiguration) GetLastProbeTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastProbeTime; v != nil {
 		return *v, true
 	}
@@ -114,19 +114,19 @@ func (b *JobConditionBuilder) GetLastProbeTime() (value metav1.Time, ok bool) {
 }
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
-func (b *JobConditionBuilder) SetLastTransitionTime(value metav1.Time) *JobConditionBuilder {
+func (b *JobConditionApplyConfiguration) SetLastTransitionTime(value metav1.Time) *JobConditionApplyConfiguration {
 	b.fields.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
-func (b *JobConditionBuilder) RemoveLastTransitionTime() *JobConditionBuilder {
+func (b *JobConditionApplyConfiguration) RemoveLastTransitionTime() *JobConditionApplyConfiguration {
 	b.fields.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
-func (b *JobConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
+func (b *JobConditionApplyConfiguration) GetLastTransitionTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastTransitionTime; v != nil {
 		return *v, true
 	}
@@ -134,19 +134,19 @@ func (b *JobConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok boo
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b *JobConditionBuilder) SetReason(value string) *JobConditionBuilder {
+func (b *JobConditionApplyConfiguration) SetReason(value string) *JobConditionApplyConfiguration {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b *JobConditionBuilder) RemoveReason() *JobConditionBuilder {
+func (b *JobConditionApplyConfiguration) RemoveReason() *JobConditionApplyConfiguration {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b *JobConditionBuilder) GetReason() (value string, ok bool) {
+func (b *JobConditionApplyConfiguration) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -154,27 +154,27 @@ func (b *JobConditionBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b *JobConditionBuilder) SetMessage(value string) *JobConditionBuilder {
+func (b *JobConditionApplyConfiguration) SetMessage(value string) *JobConditionApplyConfiguration {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b *JobConditionBuilder) RemoveMessage() *JobConditionBuilder {
+func (b *JobConditionApplyConfiguration) RemoveMessage() *JobConditionApplyConfiguration {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b *JobConditionBuilder) GetMessage() (value string, ok bool) {
+func (b *JobConditionApplyConfiguration) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts JobConditionBuilder to unstructured.
-func (b *JobConditionBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts JobConditionApplyConfiguration to unstructured.
+func (b *JobConditionApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -186,9 +186,9 @@ func (b *JobConditionBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to JobConditionBuilder, replacing the contents
-// of JobConditionBuilder.
-func (b *JobConditionBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to JobConditionApplyConfiguration, replacing the contents
+// of JobConditionApplyConfiguration.
+func (b *JobConditionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &jobConditionFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -199,15 +199,15 @@ func (b *JobConditionBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals JobConditionBuilder to JSON.
-func (b *JobConditionBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals JobConditionApplyConfiguration to JSON.
+func (b *JobConditionApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into JobConditionBuilder, replacing the contents of
-// JobConditionBuilder.
-func (b *JobConditionBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into JobConditionApplyConfiguration, replacing the contents of
+// JobConditionApplyConfiguration.
+func (b *JobConditionApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -215,13 +215,13 @@ func (b *JobConditionBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// JobConditionList represents a list of JobConditionBuilder.
-type JobConditionList []*JobConditionBuilder
+// JobConditionList represents a listAlias of JobConditionApplyConfiguration.
+type JobConditionList []*JobConditionApplyConfiguration
 
-// JobConditionList represents a map of JobConditionBuilder.
-type JobConditionMap map[string]JobConditionBuilder
+// JobConditionList represents a map of JobConditionApplyConfiguration.
+type JobConditionMap map[string]JobConditionApplyConfiguration
 
-func (b *JobConditionBuilder) preMarshal() {
+func (b *JobConditionApplyConfiguration) preMarshal() {
 }
-func (b *JobConditionBuilder) postUnmarshal() {
+func (b *JobConditionApplyConfiguration) postUnmarshal() {
 }

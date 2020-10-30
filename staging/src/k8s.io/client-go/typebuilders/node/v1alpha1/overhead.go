@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// OverheadBuilder represents an declarative configuration of the Overhead type for use
+// OverheadApplyConfiguration represents an declarative configuration of the Overhead type for use
 // with apply.
-type OverheadBuilder struct {
+type OverheadApplyConfiguration struct {
 	fields overheadFields
 }
 
+// OverheadApplyConfiguration constructs an declarative configuration of the Overhead type for use with
+// apply.
+func Overhead() *OverheadApplyConfiguration {
+	return &OverheadApplyConfiguration{}
+}
+
 // overheadFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in OverheadBuilder.
+// Inline fields are owned by their respective inline type in OverheadApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,34 +46,28 @@ type overheadFields struct {
 	PodFixed *v1.ResourceList `json:"podFixed,omitempty"`
 }
 
-// Overhead constructs an declarative configuration of the Overhead type for use with
-// apply.
-func Overhead() *OverheadBuilder {
-	return &OverheadBuilder{}
-}
-
 // SetPodFixed sets the PodFixed field in the declarative configuration to the given value.
-func (b *OverheadBuilder) SetPodFixed(value v1.ResourceList) *OverheadBuilder {
+func (b *OverheadApplyConfiguration) SetPodFixed(value v1.ResourceList) *OverheadApplyConfiguration {
 	b.fields.PodFixed = &value
 	return b
 }
 
 // RemovePodFixed removes the PodFixed field from the declarative configuration.
-func (b *OverheadBuilder) RemovePodFixed() *OverheadBuilder {
+func (b *OverheadApplyConfiguration) RemovePodFixed() *OverheadApplyConfiguration {
 	b.fields.PodFixed = nil
 	return b
 }
 
 // GetPodFixed gets the PodFixed field from the declarative configuration.
-func (b *OverheadBuilder) GetPodFixed() (value v1.ResourceList, ok bool) {
+func (b *OverheadApplyConfiguration) GetPodFixed() (value v1.ResourceList, ok bool) {
 	if v := b.fields.PodFixed; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts OverheadBuilder to unstructured.
-func (b *OverheadBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts OverheadApplyConfiguration to unstructured.
+func (b *OverheadApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -79,9 +79,9 @@ func (b *OverheadBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to OverheadBuilder, replacing the contents
-// of OverheadBuilder.
-func (b *OverheadBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to OverheadApplyConfiguration, replacing the contents
+// of OverheadApplyConfiguration.
+func (b *OverheadApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &overheadFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -92,15 +92,15 @@ func (b *OverheadBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals OverheadBuilder to JSON.
-func (b *OverheadBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals OverheadApplyConfiguration to JSON.
+func (b *OverheadApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into OverheadBuilder, replacing the contents of
-// OverheadBuilder.
-func (b *OverheadBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into OverheadApplyConfiguration, replacing the contents of
+// OverheadApplyConfiguration.
+func (b *OverheadApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -108,13 +108,13 @@ func (b *OverheadBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// OverheadList represents a list of OverheadBuilder.
-type OverheadList []*OverheadBuilder
+// OverheadList represents a listAlias of OverheadApplyConfiguration.
+type OverheadList []*OverheadApplyConfiguration
 
-// OverheadList represents a map of OverheadBuilder.
-type OverheadMap map[string]OverheadBuilder
+// OverheadList represents a map of OverheadApplyConfiguration.
+type OverheadMap map[string]OverheadApplyConfiguration
 
-func (b *OverheadBuilder) preMarshal() {
+func (b *OverheadApplyConfiguration) preMarshal() {
 }
-func (b *OverheadBuilder) postUnmarshal() {
+func (b *OverheadApplyConfiguration) postUnmarshal() {
 }

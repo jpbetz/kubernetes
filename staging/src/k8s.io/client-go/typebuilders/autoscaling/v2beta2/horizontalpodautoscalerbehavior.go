@@ -24,64 +24,64 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// HorizontalPodAutoscalerBehaviorBuilder represents an declarative configuration of the HorizontalPodAutoscalerBehavior type for use
+// HorizontalPodAutoscalerBehaviorApplyConfiguration represents an declarative configuration of the HorizontalPodAutoscalerBehavior type for use
 // with apply.
-type HorizontalPodAutoscalerBehaviorBuilder struct {
+type HorizontalPodAutoscalerBehaviorApplyConfiguration struct {
 	fields horizontalPodAutoscalerBehaviorFields
 }
 
+// HorizontalPodAutoscalerBehaviorApplyConfiguration constructs an declarative configuration of the HorizontalPodAutoscalerBehavior type for use with
+// apply.
+func HorizontalPodAutoscalerBehavior() *HorizontalPodAutoscalerBehaviorApplyConfiguration {
+	return &HorizontalPodAutoscalerBehaviorApplyConfiguration{}
+}
+
 // horizontalPodAutoscalerBehaviorFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in HorizontalPodAutoscalerBehaviorBuilder.
+// Inline fields are owned by their respective inline type in HorizontalPodAutoscalerBehaviorApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type horizontalPodAutoscalerBehaviorFields struct {
-	ScaleUp   *HPAScalingRulesBuilder `json:"scaleUp,omitempty"`
-	ScaleDown *HPAScalingRulesBuilder `json:"scaleDown,omitempty"`
-}
-
-// HorizontalPodAutoscalerBehavior constructs an declarative configuration of the HorizontalPodAutoscalerBehavior type for use with
-// apply.
-func HorizontalPodAutoscalerBehavior() *HorizontalPodAutoscalerBehaviorBuilder {
-	return &HorizontalPodAutoscalerBehaviorBuilder{}
+	ScaleUp   *HPAScalingRulesApplyConfiguration `json:"scaleUp,omitempty"`
+	ScaleDown *HPAScalingRulesApplyConfiguration `json:"scaleDown,omitempty"`
 }
 
 // SetScaleUp sets the ScaleUp field in the declarative configuration to the given value.
-func (b *HorizontalPodAutoscalerBehaviorBuilder) SetScaleUp(value *HPAScalingRulesBuilder) *HorizontalPodAutoscalerBehaviorBuilder {
+func (b *HorizontalPodAutoscalerBehaviorApplyConfiguration) SetScaleUp(value *HPAScalingRulesApplyConfiguration) *HorizontalPodAutoscalerBehaviorApplyConfiguration {
 	b.fields.ScaleUp = value
 	return b
 }
 
 // RemoveScaleUp removes the ScaleUp field from the declarative configuration.
-func (b *HorizontalPodAutoscalerBehaviorBuilder) RemoveScaleUp() *HorizontalPodAutoscalerBehaviorBuilder {
+func (b *HorizontalPodAutoscalerBehaviorApplyConfiguration) RemoveScaleUp() *HorizontalPodAutoscalerBehaviorApplyConfiguration {
 	b.fields.ScaleUp = nil
 	return b
 }
 
 // GetScaleUp gets the ScaleUp field from the declarative configuration.
-func (b *HorizontalPodAutoscalerBehaviorBuilder) GetScaleUp() (value *HPAScalingRulesBuilder, ok bool) {
+func (b *HorizontalPodAutoscalerBehaviorApplyConfiguration) GetScaleUp() (value *HPAScalingRulesApplyConfiguration, ok bool) {
 	return b.fields.ScaleUp, b.fields.ScaleUp != nil
 }
 
 // SetScaleDown sets the ScaleDown field in the declarative configuration to the given value.
-func (b *HorizontalPodAutoscalerBehaviorBuilder) SetScaleDown(value *HPAScalingRulesBuilder) *HorizontalPodAutoscalerBehaviorBuilder {
+func (b *HorizontalPodAutoscalerBehaviorApplyConfiguration) SetScaleDown(value *HPAScalingRulesApplyConfiguration) *HorizontalPodAutoscalerBehaviorApplyConfiguration {
 	b.fields.ScaleDown = value
 	return b
 }
 
 // RemoveScaleDown removes the ScaleDown field from the declarative configuration.
-func (b *HorizontalPodAutoscalerBehaviorBuilder) RemoveScaleDown() *HorizontalPodAutoscalerBehaviorBuilder {
+func (b *HorizontalPodAutoscalerBehaviorApplyConfiguration) RemoveScaleDown() *HorizontalPodAutoscalerBehaviorApplyConfiguration {
 	b.fields.ScaleDown = nil
 	return b
 }
 
 // GetScaleDown gets the ScaleDown field from the declarative configuration.
-func (b *HorizontalPodAutoscalerBehaviorBuilder) GetScaleDown() (value *HPAScalingRulesBuilder, ok bool) {
+func (b *HorizontalPodAutoscalerBehaviorApplyConfiguration) GetScaleDown() (value *HPAScalingRulesApplyConfiguration, ok bool) {
 	return b.fields.ScaleDown, b.fields.ScaleDown != nil
 }
 
-// ToUnstructured converts HorizontalPodAutoscalerBehaviorBuilder to unstructured.
-func (b *HorizontalPodAutoscalerBehaviorBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts HorizontalPodAutoscalerBehaviorApplyConfiguration to unstructured.
+func (b *HorizontalPodAutoscalerBehaviorApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -93,9 +93,9 @@ func (b *HorizontalPodAutoscalerBehaviorBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to HorizontalPodAutoscalerBehaviorBuilder, replacing the contents
-// of HorizontalPodAutoscalerBehaviorBuilder.
-func (b *HorizontalPodAutoscalerBehaviorBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to HorizontalPodAutoscalerBehaviorApplyConfiguration, replacing the contents
+// of HorizontalPodAutoscalerBehaviorApplyConfiguration.
+func (b *HorizontalPodAutoscalerBehaviorApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &horizontalPodAutoscalerBehaviorFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -106,15 +106,15 @@ func (b *HorizontalPodAutoscalerBehaviorBuilder) FromUnstructured(u map[string]i
 	return nil
 }
 
-// MarshalJSON marshals HorizontalPodAutoscalerBehaviorBuilder to JSON.
-func (b *HorizontalPodAutoscalerBehaviorBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals HorizontalPodAutoscalerBehaviorApplyConfiguration to JSON.
+func (b *HorizontalPodAutoscalerBehaviorApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into HorizontalPodAutoscalerBehaviorBuilder, replacing the contents of
-// HorizontalPodAutoscalerBehaviorBuilder.
-func (b *HorizontalPodAutoscalerBehaviorBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into HorizontalPodAutoscalerBehaviorApplyConfiguration, replacing the contents of
+// HorizontalPodAutoscalerBehaviorApplyConfiguration.
+func (b *HorizontalPodAutoscalerBehaviorApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -122,13 +122,13 @@ func (b *HorizontalPodAutoscalerBehaviorBuilder) UnmarshalJSON(data []byte) erro
 	return nil
 }
 
-// HorizontalPodAutoscalerBehaviorList represents a list of HorizontalPodAutoscalerBehaviorBuilder.
-type HorizontalPodAutoscalerBehaviorList []*HorizontalPodAutoscalerBehaviorBuilder
+// HorizontalPodAutoscalerBehaviorList represents a listAlias of HorizontalPodAutoscalerBehaviorApplyConfiguration.
+type HorizontalPodAutoscalerBehaviorList []*HorizontalPodAutoscalerBehaviorApplyConfiguration
 
-// HorizontalPodAutoscalerBehaviorList represents a map of HorizontalPodAutoscalerBehaviorBuilder.
-type HorizontalPodAutoscalerBehaviorMap map[string]HorizontalPodAutoscalerBehaviorBuilder
+// HorizontalPodAutoscalerBehaviorList represents a map of HorizontalPodAutoscalerBehaviorApplyConfiguration.
+type HorizontalPodAutoscalerBehaviorMap map[string]HorizontalPodAutoscalerBehaviorApplyConfiguration
 
-func (b *HorizontalPodAutoscalerBehaviorBuilder) preMarshal() {
+func (b *HorizontalPodAutoscalerBehaviorApplyConfiguration) preMarshal() {
 }
-func (b *HorizontalPodAutoscalerBehaviorBuilder) postUnmarshal() {
+func (b *HorizontalPodAutoscalerBehaviorApplyConfiguration) postUnmarshal() {
 }

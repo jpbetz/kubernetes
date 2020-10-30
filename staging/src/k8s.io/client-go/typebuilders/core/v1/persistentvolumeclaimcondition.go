@@ -26,14 +26,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// PersistentVolumeClaimConditionBuilder represents an declarative configuration of the PersistentVolumeClaimCondition type for use
+// PersistentVolumeClaimConditionApplyConfiguration represents an declarative configuration of the PersistentVolumeClaimCondition type for use
 // with apply.
-type PersistentVolumeClaimConditionBuilder struct {
+type PersistentVolumeClaimConditionApplyConfiguration struct {
 	fields persistentVolumeClaimConditionFields
 }
 
+// PersistentVolumeClaimConditionApplyConfiguration constructs an declarative configuration of the PersistentVolumeClaimCondition type for use with
+// apply.
+func PersistentVolumeClaimCondition() *PersistentVolumeClaimConditionApplyConfiguration {
+	return &PersistentVolumeClaimConditionApplyConfiguration{}
+}
+
 // persistentVolumeClaimConditionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PersistentVolumeClaimConditionBuilder.
+// Inline fields are owned by their respective inline type in PersistentVolumeClaimConditionApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -46,26 +52,20 @@ type persistentVolumeClaimConditionFields struct {
 	Message            *string                                `json:"message,omitempty"`
 }
 
-// PersistentVolumeClaimCondition constructs an declarative configuration of the PersistentVolumeClaimCondition type for use with
-// apply.
-func PersistentVolumeClaimCondition() *PersistentVolumeClaimConditionBuilder {
-	return &PersistentVolumeClaimConditionBuilder{}
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b *PersistentVolumeClaimConditionBuilder) SetType(value v1.PersistentVolumeClaimConditionType) *PersistentVolumeClaimConditionBuilder {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) SetType(value v1.PersistentVolumeClaimConditionType) *PersistentVolumeClaimConditionApplyConfiguration {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b *PersistentVolumeClaimConditionBuilder) RemoveType() *PersistentVolumeClaimConditionBuilder {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) RemoveType() *PersistentVolumeClaimConditionApplyConfiguration {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b *PersistentVolumeClaimConditionBuilder) GetType() (value v1.PersistentVolumeClaimConditionType, ok bool) {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) GetType() (value v1.PersistentVolumeClaimConditionType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -73,19 +73,19 @@ func (b *PersistentVolumeClaimConditionBuilder) GetType() (value v1.PersistentVo
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *PersistentVolumeClaimConditionBuilder) SetStatus(value v1.ConditionStatus) *PersistentVolumeClaimConditionBuilder {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) SetStatus(value v1.ConditionStatus) *PersistentVolumeClaimConditionApplyConfiguration {
 	b.fields.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *PersistentVolumeClaimConditionBuilder) RemoveStatus() *PersistentVolumeClaimConditionBuilder {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) RemoveStatus() *PersistentVolumeClaimConditionApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *PersistentVolumeClaimConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) GetStatus() (value v1.ConditionStatus, ok bool) {
 	if v := b.fields.Status; v != nil {
 		return *v, true
 	}
@@ -93,19 +93,19 @@ func (b *PersistentVolumeClaimConditionBuilder) GetStatus() (value v1.ConditionS
 }
 
 // SetLastProbeTime sets the LastProbeTime field in the declarative configuration to the given value.
-func (b *PersistentVolumeClaimConditionBuilder) SetLastProbeTime(value metav1.Time) *PersistentVolumeClaimConditionBuilder {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) SetLastProbeTime(value metav1.Time) *PersistentVolumeClaimConditionApplyConfiguration {
 	b.fields.LastProbeTime = &value
 	return b
 }
 
 // RemoveLastProbeTime removes the LastProbeTime field from the declarative configuration.
-func (b *PersistentVolumeClaimConditionBuilder) RemoveLastProbeTime() *PersistentVolumeClaimConditionBuilder {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) RemoveLastProbeTime() *PersistentVolumeClaimConditionApplyConfiguration {
 	b.fields.LastProbeTime = nil
 	return b
 }
 
 // GetLastProbeTime gets the LastProbeTime field from the declarative configuration.
-func (b *PersistentVolumeClaimConditionBuilder) GetLastProbeTime() (value metav1.Time, ok bool) {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) GetLastProbeTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastProbeTime; v != nil {
 		return *v, true
 	}
@@ -113,19 +113,19 @@ func (b *PersistentVolumeClaimConditionBuilder) GetLastProbeTime() (value metav1
 }
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
-func (b *PersistentVolumeClaimConditionBuilder) SetLastTransitionTime(value metav1.Time) *PersistentVolumeClaimConditionBuilder {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) SetLastTransitionTime(value metav1.Time) *PersistentVolumeClaimConditionApplyConfiguration {
 	b.fields.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
-func (b *PersistentVolumeClaimConditionBuilder) RemoveLastTransitionTime() *PersistentVolumeClaimConditionBuilder {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) RemoveLastTransitionTime() *PersistentVolumeClaimConditionApplyConfiguration {
 	b.fields.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
-func (b *PersistentVolumeClaimConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) GetLastTransitionTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastTransitionTime; v != nil {
 		return *v, true
 	}
@@ -133,19 +133,19 @@ func (b *PersistentVolumeClaimConditionBuilder) GetLastTransitionTime() (value m
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b *PersistentVolumeClaimConditionBuilder) SetReason(value string) *PersistentVolumeClaimConditionBuilder {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) SetReason(value string) *PersistentVolumeClaimConditionApplyConfiguration {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b *PersistentVolumeClaimConditionBuilder) RemoveReason() *PersistentVolumeClaimConditionBuilder {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) RemoveReason() *PersistentVolumeClaimConditionApplyConfiguration {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b *PersistentVolumeClaimConditionBuilder) GetReason() (value string, ok bool) {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -153,27 +153,27 @@ func (b *PersistentVolumeClaimConditionBuilder) GetReason() (value string, ok bo
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b *PersistentVolumeClaimConditionBuilder) SetMessage(value string) *PersistentVolumeClaimConditionBuilder {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) SetMessage(value string) *PersistentVolumeClaimConditionApplyConfiguration {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b *PersistentVolumeClaimConditionBuilder) RemoveMessage() *PersistentVolumeClaimConditionBuilder {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) RemoveMessage() *PersistentVolumeClaimConditionApplyConfiguration {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b *PersistentVolumeClaimConditionBuilder) GetMessage() (value string, ok bool) {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts PersistentVolumeClaimConditionBuilder to unstructured.
-func (b *PersistentVolumeClaimConditionBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PersistentVolumeClaimConditionApplyConfiguration to unstructured.
+func (b *PersistentVolumeClaimConditionApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -185,9 +185,9 @@ func (b *PersistentVolumeClaimConditionBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to PersistentVolumeClaimConditionBuilder, replacing the contents
-// of PersistentVolumeClaimConditionBuilder.
-func (b *PersistentVolumeClaimConditionBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PersistentVolumeClaimConditionApplyConfiguration, replacing the contents
+// of PersistentVolumeClaimConditionApplyConfiguration.
+func (b *PersistentVolumeClaimConditionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &persistentVolumeClaimConditionFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -198,15 +198,15 @@ func (b *PersistentVolumeClaimConditionBuilder) FromUnstructured(u map[string]in
 	return nil
 }
 
-// MarshalJSON marshals PersistentVolumeClaimConditionBuilder to JSON.
-func (b *PersistentVolumeClaimConditionBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PersistentVolumeClaimConditionApplyConfiguration to JSON.
+func (b *PersistentVolumeClaimConditionApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PersistentVolumeClaimConditionBuilder, replacing the contents of
-// PersistentVolumeClaimConditionBuilder.
-func (b *PersistentVolumeClaimConditionBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PersistentVolumeClaimConditionApplyConfiguration, replacing the contents of
+// PersistentVolumeClaimConditionApplyConfiguration.
+func (b *PersistentVolumeClaimConditionApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -214,13 +214,13 @@ func (b *PersistentVolumeClaimConditionBuilder) UnmarshalJSON(data []byte) error
 	return nil
 }
 
-// PersistentVolumeClaimConditionList represents a list of PersistentVolumeClaimConditionBuilder.
-type PersistentVolumeClaimConditionList []*PersistentVolumeClaimConditionBuilder
+// PersistentVolumeClaimConditionList represents a listAlias of PersistentVolumeClaimConditionApplyConfiguration.
+type PersistentVolumeClaimConditionList []*PersistentVolumeClaimConditionApplyConfiguration
 
-// PersistentVolumeClaimConditionList represents a map of PersistentVolumeClaimConditionBuilder.
-type PersistentVolumeClaimConditionMap map[string]PersistentVolumeClaimConditionBuilder
+// PersistentVolumeClaimConditionList represents a map of PersistentVolumeClaimConditionApplyConfiguration.
+type PersistentVolumeClaimConditionMap map[string]PersistentVolumeClaimConditionApplyConfiguration
 
-func (b *PersistentVolumeClaimConditionBuilder) preMarshal() {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) preMarshal() {
 }
-func (b *PersistentVolumeClaimConditionBuilder) postUnmarshal() {
+func (b *PersistentVolumeClaimConditionApplyConfiguration) postUnmarshal() {
 }

@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// VolumeDeviceBuilder represents an declarative configuration of the VolumeDevice type for use
+// VolumeDeviceApplyConfiguration represents an declarative configuration of the VolumeDevice type for use
 // with apply.
-type VolumeDeviceBuilder struct {
+type VolumeDeviceApplyConfiguration struct {
 	fields volumeDeviceFields
 }
 
+// VolumeDeviceApplyConfiguration constructs an declarative configuration of the VolumeDevice type for use with
+// apply.
+func VolumeDevice() *VolumeDeviceApplyConfiguration {
+	return &VolumeDeviceApplyConfiguration{}
+}
+
 // volumeDeviceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in VolumeDeviceBuilder.
+// Inline fields are owned by their respective inline type in VolumeDeviceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type volumeDeviceFields struct {
 	DevicePath *string `json:"devicePath,omitempty"`
 }
 
-// VolumeDevice constructs an declarative configuration of the VolumeDevice type for use with
-// apply.
-func VolumeDevice() *VolumeDeviceBuilder {
-	return &VolumeDeviceBuilder{}
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *VolumeDeviceBuilder) SetName(value string) *VolumeDeviceBuilder {
+func (b *VolumeDeviceApplyConfiguration) SetName(value string) *VolumeDeviceApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *VolumeDeviceBuilder) RemoveName() *VolumeDeviceBuilder {
+func (b *VolumeDeviceApplyConfiguration) RemoveName() *VolumeDeviceApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *VolumeDeviceBuilder) GetName() (value string, ok bool) {
+func (b *VolumeDeviceApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *VolumeDeviceBuilder) GetName() (value string, ok bool) {
 }
 
 // SetDevicePath sets the DevicePath field in the declarative configuration to the given value.
-func (b *VolumeDeviceBuilder) SetDevicePath(value string) *VolumeDeviceBuilder {
+func (b *VolumeDeviceApplyConfiguration) SetDevicePath(value string) *VolumeDeviceApplyConfiguration {
 	b.fields.DevicePath = &value
 	return b
 }
 
 // RemoveDevicePath removes the DevicePath field from the declarative configuration.
-func (b *VolumeDeviceBuilder) RemoveDevicePath() *VolumeDeviceBuilder {
+func (b *VolumeDeviceApplyConfiguration) RemoveDevicePath() *VolumeDeviceApplyConfiguration {
 	b.fields.DevicePath = nil
 	return b
 }
 
 // GetDevicePath gets the DevicePath field from the declarative configuration.
-func (b *VolumeDeviceBuilder) GetDevicePath() (value string, ok bool) {
+func (b *VolumeDeviceApplyConfiguration) GetDevicePath() (value string, ok bool) {
 	if v := b.fields.DevicePath; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts VolumeDeviceBuilder to unstructured.
-func (b *VolumeDeviceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts VolumeDeviceApplyConfiguration to unstructured.
+func (b *VolumeDeviceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *VolumeDeviceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to VolumeDeviceBuilder, replacing the contents
-// of VolumeDeviceBuilder.
-func (b *VolumeDeviceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to VolumeDeviceApplyConfiguration, replacing the contents
+// of VolumeDeviceApplyConfiguration.
+func (b *VolumeDeviceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &volumeDeviceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *VolumeDeviceBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals VolumeDeviceBuilder to JSON.
-func (b *VolumeDeviceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals VolumeDeviceApplyConfiguration to JSON.
+func (b *VolumeDeviceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into VolumeDeviceBuilder, replacing the contents of
-// VolumeDeviceBuilder.
-func (b *VolumeDeviceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into VolumeDeviceApplyConfiguration, replacing the contents of
+// VolumeDeviceApplyConfiguration.
+func (b *VolumeDeviceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *VolumeDeviceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// VolumeDeviceList represents a list of VolumeDeviceBuilder.
-type VolumeDeviceList []*VolumeDeviceBuilder
+// VolumeDeviceList represents a listAlias of VolumeDeviceApplyConfiguration.
+type VolumeDeviceList []*VolumeDeviceApplyConfiguration
 
-// VolumeDeviceList represents a map of VolumeDeviceBuilder.
-type VolumeDeviceMap map[string]VolumeDeviceBuilder
+// VolumeDeviceList represents a map of VolumeDeviceApplyConfiguration.
+type VolumeDeviceMap map[string]VolumeDeviceApplyConfiguration
 
-func (b *VolumeDeviceBuilder) preMarshal() {
+func (b *VolumeDeviceApplyConfiguration) preMarshal() {
 }
-func (b *VolumeDeviceBuilder) postUnmarshal() {
+func (b *VolumeDeviceApplyConfiguration) postUnmarshal() {
 }

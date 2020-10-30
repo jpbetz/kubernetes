@@ -24,46 +24,46 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ServiceStatusBuilder represents an declarative configuration of the ServiceStatus type for use
+// ServiceStatusApplyConfiguration represents an declarative configuration of the ServiceStatus type for use
 // with apply.
-type ServiceStatusBuilder struct {
+type ServiceStatusApplyConfiguration struct {
 	fields serviceStatusFields
 }
 
+// ServiceStatusApplyConfiguration constructs an declarative configuration of the ServiceStatus type for use with
+// apply.
+func ServiceStatus() *ServiceStatusApplyConfiguration {
+	return &ServiceStatusApplyConfiguration{}
+}
+
 // serviceStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ServiceStatusBuilder.
+// Inline fields are owned by their respective inline type in ServiceStatusApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type serviceStatusFields struct {
-	LoadBalancer *LoadBalancerStatusBuilder `json:"loadBalancer,omitempty"`
-}
-
-// ServiceStatus constructs an declarative configuration of the ServiceStatus type for use with
-// apply.
-func ServiceStatus() *ServiceStatusBuilder {
-	return &ServiceStatusBuilder{}
+	LoadBalancer *LoadBalancerStatusApplyConfiguration `json:"loadBalancer,omitempty"`
 }
 
 // SetLoadBalancer sets the LoadBalancer field in the declarative configuration to the given value.
-func (b *ServiceStatusBuilder) SetLoadBalancer(value *LoadBalancerStatusBuilder) *ServiceStatusBuilder {
+func (b *ServiceStatusApplyConfiguration) SetLoadBalancer(value *LoadBalancerStatusApplyConfiguration) *ServiceStatusApplyConfiguration {
 	b.fields.LoadBalancer = value
 	return b
 }
 
 // RemoveLoadBalancer removes the LoadBalancer field from the declarative configuration.
-func (b *ServiceStatusBuilder) RemoveLoadBalancer() *ServiceStatusBuilder {
+func (b *ServiceStatusApplyConfiguration) RemoveLoadBalancer() *ServiceStatusApplyConfiguration {
 	b.fields.LoadBalancer = nil
 	return b
 }
 
 // GetLoadBalancer gets the LoadBalancer field from the declarative configuration.
-func (b *ServiceStatusBuilder) GetLoadBalancer() (value *LoadBalancerStatusBuilder, ok bool) {
+func (b *ServiceStatusApplyConfiguration) GetLoadBalancer() (value *LoadBalancerStatusApplyConfiguration, ok bool) {
 	return b.fields.LoadBalancer, b.fields.LoadBalancer != nil
 }
 
-// ToUnstructured converts ServiceStatusBuilder to unstructured.
-func (b *ServiceStatusBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ServiceStatusApplyConfiguration to unstructured.
+func (b *ServiceStatusApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -75,9 +75,9 @@ func (b *ServiceStatusBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ServiceStatusBuilder, replacing the contents
-// of ServiceStatusBuilder.
-func (b *ServiceStatusBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ServiceStatusApplyConfiguration, replacing the contents
+// of ServiceStatusApplyConfiguration.
+func (b *ServiceStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &serviceStatusFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -88,15 +88,15 @@ func (b *ServiceStatusBuilder) FromUnstructured(u map[string]interface{}) error 
 	return nil
 }
 
-// MarshalJSON marshals ServiceStatusBuilder to JSON.
-func (b *ServiceStatusBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ServiceStatusApplyConfiguration to JSON.
+func (b *ServiceStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ServiceStatusBuilder, replacing the contents of
-// ServiceStatusBuilder.
-func (b *ServiceStatusBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ServiceStatusApplyConfiguration, replacing the contents of
+// ServiceStatusApplyConfiguration.
+func (b *ServiceStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -104,13 +104,13 @@ func (b *ServiceStatusBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ServiceStatusList represents a list of ServiceStatusBuilder.
-type ServiceStatusList []*ServiceStatusBuilder
+// ServiceStatusList represents a listAlias of ServiceStatusApplyConfiguration.
+type ServiceStatusList []*ServiceStatusApplyConfiguration
 
-// ServiceStatusList represents a map of ServiceStatusBuilder.
-type ServiceStatusMap map[string]ServiceStatusBuilder
+// ServiceStatusList represents a map of ServiceStatusApplyConfiguration.
+type ServiceStatusMap map[string]ServiceStatusApplyConfiguration
 
-func (b *ServiceStatusBuilder) preMarshal() {
+func (b *ServiceStatusApplyConfiguration) preMarshal() {
 }
-func (b *ServiceStatusBuilder) postUnmarshal() {
+func (b *ServiceStatusApplyConfiguration) postUnmarshal() {
 }

@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ServiceAccountTokenProjectionBuilder represents an declarative configuration of the ServiceAccountTokenProjection type for use
+// ServiceAccountTokenProjectionApplyConfiguration represents an declarative configuration of the ServiceAccountTokenProjection type for use
 // with apply.
-type ServiceAccountTokenProjectionBuilder struct {
+type ServiceAccountTokenProjectionApplyConfiguration struct {
 	fields serviceAccountTokenProjectionFields
 }
 
+// ServiceAccountTokenProjectionApplyConfiguration constructs an declarative configuration of the ServiceAccountTokenProjection type for use with
+// apply.
+func ServiceAccountTokenProjection() *ServiceAccountTokenProjectionApplyConfiguration {
+	return &ServiceAccountTokenProjectionApplyConfiguration{}
+}
+
 // serviceAccountTokenProjectionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ServiceAccountTokenProjectionBuilder.
+// Inline fields are owned by their respective inline type in ServiceAccountTokenProjectionApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type serviceAccountTokenProjectionFields struct {
 	Path              *string `json:"path,omitempty"`
 }
 
-// ServiceAccountTokenProjection constructs an declarative configuration of the ServiceAccountTokenProjection type for use with
-// apply.
-func ServiceAccountTokenProjection() *ServiceAccountTokenProjectionBuilder {
-	return &ServiceAccountTokenProjectionBuilder{}
-}
-
 // SetAudience sets the Audience field in the declarative configuration to the given value.
-func (b *ServiceAccountTokenProjectionBuilder) SetAudience(value string) *ServiceAccountTokenProjectionBuilder {
+func (b *ServiceAccountTokenProjectionApplyConfiguration) SetAudience(value string) *ServiceAccountTokenProjectionApplyConfiguration {
 	b.fields.Audience = &value
 	return b
 }
 
 // RemoveAudience removes the Audience field from the declarative configuration.
-func (b *ServiceAccountTokenProjectionBuilder) RemoveAudience() *ServiceAccountTokenProjectionBuilder {
+func (b *ServiceAccountTokenProjectionApplyConfiguration) RemoveAudience() *ServiceAccountTokenProjectionApplyConfiguration {
 	b.fields.Audience = nil
 	return b
 }
 
 // GetAudience gets the Audience field from the declarative configuration.
-func (b *ServiceAccountTokenProjectionBuilder) GetAudience() (value string, ok bool) {
+func (b *ServiceAccountTokenProjectionApplyConfiguration) GetAudience() (value string, ok bool) {
 	if v := b.fields.Audience; v != nil {
 		return *v, true
 	}
@@ -68,19 +68,19 @@ func (b *ServiceAccountTokenProjectionBuilder) GetAudience() (value string, ok b
 }
 
 // SetExpirationSeconds sets the ExpirationSeconds field in the declarative configuration to the given value.
-func (b *ServiceAccountTokenProjectionBuilder) SetExpirationSeconds(value int64) *ServiceAccountTokenProjectionBuilder {
+func (b *ServiceAccountTokenProjectionApplyConfiguration) SetExpirationSeconds(value int64) *ServiceAccountTokenProjectionApplyConfiguration {
 	b.fields.ExpirationSeconds = &value
 	return b
 }
 
 // RemoveExpirationSeconds removes the ExpirationSeconds field from the declarative configuration.
-func (b *ServiceAccountTokenProjectionBuilder) RemoveExpirationSeconds() *ServiceAccountTokenProjectionBuilder {
+func (b *ServiceAccountTokenProjectionApplyConfiguration) RemoveExpirationSeconds() *ServiceAccountTokenProjectionApplyConfiguration {
 	b.fields.ExpirationSeconds = nil
 	return b
 }
 
 // GetExpirationSeconds gets the ExpirationSeconds field from the declarative configuration.
-func (b *ServiceAccountTokenProjectionBuilder) GetExpirationSeconds() (value int64, ok bool) {
+func (b *ServiceAccountTokenProjectionApplyConfiguration) GetExpirationSeconds() (value int64, ok bool) {
 	if v := b.fields.ExpirationSeconds; v != nil {
 		return *v, true
 	}
@@ -88,27 +88,27 @@ func (b *ServiceAccountTokenProjectionBuilder) GetExpirationSeconds() (value int
 }
 
 // SetPath sets the Path field in the declarative configuration to the given value.
-func (b *ServiceAccountTokenProjectionBuilder) SetPath(value string) *ServiceAccountTokenProjectionBuilder {
+func (b *ServiceAccountTokenProjectionApplyConfiguration) SetPath(value string) *ServiceAccountTokenProjectionApplyConfiguration {
 	b.fields.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
-func (b *ServiceAccountTokenProjectionBuilder) RemovePath() *ServiceAccountTokenProjectionBuilder {
+func (b *ServiceAccountTokenProjectionApplyConfiguration) RemovePath() *ServiceAccountTokenProjectionApplyConfiguration {
 	b.fields.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
-func (b *ServiceAccountTokenProjectionBuilder) GetPath() (value string, ok bool) {
+func (b *ServiceAccountTokenProjectionApplyConfiguration) GetPath() (value string, ok bool) {
 	if v := b.fields.Path; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ServiceAccountTokenProjectionBuilder to unstructured.
-func (b *ServiceAccountTokenProjectionBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ServiceAccountTokenProjectionApplyConfiguration to unstructured.
+func (b *ServiceAccountTokenProjectionApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -120,9 +120,9 @@ func (b *ServiceAccountTokenProjectionBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ServiceAccountTokenProjectionBuilder, replacing the contents
-// of ServiceAccountTokenProjectionBuilder.
-func (b *ServiceAccountTokenProjectionBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ServiceAccountTokenProjectionApplyConfiguration, replacing the contents
+// of ServiceAccountTokenProjectionApplyConfiguration.
+func (b *ServiceAccountTokenProjectionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &serviceAccountTokenProjectionFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -133,15 +133,15 @@ func (b *ServiceAccountTokenProjectionBuilder) FromUnstructured(u map[string]int
 	return nil
 }
 
-// MarshalJSON marshals ServiceAccountTokenProjectionBuilder to JSON.
-func (b *ServiceAccountTokenProjectionBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ServiceAccountTokenProjectionApplyConfiguration to JSON.
+func (b *ServiceAccountTokenProjectionApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ServiceAccountTokenProjectionBuilder, replacing the contents of
-// ServiceAccountTokenProjectionBuilder.
-func (b *ServiceAccountTokenProjectionBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ServiceAccountTokenProjectionApplyConfiguration, replacing the contents of
+// ServiceAccountTokenProjectionApplyConfiguration.
+func (b *ServiceAccountTokenProjectionApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -149,13 +149,13 @@ func (b *ServiceAccountTokenProjectionBuilder) UnmarshalJSON(data []byte) error 
 	return nil
 }
 
-// ServiceAccountTokenProjectionList represents a list of ServiceAccountTokenProjectionBuilder.
-type ServiceAccountTokenProjectionList []*ServiceAccountTokenProjectionBuilder
+// ServiceAccountTokenProjectionList represents a listAlias of ServiceAccountTokenProjectionApplyConfiguration.
+type ServiceAccountTokenProjectionList []*ServiceAccountTokenProjectionApplyConfiguration
 
-// ServiceAccountTokenProjectionList represents a map of ServiceAccountTokenProjectionBuilder.
-type ServiceAccountTokenProjectionMap map[string]ServiceAccountTokenProjectionBuilder
+// ServiceAccountTokenProjectionList represents a map of ServiceAccountTokenProjectionApplyConfiguration.
+type ServiceAccountTokenProjectionMap map[string]ServiceAccountTokenProjectionApplyConfiguration
 
-func (b *ServiceAccountTokenProjectionBuilder) preMarshal() {
+func (b *ServiceAccountTokenProjectionApplyConfiguration) preMarshal() {
 }
-func (b *ServiceAccountTokenProjectionBuilder) postUnmarshal() {
+func (b *ServiceAccountTokenProjectionApplyConfiguration) postUnmarshal() {
 }

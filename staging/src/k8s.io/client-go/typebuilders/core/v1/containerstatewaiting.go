@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ContainerStateWaitingBuilder represents an declarative configuration of the ContainerStateWaiting type for use
+// ContainerStateWaitingApplyConfiguration represents an declarative configuration of the ContainerStateWaiting type for use
 // with apply.
-type ContainerStateWaitingBuilder struct {
+type ContainerStateWaitingApplyConfiguration struct {
 	fields containerStateWaitingFields
 }
 
+// ContainerStateWaitingApplyConfiguration constructs an declarative configuration of the ContainerStateWaiting type for use with
+// apply.
+func ContainerStateWaiting() *ContainerStateWaitingApplyConfiguration {
+	return &ContainerStateWaitingApplyConfiguration{}
+}
+
 // containerStateWaitingFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ContainerStateWaitingBuilder.
+// Inline fields are owned by their respective inline type in ContainerStateWaitingApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type containerStateWaitingFields struct {
 	Message *string `json:"message,omitempty"`
 }
 
-// ContainerStateWaiting constructs an declarative configuration of the ContainerStateWaiting type for use with
-// apply.
-func ContainerStateWaiting() *ContainerStateWaitingBuilder {
-	return &ContainerStateWaitingBuilder{}
-}
-
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b *ContainerStateWaitingBuilder) SetReason(value string) *ContainerStateWaitingBuilder {
+func (b *ContainerStateWaitingApplyConfiguration) SetReason(value string) *ContainerStateWaitingApplyConfiguration {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b *ContainerStateWaitingBuilder) RemoveReason() *ContainerStateWaitingBuilder {
+func (b *ContainerStateWaitingApplyConfiguration) RemoveReason() *ContainerStateWaitingApplyConfiguration {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b *ContainerStateWaitingBuilder) GetReason() (value string, ok bool) {
+func (b *ContainerStateWaitingApplyConfiguration) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *ContainerStateWaitingBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b *ContainerStateWaitingBuilder) SetMessage(value string) *ContainerStateWaitingBuilder {
+func (b *ContainerStateWaitingApplyConfiguration) SetMessage(value string) *ContainerStateWaitingApplyConfiguration {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b *ContainerStateWaitingBuilder) RemoveMessage() *ContainerStateWaitingBuilder {
+func (b *ContainerStateWaitingApplyConfiguration) RemoveMessage() *ContainerStateWaitingApplyConfiguration {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b *ContainerStateWaitingBuilder) GetMessage() (value string, ok bool) {
+func (b *ContainerStateWaitingApplyConfiguration) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ContainerStateWaitingBuilder to unstructured.
-func (b *ContainerStateWaitingBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ContainerStateWaitingApplyConfiguration to unstructured.
+func (b *ContainerStateWaitingApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *ContainerStateWaitingBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ContainerStateWaitingBuilder, replacing the contents
-// of ContainerStateWaitingBuilder.
-func (b *ContainerStateWaitingBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ContainerStateWaitingApplyConfiguration, replacing the contents
+// of ContainerStateWaitingApplyConfiguration.
+func (b *ContainerStateWaitingApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &containerStateWaitingFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *ContainerStateWaitingBuilder) FromUnstructured(u map[string]interface{}
 	return nil
 }
 
-// MarshalJSON marshals ContainerStateWaitingBuilder to JSON.
-func (b *ContainerStateWaitingBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ContainerStateWaitingApplyConfiguration to JSON.
+func (b *ContainerStateWaitingApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ContainerStateWaitingBuilder, replacing the contents of
-// ContainerStateWaitingBuilder.
-func (b *ContainerStateWaitingBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ContainerStateWaitingApplyConfiguration, replacing the contents of
+// ContainerStateWaitingApplyConfiguration.
+func (b *ContainerStateWaitingApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *ContainerStateWaitingBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ContainerStateWaitingList represents a list of ContainerStateWaitingBuilder.
-type ContainerStateWaitingList []*ContainerStateWaitingBuilder
+// ContainerStateWaitingList represents a listAlias of ContainerStateWaitingApplyConfiguration.
+type ContainerStateWaitingList []*ContainerStateWaitingApplyConfiguration
 
-// ContainerStateWaitingList represents a map of ContainerStateWaitingBuilder.
-type ContainerStateWaitingMap map[string]ContainerStateWaitingBuilder
+// ContainerStateWaitingList represents a map of ContainerStateWaitingApplyConfiguration.
+type ContainerStateWaitingMap map[string]ContainerStateWaitingApplyConfiguration
 
-func (b *ContainerStateWaitingBuilder) preMarshal() {
+func (b *ContainerStateWaitingApplyConfiguration) preMarshal() {
 }
-func (b *ContainerStateWaitingBuilder) postUnmarshal() {
+func (b *ContainerStateWaitingApplyConfiguration) postUnmarshal() {
 }

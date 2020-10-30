@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ServiceBackendPortBuilder represents an declarative configuration of the ServiceBackendPort type for use
+// ServiceBackendPortApplyConfiguration represents an declarative configuration of the ServiceBackendPort type for use
 // with apply.
-type ServiceBackendPortBuilder struct {
+type ServiceBackendPortApplyConfiguration struct {
 	fields serviceBackendPortFields
 }
 
+// ServiceBackendPortApplyConfiguration constructs an declarative configuration of the ServiceBackendPort type for use with
+// apply.
+func ServiceBackendPort() *ServiceBackendPortApplyConfiguration {
+	return &ServiceBackendPortApplyConfiguration{}
+}
+
 // serviceBackendPortFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ServiceBackendPortBuilder.
+// Inline fields are owned by their respective inline type in ServiceBackendPortApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type serviceBackendPortFields struct {
 	Number *int32  `json:"number,omitempty"`
 }
 
-// ServiceBackendPort constructs an declarative configuration of the ServiceBackendPort type for use with
-// apply.
-func ServiceBackendPort() *ServiceBackendPortBuilder {
-	return &ServiceBackendPortBuilder{}
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *ServiceBackendPortBuilder) SetName(value string) *ServiceBackendPortBuilder {
+func (b *ServiceBackendPortApplyConfiguration) SetName(value string) *ServiceBackendPortApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *ServiceBackendPortBuilder) RemoveName() *ServiceBackendPortBuilder {
+func (b *ServiceBackendPortApplyConfiguration) RemoveName() *ServiceBackendPortApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *ServiceBackendPortBuilder) GetName() (value string, ok bool) {
+func (b *ServiceBackendPortApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *ServiceBackendPortBuilder) GetName() (value string, ok bool) {
 }
 
 // SetNumber sets the Number field in the declarative configuration to the given value.
-func (b *ServiceBackendPortBuilder) SetNumber(value int32) *ServiceBackendPortBuilder {
+func (b *ServiceBackendPortApplyConfiguration) SetNumber(value int32) *ServiceBackendPortApplyConfiguration {
 	b.fields.Number = &value
 	return b
 }
 
 // RemoveNumber removes the Number field from the declarative configuration.
-func (b *ServiceBackendPortBuilder) RemoveNumber() *ServiceBackendPortBuilder {
+func (b *ServiceBackendPortApplyConfiguration) RemoveNumber() *ServiceBackendPortApplyConfiguration {
 	b.fields.Number = nil
 	return b
 }
 
 // GetNumber gets the Number field from the declarative configuration.
-func (b *ServiceBackendPortBuilder) GetNumber() (value int32, ok bool) {
+func (b *ServiceBackendPortApplyConfiguration) GetNumber() (value int32, ok bool) {
 	if v := b.fields.Number; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ServiceBackendPortBuilder to unstructured.
-func (b *ServiceBackendPortBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ServiceBackendPortApplyConfiguration to unstructured.
+func (b *ServiceBackendPortApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *ServiceBackendPortBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ServiceBackendPortBuilder, replacing the contents
-// of ServiceBackendPortBuilder.
-func (b *ServiceBackendPortBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ServiceBackendPortApplyConfiguration, replacing the contents
+// of ServiceBackendPortApplyConfiguration.
+func (b *ServiceBackendPortApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &serviceBackendPortFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *ServiceBackendPortBuilder) FromUnstructured(u map[string]interface{}) e
 	return nil
 }
 
-// MarshalJSON marshals ServiceBackendPortBuilder to JSON.
-func (b *ServiceBackendPortBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ServiceBackendPortApplyConfiguration to JSON.
+func (b *ServiceBackendPortApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ServiceBackendPortBuilder, replacing the contents of
-// ServiceBackendPortBuilder.
-func (b *ServiceBackendPortBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ServiceBackendPortApplyConfiguration, replacing the contents of
+// ServiceBackendPortApplyConfiguration.
+func (b *ServiceBackendPortApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *ServiceBackendPortBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ServiceBackendPortList represents a list of ServiceBackendPortBuilder.
-type ServiceBackendPortList []*ServiceBackendPortBuilder
+// ServiceBackendPortList represents a listAlias of ServiceBackendPortApplyConfiguration.
+type ServiceBackendPortList []*ServiceBackendPortApplyConfiguration
 
-// ServiceBackendPortList represents a map of ServiceBackendPortBuilder.
-type ServiceBackendPortMap map[string]ServiceBackendPortBuilder
+// ServiceBackendPortList represents a map of ServiceBackendPortApplyConfiguration.
+type ServiceBackendPortMap map[string]ServiceBackendPortApplyConfiguration
 
-func (b *ServiceBackendPortBuilder) preMarshal() {
+func (b *ServiceBackendPortApplyConfiguration) preMarshal() {
 }
-func (b *ServiceBackendPortBuilder) postUnmarshal() {
+func (b *ServiceBackendPortApplyConfiguration) postUnmarshal() {
 }

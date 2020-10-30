@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// VolumeNodeResourcesBuilder represents an declarative configuration of the VolumeNodeResources type for use
+// VolumeNodeResourcesApplyConfiguration represents an declarative configuration of the VolumeNodeResources type for use
 // with apply.
-type VolumeNodeResourcesBuilder struct {
+type VolumeNodeResourcesApplyConfiguration struct {
 	fields volumeNodeResourcesFields
 }
 
+// VolumeNodeResourcesApplyConfiguration constructs an declarative configuration of the VolumeNodeResources type for use with
+// apply.
+func VolumeNodeResources() *VolumeNodeResourcesApplyConfiguration {
+	return &VolumeNodeResourcesApplyConfiguration{}
+}
+
 // volumeNodeResourcesFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in VolumeNodeResourcesBuilder.
+// Inline fields are owned by their respective inline type in VolumeNodeResourcesApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type volumeNodeResourcesFields struct {
 	Count *int32 `json:"count,omitempty"`
 }
 
-// VolumeNodeResources constructs an declarative configuration of the VolumeNodeResources type for use with
-// apply.
-func VolumeNodeResources() *VolumeNodeResourcesBuilder {
-	return &VolumeNodeResourcesBuilder{}
-}
-
 // SetCount sets the Count field in the declarative configuration to the given value.
-func (b *VolumeNodeResourcesBuilder) SetCount(value int32) *VolumeNodeResourcesBuilder {
+func (b *VolumeNodeResourcesApplyConfiguration) SetCount(value int32) *VolumeNodeResourcesApplyConfiguration {
 	b.fields.Count = &value
 	return b
 }
 
 // RemoveCount removes the Count field from the declarative configuration.
-func (b *VolumeNodeResourcesBuilder) RemoveCount() *VolumeNodeResourcesBuilder {
+func (b *VolumeNodeResourcesApplyConfiguration) RemoveCount() *VolumeNodeResourcesApplyConfiguration {
 	b.fields.Count = nil
 	return b
 }
 
 // GetCount gets the Count field from the declarative configuration.
-func (b *VolumeNodeResourcesBuilder) GetCount() (value int32, ok bool) {
+func (b *VolumeNodeResourcesApplyConfiguration) GetCount() (value int32, ok bool) {
 	if v := b.fields.Count; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts VolumeNodeResourcesBuilder to unstructured.
-func (b *VolumeNodeResourcesBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts VolumeNodeResourcesApplyConfiguration to unstructured.
+func (b *VolumeNodeResourcesApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *VolumeNodeResourcesBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to VolumeNodeResourcesBuilder, replacing the contents
-// of VolumeNodeResourcesBuilder.
-func (b *VolumeNodeResourcesBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to VolumeNodeResourcesApplyConfiguration, replacing the contents
+// of VolumeNodeResourcesApplyConfiguration.
+func (b *VolumeNodeResourcesApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &volumeNodeResourcesFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *VolumeNodeResourcesBuilder) FromUnstructured(u map[string]interface{}) 
 	return nil
 }
 
-// MarshalJSON marshals VolumeNodeResourcesBuilder to JSON.
-func (b *VolumeNodeResourcesBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals VolumeNodeResourcesApplyConfiguration to JSON.
+func (b *VolumeNodeResourcesApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into VolumeNodeResourcesBuilder, replacing the contents of
-// VolumeNodeResourcesBuilder.
-func (b *VolumeNodeResourcesBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into VolumeNodeResourcesApplyConfiguration, replacing the contents of
+// VolumeNodeResourcesApplyConfiguration.
+func (b *VolumeNodeResourcesApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *VolumeNodeResourcesBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// VolumeNodeResourcesList represents a list of VolumeNodeResourcesBuilder.
-type VolumeNodeResourcesList []*VolumeNodeResourcesBuilder
+// VolumeNodeResourcesList represents a listAlias of VolumeNodeResourcesApplyConfiguration.
+type VolumeNodeResourcesList []*VolumeNodeResourcesApplyConfiguration
 
-// VolumeNodeResourcesList represents a map of VolumeNodeResourcesBuilder.
-type VolumeNodeResourcesMap map[string]VolumeNodeResourcesBuilder
+// VolumeNodeResourcesList represents a map of VolumeNodeResourcesApplyConfiguration.
+type VolumeNodeResourcesMap map[string]VolumeNodeResourcesApplyConfiguration
 
-func (b *VolumeNodeResourcesBuilder) preMarshal() {
+func (b *VolumeNodeResourcesApplyConfiguration) preMarshal() {
 }
-func (b *VolumeNodeResourcesBuilder) postUnmarshal() {
+func (b *VolumeNodeResourcesApplyConfiguration) postUnmarshal() {
 }

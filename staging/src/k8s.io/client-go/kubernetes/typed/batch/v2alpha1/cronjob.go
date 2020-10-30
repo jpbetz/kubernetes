@@ -49,7 +49,7 @@ type CronJobInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v2alpha1.CronJobList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v2alpha1.CronJob, err error)
-	Apply(ctx context.Context, cronJob batchv2alpha1.CronJobBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v2alpha1.CronJob, err error)
+	Apply(ctx context.Context, cronJob *batchv2alpha1.CronJobApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v2alpha1.CronJob, err error)
 	CronJobExpansion
 }
 
@@ -198,7 +198,7 @@ func (c *cronJobs) Patch(ctx context.Context, name string, pt types.PatchType, d
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied cronJob.
-func (c *cronJobs) Apply(ctx context.Context, cronJob batchv2alpha1.CronJobBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v2alpha1.CronJob, err error) {
+func (c *cronJobs) Apply(ctx context.Context, cronJob *batchv2alpha1.CronJobApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v2alpha1.CronJob, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := cronJob.MarshalJSON()
 	if err != nil {

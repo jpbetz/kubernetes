@@ -24,43 +24,43 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// WebhookClientConfigBuilder represents an declarative configuration of the WebhookClientConfig type for use
+// WebhookClientConfigApplyConfiguration represents an declarative configuration of the WebhookClientConfig type for use
 // with apply.
-type WebhookClientConfigBuilder struct {
+type WebhookClientConfigApplyConfiguration struct {
 	fields webhookClientConfigFields
 }
 
+// WebhookClientConfigApplyConfiguration constructs an declarative configuration of the WebhookClientConfig type for use with
+// apply.
+func WebhookClientConfig() *WebhookClientConfigApplyConfiguration {
+	return &WebhookClientConfigApplyConfiguration{}
+}
+
 // webhookClientConfigFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in WebhookClientConfigBuilder.
+// Inline fields are owned by their respective inline type in WebhookClientConfigApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type webhookClientConfigFields struct {
-	URL      *string                  `json:"url,omitempty"`
-	Service  *ServiceReferenceBuilder `json:"service,omitempty"`
-	CABundle *[]byte                  `json:"caBundle,omitempty"`
-}
-
-// WebhookClientConfig constructs an declarative configuration of the WebhookClientConfig type for use with
-// apply.
-func WebhookClientConfig() *WebhookClientConfigBuilder {
-	return &WebhookClientConfigBuilder{}
+	URL      *string                             `json:"url,omitempty"`
+	Service  *ServiceReferenceApplyConfiguration `json:"service,omitempty"`
+	CABundle *[]byte                             `json:"caBundle,omitempty"`
 }
 
 // SetURL sets the URL field in the declarative configuration to the given value.
-func (b *WebhookClientConfigBuilder) SetURL(value string) *WebhookClientConfigBuilder {
+func (b *WebhookClientConfigApplyConfiguration) SetURL(value string) *WebhookClientConfigApplyConfiguration {
 	b.fields.URL = &value
 	return b
 }
 
 // RemoveURL removes the URL field from the declarative configuration.
-func (b *WebhookClientConfigBuilder) RemoveURL() *WebhookClientConfigBuilder {
+func (b *WebhookClientConfigApplyConfiguration) RemoveURL() *WebhookClientConfigApplyConfiguration {
 	b.fields.URL = nil
 	return b
 }
 
 // GetURL gets the URL field from the declarative configuration.
-func (b *WebhookClientConfigBuilder) GetURL() (value string, ok bool) {
+func (b *WebhookClientConfigApplyConfiguration) GetURL() (value string, ok bool) {
 	if v := b.fields.URL; v != nil {
 		return *v, true
 	}
@@ -68,44 +68,44 @@ func (b *WebhookClientConfigBuilder) GetURL() (value string, ok bool) {
 }
 
 // SetService sets the Service field in the declarative configuration to the given value.
-func (b *WebhookClientConfigBuilder) SetService(value *ServiceReferenceBuilder) *WebhookClientConfigBuilder {
+func (b *WebhookClientConfigApplyConfiguration) SetService(value *ServiceReferenceApplyConfiguration) *WebhookClientConfigApplyConfiguration {
 	b.fields.Service = value
 	return b
 }
 
 // RemoveService removes the Service field from the declarative configuration.
-func (b *WebhookClientConfigBuilder) RemoveService() *WebhookClientConfigBuilder {
+func (b *WebhookClientConfigApplyConfiguration) RemoveService() *WebhookClientConfigApplyConfiguration {
 	b.fields.Service = nil
 	return b
 }
 
 // GetService gets the Service field from the declarative configuration.
-func (b *WebhookClientConfigBuilder) GetService() (value *ServiceReferenceBuilder, ok bool) {
+func (b *WebhookClientConfigApplyConfiguration) GetService() (value *ServiceReferenceApplyConfiguration, ok bool) {
 	return b.fields.Service, b.fields.Service != nil
 }
 
 // SetCABundle sets the CABundle field in the declarative configuration to the given value.
-func (b *WebhookClientConfigBuilder) SetCABundle(value []byte) *WebhookClientConfigBuilder {
+func (b *WebhookClientConfigApplyConfiguration) SetCABundle(value []byte) *WebhookClientConfigApplyConfiguration {
 	b.fields.CABundle = &value
 	return b
 }
 
 // RemoveCABundle removes the CABundle field from the declarative configuration.
-func (b *WebhookClientConfigBuilder) RemoveCABundle() *WebhookClientConfigBuilder {
+func (b *WebhookClientConfigApplyConfiguration) RemoveCABundle() *WebhookClientConfigApplyConfiguration {
 	b.fields.CABundle = nil
 	return b
 }
 
 // GetCABundle gets the CABundle field from the declarative configuration.
-func (b *WebhookClientConfigBuilder) GetCABundle() (value []byte, ok bool) {
+func (b *WebhookClientConfigApplyConfiguration) GetCABundle() (value []byte, ok bool) {
 	if v := b.fields.CABundle; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts WebhookClientConfigBuilder to unstructured.
-func (b *WebhookClientConfigBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts WebhookClientConfigApplyConfiguration to unstructured.
+func (b *WebhookClientConfigApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -117,9 +117,9 @@ func (b *WebhookClientConfigBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to WebhookClientConfigBuilder, replacing the contents
-// of WebhookClientConfigBuilder.
-func (b *WebhookClientConfigBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to WebhookClientConfigApplyConfiguration, replacing the contents
+// of WebhookClientConfigApplyConfiguration.
+func (b *WebhookClientConfigApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &webhookClientConfigFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -130,15 +130,15 @@ func (b *WebhookClientConfigBuilder) FromUnstructured(u map[string]interface{}) 
 	return nil
 }
 
-// MarshalJSON marshals WebhookClientConfigBuilder to JSON.
-func (b *WebhookClientConfigBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals WebhookClientConfigApplyConfiguration to JSON.
+func (b *WebhookClientConfigApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into WebhookClientConfigBuilder, replacing the contents of
-// WebhookClientConfigBuilder.
-func (b *WebhookClientConfigBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into WebhookClientConfigApplyConfiguration, replacing the contents of
+// WebhookClientConfigApplyConfiguration.
+func (b *WebhookClientConfigApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -146,13 +146,13 @@ func (b *WebhookClientConfigBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// WebhookClientConfigList represents a list of WebhookClientConfigBuilder.
-type WebhookClientConfigList []*WebhookClientConfigBuilder
+// WebhookClientConfigList represents a listAlias of WebhookClientConfigApplyConfiguration.
+type WebhookClientConfigList []*WebhookClientConfigApplyConfiguration
 
-// WebhookClientConfigList represents a map of WebhookClientConfigBuilder.
-type WebhookClientConfigMap map[string]WebhookClientConfigBuilder
+// WebhookClientConfigList represents a map of WebhookClientConfigApplyConfiguration.
+type WebhookClientConfigMap map[string]WebhookClientConfigApplyConfiguration
 
-func (b *WebhookClientConfigBuilder) preMarshal() {
+func (b *WebhookClientConfigApplyConfiguration) preMarshal() {
 }
-func (b *WebhookClientConfigBuilder) postUnmarshal() {
+func (b *WebhookClientConfigApplyConfiguration) postUnmarshal() {
 }

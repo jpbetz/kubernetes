@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// HostPathVolumeSourceBuilder represents an declarative configuration of the HostPathVolumeSource type for use
+// HostPathVolumeSourceApplyConfiguration represents an declarative configuration of the HostPathVolumeSource type for use
 // with apply.
-type HostPathVolumeSourceBuilder struct {
+type HostPathVolumeSourceApplyConfiguration struct {
 	fields hostPathVolumeSourceFields
 }
 
+// HostPathVolumeSourceApplyConfiguration constructs an declarative configuration of the HostPathVolumeSource type for use with
+// apply.
+func HostPathVolumeSource() *HostPathVolumeSourceApplyConfiguration {
+	return &HostPathVolumeSourceApplyConfiguration{}
+}
+
 // hostPathVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in HostPathVolumeSourceBuilder.
+// Inline fields are owned by their respective inline type in HostPathVolumeSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type hostPathVolumeSourceFields struct {
 	Type *v1.HostPathType `json:"type,omitempty"`
 }
 
-// HostPathVolumeSource constructs an declarative configuration of the HostPathVolumeSource type for use with
-// apply.
-func HostPathVolumeSource() *HostPathVolumeSourceBuilder {
-	return &HostPathVolumeSourceBuilder{}
-}
-
 // SetPath sets the Path field in the declarative configuration to the given value.
-func (b *HostPathVolumeSourceBuilder) SetPath(value string) *HostPathVolumeSourceBuilder {
+func (b *HostPathVolumeSourceApplyConfiguration) SetPath(value string) *HostPathVolumeSourceApplyConfiguration {
 	b.fields.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
-func (b *HostPathVolumeSourceBuilder) RemovePath() *HostPathVolumeSourceBuilder {
+func (b *HostPathVolumeSourceApplyConfiguration) RemovePath() *HostPathVolumeSourceApplyConfiguration {
 	b.fields.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
-func (b *HostPathVolumeSourceBuilder) GetPath() (value string, ok bool) {
+func (b *HostPathVolumeSourceApplyConfiguration) GetPath() (value string, ok bool) {
 	if v := b.fields.Path; v != nil {
 		return *v, true
 	}
@@ -68,27 +68,27 @@ func (b *HostPathVolumeSourceBuilder) GetPath() (value string, ok bool) {
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b *HostPathVolumeSourceBuilder) SetType(value v1.HostPathType) *HostPathVolumeSourceBuilder {
+func (b *HostPathVolumeSourceApplyConfiguration) SetType(value v1.HostPathType) *HostPathVolumeSourceApplyConfiguration {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b *HostPathVolumeSourceBuilder) RemoveType() *HostPathVolumeSourceBuilder {
+func (b *HostPathVolumeSourceApplyConfiguration) RemoveType() *HostPathVolumeSourceApplyConfiguration {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b *HostPathVolumeSourceBuilder) GetType() (value v1.HostPathType, ok bool) {
+func (b *HostPathVolumeSourceApplyConfiguration) GetType() (value v1.HostPathType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts HostPathVolumeSourceBuilder to unstructured.
-func (b *HostPathVolumeSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts HostPathVolumeSourceApplyConfiguration to unstructured.
+func (b *HostPathVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -100,9 +100,9 @@ func (b *HostPathVolumeSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to HostPathVolumeSourceBuilder, replacing the contents
-// of HostPathVolumeSourceBuilder.
-func (b *HostPathVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to HostPathVolumeSourceApplyConfiguration, replacing the contents
+// of HostPathVolumeSourceApplyConfiguration.
+func (b *HostPathVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &hostPathVolumeSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -113,15 +113,15 @@ func (b *HostPathVolumeSourceBuilder) FromUnstructured(u map[string]interface{})
 	return nil
 }
 
-// MarshalJSON marshals HostPathVolumeSourceBuilder to JSON.
-func (b *HostPathVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals HostPathVolumeSourceApplyConfiguration to JSON.
+func (b *HostPathVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into HostPathVolumeSourceBuilder, replacing the contents of
-// HostPathVolumeSourceBuilder.
-func (b *HostPathVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into HostPathVolumeSourceApplyConfiguration, replacing the contents of
+// HostPathVolumeSourceApplyConfiguration.
+func (b *HostPathVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -129,13 +129,13 @@ func (b *HostPathVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// HostPathVolumeSourceList represents a list of HostPathVolumeSourceBuilder.
-type HostPathVolumeSourceList []*HostPathVolumeSourceBuilder
+// HostPathVolumeSourceList represents a listAlias of HostPathVolumeSourceApplyConfiguration.
+type HostPathVolumeSourceList []*HostPathVolumeSourceApplyConfiguration
 
-// HostPathVolumeSourceList represents a map of HostPathVolumeSourceBuilder.
-type HostPathVolumeSourceMap map[string]HostPathVolumeSourceBuilder
+// HostPathVolumeSourceList represents a map of HostPathVolumeSourceApplyConfiguration.
+type HostPathVolumeSourceMap map[string]HostPathVolumeSourceApplyConfiguration
 
-func (b *HostPathVolumeSourceBuilder) preMarshal() {
+func (b *HostPathVolumeSourceApplyConfiguration) preMarshal() {
 }
-func (b *HostPathVolumeSourceBuilder) postUnmarshal() {
+func (b *HostPathVolumeSourceApplyConfiguration) postUnmarshal() {
 }

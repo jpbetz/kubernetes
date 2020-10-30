@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// CapabilitiesBuilder represents an declarative configuration of the Capabilities type for use
+// CapabilitiesApplyConfiguration represents an declarative configuration of the Capabilities type for use
 // with apply.
-type CapabilitiesBuilder struct {
+type CapabilitiesApplyConfiguration struct {
 	fields capabilitiesFields
 }
 
+// CapabilitiesApplyConfiguration constructs an declarative configuration of the Capabilities type for use with
+// apply.
+func Capabilities() *CapabilitiesApplyConfiguration {
+	return &CapabilitiesApplyConfiguration{}
+}
+
 // capabilitiesFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in CapabilitiesBuilder.
+// Inline fields are owned by their respective inline type in CapabilitiesApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type capabilitiesFields struct {
 	Drop *[]v1.Capability `json:"drop,omitempty"`
 }
 
-// Capabilities constructs an declarative configuration of the Capabilities type for use with
-// apply.
-func Capabilities() *CapabilitiesBuilder {
-	return &CapabilitiesBuilder{}
-}
-
 // SetAdd sets the Add field in the declarative configuration to the given value.
-func (b *CapabilitiesBuilder) SetAdd(value []v1.Capability) *CapabilitiesBuilder {
+func (b *CapabilitiesApplyConfiguration) SetAdd(value []v1.Capability) *CapabilitiesApplyConfiguration {
 	b.fields.Add = &value
 	return b
 }
 
 // RemoveAdd removes the Add field from the declarative configuration.
-func (b *CapabilitiesBuilder) RemoveAdd() *CapabilitiesBuilder {
+func (b *CapabilitiesApplyConfiguration) RemoveAdd() *CapabilitiesApplyConfiguration {
 	b.fields.Add = nil
 	return b
 }
 
 // GetAdd gets the Add field from the declarative configuration.
-func (b *CapabilitiesBuilder) GetAdd() (value []v1.Capability, ok bool) {
+func (b *CapabilitiesApplyConfiguration) GetAdd() (value []v1.Capability, ok bool) {
 	if v := b.fields.Add; v != nil {
 		return *v, true
 	}
@@ -68,27 +68,27 @@ func (b *CapabilitiesBuilder) GetAdd() (value []v1.Capability, ok bool) {
 }
 
 // SetDrop sets the Drop field in the declarative configuration to the given value.
-func (b *CapabilitiesBuilder) SetDrop(value []v1.Capability) *CapabilitiesBuilder {
+func (b *CapabilitiesApplyConfiguration) SetDrop(value []v1.Capability) *CapabilitiesApplyConfiguration {
 	b.fields.Drop = &value
 	return b
 }
 
 // RemoveDrop removes the Drop field from the declarative configuration.
-func (b *CapabilitiesBuilder) RemoveDrop() *CapabilitiesBuilder {
+func (b *CapabilitiesApplyConfiguration) RemoveDrop() *CapabilitiesApplyConfiguration {
 	b.fields.Drop = nil
 	return b
 }
 
 // GetDrop gets the Drop field from the declarative configuration.
-func (b *CapabilitiesBuilder) GetDrop() (value []v1.Capability, ok bool) {
+func (b *CapabilitiesApplyConfiguration) GetDrop() (value []v1.Capability, ok bool) {
 	if v := b.fields.Drop; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts CapabilitiesBuilder to unstructured.
-func (b *CapabilitiesBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts CapabilitiesApplyConfiguration to unstructured.
+func (b *CapabilitiesApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -100,9 +100,9 @@ func (b *CapabilitiesBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to CapabilitiesBuilder, replacing the contents
-// of CapabilitiesBuilder.
-func (b *CapabilitiesBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to CapabilitiesApplyConfiguration, replacing the contents
+// of CapabilitiesApplyConfiguration.
+func (b *CapabilitiesApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &capabilitiesFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -113,15 +113,15 @@ func (b *CapabilitiesBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals CapabilitiesBuilder to JSON.
-func (b *CapabilitiesBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals CapabilitiesApplyConfiguration to JSON.
+func (b *CapabilitiesApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into CapabilitiesBuilder, replacing the contents of
-// CapabilitiesBuilder.
-func (b *CapabilitiesBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into CapabilitiesApplyConfiguration, replacing the contents of
+// CapabilitiesApplyConfiguration.
+func (b *CapabilitiesApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -129,13 +129,13 @@ func (b *CapabilitiesBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// CapabilitiesList represents a list of CapabilitiesBuilder.
-type CapabilitiesList []*CapabilitiesBuilder
+// CapabilitiesList represents a listAlias of CapabilitiesApplyConfiguration.
+type CapabilitiesList []*CapabilitiesApplyConfiguration
 
-// CapabilitiesList represents a map of CapabilitiesBuilder.
-type CapabilitiesMap map[string]CapabilitiesBuilder
+// CapabilitiesList represents a map of CapabilitiesApplyConfiguration.
+type CapabilitiesMap map[string]CapabilitiesApplyConfiguration
 
-func (b *CapabilitiesBuilder) preMarshal() {
+func (b *CapabilitiesApplyConfiguration) preMarshal() {
 }
-func (b *CapabilitiesBuilder) postUnmarshal() {
+func (b *CapabilitiesApplyConfiguration) postUnmarshal() {
 }

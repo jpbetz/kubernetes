@@ -124,7 +124,7 @@ func (c *FakeIngressClasses) Patch(ctx context.Context, name string, pt types.Pa
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied ingressClass.
-func (c *FakeIngressClasses) Apply(ctx context.Context, ingressClass typebuildersnetworkingv1.IngressClassBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *networkingv1.IngressClass, err error) {
+func (c *FakeIngressClasses) Apply(ctx context.Context, ingressClass *typebuildersnetworkingv1.IngressClassApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *networkingv1.IngressClass, err error) {
 	data, err := ingressClass.MarshalJSON()
 	if err != nil {
 		return nil, err

@@ -132,7 +132,7 @@ func (c *FakeSecrets) Patch(ctx context.Context, name string, pt types.PatchType
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied secret.
-func (c *FakeSecrets) Apply(ctx context.Context, secret typebuilderscorev1.SecretBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Secret, err error) {
+func (c *FakeSecrets) Apply(ctx context.Context, secret *typebuilderscorev1.SecretApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Secret, err error) {
 	data, err := secret.MarshalJSON()
 	if err != nil {
 		return nil, err

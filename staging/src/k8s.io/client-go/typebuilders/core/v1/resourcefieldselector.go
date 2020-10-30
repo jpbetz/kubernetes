@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ResourceFieldSelectorBuilder represents an declarative configuration of the ResourceFieldSelector type for use
+// ResourceFieldSelectorApplyConfiguration represents an declarative configuration of the ResourceFieldSelector type for use
 // with apply.
-type ResourceFieldSelectorBuilder struct {
+type ResourceFieldSelectorApplyConfiguration struct {
 	fields resourceFieldSelectorFields
 }
 
+// ResourceFieldSelectorApplyConfiguration constructs an declarative configuration of the ResourceFieldSelector type for use with
+// apply.
+func ResourceFieldSelector() *ResourceFieldSelectorApplyConfiguration {
+	return &ResourceFieldSelectorApplyConfiguration{}
+}
+
 // resourceFieldSelectorFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ResourceFieldSelectorBuilder.
+// Inline fields are owned by their respective inline type in ResourceFieldSelectorApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -42,26 +48,20 @@ type resourceFieldSelectorFields struct {
 	Divisor       *resource.Quantity `json:"divisor,omitempty"`
 }
 
-// ResourceFieldSelector constructs an declarative configuration of the ResourceFieldSelector type for use with
-// apply.
-func ResourceFieldSelector() *ResourceFieldSelectorBuilder {
-	return &ResourceFieldSelectorBuilder{}
-}
-
 // SetContainerName sets the ContainerName field in the declarative configuration to the given value.
-func (b *ResourceFieldSelectorBuilder) SetContainerName(value string) *ResourceFieldSelectorBuilder {
+func (b *ResourceFieldSelectorApplyConfiguration) SetContainerName(value string) *ResourceFieldSelectorApplyConfiguration {
 	b.fields.ContainerName = &value
 	return b
 }
 
 // RemoveContainerName removes the ContainerName field from the declarative configuration.
-func (b *ResourceFieldSelectorBuilder) RemoveContainerName() *ResourceFieldSelectorBuilder {
+func (b *ResourceFieldSelectorApplyConfiguration) RemoveContainerName() *ResourceFieldSelectorApplyConfiguration {
 	b.fields.ContainerName = nil
 	return b
 }
 
 // GetContainerName gets the ContainerName field from the declarative configuration.
-func (b *ResourceFieldSelectorBuilder) GetContainerName() (value string, ok bool) {
+func (b *ResourceFieldSelectorApplyConfiguration) GetContainerName() (value string, ok bool) {
 	if v := b.fields.ContainerName; v != nil {
 		return *v, true
 	}
@@ -69,19 +69,19 @@ func (b *ResourceFieldSelectorBuilder) GetContainerName() (value string, ok bool
 }
 
 // SetResource sets the Resource field in the declarative configuration to the given value.
-func (b *ResourceFieldSelectorBuilder) SetResource(value string) *ResourceFieldSelectorBuilder {
+func (b *ResourceFieldSelectorApplyConfiguration) SetResource(value string) *ResourceFieldSelectorApplyConfiguration {
 	b.fields.Resource = &value
 	return b
 }
 
 // RemoveResource removes the Resource field from the declarative configuration.
-func (b *ResourceFieldSelectorBuilder) RemoveResource() *ResourceFieldSelectorBuilder {
+func (b *ResourceFieldSelectorApplyConfiguration) RemoveResource() *ResourceFieldSelectorApplyConfiguration {
 	b.fields.Resource = nil
 	return b
 }
 
 // GetResource gets the Resource field from the declarative configuration.
-func (b *ResourceFieldSelectorBuilder) GetResource() (value string, ok bool) {
+func (b *ResourceFieldSelectorApplyConfiguration) GetResource() (value string, ok bool) {
 	if v := b.fields.Resource; v != nil {
 		return *v, true
 	}
@@ -89,27 +89,27 @@ func (b *ResourceFieldSelectorBuilder) GetResource() (value string, ok bool) {
 }
 
 // SetDivisor sets the Divisor field in the declarative configuration to the given value.
-func (b *ResourceFieldSelectorBuilder) SetDivisor(value resource.Quantity) *ResourceFieldSelectorBuilder {
+func (b *ResourceFieldSelectorApplyConfiguration) SetDivisor(value resource.Quantity) *ResourceFieldSelectorApplyConfiguration {
 	b.fields.Divisor = &value
 	return b
 }
 
 // RemoveDivisor removes the Divisor field from the declarative configuration.
-func (b *ResourceFieldSelectorBuilder) RemoveDivisor() *ResourceFieldSelectorBuilder {
+func (b *ResourceFieldSelectorApplyConfiguration) RemoveDivisor() *ResourceFieldSelectorApplyConfiguration {
 	b.fields.Divisor = nil
 	return b
 }
 
 // GetDivisor gets the Divisor field from the declarative configuration.
-func (b *ResourceFieldSelectorBuilder) GetDivisor() (value resource.Quantity, ok bool) {
+func (b *ResourceFieldSelectorApplyConfiguration) GetDivisor() (value resource.Quantity, ok bool) {
 	if v := b.fields.Divisor; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ResourceFieldSelectorBuilder to unstructured.
-func (b *ResourceFieldSelectorBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ResourceFieldSelectorApplyConfiguration to unstructured.
+func (b *ResourceFieldSelectorApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -121,9 +121,9 @@ func (b *ResourceFieldSelectorBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ResourceFieldSelectorBuilder, replacing the contents
-// of ResourceFieldSelectorBuilder.
-func (b *ResourceFieldSelectorBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ResourceFieldSelectorApplyConfiguration, replacing the contents
+// of ResourceFieldSelectorApplyConfiguration.
+func (b *ResourceFieldSelectorApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &resourceFieldSelectorFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -134,15 +134,15 @@ func (b *ResourceFieldSelectorBuilder) FromUnstructured(u map[string]interface{}
 	return nil
 }
 
-// MarshalJSON marshals ResourceFieldSelectorBuilder to JSON.
-func (b *ResourceFieldSelectorBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ResourceFieldSelectorApplyConfiguration to JSON.
+func (b *ResourceFieldSelectorApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ResourceFieldSelectorBuilder, replacing the contents of
-// ResourceFieldSelectorBuilder.
-func (b *ResourceFieldSelectorBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ResourceFieldSelectorApplyConfiguration, replacing the contents of
+// ResourceFieldSelectorApplyConfiguration.
+func (b *ResourceFieldSelectorApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -150,13 +150,13 @@ func (b *ResourceFieldSelectorBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ResourceFieldSelectorList represents a list of ResourceFieldSelectorBuilder.
-type ResourceFieldSelectorList []*ResourceFieldSelectorBuilder
+// ResourceFieldSelectorList represents a listAlias of ResourceFieldSelectorApplyConfiguration.
+type ResourceFieldSelectorList []*ResourceFieldSelectorApplyConfiguration
 
-// ResourceFieldSelectorList represents a map of ResourceFieldSelectorBuilder.
-type ResourceFieldSelectorMap map[string]ResourceFieldSelectorBuilder
+// ResourceFieldSelectorList represents a map of ResourceFieldSelectorApplyConfiguration.
+type ResourceFieldSelectorMap map[string]ResourceFieldSelectorApplyConfiguration
 
-func (b *ResourceFieldSelectorBuilder) preMarshal() {
+func (b *ResourceFieldSelectorApplyConfiguration) preMarshal() {
 }
-func (b *ResourceFieldSelectorBuilder) postUnmarshal() {
+func (b *ResourceFieldSelectorApplyConfiguration) postUnmarshal() {
 }

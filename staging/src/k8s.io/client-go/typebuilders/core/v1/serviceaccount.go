@@ -25,81 +25,81 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// ServiceAccountBuilder represents an declarative configuration of the ServiceAccount type for use
+// ServiceAccountApplyConfiguration represents an declarative configuration of the ServiceAccount type for use
 // with apply.
-type ServiceAccountBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type ServiceAccountApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   serviceAccountFields
 }
 
+// ServiceAccountApplyConfiguration constructs an declarative configuration of the ServiceAccount type for use with
+// apply.
+func ServiceAccount() *ServiceAccountApplyConfiguration {
+	return &ServiceAccountApplyConfiguration{}
+}
+
 // serviceAccountFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ServiceAccountBuilder.
+// Inline fields are owned by their respective inline type in ServiceAccountApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type serviceAccountFields struct {
-	Kind                         *string                   `json:"kind,omitempty"`       // inlined ServiceAccountBuilder.typeMeta.Kind field
-	APIVersion                   *string                   `json:"apiVersion,omitempty"` // inlined ServiceAccountBuilder.typeMeta.APIVersion field
-	ObjectMeta                   *v1.ObjectMetaBuilder     `json:"metadata,omitempty"`
-	Secrets                      *ObjectReferenceList      `json:"secrets,omitempty"`
-	ImagePullSecrets             *LocalObjectReferenceList `json:"imagePullSecrets,omitempty"`
-	AutomountServiceAccountToken *bool                     `json:"automountServiceAccountToken,omitempty"`
-}
-
-// ServiceAccount constructs an declarative configuration of the ServiceAccount type for use with
-// apply.
-func ServiceAccount() *ServiceAccountBuilder {
-	return &ServiceAccountBuilder{}
+	Kind                         *string                          `json:"kind,omitempty"`       // inlined ServiceAccountApplyConfiguration.typeMeta.Kind field
+	APIVersion                   *string                          `json:"apiVersion,omitempty"` // inlined ServiceAccountApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta                   *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Secrets                      *ObjectReferenceList             `json:"secrets,omitempty"`
+	ImagePullSecrets             *LocalObjectReferenceList        `json:"imagePullSecrets,omitempty"`
+	AutomountServiceAccountToken *bool                            `json:"automountServiceAccountToken,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *ServiceAccountBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *ServiceAccountBuilder {
+func (b *ServiceAccountApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *ServiceAccountApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *ServiceAccountBuilder) RemoveTypeMeta() *ServiceAccountBuilder {
+func (b *ServiceAccountApplyConfiguration) RemoveTypeMeta() *ServiceAccountApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *ServiceAccountBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *ServiceAccountApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *ServiceAccountBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *ServiceAccountBuilder {
+func (b *ServiceAccountApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *ServiceAccountApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *ServiceAccountBuilder) RemoveObjectMeta() *ServiceAccountBuilder {
+func (b *ServiceAccountApplyConfiguration) RemoveObjectMeta() *ServiceAccountApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *ServiceAccountBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *ServiceAccountApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSecrets sets the Secrets field in the declarative configuration to the given value.
-func (b *ServiceAccountBuilder) SetSecrets(value ObjectReferenceList) *ServiceAccountBuilder {
+func (b *ServiceAccountApplyConfiguration) SetSecrets(value ObjectReferenceList) *ServiceAccountApplyConfiguration {
 	b.fields.Secrets = &value
 	return b
 }
 
 // RemoveSecrets removes the Secrets field from the declarative configuration.
-func (b *ServiceAccountBuilder) RemoveSecrets() *ServiceAccountBuilder {
+func (b *ServiceAccountApplyConfiguration) RemoveSecrets() *ServiceAccountApplyConfiguration {
 	b.fields.Secrets = nil
 	return b
 }
 
 // GetSecrets gets the Secrets field from the declarative configuration.
-func (b *ServiceAccountBuilder) GetSecrets() (value ObjectReferenceList, ok bool) {
+func (b *ServiceAccountApplyConfiguration) GetSecrets() (value ObjectReferenceList, ok bool) {
 	if v := b.fields.Secrets; v != nil {
 		return *v, true
 	}
@@ -107,19 +107,19 @@ func (b *ServiceAccountBuilder) GetSecrets() (value ObjectReferenceList, ok bool
 }
 
 // SetImagePullSecrets sets the ImagePullSecrets field in the declarative configuration to the given value.
-func (b *ServiceAccountBuilder) SetImagePullSecrets(value LocalObjectReferenceList) *ServiceAccountBuilder {
+func (b *ServiceAccountApplyConfiguration) SetImagePullSecrets(value LocalObjectReferenceList) *ServiceAccountApplyConfiguration {
 	b.fields.ImagePullSecrets = &value
 	return b
 }
 
 // RemoveImagePullSecrets removes the ImagePullSecrets field from the declarative configuration.
-func (b *ServiceAccountBuilder) RemoveImagePullSecrets() *ServiceAccountBuilder {
+func (b *ServiceAccountApplyConfiguration) RemoveImagePullSecrets() *ServiceAccountApplyConfiguration {
 	b.fields.ImagePullSecrets = nil
 	return b
 }
 
 // GetImagePullSecrets gets the ImagePullSecrets field from the declarative configuration.
-func (b *ServiceAccountBuilder) GetImagePullSecrets() (value LocalObjectReferenceList, ok bool) {
+func (b *ServiceAccountApplyConfiguration) GetImagePullSecrets() (value LocalObjectReferenceList, ok bool) {
 	if v := b.fields.ImagePullSecrets; v != nil {
 		return *v, true
 	}
@@ -127,27 +127,27 @@ func (b *ServiceAccountBuilder) GetImagePullSecrets() (value LocalObjectReferenc
 }
 
 // SetAutomountServiceAccountToken sets the AutomountServiceAccountToken field in the declarative configuration to the given value.
-func (b *ServiceAccountBuilder) SetAutomountServiceAccountToken(value bool) *ServiceAccountBuilder {
+func (b *ServiceAccountApplyConfiguration) SetAutomountServiceAccountToken(value bool) *ServiceAccountApplyConfiguration {
 	b.fields.AutomountServiceAccountToken = &value
 	return b
 }
 
 // RemoveAutomountServiceAccountToken removes the AutomountServiceAccountToken field from the declarative configuration.
-func (b *ServiceAccountBuilder) RemoveAutomountServiceAccountToken() *ServiceAccountBuilder {
+func (b *ServiceAccountApplyConfiguration) RemoveAutomountServiceAccountToken() *ServiceAccountApplyConfiguration {
 	b.fields.AutomountServiceAccountToken = nil
 	return b
 }
 
 // GetAutomountServiceAccountToken gets the AutomountServiceAccountToken field from the declarative configuration.
-func (b *ServiceAccountBuilder) GetAutomountServiceAccountToken() (value bool, ok bool) {
+func (b *ServiceAccountApplyConfiguration) GetAutomountServiceAccountToken() (value bool, ok bool) {
 	if v := b.fields.AutomountServiceAccountToken; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ServiceAccountBuilder to unstructured.
-func (b *ServiceAccountBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ServiceAccountApplyConfiguration to unstructured.
+func (b *ServiceAccountApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -159,9 +159,9 @@ func (b *ServiceAccountBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ServiceAccountBuilder, replacing the contents
-// of ServiceAccountBuilder.
-func (b *ServiceAccountBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ServiceAccountApplyConfiguration, replacing the contents
+// of ServiceAccountApplyConfiguration.
+func (b *ServiceAccountApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &serviceAccountFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -172,15 +172,15 @@ func (b *ServiceAccountBuilder) FromUnstructured(u map[string]interface{}) error
 	return nil
 }
 
-// MarshalJSON marshals ServiceAccountBuilder to JSON.
-func (b *ServiceAccountBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ServiceAccountApplyConfiguration to JSON.
+func (b *ServiceAccountApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ServiceAccountBuilder, replacing the contents of
-// ServiceAccountBuilder.
-func (b *ServiceAccountBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ServiceAccountApplyConfiguration, replacing the contents of
+// ServiceAccountApplyConfiguration.
+func (b *ServiceAccountApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -188,13 +188,13 @@ func (b *ServiceAccountBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ServiceAccountList represents a list of ServiceAccountBuilder.
-type ServiceAccountList []*ServiceAccountBuilder
+// ServiceAccountList represents a listAlias of ServiceAccountApplyConfiguration.
+type ServiceAccountList []*ServiceAccountApplyConfiguration
 
-// ServiceAccountList represents a map of ServiceAccountBuilder.
-type ServiceAccountMap map[string]ServiceAccountBuilder
+// ServiceAccountList represents a map of ServiceAccountApplyConfiguration.
+type ServiceAccountMap map[string]ServiceAccountApplyConfiguration
 
-func (b *ServiceAccountBuilder) preMarshal() {
+func (b *ServiceAccountApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -204,9 +204,9 @@ func (b *ServiceAccountBuilder) preMarshal() {
 		}
 	}
 }
-func (b *ServiceAccountBuilder) postUnmarshal() {
+func (b *ServiceAccountApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

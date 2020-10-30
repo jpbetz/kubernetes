@@ -24,49 +24,49 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// CSIPersistentVolumeSourceBuilder represents an declarative configuration of the CSIPersistentVolumeSource type for use
+// CSIPersistentVolumeSourceApplyConfiguration represents an declarative configuration of the CSIPersistentVolumeSource type for use
 // with apply.
-type CSIPersistentVolumeSourceBuilder struct {
+type CSIPersistentVolumeSourceApplyConfiguration struct {
 	fields cSIPersistentVolumeSourceFields
 }
 
+// CSIPersistentVolumeSourceApplyConfiguration constructs an declarative configuration of the CSIPersistentVolumeSource type for use with
+// apply.
+func CSIPersistentVolumeSource() *CSIPersistentVolumeSourceApplyConfiguration {
+	return &CSIPersistentVolumeSourceApplyConfiguration{}
+}
+
 // cSIPersistentVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in CSIPersistentVolumeSourceBuilder.
+// Inline fields are owned by their respective inline type in CSIPersistentVolumeSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type cSIPersistentVolumeSourceFields struct {
-	Driver                     *string                 `json:"driver,omitempty"`
-	VolumeHandle               *string                 `json:"volumeHandle,omitempty"`
-	ReadOnly                   *bool                   `json:"readOnly,omitempty"`
-	FSType                     *string                 `json:"fsType,omitempty"`
-	VolumeAttributes           *map[string]string      `json:"volumeAttributes,omitempty"`
-	ControllerPublishSecretRef *SecretReferenceBuilder `json:"controllerPublishSecretRef,omitempty"`
-	NodeStageSecretRef         *SecretReferenceBuilder `json:"nodeStageSecretRef,omitempty"`
-	NodePublishSecretRef       *SecretReferenceBuilder `json:"nodePublishSecretRef,omitempty"`
-	ControllerExpandSecretRef  *SecretReferenceBuilder `json:"controllerExpandSecretRef,omitempty"`
-}
-
-// CSIPersistentVolumeSource constructs an declarative configuration of the CSIPersistentVolumeSource type for use with
-// apply.
-func CSIPersistentVolumeSource() *CSIPersistentVolumeSourceBuilder {
-	return &CSIPersistentVolumeSourceBuilder{}
+	Driver                     *string                            `json:"driver,omitempty"`
+	VolumeHandle               *string                            `json:"volumeHandle,omitempty"`
+	ReadOnly                   *bool                              `json:"readOnly,omitempty"`
+	FSType                     *string                            `json:"fsType,omitempty"`
+	VolumeAttributes           *map[string]string                 `json:"volumeAttributes,omitempty"`
+	ControllerPublishSecretRef *SecretReferenceApplyConfiguration `json:"controllerPublishSecretRef,omitempty"`
+	NodeStageSecretRef         *SecretReferenceApplyConfiguration `json:"nodeStageSecretRef,omitempty"`
+	NodePublishSecretRef       *SecretReferenceApplyConfiguration `json:"nodePublishSecretRef,omitempty"`
+	ControllerExpandSecretRef  *SecretReferenceApplyConfiguration `json:"controllerExpandSecretRef,omitempty"`
 }
 
 // SetDriver sets the Driver field in the declarative configuration to the given value.
-func (b *CSIPersistentVolumeSourceBuilder) SetDriver(value string) *CSIPersistentVolumeSourceBuilder {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) SetDriver(value string) *CSIPersistentVolumeSourceApplyConfiguration {
 	b.fields.Driver = &value
 	return b
 }
 
 // RemoveDriver removes the Driver field from the declarative configuration.
-func (b *CSIPersistentVolumeSourceBuilder) RemoveDriver() *CSIPersistentVolumeSourceBuilder {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) RemoveDriver() *CSIPersistentVolumeSourceApplyConfiguration {
 	b.fields.Driver = nil
 	return b
 }
 
 // GetDriver gets the Driver field from the declarative configuration.
-func (b *CSIPersistentVolumeSourceBuilder) GetDriver() (value string, ok bool) {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) GetDriver() (value string, ok bool) {
 	if v := b.fields.Driver; v != nil {
 		return *v, true
 	}
@@ -74,19 +74,19 @@ func (b *CSIPersistentVolumeSourceBuilder) GetDriver() (value string, ok bool) {
 }
 
 // SetVolumeHandle sets the VolumeHandle field in the declarative configuration to the given value.
-func (b *CSIPersistentVolumeSourceBuilder) SetVolumeHandle(value string) *CSIPersistentVolumeSourceBuilder {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) SetVolumeHandle(value string) *CSIPersistentVolumeSourceApplyConfiguration {
 	b.fields.VolumeHandle = &value
 	return b
 }
 
 // RemoveVolumeHandle removes the VolumeHandle field from the declarative configuration.
-func (b *CSIPersistentVolumeSourceBuilder) RemoveVolumeHandle() *CSIPersistentVolumeSourceBuilder {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) RemoveVolumeHandle() *CSIPersistentVolumeSourceApplyConfiguration {
 	b.fields.VolumeHandle = nil
 	return b
 }
 
 // GetVolumeHandle gets the VolumeHandle field from the declarative configuration.
-func (b *CSIPersistentVolumeSourceBuilder) GetVolumeHandle() (value string, ok bool) {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) GetVolumeHandle() (value string, ok bool) {
 	if v := b.fields.VolumeHandle; v != nil {
 		return *v, true
 	}
@@ -94,19 +94,19 @@ func (b *CSIPersistentVolumeSourceBuilder) GetVolumeHandle() (value string, ok b
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b *CSIPersistentVolumeSourceBuilder) SetReadOnly(value bool) *CSIPersistentVolumeSourceBuilder {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) SetReadOnly(value bool) *CSIPersistentVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b *CSIPersistentVolumeSourceBuilder) RemoveReadOnly() *CSIPersistentVolumeSourceBuilder {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) RemoveReadOnly() *CSIPersistentVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b *CSIPersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
@@ -114,19 +114,19 @@ func (b *CSIPersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
 }
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
-func (b *CSIPersistentVolumeSourceBuilder) SetFSType(value string) *CSIPersistentVolumeSourceBuilder {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) SetFSType(value string) *CSIPersistentVolumeSourceApplyConfiguration {
 	b.fields.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
-func (b *CSIPersistentVolumeSourceBuilder) RemoveFSType() *CSIPersistentVolumeSourceBuilder {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) RemoveFSType() *CSIPersistentVolumeSourceApplyConfiguration {
 	b.fields.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
-func (b *CSIPersistentVolumeSourceBuilder) GetFSType() (value string, ok bool) {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) GetFSType() (value string, ok bool) {
 	if v := b.fields.FSType; v != nil {
 		return *v, true
 	}
@@ -134,19 +134,19 @@ func (b *CSIPersistentVolumeSourceBuilder) GetFSType() (value string, ok bool) {
 }
 
 // SetVolumeAttributes sets the VolumeAttributes field in the declarative configuration to the given value.
-func (b *CSIPersistentVolumeSourceBuilder) SetVolumeAttributes(value map[string]string) *CSIPersistentVolumeSourceBuilder {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) SetVolumeAttributes(value map[string]string) *CSIPersistentVolumeSourceApplyConfiguration {
 	b.fields.VolumeAttributes = &value
 	return b
 }
 
 // RemoveVolumeAttributes removes the VolumeAttributes field from the declarative configuration.
-func (b *CSIPersistentVolumeSourceBuilder) RemoveVolumeAttributes() *CSIPersistentVolumeSourceBuilder {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) RemoveVolumeAttributes() *CSIPersistentVolumeSourceApplyConfiguration {
 	b.fields.VolumeAttributes = nil
 	return b
 }
 
 // GetVolumeAttributes gets the VolumeAttributes field from the declarative configuration.
-func (b *CSIPersistentVolumeSourceBuilder) GetVolumeAttributes() (value map[string]string, ok bool) {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) GetVolumeAttributes() (value map[string]string, ok bool) {
 	if v := b.fields.VolumeAttributes; v != nil {
 		return *v, true
 	}
@@ -154,75 +154,75 @@ func (b *CSIPersistentVolumeSourceBuilder) GetVolumeAttributes() (value map[stri
 }
 
 // SetControllerPublishSecretRef sets the ControllerPublishSecretRef field in the declarative configuration to the given value.
-func (b *CSIPersistentVolumeSourceBuilder) SetControllerPublishSecretRef(value *SecretReferenceBuilder) *CSIPersistentVolumeSourceBuilder {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) SetControllerPublishSecretRef(value *SecretReferenceApplyConfiguration) *CSIPersistentVolumeSourceApplyConfiguration {
 	b.fields.ControllerPublishSecretRef = value
 	return b
 }
 
 // RemoveControllerPublishSecretRef removes the ControllerPublishSecretRef field from the declarative configuration.
-func (b *CSIPersistentVolumeSourceBuilder) RemoveControllerPublishSecretRef() *CSIPersistentVolumeSourceBuilder {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) RemoveControllerPublishSecretRef() *CSIPersistentVolumeSourceApplyConfiguration {
 	b.fields.ControllerPublishSecretRef = nil
 	return b
 }
 
 // GetControllerPublishSecretRef gets the ControllerPublishSecretRef field from the declarative configuration.
-func (b *CSIPersistentVolumeSourceBuilder) GetControllerPublishSecretRef() (value *SecretReferenceBuilder, ok bool) {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) GetControllerPublishSecretRef() (value *SecretReferenceApplyConfiguration, ok bool) {
 	return b.fields.ControllerPublishSecretRef, b.fields.ControllerPublishSecretRef != nil
 }
 
 // SetNodeStageSecretRef sets the NodeStageSecretRef field in the declarative configuration to the given value.
-func (b *CSIPersistentVolumeSourceBuilder) SetNodeStageSecretRef(value *SecretReferenceBuilder) *CSIPersistentVolumeSourceBuilder {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) SetNodeStageSecretRef(value *SecretReferenceApplyConfiguration) *CSIPersistentVolumeSourceApplyConfiguration {
 	b.fields.NodeStageSecretRef = value
 	return b
 }
 
 // RemoveNodeStageSecretRef removes the NodeStageSecretRef field from the declarative configuration.
-func (b *CSIPersistentVolumeSourceBuilder) RemoveNodeStageSecretRef() *CSIPersistentVolumeSourceBuilder {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) RemoveNodeStageSecretRef() *CSIPersistentVolumeSourceApplyConfiguration {
 	b.fields.NodeStageSecretRef = nil
 	return b
 }
 
 // GetNodeStageSecretRef gets the NodeStageSecretRef field from the declarative configuration.
-func (b *CSIPersistentVolumeSourceBuilder) GetNodeStageSecretRef() (value *SecretReferenceBuilder, ok bool) {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) GetNodeStageSecretRef() (value *SecretReferenceApplyConfiguration, ok bool) {
 	return b.fields.NodeStageSecretRef, b.fields.NodeStageSecretRef != nil
 }
 
 // SetNodePublishSecretRef sets the NodePublishSecretRef field in the declarative configuration to the given value.
-func (b *CSIPersistentVolumeSourceBuilder) SetNodePublishSecretRef(value *SecretReferenceBuilder) *CSIPersistentVolumeSourceBuilder {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) SetNodePublishSecretRef(value *SecretReferenceApplyConfiguration) *CSIPersistentVolumeSourceApplyConfiguration {
 	b.fields.NodePublishSecretRef = value
 	return b
 }
 
 // RemoveNodePublishSecretRef removes the NodePublishSecretRef field from the declarative configuration.
-func (b *CSIPersistentVolumeSourceBuilder) RemoveNodePublishSecretRef() *CSIPersistentVolumeSourceBuilder {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) RemoveNodePublishSecretRef() *CSIPersistentVolumeSourceApplyConfiguration {
 	b.fields.NodePublishSecretRef = nil
 	return b
 }
 
 // GetNodePublishSecretRef gets the NodePublishSecretRef field from the declarative configuration.
-func (b *CSIPersistentVolumeSourceBuilder) GetNodePublishSecretRef() (value *SecretReferenceBuilder, ok bool) {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) GetNodePublishSecretRef() (value *SecretReferenceApplyConfiguration, ok bool) {
 	return b.fields.NodePublishSecretRef, b.fields.NodePublishSecretRef != nil
 }
 
 // SetControllerExpandSecretRef sets the ControllerExpandSecretRef field in the declarative configuration to the given value.
-func (b *CSIPersistentVolumeSourceBuilder) SetControllerExpandSecretRef(value *SecretReferenceBuilder) *CSIPersistentVolumeSourceBuilder {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) SetControllerExpandSecretRef(value *SecretReferenceApplyConfiguration) *CSIPersistentVolumeSourceApplyConfiguration {
 	b.fields.ControllerExpandSecretRef = value
 	return b
 }
 
 // RemoveControllerExpandSecretRef removes the ControllerExpandSecretRef field from the declarative configuration.
-func (b *CSIPersistentVolumeSourceBuilder) RemoveControllerExpandSecretRef() *CSIPersistentVolumeSourceBuilder {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) RemoveControllerExpandSecretRef() *CSIPersistentVolumeSourceApplyConfiguration {
 	b.fields.ControllerExpandSecretRef = nil
 	return b
 }
 
 // GetControllerExpandSecretRef gets the ControllerExpandSecretRef field from the declarative configuration.
-func (b *CSIPersistentVolumeSourceBuilder) GetControllerExpandSecretRef() (value *SecretReferenceBuilder, ok bool) {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) GetControllerExpandSecretRef() (value *SecretReferenceApplyConfiguration, ok bool) {
 	return b.fields.ControllerExpandSecretRef, b.fields.ControllerExpandSecretRef != nil
 }
 
-// ToUnstructured converts CSIPersistentVolumeSourceBuilder to unstructured.
-func (b *CSIPersistentVolumeSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts CSIPersistentVolumeSourceApplyConfiguration to unstructured.
+func (b *CSIPersistentVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -234,9 +234,9 @@ func (b *CSIPersistentVolumeSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to CSIPersistentVolumeSourceBuilder, replacing the contents
-// of CSIPersistentVolumeSourceBuilder.
-func (b *CSIPersistentVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to CSIPersistentVolumeSourceApplyConfiguration, replacing the contents
+// of CSIPersistentVolumeSourceApplyConfiguration.
+func (b *CSIPersistentVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &cSIPersistentVolumeSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -247,15 +247,15 @@ func (b *CSIPersistentVolumeSourceBuilder) FromUnstructured(u map[string]interfa
 	return nil
 }
 
-// MarshalJSON marshals CSIPersistentVolumeSourceBuilder to JSON.
-func (b *CSIPersistentVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals CSIPersistentVolumeSourceApplyConfiguration to JSON.
+func (b *CSIPersistentVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into CSIPersistentVolumeSourceBuilder, replacing the contents of
-// CSIPersistentVolumeSourceBuilder.
-func (b *CSIPersistentVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into CSIPersistentVolumeSourceApplyConfiguration, replacing the contents of
+// CSIPersistentVolumeSourceApplyConfiguration.
+func (b *CSIPersistentVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -263,13 +263,13 @@ func (b *CSIPersistentVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// CSIPersistentVolumeSourceList represents a list of CSIPersistentVolumeSourceBuilder.
-type CSIPersistentVolumeSourceList []*CSIPersistentVolumeSourceBuilder
+// CSIPersistentVolumeSourceList represents a listAlias of CSIPersistentVolumeSourceApplyConfiguration.
+type CSIPersistentVolumeSourceList []*CSIPersistentVolumeSourceApplyConfiguration
 
-// CSIPersistentVolumeSourceList represents a map of CSIPersistentVolumeSourceBuilder.
-type CSIPersistentVolumeSourceMap map[string]CSIPersistentVolumeSourceBuilder
+// CSIPersistentVolumeSourceList represents a map of CSIPersistentVolumeSourceApplyConfiguration.
+type CSIPersistentVolumeSourceMap map[string]CSIPersistentVolumeSourceApplyConfiguration
 
-func (b *CSIPersistentVolumeSourceBuilder) preMarshal() {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) preMarshal() {
 }
-func (b *CSIPersistentVolumeSourceBuilder) postUnmarshal() {
+func (b *CSIPersistentVolumeSourceApplyConfiguration) postUnmarshal() {
 }

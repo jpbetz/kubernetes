@@ -132,7 +132,7 @@ func (c *FakePodTemplates) Patch(ctx context.Context, name string, pt types.Patc
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied podTemplate.
-func (c *FakePodTemplates) Apply(ctx context.Context, podTemplate typebuilderscorev1.PodTemplateBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.PodTemplate, err error) {
+func (c *FakePodTemplates) Apply(ctx context.Context, podTemplate *typebuilderscorev1.PodTemplateApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.PodTemplate, err error) {
 	data, err := podTemplate.MarshalJSON()
 	if err != nil {
 		return nil, err

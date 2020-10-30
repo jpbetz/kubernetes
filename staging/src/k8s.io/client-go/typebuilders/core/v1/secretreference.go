@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// SecretReferenceBuilder represents an declarative configuration of the SecretReference type for use
+// SecretReferenceApplyConfiguration represents an declarative configuration of the SecretReference type for use
 // with apply.
-type SecretReferenceBuilder struct {
+type SecretReferenceApplyConfiguration struct {
 	fields secretReferenceFields
 }
 
+// SecretReferenceApplyConfiguration constructs an declarative configuration of the SecretReference type for use with
+// apply.
+func SecretReference() *SecretReferenceApplyConfiguration {
+	return &SecretReferenceApplyConfiguration{}
+}
+
 // secretReferenceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SecretReferenceBuilder.
+// Inline fields are owned by their respective inline type in SecretReferenceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type secretReferenceFields struct {
 	Namespace *string `json:"namespace,omitempty"`
 }
 
-// SecretReference constructs an declarative configuration of the SecretReference type for use with
-// apply.
-func SecretReference() *SecretReferenceBuilder {
-	return &SecretReferenceBuilder{}
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *SecretReferenceBuilder) SetName(value string) *SecretReferenceBuilder {
+func (b *SecretReferenceApplyConfiguration) SetName(value string) *SecretReferenceApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *SecretReferenceBuilder) RemoveName() *SecretReferenceBuilder {
+func (b *SecretReferenceApplyConfiguration) RemoveName() *SecretReferenceApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *SecretReferenceBuilder) GetName() (value string, ok bool) {
+func (b *SecretReferenceApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *SecretReferenceBuilder) GetName() (value string, ok bool) {
 }
 
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
-func (b *SecretReferenceBuilder) SetNamespace(value string) *SecretReferenceBuilder {
+func (b *SecretReferenceApplyConfiguration) SetNamespace(value string) *SecretReferenceApplyConfiguration {
 	b.fields.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
-func (b *SecretReferenceBuilder) RemoveNamespace() *SecretReferenceBuilder {
+func (b *SecretReferenceApplyConfiguration) RemoveNamespace() *SecretReferenceApplyConfiguration {
 	b.fields.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
-func (b *SecretReferenceBuilder) GetNamespace() (value string, ok bool) {
+func (b *SecretReferenceApplyConfiguration) GetNamespace() (value string, ok bool) {
 	if v := b.fields.Namespace; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts SecretReferenceBuilder to unstructured.
-func (b *SecretReferenceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts SecretReferenceApplyConfiguration to unstructured.
+func (b *SecretReferenceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *SecretReferenceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to SecretReferenceBuilder, replacing the contents
-// of SecretReferenceBuilder.
-func (b *SecretReferenceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to SecretReferenceApplyConfiguration, replacing the contents
+// of SecretReferenceApplyConfiguration.
+func (b *SecretReferenceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &secretReferenceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *SecretReferenceBuilder) FromUnstructured(u map[string]interface{}) erro
 	return nil
 }
 
-// MarshalJSON marshals SecretReferenceBuilder to JSON.
-func (b *SecretReferenceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals SecretReferenceApplyConfiguration to JSON.
+func (b *SecretReferenceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into SecretReferenceBuilder, replacing the contents of
-// SecretReferenceBuilder.
-func (b *SecretReferenceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into SecretReferenceApplyConfiguration, replacing the contents of
+// SecretReferenceApplyConfiguration.
+func (b *SecretReferenceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *SecretReferenceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// SecretReferenceList represents a list of SecretReferenceBuilder.
-type SecretReferenceList []*SecretReferenceBuilder
+// SecretReferenceList represents a listAlias of SecretReferenceApplyConfiguration.
+type SecretReferenceList []*SecretReferenceApplyConfiguration
 
-// SecretReferenceList represents a map of SecretReferenceBuilder.
-type SecretReferenceMap map[string]SecretReferenceBuilder
+// SecretReferenceList represents a map of SecretReferenceApplyConfiguration.
+type SecretReferenceMap map[string]SecretReferenceApplyConfiguration
 
-func (b *SecretReferenceBuilder) preMarshal() {
+func (b *SecretReferenceApplyConfiguration) preMarshal() {
 }
-func (b *SecretReferenceBuilder) postUnmarshal() {
+func (b *SecretReferenceApplyConfiguration) postUnmarshal() {
 }

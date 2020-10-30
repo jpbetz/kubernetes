@@ -48,7 +48,7 @@ type ComponentStatusInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.ComponentStatusList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.ComponentStatus, err error)
-	Apply(ctx context.Context, componentStatus corev1.ComponentStatusBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ComponentStatus, err error)
+	Apply(ctx context.Context, componentStatus *corev1.ComponentStatusApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ComponentStatus, err error)
 	ComponentStatusExpansion
 }
 
@@ -171,7 +171,7 @@ func (c *componentStatuses) Patch(ctx context.Context, name string, pt types.Pat
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied componentStatus.
-func (c *componentStatuses) Apply(ctx context.Context, componentStatus corev1.ComponentStatusBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ComponentStatus, err error) {
+func (c *componentStatuses) Apply(ctx context.Context, componentStatus *corev1.ComponentStatusApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ComponentStatus, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := componentStatus.MarshalJSON()
 	if err != nil {

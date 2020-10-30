@@ -132,7 +132,7 @@ func (c *FakeCSIStorageCapacities) Patch(ctx context.Context, name string, pt ty
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied cSIStorageCapacity.
-func (c *FakeCSIStorageCapacities) Apply(ctx context.Context, cSIStorageCapacity storagev1alpha1.CSIStorageCapacityBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.CSIStorageCapacity, err error) {
+func (c *FakeCSIStorageCapacities) Apply(ctx context.Context, cSIStorageCapacity *storagev1alpha1.CSIStorageCapacityApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.CSIStorageCapacity, err error) {
 	data, err := cSIStorageCapacity.MarshalJSON()
 	if err != nil {
 		return nil, err

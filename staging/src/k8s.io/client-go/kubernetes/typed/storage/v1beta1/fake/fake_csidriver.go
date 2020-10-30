@@ -124,7 +124,7 @@ func (c *FakeCSIDrivers) Patch(ctx context.Context, name string, pt types.PatchT
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied cSIDriver.
-func (c *FakeCSIDrivers) Apply(ctx context.Context, cSIDriver storagev1beta1.CSIDriverBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.CSIDriver, err error) {
+func (c *FakeCSIDrivers) Apply(ctx context.Context, cSIDriver *storagev1beta1.CSIDriverApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.CSIDriver, err error) {
 	data, err := cSIDriver.MarshalJSON()
 	if err != nil {
 		return nil, err

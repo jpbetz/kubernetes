@@ -24,82 +24,82 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// AffinityBuilder represents an declarative configuration of the Affinity type for use
+// AffinityApplyConfiguration represents an declarative configuration of the Affinity type for use
 // with apply.
-type AffinityBuilder struct {
+type AffinityApplyConfiguration struct {
 	fields affinityFields
 }
 
+// AffinityApplyConfiguration constructs an declarative configuration of the Affinity type for use with
+// apply.
+func Affinity() *AffinityApplyConfiguration {
+	return &AffinityApplyConfiguration{}
+}
+
 // affinityFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in AffinityBuilder.
+// Inline fields are owned by their respective inline type in AffinityApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type affinityFields struct {
-	NodeAffinity    *NodeAffinityBuilder    `json:"nodeAffinity,omitempty"`
-	PodAffinity     *PodAffinityBuilder     `json:"podAffinity,omitempty"`
-	PodAntiAffinity *PodAntiAffinityBuilder `json:"podAntiAffinity,omitempty"`
-}
-
-// Affinity constructs an declarative configuration of the Affinity type for use with
-// apply.
-func Affinity() *AffinityBuilder {
-	return &AffinityBuilder{}
+	NodeAffinity    *NodeAffinityApplyConfiguration    `json:"nodeAffinity,omitempty"`
+	PodAffinity     *PodAffinityApplyConfiguration     `json:"podAffinity,omitempty"`
+	PodAntiAffinity *PodAntiAffinityApplyConfiguration `json:"podAntiAffinity,omitempty"`
 }
 
 // SetNodeAffinity sets the NodeAffinity field in the declarative configuration to the given value.
-func (b *AffinityBuilder) SetNodeAffinity(value *NodeAffinityBuilder) *AffinityBuilder {
+func (b *AffinityApplyConfiguration) SetNodeAffinity(value *NodeAffinityApplyConfiguration) *AffinityApplyConfiguration {
 	b.fields.NodeAffinity = value
 	return b
 }
 
 // RemoveNodeAffinity removes the NodeAffinity field from the declarative configuration.
-func (b *AffinityBuilder) RemoveNodeAffinity() *AffinityBuilder {
+func (b *AffinityApplyConfiguration) RemoveNodeAffinity() *AffinityApplyConfiguration {
 	b.fields.NodeAffinity = nil
 	return b
 }
 
 // GetNodeAffinity gets the NodeAffinity field from the declarative configuration.
-func (b *AffinityBuilder) GetNodeAffinity() (value *NodeAffinityBuilder, ok bool) {
+func (b *AffinityApplyConfiguration) GetNodeAffinity() (value *NodeAffinityApplyConfiguration, ok bool) {
 	return b.fields.NodeAffinity, b.fields.NodeAffinity != nil
 }
 
 // SetPodAffinity sets the PodAffinity field in the declarative configuration to the given value.
-func (b *AffinityBuilder) SetPodAffinity(value *PodAffinityBuilder) *AffinityBuilder {
+func (b *AffinityApplyConfiguration) SetPodAffinity(value *PodAffinityApplyConfiguration) *AffinityApplyConfiguration {
 	b.fields.PodAffinity = value
 	return b
 }
 
 // RemovePodAffinity removes the PodAffinity field from the declarative configuration.
-func (b *AffinityBuilder) RemovePodAffinity() *AffinityBuilder {
+func (b *AffinityApplyConfiguration) RemovePodAffinity() *AffinityApplyConfiguration {
 	b.fields.PodAffinity = nil
 	return b
 }
 
 // GetPodAffinity gets the PodAffinity field from the declarative configuration.
-func (b *AffinityBuilder) GetPodAffinity() (value *PodAffinityBuilder, ok bool) {
+func (b *AffinityApplyConfiguration) GetPodAffinity() (value *PodAffinityApplyConfiguration, ok bool) {
 	return b.fields.PodAffinity, b.fields.PodAffinity != nil
 }
 
 // SetPodAntiAffinity sets the PodAntiAffinity field in the declarative configuration to the given value.
-func (b *AffinityBuilder) SetPodAntiAffinity(value *PodAntiAffinityBuilder) *AffinityBuilder {
+func (b *AffinityApplyConfiguration) SetPodAntiAffinity(value *PodAntiAffinityApplyConfiguration) *AffinityApplyConfiguration {
 	b.fields.PodAntiAffinity = value
 	return b
 }
 
 // RemovePodAntiAffinity removes the PodAntiAffinity field from the declarative configuration.
-func (b *AffinityBuilder) RemovePodAntiAffinity() *AffinityBuilder {
+func (b *AffinityApplyConfiguration) RemovePodAntiAffinity() *AffinityApplyConfiguration {
 	b.fields.PodAntiAffinity = nil
 	return b
 }
 
 // GetPodAntiAffinity gets the PodAntiAffinity field from the declarative configuration.
-func (b *AffinityBuilder) GetPodAntiAffinity() (value *PodAntiAffinityBuilder, ok bool) {
+func (b *AffinityApplyConfiguration) GetPodAntiAffinity() (value *PodAntiAffinityApplyConfiguration, ok bool) {
 	return b.fields.PodAntiAffinity, b.fields.PodAntiAffinity != nil
 }
 
-// ToUnstructured converts AffinityBuilder to unstructured.
-func (b *AffinityBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts AffinityApplyConfiguration to unstructured.
+func (b *AffinityApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -111,9 +111,9 @@ func (b *AffinityBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to AffinityBuilder, replacing the contents
-// of AffinityBuilder.
-func (b *AffinityBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to AffinityApplyConfiguration, replacing the contents
+// of AffinityApplyConfiguration.
+func (b *AffinityApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &affinityFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -124,15 +124,15 @@ func (b *AffinityBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals AffinityBuilder to JSON.
-func (b *AffinityBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals AffinityApplyConfiguration to JSON.
+func (b *AffinityApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into AffinityBuilder, replacing the contents of
-// AffinityBuilder.
-func (b *AffinityBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into AffinityApplyConfiguration, replacing the contents of
+// AffinityApplyConfiguration.
+func (b *AffinityApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -140,13 +140,13 @@ func (b *AffinityBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// AffinityList represents a list of AffinityBuilder.
-type AffinityList []*AffinityBuilder
+// AffinityList represents a listAlias of AffinityApplyConfiguration.
+type AffinityList []*AffinityApplyConfiguration
 
-// AffinityList represents a map of AffinityBuilder.
-type AffinityMap map[string]AffinityBuilder
+// AffinityList represents a map of AffinityApplyConfiguration.
+type AffinityMap map[string]AffinityApplyConfiguration
 
-func (b *AffinityBuilder) preMarshal() {
+func (b *AffinityApplyConfiguration) preMarshal() {
 }
-func (b *AffinityBuilder) postUnmarshal() {
+func (b *AffinityApplyConfiguration) postUnmarshal() {
 }

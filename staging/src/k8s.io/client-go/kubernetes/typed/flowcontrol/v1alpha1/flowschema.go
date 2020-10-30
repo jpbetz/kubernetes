@@ -49,7 +49,7 @@ type FlowSchemaInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.FlowSchemaList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.FlowSchema, err error)
-	Apply(ctx context.Context, flowSchema flowcontrolv1alpha1.FlowSchemaBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.FlowSchema, err error)
+	Apply(ctx context.Context, flowSchema *flowcontrolv1alpha1.FlowSchemaApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.FlowSchema, err error)
 	FlowSchemaExpansion
 }
 
@@ -187,7 +187,7 @@ func (c *flowSchemas) Patch(ctx context.Context, name string, pt types.PatchType
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied flowSchema.
-func (c *flowSchemas) Apply(ctx context.Context, flowSchema flowcontrolv1alpha1.FlowSchemaBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.FlowSchema, err error) {
+func (c *flowSchemas) Apply(ctx context.Context, flowSchema *flowcontrolv1alpha1.FlowSchemaApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.FlowSchema, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := flowSchema.MarshalJSON()
 	if err != nil {

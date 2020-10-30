@@ -25,42 +25,42 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// DaemonSetUpdateStrategyBuilder represents an declarative configuration of the DaemonSetUpdateStrategy type for use
+// DaemonSetUpdateStrategyApplyConfiguration represents an declarative configuration of the DaemonSetUpdateStrategy type for use
 // with apply.
-type DaemonSetUpdateStrategyBuilder struct {
+type DaemonSetUpdateStrategyApplyConfiguration struct {
 	fields daemonSetUpdateStrategyFields
 }
 
+// DaemonSetUpdateStrategyApplyConfiguration constructs an declarative configuration of the DaemonSetUpdateStrategy type for use with
+// apply.
+func DaemonSetUpdateStrategy() *DaemonSetUpdateStrategyApplyConfiguration {
+	return &DaemonSetUpdateStrategyApplyConfiguration{}
+}
+
 // daemonSetUpdateStrategyFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in DaemonSetUpdateStrategyBuilder.
+// Inline fields are owned by their respective inline type in DaemonSetUpdateStrategyApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type daemonSetUpdateStrategyFields struct {
-	Type          *v1beta1.DaemonSetUpdateStrategyType `json:"type,omitempty"`
-	RollingUpdate *RollingUpdateDaemonSetBuilder       `json:"rollingUpdate,omitempty"`
-}
-
-// DaemonSetUpdateStrategy constructs an declarative configuration of the DaemonSetUpdateStrategy type for use with
-// apply.
-func DaemonSetUpdateStrategy() *DaemonSetUpdateStrategyBuilder {
-	return &DaemonSetUpdateStrategyBuilder{}
+	Type          *v1beta1.DaemonSetUpdateStrategyType      `json:"type,omitempty"`
+	RollingUpdate *RollingUpdateDaemonSetApplyConfiguration `json:"rollingUpdate,omitempty"`
 }
 
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b *DaemonSetUpdateStrategyBuilder) SetType(value v1beta1.DaemonSetUpdateStrategyType) *DaemonSetUpdateStrategyBuilder {
+func (b *DaemonSetUpdateStrategyApplyConfiguration) SetType(value v1beta1.DaemonSetUpdateStrategyType) *DaemonSetUpdateStrategyApplyConfiguration {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b *DaemonSetUpdateStrategyBuilder) RemoveType() *DaemonSetUpdateStrategyBuilder {
+func (b *DaemonSetUpdateStrategyApplyConfiguration) RemoveType() *DaemonSetUpdateStrategyApplyConfiguration {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b *DaemonSetUpdateStrategyBuilder) GetType() (value v1beta1.DaemonSetUpdateStrategyType, ok bool) {
+func (b *DaemonSetUpdateStrategyApplyConfiguration) GetType() (value v1beta1.DaemonSetUpdateStrategyType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -68,24 +68,24 @@ func (b *DaemonSetUpdateStrategyBuilder) GetType() (value v1beta1.DaemonSetUpdat
 }
 
 // SetRollingUpdate sets the RollingUpdate field in the declarative configuration to the given value.
-func (b *DaemonSetUpdateStrategyBuilder) SetRollingUpdate(value *RollingUpdateDaemonSetBuilder) *DaemonSetUpdateStrategyBuilder {
+func (b *DaemonSetUpdateStrategyApplyConfiguration) SetRollingUpdate(value *RollingUpdateDaemonSetApplyConfiguration) *DaemonSetUpdateStrategyApplyConfiguration {
 	b.fields.RollingUpdate = value
 	return b
 }
 
 // RemoveRollingUpdate removes the RollingUpdate field from the declarative configuration.
-func (b *DaemonSetUpdateStrategyBuilder) RemoveRollingUpdate() *DaemonSetUpdateStrategyBuilder {
+func (b *DaemonSetUpdateStrategyApplyConfiguration) RemoveRollingUpdate() *DaemonSetUpdateStrategyApplyConfiguration {
 	b.fields.RollingUpdate = nil
 	return b
 }
 
 // GetRollingUpdate gets the RollingUpdate field from the declarative configuration.
-func (b *DaemonSetUpdateStrategyBuilder) GetRollingUpdate() (value *RollingUpdateDaemonSetBuilder, ok bool) {
+func (b *DaemonSetUpdateStrategyApplyConfiguration) GetRollingUpdate() (value *RollingUpdateDaemonSetApplyConfiguration, ok bool) {
 	return b.fields.RollingUpdate, b.fields.RollingUpdate != nil
 }
 
-// ToUnstructured converts DaemonSetUpdateStrategyBuilder to unstructured.
-func (b *DaemonSetUpdateStrategyBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts DaemonSetUpdateStrategyApplyConfiguration to unstructured.
+func (b *DaemonSetUpdateStrategyApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -97,9 +97,9 @@ func (b *DaemonSetUpdateStrategyBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to DaemonSetUpdateStrategyBuilder, replacing the contents
-// of DaemonSetUpdateStrategyBuilder.
-func (b *DaemonSetUpdateStrategyBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to DaemonSetUpdateStrategyApplyConfiguration, replacing the contents
+// of DaemonSetUpdateStrategyApplyConfiguration.
+func (b *DaemonSetUpdateStrategyApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &daemonSetUpdateStrategyFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -110,15 +110,15 @@ func (b *DaemonSetUpdateStrategyBuilder) FromUnstructured(u map[string]interface
 	return nil
 }
 
-// MarshalJSON marshals DaemonSetUpdateStrategyBuilder to JSON.
-func (b *DaemonSetUpdateStrategyBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals DaemonSetUpdateStrategyApplyConfiguration to JSON.
+func (b *DaemonSetUpdateStrategyApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into DaemonSetUpdateStrategyBuilder, replacing the contents of
-// DaemonSetUpdateStrategyBuilder.
-func (b *DaemonSetUpdateStrategyBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into DaemonSetUpdateStrategyApplyConfiguration, replacing the contents of
+// DaemonSetUpdateStrategyApplyConfiguration.
+func (b *DaemonSetUpdateStrategyApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -126,13 +126,13 @@ func (b *DaemonSetUpdateStrategyBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// DaemonSetUpdateStrategyList represents a list of DaemonSetUpdateStrategyBuilder.
-type DaemonSetUpdateStrategyList []*DaemonSetUpdateStrategyBuilder
+// DaemonSetUpdateStrategyList represents a listAlias of DaemonSetUpdateStrategyApplyConfiguration.
+type DaemonSetUpdateStrategyList []*DaemonSetUpdateStrategyApplyConfiguration
 
-// DaemonSetUpdateStrategyList represents a map of DaemonSetUpdateStrategyBuilder.
-type DaemonSetUpdateStrategyMap map[string]DaemonSetUpdateStrategyBuilder
+// DaemonSetUpdateStrategyList represents a map of DaemonSetUpdateStrategyApplyConfiguration.
+type DaemonSetUpdateStrategyMap map[string]DaemonSetUpdateStrategyApplyConfiguration
 
-func (b *DaemonSetUpdateStrategyBuilder) preMarshal() {
+func (b *DaemonSetUpdateStrategyApplyConfiguration) preMarshal() {
 }
-func (b *DaemonSetUpdateStrategyBuilder) postUnmarshal() {
+func (b *DaemonSetUpdateStrategyApplyConfiguration) postUnmarshal() {
 }

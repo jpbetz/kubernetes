@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// SubjectBuilder represents an declarative configuration of the Subject type for use
+// SubjectApplyConfiguration represents an declarative configuration of the Subject type for use
 // with apply.
-type SubjectBuilder struct {
+type SubjectApplyConfiguration struct {
 	fields subjectFields
 }
 
+// SubjectApplyConfiguration constructs an declarative configuration of the Subject type for use with
+// apply.
+func Subject() *SubjectApplyConfiguration {
+	return &SubjectApplyConfiguration{}
+}
+
 // subjectFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SubjectBuilder.
+// Inline fields are owned by their respective inline type in SubjectApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -42,26 +48,20 @@ type subjectFields struct {
 	Namespace *string `json:"namespace,omitempty"`
 }
 
-// Subject constructs an declarative configuration of the Subject type for use with
-// apply.
-func Subject() *SubjectBuilder {
-	return &SubjectBuilder{}
-}
-
 // SetKind sets the Kind field in the declarative configuration to the given value.
-func (b *SubjectBuilder) SetKind(value string) *SubjectBuilder {
+func (b *SubjectApplyConfiguration) SetKind(value string) *SubjectApplyConfiguration {
 	b.fields.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
-func (b *SubjectBuilder) RemoveKind() *SubjectBuilder {
+func (b *SubjectApplyConfiguration) RemoveKind() *SubjectApplyConfiguration {
 	b.fields.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
-func (b *SubjectBuilder) GetKind() (value string, ok bool) {
+func (b *SubjectApplyConfiguration) GetKind() (value string, ok bool) {
 	if v := b.fields.Kind; v != nil {
 		return *v, true
 	}
@@ -69,19 +69,19 @@ func (b *SubjectBuilder) GetKind() (value string, ok bool) {
 }
 
 // SetAPIGroup sets the APIGroup field in the declarative configuration to the given value.
-func (b *SubjectBuilder) SetAPIGroup(value string) *SubjectBuilder {
+func (b *SubjectApplyConfiguration) SetAPIGroup(value string) *SubjectApplyConfiguration {
 	b.fields.APIGroup = &value
 	return b
 }
 
 // RemoveAPIGroup removes the APIGroup field from the declarative configuration.
-func (b *SubjectBuilder) RemoveAPIGroup() *SubjectBuilder {
+func (b *SubjectApplyConfiguration) RemoveAPIGroup() *SubjectApplyConfiguration {
 	b.fields.APIGroup = nil
 	return b
 }
 
 // GetAPIGroup gets the APIGroup field from the declarative configuration.
-func (b *SubjectBuilder) GetAPIGroup() (value string, ok bool) {
+func (b *SubjectApplyConfiguration) GetAPIGroup() (value string, ok bool) {
 	if v := b.fields.APIGroup; v != nil {
 		return *v, true
 	}
@@ -89,19 +89,19 @@ func (b *SubjectBuilder) GetAPIGroup() (value string, ok bool) {
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *SubjectBuilder) SetName(value string) *SubjectBuilder {
+func (b *SubjectApplyConfiguration) SetName(value string) *SubjectApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *SubjectBuilder) RemoveName() *SubjectBuilder {
+func (b *SubjectApplyConfiguration) RemoveName() *SubjectApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *SubjectBuilder) GetName() (value string, ok bool) {
+func (b *SubjectApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -109,27 +109,27 @@ func (b *SubjectBuilder) GetName() (value string, ok bool) {
 }
 
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
-func (b *SubjectBuilder) SetNamespace(value string) *SubjectBuilder {
+func (b *SubjectApplyConfiguration) SetNamespace(value string) *SubjectApplyConfiguration {
 	b.fields.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
-func (b *SubjectBuilder) RemoveNamespace() *SubjectBuilder {
+func (b *SubjectApplyConfiguration) RemoveNamespace() *SubjectApplyConfiguration {
 	b.fields.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
-func (b *SubjectBuilder) GetNamespace() (value string, ok bool) {
+func (b *SubjectApplyConfiguration) GetNamespace() (value string, ok bool) {
 	if v := b.fields.Namespace; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts SubjectBuilder to unstructured.
-func (b *SubjectBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts SubjectApplyConfiguration to unstructured.
+func (b *SubjectApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -141,9 +141,9 @@ func (b *SubjectBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to SubjectBuilder, replacing the contents
-// of SubjectBuilder.
-func (b *SubjectBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to SubjectApplyConfiguration, replacing the contents
+// of SubjectApplyConfiguration.
+func (b *SubjectApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &subjectFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -154,15 +154,15 @@ func (b *SubjectBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals SubjectBuilder to JSON.
-func (b *SubjectBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals SubjectApplyConfiguration to JSON.
+func (b *SubjectApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into SubjectBuilder, replacing the contents of
-// SubjectBuilder.
-func (b *SubjectBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into SubjectApplyConfiguration, replacing the contents of
+// SubjectApplyConfiguration.
+func (b *SubjectApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -170,13 +170,13 @@ func (b *SubjectBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// SubjectList represents a list of SubjectBuilder.
-type SubjectList []*SubjectBuilder
+// SubjectList represents a listAlias of SubjectApplyConfiguration.
+type SubjectList []*SubjectApplyConfiguration
 
-// SubjectList represents a map of SubjectBuilder.
-type SubjectMap map[string]SubjectBuilder
+// SubjectList represents a map of SubjectApplyConfiguration.
+type SubjectMap map[string]SubjectApplyConfiguration
 
-func (b *SubjectBuilder) preMarshal() {
+func (b *SubjectApplyConfiguration) preMarshal() {
 }
-func (b *SubjectBuilder) postUnmarshal() {
+func (b *SubjectApplyConfiguration) postUnmarshal() {
 }

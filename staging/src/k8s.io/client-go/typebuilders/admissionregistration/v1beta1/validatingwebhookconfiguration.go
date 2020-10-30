@@ -25,87 +25,87 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// ValidatingWebhookConfigurationBuilder represents an declarative configuration of the ValidatingWebhookConfiguration type for use
+// ValidatingWebhookConfigurationApplyConfiguration represents an declarative configuration of the ValidatingWebhookConfiguration type for use
 // with apply.
-type ValidatingWebhookConfigurationBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type ValidatingWebhookConfigurationApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   validatingWebhookConfigurationFields
 }
 
+// ValidatingWebhookConfigurationApplyConfiguration constructs an declarative configuration of the ValidatingWebhookConfiguration type for use with
+// apply.
+func ValidatingWebhookConfiguration() *ValidatingWebhookConfigurationApplyConfiguration {
+	return &ValidatingWebhookConfigurationApplyConfiguration{}
+}
+
 // validatingWebhookConfigurationFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ValidatingWebhookConfigurationBuilder.
+// Inline fields are owned by their respective inline type in ValidatingWebhookConfigurationApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type validatingWebhookConfigurationFields struct {
-	Kind       *string                `json:"kind,omitempty"`       // inlined ValidatingWebhookConfigurationBuilder.typeMeta.Kind field
-	APIVersion *string                `json:"apiVersion,omitempty"` // inlined ValidatingWebhookConfigurationBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder  `json:"metadata,omitempty"`
-	Webhooks   *ValidatingWebhookList `json:"webhooks,omitempty"`
-}
-
-// ValidatingWebhookConfiguration constructs an declarative configuration of the ValidatingWebhookConfiguration type for use with
-// apply.
-func ValidatingWebhookConfiguration() *ValidatingWebhookConfigurationBuilder {
-	return &ValidatingWebhookConfigurationBuilder{}
+	Kind       *string                          `json:"kind,omitempty"`       // inlined ValidatingWebhookConfigurationApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                          `json:"apiVersion,omitempty"` // inlined ValidatingWebhookConfigurationApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Webhooks   *ValidatingWebhookList           `json:"webhooks,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *ValidatingWebhookConfigurationBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *ValidatingWebhookConfigurationBuilder {
+func (b *ValidatingWebhookConfigurationApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *ValidatingWebhookConfigurationApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *ValidatingWebhookConfigurationBuilder) RemoveTypeMeta() *ValidatingWebhookConfigurationBuilder {
+func (b *ValidatingWebhookConfigurationApplyConfiguration) RemoveTypeMeta() *ValidatingWebhookConfigurationApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *ValidatingWebhookConfigurationBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *ValidatingWebhookConfigurationApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *ValidatingWebhookConfigurationBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *ValidatingWebhookConfigurationBuilder {
+func (b *ValidatingWebhookConfigurationApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *ValidatingWebhookConfigurationApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *ValidatingWebhookConfigurationBuilder) RemoveObjectMeta() *ValidatingWebhookConfigurationBuilder {
+func (b *ValidatingWebhookConfigurationApplyConfiguration) RemoveObjectMeta() *ValidatingWebhookConfigurationApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *ValidatingWebhookConfigurationBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *ValidatingWebhookConfigurationApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetWebhooks sets the Webhooks field in the declarative configuration to the given value.
-func (b *ValidatingWebhookConfigurationBuilder) SetWebhooks(value ValidatingWebhookList) *ValidatingWebhookConfigurationBuilder {
+func (b *ValidatingWebhookConfigurationApplyConfiguration) SetWebhooks(value ValidatingWebhookList) *ValidatingWebhookConfigurationApplyConfiguration {
 	b.fields.Webhooks = &value
 	return b
 }
 
 // RemoveWebhooks removes the Webhooks field from the declarative configuration.
-func (b *ValidatingWebhookConfigurationBuilder) RemoveWebhooks() *ValidatingWebhookConfigurationBuilder {
+func (b *ValidatingWebhookConfigurationApplyConfiguration) RemoveWebhooks() *ValidatingWebhookConfigurationApplyConfiguration {
 	b.fields.Webhooks = nil
 	return b
 }
 
 // GetWebhooks gets the Webhooks field from the declarative configuration.
-func (b *ValidatingWebhookConfigurationBuilder) GetWebhooks() (value ValidatingWebhookList, ok bool) {
+func (b *ValidatingWebhookConfigurationApplyConfiguration) GetWebhooks() (value ValidatingWebhookList, ok bool) {
 	if v := b.fields.Webhooks; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ValidatingWebhookConfigurationBuilder to unstructured.
-func (b *ValidatingWebhookConfigurationBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ValidatingWebhookConfigurationApplyConfiguration to unstructured.
+func (b *ValidatingWebhookConfigurationApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -117,9 +117,9 @@ func (b *ValidatingWebhookConfigurationBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ValidatingWebhookConfigurationBuilder, replacing the contents
-// of ValidatingWebhookConfigurationBuilder.
-func (b *ValidatingWebhookConfigurationBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ValidatingWebhookConfigurationApplyConfiguration, replacing the contents
+// of ValidatingWebhookConfigurationApplyConfiguration.
+func (b *ValidatingWebhookConfigurationApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &validatingWebhookConfigurationFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -130,15 +130,15 @@ func (b *ValidatingWebhookConfigurationBuilder) FromUnstructured(u map[string]in
 	return nil
 }
 
-// MarshalJSON marshals ValidatingWebhookConfigurationBuilder to JSON.
-func (b *ValidatingWebhookConfigurationBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ValidatingWebhookConfigurationApplyConfiguration to JSON.
+func (b *ValidatingWebhookConfigurationApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ValidatingWebhookConfigurationBuilder, replacing the contents of
-// ValidatingWebhookConfigurationBuilder.
-func (b *ValidatingWebhookConfigurationBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ValidatingWebhookConfigurationApplyConfiguration, replacing the contents of
+// ValidatingWebhookConfigurationApplyConfiguration.
+func (b *ValidatingWebhookConfigurationApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -146,13 +146,13 @@ func (b *ValidatingWebhookConfigurationBuilder) UnmarshalJSON(data []byte) error
 	return nil
 }
 
-// ValidatingWebhookConfigurationList represents a list of ValidatingWebhookConfigurationBuilder.
-type ValidatingWebhookConfigurationList []*ValidatingWebhookConfigurationBuilder
+// ValidatingWebhookConfigurationList represents a listAlias of ValidatingWebhookConfigurationApplyConfiguration.
+type ValidatingWebhookConfigurationList []*ValidatingWebhookConfigurationApplyConfiguration
 
-// ValidatingWebhookConfigurationList represents a map of ValidatingWebhookConfigurationBuilder.
-type ValidatingWebhookConfigurationMap map[string]ValidatingWebhookConfigurationBuilder
+// ValidatingWebhookConfigurationList represents a map of ValidatingWebhookConfigurationApplyConfiguration.
+type ValidatingWebhookConfigurationMap map[string]ValidatingWebhookConfigurationApplyConfiguration
 
-func (b *ValidatingWebhookConfigurationBuilder) preMarshal() {
+func (b *ValidatingWebhookConfigurationApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -162,9 +162,9 @@ func (b *ValidatingWebhookConfigurationBuilder) preMarshal() {
 		}
 	}
 }
-func (b *ValidatingWebhookConfigurationBuilder) postUnmarshal() {
+func (b *ValidatingWebhookConfigurationApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

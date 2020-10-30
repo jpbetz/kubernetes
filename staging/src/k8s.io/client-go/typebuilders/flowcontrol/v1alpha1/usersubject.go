@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// UserSubjectBuilder represents an declarative configuration of the UserSubject type for use
+// UserSubjectApplyConfiguration represents an declarative configuration of the UserSubject type for use
 // with apply.
-type UserSubjectBuilder struct {
+type UserSubjectApplyConfiguration struct {
 	fields userSubjectFields
 }
 
+// UserSubjectApplyConfiguration constructs an declarative configuration of the UserSubject type for use with
+// apply.
+func UserSubject() *UserSubjectApplyConfiguration {
+	return &UserSubjectApplyConfiguration{}
+}
+
 // userSubjectFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in UserSubjectBuilder.
+// Inline fields are owned by their respective inline type in UserSubjectApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -39,34 +45,28 @@ type userSubjectFields struct {
 	Name *string `json:"name,omitempty"`
 }
 
-// UserSubject constructs an declarative configuration of the UserSubject type for use with
-// apply.
-func UserSubject() *UserSubjectBuilder {
-	return &UserSubjectBuilder{}
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *UserSubjectBuilder) SetName(value string) *UserSubjectBuilder {
+func (b *UserSubjectApplyConfiguration) SetName(value string) *UserSubjectApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *UserSubjectBuilder) RemoveName() *UserSubjectBuilder {
+func (b *UserSubjectApplyConfiguration) RemoveName() *UserSubjectApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *UserSubjectBuilder) GetName() (value string, ok bool) {
+func (b *UserSubjectApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts UserSubjectBuilder to unstructured.
-func (b *UserSubjectBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts UserSubjectApplyConfiguration to unstructured.
+func (b *UserSubjectApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -78,9 +78,9 @@ func (b *UserSubjectBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to UserSubjectBuilder, replacing the contents
-// of UserSubjectBuilder.
-func (b *UserSubjectBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to UserSubjectApplyConfiguration, replacing the contents
+// of UserSubjectApplyConfiguration.
+func (b *UserSubjectApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &userSubjectFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -91,15 +91,15 @@ func (b *UserSubjectBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals UserSubjectBuilder to JSON.
-func (b *UserSubjectBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals UserSubjectApplyConfiguration to JSON.
+func (b *UserSubjectApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into UserSubjectBuilder, replacing the contents of
-// UserSubjectBuilder.
-func (b *UserSubjectBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into UserSubjectApplyConfiguration, replacing the contents of
+// UserSubjectApplyConfiguration.
+func (b *UserSubjectApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -107,13 +107,13 @@ func (b *UserSubjectBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// UserSubjectList represents a list of UserSubjectBuilder.
-type UserSubjectList []*UserSubjectBuilder
+// UserSubjectList represents a listAlias of UserSubjectApplyConfiguration.
+type UserSubjectList []*UserSubjectApplyConfiguration
 
-// UserSubjectList represents a map of UserSubjectBuilder.
-type UserSubjectMap map[string]UserSubjectBuilder
+// UserSubjectList represents a map of UserSubjectApplyConfiguration.
+type UserSubjectMap map[string]UserSubjectApplyConfiguration
 
-func (b *UserSubjectBuilder) preMarshal() {
+func (b *UserSubjectApplyConfiguration) preMarshal() {
 }
-func (b *UserSubjectBuilder) postUnmarshal() {
+func (b *UserSubjectApplyConfiguration) postUnmarshal() {
 }

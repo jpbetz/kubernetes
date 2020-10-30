@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ResourceAttributesBuilder represents an declarative configuration of the ResourceAttributes type for use
+// ResourceAttributesApplyConfiguration represents an declarative configuration of the ResourceAttributes type for use
 // with apply.
-type ResourceAttributesBuilder struct {
+type ResourceAttributesApplyConfiguration struct {
 	fields resourceAttributesFields
 }
 
+// ResourceAttributesApplyConfiguration constructs an declarative configuration of the ResourceAttributes type for use with
+// apply.
+func ResourceAttributes() *ResourceAttributesApplyConfiguration {
+	return &ResourceAttributesApplyConfiguration{}
+}
+
 // resourceAttributesFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ResourceAttributesBuilder.
+// Inline fields are owned by their respective inline type in ResourceAttributesApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -45,26 +51,20 @@ type resourceAttributesFields struct {
 	Name        *string `json:"name,omitempty"`
 }
 
-// ResourceAttributes constructs an declarative configuration of the ResourceAttributes type for use with
-// apply.
-func ResourceAttributes() *ResourceAttributesBuilder {
-	return &ResourceAttributesBuilder{}
-}
-
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
-func (b *ResourceAttributesBuilder) SetNamespace(value string) *ResourceAttributesBuilder {
+func (b *ResourceAttributesApplyConfiguration) SetNamespace(value string) *ResourceAttributesApplyConfiguration {
 	b.fields.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
-func (b *ResourceAttributesBuilder) RemoveNamespace() *ResourceAttributesBuilder {
+func (b *ResourceAttributesApplyConfiguration) RemoveNamespace() *ResourceAttributesApplyConfiguration {
 	b.fields.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
-func (b *ResourceAttributesBuilder) GetNamespace() (value string, ok bool) {
+func (b *ResourceAttributesApplyConfiguration) GetNamespace() (value string, ok bool) {
 	if v := b.fields.Namespace; v != nil {
 		return *v, true
 	}
@@ -72,19 +72,19 @@ func (b *ResourceAttributesBuilder) GetNamespace() (value string, ok bool) {
 }
 
 // SetVerb sets the Verb field in the declarative configuration to the given value.
-func (b *ResourceAttributesBuilder) SetVerb(value string) *ResourceAttributesBuilder {
+func (b *ResourceAttributesApplyConfiguration) SetVerb(value string) *ResourceAttributesApplyConfiguration {
 	b.fields.Verb = &value
 	return b
 }
 
 // RemoveVerb removes the Verb field from the declarative configuration.
-func (b *ResourceAttributesBuilder) RemoveVerb() *ResourceAttributesBuilder {
+func (b *ResourceAttributesApplyConfiguration) RemoveVerb() *ResourceAttributesApplyConfiguration {
 	b.fields.Verb = nil
 	return b
 }
 
 // GetVerb gets the Verb field from the declarative configuration.
-func (b *ResourceAttributesBuilder) GetVerb() (value string, ok bool) {
+func (b *ResourceAttributesApplyConfiguration) GetVerb() (value string, ok bool) {
 	if v := b.fields.Verb; v != nil {
 		return *v, true
 	}
@@ -92,19 +92,19 @@ func (b *ResourceAttributesBuilder) GetVerb() (value string, ok bool) {
 }
 
 // SetGroup sets the Group field in the declarative configuration to the given value.
-func (b *ResourceAttributesBuilder) SetGroup(value string) *ResourceAttributesBuilder {
+func (b *ResourceAttributesApplyConfiguration) SetGroup(value string) *ResourceAttributesApplyConfiguration {
 	b.fields.Group = &value
 	return b
 }
 
 // RemoveGroup removes the Group field from the declarative configuration.
-func (b *ResourceAttributesBuilder) RemoveGroup() *ResourceAttributesBuilder {
+func (b *ResourceAttributesApplyConfiguration) RemoveGroup() *ResourceAttributesApplyConfiguration {
 	b.fields.Group = nil
 	return b
 }
 
 // GetGroup gets the Group field from the declarative configuration.
-func (b *ResourceAttributesBuilder) GetGroup() (value string, ok bool) {
+func (b *ResourceAttributesApplyConfiguration) GetGroup() (value string, ok bool) {
 	if v := b.fields.Group; v != nil {
 		return *v, true
 	}
@@ -112,19 +112,19 @@ func (b *ResourceAttributesBuilder) GetGroup() (value string, ok bool) {
 }
 
 // SetVersion sets the Version field in the declarative configuration to the given value.
-func (b *ResourceAttributesBuilder) SetVersion(value string) *ResourceAttributesBuilder {
+func (b *ResourceAttributesApplyConfiguration) SetVersion(value string) *ResourceAttributesApplyConfiguration {
 	b.fields.Version = &value
 	return b
 }
 
 // RemoveVersion removes the Version field from the declarative configuration.
-func (b *ResourceAttributesBuilder) RemoveVersion() *ResourceAttributesBuilder {
+func (b *ResourceAttributesApplyConfiguration) RemoveVersion() *ResourceAttributesApplyConfiguration {
 	b.fields.Version = nil
 	return b
 }
 
 // GetVersion gets the Version field from the declarative configuration.
-func (b *ResourceAttributesBuilder) GetVersion() (value string, ok bool) {
+func (b *ResourceAttributesApplyConfiguration) GetVersion() (value string, ok bool) {
 	if v := b.fields.Version; v != nil {
 		return *v, true
 	}
@@ -132,19 +132,19 @@ func (b *ResourceAttributesBuilder) GetVersion() (value string, ok bool) {
 }
 
 // SetResource sets the Resource field in the declarative configuration to the given value.
-func (b *ResourceAttributesBuilder) SetResource(value string) *ResourceAttributesBuilder {
+func (b *ResourceAttributesApplyConfiguration) SetResource(value string) *ResourceAttributesApplyConfiguration {
 	b.fields.Resource = &value
 	return b
 }
 
 // RemoveResource removes the Resource field from the declarative configuration.
-func (b *ResourceAttributesBuilder) RemoveResource() *ResourceAttributesBuilder {
+func (b *ResourceAttributesApplyConfiguration) RemoveResource() *ResourceAttributesApplyConfiguration {
 	b.fields.Resource = nil
 	return b
 }
 
 // GetResource gets the Resource field from the declarative configuration.
-func (b *ResourceAttributesBuilder) GetResource() (value string, ok bool) {
+func (b *ResourceAttributesApplyConfiguration) GetResource() (value string, ok bool) {
 	if v := b.fields.Resource; v != nil {
 		return *v, true
 	}
@@ -152,19 +152,19 @@ func (b *ResourceAttributesBuilder) GetResource() (value string, ok bool) {
 }
 
 // SetSubresource sets the Subresource field in the declarative configuration to the given value.
-func (b *ResourceAttributesBuilder) SetSubresource(value string) *ResourceAttributesBuilder {
+func (b *ResourceAttributesApplyConfiguration) SetSubresource(value string) *ResourceAttributesApplyConfiguration {
 	b.fields.Subresource = &value
 	return b
 }
 
 // RemoveSubresource removes the Subresource field from the declarative configuration.
-func (b *ResourceAttributesBuilder) RemoveSubresource() *ResourceAttributesBuilder {
+func (b *ResourceAttributesApplyConfiguration) RemoveSubresource() *ResourceAttributesApplyConfiguration {
 	b.fields.Subresource = nil
 	return b
 }
 
 // GetSubresource gets the Subresource field from the declarative configuration.
-func (b *ResourceAttributesBuilder) GetSubresource() (value string, ok bool) {
+func (b *ResourceAttributesApplyConfiguration) GetSubresource() (value string, ok bool) {
 	if v := b.fields.Subresource; v != nil {
 		return *v, true
 	}
@@ -172,27 +172,27 @@ func (b *ResourceAttributesBuilder) GetSubresource() (value string, ok bool) {
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *ResourceAttributesBuilder) SetName(value string) *ResourceAttributesBuilder {
+func (b *ResourceAttributesApplyConfiguration) SetName(value string) *ResourceAttributesApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *ResourceAttributesBuilder) RemoveName() *ResourceAttributesBuilder {
+func (b *ResourceAttributesApplyConfiguration) RemoveName() *ResourceAttributesApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *ResourceAttributesBuilder) GetName() (value string, ok bool) {
+func (b *ResourceAttributesApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ResourceAttributesBuilder to unstructured.
-func (b *ResourceAttributesBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ResourceAttributesApplyConfiguration to unstructured.
+func (b *ResourceAttributesApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -204,9 +204,9 @@ func (b *ResourceAttributesBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ResourceAttributesBuilder, replacing the contents
-// of ResourceAttributesBuilder.
-func (b *ResourceAttributesBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ResourceAttributesApplyConfiguration, replacing the contents
+// of ResourceAttributesApplyConfiguration.
+func (b *ResourceAttributesApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &resourceAttributesFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -217,15 +217,15 @@ func (b *ResourceAttributesBuilder) FromUnstructured(u map[string]interface{}) e
 	return nil
 }
 
-// MarshalJSON marshals ResourceAttributesBuilder to JSON.
-func (b *ResourceAttributesBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ResourceAttributesApplyConfiguration to JSON.
+func (b *ResourceAttributesApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ResourceAttributesBuilder, replacing the contents of
-// ResourceAttributesBuilder.
-func (b *ResourceAttributesBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ResourceAttributesApplyConfiguration, replacing the contents of
+// ResourceAttributesApplyConfiguration.
+func (b *ResourceAttributesApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -233,13 +233,13 @@ func (b *ResourceAttributesBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ResourceAttributesList represents a list of ResourceAttributesBuilder.
-type ResourceAttributesList []*ResourceAttributesBuilder
+// ResourceAttributesList represents a listAlias of ResourceAttributesApplyConfiguration.
+type ResourceAttributesList []*ResourceAttributesApplyConfiguration
 
-// ResourceAttributesList represents a map of ResourceAttributesBuilder.
-type ResourceAttributesMap map[string]ResourceAttributesBuilder
+// ResourceAttributesList represents a map of ResourceAttributesApplyConfiguration.
+type ResourceAttributesMap map[string]ResourceAttributesApplyConfiguration
 
-func (b *ResourceAttributesBuilder) preMarshal() {
+func (b *ResourceAttributesApplyConfiguration) preMarshal() {
 }
-func (b *ResourceAttributesBuilder) postUnmarshal() {
+func (b *ResourceAttributesApplyConfiguration) postUnmarshal() {
 }

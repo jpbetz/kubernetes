@@ -49,7 +49,7 @@ type ResourceQuotaInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.ResourceQuotaList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.ResourceQuota, err error)
-	Apply(ctx context.Context, resourceQuota corev1.ResourceQuotaBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ResourceQuota, err error)
+	Apply(ctx context.Context, resourceQuota *corev1.ResourceQuotaApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ResourceQuota, err error)
 	ResourceQuotaExpansion
 }
 
@@ -198,7 +198,7 @@ func (c *resourceQuotas) Patch(ctx context.Context, name string, pt types.PatchT
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied resourceQuota.
-func (c *resourceQuotas) Apply(ctx context.Context, resourceQuota corev1.ResourceQuotaBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ResourceQuota, err error) {
+func (c *resourceQuotas) Apply(ctx context.Context, resourceQuota *corev1.ResourceQuotaApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ResourceQuota, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := resourceQuota.MarshalJSON()
 	if err != nil {

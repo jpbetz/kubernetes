@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ContainerImageBuilder represents an declarative configuration of the ContainerImage type for use
+// ContainerImageApplyConfiguration represents an declarative configuration of the ContainerImage type for use
 // with apply.
-type ContainerImageBuilder struct {
+type ContainerImageApplyConfiguration struct {
 	fields containerImageFields
 }
 
+// ContainerImageApplyConfiguration constructs an declarative configuration of the ContainerImage type for use with
+// apply.
+func ContainerImage() *ContainerImageApplyConfiguration {
+	return &ContainerImageApplyConfiguration{}
+}
+
 // containerImageFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ContainerImageBuilder.
+// Inline fields are owned by their respective inline type in ContainerImageApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type containerImageFields struct {
 	SizeBytes *int64    `json:"sizeBytes,omitempty"`
 }
 
-// ContainerImage constructs an declarative configuration of the ContainerImage type for use with
-// apply.
-func ContainerImage() *ContainerImageBuilder {
-	return &ContainerImageBuilder{}
-}
-
 // SetNames sets the Names field in the declarative configuration to the given value.
-func (b *ContainerImageBuilder) SetNames(value []string) *ContainerImageBuilder {
+func (b *ContainerImageApplyConfiguration) SetNames(value []string) *ContainerImageApplyConfiguration {
 	b.fields.Names = &value
 	return b
 }
 
 // RemoveNames removes the Names field from the declarative configuration.
-func (b *ContainerImageBuilder) RemoveNames() *ContainerImageBuilder {
+func (b *ContainerImageApplyConfiguration) RemoveNames() *ContainerImageApplyConfiguration {
 	b.fields.Names = nil
 	return b
 }
 
 // GetNames gets the Names field from the declarative configuration.
-func (b *ContainerImageBuilder) GetNames() (value []string, ok bool) {
+func (b *ContainerImageApplyConfiguration) GetNames() (value []string, ok bool) {
 	if v := b.fields.Names; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *ContainerImageBuilder) GetNames() (value []string, ok bool) {
 }
 
 // SetSizeBytes sets the SizeBytes field in the declarative configuration to the given value.
-func (b *ContainerImageBuilder) SetSizeBytes(value int64) *ContainerImageBuilder {
+func (b *ContainerImageApplyConfiguration) SetSizeBytes(value int64) *ContainerImageApplyConfiguration {
 	b.fields.SizeBytes = &value
 	return b
 }
 
 // RemoveSizeBytes removes the SizeBytes field from the declarative configuration.
-func (b *ContainerImageBuilder) RemoveSizeBytes() *ContainerImageBuilder {
+func (b *ContainerImageApplyConfiguration) RemoveSizeBytes() *ContainerImageApplyConfiguration {
 	b.fields.SizeBytes = nil
 	return b
 }
 
 // GetSizeBytes gets the SizeBytes field from the declarative configuration.
-func (b *ContainerImageBuilder) GetSizeBytes() (value int64, ok bool) {
+func (b *ContainerImageApplyConfiguration) GetSizeBytes() (value int64, ok bool) {
 	if v := b.fields.SizeBytes; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ContainerImageBuilder to unstructured.
-func (b *ContainerImageBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ContainerImageApplyConfiguration to unstructured.
+func (b *ContainerImageApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *ContainerImageBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ContainerImageBuilder, replacing the contents
-// of ContainerImageBuilder.
-func (b *ContainerImageBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ContainerImageApplyConfiguration, replacing the contents
+// of ContainerImageApplyConfiguration.
+func (b *ContainerImageApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &containerImageFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *ContainerImageBuilder) FromUnstructured(u map[string]interface{}) error
 	return nil
 }
 
-// MarshalJSON marshals ContainerImageBuilder to JSON.
-func (b *ContainerImageBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ContainerImageApplyConfiguration to JSON.
+func (b *ContainerImageApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ContainerImageBuilder, replacing the contents of
-// ContainerImageBuilder.
-func (b *ContainerImageBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ContainerImageApplyConfiguration, replacing the contents of
+// ContainerImageApplyConfiguration.
+func (b *ContainerImageApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *ContainerImageBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ContainerImageList represents a list of ContainerImageBuilder.
-type ContainerImageList []*ContainerImageBuilder
+// ContainerImageList represents a listAlias of ContainerImageApplyConfiguration.
+type ContainerImageList []*ContainerImageApplyConfiguration
 
-// ContainerImageList represents a map of ContainerImageBuilder.
-type ContainerImageMap map[string]ContainerImageBuilder
+// ContainerImageList represents a map of ContainerImageApplyConfiguration.
+type ContainerImageMap map[string]ContainerImageApplyConfiguration
 
-func (b *ContainerImageBuilder) preMarshal() {
+func (b *ContainerImageApplyConfiguration) preMarshal() {
 }
-func (b *ContainerImageBuilder) postUnmarshal() {
+func (b *ContainerImageApplyConfiguration) postUnmarshal() {
 }

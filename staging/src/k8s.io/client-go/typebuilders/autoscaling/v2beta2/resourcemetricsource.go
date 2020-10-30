@@ -25,42 +25,42 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ResourceMetricSourceBuilder represents an declarative configuration of the ResourceMetricSource type for use
+// ResourceMetricSourceApplyConfiguration represents an declarative configuration of the ResourceMetricSource type for use
 // with apply.
-type ResourceMetricSourceBuilder struct {
+type ResourceMetricSourceApplyConfiguration struct {
 	fields resourceMetricSourceFields
 }
 
+// ResourceMetricSourceApplyConfiguration constructs an declarative configuration of the ResourceMetricSource type for use with
+// apply.
+func ResourceMetricSource() *ResourceMetricSourceApplyConfiguration {
+	return &ResourceMetricSourceApplyConfiguration{}
+}
+
 // resourceMetricSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ResourceMetricSourceBuilder.
+// Inline fields are owned by their respective inline type in ResourceMetricSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type resourceMetricSourceFields struct {
-	Name   *v1.ResourceName     `json:"name,omitempty"`
-	Target *MetricTargetBuilder `json:"target,omitempty"`
-}
-
-// ResourceMetricSource constructs an declarative configuration of the ResourceMetricSource type for use with
-// apply.
-func ResourceMetricSource() *ResourceMetricSourceBuilder {
-	return &ResourceMetricSourceBuilder{}
+	Name   *v1.ResourceName                `json:"name,omitempty"`
+	Target *MetricTargetApplyConfiguration `json:"target,omitempty"`
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *ResourceMetricSourceBuilder) SetName(value v1.ResourceName) *ResourceMetricSourceBuilder {
+func (b *ResourceMetricSourceApplyConfiguration) SetName(value v1.ResourceName) *ResourceMetricSourceApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *ResourceMetricSourceBuilder) RemoveName() *ResourceMetricSourceBuilder {
+func (b *ResourceMetricSourceApplyConfiguration) RemoveName() *ResourceMetricSourceApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *ResourceMetricSourceBuilder) GetName() (value v1.ResourceName, ok bool) {
+func (b *ResourceMetricSourceApplyConfiguration) GetName() (value v1.ResourceName, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
@@ -68,24 +68,24 @@ func (b *ResourceMetricSourceBuilder) GetName() (value v1.ResourceName, ok bool)
 }
 
 // SetTarget sets the Target field in the declarative configuration to the given value.
-func (b *ResourceMetricSourceBuilder) SetTarget(value *MetricTargetBuilder) *ResourceMetricSourceBuilder {
+func (b *ResourceMetricSourceApplyConfiguration) SetTarget(value *MetricTargetApplyConfiguration) *ResourceMetricSourceApplyConfiguration {
 	b.fields.Target = value
 	return b
 }
 
 // RemoveTarget removes the Target field from the declarative configuration.
-func (b *ResourceMetricSourceBuilder) RemoveTarget() *ResourceMetricSourceBuilder {
+func (b *ResourceMetricSourceApplyConfiguration) RemoveTarget() *ResourceMetricSourceApplyConfiguration {
 	b.fields.Target = nil
 	return b
 }
 
 // GetTarget gets the Target field from the declarative configuration.
-func (b *ResourceMetricSourceBuilder) GetTarget() (value *MetricTargetBuilder, ok bool) {
+func (b *ResourceMetricSourceApplyConfiguration) GetTarget() (value *MetricTargetApplyConfiguration, ok bool) {
 	return b.fields.Target, b.fields.Target != nil
 }
 
-// ToUnstructured converts ResourceMetricSourceBuilder to unstructured.
-func (b *ResourceMetricSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ResourceMetricSourceApplyConfiguration to unstructured.
+func (b *ResourceMetricSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -97,9 +97,9 @@ func (b *ResourceMetricSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ResourceMetricSourceBuilder, replacing the contents
-// of ResourceMetricSourceBuilder.
-func (b *ResourceMetricSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ResourceMetricSourceApplyConfiguration, replacing the contents
+// of ResourceMetricSourceApplyConfiguration.
+func (b *ResourceMetricSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &resourceMetricSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -110,15 +110,15 @@ func (b *ResourceMetricSourceBuilder) FromUnstructured(u map[string]interface{})
 	return nil
 }
 
-// MarshalJSON marshals ResourceMetricSourceBuilder to JSON.
-func (b *ResourceMetricSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ResourceMetricSourceApplyConfiguration to JSON.
+func (b *ResourceMetricSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ResourceMetricSourceBuilder, replacing the contents of
-// ResourceMetricSourceBuilder.
-func (b *ResourceMetricSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ResourceMetricSourceApplyConfiguration, replacing the contents of
+// ResourceMetricSourceApplyConfiguration.
+func (b *ResourceMetricSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -126,13 +126,13 @@ func (b *ResourceMetricSourceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ResourceMetricSourceList represents a list of ResourceMetricSourceBuilder.
-type ResourceMetricSourceList []*ResourceMetricSourceBuilder
+// ResourceMetricSourceList represents a listAlias of ResourceMetricSourceApplyConfiguration.
+type ResourceMetricSourceList []*ResourceMetricSourceApplyConfiguration
 
-// ResourceMetricSourceList represents a map of ResourceMetricSourceBuilder.
-type ResourceMetricSourceMap map[string]ResourceMetricSourceBuilder
+// ResourceMetricSourceList represents a map of ResourceMetricSourceApplyConfiguration.
+type ResourceMetricSourceMap map[string]ResourceMetricSourceApplyConfiguration
 
-func (b *ResourceMetricSourceBuilder) preMarshal() {
+func (b *ResourceMetricSourceApplyConfiguration) preMarshal() {
 }
-func (b *ResourceMetricSourceBuilder) postUnmarshal() {
+func (b *ResourceMetricSourceApplyConfiguration) postUnmarshal() {
 }

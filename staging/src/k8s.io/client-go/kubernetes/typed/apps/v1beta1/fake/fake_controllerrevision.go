@@ -132,7 +132,7 @@ func (c *FakeControllerRevisions) Patch(ctx context.Context, name string, pt typ
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied controllerRevision.
-func (c *FakeControllerRevisions) Apply(ctx context.Context, controllerRevision appsv1beta1.ControllerRevisionBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ControllerRevision, err error) {
+func (c *FakeControllerRevisions) Apply(ctx context.Context, controllerRevision *appsv1beta1.ControllerRevisionApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ControllerRevision, err error) {
 	data, err := controllerRevision.MarshalJSON()
 	if err != nil {
 		return nil, err

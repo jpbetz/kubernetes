@@ -24,66 +24,66 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ProbeBuilder represents an declarative configuration of the Probe type for use
+// ProbeApplyConfiguration represents an declarative configuration of the Probe type for use
 // with apply.
-type ProbeBuilder struct {
-	handler *HandlerBuilder // inlined type
+type ProbeApplyConfiguration struct {
+	handler *HandlerApplyConfiguration // inlined type
 	fields  probeFields
 }
 
+// ProbeApplyConfiguration constructs an declarative configuration of the Probe type for use with
+// apply.
+func Probe() *ProbeApplyConfiguration {
+	return &ProbeApplyConfiguration{}
+}
+
 // probeFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ProbeBuilder.
+// Inline fields are owned by their respective inline type in ProbeApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type probeFields struct {
-	Exec                *ExecActionBuilder      `json:"exec,omitempty"`      // inlined ProbeBuilder.handler.Exec field
-	HTTPGet             *HTTPGetActionBuilder   `json:"httpGet,omitempty"`   // inlined ProbeBuilder.handler.HTTPGet field
-	TCPSocket           *TCPSocketActionBuilder `json:"tcpSocket,omitempty"` // inlined ProbeBuilder.handler.TCPSocket field
-	InitialDelaySeconds *int32                  `json:"initialDelaySeconds,omitempty"`
-	TimeoutSeconds      *int32                  `json:"timeoutSeconds,omitempty"`
-	PeriodSeconds       *int32                  `json:"periodSeconds,omitempty"`
-	SuccessThreshold    *int32                  `json:"successThreshold,omitempty"`
-	FailureThreshold    *int32                  `json:"failureThreshold,omitempty"`
-}
-
-// Probe constructs an declarative configuration of the Probe type for use with
-// apply.
-func Probe() *ProbeBuilder {
-	return &ProbeBuilder{}
+	Exec                *ExecActionApplyConfiguration      `json:"exec,omitempty"`      // inlined ProbeApplyConfiguration.handler.Exec field
+	HTTPGet             *HTTPGetActionApplyConfiguration   `json:"httpGet,omitempty"`   // inlined ProbeApplyConfiguration.handler.HTTPGet field
+	TCPSocket           *TCPSocketActionApplyConfiguration `json:"tcpSocket,omitempty"` // inlined ProbeApplyConfiguration.handler.TCPSocket field
+	InitialDelaySeconds *int32                             `json:"initialDelaySeconds,omitempty"`
+	TimeoutSeconds      *int32                             `json:"timeoutSeconds,omitempty"`
+	PeriodSeconds       *int32                             `json:"periodSeconds,omitempty"`
+	SuccessThreshold    *int32                             `json:"successThreshold,omitempty"`
+	FailureThreshold    *int32                             `json:"failureThreshold,omitempty"`
 }
 
 // SetHandler sets the Handler field in the declarative configuration to the given value.
-func (b *ProbeBuilder) SetHandler(value *HandlerBuilder) *ProbeBuilder {
+func (b *ProbeApplyConfiguration) SetHandler(value *HandlerApplyConfiguration) *ProbeApplyConfiguration {
 	b.handler = value
 	return b
 }
 
 // RemoveHandler removes the Handler field from the declarative configuration.
-func (b *ProbeBuilder) RemoveHandler() *ProbeBuilder {
+func (b *ProbeApplyConfiguration) RemoveHandler() *ProbeApplyConfiguration {
 	b.handler = nil
 	return b
 }
 
 // GetHandler gets the Handler field from the declarative configuration.
-func (b *ProbeBuilder) GetHandler() (value *HandlerBuilder, ok bool) {
+func (b *ProbeApplyConfiguration) GetHandler() (value *HandlerApplyConfiguration, ok bool) {
 	return b.handler, true
 }
 
 // SetInitialDelaySeconds sets the InitialDelaySeconds field in the declarative configuration to the given value.
-func (b *ProbeBuilder) SetInitialDelaySeconds(value int32) *ProbeBuilder {
+func (b *ProbeApplyConfiguration) SetInitialDelaySeconds(value int32) *ProbeApplyConfiguration {
 	b.fields.InitialDelaySeconds = &value
 	return b
 }
 
 // RemoveInitialDelaySeconds removes the InitialDelaySeconds field from the declarative configuration.
-func (b *ProbeBuilder) RemoveInitialDelaySeconds() *ProbeBuilder {
+func (b *ProbeApplyConfiguration) RemoveInitialDelaySeconds() *ProbeApplyConfiguration {
 	b.fields.InitialDelaySeconds = nil
 	return b
 }
 
 // GetInitialDelaySeconds gets the InitialDelaySeconds field from the declarative configuration.
-func (b *ProbeBuilder) GetInitialDelaySeconds() (value int32, ok bool) {
+func (b *ProbeApplyConfiguration) GetInitialDelaySeconds() (value int32, ok bool) {
 	if v := b.fields.InitialDelaySeconds; v != nil {
 		return *v, true
 	}
@@ -91,19 +91,19 @@ func (b *ProbeBuilder) GetInitialDelaySeconds() (value int32, ok bool) {
 }
 
 // SetTimeoutSeconds sets the TimeoutSeconds field in the declarative configuration to the given value.
-func (b *ProbeBuilder) SetTimeoutSeconds(value int32) *ProbeBuilder {
+func (b *ProbeApplyConfiguration) SetTimeoutSeconds(value int32) *ProbeApplyConfiguration {
 	b.fields.TimeoutSeconds = &value
 	return b
 }
 
 // RemoveTimeoutSeconds removes the TimeoutSeconds field from the declarative configuration.
-func (b *ProbeBuilder) RemoveTimeoutSeconds() *ProbeBuilder {
+func (b *ProbeApplyConfiguration) RemoveTimeoutSeconds() *ProbeApplyConfiguration {
 	b.fields.TimeoutSeconds = nil
 	return b
 }
 
 // GetTimeoutSeconds gets the TimeoutSeconds field from the declarative configuration.
-func (b *ProbeBuilder) GetTimeoutSeconds() (value int32, ok bool) {
+func (b *ProbeApplyConfiguration) GetTimeoutSeconds() (value int32, ok bool) {
 	if v := b.fields.TimeoutSeconds; v != nil {
 		return *v, true
 	}
@@ -111,19 +111,19 @@ func (b *ProbeBuilder) GetTimeoutSeconds() (value int32, ok bool) {
 }
 
 // SetPeriodSeconds sets the PeriodSeconds field in the declarative configuration to the given value.
-func (b *ProbeBuilder) SetPeriodSeconds(value int32) *ProbeBuilder {
+func (b *ProbeApplyConfiguration) SetPeriodSeconds(value int32) *ProbeApplyConfiguration {
 	b.fields.PeriodSeconds = &value
 	return b
 }
 
 // RemovePeriodSeconds removes the PeriodSeconds field from the declarative configuration.
-func (b *ProbeBuilder) RemovePeriodSeconds() *ProbeBuilder {
+func (b *ProbeApplyConfiguration) RemovePeriodSeconds() *ProbeApplyConfiguration {
 	b.fields.PeriodSeconds = nil
 	return b
 }
 
 // GetPeriodSeconds gets the PeriodSeconds field from the declarative configuration.
-func (b *ProbeBuilder) GetPeriodSeconds() (value int32, ok bool) {
+func (b *ProbeApplyConfiguration) GetPeriodSeconds() (value int32, ok bool) {
 	if v := b.fields.PeriodSeconds; v != nil {
 		return *v, true
 	}
@@ -131,19 +131,19 @@ func (b *ProbeBuilder) GetPeriodSeconds() (value int32, ok bool) {
 }
 
 // SetSuccessThreshold sets the SuccessThreshold field in the declarative configuration to the given value.
-func (b *ProbeBuilder) SetSuccessThreshold(value int32) *ProbeBuilder {
+func (b *ProbeApplyConfiguration) SetSuccessThreshold(value int32) *ProbeApplyConfiguration {
 	b.fields.SuccessThreshold = &value
 	return b
 }
 
 // RemoveSuccessThreshold removes the SuccessThreshold field from the declarative configuration.
-func (b *ProbeBuilder) RemoveSuccessThreshold() *ProbeBuilder {
+func (b *ProbeApplyConfiguration) RemoveSuccessThreshold() *ProbeApplyConfiguration {
 	b.fields.SuccessThreshold = nil
 	return b
 }
 
 // GetSuccessThreshold gets the SuccessThreshold field from the declarative configuration.
-func (b *ProbeBuilder) GetSuccessThreshold() (value int32, ok bool) {
+func (b *ProbeApplyConfiguration) GetSuccessThreshold() (value int32, ok bool) {
 	if v := b.fields.SuccessThreshold; v != nil {
 		return *v, true
 	}
@@ -151,27 +151,27 @@ func (b *ProbeBuilder) GetSuccessThreshold() (value int32, ok bool) {
 }
 
 // SetFailureThreshold sets the FailureThreshold field in the declarative configuration to the given value.
-func (b *ProbeBuilder) SetFailureThreshold(value int32) *ProbeBuilder {
+func (b *ProbeApplyConfiguration) SetFailureThreshold(value int32) *ProbeApplyConfiguration {
 	b.fields.FailureThreshold = &value
 	return b
 }
 
 // RemoveFailureThreshold removes the FailureThreshold field from the declarative configuration.
-func (b *ProbeBuilder) RemoveFailureThreshold() *ProbeBuilder {
+func (b *ProbeApplyConfiguration) RemoveFailureThreshold() *ProbeApplyConfiguration {
 	b.fields.FailureThreshold = nil
 	return b
 }
 
 // GetFailureThreshold gets the FailureThreshold field from the declarative configuration.
-func (b *ProbeBuilder) GetFailureThreshold() (value int32, ok bool) {
+func (b *ProbeApplyConfiguration) GetFailureThreshold() (value int32, ok bool) {
 	if v := b.fields.FailureThreshold; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ProbeBuilder to unstructured.
-func (b *ProbeBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ProbeApplyConfiguration to unstructured.
+func (b *ProbeApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -183,9 +183,9 @@ func (b *ProbeBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ProbeBuilder, replacing the contents
-// of ProbeBuilder.
-func (b *ProbeBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ProbeApplyConfiguration, replacing the contents
+// of ProbeApplyConfiguration.
+func (b *ProbeApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &probeFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -196,15 +196,15 @@ func (b *ProbeBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals ProbeBuilder to JSON.
-func (b *ProbeBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ProbeApplyConfiguration to JSON.
+func (b *ProbeApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ProbeBuilder, replacing the contents of
-// ProbeBuilder.
-func (b *ProbeBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ProbeApplyConfiguration, replacing the contents of
+// ProbeApplyConfiguration.
+func (b *ProbeApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -212,13 +212,13 @@ func (b *ProbeBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ProbeList represents a list of ProbeBuilder.
-type ProbeList []*ProbeBuilder
+// ProbeList represents a listAlias of ProbeApplyConfiguration.
+type ProbeList []*ProbeApplyConfiguration
 
-// ProbeList represents a map of ProbeBuilder.
-type ProbeMap map[string]ProbeBuilder
+// ProbeList represents a map of ProbeApplyConfiguration.
+type ProbeMap map[string]ProbeApplyConfiguration
 
-func (b *ProbeBuilder) preMarshal() {
+func (b *ProbeApplyConfiguration) preMarshal() {
 	if b.handler != nil {
 		if v, ok := b.handler.GetExec(); ok {
 			b.fields.Exec = v
@@ -231,9 +231,9 @@ func (b *ProbeBuilder) preMarshal() {
 		}
 	}
 }
-func (b *ProbeBuilder) postUnmarshal() {
+func (b *ProbeApplyConfiguration) postUnmarshal() {
 	if b.handler == nil {
-		b.handler = &HandlerBuilder{}
+		b.handler = &HandlerApplyConfiguration{}
 	}
 	if b.fields.Exec != nil {
 		b.handler.SetExec(b.fields.Exec)

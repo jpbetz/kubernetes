@@ -48,7 +48,7 @@ type StorageClassInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.StorageClassList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.StorageClass, err error)
-	Apply(ctx context.Context, storageClass storagev1.StorageClassBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.StorageClass, err error)
+	Apply(ctx context.Context, storageClass *storagev1.StorageClassApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.StorageClass, err error)
 	StorageClassExpansion
 }
 
@@ -171,7 +171,7 @@ func (c *storageClasses) Patch(ctx context.Context, name string, pt types.PatchT
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied storageClass.
-func (c *storageClasses) Apply(ctx context.Context, storageClass storagev1.StorageClassBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.StorageClass, err error) {
+func (c *storageClasses) Apply(ctx context.Context, storageClass *storagev1.StorageClassApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.StorageClass, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := storageClass.MarshalJSON()
 	if err != nil {

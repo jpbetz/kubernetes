@@ -25,42 +25,42 @@ import (
 	v1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
-// VolumeAttachmentSourceBuilder represents an declarative configuration of the VolumeAttachmentSource type for use
+// VolumeAttachmentSourceApplyConfiguration represents an declarative configuration of the VolumeAttachmentSource type for use
 // with apply.
-type VolumeAttachmentSourceBuilder struct {
+type VolumeAttachmentSourceApplyConfiguration struct {
 	fields volumeAttachmentSourceFields
 }
 
+// VolumeAttachmentSourceApplyConfiguration constructs an declarative configuration of the VolumeAttachmentSource type for use with
+// apply.
+func VolumeAttachmentSource() *VolumeAttachmentSourceApplyConfiguration {
+	return &VolumeAttachmentSourceApplyConfiguration{}
+}
+
 // volumeAttachmentSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in VolumeAttachmentSourceBuilder.
+// Inline fields are owned by their respective inline type in VolumeAttachmentSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type volumeAttachmentSourceFields struct {
-	PersistentVolumeName *string                         `json:"persistentVolumeName,omitempty"`
-	InlineVolumeSpec     *v1.PersistentVolumeSpecBuilder `json:"inlineVolumeSpec,omitempty"`
-}
-
-// VolumeAttachmentSource constructs an declarative configuration of the VolumeAttachmentSource type for use with
-// apply.
-func VolumeAttachmentSource() *VolumeAttachmentSourceBuilder {
-	return &VolumeAttachmentSourceBuilder{}
+	PersistentVolumeName *string                                    `json:"persistentVolumeName,omitempty"`
+	InlineVolumeSpec     *v1.PersistentVolumeSpecApplyConfiguration `json:"inlineVolumeSpec,omitempty"`
 }
 
 // SetPersistentVolumeName sets the PersistentVolumeName field in the declarative configuration to the given value.
-func (b *VolumeAttachmentSourceBuilder) SetPersistentVolumeName(value string) *VolumeAttachmentSourceBuilder {
+func (b *VolumeAttachmentSourceApplyConfiguration) SetPersistentVolumeName(value string) *VolumeAttachmentSourceApplyConfiguration {
 	b.fields.PersistentVolumeName = &value
 	return b
 }
 
 // RemovePersistentVolumeName removes the PersistentVolumeName field from the declarative configuration.
-func (b *VolumeAttachmentSourceBuilder) RemovePersistentVolumeName() *VolumeAttachmentSourceBuilder {
+func (b *VolumeAttachmentSourceApplyConfiguration) RemovePersistentVolumeName() *VolumeAttachmentSourceApplyConfiguration {
 	b.fields.PersistentVolumeName = nil
 	return b
 }
 
 // GetPersistentVolumeName gets the PersistentVolumeName field from the declarative configuration.
-func (b *VolumeAttachmentSourceBuilder) GetPersistentVolumeName() (value string, ok bool) {
+func (b *VolumeAttachmentSourceApplyConfiguration) GetPersistentVolumeName() (value string, ok bool) {
 	if v := b.fields.PersistentVolumeName; v != nil {
 		return *v, true
 	}
@@ -68,24 +68,24 @@ func (b *VolumeAttachmentSourceBuilder) GetPersistentVolumeName() (value string,
 }
 
 // SetInlineVolumeSpec sets the InlineVolumeSpec field in the declarative configuration to the given value.
-func (b *VolumeAttachmentSourceBuilder) SetInlineVolumeSpec(value *v1.PersistentVolumeSpecBuilder) *VolumeAttachmentSourceBuilder {
+func (b *VolumeAttachmentSourceApplyConfiguration) SetInlineVolumeSpec(value *v1.PersistentVolumeSpecApplyConfiguration) *VolumeAttachmentSourceApplyConfiguration {
 	b.fields.InlineVolumeSpec = value
 	return b
 }
 
 // RemoveInlineVolumeSpec removes the InlineVolumeSpec field from the declarative configuration.
-func (b *VolumeAttachmentSourceBuilder) RemoveInlineVolumeSpec() *VolumeAttachmentSourceBuilder {
+func (b *VolumeAttachmentSourceApplyConfiguration) RemoveInlineVolumeSpec() *VolumeAttachmentSourceApplyConfiguration {
 	b.fields.InlineVolumeSpec = nil
 	return b
 }
 
 // GetInlineVolumeSpec gets the InlineVolumeSpec field from the declarative configuration.
-func (b *VolumeAttachmentSourceBuilder) GetInlineVolumeSpec() (value *v1.PersistentVolumeSpecBuilder, ok bool) {
+func (b *VolumeAttachmentSourceApplyConfiguration) GetInlineVolumeSpec() (value *v1.PersistentVolumeSpecApplyConfiguration, ok bool) {
 	return b.fields.InlineVolumeSpec, b.fields.InlineVolumeSpec != nil
 }
 
-// ToUnstructured converts VolumeAttachmentSourceBuilder to unstructured.
-func (b *VolumeAttachmentSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts VolumeAttachmentSourceApplyConfiguration to unstructured.
+func (b *VolumeAttachmentSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -97,9 +97,9 @@ func (b *VolumeAttachmentSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to VolumeAttachmentSourceBuilder, replacing the contents
-// of VolumeAttachmentSourceBuilder.
-func (b *VolumeAttachmentSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to VolumeAttachmentSourceApplyConfiguration, replacing the contents
+// of VolumeAttachmentSourceApplyConfiguration.
+func (b *VolumeAttachmentSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &volumeAttachmentSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -110,15 +110,15 @@ func (b *VolumeAttachmentSourceBuilder) FromUnstructured(u map[string]interface{
 	return nil
 }
 
-// MarshalJSON marshals VolumeAttachmentSourceBuilder to JSON.
-func (b *VolumeAttachmentSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals VolumeAttachmentSourceApplyConfiguration to JSON.
+func (b *VolumeAttachmentSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into VolumeAttachmentSourceBuilder, replacing the contents of
-// VolumeAttachmentSourceBuilder.
-func (b *VolumeAttachmentSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into VolumeAttachmentSourceApplyConfiguration, replacing the contents of
+// VolumeAttachmentSourceApplyConfiguration.
+func (b *VolumeAttachmentSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -126,13 +126,13 @@ func (b *VolumeAttachmentSourceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// VolumeAttachmentSourceList represents a list of VolumeAttachmentSourceBuilder.
-type VolumeAttachmentSourceList []*VolumeAttachmentSourceBuilder
+// VolumeAttachmentSourceList represents a listAlias of VolumeAttachmentSourceApplyConfiguration.
+type VolumeAttachmentSourceList []*VolumeAttachmentSourceApplyConfiguration
 
-// VolumeAttachmentSourceList represents a map of VolumeAttachmentSourceBuilder.
-type VolumeAttachmentSourceMap map[string]VolumeAttachmentSourceBuilder
+// VolumeAttachmentSourceList represents a map of VolumeAttachmentSourceApplyConfiguration.
+type VolumeAttachmentSourceMap map[string]VolumeAttachmentSourceApplyConfiguration
 
-func (b *VolumeAttachmentSourceBuilder) preMarshal() {
+func (b *VolumeAttachmentSourceApplyConfiguration) preMarshal() {
 }
-func (b *VolumeAttachmentSourceBuilder) postUnmarshal() {
+func (b *VolumeAttachmentSourceApplyConfiguration) postUnmarshal() {
 }

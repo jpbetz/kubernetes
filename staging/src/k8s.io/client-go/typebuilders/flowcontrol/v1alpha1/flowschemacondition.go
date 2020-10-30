@@ -26,14 +26,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// FlowSchemaConditionBuilder represents an declarative configuration of the FlowSchemaCondition type for use
+// FlowSchemaConditionApplyConfiguration represents an declarative configuration of the FlowSchemaCondition type for use
 // with apply.
-type FlowSchemaConditionBuilder struct {
+type FlowSchemaConditionApplyConfiguration struct {
 	fields flowSchemaConditionFields
 }
 
+// FlowSchemaConditionApplyConfiguration constructs an declarative configuration of the FlowSchemaCondition type for use with
+// apply.
+func FlowSchemaCondition() *FlowSchemaConditionApplyConfiguration {
+	return &FlowSchemaConditionApplyConfiguration{}
+}
+
 // flowSchemaConditionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in FlowSchemaConditionBuilder.
+// Inline fields are owned by their respective inline type in FlowSchemaConditionApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -45,26 +51,20 @@ type flowSchemaConditionFields struct {
 	Message            *string                           `json:"message,omitempty"`
 }
 
-// FlowSchemaCondition constructs an declarative configuration of the FlowSchemaCondition type for use with
-// apply.
-func FlowSchemaCondition() *FlowSchemaConditionBuilder {
-	return &FlowSchemaConditionBuilder{}
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b *FlowSchemaConditionBuilder) SetType(value v1alpha1.FlowSchemaConditionType) *FlowSchemaConditionBuilder {
+func (b *FlowSchemaConditionApplyConfiguration) SetType(value v1alpha1.FlowSchemaConditionType) *FlowSchemaConditionApplyConfiguration {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b *FlowSchemaConditionBuilder) RemoveType() *FlowSchemaConditionBuilder {
+func (b *FlowSchemaConditionApplyConfiguration) RemoveType() *FlowSchemaConditionApplyConfiguration {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b *FlowSchemaConditionBuilder) GetType() (value v1alpha1.FlowSchemaConditionType, ok bool) {
+func (b *FlowSchemaConditionApplyConfiguration) GetType() (value v1alpha1.FlowSchemaConditionType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -72,19 +72,19 @@ func (b *FlowSchemaConditionBuilder) GetType() (value v1alpha1.FlowSchemaConditi
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *FlowSchemaConditionBuilder) SetStatus(value v1alpha1.ConditionStatus) *FlowSchemaConditionBuilder {
+func (b *FlowSchemaConditionApplyConfiguration) SetStatus(value v1alpha1.ConditionStatus) *FlowSchemaConditionApplyConfiguration {
 	b.fields.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *FlowSchemaConditionBuilder) RemoveStatus() *FlowSchemaConditionBuilder {
+func (b *FlowSchemaConditionApplyConfiguration) RemoveStatus() *FlowSchemaConditionApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *FlowSchemaConditionBuilder) GetStatus() (value v1alpha1.ConditionStatus, ok bool) {
+func (b *FlowSchemaConditionApplyConfiguration) GetStatus() (value v1alpha1.ConditionStatus, ok bool) {
 	if v := b.fields.Status; v != nil {
 		return *v, true
 	}
@@ -92,19 +92,19 @@ func (b *FlowSchemaConditionBuilder) GetStatus() (value v1alpha1.ConditionStatus
 }
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
-func (b *FlowSchemaConditionBuilder) SetLastTransitionTime(value v1.Time) *FlowSchemaConditionBuilder {
+func (b *FlowSchemaConditionApplyConfiguration) SetLastTransitionTime(value v1.Time) *FlowSchemaConditionApplyConfiguration {
 	b.fields.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
-func (b *FlowSchemaConditionBuilder) RemoveLastTransitionTime() *FlowSchemaConditionBuilder {
+func (b *FlowSchemaConditionApplyConfiguration) RemoveLastTransitionTime() *FlowSchemaConditionApplyConfiguration {
 	b.fields.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
-func (b *FlowSchemaConditionBuilder) GetLastTransitionTime() (value v1.Time, ok bool) {
+func (b *FlowSchemaConditionApplyConfiguration) GetLastTransitionTime() (value v1.Time, ok bool) {
 	if v := b.fields.LastTransitionTime; v != nil {
 		return *v, true
 	}
@@ -112,19 +112,19 @@ func (b *FlowSchemaConditionBuilder) GetLastTransitionTime() (value v1.Time, ok 
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b *FlowSchemaConditionBuilder) SetReason(value string) *FlowSchemaConditionBuilder {
+func (b *FlowSchemaConditionApplyConfiguration) SetReason(value string) *FlowSchemaConditionApplyConfiguration {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b *FlowSchemaConditionBuilder) RemoveReason() *FlowSchemaConditionBuilder {
+func (b *FlowSchemaConditionApplyConfiguration) RemoveReason() *FlowSchemaConditionApplyConfiguration {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b *FlowSchemaConditionBuilder) GetReason() (value string, ok bool) {
+func (b *FlowSchemaConditionApplyConfiguration) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -132,27 +132,27 @@ func (b *FlowSchemaConditionBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b *FlowSchemaConditionBuilder) SetMessage(value string) *FlowSchemaConditionBuilder {
+func (b *FlowSchemaConditionApplyConfiguration) SetMessage(value string) *FlowSchemaConditionApplyConfiguration {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b *FlowSchemaConditionBuilder) RemoveMessage() *FlowSchemaConditionBuilder {
+func (b *FlowSchemaConditionApplyConfiguration) RemoveMessage() *FlowSchemaConditionApplyConfiguration {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b *FlowSchemaConditionBuilder) GetMessage() (value string, ok bool) {
+func (b *FlowSchemaConditionApplyConfiguration) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts FlowSchemaConditionBuilder to unstructured.
-func (b *FlowSchemaConditionBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts FlowSchemaConditionApplyConfiguration to unstructured.
+func (b *FlowSchemaConditionApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -164,9 +164,9 @@ func (b *FlowSchemaConditionBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to FlowSchemaConditionBuilder, replacing the contents
-// of FlowSchemaConditionBuilder.
-func (b *FlowSchemaConditionBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to FlowSchemaConditionApplyConfiguration, replacing the contents
+// of FlowSchemaConditionApplyConfiguration.
+func (b *FlowSchemaConditionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &flowSchemaConditionFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -177,15 +177,15 @@ func (b *FlowSchemaConditionBuilder) FromUnstructured(u map[string]interface{}) 
 	return nil
 }
 
-// MarshalJSON marshals FlowSchemaConditionBuilder to JSON.
-func (b *FlowSchemaConditionBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals FlowSchemaConditionApplyConfiguration to JSON.
+func (b *FlowSchemaConditionApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into FlowSchemaConditionBuilder, replacing the contents of
-// FlowSchemaConditionBuilder.
-func (b *FlowSchemaConditionBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into FlowSchemaConditionApplyConfiguration, replacing the contents of
+// FlowSchemaConditionApplyConfiguration.
+func (b *FlowSchemaConditionApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -193,13 +193,13 @@ func (b *FlowSchemaConditionBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// FlowSchemaConditionList represents a list of FlowSchemaConditionBuilder.
-type FlowSchemaConditionList []*FlowSchemaConditionBuilder
+// FlowSchemaConditionList represents a listAlias of FlowSchemaConditionApplyConfiguration.
+type FlowSchemaConditionList []*FlowSchemaConditionApplyConfiguration
 
-// FlowSchemaConditionList represents a map of FlowSchemaConditionBuilder.
-type FlowSchemaConditionMap map[string]FlowSchemaConditionBuilder
+// FlowSchemaConditionList represents a map of FlowSchemaConditionApplyConfiguration.
+type FlowSchemaConditionMap map[string]FlowSchemaConditionApplyConfiguration
 
-func (b *FlowSchemaConditionBuilder) preMarshal() {
+func (b *FlowSchemaConditionApplyConfiguration) preMarshal() {
 }
-func (b *FlowSchemaConditionBuilder) postUnmarshal() {
+func (b *FlowSchemaConditionApplyConfiguration) postUnmarshal() {
 }

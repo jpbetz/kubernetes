@@ -132,7 +132,7 @@ func (c *FakeNetworkPolicies) Patch(ctx context.Context, name string, pt types.P
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied networkPolicy.
-func (c *FakeNetworkPolicies) Apply(ctx context.Context, networkPolicy extensionsv1beta1.NetworkPolicyBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.NetworkPolicy, err error) {
+func (c *FakeNetworkPolicies) Apply(ctx context.Context, networkPolicy *extensionsv1beta1.NetworkPolicyApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.NetworkPolicy, err error) {
 	data, err := networkPolicy.MarshalJSON()
 	if err != nil {
 		return nil, err

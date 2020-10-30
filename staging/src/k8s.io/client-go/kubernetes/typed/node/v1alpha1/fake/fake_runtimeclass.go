@@ -124,7 +124,7 @@ func (c *FakeRuntimeClasses) Patch(ctx context.Context, name string, pt types.Pa
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied runtimeClass.
-func (c *FakeRuntimeClasses) Apply(ctx context.Context, runtimeClass nodev1alpha1.RuntimeClassBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.RuntimeClass, err error) {
+func (c *FakeRuntimeClasses) Apply(ctx context.Context, runtimeClass *nodev1alpha1.RuntimeClassApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.RuntimeClass, err error) {
 	data, err := runtimeClass.MarshalJSON()
 	if err != nil {
 		return nil, err

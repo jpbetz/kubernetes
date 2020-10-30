@@ -49,7 +49,7 @@ type DaemonSetInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1beta1.DaemonSetList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.DaemonSet, err error)
-	Apply(ctx context.Context, daemonSet extensionsv1beta1.DaemonSetBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.DaemonSet, err error)
+	Apply(ctx context.Context, daemonSet *extensionsv1beta1.DaemonSetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.DaemonSet, err error)
 	DaemonSetExpansion
 }
 
@@ -198,7 +198,7 @@ func (c *daemonSets) Patch(ctx context.Context, name string, pt types.PatchType,
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied daemonSet.
-func (c *daemonSets) Apply(ctx context.Context, daemonSet extensionsv1beta1.DaemonSetBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.DaemonSet, err error) {
+func (c *daemonSets) Apply(ctx context.Context, daemonSet *extensionsv1beta1.DaemonSetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.DaemonSet, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := daemonSet.MarshalJSON()
 	if err != nil {

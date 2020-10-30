@@ -25,102 +25,102 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// NamespaceBuilder represents an declarative configuration of the Namespace type for use
+// NamespaceApplyConfiguration represents an declarative configuration of the Namespace type for use
 // with apply.
-type NamespaceBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type NamespaceApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   namespaceFields
 }
 
+// NamespaceApplyConfiguration constructs an declarative configuration of the Namespace type for use with
+// apply.
+func Namespace() *NamespaceApplyConfiguration {
+	return &NamespaceApplyConfiguration{}
+}
+
 // namespaceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NamespaceBuilder.
+// Inline fields are owned by their respective inline type in NamespaceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type namespaceFields struct {
-	Kind       *string                 `json:"kind,omitempty"`       // inlined NamespaceBuilder.typeMeta.Kind field
-	APIVersion *string                 `json:"apiVersion,omitempty"` // inlined NamespaceBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder   `json:"metadata,omitempty"`
-	Spec       *NamespaceSpecBuilder   `json:"spec,omitempty"`
-	Status     *NamespaceStatusBuilder `json:"status,omitempty"`
-}
-
-// Namespace constructs an declarative configuration of the Namespace type for use with
-// apply.
-func Namespace() *NamespaceBuilder {
-	return &NamespaceBuilder{}
+	Kind       *string                            `json:"kind,omitempty"`       // inlined NamespaceApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                            `json:"apiVersion,omitempty"` // inlined NamespaceApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration   `json:"metadata,omitempty"`
+	Spec       *NamespaceSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status     *NamespaceStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *NamespaceBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *NamespaceBuilder {
+func (b *NamespaceApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *NamespaceApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *NamespaceBuilder) RemoveTypeMeta() *NamespaceBuilder {
+func (b *NamespaceApplyConfiguration) RemoveTypeMeta() *NamespaceApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *NamespaceBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *NamespaceApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *NamespaceBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *NamespaceBuilder {
+func (b *NamespaceApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *NamespaceApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *NamespaceBuilder) RemoveObjectMeta() *NamespaceBuilder {
+func (b *NamespaceApplyConfiguration) RemoveObjectMeta() *NamespaceApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *NamespaceBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *NamespaceApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *NamespaceBuilder) SetSpec(value *NamespaceSpecBuilder) *NamespaceBuilder {
+func (b *NamespaceApplyConfiguration) SetSpec(value *NamespaceSpecApplyConfiguration) *NamespaceApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *NamespaceBuilder) RemoveSpec() *NamespaceBuilder {
+func (b *NamespaceApplyConfiguration) RemoveSpec() *NamespaceApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *NamespaceBuilder) GetSpec() (value *NamespaceSpecBuilder, ok bool) {
+func (b *NamespaceApplyConfiguration) GetSpec() (value *NamespaceSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *NamespaceBuilder) SetStatus(value *NamespaceStatusBuilder) *NamespaceBuilder {
+func (b *NamespaceApplyConfiguration) SetStatus(value *NamespaceStatusApplyConfiguration) *NamespaceApplyConfiguration {
 	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *NamespaceBuilder) RemoveStatus() *NamespaceBuilder {
+func (b *NamespaceApplyConfiguration) RemoveStatus() *NamespaceApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *NamespaceBuilder) GetStatus() (value *NamespaceStatusBuilder, ok bool) {
+func (b *NamespaceApplyConfiguration) GetStatus() (value *NamespaceStatusApplyConfiguration, ok bool) {
 	return b.fields.Status, b.fields.Status != nil
 }
 
-// ToUnstructured converts NamespaceBuilder to unstructured.
-func (b *NamespaceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NamespaceApplyConfiguration to unstructured.
+func (b *NamespaceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -132,9 +132,9 @@ func (b *NamespaceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NamespaceBuilder, replacing the contents
-// of NamespaceBuilder.
-func (b *NamespaceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NamespaceApplyConfiguration, replacing the contents
+// of NamespaceApplyConfiguration.
+func (b *NamespaceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &namespaceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -145,15 +145,15 @@ func (b *NamespaceBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals NamespaceBuilder to JSON.
-func (b *NamespaceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NamespaceApplyConfiguration to JSON.
+func (b *NamespaceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NamespaceBuilder, replacing the contents of
-// NamespaceBuilder.
-func (b *NamespaceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NamespaceApplyConfiguration, replacing the contents of
+// NamespaceApplyConfiguration.
+func (b *NamespaceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -161,13 +161,13 @@ func (b *NamespaceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NamespaceList represents a list of NamespaceBuilder.
-type NamespaceList []*NamespaceBuilder
+// NamespaceList represents a listAlias of NamespaceApplyConfiguration.
+type NamespaceList []*NamespaceApplyConfiguration
 
-// NamespaceList represents a map of NamespaceBuilder.
-type NamespaceMap map[string]NamespaceBuilder
+// NamespaceList represents a map of NamespaceApplyConfiguration.
+type NamespaceMap map[string]NamespaceApplyConfiguration
 
-func (b *NamespaceBuilder) preMarshal() {
+func (b *NamespaceApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -177,9 +177,9 @@ func (b *NamespaceBuilder) preMarshal() {
 		}
 	}
 }
-func (b *NamespaceBuilder) postUnmarshal() {
+func (b *NamespaceApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

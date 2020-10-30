@@ -26,44 +26,44 @@ import (
 	metav1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// TopologySpreadConstraintBuilder represents an declarative configuration of the TopologySpreadConstraint type for use
+// TopologySpreadConstraintApplyConfiguration represents an declarative configuration of the TopologySpreadConstraint type for use
 // with apply.
-type TopologySpreadConstraintBuilder struct {
+type TopologySpreadConstraintApplyConfiguration struct {
 	fields topologySpreadConstraintFields
 }
 
+// TopologySpreadConstraintApplyConfiguration constructs an declarative configuration of the TopologySpreadConstraint type for use with
+// apply.
+func TopologySpreadConstraint() *TopologySpreadConstraintApplyConfiguration {
+	return &TopologySpreadConstraintApplyConfiguration{}
+}
+
 // topologySpreadConstraintFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in TopologySpreadConstraintBuilder.
+// Inline fields are owned by their respective inline type in TopologySpreadConstraintApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type topologySpreadConstraintFields struct {
-	MaxSkew           *int32                            `json:"maxSkew,omitempty"`
-	TopologyKey       *string                           `json:"topologyKey,omitempty"`
-	WhenUnsatisfiable *v1.UnsatisfiableConstraintAction `json:"whenUnsatisfiable,omitempty"`
-	LabelSelector     *metav1.LabelSelectorBuilder      `json:"labelSelector,omitempty"`
-}
-
-// TopologySpreadConstraint constructs an declarative configuration of the TopologySpreadConstraint type for use with
-// apply.
-func TopologySpreadConstraint() *TopologySpreadConstraintBuilder {
-	return &TopologySpreadConstraintBuilder{}
+	MaxSkew           *int32                                  `json:"maxSkew,omitempty"`
+	TopologyKey       *string                                 `json:"topologyKey,omitempty"`
+	WhenUnsatisfiable *v1.UnsatisfiableConstraintAction       `json:"whenUnsatisfiable,omitempty"`
+	LabelSelector     *metav1.LabelSelectorApplyConfiguration `json:"labelSelector,omitempty"`
 }
 
 // SetMaxSkew sets the MaxSkew field in the declarative configuration to the given value.
-func (b *TopologySpreadConstraintBuilder) SetMaxSkew(value int32) *TopologySpreadConstraintBuilder {
+func (b *TopologySpreadConstraintApplyConfiguration) SetMaxSkew(value int32) *TopologySpreadConstraintApplyConfiguration {
 	b.fields.MaxSkew = &value
 	return b
 }
 
 // RemoveMaxSkew removes the MaxSkew field from the declarative configuration.
-func (b *TopologySpreadConstraintBuilder) RemoveMaxSkew() *TopologySpreadConstraintBuilder {
+func (b *TopologySpreadConstraintApplyConfiguration) RemoveMaxSkew() *TopologySpreadConstraintApplyConfiguration {
 	b.fields.MaxSkew = nil
 	return b
 }
 
 // GetMaxSkew gets the MaxSkew field from the declarative configuration.
-func (b *TopologySpreadConstraintBuilder) GetMaxSkew() (value int32, ok bool) {
+func (b *TopologySpreadConstraintApplyConfiguration) GetMaxSkew() (value int32, ok bool) {
 	if v := b.fields.MaxSkew; v != nil {
 		return *v, true
 	}
@@ -71,19 +71,19 @@ func (b *TopologySpreadConstraintBuilder) GetMaxSkew() (value int32, ok bool) {
 }
 
 // SetTopologyKey sets the TopologyKey field in the declarative configuration to the given value.
-func (b *TopologySpreadConstraintBuilder) SetTopologyKey(value string) *TopologySpreadConstraintBuilder {
+func (b *TopologySpreadConstraintApplyConfiguration) SetTopologyKey(value string) *TopologySpreadConstraintApplyConfiguration {
 	b.fields.TopologyKey = &value
 	return b
 }
 
 // RemoveTopologyKey removes the TopologyKey field from the declarative configuration.
-func (b *TopologySpreadConstraintBuilder) RemoveTopologyKey() *TopologySpreadConstraintBuilder {
+func (b *TopologySpreadConstraintApplyConfiguration) RemoveTopologyKey() *TopologySpreadConstraintApplyConfiguration {
 	b.fields.TopologyKey = nil
 	return b
 }
 
 // GetTopologyKey gets the TopologyKey field from the declarative configuration.
-func (b *TopologySpreadConstraintBuilder) GetTopologyKey() (value string, ok bool) {
+func (b *TopologySpreadConstraintApplyConfiguration) GetTopologyKey() (value string, ok bool) {
 	if v := b.fields.TopologyKey; v != nil {
 		return *v, true
 	}
@@ -91,19 +91,19 @@ func (b *TopologySpreadConstraintBuilder) GetTopologyKey() (value string, ok boo
 }
 
 // SetWhenUnsatisfiable sets the WhenUnsatisfiable field in the declarative configuration to the given value.
-func (b *TopologySpreadConstraintBuilder) SetWhenUnsatisfiable(value v1.UnsatisfiableConstraintAction) *TopologySpreadConstraintBuilder {
+func (b *TopologySpreadConstraintApplyConfiguration) SetWhenUnsatisfiable(value v1.UnsatisfiableConstraintAction) *TopologySpreadConstraintApplyConfiguration {
 	b.fields.WhenUnsatisfiable = &value
 	return b
 }
 
 // RemoveWhenUnsatisfiable removes the WhenUnsatisfiable field from the declarative configuration.
-func (b *TopologySpreadConstraintBuilder) RemoveWhenUnsatisfiable() *TopologySpreadConstraintBuilder {
+func (b *TopologySpreadConstraintApplyConfiguration) RemoveWhenUnsatisfiable() *TopologySpreadConstraintApplyConfiguration {
 	b.fields.WhenUnsatisfiable = nil
 	return b
 }
 
 // GetWhenUnsatisfiable gets the WhenUnsatisfiable field from the declarative configuration.
-func (b *TopologySpreadConstraintBuilder) GetWhenUnsatisfiable() (value v1.UnsatisfiableConstraintAction, ok bool) {
+func (b *TopologySpreadConstraintApplyConfiguration) GetWhenUnsatisfiable() (value v1.UnsatisfiableConstraintAction, ok bool) {
 	if v := b.fields.WhenUnsatisfiable; v != nil {
 		return *v, true
 	}
@@ -111,24 +111,24 @@ func (b *TopologySpreadConstraintBuilder) GetWhenUnsatisfiable() (value v1.Unsat
 }
 
 // SetLabelSelector sets the LabelSelector field in the declarative configuration to the given value.
-func (b *TopologySpreadConstraintBuilder) SetLabelSelector(value *metav1.LabelSelectorBuilder) *TopologySpreadConstraintBuilder {
+func (b *TopologySpreadConstraintApplyConfiguration) SetLabelSelector(value *metav1.LabelSelectorApplyConfiguration) *TopologySpreadConstraintApplyConfiguration {
 	b.fields.LabelSelector = value
 	return b
 }
 
 // RemoveLabelSelector removes the LabelSelector field from the declarative configuration.
-func (b *TopologySpreadConstraintBuilder) RemoveLabelSelector() *TopologySpreadConstraintBuilder {
+func (b *TopologySpreadConstraintApplyConfiguration) RemoveLabelSelector() *TopologySpreadConstraintApplyConfiguration {
 	b.fields.LabelSelector = nil
 	return b
 }
 
 // GetLabelSelector gets the LabelSelector field from the declarative configuration.
-func (b *TopologySpreadConstraintBuilder) GetLabelSelector() (value *metav1.LabelSelectorBuilder, ok bool) {
+func (b *TopologySpreadConstraintApplyConfiguration) GetLabelSelector() (value *metav1.LabelSelectorApplyConfiguration, ok bool) {
 	return b.fields.LabelSelector, b.fields.LabelSelector != nil
 }
 
-// ToUnstructured converts TopologySpreadConstraintBuilder to unstructured.
-func (b *TopologySpreadConstraintBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts TopologySpreadConstraintApplyConfiguration to unstructured.
+func (b *TopologySpreadConstraintApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -140,9 +140,9 @@ func (b *TopologySpreadConstraintBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to TopologySpreadConstraintBuilder, replacing the contents
-// of TopologySpreadConstraintBuilder.
-func (b *TopologySpreadConstraintBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to TopologySpreadConstraintApplyConfiguration, replacing the contents
+// of TopologySpreadConstraintApplyConfiguration.
+func (b *TopologySpreadConstraintApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &topologySpreadConstraintFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -153,15 +153,15 @@ func (b *TopologySpreadConstraintBuilder) FromUnstructured(u map[string]interfac
 	return nil
 }
 
-// MarshalJSON marshals TopologySpreadConstraintBuilder to JSON.
-func (b *TopologySpreadConstraintBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals TopologySpreadConstraintApplyConfiguration to JSON.
+func (b *TopologySpreadConstraintApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into TopologySpreadConstraintBuilder, replacing the contents of
-// TopologySpreadConstraintBuilder.
-func (b *TopologySpreadConstraintBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into TopologySpreadConstraintApplyConfiguration, replacing the contents of
+// TopologySpreadConstraintApplyConfiguration.
+func (b *TopologySpreadConstraintApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -169,13 +169,13 @@ func (b *TopologySpreadConstraintBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// TopologySpreadConstraintList represents a list of TopologySpreadConstraintBuilder.
-type TopologySpreadConstraintList []*TopologySpreadConstraintBuilder
+// TopologySpreadConstraintList represents a listAlias of TopologySpreadConstraintApplyConfiguration.
+type TopologySpreadConstraintList []*TopologySpreadConstraintApplyConfiguration
 
-// TopologySpreadConstraintList represents a map of TopologySpreadConstraintBuilder.
-type TopologySpreadConstraintMap map[string]TopologySpreadConstraintBuilder
+// TopologySpreadConstraintList represents a map of TopologySpreadConstraintApplyConfiguration.
+type TopologySpreadConstraintMap map[string]TopologySpreadConstraintApplyConfiguration
 
-func (b *TopologySpreadConstraintBuilder) preMarshal() {
+func (b *TopologySpreadConstraintApplyConfiguration) preMarshal() {
 }
-func (b *TopologySpreadConstraintBuilder) postUnmarshal() {
+func (b *TopologySpreadConstraintApplyConfiguration) postUnmarshal() {
 }

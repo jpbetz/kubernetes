@@ -25,102 +25,102 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// ReplicationControllerBuilder represents an declarative configuration of the ReplicationController type for use
+// ReplicationControllerApplyConfiguration represents an declarative configuration of the ReplicationController type for use
 // with apply.
-type ReplicationControllerBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type ReplicationControllerApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   replicationControllerFields
 }
 
+// ReplicationControllerApplyConfiguration constructs an declarative configuration of the ReplicationController type for use with
+// apply.
+func ReplicationController() *ReplicationControllerApplyConfiguration {
+	return &ReplicationControllerApplyConfiguration{}
+}
+
 // replicationControllerFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ReplicationControllerBuilder.
+// Inline fields are owned by their respective inline type in ReplicationControllerApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type replicationControllerFields struct {
-	Kind       *string                             `json:"kind,omitempty"`       // inlined ReplicationControllerBuilder.typeMeta.Kind field
-	APIVersion *string                             `json:"apiVersion,omitempty"` // inlined ReplicationControllerBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder               `json:"metadata,omitempty"`
-	Spec       *ReplicationControllerSpecBuilder   `json:"spec,omitempty"`
-	Status     *ReplicationControllerStatusBuilder `json:"status,omitempty"`
-}
-
-// ReplicationController constructs an declarative configuration of the ReplicationController type for use with
-// apply.
-func ReplicationController() *ReplicationControllerBuilder {
-	return &ReplicationControllerBuilder{}
+	Kind       *string                                        `json:"kind,omitempty"`       // inlined ReplicationControllerApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                                        `json:"apiVersion,omitempty"` // inlined ReplicationControllerApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration               `json:"metadata,omitempty"`
+	Spec       *ReplicationControllerSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status     *ReplicationControllerStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *ReplicationControllerBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *ReplicationControllerBuilder {
+func (b *ReplicationControllerApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *ReplicationControllerApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *ReplicationControllerBuilder) RemoveTypeMeta() *ReplicationControllerBuilder {
+func (b *ReplicationControllerApplyConfiguration) RemoveTypeMeta() *ReplicationControllerApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *ReplicationControllerBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *ReplicationControllerApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *ReplicationControllerBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *ReplicationControllerBuilder {
+func (b *ReplicationControllerApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *ReplicationControllerApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *ReplicationControllerBuilder) RemoveObjectMeta() *ReplicationControllerBuilder {
+func (b *ReplicationControllerApplyConfiguration) RemoveObjectMeta() *ReplicationControllerApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *ReplicationControllerBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *ReplicationControllerApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *ReplicationControllerBuilder) SetSpec(value *ReplicationControllerSpecBuilder) *ReplicationControllerBuilder {
+func (b *ReplicationControllerApplyConfiguration) SetSpec(value *ReplicationControllerSpecApplyConfiguration) *ReplicationControllerApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *ReplicationControllerBuilder) RemoveSpec() *ReplicationControllerBuilder {
+func (b *ReplicationControllerApplyConfiguration) RemoveSpec() *ReplicationControllerApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *ReplicationControllerBuilder) GetSpec() (value *ReplicationControllerSpecBuilder, ok bool) {
+func (b *ReplicationControllerApplyConfiguration) GetSpec() (value *ReplicationControllerSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *ReplicationControllerBuilder) SetStatus(value *ReplicationControllerStatusBuilder) *ReplicationControllerBuilder {
+func (b *ReplicationControllerApplyConfiguration) SetStatus(value *ReplicationControllerStatusApplyConfiguration) *ReplicationControllerApplyConfiguration {
 	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *ReplicationControllerBuilder) RemoveStatus() *ReplicationControllerBuilder {
+func (b *ReplicationControllerApplyConfiguration) RemoveStatus() *ReplicationControllerApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *ReplicationControllerBuilder) GetStatus() (value *ReplicationControllerStatusBuilder, ok bool) {
+func (b *ReplicationControllerApplyConfiguration) GetStatus() (value *ReplicationControllerStatusApplyConfiguration, ok bool) {
 	return b.fields.Status, b.fields.Status != nil
 }
 
-// ToUnstructured converts ReplicationControllerBuilder to unstructured.
-func (b *ReplicationControllerBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ReplicationControllerApplyConfiguration to unstructured.
+func (b *ReplicationControllerApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -132,9 +132,9 @@ func (b *ReplicationControllerBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ReplicationControllerBuilder, replacing the contents
-// of ReplicationControllerBuilder.
-func (b *ReplicationControllerBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ReplicationControllerApplyConfiguration, replacing the contents
+// of ReplicationControllerApplyConfiguration.
+func (b *ReplicationControllerApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &replicationControllerFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -145,15 +145,15 @@ func (b *ReplicationControllerBuilder) FromUnstructured(u map[string]interface{}
 	return nil
 }
 
-// MarshalJSON marshals ReplicationControllerBuilder to JSON.
-func (b *ReplicationControllerBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ReplicationControllerApplyConfiguration to JSON.
+func (b *ReplicationControllerApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ReplicationControllerBuilder, replacing the contents of
-// ReplicationControllerBuilder.
-func (b *ReplicationControllerBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ReplicationControllerApplyConfiguration, replacing the contents of
+// ReplicationControllerApplyConfiguration.
+func (b *ReplicationControllerApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -161,13 +161,13 @@ func (b *ReplicationControllerBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ReplicationControllerList represents a list of ReplicationControllerBuilder.
-type ReplicationControllerList []*ReplicationControllerBuilder
+// ReplicationControllerList represents a listAlias of ReplicationControllerApplyConfiguration.
+type ReplicationControllerList []*ReplicationControllerApplyConfiguration
 
-// ReplicationControllerList represents a map of ReplicationControllerBuilder.
-type ReplicationControllerMap map[string]ReplicationControllerBuilder
+// ReplicationControllerList represents a map of ReplicationControllerApplyConfiguration.
+type ReplicationControllerMap map[string]ReplicationControllerApplyConfiguration
 
-func (b *ReplicationControllerBuilder) preMarshal() {
+func (b *ReplicationControllerApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -177,9 +177,9 @@ func (b *ReplicationControllerBuilder) preMarshal() {
 		}
 	}
 }
-func (b *ReplicationControllerBuilder) postUnmarshal() {
+func (b *ReplicationControllerApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

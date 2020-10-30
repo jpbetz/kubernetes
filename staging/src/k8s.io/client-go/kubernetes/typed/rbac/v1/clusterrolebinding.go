@@ -48,7 +48,7 @@ type ClusterRoleBindingInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.ClusterRoleBindingList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.ClusterRoleBinding, err error)
-	Apply(ctx context.Context, clusterRoleBinding rbacv1.ClusterRoleBindingBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ClusterRoleBinding, err error)
+	Apply(ctx context.Context, clusterRoleBinding *rbacv1.ClusterRoleBindingApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ClusterRoleBinding, err error)
 	ClusterRoleBindingExpansion
 }
 
@@ -171,7 +171,7 @@ func (c *clusterRoleBindings) Patch(ctx context.Context, name string, pt types.P
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied clusterRoleBinding.
-func (c *clusterRoleBindings) Apply(ctx context.Context, clusterRoleBinding rbacv1.ClusterRoleBindingBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ClusterRoleBinding, err error) {
+func (c *clusterRoleBindings) Apply(ctx context.Context, clusterRoleBinding *rbacv1.ClusterRoleBindingApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ClusterRoleBinding, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := clusterRoleBinding.MarshalJSON()
 	if err != nil {

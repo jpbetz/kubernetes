@@ -49,7 +49,7 @@ type ServiceAccountInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.ServiceAccountList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.ServiceAccount, err error)
-	Apply(ctx context.Context, serviceAccount corev1.ServiceAccountBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ServiceAccount, err error)
+	Apply(ctx context.Context, serviceAccount *corev1.ServiceAccountApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ServiceAccount, err error)
 	CreateToken(ctx context.Context, serviceAccountName string, tokenRequest *authenticationv1.TokenRequest, opts metav1.CreateOptions) (*authenticationv1.TokenRequest, error)
 
 	ServiceAccountExpansion
@@ -184,7 +184,7 @@ func (c *serviceAccounts) Patch(ctx context.Context, name string, pt types.Patch
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied serviceAccount.
-func (c *serviceAccounts) Apply(ctx context.Context, serviceAccount corev1.ServiceAccountBuilder, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ServiceAccount, err error) {
+func (c *serviceAccounts) Apply(ctx context.Context, serviceAccount *corev1.ServiceAccountApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ServiceAccount, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := serviceAccount.MarshalJSON()
 	if err != nil {

@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// EventSourceBuilder represents an declarative configuration of the EventSource type for use
+// EventSourceApplyConfiguration represents an declarative configuration of the EventSource type for use
 // with apply.
-type EventSourceBuilder struct {
+type EventSourceApplyConfiguration struct {
 	fields eventSourceFields
 }
 
+// EventSourceApplyConfiguration constructs an declarative configuration of the EventSource type for use with
+// apply.
+func EventSource() *EventSourceApplyConfiguration {
+	return &EventSourceApplyConfiguration{}
+}
+
 // eventSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in EventSourceBuilder.
+// Inline fields are owned by their respective inline type in EventSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type eventSourceFields struct {
 	Host      *string `json:"host,omitempty"`
 }
 
-// EventSource constructs an declarative configuration of the EventSource type for use with
-// apply.
-func EventSource() *EventSourceBuilder {
-	return &EventSourceBuilder{}
-}
-
 // SetComponent sets the Component field in the declarative configuration to the given value.
-func (b *EventSourceBuilder) SetComponent(value string) *EventSourceBuilder {
+func (b *EventSourceApplyConfiguration) SetComponent(value string) *EventSourceApplyConfiguration {
 	b.fields.Component = &value
 	return b
 }
 
 // RemoveComponent removes the Component field from the declarative configuration.
-func (b *EventSourceBuilder) RemoveComponent() *EventSourceBuilder {
+func (b *EventSourceApplyConfiguration) RemoveComponent() *EventSourceApplyConfiguration {
 	b.fields.Component = nil
 	return b
 }
 
 // GetComponent gets the Component field from the declarative configuration.
-func (b *EventSourceBuilder) GetComponent() (value string, ok bool) {
+func (b *EventSourceApplyConfiguration) GetComponent() (value string, ok bool) {
 	if v := b.fields.Component; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *EventSourceBuilder) GetComponent() (value string, ok bool) {
 }
 
 // SetHost sets the Host field in the declarative configuration to the given value.
-func (b *EventSourceBuilder) SetHost(value string) *EventSourceBuilder {
+func (b *EventSourceApplyConfiguration) SetHost(value string) *EventSourceApplyConfiguration {
 	b.fields.Host = &value
 	return b
 }
 
 // RemoveHost removes the Host field from the declarative configuration.
-func (b *EventSourceBuilder) RemoveHost() *EventSourceBuilder {
+func (b *EventSourceApplyConfiguration) RemoveHost() *EventSourceApplyConfiguration {
 	b.fields.Host = nil
 	return b
 }
 
 // GetHost gets the Host field from the declarative configuration.
-func (b *EventSourceBuilder) GetHost() (value string, ok bool) {
+func (b *EventSourceApplyConfiguration) GetHost() (value string, ok bool) {
 	if v := b.fields.Host; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts EventSourceBuilder to unstructured.
-func (b *EventSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts EventSourceApplyConfiguration to unstructured.
+func (b *EventSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *EventSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to EventSourceBuilder, replacing the contents
-// of EventSourceBuilder.
-func (b *EventSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to EventSourceApplyConfiguration, replacing the contents
+// of EventSourceApplyConfiguration.
+func (b *EventSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &eventSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *EventSourceBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals EventSourceBuilder to JSON.
-func (b *EventSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals EventSourceApplyConfiguration to JSON.
+func (b *EventSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into EventSourceBuilder, replacing the contents of
-// EventSourceBuilder.
-func (b *EventSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into EventSourceApplyConfiguration, replacing the contents of
+// EventSourceApplyConfiguration.
+func (b *EventSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *EventSourceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// EventSourceList represents a list of EventSourceBuilder.
-type EventSourceList []*EventSourceBuilder
+// EventSourceList represents a listAlias of EventSourceApplyConfiguration.
+type EventSourceList []*EventSourceApplyConfiguration
 
-// EventSourceList represents a map of EventSourceBuilder.
-type EventSourceMap map[string]EventSourceBuilder
+// EventSourceList represents a map of EventSourceApplyConfiguration.
+type EventSourceMap map[string]EventSourceApplyConfiguration
 
-func (b *EventSourceBuilder) preMarshal() {
+func (b *EventSourceApplyConfiguration) preMarshal() {
 }
-func (b *EventSourceBuilder) postUnmarshal() {
+func (b *EventSourceApplyConfiguration) postUnmarshal() {
 }

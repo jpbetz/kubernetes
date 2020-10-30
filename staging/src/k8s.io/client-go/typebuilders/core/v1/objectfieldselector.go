@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ObjectFieldSelectorBuilder represents an declarative configuration of the ObjectFieldSelector type for use
+// ObjectFieldSelectorApplyConfiguration represents an declarative configuration of the ObjectFieldSelector type for use
 // with apply.
-type ObjectFieldSelectorBuilder struct {
+type ObjectFieldSelectorApplyConfiguration struct {
 	fields objectFieldSelectorFields
 }
 
+// ObjectFieldSelectorApplyConfiguration constructs an declarative configuration of the ObjectFieldSelector type for use with
+// apply.
+func ObjectFieldSelector() *ObjectFieldSelectorApplyConfiguration {
+	return &ObjectFieldSelectorApplyConfiguration{}
+}
+
 // objectFieldSelectorFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ObjectFieldSelectorBuilder.
+// Inline fields are owned by their respective inline type in ObjectFieldSelectorApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type objectFieldSelectorFields struct {
 	FieldPath  *string `json:"fieldPath,omitempty"`
 }
 
-// ObjectFieldSelector constructs an declarative configuration of the ObjectFieldSelector type for use with
-// apply.
-func ObjectFieldSelector() *ObjectFieldSelectorBuilder {
-	return &ObjectFieldSelectorBuilder{}
-}
-
 // SetAPIVersion sets the APIVersion field in the declarative configuration to the given value.
-func (b *ObjectFieldSelectorBuilder) SetAPIVersion(value string) *ObjectFieldSelectorBuilder {
+func (b *ObjectFieldSelectorApplyConfiguration) SetAPIVersion(value string) *ObjectFieldSelectorApplyConfiguration {
 	b.fields.APIVersion = &value
 	return b
 }
 
 // RemoveAPIVersion removes the APIVersion field from the declarative configuration.
-func (b *ObjectFieldSelectorBuilder) RemoveAPIVersion() *ObjectFieldSelectorBuilder {
+func (b *ObjectFieldSelectorApplyConfiguration) RemoveAPIVersion() *ObjectFieldSelectorApplyConfiguration {
 	b.fields.APIVersion = nil
 	return b
 }
 
 // GetAPIVersion gets the APIVersion field from the declarative configuration.
-func (b *ObjectFieldSelectorBuilder) GetAPIVersion() (value string, ok bool) {
+func (b *ObjectFieldSelectorApplyConfiguration) GetAPIVersion() (value string, ok bool) {
 	if v := b.fields.APIVersion; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *ObjectFieldSelectorBuilder) GetAPIVersion() (value string, ok bool) {
 }
 
 // SetFieldPath sets the FieldPath field in the declarative configuration to the given value.
-func (b *ObjectFieldSelectorBuilder) SetFieldPath(value string) *ObjectFieldSelectorBuilder {
+func (b *ObjectFieldSelectorApplyConfiguration) SetFieldPath(value string) *ObjectFieldSelectorApplyConfiguration {
 	b.fields.FieldPath = &value
 	return b
 }
 
 // RemoveFieldPath removes the FieldPath field from the declarative configuration.
-func (b *ObjectFieldSelectorBuilder) RemoveFieldPath() *ObjectFieldSelectorBuilder {
+func (b *ObjectFieldSelectorApplyConfiguration) RemoveFieldPath() *ObjectFieldSelectorApplyConfiguration {
 	b.fields.FieldPath = nil
 	return b
 }
 
 // GetFieldPath gets the FieldPath field from the declarative configuration.
-func (b *ObjectFieldSelectorBuilder) GetFieldPath() (value string, ok bool) {
+func (b *ObjectFieldSelectorApplyConfiguration) GetFieldPath() (value string, ok bool) {
 	if v := b.fields.FieldPath; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ObjectFieldSelectorBuilder to unstructured.
-func (b *ObjectFieldSelectorBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ObjectFieldSelectorApplyConfiguration to unstructured.
+func (b *ObjectFieldSelectorApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *ObjectFieldSelectorBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ObjectFieldSelectorBuilder, replacing the contents
-// of ObjectFieldSelectorBuilder.
-func (b *ObjectFieldSelectorBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ObjectFieldSelectorApplyConfiguration, replacing the contents
+// of ObjectFieldSelectorApplyConfiguration.
+func (b *ObjectFieldSelectorApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &objectFieldSelectorFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *ObjectFieldSelectorBuilder) FromUnstructured(u map[string]interface{}) 
 	return nil
 }
 
-// MarshalJSON marshals ObjectFieldSelectorBuilder to JSON.
-func (b *ObjectFieldSelectorBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ObjectFieldSelectorApplyConfiguration to JSON.
+func (b *ObjectFieldSelectorApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ObjectFieldSelectorBuilder, replacing the contents of
-// ObjectFieldSelectorBuilder.
-func (b *ObjectFieldSelectorBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ObjectFieldSelectorApplyConfiguration, replacing the contents of
+// ObjectFieldSelectorApplyConfiguration.
+func (b *ObjectFieldSelectorApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *ObjectFieldSelectorBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ObjectFieldSelectorList represents a list of ObjectFieldSelectorBuilder.
-type ObjectFieldSelectorList []*ObjectFieldSelectorBuilder
+// ObjectFieldSelectorList represents a listAlias of ObjectFieldSelectorApplyConfiguration.
+type ObjectFieldSelectorList []*ObjectFieldSelectorApplyConfiguration
 
-// ObjectFieldSelectorList represents a map of ObjectFieldSelectorBuilder.
-type ObjectFieldSelectorMap map[string]ObjectFieldSelectorBuilder
+// ObjectFieldSelectorList represents a map of ObjectFieldSelectorApplyConfiguration.
+type ObjectFieldSelectorMap map[string]ObjectFieldSelectorApplyConfiguration
 
-func (b *ObjectFieldSelectorBuilder) preMarshal() {
+func (b *ObjectFieldSelectorApplyConfiguration) preMarshal() {
 }
-func (b *ObjectFieldSelectorBuilder) postUnmarshal() {
+func (b *ObjectFieldSelectorApplyConfiguration) postUnmarshal() {
 }

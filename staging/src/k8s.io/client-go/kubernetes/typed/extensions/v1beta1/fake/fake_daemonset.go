@@ -144,7 +144,7 @@ func (c *FakeDaemonSets) Patch(ctx context.Context, name string, pt types.PatchT
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied daemonSet.
-func (c *FakeDaemonSets) Apply(ctx context.Context, daemonSet extensionsv1beta1.DaemonSetBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.DaemonSet, err error) {
+func (c *FakeDaemonSets) Apply(ctx context.Context, daemonSet *extensionsv1beta1.DaemonSetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.DaemonSet, err error) {
 	data, err := daemonSet.MarshalJSON()
 	if err != nil {
 		return nil, err

@@ -24,61 +24,61 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// FlowSchemaSpecBuilder represents an declarative configuration of the FlowSchemaSpec type for use
+// FlowSchemaSpecApplyConfiguration represents an declarative configuration of the FlowSchemaSpec type for use
 // with apply.
-type FlowSchemaSpecBuilder struct {
+type FlowSchemaSpecApplyConfiguration struct {
 	fields flowSchemaSpecFields
 }
 
+// FlowSchemaSpecApplyConfiguration constructs an declarative configuration of the FlowSchemaSpec type for use with
+// apply.
+func FlowSchemaSpec() *FlowSchemaSpecApplyConfiguration {
+	return &FlowSchemaSpecApplyConfiguration{}
+}
+
 // flowSchemaSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in FlowSchemaSpecBuilder.
+// Inline fields are owned by their respective inline type in FlowSchemaSpecApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type flowSchemaSpecFields struct {
-	PriorityLevelConfiguration *PriorityLevelConfigurationReferenceBuilder `json:"priorityLevelConfiguration,omitempty"`
-	MatchingPrecedence         *int32                                      `json:"matchingPrecedence,omitempty"`
-	DistinguisherMethod        *FlowDistinguisherMethodBuilder             `json:"distinguisherMethod,omitempty"`
-	Rules                      *PolicyRulesWithSubjectsList                `json:"rules,omitempty"`
-}
-
-// FlowSchemaSpec constructs an declarative configuration of the FlowSchemaSpec type for use with
-// apply.
-func FlowSchemaSpec() *FlowSchemaSpecBuilder {
-	return &FlowSchemaSpecBuilder{}
+	PriorityLevelConfiguration *PriorityLevelConfigurationReferenceApplyConfiguration `json:"priorityLevelConfiguration,omitempty"`
+	MatchingPrecedence         *int32                                                 `json:"matchingPrecedence,omitempty"`
+	DistinguisherMethod        *FlowDistinguisherMethodApplyConfiguration             `json:"distinguisherMethod,omitempty"`
+	Rules                      *PolicyRulesWithSubjectsList                           `json:"rules,omitempty"`
 }
 
 // SetPriorityLevelConfiguration sets the PriorityLevelConfiguration field in the declarative configuration to the given value.
-func (b *FlowSchemaSpecBuilder) SetPriorityLevelConfiguration(value *PriorityLevelConfigurationReferenceBuilder) *FlowSchemaSpecBuilder {
+func (b *FlowSchemaSpecApplyConfiguration) SetPriorityLevelConfiguration(value *PriorityLevelConfigurationReferenceApplyConfiguration) *FlowSchemaSpecApplyConfiguration {
 	b.fields.PriorityLevelConfiguration = value
 	return b
 }
 
 // RemovePriorityLevelConfiguration removes the PriorityLevelConfiguration field from the declarative configuration.
-func (b *FlowSchemaSpecBuilder) RemovePriorityLevelConfiguration() *FlowSchemaSpecBuilder {
+func (b *FlowSchemaSpecApplyConfiguration) RemovePriorityLevelConfiguration() *FlowSchemaSpecApplyConfiguration {
 	b.fields.PriorityLevelConfiguration = nil
 	return b
 }
 
 // GetPriorityLevelConfiguration gets the PriorityLevelConfiguration field from the declarative configuration.
-func (b *FlowSchemaSpecBuilder) GetPriorityLevelConfiguration() (value *PriorityLevelConfigurationReferenceBuilder, ok bool) {
+func (b *FlowSchemaSpecApplyConfiguration) GetPriorityLevelConfiguration() (value *PriorityLevelConfigurationReferenceApplyConfiguration, ok bool) {
 	return b.fields.PriorityLevelConfiguration, b.fields.PriorityLevelConfiguration != nil
 }
 
 // SetMatchingPrecedence sets the MatchingPrecedence field in the declarative configuration to the given value.
-func (b *FlowSchemaSpecBuilder) SetMatchingPrecedence(value int32) *FlowSchemaSpecBuilder {
+func (b *FlowSchemaSpecApplyConfiguration) SetMatchingPrecedence(value int32) *FlowSchemaSpecApplyConfiguration {
 	b.fields.MatchingPrecedence = &value
 	return b
 }
 
 // RemoveMatchingPrecedence removes the MatchingPrecedence field from the declarative configuration.
-func (b *FlowSchemaSpecBuilder) RemoveMatchingPrecedence() *FlowSchemaSpecBuilder {
+func (b *FlowSchemaSpecApplyConfiguration) RemoveMatchingPrecedence() *FlowSchemaSpecApplyConfiguration {
 	b.fields.MatchingPrecedence = nil
 	return b
 }
 
 // GetMatchingPrecedence gets the MatchingPrecedence field from the declarative configuration.
-func (b *FlowSchemaSpecBuilder) GetMatchingPrecedence() (value int32, ok bool) {
+func (b *FlowSchemaSpecApplyConfiguration) GetMatchingPrecedence() (value int32, ok bool) {
 	if v := b.fields.MatchingPrecedence; v != nil {
 		return *v, true
 	}
@@ -86,44 +86,44 @@ func (b *FlowSchemaSpecBuilder) GetMatchingPrecedence() (value int32, ok bool) {
 }
 
 // SetDistinguisherMethod sets the DistinguisherMethod field in the declarative configuration to the given value.
-func (b *FlowSchemaSpecBuilder) SetDistinguisherMethod(value *FlowDistinguisherMethodBuilder) *FlowSchemaSpecBuilder {
+func (b *FlowSchemaSpecApplyConfiguration) SetDistinguisherMethod(value *FlowDistinguisherMethodApplyConfiguration) *FlowSchemaSpecApplyConfiguration {
 	b.fields.DistinguisherMethod = value
 	return b
 }
 
 // RemoveDistinguisherMethod removes the DistinguisherMethod field from the declarative configuration.
-func (b *FlowSchemaSpecBuilder) RemoveDistinguisherMethod() *FlowSchemaSpecBuilder {
+func (b *FlowSchemaSpecApplyConfiguration) RemoveDistinguisherMethod() *FlowSchemaSpecApplyConfiguration {
 	b.fields.DistinguisherMethod = nil
 	return b
 }
 
 // GetDistinguisherMethod gets the DistinguisherMethod field from the declarative configuration.
-func (b *FlowSchemaSpecBuilder) GetDistinguisherMethod() (value *FlowDistinguisherMethodBuilder, ok bool) {
+func (b *FlowSchemaSpecApplyConfiguration) GetDistinguisherMethod() (value *FlowDistinguisherMethodApplyConfiguration, ok bool) {
 	return b.fields.DistinguisherMethod, b.fields.DistinguisherMethod != nil
 }
 
 // SetRules sets the Rules field in the declarative configuration to the given value.
-func (b *FlowSchemaSpecBuilder) SetRules(value PolicyRulesWithSubjectsList) *FlowSchemaSpecBuilder {
+func (b *FlowSchemaSpecApplyConfiguration) SetRules(value PolicyRulesWithSubjectsList) *FlowSchemaSpecApplyConfiguration {
 	b.fields.Rules = &value
 	return b
 }
 
 // RemoveRules removes the Rules field from the declarative configuration.
-func (b *FlowSchemaSpecBuilder) RemoveRules() *FlowSchemaSpecBuilder {
+func (b *FlowSchemaSpecApplyConfiguration) RemoveRules() *FlowSchemaSpecApplyConfiguration {
 	b.fields.Rules = nil
 	return b
 }
 
 // GetRules gets the Rules field from the declarative configuration.
-func (b *FlowSchemaSpecBuilder) GetRules() (value PolicyRulesWithSubjectsList, ok bool) {
+func (b *FlowSchemaSpecApplyConfiguration) GetRules() (value PolicyRulesWithSubjectsList, ok bool) {
 	if v := b.fields.Rules; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts FlowSchemaSpecBuilder to unstructured.
-func (b *FlowSchemaSpecBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts FlowSchemaSpecApplyConfiguration to unstructured.
+func (b *FlowSchemaSpecApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -135,9 +135,9 @@ func (b *FlowSchemaSpecBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to FlowSchemaSpecBuilder, replacing the contents
-// of FlowSchemaSpecBuilder.
-func (b *FlowSchemaSpecBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to FlowSchemaSpecApplyConfiguration, replacing the contents
+// of FlowSchemaSpecApplyConfiguration.
+func (b *FlowSchemaSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &flowSchemaSpecFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -148,15 +148,15 @@ func (b *FlowSchemaSpecBuilder) FromUnstructured(u map[string]interface{}) error
 	return nil
 }
 
-// MarshalJSON marshals FlowSchemaSpecBuilder to JSON.
-func (b *FlowSchemaSpecBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals FlowSchemaSpecApplyConfiguration to JSON.
+func (b *FlowSchemaSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into FlowSchemaSpecBuilder, replacing the contents of
-// FlowSchemaSpecBuilder.
-func (b *FlowSchemaSpecBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into FlowSchemaSpecApplyConfiguration, replacing the contents of
+// FlowSchemaSpecApplyConfiguration.
+func (b *FlowSchemaSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -164,13 +164,13 @@ func (b *FlowSchemaSpecBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// FlowSchemaSpecList represents a list of FlowSchemaSpecBuilder.
-type FlowSchemaSpecList []*FlowSchemaSpecBuilder
+// FlowSchemaSpecList represents a listAlias of FlowSchemaSpecApplyConfiguration.
+type FlowSchemaSpecList []*FlowSchemaSpecApplyConfiguration
 
-// FlowSchemaSpecList represents a map of FlowSchemaSpecBuilder.
-type FlowSchemaSpecMap map[string]FlowSchemaSpecBuilder
+// FlowSchemaSpecList represents a map of FlowSchemaSpecApplyConfiguration.
+type FlowSchemaSpecMap map[string]FlowSchemaSpecApplyConfiguration
 
-func (b *FlowSchemaSpecBuilder) preMarshal() {
+func (b *FlowSchemaSpecApplyConfiguration) preMarshal() {
 }
-func (b *FlowSchemaSpecBuilder) postUnmarshal() {
+func (b *FlowSchemaSpecApplyConfiguration) postUnmarshal() {
 }

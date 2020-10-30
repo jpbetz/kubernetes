@@ -48,7 +48,7 @@ type ValidatingWebhookConfigurationInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1beta1.ValidatingWebhookConfigurationList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.ValidatingWebhookConfiguration, err error)
-	Apply(ctx context.Context, validatingWebhookConfiguration admissionregistrationv1beta1.ValidatingWebhookConfigurationBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ValidatingWebhookConfiguration, err error)
+	Apply(ctx context.Context, validatingWebhookConfiguration *admissionregistrationv1beta1.ValidatingWebhookConfigurationApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ValidatingWebhookConfiguration, err error)
 	ValidatingWebhookConfigurationExpansion
 }
 
@@ -171,7 +171,7 @@ func (c *validatingWebhookConfigurations) Patch(ctx context.Context, name string
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied validatingWebhookConfiguration.
-func (c *validatingWebhookConfigurations) Apply(ctx context.Context, validatingWebhookConfiguration admissionregistrationv1beta1.ValidatingWebhookConfigurationBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ValidatingWebhookConfiguration, err error) {
+func (c *validatingWebhookConfigurations) Apply(ctx context.Context, validatingWebhookConfiguration *admissionregistrationv1beta1.ValidatingWebhookConfigurationApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ValidatingWebhookConfiguration, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := validatingWebhookConfiguration.MarshalJSON()
 	if err != nil {

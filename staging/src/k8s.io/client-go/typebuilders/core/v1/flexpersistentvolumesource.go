@@ -24,45 +24,45 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// FlexPersistentVolumeSourceBuilder represents an declarative configuration of the FlexPersistentVolumeSource type for use
+// FlexPersistentVolumeSourceApplyConfiguration represents an declarative configuration of the FlexPersistentVolumeSource type for use
 // with apply.
-type FlexPersistentVolumeSourceBuilder struct {
+type FlexPersistentVolumeSourceApplyConfiguration struct {
 	fields flexPersistentVolumeSourceFields
 }
 
+// FlexPersistentVolumeSourceApplyConfiguration constructs an declarative configuration of the FlexPersistentVolumeSource type for use with
+// apply.
+func FlexPersistentVolumeSource() *FlexPersistentVolumeSourceApplyConfiguration {
+	return &FlexPersistentVolumeSourceApplyConfiguration{}
+}
+
 // flexPersistentVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in FlexPersistentVolumeSourceBuilder.
+// Inline fields are owned by their respective inline type in FlexPersistentVolumeSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type flexPersistentVolumeSourceFields struct {
-	Driver    *string                 `json:"driver,omitempty"`
-	FSType    *string                 `json:"fsType,omitempty"`
-	SecretRef *SecretReferenceBuilder `json:"secretRef,omitempty"`
-	ReadOnly  *bool                   `json:"readOnly,omitempty"`
-	Options   *map[string]string      `json:"options,omitempty"`
-}
-
-// FlexPersistentVolumeSource constructs an declarative configuration of the FlexPersistentVolumeSource type for use with
-// apply.
-func FlexPersistentVolumeSource() *FlexPersistentVolumeSourceBuilder {
-	return &FlexPersistentVolumeSourceBuilder{}
+	Driver    *string                            `json:"driver,omitempty"`
+	FSType    *string                            `json:"fsType,omitempty"`
+	SecretRef *SecretReferenceApplyConfiguration `json:"secretRef,omitempty"`
+	ReadOnly  *bool                              `json:"readOnly,omitempty"`
+	Options   *map[string]string                 `json:"options,omitempty"`
 }
 
 // SetDriver sets the Driver field in the declarative configuration to the given value.
-func (b *FlexPersistentVolumeSourceBuilder) SetDriver(value string) *FlexPersistentVolumeSourceBuilder {
+func (b *FlexPersistentVolumeSourceApplyConfiguration) SetDriver(value string) *FlexPersistentVolumeSourceApplyConfiguration {
 	b.fields.Driver = &value
 	return b
 }
 
 // RemoveDriver removes the Driver field from the declarative configuration.
-func (b *FlexPersistentVolumeSourceBuilder) RemoveDriver() *FlexPersistentVolumeSourceBuilder {
+func (b *FlexPersistentVolumeSourceApplyConfiguration) RemoveDriver() *FlexPersistentVolumeSourceApplyConfiguration {
 	b.fields.Driver = nil
 	return b
 }
 
 // GetDriver gets the Driver field from the declarative configuration.
-func (b *FlexPersistentVolumeSourceBuilder) GetDriver() (value string, ok bool) {
+func (b *FlexPersistentVolumeSourceApplyConfiguration) GetDriver() (value string, ok bool) {
 	if v := b.fields.Driver; v != nil {
 		return *v, true
 	}
@@ -70,19 +70,19 @@ func (b *FlexPersistentVolumeSourceBuilder) GetDriver() (value string, ok bool) 
 }
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
-func (b *FlexPersistentVolumeSourceBuilder) SetFSType(value string) *FlexPersistentVolumeSourceBuilder {
+func (b *FlexPersistentVolumeSourceApplyConfiguration) SetFSType(value string) *FlexPersistentVolumeSourceApplyConfiguration {
 	b.fields.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
-func (b *FlexPersistentVolumeSourceBuilder) RemoveFSType() *FlexPersistentVolumeSourceBuilder {
+func (b *FlexPersistentVolumeSourceApplyConfiguration) RemoveFSType() *FlexPersistentVolumeSourceApplyConfiguration {
 	b.fields.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
-func (b *FlexPersistentVolumeSourceBuilder) GetFSType() (value string, ok bool) {
+func (b *FlexPersistentVolumeSourceApplyConfiguration) GetFSType() (value string, ok bool) {
 	if v := b.fields.FSType; v != nil {
 		return *v, true
 	}
@@ -90,36 +90,36 @@ func (b *FlexPersistentVolumeSourceBuilder) GetFSType() (value string, ok bool) 
 }
 
 // SetSecretRef sets the SecretRef field in the declarative configuration to the given value.
-func (b *FlexPersistentVolumeSourceBuilder) SetSecretRef(value *SecretReferenceBuilder) *FlexPersistentVolumeSourceBuilder {
+func (b *FlexPersistentVolumeSourceApplyConfiguration) SetSecretRef(value *SecretReferenceApplyConfiguration) *FlexPersistentVolumeSourceApplyConfiguration {
 	b.fields.SecretRef = value
 	return b
 }
 
 // RemoveSecretRef removes the SecretRef field from the declarative configuration.
-func (b *FlexPersistentVolumeSourceBuilder) RemoveSecretRef() *FlexPersistentVolumeSourceBuilder {
+func (b *FlexPersistentVolumeSourceApplyConfiguration) RemoveSecretRef() *FlexPersistentVolumeSourceApplyConfiguration {
 	b.fields.SecretRef = nil
 	return b
 }
 
 // GetSecretRef gets the SecretRef field from the declarative configuration.
-func (b *FlexPersistentVolumeSourceBuilder) GetSecretRef() (value *SecretReferenceBuilder, ok bool) {
+func (b *FlexPersistentVolumeSourceApplyConfiguration) GetSecretRef() (value *SecretReferenceApplyConfiguration, ok bool) {
 	return b.fields.SecretRef, b.fields.SecretRef != nil
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b *FlexPersistentVolumeSourceBuilder) SetReadOnly(value bool) *FlexPersistentVolumeSourceBuilder {
+func (b *FlexPersistentVolumeSourceApplyConfiguration) SetReadOnly(value bool) *FlexPersistentVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b *FlexPersistentVolumeSourceBuilder) RemoveReadOnly() *FlexPersistentVolumeSourceBuilder {
+func (b *FlexPersistentVolumeSourceApplyConfiguration) RemoveReadOnly() *FlexPersistentVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b *FlexPersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
+func (b *FlexPersistentVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
@@ -127,27 +127,27 @@ func (b *FlexPersistentVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) 
 }
 
 // SetOptions sets the Options field in the declarative configuration to the given value.
-func (b *FlexPersistentVolumeSourceBuilder) SetOptions(value map[string]string) *FlexPersistentVolumeSourceBuilder {
+func (b *FlexPersistentVolumeSourceApplyConfiguration) SetOptions(value map[string]string) *FlexPersistentVolumeSourceApplyConfiguration {
 	b.fields.Options = &value
 	return b
 }
 
 // RemoveOptions removes the Options field from the declarative configuration.
-func (b *FlexPersistentVolumeSourceBuilder) RemoveOptions() *FlexPersistentVolumeSourceBuilder {
+func (b *FlexPersistentVolumeSourceApplyConfiguration) RemoveOptions() *FlexPersistentVolumeSourceApplyConfiguration {
 	b.fields.Options = nil
 	return b
 }
 
 // GetOptions gets the Options field from the declarative configuration.
-func (b *FlexPersistentVolumeSourceBuilder) GetOptions() (value map[string]string, ok bool) {
+func (b *FlexPersistentVolumeSourceApplyConfiguration) GetOptions() (value map[string]string, ok bool) {
 	if v := b.fields.Options; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts FlexPersistentVolumeSourceBuilder to unstructured.
-func (b *FlexPersistentVolumeSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts FlexPersistentVolumeSourceApplyConfiguration to unstructured.
+func (b *FlexPersistentVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -159,9 +159,9 @@ func (b *FlexPersistentVolumeSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to FlexPersistentVolumeSourceBuilder, replacing the contents
-// of FlexPersistentVolumeSourceBuilder.
-func (b *FlexPersistentVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to FlexPersistentVolumeSourceApplyConfiguration, replacing the contents
+// of FlexPersistentVolumeSourceApplyConfiguration.
+func (b *FlexPersistentVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &flexPersistentVolumeSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -172,15 +172,15 @@ func (b *FlexPersistentVolumeSourceBuilder) FromUnstructured(u map[string]interf
 	return nil
 }
 
-// MarshalJSON marshals FlexPersistentVolumeSourceBuilder to JSON.
-func (b *FlexPersistentVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals FlexPersistentVolumeSourceApplyConfiguration to JSON.
+func (b *FlexPersistentVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into FlexPersistentVolumeSourceBuilder, replacing the contents of
-// FlexPersistentVolumeSourceBuilder.
-func (b *FlexPersistentVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into FlexPersistentVolumeSourceApplyConfiguration, replacing the contents of
+// FlexPersistentVolumeSourceApplyConfiguration.
+func (b *FlexPersistentVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -188,13 +188,13 @@ func (b *FlexPersistentVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// FlexPersistentVolumeSourceList represents a list of FlexPersistentVolumeSourceBuilder.
-type FlexPersistentVolumeSourceList []*FlexPersistentVolumeSourceBuilder
+// FlexPersistentVolumeSourceList represents a listAlias of FlexPersistentVolumeSourceApplyConfiguration.
+type FlexPersistentVolumeSourceList []*FlexPersistentVolumeSourceApplyConfiguration
 
-// FlexPersistentVolumeSourceList represents a map of FlexPersistentVolumeSourceBuilder.
-type FlexPersistentVolumeSourceMap map[string]FlexPersistentVolumeSourceBuilder
+// FlexPersistentVolumeSourceList represents a map of FlexPersistentVolumeSourceApplyConfiguration.
+type FlexPersistentVolumeSourceMap map[string]FlexPersistentVolumeSourceApplyConfiguration
 
-func (b *FlexPersistentVolumeSourceBuilder) preMarshal() {
+func (b *FlexPersistentVolumeSourceApplyConfiguration) preMarshal() {
 }
-func (b *FlexPersistentVolumeSourceBuilder) postUnmarshal() {
+func (b *FlexPersistentVolumeSourceApplyConfiguration) postUnmarshal() {
 }

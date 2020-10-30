@@ -135,7 +135,7 @@ func (c *FakeCertificateSigningRequests) Patch(ctx context.Context, name string,
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied certificateSigningRequest.
-func (c *FakeCertificateSigningRequests) Apply(ctx context.Context, certificateSigningRequest certificatesv1beta1.CertificateSigningRequestBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.CertificateSigningRequest, err error) {
+func (c *FakeCertificateSigningRequests) Apply(ctx context.Context, certificateSigningRequest *certificatesv1beta1.CertificateSigningRequestApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.CertificateSigningRequest, err error) {
 	data, err := certificateSigningRequest.MarshalJSON()
 	if err != nil {
 		return nil, err

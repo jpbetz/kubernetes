@@ -26,14 +26,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// PodConditionBuilder represents an declarative configuration of the PodCondition type for use
+// PodConditionApplyConfiguration represents an declarative configuration of the PodCondition type for use
 // with apply.
-type PodConditionBuilder struct {
+type PodConditionApplyConfiguration struct {
 	fields podConditionFields
 }
 
+// PodConditionApplyConfiguration constructs an declarative configuration of the PodCondition type for use with
+// apply.
+func PodCondition() *PodConditionApplyConfiguration {
+	return &PodConditionApplyConfiguration{}
+}
+
 // podConditionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodConditionBuilder.
+// Inline fields are owned by their respective inline type in PodConditionApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -46,26 +52,20 @@ type podConditionFields struct {
 	Message            *string              `json:"message,omitempty"`
 }
 
-// PodCondition constructs an declarative configuration of the PodCondition type for use with
-// apply.
-func PodCondition() *PodConditionBuilder {
-	return &PodConditionBuilder{}
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
-func (b *PodConditionBuilder) SetType(value v1.PodConditionType) *PodConditionBuilder {
+func (b *PodConditionApplyConfiguration) SetType(value v1.PodConditionType) *PodConditionApplyConfiguration {
 	b.fields.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
-func (b *PodConditionBuilder) RemoveType() *PodConditionBuilder {
+func (b *PodConditionApplyConfiguration) RemoveType() *PodConditionApplyConfiguration {
 	b.fields.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
-func (b *PodConditionBuilder) GetType() (value v1.PodConditionType, ok bool) {
+func (b *PodConditionApplyConfiguration) GetType() (value v1.PodConditionType, ok bool) {
 	if v := b.fields.Type; v != nil {
 		return *v, true
 	}
@@ -73,19 +73,19 @@ func (b *PodConditionBuilder) GetType() (value v1.PodConditionType, ok bool) {
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *PodConditionBuilder) SetStatus(value v1.ConditionStatus) *PodConditionBuilder {
+func (b *PodConditionApplyConfiguration) SetStatus(value v1.ConditionStatus) *PodConditionApplyConfiguration {
 	b.fields.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *PodConditionBuilder) RemoveStatus() *PodConditionBuilder {
+func (b *PodConditionApplyConfiguration) RemoveStatus() *PodConditionApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *PodConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
+func (b *PodConditionApplyConfiguration) GetStatus() (value v1.ConditionStatus, ok bool) {
 	if v := b.fields.Status; v != nil {
 		return *v, true
 	}
@@ -93,19 +93,19 @@ func (b *PodConditionBuilder) GetStatus() (value v1.ConditionStatus, ok bool) {
 }
 
 // SetLastProbeTime sets the LastProbeTime field in the declarative configuration to the given value.
-func (b *PodConditionBuilder) SetLastProbeTime(value metav1.Time) *PodConditionBuilder {
+func (b *PodConditionApplyConfiguration) SetLastProbeTime(value metav1.Time) *PodConditionApplyConfiguration {
 	b.fields.LastProbeTime = &value
 	return b
 }
 
 // RemoveLastProbeTime removes the LastProbeTime field from the declarative configuration.
-func (b *PodConditionBuilder) RemoveLastProbeTime() *PodConditionBuilder {
+func (b *PodConditionApplyConfiguration) RemoveLastProbeTime() *PodConditionApplyConfiguration {
 	b.fields.LastProbeTime = nil
 	return b
 }
 
 // GetLastProbeTime gets the LastProbeTime field from the declarative configuration.
-func (b *PodConditionBuilder) GetLastProbeTime() (value metav1.Time, ok bool) {
+func (b *PodConditionApplyConfiguration) GetLastProbeTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastProbeTime; v != nil {
 		return *v, true
 	}
@@ -113,19 +113,19 @@ func (b *PodConditionBuilder) GetLastProbeTime() (value metav1.Time, ok bool) {
 }
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
-func (b *PodConditionBuilder) SetLastTransitionTime(value metav1.Time) *PodConditionBuilder {
+func (b *PodConditionApplyConfiguration) SetLastTransitionTime(value metav1.Time) *PodConditionApplyConfiguration {
 	b.fields.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
-func (b *PodConditionBuilder) RemoveLastTransitionTime() *PodConditionBuilder {
+func (b *PodConditionApplyConfiguration) RemoveLastTransitionTime() *PodConditionApplyConfiguration {
 	b.fields.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
-func (b *PodConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok bool) {
+func (b *PodConditionApplyConfiguration) GetLastTransitionTime() (value metav1.Time, ok bool) {
 	if v := b.fields.LastTransitionTime; v != nil {
 		return *v, true
 	}
@@ -133,19 +133,19 @@ func (b *PodConditionBuilder) GetLastTransitionTime() (value metav1.Time, ok boo
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
-func (b *PodConditionBuilder) SetReason(value string) *PodConditionBuilder {
+func (b *PodConditionApplyConfiguration) SetReason(value string) *PodConditionApplyConfiguration {
 	b.fields.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
-func (b *PodConditionBuilder) RemoveReason() *PodConditionBuilder {
+func (b *PodConditionApplyConfiguration) RemoveReason() *PodConditionApplyConfiguration {
 	b.fields.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
-func (b *PodConditionBuilder) GetReason() (value string, ok bool) {
+func (b *PodConditionApplyConfiguration) GetReason() (value string, ok bool) {
 	if v := b.fields.Reason; v != nil {
 		return *v, true
 	}
@@ -153,27 +153,27 @@ func (b *PodConditionBuilder) GetReason() (value string, ok bool) {
 }
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
-func (b *PodConditionBuilder) SetMessage(value string) *PodConditionBuilder {
+func (b *PodConditionApplyConfiguration) SetMessage(value string) *PodConditionApplyConfiguration {
 	b.fields.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
-func (b *PodConditionBuilder) RemoveMessage() *PodConditionBuilder {
+func (b *PodConditionApplyConfiguration) RemoveMessage() *PodConditionApplyConfiguration {
 	b.fields.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
-func (b *PodConditionBuilder) GetMessage() (value string, ok bool) {
+func (b *PodConditionApplyConfiguration) GetMessage() (value string, ok bool) {
 	if v := b.fields.Message; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts PodConditionBuilder to unstructured.
-func (b *PodConditionBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PodConditionApplyConfiguration to unstructured.
+func (b *PodConditionApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -185,9 +185,9 @@ func (b *PodConditionBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to PodConditionBuilder, replacing the contents
-// of PodConditionBuilder.
-func (b *PodConditionBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PodConditionApplyConfiguration, replacing the contents
+// of PodConditionApplyConfiguration.
+func (b *PodConditionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &podConditionFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -198,15 +198,15 @@ func (b *PodConditionBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals PodConditionBuilder to JSON.
-func (b *PodConditionBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PodConditionApplyConfiguration to JSON.
+func (b *PodConditionApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PodConditionBuilder, replacing the contents of
-// PodConditionBuilder.
-func (b *PodConditionBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PodConditionApplyConfiguration, replacing the contents of
+// PodConditionApplyConfiguration.
+func (b *PodConditionApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -214,13 +214,13 @@ func (b *PodConditionBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// PodConditionList represents a list of PodConditionBuilder.
-type PodConditionList []*PodConditionBuilder
+// PodConditionList represents a listAlias of PodConditionApplyConfiguration.
+type PodConditionList []*PodConditionApplyConfiguration
 
-// PodConditionList represents a map of PodConditionBuilder.
-type PodConditionMap map[string]PodConditionBuilder
+// PodConditionList represents a map of PodConditionApplyConfiguration.
+type PodConditionMap map[string]PodConditionApplyConfiguration
 
-func (b *PodConditionBuilder) preMarshal() {
+func (b *PodConditionApplyConfiguration) preMarshal() {
 }
-func (b *PodConditionBuilder) postUnmarshal() {
+func (b *PodConditionApplyConfiguration) postUnmarshal() {
 }

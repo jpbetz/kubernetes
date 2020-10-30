@@ -24,46 +24,46 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// VolumeNodeAffinityBuilder represents an declarative configuration of the VolumeNodeAffinity type for use
+// VolumeNodeAffinityApplyConfiguration represents an declarative configuration of the VolumeNodeAffinity type for use
 // with apply.
-type VolumeNodeAffinityBuilder struct {
+type VolumeNodeAffinityApplyConfiguration struct {
 	fields volumeNodeAffinityFields
 }
 
+// VolumeNodeAffinityApplyConfiguration constructs an declarative configuration of the VolumeNodeAffinity type for use with
+// apply.
+func VolumeNodeAffinity() *VolumeNodeAffinityApplyConfiguration {
+	return &VolumeNodeAffinityApplyConfiguration{}
+}
+
 // volumeNodeAffinityFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in VolumeNodeAffinityBuilder.
+// Inline fields are owned by their respective inline type in VolumeNodeAffinityApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type volumeNodeAffinityFields struct {
-	Required *NodeSelectorBuilder `json:"required,omitempty"`
-}
-
-// VolumeNodeAffinity constructs an declarative configuration of the VolumeNodeAffinity type for use with
-// apply.
-func VolumeNodeAffinity() *VolumeNodeAffinityBuilder {
-	return &VolumeNodeAffinityBuilder{}
+	Required *NodeSelectorApplyConfiguration `json:"required,omitempty"`
 }
 
 // SetRequired sets the Required field in the declarative configuration to the given value.
-func (b *VolumeNodeAffinityBuilder) SetRequired(value *NodeSelectorBuilder) *VolumeNodeAffinityBuilder {
+func (b *VolumeNodeAffinityApplyConfiguration) SetRequired(value *NodeSelectorApplyConfiguration) *VolumeNodeAffinityApplyConfiguration {
 	b.fields.Required = value
 	return b
 }
 
 // RemoveRequired removes the Required field from the declarative configuration.
-func (b *VolumeNodeAffinityBuilder) RemoveRequired() *VolumeNodeAffinityBuilder {
+func (b *VolumeNodeAffinityApplyConfiguration) RemoveRequired() *VolumeNodeAffinityApplyConfiguration {
 	b.fields.Required = nil
 	return b
 }
 
 // GetRequired gets the Required field from the declarative configuration.
-func (b *VolumeNodeAffinityBuilder) GetRequired() (value *NodeSelectorBuilder, ok bool) {
+func (b *VolumeNodeAffinityApplyConfiguration) GetRequired() (value *NodeSelectorApplyConfiguration, ok bool) {
 	return b.fields.Required, b.fields.Required != nil
 }
 
-// ToUnstructured converts VolumeNodeAffinityBuilder to unstructured.
-func (b *VolumeNodeAffinityBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts VolumeNodeAffinityApplyConfiguration to unstructured.
+func (b *VolumeNodeAffinityApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -75,9 +75,9 @@ func (b *VolumeNodeAffinityBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to VolumeNodeAffinityBuilder, replacing the contents
-// of VolumeNodeAffinityBuilder.
-func (b *VolumeNodeAffinityBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to VolumeNodeAffinityApplyConfiguration, replacing the contents
+// of VolumeNodeAffinityApplyConfiguration.
+func (b *VolumeNodeAffinityApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &volumeNodeAffinityFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -88,15 +88,15 @@ func (b *VolumeNodeAffinityBuilder) FromUnstructured(u map[string]interface{}) e
 	return nil
 }
 
-// MarshalJSON marshals VolumeNodeAffinityBuilder to JSON.
-func (b *VolumeNodeAffinityBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals VolumeNodeAffinityApplyConfiguration to JSON.
+func (b *VolumeNodeAffinityApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into VolumeNodeAffinityBuilder, replacing the contents of
-// VolumeNodeAffinityBuilder.
-func (b *VolumeNodeAffinityBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into VolumeNodeAffinityApplyConfiguration, replacing the contents of
+// VolumeNodeAffinityApplyConfiguration.
+func (b *VolumeNodeAffinityApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -104,13 +104,13 @@ func (b *VolumeNodeAffinityBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// VolumeNodeAffinityList represents a list of VolumeNodeAffinityBuilder.
-type VolumeNodeAffinityList []*VolumeNodeAffinityBuilder
+// VolumeNodeAffinityList represents a listAlias of VolumeNodeAffinityApplyConfiguration.
+type VolumeNodeAffinityList []*VolumeNodeAffinityApplyConfiguration
 
-// VolumeNodeAffinityList represents a map of VolumeNodeAffinityBuilder.
-type VolumeNodeAffinityMap map[string]VolumeNodeAffinityBuilder
+// VolumeNodeAffinityList represents a map of VolumeNodeAffinityApplyConfiguration.
+type VolumeNodeAffinityMap map[string]VolumeNodeAffinityApplyConfiguration
 
-func (b *VolumeNodeAffinityBuilder) preMarshal() {
+func (b *VolumeNodeAffinityApplyConfiguration) preMarshal() {
 }
-func (b *VolumeNodeAffinityBuilder) postUnmarshal() {
+func (b *VolumeNodeAffinityApplyConfiguration) postUnmarshal() {
 }

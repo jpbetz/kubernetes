@@ -144,7 +144,7 @@ func (c *FakeStatefulSets) Patch(ctx context.Context, name string, pt types.Patc
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied statefulSet.
-func (c *FakeStatefulSets) Apply(ctx context.Context, statefulSet appsv1beta1.StatefulSetBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.StatefulSet, err error) {
+func (c *FakeStatefulSets) Apply(ctx context.Context, statefulSet *appsv1beta1.StatefulSetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.StatefulSet, err error) {
 	data, err := statefulSet.MarshalJSON()
 	if err != nil {
 		return nil, err

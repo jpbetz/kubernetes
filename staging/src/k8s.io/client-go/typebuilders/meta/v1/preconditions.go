@@ -25,14 +25,20 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 )
 
-// PreconditionsBuilder represents an declarative configuration of the Preconditions type for use
+// PreconditionsApplyConfiguration represents an declarative configuration of the Preconditions type for use
 // with apply.
-type PreconditionsBuilder struct {
+type PreconditionsApplyConfiguration struct {
 	fields preconditionsFields
 }
 
+// PreconditionsApplyConfiguration constructs an declarative configuration of the Preconditions type for use with
+// apply.
+func Preconditions() *PreconditionsApplyConfiguration {
+	return &PreconditionsApplyConfiguration{}
+}
+
 // preconditionsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PreconditionsBuilder.
+// Inline fields are owned by their respective inline type in PreconditionsApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type preconditionsFields struct {
 	ResourceVersion *string    `json:"resourceVersion,omitempty"`
 }
 
-// Preconditions constructs an declarative configuration of the Preconditions type for use with
-// apply.
-func Preconditions() *PreconditionsBuilder {
-	return &PreconditionsBuilder{}
-}
-
 // SetUID sets the UID field in the declarative configuration to the given value.
-func (b *PreconditionsBuilder) SetUID(value types.UID) *PreconditionsBuilder {
+func (b *PreconditionsApplyConfiguration) SetUID(value types.UID) *PreconditionsApplyConfiguration {
 	b.fields.UID = &value
 	return b
 }
 
 // RemoveUID removes the UID field from the declarative configuration.
-func (b *PreconditionsBuilder) RemoveUID() *PreconditionsBuilder {
+func (b *PreconditionsApplyConfiguration) RemoveUID() *PreconditionsApplyConfiguration {
 	b.fields.UID = nil
 	return b
 }
 
 // GetUID gets the UID field from the declarative configuration.
-func (b *PreconditionsBuilder) GetUID() (value types.UID, ok bool) {
+func (b *PreconditionsApplyConfiguration) GetUID() (value types.UID, ok bool) {
 	if v := b.fields.UID; v != nil {
 		return *v, true
 	}
@@ -68,27 +68,27 @@ func (b *PreconditionsBuilder) GetUID() (value types.UID, ok bool) {
 }
 
 // SetResourceVersion sets the ResourceVersion field in the declarative configuration to the given value.
-func (b *PreconditionsBuilder) SetResourceVersion(value string) *PreconditionsBuilder {
+func (b *PreconditionsApplyConfiguration) SetResourceVersion(value string) *PreconditionsApplyConfiguration {
 	b.fields.ResourceVersion = &value
 	return b
 }
 
 // RemoveResourceVersion removes the ResourceVersion field from the declarative configuration.
-func (b *PreconditionsBuilder) RemoveResourceVersion() *PreconditionsBuilder {
+func (b *PreconditionsApplyConfiguration) RemoveResourceVersion() *PreconditionsApplyConfiguration {
 	b.fields.ResourceVersion = nil
 	return b
 }
 
 // GetResourceVersion gets the ResourceVersion field from the declarative configuration.
-func (b *PreconditionsBuilder) GetResourceVersion() (value string, ok bool) {
+func (b *PreconditionsApplyConfiguration) GetResourceVersion() (value string, ok bool) {
 	if v := b.fields.ResourceVersion; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts PreconditionsBuilder to unstructured.
-func (b *PreconditionsBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PreconditionsApplyConfiguration to unstructured.
+func (b *PreconditionsApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -100,9 +100,9 @@ func (b *PreconditionsBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to PreconditionsBuilder, replacing the contents
-// of PreconditionsBuilder.
-func (b *PreconditionsBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PreconditionsApplyConfiguration, replacing the contents
+// of PreconditionsApplyConfiguration.
+func (b *PreconditionsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &preconditionsFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -113,15 +113,15 @@ func (b *PreconditionsBuilder) FromUnstructured(u map[string]interface{}) error 
 	return nil
 }
 
-// MarshalJSON marshals PreconditionsBuilder to JSON.
-func (b *PreconditionsBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PreconditionsApplyConfiguration to JSON.
+func (b *PreconditionsApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PreconditionsBuilder, replacing the contents of
-// PreconditionsBuilder.
-func (b *PreconditionsBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PreconditionsApplyConfiguration, replacing the contents of
+// PreconditionsApplyConfiguration.
+func (b *PreconditionsApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -129,13 +129,13 @@ func (b *PreconditionsBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// PreconditionsList represents a list of PreconditionsBuilder.
-type PreconditionsList []*PreconditionsBuilder
+// PreconditionsList represents a listAlias of PreconditionsApplyConfiguration.
+type PreconditionsList []*PreconditionsApplyConfiguration
 
-// PreconditionsList represents a map of PreconditionsBuilder.
-type PreconditionsMap map[string]PreconditionsBuilder
+// PreconditionsList represents a map of PreconditionsApplyConfiguration.
+type PreconditionsMap map[string]PreconditionsApplyConfiguration
 
-func (b *PreconditionsBuilder) preMarshal() {
+func (b *PreconditionsApplyConfiguration) preMarshal() {
 }
-func (b *PreconditionsBuilder) postUnmarshal() {
+func (b *PreconditionsApplyConfiguration) postUnmarshal() {
 }

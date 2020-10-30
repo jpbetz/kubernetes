@@ -25,102 +25,102 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// PersistentVolumeBuilder represents an declarative configuration of the PersistentVolume type for use
+// PersistentVolumeApplyConfiguration represents an declarative configuration of the PersistentVolume type for use
 // with apply.
-type PersistentVolumeBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type PersistentVolumeApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   persistentVolumeFields
 }
 
+// PersistentVolumeApplyConfiguration constructs an declarative configuration of the PersistentVolume type for use with
+// apply.
+func PersistentVolume() *PersistentVolumeApplyConfiguration {
+	return &PersistentVolumeApplyConfiguration{}
+}
+
 // persistentVolumeFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PersistentVolumeBuilder.
+// Inline fields are owned by their respective inline type in PersistentVolumeApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type persistentVolumeFields struct {
-	Kind       *string                        `json:"kind,omitempty"`       // inlined PersistentVolumeBuilder.typeMeta.Kind field
-	APIVersion *string                        `json:"apiVersion,omitempty"` // inlined PersistentVolumeBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder          `json:"metadata,omitempty"`
-	Spec       *PersistentVolumeSpecBuilder   `json:"spec,omitempty"`
-	Status     *PersistentVolumeStatusBuilder `json:"status,omitempty"`
-}
-
-// PersistentVolume constructs an declarative configuration of the PersistentVolume type for use with
-// apply.
-func PersistentVolume() *PersistentVolumeBuilder {
-	return &PersistentVolumeBuilder{}
+	Kind       *string                                   `json:"kind,omitempty"`       // inlined PersistentVolumeApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                                   `json:"apiVersion,omitempty"` // inlined PersistentVolumeApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration          `json:"metadata,omitempty"`
+	Spec       *PersistentVolumeSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status     *PersistentVolumeStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *PersistentVolumeBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *PersistentVolumeBuilder {
+func (b *PersistentVolumeApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *PersistentVolumeApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *PersistentVolumeBuilder) RemoveTypeMeta() *PersistentVolumeBuilder {
+func (b *PersistentVolumeApplyConfiguration) RemoveTypeMeta() *PersistentVolumeApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *PersistentVolumeBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *PersistentVolumeApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *PersistentVolumeBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *PersistentVolumeBuilder {
+func (b *PersistentVolumeApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *PersistentVolumeApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *PersistentVolumeBuilder) RemoveObjectMeta() *PersistentVolumeBuilder {
+func (b *PersistentVolumeApplyConfiguration) RemoveObjectMeta() *PersistentVolumeApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *PersistentVolumeBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *PersistentVolumeApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *PersistentVolumeBuilder) SetSpec(value *PersistentVolumeSpecBuilder) *PersistentVolumeBuilder {
+func (b *PersistentVolumeApplyConfiguration) SetSpec(value *PersistentVolumeSpecApplyConfiguration) *PersistentVolumeApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *PersistentVolumeBuilder) RemoveSpec() *PersistentVolumeBuilder {
+func (b *PersistentVolumeApplyConfiguration) RemoveSpec() *PersistentVolumeApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *PersistentVolumeBuilder) GetSpec() (value *PersistentVolumeSpecBuilder, ok bool) {
+func (b *PersistentVolumeApplyConfiguration) GetSpec() (value *PersistentVolumeSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *PersistentVolumeBuilder) SetStatus(value *PersistentVolumeStatusBuilder) *PersistentVolumeBuilder {
+func (b *PersistentVolumeApplyConfiguration) SetStatus(value *PersistentVolumeStatusApplyConfiguration) *PersistentVolumeApplyConfiguration {
 	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *PersistentVolumeBuilder) RemoveStatus() *PersistentVolumeBuilder {
+func (b *PersistentVolumeApplyConfiguration) RemoveStatus() *PersistentVolumeApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *PersistentVolumeBuilder) GetStatus() (value *PersistentVolumeStatusBuilder, ok bool) {
+func (b *PersistentVolumeApplyConfiguration) GetStatus() (value *PersistentVolumeStatusApplyConfiguration, ok bool) {
 	return b.fields.Status, b.fields.Status != nil
 }
 
-// ToUnstructured converts PersistentVolumeBuilder to unstructured.
-func (b *PersistentVolumeBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts PersistentVolumeApplyConfiguration to unstructured.
+func (b *PersistentVolumeApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -132,9 +132,9 @@ func (b *PersistentVolumeBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to PersistentVolumeBuilder, replacing the contents
-// of PersistentVolumeBuilder.
-func (b *PersistentVolumeBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to PersistentVolumeApplyConfiguration, replacing the contents
+// of PersistentVolumeApplyConfiguration.
+func (b *PersistentVolumeApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &persistentVolumeFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -145,15 +145,15 @@ func (b *PersistentVolumeBuilder) FromUnstructured(u map[string]interface{}) err
 	return nil
 }
 
-// MarshalJSON marshals PersistentVolumeBuilder to JSON.
-func (b *PersistentVolumeBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals PersistentVolumeApplyConfiguration to JSON.
+func (b *PersistentVolumeApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into PersistentVolumeBuilder, replacing the contents of
-// PersistentVolumeBuilder.
-func (b *PersistentVolumeBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into PersistentVolumeApplyConfiguration, replacing the contents of
+// PersistentVolumeApplyConfiguration.
+func (b *PersistentVolumeApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -161,13 +161,13 @@ func (b *PersistentVolumeBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// PersistentVolumeList represents a list of PersistentVolumeBuilder.
-type PersistentVolumeList []*PersistentVolumeBuilder
+// PersistentVolumeList represents a listAlias of PersistentVolumeApplyConfiguration.
+type PersistentVolumeList []*PersistentVolumeApplyConfiguration
 
-// PersistentVolumeList represents a map of PersistentVolumeBuilder.
-type PersistentVolumeMap map[string]PersistentVolumeBuilder
+// PersistentVolumeList represents a map of PersistentVolumeApplyConfiguration.
+type PersistentVolumeMap map[string]PersistentVolumeApplyConfiguration
 
-func (b *PersistentVolumeBuilder) preMarshal() {
+func (b *PersistentVolumeApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -177,9 +177,9 @@ func (b *PersistentVolumeBuilder) preMarshal() {
 		}
 	}
 }
-func (b *PersistentVolumeBuilder) postUnmarshal() {
+func (b *PersistentVolumeApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

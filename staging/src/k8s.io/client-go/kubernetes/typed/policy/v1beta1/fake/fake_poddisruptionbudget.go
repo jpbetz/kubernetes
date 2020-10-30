@@ -144,7 +144,7 @@ func (c *FakePodDisruptionBudgets) Patch(ctx context.Context, name string, pt ty
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied podDisruptionBudget.
-func (c *FakePodDisruptionBudgets) Apply(ctx context.Context, podDisruptionBudget policyv1beta1.PodDisruptionBudgetBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PodDisruptionBudget, err error) {
+func (c *FakePodDisruptionBudgets) Apply(ctx context.Context, podDisruptionBudget *policyv1beta1.PodDisruptionBudgetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PodDisruptionBudget, err error) {
 	data, err := podDisruptionBudget.MarshalJSON()
 	if err != nil {
 		return nil, err

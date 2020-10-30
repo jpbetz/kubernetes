@@ -144,7 +144,7 @@ func (c *FakeResourceQuotas) Patch(ctx context.Context, name string, pt types.Pa
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied resourceQuota.
-func (c *FakeResourceQuotas) Apply(ctx context.Context, resourceQuota typebuilderscorev1.ResourceQuotaBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ResourceQuota, err error) {
+func (c *FakeResourceQuotas) Apply(ctx context.Context, resourceQuota *typebuilderscorev1.ResourceQuotaApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ResourceQuota, err error) {
 	data, err := resourceQuota.MarshalJSON()
 	if err != nil {
 		return nil, err

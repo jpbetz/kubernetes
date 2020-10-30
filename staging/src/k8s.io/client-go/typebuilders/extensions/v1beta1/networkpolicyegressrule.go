@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// NetworkPolicyEgressRuleBuilder represents an declarative configuration of the NetworkPolicyEgressRule type for use
+// NetworkPolicyEgressRuleApplyConfiguration represents an declarative configuration of the NetworkPolicyEgressRule type for use
 // with apply.
-type NetworkPolicyEgressRuleBuilder struct {
+type NetworkPolicyEgressRuleApplyConfiguration struct {
 	fields networkPolicyEgressRuleFields
 }
 
+// NetworkPolicyEgressRuleApplyConfiguration constructs an declarative configuration of the NetworkPolicyEgressRule type for use with
+// apply.
+func NetworkPolicyEgressRule() *NetworkPolicyEgressRuleApplyConfiguration {
+	return &NetworkPolicyEgressRuleApplyConfiguration{}
+}
+
 // networkPolicyEgressRuleFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NetworkPolicyEgressRuleBuilder.
+// Inline fields are owned by their respective inline type in NetworkPolicyEgressRuleApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type networkPolicyEgressRuleFields struct {
 	To    *NetworkPolicyPeerList `json:"to,omitempty"`
 }
 
-// NetworkPolicyEgressRule constructs an declarative configuration of the NetworkPolicyEgressRule type for use with
-// apply.
-func NetworkPolicyEgressRule() *NetworkPolicyEgressRuleBuilder {
-	return &NetworkPolicyEgressRuleBuilder{}
-}
-
 // SetPorts sets the Ports field in the declarative configuration to the given value.
-func (b *NetworkPolicyEgressRuleBuilder) SetPorts(value NetworkPolicyPortList) *NetworkPolicyEgressRuleBuilder {
+func (b *NetworkPolicyEgressRuleApplyConfiguration) SetPorts(value NetworkPolicyPortList) *NetworkPolicyEgressRuleApplyConfiguration {
 	b.fields.Ports = &value
 	return b
 }
 
 // RemovePorts removes the Ports field from the declarative configuration.
-func (b *NetworkPolicyEgressRuleBuilder) RemovePorts() *NetworkPolicyEgressRuleBuilder {
+func (b *NetworkPolicyEgressRuleApplyConfiguration) RemovePorts() *NetworkPolicyEgressRuleApplyConfiguration {
 	b.fields.Ports = nil
 	return b
 }
 
 // GetPorts gets the Ports field from the declarative configuration.
-func (b *NetworkPolicyEgressRuleBuilder) GetPorts() (value NetworkPolicyPortList, ok bool) {
+func (b *NetworkPolicyEgressRuleApplyConfiguration) GetPorts() (value NetworkPolicyPortList, ok bool) {
 	if v := b.fields.Ports; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *NetworkPolicyEgressRuleBuilder) GetPorts() (value NetworkPolicyPortList
 }
 
 // SetTo sets the To field in the declarative configuration to the given value.
-func (b *NetworkPolicyEgressRuleBuilder) SetTo(value NetworkPolicyPeerList) *NetworkPolicyEgressRuleBuilder {
+func (b *NetworkPolicyEgressRuleApplyConfiguration) SetTo(value NetworkPolicyPeerList) *NetworkPolicyEgressRuleApplyConfiguration {
 	b.fields.To = &value
 	return b
 }
 
 // RemoveTo removes the To field from the declarative configuration.
-func (b *NetworkPolicyEgressRuleBuilder) RemoveTo() *NetworkPolicyEgressRuleBuilder {
+func (b *NetworkPolicyEgressRuleApplyConfiguration) RemoveTo() *NetworkPolicyEgressRuleApplyConfiguration {
 	b.fields.To = nil
 	return b
 }
 
 // GetTo gets the To field from the declarative configuration.
-func (b *NetworkPolicyEgressRuleBuilder) GetTo() (value NetworkPolicyPeerList, ok bool) {
+func (b *NetworkPolicyEgressRuleApplyConfiguration) GetTo() (value NetworkPolicyPeerList, ok bool) {
 	if v := b.fields.To; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts NetworkPolicyEgressRuleBuilder to unstructured.
-func (b *NetworkPolicyEgressRuleBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NetworkPolicyEgressRuleApplyConfiguration to unstructured.
+func (b *NetworkPolicyEgressRuleApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *NetworkPolicyEgressRuleBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NetworkPolicyEgressRuleBuilder, replacing the contents
-// of NetworkPolicyEgressRuleBuilder.
-func (b *NetworkPolicyEgressRuleBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NetworkPolicyEgressRuleApplyConfiguration, replacing the contents
+// of NetworkPolicyEgressRuleApplyConfiguration.
+func (b *NetworkPolicyEgressRuleApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &networkPolicyEgressRuleFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *NetworkPolicyEgressRuleBuilder) FromUnstructured(u map[string]interface
 	return nil
 }
 
-// MarshalJSON marshals NetworkPolicyEgressRuleBuilder to JSON.
-func (b *NetworkPolicyEgressRuleBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NetworkPolicyEgressRuleApplyConfiguration to JSON.
+func (b *NetworkPolicyEgressRuleApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NetworkPolicyEgressRuleBuilder, replacing the contents of
-// NetworkPolicyEgressRuleBuilder.
-func (b *NetworkPolicyEgressRuleBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NetworkPolicyEgressRuleApplyConfiguration, replacing the contents of
+// NetworkPolicyEgressRuleApplyConfiguration.
+func (b *NetworkPolicyEgressRuleApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *NetworkPolicyEgressRuleBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NetworkPolicyEgressRuleList represents a list of NetworkPolicyEgressRuleBuilder.
-type NetworkPolicyEgressRuleList []*NetworkPolicyEgressRuleBuilder
+// NetworkPolicyEgressRuleList represents a listAlias of NetworkPolicyEgressRuleApplyConfiguration.
+type NetworkPolicyEgressRuleList []*NetworkPolicyEgressRuleApplyConfiguration
 
-// NetworkPolicyEgressRuleList represents a map of NetworkPolicyEgressRuleBuilder.
-type NetworkPolicyEgressRuleMap map[string]NetworkPolicyEgressRuleBuilder
+// NetworkPolicyEgressRuleList represents a map of NetworkPolicyEgressRuleApplyConfiguration.
+type NetworkPolicyEgressRuleMap map[string]NetworkPolicyEgressRuleApplyConfiguration
 
-func (b *NetworkPolicyEgressRuleBuilder) preMarshal() {
+func (b *NetworkPolicyEgressRuleApplyConfiguration) preMarshal() {
 }
-func (b *NetworkPolicyEgressRuleBuilder) postUnmarshal() {
+func (b *NetworkPolicyEgressRuleApplyConfiguration) postUnmarshal() {
 }

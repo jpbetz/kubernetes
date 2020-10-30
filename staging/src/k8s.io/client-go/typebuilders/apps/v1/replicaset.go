@@ -25,102 +25,102 @@ import (
 	v1 "k8s.io/client-go/typebuilders/meta/v1"
 )
 
-// ReplicaSetBuilder represents an declarative configuration of the ReplicaSet type for use
+// ReplicaSetApplyConfiguration represents an declarative configuration of the ReplicaSet type for use
 // with apply.
-type ReplicaSetBuilder struct {
-	typeMeta *v1.TypeMetaBuilder // inlined type
+type ReplicaSetApplyConfiguration struct {
+	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
 	fields   replicaSetFields
 }
 
+// ReplicaSetApplyConfiguration constructs an declarative configuration of the ReplicaSet type for use with
+// apply.
+func ReplicaSet() *ReplicaSetApplyConfiguration {
+	return &ReplicaSetApplyConfiguration{}
+}
+
 // replicaSetFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ReplicaSetBuilder.
+// Inline fields are owned by their respective inline type in ReplicaSetApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type replicaSetFields struct {
-	Kind       *string                  `json:"kind,omitempty"`       // inlined ReplicaSetBuilder.typeMeta.Kind field
-	APIVersion *string                  `json:"apiVersion,omitempty"` // inlined ReplicaSetBuilder.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaBuilder    `json:"metadata,omitempty"`
-	Spec       *ReplicaSetSpecBuilder   `json:"spec,omitempty"`
-	Status     *ReplicaSetStatusBuilder `json:"status,omitempty"`
-}
-
-// ReplicaSet constructs an declarative configuration of the ReplicaSet type for use with
-// apply.
-func ReplicaSet() *ReplicaSetBuilder {
-	return &ReplicaSetBuilder{}
+	Kind       *string                             `json:"kind,omitempty"`       // inlined ReplicaSetApplyConfiguration.typeMeta.Kind field
+	APIVersion *string                             `json:"apiVersion,omitempty"` // inlined ReplicaSetApplyConfiguration.typeMeta.APIVersion field
+	ObjectMeta *v1.ObjectMetaApplyConfiguration    `json:"metadata,omitempty"`
+	Spec       *ReplicaSetSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status     *ReplicaSetStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
-func (b *ReplicaSetBuilder) SetTypeMeta(value *v1.TypeMetaBuilder) *ReplicaSetBuilder {
+func (b *ReplicaSetApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *ReplicaSetApplyConfiguration {
 	b.typeMeta = value
 	return b
 }
 
 // RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *ReplicaSetBuilder) RemoveTypeMeta() *ReplicaSetBuilder {
+func (b *ReplicaSetApplyConfiguration) RemoveTypeMeta() *ReplicaSetApplyConfiguration {
 	b.typeMeta = nil
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
-func (b *ReplicaSetBuilder) GetTypeMeta() (value *v1.TypeMetaBuilder, ok bool) {
+func (b *ReplicaSetApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
 	return b.typeMeta, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
-func (b *ReplicaSetBuilder) SetObjectMeta(value *v1.ObjectMetaBuilder) *ReplicaSetBuilder {
+func (b *ReplicaSetApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *ReplicaSetApplyConfiguration {
 	b.fields.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
-func (b *ReplicaSetBuilder) RemoveObjectMeta() *ReplicaSetBuilder {
+func (b *ReplicaSetApplyConfiguration) RemoveObjectMeta() *ReplicaSetApplyConfiguration {
 	b.fields.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
-func (b *ReplicaSetBuilder) GetObjectMeta() (value *v1.ObjectMetaBuilder, ok bool) {
+func (b *ReplicaSetApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
 	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
-func (b *ReplicaSetBuilder) SetSpec(value *ReplicaSetSpecBuilder) *ReplicaSetBuilder {
+func (b *ReplicaSetApplyConfiguration) SetSpec(value *ReplicaSetSpecApplyConfiguration) *ReplicaSetApplyConfiguration {
 	b.fields.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
-func (b *ReplicaSetBuilder) RemoveSpec() *ReplicaSetBuilder {
+func (b *ReplicaSetApplyConfiguration) RemoveSpec() *ReplicaSetApplyConfiguration {
 	b.fields.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
-func (b *ReplicaSetBuilder) GetSpec() (value *ReplicaSetSpecBuilder, ok bool) {
+func (b *ReplicaSetApplyConfiguration) GetSpec() (value *ReplicaSetSpecApplyConfiguration, ok bool) {
 	return b.fields.Spec, b.fields.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
-func (b *ReplicaSetBuilder) SetStatus(value *ReplicaSetStatusBuilder) *ReplicaSetBuilder {
+func (b *ReplicaSetApplyConfiguration) SetStatus(value *ReplicaSetStatusApplyConfiguration) *ReplicaSetApplyConfiguration {
 	b.fields.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
-func (b *ReplicaSetBuilder) RemoveStatus() *ReplicaSetBuilder {
+func (b *ReplicaSetApplyConfiguration) RemoveStatus() *ReplicaSetApplyConfiguration {
 	b.fields.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
-func (b *ReplicaSetBuilder) GetStatus() (value *ReplicaSetStatusBuilder, ok bool) {
+func (b *ReplicaSetApplyConfiguration) GetStatus() (value *ReplicaSetStatusApplyConfiguration, ok bool) {
 	return b.fields.Status, b.fields.Status != nil
 }
 
-// ToUnstructured converts ReplicaSetBuilder to unstructured.
-func (b *ReplicaSetBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ReplicaSetApplyConfiguration to unstructured.
+func (b *ReplicaSetApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -132,9 +132,9 @@ func (b *ReplicaSetBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ReplicaSetBuilder, replacing the contents
-// of ReplicaSetBuilder.
-func (b *ReplicaSetBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ReplicaSetApplyConfiguration, replacing the contents
+// of ReplicaSetApplyConfiguration.
+func (b *ReplicaSetApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &replicaSetFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -145,15 +145,15 @@ func (b *ReplicaSetBuilder) FromUnstructured(u map[string]interface{}) error {
 	return nil
 }
 
-// MarshalJSON marshals ReplicaSetBuilder to JSON.
-func (b *ReplicaSetBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ReplicaSetApplyConfiguration to JSON.
+func (b *ReplicaSetApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ReplicaSetBuilder, replacing the contents of
-// ReplicaSetBuilder.
-func (b *ReplicaSetBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ReplicaSetApplyConfiguration, replacing the contents of
+// ReplicaSetApplyConfiguration.
+func (b *ReplicaSetApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -161,13 +161,13 @@ func (b *ReplicaSetBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ReplicaSetList represents a list of ReplicaSetBuilder.
-type ReplicaSetList []*ReplicaSetBuilder
+// ReplicaSetList represents a listAlias of ReplicaSetApplyConfiguration.
+type ReplicaSetList []*ReplicaSetApplyConfiguration
 
-// ReplicaSetList represents a map of ReplicaSetBuilder.
-type ReplicaSetMap map[string]ReplicaSetBuilder
+// ReplicaSetList represents a map of ReplicaSetApplyConfiguration.
+type ReplicaSetMap map[string]ReplicaSetApplyConfiguration
 
-func (b *ReplicaSetBuilder) preMarshal() {
+func (b *ReplicaSetApplyConfiguration) preMarshal() {
 	if b.typeMeta != nil {
 		if v, ok := b.typeMeta.GetKind(); ok {
 			b.fields.Kind = &v
@@ -177,9 +177,9 @@ func (b *ReplicaSetBuilder) preMarshal() {
 		}
 	}
 }
-func (b *ReplicaSetBuilder) postUnmarshal() {
+func (b *ReplicaSetApplyConfiguration) postUnmarshal() {
 	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaBuilder{}
+		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
 	}
 	if b.fields.Kind != nil {
 		b.typeMeta.SetKind(*b.fields.Kind)

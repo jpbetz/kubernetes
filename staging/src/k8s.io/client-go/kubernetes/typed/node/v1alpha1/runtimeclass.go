@@ -48,7 +48,7 @@ type RuntimeClassInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.RuntimeClassList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.RuntimeClass, err error)
-	Apply(ctx context.Context, runtimeClass nodev1alpha1.RuntimeClassBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.RuntimeClass, err error)
+	Apply(ctx context.Context, runtimeClass *nodev1alpha1.RuntimeClassApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.RuntimeClass, err error)
 	RuntimeClassExpansion
 }
 
@@ -171,7 +171,7 @@ func (c *runtimeClasses) Patch(ctx context.Context, name string, pt types.PatchT
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied runtimeClass.
-func (c *runtimeClasses) Apply(ctx context.Context, runtimeClass nodev1alpha1.RuntimeClassBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.RuntimeClass, err error) {
+func (c *runtimeClasses) Apply(ctx context.Context, runtimeClass *nodev1alpha1.RuntimeClassApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.RuntimeClass, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
 	data, err := runtimeClass.MarshalJSON()
 	if err != nil {

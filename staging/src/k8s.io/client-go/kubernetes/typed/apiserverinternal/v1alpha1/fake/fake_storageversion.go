@@ -135,7 +135,7 @@ func (c *FakeStorageVersions) Patch(ctx context.Context, name string, pt types.P
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied storageVersion.
-func (c *FakeStorageVersions) Apply(ctx context.Context, storageVersion apiserverinternalv1alpha1.StorageVersionBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.StorageVersion, err error) {
+func (c *FakeStorageVersions) Apply(ctx context.Context, storageVersion *apiserverinternalv1alpha1.StorageVersionApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.StorageVersion, err error) {
 	data, err := storageVersion.MarshalJSON()
 	if err != nil {
 		return nil, err

@@ -124,7 +124,7 @@ func (c *FakeComponentStatuses) Patch(ctx context.Context, name string, pt types
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied componentStatus.
-func (c *FakeComponentStatuses) Apply(ctx context.Context, componentStatus typebuilderscorev1.ComponentStatusBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ComponentStatus, err error) {
+func (c *FakeComponentStatuses) Apply(ctx context.Context, componentStatus *typebuilderscorev1.ComponentStatusApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ComponentStatus, err error) {
 	data, err := componentStatus.MarshalJSON()
 	if err != nil {
 		return nil, err

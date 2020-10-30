@@ -25,14 +25,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// NamespaceStatusBuilder represents an declarative configuration of the NamespaceStatus type for use
+// NamespaceStatusApplyConfiguration represents an declarative configuration of the NamespaceStatus type for use
 // with apply.
-type NamespaceStatusBuilder struct {
+type NamespaceStatusApplyConfiguration struct {
 	fields namespaceStatusFields
 }
 
+// NamespaceStatusApplyConfiguration constructs an declarative configuration of the NamespaceStatus type for use with
+// apply.
+func NamespaceStatus() *NamespaceStatusApplyConfiguration {
+	return &NamespaceStatusApplyConfiguration{}
+}
+
 // namespaceStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NamespaceStatusBuilder.
+// Inline fields are owned by their respective inline type in NamespaceStatusApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type namespaceStatusFields struct {
 	Conditions *NamespaceConditionList `json:"conditions,omitempty"`
 }
 
-// NamespaceStatus constructs an declarative configuration of the NamespaceStatus type for use with
-// apply.
-func NamespaceStatus() *NamespaceStatusBuilder {
-	return &NamespaceStatusBuilder{}
-}
-
 // SetPhase sets the Phase field in the declarative configuration to the given value.
-func (b *NamespaceStatusBuilder) SetPhase(value v1.NamespacePhase) *NamespaceStatusBuilder {
+func (b *NamespaceStatusApplyConfiguration) SetPhase(value v1.NamespacePhase) *NamespaceStatusApplyConfiguration {
 	b.fields.Phase = &value
 	return b
 }
 
 // RemovePhase removes the Phase field from the declarative configuration.
-func (b *NamespaceStatusBuilder) RemovePhase() *NamespaceStatusBuilder {
+func (b *NamespaceStatusApplyConfiguration) RemovePhase() *NamespaceStatusApplyConfiguration {
 	b.fields.Phase = nil
 	return b
 }
 
 // GetPhase gets the Phase field from the declarative configuration.
-func (b *NamespaceStatusBuilder) GetPhase() (value v1.NamespacePhase, ok bool) {
+func (b *NamespaceStatusApplyConfiguration) GetPhase() (value v1.NamespacePhase, ok bool) {
 	if v := b.fields.Phase; v != nil {
 		return *v, true
 	}
@@ -68,27 +68,27 @@ func (b *NamespaceStatusBuilder) GetPhase() (value v1.NamespacePhase, ok bool) {
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b *NamespaceStatusBuilder) SetConditions(value NamespaceConditionList) *NamespaceStatusBuilder {
+func (b *NamespaceStatusApplyConfiguration) SetConditions(value NamespaceConditionList) *NamespaceStatusApplyConfiguration {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b *NamespaceStatusBuilder) RemoveConditions() *NamespaceStatusBuilder {
+func (b *NamespaceStatusApplyConfiguration) RemoveConditions() *NamespaceStatusApplyConfiguration {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b *NamespaceStatusBuilder) GetConditions() (value NamespaceConditionList, ok bool) {
+func (b *NamespaceStatusApplyConfiguration) GetConditions() (value NamespaceConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts NamespaceStatusBuilder to unstructured.
-func (b *NamespaceStatusBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NamespaceStatusApplyConfiguration to unstructured.
+func (b *NamespaceStatusApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -100,9 +100,9 @@ func (b *NamespaceStatusBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NamespaceStatusBuilder, replacing the contents
-// of NamespaceStatusBuilder.
-func (b *NamespaceStatusBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NamespaceStatusApplyConfiguration, replacing the contents
+// of NamespaceStatusApplyConfiguration.
+func (b *NamespaceStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &namespaceStatusFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -113,15 +113,15 @@ func (b *NamespaceStatusBuilder) FromUnstructured(u map[string]interface{}) erro
 	return nil
 }
 
-// MarshalJSON marshals NamespaceStatusBuilder to JSON.
-func (b *NamespaceStatusBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NamespaceStatusApplyConfiguration to JSON.
+func (b *NamespaceStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NamespaceStatusBuilder, replacing the contents of
-// NamespaceStatusBuilder.
-func (b *NamespaceStatusBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NamespaceStatusApplyConfiguration, replacing the contents of
+// NamespaceStatusApplyConfiguration.
+func (b *NamespaceStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -129,13 +129,13 @@ func (b *NamespaceStatusBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NamespaceStatusList represents a list of NamespaceStatusBuilder.
-type NamespaceStatusList []*NamespaceStatusBuilder
+// NamespaceStatusList represents a listAlias of NamespaceStatusApplyConfiguration.
+type NamespaceStatusList []*NamespaceStatusApplyConfiguration
 
-// NamespaceStatusList represents a map of NamespaceStatusBuilder.
-type NamespaceStatusMap map[string]NamespaceStatusBuilder
+// NamespaceStatusList represents a map of NamespaceStatusApplyConfiguration.
+type NamespaceStatusMap map[string]NamespaceStatusApplyConfiguration
 
-func (b *NamespaceStatusBuilder) preMarshal() {
+func (b *NamespaceStatusApplyConfiguration) preMarshal() {
 }
-func (b *NamespaceStatusBuilder) postUnmarshal() {
+func (b *NamespaceStatusApplyConfiguration) postUnmarshal() {
 }

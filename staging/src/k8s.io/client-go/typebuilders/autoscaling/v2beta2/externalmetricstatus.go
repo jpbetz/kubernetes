@@ -24,64 +24,64 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ExternalMetricStatusBuilder represents an declarative configuration of the ExternalMetricStatus type for use
+// ExternalMetricStatusApplyConfiguration represents an declarative configuration of the ExternalMetricStatus type for use
 // with apply.
-type ExternalMetricStatusBuilder struct {
+type ExternalMetricStatusApplyConfiguration struct {
 	fields externalMetricStatusFields
 }
 
+// ExternalMetricStatusApplyConfiguration constructs an declarative configuration of the ExternalMetricStatus type for use with
+// apply.
+func ExternalMetricStatus() *ExternalMetricStatusApplyConfiguration {
+	return &ExternalMetricStatusApplyConfiguration{}
+}
+
 // externalMetricStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ExternalMetricStatusBuilder.
+// Inline fields are owned by their respective inline type in ExternalMetricStatusApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
 type externalMetricStatusFields struct {
-	Metric  *MetricIdentifierBuilder  `json:"metric,omitempty"`
-	Current *MetricValueStatusBuilder `json:"current,omitempty"`
-}
-
-// ExternalMetricStatus constructs an declarative configuration of the ExternalMetricStatus type for use with
-// apply.
-func ExternalMetricStatus() *ExternalMetricStatusBuilder {
-	return &ExternalMetricStatusBuilder{}
+	Metric  *MetricIdentifierApplyConfiguration  `json:"metric,omitempty"`
+	Current *MetricValueStatusApplyConfiguration `json:"current,omitempty"`
 }
 
 // SetMetric sets the Metric field in the declarative configuration to the given value.
-func (b *ExternalMetricStatusBuilder) SetMetric(value *MetricIdentifierBuilder) *ExternalMetricStatusBuilder {
+func (b *ExternalMetricStatusApplyConfiguration) SetMetric(value *MetricIdentifierApplyConfiguration) *ExternalMetricStatusApplyConfiguration {
 	b.fields.Metric = value
 	return b
 }
 
 // RemoveMetric removes the Metric field from the declarative configuration.
-func (b *ExternalMetricStatusBuilder) RemoveMetric() *ExternalMetricStatusBuilder {
+func (b *ExternalMetricStatusApplyConfiguration) RemoveMetric() *ExternalMetricStatusApplyConfiguration {
 	b.fields.Metric = nil
 	return b
 }
 
 // GetMetric gets the Metric field from the declarative configuration.
-func (b *ExternalMetricStatusBuilder) GetMetric() (value *MetricIdentifierBuilder, ok bool) {
+func (b *ExternalMetricStatusApplyConfiguration) GetMetric() (value *MetricIdentifierApplyConfiguration, ok bool) {
 	return b.fields.Metric, b.fields.Metric != nil
 }
 
 // SetCurrent sets the Current field in the declarative configuration to the given value.
-func (b *ExternalMetricStatusBuilder) SetCurrent(value *MetricValueStatusBuilder) *ExternalMetricStatusBuilder {
+func (b *ExternalMetricStatusApplyConfiguration) SetCurrent(value *MetricValueStatusApplyConfiguration) *ExternalMetricStatusApplyConfiguration {
 	b.fields.Current = value
 	return b
 }
 
 // RemoveCurrent removes the Current field from the declarative configuration.
-func (b *ExternalMetricStatusBuilder) RemoveCurrent() *ExternalMetricStatusBuilder {
+func (b *ExternalMetricStatusApplyConfiguration) RemoveCurrent() *ExternalMetricStatusApplyConfiguration {
 	b.fields.Current = nil
 	return b
 }
 
 // GetCurrent gets the Current field from the declarative configuration.
-func (b *ExternalMetricStatusBuilder) GetCurrent() (value *MetricValueStatusBuilder, ok bool) {
+func (b *ExternalMetricStatusApplyConfiguration) GetCurrent() (value *MetricValueStatusApplyConfiguration, ok bool) {
 	return b.fields.Current, b.fields.Current != nil
 }
 
-// ToUnstructured converts ExternalMetricStatusBuilder to unstructured.
-func (b *ExternalMetricStatusBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ExternalMetricStatusApplyConfiguration to unstructured.
+func (b *ExternalMetricStatusApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -93,9 +93,9 @@ func (b *ExternalMetricStatusBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ExternalMetricStatusBuilder, replacing the contents
-// of ExternalMetricStatusBuilder.
-func (b *ExternalMetricStatusBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ExternalMetricStatusApplyConfiguration, replacing the contents
+// of ExternalMetricStatusApplyConfiguration.
+func (b *ExternalMetricStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &externalMetricStatusFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -106,15 +106,15 @@ func (b *ExternalMetricStatusBuilder) FromUnstructured(u map[string]interface{})
 	return nil
 }
 
-// MarshalJSON marshals ExternalMetricStatusBuilder to JSON.
-func (b *ExternalMetricStatusBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ExternalMetricStatusApplyConfiguration to JSON.
+func (b *ExternalMetricStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ExternalMetricStatusBuilder, replacing the contents of
-// ExternalMetricStatusBuilder.
-func (b *ExternalMetricStatusBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ExternalMetricStatusApplyConfiguration, replacing the contents of
+// ExternalMetricStatusApplyConfiguration.
+func (b *ExternalMetricStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -122,13 +122,13 @@ func (b *ExternalMetricStatusBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ExternalMetricStatusList represents a list of ExternalMetricStatusBuilder.
-type ExternalMetricStatusList []*ExternalMetricStatusBuilder
+// ExternalMetricStatusList represents a listAlias of ExternalMetricStatusApplyConfiguration.
+type ExternalMetricStatusList []*ExternalMetricStatusApplyConfiguration
 
-// ExternalMetricStatusList represents a map of ExternalMetricStatusBuilder.
-type ExternalMetricStatusMap map[string]ExternalMetricStatusBuilder
+// ExternalMetricStatusList represents a map of ExternalMetricStatusApplyConfiguration.
+type ExternalMetricStatusMap map[string]ExternalMetricStatusApplyConfiguration
 
-func (b *ExternalMetricStatusBuilder) preMarshal() {
+func (b *ExternalMetricStatusApplyConfiguration) preMarshal() {
 }
-func (b *ExternalMetricStatusBuilder) postUnmarshal() {
+func (b *ExternalMetricStatusApplyConfiguration) postUnmarshal() {
 }

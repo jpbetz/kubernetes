@@ -136,7 +136,7 @@ func (c *FakeServices) Patch(ctx context.Context, name string, pt types.PatchTyp
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied service.
-func (c *FakeServices) Apply(ctx context.Context, service typebuilderscorev1.ServiceBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Service, err error) {
+func (c *FakeServices) Apply(ctx context.Context, service *typebuilderscorev1.ServiceApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Service, err error) {
 	data, err := service.MarshalJSON()
 	if err != nil {
 		return nil, err

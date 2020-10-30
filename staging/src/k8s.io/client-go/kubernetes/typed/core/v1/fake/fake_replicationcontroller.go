@@ -145,7 +145,7 @@ func (c *FakeReplicationControllers) Patch(ctx context.Context, name string, pt 
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied replicationController.
-func (c *FakeReplicationControllers) Apply(ctx context.Context, replicationController typebuilderscorev1.ReplicationControllerBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ReplicationController, err error) {
+func (c *FakeReplicationControllers) Apply(ctx context.Context, replicationController *typebuilderscorev1.ReplicationControllerApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ReplicationController, err error) {
 	data, err := replicationController.MarshalJSON()
 	if err != nil {
 		return nil, err

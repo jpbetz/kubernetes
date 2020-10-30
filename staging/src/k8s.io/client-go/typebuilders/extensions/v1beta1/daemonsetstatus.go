@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// DaemonSetStatusBuilder represents an declarative configuration of the DaemonSetStatus type for use
+// DaemonSetStatusApplyConfiguration represents an declarative configuration of the DaemonSetStatus type for use
 // with apply.
-type DaemonSetStatusBuilder struct {
+type DaemonSetStatusApplyConfiguration struct {
 	fields daemonSetStatusFields
 }
 
+// DaemonSetStatusApplyConfiguration constructs an declarative configuration of the DaemonSetStatus type for use with
+// apply.
+func DaemonSetStatus() *DaemonSetStatusApplyConfiguration {
+	return &DaemonSetStatusApplyConfiguration{}
+}
+
 // daemonSetStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in DaemonSetStatusBuilder.
+// Inline fields are owned by their respective inline type in DaemonSetStatusApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -48,26 +54,20 @@ type daemonSetStatusFields struct {
 	Conditions             *DaemonSetConditionList `json:"conditions,omitempty"`
 }
 
-// DaemonSetStatus constructs an declarative configuration of the DaemonSetStatus type for use with
-// apply.
-func DaemonSetStatus() *DaemonSetStatusBuilder {
-	return &DaemonSetStatusBuilder{}
-}
-
 // SetCurrentNumberScheduled sets the CurrentNumberScheduled field in the declarative configuration to the given value.
-func (b *DaemonSetStatusBuilder) SetCurrentNumberScheduled(value int32) *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) SetCurrentNumberScheduled(value int32) *DaemonSetStatusApplyConfiguration {
 	b.fields.CurrentNumberScheduled = &value
 	return b
 }
 
 // RemoveCurrentNumberScheduled removes the CurrentNumberScheduled field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) RemoveCurrentNumberScheduled() *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) RemoveCurrentNumberScheduled() *DaemonSetStatusApplyConfiguration {
 	b.fields.CurrentNumberScheduled = nil
 	return b
 }
 
 // GetCurrentNumberScheduled gets the CurrentNumberScheduled field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) GetCurrentNumberScheduled() (value int32, ok bool) {
+func (b *DaemonSetStatusApplyConfiguration) GetCurrentNumberScheduled() (value int32, ok bool) {
 	if v := b.fields.CurrentNumberScheduled; v != nil {
 		return *v, true
 	}
@@ -75,19 +75,19 @@ func (b *DaemonSetStatusBuilder) GetCurrentNumberScheduled() (value int32, ok bo
 }
 
 // SetNumberMisscheduled sets the NumberMisscheduled field in the declarative configuration to the given value.
-func (b *DaemonSetStatusBuilder) SetNumberMisscheduled(value int32) *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) SetNumberMisscheduled(value int32) *DaemonSetStatusApplyConfiguration {
 	b.fields.NumberMisscheduled = &value
 	return b
 }
 
 // RemoveNumberMisscheduled removes the NumberMisscheduled field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) RemoveNumberMisscheduled() *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) RemoveNumberMisscheduled() *DaemonSetStatusApplyConfiguration {
 	b.fields.NumberMisscheduled = nil
 	return b
 }
 
 // GetNumberMisscheduled gets the NumberMisscheduled field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) GetNumberMisscheduled() (value int32, ok bool) {
+func (b *DaemonSetStatusApplyConfiguration) GetNumberMisscheduled() (value int32, ok bool) {
 	if v := b.fields.NumberMisscheduled; v != nil {
 		return *v, true
 	}
@@ -95,19 +95,19 @@ func (b *DaemonSetStatusBuilder) GetNumberMisscheduled() (value int32, ok bool) 
 }
 
 // SetDesiredNumberScheduled sets the DesiredNumberScheduled field in the declarative configuration to the given value.
-func (b *DaemonSetStatusBuilder) SetDesiredNumberScheduled(value int32) *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) SetDesiredNumberScheduled(value int32) *DaemonSetStatusApplyConfiguration {
 	b.fields.DesiredNumberScheduled = &value
 	return b
 }
 
 // RemoveDesiredNumberScheduled removes the DesiredNumberScheduled field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) RemoveDesiredNumberScheduled() *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) RemoveDesiredNumberScheduled() *DaemonSetStatusApplyConfiguration {
 	b.fields.DesiredNumberScheduled = nil
 	return b
 }
 
 // GetDesiredNumberScheduled gets the DesiredNumberScheduled field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) GetDesiredNumberScheduled() (value int32, ok bool) {
+func (b *DaemonSetStatusApplyConfiguration) GetDesiredNumberScheduled() (value int32, ok bool) {
 	if v := b.fields.DesiredNumberScheduled; v != nil {
 		return *v, true
 	}
@@ -115,19 +115,19 @@ func (b *DaemonSetStatusBuilder) GetDesiredNumberScheduled() (value int32, ok bo
 }
 
 // SetNumberReady sets the NumberReady field in the declarative configuration to the given value.
-func (b *DaemonSetStatusBuilder) SetNumberReady(value int32) *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) SetNumberReady(value int32) *DaemonSetStatusApplyConfiguration {
 	b.fields.NumberReady = &value
 	return b
 }
 
 // RemoveNumberReady removes the NumberReady field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) RemoveNumberReady() *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) RemoveNumberReady() *DaemonSetStatusApplyConfiguration {
 	b.fields.NumberReady = nil
 	return b
 }
 
 // GetNumberReady gets the NumberReady field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) GetNumberReady() (value int32, ok bool) {
+func (b *DaemonSetStatusApplyConfiguration) GetNumberReady() (value int32, ok bool) {
 	if v := b.fields.NumberReady; v != nil {
 		return *v, true
 	}
@@ -135,19 +135,19 @@ func (b *DaemonSetStatusBuilder) GetNumberReady() (value int32, ok bool) {
 }
 
 // SetObservedGeneration sets the ObservedGeneration field in the declarative configuration to the given value.
-func (b *DaemonSetStatusBuilder) SetObservedGeneration(value int64) *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) SetObservedGeneration(value int64) *DaemonSetStatusApplyConfiguration {
 	b.fields.ObservedGeneration = &value
 	return b
 }
 
 // RemoveObservedGeneration removes the ObservedGeneration field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) RemoveObservedGeneration() *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) RemoveObservedGeneration() *DaemonSetStatusApplyConfiguration {
 	b.fields.ObservedGeneration = nil
 	return b
 }
 
 // GetObservedGeneration gets the ObservedGeneration field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) GetObservedGeneration() (value int64, ok bool) {
+func (b *DaemonSetStatusApplyConfiguration) GetObservedGeneration() (value int64, ok bool) {
 	if v := b.fields.ObservedGeneration; v != nil {
 		return *v, true
 	}
@@ -155,19 +155,19 @@ func (b *DaemonSetStatusBuilder) GetObservedGeneration() (value int64, ok bool) 
 }
 
 // SetUpdatedNumberScheduled sets the UpdatedNumberScheduled field in the declarative configuration to the given value.
-func (b *DaemonSetStatusBuilder) SetUpdatedNumberScheduled(value int32) *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) SetUpdatedNumberScheduled(value int32) *DaemonSetStatusApplyConfiguration {
 	b.fields.UpdatedNumberScheduled = &value
 	return b
 }
 
 // RemoveUpdatedNumberScheduled removes the UpdatedNumberScheduled field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) RemoveUpdatedNumberScheduled() *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) RemoveUpdatedNumberScheduled() *DaemonSetStatusApplyConfiguration {
 	b.fields.UpdatedNumberScheduled = nil
 	return b
 }
 
 // GetUpdatedNumberScheduled gets the UpdatedNumberScheduled field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) GetUpdatedNumberScheduled() (value int32, ok bool) {
+func (b *DaemonSetStatusApplyConfiguration) GetUpdatedNumberScheduled() (value int32, ok bool) {
 	if v := b.fields.UpdatedNumberScheduled; v != nil {
 		return *v, true
 	}
@@ -175,19 +175,19 @@ func (b *DaemonSetStatusBuilder) GetUpdatedNumberScheduled() (value int32, ok bo
 }
 
 // SetNumberAvailable sets the NumberAvailable field in the declarative configuration to the given value.
-func (b *DaemonSetStatusBuilder) SetNumberAvailable(value int32) *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) SetNumberAvailable(value int32) *DaemonSetStatusApplyConfiguration {
 	b.fields.NumberAvailable = &value
 	return b
 }
 
 // RemoveNumberAvailable removes the NumberAvailable field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) RemoveNumberAvailable() *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) RemoveNumberAvailable() *DaemonSetStatusApplyConfiguration {
 	b.fields.NumberAvailable = nil
 	return b
 }
 
 // GetNumberAvailable gets the NumberAvailable field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) GetNumberAvailable() (value int32, ok bool) {
+func (b *DaemonSetStatusApplyConfiguration) GetNumberAvailable() (value int32, ok bool) {
 	if v := b.fields.NumberAvailable; v != nil {
 		return *v, true
 	}
@@ -195,19 +195,19 @@ func (b *DaemonSetStatusBuilder) GetNumberAvailable() (value int32, ok bool) {
 }
 
 // SetNumberUnavailable sets the NumberUnavailable field in the declarative configuration to the given value.
-func (b *DaemonSetStatusBuilder) SetNumberUnavailable(value int32) *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) SetNumberUnavailable(value int32) *DaemonSetStatusApplyConfiguration {
 	b.fields.NumberUnavailable = &value
 	return b
 }
 
 // RemoveNumberUnavailable removes the NumberUnavailable field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) RemoveNumberUnavailable() *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) RemoveNumberUnavailable() *DaemonSetStatusApplyConfiguration {
 	b.fields.NumberUnavailable = nil
 	return b
 }
 
 // GetNumberUnavailable gets the NumberUnavailable field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) GetNumberUnavailable() (value int32, ok bool) {
+func (b *DaemonSetStatusApplyConfiguration) GetNumberUnavailable() (value int32, ok bool) {
 	if v := b.fields.NumberUnavailable; v != nil {
 		return *v, true
 	}
@@ -215,19 +215,19 @@ func (b *DaemonSetStatusBuilder) GetNumberUnavailable() (value int32, ok bool) {
 }
 
 // SetCollisionCount sets the CollisionCount field in the declarative configuration to the given value.
-func (b *DaemonSetStatusBuilder) SetCollisionCount(value int32) *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) SetCollisionCount(value int32) *DaemonSetStatusApplyConfiguration {
 	b.fields.CollisionCount = &value
 	return b
 }
 
 // RemoveCollisionCount removes the CollisionCount field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) RemoveCollisionCount() *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) RemoveCollisionCount() *DaemonSetStatusApplyConfiguration {
 	b.fields.CollisionCount = nil
 	return b
 }
 
 // GetCollisionCount gets the CollisionCount field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) GetCollisionCount() (value int32, ok bool) {
+func (b *DaemonSetStatusApplyConfiguration) GetCollisionCount() (value int32, ok bool) {
 	if v := b.fields.CollisionCount; v != nil {
 		return *v, true
 	}
@@ -235,27 +235,27 @@ func (b *DaemonSetStatusBuilder) GetCollisionCount() (value int32, ok bool) {
 }
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
-func (b *DaemonSetStatusBuilder) SetConditions(value DaemonSetConditionList) *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) SetConditions(value DaemonSetConditionList) *DaemonSetStatusApplyConfiguration {
 	b.fields.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) RemoveConditions() *DaemonSetStatusBuilder {
+func (b *DaemonSetStatusApplyConfiguration) RemoveConditions() *DaemonSetStatusApplyConfiguration {
 	b.fields.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
-func (b *DaemonSetStatusBuilder) GetConditions() (value DaemonSetConditionList, ok bool) {
+func (b *DaemonSetStatusApplyConfiguration) GetConditions() (value DaemonSetConditionList, ok bool) {
 	if v := b.fields.Conditions; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts DaemonSetStatusBuilder to unstructured.
-func (b *DaemonSetStatusBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts DaemonSetStatusApplyConfiguration to unstructured.
+func (b *DaemonSetStatusApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -267,9 +267,9 @@ func (b *DaemonSetStatusBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to DaemonSetStatusBuilder, replacing the contents
-// of DaemonSetStatusBuilder.
-func (b *DaemonSetStatusBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to DaemonSetStatusApplyConfiguration, replacing the contents
+// of DaemonSetStatusApplyConfiguration.
+func (b *DaemonSetStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &daemonSetStatusFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -280,15 +280,15 @@ func (b *DaemonSetStatusBuilder) FromUnstructured(u map[string]interface{}) erro
 	return nil
 }
 
-// MarshalJSON marshals DaemonSetStatusBuilder to JSON.
-func (b *DaemonSetStatusBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals DaemonSetStatusApplyConfiguration to JSON.
+func (b *DaemonSetStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into DaemonSetStatusBuilder, replacing the contents of
-// DaemonSetStatusBuilder.
-func (b *DaemonSetStatusBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into DaemonSetStatusApplyConfiguration, replacing the contents of
+// DaemonSetStatusApplyConfiguration.
+func (b *DaemonSetStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -296,13 +296,13 @@ func (b *DaemonSetStatusBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// DaemonSetStatusList represents a list of DaemonSetStatusBuilder.
-type DaemonSetStatusList []*DaemonSetStatusBuilder
+// DaemonSetStatusList represents a listAlias of DaemonSetStatusApplyConfiguration.
+type DaemonSetStatusList []*DaemonSetStatusApplyConfiguration
 
-// DaemonSetStatusList represents a map of DaemonSetStatusBuilder.
-type DaemonSetStatusMap map[string]DaemonSetStatusBuilder
+// DaemonSetStatusList represents a map of DaemonSetStatusApplyConfiguration.
+type DaemonSetStatusMap map[string]DaemonSetStatusApplyConfiguration
 
-func (b *DaemonSetStatusBuilder) preMarshal() {
+func (b *DaemonSetStatusApplyConfiguration) preMarshal() {
 }
-func (b *DaemonSetStatusBuilder) postUnmarshal() {
+func (b *DaemonSetStatusApplyConfiguration) postUnmarshal() {
 }

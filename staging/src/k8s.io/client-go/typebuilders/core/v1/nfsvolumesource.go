@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// NFSVolumeSourceBuilder represents an declarative configuration of the NFSVolumeSource type for use
+// NFSVolumeSourceApplyConfiguration represents an declarative configuration of the NFSVolumeSource type for use
 // with apply.
-type NFSVolumeSourceBuilder struct {
+type NFSVolumeSourceApplyConfiguration struct {
 	fields nFSVolumeSourceFields
 }
 
+// NFSVolumeSourceApplyConfiguration constructs an declarative configuration of the NFSVolumeSource type for use with
+// apply.
+func NFSVolumeSource() *NFSVolumeSourceApplyConfiguration {
+	return &NFSVolumeSourceApplyConfiguration{}
+}
+
 // nFSVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NFSVolumeSourceBuilder.
+// Inline fields are owned by their respective inline type in NFSVolumeSourceApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -41,26 +47,20 @@ type nFSVolumeSourceFields struct {
 	ReadOnly *bool   `json:"readOnly,omitempty"`
 }
 
-// NFSVolumeSource constructs an declarative configuration of the NFSVolumeSource type for use with
-// apply.
-func NFSVolumeSource() *NFSVolumeSourceBuilder {
-	return &NFSVolumeSourceBuilder{}
-}
-
 // SetServer sets the Server field in the declarative configuration to the given value.
-func (b *NFSVolumeSourceBuilder) SetServer(value string) *NFSVolumeSourceBuilder {
+func (b *NFSVolumeSourceApplyConfiguration) SetServer(value string) *NFSVolumeSourceApplyConfiguration {
 	b.fields.Server = &value
 	return b
 }
 
 // RemoveServer removes the Server field from the declarative configuration.
-func (b *NFSVolumeSourceBuilder) RemoveServer() *NFSVolumeSourceBuilder {
+func (b *NFSVolumeSourceApplyConfiguration) RemoveServer() *NFSVolumeSourceApplyConfiguration {
 	b.fields.Server = nil
 	return b
 }
 
 // GetServer gets the Server field from the declarative configuration.
-func (b *NFSVolumeSourceBuilder) GetServer() (value string, ok bool) {
+func (b *NFSVolumeSourceApplyConfiguration) GetServer() (value string, ok bool) {
 	if v := b.fields.Server; v != nil {
 		return *v, true
 	}
@@ -68,19 +68,19 @@ func (b *NFSVolumeSourceBuilder) GetServer() (value string, ok bool) {
 }
 
 // SetPath sets the Path field in the declarative configuration to the given value.
-func (b *NFSVolumeSourceBuilder) SetPath(value string) *NFSVolumeSourceBuilder {
+func (b *NFSVolumeSourceApplyConfiguration) SetPath(value string) *NFSVolumeSourceApplyConfiguration {
 	b.fields.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
-func (b *NFSVolumeSourceBuilder) RemovePath() *NFSVolumeSourceBuilder {
+func (b *NFSVolumeSourceApplyConfiguration) RemovePath() *NFSVolumeSourceApplyConfiguration {
 	b.fields.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
-func (b *NFSVolumeSourceBuilder) GetPath() (value string, ok bool) {
+func (b *NFSVolumeSourceApplyConfiguration) GetPath() (value string, ok bool) {
 	if v := b.fields.Path; v != nil {
 		return *v, true
 	}
@@ -88,27 +88,27 @@ func (b *NFSVolumeSourceBuilder) GetPath() (value string, ok bool) {
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b *NFSVolumeSourceBuilder) SetReadOnly(value bool) *NFSVolumeSourceBuilder {
+func (b *NFSVolumeSourceApplyConfiguration) SetReadOnly(value bool) *NFSVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b *NFSVolumeSourceBuilder) RemoveReadOnly() *NFSVolumeSourceBuilder {
+func (b *NFSVolumeSourceApplyConfiguration) RemoveReadOnly() *NFSVolumeSourceApplyConfiguration {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b *NFSVolumeSourceBuilder) GetReadOnly() (value bool, ok bool) {
+func (b *NFSVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts NFSVolumeSourceBuilder to unstructured.
-func (b *NFSVolumeSourceBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts NFSVolumeSourceApplyConfiguration to unstructured.
+func (b *NFSVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -120,9 +120,9 @@ func (b *NFSVolumeSourceBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to NFSVolumeSourceBuilder, replacing the contents
-// of NFSVolumeSourceBuilder.
-func (b *NFSVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to NFSVolumeSourceApplyConfiguration, replacing the contents
+// of NFSVolumeSourceApplyConfiguration.
+func (b *NFSVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &nFSVolumeSourceFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -133,15 +133,15 @@ func (b *NFSVolumeSourceBuilder) FromUnstructured(u map[string]interface{}) erro
 	return nil
 }
 
-// MarshalJSON marshals NFSVolumeSourceBuilder to JSON.
-func (b *NFSVolumeSourceBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals NFSVolumeSourceApplyConfiguration to JSON.
+func (b *NFSVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into NFSVolumeSourceBuilder, replacing the contents of
-// NFSVolumeSourceBuilder.
-func (b *NFSVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into NFSVolumeSourceApplyConfiguration, replacing the contents of
+// NFSVolumeSourceApplyConfiguration.
+func (b *NFSVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -149,13 +149,13 @@ func (b *NFSVolumeSourceBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NFSVolumeSourceList represents a list of NFSVolumeSourceBuilder.
-type NFSVolumeSourceList []*NFSVolumeSourceBuilder
+// NFSVolumeSourceList represents a listAlias of NFSVolumeSourceApplyConfiguration.
+type NFSVolumeSourceList []*NFSVolumeSourceApplyConfiguration
 
-// NFSVolumeSourceList represents a map of NFSVolumeSourceBuilder.
-type NFSVolumeSourceMap map[string]NFSVolumeSourceBuilder
+// NFSVolumeSourceList represents a map of NFSVolumeSourceApplyConfiguration.
+type NFSVolumeSourceMap map[string]NFSVolumeSourceApplyConfiguration
 
-func (b *NFSVolumeSourceBuilder) preMarshal() {
+func (b *NFSVolumeSourceApplyConfiguration) preMarshal() {
 }
-func (b *NFSVolumeSourceBuilder) postUnmarshal() {
+func (b *NFSVolumeSourceApplyConfiguration) postUnmarshal() {
 }

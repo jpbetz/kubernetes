@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// ServiceAccountSubjectBuilder represents an declarative configuration of the ServiceAccountSubject type for use
+// ServiceAccountSubjectApplyConfiguration represents an declarative configuration of the ServiceAccountSubject type for use
 // with apply.
-type ServiceAccountSubjectBuilder struct {
+type ServiceAccountSubjectApplyConfiguration struct {
 	fields serviceAccountSubjectFields
 }
 
+// ServiceAccountSubjectApplyConfiguration constructs an declarative configuration of the ServiceAccountSubject type for use with
+// apply.
+func ServiceAccountSubject() *ServiceAccountSubjectApplyConfiguration {
+	return &ServiceAccountSubjectApplyConfiguration{}
+}
+
 // serviceAccountSubjectFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ServiceAccountSubjectBuilder.
+// Inline fields are owned by their respective inline type in ServiceAccountSubjectApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type serviceAccountSubjectFields struct {
 	Name      *string `json:"name,omitempty"`
 }
 
-// ServiceAccountSubject constructs an declarative configuration of the ServiceAccountSubject type for use with
-// apply.
-func ServiceAccountSubject() *ServiceAccountSubjectBuilder {
-	return &ServiceAccountSubjectBuilder{}
-}
-
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
-func (b *ServiceAccountSubjectBuilder) SetNamespace(value string) *ServiceAccountSubjectBuilder {
+func (b *ServiceAccountSubjectApplyConfiguration) SetNamespace(value string) *ServiceAccountSubjectApplyConfiguration {
 	b.fields.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
-func (b *ServiceAccountSubjectBuilder) RemoveNamespace() *ServiceAccountSubjectBuilder {
+func (b *ServiceAccountSubjectApplyConfiguration) RemoveNamespace() *ServiceAccountSubjectApplyConfiguration {
 	b.fields.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
-func (b *ServiceAccountSubjectBuilder) GetNamespace() (value string, ok bool) {
+func (b *ServiceAccountSubjectApplyConfiguration) GetNamespace() (value string, ok bool) {
 	if v := b.fields.Namespace; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *ServiceAccountSubjectBuilder) GetNamespace() (value string, ok bool) {
 }
 
 // SetName sets the Name field in the declarative configuration to the given value.
-func (b *ServiceAccountSubjectBuilder) SetName(value string) *ServiceAccountSubjectBuilder {
+func (b *ServiceAccountSubjectApplyConfiguration) SetName(value string) *ServiceAccountSubjectApplyConfiguration {
 	b.fields.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
-func (b *ServiceAccountSubjectBuilder) RemoveName() *ServiceAccountSubjectBuilder {
+func (b *ServiceAccountSubjectApplyConfiguration) RemoveName() *ServiceAccountSubjectApplyConfiguration {
 	b.fields.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
-func (b *ServiceAccountSubjectBuilder) GetName() (value string, ok bool) {
+func (b *ServiceAccountSubjectApplyConfiguration) GetName() (value string, ok bool) {
 	if v := b.fields.Name; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts ServiceAccountSubjectBuilder to unstructured.
-func (b *ServiceAccountSubjectBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts ServiceAccountSubjectApplyConfiguration to unstructured.
+func (b *ServiceAccountSubjectApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *ServiceAccountSubjectBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to ServiceAccountSubjectBuilder, replacing the contents
-// of ServiceAccountSubjectBuilder.
-func (b *ServiceAccountSubjectBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to ServiceAccountSubjectApplyConfiguration, replacing the contents
+// of ServiceAccountSubjectApplyConfiguration.
+func (b *ServiceAccountSubjectApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &serviceAccountSubjectFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *ServiceAccountSubjectBuilder) FromUnstructured(u map[string]interface{}
 	return nil
 }
 
-// MarshalJSON marshals ServiceAccountSubjectBuilder to JSON.
-func (b *ServiceAccountSubjectBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals ServiceAccountSubjectApplyConfiguration to JSON.
+func (b *ServiceAccountSubjectApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into ServiceAccountSubjectBuilder, replacing the contents of
-// ServiceAccountSubjectBuilder.
-func (b *ServiceAccountSubjectBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into ServiceAccountSubjectApplyConfiguration, replacing the contents of
+// ServiceAccountSubjectApplyConfiguration.
+func (b *ServiceAccountSubjectApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *ServiceAccountSubjectBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// ServiceAccountSubjectList represents a list of ServiceAccountSubjectBuilder.
-type ServiceAccountSubjectList []*ServiceAccountSubjectBuilder
+// ServiceAccountSubjectList represents a listAlias of ServiceAccountSubjectApplyConfiguration.
+type ServiceAccountSubjectList []*ServiceAccountSubjectApplyConfiguration
 
-// ServiceAccountSubjectList represents a map of ServiceAccountSubjectBuilder.
-type ServiceAccountSubjectMap map[string]ServiceAccountSubjectBuilder
+// ServiceAccountSubjectList represents a map of ServiceAccountSubjectApplyConfiguration.
+type ServiceAccountSubjectMap map[string]ServiceAccountSubjectApplyConfiguration
 
-func (b *ServiceAccountSubjectBuilder) preMarshal() {
+func (b *ServiceAccountSubjectApplyConfiguration) preMarshal() {
 }
-func (b *ServiceAccountSubjectBuilder) postUnmarshal() {
+func (b *ServiceAccountSubjectApplyConfiguration) postUnmarshal() {
 }

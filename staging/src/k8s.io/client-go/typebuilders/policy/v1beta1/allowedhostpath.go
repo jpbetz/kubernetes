@@ -24,14 +24,20 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// AllowedHostPathBuilder represents an declarative configuration of the AllowedHostPath type for use
+// AllowedHostPathApplyConfiguration represents an declarative configuration of the AllowedHostPath type for use
 // with apply.
-type AllowedHostPathBuilder struct {
+type AllowedHostPathApplyConfiguration struct {
 	fields allowedHostPathFields
 }
 
+// AllowedHostPathApplyConfiguration constructs an declarative configuration of the AllowedHostPath type for use with
+// apply.
+func AllowedHostPath() *AllowedHostPathApplyConfiguration {
+	return &AllowedHostPathApplyConfiguration{}
+}
+
 // allowedHostPathFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in AllowedHostPathBuilder.
+// Inline fields are owned by their respective inline type in AllowedHostPathApplyConfiguration.
 // They are copied to this type before marshalling, and are copied out
 // after unmarshalling. The inlined types cannot be embedded because they do
 // not expose their fields directly.
@@ -40,26 +46,20 @@ type allowedHostPathFields struct {
 	ReadOnly   *bool   `json:"readOnly,omitempty"`
 }
 
-// AllowedHostPath constructs an declarative configuration of the AllowedHostPath type for use with
-// apply.
-func AllowedHostPath() *AllowedHostPathBuilder {
-	return &AllowedHostPathBuilder{}
-}
-
 // SetPathPrefix sets the PathPrefix field in the declarative configuration to the given value.
-func (b *AllowedHostPathBuilder) SetPathPrefix(value string) *AllowedHostPathBuilder {
+func (b *AllowedHostPathApplyConfiguration) SetPathPrefix(value string) *AllowedHostPathApplyConfiguration {
 	b.fields.PathPrefix = &value
 	return b
 }
 
 // RemovePathPrefix removes the PathPrefix field from the declarative configuration.
-func (b *AllowedHostPathBuilder) RemovePathPrefix() *AllowedHostPathBuilder {
+func (b *AllowedHostPathApplyConfiguration) RemovePathPrefix() *AllowedHostPathApplyConfiguration {
 	b.fields.PathPrefix = nil
 	return b
 }
 
 // GetPathPrefix gets the PathPrefix field from the declarative configuration.
-func (b *AllowedHostPathBuilder) GetPathPrefix() (value string, ok bool) {
+func (b *AllowedHostPathApplyConfiguration) GetPathPrefix() (value string, ok bool) {
 	if v := b.fields.PathPrefix; v != nil {
 		return *v, true
 	}
@@ -67,27 +67,27 @@ func (b *AllowedHostPathBuilder) GetPathPrefix() (value string, ok bool) {
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
-func (b *AllowedHostPathBuilder) SetReadOnly(value bool) *AllowedHostPathBuilder {
+func (b *AllowedHostPathApplyConfiguration) SetReadOnly(value bool) *AllowedHostPathApplyConfiguration {
 	b.fields.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
-func (b *AllowedHostPathBuilder) RemoveReadOnly() *AllowedHostPathBuilder {
+func (b *AllowedHostPathApplyConfiguration) RemoveReadOnly() *AllowedHostPathApplyConfiguration {
 	b.fields.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
-func (b *AllowedHostPathBuilder) GetReadOnly() (value bool, ok bool) {
+func (b *AllowedHostPathApplyConfiguration) GetReadOnly() (value bool, ok bool) {
 	if v := b.fields.ReadOnly; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
-// ToUnstructured converts AllowedHostPathBuilder to unstructured.
-func (b *AllowedHostPathBuilder) ToUnstructured() interface{} {
+// ToUnstructured converts AllowedHostPathApplyConfiguration to unstructured.
+func (b *AllowedHostPathApplyConfiguration) ToUnstructured() interface{} {
 	if b == nil {
 		return nil
 	}
@@ -99,9 +99,9 @@ func (b *AllowedHostPathBuilder) ToUnstructured() interface{} {
 	return u
 }
 
-// FromUnstructured converts unstructured to AllowedHostPathBuilder, replacing the contents
-// of AllowedHostPathBuilder.
-func (b *AllowedHostPathBuilder) FromUnstructured(u map[string]interface{}) error {
+// FromUnstructured converts unstructured to AllowedHostPathApplyConfiguration, replacing the contents
+// of AllowedHostPathApplyConfiguration.
+func (b *AllowedHostPathApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
 	m := &allowedHostPathFields{}
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
 	if err != nil {
@@ -112,15 +112,15 @@ func (b *AllowedHostPathBuilder) FromUnstructured(u map[string]interface{}) erro
 	return nil
 }
 
-// MarshalJSON marshals AllowedHostPathBuilder to JSON.
-func (b *AllowedHostPathBuilder) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals AllowedHostPathApplyConfiguration to JSON.
+func (b *AllowedHostPathApplyConfiguration) MarshalJSON() ([]byte, error) {
 	b.preMarshal()
 	return json.Marshal(b.fields)
 }
 
-// UnmarshalJSON unmarshals JSON into AllowedHostPathBuilder, replacing the contents of
-// AllowedHostPathBuilder.
-func (b *AllowedHostPathBuilder) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON unmarshals JSON into AllowedHostPathApplyConfiguration, replacing the contents of
+// AllowedHostPathApplyConfiguration.
+func (b *AllowedHostPathApplyConfiguration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &b.fields); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (b *AllowedHostPathBuilder) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// AllowedHostPathList represents a list of AllowedHostPathBuilder.
-type AllowedHostPathList []*AllowedHostPathBuilder
+// AllowedHostPathList represents a listAlias of AllowedHostPathApplyConfiguration.
+type AllowedHostPathList []*AllowedHostPathApplyConfiguration
 
-// AllowedHostPathList represents a map of AllowedHostPathBuilder.
-type AllowedHostPathMap map[string]AllowedHostPathBuilder
+// AllowedHostPathList represents a map of AllowedHostPathApplyConfiguration.
+type AllowedHostPathMap map[string]AllowedHostPathApplyConfiguration
 
-func (b *AllowedHostPathBuilder) preMarshal() {
+func (b *AllowedHostPathApplyConfiguration) preMarshal() {
 }
-func (b *AllowedHostPathBuilder) postUnmarshal() {
+func (b *AllowedHostPathApplyConfiguration) postUnmarshal() {
 }

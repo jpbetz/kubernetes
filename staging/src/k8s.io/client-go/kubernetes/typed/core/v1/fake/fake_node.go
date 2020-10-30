@@ -135,7 +135,7 @@ func (c *FakeNodes) Patch(ctx context.Context, name string, pt types.PatchType, 
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied node.
-func (c *FakeNodes) Apply(ctx context.Context, node typebuilderscorev1.NodeBuilder, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Node, err error) {
+func (c *FakeNodes) Apply(ctx context.Context, node *typebuilderscorev1.NodeApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Node, err error) {
 	data, err := node.MarshalJSON()
 	if err != nil {
 		return nil, err
