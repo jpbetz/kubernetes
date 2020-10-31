@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	networkingv1beta1 "k8s.io/client-go/applyconfigurations/networking/v1beta1"
 	testing "k8s.io/client-go/testing"
-	networkingv1beta1 "k8s.io/client-go/typebuilders/networking/v1beta1"
 )
 
 // FakeIngresses implements IngressInterface

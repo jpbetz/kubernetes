@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsrbacv1 "k8s.io/client-go/applyconfigurations/rbac/v1"
 	testing "k8s.io/client-go/testing"
-	typebuildersrbacv1 "k8s.io/client-go/typebuilders/rbac/v1"
 )
 
 // FakeClusterRoles implements ClusterRoleInterface
@@ -124,7 +124,7 @@ func (c *FakeClusterRoles) Patch(ctx context.Context, name string, pt types.Patc
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied clusterRole.
-func (c *FakeClusterRoles) Apply(ctx context.Context, clusterRole *typebuildersrbacv1.ClusterRoleApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *rbacv1.ClusterRole, err error) {
+func (c *FakeClusterRoles) Apply(ctx context.Context, clusterRole *applyconfigurationsrbacv1.ClusterRoleApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *rbacv1.ClusterRole, err error) {
 	data, err := clusterRole.MarshalJSON()
 	if err != nil {
 		return nil, err

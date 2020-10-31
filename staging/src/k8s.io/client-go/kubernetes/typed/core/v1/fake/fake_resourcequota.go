@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationscorev1 "k8s.io/client-go/applyconfigurations/core/v1"
 	testing "k8s.io/client-go/testing"
-	typebuilderscorev1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
 // FakeResourceQuotas implements ResourceQuotaInterface
@@ -144,7 +144,7 @@ func (c *FakeResourceQuotas) Patch(ctx context.Context, name string, pt types.Pa
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied resourceQuota.
-func (c *FakeResourceQuotas) Apply(ctx context.Context, resourceQuota *typebuilderscorev1.ResourceQuotaApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ResourceQuota, err error) {
+func (c *FakeResourceQuotas) Apply(ctx context.Context, resourceQuota *applyconfigurationscorev1.ResourceQuotaApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ResourceQuota, err error) {
 	data, err := resourceQuota.MarshalJSON()
 	if err != nil {
 		return nil, err

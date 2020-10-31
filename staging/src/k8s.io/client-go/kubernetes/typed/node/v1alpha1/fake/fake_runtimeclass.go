@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	nodev1alpha1 "k8s.io/client-go/applyconfigurations/node/v1alpha1"
 	testing "k8s.io/client-go/testing"
-	nodev1alpha1 "k8s.io/client-go/typebuilders/node/v1alpha1"
 )
 
 // FakeRuntimeClasses implements RuntimeClassInterface

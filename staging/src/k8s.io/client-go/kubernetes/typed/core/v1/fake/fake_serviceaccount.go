@@ -29,8 +29,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationscorev1 "k8s.io/client-go/applyconfigurations/core/v1"
 	testing "k8s.io/client-go/testing"
-	typebuilderscorev1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
 // FakeServiceAccounts implements ServiceAccountInterface
@@ -133,7 +133,7 @@ func (c *FakeServiceAccounts) Patch(ctx context.Context, name string, pt types.P
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied serviceAccount.
-func (c *FakeServiceAccounts) Apply(ctx context.Context, serviceAccount *typebuilderscorev1.ServiceAccountApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ServiceAccount, err error) {
+func (c *FakeServiceAccounts) Apply(ctx context.Context, serviceAccount *applyconfigurationscorev1.ServiceAccountApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ServiceAccount, err error) {
 	data, err := serviceAccount.MarshalJSON()
 	if err != nil {
 		return nil, err

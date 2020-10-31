@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationscorev1 "k8s.io/client-go/applyconfigurations/core/v1"
 	testing "k8s.io/client-go/testing"
-	typebuilderscorev1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
 // FakePods implements PodInterface
@@ -144,7 +144,7 @@ func (c *FakePods) Patch(ctx context.Context, name string, pt types.PatchType, d
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied pod.
-func (c *FakePods) Apply(ctx context.Context, pod *typebuilderscorev1.PodApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Pod, err error) {
+func (c *FakePods) Apply(ctx context.Context, pod *applyconfigurationscorev1.PodApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Pod, err error) {
 	data, err := pod.MarshalJSON()
 	if err != nil {
 		return nil, err

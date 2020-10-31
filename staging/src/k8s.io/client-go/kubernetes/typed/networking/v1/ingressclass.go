@@ -27,9 +27,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	networkingv1 "k8s.io/client-go/applyconfigurations/networking/v1"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
-	networkingv1 "k8s.io/client-go/typebuilders/networking/v1"
 )
 
 // IngressClassesGetter has a method to return a IngressClassInterface.

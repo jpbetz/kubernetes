@@ -27,9 +27,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	certificatesv1 "k8s.io/client-go/applyconfigurations/certificates/v1"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
-	certificatesv1 "k8s.io/client-go/typebuilders/certificates/v1"
 )
 
 // CertificateSigningRequestsGetter has a method to return a CertificateSigningRequestInterface.

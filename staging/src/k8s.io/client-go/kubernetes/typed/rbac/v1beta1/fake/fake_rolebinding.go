@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	rbacv1beta1 "k8s.io/client-go/applyconfigurations/rbac/v1beta1"
 	testing "k8s.io/client-go/testing"
-	rbacv1beta1 "k8s.io/client-go/typebuilders/rbac/v1beta1"
 )
 
 // FakeRoleBindings implements RoleBindingInterface

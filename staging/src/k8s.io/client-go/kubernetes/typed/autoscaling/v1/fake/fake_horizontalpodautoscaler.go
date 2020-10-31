@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsautoscalingv1 "k8s.io/client-go/applyconfigurations/autoscaling/v1"
 	testing "k8s.io/client-go/testing"
-	typebuildersautoscalingv1 "k8s.io/client-go/typebuilders/autoscaling/v1"
 )
 
 // FakeHorizontalPodAutoscalers implements HorizontalPodAutoscalerInterface
@@ -144,7 +144,7 @@ func (c *FakeHorizontalPodAutoscalers) Patch(ctx context.Context, name string, p
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied horizontalPodAutoscaler.
-func (c *FakeHorizontalPodAutoscalers) Apply(ctx context.Context, horizontalPodAutoscaler *typebuildersautoscalingv1.HorizontalPodAutoscalerApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *autoscalingv1.HorizontalPodAutoscaler, err error) {
+func (c *FakeHorizontalPodAutoscalers) Apply(ctx context.Context, horizontalPodAutoscaler *applyconfigurationsautoscalingv1.HorizontalPodAutoscalerApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *autoscalingv1.HorizontalPodAutoscaler, err error) {
 	data, err := horizontalPodAutoscaler.MarshalJSON()
 	if err != nil {
 		return nil, err

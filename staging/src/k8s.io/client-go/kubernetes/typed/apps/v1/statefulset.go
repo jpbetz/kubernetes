@@ -28,9 +28,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	appsv1 "k8s.io/client-go/applyconfigurations/apps/v1"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
-	appsv1 "k8s.io/client-go/typebuilders/apps/v1"
 )
 
 // StatefulSetsGetter has a method to return a StatefulSetInterface.

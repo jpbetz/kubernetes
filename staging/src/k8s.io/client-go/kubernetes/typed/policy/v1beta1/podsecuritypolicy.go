@@ -27,9 +27,9 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	policyv1beta1 "k8s.io/client-go/applyconfigurations/policy/v1beta1"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
-	policyv1beta1 "k8s.io/client-go/typebuilders/policy/v1beta1"
 )
 
 // PodSecurityPoliciesGetter has a method to return a PodSecurityPolicyInterface.

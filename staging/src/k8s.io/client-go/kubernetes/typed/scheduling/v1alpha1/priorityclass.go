@@ -27,9 +27,9 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	schedulingv1alpha1 "k8s.io/client-go/applyconfigurations/scheduling/v1alpha1"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
-	schedulingv1alpha1 "k8s.io/client-go/typebuilders/scheduling/v1alpha1"
 )
 
 // PriorityClassesGetter has a method to return a PriorityClassInterface.

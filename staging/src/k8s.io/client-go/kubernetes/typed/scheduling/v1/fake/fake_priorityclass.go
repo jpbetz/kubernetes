@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsschedulingv1 "k8s.io/client-go/applyconfigurations/scheduling/v1"
 	testing "k8s.io/client-go/testing"
-	typebuildersschedulingv1 "k8s.io/client-go/typebuilders/scheduling/v1"
 )
 
 // FakePriorityClasses implements PriorityClassInterface
@@ -124,7 +124,7 @@ func (c *FakePriorityClasses) Patch(ctx context.Context, name string, pt types.P
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied priorityClass.
-func (c *FakePriorityClasses) Apply(ctx context.Context, priorityClass *typebuildersschedulingv1.PriorityClassApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *schedulingv1.PriorityClass, err error) {
+func (c *FakePriorityClasses) Apply(ctx context.Context, priorityClass *applyconfigurationsschedulingv1.PriorityClassApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *schedulingv1.PriorityClass, err error) {
 	data, err := priorityClass.MarshalJSON()
 	if err != nil {
 		return nil, err

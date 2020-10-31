@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsrbacv1 "k8s.io/client-go/applyconfigurations/rbac/v1"
 	testing "k8s.io/client-go/testing"
-	typebuildersrbacv1 "k8s.io/client-go/typebuilders/rbac/v1"
 )
 
 // FakeRoleBindings implements RoleBindingInterface
@@ -132,7 +132,7 @@ func (c *FakeRoleBindings) Patch(ctx context.Context, name string, pt types.Patc
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied roleBinding.
-func (c *FakeRoleBindings) Apply(ctx context.Context, roleBinding *typebuildersrbacv1.RoleBindingApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *rbacv1.RoleBinding, err error) {
+func (c *FakeRoleBindings) Apply(ctx context.Context, roleBinding *applyconfigurationsrbacv1.RoleBindingApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *rbacv1.RoleBinding, err error) {
 	data, err := roleBinding.MarshalJSON()
 	if err != nil {
 		return nil, err

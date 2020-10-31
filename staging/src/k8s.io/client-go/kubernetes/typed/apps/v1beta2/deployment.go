@@ -27,9 +27,9 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	appsv1beta2 "k8s.io/client-go/applyconfigurations/apps/v1beta2"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
-	appsv1beta2 "k8s.io/client-go/typebuilders/apps/v1beta2"
 )
 
 // DeploymentsGetter has a method to return a DeploymentInterface.

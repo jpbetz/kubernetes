@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationscertificatesv1 "k8s.io/client-go/applyconfigurations/certificates/v1"
 	testing "k8s.io/client-go/testing"
-	typebuilderscertificatesv1 "k8s.io/client-go/typebuilders/certificates/v1"
 )
 
 // FakeCertificateSigningRequests implements CertificateSigningRequestInterface
@@ -135,7 +135,7 @@ func (c *FakeCertificateSigningRequests) Patch(ctx context.Context, name string,
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied certificateSigningRequest.
-func (c *FakeCertificateSigningRequests) Apply(ctx context.Context, certificateSigningRequest *typebuilderscertificatesv1.CertificateSigningRequestApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *certificatesv1.CertificateSigningRequest, err error) {
+func (c *FakeCertificateSigningRequests) Apply(ctx context.Context, certificateSigningRequest *applyconfigurationscertificatesv1.CertificateSigningRequestApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *certificatesv1.CertificateSigningRequest, err error) {
 	data, err := certificateSigningRequest.MarshalJSON()
 	if err != nil {
 		return nil, err

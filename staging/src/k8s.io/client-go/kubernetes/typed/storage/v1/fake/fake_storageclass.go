@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsstoragev1 "k8s.io/client-go/applyconfigurations/storage/v1"
 	testing "k8s.io/client-go/testing"
-	typebuildersstoragev1 "k8s.io/client-go/typebuilders/storage/v1"
 )
 
 // FakeStorageClasses implements StorageClassInterface
@@ -124,7 +124,7 @@ func (c *FakeStorageClasses) Patch(ctx context.Context, name string, pt types.Pa
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied storageClass.
-func (c *FakeStorageClasses) Apply(ctx context.Context, storageClass *typebuildersstoragev1.StorageClassApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *storagev1.StorageClass, err error) {
+func (c *FakeStorageClasses) Apply(ctx context.Context, storageClass *applyconfigurationsstoragev1.StorageClassApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *storagev1.StorageClass, err error) {
 	data, err := storageClass.MarshalJSON()
 	if err != nil {
 		return nil, err

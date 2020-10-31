@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	autoscalingv2beta1 "k8s.io/client-go/applyconfigurations/autoscaling/v2beta1"
 	testing "k8s.io/client-go/testing"
-	autoscalingv2beta1 "k8s.io/client-go/typebuilders/autoscaling/v2beta1"
 )
 
 // FakeHorizontalPodAutoscalers implements HorizontalPodAutoscalerInterface

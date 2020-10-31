@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationseventsv1 "k8s.io/client-go/applyconfigurations/events/v1"
 	testing "k8s.io/client-go/testing"
-	typebuilderseventsv1 "k8s.io/client-go/typebuilders/events/v1"
 )
 
 // FakeEvents implements EventInterface
@@ -132,7 +132,7 @@ func (c *FakeEvents) Patch(ctx context.Context, name string, pt types.PatchType,
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied event.
-func (c *FakeEvents) Apply(ctx context.Context, event *typebuilderseventsv1.EventApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *eventsv1.Event, err error) {
+func (c *FakeEvents) Apply(ctx context.Context, event *applyconfigurationseventsv1.EventApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *eventsv1.Event, err error) {
 	data, err := event.MarshalJSON()
 	if err != nil {
 		return nil, err

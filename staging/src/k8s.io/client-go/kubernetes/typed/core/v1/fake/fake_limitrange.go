@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationscorev1 "k8s.io/client-go/applyconfigurations/core/v1"
 	testing "k8s.io/client-go/testing"
-	typebuilderscorev1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
 // FakeLimitRanges implements LimitRangeInterface
@@ -132,7 +132,7 @@ func (c *FakeLimitRanges) Patch(ctx context.Context, name string, pt types.Patch
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied limitRange.
-func (c *FakeLimitRanges) Apply(ctx context.Context, limitRange *typebuilderscorev1.LimitRangeApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.LimitRange, err error) {
+func (c *FakeLimitRanges) Apply(ctx context.Context, limitRange *applyconfigurationscorev1.LimitRangeApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.LimitRange, err error) {
 	data, err := limitRange.MarshalJSON()
 	if err != nil {
 		return nil, err

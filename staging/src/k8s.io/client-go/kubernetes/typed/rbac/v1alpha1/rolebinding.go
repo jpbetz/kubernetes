@@ -27,9 +27,9 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	rbacv1alpha1 "k8s.io/client-go/applyconfigurations/rbac/v1alpha1"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
-	rbacv1alpha1 "k8s.io/client-go/typebuilders/rbac/v1alpha1"
 )
 
 // RoleBindingsGetter has a method to return a RoleBindingInterface.

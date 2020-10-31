@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsadmissionregistrationv1 "k8s.io/client-go/applyconfigurations/admissionregistration/v1"
 	testing "k8s.io/client-go/testing"
-	typebuildersadmissionregistrationv1 "k8s.io/client-go/typebuilders/admissionregistration/v1"
 )
 
 // FakeMutatingWebhookConfigurations implements MutatingWebhookConfigurationInterface
@@ -124,7 +124,7 @@ func (c *FakeMutatingWebhookConfigurations) Patch(ctx context.Context, name stri
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied mutatingWebhookConfiguration.
-func (c *FakeMutatingWebhookConfigurations) Apply(ctx context.Context, mutatingWebhookConfiguration *typebuildersadmissionregistrationv1.MutatingWebhookConfigurationApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *admissionregistrationv1.MutatingWebhookConfiguration, err error) {
+func (c *FakeMutatingWebhookConfigurations) Apply(ctx context.Context, mutatingWebhookConfiguration *applyconfigurationsadmissionregistrationv1.MutatingWebhookConfigurationApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *admissionregistrationv1.MutatingWebhookConfiguration, err error) {
 	data, err := mutatingWebhookConfiguration.MarshalJSON()
 	if err != nil {
 		return nil, err

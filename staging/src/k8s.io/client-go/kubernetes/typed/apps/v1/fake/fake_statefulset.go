@@ -29,8 +29,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsappsv1 "k8s.io/client-go/applyconfigurations/apps/v1"
 	testing "k8s.io/client-go/testing"
-	typebuildersappsv1 "k8s.io/client-go/typebuilders/apps/v1"
 )
 
 // FakeStatefulSets implements StatefulSetInterface
@@ -145,7 +145,7 @@ func (c *FakeStatefulSets) Patch(ctx context.Context, name string, pt types.Patc
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied statefulSet.
-func (c *FakeStatefulSets) Apply(ctx context.Context, statefulSet *typebuildersappsv1.StatefulSetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *appsv1.StatefulSet, err error) {
+func (c *FakeStatefulSets) Apply(ctx context.Context, statefulSet *applyconfigurationsappsv1.StatefulSetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *appsv1.StatefulSet, err error) {
 	data, err := statefulSet.MarshalJSON()
 	if err != nil {
 		return nil, err

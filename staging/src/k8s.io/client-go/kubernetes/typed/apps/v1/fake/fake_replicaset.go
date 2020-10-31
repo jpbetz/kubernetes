@@ -29,8 +29,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsappsv1 "k8s.io/client-go/applyconfigurations/apps/v1"
 	testing "k8s.io/client-go/testing"
-	typebuildersappsv1 "k8s.io/client-go/typebuilders/apps/v1"
 )
 
 // FakeReplicaSets implements ReplicaSetInterface
@@ -145,7 +145,7 @@ func (c *FakeReplicaSets) Patch(ctx context.Context, name string, pt types.Patch
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied replicaSet.
-func (c *FakeReplicaSets) Apply(ctx context.Context, replicaSet *typebuildersappsv1.ReplicaSetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *appsv1.ReplicaSet, err error) {
+func (c *FakeReplicaSets) Apply(ctx context.Context, replicaSet *applyconfigurationsappsv1.ReplicaSetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *appsv1.ReplicaSet, err error) {
 	data, err := replicaSet.MarshalJSON()
 	if err != nil {
 		return nil, err

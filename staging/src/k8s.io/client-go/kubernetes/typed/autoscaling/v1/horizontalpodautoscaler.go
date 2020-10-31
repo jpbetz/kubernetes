@@ -27,9 +27,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	autoscalingv1 "k8s.io/client-go/applyconfigurations/autoscaling/v1"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
-	autoscalingv1 "k8s.io/client-go/typebuilders/autoscaling/v1"
 )
 
 // HorizontalPodAutoscalersGetter has a method to return a HorizontalPodAutoscalerInterface.

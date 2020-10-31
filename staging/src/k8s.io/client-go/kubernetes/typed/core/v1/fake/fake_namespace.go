@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationscorev1 "k8s.io/client-go/applyconfigurations/core/v1"
 	testing "k8s.io/client-go/testing"
-	typebuilderscorev1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
 // FakeNamespaces implements NamespaceInterface
@@ -127,7 +127,7 @@ func (c *FakeNamespaces) Patch(ctx context.Context, name string, pt types.PatchT
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied namespace.
-func (c *FakeNamespaces) Apply(ctx context.Context, namespace *typebuilderscorev1.NamespaceApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Namespace, err error) {
+func (c *FakeNamespaces) Apply(ctx context.Context, namespace *applyconfigurationscorev1.NamespaceApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Namespace, err error) {
 	data, err := namespace.MarshalJSON()
 	if err != nil {
 		return nil, err

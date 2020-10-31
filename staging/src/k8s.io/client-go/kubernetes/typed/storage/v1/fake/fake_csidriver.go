@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsstoragev1 "k8s.io/client-go/applyconfigurations/storage/v1"
 	testing "k8s.io/client-go/testing"
-	typebuildersstoragev1 "k8s.io/client-go/typebuilders/storage/v1"
 )
 
 // FakeCSIDrivers implements CSIDriverInterface
@@ -124,7 +124,7 @@ func (c *FakeCSIDrivers) Patch(ctx context.Context, name string, pt types.PatchT
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied cSIDriver.
-func (c *FakeCSIDrivers) Apply(ctx context.Context, cSIDriver *typebuildersstoragev1.CSIDriverApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *storagev1.CSIDriver, err error) {
+func (c *FakeCSIDrivers) Apply(ctx context.Context, cSIDriver *applyconfigurationsstoragev1.CSIDriverApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *storagev1.CSIDriver, err error) {
 	data, err := cSIDriver.MarshalJSON()
 	if err != nil {
 		return nil, err

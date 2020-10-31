@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsstoragev1 "k8s.io/client-go/applyconfigurations/storage/v1"
 	testing "k8s.io/client-go/testing"
-	typebuildersstoragev1 "k8s.io/client-go/typebuilders/storage/v1"
 )
 
 // FakeVolumeAttachments implements VolumeAttachmentInterface
@@ -135,7 +135,7 @@ func (c *FakeVolumeAttachments) Patch(ctx context.Context, name string, pt types
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied volumeAttachment.
-func (c *FakeVolumeAttachments) Apply(ctx context.Context, volumeAttachment *typebuildersstoragev1.VolumeAttachmentApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *storagev1.VolumeAttachment, err error) {
+func (c *FakeVolumeAttachments) Apply(ctx context.Context, volumeAttachment *applyconfigurationsstoragev1.VolumeAttachmentApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *storagev1.VolumeAttachment, err error) {
 	data, err := volumeAttachment.MarshalJSON()
 	if err != nil {
 		return nil, err

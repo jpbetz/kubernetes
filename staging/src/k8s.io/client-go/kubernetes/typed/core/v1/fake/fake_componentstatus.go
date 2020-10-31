@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationscorev1 "k8s.io/client-go/applyconfigurations/core/v1"
 	testing "k8s.io/client-go/testing"
-	typebuilderscorev1 "k8s.io/client-go/typebuilders/core/v1"
 )
 
 // FakeComponentStatuses implements ComponentStatusInterface
@@ -124,7 +124,7 @@ func (c *FakeComponentStatuses) Patch(ctx context.Context, name string, pt types
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied componentStatus.
-func (c *FakeComponentStatuses) Apply(ctx context.Context, componentStatus *typebuilderscorev1.ComponentStatusApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ComponentStatus, err error) {
+func (c *FakeComponentStatuses) Apply(ctx context.Context, componentStatus *applyconfigurationscorev1.ComponentStatusApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ComponentStatus, err error) {
 	data, err := componentStatus.MarshalJSON()
 	if err != nil {
 		return nil, err

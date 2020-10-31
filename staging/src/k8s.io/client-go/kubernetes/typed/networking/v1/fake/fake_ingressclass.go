@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsnetworkingv1 "k8s.io/client-go/applyconfigurations/networking/v1"
 	testing "k8s.io/client-go/testing"
-	typebuildersnetworkingv1 "k8s.io/client-go/typebuilders/networking/v1"
 )
 
 // FakeIngressClasses implements IngressClassInterface
@@ -124,7 +124,7 @@ func (c *FakeIngressClasses) Patch(ctx context.Context, name string, pt types.Pa
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied ingressClass.
-func (c *FakeIngressClasses) Apply(ctx context.Context, ingressClass *typebuildersnetworkingv1.IngressClassApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *networkingv1.IngressClass, err error) {
+func (c *FakeIngressClasses) Apply(ctx context.Context, ingressClass *applyconfigurationsnetworkingv1.IngressClassApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *networkingv1.IngressClass, err error) {
 	data, err := ingressClass.MarshalJSON()
 	if err != nil {
 		return nil, err

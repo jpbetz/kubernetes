@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsadmissionregistrationv1 "k8s.io/client-go/applyconfigurations/admissionregistration/v1"
 	testing "k8s.io/client-go/testing"
-	typebuildersadmissionregistrationv1 "k8s.io/client-go/typebuilders/admissionregistration/v1"
 )
 
 // FakeValidatingWebhookConfigurations implements ValidatingWebhookConfigurationInterface
@@ -124,7 +124,7 @@ func (c *FakeValidatingWebhookConfigurations) Patch(ctx context.Context, name st
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied validatingWebhookConfiguration.
-func (c *FakeValidatingWebhookConfigurations) Apply(ctx context.Context, validatingWebhookConfiguration *typebuildersadmissionregistrationv1.ValidatingWebhookConfigurationApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *admissionregistrationv1.ValidatingWebhookConfiguration, err error) {
+func (c *FakeValidatingWebhookConfigurations) Apply(ctx context.Context, validatingWebhookConfiguration *applyconfigurationsadmissionregistrationv1.ValidatingWebhookConfigurationApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *admissionregistrationv1.ValidatingWebhookConfiguration, err error) {
 	data, err := validatingWebhookConfiguration.MarshalJSON()
 	if err != nil {
 		return nil, err

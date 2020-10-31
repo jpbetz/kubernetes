@@ -27,9 +27,9 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	eventsv1beta1 "k8s.io/client-go/applyconfigurations/events/v1beta1"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
-	eventsv1beta1 "k8s.io/client-go/typebuilders/events/v1beta1"
 )
 
 // EventsGetter has a method to return a EventInterface.

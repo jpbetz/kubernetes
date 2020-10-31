@@ -27,9 +27,9 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	storagev1beta1 "k8s.io/client-go/applyconfigurations/storage/v1beta1"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
-	storagev1beta1 "k8s.io/client-go/typebuilders/storage/v1beta1"
 )
 
 // VolumeAttachmentsGetter has a method to return a VolumeAttachmentInterface.

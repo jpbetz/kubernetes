@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsappsv1 "k8s.io/client-go/applyconfigurations/apps/v1"
 	testing "k8s.io/client-go/testing"
-	typebuildersappsv1 "k8s.io/client-go/typebuilders/apps/v1"
 )
 
 // FakeDaemonSets implements DaemonSetInterface
@@ -144,7 +144,7 @@ func (c *FakeDaemonSets) Patch(ctx context.Context, name string, pt types.PatchT
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied daemonSet.
-func (c *FakeDaemonSets) Apply(ctx context.Context, daemonSet *typebuildersappsv1.DaemonSetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *appsv1.DaemonSet, err error) {
+func (c *FakeDaemonSets) Apply(ctx context.Context, daemonSet *applyconfigurationsappsv1.DaemonSetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *appsv1.DaemonSet, err error) {
 	data, err := daemonSet.MarshalJSON()
 	if err != nil {
 		return nil, err

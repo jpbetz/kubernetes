@@ -28,8 +28,8 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsappsv1 "k8s.io/client-go/applyconfigurations/apps/v1"
 	testing "k8s.io/client-go/testing"
-	typebuildersappsv1 "k8s.io/client-go/typebuilders/apps/v1"
 )
 
 // FakeControllerRevisions implements ControllerRevisionInterface
@@ -132,7 +132,7 @@ func (c *FakeControllerRevisions) Patch(ctx context.Context, name string, pt typ
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied controllerRevision.
-func (c *FakeControllerRevisions) Apply(ctx context.Context, controllerRevision *typebuildersappsv1.ControllerRevisionApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *appsv1.ControllerRevision, err error) {
+func (c *FakeControllerRevisions) Apply(ctx context.Context, controllerRevision *applyconfigurationsappsv1.ControllerRevisionApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *appsv1.ControllerRevision, err error) {
 	data, err := controllerRevision.MarshalJSON()
 	if err != nil {
 		return nil, err
