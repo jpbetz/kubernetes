@@ -42,10 +42,10 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/apiserver/pkg/features"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	appsv1mf "k8s.io/client-go/applyconfigurations/apps/v1"
+	corev1mf "k8s.io/client-go/applyconfigurations/core/v1"
+	metav1mf "k8s.io/client-go/applyconfigurations/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
-	appsv1mf "k8s.io/client-go/typebuilders/apps/v1"
-	corev1mf "k8s.io/client-go/typebuilders/core/v1"
-	metav1mf "k8s.io/client-go/typebuilders/meta/v1"
 	featuregatetesting "k8s.io/component-base/featuregate/testing"
 	"k8s.io/component-base/version"
 
@@ -810,8 +810,8 @@ func TestSelfLinkOnNamespace(t *testing.T) {
 	runSelfLinkTestOnNamespace(t, c, "default")
 }
 
-func TestApplyWithBuilders(t *testing.T) {
-	deploymentManifest := appsv1mf.Deployment().
+func TestApplyWithApplyConfigurations(t *testing.T) {
+	deploymentConfig := appsv1mf.Deployment().
 		SetTypeMeta(metav1mf.TypeMeta().
 			SetKind("Deployment").
 			SetAPIVersion("apps/v1"),
@@ -888,11 +888,11 @@ func TestApplyWithBuilders(t *testing.T) {
 		},
 	}
 
-	data, _ := deploymentManifest.MarshalJSON()
+	data, _ := deploymentConfig.MarshalJSON()
 	t.Logf("%s", string(data))
 	{
 		obj := &appsv1.Deployment{}
-		err := runtime.DefaultUnstructuredConverter.FromUnstructured(deploymentManifest.ToUnstructured().(map[string]interface{}), obj)
+		err := runtime.DefaultUnstructuredConverter.FromUnstructured(deploymentConfig.ToUnstructured().(map[string]interface{}), obj)
 		if err != nil {
 			t.Fatalf("unexpected error when converting manifest to Deployment struct: %v", err)
 		}
@@ -927,7 +927,7 @@ func TestApplyWithBuilders(t *testing.T) {
 		defer result.TearDownFn()
 
 		c := clientset.NewForConfigOrDie(result.ClientConfig)
-		obj, err := c.AppsV1().Deployments("default").Apply(context.TODO(), deploymentManifest, "test-mgr", metav1.ApplyOptions{})
+		obj, err := c.AppsV1().Deployments("default").Apply(context.TODO(), deploymentConfig, "test-mgr", metav1.ApplyOptions{})
 		if err != nil {
 			t.Fatalf("unexpected error when applying manifest for Deployment: %v", err)
 		}
@@ -942,7 +942,7 @@ func TestApplyWithBuilders(t *testing.T) {
 	}
 }
 
-func TestApplyBuilderAccessors(t *testing.T) {
+func TestApplyApplyConfigurationAccessors(t *testing.T) {
 	deploymentManifest := appsv1mf.Deployment().
 		SetTypeMeta(metav1mf.TypeMeta().
 			SetKind("Deployment").
