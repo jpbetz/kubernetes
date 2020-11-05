@@ -18,6 +18,7 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"reflect"
@@ -888,11 +889,15 @@ func TestApplyWithApplyConfigurations(t *testing.T) {
 		},
 	}
 
-	data, _ := deploymentConfig.MarshalJSON()
+	data, _ := json.Marshal(deploymentConfig)
 	t.Logf("%s", string(data))
 	{
 		obj := &appsv1.Deployment{}
-		err := runtime.DefaultUnstructuredConverter.FromUnstructured(deploymentConfig.ToUnstructured().(map[string]interface{}), obj)
+		unstructuredConfig, err := runtime.DefaultUnstructuredConverter.ToUnstructured(deploymentConfig)
+		if err != nil {
+			t.Fatalf("unexpected error when converting manifest to unstructured: %v", err)
+		}
+		err = runtime.DefaultUnstructuredConverter.FromUnstructured(unstructuredConfig, obj)
 		if err != nil {
 			t.Fatalf("unexpected error when converting manifest to Deployment struct: %v", err)
 		}
@@ -912,7 +917,11 @@ func TestApplyWithApplyConfigurations(t *testing.T) {
 			t.Fatalf("unexpected error when converting unstructured to manifest: %v", err)
 		}
 		obj := &appsv1.Deployment{}
-		err = runtime.DefaultUnstructuredConverter.FromUnstructured(mf.ToUnstructured().(map[string]interface{}), obj)
+		unstructuredConfig, err := runtime.DefaultUnstructuredConverter.ToUnstructured(deploymentConfig)
+		if err != nil {
+			t.Fatalf("unexpected error when converting manifest to unstructured: %v", err)
+		}
+		err = runtime.DefaultUnstructuredConverter.FromUnstructured(unstructuredConfig, obj)
 		if err != nil {
 			t.Fatalf("unexpected error when converting manifest to Deployment struct: %v", err)
 		}

@@ -144,7 +144,9 @@ func (g *utilGenerator) GenerateType(c *generator.Context, _ *types.Type, w io.W
 }
 
 var forKindFunc = `
-func ForKind(kind {{.schemaGroupVersionKind|raw}}) {{.applyConfiguration|raw}} {
+// ForKind returns an apply configuration type for the given GroupVersionKind, or nil if no
+// apply configuration type exists for the given GroupVersionKind.
+func ForKind(kind {{.schemaGroupVersionKind|raw}}) interface{} {
 	switch kind {
 		{{range $group := .groups -}}{{$GroupGoName := .GroupGoName -}}
 			{{range $version := .Versions -}}

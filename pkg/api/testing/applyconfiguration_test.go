@@ -34,7 +34,7 @@ import (
 	api "k8s.io/kubernetes/pkg/apis/core"
 )
 
-func doRoundTripApplyConfigurations(t *testing.T, internalVersion schema.GroupVersion, externalVersion schema.GroupVersion, kind string, applyConfig runtime.ApplyConfiguration) {
+func doRoundTripApplyConfigurations(t *testing.T, internalVersion schema.GroupVersion, externalVersion schema.GroupVersion, kind string, applyConfig interface{}) {
 	// We do fuzzing on the internal version of the object, and only then
 	// convert to the external version. This is because custom fuzzing
 	// function are only supported for internal objects.
@@ -71,13 +71,19 @@ func doRoundTripApplyConfigurations(t *testing.T, internalVersion schema.GroupVe
 		t.Errorf("ToUnstructured failed: %v", err)
 		return
 	}
-	err = applyConfig.FromUnstructured(u)
+
+	err = runtime.DefaultUnstructuredConverter.FromUnstructured(u, applyConfig)
 	if err != nil {
-		t.Errorf("ApplyBuilder.FromUnstructured failed: %v", err)
+		t.Errorf("FromUnstructured failed: %v", err)
 		return
 	}
 	rtObj := reflect.New(reflect.TypeOf(item).Elem()).Interface().(runtime.Object)
-	err = runtime.DefaultUnstructuredConverter.FromUnstructured(applyConfig.ToUnstructured().(map[string]interface{}), rtObj)
+	rtUnstructured, err := runtime.DefaultUnstructuredConverter.ToUnstructured(applyConfig)
+	if err != nil {
+		t.Errorf("DefaultUnstructuredConverter.ToUnstructured failed: %v", err)
+		return
+	}
+	err = runtime.DefaultUnstructuredConverter.FromUnstructured(rtUnstructured, rtObj)
 	if err != nil {
 		t.Errorf("FromUnstructured failed: %v", err)
 		return
@@ -129,7 +135,7 @@ func BenchmarkApplyConfigurationsFromUnstructured(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		builder := v1mf.Pod()
-		if err := builder.FromUnstructured(unstr[i%size]); err != nil {
+		if err := runtime.DefaultUnstructuredConverter.FromUnstructured(unstr[i%size], builder); err != nil {
 			b.Fatalf("unexpected error: %v", err)
 		}
 	}
@@ -146,7 +152,7 @@ func BenchmarkApplyConfigurationsToUnstructured(b *testing.B) {
 			b.Fatalf("unexpected error: %v", err)
 		}
 		builder := v1mf.Pod()
-		if err := builder.FromUnstructured(item); err != nil {
+		if err := runtime.DefaultUnstructuredConverter.FromUnstructured(item, builder); err != nil {
 			b.Fatalf("unexpected error: %v", err)
 		}
 		builders[i] = builder
@@ -155,7 +161,10 @@ func BenchmarkApplyConfigurationsToUnstructured(b *testing.B) {
 	size := len(items)
 	for i := 0; i < b.N; i++ {
 		builder := builders[i%size]
-		builder.ToUnstructured()
+		_, err := runtime.DefaultUnstructuredConverter.ToUnstructured(builder)
+		if err != nil {
+			b.Fatalf("unexpected error: %v", err)
+		}
 	}
 	b.StopTimer()
 }

@@ -137,6 +137,7 @@ func (g *genFakeForType) GenerateType(c *generator.Context, t *types.Type, w io.
 		"PatchType":            c.Universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/types", Name: "PatchType"}),
 		"ApplyPatchType":       c.Universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/types", Name: "ApplyPatchType"}),
 		"watchInterface":       c.Universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/watch", Name: "Interface"}),
+		"jsonMarshal":          c.Universe.Type(types.Name{Package: "encoding/json", Name: "Marshal"}),
 
 		"NewRootListAction":              c.Universe.Function(types.Name{Package: pkgClientGoTesting, Name: "NewRootListAction"}),
 		"NewListAction":                  c.Universe.Function(types.Name{Package: pkgClientGoTesting, Name: "NewListAction"}),
@@ -501,7 +502,7 @@ func (c *Fake$.type|publicPlural$) Patch(ctx context.Context, name string, pt $.
 var applyTemplate = `
 // Apply takes the given apply declarative configuration, applies it and returns the applied $.resultType|private$.
 func (c *Fake$.type|publicPlural$) Apply(ctx context.Context, $.inputType|private$ *$.applyConfig|raw$, fieldManager string, opts $.ApplyOptions|raw$, subresources ...string) (result *$.resultType|raw$, err error) {
-	data, err := $.inputType|private$.MarshalJSON()
+	data, err := $.jsonMarshal|raw$($.inputType|private$)
 	if err != nil {
 		return nil, err
 	}

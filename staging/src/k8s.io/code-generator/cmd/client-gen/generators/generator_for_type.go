@@ -155,6 +155,7 @@ func (g *genClientForType) GenerateType(c *generator.Context, t *types.Type, w i
 		"watchInterface":       c.Universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/watch", Name: "Interface"}),
 		"RESTClientInterface":  c.Universe.Type(types.Name{Package: "k8s.io/client-go/rest", Name: "Interface"}),
 		"schemeParameterCodec": c.Universe.Variable(types.Name{Package: filepath.Join(g.clientsetPackage, "scheme"), Name: "ParameterCodec"}),
+		"jsonMarshal":          c.Universe.Type(types.Name{Package: "encoding/json", Name: "Marshal"}),
 	}
 
 	generateApply := len(g.applyConfigurationPackage) > 0
@@ -636,12 +637,11 @@ func (c *$.type|privatePlural$) Patch(ctx context.Context, name string, pt $.Pat
 }
 `
 
-// TODO(jpbetz): Assert that GetObjectMeta().GetName() is retrievable and non-nil
 var applyTemplate = `
 // Apply takes the given apply declarative configuration, applies it and returns the applied $.resultType|private$.
 func (c *$.type|privatePlural$) Apply(ctx context.Context, $.inputType|private$ *$.applyConfig|raw$, fieldManager string, opts $.ApplyOptions|raw$, subresources ...string) (result *$.resultType|raw$, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := $.inputType|private$.MarshalJSON()
+	data, err := $.jsonMarshal|raw$($.inputType|private$)
 	if err != nil {
 		return nil, err
 	}
