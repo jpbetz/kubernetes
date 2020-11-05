@@ -9,6 +9,7 @@ filegroup(
     name = "all-srcs",
     srcs = [
         ":package-srcs",
+        "//staging/src/k8s.io/client-go/applyconfigurations:all-srcs",
         "//staging/src/k8s.io/client-go/discovery:all-srcs",
         "//staging/src/k8s.io/client-go/dynamic:all-srcs",
         "//staging/src/k8s.io/client-go/examples/create-update-delete-deployment:all-srcs",
@@ -85,7 +86,6 @@ filegroup(
         "//staging/src/k8s.io/client-go/tools/remotecommand:all-srcs",
         "//staging/src/k8s.io/client-go/tools/watch:all-srcs",
         "//staging/src/k8s.io/client-go/transport:all-srcs",
-        "//staging/src/k8s.io/client-go/typebuilders:all-srcs",
         "//staging/src/k8s.io/client-go/util/cert:all-srcs",
         "//staging/src/k8s.io/client-go/util/certificate:all-srcs",
         "//staging/src/k8s.io/client-go/util/connrotation:all-srcs",

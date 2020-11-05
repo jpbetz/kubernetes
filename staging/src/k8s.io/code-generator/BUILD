@@ -9,6 +9,7 @@ filegroup(
     name = "all-srcs",
     srcs = [
         ":package-srcs",
+        "//staging/src/k8s.io/code-generator/cmd/applyconfiguration-gen:all-srcs",
         "//staging/src/k8s.io/code-generator/cmd/client-gen:all-srcs",
         "//staging/src/k8s.io/code-generator/cmd/conversion-gen:all-srcs",
         "//staging/src/k8s.io/code-generator/cmd/deepcopy-gen:all-srcs",
@@ -21,7 +22,6 @@ filegroup(
         "//staging/src/k8s.io/code-generator/cmd/prerelease-lifecycle-gen:all-srcs",
         "//staging/src/k8s.io/code-generator/cmd/register-gen:all-srcs",
         "//staging/src/k8s.io/code-generator/cmd/set-gen:all-srcs",
-        "//staging/src/k8s.io/code-generator/cmd/typebuilder-gen:all-srcs",
         "//staging/src/k8s.io/code-generator/hack:all-srcs",
         "//staging/src/k8s.io/code-generator/pkg/namer:all-srcs",
         "//staging/src/k8s.io/code-generator/pkg/util:all-srcs",

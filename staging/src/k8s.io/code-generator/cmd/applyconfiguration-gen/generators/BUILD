@@ -3,15 +3,15 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "go_default_library",
     srcs = [
-        "builder.go",
-        "interface.go",
+        "applyconfiguration.go",
         "jsontagutil.go",
         "packages.go",
         "refgraph.go",
         "types.go",
+        "util.go",
     ],
-    importmap = "k8s.io/kubernetes/vendor/k8s.io/code-generator/cmd/typebuilder-gen/generators",
-    importpath = "k8s.io/code-generator/cmd/typebuilder-gen/generators",
+    importmap = "k8s.io/kubernetes/vendor/k8s.io/code-generator/cmd/applyconfiguration-gen/generators",
+    importpath = "k8s.io/code-generator/cmd/applyconfiguration-gen/generators",
     visibility = ["//visibility:public"],
     deps = [
         "//staging/src/k8s.io/code-generator/cmd/client-gen/generators/util:go_default_library",

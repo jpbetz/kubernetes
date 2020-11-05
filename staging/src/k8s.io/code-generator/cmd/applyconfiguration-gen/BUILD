@@ -3,12 +3,12 @@ load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "go_default_library",
     srcs = ["main.go"],
-    importmap = "k8s.io/kubernetes/vendor/k8s.io/code-generator/cmd/typebuilder-gen",
-    importpath = "k8s.io/code-generator/cmd/typebuilder-gen",
+    importmap = "k8s.io/kubernetes/vendor/k8s.io/code-generator/cmd/applyconfiguration-gen",
+    importpath = "k8s.io/code-generator/cmd/applyconfiguration-gen",
     visibility = ["//visibility:private"],
     deps = [
-        "//staging/src/k8s.io/code-generator/cmd/typebuilder-gen/args:go_default_library",
-        "//staging/src/k8s.io/code-generator/cmd/typebuilder-gen/generators:go_default_library",
+        "//staging/src/k8s.io/code-generator/cmd/applyconfiguration-gen/args:go_default_library",
+        "//staging/src/k8s.io/code-generator/cmd/applyconfiguration-gen/generators:go_default_library",
         "//staging/src/k8s.io/code-generator/pkg/util:go_default_library",
         "//vendor/github.com/spf13/pflag:go_default_library",
         "//vendor/k8s.io/gengo/args:go_default_library",
@@ -33,8 +33,8 @@ filegroup(
     name = "all-srcs",
     srcs = [
         ":package-srcs",
-        "//staging/src/k8s.io/code-generator/cmd/typebuilder-gen/args:all-srcs",
-        "//staging/src/k8s.io/code-generator/cmd/typebuilder-gen/generators:all-srcs",
+        "//staging/src/k8s.io/code-generator/cmd/applyconfiguration-gen/args:all-srcs",
+        "//staging/src/k8s.io/code-generator/cmd/applyconfiguration-gen/generators:all-srcs",
     ],
     tags = ["automanaged"],
     visibility = ["//visibility:public"],
