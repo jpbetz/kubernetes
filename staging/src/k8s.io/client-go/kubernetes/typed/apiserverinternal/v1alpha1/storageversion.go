@@ -20,6 +20,7 @@ package v1alpha1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -189,7 +190,7 @@ func (c *storageVersions) Patch(ctx context.Context, name string, pt types.Patch
 // Apply takes the given apply declarative configuration, applies it and returns the applied storageVersion.
 func (c *storageVersions) Apply(ctx context.Context, storageVersion *apiserverinternalv1alpha1.StorageVersionApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.StorageVersion, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := storageVersion.MarshalJSON()
+	data, err := json.Marshal(storageVersion)
 	if err != nil {
 		return nil, err
 	}

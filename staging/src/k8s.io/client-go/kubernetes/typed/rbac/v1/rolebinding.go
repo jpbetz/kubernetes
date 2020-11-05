@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -183,7 +184,7 @@ func (c *roleBindings) Patch(ctx context.Context, name string, pt types.PatchTyp
 // Apply takes the given apply declarative configuration, applies it and returns the applied roleBinding.
 func (c *roleBindings) Apply(ctx context.Context, roleBinding *rbacv1.RoleBindingApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.RoleBinding, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := roleBinding.MarshalJSON()
+	data, err := json.Marshal(roleBinding)
 	if err != nil {
 		return nil, err
 	}

@@ -19,31 +19,13 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // PodStatusApplyConfiguration represents an declarative configuration of the PodStatus type for use
 // with apply.
 type PodStatusApplyConfiguration struct {
-	fields podStatusFields
-}
-
-// PodStatusApplyConfiguration constructs an declarative configuration of the PodStatus type for use with
-// apply.
-func PodStatus() *PodStatusApplyConfiguration {
-	return &PodStatusApplyConfiguration{}
-}
-
-// podStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type podStatusFields struct {
 	Phase                      *v1.PodPhase         `json:"phase,omitempty"`
 	Conditions                 *PodConditionList    `json:"conditions,omitempty"`
 	Message                    *string              `json:"message,omitempty"`
@@ -59,21 +41,27 @@ type podStatusFields struct {
 	EphemeralContainerStatuses *ContainerStatusList `json:"ephemeralContainerStatuses,omitempty"`
 }
 
+// PodStatusApplyConfiguration constructs an declarative configuration of the PodStatus type for use with
+// apply.
+func PodStatus() *PodStatusApplyConfiguration {
+	return &PodStatusApplyConfiguration{}
+}
+
 // SetPhase sets the Phase field in the declarative configuration to the given value.
 func (b *PodStatusApplyConfiguration) SetPhase(value v1.PodPhase) *PodStatusApplyConfiguration {
-	b.fields.Phase = &value
+	b.Phase = &value
 	return b
 }
 
 // RemovePhase removes the Phase field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) RemovePhase() *PodStatusApplyConfiguration {
-	b.fields.Phase = nil
+	b.Phase = nil
 	return b
 }
 
 // GetPhase gets the Phase field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) GetPhase() (value v1.PodPhase, ok bool) {
-	if v := b.fields.Phase; v != nil {
+	if v := b.Phase; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -81,19 +69,19 @@ func (b *PodStatusApplyConfiguration) GetPhase() (value v1.PodPhase, ok bool) {
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
 func (b *PodStatusApplyConfiguration) SetConditions(value PodConditionList) *PodStatusApplyConfiguration {
-	b.fields.Conditions = &value
+	b.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) RemoveConditions() *PodStatusApplyConfiguration {
-	b.fields.Conditions = nil
+	b.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) GetConditions() (value PodConditionList, ok bool) {
-	if v := b.fields.Conditions; v != nil {
+	if v := b.Conditions; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -101,19 +89,19 @@ func (b *PodStatusApplyConfiguration) GetConditions() (value PodConditionList, o
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
 func (b *PodStatusApplyConfiguration) SetMessage(value string) *PodStatusApplyConfiguration {
-	b.fields.Message = &value
+	b.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) RemoveMessage() *PodStatusApplyConfiguration {
-	b.fields.Message = nil
+	b.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) GetMessage() (value string, ok bool) {
-	if v := b.fields.Message; v != nil {
+	if v := b.Message; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -121,19 +109,19 @@ func (b *PodStatusApplyConfiguration) GetMessage() (value string, ok bool) {
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
 func (b *PodStatusApplyConfiguration) SetReason(value string) *PodStatusApplyConfiguration {
-	b.fields.Reason = &value
+	b.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) RemoveReason() *PodStatusApplyConfiguration {
-	b.fields.Reason = nil
+	b.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) GetReason() (value string, ok bool) {
-	if v := b.fields.Reason; v != nil {
+	if v := b.Reason; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -141,19 +129,19 @@ func (b *PodStatusApplyConfiguration) GetReason() (value string, ok bool) {
 
 // SetNominatedNodeName sets the NominatedNodeName field in the declarative configuration to the given value.
 func (b *PodStatusApplyConfiguration) SetNominatedNodeName(value string) *PodStatusApplyConfiguration {
-	b.fields.NominatedNodeName = &value
+	b.NominatedNodeName = &value
 	return b
 }
 
 // RemoveNominatedNodeName removes the NominatedNodeName field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) RemoveNominatedNodeName() *PodStatusApplyConfiguration {
-	b.fields.NominatedNodeName = nil
+	b.NominatedNodeName = nil
 	return b
 }
 
 // GetNominatedNodeName gets the NominatedNodeName field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) GetNominatedNodeName() (value string, ok bool) {
-	if v := b.fields.NominatedNodeName; v != nil {
+	if v := b.NominatedNodeName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -161,19 +149,19 @@ func (b *PodStatusApplyConfiguration) GetNominatedNodeName() (value string, ok b
 
 // SetHostIP sets the HostIP field in the declarative configuration to the given value.
 func (b *PodStatusApplyConfiguration) SetHostIP(value string) *PodStatusApplyConfiguration {
-	b.fields.HostIP = &value
+	b.HostIP = &value
 	return b
 }
 
 // RemoveHostIP removes the HostIP field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) RemoveHostIP() *PodStatusApplyConfiguration {
-	b.fields.HostIP = nil
+	b.HostIP = nil
 	return b
 }
 
 // GetHostIP gets the HostIP field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) GetHostIP() (value string, ok bool) {
-	if v := b.fields.HostIP; v != nil {
+	if v := b.HostIP; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -181,19 +169,19 @@ func (b *PodStatusApplyConfiguration) GetHostIP() (value string, ok bool) {
 
 // SetPodIP sets the PodIP field in the declarative configuration to the given value.
 func (b *PodStatusApplyConfiguration) SetPodIP(value string) *PodStatusApplyConfiguration {
-	b.fields.PodIP = &value
+	b.PodIP = &value
 	return b
 }
 
 // RemovePodIP removes the PodIP field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) RemovePodIP() *PodStatusApplyConfiguration {
-	b.fields.PodIP = nil
+	b.PodIP = nil
 	return b
 }
 
 // GetPodIP gets the PodIP field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) GetPodIP() (value string, ok bool) {
-	if v := b.fields.PodIP; v != nil {
+	if v := b.PodIP; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -201,19 +189,19 @@ func (b *PodStatusApplyConfiguration) GetPodIP() (value string, ok bool) {
 
 // SetPodIPs sets the PodIPs field in the declarative configuration to the given value.
 func (b *PodStatusApplyConfiguration) SetPodIPs(value PodIPList) *PodStatusApplyConfiguration {
-	b.fields.PodIPs = &value
+	b.PodIPs = &value
 	return b
 }
 
 // RemovePodIPs removes the PodIPs field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) RemovePodIPs() *PodStatusApplyConfiguration {
-	b.fields.PodIPs = nil
+	b.PodIPs = nil
 	return b
 }
 
 // GetPodIPs gets the PodIPs field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) GetPodIPs() (value PodIPList, ok bool) {
-	if v := b.fields.PodIPs; v != nil {
+	if v := b.PodIPs; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -221,19 +209,19 @@ func (b *PodStatusApplyConfiguration) GetPodIPs() (value PodIPList, ok bool) {
 
 // SetStartTime sets the StartTime field in the declarative configuration to the given value.
 func (b *PodStatusApplyConfiguration) SetStartTime(value metav1.Time) *PodStatusApplyConfiguration {
-	b.fields.StartTime = &value
+	b.StartTime = &value
 	return b
 }
 
 // RemoveStartTime removes the StartTime field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) RemoveStartTime() *PodStatusApplyConfiguration {
-	b.fields.StartTime = nil
+	b.StartTime = nil
 	return b
 }
 
 // GetStartTime gets the StartTime field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) GetStartTime() (value metav1.Time, ok bool) {
-	if v := b.fields.StartTime; v != nil {
+	if v := b.StartTime; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -241,19 +229,19 @@ func (b *PodStatusApplyConfiguration) GetStartTime() (value metav1.Time, ok bool
 
 // SetInitContainerStatuses sets the InitContainerStatuses field in the declarative configuration to the given value.
 func (b *PodStatusApplyConfiguration) SetInitContainerStatuses(value ContainerStatusList) *PodStatusApplyConfiguration {
-	b.fields.InitContainerStatuses = &value
+	b.InitContainerStatuses = &value
 	return b
 }
 
 // RemoveInitContainerStatuses removes the InitContainerStatuses field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) RemoveInitContainerStatuses() *PodStatusApplyConfiguration {
-	b.fields.InitContainerStatuses = nil
+	b.InitContainerStatuses = nil
 	return b
 }
 
 // GetInitContainerStatuses gets the InitContainerStatuses field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) GetInitContainerStatuses() (value ContainerStatusList, ok bool) {
-	if v := b.fields.InitContainerStatuses; v != nil {
+	if v := b.InitContainerStatuses; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -261,19 +249,19 @@ func (b *PodStatusApplyConfiguration) GetInitContainerStatuses() (value Containe
 
 // SetContainerStatuses sets the ContainerStatuses field in the declarative configuration to the given value.
 func (b *PodStatusApplyConfiguration) SetContainerStatuses(value ContainerStatusList) *PodStatusApplyConfiguration {
-	b.fields.ContainerStatuses = &value
+	b.ContainerStatuses = &value
 	return b
 }
 
 // RemoveContainerStatuses removes the ContainerStatuses field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) RemoveContainerStatuses() *PodStatusApplyConfiguration {
-	b.fields.ContainerStatuses = nil
+	b.ContainerStatuses = nil
 	return b
 }
 
 // GetContainerStatuses gets the ContainerStatuses field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) GetContainerStatuses() (value ContainerStatusList, ok bool) {
-	if v := b.fields.ContainerStatuses; v != nil {
+	if v := b.ContainerStatuses; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -281,19 +269,19 @@ func (b *PodStatusApplyConfiguration) GetContainerStatuses() (value ContainerSta
 
 // SetQOSClass sets the QOSClass field in the declarative configuration to the given value.
 func (b *PodStatusApplyConfiguration) SetQOSClass(value v1.PodQOSClass) *PodStatusApplyConfiguration {
-	b.fields.QOSClass = &value
+	b.QOSClass = &value
 	return b
 }
 
 // RemoveQOSClass removes the QOSClass field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) RemoveQOSClass() *PodStatusApplyConfiguration {
-	b.fields.QOSClass = nil
+	b.QOSClass = nil
 	return b
 }
 
 // GetQOSClass gets the QOSClass field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) GetQOSClass() (value v1.PodQOSClass, ok bool) {
-	if v := b.fields.QOSClass; v != nil {
+	if v := b.QOSClass; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -301,64 +289,22 @@ func (b *PodStatusApplyConfiguration) GetQOSClass() (value v1.PodQOSClass, ok bo
 
 // SetEphemeralContainerStatuses sets the EphemeralContainerStatuses field in the declarative configuration to the given value.
 func (b *PodStatusApplyConfiguration) SetEphemeralContainerStatuses(value ContainerStatusList) *PodStatusApplyConfiguration {
-	b.fields.EphemeralContainerStatuses = &value
+	b.EphemeralContainerStatuses = &value
 	return b
 }
 
 // RemoveEphemeralContainerStatuses removes the EphemeralContainerStatuses field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) RemoveEphemeralContainerStatuses() *PodStatusApplyConfiguration {
-	b.fields.EphemeralContainerStatuses = nil
+	b.EphemeralContainerStatuses = nil
 	return b
 }
 
 // GetEphemeralContainerStatuses gets the EphemeralContainerStatuses field from the declarative configuration.
 func (b *PodStatusApplyConfiguration) GetEphemeralContainerStatuses() (value ContainerStatusList, ok bool) {
-	if v := b.fields.EphemeralContainerStatuses; v != nil {
+	if v := b.EphemeralContainerStatuses; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts PodStatusApplyConfiguration to unstructured.
-func (b *PodStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PodStatusApplyConfiguration, replacing the contents
-// of PodStatusApplyConfiguration.
-func (b *PodStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &podStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PodStatusApplyConfiguration to JSON.
-func (b *PodStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PodStatusApplyConfiguration, replacing the contents of
-// PodStatusApplyConfiguration.
-func (b *PodStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // PodStatusList represents a listAlias of PodStatusApplyConfiguration.
@@ -366,8 +312,3 @@ type PodStatusList []*PodStatusApplyConfiguration
 
 // PodStatusList represents a map of PodStatusApplyConfiguration.
 type PodStatusMap map[string]PodStatusApplyConfiguration
-
-func (b *PodStatusApplyConfiguration) preMarshal() {
-}
-func (b *PodStatusApplyConfiguration) postUnmarshal() {
-}

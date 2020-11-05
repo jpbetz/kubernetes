@@ -20,6 +20,7 @@ package v1beta1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -173,7 +174,7 @@ func (c *clusterRoleBindings) Patch(ctx context.Context, name string, pt types.P
 // Apply takes the given apply declarative configuration, applies it and returns the applied clusterRoleBinding.
 func (c *clusterRoleBindings) Apply(ctx context.Context, clusterRoleBinding *rbacv1beta1.ClusterRoleBindingApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ClusterRoleBinding, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := clusterRoleBinding.MarshalJSON()
+	data, err := json.Marshal(clusterRoleBinding)
 	if err != nil {
 		return nil, err
 	}

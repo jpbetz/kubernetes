@@ -19,16 +19,17 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // HorizontalPodAutoscalerStatusApplyConfiguration represents an declarative configuration of the HorizontalPodAutoscalerStatus type for use
 // with apply.
 type HorizontalPodAutoscalerStatusApplyConfiguration struct {
-	fields horizontalPodAutoscalerStatusFields
+	ObservedGeneration              *int64   `json:"observedGeneration,omitempty"`
+	LastScaleTime                   *v1.Time `json:"lastScaleTime,omitempty"`
+	CurrentReplicas                 *int32   `json:"currentReplicas,omitempty"`
+	DesiredReplicas                 *int32   `json:"desiredReplicas,omitempty"`
+	CurrentCPUUtilizationPercentage *int32   `json:"currentCPUUtilizationPercentage,omitempty"`
 }
 
 // HorizontalPodAutoscalerStatusApplyConfiguration constructs an declarative configuration of the HorizontalPodAutoscalerStatus type for use with
@@ -37,34 +38,21 @@ func HorizontalPodAutoscalerStatus() *HorizontalPodAutoscalerStatusApplyConfigur
 	return &HorizontalPodAutoscalerStatusApplyConfiguration{}
 }
 
-// horizontalPodAutoscalerStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in HorizontalPodAutoscalerStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type horizontalPodAutoscalerStatusFields struct {
-	ObservedGeneration              *int64   `json:"observedGeneration,omitempty"`
-	LastScaleTime                   *v1.Time `json:"lastScaleTime,omitempty"`
-	CurrentReplicas                 *int32   `json:"currentReplicas,omitempty"`
-	DesiredReplicas                 *int32   `json:"desiredReplicas,omitempty"`
-	CurrentCPUUtilizationPercentage *int32   `json:"currentCPUUtilizationPercentage,omitempty"`
-}
-
 // SetObservedGeneration sets the ObservedGeneration field in the declarative configuration to the given value.
 func (b *HorizontalPodAutoscalerStatusApplyConfiguration) SetObservedGeneration(value int64) *HorizontalPodAutoscalerStatusApplyConfiguration {
-	b.fields.ObservedGeneration = &value
+	b.ObservedGeneration = &value
 	return b
 }
 
 // RemoveObservedGeneration removes the ObservedGeneration field from the declarative configuration.
 func (b *HorizontalPodAutoscalerStatusApplyConfiguration) RemoveObservedGeneration() *HorizontalPodAutoscalerStatusApplyConfiguration {
-	b.fields.ObservedGeneration = nil
+	b.ObservedGeneration = nil
 	return b
 }
 
 // GetObservedGeneration gets the ObservedGeneration field from the declarative configuration.
 func (b *HorizontalPodAutoscalerStatusApplyConfiguration) GetObservedGeneration() (value int64, ok bool) {
-	if v := b.fields.ObservedGeneration; v != nil {
+	if v := b.ObservedGeneration; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -72,19 +60,19 @@ func (b *HorizontalPodAutoscalerStatusApplyConfiguration) GetObservedGeneration(
 
 // SetLastScaleTime sets the LastScaleTime field in the declarative configuration to the given value.
 func (b *HorizontalPodAutoscalerStatusApplyConfiguration) SetLastScaleTime(value v1.Time) *HorizontalPodAutoscalerStatusApplyConfiguration {
-	b.fields.LastScaleTime = &value
+	b.LastScaleTime = &value
 	return b
 }
 
 // RemoveLastScaleTime removes the LastScaleTime field from the declarative configuration.
 func (b *HorizontalPodAutoscalerStatusApplyConfiguration) RemoveLastScaleTime() *HorizontalPodAutoscalerStatusApplyConfiguration {
-	b.fields.LastScaleTime = nil
+	b.LastScaleTime = nil
 	return b
 }
 
 // GetLastScaleTime gets the LastScaleTime field from the declarative configuration.
 func (b *HorizontalPodAutoscalerStatusApplyConfiguration) GetLastScaleTime() (value v1.Time, ok bool) {
-	if v := b.fields.LastScaleTime; v != nil {
+	if v := b.LastScaleTime; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -92,19 +80,19 @@ func (b *HorizontalPodAutoscalerStatusApplyConfiguration) GetLastScaleTime() (va
 
 // SetCurrentReplicas sets the CurrentReplicas field in the declarative configuration to the given value.
 func (b *HorizontalPodAutoscalerStatusApplyConfiguration) SetCurrentReplicas(value int32) *HorizontalPodAutoscalerStatusApplyConfiguration {
-	b.fields.CurrentReplicas = &value
+	b.CurrentReplicas = &value
 	return b
 }
 
 // RemoveCurrentReplicas removes the CurrentReplicas field from the declarative configuration.
 func (b *HorizontalPodAutoscalerStatusApplyConfiguration) RemoveCurrentReplicas() *HorizontalPodAutoscalerStatusApplyConfiguration {
-	b.fields.CurrentReplicas = nil
+	b.CurrentReplicas = nil
 	return b
 }
 
 // GetCurrentReplicas gets the CurrentReplicas field from the declarative configuration.
 func (b *HorizontalPodAutoscalerStatusApplyConfiguration) GetCurrentReplicas() (value int32, ok bool) {
-	if v := b.fields.CurrentReplicas; v != nil {
+	if v := b.CurrentReplicas; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -112,19 +100,19 @@ func (b *HorizontalPodAutoscalerStatusApplyConfiguration) GetCurrentReplicas() (
 
 // SetDesiredReplicas sets the DesiredReplicas field in the declarative configuration to the given value.
 func (b *HorizontalPodAutoscalerStatusApplyConfiguration) SetDesiredReplicas(value int32) *HorizontalPodAutoscalerStatusApplyConfiguration {
-	b.fields.DesiredReplicas = &value
+	b.DesiredReplicas = &value
 	return b
 }
 
 // RemoveDesiredReplicas removes the DesiredReplicas field from the declarative configuration.
 func (b *HorizontalPodAutoscalerStatusApplyConfiguration) RemoveDesiredReplicas() *HorizontalPodAutoscalerStatusApplyConfiguration {
-	b.fields.DesiredReplicas = nil
+	b.DesiredReplicas = nil
 	return b
 }
 
 // GetDesiredReplicas gets the DesiredReplicas field from the declarative configuration.
 func (b *HorizontalPodAutoscalerStatusApplyConfiguration) GetDesiredReplicas() (value int32, ok bool) {
-	if v := b.fields.DesiredReplicas; v != nil {
+	if v := b.DesiredReplicas; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -132,64 +120,22 @@ func (b *HorizontalPodAutoscalerStatusApplyConfiguration) GetDesiredReplicas() (
 
 // SetCurrentCPUUtilizationPercentage sets the CurrentCPUUtilizationPercentage field in the declarative configuration to the given value.
 func (b *HorizontalPodAutoscalerStatusApplyConfiguration) SetCurrentCPUUtilizationPercentage(value int32) *HorizontalPodAutoscalerStatusApplyConfiguration {
-	b.fields.CurrentCPUUtilizationPercentage = &value
+	b.CurrentCPUUtilizationPercentage = &value
 	return b
 }
 
 // RemoveCurrentCPUUtilizationPercentage removes the CurrentCPUUtilizationPercentage field from the declarative configuration.
 func (b *HorizontalPodAutoscalerStatusApplyConfiguration) RemoveCurrentCPUUtilizationPercentage() *HorizontalPodAutoscalerStatusApplyConfiguration {
-	b.fields.CurrentCPUUtilizationPercentage = nil
+	b.CurrentCPUUtilizationPercentage = nil
 	return b
 }
 
 // GetCurrentCPUUtilizationPercentage gets the CurrentCPUUtilizationPercentage field from the declarative configuration.
 func (b *HorizontalPodAutoscalerStatusApplyConfiguration) GetCurrentCPUUtilizationPercentage() (value int32, ok bool) {
-	if v := b.fields.CurrentCPUUtilizationPercentage; v != nil {
+	if v := b.CurrentCPUUtilizationPercentage; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts HorizontalPodAutoscalerStatusApplyConfiguration to unstructured.
-func (b *HorizontalPodAutoscalerStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to HorizontalPodAutoscalerStatusApplyConfiguration, replacing the contents
-// of HorizontalPodAutoscalerStatusApplyConfiguration.
-func (b *HorizontalPodAutoscalerStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &horizontalPodAutoscalerStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals HorizontalPodAutoscalerStatusApplyConfiguration to JSON.
-func (b *HorizontalPodAutoscalerStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into HorizontalPodAutoscalerStatusApplyConfiguration, replacing the contents of
-// HorizontalPodAutoscalerStatusApplyConfiguration.
-func (b *HorizontalPodAutoscalerStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // HorizontalPodAutoscalerStatusList represents a listAlias of HorizontalPodAutoscalerStatusApplyConfiguration.
@@ -197,8 +143,3 @@ type HorizontalPodAutoscalerStatusList []*HorizontalPodAutoscalerStatusApplyConf
 
 // HorizontalPodAutoscalerStatusList represents a map of HorizontalPodAutoscalerStatusApplyConfiguration.
 type HorizontalPodAutoscalerStatusMap map[string]HorizontalPodAutoscalerStatusApplyConfiguration
-
-func (b *HorizontalPodAutoscalerStatusApplyConfiguration) preMarshal() {
-}
-func (b *HorizontalPodAutoscalerStatusApplyConfiguration) postUnmarshal() {
-}

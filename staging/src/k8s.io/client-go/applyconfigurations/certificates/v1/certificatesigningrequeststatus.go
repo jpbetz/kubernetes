@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // CertificateSigningRequestStatusApplyConfiguration represents an declarative configuration of the CertificateSigningRequestStatus type for use
 // with apply.
 type CertificateSigningRequestStatusApplyConfiguration struct {
-	fields certificateSigningRequestStatusFields
+	Conditions  *CertificateSigningRequestConditionList `json:"conditions,omitempty"`
+	Certificate *[]byte                                 `json:"certificate,omitempty"`
 }
 
 // CertificateSigningRequestStatusApplyConfiguration constructs an declarative configuration of the CertificateSigningRequestStatus type for use with
@@ -36,31 +31,21 @@ func CertificateSigningRequestStatus() *CertificateSigningRequestStatusApplyConf
 	return &CertificateSigningRequestStatusApplyConfiguration{}
 }
 
-// certificateSigningRequestStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in CertificateSigningRequestStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type certificateSigningRequestStatusFields struct {
-	Conditions  *CertificateSigningRequestConditionList `json:"conditions,omitempty"`
-	Certificate *[]byte                                 `json:"certificate,omitempty"`
-}
-
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
 func (b *CertificateSigningRequestStatusApplyConfiguration) SetConditions(value CertificateSigningRequestConditionList) *CertificateSigningRequestStatusApplyConfiguration {
-	b.fields.Conditions = &value
+	b.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
 func (b *CertificateSigningRequestStatusApplyConfiguration) RemoveConditions() *CertificateSigningRequestStatusApplyConfiguration {
-	b.fields.Conditions = nil
+	b.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
 func (b *CertificateSigningRequestStatusApplyConfiguration) GetConditions() (value CertificateSigningRequestConditionList, ok bool) {
-	if v := b.fields.Conditions; v != nil {
+	if v := b.Conditions; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *CertificateSigningRequestStatusApplyConfiguration) GetConditions() (val
 
 // SetCertificate sets the Certificate field in the declarative configuration to the given value.
 func (b *CertificateSigningRequestStatusApplyConfiguration) SetCertificate(value []byte) *CertificateSigningRequestStatusApplyConfiguration {
-	b.fields.Certificate = &value
+	b.Certificate = &value
 	return b
 }
 
 // RemoveCertificate removes the Certificate field from the declarative configuration.
 func (b *CertificateSigningRequestStatusApplyConfiguration) RemoveCertificate() *CertificateSigningRequestStatusApplyConfiguration {
-	b.fields.Certificate = nil
+	b.Certificate = nil
 	return b
 }
 
 // GetCertificate gets the Certificate field from the declarative configuration.
 func (b *CertificateSigningRequestStatusApplyConfiguration) GetCertificate() (value []byte, ok bool) {
-	if v := b.fields.Certificate; v != nil {
+	if v := b.Certificate; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts CertificateSigningRequestStatusApplyConfiguration to unstructured.
-func (b *CertificateSigningRequestStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to CertificateSigningRequestStatusApplyConfiguration, replacing the contents
-// of CertificateSigningRequestStatusApplyConfiguration.
-func (b *CertificateSigningRequestStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &certificateSigningRequestStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals CertificateSigningRequestStatusApplyConfiguration to JSON.
-func (b *CertificateSigningRequestStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into CertificateSigningRequestStatusApplyConfiguration, replacing the contents of
-// CertificateSigningRequestStatusApplyConfiguration.
-func (b *CertificateSigningRequestStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // CertificateSigningRequestStatusList represents a listAlias of CertificateSigningRequestStatusApplyConfiguration.
@@ -133,8 +76,3 @@ type CertificateSigningRequestStatusList []*CertificateSigningRequestStatusApply
 
 // CertificateSigningRequestStatusList represents a map of CertificateSigningRequestStatusApplyConfiguration.
 type CertificateSigningRequestStatusMap map[string]CertificateSigningRequestStatusApplyConfiguration
-
-func (b *CertificateSigningRequestStatusApplyConfiguration) preMarshal() {
-}
-func (b *CertificateSigningRequestStatusApplyConfiguration) postUnmarshal() {
-}

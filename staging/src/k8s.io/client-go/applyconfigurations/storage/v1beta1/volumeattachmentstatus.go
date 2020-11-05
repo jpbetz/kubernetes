@@ -18,16 +18,13 @@ limitations under the License.
 
 package v1beta1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // VolumeAttachmentStatusApplyConfiguration represents an declarative configuration of the VolumeAttachmentStatus type for use
 // with apply.
 type VolumeAttachmentStatusApplyConfiguration struct {
-	fields volumeAttachmentStatusFields
+	Attached           *bool                          `json:"attached,omitempty"`
+	AttachmentMetadata *map[string]string             `json:"attachmentMetadata,omitempty"`
+	AttachError        *VolumeErrorApplyConfiguration `json:"attachError,omitempty"`
+	DetachError        *VolumeErrorApplyConfiguration `json:"detachError,omitempty"`
 }
 
 // VolumeAttachmentStatusApplyConfiguration constructs an declarative configuration of the VolumeAttachmentStatus type for use with
@@ -36,33 +33,21 @@ func VolumeAttachmentStatus() *VolumeAttachmentStatusApplyConfiguration {
 	return &VolumeAttachmentStatusApplyConfiguration{}
 }
 
-// volumeAttachmentStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in VolumeAttachmentStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type volumeAttachmentStatusFields struct {
-	Attached           *bool                          `json:"attached,omitempty"`
-	AttachmentMetadata *map[string]string             `json:"attachmentMetadata,omitempty"`
-	AttachError        *VolumeErrorApplyConfiguration `json:"attachError,omitempty"`
-	DetachError        *VolumeErrorApplyConfiguration `json:"detachError,omitempty"`
-}
-
 // SetAttached sets the Attached field in the declarative configuration to the given value.
 func (b *VolumeAttachmentStatusApplyConfiguration) SetAttached(value bool) *VolumeAttachmentStatusApplyConfiguration {
-	b.fields.Attached = &value
+	b.Attached = &value
 	return b
 }
 
 // RemoveAttached removes the Attached field from the declarative configuration.
 func (b *VolumeAttachmentStatusApplyConfiguration) RemoveAttached() *VolumeAttachmentStatusApplyConfiguration {
-	b.fields.Attached = nil
+	b.Attached = nil
 	return b
 }
 
 // GetAttached gets the Attached field from the declarative configuration.
 func (b *VolumeAttachmentStatusApplyConfiguration) GetAttached() (value bool, ok bool) {
-	if v := b.fields.Attached; v != nil {
+	if v := b.Attached; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,19 +55,19 @@ func (b *VolumeAttachmentStatusApplyConfiguration) GetAttached() (value bool, ok
 
 // SetAttachmentMetadata sets the AttachmentMetadata field in the declarative configuration to the given value.
 func (b *VolumeAttachmentStatusApplyConfiguration) SetAttachmentMetadata(value map[string]string) *VolumeAttachmentStatusApplyConfiguration {
-	b.fields.AttachmentMetadata = &value
+	b.AttachmentMetadata = &value
 	return b
 }
 
 // RemoveAttachmentMetadata removes the AttachmentMetadata field from the declarative configuration.
 func (b *VolumeAttachmentStatusApplyConfiguration) RemoveAttachmentMetadata() *VolumeAttachmentStatusApplyConfiguration {
-	b.fields.AttachmentMetadata = nil
+	b.AttachmentMetadata = nil
 	return b
 }
 
 // GetAttachmentMetadata gets the AttachmentMetadata field from the declarative configuration.
 func (b *VolumeAttachmentStatusApplyConfiguration) GetAttachmentMetadata() (value map[string]string, ok bool) {
-	if v := b.fields.AttachmentMetadata; v != nil {
+	if v := b.AttachmentMetadata; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -90,78 +75,36 @@ func (b *VolumeAttachmentStatusApplyConfiguration) GetAttachmentMetadata() (valu
 
 // SetAttachError sets the AttachError field in the declarative configuration to the given value.
 func (b *VolumeAttachmentStatusApplyConfiguration) SetAttachError(value *VolumeErrorApplyConfiguration) *VolumeAttachmentStatusApplyConfiguration {
-	b.fields.AttachError = value
+	b.AttachError = value
 	return b
 }
 
 // RemoveAttachError removes the AttachError field from the declarative configuration.
 func (b *VolumeAttachmentStatusApplyConfiguration) RemoveAttachError() *VolumeAttachmentStatusApplyConfiguration {
-	b.fields.AttachError = nil
+	b.AttachError = nil
 	return b
 }
 
 // GetAttachError gets the AttachError field from the declarative configuration.
 func (b *VolumeAttachmentStatusApplyConfiguration) GetAttachError() (value *VolumeErrorApplyConfiguration, ok bool) {
-	return b.fields.AttachError, b.fields.AttachError != nil
+	return b.AttachError, b.AttachError != nil
 }
 
 // SetDetachError sets the DetachError field in the declarative configuration to the given value.
 func (b *VolumeAttachmentStatusApplyConfiguration) SetDetachError(value *VolumeErrorApplyConfiguration) *VolumeAttachmentStatusApplyConfiguration {
-	b.fields.DetachError = value
+	b.DetachError = value
 	return b
 }
 
 // RemoveDetachError removes the DetachError field from the declarative configuration.
 func (b *VolumeAttachmentStatusApplyConfiguration) RemoveDetachError() *VolumeAttachmentStatusApplyConfiguration {
-	b.fields.DetachError = nil
+	b.DetachError = nil
 	return b
 }
 
 // GetDetachError gets the DetachError field from the declarative configuration.
 func (b *VolumeAttachmentStatusApplyConfiguration) GetDetachError() (value *VolumeErrorApplyConfiguration, ok bool) {
-	return b.fields.DetachError, b.fields.DetachError != nil
-}
-
-// ToUnstructured converts VolumeAttachmentStatusApplyConfiguration to unstructured.
-func (b *VolumeAttachmentStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to VolumeAttachmentStatusApplyConfiguration, replacing the contents
-// of VolumeAttachmentStatusApplyConfiguration.
-func (b *VolumeAttachmentStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &volumeAttachmentStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals VolumeAttachmentStatusApplyConfiguration to JSON.
-func (b *VolumeAttachmentStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into VolumeAttachmentStatusApplyConfiguration, replacing the contents of
-// VolumeAttachmentStatusApplyConfiguration.
-func (b *VolumeAttachmentStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.DetachError, b.DetachError != nil
 }
 
 // VolumeAttachmentStatusList represents a listAlias of VolumeAttachmentStatusApplyConfiguration.
@@ -169,8 +112,3 @@ type VolumeAttachmentStatusList []*VolumeAttachmentStatusApplyConfiguration
 
 // VolumeAttachmentStatusList represents a map of VolumeAttachmentStatusApplyConfiguration.
 type VolumeAttachmentStatusMap map[string]VolumeAttachmentStatusApplyConfiguration
-
-func (b *VolumeAttachmentStatusApplyConfiguration) preMarshal() {
-}
-func (b *VolumeAttachmentStatusApplyConfiguration) postUnmarshal() {
-}

@@ -18,16 +18,12 @@ limitations under the License.
 
 package v2beta2
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ObjectMetricSourceApplyConfiguration represents an declarative configuration of the ObjectMetricSource type for use
 // with apply.
 type ObjectMetricSourceApplyConfiguration struct {
-	fields objectMetricSourceFields
+	DescribedObject *CrossVersionObjectReferenceApplyConfiguration `json:"describedObject,omitempty"`
+	Target          *MetricTargetApplyConfiguration                `json:"target,omitempty"`
+	Metric          *MetricIdentifierApplyConfiguration            `json:"metric,omitempty"`
 }
 
 // ObjectMetricSourceApplyConfiguration constructs an declarative configuration of the ObjectMetricSource type for use with
@@ -36,108 +32,55 @@ func ObjectMetricSource() *ObjectMetricSourceApplyConfiguration {
 	return &ObjectMetricSourceApplyConfiguration{}
 }
 
-// objectMetricSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ObjectMetricSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type objectMetricSourceFields struct {
-	DescribedObject *CrossVersionObjectReferenceApplyConfiguration `json:"describedObject,omitempty"`
-	Target          *MetricTargetApplyConfiguration                `json:"target,omitempty"`
-	Metric          *MetricIdentifierApplyConfiguration            `json:"metric,omitempty"`
-}
-
 // SetDescribedObject sets the DescribedObject field in the declarative configuration to the given value.
 func (b *ObjectMetricSourceApplyConfiguration) SetDescribedObject(value *CrossVersionObjectReferenceApplyConfiguration) *ObjectMetricSourceApplyConfiguration {
-	b.fields.DescribedObject = value
+	b.DescribedObject = value
 	return b
 }
 
 // RemoveDescribedObject removes the DescribedObject field from the declarative configuration.
 func (b *ObjectMetricSourceApplyConfiguration) RemoveDescribedObject() *ObjectMetricSourceApplyConfiguration {
-	b.fields.DescribedObject = nil
+	b.DescribedObject = nil
 	return b
 }
 
 // GetDescribedObject gets the DescribedObject field from the declarative configuration.
 func (b *ObjectMetricSourceApplyConfiguration) GetDescribedObject() (value *CrossVersionObjectReferenceApplyConfiguration, ok bool) {
-	return b.fields.DescribedObject, b.fields.DescribedObject != nil
+	return b.DescribedObject, b.DescribedObject != nil
 }
 
 // SetTarget sets the Target field in the declarative configuration to the given value.
 func (b *ObjectMetricSourceApplyConfiguration) SetTarget(value *MetricTargetApplyConfiguration) *ObjectMetricSourceApplyConfiguration {
-	b.fields.Target = value
+	b.Target = value
 	return b
 }
 
 // RemoveTarget removes the Target field from the declarative configuration.
 func (b *ObjectMetricSourceApplyConfiguration) RemoveTarget() *ObjectMetricSourceApplyConfiguration {
-	b.fields.Target = nil
+	b.Target = nil
 	return b
 }
 
 // GetTarget gets the Target field from the declarative configuration.
 func (b *ObjectMetricSourceApplyConfiguration) GetTarget() (value *MetricTargetApplyConfiguration, ok bool) {
-	return b.fields.Target, b.fields.Target != nil
+	return b.Target, b.Target != nil
 }
 
 // SetMetric sets the Metric field in the declarative configuration to the given value.
 func (b *ObjectMetricSourceApplyConfiguration) SetMetric(value *MetricIdentifierApplyConfiguration) *ObjectMetricSourceApplyConfiguration {
-	b.fields.Metric = value
+	b.Metric = value
 	return b
 }
 
 // RemoveMetric removes the Metric field from the declarative configuration.
 func (b *ObjectMetricSourceApplyConfiguration) RemoveMetric() *ObjectMetricSourceApplyConfiguration {
-	b.fields.Metric = nil
+	b.Metric = nil
 	return b
 }
 
 // GetMetric gets the Metric field from the declarative configuration.
 func (b *ObjectMetricSourceApplyConfiguration) GetMetric() (value *MetricIdentifierApplyConfiguration, ok bool) {
-	return b.fields.Metric, b.fields.Metric != nil
-}
-
-// ToUnstructured converts ObjectMetricSourceApplyConfiguration to unstructured.
-func (b *ObjectMetricSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ObjectMetricSourceApplyConfiguration, replacing the contents
-// of ObjectMetricSourceApplyConfiguration.
-func (b *ObjectMetricSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &objectMetricSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ObjectMetricSourceApplyConfiguration to JSON.
-func (b *ObjectMetricSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ObjectMetricSourceApplyConfiguration, replacing the contents of
-// ObjectMetricSourceApplyConfiguration.
-func (b *ObjectMetricSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Metric, b.Metric != nil
 }
 
 // ObjectMetricSourceList represents a listAlias of ObjectMetricSourceApplyConfiguration.
@@ -145,8 +88,3 @@ type ObjectMetricSourceList []*ObjectMetricSourceApplyConfiguration
 
 // ObjectMetricSourceList represents a map of ObjectMetricSourceApplyConfiguration.
 type ObjectMetricSourceMap map[string]ObjectMetricSourceApplyConfiguration
-
-func (b *ObjectMetricSourceApplyConfiguration) preMarshal() {
-}
-func (b *ObjectMetricSourceApplyConfiguration) postUnmarshal() {
-}

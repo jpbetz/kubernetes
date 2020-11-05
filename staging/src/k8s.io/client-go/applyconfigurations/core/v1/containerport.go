@@ -19,16 +19,17 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // ContainerPortApplyConfiguration represents an declarative configuration of the ContainerPort type for use
 // with apply.
 type ContainerPortApplyConfiguration struct {
-	fields containerPortFields
+	Name          *string      `json:"name,omitempty"`
+	HostPort      *int32       `json:"hostPort,omitempty"`
+	ContainerPort *int32       `json:"containerPort,omitempty"`
+	Protocol      *v1.Protocol `json:"protocol,omitempty"`
+	HostIP        *string      `json:"hostIP,omitempty"`
 }
 
 // ContainerPortApplyConfiguration constructs an declarative configuration of the ContainerPort type for use with
@@ -37,34 +38,21 @@ func ContainerPort() *ContainerPortApplyConfiguration {
 	return &ContainerPortApplyConfiguration{}
 }
 
-// containerPortFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ContainerPortApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type containerPortFields struct {
-	Name          *string      `json:"name,omitempty"`
-	HostPort      *int32       `json:"hostPort,omitempty"`
-	ContainerPort *int32       `json:"containerPort,omitempty"`
-	Protocol      *v1.Protocol `json:"protocol,omitempty"`
-	HostIP        *string      `json:"hostIP,omitempty"`
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *ContainerPortApplyConfiguration) SetName(value string) *ContainerPortApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *ContainerPortApplyConfiguration) RemoveName() *ContainerPortApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *ContainerPortApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -72,19 +60,19 @@ func (b *ContainerPortApplyConfiguration) GetName() (value string, ok bool) {
 
 // SetHostPort sets the HostPort field in the declarative configuration to the given value.
 func (b *ContainerPortApplyConfiguration) SetHostPort(value int32) *ContainerPortApplyConfiguration {
-	b.fields.HostPort = &value
+	b.HostPort = &value
 	return b
 }
 
 // RemoveHostPort removes the HostPort field from the declarative configuration.
 func (b *ContainerPortApplyConfiguration) RemoveHostPort() *ContainerPortApplyConfiguration {
-	b.fields.HostPort = nil
+	b.HostPort = nil
 	return b
 }
 
 // GetHostPort gets the HostPort field from the declarative configuration.
 func (b *ContainerPortApplyConfiguration) GetHostPort() (value int32, ok bool) {
-	if v := b.fields.HostPort; v != nil {
+	if v := b.HostPort; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -92,19 +80,19 @@ func (b *ContainerPortApplyConfiguration) GetHostPort() (value int32, ok bool) {
 
 // SetContainerPort sets the ContainerPort field in the declarative configuration to the given value.
 func (b *ContainerPortApplyConfiguration) SetContainerPort(value int32) *ContainerPortApplyConfiguration {
-	b.fields.ContainerPort = &value
+	b.ContainerPort = &value
 	return b
 }
 
 // RemoveContainerPort removes the ContainerPort field from the declarative configuration.
 func (b *ContainerPortApplyConfiguration) RemoveContainerPort() *ContainerPortApplyConfiguration {
-	b.fields.ContainerPort = nil
+	b.ContainerPort = nil
 	return b
 }
 
 // GetContainerPort gets the ContainerPort field from the declarative configuration.
 func (b *ContainerPortApplyConfiguration) GetContainerPort() (value int32, ok bool) {
-	if v := b.fields.ContainerPort; v != nil {
+	if v := b.ContainerPort; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -112,19 +100,19 @@ func (b *ContainerPortApplyConfiguration) GetContainerPort() (value int32, ok bo
 
 // SetProtocol sets the Protocol field in the declarative configuration to the given value.
 func (b *ContainerPortApplyConfiguration) SetProtocol(value v1.Protocol) *ContainerPortApplyConfiguration {
-	b.fields.Protocol = &value
+	b.Protocol = &value
 	return b
 }
 
 // RemoveProtocol removes the Protocol field from the declarative configuration.
 func (b *ContainerPortApplyConfiguration) RemoveProtocol() *ContainerPortApplyConfiguration {
-	b.fields.Protocol = nil
+	b.Protocol = nil
 	return b
 }
 
 // GetProtocol gets the Protocol field from the declarative configuration.
 func (b *ContainerPortApplyConfiguration) GetProtocol() (value v1.Protocol, ok bool) {
-	if v := b.fields.Protocol; v != nil {
+	if v := b.Protocol; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -132,64 +120,22 @@ func (b *ContainerPortApplyConfiguration) GetProtocol() (value v1.Protocol, ok b
 
 // SetHostIP sets the HostIP field in the declarative configuration to the given value.
 func (b *ContainerPortApplyConfiguration) SetHostIP(value string) *ContainerPortApplyConfiguration {
-	b.fields.HostIP = &value
+	b.HostIP = &value
 	return b
 }
 
 // RemoveHostIP removes the HostIP field from the declarative configuration.
 func (b *ContainerPortApplyConfiguration) RemoveHostIP() *ContainerPortApplyConfiguration {
-	b.fields.HostIP = nil
+	b.HostIP = nil
 	return b
 }
 
 // GetHostIP gets the HostIP field from the declarative configuration.
 func (b *ContainerPortApplyConfiguration) GetHostIP() (value string, ok bool) {
-	if v := b.fields.HostIP; v != nil {
+	if v := b.HostIP; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ContainerPortApplyConfiguration to unstructured.
-func (b *ContainerPortApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ContainerPortApplyConfiguration, replacing the contents
-// of ContainerPortApplyConfiguration.
-func (b *ContainerPortApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &containerPortFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ContainerPortApplyConfiguration to JSON.
-func (b *ContainerPortApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ContainerPortApplyConfiguration, replacing the contents of
-// ContainerPortApplyConfiguration.
-func (b *ContainerPortApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ContainerPortList represents a listAlias of ContainerPortApplyConfiguration.
@@ -197,8 +143,3 @@ type ContainerPortList []*ContainerPortApplyConfiguration
 
 // ContainerPortList represents a map of ContainerPortApplyConfiguration.
 type ContainerPortMap map[string]ContainerPortApplyConfiguration
-
-func (b *ContainerPortApplyConfiguration) preMarshal() {
-}
-func (b *ContainerPortApplyConfiguration) postUnmarshal() {
-}

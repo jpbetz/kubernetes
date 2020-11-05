@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -173,7 +174,7 @@ func (c *storageClasses) Patch(ctx context.Context, name string, pt types.PatchT
 // Apply takes the given apply declarative configuration, applies it and returns the applied storageClass.
 func (c *storageClasses) Apply(ctx context.Context, storageClass *storagev1.StorageClassApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.StorageClass, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := storageClass.MarshalJSON()
+	data, err := json.Marshal(storageClass)
 	if err != nil {
 		return nil, err
 	}

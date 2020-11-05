@@ -19,16 +19,14 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/core/v1"
 )
 
 // VolumeAttachmentSourceApplyConfiguration represents an declarative configuration of the VolumeAttachmentSource type for use
 // with apply.
 type VolumeAttachmentSourceApplyConfiguration struct {
-	fields volumeAttachmentSourceFields
+	PersistentVolumeName *string                                    `json:"persistentVolumeName,omitempty"`
+	InlineVolumeSpec     *v1.PersistentVolumeSpecApplyConfiguration `json:"inlineVolumeSpec,omitempty"`
 }
 
 // VolumeAttachmentSourceApplyConfiguration constructs an declarative configuration of the VolumeAttachmentSource type for use with
@@ -37,31 +35,21 @@ func VolumeAttachmentSource() *VolumeAttachmentSourceApplyConfiguration {
 	return &VolumeAttachmentSourceApplyConfiguration{}
 }
 
-// volumeAttachmentSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in VolumeAttachmentSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type volumeAttachmentSourceFields struct {
-	PersistentVolumeName *string                                    `json:"persistentVolumeName,omitempty"`
-	InlineVolumeSpec     *v1.PersistentVolumeSpecApplyConfiguration `json:"inlineVolumeSpec,omitempty"`
-}
-
 // SetPersistentVolumeName sets the PersistentVolumeName field in the declarative configuration to the given value.
 func (b *VolumeAttachmentSourceApplyConfiguration) SetPersistentVolumeName(value string) *VolumeAttachmentSourceApplyConfiguration {
-	b.fields.PersistentVolumeName = &value
+	b.PersistentVolumeName = &value
 	return b
 }
 
 // RemovePersistentVolumeName removes the PersistentVolumeName field from the declarative configuration.
 func (b *VolumeAttachmentSourceApplyConfiguration) RemovePersistentVolumeName() *VolumeAttachmentSourceApplyConfiguration {
-	b.fields.PersistentVolumeName = nil
+	b.PersistentVolumeName = nil
 	return b
 }
 
 // GetPersistentVolumeName gets the PersistentVolumeName field from the declarative configuration.
 func (b *VolumeAttachmentSourceApplyConfiguration) GetPersistentVolumeName() (value string, ok bool) {
-	if v := b.fields.PersistentVolumeName; v != nil {
+	if v := b.PersistentVolumeName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,61 +57,19 @@ func (b *VolumeAttachmentSourceApplyConfiguration) GetPersistentVolumeName() (va
 
 // SetInlineVolumeSpec sets the InlineVolumeSpec field in the declarative configuration to the given value.
 func (b *VolumeAttachmentSourceApplyConfiguration) SetInlineVolumeSpec(value *v1.PersistentVolumeSpecApplyConfiguration) *VolumeAttachmentSourceApplyConfiguration {
-	b.fields.InlineVolumeSpec = value
+	b.InlineVolumeSpec = value
 	return b
 }
 
 // RemoveInlineVolumeSpec removes the InlineVolumeSpec field from the declarative configuration.
 func (b *VolumeAttachmentSourceApplyConfiguration) RemoveInlineVolumeSpec() *VolumeAttachmentSourceApplyConfiguration {
-	b.fields.InlineVolumeSpec = nil
+	b.InlineVolumeSpec = nil
 	return b
 }
 
 // GetInlineVolumeSpec gets the InlineVolumeSpec field from the declarative configuration.
 func (b *VolumeAttachmentSourceApplyConfiguration) GetInlineVolumeSpec() (value *v1.PersistentVolumeSpecApplyConfiguration, ok bool) {
-	return b.fields.InlineVolumeSpec, b.fields.InlineVolumeSpec != nil
-}
-
-// ToUnstructured converts VolumeAttachmentSourceApplyConfiguration to unstructured.
-func (b *VolumeAttachmentSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to VolumeAttachmentSourceApplyConfiguration, replacing the contents
-// of VolumeAttachmentSourceApplyConfiguration.
-func (b *VolumeAttachmentSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &volumeAttachmentSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals VolumeAttachmentSourceApplyConfiguration to JSON.
-func (b *VolumeAttachmentSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into VolumeAttachmentSourceApplyConfiguration, replacing the contents of
-// VolumeAttachmentSourceApplyConfiguration.
-func (b *VolumeAttachmentSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.InlineVolumeSpec, b.InlineVolumeSpec != nil
 }
 
 // VolumeAttachmentSourceList represents a listAlias of VolumeAttachmentSourceApplyConfiguration.
@@ -131,8 +77,3 @@ type VolumeAttachmentSourceList []*VolumeAttachmentSourceApplyConfiguration
 
 // VolumeAttachmentSourceList represents a map of VolumeAttachmentSourceApplyConfiguration.
 type VolumeAttachmentSourceMap map[string]VolumeAttachmentSourceApplyConfiguration
-
-func (b *VolumeAttachmentSourceApplyConfiguration) preMarshal() {
-}
-func (b *VolumeAttachmentSourceApplyConfiguration) postUnmarshal() {
-}

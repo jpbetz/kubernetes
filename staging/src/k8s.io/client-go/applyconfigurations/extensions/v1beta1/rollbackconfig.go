@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1beta1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // RollbackConfigApplyConfiguration represents an declarative configuration of the RollbackConfig type for use
 // with apply.
 type RollbackConfigApplyConfiguration struct {
-	fields rollbackConfigFields
+	Revision *int64 `json:"revision,omitempty"`
 }
 
 // RollbackConfigApplyConfiguration constructs an declarative configuration of the RollbackConfig type for use with
@@ -36,75 +30,24 @@ func RollbackConfig() *RollbackConfigApplyConfiguration {
 	return &RollbackConfigApplyConfiguration{}
 }
 
-// rollbackConfigFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in RollbackConfigApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type rollbackConfigFields struct {
-	Revision *int64 `json:"revision,omitempty"`
-}
-
 // SetRevision sets the Revision field in the declarative configuration to the given value.
 func (b *RollbackConfigApplyConfiguration) SetRevision(value int64) *RollbackConfigApplyConfiguration {
-	b.fields.Revision = &value
+	b.Revision = &value
 	return b
 }
 
 // RemoveRevision removes the Revision field from the declarative configuration.
 func (b *RollbackConfigApplyConfiguration) RemoveRevision() *RollbackConfigApplyConfiguration {
-	b.fields.Revision = nil
+	b.Revision = nil
 	return b
 }
 
 // GetRevision gets the Revision field from the declarative configuration.
 func (b *RollbackConfigApplyConfiguration) GetRevision() (value int64, ok bool) {
-	if v := b.fields.Revision; v != nil {
+	if v := b.Revision; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts RollbackConfigApplyConfiguration to unstructured.
-func (b *RollbackConfigApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to RollbackConfigApplyConfiguration, replacing the contents
-// of RollbackConfigApplyConfiguration.
-func (b *RollbackConfigApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &rollbackConfigFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals RollbackConfigApplyConfiguration to JSON.
-func (b *RollbackConfigApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into RollbackConfigApplyConfiguration, replacing the contents of
-// RollbackConfigApplyConfiguration.
-func (b *RollbackConfigApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // RollbackConfigList represents a listAlias of RollbackConfigApplyConfiguration.
@@ -112,8 +55,3 @@ type RollbackConfigList []*RollbackConfigApplyConfiguration
 
 // RollbackConfigList represents a map of RollbackConfigApplyConfiguration.
 type RollbackConfigMap map[string]RollbackConfigApplyConfiguration
-
-func (b *RollbackConfigApplyConfiguration) preMarshal() {
-}
-func (b *RollbackConfigApplyConfiguration) postUnmarshal() {
-}

@@ -19,16 +19,15 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // ScopedResourceSelectorRequirementApplyConfiguration represents an declarative configuration of the ScopedResourceSelectorRequirement type for use
 // with apply.
 type ScopedResourceSelectorRequirementApplyConfiguration struct {
-	fields scopedResourceSelectorRequirementFields
+	ScopeName *v1.ResourceQuotaScope    `json:"scopeName,omitempty"`
+	Operator  *v1.ScopeSelectorOperator `json:"operator,omitempty"`
+	Values    *[]string                 `json:"values,omitempty"`
 }
 
 // ScopedResourceSelectorRequirementApplyConfiguration constructs an declarative configuration of the ScopedResourceSelectorRequirement type for use with
@@ -37,32 +36,21 @@ func ScopedResourceSelectorRequirement() *ScopedResourceSelectorRequirementApply
 	return &ScopedResourceSelectorRequirementApplyConfiguration{}
 }
 
-// scopedResourceSelectorRequirementFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ScopedResourceSelectorRequirementApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type scopedResourceSelectorRequirementFields struct {
-	ScopeName *v1.ResourceQuotaScope    `json:"scopeName,omitempty"`
-	Operator  *v1.ScopeSelectorOperator `json:"operator,omitempty"`
-	Values    *[]string                 `json:"values,omitempty"`
-}
-
 // SetScopeName sets the ScopeName field in the declarative configuration to the given value.
 func (b *ScopedResourceSelectorRequirementApplyConfiguration) SetScopeName(value v1.ResourceQuotaScope) *ScopedResourceSelectorRequirementApplyConfiguration {
-	b.fields.ScopeName = &value
+	b.ScopeName = &value
 	return b
 }
 
 // RemoveScopeName removes the ScopeName field from the declarative configuration.
 func (b *ScopedResourceSelectorRequirementApplyConfiguration) RemoveScopeName() *ScopedResourceSelectorRequirementApplyConfiguration {
-	b.fields.ScopeName = nil
+	b.ScopeName = nil
 	return b
 }
 
 // GetScopeName gets the ScopeName field from the declarative configuration.
 func (b *ScopedResourceSelectorRequirementApplyConfiguration) GetScopeName() (value v1.ResourceQuotaScope, ok bool) {
-	if v := b.fields.ScopeName; v != nil {
+	if v := b.ScopeName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,19 +58,19 @@ func (b *ScopedResourceSelectorRequirementApplyConfiguration) GetScopeName() (va
 
 // SetOperator sets the Operator field in the declarative configuration to the given value.
 func (b *ScopedResourceSelectorRequirementApplyConfiguration) SetOperator(value v1.ScopeSelectorOperator) *ScopedResourceSelectorRequirementApplyConfiguration {
-	b.fields.Operator = &value
+	b.Operator = &value
 	return b
 }
 
 // RemoveOperator removes the Operator field from the declarative configuration.
 func (b *ScopedResourceSelectorRequirementApplyConfiguration) RemoveOperator() *ScopedResourceSelectorRequirementApplyConfiguration {
-	b.fields.Operator = nil
+	b.Operator = nil
 	return b
 }
 
 // GetOperator gets the Operator field from the declarative configuration.
 func (b *ScopedResourceSelectorRequirementApplyConfiguration) GetOperator() (value v1.ScopeSelectorOperator, ok bool) {
-	if v := b.fields.Operator; v != nil {
+	if v := b.Operator; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -90,64 +78,22 @@ func (b *ScopedResourceSelectorRequirementApplyConfiguration) GetOperator() (val
 
 // SetValues sets the Values field in the declarative configuration to the given value.
 func (b *ScopedResourceSelectorRequirementApplyConfiguration) SetValues(value []string) *ScopedResourceSelectorRequirementApplyConfiguration {
-	b.fields.Values = &value
+	b.Values = &value
 	return b
 }
 
 // RemoveValues removes the Values field from the declarative configuration.
 func (b *ScopedResourceSelectorRequirementApplyConfiguration) RemoveValues() *ScopedResourceSelectorRequirementApplyConfiguration {
-	b.fields.Values = nil
+	b.Values = nil
 	return b
 }
 
 // GetValues gets the Values field from the declarative configuration.
 func (b *ScopedResourceSelectorRequirementApplyConfiguration) GetValues() (value []string, ok bool) {
-	if v := b.fields.Values; v != nil {
+	if v := b.Values; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ScopedResourceSelectorRequirementApplyConfiguration to unstructured.
-func (b *ScopedResourceSelectorRequirementApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ScopedResourceSelectorRequirementApplyConfiguration, replacing the contents
-// of ScopedResourceSelectorRequirementApplyConfiguration.
-func (b *ScopedResourceSelectorRequirementApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &scopedResourceSelectorRequirementFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ScopedResourceSelectorRequirementApplyConfiguration to JSON.
-func (b *ScopedResourceSelectorRequirementApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ScopedResourceSelectorRequirementApplyConfiguration, replacing the contents of
-// ScopedResourceSelectorRequirementApplyConfiguration.
-func (b *ScopedResourceSelectorRequirementApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ScopedResourceSelectorRequirementList represents a listAlias of ScopedResourceSelectorRequirementApplyConfiguration.
@@ -155,8 +101,3 @@ type ScopedResourceSelectorRequirementList []*ScopedResourceSelectorRequirementA
 
 // ScopedResourceSelectorRequirementList represents a map of ScopedResourceSelectorRequirementApplyConfiguration.
 type ScopedResourceSelectorRequirementMap map[string]ScopedResourceSelectorRequirementApplyConfiguration
-
-func (b *ScopedResourceSelectorRequirementApplyConfiguration) preMarshal() {
-}
-func (b *ScopedResourceSelectorRequirementApplyConfiguration) postUnmarshal() {
-}

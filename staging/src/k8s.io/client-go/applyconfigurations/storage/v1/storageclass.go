@@ -19,11 +19,8 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	corev1 "k8s.io/api/core/v1"
 	storagev1 "k8s.io/api/storage/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	applyconfigurationscorev1 "k8s.io/client-go/applyconfigurations/core/v1"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
@@ -31,8 +28,15 @@ import (
 // StorageClassApplyConfiguration represents an declarative configuration of the StorageClass type for use
 // with apply.
 type StorageClassApplyConfiguration struct {
-	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
-	fields   storageClassFields
+	v1.TypeMetaApplyConfiguration `json:",inline"`
+	ObjectMeta                    *v1.ObjectMetaApplyConfiguration                    `json:"metadata,omitempty"`
+	Provisioner                   *string                                             `json:"provisioner,omitempty"`
+	Parameters                    *map[string]string                                  `json:"parameters,omitempty"`
+	ReclaimPolicy                 *corev1.PersistentVolumeReclaimPolicy               `json:"reclaimPolicy,omitempty"`
+	MountOptions                  *[]string                                           `json:"mountOptions,omitempty"`
+	AllowVolumeExpansion          *bool                                               `json:"allowVolumeExpansion,omitempty"`
+	VolumeBindingMode             *storagev1.VolumeBindingMode                        `json:"volumeBindingMode,omitempty"`
+	AllowedTopologies             *applyconfigurationscorev1.TopologySelectorTermList `json:"allowedTopologies,omitempty"`
 }
 
 // StorageClassApplyConfiguration constructs an declarative configuration of the StorageClass type for use with
@@ -41,73 +45,51 @@ func StorageClass() *StorageClassApplyConfiguration {
 	return &StorageClassApplyConfiguration{}
 }
 
-// storageClassFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in StorageClassApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type storageClassFields struct {
-	Kind                 *string                                             `json:"kind,omitempty"`       // inlined StorageClassApplyConfiguration.typeMeta.Kind field
-	APIVersion           *string                                             `json:"apiVersion,omitempty"` // inlined StorageClassApplyConfiguration.typeMeta.APIVersion field
-	ObjectMeta           *v1.ObjectMetaApplyConfiguration                    `json:"metadata,omitempty"`
-	Provisioner          *string                                             `json:"provisioner,omitempty"`
-	Parameters           *map[string]string                                  `json:"parameters,omitempty"`
-	ReclaimPolicy        *corev1.PersistentVolumeReclaimPolicy               `json:"reclaimPolicy,omitempty"`
-	MountOptions         *[]string                                           `json:"mountOptions,omitempty"`
-	AllowVolumeExpansion *bool                                               `json:"allowVolumeExpansion,omitempty"`
-	VolumeBindingMode    *storagev1.VolumeBindingMode                        `json:"volumeBindingMode,omitempty"`
-	AllowedTopologies    *applyconfigurationscorev1.TopologySelectorTermList `json:"allowedTopologies,omitempty"`
-}
-
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
 func (b *StorageClassApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *StorageClassApplyConfiguration {
-	b.typeMeta = value
-	return b
-}
-
-// RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *StorageClassApplyConfiguration) RemoveTypeMeta() *StorageClassApplyConfiguration {
-	b.typeMeta = nil
+	if value != nil {
+		b.TypeMetaApplyConfiguration = *value
+	}
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
 func (b *StorageClassApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
-	return b.typeMeta, true
+	return &b.TypeMetaApplyConfiguration, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
 func (b *StorageClassApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *StorageClassApplyConfiguration {
-	b.fields.ObjectMeta = value
+	b.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
 func (b *StorageClassApplyConfiguration) RemoveObjectMeta() *StorageClassApplyConfiguration {
-	b.fields.ObjectMeta = nil
+	b.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
 func (b *StorageClassApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
-	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
+	return b.ObjectMeta, b.ObjectMeta != nil
 }
 
 // SetProvisioner sets the Provisioner field in the declarative configuration to the given value.
 func (b *StorageClassApplyConfiguration) SetProvisioner(value string) *StorageClassApplyConfiguration {
-	b.fields.Provisioner = &value
+	b.Provisioner = &value
 	return b
 }
 
 // RemoveProvisioner removes the Provisioner field from the declarative configuration.
 func (b *StorageClassApplyConfiguration) RemoveProvisioner() *StorageClassApplyConfiguration {
-	b.fields.Provisioner = nil
+	b.Provisioner = nil
 	return b
 }
 
 // GetProvisioner gets the Provisioner field from the declarative configuration.
 func (b *StorageClassApplyConfiguration) GetProvisioner() (value string, ok bool) {
-	if v := b.fields.Provisioner; v != nil {
+	if v := b.Provisioner; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -115,19 +97,19 @@ func (b *StorageClassApplyConfiguration) GetProvisioner() (value string, ok bool
 
 // SetParameters sets the Parameters field in the declarative configuration to the given value.
 func (b *StorageClassApplyConfiguration) SetParameters(value map[string]string) *StorageClassApplyConfiguration {
-	b.fields.Parameters = &value
+	b.Parameters = &value
 	return b
 }
 
 // RemoveParameters removes the Parameters field from the declarative configuration.
 func (b *StorageClassApplyConfiguration) RemoveParameters() *StorageClassApplyConfiguration {
-	b.fields.Parameters = nil
+	b.Parameters = nil
 	return b
 }
 
 // GetParameters gets the Parameters field from the declarative configuration.
 func (b *StorageClassApplyConfiguration) GetParameters() (value map[string]string, ok bool) {
-	if v := b.fields.Parameters; v != nil {
+	if v := b.Parameters; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -135,19 +117,19 @@ func (b *StorageClassApplyConfiguration) GetParameters() (value map[string]strin
 
 // SetReclaimPolicy sets the ReclaimPolicy field in the declarative configuration to the given value.
 func (b *StorageClassApplyConfiguration) SetReclaimPolicy(value corev1.PersistentVolumeReclaimPolicy) *StorageClassApplyConfiguration {
-	b.fields.ReclaimPolicy = &value
+	b.ReclaimPolicy = &value
 	return b
 }
 
 // RemoveReclaimPolicy removes the ReclaimPolicy field from the declarative configuration.
 func (b *StorageClassApplyConfiguration) RemoveReclaimPolicy() *StorageClassApplyConfiguration {
-	b.fields.ReclaimPolicy = nil
+	b.ReclaimPolicy = nil
 	return b
 }
 
 // GetReclaimPolicy gets the ReclaimPolicy field from the declarative configuration.
 func (b *StorageClassApplyConfiguration) GetReclaimPolicy() (value corev1.PersistentVolumeReclaimPolicy, ok bool) {
-	if v := b.fields.ReclaimPolicy; v != nil {
+	if v := b.ReclaimPolicy; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -155,19 +137,19 @@ func (b *StorageClassApplyConfiguration) GetReclaimPolicy() (value corev1.Persis
 
 // SetMountOptions sets the MountOptions field in the declarative configuration to the given value.
 func (b *StorageClassApplyConfiguration) SetMountOptions(value []string) *StorageClassApplyConfiguration {
-	b.fields.MountOptions = &value
+	b.MountOptions = &value
 	return b
 }
 
 // RemoveMountOptions removes the MountOptions field from the declarative configuration.
 func (b *StorageClassApplyConfiguration) RemoveMountOptions() *StorageClassApplyConfiguration {
-	b.fields.MountOptions = nil
+	b.MountOptions = nil
 	return b
 }
 
 // GetMountOptions gets the MountOptions field from the declarative configuration.
 func (b *StorageClassApplyConfiguration) GetMountOptions() (value []string, ok bool) {
-	if v := b.fields.MountOptions; v != nil {
+	if v := b.MountOptions; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -175,19 +157,19 @@ func (b *StorageClassApplyConfiguration) GetMountOptions() (value []string, ok b
 
 // SetAllowVolumeExpansion sets the AllowVolumeExpansion field in the declarative configuration to the given value.
 func (b *StorageClassApplyConfiguration) SetAllowVolumeExpansion(value bool) *StorageClassApplyConfiguration {
-	b.fields.AllowVolumeExpansion = &value
+	b.AllowVolumeExpansion = &value
 	return b
 }
 
 // RemoveAllowVolumeExpansion removes the AllowVolumeExpansion field from the declarative configuration.
 func (b *StorageClassApplyConfiguration) RemoveAllowVolumeExpansion() *StorageClassApplyConfiguration {
-	b.fields.AllowVolumeExpansion = nil
+	b.AllowVolumeExpansion = nil
 	return b
 }
 
 // GetAllowVolumeExpansion gets the AllowVolumeExpansion field from the declarative configuration.
 func (b *StorageClassApplyConfiguration) GetAllowVolumeExpansion() (value bool, ok bool) {
-	if v := b.fields.AllowVolumeExpansion; v != nil {
+	if v := b.AllowVolumeExpansion; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -195,19 +177,19 @@ func (b *StorageClassApplyConfiguration) GetAllowVolumeExpansion() (value bool, 
 
 // SetVolumeBindingMode sets the VolumeBindingMode field in the declarative configuration to the given value.
 func (b *StorageClassApplyConfiguration) SetVolumeBindingMode(value storagev1.VolumeBindingMode) *StorageClassApplyConfiguration {
-	b.fields.VolumeBindingMode = &value
+	b.VolumeBindingMode = &value
 	return b
 }
 
 // RemoveVolumeBindingMode removes the VolumeBindingMode field from the declarative configuration.
 func (b *StorageClassApplyConfiguration) RemoveVolumeBindingMode() *StorageClassApplyConfiguration {
-	b.fields.VolumeBindingMode = nil
+	b.VolumeBindingMode = nil
 	return b
 }
 
 // GetVolumeBindingMode gets the VolumeBindingMode field from the declarative configuration.
 func (b *StorageClassApplyConfiguration) GetVolumeBindingMode() (value storagev1.VolumeBindingMode, ok bool) {
-	if v := b.fields.VolumeBindingMode; v != nil {
+	if v := b.VolumeBindingMode; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -215,64 +197,22 @@ func (b *StorageClassApplyConfiguration) GetVolumeBindingMode() (value storagev1
 
 // SetAllowedTopologies sets the AllowedTopologies field in the declarative configuration to the given value.
 func (b *StorageClassApplyConfiguration) SetAllowedTopologies(value applyconfigurationscorev1.TopologySelectorTermList) *StorageClassApplyConfiguration {
-	b.fields.AllowedTopologies = &value
+	b.AllowedTopologies = &value
 	return b
 }
 
 // RemoveAllowedTopologies removes the AllowedTopologies field from the declarative configuration.
 func (b *StorageClassApplyConfiguration) RemoveAllowedTopologies() *StorageClassApplyConfiguration {
-	b.fields.AllowedTopologies = nil
+	b.AllowedTopologies = nil
 	return b
 }
 
 // GetAllowedTopologies gets the AllowedTopologies field from the declarative configuration.
 func (b *StorageClassApplyConfiguration) GetAllowedTopologies() (value applyconfigurationscorev1.TopologySelectorTermList, ok bool) {
-	if v := b.fields.AllowedTopologies; v != nil {
+	if v := b.AllowedTopologies; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts StorageClassApplyConfiguration to unstructured.
-func (b *StorageClassApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to StorageClassApplyConfiguration, replacing the contents
-// of StorageClassApplyConfiguration.
-func (b *StorageClassApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &storageClassFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals StorageClassApplyConfiguration to JSON.
-func (b *StorageClassApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into StorageClassApplyConfiguration, replacing the contents of
-// StorageClassApplyConfiguration.
-func (b *StorageClassApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // StorageClassList represents a listAlias of StorageClassApplyConfiguration.
@@ -280,25 +220,3 @@ type StorageClassList []*StorageClassApplyConfiguration
 
 // StorageClassList represents a map of StorageClassApplyConfiguration.
 type StorageClassMap map[string]StorageClassApplyConfiguration
-
-func (b *StorageClassApplyConfiguration) preMarshal() {
-	if b.typeMeta != nil {
-		if v, ok := b.typeMeta.GetKind(); ok {
-			b.fields.Kind = &v
-		}
-		if v, ok := b.typeMeta.GetAPIVersion(); ok {
-			b.fields.APIVersion = &v
-		}
-	}
-}
-func (b *StorageClassApplyConfiguration) postUnmarshal() {
-	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
-	}
-	if b.fields.Kind != nil {
-		b.typeMeta.SetKind(*b.fields.Kind)
-	}
-	if b.fields.APIVersion != nil {
-		b.typeMeta.SetAPIVersion(*b.fields.APIVersion)
-	}
-}

@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
@@ -145,7 +146,7 @@ func (c *FakeResourceQuotas) Patch(ctx context.Context, name string, pt types.Pa
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied resourceQuota.
 func (c *FakeResourceQuotas) Apply(ctx context.Context, resourceQuota *applyconfigurationscorev1.ResourceQuotaApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ResourceQuota, err error) {
-	data, err := resourceQuota.MarshalJSON()
+	data, err := json.Marshal(resourceQuota)
 	if err != nil {
 		return nil, err
 	}

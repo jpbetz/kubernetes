@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
@@ -133,7 +134,7 @@ func (c *FakeConfigMaps) Patch(ctx context.Context, name string, pt types.PatchT
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied configMap.
 func (c *FakeConfigMaps) Apply(ctx context.Context, configMap *applyconfigurationscorev1.ConfigMapApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ConfigMap, err error) {
-	data, err := configMap.MarshalJSON()
+	data, err := json.Marshal(configMap)
 	if err != nil {
 		return nil, err
 	}

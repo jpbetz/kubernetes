@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // TypeMetaApplyConfiguration represents an declarative configuration of the TypeMeta type for use
 // with apply.
 type TypeMetaApplyConfiguration struct {
-	fields typeMetaFields
+	Kind       *string `json:"kind,omitempty"`
+	APIVersion *string `json:"apiVersion,omitempty"`
 }
 
 // TypeMetaApplyConfiguration constructs an declarative configuration of the TypeMeta type for use with
@@ -36,31 +31,21 @@ func TypeMeta() *TypeMetaApplyConfiguration {
 	return &TypeMetaApplyConfiguration{}
 }
 
-// typeMetaFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in TypeMetaApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type typeMetaFields struct {
-	Kind       *string `json:"kind,omitempty"`
-	APIVersion *string `json:"apiVersion,omitempty"`
-}
-
 // SetKind sets the Kind field in the declarative configuration to the given value.
 func (b *TypeMetaApplyConfiguration) SetKind(value string) *TypeMetaApplyConfiguration {
-	b.fields.Kind = &value
+	b.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
 func (b *TypeMetaApplyConfiguration) RemoveKind() *TypeMetaApplyConfiguration {
-	b.fields.Kind = nil
+	b.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
 func (b *TypeMetaApplyConfiguration) GetKind() (value string, ok bool) {
-	if v := b.fields.Kind; v != nil {
+	if v := b.Kind; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *TypeMetaApplyConfiguration) GetKind() (value string, ok bool) {
 
 // SetAPIVersion sets the APIVersion field in the declarative configuration to the given value.
 func (b *TypeMetaApplyConfiguration) SetAPIVersion(value string) *TypeMetaApplyConfiguration {
-	b.fields.APIVersion = &value
+	b.APIVersion = &value
 	return b
 }
 
 // RemoveAPIVersion removes the APIVersion field from the declarative configuration.
 func (b *TypeMetaApplyConfiguration) RemoveAPIVersion() *TypeMetaApplyConfiguration {
-	b.fields.APIVersion = nil
+	b.APIVersion = nil
 	return b
 }
 
 // GetAPIVersion gets the APIVersion field from the declarative configuration.
 func (b *TypeMetaApplyConfiguration) GetAPIVersion() (value string, ok bool) {
-	if v := b.fields.APIVersion; v != nil {
+	if v := b.APIVersion; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts TypeMetaApplyConfiguration to unstructured.
-func (b *TypeMetaApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to TypeMetaApplyConfiguration, replacing the contents
-// of TypeMetaApplyConfiguration.
-func (b *TypeMetaApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &typeMetaFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals TypeMetaApplyConfiguration to JSON.
-func (b *TypeMetaApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into TypeMetaApplyConfiguration, replacing the contents of
-// TypeMetaApplyConfiguration.
-func (b *TypeMetaApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // TypeMetaList represents a listAlias of TypeMetaApplyConfiguration.
@@ -133,8 +76,3 @@ type TypeMetaList []*TypeMetaApplyConfiguration
 
 // TypeMetaList represents a map of TypeMetaApplyConfiguration.
 type TypeMetaMap map[string]TypeMetaApplyConfiguration
-
-func (b *TypeMetaApplyConfiguration) preMarshal() {
-}
-func (b *TypeMetaApplyConfiguration) postUnmarshal() {
-}

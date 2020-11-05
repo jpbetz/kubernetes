@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -173,7 +174,7 @@ func (c *namespaces) Patch(ctx context.Context, name string, pt types.PatchType,
 // Apply takes the given apply declarative configuration, applies it and returns the applied namespace.
 func (c *namespaces) Apply(ctx context.Context, namespace *corev1.NamespaceApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Namespace, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := namespace.MarshalJSON()
+	data, err := json.Marshal(namespace)
 	if err != nil {
 		return nil, err
 	}

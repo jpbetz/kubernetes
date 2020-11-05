@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // EventSourceApplyConfiguration represents an declarative configuration of the EventSource type for use
 // with apply.
 type EventSourceApplyConfiguration struct {
-	fields eventSourceFields
+	Component *string `json:"component,omitempty"`
+	Host      *string `json:"host,omitempty"`
 }
 
 // EventSourceApplyConfiguration constructs an declarative configuration of the EventSource type for use with
@@ -36,31 +31,21 @@ func EventSource() *EventSourceApplyConfiguration {
 	return &EventSourceApplyConfiguration{}
 }
 
-// eventSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in EventSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type eventSourceFields struct {
-	Component *string `json:"component,omitempty"`
-	Host      *string `json:"host,omitempty"`
-}
-
 // SetComponent sets the Component field in the declarative configuration to the given value.
 func (b *EventSourceApplyConfiguration) SetComponent(value string) *EventSourceApplyConfiguration {
-	b.fields.Component = &value
+	b.Component = &value
 	return b
 }
 
 // RemoveComponent removes the Component field from the declarative configuration.
 func (b *EventSourceApplyConfiguration) RemoveComponent() *EventSourceApplyConfiguration {
-	b.fields.Component = nil
+	b.Component = nil
 	return b
 }
 
 // GetComponent gets the Component field from the declarative configuration.
 func (b *EventSourceApplyConfiguration) GetComponent() (value string, ok bool) {
-	if v := b.fields.Component; v != nil {
+	if v := b.Component; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *EventSourceApplyConfiguration) GetComponent() (value string, ok bool) {
 
 // SetHost sets the Host field in the declarative configuration to the given value.
 func (b *EventSourceApplyConfiguration) SetHost(value string) *EventSourceApplyConfiguration {
-	b.fields.Host = &value
+	b.Host = &value
 	return b
 }
 
 // RemoveHost removes the Host field from the declarative configuration.
 func (b *EventSourceApplyConfiguration) RemoveHost() *EventSourceApplyConfiguration {
-	b.fields.Host = nil
+	b.Host = nil
 	return b
 }
 
 // GetHost gets the Host field from the declarative configuration.
 func (b *EventSourceApplyConfiguration) GetHost() (value string, ok bool) {
-	if v := b.fields.Host; v != nil {
+	if v := b.Host; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts EventSourceApplyConfiguration to unstructured.
-func (b *EventSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to EventSourceApplyConfiguration, replacing the contents
-// of EventSourceApplyConfiguration.
-func (b *EventSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &eventSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals EventSourceApplyConfiguration to JSON.
-func (b *EventSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into EventSourceApplyConfiguration, replacing the contents of
-// EventSourceApplyConfiguration.
-func (b *EventSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // EventSourceList represents a listAlias of EventSourceApplyConfiguration.
@@ -133,8 +76,3 @@ type EventSourceList []*EventSourceApplyConfiguration
 
 // EventSourceList represents a map of EventSourceApplyConfiguration.
 type EventSourceMap map[string]EventSourceApplyConfiguration
-
-func (b *EventSourceApplyConfiguration) preMarshal() {
-}
-func (b *EventSourceApplyConfiguration) postUnmarshal() {
-}

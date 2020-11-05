@@ -19,16 +19,17 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // LeaseSpecApplyConfiguration represents an declarative configuration of the LeaseSpec type for use
 // with apply.
 type LeaseSpecApplyConfiguration struct {
-	fields leaseSpecFields
+	HolderIdentity       *string       `json:"holderIdentity,omitempty"`
+	LeaseDurationSeconds *int32        `json:"leaseDurationSeconds,omitempty"`
+	AcquireTime          *v1.MicroTime `json:"acquireTime,omitempty"`
+	RenewTime            *v1.MicroTime `json:"renewTime,omitempty"`
+	LeaseTransitions     *int32        `json:"leaseTransitions,omitempty"`
 }
 
 // LeaseSpecApplyConfiguration constructs an declarative configuration of the LeaseSpec type for use with
@@ -37,34 +38,21 @@ func LeaseSpec() *LeaseSpecApplyConfiguration {
 	return &LeaseSpecApplyConfiguration{}
 }
 
-// leaseSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LeaseSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type leaseSpecFields struct {
-	HolderIdentity       *string       `json:"holderIdentity,omitempty"`
-	LeaseDurationSeconds *int32        `json:"leaseDurationSeconds,omitempty"`
-	AcquireTime          *v1.MicroTime `json:"acquireTime,omitempty"`
-	RenewTime            *v1.MicroTime `json:"renewTime,omitempty"`
-	LeaseTransitions     *int32        `json:"leaseTransitions,omitempty"`
-}
-
 // SetHolderIdentity sets the HolderIdentity field in the declarative configuration to the given value.
 func (b *LeaseSpecApplyConfiguration) SetHolderIdentity(value string) *LeaseSpecApplyConfiguration {
-	b.fields.HolderIdentity = &value
+	b.HolderIdentity = &value
 	return b
 }
 
 // RemoveHolderIdentity removes the HolderIdentity field from the declarative configuration.
 func (b *LeaseSpecApplyConfiguration) RemoveHolderIdentity() *LeaseSpecApplyConfiguration {
-	b.fields.HolderIdentity = nil
+	b.HolderIdentity = nil
 	return b
 }
 
 // GetHolderIdentity gets the HolderIdentity field from the declarative configuration.
 func (b *LeaseSpecApplyConfiguration) GetHolderIdentity() (value string, ok bool) {
-	if v := b.fields.HolderIdentity; v != nil {
+	if v := b.HolderIdentity; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -72,19 +60,19 @@ func (b *LeaseSpecApplyConfiguration) GetHolderIdentity() (value string, ok bool
 
 // SetLeaseDurationSeconds sets the LeaseDurationSeconds field in the declarative configuration to the given value.
 func (b *LeaseSpecApplyConfiguration) SetLeaseDurationSeconds(value int32) *LeaseSpecApplyConfiguration {
-	b.fields.LeaseDurationSeconds = &value
+	b.LeaseDurationSeconds = &value
 	return b
 }
 
 // RemoveLeaseDurationSeconds removes the LeaseDurationSeconds field from the declarative configuration.
 func (b *LeaseSpecApplyConfiguration) RemoveLeaseDurationSeconds() *LeaseSpecApplyConfiguration {
-	b.fields.LeaseDurationSeconds = nil
+	b.LeaseDurationSeconds = nil
 	return b
 }
 
 // GetLeaseDurationSeconds gets the LeaseDurationSeconds field from the declarative configuration.
 func (b *LeaseSpecApplyConfiguration) GetLeaseDurationSeconds() (value int32, ok bool) {
-	if v := b.fields.LeaseDurationSeconds; v != nil {
+	if v := b.LeaseDurationSeconds; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -92,19 +80,19 @@ func (b *LeaseSpecApplyConfiguration) GetLeaseDurationSeconds() (value int32, ok
 
 // SetAcquireTime sets the AcquireTime field in the declarative configuration to the given value.
 func (b *LeaseSpecApplyConfiguration) SetAcquireTime(value v1.MicroTime) *LeaseSpecApplyConfiguration {
-	b.fields.AcquireTime = &value
+	b.AcquireTime = &value
 	return b
 }
 
 // RemoveAcquireTime removes the AcquireTime field from the declarative configuration.
 func (b *LeaseSpecApplyConfiguration) RemoveAcquireTime() *LeaseSpecApplyConfiguration {
-	b.fields.AcquireTime = nil
+	b.AcquireTime = nil
 	return b
 }
 
 // GetAcquireTime gets the AcquireTime field from the declarative configuration.
 func (b *LeaseSpecApplyConfiguration) GetAcquireTime() (value v1.MicroTime, ok bool) {
-	if v := b.fields.AcquireTime; v != nil {
+	if v := b.AcquireTime; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -112,19 +100,19 @@ func (b *LeaseSpecApplyConfiguration) GetAcquireTime() (value v1.MicroTime, ok b
 
 // SetRenewTime sets the RenewTime field in the declarative configuration to the given value.
 func (b *LeaseSpecApplyConfiguration) SetRenewTime(value v1.MicroTime) *LeaseSpecApplyConfiguration {
-	b.fields.RenewTime = &value
+	b.RenewTime = &value
 	return b
 }
 
 // RemoveRenewTime removes the RenewTime field from the declarative configuration.
 func (b *LeaseSpecApplyConfiguration) RemoveRenewTime() *LeaseSpecApplyConfiguration {
-	b.fields.RenewTime = nil
+	b.RenewTime = nil
 	return b
 }
 
 // GetRenewTime gets the RenewTime field from the declarative configuration.
 func (b *LeaseSpecApplyConfiguration) GetRenewTime() (value v1.MicroTime, ok bool) {
-	if v := b.fields.RenewTime; v != nil {
+	if v := b.RenewTime; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -132,64 +120,22 @@ func (b *LeaseSpecApplyConfiguration) GetRenewTime() (value v1.MicroTime, ok boo
 
 // SetLeaseTransitions sets the LeaseTransitions field in the declarative configuration to the given value.
 func (b *LeaseSpecApplyConfiguration) SetLeaseTransitions(value int32) *LeaseSpecApplyConfiguration {
-	b.fields.LeaseTransitions = &value
+	b.LeaseTransitions = &value
 	return b
 }
 
 // RemoveLeaseTransitions removes the LeaseTransitions field from the declarative configuration.
 func (b *LeaseSpecApplyConfiguration) RemoveLeaseTransitions() *LeaseSpecApplyConfiguration {
-	b.fields.LeaseTransitions = nil
+	b.LeaseTransitions = nil
 	return b
 }
 
 // GetLeaseTransitions gets the LeaseTransitions field from the declarative configuration.
 func (b *LeaseSpecApplyConfiguration) GetLeaseTransitions() (value int32, ok bool) {
-	if v := b.fields.LeaseTransitions; v != nil {
+	if v := b.LeaseTransitions; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts LeaseSpecApplyConfiguration to unstructured.
-func (b *LeaseSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to LeaseSpecApplyConfiguration, replacing the contents
-// of LeaseSpecApplyConfiguration.
-func (b *LeaseSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &leaseSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals LeaseSpecApplyConfiguration to JSON.
-func (b *LeaseSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into LeaseSpecApplyConfiguration, replacing the contents of
-// LeaseSpecApplyConfiguration.
-func (b *LeaseSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // LeaseSpecList represents a listAlias of LeaseSpecApplyConfiguration.
@@ -197,8 +143,3 @@ type LeaseSpecList []*LeaseSpecApplyConfiguration
 
 // LeaseSpecList represents a map of LeaseSpecApplyConfiguration.
 type LeaseSpecMap map[string]LeaseSpecApplyConfiguration
-
-func (b *LeaseSpecApplyConfiguration) preMarshal() {
-}
-func (b *LeaseSpecApplyConfiguration) postUnmarshal() {
-}

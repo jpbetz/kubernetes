@@ -20,6 +20,7 @@ package v1beta1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -183,7 +184,7 @@ func (c *roles) Patch(ctx context.Context, name string, pt types.PatchType, data
 // Apply takes the given apply declarative configuration, applies it and returns the applied role.
 func (c *roles) Apply(ctx context.Context, role *rbacv1beta1.RoleApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.Role, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := role.MarshalJSON()
+	data, err := json.Marshal(role)
 	if err != nil {
 		return nil, err
 	}

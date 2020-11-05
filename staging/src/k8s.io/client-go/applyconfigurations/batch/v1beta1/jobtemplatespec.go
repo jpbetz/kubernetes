@@ -19,9 +19,6 @@ limitations under the License.
 package v1beta1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	batchv1 "k8s.io/client-go/applyconfigurations/batch/v1"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
@@ -29,7 +26,8 @@ import (
 // JobTemplateSpecApplyConfiguration represents an declarative configuration of the JobTemplateSpec type for use
 // with apply.
 type JobTemplateSpecApplyConfiguration struct {
-	fields jobTemplateSpecFields
+	ObjectMeta *v1.ObjectMetaApplyConfiguration   `json:"metadata,omitempty"`
+	Spec       *batchv1.JobSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
 // JobTemplateSpecApplyConfiguration constructs an declarative configuration of the JobTemplateSpec type for use with
@@ -38,90 +36,38 @@ func JobTemplateSpec() *JobTemplateSpecApplyConfiguration {
 	return &JobTemplateSpecApplyConfiguration{}
 }
 
-// jobTemplateSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in JobTemplateSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type jobTemplateSpecFields struct {
-	ObjectMeta *v1.ObjectMetaApplyConfiguration   `json:"metadata,omitempty"`
-	Spec       *batchv1.JobSpecApplyConfiguration `json:"spec,omitempty"`
-}
-
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
 func (b *JobTemplateSpecApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *JobTemplateSpecApplyConfiguration {
-	b.fields.ObjectMeta = value
+	b.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
 func (b *JobTemplateSpecApplyConfiguration) RemoveObjectMeta() *JobTemplateSpecApplyConfiguration {
-	b.fields.ObjectMeta = nil
+	b.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
 func (b *JobTemplateSpecApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
-	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
+	return b.ObjectMeta, b.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
 func (b *JobTemplateSpecApplyConfiguration) SetSpec(value *batchv1.JobSpecApplyConfiguration) *JobTemplateSpecApplyConfiguration {
-	b.fields.Spec = value
+	b.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
 func (b *JobTemplateSpecApplyConfiguration) RemoveSpec() *JobTemplateSpecApplyConfiguration {
-	b.fields.Spec = nil
+	b.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
 func (b *JobTemplateSpecApplyConfiguration) GetSpec() (value *batchv1.JobSpecApplyConfiguration, ok bool) {
-	return b.fields.Spec, b.fields.Spec != nil
-}
-
-// ToUnstructured converts JobTemplateSpecApplyConfiguration to unstructured.
-func (b *JobTemplateSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to JobTemplateSpecApplyConfiguration, replacing the contents
-// of JobTemplateSpecApplyConfiguration.
-func (b *JobTemplateSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &jobTemplateSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals JobTemplateSpecApplyConfiguration to JSON.
-func (b *JobTemplateSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into JobTemplateSpecApplyConfiguration, replacing the contents of
-// JobTemplateSpecApplyConfiguration.
-func (b *JobTemplateSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Spec, b.Spec != nil
 }
 
 // JobTemplateSpecList represents a listAlias of JobTemplateSpecApplyConfiguration.
@@ -129,8 +75,3 @@ type JobTemplateSpecList []*JobTemplateSpecApplyConfiguration
 
 // JobTemplateSpecList represents a map of JobTemplateSpecApplyConfiguration.
 type JobTemplateSpecMap map[string]JobTemplateSpecApplyConfiguration
-
-func (b *JobTemplateSpecApplyConfiguration) preMarshal() {
-}
-func (b *JobTemplateSpecApplyConfiguration) postUnmarshal() {
-}

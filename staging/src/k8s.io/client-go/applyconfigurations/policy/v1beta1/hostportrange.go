@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1beta1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // HostPortRangeApplyConfiguration represents an declarative configuration of the HostPortRange type for use
 // with apply.
 type HostPortRangeApplyConfiguration struct {
-	fields hostPortRangeFields
+	Min *int32 `json:"min,omitempty"`
+	Max *int32 `json:"max,omitempty"`
 }
 
 // HostPortRangeApplyConfiguration constructs an declarative configuration of the HostPortRange type for use with
@@ -36,31 +31,21 @@ func HostPortRange() *HostPortRangeApplyConfiguration {
 	return &HostPortRangeApplyConfiguration{}
 }
 
-// hostPortRangeFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in HostPortRangeApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type hostPortRangeFields struct {
-	Min *int32 `json:"min,omitempty"`
-	Max *int32 `json:"max,omitempty"`
-}
-
 // SetMin sets the Min field in the declarative configuration to the given value.
 func (b *HostPortRangeApplyConfiguration) SetMin(value int32) *HostPortRangeApplyConfiguration {
-	b.fields.Min = &value
+	b.Min = &value
 	return b
 }
 
 // RemoveMin removes the Min field from the declarative configuration.
 func (b *HostPortRangeApplyConfiguration) RemoveMin() *HostPortRangeApplyConfiguration {
-	b.fields.Min = nil
+	b.Min = nil
 	return b
 }
 
 // GetMin gets the Min field from the declarative configuration.
 func (b *HostPortRangeApplyConfiguration) GetMin() (value int32, ok bool) {
-	if v := b.fields.Min; v != nil {
+	if v := b.Min; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *HostPortRangeApplyConfiguration) GetMin() (value int32, ok bool) {
 
 // SetMax sets the Max field in the declarative configuration to the given value.
 func (b *HostPortRangeApplyConfiguration) SetMax(value int32) *HostPortRangeApplyConfiguration {
-	b.fields.Max = &value
+	b.Max = &value
 	return b
 }
 
 // RemoveMax removes the Max field from the declarative configuration.
 func (b *HostPortRangeApplyConfiguration) RemoveMax() *HostPortRangeApplyConfiguration {
-	b.fields.Max = nil
+	b.Max = nil
 	return b
 }
 
 // GetMax gets the Max field from the declarative configuration.
 func (b *HostPortRangeApplyConfiguration) GetMax() (value int32, ok bool) {
-	if v := b.fields.Max; v != nil {
+	if v := b.Max; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts HostPortRangeApplyConfiguration to unstructured.
-func (b *HostPortRangeApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to HostPortRangeApplyConfiguration, replacing the contents
-// of HostPortRangeApplyConfiguration.
-func (b *HostPortRangeApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &hostPortRangeFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals HostPortRangeApplyConfiguration to JSON.
-func (b *HostPortRangeApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into HostPortRangeApplyConfiguration, replacing the contents of
-// HostPortRangeApplyConfiguration.
-func (b *HostPortRangeApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // HostPortRangeList represents a listAlias of HostPortRangeApplyConfiguration.
@@ -133,8 +76,3 @@ type HostPortRangeList []*HostPortRangeApplyConfiguration
 
 // HostPortRangeList represents a map of HostPortRangeApplyConfiguration.
 type HostPortRangeMap map[string]HostPortRangeApplyConfiguration
-
-func (b *HostPortRangeApplyConfiguration) preMarshal() {
-}
-func (b *HostPortRangeApplyConfiguration) postUnmarshal() {
-}

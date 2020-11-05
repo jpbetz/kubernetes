@@ -19,31 +19,13 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // NodeConditionApplyConfiguration represents an declarative configuration of the NodeCondition type for use
 // with apply.
 type NodeConditionApplyConfiguration struct {
-	fields nodeConditionFields
-}
-
-// NodeConditionApplyConfiguration constructs an declarative configuration of the NodeCondition type for use with
-// apply.
-func NodeCondition() *NodeConditionApplyConfiguration {
-	return &NodeConditionApplyConfiguration{}
-}
-
-// nodeConditionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NodeConditionApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type nodeConditionFields struct {
 	Type               *v1.NodeConditionType `json:"type,omitempty"`
 	Status             *v1.ConditionStatus   `json:"status,omitempty"`
 	LastHeartbeatTime  *metav1.Time          `json:"lastHeartbeatTime,omitempty"`
@@ -52,21 +34,27 @@ type nodeConditionFields struct {
 	Message            *string               `json:"message,omitempty"`
 }
 
+// NodeConditionApplyConfiguration constructs an declarative configuration of the NodeCondition type for use with
+// apply.
+func NodeCondition() *NodeConditionApplyConfiguration {
+	return &NodeConditionApplyConfiguration{}
+}
+
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *NodeConditionApplyConfiguration) SetType(value v1.NodeConditionType) *NodeConditionApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *NodeConditionApplyConfiguration) RemoveType() *NodeConditionApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *NodeConditionApplyConfiguration) GetType() (value v1.NodeConditionType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -74,19 +62,19 @@ func (b *NodeConditionApplyConfiguration) GetType() (value v1.NodeConditionType,
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
 func (b *NodeConditionApplyConfiguration) SetStatus(value v1.ConditionStatus) *NodeConditionApplyConfiguration {
-	b.fields.Status = &value
+	b.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
 func (b *NodeConditionApplyConfiguration) RemoveStatus() *NodeConditionApplyConfiguration {
-	b.fields.Status = nil
+	b.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
 func (b *NodeConditionApplyConfiguration) GetStatus() (value v1.ConditionStatus, ok bool) {
-	if v := b.fields.Status; v != nil {
+	if v := b.Status; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -94,19 +82,19 @@ func (b *NodeConditionApplyConfiguration) GetStatus() (value v1.ConditionStatus,
 
 // SetLastHeartbeatTime sets the LastHeartbeatTime field in the declarative configuration to the given value.
 func (b *NodeConditionApplyConfiguration) SetLastHeartbeatTime(value metav1.Time) *NodeConditionApplyConfiguration {
-	b.fields.LastHeartbeatTime = &value
+	b.LastHeartbeatTime = &value
 	return b
 }
 
 // RemoveLastHeartbeatTime removes the LastHeartbeatTime field from the declarative configuration.
 func (b *NodeConditionApplyConfiguration) RemoveLastHeartbeatTime() *NodeConditionApplyConfiguration {
-	b.fields.LastHeartbeatTime = nil
+	b.LastHeartbeatTime = nil
 	return b
 }
 
 // GetLastHeartbeatTime gets the LastHeartbeatTime field from the declarative configuration.
 func (b *NodeConditionApplyConfiguration) GetLastHeartbeatTime() (value metav1.Time, ok bool) {
-	if v := b.fields.LastHeartbeatTime; v != nil {
+	if v := b.LastHeartbeatTime; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -114,19 +102,19 @@ func (b *NodeConditionApplyConfiguration) GetLastHeartbeatTime() (value metav1.T
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
 func (b *NodeConditionApplyConfiguration) SetLastTransitionTime(value metav1.Time) *NodeConditionApplyConfiguration {
-	b.fields.LastTransitionTime = &value
+	b.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
 func (b *NodeConditionApplyConfiguration) RemoveLastTransitionTime() *NodeConditionApplyConfiguration {
-	b.fields.LastTransitionTime = nil
+	b.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
 func (b *NodeConditionApplyConfiguration) GetLastTransitionTime() (value metav1.Time, ok bool) {
-	if v := b.fields.LastTransitionTime; v != nil {
+	if v := b.LastTransitionTime; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -134,19 +122,19 @@ func (b *NodeConditionApplyConfiguration) GetLastTransitionTime() (value metav1.
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
 func (b *NodeConditionApplyConfiguration) SetReason(value string) *NodeConditionApplyConfiguration {
-	b.fields.Reason = &value
+	b.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
 func (b *NodeConditionApplyConfiguration) RemoveReason() *NodeConditionApplyConfiguration {
-	b.fields.Reason = nil
+	b.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
 func (b *NodeConditionApplyConfiguration) GetReason() (value string, ok bool) {
-	if v := b.fields.Reason; v != nil {
+	if v := b.Reason; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -154,64 +142,22 @@ func (b *NodeConditionApplyConfiguration) GetReason() (value string, ok bool) {
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
 func (b *NodeConditionApplyConfiguration) SetMessage(value string) *NodeConditionApplyConfiguration {
-	b.fields.Message = &value
+	b.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
 func (b *NodeConditionApplyConfiguration) RemoveMessage() *NodeConditionApplyConfiguration {
-	b.fields.Message = nil
+	b.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
 func (b *NodeConditionApplyConfiguration) GetMessage() (value string, ok bool) {
-	if v := b.fields.Message; v != nil {
+	if v := b.Message; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts NodeConditionApplyConfiguration to unstructured.
-func (b *NodeConditionApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to NodeConditionApplyConfiguration, replacing the contents
-// of NodeConditionApplyConfiguration.
-func (b *NodeConditionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &nodeConditionFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals NodeConditionApplyConfiguration to JSON.
-func (b *NodeConditionApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into NodeConditionApplyConfiguration, replacing the contents of
-// NodeConditionApplyConfiguration.
-func (b *NodeConditionApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // NodeConditionList represents a listAlias of NodeConditionApplyConfiguration.
@@ -219,8 +165,3 @@ type NodeConditionList []*NodeConditionApplyConfiguration
 
 // NodeConditionList represents a map of NodeConditionApplyConfiguration.
 type NodeConditionMap map[string]NodeConditionApplyConfiguration
-
-func (b *NodeConditionApplyConfiguration) preMarshal() {
-}
-func (b *NodeConditionApplyConfiguration) postUnmarshal() {
-}

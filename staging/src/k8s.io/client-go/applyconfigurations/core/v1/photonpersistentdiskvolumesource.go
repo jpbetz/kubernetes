@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // PhotonPersistentDiskVolumeSourceApplyConfiguration represents an declarative configuration of the PhotonPersistentDiskVolumeSource type for use
 // with apply.
 type PhotonPersistentDiskVolumeSourceApplyConfiguration struct {
-	fields photonPersistentDiskVolumeSourceFields
+	PdID   *string `json:"pdID,omitempty"`
+	FSType *string `json:"fsType,omitempty"`
 }
 
 // PhotonPersistentDiskVolumeSourceApplyConfiguration constructs an declarative configuration of the PhotonPersistentDiskVolumeSource type for use with
@@ -36,31 +31,21 @@ func PhotonPersistentDiskVolumeSource() *PhotonPersistentDiskVolumeSourceApplyCo
 	return &PhotonPersistentDiskVolumeSourceApplyConfiguration{}
 }
 
-// photonPersistentDiskVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PhotonPersistentDiskVolumeSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type photonPersistentDiskVolumeSourceFields struct {
-	PdID   *string `json:"pdID,omitempty"`
-	FSType *string `json:"fsType,omitempty"`
-}
-
 // SetPdID sets the PdID field in the declarative configuration to the given value.
 func (b *PhotonPersistentDiskVolumeSourceApplyConfiguration) SetPdID(value string) *PhotonPersistentDiskVolumeSourceApplyConfiguration {
-	b.fields.PdID = &value
+	b.PdID = &value
 	return b
 }
 
 // RemovePdID removes the PdID field from the declarative configuration.
 func (b *PhotonPersistentDiskVolumeSourceApplyConfiguration) RemovePdID() *PhotonPersistentDiskVolumeSourceApplyConfiguration {
-	b.fields.PdID = nil
+	b.PdID = nil
 	return b
 }
 
 // GetPdID gets the PdID field from the declarative configuration.
 func (b *PhotonPersistentDiskVolumeSourceApplyConfiguration) GetPdID() (value string, ok bool) {
-	if v := b.fields.PdID; v != nil {
+	if v := b.PdID; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *PhotonPersistentDiskVolumeSourceApplyConfiguration) GetPdID() (value st
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
 func (b *PhotonPersistentDiskVolumeSourceApplyConfiguration) SetFSType(value string) *PhotonPersistentDiskVolumeSourceApplyConfiguration {
-	b.fields.FSType = &value
+	b.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
 func (b *PhotonPersistentDiskVolumeSourceApplyConfiguration) RemoveFSType() *PhotonPersistentDiskVolumeSourceApplyConfiguration {
-	b.fields.FSType = nil
+	b.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
 func (b *PhotonPersistentDiskVolumeSourceApplyConfiguration) GetFSType() (value string, ok bool) {
-	if v := b.fields.FSType; v != nil {
+	if v := b.FSType; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts PhotonPersistentDiskVolumeSourceApplyConfiguration to unstructured.
-func (b *PhotonPersistentDiskVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PhotonPersistentDiskVolumeSourceApplyConfiguration, replacing the contents
-// of PhotonPersistentDiskVolumeSourceApplyConfiguration.
-func (b *PhotonPersistentDiskVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &photonPersistentDiskVolumeSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PhotonPersistentDiskVolumeSourceApplyConfiguration to JSON.
-func (b *PhotonPersistentDiskVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PhotonPersistentDiskVolumeSourceApplyConfiguration, replacing the contents of
-// PhotonPersistentDiskVolumeSourceApplyConfiguration.
-func (b *PhotonPersistentDiskVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // PhotonPersistentDiskVolumeSourceList represents a listAlias of PhotonPersistentDiskVolumeSourceApplyConfiguration.
@@ -133,8 +76,3 @@ type PhotonPersistentDiskVolumeSourceList []*PhotonPersistentDiskVolumeSourceApp
 
 // PhotonPersistentDiskVolumeSourceList represents a map of PhotonPersistentDiskVolumeSourceApplyConfiguration.
 type PhotonPersistentDiskVolumeSourceMap map[string]PhotonPersistentDiskVolumeSourceApplyConfiguration
-
-func (b *PhotonPersistentDiskVolumeSourceApplyConfiguration) preMarshal() {
-}
-func (b *PhotonPersistentDiskVolumeSourceApplyConfiguration) postUnmarshal() {
-}

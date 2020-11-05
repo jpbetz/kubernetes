@@ -18,16 +18,12 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // HandlerApplyConfiguration represents an declarative configuration of the Handler type for use
 // with apply.
 type HandlerApplyConfiguration struct {
-	fields handlerFields
+	Exec      *ExecActionApplyConfiguration      `json:"exec,omitempty"`
+	HTTPGet   *HTTPGetActionApplyConfiguration   `json:"httpGet,omitempty"`
+	TCPSocket *TCPSocketActionApplyConfiguration `json:"tcpSocket,omitempty"`
 }
 
 // HandlerApplyConfiguration constructs an declarative configuration of the Handler type for use with
@@ -36,108 +32,55 @@ func Handler() *HandlerApplyConfiguration {
 	return &HandlerApplyConfiguration{}
 }
 
-// handlerFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in HandlerApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type handlerFields struct {
-	Exec      *ExecActionApplyConfiguration      `json:"exec,omitempty"`
-	HTTPGet   *HTTPGetActionApplyConfiguration   `json:"httpGet,omitempty"`
-	TCPSocket *TCPSocketActionApplyConfiguration `json:"tcpSocket,omitempty"`
-}
-
 // SetExec sets the Exec field in the declarative configuration to the given value.
 func (b *HandlerApplyConfiguration) SetExec(value *ExecActionApplyConfiguration) *HandlerApplyConfiguration {
-	b.fields.Exec = value
+	b.Exec = value
 	return b
 }
 
 // RemoveExec removes the Exec field from the declarative configuration.
 func (b *HandlerApplyConfiguration) RemoveExec() *HandlerApplyConfiguration {
-	b.fields.Exec = nil
+	b.Exec = nil
 	return b
 }
 
 // GetExec gets the Exec field from the declarative configuration.
 func (b *HandlerApplyConfiguration) GetExec() (value *ExecActionApplyConfiguration, ok bool) {
-	return b.fields.Exec, b.fields.Exec != nil
+	return b.Exec, b.Exec != nil
 }
 
 // SetHTTPGet sets the HTTPGet field in the declarative configuration to the given value.
 func (b *HandlerApplyConfiguration) SetHTTPGet(value *HTTPGetActionApplyConfiguration) *HandlerApplyConfiguration {
-	b.fields.HTTPGet = value
+	b.HTTPGet = value
 	return b
 }
 
 // RemoveHTTPGet removes the HTTPGet field from the declarative configuration.
 func (b *HandlerApplyConfiguration) RemoveHTTPGet() *HandlerApplyConfiguration {
-	b.fields.HTTPGet = nil
+	b.HTTPGet = nil
 	return b
 }
 
 // GetHTTPGet gets the HTTPGet field from the declarative configuration.
 func (b *HandlerApplyConfiguration) GetHTTPGet() (value *HTTPGetActionApplyConfiguration, ok bool) {
-	return b.fields.HTTPGet, b.fields.HTTPGet != nil
+	return b.HTTPGet, b.HTTPGet != nil
 }
 
 // SetTCPSocket sets the TCPSocket field in the declarative configuration to the given value.
 func (b *HandlerApplyConfiguration) SetTCPSocket(value *TCPSocketActionApplyConfiguration) *HandlerApplyConfiguration {
-	b.fields.TCPSocket = value
+	b.TCPSocket = value
 	return b
 }
 
 // RemoveTCPSocket removes the TCPSocket field from the declarative configuration.
 func (b *HandlerApplyConfiguration) RemoveTCPSocket() *HandlerApplyConfiguration {
-	b.fields.TCPSocket = nil
+	b.TCPSocket = nil
 	return b
 }
 
 // GetTCPSocket gets the TCPSocket field from the declarative configuration.
 func (b *HandlerApplyConfiguration) GetTCPSocket() (value *TCPSocketActionApplyConfiguration, ok bool) {
-	return b.fields.TCPSocket, b.fields.TCPSocket != nil
-}
-
-// ToUnstructured converts HandlerApplyConfiguration to unstructured.
-func (b *HandlerApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to HandlerApplyConfiguration, replacing the contents
-// of HandlerApplyConfiguration.
-func (b *HandlerApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &handlerFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals HandlerApplyConfiguration to JSON.
-func (b *HandlerApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into HandlerApplyConfiguration, replacing the contents of
-// HandlerApplyConfiguration.
-func (b *HandlerApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.TCPSocket, b.TCPSocket != nil
 }
 
 // HandlerList represents a listAlias of HandlerApplyConfiguration.
@@ -145,8 +88,3 @@ type HandlerList []*HandlerApplyConfiguration
 
 // HandlerList represents a map of HandlerApplyConfiguration.
 type HandlerMap map[string]HandlerApplyConfiguration
-
-func (b *HandlerApplyConfiguration) preMarshal() {
-}
-func (b *HandlerApplyConfiguration) postUnmarshal() {
-}

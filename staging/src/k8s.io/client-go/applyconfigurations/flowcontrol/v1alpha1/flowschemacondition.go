@@ -19,17 +19,18 @@ limitations under the License.
 package v1alpha1
 
 import (
-	json "encoding/json"
-
 	v1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // FlowSchemaConditionApplyConfiguration represents an declarative configuration of the FlowSchemaCondition type for use
 // with apply.
 type FlowSchemaConditionApplyConfiguration struct {
-	fields flowSchemaConditionFields
+	Type               *v1alpha1.FlowSchemaConditionType `json:"type,omitempty"`
+	Status             *v1alpha1.ConditionStatus         `json:"status,omitempty"`
+	LastTransitionTime *v1.Time                          `json:"lastTransitionTime,omitempty"`
+	Reason             *string                           `json:"reason,omitempty"`
+	Message            *string                           `json:"message,omitempty"`
 }
 
 // FlowSchemaConditionApplyConfiguration constructs an declarative configuration of the FlowSchemaCondition type for use with
@@ -38,34 +39,21 @@ func FlowSchemaCondition() *FlowSchemaConditionApplyConfiguration {
 	return &FlowSchemaConditionApplyConfiguration{}
 }
 
-// flowSchemaConditionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in FlowSchemaConditionApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type flowSchemaConditionFields struct {
-	Type               *v1alpha1.FlowSchemaConditionType `json:"type,omitempty"`
-	Status             *v1alpha1.ConditionStatus         `json:"status,omitempty"`
-	LastTransitionTime *v1.Time                          `json:"lastTransitionTime,omitempty"`
-	Reason             *string                           `json:"reason,omitempty"`
-	Message            *string                           `json:"message,omitempty"`
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *FlowSchemaConditionApplyConfiguration) SetType(value v1alpha1.FlowSchemaConditionType) *FlowSchemaConditionApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *FlowSchemaConditionApplyConfiguration) RemoveType() *FlowSchemaConditionApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *FlowSchemaConditionApplyConfiguration) GetType() (value v1alpha1.FlowSchemaConditionType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -73,19 +61,19 @@ func (b *FlowSchemaConditionApplyConfiguration) GetType() (value v1alpha1.FlowSc
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
 func (b *FlowSchemaConditionApplyConfiguration) SetStatus(value v1alpha1.ConditionStatus) *FlowSchemaConditionApplyConfiguration {
-	b.fields.Status = &value
+	b.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
 func (b *FlowSchemaConditionApplyConfiguration) RemoveStatus() *FlowSchemaConditionApplyConfiguration {
-	b.fields.Status = nil
+	b.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
 func (b *FlowSchemaConditionApplyConfiguration) GetStatus() (value v1alpha1.ConditionStatus, ok bool) {
-	if v := b.fields.Status; v != nil {
+	if v := b.Status; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -93,19 +81,19 @@ func (b *FlowSchemaConditionApplyConfiguration) GetStatus() (value v1alpha1.Cond
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
 func (b *FlowSchemaConditionApplyConfiguration) SetLastTransitionTime(value v1.Time) *FlowSchemaConditionApplyConfiguration {
-	b.fields.LastTransitionTime = &value
+	b.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
 func (b *FlowSchemaConditionApplyConfiguration) RemoveLastTransitionTime() *FlowSchemaConditionApplyConfiguration {
-	b.fields.LastTransitionTime = nil
+	b.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
 func (b *FlowSchemaConditionApplyConfiguration) GetLastTransitionTime() (value v1.Time, ok bool) {
-	if v := b.fields.LastTransitionTime; v != nil {
+	if v := b.LastTransitionTime; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -113,19 +101,19 @@ func (b *FlowSchemaConditionApplyConfiguration) GetLastTransitionTime() (value v
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
 func (b *FlowSchemaConditionApplyConfiguration) SetReason(value string) *FlowSchemaConditionApplyConfiguration {
-	b.fields.Reason = &value
+	b.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
 func (b *FlowSchemaConditionApplyConfiguration) RemoveReason() *FlowSchemaConditionApplyConfiguration {
-	b.fields.Reason = nil
+	b.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
 func (b *FlowSchemaConditionApplyConfiguration) GetReason() (value string, ok bool) {
-	if v := b.fields.Reason; v != nil {
+	if v := b.Reason; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -133,64 +121,22 @@ func (b *FlowSchemaConditionApplyConfiguration) GetReason() (value string, ok bo
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
 func (b *FlowSchemaConditionApplyConfiguration) SetMessage(value string) *FlowSchemaConditionApplyConfiguration {
-	b.fields.Message = &value
+	b.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
 func (b *FlowSchemaConditionApplyConfiguration) RemoveMessage() *FlowSchemaConditionApplyConfiguration {
-	b.fields.Message = nil
+	b.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
 func (b *FlowSchemaConditionApplyConfiguration) GetMessage() (value string, ok bool) {
-	if v := b.fields.Message; v != nil {
+	if v := b.Message; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts FlowSchemaConditionApplyConfiguration to unstructured.
-func (b *FlowSchemaConditionApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to FlowSchemaConditionApplyConfiguration, replacing the contents
-// of FlowSchemaConditionApplyConfiguration.
-func (b *FlowSchemaConditionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &flowSchemaConditionFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals FlowSchemaConditionApplyConfiguration to JSON.
-func (b *FlowSchemaConditionApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into FlowSchemaConditionApplyConfiguration, replacing the contents of
-// FlowSchemaConditionApplyConfiguration.
-func (b *FlowSchemaConditionApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // FlowSchemaConditionList represents a listAlias of FlowSchemaConditionApplyConfiguration.
@@ -198,8 +144,3 @@ type FlowSchemaConditionList []*FlowSchemaConditionApplyConfiguration
 
 // FlowSchemaConditionList represents a map of FlowSchemaConditionApplyConfiguration.
 type FlowSchemaConditionMap map[string]FlowSchemaConditionApplyConfiguration
-
-func (b *FlowSchemaConditionApplyConfiguration) preMarshal() {
-}
-func (b *FlowSchemaConditionApplyConfiguration) postUnmarshal() {
-}

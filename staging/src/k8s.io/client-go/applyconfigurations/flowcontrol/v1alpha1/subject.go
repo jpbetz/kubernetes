@@ -19,16 +19,16 @@ limitations under the License.
 package v1alpha1
 
 import (
-	json "encoding/json"
-
 	v1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // SubjectApplyConfiguration represents an declarative configuration of the Subject type for use
 // with apply.
 type SubjectApplyConfiguration struct {
-	fields subjectFields
+	Kind           *v1alpha1.SubjectKind                    `json:"kind,omitempty"`
+	User           *UserSubjectApplyConfiguration           `json:"user,omitempty"`
+	Group          *GroupSubjectApplyConfiguration          `json:"group,omitempty"`
+	ServiceAccount *ServiceAccountSubjectApplyConfiguration `json:"serviceAccount,omitempty"`
 }
 
 // SubjectApplyConfiguration constructs an declarative configuration of the Subject type for use with
@@ -37,33 +37,21 @@ func Subject() *SubjectApplyConfiguration {
 	return &SubjectApplyConfiguration{}
 }
 
-// subjectFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SubjectApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type subjectFields struct {
-	Kind           *v1alpha1.SubjectKind                    `json:"kind,omitempty"`
-	User           *UserSubjectApplyConfiguration           `json:"user,omitempty"`
-	Group          *GroupSubjectApplyConfiguration          `json:"group,omitempty"`
-	ServiceAccount *ServiceAccountSubjectApplyConfiguration `json:"serviceAccount,omitempty"`
-}
-
 // SetKind sets the Kind field in the declarative configuration to the given value.
 func (b *SubjectApplyConfiguration) SetKind(value v1alpha1.SubjectKind) *SubjectApplyConfiguration {
-	b.fields.Kind = &value
+	b.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
 func (b *SubjectApplyConfiguration) RemoveKind() *SubjectApplyConfiguration {
-	b.fields.Kind = nil
+	b.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
 func (b *SubjectApplyConfiguration) GetKind() (value v1alpha1.SubjectKind, ok bool) {
-	if v := b.fields.Kind; v != nil {
+	if v := b.Kind; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -71,95 +59,53 @@ func (b *SubjectApplyConfiguration) GetKind() (value v1alpha1.SubjectKind, ok bo
 
 // SetUser sets the User field in the declarative configuration to the given value.
 func (b *SubjectApplyConfiguration) SetUser(value *UserSubjectApplyConfiguration) *SubjectApplyConfiguration {
-	b.fields.User = value
+	b.User = value
 	return b
 }
 
 // RemoveUser removes the User field from the declarative configuration.
 func (b *SubjectApplyConfiguration) RemoveUser() *SubjectApplyConfiguration {
-	b.fields.User = nil
+	b.User = nil
 	return b
 }
 
 // GetUser gets the User field from the declarative configuration.
 func (b *SubjectApplyConfiguration) GetUser() (value *UserSubjectApplyConfiguration, ok bool) {
-	return b.fields.User, b.fields.User != nil
+	return b.User, b.User != nil
 }
 
 // SetGroup sets the Group field in the declarative configuration to the given value.
 func (b *SubjectApplyConfiguration) SetGroup(value *GroupSubjectApplyConfiguration) *SubjectApplyConfiguration {
-	b.fields.Group = value
+	b.Group = value
 	return b
 }
 
 // RemoveGroup removes the Group field from the declarative configuration.
 func (b *SubjectApplyConfiguration) RemoveGroup() *SubjectApplyConfiguration {
-	b.fields.Group = nil
+	b.Group = nil
 	return b
 }
 
 // GetGroup gets the Group field from the declarative configuration.
 func (b *SubjectApplyConfiguration) GetGroup() (value *GroupSubjectApplyConfiguration, ok bool) {
-	return b.fields.Group, b.fields.Group != nil
+	return b.Group, b.Group != nil
 }
 
 // SetServiceAccount sets the ServiceAccount field in the declarative configuration to the given value.
 func (b *SubjectApplyConfiguration) SetServiceAccount(value *ServiceAccountSubjectApplyConfiguration) *SubjectApplyConfiguration {
-	b.fields.ServiceAccount = value
+	b.ServiceAccount = value
 	return b
 }
 
 // RemoveServiceAccount removes the ServiceAccount field from the declarative configuration.
 func (b *SubjectApplyConfiguration) RemoveServiceAccount() *SubjectApplyConfiguration {
-	b.fields.ServiceAccount = nil
+	b.ServiceAccount = nil
 	return b
 }
 
 // GetServiceAccount gets the ServiceAccount field from the declarative configuration.
 func (b *SubjectApplyConfiguration) GetServiceAccount() (value *ServiceAccountSubjectApplyConfiguration, ok bool) {
-	return b.fields.ServiceAccount, b.fields.ServiceAccount != nil
-}
-
-// ToUnstructured converts SubjectApplyConfiguration to unstructured.
-func (b *SubjectApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to SubjectApplyConfiguration, replacing the contents
-// of SubjectApplyConfiguration.
-func (b *SubjectApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &subjectFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals SubjectApplyConfiguration to JSON.
-func (b *SubjectApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into SubjectApplyConfiguration, replacing the contents of
-// SubjectApplyConfiguration.
-func (b *SubjectApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.ServiceAccount, b.ServiceAccount != nil
 }
 
 // SubjectList represents a listAlias of SubjectApplyConfiguration.
@@ -167,8 +113,3 @@ type SubjectList []*SubjectApplyConfiguration
 
 // SubjectList represents a map of SubjectApplyConfiguration.
 type SubjectMap map[string]SubjectApplyConfiguration
-
-func (b *SubjectApplyConfiguration) preMarshal() {
-}
-func (b *SubjectApplyConfiguration) postUnmarshal() {
-}

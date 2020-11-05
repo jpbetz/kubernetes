@@ -19,17 +19,17 @@ limitations under the License.
 package v2beta1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
 	resource "k8s.io/apimachinery/pkg/api/resource"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // ContainerResourceMetricStatusApplyConfiguration represents an declarative configuration of the ContainerResourceMetricStatus type for use
 // with apply.
 type ContainerResourceMetricStatusApplyConfiguration struct {
-	fields containerResourceMetricStatusFields
+	Name                      *v1.ResourceName   `json:"name,omitempty"`
+	CurrentAverageUtilization *int32             `json:"currentAverageUtilization,omitempty"`
+	CurrentAverageValue       *resource.Quantity `json:"currentAverageValue,omitempty"`
+	Container                 *string            `json:"container,omitempty"`
 }
 
 // ContainerResourceMetricStatusApplyConfiguration constructs an declarative configuration of the ContainerResourceMetricStatus type for use with
@@ -38,33 +38,21 @@ func ContainerResourceMetricStatus() *ContainerResourceMetricStatusApplyConfigur
 	return &ContainerResourceMetricStatusApplyConfiguration{}
 }
 
-// containerResourceMetricStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ContainerResourceMetricStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type containerResourceMetricStatusFields struct {
-	Name                      *v1.ResourceName   `json:"name,omitempty"`
-	CurrentAverageUtilization *int32             `json:"currentAverageUtilization,omitempty"`
-	CurrentAverageValue       *resource.Quantity `json:"currentAverageValue,omitempty"`
-	Container                 *string            `json:"container,omitempty"`
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *ContainerResourceMetricStatusApplyConfiguration) SetName(value v1.ResourceName) *ContainerResourceMetricStatusApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *ContainerResourceMetricStatusApplyConfiguration) RemoveName() *ContainerResourceMetricStatusApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *ContainerResourceMetricStatusApplyConfiguration) GetName() (value v1.ResourceName, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -72,19 +60,19 @@ func (b *ContainerResourceMetricStatusApplyConfiguration) GetName() (value v1.Re
 
 // SetCurrentAverageUtilization sets the CurrentAverageUtilization field in the declarative configuration to the given value.
 func (b *ContainerResourceMetricStatusApplyConfiguration) SetCurrentAverageUtilization(value int32) *ContainerResourceMetricStatusApplyConfiguration {
-	b.fields.CurrentAverageUtilization = &value
+	b.CurrentAverageUtilization = &value
 	return b
 }
 
 // RemoveCurrentAverageUtilization removes the CurrentAverageUtilization field from the declarative configuration.
 func (b *ContainerResourceMetricStatusApplyConfiguration) RemoveCurrentAverageUtilization() *ContainerResourceMetricStatusApplyConfiguration {
-	b.fields.CurrentAverageUtilization = nil
+	b.CurrentAverageUtilization = nil
 	return b
 }
 
 // GetCurrentAverageUtilization gets the CurrentAverageUtilization field from the declarative configuration.
 func (b *ContainerResourceMetricStatusApplyConfiguration) GetCurrentAverageUtilization() (value int32, ok bool) {
-	if v := b.fields.CurrentAverageUtilization; v != nil {
+	if v := b.CurrentAverageUtilization; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -92,19 +80,19 @@ func (b *ContainerResourceMetricStatusApplyConfiguration) GetCurrentAverageUtili
 
 // SetCurrentAverageValue sets the CurrentAverageValue field in the declarative configuration to the given value.
 func (b *ContainerResourceMetricStatusApplyConfiguration) SetCurrentAverageValue(value resource.Quantity) *ContainerResourceMetricStatusApplyConfiguration {
-	b.fields.CurrentAverageValue = &value
+	b.CurrentAverageValue = &value
 	return b
 }
 
 // RemoveCurrentAverageValue removes the CurrentAverageValue field from the declarative configuration.
 func (b *ContainerResourceMetricStatusApplyConfiguration) RemoveCurrentAverageValue() *ContainerResourceMetricStatusApplyConfiguration {
-	b.fields.CurrentAverageValue = nil
+	b.CurrentAverageValue = nil
 	return b
 }
 
 // GetCurrentAverageValue gets the CurrentAverageValue field from the declarative configuration.
 func (b *ContainerResourceMetricStatusApplyConfiguration) GetCurrentAverageValue() (value resource.Quantity, ok bool) {
-	if v := b.fields.CurrentAverageValue; v != nil {
+	if v := b.CurrentAverageValue; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -112,64 +100,22 @@ func (b *ContainerResourceMetricStatusApplyConfiguration) GetCurrentAverageValue
 
 // SetContainer sets the Container field in the declarative configuration to the given value.
 func (b *ContainerResourceMetricStatusApplyConfiguration) SetContainer(value string) *ContainerResourceMetricStatusApplyConfiguration {
-	b.fields.Container = &value
+	b.Container = &value
 	return b
 }
 
 // RemoveContainer removes the Container field from the declarative configuration.
 func (b *ContainerResourceMetricStatusApplyConfiguration) RemoveContainer() *ContainerResourceMetricStatusApplyConfiguration {
-	b.fields.Container = nil
+	b.Container = nil
 	return b
 }
 
 // GetContainer gets the Container field from the declarative configuration.
 func (b *ContainerResourceMetricStatusApplyConfiguration) GetContainer() (value string, ok bool) {
-	if v := b.fields.Container; v != nil {
+	if v := b.Container; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ContainerResourceMetricStatusApplyConfiguration to unstructured.
-func (b *ContainerResourceMetricStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ContainerResourceMetricStatusApplyConfiguration, replacing the contents
-// of ContainerResourceMetricStatusApplyConfiguration.
-func (b *ContainerResourceMetricStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &containerResourceMetricStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ContainerResourceMetricStatusApplyConfiguration to JSON.
-func (b *ContainerResourceMetricStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ContainerResourceMetricStatusApplyConfiguration, replacing the contents of
-// ContainerResourceMetricStatusApplyConfiguration.
-func (b *ContainerResourceMetricStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ContainerResourceMetricStatusList represents a listAlias of ContainerResourceMetricStatusApplyConfiguration.
@@ -177,8 +123,3 @@ type ContainerResourceMetricStatusList []*ContainerResourceMetricStatusApplyConf
 
 // ContainerResourceMetricStatusList represents a map of ContainerResourceMetricStatusApplyConfiguration.
 type ContainerResourceMetricStatusMap map[string]ContainerResourceMetricStatusApplyConfiguration
-
-func (b *ContainerResourceMetricStatusApplyConfiguration) preMarshal() {
-}
-func (b *ContainerResourceMetricStatusApplyConfiguration) postUnmarshal() {
-}

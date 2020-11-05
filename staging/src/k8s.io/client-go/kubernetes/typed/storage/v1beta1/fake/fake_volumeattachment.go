@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	v1beta1 "k8s.io/api/storage/v1beta1"
@@ -136,7 +137,7 @@ func (c *FakeVolumeAttachments) Patch(ctx context.Context, name string, pt types
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied volumeAttachment.
 func (c *FakeVolumeAttachments) Apply(ctx context.Context, volumeAttachment *storagev1beta1.VolumeAttachmentApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.VolumeAttachment, err error) {
-	data, err := volumeAttachment.MarshalJSON()
+	data, err := json.Marshal(volumeAttachment)
 	if err != nil {
 		return nil, err
 	}

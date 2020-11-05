@@ -20,6 +20,7 @@ package v1beta1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -183,7 +184,7 @@ func (c *events) Patch(ctx context.Context, name string, pt types.PatchType, dat
 // Apply takes the given apply declarative configuration, applies it and returns the applied event.
 func (c *events) Apply(ctx context.Context, event *eventsv1beta1.EventApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.Event, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := event.MarshalJSON()
+	data, err := json.Marshal(event)
 	if err != nil {
 		return nil, err
 	}

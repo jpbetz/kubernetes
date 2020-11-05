@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -183,7 +184,7 @@ func (c *limitRanges) Patch(ctx context.Context, name string, pt types.PatchType
 // Apply takes the given apply declarative configuration, applies it and returns the applied limitRange.
 func (c *limitRanges) Apply(ctx context.Context, limitRange *corev1.LimitRangeApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.LimitRange, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := limitRange.MarshalJSON()
+	data, err := json.Marshal(limitRange)
 	if err != nil {
 		return nil, err
 	}

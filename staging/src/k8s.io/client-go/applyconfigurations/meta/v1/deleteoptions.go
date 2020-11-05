@@ -19,17 +19,18 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // DeleteOptionsApplyConfiguration represents an declarative configuration of the DeleteOptions type for use
 // with apply.
 type DeleteOptionsApplyConfiguration struct {
-	typeMeta *TypeMetaApplyConfiguration // inlined type
-	fields   deleteOptionsFields
+	TypeMetaApplyConfiguration `json:",inline"`
+	GracePeriodSeconds         *int64                           `json:"gracePeriodSeconds,omitempty"`
+	Preconditions              *PreconditionsApplyConfiguration `json:"preconditions,omitempty"`
+	OrphanDependents           *bool                            `json:"orphanDependents,omitempty"`
+	PropagationPolicy          *metav1.DeletionPropagation      `json:"propagationPolicy,omitempty"`
+	DryRun                     *[]string                        `json:"dryRun,omitempty"`
 }
 
 // DeleteOptionsApplyConfiguration constructs an declarative configuration of the DeleteOptions type for use with
@@ -38,53 +39,34 @@ func DeleteOptions() *DeleteOptionsApplyConfiguration {
 	return &DeleteOptionsApplyConfiguration{}
 }
 
-// deleteOptionsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in DeleteOptionsApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type deleteOptionsFields struct {
-	Kind               *string                          `json:"kind,omitempty"`       // inlined DeleteOptionsApplyConfiguration.typeMeta.Kind field
-	APIVersion         *string                          `json:"apiVersion,omitempty"` // inlined DeleteOptionsApplyConfiguration.typeMeta.APIVersion field
-	GracePeriodSeconds *int64                           `json:"gracePeriodSeconds,omitempty"`
-	Preconditions      *PreconditionsApplyConfiguration `json:"preconditions,omitempty"`
-	OrphanDependents   *bool                            `json:"orphanDependents,omitempty"`
-	PropagationPolicy  *metav1.DeletionPropagation      `json:"propagationPolicy,omitempty"`
-	DryRun             *[]string                        `json:"dryRun,omitempty"`
-}
-
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
 func (b *DeleteOptionsApplyConfiguration) SetTypeMeta(value *TypeMetaApplyConfiguration) *DeleteOptionsApplyConfiguration {
-	b.typeMeta = value
-	return b
-}
-
-// RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *DeleteOptionsApplyConfiguration) RemoveTypeMeta() *DeleteOptionsApplyConfiguration {
-	b.typeMeta = nil
+	if value != nil {
+		b.TypeMetaApplyConfiguration = *value
+	}
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
 func (b *DeleteOptionsApplyConfiguration) GetTypeMeta() (value *TypeMetaApplyConfiguration, ok bool) {
-	return b.typeMeta, true
+	return &b.TypeMetaApplyConfiguration, true
 }
 
 // SetGracePeriodSeconds sets the GracePeriodSeconds field in the declarative configuration to the given value.
 func (b *DeleteOptionsApplyConfiguration) SetGracePeriodSeconds(value int64) *DeleteOptionsApplyConfiguration {
-	b.fields.GracePeriodSeconds = &value
+	b.GracePeriodSeconds = &value
 	return b
 }
 
 // RemoveGracePeriodSeconds removes the GracePeriodSeconds field from the declarative configuration.
 func (b *DeleteOptionsApplyConfiguration) RemoveGracePeriodSeconds() *DeleteOptionsApplyConfiguration {
-	b.fields.GracePeriodSeconds = nil
+	b.GracePeriodSeconds = nil
 	return b
 }
 
 // GetGracePeriodSeconds gets the GracePeriodSeconds field from the declarative configuration.
 func (b *DeleteOptionsApplyConfiguration) GetGracePeriodSeconds() (value int64, ok bool) {
-	if v := b.fields.GracePeriodSeconds; v != nil {
+	if v := b.GracePeriodSeconds; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -92,36 +74,36 @@ func (b *DeleteOptionsApplyConfiguration) GetGracePeriodSeconds() (value int64, 
 
 // SetPreconditions sets the Preconditions field in the declarative configuration to the given value.
 func (b *DeleteOptionsApplyConfiguration) SetPreconditions(value *PreconditionsApplyConfiguration) *DeleteOptionsApplyConfiguration {
-	b.fields.Preconditions = value
+	b.Preconditions = value
 	return b
 }
 
 // RemovePreconditions removes the Preconditions field from the declarative configuration.
 func (b *DeleteOptionsApplyConfiguration) RemovePreconditions() *DeleteOptionsApplyConfiguration {
-	b.fields.Preconditions = nil
+	b.Preconditions = nil
 	return b
 }
 
 // GetPreconditions gets the Preconditions field from the declarative configuration.
 func (b *DeleteOptionsApplyConfiguration) GetPreconditions() (value *PreconditionsApplyConfiguration, ok bool) {
-	return b.fields.Preconditions, b.fields.Preconditions != nil
+	return b.Preconditions, b.Preconditions != nil
 }
 
 // SetOrphanDependents sets the OrphanDependents field in the declarative configuration to the given value.
 func (b *DeleteOptionsApplyConfiguration) SetOrphanDependents(value bool) *DeleteOptionsApplyConfiguration {
-	b.fields.OrphanDependents = &value
+	b.OrphanDependents = &value
 	return b
 }
 
 // RemoveOrphanDependents removes the OrphanDependents field from the declarative configuration.
 func (b *DeleteOptionsApplyConfiguration) RemoveOrphanDependents() *DeleteOptionsApplyConfiguration {
-	b.fields.OrphanDependents = nil
+	b.OrphanDependents = nil
 	return b
 }
 
 // GetOrphanDependents gets the OrphanDependents field from the declarative configuration.
 func (b *DeleteOptionsApplyConfiguration) GetOrphanDependents() (value bool, ok bool) {
-	if v := b.fields.OrphanDependents; v != nil {
+	if v := b.OrphanDependents; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -129,19 +111,19 @@ func (b *DeleteOptionsApplyConfiguration) GetOrphanDependents() (value bool, ok 
 
 // SetPropagationPolicy sets the PropagationPolicy field in the declarative configuration to the given value.
 func (b *DeleteOptionsApplyConfiguration) SetPropagationPolicy(value metav1.DeletionPropagation) *DeleteOptionsApplyConfiguration {
-	b.fields.PropagationPolicy = &value
+	b.PropagationPolicy = &value
 	return b
 }
 
 // RemovePropagationPolicy removes the PropagationPolicy field from the declarative configuration.
 func (b *DeleteOptionsApplyConfiguration) RemovePropagationPolicy() *DeleteOptionsApplyConfiguration {
-	b.fields.PropagationPolicy = nil
+	b.PropagationPolicy = nil
 	return b
 }
 
 // GetPropagationPolicy gets the PropagationPolicy field from the declarative configuration.
 func (b *DeleteOptionsApplyConfiguration) GetPropagationPolicy() (value metav1.DeletionPropagation, ok bool) {
-	if v := b.fields.PropagationPolicy; v != nil {
+	if v := b.PropagationPolicy; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -149,64 +131,22 @@ func (b *DeleteOptionsApplyConfiguration) GetPropagationPolicy() (value metav1.D
 
 // SetDryRun sets the DryRun field in the declarative configuration to the given value.
 func (b *DeleteOptionsApplyConfiguration) SetDryRun(value []string) *DeleteOptionsApplyConfiguration {
-	b.fields.DryRun = &value
+	b.DryRun = &value
 	return b
 }
 
 // RemoveDryRun removes the DryRun field from the declarative configuration.
 func (b *DeleteOptionsApplyConfiguration) RemoveDryRun() *DeleteOptionsApplyConfiguration {
-	b.fields.DryRun = nil
+	b.DryRun = nil
 	return b
 }
 
 // GetDryRun gets the DryRun field from the declarative configuration.
 func (b *DeleteOptionsApplyConfiguration) GetDryRun() (value []string, ok bool) {
-	if v := b.fields.DryRun; v != nil {
+	if v := b.DryRun; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts DeleteOptionsApplyConfiguration to unstructured.
-func (b *DeleteOptionsApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to DeleteOptionsApplyConfiguration, replacing the contents
-// of DeleteOptionsApplyConfiguration.
-func (b *DeleteOptionsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &deleteOptionsFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals DeleteOptionsApplyConfiguration to JSON.
-func (b *DeleteOptionsApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into DeleteOptionsApplyConfiguration, replacing the contents of
-// DeleteOptionsApplyConfiguration.
-func (b *DeleteOptionsApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // DeleteOptionsList represents a listAlias of DeleteOptionsApplyConfiguration.
@@ -214,25 +154,3 @@ type DeleteOptionsList []*DeleteOptionsApplyConfiguration
 
 // DeleteOptionsList represents a map of DeleteOptionsApplyConfiguration.
 type DeleteOptionsMap map[string]DeleteOptionsApplyConfiguration
-
-func (b *DeleteOptionsApplyConfiguration) preMarshal() {
-	if b.typeMeta != nil {
-		if v, ok := b.typeMeta.GetKind(); ok {
-			b.fields.Kind = &v
-		}
-		if v, ok := b.typeMeta.GetAPIVersion(); ok {
-			b.fields.APIVersion = &v
-		}
-	}
-}
-func (b *DeleteOptionsApplyConfiguration) postUnmarshal() {
-	if b.typeMeta == nil {
-		b.typeMeta = &TypeMetaApplyConfiguration{}
-	}
-	if b.fields.Kind != nil {
-		b.typeMeta.SetKind(*b.fields.Kind)
-	}
-	if b.fields.APIVersion != nil {
-		b.typeMeta.SetAPIVersion(*b.fields.APIVersion)
-	}
-}

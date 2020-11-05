@@ -19,16 +19,15 @@ limitations under the License.
 package v2beta2
 
 import (
-	json "encoding/json"
-
 	v2beta2 "k8s.io/api/autoscaling/v2beta2"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // HPAScalingPolicyApplyConfiguration represents an declarative configuration of the HPAScalingPolicy type for use
 // with apply.
 type HPAScalingPolicyApplyConfiguration struct {
-	fields hPAScalingPolicyFields
+	Type          *v2beta2.HPAScalingPolicyType `json:"type,omitempty"`
+	Value         *int32                        `json:"value,omitempty"`
+	PeriodSeconds *int32                        `json:"periodSeconds,omitempty"`
 }
 
 // HPAScalingPolicyApplyConfiguration constructs an declarative configuration of the HPAScalingPolicy type for use with
@@ -37,32 +36,21 @@ func HPAScalingPolicy() *HPAScalingPolicyApplyConfiguration {
 	return &HPAScalingPolicyApplyConfiguration{}
 }
 
-// hPAScalingPolicyFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in HPAScalingPolicyApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type hPAScalingPolicyFields struct {
-	Type          *v2beta2.HPAScalingPolicyType `json:"type,omitempty"`
-	Value         *int32                        `json:"value,omitempty"`
-	PeriodSeconds *int32                        `json:"periodSeconds,omitempty"`
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *HPAScalingPolicyApplyConfiguration) SetType(value v2beta2.HPAScalingPolicyType) *HPAScalingPolicyApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *HPAScalingPolicyApplyConfiguration) RemoveType() *HPAScalingPolicyApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *HPAScalingPolicyApplyConfiguration) GetType() (value v2beta2.HPAScalingPolicyType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,19 +58,19 @@ func (b *HPAScalingPolicyApplyConfiguration) GetType() (value v2beta2.HPAScaling
 
 // SetValue sets the Value field in the declarative configuration to the given value.
 func (b *HPAScalingPolicyApplyConfiguration) SetValue(value int32) *HPAScalingPolicyApplyConfiguration {
-	b.fields.Value = &value
+	b.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
 func (b *HPAScalingPolicyApplyConfiguration) RemoveValue() *HPAScalingPolicyApplyConfiguration {
-	b.fields.Value = nil
+	b.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
 func (b *HPAScalingPolicyApplyConfiguration) GetValue() (value int32, ok bool) {
-	if v := b.fields.Value; v != nil {
+	if v := b.Value; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -90,64 +78,22 @@ func (b *HPAScalingPolicyApplyConfiguration) GetValue() (value int32, ok bool) {
 
 // SetPeriodSeconds sets the PeriodSeconds field in the declarative configuration to the given value.
 func (b *HPAScalingPolicyApplyConfiguration) SetPeriodSeconds(value int32) *HPAScalingPolicyApplyConfiguration {
-	b.fields.PeriodSeconds = &value
+	b.PeriodSeconds = &value
 	return b
 }
 
 // RemovePeriodSeconds removes the PeriodSeconds field from the declarative configuration.
 func (b *HPAScalingPolicyApplyConfiguration) RemovePeriodSeconds() *HPAScalingPolicyApplyConfiguration {
-	b.fields.PeriodSeconds = nil
+	b.PeriodSeconds = nil
 	return b
 }
 
 // GetPeriodSeconds gets the PeriodSeconds field from the declarative configuration.
 func (b *HPAScalingPolicyApplyConfiguration) GetPeriodSeconds() (value int32, ok bool) {
-	if v := b.fields.PeriodSeconds; v != nil {
+	if v := b.PeriodSeconds; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts HPAScalingPolicyApplyConfiguration to unstructured.
-func (b *HPAScalingPolicyApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to HPAScalingPolicyApplyConfiguration, replacing the contents
-// of HPAScalingPolicyApplyConfiguration.
-func (b *HPAScalingPolicyApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &hPAScalingPolicyFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals HPAScalingPolicyApplyConfiguration to JSON.
-func (b *HPAScalingPolicyApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into HPAScalingPolicyApplyConfiguration, replacing the contents of
-// HPAScalingPolicyApplyConfiguration.
-func (b *HPAScalingPolicyApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // HPAScalingPolicyList represents a listAlias of HPAScalingPolicyApplyConfiguration.
@@ -155,8 +101,3 @@ type HPAScalingPolicyList []*HPAScalingPolicyApplyConfiguration
 
 // HPAScalingPolicyList represents a map of HPAScalingPolicyApplyConfiguration.
 type HPAScalingPolicyMap map[string]HPAScalingPolicyApplyConfiguration
-
-func (b *HPAScalingPolicyApplyConfiguration) preMarshal() {
-}
-func (b *HPAScalingPolicyApplyConfiguration) postUnmarshal() {
-}

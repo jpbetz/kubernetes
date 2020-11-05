@@ -19,16 +19,15 @@ limitations under the License.
 package v2beta2
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // ContainerResourceMetricSourceApplyConfiguration represents an declarative configuration of the ContainerResourceMetricSource type for use
 // with apply.
 type ContainerResourceMetricSourceApplyConfiguration struct {
-	fields containerResourceMetricSourceFields
+	Name      *v1.ResourceName                `json:"name,omitempty"`
+	Target    *MetricTargetApplyConfiguration `json:"target,omitempty"`
+	Container *string                         `json:"container,omitempty"`
 }
 
 // ContainerResourceMetricSourceApplyConfiguration constructs an declarative configuration of the ContainerResourceMetricSource type for use with
@@ -37,32 +36,21 @@ func ContainerResourceMetricSource() *ContainerResourceMetricSourceApplyConfigur
 	return &ContainerResourceMetricSourceApplyConfiguration{}
 }
 
-// containerResourceMetricSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ContainerResourceMetricSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type containerResourceMetricSourceFields struct {
-	Name      *v1.ResourceName                `json:"name,omitempty"`
-	Target    *MetricTargetApplyConfiguration `json:"target,omitempty"`
-	Container *string                         `json:"container,omitempty"`
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *ContainerResourceMetricSourceApplyConfiguration) SetName(value v1.ResourceName) *ContainerResourceMetricSourceApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *ContainerResourceMetricSourceApplyConfiguration) RemoveName() *ContainerResourceMetricSourceApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *ContainerResourceMetricSourceApplyConfiguration) GetName() (value v1.ResourceName, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,81 +58,39 @@ func (b *ContainerResourceMetricSourceApplyConfiguration) GetName() (value v1.Re
 
 // SetTarget sets the Target field in the declarative configuration to the given value.
 func (b *ContainerResourceMetricSourceApplyConfiguration) SetTarget(value *MetricTargetApplyConfiguration) *ContainerResourceMetricSourceApplyConfiguration {
-	b.fields.Target = value
+	b.Target = value
 	return b
 }
 
 // RemoveTarget removes the Target field from the declarative configuration.
 func (b *ContainerResourceMetricSourceApplyConfiguration) RemoveTarget() *ContainerResourceMetricSourceApplyConfiguration {
-	b.fields.Target = nil
+	b.Target = nil
 	return b
 }
 
 // GetTarget gets the Target field from the declarative configuration.
 func (b *ContainerResourceMetricSourceApplyConfiguration) GetTarget() (value *MetricTargetApplyConfiguration, ok bool) {
-	return b.fields.Target, b.fields.Target != nil
+	return b.Target, b.Target != nil
 }
 
 // SetContainer sets the Container field in the declarative configuration to the given value.
 func (b *ContainerResourceMetricSourceApplyConfiguration) SetContainer(value string) *ContainerResourceMetricSourceApplyConfiguration {
-	b.fields.Container = &value
+	b.Container = &value
 	return b
 }
 
 // RemoveContainer removes the Container field from the declarative configuration.
 func (b *ContainerResourceMetricSourceApplyConfiguration) RemoveContainer() *ContainerResourceMetricSourceApplyConfiguration {
-	b.fields.Container = nil
+	b.Container = nil
 	return b
 }
 
 // GetContainer gets the Container field from the declarative configuration.
 func (b *ContainerResourceMetricSourceApplyConfiguration) GetContainer() (value string, ok bool) {
-	if v := b.fields.Container; v != nil {
+	if v := b.Container; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ContainerResourceMetricSourceApplyConfiguration to unstructured.
-func (b *ContainerResourceMetricSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ContainerResourceMetricSourceApplyConfiguration, replacing the contents
-// of ContainerResourceMetricSourceApplyConfiguration.
-func (b *ContainerResourceMetricSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &containerResourceMetricSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ContainerResourceMetricSourceApplyConfiguration to JSON.
-func (b *ContainerResourceMetricSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ContainerResourceMetricSourceApplyConfiguration, replacing the contents of
-// ContainerResourceMetricSourceApplyConfiguration.
-func (b *ContainerResourceMetricSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ContainerResourceMetricSourceList represents a listAlias of ContainerResourceMetricSourceApplyConfiguration.
@@ -152,8 +98,3 @@ type ContainerResourceMetricSourceList []*ContainerResourceMetricSourceApplyConf
 
 // ContainerResourceMetricSourceList represents a map of ContainerResourceMetricSourceApplyConfiguration.
 type ContainerResourceMetricSourceMap map[string]ContainerResourceMetricSourceApplyConfiguration
-
-func (b *ContainerResourceMetricSourceApplyConfiguration) preMarshal() {
-}
-func (b *ContainerResourceMetricSourceApplyConfiguration) postUnmarshal() {
-}

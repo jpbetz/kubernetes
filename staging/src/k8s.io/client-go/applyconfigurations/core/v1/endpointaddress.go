@@ -18,16 +18,13 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // EndpointAddressApplyConfiguration represents an declarative configuration of the EndpointAddress type for use
 // with apply.
 type EndpointAddressApplyConfiguration struct {
-	fields endpointAddressFields
+	IP        *string                            `json:"ip,omitempty"`
+	Hostname  *string                            `json:"hostname,omitempty"`
+	NodeName  *string                            `json:"nodeName,omitempty"`
+	TargetRef *ObjectReferenceApplyConfiguration `json:"targetRef,omitempty"`
 }
 
 // EndpointAddressApplyConfiguration constructs an declarative configuration of the EndpointAddress type for use with
@@ -36,33 +33,21 @@ func EndpointAddress() *EndpointAddressApplyConfiguration {
 	return &EndpointAddressApplyConfiguration{}
 }
 
-// endpointAddressFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in EndpointAddressApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type endpointAddressFields struct {
-	IP        *string                            `json:"ip,omitempty"`
-	Hostname  *string                            `json:"hostname,omitempty"`
-	NodeName  *string                            `json:"nodeName,omitempty"`
-	TargetRef *ObjectReferenceApplyConfiguration `json:"targetRef,omitempty"`
-}
-
 // SetIP sets the IP field in the declarative configuration to the given value.
 func (b *EndpointAddressApplyConfiguration) SetIP(value string) *EndpointAddressApplyConfiguration {
-	b.fields.IP = &value
+	b.IP = &value
 	return b
 }
 
 // RemoveIP removes the IP field from the declarative configuration.
 func (b *EndpointAddressApplyConfiguration) RemoveIP() *EndpointAddressApplyConfiguration {
-	b.fields.IP = nil
+	b.IP = nil
 	return b
 }
 
 // GetIP gets the IP field from the declarative configuration.
 func (b *EndpointAddressApplyConfiguration) GetIP() (value string, ok bool) {
-	if v := b.fields.IP; v != nil {
+	if v := b.IP; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,19 +55,19 @@ func (b *EndpointAddressApplyConfiguration) GetIP() (value string, ok bool) {
 
 // SetHostname sets the Hostname field in the declarative configuration to the given value.
 func (b *EndpointAddressApplyConfiguration) SetHostname(value string) *EndpointAddressApplyConfiguration {
-	b.fields.Hostname = &value
+	b.Hostname = &value
 	return b
 }
 
 // RemoveHostname removes the Hostname field from the declarative configuration.
 func (b *EndpointAddressApplyConfiguration) RemoveHostname() *EndpointAddressApplyConfiguration {
-	b.fields.Hostname = nil
+	b.Hostname = nil
 	return b
 }
 
 // GetHostname gets the Hostname field from the declarative configuration.
 func (b *EndpointAddressApplyConfiguration) GetHostname() (value string, ok bool) {
-	if v := b.fields.Hostname; v != nil {
+	if v := b.Hostname; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -90,19 +75,19 @@ func (b *EndpointAddressApplyConfiguration) GetHostname() (value string, ok bool
 
 // SetNodeName sets the NodeName field in the declarative configuration to the given value.
 func (b *EndpointAddressApplyConfiguration) SetNodeName(value string) *EndpointAddressApplyConfiguration {
-	b.fields.NodeName = &value
+	b.NodeName = &value
 	return b
 }
 
 // RemoveNodeName removes the NodeName field from the declarative configuration.
 func (b *EndpointAddressApplyConfiguration) RemoveNodeName() *EndpointAddressApplyConfiguration {
-	b.fields.NodeName = nil
+	b.NodeName = nil
 	return b
 }
 
 // GetNodeName gets the NodeName field from the declarative configuration.
 func (b *EndpointAddressApplyConfiguration) GetNodeName() (value string, ok bool) {
-	if v := b.fields.NodeName; v != nil {
+	if v := b.NodeName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -110,61 +95,19 @@ func (b *EndpointAddressApplyConfiguration) GetNodeName() (value string, ok bool
 
 // SetTargetRef sets the TargetRef field in the declarative configuration to the given value.
 func (b *EndpointAddressApplyConfiguration) SetTargetRef(value *ObjectReferenceApplyConfiguration) *EndpointAddressApplyConfiguration {
-	b.fields.TargetRef = value
+	b.TargetRef = value
 	return b
 }
 
 // RemoveTargetRef removes the TargetRef field from the declarative configuration.
 func (b *EndpointAddressApplyConfiguration) RemoveTargetRef() *EndpointAddressApplyConfiguration {
-	b.fields.TargetRef = nil
+	b.TargetRef = nil
 	return b
 }
 
 // GetTargetRef gets the TargetRef field from the declarative configuration.
 func (b *EndpointAddressApplyConfiguration) GetTargetRef() (value *ObjectReferenceApplyConfiguration, ok bool) {
-	return b.fields.TargetRef, b.fields.TargetRef != nil
-}
-
-// ToUnstructured converts EndpointAddressApplyConfiguration to unstructured.
-func (b *EndpointAddressApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to EndpointAddressApplyConfiguration, replacing the contents
-// of EndpointAddressApplyConfiguration.
-func (b *EndpointAddressApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &endpointAddressFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals EndpointAddressApplyConfiguration to JSON.
-func (b *EndpointAddressApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into EndpointAddressApplyConfiguration, replacing the contents of
-// EndpointAddressApplyConfiguration.
-func (b *EndpointAddressApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.TargetRef, b.TargetRef != nil
 }
 
 // EndpointAddressList represents a listAlias of EndpointAddressApplyConfiguration.
@@ -172,8 +115,3 @@ type EndpointAddressList []*EndpointAddressApplyConfiguration
 
 // EndpointAddressList represents a map of EndpointAddressApplyConfiguration.
 type EndpointAddressMap map[string]EndpointAddressApplyConfiguration
-
-func (b *EndpointAddressApplyConfiguration) preMarshal() {
-}
-func (b *EndpointAddressApplyConfiguration) postUnmarshal() {
-}

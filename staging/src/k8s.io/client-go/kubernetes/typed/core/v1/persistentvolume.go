@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -189,7 +190,7 @@ func (c *persistentVolumes) Patch(ctx context.Context, name string, pt types.Pat
 // Apply takes the given apply declarative configuration, applies it and returns the applied persistentVolume.
 func (c *persistentVolumes) Apply(ctx context.Context, persistentVolume *corev1.PersistentVolumeApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.PersistentVolume, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := persistentVolume.MarshalJSON()
+	data, err := json.Marshal(persistentVolume)
 	if err != nil {
 		return nil, err
 	}

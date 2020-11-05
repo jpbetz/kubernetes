@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	v1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
@@ -136,7 +137,7 @@ func (c *FakeFlowSchemas) Patch(ctx context.Context, name string, pt types.Patch
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied flowSchema.
 func (c *FakeFlowSchemas) Apply(ctx context.Context, flowSchema *flowcontrolv1alpha1.FlowSchemaApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.FlowSchema, err error) {
-	data, err := flowSchema.MarshalJSON()
+	data, err := json.Marshal(flowSchema)
 	if err != nil {
 		return nil, err
 	}

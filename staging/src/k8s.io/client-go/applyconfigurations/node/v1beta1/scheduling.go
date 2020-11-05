@@ -19,16 +19,14 @@ limitations under the License.
 package v1beta1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/core/v1"
 )
 
 // SchedulingApplyConfiguration represents an declarative configuration of the Scheduling type for use
 // with apply.
 type SchedulingApplyConfiguration struct {
-	fields schedulingFields
+	NodeSelector *map[string]string `json:"nodeSelector,omitempty"`
+	Tolerations  *v1.TolerationList `json:"tolerations,omitempty"`
 }
 
 // SchedulingApplyConfiguration constructs an declarative configuration of the Scheduling type for use with
@@ -37,31 +35,21 @@ func Scheduling() *SchedulingApplyConfiguration {
 	return &SchedulingApplyConfiguration{}
 }
 
-// schedulingFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SchedulingApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type schedulingFields struct {
-	NodeSelector *map[string]string `json:"nodeSelector,omitempty"`
-	Tolerations  *v1.TolerationList `json:"tolerations,omitempty"`
-}
-
 // SetNodeSelector sets the NodeSelector field in the declarative configuration to the given value.
 func (b *SchedulingApplyConfiguration) SetNodeSelector(value map[string]string) *SchedulingApplyConfiguration {
-	b.fields.NodeSelector = &value
+	b.NodeSelector = &value
 	return b
 }
 
 // RemoveNodeSelector removes the NodeSelector field from the declarative configuration.
 func (b *SchedulingApplyConfiguration) RemoveNodeSelector() *SchedulingApplyConfiguration {
-	b.fields.NodeSelector = nil
+	b.NodeSelector = nil
 	return b
 }
 
 // GetNodeSelector gets the NodeSelector field from the declarative configuration.
 func (b *SchedulingApplyConfiguration) GetNodeSelector() (value map[string]string, ok bool) {
-	if v := b.fields.NodeSelector; v != nil {
+	if v := b.NodeSelector; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,64 +57,22 @@ func (b *SchedulingApplyConfiguration) GetNodeSelector() (value map[string]strin
 
 // SetTolerations sets the Tolerations field in the declarative configuration to the given value.
 func (b *SchedulingApplyConfiguration) SetTolerations(value v1.TolerationList) *SchedulingApplyConfiguration {
-	b.fields.Tolerations = &value
+	b.Tolerations = &value
 	return b
 }
 
 // RemoveTolerations removes the Tolerations field from the declarative configuration.
 func (b *SchedulingApplyConfiguration) RemoveTolerations() *SchedulingApplyConfiguration {
-	b.fields.Tolerations = nil
+	b.Tolerations = nil
 	return b
 }
 
 // GetTolerations gets the Tolerations field from the declarative configuration.
 func (b *SchedulingApplyConfiguration) GetTolerations() (value v1.TolerationList, ok bool) {
-	if v := b.fields.Tolerations; v != nil {
+	if v := b.Tolerations; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts SchedulingApplyConfiguration to unstructured.
-func (b *SchedulingApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to SchedulingApplyConfiguration, replacing the contents
-// of SchedulingApplyConfiguration.
-func (b *SchedulingApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &schedulingFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals SchedulingApplyConfiguration to JSON.
-func (b *SchedulingApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into SchedulingApplyConfiguration, replacing the contents of
-// SchedulingApplyConfiguration.
-func (b *SchedulingApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // SchedulingList represents a listAlias of SchedulingApplyConfiguration.
@@ -134,8 +80,3 @@ type SchedulingList []*SchedulingApplyConfiguration
 
 // SchedulingList represents a map of SchedulingApplyConfiguration.
 type SchedulingMap map[string]SchedulingApplyConfiguration
-
-func (b *SchedulingApplyConfiguration) preMarshal() {
-}
-func (b *SchedulingApplyConfiguration) postUnmarshal() {
-}

@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -186,7 +187,7 @@ func (c *serviceAccounts) Patch(ctx context.Context, name string, pt types.Patch
 // Apply takes the given apply declarative configuration, applies it and returns the applied serviceAccount.
 func (c *serviceAccounts) Apply(ctx context.Context, serviceAccount *corev1.ServiceAccountApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ServiceAccount, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := serviceAccount.MarshalJSON()
+	data, err := json.Marshal(serviceAccount)
 	if err != nil {
 		return nil, err
 	}

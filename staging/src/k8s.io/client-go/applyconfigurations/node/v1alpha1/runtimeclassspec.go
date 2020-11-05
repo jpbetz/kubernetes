@@ -18,16 +18,12 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // RuntimeClassSpecApplyConfiguration represents an declarative configuration of the RuntimeClassSpec type for use
 // with apply.
 type RuntimeClassSpecApplyConfiguration struct {
-	fields runtimeClassSpecFields
+	RuntimeHandler *string                       `json:"runtimeHandler,omitempty"`
+	Overhead       *OverheadApplyConfiguration   `json:"overhead,omitempty"`
+	Scheduling     *SchedulingApplyConfiguration `json:"scheduling,omitempty"`
 }
 
 // RuntimeClassSpecApplyConfiguration constructs an declarative configuration of the RuntimeClassSpec type for use with
@@ -36,32 +32,21 @@ func RuntimeClassSpec() *RuntimeClassSpecApplyConfiguration {
 	return &RuntimeClassSpecApplyConfiguration{}
 }
 
-// runtimeClassSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in RuntimeClassSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type runtimeClassSpecFields struct {
-	RuntimeHandler *string                       `json:"runtimeHandler,omitempty"`
-	Overhead       *OverheadApplyConfiguration   `json:"overhead,omitempty"`
-	Scheduling     *SchedulingApplyConfiguration `json:"scheduling,omitempty"`
-}
-
 // SetRuntimeHandler sets the RuntimeHandler field in the declarative configuration to the given value.
 func (b *RuntimeClassSpecApplyConfiguration) SetRuntimeHandler(value string) *RuntimeClassSpecApplyConfiguration {
-	b.fields.RuntimeHandler = &value
+	b.RuntimeHandler = &value
 	return b
 }
 
 // RemoveRuntimeHandler removes the RuntimeHandler field from the declarative configuration.
 func (b *RuntimeClassSpecApplyConfiguration) RemoveRuntimeHandler() *RuntimeClassSpecApplyConfiguration {
-	b.fields.RuntimeHandler = nil
+	b.RuntimeHandler = nil
 	return b
 }
 
 // GetRuntimeHandler gets the RuntimeHandler field from the declarative configuration.
 func (b *RuntimeClassSpecApplyConfiguration) GetRuntimeHandler() (value string, ok bool) {
-	if v := b.fields.RuntimeHandler; v != nil {
+	if v := b.RuntimeHandler; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,78 +54,36 @@ func (b *RuntimeClassSpecApplyConfiguration) GetRuntimeHandler() (value string, 
 
 // SetOverhead sets the Overhead field in the declarative configuration to the given value.
 func (b *RuntimeClassSpecApplyConfiguration) SetOverhead(value *OverheadApplyConfiguration) *RuntimeClassSpecApplyConfiguration {
-	b.fields.Overhead = value
+	b.Overhead = value
 	return b
 }
 
 // RemoveOverhead removes the Overhead field from the declarative configuration.
 func (b *RuntimeClassSpecApplyConfiguration) RemoveOverhead() *RuntimeClassSpecApplyConfiguration {
-	b.fields.Overhead = nil
+	b.Overhead = nil
 	return b
 }
 
 // GetOverhead gets the Overhead field from the declarative configuration.
 func (b *RuntimeClassSpecApplyConfiguration) GetOverhead() (value *OverheadApplyConfiguration, ok bool) {
-	return b.fields.Overhead, b.fields.Overhead != nil
+	return b.Overhead, b.Overhead != nil
 }
 
 // SetScheduling sets the Scheduling field in the declarative configuration to the given value.
 func (b *RuntimeClassSpecApplyConfiguration) SetScheduling(value *SchedulingApplyConfiguration) *RuntimeClassSpecApplyConfiguration {
-	b.fields.Scheduling = value
+	b.Scheduling = value
 	return b
 }
 
 // RemoveScheduling removes the Scheduling field from the declarative configuration.
 func (b *RuntimeClassSpecApplyConfiguration) RemoveScheduling() *RuntimeClassSpecApplyConfiguration {
-	b.fields.Scheduling = nil
+	b.Scheduling = nil
 	return b
 }
 
 // GetScheduling gets the Scheduling field from the declarative configuration.
 func (b *RuntimeClassSpecApplyConfiguration) GetScheduling() (value *SchedulingApplyConfiguration, ok bool) {
-	return b.fields.Scheduling, b.fields.Scheduling != nil
-}
-
-// ToUnstructured converts RuntimeClassSpecApplyConfiguration to unstructured.
-func (b *RuntimeClassSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to RuntimeClassSpecApplyConfiguration, replacing the contents
-// of RuntimeClassSpecApplyConfiguration.
-func (b *RuntimeClassSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &runtimeClassSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals RuntimeClassSpecApplyConfiguration to JSON.
-func (b *RuntimeClassSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into RuntimeClassSpecApplyConfiguration, replacing the contents of
-// RuntimeClassSpecApplyConfiguration.
-func (b *RuntimeClassSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Scheduling, b.Scheduling != nil
 }
 
 // RuntimeClassSpecList represents a listAlias of RuntimeClassSpecApplyConfiguration.
@@ -148,8 +91,3 @@ type RuntimeClassSpecList []*RuntimeClassSpecApplyConfiguration
 
 // RuntimeClassSpecList represents a map of RuntimeClassSpecApplyConfiguration.
 type RuntimeClassSpecMap map[string]RuntimeClassSpecApplyConfiguration
-
-func (b *RuntimeClassSpecApplyConfiguration) preMarshal() {
-}
-func (b *RuntimeClassSpecApplyConfiguration) postUnmarshal() {
-}

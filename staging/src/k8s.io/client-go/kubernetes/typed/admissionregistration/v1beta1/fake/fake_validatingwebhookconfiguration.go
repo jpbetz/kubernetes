@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	v1beta1 "k8s.io/api/admissionregistration/v1beta1"
@@ -125,7 +126,7 @@ func (c *FakeValidatingWebhookConfigurations) Patch(ctx context.Context, name st
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied validatingWebhookConfiguration.
 func (c *FakeValidatingWebhookConfigurations) Apply(ctx context.Context, validatingWebhookConfiguration *admissionregistrationv1beta1.ValidatingWebhookConfigurationApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ValidatingWebhookConfiguration, err error) {
-	data, err := validatingWebhookConfiguration.MarshalJSON()
+	data, err := json.Marshal(validatingWebhookConfiguration)
 	if err != nil {
 		return nil, err
 	}

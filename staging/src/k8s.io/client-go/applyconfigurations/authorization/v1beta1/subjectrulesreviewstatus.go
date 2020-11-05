@@ -18,16 +18,13 @@ limitations under the License.
 
 package v1beta1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // SubjectRulesReviewStatusApplyConfiguration represents an declarative configuration of the SubjectRulesReviewStatus type for use
 // with apply.
 type SubjectRulesReviewStatusApplyConfiguration struct {
-	fields subjectRulesReviewStatusFields
+	ResourceRules    *ResourceRuleList    `json:"resourceRules,omitempty"`
+	NonResourceRules *NonResourceRuleList `json:"nonResourceRules,omitempty"`
+	Incomplete       *bool                `json:"incomplete,omitempty"`
+	EvaluationError  *string              `json:"evaluationError,omitempty"`
 }
 
 // SubjectRulesReviewStatusApplyConfiguration constructs an declarative configuration of the SubjectRulesReviewStatus type for use with
@@ -36,33 +33,21 @@ func SubjectRulesReviewStatus() *SubjectRulesReviewStatusApplyConfiguration {
 	return &SubjectRulesReviewStatusApplyConfiguration{}
 }
 
-// subjectRulesReviewStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SubjectRulesReviewStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type subjectRulesReviewStatusFields struct {
-	ResourceRules    *ResourceRuleList    `json:"resourceRules,omitempty"`
-	NonResourceRules *NonResourceRuleList `json:"nonResourceRules,omitempty"`
-	Incomplete       *bool                `json:"incomplete,omitempty"`
-	EvaluationError  *string              `json:"evaluationError,omitempty"`
-}
-
 // SetResourceRules sets the ResourceRules field in the declarative configuration to the given value.
 func (b *SubjectRulesReviewStatusApplyConfiguration) SetResourceRules(value ResourceRuleList) *SubjectRulesReviewStatusApplyConfiguration {
-	b.fields.ResourceRules = &value
+	b.ResourceRules = &value
 	return b
 }
 
 // RemoveResourceRules removes the ResourceRules field from the declarative configuration.
 func (b *SubjectRulesReviewStatusApplyConfiguration) RemoveResourceRules() *SubjectRulesReviewStatusApplyConfiguration {
-	b.fields.ResourceRules = nil
+	b.ResourceRules = nil
 	return b
 }
 
 // GetResourceRules gets the ResourceRules field from the declarative configuration.
 func (b *SubjectRulesReviewStatusApplyConfiguration) GetResourceRules() (value ResourceRuleList, ok bool) {
-	if v := b.fields.ResourceRules; v != nil {
+	if v := b.ResourceRules; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,19 +55,19 @@ func (b *SubjectRulesReviewStatusApplyConfiguration) GetResourceRules() (value R
 
 // SetNonResourceRules sets the NonResourceRules field in the declarative configuration to the given value.
 func (b *SubjectRulesReviewStatusApplyConfiguration) SetNonResourceRules(value NonResourceRuleList) *SubjectRulesReviewStatusApplyConfiguration {
-	b.fields.NonResourceRules = &value
+	b.NonResourceRules = &value
 	return b
 }
 
 // RemoveNonResourceRules removes the NonResourceRules field from the declarative configuration.
 func (b *SubjectRulesReviewStatusApplyConfiguration) RemoveNonResourceRules() *SubjectRulesReviewStatusApplyConfiguration {
-	b.fields.NonResourceRules = nil
+	b.NonResourceRules = nil
 	return b
 }
 
 // GetNonResourceRules gets the NonResourceRules field from the declarative configuration.
 func (b *SubjectRulesReviewStatusApplyConfiguration) GetNonResourceRules() (value NonResourceRuleList, ok bool) {
-	if v := b.fields.NonResourceRules; v != nil {
+	if v := b.NonResourceRules; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -90,19 +75,19 @@ func (b *SubjectRulesReviewStatusApplyConfiguration) GetNonResourceRules() (valu
 
 // SetIncomplete sets the Incomplete field in the declarative configuration to the given value.
 func (b *SubjectRulesReviewStatusApplyConfiguration) SetIncomplete(value bool) *SubjectRulesReviewStatusApplyConfiguration {
-	b.fields.Incomplete = &value
+	b.Incomplete = &value
 	return b
 }
 
 // RemoveIncomplete removes the Incomplete field from the declarative configuration.
 func (b *SubjectRulesReviewStatusApplyConfiguration) RemoveIncomplete() *SubjectRulesReviewStatusApplyConfiguration {
-	b.fields.Incomplete = nil
+	b.Incomplete = nil
 	return b
 }
 
 // GetIncomplete gets the Incomplete field from the declarative configuration.
 func (b *SubjectRulesReviewStatusApplyConfiguration) GetIncomplete() (value bool, ok bool) {
-	if v := b.fields.Incomplete; v != nil {
+	if v := b.Incomplete; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -110,64 +95,22 @@ func (b *SubjectRulesReviewStatusApplyConfiguration) GetIncomplete() (value bool
 
 // SetEvaluationError sets the EvaluationError field in the declarative configuration to the given value.
 func (b *SubjectRulesReviewStatusApplyConfiguration) SetEvaluationError(value string) *SubjectRulesReviewStatusApplyConfiguration {
-	b.fields.EvaluationError = &value
+	b.EvaluationError = &value
 	return b
 }
 
 // RemoveEvaluationError removes the EvaluationError field from the declarative configuration.
 func (b *SubjectRulesReviewStatusApplyConfiguration) RemoveEvaluationError() *SubjectRulesReviewStatusApplyConfiguration {
-	b.fields.EvaluationError = nil
+	b.EvaluationError = nil
 	return b
 }
 
 // GetEvaluationError gets the EvaluationError field from the declarative configuration.
 func (b *SubjectRulesReviewStatusApplyConfiguration) GetEvaluationError() (value string, ok bool) {
-	if v := b.fields.EvaluationError; v != nil {
+	if v := b.EvaluationError; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts SubjectRulesReviewStatusApplyConfiguration to unstructured.
-func (b *SubjectRulesReviewStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to SubjectRulesReviewStatusApplyConfiguration, replacing the contents
-// of SubjectRulesReviewStatusApplyConfiguration.
-func (b *SubjectRulesReviewStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &subjectRulesReviewStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals SubjectRulesReviewStatusApplyConfiguration to JSON.
-func (b *SubjectRulesReviewStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into SubjectRulesReviewStatusApplyConfiguration, replacing the contents of
-// SubjectRulesReviewStatusApplyConfiguration.
-func (b *SubjectRulesReviewStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // SubjectRulesReviewStatusList represents a listAlias of SubjectRulesReviewStatusApplyConfiguration.
@@ -175,8 +118,3 @@ type SubjectRulesReviewStatusList []*SubjectRulesReviewStatusApplyConfiguration
 
 // SubjectRulesReviewStatusList represents a map of SubjectRulesReviewStatusApplyConfiguration.
 type SubjectRulesReviewStatusMap map[string]SubjectRulesReviewStatusApplyConfiguration
-
-func (b *SubjectRulesReviewStatusApplyConfiguration) preMarshal() {
-}
-func (b *SubjectRulesReviewStatusApplyConfiguration) postUnmarshal() {
-}

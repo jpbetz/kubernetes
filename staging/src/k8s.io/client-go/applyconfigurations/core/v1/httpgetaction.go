@@ -19,17 +19,18 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	intstr "k8s.io/apimachinery/pkg/util/intstr"
 )
 
 // HTTPGetActionApplyConfiguration represents an declarative configuration of the HTTPGetAction type for use
 // with apply.
 type HTTPGetActionApplyConfiguration struct {
-	fields hTTPGetActionFields
+	Path        *string             `json:"path,omitempty"`
+	Port        *intstr.IntOrString `json:"port,omitempty"`
+	Host        *string             `json:"host,omitempty"`
+	Scheme      *v1.URIScheme       `json:"scheme,omitempty"`
+	HTTPHeaders *HTTPHeaderList     `json:"httpHeaders,omitempty"`
 }
 
 // HTTPGetActionApplyConfiguration constructs an declarative configuration of the HTTPGetAction type for use with
@@ -38,34 +39,21 @@ func HTTPGetAction() *HTTPGetActionApplyConfiguration {
 	return &HTTPGetActionApplyConfiguration{}
 }
 
-// hTTPGetActionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in HTTPGetActionApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type hTTPGetActionFields struct {
-	Path        *string             `json:"path,omitempty"`
-	Port        *intstr.IntOrString `json:"port,omitempty"`
-	Host        *string             `json:"host,omitempty"`
-	Scheme      *v1.URIScheme       `json:"scheme,omitempty"`
-	HTTPHeaders *HTTPHeaderList     `json:"httpHeaders,omitempty"`
-}
-
 // SetPath sets the Path field in the declarative configuration to the given value.
 func (b *HTTPGetActionApplyConfiguration) SetPath(value string) *HTTPGetActionApplyConfiguration {
-	b.fields.Path = &value
+	b.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
 func (b *HTTPGetActionApplyConfiguration) RemovePath() *HTTPGetActionApplyConfiguration {
-	b.fields.Path = nil
+	b.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
 func (b *HTTPGetActionApplyConfiguration) GetPath() (value string, ok bool) {
-	if v := b.fields.Path; v != nil {
+	if v := b.Path; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -73,19 +61,19 @@ func (b *HTTPGetActionApplyConfiguration) GetPath() (value string, ok bool) {
 
 // SetPort sets the Port field in the declarative configuration to the given value.
 func (b *HTTPGetActionApplyConfiguration) SetPort(value intstr.IntOrString) *HTTPGetActionApplyConfiguration {
-	b.fields.Port = &value
+	b.Port = &value
 	return b
 }
 
 // RemovePort removes the Port field from the declarative configuration.
 func (b *HTTPGetActionApplyConfiguration) RemovePort() *HTTPGetActionApplyConfiguration {
-	b.fields.Port = nil
+	b.Port = nil
 	return b
 }
 
 // GetPort gets the Port field from the declarative configuration.
 func (b *HTTPGetActionApplyConfiguration) GetPort() (value intstr.IntOrString, ok bool) {
-	if v := b.fields.Port; v != nil {
+	if v := b.Port; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -93,19 +81,19 @@ func (b *HTTPGetActionApplyConfiguration) GetPort() (value intstr.IntOrString, o
 
 // SetHost sets the Host field in the declarative configuration to the given value.
 func (b *HTTPGetActionApplyConfiguration) SetHost(value string) *HTTPGetActionApplyConfiguration {
-	b.fields.Host = &value
+	b.Host = &value
 	return b
 }
 
 // RemoveHost removes the Host field from the declarative configuration.
 func (b *HTTPGetActionApplyConfiguration) RemoveHost() *HTTPGetActionApplyConfiguration {
-	b.fields.Host = nil
+	b.Host = nil
 	return b
 }
 
 // GetHost gets the Host field from the declarative configuration.
 func (b *HTTPGetActionApplyConfiguration) GetHost() (value string, ok bool) {
-	if v := b.fields.Host; v != nil {
+	if v := b.Host; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -113,19 +101,19 @@ func (b *HTTPGetActionApplyConfiguration) GetHost() (value string, ok bool) {
 
 // SetScheme sets the Scheme field in the declarative configuration to the given value.
 func (b *HTTPGetActionApplyConfiguration) SetScheme(value v1.URIScheme) *HTTPGetActionApplyConfiguration {
-	b.fields.Scheme = &value
+	b.Scheme = &value
 	return b
 }
 
 // RemoveScheme removes the Scheme field from the declarative configuration.
 func (b *HTTPGetActionApplyConfiguration) RemoveScheme() *HTTPGetActionApplyConfiguration {
-	b.fields.Scheme = nil
+	b.Scheme = nil
 	return b
 }
 
 // GetScheme gets the Scheme field from the declarative configuration.
 func (b *HTTPGetActionApplyConfiguration) GetScheme() (value v1.URIScheme, ok bool) {
-	if v := b.fields.Scheme; v != nil {
+	if v := b.Scheme; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -133,64 +121,22 @@ func (b *HTTPGetActionApplyConfiguration) GetScheme() (value v1.URIScheme, ok bo
 
 // SetHTTPHeaders sets the HTTPHeaders field in the declarative configuration to the given value.
 func (b *HTTPGetActionApplyConfiguration) SetHTTPHeaders(value HTTPHeaderList) *HTTPGetActionApplyConfiguration {
-	b.fields.HTTPHeaders = &value
+	b.HTTPHeaders = &value
 	return b
 }
 
 // RemoveHTTPHeaders removes the HTTPHeaders field from the declarative configuration.
 func (b *HTTPGetActionApplyConfiguration) RemoveHTTPHeaders() *HTTPGetActionApplyConfiguration {
-	b.fields.HTTPHeaders = nil
+	b.HTTPHeaders = nil
 	return b
 }
 
 // GetHTTPHeaders gets the HTTPHeaders field from the declarative configuration.
 func (b *HTTPGetActionApplyConfiguration) GetHTTPHeaders() (value HTTPHeaderList, ok bool) {
-	if v := b.fields.HTTPHeaders; v != nil {
+	if v := b.HTTPHeaders; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts HTTPGetActionApplyConfiguration to unstructured.
-func (b *HTTPGetActionApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to HTTPGetActionApplyConfiguration, replacing the contents
-// of HTTPGetActionApplyConfiguration.
-func (b *HTTPGetActionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &hTTPGetActionFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals HTTPGetActionApplyConfiguration to JSON.
-func (b *HTTPGetActionApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into HTTPGetActionApplyConfiguration, replacing the contents of
-// HTTPGetActionApplyConfiguration.
-func (b *HTTPGetActionApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // HTTPGetActionList represents a listAlias of HTTPGetActionApplyConfiguration.
@@ -198,8 +144,3 @@ type HTTPGetActionList []*HTTPGetActionApplyConfiguration
 
 // HTTPGetActionList represents a map of HTTPGetActionApplyConfiguration.
 type HTTPGetActionMap map[string]HTTPGetActionApplyConfiguration
-
-func (b *HTTPGetActionApplyConfiguration) preMarshal() {
-}
-func (b *HTTPGetActionApplyConfiguration) postUnmarshal() {
-}

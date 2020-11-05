@@ -20,6 +20,7 @@ package v1beta2
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -200,7 +201,7 @@ func (c *replicaSets) Patch(ctx context.Context, name string, pt types.PatchType
 // Apply takes the given apply declarative configuration, applies it and returns the applied replicaSet.
 func (c *replicaSets) Apply(ctx context.Context, replicaSet *appsv1beta2.ReplicaSetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta2.ReplicaSet, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := replicaSet.MarshalJSON()
+	data, err := json.Marshal(replicaSet)
 	if err != nil {
 		return nil, err
 	}

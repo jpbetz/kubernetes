@@ -19,30 +19,12 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // AzureDiskVolumeSourceApplyConfiguration represents an declarative configuration of the AzureDiskVolumeSource type for use
 // with apply.
 type AzureDiskVolumeSourceApplyConfiguration struct {
-	fields azureDiskVolumeSourceFields
-}
-
-// AzureDiskVolumeSourceApplyConfiguration constructs an declarative configuration of the AzureDiskVolumeSource type for use with
-// apply.
-func AzureDiskVolumeSource() *AzureDiskVolumeSourceApplyConfiguration {
-	return &AzureDiskVolumeSourceApplyConfiguration{}
-}
-
-// azureDiskVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in AzureDiskVolumeSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type azureDiskVolumeSourceFields struct {
 	DiskName    *string                      `json:"diskName,omitempty"`
 	DataDiskURI *string                      `json:"diskURI,omitempty"`
 	CachingMode *v1.AzureDataDiskCachingMode `json:"cachingMode,omitempty"`
@@ -51,21 +33,27 @@ type azureDiskVolumeSourceFields struct {
 	Kind        *v1.AzureDataDiskKind        `json:"kind,omitempty"`
 }
 
+// AzureDiskVolumeSourceApplyConfiguration constructs an declarative configuration of the AzureDiskVolumeSource type for use with
+// apply.
+func AzureDiskVolumeSource() *AzureDiskVolumeSourceApplyConfiguration {
+	return &AzureDiskVolumeSourceApplyConfiguration{}
+}
+
 // SetDiskName sets the DiskName field in the declarative configuration to the given value.
 func (b *AzureDiskVolumeSourceApplyConfiguration) SetDiskName(value string) *AzureDiskVolumeSourceApplyConfiguration {
-	b.fields.DiskName = &value
+	b.DiskName = &value
 	return b
 }
 
 // RemoveDiskName removes the DiskName field from the declarative configuration.
 func (b *AzureDiskVolumeSourceApplyConfiguration) RemoveDiskName() *AzureDiskVolumeSourceApplyConfiguration {
-	b.fields.DiskName = nil
+	b.DiskName = nil
 	return b
 }
 
 // GetDiskName gets the DiskName field from the declarative configuration.
 func (b *AzureDiskVolumeSourceApplyConfiguration) GetDiskName() (value string, ok bool) {
-	if v := b.fields.DiskName; v != nil {
+	if v := b.DiskName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -73,19 +61,19 @@ func (b *AzureDiskVolumeSourceApplyConfiguration) GetDiskName() (value string, o
 
 // SetDataDiskURI sets the DataDiskURI field in the declarative configuration to the given value.
 func (b *AzureDiskVolumeSourceApplyConfiguration) SetDataDiskURI(value string) *AzureDiskVolumeSourceApplyConfiguration {
-	b.fields.DataDiskURI = &value
+	b.DataDiskURI = &value
 	return b
 }
 
 // RemoveDataDiskURI removes the DataDiskURI field from the declarative configuration.
 func (b *AzureDiskVolumeSourceApplyConfiguration) RemoveDataDiskURI() *AzureDiskVolumeSourceApplyConfiguration {
-	b.fields.DataDiskURI = nil
+	b.DataDiskURI = nil
 	return b
 }
 
 // GetDataDiskURI gets the DataDiskURI field from the declarative configuration.
 func (b *AzureDiskVolumeSourceApplyConfiguration) GetDataDiskURI() (value string, ok bool) {
-	if v := b.fields.DataDiskURI; v != nil {
+	if v := b.DataDiskURI; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -93,19 +81,19 @@ func (b *AzureDiskVolumeSourceApplyConfiguration) GetDataDiskURI() (value string
 
 // SetCachingMode sets the CachingMode field in the declarative configuration to the given value.
 func (b *AzureDiskVolumeSourceApplyConfiguration) SetCachingMode(value v1.AzureDataDiskCachingMode) *AzureDiskVolumeSourceApplyConfiguration {
-	b.fields.CachingMode = &value
+	b.CachingMode = &value
 	return b
 }
 
 // RemoveCachingMode removes the CachingMode field from the declarative configuration.
 func (b *AzureDiskVolumeSourceApplyConfiguration) RemoveCachingMode() *AzureDiskVolumeSourceApplyConfiguration {
-	b.fields.CachingMode = nil
+	b.CachingMode = nil
 	return b
 }
 
 // GetCachingMode gets the CachingMode field from the declarative configuration.
 func (b *AzureDiskVolumeSourceApplyConfiguration) GetCachingMode() (value v1.AzureDataDiskCachingMode, ok bool) {
-	if v := b.fields.CachingMode; v != nil {
+	if v := b.CachingMode; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -113,19 +101,19 @@ func (b *AzureDiskVolumeSourceApplyConfiguration) GetCachingMode() (value v1.Azu
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
 func (b *AzureDiskVolumeSourceApplyConfiguration) SetFSType(value string) *AzureDiskVolumeSourceApplyConfiguration {
-	b.fields.FSType = &value
+	b.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
 func (b *AzureDiskVolumeSourceApplyConfiguration) RemoveFSType() *AzureDiskVolumeSourceApplyConfiguration {
-	b.fields.FSType = nil
+	b.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
 func (b *AzureDiskVolumeSourceApplyConfiguration) GetFSType() (value string, ok bool) {
-	if v := b.fields.FSType; v != nil {
+	if v := b.FSType; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -133,19 +121,19 @@ func (b *AzureDiskVolumeSourceApplyConfiguration) GetFSType() (value string, ok 
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
 func (b *AzureDiskVolumeSourceApplyConfiguration) SetReadOnly(value bool) *AzureDiskVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = &value
+	b.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
 func (b *AzureDiskVolumeSourceApplyConfiguration) RemoveReadOnly() *AzureDiskVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = nil
+	b.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
 func (b *AzureDiskVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
-	if v := b.fields.ReadOnly; v != nil {
+	if v := b.ReadOnly; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -153,64 +141,22 @@ func (b *AzureDiskVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok 
 
 // SetKind sets the Kind field in the declarative configuration to the given value.
 func (b *AzureDiskVolumeSourceApplyConfiguration) SetKind(value v1.AzureDataDiskKind) *AzureDiskVolumeSourceApplyConfiguration {
-	b.fields.Kind = &value
+	b.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
 func (b *AzureDiskVolumeSourceApplyConfiguration) RemoveKind() *AzureDiskVolumeSourceApplyConfiguration {
-	b.fields.Kind = nil
+	b.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
 func (b *AzureDiskVolumeSourceApplyConfiguration) GetKind() (value v1.AzureDataDiskKind, ok bool) {
-	if v := b.fields.Kind; v != nil {
+	if v := b.Kind; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts AzureDiskVolumeSourceApplyConfiguration to unstructured.
-func (b *AzureDiskVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to AzureDiskVolumeSourceApplyConfiguration, replacing the contents
-// of AzureDiskVolumeSourceApplyConfiguration.
-func (b *AzureDiskVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &azureDiskVolumeSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals AzureDiskVolumeSourceApplyConfiguration to JSON.
-func (b *AzureDiskVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into AzureDiskVolumeSourceApplyConfiguration, replacing the contents of
-// AzureDiskVolumeSourceApplyConfiguration.
-func (b *AzureDiskVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // AzureDiskVolumeSourceList represents a listAlias of AzureDiskVolumeSourceApplyConfiguration.
@@ -218,8 +164,3 @@ type AzureDiskVolumeSourceList []*AzureDiskVolumeSourceApplyConfiguration
 
 // AzureDiskVolumeSourceList represents a map of AzureDiskVolumeSourceApplyConfiguration.
 type AzureDiskVolumeSourceMap map[string]AzureDiskVolumeSourceApplyConfiguration
-
-func (b *AzureDiskVolumeSourceApplyConfiguration) preMarshal() {
-}
-func (b *AzureDiskVolumeSourceApplyConfiguration) postUnmarshal() {
-}

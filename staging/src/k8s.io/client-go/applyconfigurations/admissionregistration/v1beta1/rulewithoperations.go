@@ -19,17 +19,14 @@ limitations under the License.
 package v1beta1
 
 import (
-	json "encoding/json"
-
-	admissionregistrationv1beta1 "k8s.io/api/admissionregistration/v1beta1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
+	v1beta1 "k8s.io/api/admissionregistration/v1beta1"
 )
 
 // RuleWithOperationsApplyConfiguration represents an declarative configuration of the RuleWithOperations type for use
 // with apply.
 type RuleWithOperationsApplyConfiguration struct {
-	rule   *RuleApplyConfiguration // inlined type
-	fields ruleWithOperationsFields
+	Operations             *[]v1beta1.OperationType `json:"operations,omitempty"`
+	RuleApplyConfiguration `json:",inline"`
 }
 
 // RuleWithOperationsApplyConfiguration constructs an declarative configuration of the RuleWithOperations type for use with
@@ -38,34 +35,21 @@ func RuleWithOperations() *RuleWithOperationsApplyConfiguration {
 	return &RuleWithOperationsApplyConfiguration{}
 }
 
-// ruleWithOperationsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in RuleWithOperationsApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type ruleWithOperationsFields struct {
-	Operations  *[]admissionregistrationv1beta1.OperationType `json:"operations,omitempty"`
-	APIGroups   *[]string                                     `json:"apiGroups,omitempty"`   // inlined RuleWithOperationsApplyConfiguration.rule.APIGroups field
-	APIVersions *[]string                                     `json:"apiVersions,omitempty"` // inlined RuleWithOperationsApplyConfiguration.rule.APIVersions field
-	Resources   *[]string                                     `json:"resources,omitempty"`   // inlined RuleWithOperationsApplyConfiguration.rule.Resources field
-	Scope       *admissionregistrationv1beta1.ScopeType       `json:"scope,omitempty"`       // inlined RuleWithOperationsApplyConfiguration.rule.Scope field
-}
-
 // SetOperations sets the Operations field in the declarative configuration to the given value.
-func (b *RuleWithOperationsApplyConfiguration) SetOperations(value []admissionregistrationv1beta1.OperationType) *RuleWithOperationsApplyConfiguration {
-	b.fields.Operations = &value
+func (b *RuleWithOperationsApplyConfiguration) SetOperations(value []v1beta1.OperationType) *RuleWithOperationsApplyConfiguration {
+	b.Operations = &value
 	return b
 }
 
 // RemoveOperations removes the Operations field from the declarative configuration.
 func (b *RuleWithOperationsApplyConfiguration) RemoveOperations() *RuleWithOperationsApplyConfiguration {
-	b.fields.Operations = nil
+	b.Operations = nil
 	return b
 }
 
 // GetOperations gets the Operations field from the declarative configuration.
-func (b *RuleWithOperationsApplyConfiguration) GetOperations() (value []admissionregistrationv1beta1.OperationType, ok bool) {
-	if v := b.fields.Operations; v != nil {
+func (b *RuleWithOperationsApplyConfiguration) GetOperations() (value []v1beta1.OperationType, ok bool) {
+	if v := b.Operations; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -73,61 +57,15 @@ func (b *RuleWithOperationsApplyConfiguration) GetOperations() (value []admissio
 
 // SetRule sets the Rule field in the declarative configuration to the given value.
 func (b *RuleWithOperationsApplyConfiguration) SetRule(value *RuleApplyConfiguration) *RuleWithOperationsApplyConfiguration {
-	b.rule = value
-	return b
-}
-
-// RemoveRule removes the Rule field from the declarative configuration.
-func (b *RuleWithOperationsApplyConfiguration) RemoveRule() *RuleWithOperationsApplyConfiguration {
-	b.rule = nil
+	if value != nil {
+		b.RuleApplyConfiguration = *value
+	}
 	return b
 }
 
 // GetRule gets the Rule field from the declarative configuration.
 func (b *RuleWithOperationsApplyConfiguration) GetRule() (value *RuleApplyConfiguration, ok bool) {
-	return b.rule, true
-}
-
-// ToUnstructured converts RuleWithOperationsApplyConfiguration to unstructured.
-func (b *RuleWithOperationsApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to RuleWithOperationsApplyConfiguration, replacing the contents
-// of RuleWithOperationsApplyConfiguration.
-func (b *RuleWithOperationsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &ruleWithOperationsFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals RuleWithOperationsApplyConfiguration to JSON.
-func (b *RuleWithOperationsApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into RuleWithOperationsApplyConfiguration, replacing the contents of
-// RuleWithOperationsApplyConfiguration.
-func (b *RuleWithOperationsApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return &b.RuleApplyConfiguration, true
 }
 
 // RuleWithOperationsList represents a listAlias of RuleWithOperationsApplyConfiguration.
@@ -135,37 +73,3 @@ type RuleWithOperationsList []*RuleWithOperationsApplyConfiguration
 
 // RuleWithOperationsList represents a map of RuleWithOperationsApplyConfiguration.
 type RuleWithOperationsMap map[string]RuleWithOperationsApplyConfiguration
-
-func (b *RuleWithOperationsApplyConfiguration) preMarshal() {
-	if b.rule != nil {
-		if v, ok := b.rule.GetAPIGroups(); ok {
-			b.fields.APIGroups = &v
-		}
-		if v, ok := b.rule.GetAPIVersions(); ok {
-			b.fields.APIVersions = &v
-		}
-		if v, ok := b.rule.GetResources(); ok {
-			b.fields.Resources = &v
-		}
-		if v, ok := b.rule.GetScope(); ok {
-			b.fields.Scope = &v
-		}
-	}
-}
-func (b *RuleWithOperationsApplyConfiguration) postUnmarshal() {
-	if b.rule == nil {
-		b.rule = &RuleApplyConfiguration{}
-	}
-	if b.fields.APIGroups != nil {
-		b.rule.SetAPIGroups(*b.fields.APIGroups)
-	}
-	if b.fields.APIVersions != nil {
-		b.rule.SetAPIVersions(*b.fields.APIVersions)
-	}
-	if b.fields.Resources != nil {
-		b.rule.SetResources(*b.fields.Resources)
-	}
-	if b.fields.Scope != nil {
-		b.rule.SetScope(*b.fields.Scope)
-	}
-}

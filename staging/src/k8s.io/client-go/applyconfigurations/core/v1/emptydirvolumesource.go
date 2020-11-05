@@ -19,17 +19,15 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
 	resource "k8s.io/apimachinery/pkg/api/resource"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // EmptyDirVolumeSourceApplyConfiguration represents an declarative configuration of the EmptyDirVolumeSource type for use
 // with apply.
 type EmptyDirVolumeSourceApplyConfiguration struct {
-	fields emptyDirVolumeSourceFields
+	Medium    *v1.StorageMedium  `json:"medium,omitempty"`
+	SizeLimit *resource.Quantity `json:"sizeLimit,omitempty"`
 }
 
 // EmptyDirVolumeSourceApplyConfiguration constructs an declarative configuration of the EmptyDirVolumeSource type for use with
@@ -38,31 +36,21 @@ func EmptyDirVolumeSource() *EmptyDirVolumeSourceApplyConfiguration {
 	return &EmptyDirVolumeSourceApplyConfiguration{}
 }
 
-// emptyDirVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in EmptyDirVolumeSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type emptyDirVolumeSourceFields struct {
-	Medium    *v1.StorageMedium  `json:"medium,omitempty"`
-	SizeLimit *resource.Quantity `json:"sizeLimit,omitempty"`
-}
-
 // SetMedium sets the Medium field in the declarative configuration to the given value.
 func (b *EmptyDirVolumeSourceApplyConfiguration) SetMedium(value v1.StorageMedium) *EmptyDirVolumeSourceApplyConfiguration {
-	b.fields.Medium = &value
+	b.Medium = &value
 	return b
 }
 
 // RemoveMedium removes the Medium field from the declarative configuration.
 func (b *EmptyDirVolumeSourceApplyConfiguration) RemoveMedium() *EmptyDirVolumeSourceApplyConfiguration {
-	b.fields.Medium = nil
+	b.Medium = nil
 	return b
 }
 
 // GetMedium gets the Medium field from the declarative configuration.
 func (b *EmptyDirVolumeSourceApplyConfiguration) GetMedium() (value v1.StorageMedium, ok bool) {
-	if v := b.fields.Medium; v != nil {
+	if v := b.Medium; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,64 +58,22 @@ func (b *EmptyDirVolumeSourceApplyConfiguration) GetMedium() (value v1.StorageMe
 
 // SetSizeLimit sets the SizeLimit field in the declarative configuration to the given value.
 func (b *EmptyDirVolumeSourceApplyConfiguration) SetSizeLimit(value resource.Quantity) *EmptyDirVolumeSourceApplyConfiguration {
-	b.fields.SizeLimit = &value
+	b.SizeLimit = &value
 	return b
 }
 
 // RemoveSizeLimit removes the SizeLimit field from the declarative configuration.
 func (b *EmptyDirVolumeSourceApplyConfiguration) RemoveSizeLimit() *EmptyDirVolumeSourceApplyConfiguration {
-	b.fields.SizeLimit = nil
+	b.SizeLimit = nil
 	return b
 }
 
 // GetSizeLimit gets the SizeLimit field from the declarative configuration.
 func (b *EmptyDirVolumeSourceApplyConfiguration) GetSizeLimit() (value resource.Quantity, ok bool) {
-	if v := b.fields.SizeLimit; v != nil {
+	if v := b.SizeLimit; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts EmptyDirVolumeSourceApplyConfiguration to unstructured.
-func (b *EmptyDirVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to EmptyDirVolumeSourceApplyConfiguration, replacing the contents
-// of EmptyDirVolumeSourceApplyConfiguration.
-func (b *EmptyDirVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &emptyDirVolumeSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals EmptyDirVolumeSourceApplyConfiguration to JSON.
-func (b *EmptyDirVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into EmptyDirVolumeSourceApplyConfiguration, replacing the contents of
-// EmptyDirVolumeSourceApplyConfiguration.
-func (b *EmptyDirVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // EmptyDirVolumeSourceList represents a listAlias of EmptyDirVolumeSourceApplyConfiguration.
@@ -135,8 +81,3 @@ type EmptyDirVolumeSourceList []*EmptyDirVolumeSourceApplyConfiguration
 
 // EmptyDirVolumeSourceList represents a map of EmptyDirVolumeSourceApplyConfiguration.
 type EmptyDirVolumeSourceMap map[string]EmptyDirVolumeSourceApplyConfiguration
-
-func (b *EmptyDirVolumeSourceApplyConfiguration) preMarshal() {
-}
-func (b *EmptyDirVolumeSourceApplyConfiguration) postUnmarshal() {
-}

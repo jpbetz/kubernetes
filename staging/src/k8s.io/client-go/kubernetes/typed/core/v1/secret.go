@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -183,7 +184,7 @@ func (c *secrets) Patch(ctx context.Context, name string, pt types.PatchType, da
 // Apply takes the given apply declarative configuration, applies it and returns the applied secret.
 func (c *secrets) Apply(ctx context.Context, secret *corev1.SecretApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Secret, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := secret.MarshalJSON()
+	data, err := json.Marshal(secret)
 	if err != nil {
 		return nil, err
 	}

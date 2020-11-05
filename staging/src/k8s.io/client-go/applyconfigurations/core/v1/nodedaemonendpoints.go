@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // NodeDaemonEndpointsApplyConfiguration represents an declarative configuration of the NodeDaemonEndpoints type for use
 // with apply.
 type NodeDaemonEndpointsApplyConfiguration struct {
-	fields nodeDaemonEndpointsFields
+	KubeletEndpoint *DaemonEndpointApplyConfiguration `json:"kubeletEndpoint,omitempty"`
 }
 
 // NodeDaemonEndpointsApplyConfiguration constructs an declarative configuration of the NodeDaemonEndpoints type for use with
@@ -36,72 +30,21 @@ func NodeDaemonEndpoints() *NodeDaemonEndpointsApplyConfiguration {
 	return &NodeDaemonEndpointsApplyConfiguration{}
 }
 
-// nodeDaemonEndpointsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NodeDaemonEndpointsApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type nodeDaemonEndpointsFields struct {
-	KubeletEndpoint *DaemonEndpointApplyConfiguration `json:"kubeletEndpoint,omitempty"`
-}
-
 // SetKubeletEndpoint sets the KubeletEndpoint field in the declarative configuration to the given value.
 func (b *NodeDaemonEndpointsApplyConfiguration) SetKubeletEndpoint(value *DaemonEndpointApplyConfiguration) *NodeDaemonEndpointsApplyConfiguration {
-	b.fields.KubeletEndpoint = value
+	b.KubeletEndpoint = value
 	return b
 }
 
 // RemoveKubeletEndpoint removes the KubeletEndpoint field from the declarative configuration.
 func (b *NodeDaemonEndpointsApplyConfiguration) RemoveKubeletEndpoint() *NodeDaemonEndpointsApplyConfiguration {
-	b.fields.KubeletEndpoint = nil
+	b.KubeletEndpoint = nil
 	return b
 }
 
 // GetKubeletEndpoint gets the KubeletEndpoint field from the declarative configuration.
 func (b *NodeDaemonEndpointsApplyConfiguration) GetKubeletEndpoint() (value *DaemonEndpointApplyConfiguration, ok bool) {
-	return b.fields.KubeletEndpoint, b.fields.KubeletEndpoint != nil
-}
-
-// ToUnstructured converts NodeDaemonEndpointsApplyConfiguration to unstructured.
-func (b *NodeDaemonEndpointsApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to NodeDaemonEndpointsApplyConfiguration, replacing the contents
-// of NodeDaemonEndpointsApplyConfiguration.
-func (b *NodeDaemonEndpointsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &nodeDaemonEndpointsFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals NodeDaemonEndpointsApplyConfiguration to JSON.
-func (b *NodeDaemonEndpointsApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into NodeDaemonEndpointsApplyConfiguration, replacing the contents of
-// NodeDaemonEndpointsApplyConfiguration.
-func (b *NodeDaemonEndpointsApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.KubeletEndpoint, b.KubeletEndpoint != nil
 }
 
 // NodeDaemonEndpointsList represents a listAlias of NodeDaemonEndpointsApplyConfiguration.
@@ -109,8 +52,3 @@ type NodeDaemonEndpointsList []*NodeDaemonEndpointsApplyConfiguration
 
 // NodeDaemonEndpointsList represents a map of NodeDaemonEndpointsApplyConfiguration.
 type NodeDaemonEndpointsMap map[string]NodeDaemonEndpointsApplyConfiguration
-
-func (b *NodeDaemonEndpointsApplyConfiguration) preMarshal() {
-}
-func (b *NodeDaemonEndpointsApplyConfiguration) postUnmarshal() {
-}

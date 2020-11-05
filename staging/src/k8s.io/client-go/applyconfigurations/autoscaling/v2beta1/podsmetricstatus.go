@@ -19,17 +19,16 @@ limitations under the License.
 package v2beta1
 
 import (
-	json "encoding/json"
-
 	resource "k8s.io/apimachinery/pkg/api/resource"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // PodsMetricStatusApplyConfiguration represents an declarative configuration of the PodsMetricStatus type for use
 // with apply.
 type PodsMetricStatusApplyConfiguration struct {
-	fields podsMetricStatusFields
+	MetricName          *string                             `json:"metricName,omitempty"`
+	CurrentAverageValue *resource.Quantity                  `json:"currentAverageValue,omitempty"`
+	Selector            *v1.LabelSelectorApplyConfiguration `json:"selector,omitempty"`
 }
 
 // PodsMetricStatusApplyConfiguration constructs an declarative configuration of the PodsMetricStatus type for use with
@@ -38,32 +37,21 @@ func PodsMetricStatus() *PodsMetricStatusApplyConfiguration {
 	return &PodsMetricStatusApplyConfiguration{}
 }
 
-// podsMetricStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodsMetricStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type podsMetricStatusFields struct {
-	MetricName          *string                             `json:"metricName,omitempty"`
-	CurrentAverageValue *resource.Quantity                  `json:"currentAverageValue,omitempty"`
-	Selector            *v1.LabelSelectorApplyConfiguration `json:"selector,omitempty"`
-}
-
 // SetMetricName sets the MetricName field in the declarative configuration to the given value.
 func (b *PodsMetricStatusApplyConfiguration) SetMetricName(value string) *PodsMetricStatusApplyConfiguration {
-	b.fields.MetricName = &value
+	b.MetricName = &value
 	return b
 }
 
 // RemoveMetricName removes the MetricName field from the declarative configuration.
 func (b *PodsMetricStatusApplyConfiguration) RemoveMetricName() *PodsMetricStatusApplyConfiguration {
-	b.fields.MetricName = nil
+	b.MetricName = nil
 	return b
 }
 
 // GetMetricName gets the MetricName field from the declarative configuration.
 func (b *PodsMetricStatusApplyConfiguration) GetMetricName() (value string, ok bool) {
-	if v := b.fields.MetricName; v != nil {
+	if v := b.MetricName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -71,19 +59,19 @@ func (b *PodsMetricStatusApplyConfiguration) GetMetricName() (value string, ok b
 
 // SetCurrentAverageValue sets the CurrentAverageValue field in the declarative configuration to the given value.
 func (b *PodsMetricStatusApplyConfiguration) SetCurrentAverageValue(value resource.Quantity) *PodsMetricStatusApplyConfiguration {
-	b.fields.CurrentAverageValue = &value
+	b.CurrentAverageValue = &value
 	return b
 }
 
 // RemoveCurrentAverageValue removes the CurrentAverageValue field from the declarative configuration.
 func (b *PodsMetricStatusApplyConfiguration) RemoveCurrentAverageValue() *PodsMetricStatusApplyConfiguration {
-	b.fields.CurrentAverageValue = nil
+	b.CurrentAverageValue = nil
 	return b
 }
 
 // GetCurrentAverageValue gets the CurrentAverageValue field from the declarative configuration.
 func (b *PodsMetricStatusApplyConfiguration) GetCurrentAverageValue() (value resource.Quantity, ok bool) {
-	if v := b.fields.CurrentAverageValue; v != nil {
+	if v := b.CurrentAverageValue; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -91,61 +79,19 @@ func (b *PodsMetricStatusApplyConfiguration) GetCurrentAverageValue() (value res
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
 func (b *PodsMetricStatusApplyConfiguration) SetSelector(value *v1.LabelSelectorApplyConfiguration) *PodsMetricStatusApplyConfiguration {
-	b.fields.Selector = value
+	b.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
 func (b *PodsMetricStatusApplyConfiguration) RemoveSelector() *PodsMetricStatusApplyConfiguration {
-	b.fields.Selector = nil
+	b.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
 func (b *PodsMetricStatusApplyConfiguration) GetSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
-	return b.fields.Selector, b.fields.Selector != nil
-}
-
-// ToUnstructured converts PodsMetricStatusApplyConfiguration to unstructured.
-func (b *PodsMetricStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PodsMetricStatusApplyConfiguration, replacing the contents
-// of PodsMetricStatusApplyConfiguration.
-func (b *PodsMetricStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &podsMetricStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PodsMetricStatusApplyConfiguration to JSON.
-func (b *PodsMetricStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PodsMetricStatusApplyConfiguration, replacing the contents of
-// PodsMetricStatusApplyConfiguration.
-func (b *PodsMetricStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Selector, b.Selector != nil
 }
 
 // PodsMetricStatusList represents a listAlias of PodsMetricStatusApplyConfiguration.
@@ -153,8 +99,3 @@ type PodsMetricStatusList []*PodsMetricStatusApplyConfiguration
 
 // PodsMetricStatusList represents a map of PodsMetricStatusApplyConfiguration.
 type PodsMetricStatusMap map[string]PodsMetricStatusApplyConfiguration
-
-func (b *PodsMetricStatusApplyConfiguration) preMarshal() {
-}
-func (b *PodsMetricStatusApplyConfiguration) postUnmarshal() {
-}

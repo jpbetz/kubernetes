@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // GroupSubjectApplyConfiguration represents an declarative configuration of the GroupSubject type for use
 // with apply.
 type GroupSubjectApplyConfiguration struct {
-	fields groupSubjectFields
+	Name *string `json:"name,omitempty"`
 }
 
 // GroupSubjectApplyConfiguration constructs an declarative configuration of the GroupSubject type for use with
@@ -36,75 +30,24 @@ func GroupSubject() *GroupSubjectApplyConfiguration {
 	return &GroupSubjectApplyConfiguration{}
 }
 
-// groupSubjectFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in GroupSubjectApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type groupSubjectFields struct {
-	Name *string `json:"name,omitempty"`
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *GroupSubjectApplyConfiguration) SetName(value string) *GroupSubjectApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *GroupSubjectApplyConfiguration) RemoveName() *GroupSubjectApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *GroupSubjectApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts GroupSubjectApplyConfiguration to unstructured.
-func (b *GroupSubjectApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to GroupSubjectApplyConfiguration, replacing the contents
-// of GroupSubjectApplyConfiguration.
-func (b *GroupSubjectApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &groupSubjectFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals GroupSubjectApplyConfiguration to JSON.
-func (b *GroupSubjectApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into GroupSubjectApplyConfiguration, replacing the contents of
-// GroupSubjectApplyConfiguration.
-func (b *GroupSubjectApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // GroupSubjectList represents a listAlias of GroupSubjectApplyConfiguration.
@@ -112,8 +55,3 @@ type GroupSubjectList []*GroupSubjectApplyConfiguration
 
 // GroupSubjectList represents a map of GroupSubjectApplyConfiguration.
 type GroupSubjectMap map[string]GroupSubjectApplyConfiguration
-
-func (b *GroupSubjectApplyConfiguration) preMarshal() {
-}
-func (b *GroupSubjectApplyConfiguration) postUnmarshal() {
-}

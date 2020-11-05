@@ -19,31 +19,13 @@ limitations under the License.
 package v1alpha1
 
 import (
-	json "encoding/json"
-
 	v1alpha1 "k8s.io/api/apiserverinternal/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // StorageVersionConditionApplyConfiguration represents an declarative configuration of the StorageVersionCondition type for use
 // with apply.
 type StorageVersionConditionApplyConfiguration struct {
-	fields storageVersionConditionFields
-}
-
-// StorageVersionConditionApplyConfiguration constructs an declarative configuration of the StorageVersionCondition type for use with
-// apply.
-func StorageVersionCondition() *StorageVersionConditionApplyConfiguration {
-	return &StorageVersionConditionApplyConfiguration{}
-}
-
-// storageVersionConditionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in StorageVersionConditionApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type storageVersionConditionFields struct {
 	Type               *v1alpha1.StorageVersionConditionType `json:"type,omitempty"`
 	Status             *v1alpha1.ConditionStatus             `json:"status,omitempty"`
 	ObservedGeneration *int64                                `json:"observedGeneration,omitempty"`
@@ -52,21 +34,27 @@ type storageVersionConditionFields struct {
 	Message            *string                               `json:"message,omitempty"`
 }
 
+// StorageVersionConditionApplyConfiguration constructs an declarative configuration of the StorageVersionCondition type for use with
+// apply.
+func StorageVersionCondition() *StorageVersionConditionApplyConfiguration {
+	return &StorageVersionConditionApplyConfiguration{}
+}
+
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *StorageVersionConditionApplyConfiguration) SetType(value v1alpha1.StorageVersionConditionType) *StorageVersionConditionApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *StorageVersionConditionApplyConfiguration) RemoveType() *StorageVersionConditionApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *StorageVersionConditionApplyConfiguration) GetType() (value v1alpha1.StorageVersionConditionType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -74,19 +62,19 @@ func (b *StorageVersionConditionApplyConfiguration) GetType() (value v1alpha1.St
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
 func (b *StorageVersionConditionApplyConfiguration) SetStatus(value v1alpha1.ConditionStatus) *StorageVersionConditionApplyConfiguration {
-	b.fields.Status = &value
+	b.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
 func (b *StorageVersionConditionApplyConfiguration) RemoveStatus() *StorageVersionConditionApplyConfiguration {
-	b.fields.Status = nil
+	b.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
 func (b *StorageVersionConditionApplyConfiguration) GetStatus() (value v1alpha1.ConditionStatus, ok bool) {
-	if v := b.fields.Status; v != nil {
+	if v := b.Status; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -94,19 +82,19 @@ func (b *StorageVersionConditionApplyConfiguration) GetStatus() (value v1alpha1.
 
 // SetObservedGeneration sets the ObservedGeneration field in the declarative configuration to the given value.
 func (b *StorageVersionConditionApplyConfiguration) SetObservedGeneration(value int64) *StorageVersionConditionApplyConfiguration {
-	b.fields.ObservedGeneration = &value
+	b.ObservedGeneration = &value
 	return b
 }
 
 // RemoveObservedGeneration removes the ObservedGeneration field from the declarative configuration.
 func (b *StorageVersionConditionApplyConfiguration) RemoveObservedGeneration() *StorageVersionConditionApplyConfiguration {
-	b.fields.ObservedGeneration = nil
+	b.ObservedGeneration = nil
 	return b
 }
 
 // GetObservedGeneration gets the ObservedGeneration field from the declarative configuration.
 func (b *StorageVersionConditionApplyConfiguration) GetObservedGeneration() (value int64, ok bool) {
-	if v := b.fields.ObservedGeneration; v != nil {
+	if v := b.ObservedGeneration; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -114,19 +102,19 @@ func (b *StorageVersionConditionApplyConfiguration) GetObservedGeneration() (val
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
 func (b *StorageVersionConditionApplyConfiguration) SetLastTransitionTime(value v1.Time) *StorageVersionConditionApplyConfiguration {
-	b.fields.LastTransitionTime = &value
+	b.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
 func (b *StorageVersionConditionApplyConfiguration) RemoveLastTransitionTime() *StorageVersionConditionApplyConfiguration {
-	b.fields.LastTransitionTime = nil
+	b.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
 func (b *StorageVersionConditionApplyConfiguration) GetLastTransitionTime() (value v1.Time, ok bool) {
-	if v := b.fields.LastTransitionTime; v != nil {
+	if v := b.LastTransitionTime; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -134,19 +122,19 @@ func (b *StorageVersionConditionApplyConfiguration) GetLastTransitionTime() (val
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
 func (b *StorageVersionConditionApplyConfiguration) SetReason(value string) *StorageVersionConditionApplyConfiguration {
-	b.fields.Reason = &value
+	b.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
 func (b *StorageVersionConditionApplyConfiguration) RemoveReason() *StorageVersionConditionApplyConfiguration {
-	b.fields.Reason = nil
+	b.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
 func (b *StorageVersionConditionApplyConfiguration) GetReason() (value string, ok bool) {
-	if v := b.fields.Reason; v != nil {
+	if v := b.Reason; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -154,64 +142,22 @@ func (b *StorageVersionConditionApplyConfiguration) GetReason() (value string, o
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
 func (b *StorageVersionConditionApplyConfiguration) SetMessage(value string) *StorageVersionConditionApplyConfiguration {
-	b.fields.Message = &value
+	b.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
 func (b *StorageVersionConditionApplyConfiguration) RemoveMessage() *StorageVersionConditionApplyConfiguration {
-	b.fields.Message = nil
+	b.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
 func (b *StorageVersionConditionApplyConfiguration) GetMessage() (value string, ok bool) {
-	if v := b.fields.Message; v != nil {
+	if v := b.Message; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts StorageVersionConditionApplyConfiguration to unstructured.
-func (b *StorageVersionConditionApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to StorageVersionConditionApplyConfiguration, replacing the contents
-// of StorageVersionConditionApplyConfiguration.
-func (b *StorageVersionConditionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &storageVersionConditionFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals StorageVersionConditionApplyConfiguration to JSON.
-func (b *StorageVersionConditionApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into StorageVersionConditionApplyConfiguration, replacing the contents of
-// StorageVersionConditionApplyConfiguration.
-func (b *StorageVersionConditionApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // StorageVersionConditionList represents a listAlias of StorageVersionConditionApplyConfiguration.
@@ -219,8 +165,3 @@ type StorageVersionConditionList []*StorageVersionConditionApplyConfiguration
 
 // StorageVersionConditionList represents a map of StorageVersionConditionApplyConfiguration.
 type StorageVersionConditionMap map[string]StorageVersionConditionApplyConfiguration
-
-func (b *StorageVersionConditionApplyConfiguration) preMarshal() {
-}
-func (b *StorageVersionConditionApplyConfiguration) postUnmarshal() {
-}

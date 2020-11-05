@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -183,7 +184,7 @@ func (c *leases) Patch(ctx context.Context, name string, pt types.PatchType, dat
 // Apply takes the given apply declarative configuration, applies it and returns the applied lease.
 func (c *leases) Apply(ctx context.Context, lease *coordinationv1.LeaseApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Lease, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := lease.MarshalJSON()
+	data, err := json.Marshal(lease)
 	if err != nil {
 		return nil, err
 	}

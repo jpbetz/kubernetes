@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // WeightedPodAffinityTermApplyConfiguration represents an declarative configuration of the WeightedPodAffinityTerm type for use
 // with apply.
 type WeightedPodAffinityTermApplyConfiguration struct {
-	fields weightedPodAffinityTermFields
+	Weight          *int32                             `json:"weight,omitempty"`
+	PodAffinityTerm *PodAffinityTermApplyConfiguration `json:"podAffinityTerm,omitempty"`
 }
 
 // WeightedPodAffinityTermApplyConfiguration constructs an declarative configuration of the WeightedPodAffinityTerm type for use with
@@ -36,31 +31,21 @@ func WeightedPodAffinityTerm() *WeightedPodAffinityTermApplyConfiguration {
 	return &WeightedPodAffinityTermApplyConfiguration{}
 }
 
-// weightedPodAffinityTermFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in WeightedPodAffinityTermApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type weightedPodAffinityTermFields struct {
-	Weight          *int32                             `json:"weight,omitempty"`
-	PodAffinityTerm *PodAffinityTermApplyConfiguration `json:"podAffinityTerm,omitempty"`
-}
-
 // SetWeight sets the Weight field in the declarative configuration to the given value.
 func (b *WeightedPodAffinityTermApplyConfiguration) SetWeight(value int32) *WeightedPodAffinityTermApplyConfiguration {
-	b.fields.Weight = &value
+	b.Weight = &value
 	return b
 }
 
 // RemoveWeight removes the Weight field from the declarative configuration.
 func (b *WeightedPodAffinityTermApplyConfiguration) RemoveWeight() *WeightedPodAffinityTermApplyConfiguration {
-	b.fields.Weight = nil
+	b.Weight = nil
 	return b
 }
 
 // GetWeight gets the Weight field from the declarative configuration.
 func (b *WeightedPodAffinityTermApplyConfiguration) GetWeight() (value int32, ok bool) {
-	if v := b.fields.Weight; v != nil {
+	if v := b.Weight; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,61 +53,19 @@ func (b *WeightedPodAffinityTermApplyConfiguration) GetWeight() (value int32, ok
 
 // SetPodAffinityTerm sets the PodAffinityTerm field in the declarative configuration to the given value.
 func (b *WeightedPodAffinityTermApplyConfiguration) SetPodAffinityTerm(value *PodAffinityTermApplyConfiguration) *WeightedPodAffinityTermApplyConfiguration {
-	b.fields.PodAffinityTerm = value
+	b.PodAffinityTerm = value
 	return b
 }
 
 // RemovePodAffinityTerm removes the PodAffinityTerm field from the declarative configuration.
 func (b *WeightedPodAffinityTermApplyConfiguration) RemovePodAffinityTerm() *WeightedPodAffinityTermApplyConfiguration {
-	b.fields.PodAffinityTerm = nil
+	b.PodAffinityTerm = nil
 	return b
 }
 
 // GetPodAffinityTerm gets the PodAffinityTerm field from the declarative configuration.
 func (b *WeightedPodAffinityTermApplyConfiguration) GetPodAffinityTerm() (value *PodAffinityTermApplyConfiguration, ok bool) {
-	return b.fields.PodAffinityTerm, b.fields.PodAffinityTerm != nil
-}
-
-// ToUnstructured converts WeightedPodAffinityTermApplyConfiguration to unstructured.
-func (b *WeightedPodAffinityTermApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to WeightedPodAffinityTermApplyConfiguration, replacing the contents
-// of WeightedPodAffinityTermApplyConfiguration.
-func (b *WeightedPodAffinityTermApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &weightedPodAffinityTermFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals WeightedPodAffinityTermApplyConfiguration to JSON.
-func (b *WeightedPodAffinityTermApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into WeightedPodAffinityTermApplyConfiguration, replacing the contents of
-// WeightedPodAffinityTermApplyConfiguration.
-func (b *WeightedPodAffinityTermApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.PodAffinityTerm, b.PodAffinityTerm != nil
 }
 
 // WeightedPodAffinityTermList represents a listAlias of WeightedPodAffinityTermApplyConfiguration.
@@ -130,8 +73,3 @@ type WeightedPodAffinityTermList []*WeightedPodAffinityTermApplyConfiguration
 
 // WeightedPodAffinityTermList represents a map of WeightedPodAffinityTermApplyConfiguration.
 type WeightedPodAffinityTermMap map[string]WeightedPodAffinityTermApplyConfiguration
-
-func (b *WeightedPodAffinityTermApplyConfiguration) preMarshal() {
-}
-func (b *WeightedPodAffinityTermApplyConfiguration) postUnmarshal() {
-}

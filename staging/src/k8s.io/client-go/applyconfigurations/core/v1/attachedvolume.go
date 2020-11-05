@@ -19,16 +19,14 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // AttachedVolumeApplyConfiguration represents an declarative configuration of the AttachedVolume type for use
 // with apply.
 type AttachedVolumeApplyConfiguration struct {
-	fields attachedVolumeFields
+	Name       *v1.UniqueVolumeName `json:"name,omitempty"`
+	DevicePath *string              `json:"devicePath,omitempty"`
 }
 
 // AttachedVolumeApplyConfiguration constructs an declarative configuration of the AttachedVolume type for use with
@@ -37,31 +35,21 @@ func AttachedVolume() *AttachedVolumeApplyConfiguration {
 	return &AttachedVolumeApplyConfiguration{}
 }
 
-// attachedVolumeFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in AttachedVolumeApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type attachedVolumeFields struct {
-	Name       *v1.UniqueVolumeName `json:"name,omitempty"`
-	DevicePath *string              `json:"devicePath,omitempty"`
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *AttachedVolumeApplyConfiguration) SetName(value v1.UniqueVolumeName) *AttachedVolumeApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *AttachedVolumeApplyConfiguration) RemoveName() *AttachedVolumeApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *AttachedVolumeApplyConfiguration) GetName() (value v1.UniqueVolumeName, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,64 +57,22 @@ func (b *AttachedVolumeApplyConfiguration) GetName() (value v1.UniqueVolumeName,
 
 // SetDevicePath sets the DevicePath field in the declarative configuration to the given value.
 func (b *AttachedVolumeApplyConfiguration) SetDevicePath(value string) *AttachedVolumeApplyConfiguration {
-	b.fields.DevicePath = &value
+	b.DevicePath = &value
 	return b
 }
 
 // RemoveDevicePath removes the DevicePath field from the declarative configuration.
 func (b *AttachedVolumeApplyConfiguration) RemoveDevicePath() *AttachedVolumeApplyConfiguration {
-	b.fields.DevicePath = nil
+	b.DevicePath = nil
 	return b
 }
 
 // GetDevicePath gets the DevicePath field from the declarative configuration.
 func (b *AttachedVolumeApplyConfiguration) GetDevicePath() (value string, ok bool) {
-	if v := b.fields.DevicePath; v != nil {
+	if v := b.DevicePath; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts AttachedVolumeApplyConfiguration to unstructured.
-func (b *AttachedVolumeApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to AttachedVolumeApplyConfiguration, replacing the contents
-// of AttachedVolumeApplyConfiguration.
-func (b *AttachedVolumeApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &attachedVolumeFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals AttachedVolumeApplyConfiguration to JSON.
-func (b *AttachedVolumeApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into AttachedVolumeApplyConfiguration, replacing the contents of
-// AttachedVolumeApplyConfiguration.
-func (b *AttachedVolumeApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // AttachedVolumeList represents a listAlias of AttachedVolumeApplyConfiguration.
@@ -134,8 +80,3 @@ type AttachedVolumeList []*AttachedVolumeApplyConfiguration
 
 // AttachedVolumeList represents a map of AttachedVolumeApplyConfiguration.
 type AttachedVolumeMap map[string]AttachedVolumeApplyConfiguration
-
-func (b *AttachedVolumeApplyConfiguration) preMarshal() {
-}
-func (b *AttachedVolumeApplyConfiguration) postUnmarshal() {
-}

@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // NodeAffinityApplyConfiguration represents an declarative configuration of the NodeAffinity type for use
 // with apply.
 type NodeAffinityApplyConfiguration struct {
-	fields nodeAffinityFields
+	RequiredDuringSchedulingIgnoredDuringExecution  *NodeSelectorApplyConfiguration `json:"requiredDuringSchedulingIgnoredDuringExecution,omitempty"`
+	PreferredDuringSchedulingIgnoredDuringExecution *PreferredSchedulingTermList    `json:"preferredDuringSchedulingIgnoredDuringExecution,omitempty"`
 }
 
 // NodeAffinityApplyConfiguration constructs an declarative configuration of the NodeAffinity type for use with
@@ -36,93 +31,41 @@ func NodeAffinity() *NodeAffinityApplyConfiguration {
 	return &NodeAffinityApplyConfiguration{}
 }
 
-// nodeAffinityFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NodeAffinityApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type nodeAffinityFields struct {
-	RequiredDuringSchedulingIgnoredDuringExecution  *NodeSelectorApplyConfiguration `json:"requiredDuringSchedulingIgnoredDuringExecution,omitempty"`
-	PreferredDuringSchedulingIgnoredDuringExecution *PreferredSchedulingTermList    `json:"preferredDuringSchedulingIgnoredDuringExecution,omitempty"`
-}
-
 // SetRequiredDuringSchedulingIgnoredDuringExecution sets the RequiredDuringSchedulingIgnoredDuringExecution field in the declarative configuration to the given value.
 func (b *NodeAffinityApplyConfiguration) SetRequiredDuringSchedulingIgnoredDuringExecution(value *NodeSelectorApplyConfiguration) *NodeAffinityApplyConfiguration {
-	b.fields.RequiredDuringSchedulingIgnoredDuringExecution = value
+	b.RequiredDuringSchedulingIgnoredDuringExecution = value
 	return b
 }
 
 // RemoveRequiredDuringSchedulingIgnoredDuringExecution removes the RequiredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
 func (b *NodeAffinityApplyConfiguration) RemoveRequiredDuringSchedulingIgnoredDuringExecution() *NodeAffinityApplyConfiguration {
-	b.fields.RequiredDuringSchedulingIgnoredDuringExecution = nil
+	b.RequiredDuringSchedulingIgnoredDuringExecution = nil
 	return b
 }
 
 // GetRequiredDuringSchedulingIgnoredDuringExecution gets the RequiredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
 func (b *NodeAffinityApplyConfiguration) GetRequiredDuringSchedulingIgnoredDuringExecution() (value *NodeSelectorApplyConfiguration, ok bool) {
-	return b.fields.RequiredDuringSchedulingIgnoredDuringExecution, b.fields.RequiredDuringSchedulingIgnoredDuringExecution != nil
+	return b.RequiredDuringSchedulingIgnoredDuringExecution, b.RequiredDuringSchedulingIgnoredDuringExecution != nil
 }
 
 // SetPreferredDuringSchedulingIgnoredDuringExecution sets the PreferredDuringSchedulingIgnoredDuringExecution field in the declarative configuration to the given value.
 func (b *NodeAffinityApplyConfiguration) SetPreferredDuringSchedulingIgnoredDuringExecution(value PreferredSchedulingTermList) *NodeAffinityApplyConfiguration {
-	b.fields.PreferredDuringSchedulingIgnoredDuringExecution = &value
+	b.PreferredDuringSchedulingIgnoredDuringExecution = &value
 	return b
 }
 
 // RemovePreferredDuringSchedulingIgnoredDuringExecution removes the PreferredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
 func (b *NodeAffinityApplyConfiguration) RemovePreferredDuringSchedulingIgnoredDuringExecution() *NodeAffinityApplyConfiguration {
-	b.fields.PreferredDuringSchedulingIgnoredDuringExecution = nil
+	b.PreferredDuringSchedulingIgnoredDuringExecution = nil
 	return b
 }
 
 // GetPreferredDuringSchedulingIgnoredDuringExecution gets the PreferredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
 func (b *NodeAffinityApplyConfiguration) GetPreferredDuringSchedulingIgnoredDuringExecution() (value PreferredSchedulingTermList, ok bool) {
-	if v := b.fields.PreferredDuringSchedulingIgnoredDuringExecution; v != nil {
+	if v := b.PreferredDuringSchedulingIgnoredDuringExecution; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts NodeAffinityApplyConfiguration to unstructured.
-func (b *NodeAffinityApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to NodeAffinityApplyConfiguration, replacing the contents
-// of NodeAffinityApplyConfiguration.
-func (b *NodeAffinityApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &nodeAffinityFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals NodeAffinityApplyConfiguration to JSON.
-func (b *NodeAffinityApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into NodeAffinityApplyConfiguration, replacing the contents of
-// NodeAffinityApplyConfiguration.
-func (b *NodeAffinityApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // NodeAffinityList represents a listAlias of NodeAffinityApplyConfiguration.
@@ -130,8 +73,3 @@ type NodeAffinityList []*NodeAffinityApplyConfiguration
 
 // NodeAffinityList represents a map of NodeAffinityApplyConfiguration.
 type NodeAffinityMap map[string]NodeAffinityApplyConfiguration
-
-func (b *NodeAffinityApplyConfiguration) preMarshal() {
-}
-func (b *NodeAffinityApplyConfiguration) postUnmarshal() {
-}

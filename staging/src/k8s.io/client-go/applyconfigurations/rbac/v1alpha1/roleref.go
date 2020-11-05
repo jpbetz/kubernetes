@@ -18,16 +18,12 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // RoleRefApplyConfiguration represents an declarative configuration of the RoleRef type for use
 // with apply.
 type RoleRefApplyConfiguration struct {
-	fields roleRefFields
+	APIGroup *string `json:"apiGroup,omitempty"`
+	Kind     *string `json:"kind,omitempty"`
+	Name     *string `json:"name,omitempty"`
 }
 
 // RoleRefApplyConfiguration constructs an declarative configuration of the RoleRef type for use with
@@ -36,32 +32,21 @@ func RoleRef() *RoleRefApplyConfiguration {
 	return &RoleRefApplyConfiguration{}
 }
 
-// roleRefFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in RoleRefApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type roleRefFields struct {
-	APIGroup *string `json:"apiGroup,omitempty"`
-	Kind     *string `json:"kind,omitempty"`
-	Name     *string `json:"name,omitempty"`
-}
-
 // SetAPIGroup sets the APIGroup field in the declarative configuration to the given value.
 func (b *RoleRefApplyConfiguration) SetAPIGroup(value string) *RoleRefApplyConfiguration {
-	b.fields.APIGroup = &value
+	b.APIGroup = &value
 	return b
 }
 
 // RemoveAPIGroup removes the APIGroup field from the declarative configuration.
 func (b *RoleRefApplyConfiguration) RemoveAPIGroup() *RoleRefApplyConfiguration {
-	b.fields.APIGroup = nil
+	b.APIGroup = nil
 	return b
 }
 
 // GetAPIGroup gets the APIGroup field from the declarative configuration.
 func (b *RoleRefApplyConfiguration) GetAPIGroup() (value string, ok bool) {
-	if v := b.fields.APIGroup; v != nil {
+	if v := b.APIGroup; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,19 +54,19 @@ func (b *RoleRefApplyConfiguration) GetAPIGroup() (value string, ok bool) {
 
 // SetKind sets the Kind field in the declarative configuration to the given value.
 func (b *RoleRefApplyConfiguration) SetKind(value string) *RoleRefApplyConfiguration {
-	b.fields.Kind = &value
+	b.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
 func (b *RoleRefApplyConfiguration) RemoveKind() *RoleRefApplyConfiguration {
-	b.fields.Kind = nil
+	b.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
 func (b *RoleRefApplyConfiguration) GetKind() (value string, ok bool) {
-	if v := b.fields.Kind; v != nil {
+	if v := b.Kind; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -89,64 +74,22 @@ func (b *RoleRefApplyConfiguration) GetKind() (value string, ok bool) {
 
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *RoleRefApplyConfiguration) SetName(value string) *RoleRefApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *RoleRefApplyConfiguration) RemoveName() *RoleRefApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *RoleRefApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts RoleRefApplyConfiguration to unstructured.
-func (b *RoleRefApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to RoleRefApplyConfiguration, replacing the contents
-// of RoleRefApplyConfiguration.
-func (b *RoleRefApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &roleRefFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals RoleRefApplyConfiguration to JSON.
-func (b *RoleRefApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into RoleRefApplyConfiguration, replacing the contents of
-// RoleRefApplyConfiguration.
-func (b *RoleRefApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // RoleRefList represents a listAlias of RoleRefApplyConfiguration.
@@ -154,8 +97,3 @@ type RoleRefList []*RoleRefApplyConfiguration
 
 // RoleRefList represents a map of RoleRefApplyConfiguration.
 type RoleRefMap map[string]RoleRefApplyConfiguration
-
-func (b *RoleRefApplyConfiguration) preMarshal() {
-}
-func (b *RoleRefApplyConfiguration) postUnmarshal() {
-}

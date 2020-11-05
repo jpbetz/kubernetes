@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1beta1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // IngressRuleValueApplyConfiguration represents an declarative configuration of the IngressRuleValue type for use
 // with apply.
 type IngressRuleValueApplyConfiguration struct {
-	fields ingressRuleValueFields
+	HTTP *HTTPIngressRuleValueApplyConfiguration `json:"http,omitempty"`
 }
 
 // IngressRuleValueApplyConfiguration constructs an declarative configuration of the IngressRuleValue type for use with
@@ -36,72 +30,21 @@ func IngressRuleValue() *IngressRuleValueApplyConfiguration {
 	return &IngressRuleValueApplyConfiguration{}
 }
 
-// ingressRuleValueFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in IngressRuleValueApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type ingressRuleValueFields struct {
-	HTTP *HTTPIngressRuleValueApplyConfiguration `json:"http,omitempty"`
-}
-
 // SetHTTP sets the HTTP field in the declarative configuration to the given value.
 func (b *IngressRuleValueApplyConfiguration) SetHTTP(value *HTTPIngressRuleValueApplyConfiguration) *IngressRuleValueApplyConfiguration {
-	b.fields.HTTP = value
+	b.HTTP = value
 	return b
 }
 
 // RemoveHTTP removes the HTTP field from the declarative configuration.
 func (b *IngressRuleValueApplyConfiguration) RemoveHTTP() *IngressRuleValueApplyConfiguration {
-	b.fields.HTTP = nil
+	b.HTTP = nil
 	return b
 }
 
 // GetHTTP gets the HTTP field from the declarative configuration.
 func (b *IngressRuleValueApplyConfiguration) GetHTTP() (value *HTTPIngressRuleValueApplyConfiguration, ok bool) {
-	return b.fields.HTTP, b.fields.HTTP != nil
-}
-
-// ToUnstructured converts IngressRuleValueApplyConfiguration to unstructured.
-func (b *IngressRuleValueApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to IngressRuleValueApplyConfiguration, replacing the contents
-// of IngressRuleValueApplyConfiguration.
-func (b *IngressRuleValueApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &ingressRuleValueFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals IngressRuleValueApplyConfiguration to JSON.
-func (b *IngressRuleValueApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into IngressRuleValueApplyConfiguration, replacing the contents of
-// IngressRuleValueApplyConfiguration.
-func (b *IngressRuleValueApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.HTTP, b.HTTP != nil
 }
 
 // IngressRuleValueList represents a listAlias of IngressRuleValueApplyConfiguration.
@@ -109,8 +52,3 @@ type IngressRuleValueList []*IngressRuleValueApplyConfiguration
 
 // IngressRuleValueList represents a map of IngressRuleValueApplyConfiguration.
 type IngressRuleValueMap map[string]IngressRuleValueApplyConfiguration
-
-func (b *IngressRuleValueApplyConfiguration) preMarshal() {
-}
-func (b *IngressRuleValueApplyConfiguration) postUnmarshal() {
-}

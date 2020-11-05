@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -173,7 +174,7 @@ func (c *componentStatuses) Patch(ctx context.Context, name string, pt types.Pat
 // Apply takes the given apply declarative configuration, applies it and returns the applied componentStatus.
 func (c *componentStatuses) Apply(ctx context.Context, componentStatus *corev1.ComponentStatusApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ComponentStatus, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := componentStatus.MarshalJSON()
+	data, err := json.Marshal(componentStatus)
 	if err != nil {
 		return nil, err
 	}

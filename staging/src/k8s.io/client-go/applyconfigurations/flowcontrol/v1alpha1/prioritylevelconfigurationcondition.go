@@ -19,17 +19,18 @@ limitations under the License.
 package v1alpha1
 
 import (
-	json "encoding/json"
-
 	v1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // PriorityLevelConfigurationConditionApplyConfiguration represents an declarative configuration of the PriorityLevelConfigurationCondition type for use
 // with apply.
 type PriorityLevelConfigurationConditionApplyConfiguration struct {
-	fields priorityLevelConfigurationConditionFields
+	Type               *v1alpha1.PriorityLevelConfigurationConditionType `json:"type,omitempty"`
+	Status             *v1alpha1.ConditionStatus                         `json:"status,omitempty"`
+	LastTransitionTime *v1.Time                                          `json:"lastTransitionTime,omitempty"`
+	Reason             *string                                           `json:"reason,omitempty"`
+	Message            *string                                           `json:"message,omitempty"`
 }
 
 // PriorityLevelConfigurationConditionApplyConfiguration constructs an declarative configuration of the PriorityLevelConfigurationCondition type for use with
@@ -38,34 +39,21 @@ func PriorityLevelConfigurationCondition() *PriorityLevelConfigurationConditionA
 	return &PriorityLevelConfigurationConditionApplyConfiguration{}
 }
 
-// priorityLevelConfigurationConditionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PriorityLevelConfigurationConditionApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type priorityLevelConfigurationConditionFields struct {
-	Type               *v1alpha1.PriorityLevelConfigurationConditionType `json:"type,omitempty"`
-	Status             *v1alpha1.ConditionStatus                         `json:"status,omitempty"`
-	LastTransitionTime *v1.Time                                          `json:"lastTransitionTime,omitempty"`
-	Reason             *string                                           `json:"reason,omitempty"`
-	Message            *string                                           `json:"message,omitempty"`
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *PriorityLevelConfigurationConditionApplyConfiguration) SetType(value v1alpha1.PriorityLevelConfigurationConditionType) *PriorityLevelConfigurationConditionApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *PriorityLevelConfigurationConditionApplyConfiguration) RemoveType() *PriorityLevelConfigurationConditionApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *PriorityLevelConfigurationConditionApplyConfiguration) GetType() (value v1alpha1.PriorityLevelConfigurationConditionType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -73,19 +61,19 @@ func (b *PriorityLevelConfigurationConditionApplyConfiguration) GetType() (value
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
 func (b *PriorityLevelConfigurationConditionApplyConfiguration) SetStatus(value v1alpha1.ConditionStatus) *PriorityLevelConfigurationConditionApplyConfiguration {
-	b.fields.Status = &value
+	b.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
 func (b *PriorityLevelConfigurationConditionApplyConfiguration) RemoveStatus() *PriorityLevelConfigurationConditionApplyConfiguration {
-	b.fields.Status = nil
+	b.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
 func (b *PriorityLevelConfigurationConditionApplyConfiguration) GetStatus() (value v1alpha1.ConditionStatus, ok bool) {
-	if v := b.fields.Status; v != nil {
+	if v := b.Status; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -93,19 +81,19 @@ func (b *PriorityLevelConfigurationConditionApplyConfiguration) GetStatus() (val
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
 func (b *PriorityLevelConfigurationConditionApplyConfiguration) SetLastTransitionTime(value v1.Time) *PriorityLevelConfigurationConditionApplyConfiguration {
-	b.fields.LastTransitionTime = &value
+	b.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
 func (b *PriorityLevelConfigurationConditionApplyConfiguration) RemoveLastTransitionTime() *PriorityLevelConfigurationConditionApplyConfiguration {
-	b.fields.LastTransitionTime = nil
+	b.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
 func (b *PriorityLevelConfigurationConditionApplyConfiguration) GetLastTransitionTime() (value v1.Time, ok bool) {
-	if v := b.fields.LastTransitionTime; v != nil {
+	if v := b.LastTransitionTime; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -113,19 +101,19 @@ func (b *PriorityLevelConfigurationConditionApplyConfiguration) GetLastTransitio
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
 func (b *PriorityLevelConfigurationConditionApplyConfiguration) SetReason(value string) *PriorityLevelConfigurationConditionApplyConfiguration {
-	b.fields.Reason = &value
+	b.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
 func (b *PriorityLevelConfigurationConditionApplyConfiguration) RemoveReason() *PriorityLevelConfigurationConditionApplyConfiguration {
-	b.fields.Reason = nil
+	b.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
 func (b *PriorityLevelConfigurationConditionApplyConfiguration) GetReason() (value string, ok bool) {
-	if v := b.fields.Reason; v != nil {
+	if v := b.Reason; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -133,64 +121,22 @@ func (b *PriorityLevelConfigurationConditionApplyConfiguration) GetReason() (val
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
 func (b *PriorityLevelConfigurationConditionApplyConfiguration) SetMessage(value string) *PriorityLevelConfigurationConditionApplyConfiguration {
-	b.fields.Message = &value
+	b.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
 func (b *PriorityLevelConfigurationConditionApplyConfiguration) RemoveMessage() *PriorityLevelConfigurationConditionApplyConfiguration {
-	b.fields.Message = nil
+	b.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
 func (b *PriorityLevelConfigurationConditionApplyConfiguration) GetMessage() (value string, ok bool) {
-	if v := b.fields.Message; v != nil {
+	if v := b.Message; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts PriorityLevelConfigurationConditionApplyConfiguration to unstructured.
-func (b *PriorityLevelConfigurationConditionApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PriorityLevelConfigurationConditionApplyConfiguration, replacing the contents
-// of PriorityLevelConfigurationConditionApplyConfiguration.
-func (b *PriorityLevelConfigurationConditionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &priorityLevelConfigurationConditionFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PriorityLevelConfigurationConditionApplyConfiguration to JSON.
-func (b *PriorityLevelConfigurationConditionApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PriorityLevelConfigurationConditionApplyConfiguration, replacing the contents of
-// PriorityLevelConfigurationConditionApplyConfiguration.
-func (b *PriorityLevelConfigurationConditionApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // PriorityLevelConfigurationConditionList represents a listAlias of PriorityLevelConfigurationConditionApplyConfiguration.
@@ -198,8 +144,3 @@ type PriorityLevelConfigurationConditionList []*PriorityLevelConfigurationCondit
 
 // PriorityLevelConfigurationConditionList represents a map of PriorityLevelConfigurationConditionApplyConfiguration.
 type PriorityLevelConfigurationConditionMap map[string]PriorityLevelConfigurationConditionApplyConfiguration
-
-func (b *PriorityLevelConfigurationConditionApplyConfiguration) preMarshal() {
-}
-func (b *PriorityLevelConfigurationConditionApplyConfiguration) postUnmarshal() {
-}

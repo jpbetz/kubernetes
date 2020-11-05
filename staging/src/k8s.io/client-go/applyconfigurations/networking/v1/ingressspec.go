@@ -18,16 +18,13 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // IngressSpecApplyConfiguration represents an declarative configuration of the IngressSpec type for use
 // with apply.
 type IngressSpecApplyConfiguration struct {
-	fields ingressSpecFields
+	IngressClassName *string                           `json:"ingressClassName,omitempty"`
+	DefaultBackend   *IngressBackendApplyConfiguration `json:"defaultBackend,omitempty"`
+	TLS              *IngressTLSList                   `json:"tls,omitempty"`
+	Rules            *IngressRuleList                  `json:"rules,omitempty"`
 }
 
 // IngressSpecApplyConfiguration constructs an declarative configuration of the IngressSpec type for use with
@@ -36,33 +33,21 @@ func IngressSpec() *IngressSpecApplyConfiguration {
 	return &IngressSpecApplyConfiguration{}
 }
 
-// ingressSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in IngressSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type ingressSpecFields struct {
-	IngressClassName *string                           `json:"ingressClassName,omitempty"`
-	DefaultBackend   *IngressBackendApplyConfiguration `json:"defaultBackend,omitempty"`
-	TLS              *IngressTLSList                   `json:"tls,omitempty"`
-	Rules            *IngressRuleList                  `json:"rules,omitempty"`
-}
-
 // SetIngressClassName sets the IngressClassName field in the declarative configuration to the given value.
 func (b *IngressSpecApplyConfiguration) SetIngressClassName(value string) *IngressSpecApplyConfiguration {
-	b.fields.IngressClassName = &value
+	b.IngressClassName = &value
 	return b
 }
 
 // RemoveIngressClassName removes the IngressClassName field from the declarative configuration.
 func (b *IngressSpecApplyConfiguration) RemoveIngressClassName() *IngressSpecApplyConfiguration {
-	b.fields.IngressClassName = nil
+	b.IngressClassName = nil
 	return b
 }
 
 // GetIngressClassName gets the IngressClassName field from the declarative configuration.
 func (b *IngressSpecApplyConfiguration) GetIngressClassName() (value string, ok bool) {
-	if v := b.fields.IngressClassName; v != nil {
+	if v := b.IngressClassName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,36 +55,36 @@ func (b *IngressSpecApplyConfiguration) GetIngressClassName() (value string, ok 
 
 // SetDefaultBackend sets the DefaultBackend field in the declarative configuration to the given value.
 func (b *IngressSpecApplyConfiguration) SetDefaultBackend(value *IngressBackendApplyConfiguration) *IngressSpecApplyConfiguration {
-	b.fields.DefaultBackend = value
+	b.DefaultBackend = value
 	return b
 }
 
 // RemoveDefaultBackend removes the DefaultBackend field from the declarative configuration.
 func (b *IngressSpecApplyConfiguration) RemoveDefaultBackend() *IngressSpecApplyConfiguration {
-	b.fields.DefaultBackend = nil
+	b.DefaultBackend = nil
 	return b
 }
 
 // GetDefaultBackend gets the DefaultBackend field from the declarative configuration.
 func (b *IngressSpecApplyConfiguration) GetDefaultBackend() (value *IngressBackendApplyConfiguration, ok bool) {
-	return b.fields.DefaultBackend, b.fields.DefaultBackend != nil
+	return b.DefaultBackend, b.DefaultBackend != nil
 }
 
 // SetTLS sets the TLS field in the declarative configuration to the given value.
 func (b *IngressSpecApplyConfiguration) SetTLS(value IngressTLSList) *IngressSpecApplyConfiguration {
-	b.fields.TLS = &value
+	b.TLS = &value
 	return b
 }
 
 // RemoveTLS removes the TLS field from the declarative configuration.
 func (b *IngressSpecApplyConfiguration) RemoveTLS() *IngressSpecApplyConfiguration {
-	b.fields.TLS = nil
+	b.TLS = nil
 	return b
 }
 
 // GetTLS gets the TLS field from the declarative configuration.
 func (b *IngressSpecApplyConfiguration) GetTLS() (value IngressTLSList, ok bool) {
-	if v := b.fields.TLS; v != nil {
+	if v := b.TLS; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -107,64 +92,22 @@ func (b *IngressSpecApplyConfiguration) GetTLS() (value IngressTLSList, ok bool)
 
 // SetRules sets the Rules field in the declarative configuration to the given value.
 func (b *IngressSpecApplyConfiguration) SetRules(value IngressRuleList) *IngressSpecApplyConfiguration {
-	b.fields.Rules = &value
+	b.Rules = &value
 	return b
 }
 
 // RemoveRules removes the Rules field from the declarative configuration.
 func (b *IngressSpecApplyConfiguration) RemoveRules() *IngressSpecApplyConfiguration {
-	b.fields.Rules = nil
+	b.Rules = nil
 	return b
 }
 
 // GetRules gets the Rules field from the declarative configuration.
 func (b *IngressSpecApplyConfiguration) GetRules() (value IngressRuleList, ok bool) {
-	if v := b.fields.Rules; v != nil {
+	if v := b.Rules; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts IngressSpecApplyConfiguration to unstructured.
-func (b *IngressSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to IngressSpecApplyConfiguration, replacing the contents
-// of IngressSpecApplyConfiguration.
-func (b *IngressSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &ingressSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals IngressSpecApplyConfiguration to JSON.
-func (b *IngressSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into IngressSpecApplyConfiguration, replacing the contents of
-// IngressSpecApplyConfiguration.
-func (b *IngressSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // IngressSpecList represents a listAlias of IngressSpecApplyConfiguration.
@@ -172,8 +115,3 @@ type IngressSpecList []*IngressSpecApplyConfiguration
 
 // IngressSpecList represents a map of IngressSpecApplyConfiguration.
 type IngressSpecMap map[string]IngressSpecApplyConfiguration
-
-func (b *IngressSpecApplyConfiguration) preMarshal() {
-}
-func (b *IngressSpecApplyConfiguration) postUnmarshal() {
-}

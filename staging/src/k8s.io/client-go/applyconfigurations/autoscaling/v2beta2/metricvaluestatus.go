@@ -19,16 +19,15 @@ limitations under the License.
 package v2beta2
 
 import (
-	json "encoding/json"
-
 	resource "k8s.io/apimachinery/pkg/api/resource"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // MetricValueStatusApplyConfiguration represents an declarative configuration of the MetricValueStatus type for use
 // with apply.
 type MetricValueStatusApplyConfiguration struct {
-	fields metricValueStatusFields
+	Value              *resource.Quantity `json:"value,omitempty"`
+	AverageValue       *resource.Quantity `json:"averageValue,omitempty"`
+	AverageUtilization *int32             `json:"averageUtilization,omitempty"`
 }
 
 // MetricValueStatusApplyConfiguration constructs an declarative configuration of the MetricValueStatus type for use with
@@ -37,32 +36,21 @@ func MetricValueStatus() *MetricValueStatusApplyConfiguration {
 	return &MetricValueStatusApplyConfiguration{}
 }
 
-// metricValueStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in MetricValueStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type metricValueStatusFields struct {
-	Value              *resource.Quantity `json:"value,omitempty"`
-	AverageValue       *resource.Quantity `json:"averageValue,omitempty"`
-	AverageUtilization *int32             `json:"averageUtilization,omitempty"`
-}
-
 // SetValue sets the Value field in the declarative configuration to the given value.
 func (b *MetricValueStatusApplyConfiguration) SetValue(value resource.Quantity) *MetricValueStatusApplyConfiguration {
-	b.fields.Value = &value
+	b.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
 func (b *MetricValueStatusApplyConfiguration) RemoveValue() *MetricValueStatusApplyConfiguration {
-	b.fields.Value = nil
+	b.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
 func (b *MetricValueStatusApplyConfiguration) GetValue() (value resource.Quantity, ok bool) {
-	if v := b.fields.Value; v != nil {
+	if v := b.Value; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,19 +58,19 @@ func (b *MetricValueStatusApplyConfiguration) GetValue() (value resource.Quantit
 
 // SetAverageValue sets the AverageValue field in the declarative configuration to the given value.
 func (b *MetricValueStatusApplyConfiguration) SetAverageValue(value resource.Quantity) *MetricValueStatusApplyConfiguration {
-	b.fields.AverageValue = &value
+	b.AverageValue = &value
 	return b
 }
 
 // RemoveAverageValue removes the AverageValue field from the declarative configuration.
 func (b *MetricValueStatusApplyConfiguration) RemoveAverageValue() *MetricValueStatusApplyConfiguration {
-	b.fields.AverageValue = nil
+	b.AverageValue = nil
 	return b
 }
 
 // GetAverageValue gets the AverageValue field from the declarative configuration.
 func (b *MetricValueStatusApplyConfiguration) GetAverageValue() (value resource.Quantity, ok bool) {
-	if v := b.fields.AverageValue; v != nil {
+	if v := b.AverageValue; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -90,64 +78,22 @@ func (b *MetricValueStatusApplyConfiguration) GetAverageValue() (value resource.
 
 // SetAverageUtilization sets the AverageUtilization field in the declarative configuration to the given value.
 func (b *MetricValueStatusApplyConfiguration) SetAverageUtilization(value int32) *MetricValueStatusApplyConfiguration {
-	b.fields.AverageUtilization = &value
+	b.AverageUtilization = &value
 	return b
 }
 
 // RemoveAverageUtilization removes the AverageUtilization field from the declarative configuration.
 func (b *MetricValueStatusApplyConfiguration) RemoveAverageUtilization() *MetricValueStatusApplyConfiguration {
-	b.fields.AverageUtilization = nil
+	b.AverageUtilization = nil
 	return b
 }
 
 // GetAverageUtilization gets the AverageUtilization field from the declarative configuration.
 func (b *MetricValueStatusApplyConfiguration) GetAverageUtilization() (value int32, ok bool) {
-	if v := b.fields.AverageUtilization; v != nil {
+	if v := b.AverageUtilization; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts MetricValueStatusApplyConfiguration to unstructured.
-func (b *MetricValueStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to MetricValueStatusApplyConfiguration, replacing the contents
-// of MetricValueStatusApplyConfiguration.
-func (b *MetricValueStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &metricValueStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals MetricValueStatusApplyConfiguration to JSON.
-func (b *MetricValueStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into MetricValueStatusApplyConfiguration, replacing the contents of
-// MetricValueStatusApplyConfiguration.
-func (b *MetricValueStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // MetricValueStatusList represents a listAlias of MetricValueStatusApplyConfiguration.
@@ -155,8 +101,3 @@ type MetricValueStatusList []*MetricValueStatusApplyConfiguration
 
 // MetricValueStatusList represents a map of MetricValueStatusApplyConfiguration.
 type MetricValueStatusMap map[string]MetricValueStatusApplyConfiguration
-
-func (b *MetricValueStatusApplyConfiguration) preMarshal() {
-}
-func (b *MetricValueStatusApplyConfiguration) postUnmarshal() {
-}

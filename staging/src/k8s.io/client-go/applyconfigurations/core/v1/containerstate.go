@@ -18,16 +18,12 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ContainerStateApplyConfiguration represents an declarative configuration of the ContainerState type for use
 // with apply.
 type ContainerStateApplyConfiguration struct {
-	fields containerStateFields
+	Waiting    *ContainerStateWaitingApplyConfiguration    `json:"waiting,omitempty"`
+	Running    *ContainerStateRunningApplyConfiguration    `json:"running,omitempty"`
+	Terminated *ContainerStateTerminatedApplyConfiguration `json:"terminated,omitempty"`
 }
 
 // ContainerStateApplyConfiguration constructs an declarative configuration of the ContainerState type for use with
@@ -36,108 +32,55 @@ func ContainerState() *ContainerStateApplyConfiguration {
 	return &ContainerStateApplyConfiguration{}
 }
 
-// containerStateFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ContainerStateApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type containerStateFields struct {
-	Waiting    *ContainerStateWaitingApplyConfiguration    `json:"waiting,omitempty"`
-	Running    *ContainerStateRunningApplyConfiguration    `json:"running,omitempty"`
-	Terminated *ContainerStateTerminatedApplyConfiguration `json:"terminated,omitempty"`
-}
-
 // SetWaiting sets the Waiting field in the declarative configuration to the given value.
 func (b *ContainerStateApplyConfiguration) SetWaiting(value *ContainerStateWaitingApplyConfiguration) *ContainerStateApplyConfiguration {
-	b.fields.Waiting = value
+	b.Waiting = value
 	return b
 }
 
 // RemoveWaiting removes the Waiting field from the declarative configuration.
 func (b *ContainerStateApplyConfiguration) RemoveWaiting() *ContainerStateApplyConfiguration {
-	b.fields.Waiting = nil
+	b.Waiting = nil
 	return b
 }
 
 // GetWaiting gets the Waiting field from the declarative configuration.
 func (b *ContainerStateApplyConfiguration) GetWaiting() (value *ContainerStateWaitingApplyConfiguration, ok bool) {
-	return b.fields.Waiting, b.fields.Waiting != nil
+	return b.Waiting, b.Waiting != nil
 }
 
 // SetRunning sets the Running field in the declarative configuration to the given value.
 func (b *ContainerStateApplyConfiguration) SetRunning(value *ContainerStateRunningApplyConfiguration) *ContainerStateApplyConfiguration {
-	b.fields.Running = value
+	b.Running = value
 	return b
 }
 
 // RemoveRunning removes the Running field from the declarative configuration.
 func (b *ContainerStateApplyConfiguration) RemoveRunning() *ContainerStateApplyConfiguration {
-	b.fields.Running = nil
+	b.Running = nil
 	return b
 }
 
 // GetRunning gets the Running field from the declarative configuration.
 func (b *ContainerStateApplyConfiguration) GetRunning() (value *ContainerStateRunningApplyConfiguration, ok bool) {
-	return b.fields.Running, b.fields.Running != nil
+	return b.Running, b.Running != nil
 }
 
 // SetTerminated sets the Terminated field in the declarative configuration to the given value.
 func (b *ContainerStateApplyConfiguration) SetTerminated(value *ContainerStateTerminatedApplyConfiguration) *ContainerStateApplyConfiguration {
-	b.fields.Terminated = value
+	b.Terminated = value
 	return b
 }
 
 // RemoveTerminated removes the Terminated field from the declarative configuration.
 func (b *ContainerStateApplyConfiguration) RemoveTerminated() *ContainerStateApplyConfiguration {
-	b.fields.Terminated = nil
+	b.Terminated = nil
 	return b
 }
 
 // GetTerminated gets the Terminated field from the declarative configuration.
 func (b *ContainerStateApplyConfiguration) GetTerminated() (value *ContainerStateTerminatedApplyConfiguration, ok bool) {
-	return b.fields.Terminated, b.fields.Terminated != nil
-}
-
-// ToUnstructured converts ContainerStateApplyConfiguration to unstructured.
-func (b *ContainerStateApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ContainerStateApplyConfiguration, replacing the contents
-// of ContainerStateApplyConfiguration.
-func (b *ContainerStateApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &containerStateFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ContainerStateApplyConfiguration to JSON.
-func (b *ContainerStateApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ContainerStateApplyConfiguration, replacing the contents of
-// ContainerStateApplyConfiguration.
-func (b *ContainerStateApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Terminated, b.Terminated != nil
 }
 
 // ContainerStateList represents a listAlias of ContainerStateApplyConfiguration.
@@ -145,8 +88,3 @@ type ContainerStateList []*ContainerStateApplyConfiguration
 
 // ContainerStateList represents a map of ContainerStateApplyConfiguration.
 type ContainerStateMap map[string]ContainerStateApplyConfiguration
-
-func (b *ContainerStateApplyConfiguration) preMarshal() {
-}
-func (b *ContainerStateApplyConfiguration) postUnmarshal() {
-}

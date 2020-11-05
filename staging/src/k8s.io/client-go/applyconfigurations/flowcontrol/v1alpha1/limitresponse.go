@@ -19,16 +19,14 @@ limitations under the License.
 package v1alpha1
 
 import (
-	json "encoding/json"
-
 	v1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // LimitResponseApplyConfiguration represents an declarative configuration of the LimitResponse type for use
 // with apply.
 type LimitResponseApplyConfiguration struct {
-	fields limitResponseFields
+	Type    *v1alpha1.LimitResponseType             `json:"type,omitempty"`
+	Queuing *QueuingConfigurationApplyConfiguration `json:"queuing,omitempty"`
 }
 
 // LimitResponseApplyConfiguration constructs an declarative configuration of the LimitResponse type for use with
@@ -37,31 +35,21 @@ func LimitResponse() *LimitResponseApplyConfiguration {
 	return &LimitResponseApplyConfiguration{}
 }
 
-// limitResponseFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LimitResponseApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type limitResponseFields struct {
-	Type    *v1alpha1.LimitResponseType             `json:"type,omitempty"`
-	Queuing *QueuingConfigurationApplyConfiguration `json:"queuing,omitempty"`
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *LimitResponseApplyConfiguration) SetType(value v1alpha1.LimitResponseType) *LimitResponseApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *LimitResponseApplyConfiguration) RemoveType() *LimitResponseApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *LimitResponseApplyConfiguration) GetType() (value v1alpha1.LimitResponseType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,61 +57,19 @@ func (b *LimitResponseApplyConfiguration) GetType() (value v1alpha1.LimitRespons
 
 // SetQueuing sets the Queuing field in the declarative configuration to the given value.
 func (b *LimitResponseApplyConfiguration) SetQueuing(value *QueuingConfigurationApplyConfiguration) *LimitResponseApplyConfiguration {
-	b.fields.Queuing = value
+	b.Queuing = value
 	return b
 }
 
 // RemoveQueuing removes the Queuing field from the declarative configuration.
 func (b *LimitResponseApplyConfiguration) RemoveQueuing() *LimitResponseApplyConfiguration {
-	b.fields.Queuing = nil
+	b.Queuing = nil
 	return b
 }
 
 // GetQueuing gets the Queuing field from the declarative configuration.
 func (b *LimitResponseApplyConfiguration) GetQueuing() (value *QueuingConfigurationApplyConfiguration, ok bool) {
-	return b.fields.Queuing, b.fields.Queuing != nil
-}
-
-// ToUnstructured converts LimitResponseApplyConfiguration to unstructured.
-func (b *LimitResponseApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to LimitResponseApplyConfiguration, replacing the contents
-// of LimitResponseApplyConfiguration.
-func (b *LimitResponseApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &limitResponseFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals LimitResponseApplyConfiguration to JSON.
-func (b *LimitResponseApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into LimitResponseApplyConfiguration, replacing the contents of
-// LimitResponseApplyConfiguration.
-func (b *LimitResponseApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Queuing, b.Queuing != nil
 }
 
 // LimitResponseList represents a listAlias of LimitResponseApplyConfiguration.
@@ -131,8 +77,3 @@ type LimitResponseList []*LimitResponseApplyConfiguration
 
 // LimitResponseList represents a map of LimitResponseApplyConfiguration.
 type LimitResponseMap map[string]LimitResponseApplyConfiguration
-
-func (b *LimitResponseApplyConfiguration) preMarshal() {
-}
-func (b *LimitResponseApplyConfiguration) postUnmarshal() {
-}

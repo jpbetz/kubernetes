@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // PriorityLevelConfigurationReferenceApplyConfiguration represents an declarative configuration of the PriorityLevelConfigurationReference type for use
 // with apply.
 type PriorityLevelConfigurationReferenceApplyConfiguration struct {
-	fields priorityLevelConfigurationReferenceFields
+	Name *string `json:"name,omitempty"`
 }
 
 // PriorityLevelConfigurationReferenceApplyConfiguration constructs an declarative configuration of the PriorityLevelConfigurationReference type for use with
@@ -36,75 +30,24 @@ func PriorityLevelConfigurationReference() *PriorityLevelConfigurationReferenceA
 	return &PriorityLevelConfigurationReferenceApplyConfiguration{}
 }
 
-// priorityLevelConfigurationReferenceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PriorityLevelConfigurationReferenceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type priorityLevelConfigurationReferenceFields struct {
-	Name *string `json:"name,omitempty"`
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *PriorityLevelConfigurationReferenceApplyConfiguration) SetName(value string) *PriorityLevelConfigurationReferenceApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *PriorityLevelConfigurationReferenceApplyConfiguration) RemoveName() *PriorityLevelConfigurationReferenceApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *PriorityLevelConfigurationReferenceApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts PriorityLevelConfigurationReferenceApplyConfiguration to unstructured.
-func (b *PriorityLevelConfigurationReferenceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PriorityLevelConfigurationReferenceApplyConfiguration, replacing the contents
-// of PriorityLevelConfigurationReferenceApplyConfiguration.
-func (b *PriorityLevelConfigurationReferenceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &priorityLevelConfigurationReferenceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PriorityLevelConfigurationReferenceApplyConfiguration to JSON.
-func (b *PriorityLevelConfigurationReferenceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PriorityLevelConfigurationReferenceApplyConfiguration, replacing the contents of
-// PriorityLevelConfigurationReferenceApplyConfiguration.
-func (b *PriorityLevelConfigurationReferenceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // PriorityLevelConfigurationReferenceList represents a listAlias of PriorityLevelConfigurationReferenceApplyConfiguration.
@@ -112,8 +55,3 @@ type PriorityLevelConfigurationReferenceList []*PriorityLevelConfigurationRefere
 
 // PriorityLevelConfigurationReferenceList represents a map of PriorityLevelConfigurationReferenceApplyConfiguration.
 type PriorityLevelConfigurationReferenceMap map[string]PriorityLevelConfigurationReferenceApplyConfiguration
-
-func (b *PriorityLevelConfigurationReferenceApplyConfiguration) preMarshal() {
-}
-func (b *PriorityLevelConfigurationReferenceApplyConfiguration) postUnmarshal() {
-}

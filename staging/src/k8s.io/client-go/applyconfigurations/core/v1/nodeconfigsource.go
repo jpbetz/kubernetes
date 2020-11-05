@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // NodeConfigSourceApplyConfiguration represents an declarative configuration of the NodeConfigSource type for use
 // with apply.
 type NodeConfigSourceApplyConfiguration struct {
-	fields nodeConfigSourceFields
+	ConfigMap *ConfigMapNodeConfigSourceApplyConfiguration `json:"configMap,omitempty"`
 }
 
 // NodeConfigSourceApplyConfiguration constructs an declarative configuration of the NodeConfigSource type for use with
@@ -36,72 +30,21 @@ func NodeConfigSource() *NodeConfigSourceApplyConfiguration {
 	return &NodeConfigSourceApplyConfiguration{}
 }
 
-// nodeConfigSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NodeConfigSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type nodeConfigSourceFields struct {
-	ConfigMap *ConfigMapNodeConfigSourceApplyConfiguration `json:"configMap,omitempty"`
-}
-
 // SetConfigMap sets the ConfigMap field in the declarative configuration to the given value.
 func (b *NodeConfigSourceApplyConfiguration) SetConfigMap(value *ConfigMapNodeConfigSourceApplyConfiguration) *NodeConfigSourceApplyConfiguration {
-	b.fields.ConfigMap = value
+	b.ConfigMap = value
 	return b
 }
 
 // RemoveConfigMap removes the ConfigMap field from the declarative configuration.
 func (b *NodeConfigSourceApplyConfiguration) RemoveConfigMap() *NodeConfigSourceApplyConfiguration {
-	b.fields.ConfigMap = nil
+	b.ConfigMap = nil
 	return b
 }
 
 // GetConfigMap gets the ConfigMap field from the declarative configuration.
 func (b *NodeConfigSourceApplyConfiguration) GetConfigMap() (value *ConfigMapNodeConfigSourceApplyConfiguration, ok bool) {
-	return b.fields.ConfigMap, b.fields.ConfigMap != nil
-}
-
-// ToUnstructured converts NodeConfigSourceApplyConfiguration to unstructured.
-func (b *NodeConfigSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to NodeConfigSourceApplyConfiguration, replacing the contents
-// of NodeConfigSourceApplyConfiguration.
-func (b *NodeConfigSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &nodeConfigSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals NodeConfigSourceApplyConfiguration to JSON.
-func (b *NodeConfigSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into NodeConfigSourceApplyConfiguration, replacing the contents of
-// NodeConfigSourceApplyConfiguration.
-func (b *NodeConfigSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.ConfigMap, b.ConfigMap != nil
 }
 
 // NodeConfigSourceList represents a listAlias of NodeConfigSourceApplyConfiguration.
@@ -109,8 +52,3 @@ type NodeConfigSourceList []*NodeConfigSourceApplyConfiguration
 
 // NodeConfigSourceList represents a map of NodeConfigSourceApplyConfiguration.
 type NodeConfigSourceMap map[string]NodeConfigSourceApplyConfiguration
-
-func (b *NodeConfigSourceApplyConfiguration) preMarshal() {
-}
-func (b *NodeConfigSourceApplyConfiguration) postUnmarshal() {
-}

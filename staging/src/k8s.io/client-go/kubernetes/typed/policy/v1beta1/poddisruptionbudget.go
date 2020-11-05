@@ -20,6 +20,7 @@ package v1beta1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -200,7 +201,7 @@ func (c *podDisruptionBudgets) Patch(ctx context.Context, name string, pt types.
 // Apply takes the given apply declarative configuration, applies it and returns the applied podDisruptionBudget.
 func (c *podDisruptionBudgets) Apply(ctx context.Context, podDisruptionBudget *policyv1beta1.PodDisruptionBudgetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PodDisruptionBudget, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := podDisruptionBudget.MarshalJSON()
+	data, err := json.Marshal(podDisruptionBudget)
 	if err != nil {
 		return nil, err
 	}

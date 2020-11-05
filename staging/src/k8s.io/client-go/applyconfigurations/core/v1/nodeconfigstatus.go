@@ -18,16 +18,13 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // NodeConfigStatusApplyConfiguration represents an declarative configuration of the NodeConfigStatus type for use
 // with apply.
 type NodeConfigStatusApplyConfiguration struct {
-	fields nodeConfigStatusFields
+	Assigned      *NodeConfigSourceApplyConfiguration `json:"assigned,omitempty"`
+	Active        *NodeConfigSourceApplyConfiguration `json:"active,omitempty"`
+	LastKnownGood *NodeConfigSourceApplyConfiguration `json:"lastKnownGood,omitempty"`
+	Error         *string                             `json:"error,omitempty"`
 }
 
 // NodeConfigStatusApplyConfiguration constructs an declarative configuration of the NodeConfigStatus type for use with
@@ -36,129 +33,75 @@ func NodeConfigStatus() *NodeConfigStatusApplyConfiguration {
 	return &NodeConfigStatusApplyConfiguration{}
 }
 
-// nodeConfigStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NodeConfigStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type nodeConfigStatusFields struct {
-	Assigned      *NodeConfigSourceApplyConfiguration `json:"assigned,omitempty"`
-	Active        *NodeConfigSourceApplyConfiguration `json:"active,omitempty"`
-	LastKnownGood *NodeConfigSourceApplyConfiguration `json:"lastKnownGood,omitempty"`
-	Error         *string                             `json:"error,omitempty"`
-}
-
 // SetAssigned sets the Assigned field in the declarative configuration to the given value.
 func (b *NodeConfigStatusApplyConfiguration) SetAssigned(value *NodeConfigSourceApplyConfiguration) *NodeConfigStatusApplyConfiguration {
-	b.fields.Assigned = value
+	b.Assigned = value
 	return b
 }
 
 // RemoveAssigned removes the Assigned field from the declarative configuration.
 func (b *NodeConfigStatusApplyConfiguration) RemoveAssigned() *NodeConfigStatusApplyConfiguration {
-	b.fields.Assigned = nil
+	b.Assigned = nil
 	return b
 }
 
 // GetAssigned gets the Assigned field from the declarative configuration.
 func (b *NodeConfigStatusApplyConfiguration) GetAssigned() (value *NodeConfigSourceApplyConfiguration, ok bool) {
-	return b.fields.Assigned, b.fields.Assigned != nil
+	return b.Assigned, b.Assigned != nil
 }
 
 // SetActive sets the Active field in the declarative configuration to the given value.
 func (b *NodeConfigStatusApplyConfiguration) SetActive(value *NodeConfigSourceApplyConfiguration) *NodeConfigStatusApplyConfiguration {
-	b.fields.Active = value
+	b.Active = value
 	return b
 }
 
 // RemoveActive removes the Active field from the declarative configuration.
 func (b *NodeConfigStatusApplyConfiguration) RemoveActive() *NodeConfigStatusApplyConfiguration {
-	b.fields.Active = nil
+	b.Active = nil
 	return b
 }
 
 // GetActive gets the Active field from the declarative configuration.
 func (b *NodeConfigStatusApplyConfiguration) GetActive() (value *NodeConfigSourceApplyConfiguration, ok bool) {
-	return b.fields.Active, b.fields.Active != nil
+	return b.Active, b.Active != nil
 }
 
 // SetLastKnownGood sets the LastKnownGood field in the declarative configuration to the given value.
 func (b *NodeConfigStatusApplyConfiguration) SetLastKnownGood(value *NodeConfigSourceApplyConfiguration) *NodeConfigStatusApplyConfiguration {
-	b.fields.LastKnownGood = value
+	b.LastKnownGood = value
 	return b
 }
 
 // RemoveLastKnownGood removes the LastKnownGood field from the declarative configuration.
 func (b *NodeConfigStatusApplyConfiguration) RemoveLastKnownGood() *NodeConfigStatusApplyConfiguration {
-	b.fields.LastKnownGood = nil
+	b.LastKnownGood = nil
 	return b
 }
 
 // GetLastKnownGood gets the LastKnownGood field from the declarative configuration.
 func (b *NodeConfigStatusApplyConfiguration) GetLastKnownGood() (value *NodeConfigSourceApplyConfiguration, ok bool) {
-	return b.fields.LastKnownGood, b.fields.LastKnownGood != nil
+	return b.LastKnownGood, b.LastKnownGood != nil
 }
 
 // SetError sets the Error field in the declarative configuration to the given value.
 func (b *NodeConfigStatusApplyConfiguration) SetError(value string) *NodeConfigStatusApplyConfiguration {
-	b.fields.Error = &value
+	b.Error = &value
 	return b
 }
 
 // RemoveError removes the Error field from the declarative configuration.
 func (b *NodeConfigStatusApplyConfiguration) RemoveError() *NodeConfigStatusApplyConfiguration {
-	b.fields.Error = nil
+	b.Error = nil
 	return b
 }
 
 // GetError gets the Error field from the declarative configuration.
 func (b *NodeConfigStatusApplyConfiguration) GetError() (value string, ok bool) {
-	if v := b.fields.Error; v != nil {
+	if v := b.Error; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts NodeConfigStatusApplyConfiguration to unstructured.
-func (b *NodeConfigStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to NodeConfigStatusApplyConfiguration, replacing the contents
-// of NodeConfigStatusApplyConfiguration.
-func (b *NodeConfigStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &nodeConfigStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals NodeConfigStatusApplyConfiguration to JSON.
-func (b *NodeConfigStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into NodeConfigStatusApplyConfiguration, replacing the contents of
-// NodeConfigStatusApplyConfiguration.
-func (b *NodeConfigStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // NodeConfigStatusList represents a listAlias of NodeConfigStatusApplyConfiguration.
@@ -166,8 +109,3 @@ type NodeConfigStatusList []*NodeConfigStatusApplyConfiguration
 
 // NodeConfigStatusList represents a map of NodeConfigStatusApplyConfiguration.
 type NodeConfigStatusMap map[string]NodeConfigStatusApplyConfiguration
-
-func (b *NodeConfigStatusApplyConfiguration) preMarshal() {
-}
-func (b *NodeConfigStatusApplyConfiguration) postUnmarshal() {
-}

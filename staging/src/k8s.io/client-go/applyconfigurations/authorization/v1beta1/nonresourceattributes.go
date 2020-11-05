@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1beta1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // NonResourceAttributesApplyConfiguration represents an declarative configuration of the NonResourceAttributes type for use
 // with apply.
 type NonResourceAttributesApplyConfiguration struct {
-	fields nonResourceAttributesFields
+	Path *string `json:"path,omitempty"`
+	Verb *string `json:"verb,omitempty"`
 }
 
 // NonResourceAttributesApplyConfiguration constructs an declarative configuration of the NonResourceAttributes type for use with
@@ -36,31 +31,21 @@ func NonResourceAttributes() *NonResourceAttributesApplyConfiguration {
 	return &NonResourceAttributesApplyConfiguration{}
 }
 
-// nonResourceAttributesFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NonResourceAttributesApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type nonResourceAttributesFields struct {
-	Path *string `json:"path,omitempty"`
-	Verb *string `json:"verb,omitempty"`
-}
-
 // SetPath sets the Path field in the declarative configuration to the given value.
 func (b *NonResourceAttributesApplyConfiguration) SetPath(value string) *NonResourceAttributesApplyConfiguration {
-	b.fields.Path = &value
+	b.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
 func (b *NonResourceAttributesApplyConfiguration) RemovePath() *NonResourceAttributesApplyConfiguration {
-	b.fields.Path = nil
+	b.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
 func (b *NonResourceAttributesApplyConfiguration) GetPath() (value string, ok bool) {
-	if v := b.fields.Path; v != nil {
+	if v := b.Path; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *NonResourceAttributesApplyConfiguration) GetPath() (value string, ok bo
 
 // SetVerb sets the Verb field in the declarative configuration to the given value.
 func (b *NonResourceAttributesApplyConfiguration) SetVerb(value string) *NonResourceAttributesApplyConfiguration {
-	b.fields.Verb = &value
+	b.Verb = &value
 	return b
 }
 
 // RemoveVerb removes the Verb field from the declarative configuration.
 func (b *NonResourceAttributesApplyConfiguration) RemoveVerb() *NonResourceAttributesApplyConfiguration {
-	b.fields.Verb = nil
+	b.Verb = nil
 	return b
 }
 
 // GetVerb gets the Verb field from the declarative configuration.
 func (b *NonResourceAttributesApplyConfiguration) GetVerb() (value string, ok bool) {
-	if v := b.fields.Verb; v != nil {
+	if v := b.Verb; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts NonResourceAttributesApplyConfiguration to unstructured.
-func (b *NonResourceAttributesApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to NonResourceAttributesApplyConfiguration, replacing the contents
-// of NonResourceAttributesApplyConfiguration.
-func (b *NonResourceAttributesApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &nonResourceAttributesFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals NonResourceAttributesApplyConfiguration to JSON.
-func (b *NonResourceAttributesApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into NonResourceAttributesApplyConfiguration, replacing the contents of
-// NonResourceAttributesApplyConfiguration.
-func (b *NonResourceAttributesApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // NonResourceAttributesList represents a listAlias of NonResourceAttributesApplyConfiguration.
@@ -133,8 +76,3 @@ type NonResourceAttributesList []*NonResourceAttributesApplyConfiguration
 
 // NonResourceAttributesList represents a map of NonResourceAttributesApplyConfiguration.
 type NonResourceAttributesMap map[string]NonResourceAttributesApplyConfiguration
-
-func (b *NonResourceAttributesApplyConfiguration) preMarshal() {
-}
-func (b *NonResourceAttributesApplyConfiguration) postUnmarshal() {
-}

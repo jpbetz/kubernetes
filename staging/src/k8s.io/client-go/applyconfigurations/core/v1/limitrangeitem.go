@@ -19,30 +19,12 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // LimitRangeItemApplyConfiguration represents an declarative configuration of the LimitRangeItem type for use
 // with apply.
 type LimitRangeItemApplyConfiguration struct {
-	fields limitRangeItemFields
-}
-
-// LimitRangeItemApplyConfiguration constructs an declarative configuration of the LimitRangeItem type for use with
-// apply.
-func LimitRangeItem() *LimitRangeItemApplyConfiguration {
-	return &LimitRangeItemApplyConfiguration{}
-}
-
-// limitRangeItemFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LimitRangeItemApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type limitRangeItemFields struct {
 	Type                 *v1.LimitType    `json:"type,omitempty"`
 	Max                  *v1.ResourceList `json:"max,omitempty"`
 	Min                  *v1.ResourceList `json:"min,omitempty"`
@@ -51,21 +33,27 @@ type limitRangeItemFields struct {
 	MaxLimitRequestRatio *v1.ResourceList `json:"maxLimitRequestRatio,omitempty"`
 }
 
+// LimitRangeItemApplyConfiguration constructs an declarative configuration of the LimitRangeItem type for use with
+// apply.
+func LimitRangeItem() *LimitRangeItemApplyConfiguration {
+	return &LimitRangeItemApplyConfiguration{}
+}
+
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *LimitRangeItemApplyConfiguration) SetType(value v1.LimitType) *LimitRangeItemApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *LimitRangeItemApplyConfiguration) RemoveType() *LimitRangeItemApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *LimitRangeItemApplyConfiguration) GetType() (value v1.LimitType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -73,19 +61,19 @@ func (b *LimitRangeItemApplyConfiguration) GetType() (value v1.LimitType, ok boo
 
 // SetMax sets the Max field in the declarative configuration to the given value.
 func (b *LimitRangeItemApplyConfiguration) SetMax(value v1.ResourceList) *LimitRangeItemApplyConfiguration {
-	b.fields.Max = &value
+	b.Max = &value
 	return b
 }
 
 // RemoveMax removes the Max field from the declarative configuration.
 func (b *LimitRangeItemApplyConfiguration) RemoveMax() *LimitRangeItemApplyConfiguration {
-	b.fields.Max = nil
+	b.Max = nil
 	return b
 }
 
 // GetMax gets the Max field from the declarative configuration.
 func (b *LimitRangeItemApplyConfiguration) GetMax() (value v1.ResourceList, ok bool) {
-	if v := b.fields.Max; v != nil {
+	if v := b.Max; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -93,19 +81,19 @@ func (b *LimitRangeItemApplyConfiguration) GetMax() (value v1.ResourceList, ok b
 
 // SetMin sets the Min field in the declarative configuration to the given value.
 func (b *LimitRangeItemApplyConfiguration) SetMin(value v1.ResourceList) *LimitRangeItemApplyConfiguration {
-	b.fields.Min = &value
+	b.Min = &value
 	return b
 }
 
 // RemoveMin removes the Min field from the declarative configuration.
 func (b *LimitRangeItemApplyConfiguration) RemoveMin() *LimitRangeItemApplyConfiguration {
-	b.fields.Min = nil
+	b.Min = nil
 	return b
 }
 
 // GetMin gets the Min field from the declarative configuration.
 func (b *LimitRangeItemApplyConfiguration) GetMin() (value v1.ResourceList, ok bool) {
-	if v := b.fields.Min; v != nil {
+	if v := b.Min; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -113,19 +101,19 @@ func (b *LimitRangeItemApplyConfiguration) GetMin() (value v1.ResourceList, ok b
 
 // SetDefault sets the Default field in the declarative configuration to the given value.
 func (b *LimitRangeItemApplyConfiguration) SetDefault(value v1.ResourceList) *LimitRangeItemApplyConfiguration {
-	b.fields.Default = &value
+	b.Default = &value
 	return b
 }
 
 // RemoveDefault removes the Default field from the declarative configuration.
 func (b *LimitRangeItemApplyConfiguration) RemoveDefault() *LimitRangeItemApplyConfiguration {
-	b.fields.Default = nil
+	b.Default = nil
 	return b
 }
 
 // GetDefault gets the Default field from the declarative configuration.
 func (b *LimitRangeItemApplyConfiguration) GetDefault() (value v1.ResourceList, ok bool) {
-	if v := b.fields.Default; v != nil {
+	if v := b.Default; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -133,19 +121,19 @@ func (b *LimitRangeItemApplyConfiguration) GetDefault() (value v1.ResourceList, 
 
 // SetDefaultRequest sets the DefaultRequest field in the declarative configuration to the given value.
 func (b *LimitRangeItemApplyConfiguration) SetDefaultRequest(value v1.ResourceList) *LimitRangeItemApplyConfiguration {
-	b.fields.DefaultRequest = &value
+	b.DefaultRequest = &value
 	return b
 }
 
 // RemoveDefaultRequest removes the DefaultRequest field from the declarative configuration.
 func (b *LimitRangeItemApplyConfiguration) RemoveDefaultRequest() *LimitRangeItemApplyConfiguration {
-	b.fields.DefaultRequest = nil
+	b.DefaultRequest = nil
 	return b
 }
 
 // GetDefaultRequest gets the DefaultRequest field from the declarative configuration.
 func (b *LimitRangeItemApplyConfiguration) GetDefaultRequest() (value v1.ResourceList, ok bool) {
-	if v := b.fields.DefaultRequest; v != nil {
+	if v := b.DefaultRequest; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -153,64 +141,22 @@ func (b *LimitRangeItemApplyConfiguration) GetDefaultRequest() (value v1.Resourc
 
 // SetMaxLimitRequestRatio sets the MaxLimitRequestRatio field in the declarative configuration to the given value.
 func (b *LimitRangeItemApplyConfiguration) SetMaxLimitRequestRatio(value v1.ResourceList) *LimitRangeItemApplyConfiguration {
-	b.fields.MaxLimitRequestRatio = &value
+	b.MaxLimitRequestRatio = &value
 	return b
 }
 
 // RemoveMaxLimitRequestRatio removes the MaxLimitRequestRatio field from the declarative configuration.
 func (b *LimitRangeItemApplyConfiguration) RemoveMaxLimitRequestRatio() *LimitRangeItemApplyConfiguration {
-	b.fields.MaxLimitRequestRatio = nil
+	b.MaxLimitRequestRatio = nil
 	return b
 }
 
 // GetMaxLimitRequestRatio gets the MaxLimitRequestRatio field from the declarative configuration.
 func (b *LimitRangeItemApplyConfiguration) GetMaxLimitRequestRatio() (value v1.ResourceList, ok bool) {
-	if v := b.fields.MaxLimitRequestRatio; v != nil {
+	if v := b.MaxLimitRequestRatio; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts LimitRangeItemApplyConfiguration to unstructured.
-func (b *LimitRangeItemApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to LimitRangeItemApplyConfiguration, replacing the contents
-// of LimitRangeItemApplyConfiguration.
-func (b *LimitRangeItemApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &limitRangeItemFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals LimitRangeItemApplyConfiguration to JSON.
-func (b *LimitRangeItemApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into LimitRangeItemApplyConfiguration, replacing the contents of
-// LimitRangeItemApplyConfiguration.
-func (b *LimitRangeItemApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // LimitRangeItemList represents a listAlias of LimitRangeItemApplyConfiguration.
@@ -218,8 +164,3 @@ type LimitRangeItemList []*LimitRangeItemApplyConfiguration
 
 // LimitRangeItemList represents a map of LimitRangeItemApplyConfiguration.
 type LimitRangeItemMap map[string]LimitRangeItemApplyConfiguration
-
-func (b *LimitRangeItemApplyConfiguration) preMarshal() {
-}
-func (b *LimitRangeItemApplyConfiguration) postUnmarshal() {
-}

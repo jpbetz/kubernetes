@@ -19,17 +19,15 @@ limitations under the License.
 package v1alpha1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // RuntimeClassApplyConfiguration represents an declarative configuration of the RuntimeClass type for use
 // with apply.
 type RuntimeClassApplyConfiguration struct {
-	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
-	fields   runtimeClassFields
+	v1.TypeMetaApplyConfiguration `json:",inline"`
+	ObjectMeta                    *v1.ObjectMetaApplyConfiguration    `json:"metadata,omitempty"`
+	Spec                          *RuntimeClassSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
 // RuntimeClassApplyConfiguration constructs an declarative configuration of the RuntimeClass type for use with
@@ -38,109 +36,51 @@ func RuntimeClass() *RuntimeClassApplyConfiguration {
 	return &RuntimeClassApplyConfiguration{}
 }
 
-// runtimeClassFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in RuntimeClassApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type runtimeClassFields struct {
-	Kind       *string                             `json:"kind,omitempty"`       // inlined RuntimeClassApplyConfiguration.typeMeta.Kind field
-	APIVersion *string                             `json:"apiVersion,omitempty"` // inlined RuntimeClassApplyConfiguration.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaApplyConfiguration    `json:"metadata,omitempty"`
-	Spec       *RuntimeClassSpecApplyConfiguration `json:"spec,omitempty"`
-}
-
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
 func (b *RuntimeClassApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *RuntimeClassApplyConfiguration {
-	b.typeMeta = value
-	return b
-}
-
-// RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *RuntimeClassApplyConfiguration) RemoveTypeMeta() *RuntimeClassApplyConfiguration {
-	b.typeMeta = nil
+	if value != nil {
+		b.TypeMetaApplyConfiguration = *value
+	}
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
 func (b *RuntimeClassApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
-	return b.typeMeta, true
+	return &b.TypeMetaApplyConfiguration, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
 func (b *RuntimeClassApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *RuntimeClassApplyConfiguration {
-	b.fields.ObjectMeta = value
+	b.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
 func (b *RuntimeClassApplyConfiguration) RemoveObjectMeta() *RuntimeClassApplyConfiguration {
-	b.fields.ObjectMeta = nil
+	b.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
 func (b *RuntimeClassApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
-	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
+	return b.ObjectMeta, b.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
 func (b *RuntimeClassApplyConfiguration) SetSpec(value *RuntimeClassSpecApplyConfiguration) *RuntimeClassApplyConfiguration {
-	b.fields.Spec = value
+	b.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
 func (b *RuntimeClassApplyConfiguration) RemoveSpec() *RuntimeClassApplyConfiguration {
-	b.fields.Spec = nil
+	b.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
 func (b *RuntimeClassApplyConfiguration) GetSpec() (value *RuntimeClassSpecApplyConfiguration, ok bool) {
-	return b.fields.Spec, b.fields.Spec != nil
-}
-
-// ToUnstructured converts RuntimeClassApplyConfiguration to unstructured.
-func (b *RuntimeClassApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to RuntimeClassApplyConfiguration, replacing the contents
-// of RuntimeClassApplyConfiguration.
-func (b *RuntimeClassApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &runtimeClassFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals RuntimeClassApplyConfiguration to JSON.
-func (b *RuntimeClassApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into RuntimeClassApplyConfiguration, replacing the contents of
-// RuntimeClassApplyConfiguration.
-func (b *RuntimeClassApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Spec, b.Spec != nil
 }
 
 // RuntimeClassList represents a listAlias of RuntimeClassApplyConfiguration.
@@ -148,25 +88,3 @@ type RuntimeClassList []*RuntimeClassApplyConfiguration
 
 // RuntimeClassList represents a map of RuntimeClassApplyConfiguration.
 type RuntimeClassMap map[string]RuntimeClassApplyConfiguration
-
-func (b *RuntimeClassApplyConfiguration) preMarshal() {
-	if b.typeMeta != nil {
-		if v, ok := b.typeMeta.GetKind(); ok {
-			b.fields.Kind = &v
-		}
-		if v, ok := b.typeMeta.GetAPIVersion(); ok {
-			b.fields.APIVersion = &v
-		}
-	}
-}
-func (b *RuntimeClassApplyConfiguration) postUnmarshal() {
-	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
-	}
-	if b.fields.Kind != nil {
-		b.typeMeta.SetKind(*b.fields.Kind)
-	}
-	if b.fields.APIVersion != nil {
-		b.typeMeta.SetAPIVersion(*b.fields.APIVersion)
-	}
-}

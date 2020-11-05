@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
@@ -133,7 +134,7 @@ func (c *FakeEndpoints) Patch(ctx context.Context, name string, pt types.PatchTy
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied endpoints.
 func (c *FakeEndpoints) Apply(ctx context.Context, endpoints *applyconfigurationscorev1.EndpointsApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Endpoints, err error) {
-	data, err := endpoints.MarshalJSON()
+	data, err := json.Marshal(endpoints)
 	if err != nil {
 		return nil, err
 	}

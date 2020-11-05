@@ -19,17 +19,21 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
-	corev1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
+	v1 "k8s.io/api/core/v1"
 )
 
 // PersistentVolumeSpecApplyConfiguration represents an declarative configuration of the PersistentVolumeSpec type for use
 // with apply.
 type PersistentVolumeSpecApplyConfiguration struct {
-	persistentVolumeSource *PersistentVolumeSourceApplyConfiguration // inlined type
-	fields                 persistentVolumeSpecFields
+	Capacity                                 *v1.ResourceList `json:"capacity,omitempty"`
+	PersistentVolumeSourceApplyConfiguration `json:",inline"`
+	AccessModes                              *[]v1.PersistentVolumeAccessMode      `json:"accessModes,omitempty"`
+	ClaimRef                                 *ObjectReferenceApplyConfiguration    `json:"claimRef,omitempty"`
+	PersistentVolumeReclaimPolicy            *v1.PersistentVolumeReclaimPolicy     `json:"persistentVolumeReclaimPolicy,omitempty"`
+	StorageClassName                         *string                               `json:"storageClassName,omitempty"`
+	MountOptions                             *[]string                             `json:"mountOptions,omitempty"`
+	VolumeMode                               *v1.PersistentVolumeMode              `json:"volumeMode,omitempty"`
+	NodeAffinity                             *VolumeNodeAffinityApplyConfiguration `json:"nodeAffinity,omitempty"`
 }
 
 // PersistentVolumeSpecApplyConfiguration constructs an declarative configuration of the PersistentVolumeSpec type for use with
@@ -38,59 +42,21 @@ func PersistentVolumeSpec() *PersistentVolumeSpecApplyConfiguration {
 	return &PersistentVolumeSpecApplyConfiguration{}
 }
 
-// persistentVolumeSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PersistentVolumeSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type persistentVolumeSpecFields struct {
-	Capacity                      *corev1.ResourceList                                `json:"capacity,omitempty"`
-	GCEPersistentDisk             *GCEPersistentDiskVolumeSourceApplyConfiguration    `json:"gcePersistentDisk,omitempty"`    // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.GCEPersistentDisk field
-	AWSElasticBlockStore          *AWSElasticBlockStoreVolumeSourceApplyConfiguration `json:"awsElasticBlockStore,omitempty"` // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.AWSElasticBlockStore field
-	HostPath                      *HostPathVolumeSourceApplyConfiguration             `json:"hostPath,omitempty"`             // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.HostPath field
-	Glusterfs                     *GlusterfsPersistentVolumeSourceApplyConfiguration  `json:"glusterfs,omitempty"`            // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.Glusterfs field
-	NFS                           *NFSVolumeSourceApplyConfiguration                  `json:"nfs,omitempty"`                  // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.NFS field
-	RBD                           *RBDPersistentVolumeSourceApplyConfiguration        `json:"rbd,omitempty"`                  // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.RBD field
-	ISCSI                         *ISCSIPersistentVolumeSourceApplyConfiguration      `json:"iscsi,omitempty"`                // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.ISCSI field
-	Cinder                        *CinderPersistentVolumeSourceApplyConfiguration     `json:"cinder,omitempty"`               // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.Cinder field
-	CephFS                        *CephFSPersistentVolumeSourceApplyConfiguration     `json:"cephfs,omitempty"`               // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.CephFS field
-	FC                            *FCVolumeSourceApplyConfiguration                   `json:"fc,omitempty"`                   // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.FC field
-	Flocker                       *FlockerVolumeSourceApplyConfiguration              `json:"flocker,omitempty"`              // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.Flocker field
-	FlexVolume                    *FlexPersistentVolumeSourceApplyConfiguration       `json:"flexVolume,omitempty"`           // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.FlexVolume field
-	AzureFile                     *AzureFilePersistentVolumeSourceApplyConfiguration  `json:"azureFile,omitempty"`            // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.AzureFile field
-	VsphereVolume                 *VsphereVirtualDiskVolumeSourceApplyConfiguration   `json:"vsphereVolume,omitempty"`        // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.VsphereVolume field
-	Quobyte                       *QuobyteVolumeSourceApplyConfiguration              `json:"quobyte,omitempty"`              // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.Quobyte field
-	AzureDisk                     *AzureDiskVolumeSourceApplyConfiguration            `json:"azureDisk,omitempty"`            // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.AzureDisk field
-	PhotonPersistentDisk          *PhotonPersistentDiskVolumeSourceApplyConfiguration `json:"photonPersistentDisk,omitempty"` // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.PhotonPersistentDisk field
-	PortworxVolume                *PortworxVolumeSourceApplyConfiguration             `json:"portworxVolume,omitempty"`       // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.PortworxVolume field
-	ScaleIO                       *ScaleIOPersistentVolumeSourceApplyConfiguration    `json:"scaleIO,omitempty"`              // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.ScaleIO field
-	Local                         *LocalVolumeSourceApplyConfiguration                `json:"local,omitempty"`                // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.Local field
-	StorageOS                     *StorageOSPersistentVolumeSourceApplyConfiguration  `json:"storageos,omitempty"`            // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.StorageOS field
-	CSI                           *CSIPersistentVolumeSourceApplyConfiguration        `json:"csi,omitempty"`                  // inlined PersistentVolumeSpecApplyConfiguration.persistentVolumeSource.CSI field
-	AccessModes                   *[]corev1.PersistentVolumeAccessMode                `json:"accessModes,omitempty"`
-	ClaimRef                      *ObjectReferenceApplyConfiguration                  `json:"claimRef,omitempty"`
-	PersistentVolumeReclaimPolicy *corev1.PersistentVolumeReclaimPolicy               `json:"persistentVolumeReclaimPolicy,omitempty"`
-	StorageClassName              *string                                             `json:"storageClassName,omitempty"`
-	MountOptions                  *[]string                                           `json:"mountOptions,omitempty"`
-	VolumeMode                    *corev1.PersistentVolumeMode                        `json:"volumeMode,omitempty"`
-	NodeAffinity                  *VolumeNodeAffinityApplyConfiguration               `json:"nodeAffinity,omitempty"`
-}
-
 // SetCapacity sets the Capacity field in the declarative configuration to the given value.
-func (b *PersistentVolumeSpecApplyConfiguration) SetCapacity(value corev1.ResourceList) *PersistentVolumeSpecApplyConfiguration {
-	b.fields.Capacity = &value
+func (b *PersistentVolumeSpecApplyConfiguration) SetCapacity(value v1.ResourceList) *PersistentVolumeSpecApplyConfiguration {
+	b.Capacity = &value
 	return b
 }
 
 // RemoveCapacity removes the Capacity field from the declarative configuration.
 func (b *PersistentVolumeSpecApplyConfiguration) RemoveCapacity() *PersistentVolumeSpecApplyConfiguration {
-	b.fields.Capacity = nil
+	b.Capacity = nil
 	return b
 }
 
 // GetCapacity gets the Capacity field from the declarative configuration.
-func (b *PersistentVolumeSpecApplyConfiguration) GetCapacity() (value corev1.ResourceList, ok bool) {
-	if v := b.fields.Capacity; v != nil {
+func (b *PersistentVolumeSpecApplyConfiguration) GetCapacity() (value v1.ResourceList, ok bool) {
+	if v := b.Capacity; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -98,36 +64,32 @@ func (b *PersistentVolumeSpecApplyConfiguration) GetCapacity() (value corev1.Res
 
 // SetPersistentVolumeSource sets the PersistentVolumeSource field in the declarative configuration to the given value.
 func (b *PersistentVolumeSpecApplyConfiguration) SetPersistentVolumeSource(value *PersistentVolumeSourceApplyConfiguration) *PersistentVolumeSpecApplyConfiguration {
-	b.persistentVolumeSource = value
-	return b
-}
-
-// RemovePersistentVolumeSource removes the PersistentVolumeSource field from the declarative configuration.
-func (b *PersistentVolumeSpecApplyConfiguration) RemovePersistentVolumeSource() *PersistentVolumeSpecApplyConfiguration {
-	b.persistentVolumeSource = nil
+	if value != nil {
+		b.PersistentVolumeSourceApplyConfiguration = *value
+	}
 	return b
 }
 
 // GetPersistentVolumeSource gets the PersistentVolumeSource field from the declarative configuration.
 func (b *PersistentVolumeSpecApplyConfiguration) GetPersistentVolumeSource() (value *PersistentVolumeSourceApplyConfiguration, ok bool) {
-	return b.persistentVolumeSource, true
+	return &b.PersistentVolumeSourceApplyConfiguration, true
 }
 
 // SetAccessModes sets the AccessModes field in the declarative configuration to the given value.
-func (b *PersistentVolumeSpecApplyConfiguration) SetAccessModes(value []corev1.PersistentVolumeAccessMode) *PersistentVolumeSpecApplyConfiguration {
-	b.fields.AccessModes = &value
+func (b *PersistentVolumeSpecApplyConfiguration) SetAccessModes(value []v1.PersistentVolumeAccessMode) *PersistentVolumeSpecApplyConfiguration {
+	b.AccessModes = &value
 	return b
 }
 
 // RemoveAccessModes removes the AccessModes field from the declarative configuration.
 func (b *PersistentVolumeSpecApplyConfiguration) RemoveAccessModes() *PersistentVolumeSpecApplyConfiguration {
-	b.fields.AccessModes = nil
+	b.AccessModes = nil
 	return b
 }
 
 // GetAccessModes gets the AccessModes field from the declarative configuration.
-func (b *PersistentVolumeSpecApplyConfiguration) GetAccessModes() (value []corev1.PersistentVolumeAccessMode, ok bool) {
-	if v := b.fields.AccessModes; v != nil {
+func (b *PersistentVolumeSpecApplyConfiguration) GetAccessModes() (value []v1.PersistentVolumeAccessMode, ok bool) {
+	if v := b.AccessModes; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -135,36 +97,36 @@ func (b *PersistentVolumeSpecApplyConfiguration) GetAccessModes() (value []corev
 
 // SetClaimRef sets the ClaimRef field in the declarative configuration to the given value.
 func (b *PersistentVolumeSpecApplyConfiguration) SetClaimRef(value *ObjectReferenceApplyConfiguration) *PersistentVolumeSpecApplyConfiguration {
-	b.fields.ClaimRef = value
+	b.ClaimRef = value
 	return b
 }
 
 // RemoveClaimRef removes the ClaimRef field from the declarative configuration.
 func (b *PersistentVolumeSpecApplyConfiguration) RemoveClaimRef() *PersistentVolumeSpecApplyConfiguration {
-	b.fields.ClaimRef = nil
+	b.ClaimRef = nil
 	return b
 }
 
 // GetClaimRef gets the ClaimRef field from the declarative configuration.
 func (b *PersistentVolumeSpecApplyConfiguration) GetClaimRef() (value *ObjectReferenceApplyConfiguration, ok bool) {
-	return b.fields.ClaimRef, b.fields.ClaimRef != nil
+	return b.ClaimRef, b.ClaimRef != nil
 }
 
 // SetPersistentVolumeReclaimPolicy sets the PersistentVolumeReclaimPolicy field in the declarative configuration to the given value.
-func (b *PersistentVolumeSpecApplyConfiguration) SetPersistentVolumeReclaimPolicy(value corev1.PersistentVolumeReclaimPolicy) *PersistentVolumeSpecApplyConfiguration {
-	b.fields.PersistentVolumeReclaimPolicy = &value
+func (b *PersistentVolumeSpecApplyConfiguration) SetPersistentVolumeReclaimPolicy(value v1.PersistentVolumeReclaimPolicy) *PersistentVolumeSpecApplyConfiguration {
+	b.PersistentVolumeReclaimPolicy = &value
 	return b
 }
 
 // RemovePersistentVolumeReclaimPolicy removes the PersistentVolumeReclaimPolicy field from the declarative configuration.
 func (b *PersistentVolumeSpecApplyConfiguration) RemovePersistentVolumeReclaimPolicy() *PersistentVolumeSpecApplyConfiguration {
-	b.fields.PersistentVolumeReclaimPolicy = nil
+	b.PersistentVolumeReclaimPolicy = nil
 	return b
 }
 
 // GetPersistentVolumeReclaimPolicy gets the PersistentVolumeReclaimPolicy field from the declarative configuration.
-func (b *PersistentVolumeSpecApplyConfiguration) GetPersistentVolumeReclaimPolicy() (value corev1.PersistentVolumeReclaimPolicy, ok bool) {
-	if v := b.fields.PersistentVolumeReclaimPolicy; v != nil {
+func (b *PersistentVolumeSpecApplyConfiguration) GetPersistentVolumeReclaimPolicy() (value v1.PersistentVolumeReclaimPolicy, ok bool) {
+	if v := b.PersistentVolumeReclaimPolicy; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -172,19 +134,19 @@ func (b *PersistentVolumeSpecApplyConfiguration) GetPersistentVolumeReclaimPolic
 
 // SetStorageClassName sets the StorageClassName field in the declarative configuration to the given value.
 func (b *PersistentVolumeSpecApplyConfiguration) SetStorageClassName(value string) *PersistentVolumeSpecApplyConfiguration {
-	b.fields.StorageClassName = &value
+	b.StorageClassName = &value
 	return b
 }
 
 // RemoveStorageClassName removes the StorageClassName field from the declarative configuration.
 func (b *PersistentVolumeSpecApplyConfiguration) RemoveStorageClassName() *PersistentVolumeSpecApplyConfiguration {
-	b.fields.StorageClassName = nil
+	b.StorageClassName = nil
 	return b
 }
 
 // GetStorageClassName gets the StorageClassName field from the declarative configuration.
 func (b *PersistentVolumeSpecApplyConfiguration) GetStorageClassName() (value string, ok bool) {
-	if v := b.fields.StorageClassName; v != nil {
+	if v := b.StorageClassName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -192,39 +154,39 @@ func (b *PersistentVolumeSpecApplyConfiguration) GetStorageClassName() (value st
 
 // SetMountOptions sets the MountOptions field in the declarative configuration to the given value.
 func (b *PersistentVolumeSpecApplyConfiguration) SetMountOptions(value []string) *PersistentVolumeSpecApplyConfiguration {
-	b.fields.MountOptions = &value
+	b.MountOptions = &value
 	return b
 }
 
 // RemoveMountOptions removes the MountOptions field from the declarative configuration.
 func (b *PersistentVolumeSpecApplyConfiguration) RemoveMountOptions() *PersistentVolumeSpecApplyConfiguration {
-	b.fields.MountOptions = nil
+	b.MountOptions = nil
 	return b
 }
 
 // GetMountOptions gets the MountOptions field from the declarative configuration.
 func (b *PersistentVolumeSpecApplyConfiguration) GetMountOptions() (value []string, ok bool) {
-	if v := b.fields.MountOptions; v != nil {
+	if v := b.MountOptions; v != nil {
 		return *v, true
 	}
 	return value, false
 }
 
 // SetVolumeMode sets the VolumeMode field in the declarative configuration to the given value.
-func (b *PersistentVolumeSpecApplyConfiguration) SetVolumeMode(value corev1.PersistentVolumeMode) *PersistentVolumeSpecApplyConfiguration {
-	b.fields.VolumeMode = &value
+func (b *PersistentVolumeSpecApplyConfiguration) SetVolumeMode(value v1.PersistentVolumeMode) *PersistentVolumeSpecApplyConfiguration {
+	b.VolumeMode = &value
 	return b
 }
 
 // RemoveVolumeMode removes the VolumeMode field from the declarative configuration.
 func (b *PersistentVolumeSpecApplyConfiguration) RemoveVolumeMode() *PersistentVolumeSpecApplyConfiguration {
-	b.fields.VolumeMode = nil
+	b.VolumeMode = nil
 	return b
 }
 
 // GetVolumeMode gets the VolumeMode field from the declarative configuration.
-func (b *PersistentVolumeSpecApplyConfiguration) GetVolumeMode() (value corev1.PersistentVolumeMode, ok bool) {
-	if v := b.fields.VolumeMode; v != nil {
+func (b *PersistentVolumeSpecApplyConfiguration) GetVolumeMode() (value v1.PersistentVolumeMode, ok bool) {
+	if v := b.VolumeMode; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -232,61 +194,19 @@ func (b *PersistentVolumeSpecApplyConfiguration) GetVolumeMode() (value corev1.P
 
 // SetNodeAffinity sets the NodeAffinity field in the declarative configuration to the given value.
 func (b *PersistentVolumeSpecApplyConfiguration) SetNodeAffinity(value *VolumeNodeAffinityApplyConfiguration) *PersistentVolumeSpecApplyConfiguration {
-	b.fields.NodeAffinity = value
+	b.NodeAffinity = value
 	return b
 }
 
 // RemoveNodeAffinity removes the NodeAffinity field from the declarative configuration.
 func (b *PersistentVolumeSpecApplyConfiguration) RemoveNodeAffinity() *PersistentVolumeSpecApplyConfiguration {
-	b.fields.NodeAffinity = nil
+	b.NodeAffinity = nil
 	return b
 }
 
 // GetNodeAffinity gets the NodeAffinity field from the declarative configuration.
 func (b *PersistentVolumeSpecApplyConfiguration) GetNodeAffinity() (value *VolumeNodeAffinityApplyConfiguration, ok bool) {
-	return b.fields.NodeAffinity, b.fields.NodeAffinity != nil
-}
-
-// ToUnstructured converts PersistentVolumeSpecApplyConfiguration to unstructured.
-func (b *PersistentVolumeSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PersistentVolumeSpecApplyConfiguration, replacing the contents
-// of PersistentVolumeSpecApplyConfiguration.
-func (b *PersistentVolumeSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &persistentVolumeSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PersistentVolumeSpecApplyConfiguration to JSON.
-func (b *PersistentVolumeSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PersistentVolumeSpecApplyConfiguration, replacing the contents of
-// PersistentVolumeSpecApplyConfiguration.
-func (b *PersistentVolumeSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.NodeAffinity, b.NodeAffinity != nil
 }
 
 // PersistentVolumeSpecList represents a listAlias of PersistentVolumeSpecApplyConfiguration.
@@ -294,145 +214,3 @@ type PersistentVolumeSpecList []*PersistentVolumeSpecApplyConfiguration
 
 // PersistentVolumeSpecList represents a map of PersistentVolumeSpecApplyConfiguration.
 type PersistentVolumeSpecMap map[string]PersistentVolumeSpecApplyConfiguration
-
-func (b *PersistentVolumeSpecApplyConfiguration) preMarshal() {
-	if b.persistentVolumeSource != nil {
-		if v, ok := b.persistentVolumeSource.GetGCEPersistentDisk(); ok {
-			b.fields.GCEPersistentDisk = v
-		}
-		if v, ok := b.persistentVolumeSource.GetAWSElasticBlockStore(); ok {
-			b.fields.AWSElasticBlockStore = v
-		}
-		if v, ok := b.persistentVolumeSource.GetHostPath(); ok {
-			b.fields.HostPath = v
-		}
-		if v, ok := b.persistentVolumeSource.GetGlusterfs(); ok {
-			b.fields.Glusterfs = v
-		}
-		if v, ok := b.persistentVolumeSource.GetNFS(); ok {
-			b.fields.NFS = v
-		}
-		if v, ok := b.persistentVolumeSource.GetRBD(); ok {
-			b.fields.RBD = v
-		}
-		if v, ok := b.persistentVolumeSource.GetISCSI(); ok {
-			b.fields.ISCSI = v
-		}
-		if v, ok := b.persistentVolumeSource.GetCinder(); ok {
-			b.fields.Cinder = v
-		}
-		if v, ok := b.persistentVolumeSource.GetCephFS(); ok {
-			b.fields.CephFS = v
-		}
-		if v, ok := b.persistentVolumeSource.GetFC(); ok {
-			b.fields.FC = v
-		}
-		if v, ok := b.persistentVolumeSource.GetFlocker(); ok {
-			b.fields.Flocker = v
-		}
-		if v, ok := b.persistentVolumeSource.GetFlexVolume(); ok {
-			b.fields.FlexVolume = v
-		}
-		if v, ok := b.persistentVolumeSource.GetAzureFile(); ok {
-			b.fields.AzureFile = v
-		}
-		if v, ok := b.persistentVolumeSource.GetVsphereVolume(); ok {
-			b.fields.VsphereVolume = v
-		}
-		if v, ok := b.persistentVolumeSource.GetQuobyte(); ok {
-			b.fields.Quobyte = v
-		}
-		if v, ok := b.persistentVolumeSource.GetAzureDisk(); ok {
-			b.fields.AzureDisk = v
-		}
-		if v, ok := b.persistentVolumeSource.GetPhotonPersistentDisk(); ok {
-			b.fields.PhotonPersistentDisk = v
-		}
-		if v, ok := b.persistentVolumeSource.GetPortworxVolume(); ok {
-			b.fields.PortworxVolume = v
-		}
-		if v, ok := b.persistentVolumeSource.GetScaleIO(); ok {
-			b.fields.ScaleIO = v
-		}
-		if v, ok := b.persistentVolumeSource.GetLocal(); ok {
-			b.fields.Local = v
-		}
-		if v, ok := b.persistentVolumeSource.GetStorageOS(); ok {
-			b.fields.StorageOS = v
-		}
-		if v, ok := b.persistentVolumeSource.GetCSI(); ok {
-			b.fields.CSI = v
-		}
-	}
-}
-func (b *PersistentVolumeSpecApplyConfiguration) postUnmarshal() {
-	if b.persistentVolumeSource == nil {
-		b.persistentVolumeSource = &PersistentVolumeSourceApplyConfiguration{}
-	}
-	if b.fields.GCEPersistentDisk != nil {
-		b.persistentVolumeSource.SetGCEPersistentDisk(b.fields.GCEPersistentDisk)
-	}
-	if b.fields.AWSElasticBlockStore != nil {
-		b.persistentVolumeSource.SetAWSElasticBlockStore(b.fields.AWSElasticBlockStore)
-	}
-	if b.fields.HostPath != nil {
-		b.persistentVolumeSource.SetHostPath(b.fields.HostPath)
-	}
-	if b.fields.Glusterfs != nil {
-		b.persistentVolumeSource.SetGlusterfs(b.fields.Glusterfs)
-	}
-	if b.fields.NFS != nil {
-		b.persistentVolumeSource.SetNFS(b.fields.NFS)
-	}
-	if b.fields.RBD != nil {
-		b.persistentVolumeSource.SetRBD(b.fields.RBD)
-	}
-	if b.fields.ISCSI != nil {
-		b.persistentVolumeSource.SetISCSI(b.fields.ISCSI)
-	}
-	if b.fields.Cinder != nil {
-		b.persistentVolumeSource.SetCinder(b.fields.Cinder)
-	}
-	if b.fields.CephFS != nil {
-		b.persistentVolumeSource.SetCephFS(b.fields.CephFS)
-	}
-	if b.fields.FC != nil {
-		b.persistentVolumeSource.SetFC(b.fields.FC)
-	}
-	if b.fields.Flocker != nil {
-		b.persistentVolumeSource.SetFlocker(b.fields.Flocker)
-	}
-	if b.fields.FlexVolume != nil {
-		b.persistentVolumeSource.SetFlexVolume(b.fields.FlexVolume)
-	}
-	if b.fields.AzureFile != nil {
-		b.persistentVolumeSource.SetAzureFile(b.fields.AzureFile)
-	}
-	if b.fields.VsphereVolume != nil {
-		b.persistentVolumeSource.SetVsphereVolume(b.fields.VsphereVolume)
-	}
-	if b.fields.Quobyte != nil {
-		b.persistentVolumeSource.SetQuobyte(b.fields.Quobyte)
-	}
-	if b.fields.AzureDisk != nil {
-		b.persistentVolumeSource.SetAzureDisk(b.fields.AzureDisk)
-	}
-	if b.fields.PhotonPersistentDisk != nil {
-		b.persistentVolumeSource.SetPhotonPersistentDisk(b.fields.PhotonPersistentDisk)
-	}
-	if b.fields.PortworxVolume != nil {
-		b.persistentVolumeSource.SetPortworxVolume(b.fields.PortworxVolume)
-	}
-	if b.fields.ScaleIO != nil {
-		b.persistentVolumeSource.SetScaleIO(b.fields.ScaleIO)
-	}
-	if b.fields.Local != nil {
-		b.persistentVolumeSource.SetLocal(b.fields.Local)
-	}
-	if b.fields.StorageOS != nil {
-		b.persistentVolumeSource.SetStorageOS(b.fields.StorageOS)
-	}
-	if b.fields.CSI != nil {
-		b.persistentVolumeSource.SetCSI(b.fields.CSI)
-	}
-}

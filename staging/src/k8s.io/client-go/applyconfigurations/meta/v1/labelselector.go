@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // LabelSelectorApplyConfiguration represents an declarative configuration of the LabelSelector type for use
 // with apply.
 type LabelSelectorApplyConfiguration struct {
-	fields labelSelectorFields
+	MatchLabels      *map[string]string            `json:"matchLabels,omitempty"`
+	MatchExpressions *LabelSelectorRequirementList `json:"matchExpressions,omitempty"`
 }
 
 // LabelSelectorApplyConfiguration constructs an declarative configuration of the LabelSelector type for use with
@@ -36,31 +31,21 @@ func LabelSelector() *LabelSelectorApplyConfiguration {
 	return &LabelSelectorApplyConfiguration{}
 }
 
-// labelSelectorFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LabelSelectorApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type labelSelectorFields struct {
-	MatchLabels      *map[string]string            `json:"matchLabels,omitempty"`
-	MatchExpressions *LabelSelectorRequirementList `json:"matchExpressions,omitempty"`
-}
-
 // SetMatchLabels sets the MatchLabels field in the declarative configuration to the given value.
 func (b *LabelSelectorApplyConfiguration) SetMatchLabels(value map[string]string) *LabelSelectorApplyConfiguration {
-	b.fields.MatchLabels = &value
+	b.MatchLabels = &value
 	return b
 }
 
 // RemoveMatchLabels removes the MatchLabels field from the declarative configuration.
 func (b *LabelSelectorApplyConfiguration) RemoveMatchLabels() *LabelSelectorApplyConfiguration {
-	b.fields.MatchLabels = nil
+	b.MatchLabels = nil
 	return b
 }
 
 // GetMatchLabels gets the MatchLabels field from the declarative configuration.
 func (b *LabelSelectorApplyConfiguration) GetMatchLabels() (value map[string]string, ok bool) {
-	if v := b.fields.MatchLabels; v != nil {
+	if v := b.MatchLabels; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *LabelSelectorApplyConfiguration) GetMatchLabels() (value map[string]str
 
 // SetMatchExpressions sets the MatchExpressions field in the declarative configuration to the given value.
 func (b *LabelSelectorApplyConfiguration) SetMatchExpressions(value LabelSelectorRequirementList) *LabelSelectorApplyConfiguration {
-	b.fields.MatchExpressions = &value
+	b.MatchExpressions = &value
 	return b
 }
 
 // RemoveMatchExpressions removes the MatchExpressions field from the declarative configuration.
 func (b *LabelSelectorApplyConfiguration) RemoveMatchExpressions() *LabelSelectorApplyConfiguration {
-	b.fields.MatchExpressions = nil
+	b.MatchExpressions = nil
 	return b
 }
 
 // GetMatchExpressions gets the MatchExpressions field from the declarative configuration.
 func (b *LabelSelectorApplyConfiguration) GetMatchExpressions() (value LabelSelectorRequirementList, ok bool) {
-	if v := b.fields.MatchExpressions; v != nil {
+	if v := b.MatchExpressions; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts LabelSelectorApplyConfiguration to unstructured.
-func (b *LabelSelectorApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to LabelSelectorApplyConfiguration, replacing the contents
-// of LabelSelectorApplyConfiguration.
-func (b *LabelSelectorApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &labelSelectorFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals LabelSelectorApplyConfiguration to JSON.
-func (b *LabelSelectorApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into LabelSelectorApplyConfiguration, replacing the contents of
-// LabelSelectorApplyConfiguration.
-func (b *LabelSelectorApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // LabelSelectorList represents a listAlias of LabelSelectorApplyConfiguration.
@@ -133,8 +76,3 @@ type LabelSelectorList []*LabelSelectorApplyConfiguration
 
 // LabelSelectorList represents a map of LabelSelectorApplyConfiguration.
 type LabelSelectorMap map[string]LabelSelectorApplyConfiguration
-
-func (b *LabelSelectorApplyConfiguration) preMarshal() {
-}
-func (b *LabelSelectorApplyConfiguration) postUnmarshal() {
-}

@@ -19,16 +19,14 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	types "k8s.io/apimachinery/pkg/types"
 )
 
 // PreconditionsApplyConfiguration represents an declarative configuration of the Preconditions type for use
 // with apply.
 type PreconditionsApplyConfiguration struct {
-	fields preconditionsFields
+	UID             *types.UID `json:"uid,omitempty"`
+	ResourceVersion *string    `json:"resourceVersion,omitempty"`
 }
 
 // PreconditionsApplyConfiguration constructs an declarative configuration of the Preconditions type for use with
@@ -37,31 +35,21 @@ func Preconditions() *PreconditionsApplyConfiguration {
 	return &PreconditionsApplyConfiguration{}
 }
 
-// preconditionsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PreconditionsApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type preconditionsFields struct {
-	UID             *types.UID `json:"uid,omitempty"`
-	ResourceVersion *string    `json:"resourceVersion,omitempty"`
-}
-
 // SetUID sets the UID field in the declarative configuration to the given value.
 func (b *PreconditionsApplyConfiguration) SetUID(value types.UID) *PreconditionsApplyConfiguration {
-	b.fields.UID = &value
+	b.UID = &value
 	return b
 }
 
 // RemoveUID removes the UID field from the declarative configuration.
 func (b *PreconditionsApplyConfiguration) RemoveUID() *PreconditionsApplyConfiguration {
-	b.fields.UID = nil
+	b.UID = nil
 	return b
 }
 
 // GetUID gets the UID field from the declarative configuration.
 func (b *PreconditionsApplyConfiguration) GetUID() (value types.UID, ok bool) {
-	if v := b.fields.UID; v != nil {
+	if v := b.UID; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,64 +57,22 @@ func (b *PreconditionsApplyConfiguration) GetUID() (value types.UID, ok bool) {
 
 // SetResourceVersion sets the ResourceVersion field in the declarative configuration to the given value.
 func (b *PreconditionsApplyConfiguration) SetResourceVersion(value string) *PreconditionsApplyConfiguration {
-	b.fields.ResourceVersion = &value
+	b.ResourceVersion = &value
 	return b
 }
 
 // RemoveResourceVersion removes the ResourceVersion field from the declarative configuration.
 func (b *PreconditionsApplyConfiguration) RemoveResourceVersion() *PreconditionsApplyConfiguration {
-	b.fields.ResourceVersion = nil
+	b.ResourceVersion = nil
 	return b
 }
 
 // GetResourceVersion gets the ResourceVersion field from the declarative configuration.
 func (b *PreconditionsApplyConfiguration) GetResourceVersion() (value string, ok bool) {
-	if v := b.fields.ResourceVersion; v != nil {
+	if v := b.ResourceVersion; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts PreconditionsApplyConfiguration to unstructured.
-func (b *PreconditionsApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PreconditionsApplyConfiguration, replacing the contents
-// of PreconditionsApplyConfiguration.
-func (b *PreconditionsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &preconditionsFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PreconditionsApplyConfiguration to JSON.
-func (b *PreconditionsApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PreconditionsApplyConfiguration, replacing the contents of
-// PreconditionsApplyConfiguration.
-func (b *PreconditionsApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // PreconditionsList represents a listAlias of PreconditionsApplyConfiguration.
@@ -134,8 +80,3 @@ type PreconditionsList []*PreconditionsApplyConfiguration
 
 // PreconditionsList represents a map of PreconditionsApplyConfiguration.
 type PreconditionsMap map[string]PreconditionsApplyConfiguration
-
-func (b *PreconditionsApplyConfiguration) preMarshal() {
-}
-func (b *PreconditionsApplyConfiguration) postUnmarshal() {
-}

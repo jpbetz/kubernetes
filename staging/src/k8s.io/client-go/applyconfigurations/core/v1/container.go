@@ -19,30 +19,12 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	corev1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // ContainerApplyConfiguration represents an declarative configuration of the Container type for use
 // with apply.
 type ContainerApplyConfiguration struct {
-	fields containerFields
-}
-
-// ContainerApplyConfiguration constructs an declarative configuration of the Container type for use with
-// apply.
-func Container() *ContainerApplyConfiguration {
-	return &ContainerApplyConfiguration{}
-}
-
-// containerFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ContainerApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type containerFields struct {
 	Name                     *string                                 `json:"name,omitempty"`
 	Image                    *string                                 `json:"image,omitempty"`
 	Command                  *[]string                               `json:"command,omitempty"`
@@ -67,21 +49,27 @@ type containerFields struct {
 	TTY                      *bool                                   `json:"tty,omitempty"`
 }
 
+// ContainerApplyConfiguration constructs an declarative configuration of the Container type for use with
+// apply.
+func Container() *ContainerApplyConfiguration {
+	return &ContainerApplyConfiguration{}
+}
+
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetName(value string) *ContainerApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveName() *ContainerApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -89,19 +77,19 @@ func (b *ContainerApplyConfiguration) GetName() (value string, ok bool) {
 
 // SetImage sets the Image field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetImage(value string) *ContainerApplyConfiguration {
-	b.fields.Image = &value
+	b.Image = &value
 	return b
 }
 
 // RemoveImage removes the Image field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveImage() *ContainerApplyConfiguration {
-	b.fields.Image = nil
+	b.Image = nil
 	return b
 }
 
 // GetImage gets the Image field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetImage() (value string, ok bool) {
-	if v := b.fields.Image; v != nil {
+	if v := b.Image; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -109,19 +97,19 @@ func (b *ContainerApplyConfiguration) GetImage() (value string, ok bool) {
 
 // SetCommand sets the Command field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetCommand(value []string) *ContainerApplyConfiguration {
-	b.fields.Command = &value
+	b.Command = &value
 	return b
 }
 
 // RemoveCommand removes the Command field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveCommand() *ContainerApplyConfiguration {
-	b.fields.Command = nil
+	b.Command = nil
 	return b
 }
 
 // GetCommand gets the Command field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetCommand() (value []string, ok bool) {
-	if v := b.fields.Command; v != nil {
+	if v := b.Command; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -129,19 +117,19 @@ func (b *ContainerApplyConfiguration) GetCommand() (value []string, ok bool) {
 
 // SetArgs sets the Args field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetArgs(value []string) *ContainerApplyConfiguration {
-	b.fields.Args = &value
+	b.Args = &value
 	return b
 }
 
 // RemoveArgs removes the Args field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveArgs() *ContainerApplyConfiguration {
-	b.fields.Args = nil
+	b.Args = nil
 	return b
 }
 
 // GetArgs gets the Args field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetArgs() (value []string, ok bool) {
-	if v := b.fields.Args; v != nil {
+	if v := b.Args; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -149,19 +137,19 @@ func (b *ContainerApplyConfiguration) GetArgs() (value []string, ok bool) {
 
 // SetWorkingDir sets the WorkingDir field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetWorkingDir(value string) *ContainerApplyConfiguration {
-	b.fields.WorkingDir = &value
+	b.WorkingDir = &value
 	return b
 }
 
 // RemoveWorkingDir removes the WorkingDir field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveWorkingDir() *ContainerApplyConfiguration {
-	b.fields.WorkingDir = nil
+	b.WorkingDir = nil
 	return b
 }
 
 // GetWorkingDir gets the WorkingDir field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetWorkingDir() (value string, ok bool) {
-	if v := b.fields.WorkingDir; v != nil {
+	if v := b.WorkingDir; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -169,19 +157,19 @@ func (b *ContainerApplyConfiguration) GetWorkingDir() (value string, ok bool) {
 
 // SetPorts sets the Ports field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetPorts(value ContainerPortList) *ContainerApplyConfiguration {
-	b.fields.Ports = &value
+	b.Ports = &value
 	return b
 }
 
 // RemovePorts removes the Ports field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemovePorts() *ContainerApplyConfiguration {
-	b.fields.Ports = nil
+	b.Ports = nil
 	return b
 }
 
 // GetPorts gets the Ports field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetPorts() (value ContainerPortList, ok bool) {
-	if v := b.fields.Ports; v != nil {
+	if v := b.Ports; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -189,19 +177,19 @@ func (b *ContainerApplyConfiguration) GetPorts() (value ContainerPortList, ok bo
 
 // SetEnvFrom sets the EnvFrom field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetEnvFrom(value EnvFromSourceList) *ContainerApplyConfiguration {
-	b.fields.EnvFrom = &value
+	b.EnvFrom = &value
 	return b
 }
 
 // RemoveEnvFrom removes the EnvFrom field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveEnvFrom() *ContainerApplyConfiguration {
-	b.fields.EnvFrom = nil
+	b.EnvFrom = nil
 	return b
 }
 
 // GetEnvFrom gets the EnvFrom field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetEnvFrom() (value EnvFromSourceList, ok bool) {
-	if v := b.fields.EnvFrom; v != nil {
+	if v := b.EnvFrom; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -209,19 +197,19 @@ func (b *ContainerApplyConfiguration) GetEnvFrom() (value EnvFromSourceList, ok 
 
 // SetEnv sets the Env field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetEnv(value EnvVarList) *ContainerApplyConfiguration {
-	b.fields.Env = &value
+	b.Env = &value
 	return b
 }
 
 // RemoveEnv removes the Env field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveEnv() *ContainerApplyConfiguration {
-	b.fields.Env = nil
+	b.Env = nil
 	return b
 }
 
 // GetEnv gets the Env field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetEnv() (value EnvVarList, ok bool) {
-	if v := b.fields.Env; v != nil {
+	if v := b.Env; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -229,36 +217,36 @@ func (b *ContainerApplyConfiguration) GetEnv() (value EnvVarList, ok bool) {
 
 // SetResources sets the Resources field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetResources(value *ResourceRequirementsApplyConfiguration) *ContainerApplyConfiguration {
-	b.fields.Resources = value
+	b.Resources = value
 	return b
 }
 
 // RemoveResources removes the Resources field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveResources() *ContainerApplyConfiguration {
-	b.fields.Resources = nil
+	b.Resources = nil
 	return b
 }
 
 // GetResources gets the Resources field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetResources() (value *ResourceRequirementsApplyConfiguration, ok bool) {
-	return b.fields.Resources, b.fields.Resources != nil
+	return b.Resources, b.Resources != nil
 }
 
 // SetVolumeMounts sets the VolumeMounts field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetVolumeMounts(value VolumeMountList) *ContainerApplyConfiguration {
-	b.fields.VolumeMounts = &value
+	b.VolumeMounts = &value
 	return b
 }
 
 // RemoveVolumeMounts removes the VolumeMounts field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveVolumeMounts() *ContainerApplyConfiguration {
-	b.fields.VolumeMounts = nil
+	b.VolumeMounts = nil
 	return b
 }
 
 // GetVolumeMounts gets the VolumeMounts field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetVolumeMounts() (value VolumeMountList, ok bool) {
-	if v := b.fields.VolumeMounts; v != nil {
+	if v := b.VolumeMounts; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -266,19 +254,19 @@ func (b *ContainerApplyConfiguration) GetVolumeMounts() (value VolumeMountList, 
 
 // SetVolumeDevices sets the VolumeDevices field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetVolumeDevices(value VolumeDeviceList) *ContainerApplyConfiguration {
-	b.fields.VolumeDevices = &value
+	b.VolumeDevices = &value
 	return b
 }
 
 // RemoveVolumeDevices removes the VolumeDevices field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveVolumeDevices() *ContainerApplyConfiguration {
-	b.fields.VolumeDevices = nil
+	b.VolumeDevices = nil
 	return b
 }
 
 // GetVolumeDevices gets the VolumeDevices field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetVolumeDevices() (value VolumeDeviceList, ok bool) {
-	if v := b.fields.VolumeDevices; v != nil {
+	if v := b.VolumeDevices; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -286,87 +274,87 @@ func (b *ContainerApplyConfiguration) GetVolumeDevices() (value VolumeDeviceList
 
 // SetLivenessProbe sets the LivenessProbe field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetLivenessProbe(value *ProbeApplyConfiguration) *ContainerApplyConfiguration {
-	b.fields.LivenessProbe = value
+	b.LivenessProbe = value
 	return b
 }
 
 // RemoveLivenessProbe removes the LivenessProbe field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveLivenessProbe() *ContainerApplyConfiguration {
-	b.fields.LivenessProbe = nil
+	b.LivenessProbe = nil
 	return b
 }
 
 // GetLivenessProbe gets the LivenessProbe field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetLivenessProbe() (value *ProbeApplyConfiguration, ok bool) {
-	return b.fields.LivenessProbe, b.fields.LivenessProbe != nil
+	return b.LivenessProbe, b.LivenessProbe != nil
 }
 
 // SetReadinessProbe sets the ReadinessProbe field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetReadinessProbe(value *ProbeApplyConfiguration) *ContainerApplyConfiguration {
-	b.fields.ReadinessProbe = value
+	b.ReadinessProbe = value
 	return b
 }
 
 // RemoveReadinessProbe removes the ReadinessProbe field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveReadinessProbe() *ContainerApplyConfiguration {
-	b.fields.ReadinessProbe = nil
+	b.ReadinessProbe = nil
 	return b
 }
 
 // GetReadinessProbe gets the ReadinessProbe field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetReadinessProbe() (value *ProbeApplyConfiguration, ok bool) {
-	return b.fields.ReadinessProbe, b.fields.ReadinessProbe != nil
+	return b.ReadinessProbe, b.ReadinessProbe != nil
 }
 
 // SetStartupProbe sets the StartupProbe field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetStartupProbe(value *ProbeApplyConfiguration) *ContainerApplyConfiguration {
-	b.fields.StartupProbe = value
+	b.StartupProbe = value
 	return b
 }
 
 // RemoveStartupProbe removes the StartupProbe field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveStartupProbe() *ContainerApplyConfiguration {
-	b.fields.StartupProbe = nil
+	b.StartupProbe = nil
 	return b
 }
 
 // GetStartupProbe gets the StartupProbe field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetStartupProbe() (value *ProbeApplyConfiguration, ok bool) {
-	return b.fields.StartupProbe, b.fields.StartupProbe != nil
+	return b.StartupProbe, b.StartupProbe != nil
 }
 
 // SetLifecycle sets the Lifecycle field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetLifecycle(value *LifecycleApplyConfiguration) *ContainerApplyConfiguration {
-	b.fields.Lifecycle = value
+	b.Lifecycle = value
 	return b
 }
 
 // RemoveLifecycle removes the Lifecycle field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveLifecycle() *ContainerApplyConfiguration {
-	b.fields.Lifecycle = nil
+	b.Lifecycle = nil
 	return b
 }
 
 // GetLifecycle gets the Lifecycle field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetLifecycle() (value *LifecycleApplyConfiguration, ok bool) {
-	return b.fields.Lifecycle, b.fields.Lifecycle != nil
+	return b.Lifecycle, b.Lifecycle != nil
 }
 
 // SetTerminationMessagePath sets the TerminationMessagePath field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetTerminationMessagePath(value string) *ContainerApplyConfiguration {
-	b.fields.TerminationMessagePath = &value
+	b.TerminationMessagePath = &value
 	return b
 }
 
 // RemoveTerminationMessagePath removes the TerminationMessagePath field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveTerminationMessagePath() *ContainerApplyConfiguration {
-	b.fields.TerminationMessagePath = nil
+	b.TerminationMessagePath = nil
 	return b
 }
 
 // GetTerminationMessagePath gets the TerminationMessagePath field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetTerminationMessagePath() (value string, ok bool) {
-	if v := b.fields.TerminationMessagePath; v != nil {
+	if v := b.TerminationMessagePath; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -374,19 +362,19 @@ func (b *ContainerApplyConfiguration) GetTerminationMessagePath() (value string,
 
 // SetTerminationMessagePolicy sets the TerminationMessagePolicy field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetTerminationMessagePolicy(value corev1.TerminationMessagePolicy) *ContainerApplyConfiguration {
-	b.fields.TerminationMessagePolicy = &value
+	b.TerminationMessagePolicy = &value
 	return b
 }
 
 // RemoveTerminationMessagePolicy removes the TerminationMessagePolicy field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveTerminationMessagePolicy() *ContainerApplyConfiguration {
-	b.fields.TerminationMessagePolicy = nil
+	b.TerminationMessagePolicy = nil
 	return b
 }
 
 // GetTerminationMessagePolicy gets the TerminationMessagePolicy field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetTerminationMessagePolicy() (value corev1.TerminationMessagePolicy, ok bool) {
-	if v := b.fields.TerminationMessagePolicy; v != nil {
+	if v := b.TerminationMessagePolicy; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -394,19 +382,19 @@ func (b *ContainerApplyConfiguration) GetTerminationMessagePolicy() (value corev
 
 // SetImagePullPolicy sets the ImagePullPolicy field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetImagePullPolicy(value corev1.PullPolicy) *ContainerApplyConfiguration {
-	b.fields.ImagePullPolicy = &value
+	b.ImagePullPolicy = &value
 	return b
 }
 
 // RemoveImagePullPolicy removes the ImagePullPolicy field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveImagePullPolicy() *ContainerApplyConfiguration {
-	b.fields.ImagePullPolicy = nil
+	b.ImagePullPolicy = nil
 	return b
 }
 
 // GetImagePullPolicy gets the ImagePullPolicy field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetImagePullPolicy() (value corev1.PullPolicy, ok bool) {
-	if v := b.fields.ImagePullPolicy; v != nil {
+	if v := b.ImagePullPolicy; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -414,36 +402,36 @@ func (b *ContainerApplyConfiguration) GetImagePullPolicy() (value corev1.PullPol
 
 // SetSecurityContext sets the SecurityContext field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetSecurityContext(value *SecurityContextApplyConfiguration) *ContainerApplyConfiguration {
-	b.fields.SecurityContext = value
+	b.SecurityContext = value
 	return b
 }
 
 // RemoveSecurityContext removes the SecurityContext field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveSecurityContext() *ContainerApplyConfiguration {
-	b.fields.SecurityContext = nil
+	b.SecurityContext = nil
 	return b
 }
 
 // GetSecurityContext gets the SecurityContext field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetSecurityContext() (value *SecurityContextApplyConfiguration, ok bool) {
-	return b.fields.SecurityContext, b.fields.SecurityContext != nil
+	return b.SecurityContext, b.SecurityContext != nil
 }
 
 // SetStdin sets the Stdin field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetStdin(value bool) *ContainerApplyConfiguration {
-	b.fields.Stdin = &value
+	b.Stdin = &value
 	return b
 }
 
 // RemoveStdin removes the Stdin field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveStdin() *ContainerApplyConfiguration {
-	b.fields.Stdin = nil
+	b.Stdin = nil
 	return b
 }
 
 // GetStdin gets the Stdin field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetStdin() (value bool, ok bool) {
-	if v := b.fields.Stdin; v != nil {
+	if v := b.Stdin; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -451,19 +439,19 @@ func (b *ContainerApplyConfiguration) GetStdin() (value bool, ok bool) {
 
 // SetStdinOnce sets the StdinOnce field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetStdinOnce(value bool) *ContainerApplyConfiguration {
-	b.fields.StdinOnce = &value
+	b.StdinOnce = &value
 	return b
 }
 
 // RemoveStdinOnce removes the StdinOnce field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveStdinOnce() *ContainerApplyConfiguration {
-	b.fields.StdinOnce = nil
+	b.StdinOnce = nil
 	return b
 }
 
 // GetStdinOnce gets the StdinOnce field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetStdinOnce() (value bool, ok bool) {
-	if v := b.fields.StdinOnce; v != nil {
+	if v := b.StdinOnce; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -471,64 +459,22 @@ func (b *ContainerApplyConfiguration) GetStdinOnce() (value bool, ok bool) {
 
 // SetTTY sets the TTY field in the declarative configuration to the given value.
 func (b *ContainerApplyConfiguration) SetTTY(value bool) *ContainerApplyConfiguration {
-	b.fields.TTY = &value
+	b.TTY = &value
 	return b
 }
 
 // RemoveTTY removes the TTY field from the declarative configuration.
 func (b *ContainerApplyConfiguration) RemoveTTY() *ContainerApplyConfiguration {
-	b.fields.TTY = nil
+	b.TTY = nil
 	return b
 }
 
 // GetTTY gets the TTY field from the declarative configuration.
 func (b *ContainerApplyConfiguration) GetTTY() (value bool, ok bool) {
-	if v := b.fields.TTY; v != nil {
+	if v := b.TTY; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ContainerApplyConfiguration to unstructured.
-func (b *ContainerApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ContainerApplyConfiguration, replacing the contents
-// of ContainerApplyConfiguration.
-func (b *ContainerApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &containerFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ContainerApplyConfiguration to JSON.
-func (b *ContainerApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ContainerApplyConfiguration, replacing the contents of
-// ContainerApplyConfiguration.
-func (b *ContainerApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ContainerList represents a listAlias of ContainerApplyConfiguration.
@@ -536,8 +482,3 @@ type ContainerList []*ContainerApplyConfiguration
 
 // ContainerList represents a map of ContainerApplyConfiguration.
 type ContainerMap map[string]ContainerApplyConfiguration
-
-func (b *ContainerApplyConfiguration) preMarshal() {
-}
-func (b *ContainerApplyConfiguration) postUnmarshal() {
-}

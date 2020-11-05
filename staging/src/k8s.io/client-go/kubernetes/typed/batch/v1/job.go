@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -200,7 +201,7 @@ func (c *jobs) Patch(ctx context.Context, name string, pt types.PatchType, data 
 // Apply takes the given apply declarative configuration, applies it and returns the applied job.
 func (c *jobs) Apply(ctx context.Context, job *batchv1.JobApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Job, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := job.MarshalJSON()
+	data, err := json.Marshal(job)
 	if err != nil {
 		return nil, err
 	}

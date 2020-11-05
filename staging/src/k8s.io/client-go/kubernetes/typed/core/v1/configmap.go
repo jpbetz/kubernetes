@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -183,7 +184,7 @@ func (c *configMaps) Patch(ctx context.Context, name string, pt types.PatchType,
 // Apply takes the given apply declarative configuration, applies it and returns the applied configMap.
 func (c *configMaps) Apply(ctx context.Context, configMap *corev1.ConfigMapApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ConfigMap, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := configMap.MarshalJSON()
+	data, err := json.Marshal(configMap)
 	if err != nil {
 		return nil, err
 	}

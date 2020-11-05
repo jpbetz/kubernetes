@@ -18,16 +18,13 @@ limitations under the License.
 
 package v1beta1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ServiceReferenceApplyConfiguration represents an declarative configuration of the ServiceReference type for use
 // with apply.
 type ServiceReferenceApplyConfiguration struct {
-	fields serviceReferenceFields
+	Namespace *string `json:"namespace,omitempty"`
+	Name      *string `json:"name,omitempty"`
+	Path      *string `json:"path,omitempty"`
+	Port      *int32  `json:"port,omitempty"`
 }
 
 // ServiceReferenceApplyConfiguration constructs an declarative configuration of the ServiceReference type for use with
@@ -36,33 +33,21 @@ func ServiceReference() *ServiceReferenceApplyConfiguration {
 	return &ServiceReferenceApplyConfiguration{}
 }
 
-// serviceReferenceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ServiceReferenceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type serviceReferenceFields struct {
-	Namespace *string `json:"namespace,omitempty"`
-	Name      *string `json:"name,omitempty"`
-	Path      *string `json:"path,omitempty"`
-	Port      *int32  `json:"port,omitempty"`
-}
-
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
 func (b *ServiceReferenceApplyConfiguration) SetNamespace(value string) *ServiceReferenceApplyConfiguration {
-	b.fields.Namespace = &value
+	b.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
 func (b *ServiceReferenceApplyConfiguration) RemoveNamespace() *ServiceReferenceApplyConfiguration {
-	b.fields.Namespace = nil
+	b.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
 func (b *ServiceReferenceApplyConfiguration) GetNamespace() (value string, ok bool) {
-	if v := b.fields.Namespace; v != nil {
+	if v := b.Namespace; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,19 +55,19 @@ func (b *ServiceReferenceApplyConfiguration) GetNamespace() (value string, ok bo
 
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *ServiceReferenceApplyConfiguration) SetName(value string) *ServiceReferenceApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *ServiceReferenceApplyConfiguration) RemoveName() *ServiceReferenceApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *ServiceReferenceApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -90,19 +75,19 @@ func (b *ServiceReferenceApplyConfiguration) GetName() (value string, ok bool) {
 
 // SetPath sets the Path field in the declarative configuration to the given value.
 func (b *ServiceReferenceApplyConfiguration) SetPath(value string) *ServiceReferenceApplyConfiguration {
-	b.fields.Path = &value
+	b.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
 func (b *ServiceReferenceApplyConfiguration) RemovePath() *ServiceReferenceApplyConfiguration {
-	b.fields.Path = nil
+	b.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
 func (b *ServiceReferenceApplyConfiguration) GetPath() (value string, ok bool) {
-	if v := b.fields.Path; v != nil {
+	if v := b.Path; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -110,64 +95,22 @@ func (b *ServiceReferenceApplyConfiguration) GetPath() (value string, ok bool) {
 
 // SetPort sets the Port field in the declarative configuration to the given value.
 func (b *ServiceReferenceApplyConfiguration) SetPort(value int32) *ServiceReferenceApplyConfiguration {
-	b.fields.Port = &value
+	b.Port = &value
 	return b
 }
 
 // RemovePort removes the Port field from the declarative configuration.
 func (b *ServiceReferenceApplyConfiguration) RemovePort() *ServiceReferenceApplyConfiguration {
-	b.fields.Port = nil
+	b.Port = nil
 	return b
 }
 
 // GetPort gets the Port field from the declarative configuration.
 func (b *ServiceReferenceApplyConfiguration) GetPort() (value int32, ok bool) {
-	if v := b.fields.Port; v != nil {
+	if v := b.Port; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ServiceReferenceApplyConfiguration to unstructured.
-func (b *ServiceReferenceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ServiceReferenceApplyConfiguration, replacing the contents
-// of ServiceReferenceApplyConfiguration.
-func (b *ServiceReferenceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &serviceReferenceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ServiceReferenceApplyConfiguration to JSON.
-func (b *ServiceReferenceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ServiceReferenceApplyConfiguration, replacing the contents of
-// ServiceReferenceApplyConfiguration.
-func (b *ServiceReferenceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ServiceReferenceList represents a listAlias of ServiceReferenceApplyConfiguration.
@@ -175,8 +118,3 @@ type ServiceReferenceList []*ServiceReferenceApplyConfiguration
 
 // ServiceReferenceList represents a map of ServiceReferenceApplyConfiguration.
 type ServiceReferenceMap map[string]ServiceReferenceApplyConfiguration
-
-func (b *ServiceReferenceApplyConfiguration) preMarshal() {
-}
-func (b *ServiceReferenceApplyConfiguration) postUnmarshal() {
-}

@@ -19,16 +19,14 @@ limitations under the License.
 package v1beta1
 
 import (
-	json "encoding/json"
-
 	v1beta1 "k8s.io/api/apps/v1beta1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // DeploymentStrategyApplyConfiguration represents an declarative configuration of the DeploymentStrategy type for use
 // with apply.
 type DeploymentStrategyApplyConfiguration struct {
-	fields deploymentStrategyFields
+	Type          *v1beta1.DeploymentStrategyType            `json:"type,omitempty"`
+	RollingUpdate *RollingUpdateDeploymentApplyConfiguration `json:"rollingUpdate,omitempty"`
 }
 
 // DeploymentStrategyApplyConfiguration constructs an declarative configuration of the DeploymentStrategy type for use with
@@ -37,31 +35,21 @@ func DeploymentStrategy() *DeploymentStrategyApplyConfiguration {
 	return &DeploymentStrategyApplyConfiguration{}
 }
 
-// deploymentStrategyFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in DeploymentStrategyApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type deploymentStrategyFields struct {
-	Type          *v1beta1.DeploymentStrategyType            `json:"type,omitempty"`
-	RollingUpdate *RollingUpdateDeploymentApplyConfiguration `json:"rollingUpdate,omitempty"`
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *DeploymentStrategyApplyConfiguration) SetType(value v1beta1.DeploymentStrategyType) *DeploymentStrategyApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *DeploymentStrategyApplyConfiguration) RemoveType() *DeploymentStrategyApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *DeploymentStrategyApplyConfiguration) GetType() (value v1beta1.DeploymentStrategyType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,61 +57,19 @@ func (b *DeploymentStrategyApplyConfiguration) GetType() (value v1beta1.Deployme
 
 // SetRollingUpdate sets the RollingUpdate field in the declarative configuration to the given value.
 func (b *DeploymentStrategyApplyConfiguration) SetRollingUpdate(value *RollingUpdateDeploymentApplyConfiguration) *DeploymentStrategyApplyConfiguration {
-	b.fields.RollingUpdate = value
+	b.RollingUpdate = value
 	return b
 }
 
 // RemoveRollingUpdate removes the RollingUpdate field from the declarative configuration.
 func (b *DeploymentStrategyApplyConfiguration) RemoveRollingUpdate() *DeploymentStrategyApplyConfiguration {
-	b.fields.RollingUpdate = nil
+	b.RollingUpdate = nil
 	return b
 }
 
 // GetRollingUpdate gets the RollingUpdate field from the declarative configuration.
 func (b *DeploymentStrategyApplyConfiguration) GetRollingUpdate() (value *RollingUpdateDeploymentApplyConfiguration, ok bool) {
-	return b.fields.RollingUpdate, b.fields.RollingUpdate != nil
-}
-
-// ToUnstructured converts DeploymentStrategyApplyConfiguration to unstructured.
-func (b *DeploymentStrategyApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to DeploymentStrategyApplyConfiguration, replacing the contents
-// of DeploymentStrategyApplyConfiguration.
-func (b *DeploymentStrategyApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &deploymentStrategyFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals DeploymentStrategyApplyConfiguration to JSON.
-func (b *DeploymentStrategyApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into DeploymentStrategyApplyConfiguration, replacing the contents of
-// DeploymentStrategyApplyConfiguration.
-func (b *DeploymentStrategyApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.RollingUpdate, b.RollingUpdate != nil
 }
 
 // DeploymentStrategyList represents a listAlias of DeploymentStrategyApplyConfiguration.
@@ -131,8 +77,3 @@ type DeploymentStrategyList []*DeploymentStrategyApplyConfiguration
 
 // DeploymentStrategyList represents a map of DeploymentStrategyApplyConfiguration.
 type DeploymentStrategyMap map[string]DeploymentStrategyApplyConfiguration
-
-func (b *DeploymentStrategyApplyConfiguration) preMarshal() {
-}
-func (b *DeploymentStrategyApplyConfiguration) postUnmarshal() {
-}

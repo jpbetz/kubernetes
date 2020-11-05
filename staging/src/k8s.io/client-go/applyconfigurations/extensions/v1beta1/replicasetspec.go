@@ -19,9 +19,6 @@ limitations under the License.
 package v1beta1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	corev1 "k8s.io/client-go/applyconfigurations/core/v1"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
@@ -29,7 +26,10 @@ import (
 // ReplicaSetSpecApplyConfiguration represents an declarative configuration of the ReplicaSetSpec type for use
 // with apply.
 type ReplicaSetSpecApplyConfiguration struct {
-	fields replicaSetSpecFields
+	Replicas        *int32                                    `json:"replicas,omitempty"`
+	MinReadySeconds *int32                                    `json:"minReadySeconds,omitempty"`
+	Selector        *v1.LabelSelectorApplyConfiguration       `json:"selector,omitempty"`
+	Template        *corev1.PodTemplateSpecApplyConfiguration `json:"template,omitempty"`
 }
 
 // ReplicaSetSpecApplyConfiguration constructs an declarative configuration of the ReplicaSetSpec type for use with
@@ -38,33 +38,21 @@ func ReplicaSetSpec() *ReplicaSetSpecApplyConfiguration {
 	return &ReplicaSetSpecApplyConfiguration{}
 }
 
-// replicaSetSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ReplicaSetSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type replicaSetSpecFields struct {
-	Replicas        *int32                                    `json:"replicas,omitempty"`
-	MinReadySeconds *int32                                    `json:"minReadySeconds,omitempty"`
-	Selector        *v1.LabelSelectorApplyConfiguration       `json:"selector,omitempty"`
-	Template        *corev1.PodTemplateSpecApplyConfiguration `json:"template,omitempty"`
-}
-
 // SetReplicas sets the Replicas field in the declarative configuration to the given value.
 func (b *ReplicaSetSpecApplyConfiguration) SetReplicas(value int32) *ReplicaSetSpecApplyConfiguration {
-	b.fields.Replicas = &value
+	b.Replicas = &value
 	return b
 }
 
 // RemoveReplicas removes the Replicas field from the declarative configuration.
 func (b *ReplicaSetSpecApplyConfiguration) RemoveReplicas() *ReplicaSetSpecApplyConfiguration {
-	b.fields.Replicas = nil
+	b.Replicas = nil
 	return b
 }
 
 // GetReplicas gets the Replicas field from the declarative configuration.
 func (b *ReplicaSetSpecApplyConfiguration) GetReplicas() (value int32, ok bool) {
-	if v := b.fields.Replicas; v != nil {
+	if v := b.Replicas; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -72,19 +60,19 @@ func (b *ReplicaSetSpecApplyConfiguration) GetReplicas() (value int32, ok bool) 
 
 // SetMinReadySeconds sets the MinReadySeconds field in the declarative configuration to the given value.
 func (b *ReplicaSetSpecApplyConfiguration) SetMinReadySeconds(value int32) *ReplicaSetSpecApplyConfiguration {
-	b.fields.MinReadySeconds = &value
+	b.MinReadySeconds = &value
 	return b
 }
 
 // RemoveMinReadySeconds removes the MinReadySeconds field from the declarative configuration.
 func (b *ReplicaSetSpecApplyConfiguration) RemoveMinReadySeconds() *ReplicaSetSpecApplyConfiguration {
-	b.fields.MinReadySeconds = nil
+	b.MinReadySeconds = nil
 	return b
 }
 
 // GetMinReadySeconds gets the MinReadySeconds field from the declarative configuration.
 func (b *ReplicaSetSpecApplyConfiguration) GetMinReadySeconds() (value int32, ok bool) {
-	if v := b.fields.MinReadySeconds; v != nil {
+	if v := b.MinReadySeconds; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -92,78 +80,36 @@ func (b *ReplicaSetSpecApplyConfiguration) GetMinReadySeconds() (value int32, ok
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
 func (b *ReplicaSetSpecApplyConfiguration) SetSelector(value *v1.LabelSelectorApplyConfiguration) *ReplicaSetSpecApplyConfiguration {
-	b.fields.Selector = value
+	b.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
 func (b *ReplicaSetSpecApplyConfiguration) RemoveSelector() *ReplicaSetSpecApplyConfiguration {
-	b.fields.Selector = nil
+	b.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
 func (b *ReplicaSetSpecApplyConfiguration) GetSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
-	return b.fields.Selector, b.fields.Selector != nil
+	return b.Selector, b.Selector != nil
 }
 
 // SetTemplate sets the Template field in the declarative configuration to the given value.
 func (b *ReplicaSetSpecApplyConfiguration) SetTemplate(value *corev1.PodTemplateSpecApplyConfiguration) *ReplicaSetSpecApplyConfiguration {
-	b.fields.Template = value
+	b.Template = value
 	return b
 }
 
 // RemoveTemplate removes the Template field from the declarative configuration.
 func (b *ReplicaSetSpecApplyConfiguration) RemoveTemplate() *ReplicaSetSpecApplyConfiguration {
-	b.fields.Template = nil
+	b.Template = nil
 	return b
 }
 
 // GetTemplate gets the Template field from the declarative configuration.
 func (b *ReplicaSetSpecApplyConfiguration) GetTemplate() (value *corev1.PodTemplateSpecApplyConfiguration, ok bool) {
-	return b.fields.Template, b.fields.Template != nil
-}
-
-// ToUnstructured converts ReplicaSetSpecApplyConfiguration to unstructured.
-func (b *ReplicaSetSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ReplicaSetSpecApplyConfiguration, replacing the contents
-// of ReplicaSetSpecApplyConfiguration.
-func (b *ReplicaSetSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &replicaSetSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ReplicaSetSpecApplyConfiguration to JSON.
-func (b *ReplicaSetSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ReplicaSetSpecApplyConfiguration, replacing the contents of
-// ReplicaSetSpecApplyConfiguration.
-func (b *ReplicaSetSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Template, b.Template != nil
 }
 
 // ReplicaSetSpecList represents a listAlias of ReplicaSetSpecApplyConfiguration.
@@ -171,8 +117,3 @@ type ReplicaSetSpecList []*ReplicaSetSpecApplyConfiguration
 
 // ReplicaSetSpecList represents a map of ReplicaSetSpecApplyConfiguration.
 type ReplicaSetSpecMap map[string]ReplicaSetSpecApplyConfiguration
-
-func (b *ReplicaSetSpecApplyConfiguration) preMarshal() {
-}
-func (b *ReplicaSetSpecApplyConfiguration) postUnmarshal() {
-}

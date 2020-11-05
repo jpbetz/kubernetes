@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // PodIPApplyConfiguration represents an declarative configuration of the PodIP type for use
 // with apply.
 type PodIPApplyConfiguration struct {
-	fields podIPFields
+	IP *string `json:"ip,omitempty"`
 }
 
 // PodIPApplyConfiguration constructs an declarative configuration of the PodIP type for use with
@@ -36,75 +30,24 @@ func PodIP() *PodIPApplyConfiguration {
 	return &PodIPApplyConfiguration{}
 }
 
-// podIPFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodIPApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type podIPFields struct {
-	IP *string `json:"ip,omitempty"`
-}
-
 // SetIP sets the IP field in the declarative configuration to the given value.
 func (b *PodIPApplyConfiguration) SetIP(value string) *PodIPApplyConfiguration {
-	b.fields.IP = &value
+	b.IP = &value
 	return b
 }
 
 // RemoveIP removes the IP field from the declarative configuration.
 func (b *PodIPApplyConfiguration) RemoveIP() *PodIPApplyConfiguration {
-	b.fields.IP = nil
+	b.IP = nil
 	return b
 }
 
 // GetIP gets the IP field from the declarative configuration.
 func (b *PodIPApplyConfiguration) GetIP() (value string, ok bool) {
-	if v := b.fields.IP; v != nil {
+	if v := b.IP; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts PodIPApplyConfiguration to unstructured.
-func (b *PodIPApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PodIPApplyConfiguration, replacing the contents
-// of PodIPApplyConfiguration.
-func (b *PodIPApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &podIPFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PodIPApplyConfiguration to JSON.
-func (b *PodIPApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PodIPApplyConfiguration, replacing the contents of
-// PodIPApplyConfiguration.
-func (b *PodIPApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // PodIPList represents a listAlias of PodIPApplyConfiguration.
@@ -112,8 +55,3 @@ type PodIPList []*PodIPApplyConfiguration
 
 // PodIPList represents a map of PodIPApplyConfiguration.
 type PodIPMap map[string]PodIPApplyConfiguration
-
-func (b *PodIPApplyConfiguration) preMarshal() {
-}
-func (b *PodIPApplyConfiguration) postUnmarshal() {
-}

@@ -19,30 +19,12 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // ManagedFieldsEntryApplyConfiguration represents an declarative configuration of the ManagedFieldsEntry type for use
 // with apply.
 type ManagedFieldsEntryApplyConfiguration struct {
-	fields managedFieldsEntryFields
-}
-
-// ManagedFieldsEntryApplyConfiguration constructs an declarative configuration of the ManagedFieldsEntry type for use with
-// apply.
-func ManagedFieldsEntry() *ManagedFieldsEntryApplyConfiguration {
-	return &ManagedFieldsEntryApplyConfiguration{}
-}
-
-// managedFieldsEntryFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ManagedFieldsEntryApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type managedFieldsEntryFields struct {
 	Manager    *string                        `json:"manager,omitempty"`
 	Operation  *v1.ManagedFieldsOperationType `json:"operation,omitempty"`
 	APIVersion *string                        `json:"apiVersion,omitempty"`
@@ -51,21 +33,27 @@ type managedFieldsEntryFields struct {
 	FieldsV1   *v1.FieldsV1                   `json:"fieldsV1,omitempty"`
 }
 
+// ManagedFieldsEntryApplyConfiguration constructs an declarative configuration of the ManagedFieldsEntry type for use with
+// apply.
+func ManagedFieldsEntry() *ManagedFieldsEntryApplyConfiguration {
+	return &ManagedFieldsEntryApplyConfiguration{}
+}
+
 // SetManager sets the Manager field in the declarative configuration to the given value.
 func (b *ManagedFieldsEntryApplyConfiguration) SetManager(value string) *ManagedFieldsEntryApplyConfiguration {
-	b.fields.Manager = &value
+	b.Manager = &value
 	return b
 }
 
 // RemoveManager removes the Manager field from the declarative configuration.
 func (b *ManagedFieldsEntryApplyConfiguration) RemoveManager() *ManagedFieldsEntryApplyConfiguration {
-	b.fields.Manager = nil
+	b.Manager = nil
 	return b
 }
 
 // GetManager gets the Manager field from the declarative configuration.
 func (b *ManagedFieldsEntryApplyConfiguration) GetManager() (value string, ok bool) {
-	if v := b.fields.Manager; v != nil {
+	if v := b.Manager; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -73,19 +61,19 @@ func (b *ManagedFieldsEntryApplyConfiguration) GetManager() (value string, ok bo
 
 // SetOperation sets the Operation field in the declarative configuration to the given value.
 func (b *ManagedFieldsEntryApplyConfiguration) SetOperation(value v1.ManagedFieldsOperationType) *ManagedFieldsEntryApplyConfiguration {
-	b.fields.Operation = &value
+	b.Operation = &value
 	return b
 }
 
 // RemoveOperation removes the Operation field from the declarative configuration.
 func (b *ManagedFieldsEntryApplyConfiguration) RemoveOperation() *ManagedFieldsEntryApplyConfiguration {
-	b.fields.Operation = nil
+	b.Operation = nil
 	return b
 }
 
 // GetOperation gets the Operation field from the declarative configuration.
 func (b *ManagedFieldsEntryApplyConfiguration) GetOperation() (value v1.ManagedFieldsOperationType, ok bool) {
-	if v := b.fields.Operation; v != nil {
+	if v := b.Operation; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -93,19 +81,19 @@ func (b *ManagedFieldsEntryApplyConfiguration) GetOperation() (value v1.ManagedF
 
 // SetAPIVersion sets the APIVersion field in the declarative configuration to the given value.
 func (b *ManagedFieldsEntryApplyConfiguration) SetAPIVersion(value string) *ManagedFieldsEntryApplyConfiguration {
-	b.fields.APIVersion = &value
+	b.APIVersion = &value
 	return b
 }
 
 // RemoveAPIVersion removes the APIVersion field from the declarative configuration.
 func (b *ManagedFieldsEntryApplyConfiguration) RemoveAPIVersion() *ManagedFieldsEntryApplyConfiguration {
-	b.fields.APIVersion = nil
+	b.APIVersion = nil
 	return b
 }
 
 // GetAPIVersion gets the APIVersion field from the declarative configuration.
 func (b *ManagedFieldsEntryApplyConfiguration) GetAPIVersion() (value string, ok bool) {
-	if v := b.fields.APIVersion; v != nil {
+	if v := b.APIVersion; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -113,19 +101,19 @@ func (b *ManagedFieldsEntryApplyConfiguration) GetAPIVersion() (value string, ok
 
 // SetTime sets the Time field in the declarative configuration to the given value.
 func (b *ManagedFieldsEntryApplyConfiguration) SetTime(value v1.Time) *ManagedFieldsEntryApplyConfiguration {
-	b.fields.Time = &value
+	b.Time = &value
 	return b
 }
 
 // RemoveTime removes the Time field from the declarative configuration.
 func (b *ManagedFieldsEntryApplyConfiguration) RemoveTime() *ManagedFieldsEntryApplyConfiguration {
-	b.fields.Time = nil
+	b.Time = nil
 	return b
 }
 
 // GetTime gets the Time field from the declarative configuration.
 func (b *ManagedFieldsEntryApplyConfiguration) GetTime() (value v1.Time, ok bool) {
-	if v := b.fields.Time; v != nil {
+	if v := b.Time; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -133,19 +121,19 @@ func (b *ManagedFieldsEntryApplyConfiguration) GetTime() (value v1.Time, ok bool
 
 // SetFieldsType sets the FieldsType field in the declarative configuration to the given value.
 func (b *ManagedFieldsEntryApplyConfiguration) SetFieldsType(value string) *ManagedFieldsEntryApplyConfiguration {
-	b.fields.FieldsType = &value
+	b.FieldsType = &value
 	return b
 }
 
 // RemoveFieldsType removes the FieldsType field from the declarative configuration.
 func (b *ManagedFieldsEntryApplyConfiguration) RemoveFieldsType() *ManagedFieldsEntryApplyConfiguration {
-	b.fields.FieldsType = nil
+	b.FieldsType = nil
 	return b
 }
 
 // GetFieldsType gets the FieldsType field from the declarative configuration.
 func (b *ManagedFieldsEntryApplyConfiguration) GetFieldsType() (value string, ok bool) {
-	if v := b.fields.FieldsType; v != nil {
+	if v := b.FieldsType; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -153,64 +141,22 @@ func (b *ManagedFieldsEntryApplyConfiguration) GetFieldsType() (value string, ok
 
 // SetFieldsV1 sets the FieldsV1 field in the declarative configuration to the given value.
 func (b *ManagedFieldsEntryApplyConfiguration) SetFieldsV1(value v1.FieldsV1) *ManagedFieldsEntryApplyConfiguration {
-	b.fields.FieldsV1 = &value
+	b.FieldsV1 = &value
 	return b
 }
 
 // RemoveFieldsV1 removes the FieldsV1 field from the declarative configuration.
 func (b *ManagedFieldsEntryApplyConfiguration) RemoveFieldsV1() *ManagedFieldsEntryApplyConfiguration {
-	b.fields.FieldsV1 = nil
+	b.FieldsV1 = nil
 	return b
 }
 
 // GetFieldsV1 gets the FieldsV1 field from the declarative configuration.
 func (b *ManagedFieldsEntryApplyConfiguration) GetFieldsV1() (value v1.FieldsV1, ok bool) {
-	if v := b.fields.FieldsV1; v != nil {
+	if v := b.FieldsV1; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ManagedFieldsEntryApplyConfiguration to unstructured.
-func (b *ManagedFieldsEntryApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ManagedFieldsEntryApplyConfiguration, replacing the contents
-// of ManagedFieldsEntryApplyConfiguration.
-func (b *ManagedFieldsEntryApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &managedFieldsEntryFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ManagedFieldsEntryApplyConfiguration to JSON.
-func (b *ManagedFieldsEntryApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ManagedFieldsEntryApplyConfiguration, replacing the contents of
-// ManagedFieldsEntryApplyConfiguration.
-func (b *ManagedFieldsEntryApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ManagedFieldsEntryList represents a listAlias of ManagedFieldsEntryApplyConfiguration.
@@ -218,8 +164,3 @@ type ManagedFieldsEntryList []*ManagedFieldsEntryApplyConfiguration
 
 // ManagedFieldsEntryList represents a map of ManagedFieldsEntryApplyConfiguration.
 type ManagedFieldsEntryMap map[string]ManagedFieldsEntryApplyConfiguration
-
-func (b *ManagedFieldsEntryApplyConfiguration) preMarshal() {
-}
-func (b *ManagedFieldsEntryApplyConfiguration) postUnmarshal() {
-}

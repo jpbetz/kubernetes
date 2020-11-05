@@ -19,31 +19,13 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	types "k8s.io/apimachinery/pkg/types"
 )
 
 // ObjectMetaApplyConfiguration represents an declarative configuration of the ObjectMeta type for use
 // with apply.
 type ObjectMetaApplyConfiguration struct {
-	fields objectMetaFields
-}
-
-// ObjectMetaApplyConfiguration constructs an declarative configuration of the ObjectMeta type for use with
-// apply.
-func ObjectMeta() *ObjectMetaApplyConfiguration {
-	return &ObjectMetaApplyConfiguration{}
-}
-
-// objectMetaFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ObjectMetaApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type objectMetaFields struct {
 	Name                       *string                 `json:"name,omitempty"`
 	GenerateName               *string                 `json:"generateName,omitempty"`
 	Namespace                  *string                 `json:"namespace,omitempty"`
@@ -62,21 +44,27 @@ type objectMetaFields struct {
 	ManagedFields              *ManagedFieldsEntryList `json:"managedFields,omitempty"`
 }
 
+// ObjectMetaApplyConfiguration constructs an declarative configuration of the ObjectMeta type for use with
+// apply.
+func ObjectMeta() *ObjectMetaApplyConfiguration {
+	return &ObjectMetaApplyConfiguration{}
+}
+
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *ObjectMetaApplyConfiguration) SetName(value string) *ObjectMetaApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) RemoveName() *ObjectMetaApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -84,19 +72,19 @@ func (b *ObjectMetaApplyConfiguration) GetName() (value string, ok bool) {
 
 // SetGenerateName sets the GenerateName field in the declarative configuration to the given value.
 func (b *ObjectMetaApplyConfiguration) SetGenerateName(value string) *ObjectMetaApplyConfiguration {
-	b.fields.GenerateName = &value
+	b.GenerateName = &value
 	return b
 }
 
 // RemoveGenerateName removes the GenerateName field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) RemoveGenerateName() *ObjectMetaApplyConfiguration {
-	b.fields.GenerateName = nil
+	b.GenerateName = nil
 	return b
 }
 
 // GetGenerateName gets the GenerateName field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) GetGenerateName() (value string, ok bool) {
-	if v := b.fields.GenerateName; v != nil {
+	if v := b.GenerateName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -104,19 +92,19 @@ func (b *ObjectMetaApplyConfiguration) GetGenerateName() (value string, ok bool)
 
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
 func (b *ObjectMetaApplyConfiguration) SetNamespace(value string) *ObjectMetaApplyConfiguration {
-	b.fields.Namespace = &value
+	b.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) RemoveNamespace() *ObjectMetaApplyConfiguration {
-	b.fields.Namespace = nil
+	b.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) GetNamespace() (value string, ok bool) {
-	if v := b.fields.Namespace; v != nil {
+	if v := b.Namespace; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -124,19 +112,19 @@ func (b *ObjectMetaApplyConfiguration) GetNamespace() (value string, ok bool) {
 
 // SetSelfLink sets the SelfLink field in the declarative configuration to the given value.
 func (b *ObjectMetaApplyConfiguration) SetSelfLink(value string) *ObjectMetaApplyConfiguration {
-	b.fields.SelfLink = &value
+	b.SelfLink = &value
 	return b
 }
 
 // RemoveSelfLink removes the SelfLink field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) RemoveSelfLink() *ObjectMetaApplyConfiguration {
-	b.fields.SelfLink = nil
+	b.SelfLink = nil
 	return b
 }
 
 // GetSelfLink gets the SelfLink field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) GetSelfLink() (value string, ok bool) {
-	if v := b.fields.SelfLink; v != nil {
+	if v := b.SelfLink; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -144,19 +132,19 @@ func (b *ObjectMetaApplyConfiguration) GetSelfLink() (value string, ok bool) {
 
 // SetUID sets the UID field in the declarative configuration to the given value.
 func (b *ObjectMetaApplyConfiguration) SetUID(value types.UID) *ObjectMetaApplyConfiguration {
-	b.fields.UID = &value
+	b.UID = &value
 	return b
 }
 
 // RemoveUID removes the UID field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) RemoveUID() *ObjectMetaApplyConfiguration {
-	b.fields.UID = nil
+	b.UID = nil
 	return b
 }
 
 // GetUID gets the UID field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) GetUID() (value types.UID, ok bool) {
-	if v := b.fields.UID; v != nil {
+	if v := b.UID; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -164,19 +152,19 @@ func (b *ObjectMetaApplyConfiguration) GetUID() (value types.UID, ok bool) {
 
 // SetResourceVersion sets the ResourceVersion field in the declarative configuration to the given value.
 func (b *ObjectMetaApplyConfiguration) SetResourceVersion(value string) *ObjectMetaApplyConfiguration {
-	b.fields.ResourceVersion = &value
+	b.ResourceVersion = &value
 	return b
 }
 
 // RemoveResourceVersion removes the ResourceVersion field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) RemoveResourceVersion() *ObjectMetaApplyConfiguration {
-	b.fields.ResourceVersion = nil
+	b.ResourceVersion = nil
 	return b
 }
 
 // GetResourceVersion gets the ResourceVersion field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) GetResourceVersion() (value string, ok bool) {
-	if v := b.fields.ResourceVersion; v != nil {
+	if v := b.ResourceVersion; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -184,19 +172,19 @@ func (b *ObjectMetaApplyConfiguration) GetResourceVersion() (value string, ok bo
 
 // SetGeneration sets the Generation field in the declarative configuration to the given value.
 func (b *ObjectMetaApplyConfiguration) SetGeneration(value int64) *ObjectMetaApplyConfiguration {
-	b.fields.Generation = &value
+	b.Generation = &value
 	return b
 }
 
 // RemoveGeneration removes the Generation field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) RemoveGeneration() *ObjectMetaApplyConfiguration {
-	b.fields.Generation = nil
+	b.Generation = nil
 	return b
 }
 
 // GetGeneration gets the Generation field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) GetGeneration() (value int64, ok bool) {
-	if v := b.fields.Generation; v != nil {
+	if v := b.Generation; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -204,19 +192,19 @@ func (b *ObjectMetaApplyConfiguration) GetGeneration() (value int64, ok bool) {
 
 // SetCreationTimestamp sets the CreationTimestamp field in the declarative configuration to the given value.
 func (b *ObjectMetaApplyConfiguration) SetCreationTimestamp(value v1.Time) *ObjectMetaApplyConfiguration {
-	b.fields.CreationTimestamp = &value
+	b.CreationTimestamp = &value
 	return b
 }
 
 // RemoveCreationTimestamp removes the CreationTimestamp field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) RemoveCreationTimestamp() *ObjectMetaApplyConfiguration {
-	b.fields.CreationTimestamp = nil
+	b.CreationTimestamp = nil
 	return b
 }
 
 // GetCreationTimestamp gets the CreationTimestamp field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) GetCreationTimestamp() (value v1.Time, ok bool) {
-	if v := b.fields.CreationTimestamp; v != nil {
+	if v := b.CreationTimestamp; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -224,19 +212,19 @@ func (b *ObjectMetaApplyConfiguration) GetCreationTimestamp() (value v1.Time, ok
 
 // SetDeletionTimestamp sets the DeletionTimestamp field in the declarative configuration to the given value.
 func (b *ObjectMetaApplyConfiguration) SetDeletionTimestamp(value v1.Time) *ObjectMetaApplyConfiguration {
-	b.fields.DeletionTimestamp = &value
+	b.DeletionTimestamp = &value
 	return b
 }
 
 // RemoveDeletionTimestamp removes the DeletionTimestamp field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) RemoveDeletionTimestamp() *ObjectMetaApplyConfiguration {
-	b.fields.DeletionTimestamp = nil
+	b.DeletionTimestamp = nil
 	return b
 }
 
 // GetDeletionTimestamp gets the DeletionTimestamp field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) GetDeletionTimestamp() (value v1.Time, ok bool) {
-	if v := b.fields.DeletionTimestamp; v != nil {
+	if v := b.DeletionTimestamp; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -244,19 +232,19 @@ func (b *ObjectMetaApplyConfiguration) GetDeletionTimestamp() (value v1.Time, ok
 
 // SetDeletionGracePeriodSeconds sets the DeletionGracePeriodSeconds field in the declarative configuration to the given value.
 func (b *ObjectMetaApplyConfiguration) SetDeletionGracePeriodSeconds(value int64) *ObjectMetaApplyConfiguration {
-	b.fields.DeletionGracePeriodSeconds = &value
+	b.DeletionGracePeriodSeconds = &value
 	return b
 }
 
 // RemoveDeletionGracePeriodSeconds removes the DeletionGracePeriodSeconds field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) RemoveDeletionGracePeriodSeconds() *ObjectMetaApplyConfiguration {
-	b.fields.DeletionGracePeriodSeconds = nil
+	b.DeletionGracePeriodSeconds = nil
 	return b
 }
 
 // GetDeletionGracePeriodSeconds gets the DeletionGracePeriodSeconds field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) GetDeletionGracePeriodSeconds() (value int64, ok bool) {
-	if v := b.fields.DeletionGracePeriodSeconds; v != nil {
+	if v := b.DeletionGracePeriodSeconds; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -264,19 +252,19 @@ func (b *ObjectMetaApplyConfiguration) GetDeletionGracePeriodSeconds() (value in
 
 // SetLabels sets the Labels field in the declarative configuration to the given value.
 func (b *ObjectMetaApplyConfiguration) SetLabels(value map[string]string) *ObjectMetaApplyConfiguration {
-	b.fields.Labels = &value
+	b.Labels = &value
 	return b
 }
 
 // RemoveLabels removes the Labels field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) RemoveLabels() *ObjectMetaApplyConfiguration {
-	b.fields.Labels = nil
+	b.Labels = nil
 	return b
 }
 
 // GetLabels gets the Labels field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) GetLabels() (value map[string]string, ok bool) {
-	if v := b.fields.Labels; v != nil {
+	if v := b.Labels; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -284,19 +272,19 @@ func (b *ObjectMetaApplyConfiguration) GetLabels() (value map[string]string, ok 
 
 // SetAnnotations sets the Annotations field in the declarative configuration to the given value.
 func (b *ObjectMetaApplyConfiguration) SetAnnotations(value map[string]string) *ObjectMetaApplyConfiguration {
-	b.fields.Annotations = &value
+	b.Annotations = &value
 	return b
 }
 
 // RemoveAnnotations removes the Annotations field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) RemoveAnnotations() *ObjectMetaApplyConfiguration {
-	b.fields.Annotations = nil
+	b.Annotations = nil
 	return b
 }
 
 // GetAnnotations gets the Annotations field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) GetAnnotations() (value map[string]string, ok bool) {
-	if v := b.fields.Annotations; v != nil {
+	if v := b.Annotations; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -304,19 +292,19 @@ func (b *ObjectMetaApplyConfiguration) GetAnnotations() (value map[string]string
 
 // SetOwnerReferences sets the OwnerReferences field in the declarative configuration to the given value.
 func (b *ObjectMetaApplyConfiguration) SetOwnerReferences(value OwnerReferenceList) *ObjectMetaApplyConfiguration {
-	b.fields.OwnerReferences = &value
+	b.OwnerReferences = &value
 	return b
 }
 
 // RemoveOwnerReferences removes the OwnerReferences field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) RemoveOwnerReferences() *ObjectMetaApplyConfiguration {
-	b.fields.OwnerReferences = nil
+	b.OwnerReferences = nil
 	return b
 }
 
 // GetOwnerReferences gets the OwnerReferences field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) GetOwnerReferences() (value OwnerReferenceList, ok bool) {
-	if v := b.fields.OwnerReferences; v != nil {
+	if v := b.OwnerReferences; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -324,19 +312,19 @@ func (b *ObjectMetaApplyConfiguration) GetOwnerReferences() (value OwnerReferenc
 
 // SetFinalizers sets the Finalizers field in the declarative configuration to the given value.
 func (b *ObjectMetaApplyConfiguration) SetFinalizers(value []string) *ObjectMetaApplyConfiguration {
-	b.fields.Finalizers = &value
+	b.Finalizers = &value
 	return b
 }
 
 // RemoveFinalizers removes the Finalizers field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) RemoveFinalizers() *ObjectMetaApplyConfiguration {
-	b.fields.Finalizers = nil
+	b.Finalizers = nil
 	return b
 }
 
 // GetFinalizers gets the Finalizers field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) GetFinalizers() (value []string, ok bool) {
-	if v := b.fields.Finalizers; v != nil {
+	if v := b.Finalizers; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -344,19 +332,19 @@ func (b *ObjectMetaApplyConfiguration) GetFinalizers() (value []string, ok bool)
 
 // SetClusterName sets the ClusterName field in the declarative configuration to the given value.
 func (b *ObjectMetaApplyConfiguration) SetClusterName(value string) *ObjectMetaApplyConfiguration {
-	b.fields.ClusterName = &value
+	b.ClusterName = &value
 	return b
 }
 
 // RemoveClusterName removes the ClusterName field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) RemoveClusterName() *ObjectMetaApplyConfiguration {
-	b.fields.ClusterName = nil
+	b.ClusterName = nil
 	return b
 }
 
 // GetClusterName gets the ClusterName field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) GetClusterName() (value string, ok bool) {
-	if v := b.fields.ClusterName; v != nil {
+	if v := b.ClusterName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -364,64 +352,22 @@ func (b *ObjectMetaApplyConfiguration) GetClusterName() (value string, ok bool) 
 
 // SetManagedFields sets the ManagedFields field in the declarative configuration to the given value.
 func (b *ObjectMetaApplyConfiguration) SetManagedFields(value ManagedFieldsEntryList) *ObjectMetaApplyConfiguration {
-	b.fields.ManagedFields = &value
+	b.ManagedFields = &value
 	return b
 }
 
 // RemoveManagedFields removes the ManagedFields field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) RemoveManagedFields() *ObjectMetaApplyConfiguration {
-	b.fields.ManagedFields = nil
+	b.ManagedFields = nil
 	return b
 }
 
 // GetManagedFields gets the ManagedFields field from the declarative configuration.
 func (b *ObjectMetaApplyConfiguration) GetManagedFields() (value ManagedFieldsEntryList, ok bool) {
-	if v := b.fields.ManagedFields; v != nil {
+	if v := b.ManagedFields; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ObjectMetaApplyConfiguration to unstructured.
-func (b *ObjectMetaApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ObjectMetaApplyConfiguration, replacing the contents
-// of ObjectMetaApplyConfiguration.
-func (b *ObjectMetaApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &objectMetaFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ObjectMetaApplyConfiguration to JSON.
-func (b *ObjectMetaApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ObjectMetaApplyConfiguration, replacing the contents of
-// ObjectMetaApplyConfiguration.
-func (b *ObjectMetaApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ObjectMetaList represents a listAlias of ObjectMetaApplyConfiguration.
@@ -429,8 +375,3 @@ type ObjectMetaList []*ObjectMetaApplyConfiguration
 
 // ObjectMetaList represents a map of ObjectMetaApplyConfiguration.
 type ObjectMetaMap map[string]ObjectMetaApplyConfiguration
-
-func (b *ObjectMetaApplyConfiguration) preMarshal() {
-}
-func (b *ObjectMetaApplyConfiguration) postUnmarshal() {
-}

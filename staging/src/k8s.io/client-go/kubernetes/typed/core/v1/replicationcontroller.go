@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -204,7 +205,7 @@ func (c *replicationControllers) Patch(ctx context.Context, name string, pt type
 // Apply takes the given apply declarative configuration, applies it and returns the applied replicationController.
 func (c *replicationControllers) Apply(ctx context.Context, replicationController *corev1.ReplicationControllerApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ReplicationController, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := replicationController.MarshalJSON()
+	data, err := json.Marshal(replicationController)
 	if err != nil {
 		return nil, err
 	}

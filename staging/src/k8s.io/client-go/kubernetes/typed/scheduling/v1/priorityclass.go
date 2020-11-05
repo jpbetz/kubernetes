@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -173,7 +174,7 @@ func (c *priorityClasses) Patch(ctx context.Context, name string, pt types.Patch
 // Apply takes the given apply declarative configuration, applies it and returns the applied priorityClass.
 func (c *priorityClasses) Apply(ctx context.Context, priorityClass *schedulingv1.PriorityClassApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.PriorityClass, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := priorityClass.MarshalJSON()
+	data, err := json.Marshal(priorityClass)
 	if err != nil {
 		return nil, err
 	}

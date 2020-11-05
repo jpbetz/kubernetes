@@ -18,16 +18,12 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // PolicyRulesWithSubjectsApplyConfiguration represents an declarative configuration of the PolicyRulesWithSubjects type for use
 // with apply.
 type PolicyRulesWithSubjectsApplyConfiguration struct {
-	fields policyRulesWithSubjectsFields
+	Subjects         *SubjectList               `json:"subjects,omitempty"`
+	ResourceRules    *ResourcePolicyRuleList    `json:"resourceRules,omitempty"`
+	NonResourceRules *NonResourcePolicyRuleList `json:"nonResourceRules,omitempty"`
 }
 
 // PolicyRulesWithSubjectsApplyConfiguration constructs an declarative configuration of the PolicyRulesWithSubjects type for use with
@@ -36,32 +32,21 @@ func PolicyRulesWithSubjects() *PolicyRulesWithSubjectsApplyConfiguration {
 	return &PolicyRulesWithSubjectsApplyConfiguration{}
 }
 
-// policyRulesWithSubjectsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PolicyRulesWithSubjectsApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type policyRulesWithSubjectsFields struct {
-	Subjects         *SubjectList               `json:"subjects,omitempty"`
-	ResourceRules    *ResourcePolicyRuleList    `json:"resourceRules,omitempty"`
-	NonResourceRules *NonResourcePolicyRuleList `json:"nonResourceRules,omitempty"`
-}
-
 // SetSubjects sets the Subjects field in the declarative configuration to the given value.
 func (b *PolicyRulesWithSubjectsApplyConfiguration) SetSubjects(value SubjectList) *PolicyRulesWithSubjectsApplyConfiguration {
-	b.fields.Subjects = &value
+	b.Subjects = &value
 	return b
 }
 
 // RemoveSubjects removes the Subjects field from the declarative configuration.
 func (b *PolicyRulesWithSubjectsApplyConfiguration) RemoveSubjects() *PolicyRulesWithSubjectsApplyConfiguration {
-	b.fields.Subjects = nil
+	b.Subjects = nil
 	return b
 }
 
 // GetSubjects gets the Subjects field from the declarative configuration.
 func (b *PolicyRulesWithSubjectsApplyConfiguration) GetSubjects() (value SubjectList, ok bool) {
-	if v := b.fields.Subjects; v != nil {
+	if v := b.Subjects; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,19 +54,19 @@ func (b *PolicyRulesWithSubjectsApplyConfiguration) GetSubjects() (value Subject
 
 // SetResourceRules sets the ResourceRules field in the declarative configuration to the given value.
 func (b *PolicyRulesWithSubjectsApplyConfiguration) SetResourceRules(value ResourcePolicyRuleList) *PolicyRulesWithSubjectsApplyConfiguration {
-	b.fields.ResourceRules = &value
+	b.ResourceRules = &value
 	return b
 }
 
 // RemoveResourceRules removes the ResourceRules field from the declarative configuration.
 func (b *PolicyRulesWithSubjectsApplyConfiguration) RemoveResourceRules() *PolicyRulesWithSubjectsApplyConfiguration {
-	b.fields.ResourceRules = nil
+	b.ResourceRules = nil
 	return b
 }
 
 // GetResourceRules gets the ResourceRules field from the declarative configuration.
 func (b *PolicyRulesWithSubjectsApplyConfiguration) GetResourceRules() (value ResourcePolicyRuleList, ok bool) {
-	if v := b.fields.ResourceRules; v != nil {
+	if v := b.ResourceRules; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -89,64 +74,22 @@ func (b *PolicyRulesWithSubjectsApplyConfiguration) GetResourceRules() (value Re
 
 // SetNonResourceRules sets the NonResourceRules field in the declarative configuration to the given value.
 func (b *PolicyRulesWithSubjectsApplyConfiguration) SetNonResourceRules(value NonResourcePolicyRuleList) *PolicyRulesWithSubjectsApplyConfiguration {
-	b.fields.NonResourceRules = &value
+	b.NonResourceRules = &value
 	return b
 }
 
 // RemoveNonResourceRules removes the NonResourceRules field from the declarative configuration.
 func (b *PolicyRulesWithSubjectsApplyConfiguration) RemoveNonResourceRules() *PolicyRulesWithSubjectsApplyConfiguration {
-	b.fields.NonResourceRules = nil
+	b.NonResourceRules = nil
 	return b
 }
 
 // GetNonResourceRules gets the NonResourceRules field from the declarative configuration.
 func (b *PolicyRulesWithSubjectsApplyConfiguration) GetNonResourceRules() (value NonResourcePolicyRuleList, ok bool) {
-	if v := b.fields.NonResourceRules; v != nil {
+	if v := b.NonResourceRules; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts PolicyRulesWithSubjectsApplyConfiguration to unstructured.
-func (b *PolicyRulesWithSubjectsApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PolicyRulesWithSubjectsApplyConfiguration, replacing the contents
-// of PolicyRulesWithSubjectsApplyConfiguration.
-func (b *PolicyRulesWithSubjectsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &policyRulesWithSubjectsFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PolicyRulesWithSubjectsApplyConfiguration to JSON.
-func (b *PolicyRulesWithSubjectsApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PolicyRulesWithSubjectsApplyConfiguration, replacing the contents of
-// PolicyRulesWithSubjectsApplyConfiguration.
-func (b *PolicyRulesWithSubjectsApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // PolicyRulesWithSubjectsList represents a listAlias of PolicyRulesWithSubjectsApplyConfiguration.
@@ -154,8 +97,3 @@ type PolicyRulesWithSubjectsList []*PolicyRulesWithSubjectsApplyConfiguration
 
 // PolicyRulesWithSubjectsList represents a map of PolicyRulesWithSubjectsApplyConfiguration.
 type PolicyRulesWithSubjectsMap map[string]PolicyRulesWithSubjectsApplyConfiguration
-
-func (b *PolicyRulesWithSubjectsApplyConfiguration) preMarshal() {
-}
-func (b *PolicyRulesWithSubjectsApplyConfiguration) postUnmarshal() {
-}

@@ -19,16 +19,16 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/authentication/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // UserInfoApplyConfiguration represents an declarative configuration of the UserInfo type for use
 // with apply.
 type UserInfoApplyConfiguration struct {
-	fields userInfoFields
+	Username *string                   `json:"username,omitempty"`
+	UID      *string                   `json:"uid,omitempty"`
+	Groups   *[]string                 `json:"groups,omitempty"`
+	Extra    *map[string]v1.ExtraValue `json:"extra,omitempty"`
 }
 
 // UserInfoApplyConfiguration constructs an declarative configuration of the UserInfo type for use with
@@ -37,33 +37,21 @@ func UserInfo() *UserInfoApplyConfiguration {
 	return &UserInfoApplyConfiguration{}
 }
 
-// userInfoFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in UserInfoApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type userInfoFields struct {
-	Username *string                   `json:"username,omitempty"`
-	UID      *string                   `json:"uid,omitempty"`
-	Groups   *[]string                 `json:"groups,omitempty"`
-	Extra    *map[string]v1.ExtraValue `json:"extra,omitempty"`
-}
-
 // SetUsername sets the Username field in the declarative configuration to the given value.
 func (b *UserInfoApplyConfiguration) SetUsername(value string) *UserInfoApplyConfiguration {
-	b.fields.Username = &value
+	b.Username = &value
 	return b
 }
 
 // RemoveUsername removes the Username field from the declarative configuration.
 func (b *UserInfoApplyConfiguration) RemoveUsername() *UserInfoApplyConfiguration {
-	b.fields.Username = nil
+	b.Username = nil
 	return b
 }
 
 // GetUsername gets the Username field from the declarative configuration.
 func (b *UserInfoApplyConfiguration) GetUsername() (value string, ok bool) {
-	if v := b.fields.Username; v != nil {
+	if v := b.Username; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -71,19 +59,19 @@ func (b *UserInfoApplyConfiguration) GetUsername() (value string, ok bool) {
 
 // SetUID sets the UID field in the declarative configuration to the given value.
 func (b *UserInfoApplyConfiguration) SetUID(value string) *UserInfoApplyConfiguration {
-	b.fields.UID = &value
+	b.UID = &value
 	return b
 }
 
 // RemoveUID removes the UID field from the declarative configuration.
 func (b *UserInfoApplyConfiguration) RemoveUID() *UserInfoApplyConfiguration {
-	b.fields.UID = nil
+	b.UID = nil
 	return b
 }
 
 // GetUID gets the UID field from the declarative configuration.
 func (b *UserInfoApplyConfiguration) GetUID() (value string, ok bool) {
-	if v := b.fields.UID; v != nil {
+	if v := b.UID; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -91,19 +79,19 @@ func (b *UserInfoApplyConfiguration) GetUID() (value string, ok bool) {
 
 // SetGroups sets the Groups field in the declarative configuration to the given value.
 func (b *UserInfoApplyConfiguration) SetGroups(value []string) *UserInfoApplyConfiguration {
-	b.fields.Groups = &value
+	b.Groups = &value
 	return b
 }
 
 // RemoveGroups removes the Groups field from the declarative configuration.
 func (b *UserInfoApplyConfiguration) RemoveGroups() *UserInfoApplyConfiguration {
-	b.fields.Groups = nil
+	b.Groups = nil
 	return b
 }
 
 // GetGroups gets the Groups field from the declarative configuration.
 func (b *UserInfoApplyConfiguration) GetGroups() (value []string, ok bool) {
-	if v := b.fields.Groups; v != nil {
+	if v := b.Groups; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -111,64 +99,22 @@ func (b *UserInfoApplyConfiguration) GetGroups() (value []string, ok bool) {
 
 // SetExtra sets the Extra field in the declarative configuration to the given value.
 func (b *UserInfoApplyConfiguration) SetExtra(value map[string]v1.ExtraValue) *UserInfoApplyConfiguration {
-	b.fields.Extra = &value
+	b.Extra = &value
 	return b
 }
 
 // RemoveExtra removes the Extra field from the declarative configuration.
 func (b *UserInfoApplyConfiguration) RemoveExtra() *UserInfoApplyConfiguration {
-	b.fields.Extra = nil
+	b.Extra = nil
 	return b
 }
 
 // GetExtra gets the Extra field from the declarative configuration.
 func (b *UserInfoApplyConfiguration) GetExtra() (value map[string]v1.ExtraValue, ok bool) {
-	if v := b.fields.Extra; v != nil {
+	if v := b.Extra; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts UserInfoApplyConfiguration to unstructured.
-func (b *UserInfoApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to UserInfoApplyConfiguration, replacing the contents
-// of UserInfoApplyConfiguration.
-func (b *UserInfoApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &userInfoFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals UserInfoApplyConfiguration to JSON.
-func (b *UserInfoApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into UserInfoApplyConfiguration, replacing the contents of
-// UserInfoApplyConfiguration.
-func (b *UserInfoApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // UserInfoList represents a listAlias of UserInfoApplyConfiguration.
@@ -176,8 +122,3 @@ type UserInfoList []*UserInfoApplyConfiguration
 
 // UserInfoList represents a map of UserInfoApplyConfiguration.
 type UserInfoMap map[string]UserInfoApplyConfiguration
-
-func (b *UserInfoApplyConfiguration) preMarshal() {
-}
-func (b *UserInfoApplyConfiguration) postUnmarshal() {
-}

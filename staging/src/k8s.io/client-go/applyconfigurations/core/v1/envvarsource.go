@@ -18,16 +18,13 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // EnvVarSourceApplyConfiguration represents an declarative configuration of the EnvVarSource type for use
 // with apply.
 type EnvVarSourceApplyConfiguration struct {
-	fields envVarSourceFields
+	FieldRef         *ObjectFieldSelectorApplyConfiguration   `json:"fieldRef,omitempty"`
+	ResourceFieldRef *ResourceFieldSelectorApplyConfiguration `json:"resourceFieldRef,omitempty"`
+	ConfigMapKeyRef  *ConfigMapKeySelectorApplyConfiguration  `json:"configMapKeyRef,omitempty"`
+	SecretKeyRef     *SecretKeySelectorApplyConfiguration     `json:"secretKeyRef,omitempty"`
 }
 
 // EnvVarSourceApplyConfiguration constructs an declarative configuration of the EnvVarSource type for use with
@@ -36,126 +33,72 @@ func EnvVarSource() *EnvVarSourceApplyConfiguration {
 	return &EnvVarSourceApplyConfiguration{}
 }
 
-// envVarSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in EnvVarSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type envVarSourceFields struct {
-	FieldRef         *ObjectFieldSelectorApplyConfiguration   `json:"fieldRef,omitempty"`
-	ResourceFieldRef *ResourceFieldSelectorApplyConfiguration `json:"resourceFieldRef,omitempty"`
-	ConfigMapKeyRef  *ConfigMapKeySelectorApplyConfiguration  `json:"configMapKeyRef,omitempty"`
-	SecretKeyRef     *SecretKeySelectorApplyConfiguration     `json:"secretKeyRef,omitempty"`
-}
-
 // SetFieldRef sets the FieldRef field in the declarative configuration to the given value.
 func (b *EnvVarSourceApplyConfiguration) SetFieldRef(value *ObjectFieldSelectorApplyConfiguration) *EnvVarSourceApplyConfiguration {
-	b.fields.FieldRef = value
+	b.FieldRef = value
 	return b
 }
 
 // RemoveFieldRef removes the FieldRef field from the declarative configuration.
 func (b *EnvVarSourceApplyConfiguration) RemoveFieldRef() *EnvVarSourceApplyConfiguration {
-	b.fields.FieldRef = nil
+	b.FieldRef = nil
 	return b
 }
 
 // GetFieldRef gets the FieldRef field from the declarative configuration.
 func (b *EnvVarSourceApplyConfiguration) GetFieldRef() (value *ObjectFieldSelectorApplyConfiguration, ok bool) {
-	return b.fields.FieldRef, b.fields.FieldRef != nil
+	return b.FieldRef, b.FieldRef != nil
 }
 
 // SetResourceFieldRef sets the ResourceFieldRef field in the declarative configuration to the given value.
 func (b *EnvVarSourceApplyConfiguration) SetResourceFieldRef(value *ResourceFieldSelectorApplyConfiguration) *EnvVarSourceApplyConfiguration {
-	b.fields.ResourceFieldRef = value
+	b.ResourceFieldRef = value
 	return b
 }
 
 // RemoveResourceFieldRef removes the ResourceFieldRef field from the declarative configuration.
 func (b *EnvVarSourceApplyConfiguration) RemoveResourceFieldRef() *EnvVarSourceApplyConfiguration {
-	b.fields.ResourceFieldRef = nil
+	b.ResourceFieldRef = nil
 	return b
 }
 
 // GetResourceFieldRef gets the ResourceFieldRef field from the declarative configuration.
 func (b *EnvVarSourceApplyConfiguration) GetResourceFieldRef() (value *ResourceFieldSelectorApplyConfiguration, ok bool) {
-	return b.fields.ResourceFieldRef, b.fields.ResourceFieldRef != nil
+	return b.ResourceFieldRef, b.ResourceFieldRef != nil
 }
 
 // SetConfigMapKeyRef sets the ConfigMapKeyRef field in the declarative configuration to the given value.
 func (b *EnvVarSourceApplyConfiguration) SetConfigMapKeyRef(value *ConfigMapKeySelectorApplyConfiguration) *EnvVarSourceApplyConfiguration {
-	b.fields.ConfigMapKeyRef = value
+	b.ConfigMapKeyRef = value
 	return b
 }
 
 // RemoveConfigMapKeyRef removes the ConfigMapKeyRef field from the declarative configuration.
 func (b *EnvVarSourceApplyConfiguration) RemoveConfigMapKeyRef() *EnvVarSourceApplyConfiguration {
-	b.fields.ConfigMapKeyRef = nil
+	b.ConfigMapKeyRef = nil
 	return b
 }
 
 // GetConfigMapKeyRef gets the ConfigMapKeyRef field from the declarative configuration.
 func (b *EnvVarSourceApplyConfiguration) GetConfigMapKeyRef() (value *ConfigMapKeySelectorApplyConfiguration, ok bool) {
-	return b.fields.ConfigMapKeyRef, b.fields.ConfigMapKeyRef != nil
+	return b.ConfigMapKeyRef, b.ConfigMapKeyRef != nil
 }
 
 // SetSecretKeyRef sets the SecretKeyRef field in the declarative configuration to the given value.
 func (b *EnvVarSourceApplyConfiguration) SetSecretKeyRef(value *SecretKeySelectorApplyConfiguration) *EnvVarSourceApplyConfiguration {
-	b.fields.SecretKeyRef = value
+	b.SecretKeyRef = value
 	return b
 }
 
 // RemoveSecretKeyRef removes the SecretKeyRef field from the declarative configuration.
 func (b *EnvVarSourceApplyConfiguration) RemoveSecretKeyRef() *EnvVarSourceApplyConfiguration {
-	b.fields.SecretKeyRef = nil
+	b.SecretKeyRef = nil
 	return b
 }
 
 // GetSecretKeyRef gets the SecretKeyRef field from the declarative configuration.
 func (b *EnvVarSourceApplyConfiguration) GetSecretKeyRef() (value *SecretKeySelectorApplyConfiguration, ok bool) {
-	return b.fields.SecretKeyRef, b.fields.SecretKeyRef != nil
-}
-
-// ToUnstructured converts EnvVarSourceApplyConfiguration to unstructured.
-func (b *EnvVarSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to EnvVarSourceApplyConfiguration, replacing the contents
-// of EnvVarSourceApplyConfiguration.
-func (b *EnvVarSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &envVarSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals EnvVarSourceApplyConfiguration to JSON.
-func (b *EnvVarSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into EnvVarSourceApplyConfiguration, replacing the contents of
-// EnvVarSourceApplyConfiguration.
-func (b *EnvVarSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.SecretKeyRef, b.SecretKeyRef != nil
 }
 
 // EnvVarSourceList represents a listAlias of EnvVarSourceApplyConfiguration.
@@ -163,8 +106,3 @@ type EnvVarSourceList []*EnvVarSourceApplyConfiguration
 
 // EnvVarSourceList represents a map of EnvVarSourceApplyConfiguration.
 type EnvVarSourceMap map[string]EnvVarSourceApplyConfiguration
-
-func (b *EnvVarSourceApplyConfiguration) preMarshal() {
-}
-func (b *EnvVarSourceApplyConfiguration) postUnmarshal() {
-}

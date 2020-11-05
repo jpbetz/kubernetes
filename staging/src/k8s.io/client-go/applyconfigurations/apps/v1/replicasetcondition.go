@@ -19,18 +19,19 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // ReplicaSetConditionApplyConfiguration represents an declarative configuration of the ReplicaSetCondition type for use
 // with apply.
 type ReplicaSetConditionApplyConfiguration struct {
-	fields replicaSetConditionFields
+	Type               *v1.ReplicaSetConditionType `json:"type,omitempty"`
+	Status             *corev1.ConditionStatus     `json:"status,omitempty"`
+	LastTransitionTime *metav1.Time                `json:"lastTransitionTime,omitempty"`
+	Reason             *string                     `json:"reason,omitempty"`
+	Message            *string                     `json:"message,omitempty"`
 }
 
 // ReplicaSetConditionApplyConfiguration constructs an declarative configuration of the ReplicaSetCondition type for use with
@@ -39,34 +40,21 @@ func ReplicaSetCondition() *ReplicaSetConditionApplyConfiguration {
 	return &ReplicaSetConditionApplyConfiguration{}
 }
 
-// replicaSetConditionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ReplicaSetConditionApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type replicaSetConditionFields struct {
-	Type               *v1.ReplicaSetConditionType `json:"type,omitempty"`
-	Status             *corev1.ConditionStatus     `json:"status,omitempty"`
-	LastTransitionTime *metav1.Time                `json:"lastTransitionTime,omitempty"`
-	Reason             *string                     `json:"reason,omitempty"`
-	Message            *string                     `json:"message,omitempty"`
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *ReplicaSetConditionApplyConfiguration) SetType(value v1.ReplicaSetConditionType) *ReplicaSetConditionApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *ReplicaSetConditionApplyConfiguration) RemoveType() *ReplicaSetConditionApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *ReplicaSetConditionApplyConfiguration) GetType() (value v1.ReplicaSetConditionType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -74,19 +62,19 @@ func (b *ReplicaSetConditionApplyConfiguration) GetType() (value v1.ReplicaSetCo
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
 func (b *ReplicaSetConditionApplyConfiguration) SetStatus(value corev1.ConditionStatus) *ReplicaSetConditionApplyConfiguration {
-	b.fields.Status = &value
+	b.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
 func (b *ReplicaSetConditionApplyConfiguration) RemoveStatus() *ReplicaSetConditionApplyConfiguration {
-	b.fields.Status = nil
+	b.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
 func (b *ReplicaSetConditionApplyConfiguration) GetStatus() (value corev1.ConditionStatus, ok bool) {
-	if v := b.fields.Status; v != nil {
+	if v := b.Status; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -94,19 +82,19 @@ func (b *ReplicaSetConditionApplyConfiguration) GetStatus() (value corev1.Condit
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
 func (b *ReplicaSetConditionApplyConfiguration) SetLastTransitionTime(value metav1.Time) *ReplicaSetConditionApplyConfiguration {
-	b.fields.LastTransitionTime = &value
+	b.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
 func (b *ReplicaSetConditionApplyConfiguration) RemoveLastTransitionTime() *ReplicaSetConditionApplyConfiguration {
-	b.fields.LastTransitionTime = nil
+	b.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
 func (b *ReplicaSetConditionApplyConfiguration) GetLastTransitionTime() (value metav1.Time, ok bool) {
-	if v := b.fields.LastTransitionTime; v != nil {
+	if v := b.LastTransitionTime; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -114,19 +102,19 @@ func (b *ReplicaSetConditionApplyConfiguration) GetLastTransitionTime() (value m
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
 func (b *ReplicaSetConditionApplyConfiguration) SetReason(value string) *ReplicaSetConditionApplyConfiguration {
-	b.fields.Reason = &value
+	b.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
 func (b *ReplicaSetConditionApplyConfiguration) RemoveReason() *ReplicaSetConditionApplyConfiguration {
-	b.fields.Reason = nil
+	b.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
 func (b *ReplicaSetConditionApplyConfiguration) GetReason() (value string, ok bool) {
-	if v := b.fields.Reason; v != nil {
+	if v := b.Reason; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -134,64 +122,22 @@ func (b *ReplicaSetConditionApplyConfiguration) GetReason() (value string, ok bo
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
 func (b *ReplicaSetConditionApplyConfiguration) SetMessage(value string) *ReplicaSetConditionApplyConfiguration {
-	b.fields.Message = &value
+	b.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
 func (b *ReplicaSetConditionApplyConfiguration) RemoveMessage() *ReplicaSetConditionApplyConfiguration {
-	b.fields.Message = nil
+	b.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
 func (b *ReplicaSetConditionApplyConfiguration) GetMessage() (value string, ok bool) {
-	if v := b.fields.Message; v != nil {
+	if v := b.Message; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ReplicaSetConditionApplyConfiguration to unstructured.
-func (b *ReplicaSetConditionApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ReplicaSetConditionApplyConfiguration, replacing the contents
-// of ReplicaSetConditionApplyConfiguration.
-func (b *ReplicaSetConditionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &replicaSetConditionFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ReplicaSetConditionApplyConfiguration to JSON.
-func (b *ReplicaSetConditionApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ReplicaSetConditionApplyConfiguration, replacing the contents of
-// ReplicaSetConditionApplyConfiguration.
-func (b *ReplicaSetConditionApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ReplicaSetConditionList represents a listAlias of ReplicaSetConditionApplyConfiguration.
@@ -199,8 +145,3 @@ type ReplicaSetConditionList []*ReplicaSetConditionApplyConfiguration
 
 // ReplicaSetConditionList represents a map of ReplicaSetConditionApplyConfiguration.
 type ReplicaSetConditionMap map[string]ReplicaSetConditionApplyConfiguration
-
-func (b *ReplicaSetConditionApplyConfiguration) preMarshal() {
-}
-func (b *ReplicaSetConditionApplyConfiguration) postUnmarshal() {
-}

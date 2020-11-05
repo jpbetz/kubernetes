@@ -19,32 +19,14 @@ limitations under the License.
 package v1beta1
 
 import (
-	json "encoding/json"
-
 	v1beta1 "k8s.io/api/apps/v1beta1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // DeploymentConditionApplyConfiguration represents an declarative configuration of the DeploymentCondition type for use
 // with apply.
 type DeploymentConditionApplyConfiguration struct {
-	fields deploymentConditionFields
-}
-
-// DeploymentConditionApplyConfiguration constructs an declarative configuration of the DeploymentCondition type for use with
-// apply.
-func DeploymentCondition() *DeploymentConditionApplyConfiguration {
-	return &DeploymentConditionApplyConfiguration{}
-}
-
-// deploymentConditionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in DeploymentConditionApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type deploymentConditionFields struct {
 	Type               *v1beta1.DeploymentConditionType `json:"type,omitempty"`
 	Status             *v1.ConditionStatus              `json:"status,omitempty"`
 	LastUpdateTime     *metav1.Time                     `json:"lastUpdateTime,omitempty"`
@@ -53,21 +35,27 @@ type deploymentConditionFields struct {
 	Message            *string                          `json:"message,omitempty"`
 }
 
+// DeploymentConditionApplyConfiguration constructs an declarative configuration of the DeploymentCondition type for use with
+// apply.
+func DeploymentCondition() *DeploymentConditionApplyConfiguration {
+	return &DeploymentConditionApplyConfiguration{}
+}
+
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *DeploymentConditionApplyConfiguration) SetType(value v1beta1.DeploymentConditionType) *DeploymentConditionApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *DeploymentConditionApplyConfiguration) RemoveType() *DeploymentConditionApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *DeploymentConditionApplyConfiguration) GetType() (value v1beta1.DeploymentConditionType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -75,19 +63,19 @@ func (b *DeploymentConditionApplyConfiguration) GetType() (value v1beta1.Deploym
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
 func (b *DeploymentConditionApplyConfiguration) SetStatus(value v1.ConditionStatus) *DeploymentConditionApplyConfiguration {
-	b.fields.Status = &value
+	b.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
 func (b *DeploymentConditionApplyConfiguration) RemoveStatus() *DeploymentConditionApplyConfiguration {
-	b.fields.Status = nil
+	b.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
 func (b *DeploymentConditionApplyConfiguration) GetStatus() (value v1.ConditionStatus, ok bool) {
-	if v := b.fields.Status; v != nil {
+	if v := b.Status; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -95,19 +83,19 @@ func (b *DeploymentConditionApplyConfiguration) GetStatus() (value v1.ConditionS
 
 // SetLastUpdateTime sets the LastUpdateTime field in the declarative configuration to the given value.
 func (b *DeploymentConditionApplyConfiguration) SetLastUpdateTime(value metav1.Time) *DeploymentConditionApplyConfiguration {
-	b.fields.LastUpdateTime = &value
+	b.LastUpdateTime = &value
 	return b
 }
 
 // RemoveLastUpdateTime removes the LastUpdateTime field from the declarative configuration.
 func (b *DeploymentConditionApplyConfiguration) RemoveLastUpdateTime() *DeploymentConditionApplyConfiguration {
-	b.fields.LastUpdateTime = nil
+	b.LastUpdateTime = nil
 	return b
 }
 
 // GetLastUpdateTime gets the LastUpdateTime field from the declarative configuration.
 func (b *DeploymentConditionApplyConfiguration) GetLastUpdateTime() (value metav1.Time, ok bool) {
-	if v := b.fields.LastUpdateTime; v != nil {
+	if v := b.LastUpdateTime; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -115,19 +103,19 @@ func (b *DeploymentConditionApplyConfiguration) GetLastUpdateTime() (value metav
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
 func (b *DeploymentConditionApplyConfiguration) SetLastTransitionTime(value metav1.Time) *DeploymentConditionApplyConfiguration {
-	b.fields.LastTransitionTime = &value
+	b.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
 func (b *DeploymentConditionApplyConfiguration) RemoveLastTransitionTime() *DeploymentConditionApplyConfiguration {
-	b.fields.LastTransitionTime = nil
+	b.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
 func (b *DeploymentConditionApplyConfiguration) GetLastTransitionTime() (value metav1.Time, ok bool) {
-	if v := b.fields.LastTransitionTime; v != nil {
+	if v := b.LastTransitionTime; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -135,19 +123,19 @@ func (b *DeploymentConditionApplyConfiguration) GetLastTransitionTime() (value m
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
 func (b *DeploymentConditionApplyConfiguration) SetReason(value string) *DeploymentConditionApplyConfiguration {
-	b.fields.Reason = &value
+	b.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
 func (b *DeploymentConditionApplyConfiguration) RemoveReason() *DeploymentConditionApplyConfiguration {
-	b.fields.Reason = nil
+	b.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
 func (b *DeploymentConditionApplyConfiguration) GetReason() (value string, ok bool) {
-	if v := b.fields.Reason; v != nil {
+	if v := b.Reason; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -155,64 +143,22 @@ func (b *DeploymentConditionApplyConfiguration) GetReason() (value string, ok bo
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
 func (b *DeploymentConditionApplyConfiguration) SetMessage(value string) *DeploymentConditionApplyConfiguration {
-	b.fields.Message = &value
+	b.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
 func (b *DeploymentConditionApplyConfiguration) RemoveMessage() *DeploymentConditionApplyConfiguration {
-	b.fields.Message = nil
+	b.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
 func (b *DeploymentConditionApplyConfiguration) GetMessage() (value string, ok bool) {
-	if v := b.fields.Message; v != nil {
+	if v := b.Message; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts DeploymentConditionApplyConfiguration to unstructured.
-func (b *DeploymentConditionApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to DeploymentConditionApplyConfiguration, replacing the contents
-// of DeploymentConditionApplyConfiguration.
-func (b *DeploymentConditionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &deploymentConditionFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals DeploymentConditionApplyConfiguration to JSON.
-func (b *DeploymentConditionApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into DeploymentConditionApplyConfiguration, replacing the contents of
-// DeploymentConditionApplyConfiguration.
-func (b *DeploymentConditionApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // DeploymentConditionList represents a listAlias of DeploymentConditionApplyConfiguration.
@@ -220,8 +166,3 @@ type DeploymentConditionList []*DeploymentConditionApplyConfiguration
 
 // DeploymentConditionList represents a map of DeploymentConditionApplyConfiguration.
 type DeploymentConditionMap map[string]DeploymentConditionApplyConfiguration
-
-func (b *DeploymentConditionApplyConfiguration) preMarshal() {
-}
-func (b *DeploymentConditionApplyConfiguration) postUnmarshal() {
-}

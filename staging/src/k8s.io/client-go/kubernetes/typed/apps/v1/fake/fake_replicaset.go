@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -146,7 +147,7 @@ func (c *FakeReplicaSets) Patch(ctx context.Context, name string, pt types.Patch
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied replicaSet.
 func (c *FakeReplicaSets) Apply(ctx context.Context, replicaSet *applyconfigurationsappsv1.ReplicaSetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *appsv1.ReplicaSet, err error) {
-	data, err := replicaSet.MarshalJSON()
+	data, err := json.Marshal(replicaSet)
 	if err != nil {
 		return nil, err
 	}

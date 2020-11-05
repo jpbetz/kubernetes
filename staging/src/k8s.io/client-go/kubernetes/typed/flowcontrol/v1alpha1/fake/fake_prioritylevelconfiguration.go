@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	v1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
@@ -136,7 +137,7 @@ func (c *FakePriorityLevelConfigurations) Patch(ctx context.Context, name string
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied priorityLevelConfiguration.
 func (c *FakePriorityLevelConfigurations) Apply(ctx context.Context, priorityLevelConfiguration *flowcontrolv1alpha1.PriorityLevelConfigurationApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.PriorityLevelConfiguration, err error) {
-	data, err := priorityLevelConfiguration.MarshalJSON()
+	data, err := json.Marshal(priorityLevelConfiguration)
 	if err != nil {
 		return nil, err
 	}

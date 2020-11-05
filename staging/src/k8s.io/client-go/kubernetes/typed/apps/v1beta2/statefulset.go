@@ -20,6 +20,7 @@ package v1beta2
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -203,7 +204,7 @@ func (c *statefulSets) Patch(ctx context.Context, name string, pt types.PatchTyp
 // Apply takes the given apply declarative configuration, applies it and returns the applied statefulSet.
 func (c *statefulSets) Apply(ctx context.Context, statefulSet *appsv1beta2.StatefulSetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta2.StatefulSet, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := statefulSet.MarshalJSON()
+	data, err := json.Marshal(statefulSet)
 	if err != nil {
 		return nil, err
 	}

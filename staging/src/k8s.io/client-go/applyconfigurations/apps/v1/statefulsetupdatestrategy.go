@@ -19,16 +19,14 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/apps/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // StatefulSetUpdateStrategyApplyConfiguration represents an declarative configuration of the StatefulSetUpdateStrategy type for use
 // with apply.
 type StatefulSetUpdateStrategyApplyConfiguration struct {
-	fields statefulSetUpdateStrategyFields
+	Type          *v1.StatefulSetUpdateStrategyType                   `json:"type,omitempty"`
+	RollingUpdate *RollingUpdateStatefulSetStrategyApplyConfiguration `json:"rollingUpdate,omitempty"`
 }
 
 // StatefulSetUpdateStrategyApplyConfiguration constructs an declarative configuration of the StatefulSetUpdateStrategy type for use with
@@ -37,31 +35,21 @@ func StatefulSetUpdateStrategy() *StatefulSetUpdateStrategyApplyConfiguration {
 	return &StatefulSetUpdateStrategyApplyConfiguration{}
 }
 
-// statefulSetUpdateStrategyFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in StatefulSetUpdateStrategyApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type statefulSetUpdateStrategyFields struct {
-	Type          *v1.StatefulSetUpdateStrategyType                   `json:"type,omitempty"`
-	RollingUpdate *RollingUpdateStatefulSetStrategyApplyConfiguration `json:"rollingUpdate,omitempty"`
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *StatefulSetUpdateStrategyApplyConfiguration) SetType(value v1.StatefulSetUpdateStrategyType) *StatefulSetUpdateStrategyApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *StatefulSetUpdateStrategyApplyConfiguration) RemoveType() *StatefulSetUpdateStrategyApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *StatefulSetUpdateStrategyApplyConfiguration) GetType() (value v1.StatefulSetUpdateStrategyType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,61 +57,19 @@ func (b *StatefulSetUpdateStrategyApplyConfiguration) GetType() (value v1.Statef
 
 // SetRollingUpdate sets the RollingUpdate field in the declarative configuration to the given value.
 func (b *StatefulSetUpdateStrategyApplyConfiguration) SetRollingUpdate(value *RollingUpdateStatefulSetStrategyApplyConfiguration) *StatefulSetUpdateStrategyApplyConfiguration {
-	b.fields.RollingUpdate = value
+	b.RollingUpdate = value
 	return b
 }
 
 // RemoveRollingUpdate removes the RollingUpdate field from the declarative configuration.
 func (b *StatefulSetUpdateStrategyApplyConfiguration) RemoveRollingUpdate() *StatefulSetUpdateStrategyApplyConfiguration {
-	b.fields.RollingUpdate = nil
+	b.RollingUpdate = nil
 	return b
 }
 
 // GetRollingUpdate gets the RollingUpdate field from the declarative configuration.
 func (b *StatefulSetUpdateStrategyApplyConfiguration) GetRollingUpdate() (value *RollingUpdateStatefulSetStrategyApplyConfiguration, ok bool) {
-	return b.fields.RollingUpdate, b.fields.RollingUpdate != nil
-}
-
-// ToUnstructured converts StatefulSetUpdateStrategyApplyConfiguration to unstructured.
-func (b *StatefulSetUpdateStrategyApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to StatefulSetUpdateStrategyApplyConfiguration, replacing the contents
-// of StatefulSetUpdateStrategyApplyConfiguration.
-func (b *StatefulSetUpdateStrategyApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &statefulSetUpdateStrategyFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals StatefulSetUpdateStrategyApplyConfiguration to JSON.
-func (b *StatefulSetUpdateStrategyApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into StatefulSetUpdateStrategyApplyConfiguration, replacing the contents of
-// StatefulSetUpdateStrategyApplyConfiguration.
-func (b *StatefulSetUpdateStrategyApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.RollingUpdate, b.RollingUpdate != nil
 }
 
 // StatefulSetUpdateStrategyList represents a listAlias of StatefulSetUpdateStrategyApplyConfiguration.
@@ -131,8 +77,3 @@ type StatefulSetUpdateStrategyList []*StatefulSetUpdateStrategyApplyConfiguratio
 
 // StatefulSetUpdateStrategyList represents a map of StatefulSetUpdateStrategyApplyConfiguration.
 type StatefulSetUpdateStrategyMap map[string]StatefulSetUpdateStrategyApplyConfiguration
-
-func (b *StatefulSetUpdateStrategyApplyConfiguration) preMarshal() {
-}
-func (b *StatefulSetUpdateStrategyApplyConfiguration) postUnmarshal() {
-}

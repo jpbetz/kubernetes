@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
@@ -145,7 +146,7 @@ func (c *FakePods) Patch(ctx context.Context, name string, pt types.PatchType, d
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied pod.
 func (c *FakePods) Apply(ctx context.Context, pod *applyconfigurationscorev1.PodApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Pod, err error) {
-	data, err := pod.MarshalJSON()
+	data, err := json.Marshal(pod)
 	if err != nil {
 		return nil, err
 	}

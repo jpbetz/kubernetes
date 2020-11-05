@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // NodeSelectorApplyConfiguration represents an declarative configuration of the NodeSelector type for use
 // with apply.
 type NodeSelectorApplyConfiguration struct {
-	fields nodeSelectorFields
+	NodeSelectorTerms *NodeSelectorTermList `json:"nodeSelectorTerms,omitempty"`
 }
 
 // NodeSelectorApplyConfiguration constructs an declarative configuration of the NodeSelector type for use with
@@ -36,75 +30,24 @@ func NodeSelector() *NodeSelectorApplyConfiguration {
 	return &NodeSelectorApplyConfiguration{}
 }
 
-// nodeSelectorFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NodeSelectorApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type nodeSelectorFields struct {
-	NodeSelectorTerms *NodeSelectorTermList `json:"nodeSelectorTerms,omitempty"`
-}
-
 // SetNodeSelectorTerms sets the NodeSelectorTerms field in the declarative configuration to the given value.
 func (b *NodeSelectorApplyConfiguration) SetNodeSelectorTerms(value NodeSelectorTermList) *NodeSelectorApplyConfiguration {
-	b.fields.NodeSelectorTerms = &value
+	b.NodeSelectorTerms = &value
 	return b
 }
 
 // RemoveNodeSelectorTerms removes the NodeSelectorTerms field from the declarative configuration.
 func (b *NodeSelectorApplyConfiguration) RemoveNodeSelectorTerms() *NodeSelectorApplyConfiguration {
-	b.fields.NodeSelectorTerms = nil
+	b.NodeSelectorTerms = nil
 	return b
 }
 
 // GetNodeSelectorTerms gets the NodeSelectorTerms field from the declarative configuration.
 func (b *NodeSelectorApplyConfiguration) GetNodeSelectorTerms() (value NodeSelectorTermList, ok bool) {
-	if v := b.fields.NodeSelectorTerms; v != nil {
+	if v := b.NodeSelectorTerms; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts NodeSelectorApplyConfiguration to unstructured.
-func (b *NodeSelectorApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to NodeSelectorApplyConfiguration, replacing the contents
-// of NodeSelectorApplyConfiguration.
-func (b *NodeSelectorApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &nodeSelectorFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals NodeSelectorApplyConfiguration to JSON.
-func (b *NodeSelectorApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into NodeSelectorApplyConfiguration, replacing the contents of
-// NodeSelectorApplyConfiguration.
-func (b *NodeSelectorApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // NodeSelectorList represents a listAlias of NodeSelectorApplyConfiguration.
@@ -112,8 +55,3 @@ type NodeSelectorList []*NodeSelectorApplyConfiguration
 
 // NodeSelectorList represents a map of NodeSelectorApplyConfiguration.
 type NodeSelectorMap map[string]NodeSelectorApplyConfiguration
-
-func (b *NodeSelectorApplyConfiguration) preMarshal() {
-}
-func (b *NodeSelectorApplyConfiguration) postUnmarshal() {
-}

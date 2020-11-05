@@ -19,17 +19,18 @@ limitations under the License.
 package v2beta1
 
 import (
-	json "encoding/json"
-
 	resource "k8s.io/apimachinery/pkg/api/resource"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // ObjectMetricStatusApplyConfiguration represents an declarative configuration of the ObjectMetricStatus type for use
 // with apply.
 type ObjectMetricStatusApplyConfiguration struct {
-	fields objectMetricStatusFields
+	Target       *CrossVersionObjectReferenceApplyConfiguration `json:"target,omitempty"`
+	MetricName   *string                                        `json:"metricName,omitempty"`
+	CurrentValue *resource.Quantity                             `json:"currentValue,omitempty"`
+	Selector     *v1.LabelSelectorApplyConfiguration            `json:"selector,omitempty"`
+	AverageValue *resource.Quantity                             `json:"averageValue,omitempty"`
 }
 
 // ObjectMetricStatusApplyConfiguration constructs an declarative configuration of the ObjectMetricStatus type for use with
@@ -38,51 +39,38 @@ func ObjectMetricStatus() *ObjectMetricStatusApplyConfiguration {
 	return &ObjectMetricStatusApplyConfiguration{}
 }
 
-// objectMetricStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ObjectMetricStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type objectMetricStatusFields struct {
-	Target       *CrossVersionObjectReferenceApplyConfiguration `json:"target,omitempty"`
-	MetricName   *string                                        `json:"metricName,omitempty"`
-	CurrentValue *resource.Quantity                             `json:"currentValue,omitempty"`
-	Selector     *v1.LabelSelectorApplyConfiguration            `json:"selector,omitempty"`
-	AverageValue *resource.Quantity                             `json:"averageValue,omitempty"`
-}
-
 // SetTarget sets the Target field in the declarative configuration to the given value.
 func (b *ObjectMetricStatusApplyConfiguration) SetTarget(value *CrossVersionObjectReferenceApplyConfiguration) *ObjectMetricStatusApplyConfiguration {
-	b.fields.Target = value
+	b.Target = value
 	return b
 }
 
 // RemoveTarget removes the Target field from the declarative configuration.
 func (b *ObjectMetricStatusApplyConfiguration) RemoveTarget() *ObjectMetricStatusApplyConfiguration {
-	b.fields.Target = nil
+	b.Target = nil
 	return b
 }
 
 // GetTarget gets the Target field from the declarative configuration.
 func (b *ObjectMetricStatusApplyConfiguration) GetTarget() (value *CrossVersionObjectReferenceApplyConfiguration, ok bool) {
-	return b.fields.Target, b.fields.Target != nil
+	return b.Target, b.Target != nil
 }
 
 // SetMetricName sets the MetricName field in the declarative configuration to the given value.
 func (b *ObjectMetricStatusApplyConfiguration) SetMetricName(value string) *ObjectMetricStatusApplyConfiguration {
-	b.fields.MetricName = &value
+	b.MetricName = &value
 	return b
 }
 
 // RemoveMetricName removes the MetricName field from the declarative configuration.
 func (b *ObjectMetricStatusApplyConfiguration) RemoveMetricName() *ObjectMetricStatusApplyConfiguration {
-	b.fields.MetricName = nil
+	b.MetricName = nil
 	return b
 }
 
 // GetMetricName gets the MetricName field from the declarative configuration.
 func (b *ObjectMetricStatusApplyConfiguration) GetMetricName() (value string, ok bool) {
-	if v := b.fields.MetricName; v != nil {
+	if v := b.MetricName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -90,19 +78,19 @@ func (b *ObjectMetricStatusApplyConfiguration) GetMetricName() (value string, ok
 
 // SetCurrentValue sets the CurrentValue field in the declarative configuration to the given value.
 func (b *ObjectMetricStatusApplyConfiguration) SetCurrentValue(value resource.Quantity) *ObjectMetricStatusApplyConfiguration {
-	b.fields.CurrentValue = &value
+	b.CurrentValue = &value
 	return b
 }
 
 // RemoveCurrentValue removes the CurrentValue field from the declarative configuration.
 func (b *ObjectMetricStatusApplyConfiguration) RemoveCurrentValue() *ObjectMetricStatusApplyConfiguration {
-	b.fields.CurrentValue = nil
+	b.CurrentValue = nil
 	return b
 }
 
 // GetCurrentValue gets the CurrentValue field from the declarative configuration.
 func (b *ObjectMetricStatusApplyConfiguration) GetCurrentValue() (value resource.Quantity, ok bool) {
-	if v := b.fields.CurrentValue; v != nil {
+	if v := b.CurrentValue; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -110,81 +98,39 @@ func (b *ObjectMetricStatusApplyConfiguration) GetCurrentValue() (value resource
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
 func (b *ObjectMetricStatusApplyConfiguration) SetSelector(value *v1.LabelSelectorApplyConfiguration) *ObjectMetricStatusApplyConfiguration {
-	b.fields.Selector = value
+	b.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
 func (b *ObjectMetricStatusApplyConfiguration) RemoveSelector() *ObjectMetricStatusApplyConfiguration {
-	b.fields.Selector = nil
+	b.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
 func (b *ObjectMetricStatusApplyConfiguration) GetSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
-	return b.fields.Selector, b.fields.Selector != nil
+	return b.Selector, b.Selector != nil
 }
 
 // SetAverageValue sets the AverageValue field in the declarative configuration to the given value.
 func (b *ObjectMetricStatusApplyConfiguration) SetAverageValue(value resource.Quantity) *ObjectMetricStatusApplyConfiguration {
-	b.fields.AverageValue = &value
+	b.AverageValue = &value
 	return b
 }
 
 // RemoveAverageValue removes the AverageValue field from the declarative configuration.
 func (b *ObjectMetricStatusApplyConfiguration) RemoveAverageValue() *ObjectMetricStatusApplyConfiguration {
-	b.fields.AverageValue = nil
+	b.AverageValue = nil
 	return b
 }
 
 // GetAverageValue gets the AverageValue field from the declarative configuration.
 func (b *ObjectMetricStatusApplyConfiguration) GetAverageValue() (value resource.Quantity, ok bool) {
-	if v := b.fields.AverageValue; v != nil {
+	if v := b.AverageValue; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ObjectMetricStatusApplyConfiguration to unstructured.
-func (b *ObjectMetricStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ObjectMetricStatusApplyConfiguration, replacing the contents
-// of ObjectMetricStatusApplyConfiguration.
-func (b *ObjectMetricStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &objectMetricStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ObjectMetricStatusApplyConfiguration to JSON.
-func (b *ObjectMetricStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ObjectMetricStatusApplyConfiguration, replacing the contents of
-// ObjectMetricStatusApplyConfiguration.
-func (b *ObjectMetricStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ObjectMetricStatusList represents a listAlias of ObjectMetricStatusApplyConfiguration.
@@ -192,8 +138,3 @@ type ObjectMetricStatusList []*ObjectMetricStatusApplyConfiguration
 
 // ObjectMetricStatusList represents a map of ObjectMetricStatusApplyConfiguration.
 type ObjectMetricStatusMap map[string]ObjectMetricStatusApplyConfiguration
-
-func (b *ObjectMetricStatusApplyConfiguration) preMarshal() {
-}
-func (b *ObjectMetricStatusApplyConfiguration) postUnmarshal() {
-}

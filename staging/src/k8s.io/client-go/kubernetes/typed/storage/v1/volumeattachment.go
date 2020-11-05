@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -189,7 +190,7 @@ func (c *volumeAttachments) Patch(ctx context.Context, name string, pt types.Pat
 // Apply takes the given apply declarative configuration, applies it and returns the applied volumeAttachment.
 func (c *volumeAttachments) Apply(ctx context.Context, volumeAttachment *storagev1.VolumeAttachmentApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.VolumeAttachment, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := volumeAttachment.MarshalJSON()
+	data, err := json.Marshal(volumeAttachment)
 	if err != nil {
 		return nil, err
 	}

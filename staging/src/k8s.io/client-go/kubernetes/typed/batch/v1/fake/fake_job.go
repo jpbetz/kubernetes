@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	batchv1 "k8s.io/api/batch/v1"
@@ -145,7 +146,7 @@ func (c *FakeJobs) Patch(ctx context.Context, name string, pt types.PatchType, d
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied job.
 func (c *FakeJobs) Apply(ctx context.Context, job *applyconfigurationsbatchv1.JobApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *batchv1.Job, err error) {
-	data, err := job.MarshalJSON()
+	data, err := json.Marshal(job)
 	if err != nil {
 		return nil, err
 	}

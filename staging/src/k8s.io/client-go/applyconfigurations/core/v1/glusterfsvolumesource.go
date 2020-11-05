@@ -18,16 +18,12 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // GlusterfsVolumeSourceApplyConfiguration represents an declarative configuration of the GlusterfsVolumeSource type for use
 // with apply.
 type GlusterfsVolumeSourceApplyConfiguration struct {
-	fields glusterfsVolumeSourceFields
+	EndpointsName *string `json:"endpoints,omitempty"`
+	Path          *string `json:"path,omitempty"`
+	ReadOnly      *bool   `json:"readOnly,omitempty"`
 }
 
 // GlusterfsVolumeSourceApplyConfiguration constructs an declarative configuration of the GlusterfsVolumeSource type for use with
@@ -36,32 +32,21 @@ func GlusterfsVolumeSource() *GlusterfsVolumeSourceApplyConfiguration {
 	return &GlusterfsVolumeSourceApplyConfiguration{}
 }
 
-// glusterfsVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in GlusterfsVolumeSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type glusterfsVolumeSourceFields struct {
-	EndpointsName *string `json:"endpoints,omitempty"`
-	Path          *string `json:"path,omitempty"`
-	ReadOnly      *bool   `json:"readOnly,omitempty"`
-}
-
 // SetEndpointsName sets the EndpointsName field in the declarative configuration to the given value.
 func (b *GlusterfsVolumeSourceApplyConfiguration) SetEndpointsName(value string) *GlusterfsVolumeSourceApplyConfiguration {
-	b.fields.EndpointsName = &value
+	b.EndpointsName = &value
 	return b
 }
 
 // RemoveEndpointsName removes the EndpointsName field from the declarative configuration.
 func (b *GlusterfsVolumeSourceApplyConfiguration) RemoveEndpointsName() *GlusterfsVolumeSourceApplyConfiguration {
-	b.fields.EndpointsName = nil
+	b.EndpointsName = nil
 	return b
 }
 
 // GetEndpointsName gets the EndpointsName field from the declarative configuration.
 func (b *GlusterfsVolumeSourceApplyConfiguration) GetEndpointsName() (value string, ok bool) {
-	if v := b.fields.EndpointsName; v != nil {
+	if v := b.EndpointsName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,19 +54,19 @@ func (b *GlusterfsVolumeSourceApplyConfiguration) GetEndpointsName() (value stri
 
 // SetPath sets the Path field in the declarative configuration to the given value.
 func (b *GlusterfsVolumeSourceApplyConfiguration) SetPath(value string) *GlusterfsVolumeSourceApplyConfiguration {
-	b.fields.Path = &value
+	b.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
 func (b *GlusterfsVolumeSourceApplyConfiguration) RemovePath() *GlusterfsVolumeSourceApplyConfiguration {
-	b.fields.Path = nil
+	b.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
 func (b *GlusterfsVolumeSourceApplyConfiguration) GetPath() (value string, ok bool) {
-	if v := b.fields.Path; v != nil {
+	if v := b.Path; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -89,64 +74,22 @@ func (b *GlusterfsVolumeSourceApplyConfiguration) GetPath() (value string, ok bo
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
 func (b *GlusterfsVolumeSourceApplyConfiguration) SetReadOnly(value bool) *GlusterfsVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = &value
+	b.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
 func (b *GlusterfsVolumeSourceApplyConfiguration) RemoveReadOnly() *GlusterfsVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = nil
+	b.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
 func (b *GlusterfsVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
-	if v := b.fields.ReadOnly; v != nil {
+	if v := b.ReadOnly; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts GlusterfsVolumeSourceApplyConfiguration to unstructured.
-func (b *GlusterfsVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to GlusterfsVolumeSourceApplyConfiguration, replacing the contents
-// of GlusterfsVolumeSourceApplyConfiguration.
-func (b *GlusterfsVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &glusterfsVolumeSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals GlusterfsVolumeSourceApplyConfiguration to JSON.
-func (b *GlusterfsVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into GlusterfsVolumeSourceApplyConfiguration, replacing the contents of
-// GlusterfsVolumeSourceApplyConfiguration.
-func (b *GlusterfsVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // GlusterfsVolumeSourceList represents a listAlias of GlusterfsVolumeSourceApplyConfiguration.
@@ -154,8 +97,3 @@ type GlusterfsVolumeSourceList []*GlusterfsVolumeSourceApplyConfiguration
 
 // GlusterfsVolumeSourceList represents a map of GlusterfsVolumeSourceApplyConfiguration.
 type GlusterfsVolumeSourceMap map[string]GlusterfsVolumeSourceApplyConfiguration
-
-func (b *GlusterfsVolumeSourceApplyConfiguration) preMarshal() {
-}
-func (b *GlusterfsVolumeSourceApplyConfiguration) postUnmarshal() {
-}

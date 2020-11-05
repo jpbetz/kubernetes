@@ -18,16 +18,13 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // DownwardAPIVolumeFileApplyConfiguration represents an declarative configuration of the DownwardAPIVolumeFile type for use
 // with apply.
 type DownwardAPIVolumeFileApplyConfiguration struct {
-	fields downwardAPIVolumeFileFields
+	Path             *string                                  `json:"path,omitempty"`
+	FieldRef         *ObjectFieldSelectorApplyConfiguration   `json:"fieldRef,omitempty"`
+	ResourceFieldRef *ResourceFieldSelectorApplyConfiguration `json:"resourceFieldRef,omitempty"`
+	Mode             *int32                                   `json:"mode,omitempty"`
 }
 
 // DownwardAPIVolumeFileApplyConfiguration constructs an declarative configuration of the DownwardAPIVolumeFile type for use with
@@ -36,33 +33,21 @@ func DownwardAPIVolumeFile() *DownwardAPIVolumeFileApplyConfiguration {
 	return &DownwardAPIVolumeFileApplyConfiguration{}
 }
 
-// downwardAPIVolumeFileFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in DownwardAPIVolumeFileApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type downwardAPIVolumeFileFields struct {
-	Path             *string                                  `json:"path,omitempty"`
-	FieldRef         *ObjectFieldSelectorApplyConfiguration   `json:"fieldRef,omitempty"`
-	ResourceFieldRef *ResourceFieldSelectorApplyConfiguration `json:"resourceFieldRef,omitempty"`
-	Mode             *int32                                   `json:"mode,omitempty"`
-}
-
 // SetPath sets the Path field in the declarative configuration to the given value.
 func (b *DownwardAPIVolumeFileApplyConfiguration) SetPath(value string) *DownwardAPIVolumeFileApplyConfiguration {
-	b.fields.Path = &value
+	b.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
 func (b *DownwardAPIVolumeFileApplyConfiguration) RemovePath() *DownwardAPIVolumeFileApplyConfiguration {
-	b.fields.Path = nil
+	b.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
 func (b *DownwardAPIVolumeFileApplyConfiguration) GetPath() (value string, ok bool) {
-	if v := b.fields.Path; v != nil {
+	if v := b.Path; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,98 +55,56 @@ func (b *DownwardAPIVolumeFileApplyConfiguration) GetPath() (value string, ok bo
 
 // SetFieldRef sets the FieldRef field in the declarative configuration to the given value.
 func (b *DownwardAPIVolumeFileApplyConfiguration) SetFieldRef(value *ObjectFieldSelectorApplyConfiguration) *DownwardAPIVolumeFileApplyConfiguration {
-	b.fields.FieldRef = value
+	b.FieldRef = value
 	return b
 }
 
 // RemoveFieldRef removes the FieldRef field from the declarative configuration.
 func (b *DownwardAPIVolumeFileApplyConfiguration) RemoveFieldRef() *DownwardAPIVolumeFileApplyConfiguration {
-	b.fields.FieldRef = nil
+	b.FieldRef = nil
 	return b
 }
 
 // GetFieldRef gets the FieldRef field from the declarative configuration.
 func (b *DownwardAPIVolumeFileApplyConfiguration) GetFieldRef() (value *ObjectFieldSelectorApplyConfiguration, ok bool) {
-	return b.fields.FieldRef, b.fields.FieldRef != nil
+	return b.FieldRef, b.FieldRef != nil
 }
 
 // SetResourceFieldRef sets the ResourceFieldRef field in the declarative configuration to the given value.
 func (b *DownwardAPIVolumeFileApplyConfiguration) SetResourceFieldRef(value *ResourceFieldSelectorApplyConfiguration) *DownwardAPIVolumeFileApplyConfiguration {
-	b.fields.ResourceFieldRef = value
+	b.ResourceFieldRef = value
 	return b
 }
 
 // RemoveResourceFieldRef removes the ResourceFieldRef field from the declarative configuration.
 func (b *DownwardAPIVolumeFileApplyConfiguration) RemoveResourceFieldRef() *DownwardAPIVolumeFileApplyConfiguration {
-	b.fields.ResourceFieldRef = nil
+	b.ResourceFieldRef = nil
 	return b
 }
 
 // GetResourceFieldRef gets the ResourceFieldRef field from the declarative configuration.
 func (b *DownwardAPIVolumeFileApplyConfiguration) GetResourceFieldRef() (value *ResourceFieldSelectorApplyConfiguration, ok bool) {
-	return b.fields.ResourceFieldRef, b.fields.ResourceFieldRef != nil
+	return b.ResourceFieldRef, b.ResourceFieldRef != nil
 }
 
 // SetMode sets the Mode field in the declarative configuration to the given value.
 func (b *DownwardAPIVolumeFileApplyConfiguration) SetMode(value int32) *DownwardAPIVolumeFileApplyConfiguration {
-	b.fields.Mode = &value
+	b.Mode = &value
 	return b
 }
 
 // RemoveMode removes the Mode field from the declarative configuration.
 func (b *DownwardAPIVolumeFileApplyConfiguration) RemoveMode() *DownwardAPIVolumeFileApplyConfiguration {
-	b.fields.Mode = nil
+	b.Mode = nil
 	return b
 }
 
 // GetMode gets the Mode field from the declarative configuration.
 func (b *DownwardAPIVolumeFileApplyConfiguration) GetMode() (value int32, ok bool) {
-	if v := b.fields.Mode; v != nil {
+	if v := b.Mode; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts DownwardAPIVolumeFileApplyConfiguration to unstructured.
-func (b *DownwardAPIVolumeFileApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to DownwardAPIVolumeFileApplyConfiguration, replacing the contents
-// of DownwardAPIVolumeFileApplyConfiguration.
-func (b *DownwardAPIVolumeFileApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &downwardAPIVolumeFileFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals DownwardAPIVolumeFileApplyConfiguration to JSON.
-func (b *DownwardAPIVolumeFileApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into DownwardAPIVolumeFileApplyConfiguration, replacing the contents of
-// DownwardAPIVolumeFileApplyConfiguration.
-func (b *DownwardAPIVolumeFileApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // DownwardAPIVolumeFileList represents a listAlias of DownwardAPIVolumeFileApplyConfiguration.
@@ -169,8 +112,3 @@ type DownwardAPIVolumeFileList []*DownwardAPIVolumeFileApplyConfiguration
 
 // DownwardAPIVolumeFileList represents a map of DownwardAPIVolumeFileApplyConfiguration.
 type DownwardAPIVolumeFileMap map[string]DownwardAPIVolumeFileApplyConfiguration
-
-func (b *DownwardAPIVolumeFileApplyConfiguration) preMarshal() {
-}
-func (b *DownwardAPIVolumeFileApplyConfiguration) postUnmarshal() {
-}

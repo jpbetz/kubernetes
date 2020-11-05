@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // DownwardAPIVolumeSourceApplyConfiguration represents an declarative configuration of the DownwardAPIVolumeSource type for use
 // with apply.
 type DownwardAPIVolumeSourceApplyConfiguration struct {
-	fields downwardAPIVolumeSourceFields
+	Items       *DownwardAPIVolumeFileList `json:"items,omitempty"`
+	DefaultMode *int32                     `json:"defaultMode,omitempty"`
 }
 
 // DownwardAPIVolumeSourceApplyConfiguration constructs an declarative configuration of the DownwardAPIVolumeSource type for use with
@@ -36,31 +31,21 @@ func DownwardAPIVolumeSource() *DownwardAPIVolumeSourceApplyConfiguration {
 	return &DownwardAPIVolumeSourceApplyConfiguration{}
 }
 
-// downwardAPIVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in DownwardAPIVolumeSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type downwardAPIVolumeSourceFields struct {
-	Items       *DownwardAPIVolumeFileList `json:"items,omitempty"`
-	DefaultMode *int32                     `json:"defaultMode,omitempty"`
-}
-
 // SetItems sets the Items field in the declarative configuration to the given value.
 func (b *DownwardAPIVolumeSourceApplyConfiguration) SetItems(value DownwardAPIVolumeFileList) *DownwardAPIVolumeSourceApplyConfiguration {
-	b.fields.Items = &value
+	b.Items = &value
 	return b
 }
 
 // RemoveItems removes the Items field from the declarative configuration.
 func (b *DownwardAPIVolumeSourceApplyConfiguration) RemoveItems() *DownwardAPIVolumeSourceApplyConfiguration {
-	b.fields.Items = nil
+	b.Items = nil
 	return b
 }
 
 // GetItems gets the Items field from the declarative configuration.
 func (b *DownwardAPIVolumeSourceApplyConfiguration) GetItems() (value DownwardAPIVolumeFileList, ok bool) {
-	if v := b.fields.Items; v != nil {
+	if v := b.Items; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *DownwardAPIVolumeSourceApplyConfiguration) GetItems() (value DownwardAP
 
 // SetDefaultMode sets the DefaultMode field in the declarative configuration to the given value.
 func (b *DownwardAPIVolumeSourceApplyConfiguration) SetDefaultMode(value int32) *DownwardAPIVolumeSourceApplyConfiguration {
-	b.fields.DefaultMode = &value
+	b.DefaultMode = &value
 	return b
 }
 
 // RemoveDefaultMode removes the DefaultMode field from the declarative configuration.
 func (b *DownwardAPIVolumeSourceApplyConfiguration) RemoveDefaultMode() *DownwardAPIVolumeSourceApplyConfiguration {
-	b.fields.DefaultMode = nil
+	b.DefaultMode = nil
 	return b
 }
 
 // GetDefaultMode gets the DefaultMode field from the declarative configuration.
 func (b *DownwardAPIVolumeSourceApplyConfiguration) GetDefaultMode() (value int32, ok bool) {
-	if v := b.fields.DefaultMode; v != nil {
+	if v := b.DefaultMode; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts DownwardAPIVolumeSourceApplyConfiguration to unstructured.
-func (b *DownwardAPIVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to DownwardAPIVolumeSourceApplyConfiguration, replacing the contents
-// of DownwardAPIVolumeSourceApplyConfiguration.
-func (b *DownwardAPIVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &downwardAPIVolumeSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals DownwardAPIVolumeSourceApplyConfiguration to JSON.
-func (b *DownwardAPIVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into DownwardAPIVolumeSourceApplyConfiguration, replacing the contents of
-// DownwardAPIVolumeSourceApplyConfiguration.
-func (b *DownwardAPIVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // DownwardAPIVolumeSourceList represents a listAlias of DownwardAPIVolumeSourceApplyConfiguration.
@@ -133,8 +76,3 @@ type DownwardAPIVolumeSourceList []*DownwardAPIVolumeSourceApplyConfiguration
 
 // DownwardAPIVolumeSourceList represents a map of DownwardAPIVolumeSourceApplyConfiguration.
 type DownwardAPIVolumeSourceMap map[string]DownwardAPIVolumeSourceApplyConfiguration
-
-func (b *DownwardAPIVolumeSourceApplyConfiguration) preMarshal() {
-}
-func (b *DownwardAPIVolumeSourceApplyConfiguration) postUnmarshal() {
-}

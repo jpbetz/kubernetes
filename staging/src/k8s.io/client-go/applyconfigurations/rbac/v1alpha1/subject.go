@@ -18,16 +18,13 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // SubjectApplyConfiguration represents an declarative configuration of the Subject type for use
 // with apply.
 type SubjectApplyConfiguration struct {
-	fields subjectFields
+	Kind       *string `json:"kind,omitempty"`
+	APIVersion *string `json:"apiVersion,omitempty"`
+	Name       *string `json:"name,omitempty"`
+	Namespace  *string `json:"namespace,omitempty"`
 }
 
 // SubjectApplyConfiguration constructs an declarative configuration of the Subject type for use with
@@ -36,33 +33,21 @@ func Subject() *SubjectApplyConfiguration {
 	return &SubjectApplyConfiguration{}
 }
 
-// subjectFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SubjectApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type subjectFields struct {
-	Kind       *string `json:"kind,omitempty"`
-	APIVersion *string `json:"apiVersion,omitempty"`
-	Name       *string `json:"name,omitempty"`
-	Namespace  *string `json:"namespace,omitempty"`
-}
-
 // SetKind sets the Kind field in the declarative configuration to the given value.
 func (b *SubjectApplyConfiguration) SetKind(value string) *SubjectApplyConfiguration {
-	b.fields.Kind = &value
+	b.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
 func (b *SubjectApplyConfiguration) RemoveKind() *SubjectApplyConfiguration {
-	b.fields.Kind = nil
+	b.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
 func (b *SubjectApplyConfiguration) GetKind() (value string, ok bool) {
-	if v := b.fields.Kind; v != nil {
+	if v := b.Kind; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,19 +55,19 @@ func (b *SubjectApplyConfiguration) GetKind() (value string, ok bool) {
 
 // SetAPIVersion sets the APIVersion field in the declarative configuration to the given value.
 func (b *SubjectApplyConfiguration) SetAPIVersion(value string) *SubjectApplyConfiguration {
-	b.fields.APIVersion = &value
+	b.APIVersion = &value
 	return b
 }
 
 // RemoveAPIVersion removes the APIVersion field from the declarative configuration.
 func (b *SubjectApplyConfiguration) RemoveAPIVersion() *SubjectApplyConfiguration {
-	b.fields.APIVersion = nil
+	b.APIVersion = nil
 	return b
 }
 
 // GetAPIVersion gets the APIVersion field from the declarative configuration.
 func (b *SubjectApplyConfiguration) GetAPIVersion() (value string, ok bool) {
-	if v := b.fields.APIVersion; v != nil {
+	if v := b.APIVersion; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -90,19 +75,19 @@ func (b *SubjectApplyConfiguration) GetAPIVersion() (value string, ok bool) {
 
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *SubjectApplyConfiguration) SetName(value string) *SubjectApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *SubjectApplyConfiguration) RemoveName() *SubjectApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *SubjectApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -110,64 +95,22 @@ func (b *SubjectApplyConfiguration) GetName() (value string, ok bool) {
 
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
 func (b *SubjectApplyConfiguration) SetNamespace(value string) *SubjectApplyConfiguration {
-	b.fields.Namespace = &value
+	b.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
 func (b *SubjectApplyConfiguration) RemoveNamespace() *SubjectApplyConfiguration {
-	b.fields.Namespace = nil
+	b.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
 func (b *SubjectApplyConfiguration) GetNamespace() (value string, ok bool) {
-	if v := b.fields.Namespace; v != nil {
+	if v := b.Namespace; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts SubjectApplyConfiguration to unstructured.
-func (b *SubjectApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to SubjectApplyConfiguration, replacing the contents
-// of SubjectApplyConfiguration.
-func (b *SubjectApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &subjectFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals SubjectApplyConfiguration to JSON.
-func (b *SubjectApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into SubjectApplyConfiguration, replacing the contents of
-// SubjectApplyConfiguration.
-func (b *SubjectApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // SubjectList represents a listAlias of SubjectApplyConfiguration.
@@ -175,8 +118,3 @@ type SubjectList []*SubjectApplyConfiguration
 
 // SubjectList represents a map of SubjectApplyConfiguration.
 type SubjectMap map[string]SubjectApplyConfiguration
-
-func (b *SubjectApplyConfiguration) preMarshal() {
-}
-func (b *SubjectApplyConfiguration) postUnmarshal() {
-}

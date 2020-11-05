@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	coordinationv1 "k8s.io/api/coordination/v1"
@@ -133,7 +134,7 @@ func (c *FakeLeases) Patch(ctx context.Context, name string, pt types.PatchType,
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied lease.
 func (c *FakeLeases) Apply(ctx context.Context, lease *applyconfigurationscoordinationv1.LeaseApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *coordinationv1.Lease, err error) {
-	data, err := lease.MarshalJSON()
+	data, err := json.Marshal(lease)
 	if err != nil {
 		return nil, err
 	}

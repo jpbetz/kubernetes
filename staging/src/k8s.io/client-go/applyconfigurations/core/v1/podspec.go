@@ -19,30 +19,12 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	corev1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // PodSpecApplyConfiguration represents an declarative configuration of the PodSpec type for use
 // with apply.
 type PodSpecApplyConfiguration struct {
-	fields podSpecFields
-}
-
-// PodSpecApplyConfiguration constructs an declarative configuration of the PodSpec type for use with
-// apply.
-func PodSpec() *PodSpecApplyConfiguration {
-	return &PodSpecApplyConfiguration{}
-}
-
-// podSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type podSpecFields struct {
 	Volumes                       *VolumeList                           `json:"volumes,omitempty"`
 	InitContainers                *ContainerList                        `json:"initContainers,omitempty"`
 	Containers                    *ContainerList                        `json:"containers,omitempty"`
@@ -80,21 +62,27 @@ type podSpecFields struct {
 	SetHostnameAsFQDN             *bool                                 `json:"setHostnameAsFQDN,omitempty"`
 }
 
+// PodSpecApplyConfiguration constructs an declarative configuration of the PodSpec type for use with
+// apply.
+func PodSpec() *PodSpecApplyConfiguration {
+	return &PodSpecApplyConfiguration{}
+}
+
 // SetVolumes sets the Volumes field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetVolumes(value VolumeList) *PodSpecApplyConfiguration {
-	b.fields.Volumes = &value
+	b.Volumes = &value
 	return b
 }
 
 // RemoveVolumes removes the Volumes field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveVolumes() *PodSpecApplyConfiguration {
-	b.fields.Volumes = nil
+	b.Volumes = nil
 	return b
 }
 
 // GetVolumes gets the Volumes field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetVolumes() (value VolumeList, ok bool) {
-	if v := b.fields.Volumes; v != nil {
+	if v := b.Volumes; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -102,19 +90,19 @@ func (b *PodSpecApplyConfiguration) GetVolumes() (value VolumeList, ok bool) {
 
 // SetInitContainers sets the InitContainers field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetInitContainers(value ContainerList) *PodSpecApplyConfiguration {
-	b.fields.InitContainers = &value
+	b.InitContainers = &value
 	return b
 }
 
 // RemoveInitContainers removes the InitContainers field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveInitContainers() *PodSpecApplyConfiguration {
-	b.fields.InitContainers = nil
+	b.InitContainers = nil
 	return b
 }
 
 // GetInitContainers gets the InitContainers field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetInitContainers() (value ContainerList, ok bool) {
-	if v := b.fields.InitContainers; v != nil {
+	if v := b.InitContainers; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -122,19 +110,19 @@ func (b *PodSpecApplyConfiguration) GetInitContainers() (value ContainerList, ok
 
 // SetContainers sets the Containers field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetContainers(value ContainerList) *PodSpecApplyConfiguration {
-	b.fields.Containers = &value
+	b.Containers = &value
 	return b
 }
 
 // RemoveContainers removes the Containers field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveContainers() *PodSpecApplyConfiguration {
-	b.fields.Containers = nil
+	b.Containers = nil
 	return b
 }
 
 // GetContainers gets the Containers field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetContainers() (value ContainerList, ok bool) {
-	if v := b.fields.Containers; v != nil {
+	if v := b.Containers; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -142,19 +130,19 @@ func (b *PodSpecApplyConfiguration) GetContainers() (value ContainerList, ok boo
 
 // SetEphemeralContainers sets the EphemeralContainers field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetEphemeralContainers(value EphemeralContainerList) *PodSpecApplyConfiguration {
-	b.fields.EphemeralContainers = &value
+	b.EphemeralContainers = &value
 	return b
 }
 
 // RemoveEphemeralContainers removes the EphemeralContainers field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveEphemeralContainers() *PodSpecApplyConfiguration {
-	b.fields.EphemeralContainers = nil
+	b.EphemeralContainers = nil
 	return b
 }
 
 // GetEphemeralContainers gets the EphemeralContainers field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetEphemeralContainers() (value EphemeralContainerList, ok bool) {
-	if v := b.fields.EphemeralContainers; v != nil {
+	if v := b.EphemeralContainers; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -162,19 +150,19 @@ func (b *PodSpecApplyConfiguration) GetEphemeralContainers() (value EphemeralCon
 
 // SetRestartPolicy sets the RestartPolicy field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetRestartPolicy(value corev1.RestartPolicy) *PodSpecApplyConfiguration {
-	b.fields.RestartPolicy = &value
+	b.RestartPolicy = &value
 	return b
 }
 
 // RemoveRestartPolicy removes the RestartPolicy field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveRestartPolicy() *PodSpecApplyConfiguration {
-	b.fields.RestartPolicy = nil
+	b.RestartPolicy = nil
 	return b
 }
 
 // GetRestartPolicy gets the RestartPolicy field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetRestartPolicy() (value corev1.RestartPolicy, ok bool) {
-	if v := b.fields.RestartPolicy; v != nil {
+	if v := b.RestartPolicy; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -182,19 +170,19 @@ func (b *PodSpecApplyConfiguration) GetRestartPolicy() (value corev1.RestartPoli
 
 // SetTerminationGracePeriodSeconds sets the TerminationGracePeriodSeconds field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetTerminationGracePeriodSeconds(value int64) *PodSpecApplyConfiguration {
-	b.fields.TerminationGracePeriodSeconds = &value
+	b.TerminationGracePeriodSeconds = &value
 	return b
 }
 
 // RemoveTerminationGracePeriodSeconds removes the TerminationGracePeriodSeconds field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveTerminationGracePeriodSeconds() *PodSpecApplyConfiguration {
-	b.fields.TerminationGracePeriodSeconds = nil
+	b.TerminationGracePeriodSeconds = nil
 	return b
 }
 
 // GetTerminationGracePeriodSeconds gets the TerminationGracePeriodSeconds field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetTerminationGracePeriodSeconds() (value int64, ok bool) {
-	if v := b.fields.TerminationGracePeriodSeconds; v != nil {
+	if v := b.TerminationGracePeriodSeconds; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -202,19 +190,19 @@ func (b *PodSpecApplyConfiguration) GetTerminationGracePeriodSeconds() (value in
 
 // SetActiveDeadlineSeconds sets the ActiveDeadlineSeconds field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetActiveDeadlineSeconds(value int64) *PodSpecApplyConfiguration {
-	b.fields.ActiveDeadlineSeconds = &value
+	b.ActiveDeadlineSeconds = &value
 	return b
 }
 
 // RemoveActiveDeadlineSeconds removes the ActiveDeadlineSeconds field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveActiveDeadlineSeconds() *PodSpecApplyConfiguration {
-	b.fields.ActiveDeadlineSeconds = nil
+	b.ActiveDeadlineSeconds = nil
 	return b
 }
 
 // GetActiveDeadlineSeconds gets the ActiveDeadlineSeconds field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetActiveDeadlineSeconds() (value int64, ok bool) {
-	if v := b.fields.ActiveDeadlineSeconds; v != nil {
+	if v := b.ActiveDeadlineSeconds; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -222,19 +210,19 @@ func (b *PodSpecApplyConfiguration) GetActiveDeadlineSeconds() (value int64, ok 
 
 // SetDNSPolicy sets the DNSPolicy field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetDNSPolicy(value corev1.DNSPolicy) *PodSpecApplyConfiguration {
-	b.fields.DNSPolicy = &value
+	b.DNSPolicy = &value
 	return b
 }
 
 // RemoveDNSPolicy removes the DNSPolicy field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveDNSPolicy() *PodSpecApplyConfiguration {
-	b.fields.DNSPolicy = nil
+	b.DNSPolicy = nil
 	return b
 }
 
 // GetDNSPolicy gets the DNSPolicy field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetDNSPolicy() (value corev1.DNSPolicy, ok bool) {
-	if v := b.fields.DNSPolicy; v != nil {
+	if v := b.DNSPolicy; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -242,19 +230,19 @@ func (b *PodSpecApplyConfiguration) GetDNSPolicy() (value corev1.DNSPolicy, ok b
 
 // SetNodeSelector sets the NodeSelector field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetNodeSelector(value map[string]string) *PodSpecApplyConfiguration {
-	b.fields.NodeSelector = &value
+	b.NodeSelector = &value
 	return b
 }
 
 // RemoveNodeSelector removes the NodeSelector field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveNodeSelector() *PodSpecApplyConfiguration {
-	b.fields.NodeSelector = nil
+	b.NodeSelector = nil
 	return b
 }
 
 // GetNodeSelector gets the NodeSelector field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetNodeSelector() (value map[string]string, ok bool) {
-	if v := b.fields.NodeSelector; v != nil {
+	if v := b.NodeSelector; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -262,19 +250,19 @@ func (b *PodSpecApplyConfiguration) GetNodeSelector() (value map[string]string, 
 
 // SetServiceAccountName sets the ServiceAccountName field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetServiceAccountName(value string) *PodSpecApplyConfiguration {
-	b.fields.ServiceAccountName = &value
+	b.ServiceAccountName = &value
 	return b
 }
 
 // RemoveServiceAccountName removes the ServiceAccountName field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveServiceAccountName() *PodSpecApplyConfiguration {
-	b.fields.ServiceAccountName = nil
+	b.ServiceAccountName = nil
 	return b
 }
 
 // GetServiceAccountName gets the ServiceAccountName field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetServiceAccountName() (value string, ok bool) {
-	if v := b.fields.ServiceAccountName; v != nil {
+	if v := b.ServiceAccountName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -282,19 +270,19 @@ func (b *PodSpecApplyConfiguration) GetServiceAccountName() (value string, ok bo
 
 // SetDeprecatedServiceAccount sets the DeprecatedServiceAccount field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetDeprecatedServiceAccount(value string) *PodSpecApplyConfiguration {
-	b.fields.DeprecatedServiceAccount = &value
+	b.DeprecatedServiceAccount = &value
 	return b
 }
 
 // RemoveDeprecatedServiceAccount removes the DeprecatedServiceAccount field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveDeprecatedServiceAccount() *PodSpecApplyConfiguration {
-	b.fields.DeprecatedServiceAccount = nil
+	b.DeprecatedServiceAccount = nil
 	return b
 }
 
 // GetDeprecatedServiceAccount gets the DeprecatedServiceAccount field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetDeprecatedServiceAccount() (value string, ok bool) {
-	if v := b.fields.DeprecatedServiceAccount; v != nil {
+	if v := b.DeprecatedServiceAccount; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -302,19 +290,19 @@ func (b *PodSpecApplyConfiguration) GetDeprecatedServiceAccount() (value string,
 
 // SetAutomountServiceAccountToken sets the AutomountServiceAccountToken field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetAutomountServiceAccountToken(value bool) *PodSpecApplyConfiguration {
-	b.fields.AutomountServiceAccountToken = &value
+	b.AutomountServiceAccountToken = &value
 	return b
 }
 
 // RemoveAutomountServiceAccountToken removes the AutomountServiceAccountToken field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveAutomountServiceAccountToken() *PodSpecApplyConfiguration {
-	b.fields.AutomountServiceAccountToken = nil
+	b.AutomountServiceAccountToken = nil
 	return b
 }
 
 // GetAutomountServiceAccountToken gets the AutomountServiceAccountToken field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetAutomountServiceAccountToken() (value bool, ok bool) {
-	if v := b.fields.AutomountServiceAccountToken; v != nil {
+	if v := b.AutomountServiceAccountToken; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -322,19 +310,19 @@ func (b *PodSpecApplyConfiguration) GetAutomountServiceAccountToken() (value boo
 
 // SetNodeName sets the NodeName field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetNodeName(value string) *PodSpecApplyConfiguration {
-	b.fields.NodeName = &value
+	b.NodeName = &value
 	return b
 }
 
 // RemoveNodeName removes the NodeName field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveNodeName() *PodSpecApplyConfiguration {
-	b.fields.NodeName = nil
+	b.NodeName = nil
 	return b
 }
 
 // GetNodeName gets the NodeName field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetNodeName() (value string, ok bool) {
-	if v := b.fields.NodeName; v != nil {
+	if v := b.NodeName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -342,19 +330,19 @@ func (b *PodSpecApplyConfiguration) GetNodeName() (value string, ok bool) {
 
 // SetHostNetwork sets the HostNetwork field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetHostNetwork(value bool) *PodSpecApplyConfiguration {
-	b.fields.HostNetwork = &value
+	b.HostNetwork = &value
 	return b
 }
 
 // RemoveHostNetwork removes the HostNetwork field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveHostNetwork() *PodSpecApplyConfiguration {
-	b.fields.HostNetwork = nil
+	b.HostNetwork = nil
 	return b
 }
 
 // GetHostNetwork gets the HostNetwork field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetHostNetwork() (value bool, ok bool) {
-	if v := b.fields.HostNetwork; v != nil {
+	if v := b.HostNetwork; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -362,19 +350,19 @@ func (b *PodSpecApplyConfiguration) GetHostNetwork() (value bool, ok bool) {
 
 // SetHostPID sets the HostPID field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetHostPID(value bool) *PodSpecApplyConfiguration {
-	b.fields.HostPID = &value
+	b.HostPID = &value
 	return b
 }
 
 // RemoveHostPID removes the HostPID field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveHostPID() *PodSpecApplyConfiguration {
-	b.fields.HostPID = nil
+	b.HostPID = nil
 	return b
 }
 
 // GetHostPID gets the HostPID field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetHostPID() (value bool, ok bool) {
-	if v := b.fields.HostPID; v != nil {
+	if v := b.HostPID; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -382,19 +370,19 @@ func (b *PodSpecApplyConfiguration) GetHostPID() (value bool, ok bool) {
 
 // SetHostIPC sets the HostIPC field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetHostIPC(value bool) *PodSpecApplyConfiguration {
-	b.fields.HostIPC = &value
+	b.HostIPC = &value
 	return b
 }
 
 // RemoveHostIPC removes the HostIPC field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveHostIPC() *PodSpecApplyConfiguration {
-	b.fields.HostIPC = nil
+	b.HostIPC = nil
 	return b
 }
 
 // GetHostIPC gets the HostIPC field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetHostIPC() (value bool, ok bool) {
-	if v := b.fields.HostIPC; v != nil {
+	if v := b.HostIPC; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -402,19 +390,19 @@ func (b *PodSpecApplyConfiguration) GetHostIPC() (value bool, ok bool) {
 
 // SetShareProcessNamespace sets the ShareProcessNamespace field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetShareProcessNamespace(value bool) *PodSpecApplyConfiguration {
-	b.fields.ShareProcessNamespace = &value
+	b.ShareProcessNamespace = &value
 	return b
 }
 
 // RemoveShareProcessNamespace removes the ShareProcessNamespace field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveShareProcessNamespace() *PodSpecApplyConfiguration {
-	b.fields.ShareProcessNamespace = nil
+	b.ShareProcessNamespace = nil
 	return b
 }
 
 // GetShareProcessNamespace gets the ShareProcessNamespace field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetShareProcessNamespace() (value bool, ok bool) {
-	if v := b.fields.ShareProcessNamespace; v != nil {
+	if v := b.ShareProcessNamespace; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -422,36 +410,36 @@ func (b *PodSpecApplyConfiguration) GetShareProcessNamespace() (value bool, ok b
 
 // SetSecurityContext sets the SecurityContext field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetSecurityContext(value *PodSecurityContextApplyConfiguration) *PodSpecApplyConfiguration {
-	b.fields.SecurityContext = value
+	b.SecurityContext = value
 	return b
 }
 
 // RemoveSecurityContext removes the SecurityContext field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveSecurityContext() *PodSpecApplyConfiguration {
-	b.fields.SecurityContext = nil
+	b.SecurityContext = nil
 	return b
 }
 
 // GetSecurityContext gets the SecurityContext field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetSecurityContext() (value *PodSecurityContextApplyConfiguration, ok bool) {
-	return b.fields.SecurityContext, b.fields.SecurityContext != nil
+	return b.SecurityContext, b.SecurityContext != nil
 }
 
 // SetImagePullSecrets sets the ImagePullSecrets field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetImagePullSecrets(value LocalObjectReferenceList) *PodSpecApplyConfiguration {
-	b.fields.ImagePullSecrets = &value
+	b.ImagePullSecrets = &value
 	return b
 }
 
 // RemoveImagePullSecrets removes the ImagePullSecrets field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveImagePullSecrets() *PodSpecApplyConfiguration {
-	b.fields.ImagePullSecrets = nil
+	b.ImagePullSecrets = nil
 	return b
 }
 
 // GetImagePullSecrets gets the ImagePullSecrets field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetImagePullSecrets() (value LocalObjectReferenceList, ok bool) {
-	if v := b.fields.ImagePullSecrets; v != nil {
+	if v := b.ImagePullSecrets; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -459,19 +447,19 @@ func (b *PodSpecApplyConfiguration) GetImagePullSecrets() (value LocalObjectRefe
 
 // SetHostname sets the Hostname field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetHostname(value string) *PodSpecApplyConfiguration {
-	b.fields.Hostname = &value
+	b.Hostname = &value
 	return b
 }
 
 // RemoveHostname removes the Hostname field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveHostname() *PodSpecApplyConfiguration {
-	b.fields.Hostname = nil
+	b.Hostname = nil
 	return b
 }
 
 // GetHostname gets the Hostname field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetHostname() (value string, ok bool) {
-	if v := b.fields.Hostname; v != nil {
+	if v := b.Hostname; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -479,19 +467,19 @@ func (b *PodSpecApplyConfiguration) GetHostname() (value string, ok bool) {
 
 // SetSubdomain sets the Subdomain field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetSubdomain(value string) *PodSpecApplyConfiguration {
-	b.fields.Subdomain = &value
+	b.Subdomain = &value
 	return b
 }
 
 // RemoveSubdomain removes the Subdomain field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveSubdomain() *PodSpecApplyConfiguration {
-	b.fields.Subdomain = nil
+	b.Subdomain = nil
 	return b
 }
 
 // GetSubdomain gets the Subdomain field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetSubdomain() (value string, ok bool) {
-	if v := b.fields.Subdomain; v != nil {
+	if v := b.Subdomain; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -499,36 +487,36 @@ func (b *PodSpecApplyConfiguration) GetSubdomain() (value string, ok bool) {
 
 // SetAffinity sets the Affinity field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetAffinity(value *AffinityApplyConfiguration) *PodSpecApplyConfiguration {
-	b.fields.Affinity = value
+	b.Affinity = value
 	return b
 }
 
 // RemoveAffinity removes the Affinity field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveAffinity() *PodSpecApplyConfiguration {
-	b.fields.Affinity = nil
+	b.Affinity = nil
 	return b
 }
 
 // GetAffinity gets the Affinity field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetAffinity() (value *AffinityApplyConfiguration, ok bool) {
-	return b.fields.Affinity, b.fields.Affinity != nil
+	return b.Affinity, b.Affinity != nil
 }
 
 // SetSchedulerName sets the SchedulerName field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetSchedulerName(value string) *PodSpecApplyConfiguration {
-	b.fields.SchedulerName = &value
+	b.SchedulerName = &value
 	return b
 }
 
 // RemoveSchedulerName removes the SchedulerName field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveSchedulerName() *PodSpecApplyConfiguration {
-	b.fields.SchedulerName = nil
+	b.SchedulerName = nil
 	return b
 }
 
 // GetSchedulerName gets the SchedulerName field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetSchedulerName() (value string, ok bool) {
-	if v := b.fields.SchedulerName; v != nil {
+	if v := b.SchedulerName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -536,19 +524,19 @@ func (b *PodSpecApplyConfiguration) GetSchedulerName() (value string, ok bool) {
 
 // SetTolerations sets the Tolerations field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetTolerations(value TolerationList) *PodSpecApplyConfiguration {
-	b.fields.Tolerations = &value
+	b.Tolerations = &value
 	return b
 }
 
 // RemoveTolerations removes the Tolerations field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveTolerations() *PodSpecApplyConfiguration {
-	b.fields.Tolerations = nil
+	b.Tolerations = nil
 	return b
 }
 
 // GetTolerations gets the Tolerations field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetTolerations() (value TolerationList, ok bool) {
-	if v := b.fields.Tolerations; v != nil {
+	if v := b.Tolerations; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -556,19 +544,19 @@ func (b *PodSpecApplyConfiguration) GetTolerations() (value TolerationList, ok b
 
 // SetHostAliases sets the HostAliases field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetHostAliases(value HostAliasList) *PodSpecApplyConfiguration {
-	b.fields.HostAliases = &value
+	b.HostAliases = &value
 	return b
 }
 
 // RemoveHostAliases removes the HostAliases field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveHostAliases() *PodSpecApplyConfiguration {
-	b.fields.HostAliases = nil
+	b.HostAliases = nil
 	return b
 }
 
 // GetHostAliases gets the HostAliases field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetHostAliases() (value HostAliasList, ok bool) {
-	if v := b.fields.HostAliases; v != nil {
+	if v := b.HostAliases; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -576,19 +564,19 @@ func (b *PodSpecApplyConfiguration) GetHostAliases() (value HostAliasList, ok bo
 
 // SetPriorityClassName sets the PriorityClassName field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetPriorityClassName(value string) *PodSpecApplyConfiguration {
-	b.fields.PriorityClassName = &value
+	b.PriorityClassName = &value
 	return b
 }
 
 // RemovePriorityClassName removes the PriorityClassName field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemovePriorityClassName() *PodSpecApplyConfiguration {
-	b.fields.PriorityClassName = nil
+	b.PriorityClassName = nil
 	return b
 }
 
 // GetPriorityClassName gets the PriorityClassName field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetPriorityClassName() (value string, ok bool) {
-	if v := b.fields.PriorityClassName; v != nil {
+	if v := b.PriorityClassName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -596,19 +584,19 @@ func (b *PodSpecApplyConfiguration) GetPriorityClassName() (value string, ok boo
 
 // SetPriority sets the Priority field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetPriority(value int32) *PodSpecApplyConfiguration {
-	b.fields.Priority = &value
+	b.Priority = &value
 	return b
 }
 
 // RemovePriority removes the Priority field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemovePriority() *PodSpecApplyConfiguration {
-	b.fields.Priority = nil
+	b.Priority = nil
 	return b
 }
 
 // GetPriority gets the Priority field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetPriority() (value int32, ok bool) {
-	if v := b.fields.Priority; v != nil {
+	if v := b.Priority; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -616,36 +604,36 @@ func (b *PodSpecApplyConfiguration) GetPriority() (value int32, ok bool) {
 
 // SetDNSConfig sets the DNSConfig field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetDNSConfig(value *PodDNSConfigApplyConfiguration) *PodSpecApplyConfiguration {
-	b.fields.DNSConfig = value
+	b.DNSConfig = value
 	return b
 }
 
 // RemoveDNSConfig removes the DNSConfig field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveDNSConfig() *PodSpecApplyConfiguration {
-	b.fields.DNSConfig = nil
+	b.DNSConfig = nil
 	return b
 }
 
 // GetDNSConfig gets the DNSConfig field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetDNSConfig() (value *PodDNSConfigApplyConfiguration, ok bool) {
-	return b.fields.DNSConfig, b.fields.DNSConfig != nil
+	return b.DNSConfig, b.DNSConfig != nil
 }
 
 // SetReadinessGates sets the ReadinessGates field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetReadinessGates(value PodReadinessGateList) *PodSpecApplyConfiguration {
-	b.fields.ReadinessGates = &value
+	b.ReadinessGates = &value
 	return b
 }
 
 // RemoveReadinessGates removes the ReadinessGates field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveReadinessGates() *PodSpecApplyConfiguration {
-	b.fields.ReadinessGates = nil
+	b.ReadinessGates = nil
 	return b
 }
 
 // GetReadinessGates gets the ReadinessGates field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetReadinessGates() (value PodReadinessGateList, ok bool) {
-	if v := b.fields.ReadinessGates; v != nil {
+	if v := b.ReadinessGates; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -653,19 +641,19 @@ func (b *PodSpecApplyConfiguration) GetReadinessGates() (value PodReadinessGateL
 
 // SetRuntimeClassName sets the RuntimeClassName field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetRuntimeClassName(value string) *PodSpecApplyConfiguration {
-	b.fields.RuntimeClassName = &value
+	b.RuntimeClassName = &value
 	return b
 }
 
 // RemoveRuntimeClassName removes the RuntimeClassName field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveRuntimeClassName() *PodSpecApplyConfiguration {
-	b.fields.RuntimeClassName = nil
+	b.RuntimeClassName = nil
 	return b
 }
 
 // GetRuntimeClassName gets the RuntimeClassName field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetRuntimeClassName() (value string, ok bool) {
-	if v := b.fields.RuntimeClassName; v != nil {
+	if v := b.RuntimeClassName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -673,19 +661,19 @@ func (b *PodSpecApplyConfiguration) GetRuntimeClassName() (value string, ok bool
 
 // SetEnableServiceLinks sets the EnableServiceLinks field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetEnableServiceLinks(value bool) *PodSpecApplyConfiguration {
-	b.fields.EnableServiceLinks = &value
+	b.EnableServiceLinks = &value
 	return b
 }
 
 // RemoveEnableServiceLinks removes the EnableServiceLinks field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveEnableServiceLinks() *PodSpecApplyConfiguration {
-	b.fields.EnableServiceLinks = nil
+	b.EnableServiceLinks = nil
 	return b
 }
 
 // GetEnableServiceLinks gets the EnableServiceLinks field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetEnableServiceLinks() (value bool, ok bool) {
-	if v := b.fields.EnableServiceLinks; v != nil {
+	if v := b.EnableServiceLinks; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -693,19 +681,19 @@ func (b *PodSpecApplyConfiguration) GetEnableServiceLinks() (value bool, ok bool
 
 // SetPreemptionPolicy sets the PreemptionPolicy field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetPreemptionPolicy(value corev1.PreemptionPolicy) *PodSpecApplyConfiguration {
-	b.fields.PreemptionPolicy = &value
+	b.PreemptionPolicy = &value
 	return b
 }
 
 // RemovePreemptionPolicy removes the PreemptionPolicy field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemovePreemptionPolicy() *PodSpecApplyConfiguration {
-	b.fields.PreemptionPolicy = nil
+	b.PreemptionPolicy = nil
 	return b
 }
 
 // GetPreemptionPolicy gets the PreemptionPolicy field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetPreemptionPolicy() (value corev1.PreemptionPolicy, ok bool) {
-	if v := b.fields.PreemptionPolicy; v != nil {
+	if v := b.PreemptionPolicy; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -713,19 +701,19 @@ func (b *PodSpecApplyConfiguration) GetPreemptionPolicy() (value corev1.Preempti
 
 // SetOverhead sets the Overhead field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetOverhead(value corev1.ResourceList) *PodSpecApplyConfiguration {
-	b.fields.Overhead = &value
+	b.Overhead = &value
 	return b
 }
 
 // RemoveOverhead removes the Overhead field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveOverhead() *PodSpecApplyConfiguration {
-	b.fields.Overhead = nil
+	b.Overhead = nil
 	return b
 }
 
 // GetOverhead gets the Overhead field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetOverhead() (value corev1.ResourceList, ok bool) {
-	if v := b.fields.Overhead; v != nil {
+	if v := b.Overhead; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -733,19 +721,19 @@ func (b *PodSpecApplyConfiguration) GetOverhead() (value corev1.ResourceList, ok
 
 // SetTopologySpreadConstraints sets the TopologySpreadConstraints field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetTopologySpreadConstraints(value TopologySpreadConstraintList) *PodSpecApplyConfiguration {
-	b.fields.TopologySpreadConstraints = &value
+	b.TopologySpreadConstraints = &value
 	return b
 }
 
 // RemoveTopologySpreadConstraints removes the TopologySpreadConstraints field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveTopologySpreadConstraints() *PodSpecApplyConfiguration {
-	b.fields.TopologySpreadConstraints = nil
+	b.TopologySpreadConstraints = nil
 	return b
 }
 
 // GetTopologySpreadConstraints gets the TopologySpreadConstraints field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetTopologySpreadConstraints() (value TopologySpreadConstraintList, ok bool) {
-	if v := b.fields.TopologySpreadConstraints; v != nil {
+	if v := b.TopologySpreadConstraints; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -753,64 +741,22 @@ func (b *PodSpecApplyConfiguration) GetTopologySpreadConstraints() (value Topolo
 
 // SetSetHostnameAsFQDN sets the SetHostnameAsFQDN field in the declarative configuration to the given value.
 func (b *PodSpecApplyConfiguration) SetSetHostnameAsFQDN(value bool) *PodSpecApplyConfiguration {
-	b.fields.SetHostnameAsFQDN = &value
+	b.SetHostnameAsFQDN = &value
 	return b
 }
 
 // RemoveSetHostnameAsFQDN removes the SetHostnameAsFQDN field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) RemoveSetHostnameAsFQDN() *PodSpecApplyConfiguration {
-	b.fields.SetHostnameAsFQDN = nil
+	b.SetHostnameAsFQDN = nil
 	return b
 }
 
 // GetSetHostnameAsFQDN gets the SetHostnameAsFQDN field from the declarative configuration.
 func (b *PodSpecApplyConfiguration) GetSetHostnameAsFQDN() (value bool, ok bool) {
-	if v := b.fields.SetHostnameAsFQDN; v != nil {
+	if v := b.SetHostnameAsFQDN; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts PodSpecApplyConfiguration to unstructured.
-func (b *PodSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PodSpecApplyConfiguration, replacing the contents
-// of PodSpecApplyConfiguration.
-func (b *PodSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &podSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PodSpecApplyConfiguration to JSON.
-func (b *PodSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PodSpecApplyConfiguration, replacing the contents of
-// PodSpecApplyConfiguration.
-func (b *PodSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // PodSpecList represents a listAlias of PodSpecApplyConfiguration.
@@ -818,8 +764,3 @@ type PodSpecList []*PodSpecApplyConfiguration
 
 // PodSpecList represents a map of PodSpecApplyConfiguration.
 type PodSpecMap map[string]PodSpecApplyConfiguration
-
-func (b *PodSpecApplyConfiguration) preMarshal() {
-}
-func (b *PodSpecApplyConfiguration) postUnmarshal() {
-}

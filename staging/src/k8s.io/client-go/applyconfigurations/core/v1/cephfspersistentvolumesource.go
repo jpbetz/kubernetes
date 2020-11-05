@@ -18,30 +18,9 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // CephFSPersistentVolumeSourceApplyConfiguration represents an declarative configuration of the CephFSPersistentVolumeSource type for use
 // with apply.
 type CephFSPersistentVolumeSourceApplyConfiguration struct {
-	fields cephFSPersistentVolumeSourceFields
-}
-
-// CephFSPersistentVolumeSourceApplyConfiguration constructs an declarative configuration of the CephFSPersistentVolumeSource type for use with
-// apply.
-func CephFSPersistentVolumeSource() *CephFSPersistentVolumeSourceApplyConfiguration {
-	return &CephFSPersistentVolumeSourceApplyConfiguration{}
-}
-
-// cephFSPersistentVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in CephFSPersistentVolumeSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type cephFSPersistentVolumeSourceFields struct {
 	Monitors   *[]string                          `json:"monitors,omitempty"`
 	Path       *string                            `json:"path,omitempty"`
 	User       *string                            `json:"user,omitempty"`
@@ -50,21 +29,27 @@ type cephFSPersistentVolumeSourceFields struct {
 	ReadOnly   *bool                              `json:"readOnly,omitempty"`
 }
 
+// CephFSPersistentVolumeSourceApplyConfiguration constructs an declarative configuration of the CephFSPersistentVolumeSource type for use with
+// apply.
+func CephFSPersistentVolumeSource() *CephFSPersistentVolumeSourceApplyConfiguration {
+	return &CephFSPersistentVolumeSourceApplyConfiguration{}
+}
+
 // SetMonitors sets the Monitors field in the declarative configuration to the given value.
 func (b *CephFSPersistentVolumeSourceApplyConfiguration) SetMonitors(value []string) *CephFSPersistentVolumeSourceApplyConfiguration {
-	b.fields.Monitors = &value
+	b.Monitors = &value
 	return b
 }
 
 // RemoveMonitors removes the Monitors field from the declarative configuration.
 func (b *CephFSPersistentVolumeSourceApplyConfiguration) RemoveMonitors() *CephFSPersistentVolumeSourceApplyConfiguration {
-	b.fields.Monitors = nil
+	b.Monitors = nil
 	return b
 }
 
 // GetMonitors gets the Monitors field from the declarative configuration.
 func (b *CephFSPersistentVolumeSourceApplyConfiguration) GetMonitors() (value []string, ok bool) {
-	if v := b.fields.Monitors; v != nil {
+	if v := b.Monitors; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -72,19 +57,19 @@ func (b *CephFSPersistentVolumeSourceApplyConfiguration) GetMonitors() (value []
 
 // SetPath sets the Path field in the declarative configuration to the given value.
 func (b *CephFSPersistentVolumeSourceApplyConfiguration) SetPath(value string) *CephFSPersistentVolumeSourceApplyConfiguration {
-	b.fields.Path = &value
+	b.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
 func (b *CephFSPersistentVolumeSourceApplyConfiguration) RemovePath() *CephFSPersistentVolumeSourceApplyConfiguration {
-	b.fields.Path = nil
+	b.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
 func (b *CephFSPersistentVolumeSourceApplyConfiguration) GetPath() (value string, ok bool) {
-	if v := b.fields.Path; v != nil {
+	if v := b.Path; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -92,19 +77,19 @@ func (b *CephFSPersistentVolumeSourceApplyConfiguration) GetPath() (value string
 
 // SetUser sets the User field in the declarative configuration to the given value.
 func (b *CephFSPersistentVolumeSourceApplyConfiguration) SetUser(value string) *CephFSPersistentVolumeSourceApplyConfiguration {
-	b.fields.User = &value
+	b.User = &value
 	return b
 }
 
 // RemoveUser removes the User field from the declarative configuration.
 func (b *CephFSPersistentVolumeSourceApplyConfiguration) RemoveUser() *CephFSPersistentVolumeSourceApplyConfiguration {
-	b.fields.User = nil
+	b.User = nil
 	return b
 }
 
 // GetUser gets the User field from the declarative configuration.
 func (b *CephFSPersistentVolumeSourceApplyConfiguration) GetUser() (value string, ok bool) {
-	if v := b.fields.User; v != nil {
+	if v := b.User; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -112,19 +97,19 @@ func (b *CephFSPersistentVolumeSourceApplyConfiguration) GetUser() (value string
 
 // SetSecretFile sets the SecretFile field in the declarative configuration to the given value.
 func (b *CephFSPersistentVolumeSourceApplyConfiguration) SetSecretFile(value string) *CephFSPersistentVolumeSourceApplyConfiguration {
-	b.fields.SecretFile = &value
+	b.SecretFile = &value
 	return b
 }
 
 // RemoveSecretFile removes the SecretFile field from the declarative configuration.
 func (b *CephFSPersistentVolumeSourceApplyConfiguration) RemoveSecretFile() *CephFSPersistentVolumeSourceApplyConfiguration {
-	b.fields.SecretFile = nil
+	b.SecretFile = nil
 	return b
 }
 
 // GetSecretFile gets the SecretFile field from the declarative configuration.
 func (b *CephFSPersistentVolumeSourceApplyConfiguration) GetSecretFile() (value string, ok bool) {
-	if v := b.fields.SecretFile; v != nil {
+	if v := b.SecretFile; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -132,81 +117,39 @@ func (b *CephFSPersistentVolumeSourceApplyConfiguration) GetSecretFile() (value 
 
 // SetSecretRef sets the SecretRef field in the declarative configuration to the given value.
 func (b *CephFSPersistentVolumeSourceApplyConfiguration) SetSecretRef(value *SecretReferenceApplyConfiguration) *CephFSPersistentVolumeSourceApplyConfiguration {
-	b.fields.SecretRef = value
+	b.SecretRef = value
 	return b
 }
 
 // RemoveSecretRef removes the SecretRef field from the declarative configuration.
 func (b *CephFSPersistentVolumeSourceApplyConfiguration) RemoveSecretRef() *CephFSPersistentVolumeSourceApplyConfiguration {
-	b.fields.SecretRef = nil
+	b.SecretRef = nil
 	return b
 }
 
 // GetSecretRef gets the SecretRef field from the declarative configuration.
 func (b *CephFSPersistentVolumeSourceApplyConfiguration) GetSecretRef() (value *SecretReferenceApplyConfiguration, ok bool) {
-	return b.fields.SecretRef, b.fields.SecretRef != nil
+	return b.SecretRef, b.SecretRef != nil
 }
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
 func (b *CephFSPersistentVolumeSourceApplyConfiguration) SetReadOnly(value bool) *CephFSPersistentVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = &value
+	b.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
 func (b *CephFSPersistentVolumeSourceApplyConfiguration) RemoveReadOnly() *CephFSPersistentVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = nil
+	b.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
 func (b *CephFSPersistentVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
-	if v := b.fields.ReadOnly; v != nil {
+	if v := b.ReadOnly; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts CephFSPersistentVolumeSourceApplyConfiguration to unstructured.
-func (b *CephFSPersistentVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to CephFSPersistentVolumeSourceApplyConfiguration, replacing the contents
-// of CephFSPersistentVolumeSourceApplyConfiguration.
-func (b *CephFSPersistentVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &cephFSPersistentVolumeSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals CephFSPersistentVolumeSourceApplyConfiguration to JSON.
-func (b *CephFSPersistentVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into CephFSPersistentVolumeSourceApplyConfiguration, replacing the contents of
-// CephFSPersistentVolumeSourceApplyConfiguration.
-func (b *CephFSPersistentVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // CephFSPersistentVolumeSourceList represents a listAlias of CephFSPersistentVolumeSourceApplyConfiguration.
@@ -214,8 +157,3 @@ type CephFSPersistentVolumeSourceList []*CephFSPersistentVolumeSourceApplyConfig
 
 // CephFSPersistentVolumeSourceList represents a map of CephFSPersistentVolumeSourceApplyConfiguration.
 type CephFSPersistentVolumeSourceMap map[string]CephFSPersistentVolumeSourceApplyConfiguration
-
-func (b *CephFSPersistentVolumeSourceApplyConfiguration) preMarshal() {
-}
-func (b *CephFSPersistentVolumeSourceApplyConfiguration) postUnmarshal() {
-}

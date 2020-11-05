@@ -19,30 +19,12 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	corev1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // SecurityContextApplyConfiguration represents an declarative configuration of the SecurityContext type for use
 // with apply.
 type SecurityContextApplyConfiguration struct {
-	fields securityContextFields
-}
-
-// SecurityContextApplyConfiguration constructs an declarative configuration of the SecurityContext type for use with
-// apply.
-func SecurityContext() *SecurityContextApplyConfiguration {
-	return &SecurityContextApplyConfiguration{}
-}
-
-// securityContextFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SecurityContextApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type securityContextFields struct {
 	Capabilities             *CapabilitiesApplyConfiguration                  `json:"capabilities,omitempty"`
 	Privileged               *bool                                            `json:"privileged,omitempty"`
 	SELinuxOptions           *SELinuxOptionsApplyConfiguration                `json:"seLinuxOptions,omitempty"`
@@ -56,38 +38,44 @@ type securityContextFields struct {
 	SeccompProfile           *SeccompProfileApplyConfiguration                `json:"seccompProfile,omitempty"`
 }
 
+// SecurityContextApplyConfiguration constructs an declarative configuration of the SecurityContext type for use with
+// apply.
+func SecurityContext() *SecurityContextApplyConfiguration {
+	return &SecurityContextApplyConfiguration{}
+}
+
 // SetCapabilities sets the Capabilities field in the declarative configuration to the given value.
 func (b *SecurityContextApplyConfiguration) SetCapabilities(value *CapabilitiesApplyConfiguration) *SecurityContextApplyConfiguration {
-	b.fields.Capabilities = value
+	b.Capabilities = value
 	return b
 }
 
 // RemoveCapabilities removes the Capabilities field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) RemoveCapabilities() *SecurityContextApplyConfiguration {
-	b.fields.Capabilities = nil
+	b.Capabilities = nil
 	return b
 }
 
 // GetCapabilities gets the Capabilities field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) GetCapabilities() (value *CapabilitiesApplyConfiguration, ok bool) {
-	return b.fields.Capabilities, b.fields.Capabilities != nil
+	return b.Capabilities, b.Capabilities != nil
 }
 
 // SetPrivileged sets the Privileged field in the declarative configuration to the given value.
 func (b *SecurityContextApplyConfiguration) SetPrivileged(value bool) *SecurityContextApplyConfiguration {
-	b.fields.Privileged = &value
+	b.Privileged = &value
 	return b
 }
 
 // RemovePrivileged removes the Privileged field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) RemovePrivileged() *SecurityContextApplyConfiguration {
-	b.fields.Privileged = nil
+	b.Privileged = nil
 	return b
 }
 
 // GetPrivileged gets the Privileged field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) GetPrivileged() (value bool, ok bool) {
-	if v := b.fields.Privileged; v != nil {
+	if v := b.Privileged; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -95,53 +83,53 @@ func (b *SecurityContextApplyConfiguration) GetPrivileged() (value bool, ok bool
 
 // SetSELinuxOptions sets the SELinuxOptions field in the declarative configuration to the given value.
 func (b *SecurityContextApplyConfiguration) SetSELinuxOptions(value *SELinuxOptionsApplyConfiguration) *SecurityContextApplyConfiguration {
-	b.fields.SELinuxOptions = value
+	b.SELinuxOptions = value
 	return b
 }
 
 // RemoveSELinuxOptions removes the SELinuxOptions field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) RemoveSELinuxOptions() *SecurityContextApplyConfiguration {
-	b.fields.SELinuxOptions = nil
+	b.SELinuxOptions = nil
 	return b
 }
 
 // GetSELinuxOptions gets the SELinuxOptions field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) GetSELinuxOptions() (value *SELinuxOptionsApplyConfiguration, ok bool) {
-	return b.fields.SELinuxOptions, b.fields.SELinuxOptions != nil
+	return b.SELinuxOptions, b.SELinuxOptions != nil
 }
 
 // SetWindowsOptions sets the WindowsOptions field in the declarative configuration to the given value.
 func (b *SecurityContextApplyConfiguration) SetWindowsOptions(value *WindowsSecurityContextOptionsApplyConfiguration) *SecurityContextApplyConfiguration {
-	b.fields.WindowsOptions = value
+	b.WindowsOptions = value
 	return b
 }
 
 // RemoveWindowsOptions removes the WindowsOptions field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) RemoveWindowsOptions() *SecurityContextApplyConfiguration {
-	b.fields.WindowsOptions = nil
+	b.WindowsOptions = nil
 	return b
 }
 
 // GetWindowsOptions gets the WindowsOptions field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) GetWindowsOptions() (value *WindowsSecurityContextOptionsApplyConfiguration, ok bool) {
-	return b.fields.WindowsOptions, b.fields.WindowsOptions != nil
+	return b.WindowsOptions, b.WindowsOptions != nil
 }
 
 // SetRunAsUser sets the RunAsUser field in the declarative configuration to the given value.
 func (b *SecurityContextApplyConfiguration) SetRunAsUser(value int64) *SecurityContextApplyConfiguration {
-	b.fields.RunAsUser = &value
+	b.RunAsUser = &value
 	return b
 }
 
 // RemoveRunAsUser removes the RunAsUser field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) RemoveRunAsUser() *SecurityContextApplyConfiguration {
-	b.fields.RunAsUser = nil
+	b.RunAsUser = nil
 	return b
 }
 
 // GetRunAsUser gets the RunAsUser field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) GetRunAsUser() (value int64, ok bool) {
-	if v := b.fields.RunAsUser; v != nil {
+	if v := b.RunAsUser; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -149,19 +137,19 @@ func (b *SecurityContextApplyConfiguration) GetRunAsUser() (value int64, ok bool
 
 // SetRunAsGroup sets the RunAsGroup field in the declarative configuration to the given value.
 func (b *SecurityContextApplyConfiguration) SetRunAsGroup(value int64) *SecurityContextApplyConfiguration {
-	b.fields.RunAsGroup = &value
+	b.RunAsGroup = &value
 	return b
 }
 
 // RemoveRunAsGroup removes the RunAsGroup field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) RemoveRunAsGroup() *SecurityContextApplyConfiguration {
-	b.fields.RunAsGroup = nil
+	b.RunAsGroup = nil
 	return b
 }
 
 // GetRunAsGroup gets the RunAsGroup field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) GetRunAsGroup() (value int64, ok bool) {
-	if v := b.fields.RunAsGroup; v != nil {
+	if v := b.RunAsGroup; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -169,19 +157,19 @@ func (b *SecurityContextApplyConfiguration) GetRunAsGroup() (value int64, ok boo
 
 // SetRunAsNonRoot sets the RunAsNonRoot field in the declarative configuration to the given value.
 func (b *SecurityContextApplyConfiguration) SetRunAsNonRoot(value bool) *SecurityContextApplyConfiguration {
-	b.fields.RunAsNonRoot = &value
+	b.RunAsNonRoot = &value
 	return b
 }
 
 // RemoveRunAsNonRoot removes the RunAsNonRoot field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) RemoveRunAsNonRoot() *SecurityContextApplyConfiguration {
-	b.fields.RunAsNonRoot = nil
+	b.RunAsNonRoot = nil
 	return b
 }
 
 // GetRunAsNonRoot gets the RunAsNonRoot field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) GetRunAsNonRoot() (value bool, ok bool) {
-	if v := b.fields.RunAsNonRoot; v != nil {
+	if v := b.RunAsNonRoot; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -189,19 +177,19 @@ func (b *SecurityContextApplyConfiguration) GetRunAsNonRoot() (value bool, ok bo
 
 // SetReadOnlyRootFilesystem sets the ReadOnlyRootFilesystem field in the declarative configuration to the given value.
 func (b *SecurityContextApplyConfiguration) SetReadOnlyRootFilesystem(value bool) *SecurityContextApplyConfiguration {
-	b.fields.ReadOnlyRootFilesystem = &value
+	b.ReadOnlyRootFilesystem = &value
 	return b
 }
 
 // RemoveReadOnlyRootFilesystem removes the ReadOnlyRootFilesystem field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) RemoveReadOnlyRootFilesystem() *SecurityContextApplyConfiguration {
-	b.fields.ReadOnlyRootFilesystem = nil
+	b.ReadOnlyRootFilesystem = nil
 	return b
 }
 
 // GetReadOnlyRootFilesystem gets the ReadOnlyRootFilesystem field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) GetReadOnlyRootFilesystem() (value bool, ok bool) {
-	if v := b.fields.ReadOnlyRootFilesystem; v != nil {
+	if v := b.ReadOnlyRootFilesystem; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -209,19 +197,19 @@ func (b *SecurityContextApplyConfiguration) GetReadOnlyRootFilesystem() (value b
 
 // SetAllowPrivilegeEscalation sets the AllowPrivilegeEscalation field in the declarative configuration to the given value.
 func (b *SecurityContextApplyConfiguration) SetAllowPrivilegeEscalation(value bool) *SecurityContextApplyConfiguration {
-	b.fields.AllowPrivilegeEscalation = &value
+	b.AllowPrivilegeEscalation = &value
 	return b
 }
 
 // RemoveAllowPrivilegeEscalation removes the AllowPrivilegeEscalation field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) RemoveAllowPrivilegeEscalation() *SecurityContextApplyConfiguration {
-	b.fields.AllowPrivilegeEscalation = nil
+	b.AllowPrivilegeEscalation = nil
 	return b
 }
 
 // GetAllowPrivilegeEscalation gets the AllowPrivilegeEscalation field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) GetAllowPrivilegeEscalation() (value bool, ok bool) {
-	if v := b.fields.AllowPrivilegeEscalation; v != nil {
+	if v := b.AllowPrivilegeEscalation; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -229,19 +217,19 @@ func (b *SecurityContextApplyConfiguration) GetAllowPrivilegeEscalation() (value
 
 // SetProcMount sets the ProcMount field in the declarative configuration to the given value.
 func (b *SecurityContextApplyConfiguration) SetProcMount(value corev1.ProcMountType) *SecurityContextApplyConfiguration {
-	b.fields.ProcMount = &value
+	b.ProcMount = &value
 	return b
 }
 
 // RemoveProcMount removes the ProcMount field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) RemoveProcMount() *SecurityContextApplyConfiguration {
-	b.fields.ProcMount = nil
+	b.ProcMount = nil
 	return b
 }
 
 // GetProcMount gets the ProcMount field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) GetProcMount() (value corev1.ProcMountType, ok bool) {
-	if v := b.fields.ProcMount; v != nil {
+	if v := b.ProcMount; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -249,61 +237,19 @@ func (b *SecurityContextApplyConfiguration) GetProcMount() (value corev1.ProcMou
 
 // SetSeccompProfile sets the SeccompProfile field in the declarative configuration to the given value.
 func (b *SecurityContextApplyConfiguration) SetSeccompProfile(value *SeccompProfileApplyConfiguration) *SecurityContextApplyConfiguration {
-	b.fields.SeccompProfile = value
+	b.SeccompProfile = value
 	return b
 }
 
 // RemoveSeccompProfile removes the SeccompProfile field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) RemoveSeccompProfile() *SecurityContextApplyConfiguration {
-	b.fields.SeccompProfile = nil
+	b.SeccompProfile = nil
 	return b
 }
 
 // GetSeccompProfile gets the SeccompProfile field from the declarative configuration.
 func (b *SecurityContextApplyConfiguration) GetSeccompProfile() (value *SeccompProfileApplyConfiguration, ok bool) {
-	return b.fields.SeccompProfile, b.fields.SeccompProfile != nil
-}
-
-// ToUnstructured converts SecurityContextApplyConfiguration to unstructured.
-func (b *SecurityContextApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to SecurityContextApplyConfiguration, replacing the contents
-// of SecurityContextApplyConfiguration.
-func (b *SecurityContextApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &securityContextFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals SecurityContextApplyConfiguration to JSON.
-func (b *SecurityContextApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into SecurityContextApplyConfiguration, replacing the contents of
-// SecurityContextApplyConfiguration.
-func (b *SecurityContextApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.SeccompProfile, b.SeccompProfile != nil
 }
 
 // SecurityContextList represents a listAlias of SecurityContextApplyConfiguration.
@@ -311,8 +257,3 @@ type SecurityContextList []*SecurityContextApplyConfiguration
 
 // SecurityContextList represents a map of SecurityContextApplyConfiguration.
 type SecurityContextMap map[string]SecurityContextApplyConfiguration
-
-func (b *SecurityContextApplyConfiguration) preMarshal() {
-}
-func (b *SecurityContextApplyConfiguration) postUnmarshal() {
-}

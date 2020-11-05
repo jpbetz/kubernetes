@@ -18,16 +18,12 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ImageReviewStatusApplyConfiguration represents an declarative configuration of the ImageReviewStatus type for use
 // with apply.
 type ImageReviewStatusApplyConfiguration struct {
-	fields imageReviewStatusFields
+	Allowed          *bool              `json:"allowed,omitempty"`
+	Reason           *string            `json:"reason,omitempty"`
+	AuditAnnotations *map[string]string `json:"auditAnnotations,omitempty"`
 }
 
 // ImageReviewStatusApplyConfiguration constructs an declarative configuration of the ImageReviewStatus type for use with
@@ -36,32 +32,21 @@ func ImageReviewStatus() *ImageReviewStatusApplyConfiguration {
 	return &ImageReviewStatusApplyConfiguration{}
 }
 
-// imageReviewStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ImageReviewStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type imageReviewStatusFields struct {
-	Allowed          *bool              `json:"allowed,omitempty"`
-	Reason           *string            `json:"reason,omitempty"`
-	AuditAnnotations *map[string]string `json:"auditAnnotations,omitempty"`
-}
-
 // SetAllowed sets the Allowed field in the declarative configuration to the given value.
 func (b *ImageReviewStatusApplyConfiguration) SetAllowed(value bool) *ImageReviewStatusApplyConfiguration {
-	b.fields.Allowed = &value
+	b.Allowed = &value
 	return b
 }
 
 // RemoveAllowed removes the Allowed field from the declarative configuration.
 func (b *ImageReviewStatusApplyConfiguration) RemoveAllowed() *ImageReviewStatusApplyConfiguration {
-	b.fields.Allowed = nil
+	b.Allowed = nil
 	return b
 }
 
 // GetAllowed gets the Allowed field from the declarative configuration.
 func (b *ImageReviewStatusApplyConfiguration) GetAllowed() (value bool, ok bool) {
-	if v := b.fields.Allowed; v != nil {
+	if v := b.Allowed; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,19 +54,19 @@ func (b *ImageReviewStatusApplyConfiguration) GetAllowed() (value bool, ok bool)
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
 func (b *ImageReviewStatusApplyConfiguration) SetReason(value string) *ImageReviewStatusApplyConfiguration {
-	b.fields.Reason = &value
+	b.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
 func (b *ImageReviewStatusApplyConfiguration) RemoveReason() *ImageReviewStatusApplyConfiguration {
-	b.fields.Reason = nil
+	b.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
 func (b *ImageReviewStatusApplyConfiguration) GetReason() (value string, ok bool) {
-	if v := b.fields.Reason; v != nil {
+	if v := b.Reason; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -89,64 +74,22 @@ func (b *ImageReviewStatusApplyConfiguration) GetReason() (value string, ok bool
 
 // SetAuditAnnotations sets the AuditAnnotations field in the declarative configuration to the given value.
 func (b *ImageReviewStatusApplyConfiguration) SetAuditAnnotations(value map[string]string) *ImageReviewStatusApplyConfiguration {
-	b.fields.AuditAnnotations = &value
+	b.AuditAnnotations = &value
 	return b
 }
 
 // RemoveAuditAnnotations removes the AuditAnnotations field from the declarative configuration.
 func (b *ImageReviewStatusApplyConfiguration) RemoveAuditAnnotations() *ImageReviewStatusApplyConfiguration {
-	b.fields.AuditAnnotations = nil
+	b.AuditAnnotations = nil
 	return b
 }
 
 // GetAuditAnnotations gets the AuditAnnotations field from the declarative configuration.
 func (b *ImageReviewStatusApplyConfiguration) GetAuditAnnotations() (value map[string]string, ok bool) {
-	if v := b.fields.AuditAnnotations; v != nil {
+	if v := b.AuditAnnotations; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ImageReviewStatusApplyConfiguration to unstructured.
-func (b *ImageReviewStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ImageReviewStatusApplyConfiguration, replacing the contents
-// of ImageReviewStatusApplyConfiguration.
-func (b *ImageReviewStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &imageReviewStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ImageReviewStatusApplyConfiguration to JSON.
-func (b *ImageReviewStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ImageReviewStatusApplyConfiguration, replacing the contents of
-// ImageReviewStatusApplyConfiguration.
-func (b *ImageReviewStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ImageReviewStatusList represents a listAlias of ImageReviewStatusApplyConfiguration.
@@ -154,8 +97,3 @@ type ImageReviewStatusList []*ImageReviewStatusApplyConfiguration
 
 // ImageReviewStatusList represents a map of ImageReviewStatusApplyConfiguration.
 type ImageReviewStatusMap map[string]ImageReviewStatusApplyConfiguration
-
-func (b *ImageReviewStatusApplyConfiguration) preMarshal() {
-}
-func (b *ImageReviewStatusApplyConfiguration) postUnmarshal() {
-}

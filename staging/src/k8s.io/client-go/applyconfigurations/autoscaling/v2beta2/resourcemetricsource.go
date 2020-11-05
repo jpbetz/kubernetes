@@ -19,16 +19,14 @@ limitations under the License.
 package v2beta2
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // ResourceMetricSourceApplyConfiguration represents an declarative configuration of the ResourceMetricSource type for use
 // with apply.
 type ResourceMetricSourceApplyConfiguration struct {
-	fields resourceMetricSourceFields
+	Name   *v1.ResourceName                `json:"name,omitempty"`
+	Target *MetricTargetApplyConfiguration `json:"target,omitempty"`
 }
 
 // ResourceMetricSourceApplyConfiguration constructs an declarative configuration of the ResourceMetricSource type for use with
@@ -37,31 +35,21 @@ func ResourceMetricSource() *ResourceMetricSourceApplyConfiguration {
 	return &ResourceMetricSourceApplyConfiguration{}
 }
 
-// resourceMetricSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ResourceMetricSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type resourceMetricSourceFields struct {
-	Name   *v1.ResourceName                `json:"name,omitempty"`
-	Target *MetricTargetApplyConfiguration `json:"target,omitempty"`
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *ResourceMetricSourceApplyConfiguration) SetName(value v1.ResourceName) *ResourceMetricSourceApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *ResourceMetricSourceApplyConfiguration) RemoveName() *ResourceMetricSourceApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *ResourceMetricSourceApplyConfiguration) GetName() (value v1.ResourceName, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,61 +57,19 @@ func (b *ResourceMetricSourceApplyConfiguration) GetName() (value v1.ResourceNam
 
 // SetTarget sets the Target field in the declarative configuration to the given value.
 func (b *ResourceMetricSourceApplyConfiguration) SetTarget(value *MetricTargetApplyConfiguration) *ResourceMetricSourceApplyConfiguration {
-	b.fields.Target = value
+	b.Target = value
 	return b
 }
 
 // RemoveTarget removes the Target field from the declarative configuration.
 func (b *ResourceMetricSourceApplyConfiguration) RemoveTarget() *ResourceMetricSourceApplyConfiguration {
-	b.fields.Target = nil
+	b.Target = nil
 	return b
 }
 
 // GetTarget gets the Target field from the declarative configuration.
 func (b *ResourceMetricSourceApplyConfiguration) GetTarget() (value *MetricTargetApplyConfiguration, ok bool) {
-	return b.fields.Target, b.fields.Target != nil
-}
-
-// ToUnstructured converts ResourceMetricSourceApplyConfiguration to unstructured.
-func (b *ResourceMetricSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ResourceMetricSourceApplyConfiguration, replacing the contents
-// of ResourceMetricSourceApplyConfiguration.
-func (b *ResourceMetricSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &resourceMetricSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ResourceMetricSourceApplyConfiguration to JSON.
-func (b *ResourceMetricSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ResourceMetricSourceApplyConfiguration, replacing the contents of
-// ResourceMetricSourceApplyConfiguration.
-func (b *ResourceMetricSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Target, b.Target != nil
 }
 
 // ResourceMetricSourceList represents a listAlias of ResourceMetricSourceApplyConfiguration.
@@ -131,8 +77,3 @@ type ResourceMetricSourceList []*ResourceMetricSourceApplyConfiguration
 
 // ResourceMetricSourceList represents a map of ResourceMetricSourceApplyConfiguration.
 type ResourceMetricSourceMap map[string]ResourceMetricSourceApplyConfiguration
-
-func (b *ResourceMetricSourceApplyConfiguration) preMarshal() {
-}
-func (b *ResourceMetricSourceApplyConfiguration) postUnmarshal() {
-}

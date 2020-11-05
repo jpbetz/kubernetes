@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ContainerStateWaitingApplyConfiguration represents an declarative configuration of the ContainerStateWaiting type for use
 // with apply.
 type ContainerStateWaitingApplyConfiguration struct {
-	fields containerStateWaitingFields
+	Reason  *string `json:"reason,omitempty"`
+	Message *string `json:"message,omitempty"`
 }
 
 // ContainerStateWaitingApplyConfiguration constructs an declarative configuration of the ContainerStateWaiting type for use with
@@ -36,31 +31,21 @@ func ContainerStateWaiting() *ContainerStateWaitingApplyConfiguration {
 	return &ContainerStateWaitingApplyConfiguration{}
 }
 
-// containerStateWaitingFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ContainerStateWaitingApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type containerStateWaitingFields struct {
-	Reason  *string `json:"reason,omitempty"`
-	Message *string `json:"message,omitempty"`
-}
-
 // SetReason sets the Reason field in the declarative configuration to the given value.
 func (b *ContainerStateWaitingApplyConfiguration) SetReason(value string) *ContainerStateWaitingApplyConfiguration {
-	b.fields.Reason = &value
+	b.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
 func (b *ContainerStateWaitingApplyConfiguration) RemoveReason() *ContainerStateWaitingApplyConfiguration {
-	b.fields.Reason = nil
+	b.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
 func (b *ContainerStateWaitingApplyConfiguration) GetReason() (value string, ok bool) {
-	if v := b.fields.Reason; v != nil {
+	if v := b.Reason; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *ContainerStateWaitingApplyConfiguration) GetReason() (value string, ok 
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
 func (b *ContainerStateWaitingApplyConfiguration) SetMessage(value string) *ContainerStateWaitingApplyConfiguration {
-	b.fields.Message = &value
+	b.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
 func (b *ContainerStateWaitingApplyConfiguration) RemoveMessage() *ContainerStateWaitingApplyConfiguration {
-	b.fields.Message = nil
+	b.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
 func (b *ContainerStateWaitingApplyConfiguration) GetMessage() (value string, ok bool) {
-	if v := b.fields.Message; v != nil {
+	if v := b.Message; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ContainerStateWaitingApplyConfiguration to unstructured.
-func (b *ContainerStateWaitingApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ContainerStateWaitingApplyConfiguration, replacing the contents
-// of ContainerStateWaitingApplyConfiguration.
-func (b *ContainerStateWaitingApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &containerStateWaitingFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ContainerStateWaitingApplyConfiguration to JSON.
-func (b *ContainerStateWaitingApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ContainerStateWaitingApplyConfiguration, replacing the contents of
-// ContainerStateWaitingApplyConfiguration.
-func (b *ContainerStateWaitingApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ContainerStateWaitingList represents a listAlias of ContainerStateWaitingApplyConfiguration.
@@ -133,8 +76,3 @@ type ContainerStateWaitingList []*ContainerStateWaitingApplyConfiguration
 
 // ContainerStateWaitingList represents a map of ContainerStateWaitingApplyConfiguration.
 type ContainerStateWaitingMap map[string]ContainerStateWaitingApplyConfiguration
-
-func (b *ContainerStateWaitingApplyConfiguration) preMarshal() {
-}
-func (b *ContainerStateWaitingApplyConfiguration) postUnmarshal() {
-}

@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	authenticationv1 "k8s.io/api/authentication/v1"
@@ -134,7 +135,7 @@ func (c *FakeServiceAccounts) Patch(ctx context.Context, name string, pt types.P
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied serviceAccount.
 func (c *FakeServiceAccounts) Apply(ctx context.Context, serviceAccount *applyconfigurationscorev1.ServiceAccountApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ServiceAccount, err error) {
-	data, err := serviceAccount.MarshalJSON()
+	data, err := json.Marshal(serviceAccount)
 	if err != nil {
 		return nil, err
 	}

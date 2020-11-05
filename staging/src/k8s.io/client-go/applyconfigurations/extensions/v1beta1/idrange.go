@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1beta1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // IDRangeApplyConfiguration represents an declarative configuration of the IDRange type for use
 // with apply.
 type IDRangeApplyConfiguration struct {
-	fields iDRangeFields
+	Min *int64 `json:"min,omitempty"`
+	Max *int64 `json:"max,omitempty"`
 }
 
 // IDRangeApplyConfiguration constructs an declarative configuration of the IDRange type for use with
@@ -36,31 +31,21 @@ func IDRange() *IDRangeApplyConfiguration {
 	return &IDRangeApplyConfiguration{}
 }
 
-// iDRangeFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in IDRangeApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type iDRangeFields struct {
-	Min *int64 `json:"min,omitempty"`
-	Max *int64 `json:"max,omitempty"`
-}
-
 // SetMin sets the Min field in the declarative configuration to the given value.
 func (b *IDRangeApplyConfiguration) SetMin(value int64) *IDRangeApplyConfiguration {
-	b.fields.Min = &value
+	b.Min = &value
 	return b
 }
 
 // RemoveMin removes the Min field from the declarative configuration.
 func (b *IDRangeApplyConfiguration) RemoveMin() *IDRangeApplyConfiguration {
-	b.fields.Min = nil
+	b.Min = nil
 	return b
 }
 
 // GetMin gets the Min field from the declarative configuration.
 func (b *IDRangeApplyConfiguration) GetMin() (value int64, ok bool) {
-	if v := b.fields.Min; v != nil {
+	if v := b.Min; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *IDRangeApplyConfiguration) GetMin() (value int64, ok bool) {
 
 // SetMax sets the Max field in the declarative configuration to the given value.
 func (b *IDRangeApplyConfiguration) SetMax(value int64) *IDRangeApplyConfiguration {
-	b.fields.Max = &value
+	b.Max = &value
 	return b
 }
 
 // RemoveMax removes the Max field from the declarative configuration.
 func (b *IDRangeApplyConfiguration) RemoveMax() *IDRangeApplyConfiguration {
-	b.fields.Max = nil
+	b.Max = nil
 	return b
 }
 
 // GetMax gets the Max field from the declarative configuration.
 func (b *IDRangeApplyConfiguration) GetMax() (value int64, ok bool) {
-	if v := b.fields.Max; v != nil {
+	if v := b.Max; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts IDRangeApplyConfiguration to unstructured.
-func (b *IDRangeApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to IDRangeApplyConfiguration, replacing the contents
-// of IDRangeApplyConfiguration.
-func (b *IDRangeApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &iDRangeFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals IDRangeApplyConfiguration to JSON.
-func (b *IDRangeApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into IDRangeApplyConfiguration, replacing the contents of
-// IDRangeApplyConfiguration.
-func (b *IDRangeApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // IDRangeList represents a listAlias of IDRangeApplyConfiguration.
@@ -133,8 +76,3 @@ type IDRangeList []*IDRangeApplyConfiguration
 
 // IDRangeList represents a map of IDRangeApplyConfiguration.
 type IDRangeMap map[string]IDRangeApplyConfiguration
-
-func (b *IDRangeApplyConfiguration) preMarshal() {
-}
-func (b *IDRangeApplyConfiguration) postUnmarshal() {
-}

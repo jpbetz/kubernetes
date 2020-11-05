@@ -19,17 +19,16 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // SelfSubjectAccessReviewApplyConfiguration represents an declarative configuration of the SelfSubjectAccessReview type for use
 // with apply.
 type SelfSubjectAccessReviewApplyConfiguration struct {
-	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
-	fields   selfSubjectAccessReviewFields
+	v1.TypeMetaApplyConfiguration `json:",inline"`
+	ObjectMeta                    *v1.ObjectMetaApplyConfiguration               `json:"metadata,omitempty"`
+	Spec                          *SelfSubjectAccessReviewSpecApplyConfiguration `json:"spec,omitempty"`
+	Status                        *SubjectAccessReviewStatusApplyConfiguration   `json:"status,omitempty"`
 }
 
 // SelfSubjectAccessReviewApplyConfiguration constructs an declarative configuration of the SelfSubjectAccessReview type for use with
@@ -38,127 +37,68 @@ func SelfSubjectAccessReview() *SelfSubjectAccessReviewApplyConfiguration {
 	return &SelfSubjectAccessReviewApplyConfiguration{}
 }
 
-// selfSubjectAccessReviewFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SelfSubjectAccessReviewApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type selfSubjectAccessReviewFields struct {
-	Kind       *string                                        `json:"kind,omitempty"`       // inlined SelfSubjectAccessReviewApplyConfiguration.typeMeta.Kind field
-	APIVersion *string                                        `json:"apiVersion,omitempty"` // inlined SelfSubjectAccessReviewApplyConfiguration.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaApplyConfiguration               `json:"metadata,omitempty"`
-	Spec       *SelfSubjectAccessReviewSpecApplyConfiguration `json:"spec,omitempty"`
-	Status     *SubjectAccessReviewStatusApplyConfiguration   `json:"status,omitempty"`
-}
-
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
 func (b *SelfSubjectAccessReviewApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *SelfSubjectAccessReviewApplyConfiguration {
-	b.typeMeta = value
-	return b
-}
-
-// RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *SelfSubjectAccessReviewApplyConfiguration) RemoveTypeMeta() *SelfSubjectAccessReviewApplyConfiguration {
-	b.typeMeta = nil
+	if value != nil {
+		b.TypeMetaApplyConfiguration = *value
+	}
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
 func (b *SelfSubjectAccessReviewApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
-	return b.typeMeta, true
+	return &b.TypeMetaApplyConfiguration, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
 func (b *SelfSubjectAccessReviewApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *SelfSubjectAccessReviewApplyConfiguration {
-	b.fields.ObjectMeta = value
+	b.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
 func (b *SelfSubjectAccessReviewApplyConfiguration) RemoveObjectMeta() *SelfSubjectAccessReviewApplyConfiguration {
-	b.fields.ObjectMeta = nil
+	b.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
 func (b *SelfSubjectAccessReviewApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
-	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
+	return b.ObjectMeta, b.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
 func (b *SelfSubjectAccessReviewApplyConfiguration) SetSpec(value *SelfSubjectAccessReviewSpecApplyConfiguration) *SelfSubjectAccessReviewApplyConfiguration {
-	b.fields.Spec = value
+	b.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
 func (b *SelfSubjectAccessReviewApplyConfiguration) RemoveSpec() *SelfSubjectAccessReviewApplyConfiguration {
-	b.fields.Spec = nil
+	b.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
 func (b *SelfSubjectAccessReviewApplyConfiguration) GetSpec() (value *SelfSubjectAccessReviewSpecApplyConfiguration, ok bool) {
-	return b.fields.Spec, b.fields.Spec != nil
+	return b.Spec, b.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
 func (b *SelfSubjectAccessReviewApplyConfiguration) SetStatus(value *SubjectAccessReviewStatusApplyConfiguration) *SelfSubjectAccessReviewApplyConfiguration {
-	b.fields.Status = value
+	b.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
 func (b *SelfSubjectAccessReviewApplyConfiguration) RemoveStatus() *SelfSubjectAccessReviewApplyConfiguration {
-	b.fields.Status = nil
+	b.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
 func (b *SelfSubjectAccessReviewApplyConfiguration) GetStatus() (value *SubjectAccessReviewStatusApplyConfiguration, ok bool) {
-	return b.fields.Status, b.fields.Status != nil
-}
-
-// ToUnstructured converts SelfSubjectAccessReviewApplyConfiguration to unstructured.
-func (b *SelfSubjectAccessReviewApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to SelfSubjectAccessReviewApplyConfiguration, replacing the contents
-// of SelfSubjectAccessReviewApplyConfiguration.
-func (b *SelfSubjectAccessReviewApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &selfSubjectAccessReviewFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals SelfSubjectAccessReviewApplyConfiguration to JSON.
-func (b *SelfSubjectAccessReviewApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into SelfSubjectAccessReviewApplyConfiguration, replacing the contents of
-// SelfSubjectAccessReviewApplyConfiguration.
-func (b *SelfSubjectAccessReviewApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Status, b.Status != nil
 }
 
 // SelfSubjectAccessReviewList represents a listAlias of SelfSubjectAccessReviewApplyConfiguration.
@@ -166,25 +106,3 @@ type SelfSubjectAccessReviewList []*SelfSubjectAccessReviewApplyConfiguration
 
 // SelfSubjectAccessReviewList represents a map of SelfSubjectAccessReviewApplyConfiguration.
 type SelfSubjectAccessReviewMap map[string]SelfSubjectAccessReviewApplyConfiguration
-
-func (b *SelfSubjectAccessReviewApplyConfiguration) preMarshal() {
-	if b.typeMeta != nil {
-		if v, ok := b.typeMeta.GetKind(); ok {
-			b.fields.Kind = &v
-		}
-		if v, ok := b.typeMeta.GetAPIVersion(); ok {
-			b.fields.APIVersion = &v
-		}
-	}
-}
-func (b *SelfSubjectAccessReviewApplyConfiguration) postUnmarshal() {
-	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
-	}
-	if b.fields.Kind != nil {
-		b.typeMeta.SetKind(*b.fields.Kind)
-	}
-	if b.fields.APIVersion != nil {
-		b.typeMeta.SetAPIVersion(*b.fields.APIVersion)
-	}
-}

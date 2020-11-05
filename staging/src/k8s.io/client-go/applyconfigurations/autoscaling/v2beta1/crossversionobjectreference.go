@@ -18,16 +18,12 @@ limitations under the License.
 
 package v2beta1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // CrossVersionObjectReferenceApplyConfiguration represents an declarative configuration of the CrossVersionObjectReference type for use
 // with apply.
 type CrossVersionObjectReferenceApplyConfiguration struct {
-	fields crossVersionObjectReferenceFields
+	Kind       *string `json:"kind,omitempty"`
+	Name       *string `json:"name,omitempty"`
+	APIVersion *string `json:"apiVersion,omitempty"`
 }
 
 // CrossVersionObjectReferenceApplyConfiguration constructs an declarative configuration of the CrossVersionObjectReference type for use with
@@ -36,32 +32,21 @@ func CrossVersionObjectReference() *CrossVersionObjectReferenceApplyConfiguratio
 	return &CrossVersionObjectReferenceApplyConfiguration{}
 }
 
-// crossVersionObjectReferenceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in CrossVersionObjectReferenceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type crossVersionObjectReferenceFields struct {
-	Kind       *string `json:"kind,omitempty"`
-	Name       *string `json:"name,omitempty"`
-	APIVersion *string `json:"apiVersion,omitempty"`
-}
-
 // SetKind sets the Kind field in the declarative configuration to the given value.
 func (b *CrossVersionObjectReferenceApplyConfiguration) SetKind(value string) *CrossVersionObjectReferenceApplyConfiguration {
-	b.fields.Kind = &value
+	b.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
 func (b *CrossVersionObjectReferenceApplyConfiguration) RemoveKind() *CrossVersionObjectReferenceApplyConfiguration {
-	b.fields.Kind = nil
+	b.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
 func (b *CrossVersionObjectReferenceApplyConfiguration) GetKind() (value string, ok bool) {
-	if v := b.fields.Kind; v != nil {
+	if v := b.Kind; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,19 +54,19 @@ func (b *CrossVersionObjectReferenceApplyConfiguration) GetKind() (value string,
 
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *CrossVersionObjectReferenceApplyConfiguration) SetName(value string) *CrossVersionObjectReferenceApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *CrossVersionObjectReferenceApplyConfiguration) RemoveName() *CrossVersionObjectReferenceApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *CrossVersionObjectReferenceApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -89,64 +74,22 @@ func (b *CrossVersionObjectReferenceApplyConfiguration) GetName() (value string,
 
 // SetAPIVersion sets the APIVersion field in the declarative configuration to the given value.
 func (b *CrossVersionObjectReferenceApplyConfiguration) SetAPIVersion(value string) *CrossVersionObjectReferenceApplyConfiguration {
-	b.fields.APIVersion = &value
+	b.APIVersion = &value
 	return b
 }
 
 // RemoveAPIVersion removes the APIVersion field from the declarative configuration.
 func (b *CrossVersionObjectReferenceApplyConfiguration) RemoveAPIVersion() *CrossVersionObjectReferenceApplyConfiguration {
-	b.fields.APIVersion = nil
+	b.APIVersion = nil
 	return b
 }
 
 // GetAPIVersion gets the APIVersion field from the declarative configuration.
 func (b *CrossVersionObjectReferenceApplyConfiguration) GetAPIVersion() (value string, ok bool) {
-	if v := b.fields.APIVersion; v != nil {
+	if v := b.APIVersion; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts CrossVersionObjectReferenceApplyConfiguration to unstructured.
-func (b *CrossVersionObjectReferenceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to CrossVersionObjectReferenceApplyConfiguration, replacing the contents
-// of CrossVersionObjectReferenceApplyConfiguration.
-func (b *CrossVersionObjectReferenceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &crossVersionObjectReferenceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals CrossVersionObjectReferenceApplyConfiguration to JSON.
-func (b *CrossVersionObjectReferenceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into CrossVersionObjectReferenceApplyConfiguration, replacing the contents of
-// CrossVersionObjectReferenceApplyConfiguration.
-func (b *CrossVersionObjectReferenceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // CrossVersionObjectReferenceList represents a listAlias of CrossVersionObjectReferenceApplyConfiguration.
@@ -154,8 +97,3 @@ type CrossVersionObjectReferenceList []*CrossVersionObjectReferenceApplyConfigur
 
 // CrossVersionObjectReferenceList represents a map of CrossVersionObjectReferenceApplyConfiguration.
 type CrossVersionObjectReferenceMap map[string]CrossVersionObjectReferenceApplyConfiguration
-
-func (b *CrossVersionObjectReferenceApplyConfiguration) preMarshal() {
-}
-func (b *CrossVersionObjectReferenceApplyConfiguration) postUnmarshal() {
-}

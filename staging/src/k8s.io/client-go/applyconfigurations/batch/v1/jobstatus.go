@@ -19,30 +19,12 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // JobStatusApplyConfiguration represents an declarative configuration of the JobStatus type for use
 // with apply.
 type JobStatusApplyConfiguration struct {
-	fields jobStatusFields
-}
-
-// JobStatusApplyConfiguration constructs an declarative configuration of the JobStatus type for use with
-// apply.
-func JobStatus() *JobStatusApplyConfiguration {
-	return &JobStatusApplyConfiguration{}
-}
-
-// jobStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in JobStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type jobStatusFields struct {
 	Conditions     *JobConditionList `json:"conditions,omitempty"`
 	StartTime      *metav1.Time      `json:"startTime,omitempty"`
 	CompletionTime *metav1.Time      `json:"completionTime,omitempty"`
@@ -51,21 +33,27 @@ type jobStatusFields struct {
 	Failed         *int32            `json:"failed,omitempty"`
 }
 
+// JobStatusApplyConfiguration constructs an declarative configuration of the JobStatus type for use with
+// apply.
+func JobStatus() *JobStatusApplyConfiguration {
+	return &JobStatusApplyConfiguration{}
+}
+
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
 func (b *JobStatusApplyConfiguration) SetConditions(value JobConditionList) *JobStatusApplyConfiguration {
-	b.fields.Conditions = &value
+	b.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
 func (b *JobStatusApplyConfiguration) RemoveConditions() *JobStatusApplyConfiguration {
-	b.fields.Conditions = nil
+	b.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
 func (b *JobStatusApplyConfiguration) GetConditions() (value JobConditionList, ok bool) {
-	if v := b.fields.Conditions; v != nil {
+	if v := b.Conditions; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -73,19 +61,19 @@ func (b *JobStatusApplyConfiguration) GetConditions() (value JobConditionList, o
 
 // SetStartTime sets the StartTime field in the declarative configuration to the given value.
 func (b *JobStatusApplyConfiguration) SetStartTime(value metav1.Time) *JobStatusApplyConfiguration {
-	b.fields.StartTime = &value
+	b.StartTime = &value
 	return b
 }
 
 // RemoveStartTime removes the StartTime field from the declarative configuration.
 func (b *JobStatusApplyConfiguration) RemoveStartTime() *JobStatusApplyConfiguration {
-	b.fields.StartTime = nil
+	b.StartTime = nil
 	return b
 }
 
 // GetStartTime gets the StartTime field from the declarative configuration.
 func (b *JobStatusApplyConfiguration) GetStartTime() (value metav1.Time, ok bool) {
-	if v := b.fields.StartTime; v != nil {
+	if v := b.StartTime; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -93,19 +81,19 @@ func (b *JobStatusApplyConfiguration) GetStartTime() (value metav1.Time, ok bool
 
 // SetCompletionTime sets the CompletionTime field in the declarative configuration to the given value.
 func (b *JobStatusApplyConfiguration) SetCompletionTime(value metav1.Time) *JobStatusApplyConfiguration {
-	b.fields.CompletionTime = &value
+	b.CompletionTime = &value
 	return b
 }
 
 // RemoveCompletionTime removes the CompletionTime field from the declarative configuration.
 func (b *JobStatusApplyConfiguration) RemoveCompletionTime() *JobStatusApplyConfiguration {
-	b.fields.CompletionTime = nil
+	b.CompletionTime = nil
 	return b
 }
 
 // GetCompletionTime gets the CompletionTime field from the declarative configuration.
 func (b *JobStatusApplyConfiguration) GetCompletionTime() (value metav1.Time, ok bool) {
-	if v := b.fields.CompletionTime; v != nil {
+	if v := b.CompletionTime; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -113,19 +101,19 @@ func (b *JobStatusApplyConfiguration) GetCompletionTime() (value metav1.Time, ok
 
 // SetActive sets the Active field in the declarative configuration to the given value.
 func (b *JobStatusApplyConfiguration) SetActive(value int32) *JobStatusApplyConfiguration {
-	b.fields.Active = &value
+	b.Active = &value
 	return b
 }
 
 // RemoveActive removes the Active field from the declarative configuration.
 func (b *JobStatusApplyConfiguration) RemoveActive() *JobStatusApplyConfiguration {
-	b.fields.Active = nil
+	b.Active = nil
 	return b
 }
 
 // GetActive gets the Active field from the declarative configuration.
 func (b *JobStatusApplyConfiguration) GetActive() (value int32, ok bool) {
-	if v := b.fields.Active; v != nil {
+	if v := b.Active; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -133,19 +121,19 @@ func (b *JobStatusApplyConfiguration) GetActive() (value int32, ok bool) {
 
 // SetSucceeded sets the Succeeded field in the declarative configuration to the given value.
 func (b *JobStatusApplyConfiguration) SetSucceeded(value int32) *JobStatusApplyConfiguration {
-	b.fields.Succeeded = &value
+	b.Succeeded = &value
 	return b
 }
 
 // RemoveSucceeded removes the Succeeded field from the declarative configuration.
 func (b *JobStatusApplyConfiguration) RemoveSucceeded() *JobStatusApplyConfiguration {
-	b.fields.Succeeded = nil
+	b.Succeeded = nil
 	return b
 }
 
 // GetSucceeded gets the Succeeded field from the declarative configuration.
 func (b *JobStatusApplyConfiguration) GetSucceeded() (value int32, ok bool) {
-	if v := b.fields.Succeeded; v != nil {
+	if v := b.Succeeded; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -153,64 +141,22 @@ func (b *JobStatusApplyConfiguration) GetSucceeded() (value int32, ok bool) {
 
 // SetFailed sets the Failed field in the declarative configuration to the given value.
 func (b *JobStatusApplyConfiguration) SetFailed(value int32) *JobStatusApplyConfiguration {
-	b.fields.Failed = &value
+	b.Failed = &value
 	return b
 }
 
 // RemoveFailed removes the Failed field from the declarative configuration.
 func (b *JobStatusApplyConfiguration) RemoveFailed() *JobStatusApplyConfiguration {
-	b.fields.Failed = nil
+	b.Failed = nil
 	return b
 }
 
 // GetFailed gets the Failed field from the declarative configuration.
 func (b *JobStatusApplyConfiguration) GetFailed() (value int32, ok bool) {
-	if v := b.fields.Failed; v != nil {
+	if v := b.Failed; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts JobStatusApplyConfiguration to unstructured.
-func (b *JobStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to JobStatusApplyConfiguration, replacing the contents
-// of JobStatusApplyConfiguration.
-func (b *JobStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &jobStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals JobStatusApplyConfiguration to JSON.
-func (b *JobStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into JobStatusApplyConfiguration, replacing the contents of
-// JobStatusApplyConfiguration.
-func (b *JobStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // JobStatusList represents a listAlias of JobStatusApplyConfiguration.
@@ -218,8 +164,3 @@ type JobStatusList []*JobStatusApplyConfiguration
 
 // JobStatusList represents a map of JobStatusApplyConfiguration.
 type JobStatusMap map[string]JobStatusApplyConfiguration
-
-func (b *JobStatusApplyConfiguration) preMarshal() {
-}
-func (b *JobStatusApplyConfiguration) postUnmarshal() {
-}

@@ -18,16 +18,11 @@ limitations under the License.
 
 package v2beta2
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // PodsMetricStatusApplyConfiguration represents an declarative configuration of the PodsMetricStatus type for use
 // with apply.
 type PodsMetricStatusApplyConfiguration struct {
-	fields podsMetricStatusFields
+	Metric  *MetricIdentifierApplyConfiguration  `json:"metric,omitempty"`
+	Current *MetricValueStatusApplyConfiguration `json:"current,omitempty"`
 }
 
 // PodsMetricStatusApplyConfiguration constructs an declarative configuration of the PodsMetricStatus type for use with
@@ -36,90 +31,38 @@ func PodsMetricStatus() *PodsMetricStatusApplyConfiguration {
 	return &PodsMetricStatusApplyConfiguration{}
 }
 
-// podsMetricStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodsMetricStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type podsMetricStatusFields struct {
-	Metric  *MetricIdentifierApplyConfiguration  `json:"metric,omitempty"`
-	Current *MetricValueStatusApplyConfiguration `json:"current,omitempty"`
-}
-
 // SetMetric sets the Metric field in the declarative configuration to the given value.
 func (b *PodsMetricStatusApplyConfiguration) SetMetric(value *MetricIdentifierApplyConfiguration) *PodsMetricStatusApplyConfiguration {
-	b.fields.Metric = value
+	b.Metric = value
 	return b
 }
 
 // RemoveMetric removes the Metric field from the declarative configuration.
 func (b *PodsMetricStatusApplyConfiguration) RemoveMetric() *PodsMetricStatusApplyConfiguration {
-	b.fields.Metric = nil
+	b.Metric = nil
 	return b
 }
 
 // GetMetric gets the Metric field from the declarative configuration.
 func (b *PodsMetricStatusApplyConfiguration) GetMetric() (value *MetricIdentifierApplyConfiguration, ok bool) {
-	return b.fields.Metric, b.fields.Metric != nil
+	return b.Metric, b.Metric != nil
 }
 
 // SetCurrent sets the Current field in the declarative configuration to the given value.
 func (b *PodsMetricStatusApplyConfiguration) SetCurrent(value *MetricValueStatusApplyConfiguration) *PodsMetricStatusApplyConfiguration {
-	b.fields.Current = value
+	b.Current = value
 	return b
 }
 
 // RemoveCurrent removes the Current field from the declarative configuration.
 func (b *PodsMetricStatusApplyConfiguration) RemoveCurrent() *PodsMetricStatusApplyConfiguration {
-	b.fields.Current = nil
+	b.Current = nil
 	return b
 }
 
 // GetCurrent gets the Current field from the declarative configuration.
 func (b *PodsMetricStatusApplyConfiguration) GetCurrent() (value *MetricValueStatusApplyConfiguration, ok bool) {
-	return b.fields.Current, b.fields.Current != nil
-}
-
-// ToUnstructured converts PodsMetricStatusApplyConfiguration to unstructured.
-func (b *PodsMetricStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PodsMetricStatusApplyConfiguration, replacing the contents
-// of PodsMetricStatusApplyConfiguration.
-func (b *PodsMetricStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &podsMetricStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PodsMetricStatusApplyConfiguration to JSON.
-func (b *PodsMetricStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PodsMetricStatusApplyConfiguration, replacing the contents of
-// PodsMetricStatusApplyConfiguration.
-func (b *PodsMetricStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Current, b.Current != nil
 }
 
 // PodsMetricStatusList represents a listAlias of PodsMetricStatusApplyConfiguration.
@@ -127,8 +70,3 @@ type PodsMetricStatusList []*PodsMetricStatusApplyConfiguration
 
 // PodsMetricStatusList represents a map of PodsMetricStatusApplyConfiguration.
 type PodsMetricStatusMap map[string]PodsMetricStatusApplyConfiguration
-
-func (b *PodsMetricStatusApplyConfiguration) preMarshal() {
-}
-func (b *PodsMetricStatusApplyConfiguration) postUnmarshal() {
-}

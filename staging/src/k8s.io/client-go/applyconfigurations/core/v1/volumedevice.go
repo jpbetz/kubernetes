@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // VolumeDeviceApplyConfiguration represents an declarative configuration of the VolumeDevice type for use
 // with apply.
 type VolumeDeviceApplyConfiguration struct {
-	fields volumeDeviceFields
+	Name       *string `json:"name,omitempty"`
+	DevicePath *string `json:"devicePath,omitempty"`
 }
 
 // VolumeDeviceApplyConfiguration constructs an declarative configuration of the VolumeDevice type for use with
@@ -36,31 +31,21 @@ func VolumeDevice() *VolumeDeviceApplyConfiguration {
 	return &VolumeDeviceApplyConfiguration{}
 }
 
-// volumeDeviceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in VolumeDeviceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type volumeDeviceFields struct {
-	Name       *string `json:"name,omitempty"`
-	DevicePath *string `json:"devicePath,omitempty"`
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *VolumeDeviceApplyConfiguration) SetName(value string) *VolumeDeviceApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *VolumeDeviceApplyConfiguration) RemoveName() *VolumeDeviceApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *VolumeDeviceApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *VolumeDeviceApplyConfiguration) GetName() (value string, ok bool) {
 
 // SetDevicePath sets the DevicePath field in the declarative configuration to the given value.
 func (b *VolumeDeviceApplyConfiguration) SetDevicePath(value string) *VolumeDeviceApplyConfiguration {
-	b.fields.DevicePath = &value
+	b.DevicePath = &value
 	return b
 }
 
 // RemoveDevicePath removes the DevicePath field from the declarative configuration.
 func (b *VolumeDeviceApplyConfiguration) RemoveDevicePath() *VolumeDeviceApplyConfiguration {
-	b.fields.DevicePath = nil
+	b.DevicePath = nil
 	return b
 }
 
 // GetDevicePath gets the DevicePath field from the declarative configuration.
 func (b *VolumeDeviceApplyConfiguration) GetDevicePath() (value string, ok bool) {
-	if v := b.fields.DevicePath; v != nil {
+	if v := b.DevicePath; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts VolumeDeviceApplyConfiguration to unstructured.
-func (b *VolumeDeviceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to VolumeDeviceApplyConfiguration, replacing the contents
-// of VolumeDeviceApplyConfiguration.
-func (b *VolumeDeviceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &volumeDeviceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals VolumeDeviceApplyConfiguration to JSON.
-func (b *VolumeDeviceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into VolumeDeviceApplyConfiguration, replacing the contents of
-// VolumeDeviceApplyConfiguration.
-func (b *VolumeDeviceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // VolumeDeviceList represents a listAlias of VolumeDeviceApplyConfiguration.
@@ -133,8 +76,3 @@ type VolumeDeviceList []*VolumeDeviceApplyConfiguration
 
 // VolumeDeviceList represents a map of VolumeDeviceApplyConfiguration.
 type VolumeDeviceMap map[string]VolumeDeviceApplyConfiguration
-
-func (b *VolumeDeviceApplyConfiguration) preMarshal() {
-}
-func (b *VolumeDeviceApplyConfiguration) postUnmarshal() {
-}

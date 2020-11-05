@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // IngressTLSApplyConfiguration represents an declarative configuration of the IngressTLS type for use
 // with apply.
 type IngressTLSApplyConfiguration struct {
-	fields ingressTLSFields
+	Hosts      *[]string `json:"hosts,omitempty"`
+	SecretName *string   `json:"secretName,omitempty"`
 }
 
 // IngressTLSApplyConfiguration constructs an declarative configuration of the IngressTLS type for use with
@@ -36,31 +31,21 @@ func IngressTLS() *IngressTLSApplyConfiguration {
 	return &IngressTLSApplyConfiguration{}
 }
 
-// ingressTLSFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in IngressTLSApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type ingressTLSFields struct {
-	Hosts      *[]string `json:"hosts,omitempty"`
-	SecretName *string   `json:"secretName,omitempty"`
-}
-
 // SetHosts sets the Hosts field in the declarative configuration to the given value.
 func (b *IngressTLSApplyConfiguration) SetHosts(value []string) *IngressTLSApplyConfiguration {
-	b.fields.Hosts = &value
+	b.Hosts = &value
 	return b
 }
 
 // RemoveHosts removes the Hosts field from the declarative configuration.
 func (b *IngressTLSApplyConfiguration) RemoveHosts() *IngressTLSApplyConfiguration {
-	b.fields.Hosts = nil
+	b.Hosts = nil
 	return b
 }
 
 // GetHosts gets the Hosts field from the declarative configuration.
 func (b *IngressTLSApplyConfiguration) GetHosts() (value []string, ok bool) {
-	if v := b.fields.Hosts; v != nil {
+	if v := b.Hosts; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *IngressTLSApplyConfiguration) GetHosts() (value []string, ok bool) {
 
 // SetSecretName sets the SecretName field in the declarative configuration to the given value.
 func (b *IngressTLSApplyConfiguration) SetSecretName(value string) *IngressTLSApplyConfiguration {
-	b.fields.SecretName = &value
+	b.SecretName = &value
 	return b
 }
 
 // RemoveSecretName removes the SecretName field from the declarative configuration.
 func (b *IngressTLSApplyConfiguration) RemoveSecretName() *IngressTLSApplyConfiguration {
-	b.fields.SecretName = nil
+	b.SecretName = nil
 	return b
 }
 
 // GetSecretName gets the SecretName field from the declarative configuration.
 func (b *IngressTLSApplyConfiguration) GetSecretName() (value string, ok bool) {
-	if v := b.fields.SecretName; v != nil {
+	if v := b.SecretName; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts IngressTLSApplyConfiguration to unstructured.
-func (b *IngressTLSApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to IngressTLSApplyConfiguration, replacing the contents
-// of IngressTLSApplyConfiguration.
-func (b *IngressTLSApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &ingressTLSFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals IngressTLSApplyConfiguration to JSON.
-func (b *IngressTLSApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into IngressTLSApplyConfiguration, replacing the contents of
-// IngressTLSApplyConfiguration.
-func (b *IngressTLSApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // IngressTLSList represents a listAlias of IngressTLSApplyConfiguration.
@@ -133,8 +76,3 @@ type IngressTLSList []*IngressTLSApplyConfiguration
 
 // IngressTLSList represents a map of IngressTLSApplyConfiguration.
 type IngressTLSMap map[string]IngressTLSApplyConfiguration
-
-func (b *IngressTLSApplyConfiguration) preMarshal() {
-}
-func (b *IngressTLSApplyConfiguration) postUnmarshal() {
-}

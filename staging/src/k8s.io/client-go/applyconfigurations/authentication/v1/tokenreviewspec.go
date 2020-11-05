@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // TokenReviewSpecApplyConfiguration represents an declarative configuration of the TokenReviewSpec type for use
 // with apply.
 type TokenReviewSpecApplyConfiguration struct {
-	fields tokenReviewSpecFields
+	Token     *string   `json:"token,omitempty"`
+	Audiences *[]string `json:"audiences,omitempty"`
 }
 
 // TokenReviewSpecApplyConfiguration constructs an declarative configuration of the TokenReviewSpec type for use with
@@ -36,31 +31,21 @@ func TokenReviewSpec() *TokenReviewSpecApplyConfiguration {
 	return &TokenReviewSpecApplyConfiguration{}
 }
 
-// tokenReviewSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in TokenReviewSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type tokenReviewSpecFields struct {
-	Token     *string   `json:"token,omitempty"`
-	Audiences *[]string `json:"audiences,omitempty"`
-}
-
 // SetToken sets the Token field in the declarative configuration to the given value.
 func (b *TokenReviewSpecApplyConfiguration) SetToken(value string) *TokenReviewSpecApplyConfiguration {
-	b.fields.Token = &value
+	b.Token = &value
 	return b
 }
 
 // RemoveToken removes the Token field from the declarative configuration.
 func (b *TokenReviewSpecApplyConfiguration) RemoveToken() *TokenReviewSpecApplyConfiguration {
-	b.fields.Token = nil
+	b.Token = nil
 	return b
 }
 
 // GetToken gets the Token field from the declarative configuration.
 func (b *TokenReviewSpecApplyConfiguration) GetToken() (value string, ok bool) {
-	if v := b.fields.Token; v != nil {
+	if v := b.Token; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *TokenReviewSpecApplyConfiguration) GetToken() (value string, ok bool) {
 
 // SetAudiences sets the Audiences field in the declarative configuration to the given value.
 func (b *TokenReviewSpecApplyConfiguration) SetAudiences(value []string) *TokenReviewSpecApplyConfiguration {
-	b.fields.Audiences = &value
+	b.Audiences = &value
 	return b
 }
 
 // RemoveAudiences removes the Audiences field from the declarative configuration.
 func (b *TokenReviewSpecApplyConfiguration) RemoveAudiences() *TokenReviewSpecApplyConfiguration {
-	b.fields.Audiences = nil
+	b.Audiences = nil
 	return b
 }
 
 // GetAudiences gets the Audiences field from the declarative configuration.
 func (b *TokenReviewSpecApplyConfiguration) GetAudiences() (value []string, ok bool) {
-	if v := b.fields.Audiences; v != nil {
+	if v := b.Audiences; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts TokenReviewSpecApplyConfiguration to unstructured.
-func (b *TokenReviewSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to TokenReviewSpecApplyConfiguration, replacing the contents
-// of TokenReviewSpecApplyConfiguration.
-func (b *TokenReviewSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &tokenReviewSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals TokenReviewSpecApplyConfiguration to JSON.
-func (b *TokenReviewSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into TokenReviewSpecApplyConfiguration, replacing the contents of
-// TokenReviewSpecApplyConfiguration.
-func (b *TokenReviewSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // TokenReviewSpecList represents a listAlias of TokenReviewSpecApplyConfiguration.
@@ -133,8 +76,3 @@ type TokenReviewSpecList []*TokenReviewSpecApplyConfiguration
 
 // TokenReviewSpecList represents a map of TokenReviewSpecApplyConfiguration.
 type TokenReviewSpecMap map[string]TokenReviewSpecApplyConfiguration
-
-func (b *TokenReviewSpecApplyConfiguration) preMarshal() {
-}
-func (b *TokenReviewSpecApplyConfiguration) postUnmarshal() {
-}

@@ -18,30 +18,9 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // VolumeSourceApplyConfiguration represents an declarative configuration of the VolumeSource type for use
 // with apply.
 type VolumeSourceApplyConfiguration struct {
-	fields volumeSourceFields
-}
-
-// VolumeSourceApplyConfiguration constructs an declarative configuration of the VolumeSource type for use with
-// apply.
-func VolumeSource() *VolumeSourceApplyConfiguration {
-	return &VolumeSourceApplyConfiguration{}
-}
-
-// volumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in VolumeSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type volumeSourceFields struct {
 	HostPath              *HostPathVolumeSourceApplyConfiguration              `json:"hostPath,omitempty"`
 	EmptyDir              *EmptyDirVolumeSourceApplyConfiguration              `json:"emptyDir,omitempty"`
 	GCEPersistentDisk     *GCEPersistentDiskVolumeSourceApplyConfiguration     `json:"gcePersistentDisk,omitempty"`
@@ -73,539 +52,503 @@ type volumeSourceFields struct {
 	Ephemeral             *EphemeralVolumeSourceApplyConfiguration             `json:"ephemeral,omitempty"`
 }
 
+// VolumeSourceApplyConfiguration constructs an declarative configuration of the VolumeSource type for use with
+// apply.
+func VolumeSource() *VolumeSourceApplyConfiguration {
+	return &VolumeSourceApplyConfiguration{}
+}
+
 // SetHostPath sets the HostPath field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetHostPath(value *HostPathVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.HostPath = value
+	b.HostPath = value
 	return b
 }
 
 // RemoveHostPath removes the HostPath field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveHostPath() *VolumeSourceApplyConfiguration {
-	b.fields.HostPath = nil
+	b.HostPath = nil
 	return b
 }
 
 // GetHostPath gets the HostPath field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetHostPath() (value *HostPathVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.HostPath, b.fields.HostPath != nil
+	return b.HostPath, b.HostPath != nil
 }
 
 // SetEmptyDir sets the EmptyDir field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetEmptyDir(value *EmptyDirVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.EmptyDir = value
+	b.EmptyDir = value
 	return b
 }
 
 // RemoveEmptyDir removes the EmptyDir field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveEmptyDir() *VolumeSourceApplyConfiguration {
-	b.fields.EmptyDir = nil
+	b.EmptyDir = nil
 	return b
 }
 
 // GetEmptyDir gets the EmptyDir field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetEmptyDir() (value *EmptyDirVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.EmptyDir, b.fields.EmptyDir != nil
+	return b.EmptyDir, b.EmptyDir != nil
 }
 
 // SetGCEPersistentDisk sets the GCEPersistentDisk field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetGCEPersistentDisk(value *GCEPersistentDiskVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.GCEPersistentDisk = value
+	b.GCEPersistentDisk = value
 	return b
 }
 
 // RemoveGCEPersistentDisk removes the GCEPersistentDisk field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveGCEPersistentDisk() *VolumeSourceApplyConfiguration {
-	b.fields.GCEPersistentDisk = nil
+	b.GCEPersistentDisk = nil
 	return b
 }
 
 // GetGCEPersistentDisk gets the GCEPersistentDisk field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetGCEPersistentDisk() (value *GCEPersistentDiskVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.GCEPersistentDisk, b.fields.GCEPersistentDisk != nil
+	return b.GCEPersistentDisk, b.GCEPersistentDisk != nil
 }
 
 // SetAWSElasticBlockStore sets the AWSElasticBlockStore field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetAWSElasticBlockStore(value *AWSElasticBlockStoreVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.AWSElasticBlockStore = value
+	b.AWSElasticBlockStore = value
 	return b
 }
 
 // RemoveAWSElasticBlockStore removes the AWSElasticBlockStore field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveAWSElasticBlockStore() *VolumeSourceApplyConfiguration {
-	b.fields.AWSElasticBlockStore = nil
+	b.AWSElasticBlockStore = nil
 	return b
 }
 
 // GetAWSElasticBlockStore gets the AWSElasticBlockStore field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetAWSElasticBlockStore() (value *AWSElasticBlockStoreVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.AWSElasticBlockStore, b.fields.AWSElasticBlockStore != nil
+	return b.AWSElasticBlockStore, b.AWSElasticBlockStore != nil
 }
 
 // SetGitRepo sets the GitRepo field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetGitRepo(value *GitRepoVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.GitRepo = value
+	b.GitRepo = value
 	return b
 }
 
 // RemoveGitRepo removes the GitRepo field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveGitRepo() *VolumeSourceApplyConfiguration {
-	b.fields.GitRepo = nil
+	b.GitRepo = nil
 	return b
 }
 
 // GetGitRepo gets the GitRepo field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetGitRepo() (value *GitRepoVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.GitRepo, b.fields.GitRepo != nil
+	return b.GitRepo, b.GitRepo != nil
 }
 
 // SetSecret sets the Secret field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetSecret(value *SecretVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.Secret = value
+	b.Secret = value
 	return b
 }
 
 // RemoveSecret removes the Secret field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveSecret() *VolumeSourceApplyConfiguration {
-	b.fields.Secret = nil
+	b.Secret = nil
 	return b
 }
 
 // GetSecret gets the Secret field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetSecret() (value *SecretVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.Secret, b.fields.Secret != nil
+	return b.Secret, b.Secret != nil
 }
 
 // SetNFS sets the NFS field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetNFS(value *NFSVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.NFS = value
+	b.NFS = value
 	return b
 }
 
 // RemoveNFS removes the NFS field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveNFS() *VolumeSourceApplyConfiguration {
-	b.fields.NFS = nil
+	b.NFS = nil
 	return b
 }
 
 // GetNFS gets the NFS field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetNFS() (value *NFSVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.NFS, b.fields.NFS != nil
+	return b.NFS, b.NFS != nil
 }
 
 // SetISCSI sets the ISCSI field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetISCSI(value *ISCSIVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.ISCSI = value
+	b.ISCSI = value
 	return b
 }
 
 // RemoveISCSI removes the ISCSI field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveISCSI() *VolumeSourceApplyConfiguration {
-	b.fields.ISCSI = nil
+	b.ISCSI = nil
 	return b
 }
 
 // GetISCSI gets the ISCSI field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetISCSI() (value *ISCSIVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.ISCSI, b.fields.ISCSI != nil
+	return b.ISCSI, b.ISCSI != nil
 }
 
 // SetGlusterfs sets the Glusterfs field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetGlusterfs(value *GlusterfsVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.Glusterfs = value
+	b.Glusterfs = value
 	return b
 }
 
 // RemoveGlusterfs removes the Glusterfs field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveGlusterfs() *VolumeSourceApplyConfiguration {
-	b.fields.Glusterfs = nil
+	b.Glusterfs = nil
 	return b
 }
 
 // GetGlusterfs gets the Glusterfs field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetGlusterfs() (value *GlusterfsVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.Glusterfs, b.fields.Glusterfs != nil
+	return b.Glusterfs, b.Glusterfs != nil
 }
 
 // SetPersistentVolumeClaim sets the PersistentVolumeClaim field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetPersistentVolumeClaim(value *PersistentVolumeClaimVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.PersistentVolumeClaim = value
+	b.PersistentVolumeClaim = value
 	return b
 }
 
 // RemovePersistentVolumeClaim removes the PersistentVolumeClaim field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemovePersistentVolumeClaim() *VolumeSourceApplyConfiguration {
-	b.fields.PersistentVolumeClaim = nil
+	b.PersistentVolumeClaim = nil
 	return b
 }
 
 // GetPersistentVolumeClaim gets the PersistentVolumeClaim field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetPersistentVolumeClaim() (value *PersistentVolumeClaimVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.PersistentVolumeClaim, b.fields.PersistentVolumeClaim != nil
+	return b.PersistentVolumeClaim, b.PersistentVolumeClaim != nil
 }
 
 // SetRBD sets the RBD field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetRBD(value *RBDVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.RBD = value
+	b.RBD = value
 	return b
 }
 
 // RemoveRBD removes the RBD field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveRBD() *VolumeSourceApplyConfiguration {
-	b.fields.RBD = nil
+	b.RBD = nil
 	return b
 }
 
 // GetRBD gets the RBD field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetRBD() (value *RBDVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.RBD, b.fields.RBD != nil
+	return b.RBD, b.RBD != nil
 }
 
 // SetFlexVolume sets the FlexVolume field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetFlexVolume(value *FlexVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.FlexVolume = value
+	b.FlexVolume = value
 	return b
 }
 
 // RemoveFlexVolume removes the FlexVolume field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveFlexVolume() *VolumeSourceApplyConfiguration {
-	b.fields.FlexVolume = nil
+	b.FlexVolume = nil
 	return b
 }
 
 // GetFlexVolume gets the FlexVolume field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetFlexVolume() (value *FlexVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.FlexVolume, b.fields.FlexVolume != nil
+	return b.FlexVolume, b.FlexVolume != nil
 }
 
 // SetCinder sets the Cinder field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetCinder(value *CinderVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.Cinder = value
+	b.Cinder = value
 	return b
 }
 
 // RemoveCinder removes the Cinder field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveCinder() *VolumeSourceApplyConfiguration {
-	b.fields.Cinder = nil
+	b.Cinder = nil
 	return b
 }
 
 // GetCinder gets the Cinder field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetCinder() (value *CinderVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.Cinder, b.fields.Cinder != nil
+	return b.Cinder, b.Cinder != nil
 }
 
 // SetCephFS sets the CephFS field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetCephFS(value *CephFSVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.CephFS = value
+	b.CephFS = value
 	return b
 }
 
 // RemoveCephFS removes the CephFS field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveCephFS() *VolumeSourceApplyConfiguration {
-	b.fields.CephFS = nil
+	b.CephFS = nil
 	return b
 }
 
 // GetCephFS gets the CephFS field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetCephFS() (value *CephFSVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.CephFS, b.fields.CephFS != nil
+	return b.CephFS, b.CephFS != nil
 }
 
 // SetFlocker sets the Flocker field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetFlocker(value *FlockerVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.Flocker = value
+	b.Flocker = value
 	return b
 }
 
 // RemoveFlocker removes the Flocker field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveFlocker() *VolumeSourceApplyConfiguration {
-	b.fields.Flocker = nil
+	b.Flocker = nil
 	return b
 }
 
 // GetFlocker gets the Flocker field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetFlocker() (value *FlockerVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.Flocker, b.fields.Flocker != nil
+	return b.Flocker, b.Flocker != nil
 }
 
 // SetDownwardAPI sets the DownwardAPI field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetDownwardAPI(value *DownwardAPIVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.DownwardAPI = value
+	b.DownwardAPI = value
 	return b
 }
 
 // RemoveDownwardAPI removes the DownwardAPI field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveDownwardAPI() *VolumeSourceApplyConfiguration {
-	b.fields.DownwardAPI = nil
+	b.DownwardAPI = nil
 	return b
 }
 
 // GetDownwardAPI gets the DownwardAPI field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetDownwardAPI() (value *DownwardAPIVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.DownwardAPI, b.fields.DownwardAPI != nil
+	return b.DownwardAPI, b.DownwardAPI != nil
 }
 
 // SetFC sets the FC field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetFC(value *FCVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.FC = value
+	b.FC = value
 	return b
 }
 
 // RemoveFC removes the FC field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveFC() *VolumeSourceApplyConfiguration {
-	b.fields.FC = nil
+	b.FC = nil
 	return b
 }
 
 // GetFC gets the FC field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetFC() (value *FCVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.FC, b.fields.FC != nil
+	return b.FC, b.FC != nil
 }
 
 // SetAzureFile sets the AzureFile field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetAzureFile(value *AzureFileVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.AzureFile = value
+	b.AzureFile = value
 	return b
 }
 
 // RemoveAzureFile removes the AzureFile field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveAzureFile() *VolumeSourceApplyConfiguration {
-	b.fields.AzureFile = nil
+	b.AzureFile = nil
 	return b
 }
 
 // GetAzureFile gets the AzureFile field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetAzureFile() (value *AzureFileVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.AzureFile, b.fields.AzureFile != nil
+	return b.AzureFile, b.AzureFile != nil
 }
 
 // SetConfigMap sets the ConfigMap field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetConfigMap(value *ConfigMapVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.ConfigMap = value
+	b.ConfigMap = value
 	return b
 }
 
 // RemoveConfigMap removes the ConfigMap field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveConfigMap() *VolumeSourceApplyConfiguration {
-	b.fields.ConfigMap = nil
+	b.ConfigMap = nil
 	return b
 }
 
 // GetConfigMap gets the ConfigMap field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetConfigMap() (value *ConfigMapVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.ConfigMap, b.fields.ConfigMap != nil
+	return b.ConfigMap, b.ConfigMap != nil
 }
 
 // SetVsphereVolume sets the VsphereVolume field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetVsphereVolume(value *VsphereVirtualDiskVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.VsphereVolume = value
+	b.VsphereVolume = value
 	return b
 }
 
 // RemoveVsphereVolume removes the VsphereVolume field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveVsphereVolume() *VolumeSourceApplyConfiguration {
-	b.fields.VsphereVolume = nil
+	b.VsphereVolume = nil
 	return b
 }
 
 // GetVsphereVolume gets the VsphereVolume field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetVsphereVolume() (value *VsphereVirtualDiskVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.VsphereVolume, b.fields.VsphereVolume != nil
+	return b.VsphereVolume, b.VsphereVolume != nil
 }
 
 // SetQuobyte sets the Quobyte field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetQuobyte(value *QuobyteVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.Quobyte = value
+	b.Quobyte = value
 	return b
 }
 
 // RemoveQuobyte removes the Quobyte field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveQuobyte() *VolumeSourceApplyConfiguration {
-	b.fields.Quobyte = nil
+	b.Quobyte = nil
 	return b
 }
 
 // GetQuobyte gets the Quobyte field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetQuobyte() (value *QuobyteVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.Quobyte, b.fields.Quobyte != nil
+	return b.Quobyte, b.Quobyte != nil
 }
 
 // SetAzureDisk sets the AzureDisk field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetAzureDisk(value *AzureDiskVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.AzureDisk = value
+	b.AzureDisk = value
 	return b
 }
 
 // RemoveAzureDisk removes the AzureDisk field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveAzureDisk() *VolumeSourceApplyConfiguration {
-	b.fields.AzureDisk = nil
+	b.AzureDisk = nil
 	return b
 }
 
 // GetAzureDisk gets the AzureDisk field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetAzureDisk() (value *AzureDiskVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.AzureDisk, b.fields.AzureDisk != nil
+	return b.AzureDisk, b.AzureDisk != nil
 }
 
 // SetPhotonPersistentDisk sets the PhotonPersistentDisk field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetPhotonPersistentDisk(value *PhotonPersistentDiskVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.PhotonPersistentDisk = value
+	b.PhotonPersistentDisk = value
 	return b
 }
 
 // RemovePhotonPersistentDisk removes the PhotonPersistentDisk field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemovePhotonPersistentDisk() *VolumeSourceApplyConfiguration {
-	b.fields.PhotonPersistentDisk = nil
+	b.PhotonPersistentDisk = nil
 	return b
 }
 
 // GetPhotonPersistentDisk gets the PhotonPersistentDisk field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetPhotonPersistentDisk() (value *PhotonPersistentDiskVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.PhotonPersistentDisk, b.fields.PhotonPersistentDisk != nil
+	return b.PhotonPersistentDisk, b.PhotonPersistentDisk != nil
 }
 
 // SetProjected sets the Projected field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetProjected(value *ProjectedVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.Projected = value
+	b.Projected = value
 	return b
 }
 
 // RemoveProjected removes the Projected field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveProjected() *VolumeSourceApplyConfiguration {
-	b.fields.Projected = nil
+	b.Projected = nil
 	return b
 }
 
 // GetProjected gets the Projected field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetProjected() (value *ProjectedVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.Projected, b.fields.Projected != nil
+	return b.Projected, b.Projected != nil
 }
 
 // SetPortworxVolume sets the PortworxVolume field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetPortworxVolume(value *PortworxVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.PortworxVolume = value
+	b.PortworxVolume = value
 	return b
 }
 
 // RemovePortworxVolume removes the PortworxVolume field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemovePortworxVolume() *VolumeSourceApplyConfiguration {
-	b.fields.PortworxVolume = nil
+	b.PortworxVolume = nil
 	return b
 }
 
 // GetPortworxVolume gets the PortworxVolume field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetPortworxVolume() (value *PortworxVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.PortworxVolume, b.fields.PortworxVolume != nil
+	return b.PortworxVolume, b.PortworxVolume != nil
 }
 
 // SetScaleIO sets the ScaleIO field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetScaleIO(value *ScaleIOVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.ScaleIO = value
+	b.ScaleIO = value
 	return b
 }
 
 // RemoveScaleIO removes the ScaleIO field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveScaleIO() *VolumeSourceApplyConfiguration {
-	b.fields.ScaleIO = nil
+	b.ScaleIO = nil
 	return b
 }
 
 // GetScaleIO gets the ScaleIO field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetScaleIO() (value *ScaleIOVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.ScaleIO, b.fields.ScaleIO != nil
+	return b.ScaleIO, b.ScaleIO != nil
 }
 
 // SetStorageOS sets the StorageOS field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetStorageOS(value *StorageOSVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.StorageOS = value
+	b.StorageOS = value
 	return b
 }
 
 // RemoveStorageOS removes the StorageOS field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveStorageOS() *VolumeSourceApplyConfiguration {
-	b.fields.StorageOS = nil
+	b.StorageOS = nil
 	return b
 }
 
 // GetStorageOS gets the StorageOS field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetStorageOS() (value *StorageOSVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.StorageOS, b.fields.StorageOS != nil
+	return b.StorageOS, b.StorageOS != nil
 }
 
 // SetCSI sets the CSI field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetCSI(value *CSIVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.CSI = value
+	b.CSI = value
 	return b
 }
 
 // RemoveCSI removes the CSI field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveCSI() *VolumeSourceApplyConfiguration {
-	b.fields.CSI = nil
+	b.CSI = nil
 	return b
 }
 
 // GetCSI gets the CSI field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetCSI() (value *CSIVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.CSI, b.fields.CSI != nil
+	return b.CSI, b.CSI != nil
 }
 
 // SetEphemeral sets the Ephemeral field in the declarative configuration to the given value.
 func (b *VolumeSourceApplyConfiguration) SetEphemeral(value *EphemeralVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.fields.Ephemeral = value
+	b.Ephemeral = value
 	return b
 }
 
 // RemoveEphemeral removes the Ephemeral field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) RemoveEphemeral() *VolumeSourceApplyConfiguration {
-	b.fields.Ephemeral = nil
+	b.Ephemeral = nil
 	return b
 }
 
 // GetEphemeral gets the Ephemeral field from the declarative configuration.
 func (b *VolumeSourceApplyConfiguration) GetEphemeral() (value *EphemeralVolumeSourceApplyConfiguration, ok bool) {
-	return b.fields.Ephemeral, b.fields.Ephemeral != nil
-}
-
-// ToUnstructured converts VolumeSourceApplyConfiguration to unstructured.
-func (b *VolumeSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to VolumeSourceApplyConfiguration, replacing the contents
-// of VolumeSourceApplyConfiguration.
-func (b *VolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &volumeSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals VolumeSourceApplyConfiguration to JSON.
-func (b *VolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into VolumeSourceApplyConfiguration, replacing the contents of
-// VolumeSourceApplyConfiguration.
-func (b *VolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Ephemeral, b.Ephemeral != nil
 }
 
 // VolumeSourceList represents a listAlias of VolumeSourceApplyConfiguration.
@@ -613,8 +556,3 @@ type VolumeSourceList []*VolumeSourceApplyConfiguration
 
 // VolumeSourceList represents a map of VolumeSourceApplyConfiguration.
 type VolumeSourceMap map[string]VolumeSourceApplyConfiguration
-
-func (b *VolumeSourceApplyConfiguration) preMarshal() {
-}
-func (b *VolumeSourceApplyConfiguration) postUnmarshal() {
-}

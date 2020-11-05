@@ -19,16 +19,14 @@ limitations under the License.
 package v2beta2
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // MetricIdentifierApplyConfiguration represents an declarative configuration of the MetricIdentifier type for use
 // with apply.
 type MetricIdentifierApplyConfiguration struct {
-	fields metricIdentifierFields
+	Name     *string                             `json:"name,omitempty"`
+	Selector *v1.LabelSelectorApplyConfiguration `json:"selector,omitempty"`
 }
 
 // MetricIdentifierApplyConfiguration constructs an declarative configuration of the MetricIdentifier type for use with
@@ -37,31 +35,21 @@ func MetricIdentifier() *MetricIdentifierApplyConfiguration {
 	return &MetricIdentifierApplyConfiguration{}
 }
 
-// metricIdentifierFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in MetricIdentifierApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type metricIdentifierFields struct {
-	Name     *string                             `json:"name,omitempty"`
-	Selector *v1.LabelSelectorApplyConfiguration `json:"selector,omitempty"`
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *MetricIdentifierApplyConfiguration) SetName(value string) *MetricIdentifierApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *MetricIdentifierApplyConfiguration) RemoveName() *MetricIdentifierApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *MetricIdentifierApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,61 +57,19 @@ func (b *MetricIdentifierApplyConfiguration) GetName() (value string, ok bool) {
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
 func (b *MetricIdentifierApplyConfiguration) SetSelector(value *v1.LabelSelectorApplyConfiguration) *MetricIdentifierApplyConfiguration {
-	b.fields.Selector = value
+	b.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
 func (b *MetricIdentifierApplyConfiguration) RemoveSelector() *MetricIdentifierApplyConfiguration {
-	b.fields.Selector = nil
+	b.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
 func (b *MetricIdentifierApplyConfiguration) GetSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
-	return b.fields.Selector, b.fields.Selector != nil
-}
-
-// ToUnstructured converts MetricIdentifierApplyConfiguration to unstructured.
-func (b *MetricIdentifierApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to MetricIdentifierApplyConfiguration, replacing the contents
-// of MetricIdentifierApplyConfiguration.
-func (b *MetricIdentifierApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &metricIdentifierFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals MetricIdentifierApplyConfiguration to JSON.
-func (b *MetricIdentifierApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into MetricIdentifierApplyConfiguration, replacing the contents of
-// MetricIdentifierApplyConfiguration.
-func (b *MetricIdentifierApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Selector, b.Selector != nil
 }
 
 // MetricIdentifierList represents a listAlias of MetricIdentifierApplyConfiguration.
@@ -131,8 +77,3 @@ type MetricIdentifierList []*MetricIdentifierApplyConfiguration
 
 // MetricIdentifierList represents a map of MetricIdentifierApplyConfiguration.
 type MetricIdentifierMap map[string]MetricIdentifierApplyConfiguration
-
-func (b *MetricIdentifierApplyConfiguration) preMarshal() {
-}
-func (b *MetricIdentifierApplyConfiguration) postUnmarshal() {
-}

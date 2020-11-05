@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // DaemonEndpointApplyConfiguration represents an declarative configuration of the DaemonEndpoint type for use
 // with apply.
 type DaemonEndpointApplyConfiguration struct {
-	fields daemonEndpointFields
+	Port *int32 `json:"Port,omitempty"`
 }
 
 // DaemonEndpointApplyConfiguration constructs an declarative configuration of the DaemonEndpoint type for use with
@@ -36,75 +30,24 @@ func DaemonEndpoint() *DaemonEndpointApplyConfiguration {
 	return &DaemonEndpointApplyConfiguration{}
 }
 
-// daemonEndpointFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in DaemonEndpointApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type daemonEndpointFields struct {
-	Port *int32 `json:"Port,omitempty"`
-}
-
 // SetPort sets the Port field in the declarative configuration to the given value.
 func (b *DaemonEndpointApplyConfiguration) SetPort(value int32) *DaemonEndpointApplyConfiguration {
-	b.fields.Port = &value
+	b.Port = &value
 	return b
 }
 
 // RemovePort removes the Port field from the declarative configuration.
 func (b *DaemonEndpointApplyConfiguration) RemovePort() *DaemonEndpointApplyConfiguration {
-	b.fields.Port = nil
+	b.Port = nil
 	return b
 }
 
 // GetPort gets the Port field from the declarative configuration.
 func (b *DaemonEndpointApplyConfiguration) GetPort() (value int32, ok bool) {
-	if v := b.fields.Port; v != nil {
+	if v := b.Port; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts DaemonEndpointApplyConfiguration to unstructured.
-func (b *DaemonEndpointApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to DaemonEndpointApplyConfiguration, replacing the contents
-// of DaemonEndpointApplyConfiguration.
-func (b *DaemonEndpointApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &daemonEndpointFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals DaemonEndpointApplyConfiguration to JSON.
-func (b *DaemonEndpointApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into DaemonEndpointApplyConfiguration, replacing the contents of
-// DaemonEndpointApplyConfiguration.
-func (b *DaemonEndpointApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // DaemonEndpointList represents a listAlias of DaemonEndpointApplyConfiguration.
@@ -112,8 +55,3 @@ type DaemonEndpointList []*DaemonEndpointApplyConfiguration
 
 // DaemonEndpointList represents a map of DaemonEndpointApplyConfiguration.
 type DaemonEndpointMap map[string]DaemonEndpointApplyConfiguration
-
-func (b *DaemonEndpointApplyConfiguration) preMarshal() {
-}
-func (b *DaemonEndpointApplyConfiguration) postUnmarshal() {
-}

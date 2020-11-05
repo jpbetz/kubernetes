@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // SecretReferenceApplyConfiguration represents an declarative configuration of the SecretReference type for use
 // with apply.
 type SecretReferenceApplyConfiguration struct {
-	fields secretReferenceFields
+	Name      *string `json:"name,omitempty"`
+	Namespace *string `json:"namespace,omitempty"`
 }
 
 // SecretReferenceApplyConfiguration constructs an declarative configuration of the SecretReference type for use with
@@ -36,31 +31,21 @@ func SecretReference() *SecretReferenceApplyConfiguration {
 	return &SecretReferenceApplyConfiguration{}
 }
 
-// secretReferenceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SecretReferenceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type secretReferenceFields struct {
-	Name      *string `json:"name,omitempty"`
-	Namespace *string `json:"namespace,omitempty"`
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *SecretReferenceApplyConfiguration) SetName(value string) *SecretReferenceApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *SecretReferenceApplyConfiguration) RemoveName() *SecretReferenceApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *SecretReferenceApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *SecretReferenceApplyConfiguration) GetName() (value string, ok bool) {
 
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
 func (b *SecretReferenceApplyConfiguration) SetNamespace(value string) *SecretReferenceApplyConfiguration {
-	b.fields.Namespace = &value
+	b.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
 func (b *SecretReferenceApplyConfiguration) RemoveNamespace() *SecretReferenceApplyConfiguration {
-	b.fields.Namespace = nil
+	b.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
 func (b *SecretReferenceApplyConfiguration) GetNamespace() (value string, ok bool) {
-	if v := b.fields.Namespace; v != nil {
+	if v := b.Namespace; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts SecretReferenceApplyConfiguration to unstructured.
-func (b *SecretReferenceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to SecretReferenceApplyConfiguration, replacing the contents
-// of SecretReferenceApplyConfiguration.
-func (b *SecretReferenceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &secretReferenceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals SecretReferenceApplyConfiguration to JSON.
-func (b *SecretReferenceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into SecretReferenceApplyConfiguration, replacing the contents of
-// SecretReferenceApplyConfiguration.
-func (b *SecretReferenceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // SecretReferenceList represents a listAlias of SecretReferenceApplyConfiguration.
@@ -133,8 +76,3 @@ type SecretReferenceList []*SecretReferenceApplyConfiguration
 
 // SecretReferenceList represents a map of SecretReferenceApplyConfiguration.
 type SecretReferenceMap map[string]SecretReferenceApplyConfiguration
-
-func (b *SecretReferenceApplyConfiguration) preMarshal() {
-}
-func (b *SecretReferenceApplyConfiguration) postUnmarshal() {
-}

@@ -19,16 +19,13 @@ limitations under the License.
 package v1alpha1
 
 import (
-	json "encoding/json"
-
 	v1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // FlowDistinguisherMethodApplyConfiguration represents an declarative configuration of the FlowDistinguisherMethod type for use
 // with apply.
 type FlowDistinguisherMethodApplyConfiguration struct {
-	fields flowDistinguisherMethodFields
+	Type *v1alpha1.FlowDistinguisherMethodType `json:"type,omitempty"`
 }
 
 // FlowDistinguisherMethodApplyConfiguration constructs an declarative configuration of the FlowDistinguisherMethod type for use with
@@ -37,75 +34,24 @@ func FlowDistinguisherMethod() *FlowDistinguisherMethodApplyConfiguration {
 	return &FlowDistinguisherMethodApplyConfiguration{}
 }
 
-// flowDistinguisherMethodFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in FlowDistinguisherMethodApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type flowDistinguisherMethodFields struct {
-	Type *v1alpha1.FlowDistinguisherMethodType `json:"type,omitempty"`
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *FlowDistinguisherMethodApplyConfiguration) SetType(value v1alpha1.FlowDistinguisherMethodType) *FlowDistinguisherMethodApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *FlowDistinguisherMethodApplyConfiguration) RemoveType() *FlowDistinguisherMethodApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *FlowDistinguisherMethodApplyConfiguration) GetType() (value v1alpha1.FlowDistinguisherMethodType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts FlowDistinguisherMethodApplyConfiguration to unstructured.
-func (b *FlowDistinguisherMethodApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to FlowDistinguisherMethodApplyConfiguration, replacing the contents
-// of FlowDistinguisherMethodApplyConfiguration.
-func (b *FlowDistinguisherMethodApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &flowDistinguisherMethodFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals FlowDistinguisherMethodApplyConfiguration to JSON.
-func (b *FlowDistinguisherMethodApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into FlowDistinguisherMethodApplyConfiguration, replacing the contents of
-// FlowDistinguisherMethodApplyConfiguration.
-func (b *FlowDistinguisherMethodApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // FlowDistinguisherMethodList represents a listAlias of FlowDistinguisherMethodApplyConfiguration.
@@ -113,8 +59,3 @@ type FlowDistinguisherMethodList []*FlowDistinguisherMethodApplyConfiguration
 
 // FlowDistinguisherMethodList represents a map of FlowDistinguisherMethodApplyConfiguration.
 type FlowDistinguisherMethodMap map[string]FlowDistinguisherMethodApplyConfiguration
-
-func (b *FlowDistinguisherMethodApplyConfiguration) preMarshal() {
-}
-func (b *FlowDistinguisherMethodApplyConfiguration) postUnmarshal() {
-}

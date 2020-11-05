@@ -20,6 +20,7 @@ package v2beta1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -200,7 +201,7 @@ func (c *horizontalPodAutoscalers) Patch(ctx context.Context, name string, pt ty
 // Apply takes the given apply declarative configuration, applies it and returns the applied horizontalPodAutoscaler.
 func (c *horizontalPodAutoscalers) Apply(ctx context.Context, horizontalPodAutoscaler *autoscalingv2beta1.HorizontalPodAutoscalerApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v2beta1.HorizontalPodAutoscaler, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := horizontalPodAutoscaler.MarshalJSON()
+	data, err := json.Marshal(horizontalPodAutoscaler)
 	if err != nil {
 		return nil, err
 	}

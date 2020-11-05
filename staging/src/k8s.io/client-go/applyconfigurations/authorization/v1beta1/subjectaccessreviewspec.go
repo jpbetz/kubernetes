@@ -19,30 +19,12 @@ limitations under the License.
 package v1beta1
 
 import (
-	json "encoding/json"
-
 	authorizationv1beta1 "k8s.io/api/authorization/v1beta1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // SubjectAccessReviewSpecApplyConfiguration represents an declarative configuration of the SubjectAccessReviewSpec type for use
 // with apply.
 type SubjectAccessReviewSpecApplyConfiguration struct {
-	fields subjectAccessReviewSpecFields
-}
-
-// SubjectAccessReviewSpecApplyConfiguration constructs an declarative configuration of the SubjectAccessReviewSpec type for use with
-// apply.
-func SubjectAccessReviewSpec() *SubjectAccessReviewSpecApplyConfiguration {
-	return &SubjectAccessReviewSpecApplyConfiguration{}
-}
-
-// subjectAccessReviewSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SubjectAccessReviewSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type subjectAccessReviewSpecFields struct {
 	ResourceAttributes    *ResourceAttributesApplyConfiguration       `json:"resourceAttributes,omitempty"`
 	NonResourceAttributes *NonResourceAttributesApplyConfiguration    `json:"nonResourceAttributes,omitempty"`
 	User                  *string                                     `json:"user,omitempty"`
@@ -51,55 +33,61 @@ type subjectAccessReviewSpecFields struct {
 	UID                   *string                                     `json:"uid,omitempty"`
 }
 
+// SubjectAccessReviewSpecApplyConfiguration constructs an declarative configuration of the SubjectAccessReviewSpec type for use with
+// apply.
+func SubjectAccessReviewSpec() *SubjectAccessReviewSpecApplyConfiguration {
+	return &SubjectAccessReviewSpecApplyConfiguration{}
+}
+
 // SetResourceAttributes sets the ResourceAttributes field in the declarative configuration to the given value.
 func (b *SubjectAccessReviewSpecApplyConfiguration) SetResourceAttributes(value *ResourceAttributesApplyConfiguration) *SubjectAccessReviewSpecApplyConfiguration {
-	b.fields.ResourceAttributes = value
+	b.ResourceAttributes = value
 	return b
 }
 
 // RemoveResourceAttributes removes the ResourceAttributes field from the declarative configuration.
 func (b *SubjectAccessReviewSpecApplyConfiguration) RemoveResourceAttributes() *SubjectAccessReviewSpecApplyConfiguration {
-	b.fields.ResourceAttributes = nil
+	b.ResourceAttributes = nil
 	return b
 }
 
 // GetResourceAttributes gets the ResourceAttributes field from the declarative configuration.
 func (b *SubjectAccessReviewSpecApplyConfiguration) GetResourceAttributes() (value *ResourceAttributesApplyConfiguration, ok bool) {
-	return b.fields.ResourceAttributes, b.fields.ResourceAttributes != nil
+	return b.ResourceAttributes, b.ResourceAttributes != nil
 }
 
 // SetNonResourceAttributes sets the NonResourceAttributes field in the declarative configuration to the given value.
 func (b *SubjectAccessReviewSpecApplyConfiguration) SetNonResourceAttributes(value *NonResourceAttributesApplyConfiguration) *SubjectAccessReviewSpecApplyConfiguration {
-	b.fields.NonResourceAttributes = value
+	b.NonResourceAttributes = value
 	return b
 }
 
 // RemoveNonResourceAttributes removes the NonResourceAttributes field from the declarative configuration.
 func (b *SubjectAccessReviewSpecApplyConfiguration) RemoveNonResourceAttributes() *SubjectAccessReviewSpecApplyConfiguration {
-	b.fields.NonResourceAttributes = nil
+	b.NonResourceAttributes = nil
 	return b
 }
 
 // GetNonResourceAttributes gets the NonResourceAttributes field from the declarative configuration.
 func (b *SubjectAccessReviewSpecApplyConfiguration) GetNonResourceAttributes() (value *NonResourceAttributesApplyConfiguration, ok bool) {
-	return b.fields.NonResourceAttributes, b.fields.NonResourceAttributes != nil
+	return b.NonResourceAttributes, b.NonResourceAttributes != nil
 }
 
 // SetUser sets the User field in the declarative configuration to the given value.
 func (b *SubjectAccessReviewSpecApplyConfiguration) SetUser(value string) *SubjectAccessReviewSpecApplyConfiguration {
-	b.fields.User = &value
+	b.User = &value
 	return b
 }
 
 // RemoveUser removes the User field from the declarative configuration.
 func (b *SubjectAccessReviewSpecApplyConfiguration) RemoveUser() *SubjectAccessReviewSpecApplyConfiguration {
-	b.fields.User = nil
+	b.User = nil
 	return b
 }
 
 // GetUser gets the User field from the declarative configuration.
 func (b *SubjectAccessReviewSpecApplyConfiguration) GetUser() (value string, ok bool) {
-	if v := b.fields.User; v != nil {
+	if v := b.User; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -107,19 +95,19 @@ func (b *SubjectAccessReviewSpecApplyConfiguration) GetUser() (value string, ok 
 
 // SetGroups sets the Groups field in the declarative configuration to the given value.
 func (b *SubjectAccessReviewSpecApplyConfiguration) SetGroups(value []string) *SubjectAccessReviewSpecApplyConfiguration {
-	b.fields.Groups = &value
+	b.Groups = &value
 	return b
 }
 
 // RemoveGroups removes the Groups field from the declarative configuration.
 func (b *SubjectAccessReviewSpecApplyConfiguration) RemoveGroups() *SubjectAccessReviewSpecApplyConfiguration {
-	b.fields.Groups = nil
+	b.Groups = nil
 	return b
 }
 
 // GetGroups gets the Groups field from the declarative configuration.
 func (b *SubjectAccessReviewSpecApplyConfiguration) GetGroups() (value []string, ok bool) {
-	if v := b.fields.Groups; v != nil {
+	if v := b.Groups; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -127,19 +115,19 @@ func (b *SubjectAccessReviewSpecApplyConfiguration) GetGroups() (value []string,
 
 // SetExtra sets the Extra field in the declarative configuration to the given value.
 func (b *SubjectAccessReviewSpecApplyConfiguration) SetExtra(value map[string]authorizationv1beta1.ExtraValue) *SubjectAccessReviewSpecApplyConfiguration {
-	b.fields.Extra = &value
+	b.Extra = &value
 	return b
 }
 
 // RemoveExtra removes the Extra field from the declarative configuration.
 func (b *SubjectAccessReviewSpecApplyConfiguration) RemoveExtra() *SubjectAccessReviewSpecApplyConfiguration {
-	b.fields.Extra = nil
+	b.Extra = nil
 	return b
 }
 
 // GetExtra gets the Extra field from the declarative configuration.
 func (b *SubjectAccessReviewSpecApplyConfiguration) GetExtra() (value map[string]authorizationv1beta1.ExtraValue, ok bool) {
-	if v := b.fields.Extra; v != nil {
+	if v := b.Extra; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -147,64 +135,22 @@ func (b *SubjectAccessReviewSpecApplyConfiguration) GetExtra() (value map[string
 
 // SetUID sets the UID field in the declarative configuration to the given value.
 func (b *SubjectAccessReviewSpecApplyConfiguration) SetUID(value string) *SubjectAccessReviewSpecApplyConfiguration {
-	b.fields.UID = &value
+	b.UID = &value
 	return b
 }
 
 // RemoveUID removes the UID field from the declarative configuration.
 func (b *SubjectAccessReviewSpecApplyConfiguration) RemoveUID() *SubjectAccessReviewSpecApplyConfiguration {
-	b.fields.UID = nil
+	b.UID = nil
 	return b
 }
 
 // GetUID gets the UID field from the declarative configuration.
 func (b *SubjectAccessReviewSpecApplyConfiguration) GetUID() (value string, ok bool) {
-	if v := b.fields.UID; v != nil {
+	if v := b.UID; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts SubjectAccessReviewSpecApplyConfiguration to unstructured.
-func (b *SubjectAccessReviewSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to SubjectAccessReviewSpecApplyConfiguration, replacing the contents
-// of SubjectAccessReviewSpecApplyConfiguration.
-func (b *SubjectAccessReviewSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &subjectAccessReviewSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals SubjectAccessReviewSpecApplyConfiguration to JSON.
-func (b *SubjectAccessReviewSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into SubjectAccessReviewSpecApplyConfiguration, replacing the contents of
-// SubjectAccessReviewSpecApplyConfiguration.
-func (b *SubjectAccessReviewSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // SubjectAccessReviewSpecList represents a listAlias of SubjectAccessReviewSpecApplyConfiguration.
@@ -212,8 +158,3 @@ type SubjectAccessReviewSpecList []*SubjectAccessReviewSpecApplyConfiguration
 
 // SubjectAccessReviewSpecList represents a map of SubjectAccessReviewSpecApplyConfiguration.
 type SubjectAccessReviewSpecMap map[string]SubjectAccessReviewSpecApplyConfiguration
-
-func (b *SubjectAccessReviewSpecApplyConfiguration) preMarshal() {
-}
-func (b *SubjectAccessReviewSpecApplyConfiguration) postUnmarshal() {
-}

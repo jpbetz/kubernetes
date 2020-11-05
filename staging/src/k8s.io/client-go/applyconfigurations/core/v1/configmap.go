@@ -19,17 +19,17 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // ConfigMapApplyConfiguration represents an declarative configuration of the ConfigMap type for use
 // with apply.
 type ConfigMapApplyConfiguration struct {
-	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
-	fields   configMapFields
+	v1.TypeMetaApplyConfiguration `json:",inline"`
+	ObjectMeta                    *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Immutable                     *bool                            `json:"immutable,omitempty"`
+	Data                          *map[string]string               `json:"data,omitempty"`
+	BinaryData                    *map[string][]byte               `json:"binaryData,omitempty"`
 }
 
 // ConfigMapApplyConfiguration constructs an declarative configuration of the ConfigMap type for use with
@@ -38,69 +38,51 @@ func ConfigMap() *ConfigMapApplyConfiguration {
 	return &ConfigMapApplyConfiguration{}
 }
 
-// configMapFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ConfigMapApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type configMapFields struct {
-	Kind       *string                          `json:"kind,omitempty"`       // inlined ConfigMapApplyConfiguration.typeMeta.Kind field
-	APIVersion *string                          `json:"apiVersion,omitempty"` // inlined ConfigMapApplyConfiguration.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Immutable  *bool                            `json:"immutable,omitempty"`
-	Data       *map[string]string               `json:"data,omitempty"`
-	BinaryData *map[string][]byte               `json:"binaryData,omitempty"`
-}
-
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
 func (b *ConfigMapApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *ConfigMapApplyConfiguration {
-	b.typeMeta = value
-	return b
-}
-
-// RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *ConfigMapApplyConfiguration) RemoveTypeMeta() *ConfigMapApplyConfiguration {
-	b.typeMeta = nil
+	if value != nil {
+		b.TypeMetaApplyConfiguration = *value
+	}
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
 func (b *ConfigMapApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
-	return b.typeMeta, true
+	return &b.TypeMetaApplyConfiguration, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
 func (b *ConfigMapApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *ConfigMapApplyConfiguration {
-	b.fields.ObjectMeta = value
+	b.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
 func (b *ConfigMapApplyConfiguration) RemoveObjectMeta() *ConfigMapApplyConfiguration {
-	b.fields.ObjectMeta = nil
+	b.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
 func (b *ConfigMapApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
-	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
+	return b.ObjectMeta, b.ObjectMeta != nil
 }
 
 // SetImmutable sets the Immutable field in the declarative configuration to the given value.
 func (b *ConfigMapApplyConfiguration) SetImmutable(value bool) *ConfigMapApplyConfiguration {
-	b.fields.Immutable = &value
+	b.Immutable = &value
 	return b
 }
 
 // RemoveImmutable removes the Immutable field from the declarative configuration.
 func (b *ConfigMapApplyConfiguration) RemoveImmutable() *ConfigMapApplyConfiguration {
-	b.fields.Immutable = nil
+	b.Immutable = nil
 	return b
 }
 
 // GetImmutable gets the Immutable field from the declarative configuration.
 func (b *ConfigMapApplyConfiguration) GetImmutable() (value bool, ok bool) {
-	if v := b.fields.Immutable; v != nil {
+	if v := b.Immutable; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -108,19 +90,19 @@ func (b *ConfigMapApplyConfiguration) GetImmutable() (value bool, ok bool) {
 
 // SetData sets the Data field in the declarative configuration to the given value.
 func (b *ConfigMapApplyConfiguration) SetData(value map[string]string) *ConfigMapApplyConfiguration {
-	b.fields.Data = &value
+	b.Data = &value
 	return b
 }
 
 // RemoveData removes the Data field from the declarative configuration.
 func (b *ConfigMapApplyConfiguration) RemoveData() *ConfigMapApplyConfiguration {
-	b.fields.Data = nil
+	b.Data = nil
 	return b
 }
 
 // GetData gets the Data field from the declarative configuration.
 func (b *ConfigMapApplyConfiguration) GetData() (value map[string]string, ok bool) {
-	if v := b.fields.Data; v != nil {
+	if v := b.Data; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -128,64 +110,22 @@ func (b *ConfigMapApplyConfiguration) GetData() (value map[string]string, ok boo
 
 // SetBinaryData sets the BinaryData field in the declarative configuration to the given value.
 func (b *ConfigMapApplyConfiguration) SetBinaryData(value map[string][]byte) *ConfigMapApplyConfiguration {
-	b.fields.BinaryData = &value
+	b.BinaryData = &value
 	return b
 }
 
 // RemoveBinaryData removes the BinaryData field from the declarative configuration.
 func (b *ConfigMapApplyConfiguration) RemoveBinaryData() *ConfigMapApplyConfiguration {
-	b.fields.BinaryData = nil
+	b.BinaryData = nil
 	return b
 }
 
 // GetBinaryData gets the BinaryData field from the declarative configuration.
 func (b *ConfigMapApplyConfiguration) GetBinaryData() (value map[string][]byte, ok bool) {
-	if v := b.fields.BinaryData; v != nil {
+	if v := b.BinaryData; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ConfigMapApplyConfiguration to unstructured.
-func (b *ConfigMapApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ConfigMapApplyConfiguration, replacing the contents
-// of ConfigMapApplyConfiguration.
-func (b *ConfigMapApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &configMapFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ConfigMapApplyConfiguration to JSON.
-func (b *ConfigMapApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ConfigMapApplyConfiguration, replacing the contents of
-// ConfigMapApplyConfiguration.
-func (b *ConfigMapApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ConfigMapList represents a listAlias of ConfigMapApplyConfiguration.
@@ -193,25 +133,3 @@ type ConfigMapList []*ConfigMapApplyConfiguration
 
 // ConfigMapList represents a map of ConfigMapApplyConfiguration.
 type ConfigMapMap map[string]ConfigMapApplyConfiguration
-
-func (b *ConfigMapApplyConfiguration) preMarshal() {
-	if b.typeMeta != nil {
-		if v, ok := b.typeMeta.GetKind(); ok {
-			b.fields.Kind = &v
-		}
-		if v, ok := b.typeMeta.GetAPIVersion(); ok {
-			b.fields.APIVersion = &v
-		}
-	}
-}
-func (b *ConfigMapApplyConfiguration) postUnmarshal() {
-	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
-	}
-	if b.fields.Kind != nil {
-		b.typeMeta.SetKind(*b.fields.Kind)
-	}
-	if b.fields.APIVersion != nil {
-		b.typeMeta.SetAPIVersion(*b.fields.APIVersion)
-	}
-}

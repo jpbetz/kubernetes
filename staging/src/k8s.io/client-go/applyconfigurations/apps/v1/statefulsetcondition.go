@@ -19,18 +19,19 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // StatefulSetConditionApplyConfiguration represents an declarative configuration of the StatefulSetCondition type for use
 // with apply.
 type StatefulSetConditionApplyConfiguration struct {
-	fields statefulSetConditionFields
+	Type               *v1.StatefulSetConditionType `json:"type,omitempty"`
+	Status             *corev1.ConditionStatus      `json:"status,omitempty"`
+	LastTransitionTime *metav1.Time                 `json:"lastTransitionTime,omitempty"`
+	Reason             *string                      `json:"reason,omitempty"`
+	Message            *string                      `json:"message,omitempty"`
 }
 
 // StatefulSetConditionApplyConfiguration constructs an declarative configuration of the StatefulSetCondition type for use with
@@ -39,34 +40,21 @@ func StatefulSetCondition() *StatefulSetConditionApplyConfiguration {
 	return &StatefulSetConditionApplyConfiguration{}
 }
 
-// statefulSetConditionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in StatefulSetConditionApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type statefulSetConditionFields struct {
-	Type               *v1.StatefulSetConditionType `json:"type,omitempty"`
-	Status             *corev1.ConditionStatus      `json:"status,omitempty"`
-	LastTransitionTime *metav1.Time                 `json:"lastTransitionTime,omitempty"`
-	Reason             *string                      `json:"reason,omitempty"`
-	Message            *string                      `json:"message,omitempty"`
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *StatefulSetConditionApplyConfiguration) SetType(value v1.StatefulSetConditionType) *StatefulSetConditionApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *StatefulSetConditionApplyConfiguration) RemoveType() *StatefulSetConditionApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *StatefulSetConditionApplyConfiguration) GetType() (value v1.StatefulSetConditionType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -74,19 +62,19 @@ func (b *StatefulSetConditionApplyConfiguration) GetType() (value v1.StatefulSet
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
 func (b *StatefulSetConditionApplyConfiguration) SetStatus(value corev1.ConditionStatus) *StatefulSetConditionApplyConfiguration {
-	b.fields.Status = &value
+	b.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
 func (b *StatefulSetConditionApplyConfiguration) RemoveStatus() *StatefulSetConditionApplyConfiguration {
-	b.fields.Status = nil
+	b.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
 func (b *StatefulSetConditionApplyConfiguration) GetStatus() (value corev1.ConditionStatus, ok bool) {
-	if v := b.fields.Status; v != nil {
+	if v := b.Status; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -94,19 +82,19 @@ func (b *StatefulSetConditionApplyConfiguration) GetStatus() (value corev1.Condi
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
 func (b *StatefulSetConditionApplyConfiguration) SetLastTransitionTime(value metav1.Time) *StatefulSetConditionApplyConfiguration {
-	b.fields.LastTransitionTime = &value
+	b.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
 func (b *StatefulSetConditionApplyConfiguration) RemoveLastTransitionTime() *StatefulSetConditionApplyConfiguration {
-	b.fields.LastTransitionTime = nil
+	b.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
 func (b *StatefulSetConditionApplyConfiguration) GetLastTransitionTime() (value metav1.Time, ok bool) {
-	if v := b.fields.LastTransitionTime; v != nil {
+	if v := b.LastTransitionTime; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -114,19 +102,19 @@ func (b *StatefulSetConditionApplyConfiguration) GetLastTransitionTime() (value 
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
 func (b *StatefulSetConditionApplyConfiguration) SetReason(value string) *StatefulSetConditionApplyConfiguration {
-	b.fields.Reason = &value
+	b.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
 func (b *StatefulSetConditionApplyConfiguration) RemoveReason() *StatefulSetConditionApplyConfiguration {
-	b.fields.Reason = nil
+	b.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
 func (b *StatefulSetConditionApplyConfiguration) GetReason() (value string, ok bool) {
-	if v := b.fields.Reason; v != nil {
+	if v := b.Reason; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -134,64 +122,22 @@ func (b *StatefulSetConditionApplyConfiguration) GetReason() (value string, ok b
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
 func (b *StatefulSetConditionApplyConfiguration) SetMessage(value string) *StatefulSetConditionApplyConfiguration {
-	b.fields.Message = &value
+	b.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
 func (b *StatefulSetConditionApplyConfiguration) RemoveMessage() *StatefulSetConditionApplyConfiguration {
-	b.fields.Message = nil
+	b.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
 func (b *StatefulSetConditionApplyConfiguration) GetMessage() (value string, ok bool) {
-	if v := b.fields.Message; v != nil {
+	if v := b.Message; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts StatefulSetConditionApplyConfiguration to unstructured.
-func (b *StatefulSetConditionApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to StatefulSetConditionApplyConfiguration, replacing the contents
-// of StatefulSetConditionApplyConfiguration.
-func (b *StatefulSetConditionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &statefulSetConditionFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals StatefulSetConditionApplyConfiguration to JSON.
-func (b *StatefulSetConditionApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into StatefulSetConditionApplyConfiguration, replacing the contents of
-// StatefulSetConditionApplyConfiguration.
-func (b *StatefulSetConditionApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // StatefulSetConditionList represents a listAlias of StatefulSetConditionApplyConfiguration.
@@ -199,8 +145,3 @@ type StatefulSetConditionList []*StatefulSetConditionApplyConfiguration
 
 // StatefulSetConditionList represents a map of StatefulSetConditionApplyConfiguration.
 type StatefulSetConditionMap map[string]StatefulSetConditionApplyConfiguration
-
-func (b *StatefulSetConditionApplyConfiguration) preMarshal() {
-}
-func (b *StatefulSetConditionApplyConfiguration) postUnmarshal() {
-}

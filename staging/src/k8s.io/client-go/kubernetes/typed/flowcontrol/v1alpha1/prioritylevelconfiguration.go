@@ -20,6 +20,7 @@ package v1alpha1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -189,7 +190,7 @@ func (c *priorityLevelConfigurations) Patch(ctx context.Context, name string, pt
 // Apply takes the given apply declarative configuration, applies it and returns the applied priorityLevelConfiguration.
 func (c *priorityLevelConfigurations) Apply(ctx context.Context, priorityLevelConfiguration *flowcontrolv1alpha1.PriorityLevelConfigurationApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.PriorityLevelConfiguration, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := priorityLevelConfiguration.MarshalJSON()
+	data, err := json.Marshal(priorityLevelConfiguration)
 	if err != nil {
 		return nil, err
 	}

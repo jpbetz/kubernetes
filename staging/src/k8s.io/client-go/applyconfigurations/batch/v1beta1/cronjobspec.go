@@ -19,30 +19,12 @@ limitations under the License.
 package v1beta1
 
 import (
-	json "encoding/json"
-
 	v1beta1 "k8s.io/api/batch/v1beta1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // CronJobSpecApplyConfiguration represents an declarative configuration of the CronJobSpec type for use
 // with apply.
 type CronJobSpecApplyConfiguration struct {
-	fields cronJobSpecFields
-}
-
-// CronJobSpecApplyConfiguration constructs an declarative configuration of the CronJobSpec type for use with
-// apply.
-func CronJobSpec() *CronJobSpecApplyConfiguration {
-	return &CronJobSpecApplyConfiguration{}
-}
-
-// cronJobSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in CronJobSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type cronJobSpecFields struct {
 	Schedule                   *string                            `json:"schedule,omitempty"`
 	StartingDeadlineSeconds    *int64                             `json:"startingDeadlineSeconds,omitempty"`
 	ConcurrencyPolicy          *v1beta1.ConcurrencyPolicy         `json:"concurrencyPolicy,omitempty"`
@@ -52,21 +34,27 @@ type cronJobSpecFields struct {
 	FailedJobsHistoryLimit     *int32                             `json:"failedJobsHistoryLimit,omitempty"`
 }
 
+// CronJobSpecApplyConfiguration constructs an declarative configuration of the CronJobSpec type for use with
+// apply.
+func CronJobSpec() *CronJobSpecApplyConfiguration {
+	return &CronJobSpecApplyConfiguration{}
+}
+
 // SetSchedule sets the Schedule field in the declarative configuration to the given value.
 func (b *CronJobSpecApplyConfiguration) SetSchedule(value string) *CronJobSpecApplyConfiguration {
-	b.fields.Schedule = &value
+	b.Schedule = &value
 	return b
 }
 
 // RemoveSchedule removes the Schedule field from the declarative configuration.
 func (b *CronJobSpecApplyConfiguration) RemoveSchedule() *CronJobSpecApplyConfiguration {
-	b.fields.Schedule = nil
+	b.Schedule = nil
 	return b
 }
 
 // GetSchedule gets the Schedule field from the declarative configuration.
 func (b *CronJobSpecApplyConfiguration) GetSchedule() (value string, ok bool) {
-	if v := b.fields.Schedule; v != nil {
+	if v := b.Schedule; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -74,19 +62,19 @@ func (b *CronJobSpecApplyConfiguration) GetSchedule() (value string, ok bool) {
 
 // SetStartingDeadlineSeconds sets the StartingDeadlineSeconds field in the declarative configuration to the given value.
 func (b *CronJobSpecApplyConfiguration) SetStartingDeadlineSeconds(value int64) *CronJobSpecApplyConfiguration {
-	b.fields.StartingDeadlineSeconds = &value
+	b.StartingDeadlineSeconds = &value
 	return b
 }
 
 // RemoveStartingDeadlineSeconds removes the StartingDeadlineSeconds field from the declarative configuration.
 func (b *CronJobSpecApplyConfiguration) RemoveStartingDeadlineSeconds() *CronJobSpecApplyConfiguration {
-	b.fields.StartingDeadlineSeconds = nil
+	b.StartingDeadlineSeconds = nil
 	return b
 }
 
 // GetStartingDeadlineSeconds gets the StartingDeadlineSeconds field from the declarative configuration.
 func (b *CronJobSpecApplyConfiguration) GetStartingDeadlineSeconds() (value int64, ok bool) {
-	if v := b.fields.StartingDeadlineSeconds; v != nil {
+	if v := b.StartingDeadlineSeconds; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -94,19 +82,19 @@ func (b *CronJobSpecApplyConfiguration) GetStartingDeadlineSeconds() (value int6
 
 // SetConcurrencyPolicy sets the ConcurrencyPolicy field in the declarative configuration to the given value.
 func (b *CronJobSpecApplyConfiguration) SetConcurrencyPolicy(value v1beta1.ConcurrencyPolicy) *CronJobSpecApplyConfiguration {
-	b.fields.ConcurrencyPolicy = &value
+	b.ConcurrencyPolicy = &value
 	return b
 }
 
 // RemoveConcurrencyPolicy removes the ConcurrencyPolicy field from the declarative configuration.
 func (b *CronJobSpecApplyConfiguration) RemoveConcurrencyPolicy() *CronJobSpecApplyConfiguration {
-	b.fields.ConcurrencyPolicy = nil
+	b.ConcurrencyPolicy = nil
 	return b
 }
 
 // GetConcurrencyPolicy gets the ConcurrencyPolicy field from the declarative configuration.
 func (b *CronJobSpecApplyConfiguration) GetConcurrencyPolicy() (value v1beta1.ConcurrencyPolicy, ok bool) {
-	if v := b.fields.ConcurrencyPolicy; v != nil {
+	if v := b.ConcurrencyPolicy; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -114,19 +102,19 @@ func (b *CronJobSpecApplyConfiguration) GetConcurrencyPolicy() (value v1beta1.Co
 
 // SetSuspend sets the Suspend field in the declarative configuration to the given value.
 func (b *CronJobSpecApplyConfiguration) SetSuspend(value bool) *CronJobSpecApplyConfiguration {
-	b.fields.Suspend = &value
+	b.Suspend = &value
 	return b
 }
 
 // RemoveSuspend removes the Suspend field from the declarative configuration.
 func (b *CronJobSpecApplyConfiguration) RemoveSuspend() *CronJobSpecApplyConfiguration {
-	b.fields.Suspend = nil
+	b.Suspend = nil
 	return b
 }
 
 // GetSuspend gets the Suspend field from the declarative configuration.
 func (b *CronJobSpecApplyConfiguration) GetSuspend() (value bool, ok bool) {
-	if v := b.fields.Suspend; v != nil {
+	if v := b.Suspend; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -134,36 +122,36 @@ func (b *CronJobSpecApplyConfiguration) GetSuspend() (value bool, ok bool) {
 
 // SetJobTemplate sets the JobTemplate field in the declarative configuration to the given value.
 func (b *CronJobSpecApplyConfiguration) SetJobTemplate(value *JobTemplateSpecApplyConfiguration) *CronJobSpecApplyConfiguration {
-	b.fields.JobTemplate = value
+	b.JobTemplate = value
 	return b
 }
 
 // RemoveJobTemplate removes the JobTemplate field from the declarative configuration.
 func (b *CronJobSpecApplyConfiguration) RemoveJobTemplate() *CronJobSpecApplyConfiguration {
-	b.fields.JobTemplate = nil
+	b.JobTemplate = nil
 	return b
 }
 
 // GetJobTemplate gets the JobTemplate field from the declarative configuration.
 func (b *CronJobSpecApplyConfiguration) GetJobTemplate() (value *JobTemplateSpecApplyConfiguration, ok bool) {
-	return b.fields.JobTemplate, b.fields.JobTemplate != nil
+	return b.JobTemplate, b.JobTemplate != nil
 }
 
 // SetSuccessfulJobsHistoryLimit sets the SuccessfulJobsHistoryLimit field in the declarative configuration to the given value.
 func (b *CronJobSpecApplyConfiguration) SetSuccessfulJobsHistoryLimit(value int32) *CronJobSpecApplyConfiguration {
-	b.fields.SuccessfulJobsHistoryLimit = &value
+	b.SuccessfulJobsHistoryLimit = &value
 	return b
 }
 
 // RemoveSuccessfulJobsHistoryLimit removes the SuccessfulJobsHistoryLimit field from the declarative configuration.
 func (b *CronJobSpecApplyConfiguration) RemoveSuccessfulJobsHistoryLimit() *CronJobSpecApplyConfiguration {
-	b.fields.SuccessfulJobsHistoryLimit = nil
+	b.SuccessfulJobsHistoryLimit = nil
 	return b
 }
 
 // GetSuccessfulJobsHistoryLimit gets the SuccessfulJobsHistoryLimit field from the declarative configuration.
 func (b *CronJobSpecApplyConfiguration) GetSuccessfulJobsHistoryLimit() (value int32, ok bool) {
-	if v := b.fields.SuccessfulJobsHistoryLimit; v != nil {
+	if v := b.SuccessfulJobsHistoryLimit; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -171,64 +159,22 @@ func (b *CronJobSpecApplyConfiguration) GetSuccessfulJobsHistoryLimit() (value i
 
 // SetFailedJobsHistoryLimit sets the FailedJobsHistoryLimit field in the declarative configuration to the given value.
 func (b *CronJobSpecApplyConfiguration) SetFailedJobsHistoryLimit(value int32) *CronJobSpecApplyConfiguration {
-	b.fields.FailedJobsHistoryLimit = &value
+	b.FailedJobsHistoryLimit = &value
 	return b
 }
 
 // RemoveFailedJobsHistoryLimit removes the FailedJobsHistoryLimit field from the declarative configuration.
 func (b *CronJobSpecApplyConfiguration) RemoveFailedJobsHistoryLimit() *CronJobSpecApplyConfiguration {
-	b.fields.FailedJobsHistoryLimit = nil
+	b.FailedJobsHistoryLimit = nil
 	return b
 }
 
 // GetFailedJobsHistoryLimit gets the FailedJobsHistoryLimit field from the declarative configuration.
 func (b *CronJobSpecApplyConfiguration) GetFailedJobsHistoryLimit() (value int32, ok bool) {
-	if v := b.fields.FailedJobsHistoryLimit; v != nil {
+	if v := b.FailedJobsHistoryLimit; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts CronJobSpecApplyConfiguration to unstructured.
-func (b *CronJobSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to CronJobSpecApplyConfiguration, replacing the contents
-// of CronJobSpecApplyConfiguration.
-func (b *CronJobSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &cronJobSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals CronJobSpecApplyConfiguration to JSON.
-func (b *CronJobSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into CronJobSpecApplyConfiguration, replacing the contents of
-// CronJobSpecApplyConfiguration.
-func (b *CronJobSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // CronJobSpecList represents a listAlias of CronJobSpecApplyConfiguration.
@@ -236,8 +182,3 @@ type CronJobSpecList []*CronJobSpecApplyConfiguration
 
 // CronJobSpecList represents a map of CronJobSpecApplyConfiguration.
 type CronJobSpecMap map[string]CronJobSpecApplyConfiguration
-
-func (b *CronJobSpecApplyConfiguration) preMarshal() {
-}
-func (b *CronJobSpecApplyConfiguration) postUnmarshal() {
-}

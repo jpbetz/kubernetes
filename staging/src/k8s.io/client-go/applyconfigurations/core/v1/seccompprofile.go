@@ -19,16 +19,14 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // SeccompProfileApplyConfiguration represents an declarative configuration of the SeccompProfile type for use
 // with apply.
 type SeccompProfileApplyConfiguration struct {
-	fields seccompProfileFields
+	Type             *v1.SeccompProfileType `json:"type,omitempty"`
+	LocalhostProfile *string                `json:"localhostProfile,omitempty"`
 }
 
 // SeccompProfileApplyConfiguration constructs an declarative configuration of the SeccompProfile type for use with
@@ -37,31 +35,21 @@ func SeccompProfile() *SeccompProfileApplyConfiguration {
 	return &SeccompProfileApplyConfiguration{}
 }
 
-// seccompProfileFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SeccompProfileApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type seccompProfileFields struct {
-	Type             *v1.SeccompProfileType `json:"type,omitempty"`
-	LocalhostProfile *string                `json:"localhostProfile,omitempty"`
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *SeccompProfileApplyConfiguration) SetType(value v1.SeccompProfileType) *SeccompProfileApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *SeccompProfileApplyConfiguration) RemoveType() *SeccompProfileApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *SeccompProfileApplyConfiguration) GetType() (value v1.SeccompProfileType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,64 +57,22 @@ func (b *SeccompProfileApplyConfiguration) GetType() (value v1.SeccompProfileTyp
 
 // SetLocalhostProfile sets the LocalhostProfile field in the declarative configuration to the given value.
 func (b *SeccompProfileApplyConfiguration) SetLocalhostProfile(value string) *SeccompProfileApplyConfiguration {
-	b.fields.LocalhostProfile = &value
+	b.LocalhostProfile = &value
 	return b
 }
 
 // RemoveLocalhostProfile removes the LocalhostProfile field from the declarative configuration.
 func (b *SeccompProfileApplyConfiguration) RemoveLocalhostProfile() *SeccompProfileApplyConfiguration {
-	b.fields.LocalhostProfile = nil
+	b.LocalhostProfile = nil
 	return b
 }
 
 // GetLocalhostProfile gets the LocalhostProfile field from the declarative configuration.
 func (b *SeccompProfileApplyConfiguration) GetLocalhostProfile() (value string, ok bool) {
-	if v := b.fields.LocalhostProfile; v != nil {
+	if v := b.LocalhostProfile; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts SeccompProfileApplyConfiguration to unstructured.
-func (b *SeccompProfileApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to SeccompProfileApplyConfiguration, replacing the contents
-// of SeccompProfileApplyConfiguration.
-func (b *SeccompProfileApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &seccompProfileFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals SeccompProfileApplyConfiguration to JSON.
-func (b *SeccompProfileApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into SeccompProfileApplyConfiguration, replacing the contents of
-// SeccompProfileApplyConfiguration.
-func (b *SeccompProfileApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // SeccompProfileList represents a listAlias of SeccompProfileApplyConfiguration.
@@ -134,8 +80,3 @@ type SeccompProfileList []*SeccompProfileApplyConfiguration
 
 // SeccompProfileList represents a map of SeccompProfileApplyConfiguration.
 type SeccompProfileMap map[string]SeccompProfileApplyConfiguration
-
-func (b *SeccompProfileApplyConfiguration) preMarshal() {
-}
-func (b *SeccompProfileApplyConfiguration) postUnmarshal() {
-}

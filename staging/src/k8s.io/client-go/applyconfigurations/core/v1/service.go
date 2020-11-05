@@ -19,17 +19,16 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // ServiceApplyConfiguration represents an declarative configuration of the Service type for use
 // with apply.
 type ServiceApplyConfiguration struct {
-	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
-	fields   serviceFields
+	v1.TypeMetaApplyConfiguration `json:",inline"`
+	ObjectMeta                    *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Spec                          *ServiceSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status                        *ServiceStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // ServiceApplyConfiguration constructs an declarative configuration of the Service type for use with
@@ -38,127 +37,68 @@ func Service() *ServiceApplyConfiguration {
 	return &ServiceApplyConfiguration{}
 }
 
-// serviceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ServiceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type serviceFields struct {
-	Kind       *string                          `json:"kind,omitempty"`       // inlined ServiceApplyConfiguration.typeMeta.Kind field
-	APIVersion *string                          `json:"apiVersion,omitempty"` // inlined ServiceApplyConfiguration.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec       *ServiceSpecApplyConfiguration   `json:"spec,omitempty"`
-	Status     *ServiceStatusApplyConfiguration `json:"status,omitempty"`
-}
-
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
 func (b *ServiceApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *ServiceApplyConfiguration {
-	b.typeMeta = value
-	return b
-}
-
-// RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *ServiceApplyConfiguration) RemoveTypeMeta() *ServiceApplyConfiguration {
-	b.typeMeta = nil
+	if value != nil {
+		b.TypeMetaApplyConfiguration = *value
+	}
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
 func (b *ServiceApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
-	return b.typeMeta, true
+	return &b.TypeMetaApplyConfiguration, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
 func (b *ServiceApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *ServiceApplyConfiguration {
-	b.fields.ObjectMeta = value
+	b.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
 func (b *ServiceApplyConfiguration) RemoveObjectMeta() *ServiceApplyConfiguration {
-	b.fields.ObjectMeta = nil
+	b.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
 func (b *ServiceApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
-	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
+	return b.ObjectMeta, b.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
 func (b *ServiceApplyConfiguration) SetSpec(value *ServiceSpecApplyConfiguration) *ServiceApplyConfiguration {
-	b.fields.Spec = value
+	b.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
 func (b *ServiceApplyConfiguration) RemoveSpec() *ServiceApplyConfiguration {
-	b.fields.Spec = nil
+	b.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
 func (b *ServiceApplyConfiguration) GetSpec() (value *ServiceSpecApplyConfiguration, ok bool) {
-	return b.fields.Spec, b.fields.Spec != nil
+	return b.Spec, b.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
 func (b *ServiceApplyConfiguration) SetStatus(value *ServiceStatusApplyConfiguration) *ServiceApplyConfiguration {
-	b.fields.Status = value
+	b.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
 func (b *ServiceApplyConfiguration) RemoveStatus() *ServiceApplyConfiguration {
-	b.fields.Status = nil
+	b.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
 func (b *ServiceApplyConfiguration) GetStatus() (value *ServiceStatusApplyConfiguration, ok bool) {
-	return b.fields.Status, b.fields.Status != nil
-}
-
-// ToUnstructured converts ServiceApplyConfiguration to unstructured.
-func (b *ServiceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ServiceApplyConfiguration, replacing the contents
-// of ServiceApplyConfiguration.
-func (b *ServiceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &serviceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ServiceApplyConfiguration to JSON.
-func (b *ServiceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ServiceApplyConfiguration, replacing the contents of
-// ServiceApplyConfiguration.
-func (b *ServiceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Status, b.Status != nil
 }
 
 // ServiceList represents a listAlias of ServiceApplyConfiguration.
@@ -166,25 +106,3 @@ type ServiceList []*ServiceApplyConfiguration
 
 // ServiceList represents a map of ServiceApplyConfiguration.
 type ServiceMap map[string]ServiceApplyConfiguration
-
-func (b *ServiceApplyConfiguration) preMarshal() {
-	if b.typeMeta != nil {
-		if v, ok := b.typeMeta.GetKind(); ok {
-			b.fields.Kind = &v
-		}
-		if v, ok := b.typeMeta.GetAPIVersion(); ok {
-			b.fields.APIVersion = &v
-		}
-	}
-}
-func (b *ServiceApplyConfiguration) postUnmarshal() {
-	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
-	}
-	if b.fields.Kind != nil {
-		b.typeMeta.SetKind(*b.fields.Kind)
-	}
-	if b.fields.APIVersion != nil {
-		b.typeMeta.SetAPIVersion(*b.fields.APIVersion)
-	}
-}

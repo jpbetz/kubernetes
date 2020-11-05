@@ -18,16 +18,13 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // AzureFilePersistentVolumeSourceApplyConfiguration represents an declarative configuration of the AzureFilePersistentVolumeSource type for use
 // with apply.
 type AzureFilePersistentVolumeSourceApplyConfiguration struct {
-	fields azureFilePersistentVolumeSourceFields
+	SecretName      *string `json:"secretName,omitempty"`
+	ShareName       *string `json:"shareName,omitempty"`
+	ReadOnly        *bool   `json:"readOnly,omitempty"`
+	SecretNamespace *string `json:"secretNamespace,omitempty"`
 }
 
 // AzureFilePersistentVolumeSourceApplyConfiguration constructs an declarative configuration of the AzureFilePersistentVolumeSource type for use with
@@ -36,33 +33,21 @@ func AzureFilePersistentVolumeSource() *AzureFilePersistentVolumeSourceApplyConf
 	return &AzureFilePersistentVolumeSourceApplyConfiguration{}
 }
 
-// azureFilePersistentVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in AzureFilePersistentVolumeSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type azureFilePersistentVolumeSourceFields struct {
-	SecretName      *string `json:"secretName,omitempty"`
-	ShareName       *string `json:"shareName,omitempty"`
-	ReadOnly        *bool   `json:"readOnly,omitempty"`
-	SecretNamespace *string `json:"secretNamespace,omitempty"`
-}
-
 // SetSecretName sets the SecretName field in the declarative configuration to the given value.
 func (b *AzureFilePersistentVolumeSourceApplyConfiguration) SetSecretName(value string) *AzureFilePersistentVolumeSourceApplyConfiguration {
-	b.fields.SecretName = &value
+	b.SecretName = &value
 	return b
 }
 
 // RemoveSecretName removes the SecretName field from the declarative configuration.
 func (b *AzureFilePersistentVolumeSourceApplyConfiguration) RemoveSecretName() *AzureFilePersistentVolumeSourceApplyConfiguration {
-	b.fields.SecretName = nil
+	b.SecretName = nil
 	return b
 }
 
 // GetSecretName gets the SecretName field from the declarative configuration.
 func (b *AzureFilePersistentVolumeSourceApplyConfiguration) GetSecretName() (value string, ok bool) {
-	if v := b.fields.SecretName; v != nil {
+	if v := b.SecretName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,19 +55,19 @@ func (b *AzureFilePersistentVolumeSourceApplyConfiguration) GetSecretName() (val
 
 // SetShareName sets the ShareName field in the declarative configuration to the given value.
 func (b *AzureFilePersistentVolumeSourceApplyConfiguration) SetShareName(value string) *AzureFilePersistentVolumeSourceApplyConfiguration {
-	b.fields.ShareName = &value
+	b.ShareName = &value
 	return b
 }
 
 // RemoveShareName removes the ShareName field from the declarative configuration.
 func (b *AzureFilePersistentVolumeSourceApplyConfiguration) RemoveShareName() *AzureFilePersistentVolumeSourceApplyConfiguration {
-	b.fields.ShareName = nil
+	b.ShareName = nil
 	return b
 }
 
 // GetShareName gets the ShareName field from the declarative configuration.
 func (b *AzureFilePersistentVolumeSourceApplyConfiguration) GetShareName() (value string, ok bool) {
-	if v := b.fields.ShareName; v != nil {
+	if v := b.ShareName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -90,19 +75,19 @@ func (b *AzureFilePersistentVolumeSourceApplyConfiguration) GetShareName() (valu
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
 func (b *AzureFilePersistentVolumeSourceApplyConfiguration) SetReadOnly(value bool) *AzureFilePersistentVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = &value
+	b.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
 func (b *AzureFilePersistentVolumeSourceApplyConfiguration) RemoveReadOnly() *AzureFilePersistentVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = nil
+	b.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
 func (b *AzureFilePersistentVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
-	if v := b.fields.ReadOnly; v != nil {
+	if v := b.ReadOnly; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -110,64 +95,22 @@ func (b *AzureFilePersistentVolumeSourceApplyConfiguration) GetReadOnly() (value
 
 // SetSecretNamespace sets the SecretNamespace field in the declarative configuration to the given value.
 func (b *AzureFilePersistentVolumeSourceApplyConfiguration) SetSecretNamespace(value string) *AzureFilePersistentVolumeSourceApplyConfiguration {
-	b.fields.SecretNamespace = &value
+	b.SecretNamespace = &value
 	return b
 }
 
 // RemoveSecretNamespace removes the SecretNamespace field from the declarative configuration.
 func (b *AzureFilePersistentVolumeSourceApplyConfiguration) RemoveSecretNamespace() *AzureFilePersistentVolumeSourceApplyConfiguration {
-	b.fields.SecretNamespace = nil
+	b.SecretNamespace = nil
 	return b
 }
 
 // GetSecretNamespace gets the SecretNamespace field from the declarative configuration.
 func (b *AzureFilePersistentVolumeSourceApplyConfiguration) GetSecretNamespace() (value string, ok bool) {
-	if v := b.fields.SecretNamespace; v != nil {
+	if v := b.SecretNamespace; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts AzureFilePersistentVolumeSourceApplyConfiguration to unstructured.
-func (b *AzureFilePersistentVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to AzureFilePersistentVolumeSourceApplyConfiguration, replacing the contents
-// of AzureFilePersistentVolumeSourceApplyConfiguration.
-func (b *AzureFilePersistentVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &azureFilePersistentVolumeSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals AzureFilePersistentVolumeSourceApplyConfiguration to JSON.
-func (b *AzureFilePersistentVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into AzureFilePersistentVolumeSourceApplyConfiguration, replacing the contents of
-// AzureFilePersistentVolumeSourceApplyConfiguration.
-func (b *AzureFilePersistentVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // AzureFilePersistentVolumeSourceList represents a listAlias of AzureFilePersistentVolumeSourceApplyConfiguration.
@@ -175,8 +118,3 @@ type AzureFilePersistentVolumeSourceList []*AzureFilePersistentVolumeSourceApply
 
 // AzureFilePersistentVolumeSourceList represents a map of AzureFilePersistentVolumeSourceApplyConfiguration.
 type AzureFilePersistentVolumeSourceMap map[string]AzureFilePersistentVolumeSourceApplyConfiguration
-
-func (b *AzureFilePersistentVolumeSourceApplyConfiguration) preMarshal() {
-}
-func (b *AzureFilePersistentVolumeSourceApplyConfiguration) postUnmarshal() {
-}

@@ -19,16 +19,14 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	intstr "k8s.io/apimachinery/pkg/util/intstr"
 )
 
 // TCPSocketActionApplyConfiguration represents an declarative configuration of the TCPSocketAction type for use
 // with apply.
 type TCPSocketActionApplyConfiguration struct {
-	fields tCPSocketActionFields
+	Port *intstr.IntOrString `json:"port,omitempty"`
+	Host *string             `json:"host,omitempty"`
 }
 
 // TCPSocketActionApplyConfiguration constructs an declarative configuration of the TCPSocketAction type for use with
@@ -37,31 +35,21 @@ func TCPSocketAction() *TCPSocketActionApplyConfiguration {
 	return &TCPSocketActionApplyConfiguration{}
 }
 
-// tCPSocketActionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in TCPSocketActionApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type tCPSocketActionFields struct {
-	Port *intstr.IntOrString `json:"port,omitempty"`
-	Host *string             `json:"host,omitempty"`
-}
-
 // SetPort sets the Port field in the declarative configuration to the given value.
 func (b *TCPSocketActionApplyConfiguration) SetPort(value intstr.IntOrString) *TCPSocketActionApplyConfiguration {
-	b.fields.Port = &value
+	b.Port = &value
 	return b
 }
 
 // RemovePort removes the Port field from the declarative configuration.
 func (b *TCPSocketActionApplyConfiguration) RemovePort() *TCPSocketActionApplyConfiguration {
-	b.fields.Port = nil
+	b.Port = nil
 	return b
 }
 
 // GetPort gets the Port field from the declarative configuration.
 func (b *TCPSocketActionApplyConfiguration) GetPort() (value intstr.IntOrString, ok bool) {
-	if v := b.fields.Port; v != nil {
+	if v := b.Port; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,64 +57,22 @@ func (b *TCPSocketActionApplyConfiguration) GetPort() (value intstr.IntOrString,
 
 // SetHost sets the Host field in the declarative configuration to the given value.
 func (b *TCPSocketActionApplyConfiguration) SetHost(value string) *TCPSocketActionApplyConfiguration {
-	b.fields.Host = &value
+	b.Host = &value
 	return b
 }
 
 // RemoveHost removes the Host field from the declarative configuration.
 func (b *TCPSocketActionApplyConfiguration) RemoveHost() *TCPSocketActionApplyConfiguration {
-	b.fields.Host = nil
+	b.Host = nil
 	return b
 }
 
 // GetHost gets the Host field from the declarative configuration.
 func (b *TCPSocketActionApplyConfiguration) GetHost() (value string, ok bool) {
-	if v := b.fields.Host; v != nil {
+	if v := b.Host; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts TCPSocketActionApplyConfiguration to unstructured.
-func (b *TCPSocketActionApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to TCPSocketActionApplyConfiguration, replacing the contents
-// of TCPSocketActionApplyConfiguration.
-func (b *TCPSocketActionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &tCPSocketActionFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals TCPSocketActionApplyConfiguration to JSON.
-func (b *TCPSocketActionApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into TCPSocketActionApplyConfiguration, replacing the contents of
-// TCPSocketActionApplyConfiguration.
-func (b *TCPSocketActionApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // TCPSocketActionList represents a listAlias of TCPSocketActionApplyConfiguration.
@@ -134,8 +80,3 @@ type TCPSocketActionList []*TCPSocketActionApplyConfiguration
 
 // TCPSocketActionList represents a map of TCPSocketActionApplyConfiguration.
 type TCPSocketActionMap map[string]TCPSocketActionApplyConfiguration
-
-func (b *TCPSocketActionApplyConfiguration) preMarshal() {
-}
-func (b *TCPSocketActionApplyConfiguration) postUnmarshal() {
-}

@@ -20,6 +20,7 @@ package v1beta1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -183,7 +184,7 @@ func (c *endpointSlices) Patch(ctx context.Context, name string, pt types.PatchT
 // Apply takes the given apply declarative configuration, applies it and returns the applied endpointSlice.
 func (c *endpointSlices) Apply(ctx context.Context, endpointSlice *discoveryv1beta1.EndpointSliceApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.EndpointSlice, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := endpointSlice.MarshalJSON()
+	data, err := json.Marshal(endpointSlice)
 	if err != nil {
 		return nil, err
 	}

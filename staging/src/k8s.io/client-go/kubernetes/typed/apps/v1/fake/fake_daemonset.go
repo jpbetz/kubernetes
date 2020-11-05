@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -145,7 +146,7 @@ func (c *FakeDaemonSets) Patch(ctx context.Context, name string, pt types.PatchT
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied daemonSet.
 func (c *FakeDaemonSets) Apply(ctx context.Context, daemonSet *applyconfigurationsappsv1.DaemonSetApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *appsv1.DaemonSet, err error) {
-	data, err := daemonSet.MarshalJSON()
+	data, err := json.Marshal(daemonSet)
 	if err != nil {
 		return nil, err
 	}

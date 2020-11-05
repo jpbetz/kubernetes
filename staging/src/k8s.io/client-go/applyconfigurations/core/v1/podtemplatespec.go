@@ -19,16 +19,14 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // PodTemplateSpecApplyConfiguration represents an declarative configuration of the PodTemplateSpec type for use
 // with apply.
 type PodTemplateSpecApplyConfiguration struct {
-	fields podTemplateSpecFields
+	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Spec       *PodSpecApplyConfiguration       `json:"spec,omitempty"`
 }
 
 // PodTemplateSpecApplyConfiguration constructs an declarative configuration of the PodTemplateSpec type for use with
@@ -37,90 +35,38 @@ func PodTemplateSpec() *PodTemplateSpecApplyConfiguration {
 	return &PodTemplateSpecApplyConfiguration{}
 }
 
-// podTemplateSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodTemplateSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type podTemplateSpecFields struct {
-	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec       *PodSpecApplyConfiguration       `json:"spec,omitempty"`
-}
-
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
 func (b *PodTemplateSpecApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *PodTemplateSpecApplyConfiguration {
-	b.fields.ObjectMeta = value
+	b.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
 func (b *PodTemplateSpecApplyConfiguration) RemoveObjectMeta() *PodTemplateSpecApplyConfiguration {
-	b.fields.ObjectMeta = nil
+	b.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
 func (b *PodTemplateSpecApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
-	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
+	return b.ObjectMeta, b.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
 func (b *PodTemplateSpecApplyConfiguration) SetSpec(value *PodSpecApplyConfiguration) *PodTemplateSpecApplyConfiguration {
-	b.fields.Spec = value
+	b.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
 func (b *PodTemplateSpecApplyConfiguration) RemoveSpec() *PodTemplateSpecApplyConfiguration {
-	b.fields.Spec = nil
+	b.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
 func (b *PodTemplateSpecApplyConfiguration) GetSpec() (value *PodSpecApplyConfiguration, ok bool) {
-	return b.fields.Spec, b.fields.Spec != nil
-}
-
-// ToUnstructured converts PodTemplateSpecApplyConfiguration to unstructured.
-func (b *PodTemplateSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PodTemplateSpecApplyConfiguration, replacing the contents
-// of PodTemplateSpecApplyConfiguration.
-func (b *PodTemplateSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &podTemplateSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PodTemplateSpecApplyConfiguration to JSON.
-func (b *PodTemplateSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PodTemplateSpecApplyConfiguration, replacing the contents of
-// PodTemplateSpecApplyConfiguration.
-func (b *PodTemplateSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Spec, b.Spec != nil
 }
 
 // PodTemplateSpecList represents a listAlias of PodTemplateSpecApplyConfiguration.
@@ -128,8 +74,3 @@ type PodTemplateSpecList []*PodTemplateSpecApplyConfiguration
 
 // PodTemplateSpecList represents a map of PodTemplateSpecApplyConfiguration.
 type PodTemplateSpecMap map[string]PodTemplateSpecApplyConfiguration
-
-func (b *PodTemplateSpecApplyConfiguration) preMarshal() {
-}
-func (b *PodTemplateSpecApplyConfiguration) postUnmarshal() {
-}

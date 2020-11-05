@@ -18,30 +18,9 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ReplicaSetStatusApplyConfiguration represents an declarative configuration of the ReplicaSetStatus type for use
 // with apply.
 type ReplicaSetStatusApplyConfiguration struct {
-	fields replicaSetStatusFields
-}
-
-// ReplicaSetStatusApplyConfiguration constructs an declarative configuration of the ReplicaSetStatus type for use with
-// apply.
-func ReplicaSetStatus() *ReplicaSetStatusApplyConfiguration {
-	return &ReplicaSetStatusApplyConfiguration{}
-}
-
-// replicaSetStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ReplicaSetStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type replicaSetStatusFields struct {
 	Replicas             *int32                   `json:"replicas,omitempty"`
 	FullyLabeledReplicas *int32                   `json:"fullyLabeledReplicas,omitempty"`
 	ReadyReplicas        *int32                   `json:"readyReplicas,omitempty"`
@@ -50,21 +29,27 @@ type replicaSetStatusFields struct {
 	Conditions           *ReplicaSetConditionList `json:"conditions,omitempty"`
 }
 
+// ReplicaSetStatusApplyConfiguration constructs an declarative configuration of the ReplicaSetStatus type for use with
+// apply.
+func ReplicaSetStatus() *ReplicaSetStatusApplyConfiguration {
+	return &ReplicaSetStatusApplyConfiguration{}
+}
+
 // SetReplicas sets the Replicas field in the declarative configuration to the given value.
 func (b *ReplicaSetStatusApplyConfiguration) SetReplicas(value int32) *ReplicaSetStatusApplyConfiguration {
-	b.fields.Replicas = &value
+	b.Replicas = &value
 	return b
 }
 
 // RemoveReplicas removes the Replicas field from the declarative configuration.
 func (b *ReplicaSetStatusApplyConfiguration) RemoveReplicas() *ReplicaSetStatusApplyConfiguration {
-	b.fields.Replicas = nil
+	b.Replicas = nil
 	return b
 }
 
 // GetReplicas gets the Replicas field from the declarative configuration.
 func (b *ReplicaSetStatusApplyConfiguration) GetReplicas() (value int32, ok bool) {
-	if v := b.fields.Replicas; v != nil {
+	if v := b.Replicas; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -72,19 +57,19 @@ func (b *ReplicaSetStatusApplyConfiguration) GetReplicas() (value int32, ok bool
 
 // SetFullyLabeledReplicas sets the FullyLabeledReplicas field in the declarative configuration to the given value.
 func (b *ReplicaSetStatusApplyConfiguration) SetFullyLabeledReplicas(value int32) *ReplicaSetStatusApplyConfiguration {
-	b.fields.FullyLabeledReplicas = &value
+	b.FullyLabeledReplicas = &value
 	return b
 }
 
 // RemoveFullyLabeledReplicas removes the FullyLabeledReplicas field from the declarative configuration.
 func (b *ReplicaSetStatusApplyConfiguration) RemoveFullyLabeledReplicas() *ReplicaSetStatusApplyConfiguration {
-	b.fields.FullyLabeledReplicas = nil
+	b.FullyLabeledReplicas = nil
 	return b
 }
 
 // GetFullyLabeledReplicas gets the FullyLabeledReplicas field from the declarative configuration.
 func (b *ReplicaSetStatusApplyConfiguration) GetFullyLabeledReplicas() (value int32, ok bool) {
-	if v := b.fields.FullyLabeledReplicas; v != nil {
+	if v := b.FullyLabeledReplicas; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -92,19 +77,19 @@ func (b *ReplicaSetStatusApplyConfiguration) GetFullyLabeledReplicas() (value in
 
 // SetReadyReplicas sets the ReadyReplicas field in the declarative configuration to the given value.
 func (b *ReplicaSetStatusApplyConfiguration) SetReadyReplicas(value int32) *ReplicaSetStatusApplyConfiguration {
-	b.fields.ReadyReplicas = &value
+	b.ReadyReplicas = &value
 	return b
 }
 
 // RemoveReadyReplicas removes the ReadyReplicas field from the declarative configuration.
 func (b *ReplicaSetStatusApplyConfiguration) RemoveReadyReplicas() *ReplicaSetStatusApplyConfiguration {
-	b.fields.ReadyReplicas = nil
+	b.ReadyReplicas = nil
 	return b
 }
 
 // GetReadyReplicas gets the ReadyReplicas field from the declarative configuration.
 func (b *ReplicaSetStatusApplyConfiguration) GetReadyReplicas() (value int32, ok bool) {
-	if v := b.fields.ReadyReplicas; v != nil {
+	if v := b.ReadyReplicas; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -112,19 +97,19 @@ func (b *ReplicaSetStatusApplyConfiguration) GetReadyReplicas() (value int32, ok
 
 // SetAvailableReplicas sets the AvailableReplicas field in the declarative configuration to the given value.
 func (b *ReplicaSetStatusApplyConfiguration) SetAvailableReplicas(value int32) *ReplicaSetStatusApplyConfiguration {
-	b.fields.AvailableReplicas = &value
+	b.AvailableReplicas = &value
 	return b
 }
 
 // RemoveAvailableReplicas removes the AvailableReplicas field from the declarative configuration.
 func (b *ReplicaSetStatusApplyConfiguration) RemoveAvailableReplicas() *ReplicaSetStatusApplyConfiguration {
-	b.fields.AvailableReplicas = nil
+	b.AvailableReplicas = nil
 	return b
 }
 
 // GetAvailableReplicas gets the AvailableReplicas field from the declarative configuration.
 func (b *ReplicaSetStatusApplyConfiguration) GetAvailableReplicas() (value int32, ok bool) {
-	if v := b.fields.AvailableReplicas; v != nil {
+	if v := b.AvailableReplicas; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -132,19 +117,19 @@ func (b *ReplicaSetStatusApplyConfiguration) GetAvailableReplicas() (value int32
 
 // SetObservedGeneration sets the ObservedGeneration field in the declarative configuration to the given value.
 func (b *ReplicaSetStatusApplyConfiguration) SetObservedGeneration(value int64) *ReplicaSetStatusApplyConfiguration {
-	b.fields.ObservedGeneration = &value
+	b.ObservedGeneration = &value
 	return b
 }
 
 // RemoveObservedGeneration removes the ObservedGeneration field from the declarative configuration.
 func (b *ReplicaSetStatusApplyConfiguration) RemoveObservedGeneration() *ReplicaSetStatusApplyConfiguration {
-	b.fields.ObservedGeneration = nil
+	b.ObservedGeneration = nil
 	return b
 }
 
 // GetObservedGeneration gets the ObservedGeneration field from the declarative configuration.
 func (b *ReplicaSetStatusApplyConfiguration) GetObservedGeneration() (value int64, ok bool) {
-	if v := b.fields.ObservedGeneration; v != nil {
+	if v := b.ObservedGeneration; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -152,64 +137,22 @@ func (b *ReplicaSetStatusApplyConfiguration) GetObservedGeneration() (value int6
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
 func (b *ReplicaSetStatusApplyConfiguration) SetConditions(value ReplicaSetConditionList) *ReplicaSetStatusApplyConfiguration {
-	b.fields.Conditions = &value
+	b.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
 func (b *ReplicaSetStatusApplyConfiguration) RemoveConditions() *ReplicaSetStatusApplyConfiguration {
-	b.fields.Conditions = nil
+	b.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
 func (b *ReplicaSetStatusApplyConfiguration) GetConditions() (value ReplicaSetConditionList, ok bool) {
-	if v := b.fields.Conditions; v != nil {
+	if v := b.Conditions; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ReplicaSetStatusApplyConfiguration to unstructured.
-func (b *ReplicaSetStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ReplicaSetStatusApplyConfiguration, replacing the contents
-// of ReplicaSetStatusApplyConfiguration.
-func (b *ReplicaSetStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &replicaSetStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ReplicaSetStatusApplyConfiguration to JSON.
-func (b *ReplicaSetStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ReplicaSetStatusApplyConfiguration, replacing the contents of
-// ReplicaSetStatusApplyConfiguration.
-func (b *ReplicaSetStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ReplicaSetStatusList represents a listAlias of ReplicaSetStatusApplyConfiguration.
@@ -217,8 +160,3 @@ type ReplicaSetStatusList []*ReplicaSetStatusApplyConfiguration
 
 // ReplicaSetStatusList represents a map of ReplicaSetStatusApplyConfiguration.
 type ReplicaSetStatusMap map[string]ReplicaSetStatusApplyConfiguration
-
-func (b *ReplicaSetStatusApplyConfiguration) preMarshal() {
-}
-func (b *ReplicaSetStatusApplyConfiguration) postUnmarshal() {
-}

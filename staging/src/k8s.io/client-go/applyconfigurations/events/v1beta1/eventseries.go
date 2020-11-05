@@ -19,16 +19,14 @@ limitations under the License.
 package v1beta1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // EventSeriesApplyConfiguration represents an declarative configuration of the EventSeries type for use
 // with apply.
 type EventSeriesApplyConfiguration struct {
-	fields eventSeriesFields
+	Count            *int32        `json:"count,omitempty"`
+	LastObservedTime *v1.MicroTime `json:"lastObservedTime,omitempty"`
 }
 
 // EventSeriesApplyConfiguration constructs an declarative configuration of the EventSeries type for use with
@@ -37,31 +35,21 @@ func EventSeries() *EventSeriesApplyConfiguration {
 	return &EventSeriesApplyConfiguration{}
 }
 
-// eventSeriesFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in EventSeriesApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type eventSeriesFields struct {
-	Count            *int32        `json:"count,omitempty"`
-	LastObservedTime *v1.MicroTime `json:"lastObservedTime,omitempty"`
-}
-
 // SetCount sets the Count field in the declarative configuration to the given value.
 func (b *EventSeriesApplyConfiguration) SetCount(value int32) *EventSeriesApplyConfiguration {
-	b.fields.Count = &value
+	b.Count = &value
 	return b
 }
 
 // RemoveCount removes the Count field from the declarative configuration.
 func (b *EventSeriesApplyConfiguration) RemoveCount() *EventSeriesApplyConfiguration {
-	b.fields.Count = nil
+	b.Count = nil
 	return b
 }
 
 // GetCount gets the Count field from the declarative configuration.
 func (b *EventSeriesApplyConfiguration) GetCount() (value int32, ok bool) {
-	if v := b.fields.Count; v != nil {
+	if v := b.Count; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,64 +57,22 @@ func (b *EventSeriesApplyConfiguration) GetCount() (value int32, ok bool) {
 
 // SetLastObservedTime sets the LastObservedTime field in the declarative configuration to the given value.
 func (b *EventSeriesApplyConfiguration) SetLastObservedTime(value v1.MicroTime) *EventSeriesApplyConfiguration {
-	b.fields.LastObservedTime = &value
+	b.LastObservedTime = &value
 	return b
 }
 
 // RemoveLastObservedTime removes the LastObservedTime field from the declarative configuration.
 func (b *EventSeriesApplyConfiguration) RemoveLastObservedTime() *EventSeriesApplyConfiguration {
-	b.fields.LastObservedTime = nil
+	b.LastObservedTime = nil
 	return b
 }
 
 // GetLastObservedTime gets the LastObservedTime field from the declarative configuration.
 func (b *EventSeriesApplyConfiguration) GetLastObservedTime() (value v1.MicroTime, ok bool) {
-	if v := b.fields.LastObservedTime; v != nil {
+	if v := b.LastObservedTime; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts EventSeriesApplyConfiguration to unstructured.
-func (b *EventSeriesApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to EventSeriesApplyConfiguration, replacing the contents
-// of EventSeriesApplyConfiguration.
-func (b *EventSeriesApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &eventSeriesFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals EventSeriesApplyConfiguration to JSON.
-func (b *EventSeriesApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into EventSeriesApplyConfiguration, replacing the contents of
-// EventSeriesApplyConfiguration.
-func (b *EventSeriesApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // EventSeriesList represents a listAlias of EventSeriesApplyConfiguration.
@@ -134,8 +80,3 @@ type EventSeriesList []*EventSeriesApplyConfiguration
 
 // EventSeriesList represents a map of EventSeriesApplyConfiguration.
 type EventSeriesMap map[string]EventSeriesApplyConfiguration
-
-func (b *EventSeriesApplyConfiguration) preMarshal() {
-}
-func (b *EventSeriesApplyConfiguration) postUnmarshal() {
-}

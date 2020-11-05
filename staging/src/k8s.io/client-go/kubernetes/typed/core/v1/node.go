@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -189,7 +190,7 @@ func (c *nodes) Patch(ctx context.Context, name string, pt types.PatchType, data
 // Apply takes the given apply declarative configuration, applies it and returns the applied node.
 func (c *nodes) Apply(ctx context.Context, node *corev1.NodeApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Node, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := node.MarshalJSON()
+	data, err := json.Marshal(node)
 	if err != nil {
 		return nil, err
 	}

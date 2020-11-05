@@ -19,16 +19,14 @@ limitations under the License.
 package v1alpha1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // VolumeErrorApplyConfiguration represents an declarative configuration of the VolumeError type for use
 // with apply.
 type VolumeErrorApplyConfiguration struct {
-	fields volumeErrorFields
+	Time    *v1.Time `json:"time,omitempty"`
+	Message *string  `json:"message,omitempty"`
 }
 
 // VolumeErrorApplyConfiguration constructs an declarative configuration of the VolumeError type for use with
@@ -37,31 +35,21 @@ func VolumeError() *VolumeErrorApplyConfiguration {
 	return &VolumeErrorApplyConfiguration{}
 }
 
-// volumeErrorFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in VolumeErrorApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type volumeErrorFields struct {
-	Time    *v1.Time `json:"time,omitempty"`
-	Message *string  `json:"message,omitempty"`
-}
-
 // SetTime sets the Time field in the declarative configuration to the given value.
 func (b *VolumeErrorApplyConfiguration) SetTime(value v1.Time) *VolumeErrorApplyConfiguration {
-	b.fields.Time = &value
+	b.Time = &value
 	return b
 }
 
 // RemoveTime removes the Time field from the declarative configuration.
 func (b *VolumeErrorApplyConfiguration) RemoveTime() *VolumeErrorApplyConfiguration {
-	b.fields.Time = nil
+	b.Time = nil
 	return b
 }
 
 // GetTime gets the Time field from the declarative configuration.
 func (b *VolumeErrorApplyConfiguration) GetTime() (value v1.Time, ok bool) {
-	if v := b.fields.Time; v != nil {
+	if v := b.Time; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,64 +57,22 @@ func (b *VolumeErrorApplyConfiguration) GetTime() (value v1.Time, ok bool) {
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
 func (b *VolumeErrorApplyConfiguration) SetMessage(value string) *VolumeErrorApplyConfiguration {
-	b.fields.Message = &value
+	b.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
 func (b *VolumeErrorApplyConfiguration) RemoveMessage() *VolumeErrorApplyConfiguration {
-	b.fields.Message = nil
+	b.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
 func (b *VolumeErrorApplyConfiguration) GetMessage() (value string, ok bool) {
-	if v := b.fields.Message; v != nil {
+	if v := b.Message; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts VolumeErrorApplyConfiguration to unstructured.
-func (b *VolumeErrorApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to VolumeErrorApplyConfiguration, replacing the contents
-// of VolumeErrorApplyConfiguration.
-func (b *VolumeErrorApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &volumeErrorFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals VolumeErrorApplyConfiguration to JSON.
-func (b *VolumeErrorApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into VolumeErrorApplyConfiguration, replacing the contents of
-// VolumeErrorApplyConfiguration.
-func (b *VolumeErrorApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // VolumeErrorList represents a listAlias of VolumeErrorApplyConfiguration.
@@ -134,8 +80,3 @@ type VolumeErrorList []*VolumeErrorApplyConfiguration
 
 // VolumeErrorList represents a map of VolumeErrorApplyConfiguration.
 type VolumeErrorMap map[string]VolumeErrorApplyConfiguration
-
-func (b *VolumeErrorApplyConfiguration) preMarshal() {
-}
-func (b *VolumeErrorApplyConfiguration) postUnmarshal() {
-}

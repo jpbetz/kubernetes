@@ -19,17 +19,16 @@ limitations under the License.
 package v1beta2
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // StatefulSetApplyConfiguration represents an declarative configuration of the StatefulSet type for use
 // with apply.
 type StatefulSetApplyConfiguration struct {
-	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
-	fields   statefulSetFields
+	v1.TypeMetaApplyConfiguration `json:",inline"`
+	ObjectMeta                    *v1.ObjectMetaApplyConfiguration     `json:"metadata,omitempty"`
+	Spec                          *StatefulSetSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status                        *StatefulSetStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // StatefulSetApplyConfiguration constructs an declarative configuration of the StatefulSet type for use with
@@ -38,127 +37,68 @@ func StatefulSet() *StatefulSetApplyConfiguration {
 	return &StatefulSetApplyConfiguration{}
 }
 
-// statefulSetFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in StatefulSetApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type statefulSetFields struct {
-	Kind       *string                              `json:"kind,omitempty"`       // inlined StatefulSetApplyConfiguration.typeMeta.Kind field
-	APIVersion *string                              `json:"apiVersion,omitempty"` // inlined StatefulSetApplyConfiguration.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaApplyConfiguration     `json:"metadata,omitempty"`
-	Spec       *StatefulSetSpecApplyConfiguration   `json:"spec,omitempty"`
-	Status     *StatefulSetStatusApplyConfiguration `json:"status,omitempty"`
-}
-
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
 func (b *StatefulSetApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *StatefulSetApplyConfiguration {
-	b.typeMeta = value
-	return b
-}
-
-// RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *StatefulSetApplyConfiguration) RemoveTypeMeta() *StatefulSetApplyConfiguration {
-	b.typeMeta = nil
+	if value != nil {
+		b.TypeMetaApplyConfiguration = *value
+	}
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
 func (b *StatefulSetApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
-	return b.typeMeta, true
+	return &b.TypeMetaApplyConfiguration, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
 func (b *StatefulSetApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *StatefulSetApplyConfiguration {
-	b.fields.ObjectMeta = value
+	b.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
 func (b *StatefulSetApplyConfiguration) RemoveObjectMeta() *StatefulSetApplyConfiguration {
-	b.fields.ObjectMeta = nil
+	b.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
 func (b *StatefulSetApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
-	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
+	return b.ObjectMeta, b.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
 func (b *StatefulSetApplyConfiguration) SetSpec(value *StatefulSetSpecApplyConfiguration) *StatefulSetApplyConfiguration {
-	b.fields.Spec = value
+	b.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
 func (b *StatefulSetApplyConfiguration) RemoveSpec() *StatefulSetApplyConfiguration {
-	b.fields.Spec = nil
+	b.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
 func (b *StatefulSetApplyConfiguration) GetSpec() (value *StatefulSetSpecApplyConfiguration, ok bool) {
-	return b.fields.Spec, b.fields.Spec != nil
+	return b.Spec, b.Spec != nil
 }
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
 func (b *StatefulSetApplyConfiguration) SetStatus(value *StatefulSetStatusApplyConfiguration) *StatefulSetApplyConfiguration {
-	b.fields.Status = value
+	b.Status = value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
 func (b *StatefulSetApplyConfiguration) RemoveStatus() *StatefulSetApplyConfiguration {
-	b.fields.Status = nil
+	b.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
 func (b *StatefulSetApplyConfiguration) GetStatus() (value *StatefulSetStatusApplyConfiguration, ok bool) {
-	return b.fields.Status, b.fields.Status != nil
-}
-
-// ToUnstructured converts StatefulSetApplyConfiguration to unstructured.
-func (b *StatefulSetApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to StatefulSetApplyConfiguration, replacing the contents
-// of StatefulSetApplyConfiguration.
-func (b *StatefulSetApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &statefulSetFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals StatefulSetApplyConfiguration to JSON.
-func (b *StatefulSetApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into StatefulSetApplyConfiguration, replacing the contents of
-// StatefulSetApplyConfiguration.
-func (b *StatefulSetApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Status, b.Status != nil
 }
 
 // StatefulSetList represents a listAlias of StatefulSetApplyConfiguration.
@@ -166,25 +106,3 @@ type StatefulSetList []*StatefulSetApplyConfiguration
 
 // StatefulSetList represents a map of StatefulSetApplyConfiguration.
 type StatefulSetMap map[string]StatefulSetApplyConfiguration
-
-func (b *StatefulSetApplyConfiguration) preMarshal() {
-	if b.typeMeta != nil {
-		if v, ok := b.typeMeta.GetKind(); ok {
-			b.fields.Kind = &v
-		}
-		if v, ok := b.typeMeta.GetAPIVersion(); ok {
-			b.fields.APIVersion = &v
-		}
-	}
-}
-func (b *StatefulSetApplyConfiguration) postUnmarshal() {
-	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
-	}
-	if b.fields.Kind != nil {
-		b.typeMeta.SetKind(*b.fields.Kind)
-	}
-	if b.fields.APIVersion != nil {
-		b.typeMeta.SetAPIVersion(*b.fields.APIVersion)
-	}
-}

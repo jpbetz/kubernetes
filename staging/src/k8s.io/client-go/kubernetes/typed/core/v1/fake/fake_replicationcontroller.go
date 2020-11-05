@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
@@ -146,7 +147,7 @@ func (c *FakeReplicationControllers) Patch(ctx context.Context, name string, pt 
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied replicationController.
 func (c *FakeReplicationControllers) Apply(ctx context.Context, replicationController *applyconfigurationscorev1.ReplicationControllerApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.ReplicationController, err error) {
-	data, err := replicationController.MarshalJSON()
+	data, err := json.Marshal(replicationController)
 	if err != nil {
 		return nil, err
 	}

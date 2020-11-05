@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ServiceBackendPortApplyConfiguration represents an declarative configuration of the ServiceBackendPort type for use
 // with apply.
 type ServiceBackendPortApplyConfiguration struct {
-	fields serviceBackendPortFields
+	Name   *string `json:"name,omitempty"`
+	Number *int32  `json:"number,omitempty"`
 }
 
 // ServiceBackendPortApplyConfiguration constructs an declarative configuration of the ServiceBackendPort type for use with
@@ -36,31 +31,21 @@ func ServiceBackendPort() *ServiceBackendPortApplyConfiguration {
 	return &ServiceBackendPortApplyConfiguration{}
 }
 
-// serviceBackendPortFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ServiceBackendPortApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type serviceBackendPortFields struct {
-	Name   *string `json:"name,omitempty"`
-	Number *int32  `json:"number,omitempty"`
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *ServiceBackendPortApplyConfiguration) SetName(value string) *ServiceBackendPortApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *ServiceBackendPortApplyConfiguration) RemoveName() *ServiceBackendPortApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *ServiceBackendPortApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *ServiceBackendPortApplyConfiguration) GetName() (value string, ok bool)
 
 // SetNumber sets the Number field in the declarative configuration to the given value.
 func (b *ServiceBackendPortApplyConfiguration) SetNumber(value int32) *ServiceBackendPortApplyConfiguration {
-	b.fields.Number = &value
+	b.Number = &value
 	return b
 }
 
 // RemoveNumber removes the Number field from the declarative configuration.
 func (b *ServiceBackendPortApplyConfiguration) RemoveNumber() *ServiceBackendPortApplyConfiguration {
-	b.fields.Number = nil
+	b.Number = nil
 	return b
 }
 
 // GetNumber gets the Number field from the declarative configuration.
 func (b *ServiceBackendPortApplyConfiguration) GetNumber() (value int32, ok bool) {
-	if v := b.fields.Number; v != nil {
+	if v := b.Number; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ServiceBackendPortApplyConfiguration to unstructured.
-func (b *ServiceBackendPortApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ServiceBackendPortApplyConfiguration, replacing the contents
-// of ServiceBackendPortApplyConfiguration.
-func (b *ServiceBackendPortApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &serviceBackendPortFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ServiceBackendPortApplyConfiguration to JSON.
-func (b *ServiceBackendPortApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ServiceBackendPortApplyConfiguration, replacing the contents of
-// ServiceBackendPortApplyConfiguration.
-func (b *ServiceBackendPortApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ServiceBackendPortList represents a listAlias of ServiceBackendPortApplyConfiguration.
@@ -133,8 +76,3 @@ type ServiceBackendPortList []*ServiceBackendPortApplyConfiguration
 
 // ServiceBackendPortList represents a map of ServiceBackendPortApplyConfiguration.
 type ServiceBackendPortMap map[string]ServiceBackendPortApplyConfiguration
-
-func (b *ServiceBackendPortApplyConfiguration) preMarshal() {
-}
-func (b *ServiceBackendPortApplyConfiguration) postUnmarshal() {
-}

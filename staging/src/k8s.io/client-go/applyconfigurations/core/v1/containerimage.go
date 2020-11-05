@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ContainerImageApplyConfiguration represents an declarative configuration of the ContainerImage type for use
 // with apply.
 type ContainerImageApplyConfiguration struct {
-	fields containerImageFields
+	Names     *[]string `json:"names,omitempty"`
+	SizeBytes *int64    `json:"sizeBytes,omitempty"`
 }
 
 // ContainerImageApplyConfiguration constructs an declarative configuration of the ContainerImage type for use with
@@ -36,31 +31,21 @@ func ContainerImage() *ContainerImageApplyConfiguration {
 	return &ContainerImageApplyConfiguration{}
 }
 
-// containerImageFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ContainerImageApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type containerImageFields struct {
-	Names     *[]string `json:"names,omitempty"`
-	SizeBytes *int64    `json:"sizeBytes,omitempty"`
-}
-
 // SetNames sets the Names field in the declarative configuration to the given value.
 func (b *ContainerImageApplyConfiguration) SetNames(value []string) *ContainerImageApplyConfiguration {
-	b.fields.Names = &value
+	b.Names = &value
 	return b
 }
 
 // RemoveNames removes the Names field from the declarative configuration.
 func (b *ContainerImageApplyConfiguration) RemoveNames() *ContainerImageApplyConfiguration {
-	b.fields.Names = nil
+	b.Names = nil
 	return b
 }
 
 // GetNames gets the Names field from the declarative configuration.
 func (b *ContainerImageApplyConfiguration) GetNames() (value []string, ok bool) {
-	if v := b.fields.Names; v != nil {
+	if v := b.Names; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *ContainerImageApplyConfiguration) GetNames() (value []string, ok bool) 
 
 // SetSizeBytes sets the SizeBytes field in the declarative configuration to the given value.
 func (b *ContainerImageApplyConfiguration) SetSizeBytes(value int64) *ContainerImageApplyConfiguration {
-	b.fields.SizeBytes = &value
+	b.SizeBytes = &value
 	return b
 }
 
 // RemoveSizeBytes removes the SizeBytes field from the declarative configuration.
 func (b *ContainerImageApplyConfiguration) RemoveSizeBytes() *ContainerImageApplyConfiguration {
-	b.fields.SizeBytes = nil
+	b.SizeBytes = nil
 	return b
 }
 
 // GetSizeBytes gets the SizeBytes field from the declarative configuration.
 func (b *ContainerImageApplyConfiguration) GetSizeBytes() (value int64, ok bool) {
-	if v := b.fields.SizeBytes; v != nil {
+	if v := b.SizeBytes; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ContainerImageApplyConfiguration to unstructured.
-func (b *ContainerImageApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ContainerImageApplyConfiguration, replacing the contents
-// of ContainerImageApplyConfiguration.
-func (b *ContainerImageApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &containerImageFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ContainerImageApplyConfiguration to JSON.
-func (b *ContainerImageApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ContainerImageApplyConfiguration, replacing the contents of
-// ContainerImageApplyConfiguration.
-func (b *ContainerImageApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ContainerImageList represents a listAlias of ContainerImageApplyConfiguration.
@@ -133,8 +76,3 @@ type ContainerImageList []*ContainerImageApplyConfiguration
 
 // ContainerImageList represents a map of ContainerImageApplyConfiguration.
 type ContainerImageMap map[string]ContainerImageApplyConfiguration
-
-func (b *ContainerImageApplyConfiguration) preMarshal() {
-}
-func (b *ContainerImageApplyConfiguration) postUnmarshal() {
-}

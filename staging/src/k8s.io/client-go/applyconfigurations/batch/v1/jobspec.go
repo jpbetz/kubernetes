@@ -19,9 +19,6 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	corev1 "k8s.io/client-go/applyconfigurations/core/v1"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
@@ -29,21 +26,6 @@ import (
 // JobSpecApplyConfiguration represents an declarative configuration of the JobSpec type for use
 // with apply.
 type JobSpecApplyConfiguration struct {
-	fields jobSpecFields
-}
-
-// JobSpecApplyConfiguration constructs an declarative configuration of the JobSpec type for use with
-// apply.
-func JobSpec() *JobSpecApplyConfiguration {
-	return &JobSpecApplyConfiguration{}
-}
-
-// jobSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in JobSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type jobSpecFields struct {
 	Parallelism             *int32                                    `json:"parallelism,omitempty"`
 	Completions             *int32                                    `json:"completions,omitempty"`
 	ActiveDeadlineSeconds   *int64                                    `json:"activeDeadlineSeconds,omitempty"`
@@ -54,21 +36,27 @@ type jobSpecFields struct {
 	TTLSecondsAfterFinished *int32                                    `json:"ttlSecondsAfterFinished,omitempty"`
 }
 
+// JobSpecApplyConfiguration constructs an declarative configuration of the JobSpec type for use with
+// apply.
+func JobSpec() *JobSpecApplyConfiguration {
+	return &JobSpecApplyConfiguration{}
+}
+
 // SetParallelism sets the Parallelism field in the declarative configuration to the given value.
 func (b *JobSpecApplyConfiguration) SetParallelism(value int32) *JobSpecApplyConfiguration {
-	b.fields.Parallelism = &value
+	b.Parallelism = &value
 	return b
 }
 
 // RemoveParallelism removes the Parallelism field from the declarative configuration.
 func (b *JobSpecApplyConfiguration) RemoveParallelism() *JobSpecApplyConfiguration {
-	b.fields.Parallelism = nil
+	b.Parallelism = nil
 	return b
 }
 
 // GetParallelism gets the Parallelism field from the declarative configuration.
 func (b *JobSpecApplyConfiguration) GetParallelism() (value int32, ok bool) {
-	if v := b.fields.Parallelism; v != nil {
+	if v := b.Parallelism; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -76,19 +64,19 @@ func (b *JobSpecApplyConfiguration) GetParallelism() (value int32, ok bool) {
 
 // SetCompletions sets the Completions field in the declarative configuration to the given value.
 func (b *JobSpecApplyConfiguration) SetCompletions(value int32) *JobSpecApplyConfiguration {
-	b.fields.Completions = &value
+	b.Completions = &value
 	return b
 }
 
 // RemoveCompletions removes the Completions field from the declarative configuration.
 func (b *JobSpecApplyConfiguration) RemoveCompletions() *JobSpecApplyConfiguration {
-	b.fields.Completions = nil
+	b.Completions = nil
 	return b
 }
 
 // GetCompletions gets the Completions field from the declarative configuration.
 func (b *JobSpecApplyConfiguration) GetCompletions() (value int32, ok bool) {
-	if v := b.fields.Completions; v != nil {
+	if v := b.Completions; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -96,19 +84,19 @@ func (b *JobSpecApplyConfiguration) GetCompletions() (value int32, ok bool) {
 
 // SetActiveDeadlineSeconds sets the ActiveDeadlineSeconds field in the declarative configuration to the given value.
 func (b *JobSpecApplyConfiguration) SetActiveDeadlineSeconds(value int64) *JobSpecApplyConfiguration {
-	b.fields.ActiveDeadlineSeconds = &value
+	b.ActiveDeadlineSeconds = &value
 	return b
 }
 
 // RemoveActiveDeadlineSeconds removes the ActiveDeadlineSeconds field from the declarative configuration.
 func (b *JobSpecApplyConfiguration) RemoveActiveDeadlineSeconds() *JobSpecApplyConfiguration {
-	b.fields.ActiveDeadlineSeconds = nil
+	b.ActiveDeadlineSeconds = nil
 	return b
 }
 
 // GetActiveDeadlineSeconds gets the ActiveDeadlineSeconds field from the declarative configuration.
 func (b *JobSpecApplyConfiguration) GetActiveDeadlineSeconds() (value int64, ok bool) {
-	if v := b.fields.ActiveDeadlineSeconds; v != nil {
+	if v := b.ActiveDeadlineSeconds; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -116,19 +104,19 @@ func (b *JobSpecApplyConfiguration) GetActiveDeadlineSeconds() (value int64, ok 
 
 // SetBackoffLimit sets the BackoffLimit field in the declarative configuration to the given value.
 func (b *JobSpecApplyConfiguration) SetBackoffLimit(value int32) *JobSpecApplyConfiguration {
-	b.fields.BackoffLimit = &value
+	b.BackoffLimit = &value
 	return b
 }
 
 // RemoveBackoffLimit removes the BackoffLimit field from the declarative configuration.
 func (b *JobSpecApplyConfiguration) RemoveBackoffLimit() *JobSpecApplyConfiguration {
-	b.fields.BackoffLimit = nil
+	b.BackoffLimit = nil
 	return b
 }
 
 // GetBackoffLimit gets the BackoffLimit field from the declarative configuration.
 func (b *JobSpecApplyConfiguration) GetBackoffLimit() (value int32, ok bool) {
-	if v := b.fields.BackoffLimit; v != nil {
+	if v := b.BackoffLimit; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -136,36 +124,36 @@ func (b *JobSpecApplyConfiguration) GetBackoffLimit() (value int32, ok bool) {
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
 func (b *JobSpecApplyConfiguration) SetSelector(value *v1.LabelSelectorApplyConfiguration) *JobSpecApplyConfiguration {
-	b.fields.Selector = value
+	b.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
 func (b *JobSpecApplyConfiguration) RemoveSelector() *JobSpecApplyConfiguration {
-	b.fields.Selector = nil
+	b.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
 func (b *JobSpecApplyConfiguration) GetSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
-	return b.fields.Selector, b.fields.Selector != nil
+	return b.Selector, b.Selector != nil
 }
 
 // SetManualSelector sets the ManualSelector field in the declarative configuration to the given value.
 func (b *JobSpecApplyConfiguration) SetManualSelector(value bool) *JobSpecApplyConfiguration {
-	b.fields.ManualSelector = &value
+	b.ManualSelector = &value
 	return b
 }
 
 // RemoveManualSelector removes the ManualSelector field from the declarative configuration.
 func (b *JobSpecApplyConfiguration) RemoveManualSelector() *JobSpecApplyConfiguration {
-	b.fields.ManualSelector = nil
+	b.ManualSelector = nil
 	return b
 }
 
 // GetManualSelector gets the ManualSelector field from the declarative configuration.
 func (b *JobSpecApplyConfiguration) GetManualSelector() (value bool, ok bool) {
-	if v := b.fields.ManualSelector; v != nil {
+	if v := b.ManualSelector; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -173,81 +161,39 @@ func (b *JobSpecApplyConfiguration) GetManualSelector() (value bool, ok bool) {
 
 // SetTemplate sets the Template field in the declarative configuration to the given value.
 func (b *JobSpecApplyConfiguration) SetTemplate(value *corev1.PodTemplateSpecApplyConfiguration) *JobSpecApplyConfiguration {
-	b.fields.Template = value
+	b.Template = value
 	return b
 }
 
 // RemoveTemplate removes the Template field from the declarative configuration.
 func (b *JobSpecApplyConfiguration) RemoveTemplate() *JobSpecApplyConfiguration {
-	b.fields.Template = nil
+	b.Template = nil
 	return b
 }
 
 // GetTemplate gets the Template field from the declarative configuration.
 func (b *JobSpecApplyConfiguration) GetTemplate() (value *corev1.PodTemplateSpecApplyConfiguration, ok bool) {
-	return b.fields.Template, b.fields.Template != nil
+	return b.Template, b.Template != nil
 }
 
 // SetTTLSecondsAfterFinished sets the TTLSecondsAfterFinished field in the declarative configuration to the given value.
 func (b *JobSpecApplyConfiguration) SetTTLSecondsAfterFinished(value int32) *JobSpecApplyConfiguration {
-	b.fields.TTLSecondsAfterFinished = &value
+	b.TTLSecondsAfterFinished = &value
 	return b
 }
 
 // RemoveTTLSecondsAfterFinished removes the TTLSecondsAfterFinished field from the declarative configuration.
 func (b *JobSpecApplyConfiguration) RemoveTTLSecondsAfterFinished() *JobSpecApplyConfiguration {
-	b.fields.TTLSecondsAfterFinished = nil
+	b.TTLSecondsAfterFinished = nil
 	return b
 }
 
 // GetTTLSecondsAfterFinished gets the TTLSecondsAfterFinished field from the declarative configuration.
 func (b *JobSpecApplyConfiguration) GetTTLSecondsAfterFinished() (value int32, ok bool) {
-	if v := b.fields.TTLSecondsAfterFinished; v != nil {
+	if v := b.TTLSecondsAfterFinished; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts JobSpecApplyConfiguration to unstructured.
-func (b *JobSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to JobSpecApplyConfiguration, replacing the contents
-// of JobSpecApplyConfiguration.
-func (b *JobSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &jobSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals JobSpecApplyConfiguration to JSON.
-func (b *JobSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into JobSpecApplyConfiguration, replacing the contents of
-// JobSpecApplyConfiguration.
-func (b *JobSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // JobSpecList represents a listAlias of JobSpecApplyConfiguration.
@@ -255,8 +201,3 @@ type JobSpecList []*JobSpecApplyConfiguration
 
 // JobSpecList represents a map of JobSpecApplyConfiguration.
 type JobSpecMap map[string]JobSpecApplyConfiguration
-
-func (b *JobSpecApplyConfiguration) preMarshal() {
-}
-func (b *JobSpecApplyConfiguration) postUnmarshal() {
-}

@@ -19,16 +19,13 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // AggregationRuleApplyConfiguration represents an declarative configuration of the AggregationRule type for use
 // with apply.
 type AggregationRuleApplyConfiguration struct {
-	fields aggregationRuleFields
+	ClusterRoleSelectors *v1.LabelSelectorList `json:"clusterRoleSelectors,omitempty"`
 }
 
 // AggregationRuleApplyConfiguration constructs an declarative configuration of the AggregationRule type for use with
@@ -37,75 +34,24 @@ func AggregationRule() *AggregationRuleApplyConfiguration {
 	return &AggregationRuleApplyConfiguration{}
 }
 
-// aggregationRuleFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in AggregationRuleApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type aggregationRuleFields struct {
-	ClusterRoleSelectors *v1.LabelSelectorList `json:"clusterRoleSelectors,omitempty"`
-}
-
 // SetClusterRoleSelectors sets the ClusterRoleSelectors field in the declarative configuration to the given value.
 func (b *AggregationRuleApplyConfiguration) SetClusterRoleSelectors(value v1.LabelSelectorList) *AggregationRuleApplyConfiguration {
-	b.fields.ClusterRoleSelectors = &value
+	b.ClusterRoleSelectors = &value
 	return b
 }
 
 // RemoveClusterRoleSelectors removes the ClusterRoleSelectors field from the declarative configuration.
 func (b *AggregationRuleApplyConfiguration) RemoveClusterRoleSelectors() *AggregationRuleApplyConfiguration {
-	b.fields.ClusterRoleSelectors = nil
+	b.ClusterRoleSelectors = nil
 	return b
 }
 
 // GetClusterRoleSelectors gets the ClusterRoleSelectors field from the declarative configuration.
 func (b *AggregationRuleApplyConfiguration) GetClusterRoleSelectors() (value v1.LabelSelectorList, ok bool) {
-	if v := b.fields.ClusterRoleSelectors; v != nil {
+	if v := b.ClusterRoleSelectors; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts AggregationRuleApplyConfiguration to unstructured.
-func (b *AggregationRuleApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to AggregationRuleApplyConfiguration, replacing the contents
-// of AggregationRuleApplyConfiguration.
-func (b *AggregationRuleApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &aggregationRuleFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals AggregationRuleApplyConfiguration to JSON.
-func (b *AggregationRuleApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into AggregationRuleApplyConfiguration, replacing the contents of
-// AggregationRuleApplyConfiguration.
-func (b *AggregationRuleApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // AggregationRuleList represents a listAlias of AggregationRuleApplyConfiguration.
@@ -113,8 +59,3 @@ type AggregationRuleList []*AggregationRuleApplyConfiguration
 
 // AggregationRuleList represents a map of AggregationRuleApplyConfiguration.
 type AggregationRuleMap map[string]AggregationRuleApplyConfiguration
-
-func (b *AggregationRuleApplyConfiguration) preMarshal() {
-}
-func (b *AggregationRuleApplyConfiguration) postUnmarshal() {
-}

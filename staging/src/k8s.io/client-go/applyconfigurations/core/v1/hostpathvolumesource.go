@@ -19,16 +19,14 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // HostPathVolumeSourceApplyConfiguration represents an declarative configuration of the HostPathVolumeSource type for use
 // with apply.
 type HostPathVolumeSourceApplyConfiguration struct {
-	fields hostPathVolumeSourceFields
+	Path *string          `json:"path,omitempty"`
+	Type *v1.HostPathType `json:"type,omitempty"`
 }
 
 // HostPathVolumeSourceApplyConfiguration constructs an declarative configuration of the HostPathVolumeSource type for use with
@@ -37,31 +35,21 @@ func HostPathVolumeSource() *HostPathVolumeSourceApplyConfiguration {
 	return &HostPathVolumeSourceApplyConfiguration{}
 }
 
-// hostPathVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in HostPathVolumeSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type hostPathVolumeSourceFields struct {
-	Path *string          `json:"path,omitempty"`
-	Type *v1.HostPathType `json:"type,omitempty"`
-}
-
 // SetPath sets the Path field in the declarative configuration to the given value.
 func (b *HostPathVolumeSourceApplyConfiguration) SetPath(value string) *HostPathVolumeSourceApplyConfiguration {
-	b.fields.Path = &value
+	b.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
 func (b *HostPathVolumeSourceApplyConfiguration) RemovePath() *HostPathVolumeSourceApplyConfiguration {
-	b.fields.Path = nil
+	b.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
 func (b *HostPathVolumeSourceApplyConfiguration) GetPath() (value string, ok bool) {
-	if v := b.fields.Path; v != nil {
+	if v := b.Path; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,64 +57,22 @@ func (b *HostPathVolumeSourceApplyConfiguration) GetPath() (value string, ok boo
 
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *HostPathVolumeSourceApplyConfiguration) SetType(value v1.HostPathType) *HostPathVolumeSourceApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *HostPathVolumeSourceApplyConfiguration) RemoveType() *HostPathVolumeSourceApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *HostPathVolumeSourceApplyConfiguration) GetType() (value v1.HostPathType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts HostPathVolumeSourceApplyConfiguration to unstructured.
-func (b *HostPathVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to HostPathVolumeSourceApplyConfiguration, replacing the contents
-// of HostPathVolumeSourceApplyConfiguration.
-func (b *HostPathVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &hostPathVolumeSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals HostPathVolumeSourceApplyConfiguration to JSON.
-func (b *HostPathVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into HostPathVolumeSourceApplyConfiguration, replacing the contents of
-// HostPathVolumeSourceApplyConfiguration.
-func (b *HostPathVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // HostPathVolumeSourceList represents a listAlias of HostPathVolumeSourceApplyConfiguration.
@@ -134,8 +80,3 @@ type HostPathVolumeSourceList []*HostPathVolumeSourceApplyConfiguration
 
 // HostPathVolumeSourceList represents a map of HostPathVolumeSourceApplyConfiguration.
 type HostPathVolumeSourceMap map[string]HostPathVolumeSourceApplyConfiguration
-
-func (b *HostPathVolumeSourceApplyConfiguration) preMarshal() {
-}
-func (b *HostPathVolumeSourceApplyConfiguration) postUnmarshal() {
-}

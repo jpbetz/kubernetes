@@ -19,16 +19,15 @@ limitations under the License.
 package v2beta2
 
 import (
-	json "encoding/json"
-
 	v2beta2 "k8s.io/api/autoscaling/v2beta2"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // HPAScalingRulesApplyConfiguration represents an declarative configuration of the HPAScalingRules type for use
 // with apply.
 type HPAScalingRulesApplyConfiguration struct {
-	fields hPAScalingRulesFields
+	StabilizationWindowSeconds *int32                       `json:"stabilizationWindowSeconds,omitempty"`
+	SelectPolicy               *v2beta2.ScalingPolicySelect `json:"selectPolicy,omitempty"`
+	Policies                   *HPAScalingPolicyList        `json:"policies,omitempty"`
 }
 
 // HPAScalingRulesApplyConfiguration constructs an declarative configuration of the HPAScalingRules type for use with
@@ -37,32 +36,21 @@ func HPAScalingRules() *HPAScalingRulesApplyConfiguration {
 	return &HPAScalingRulesApplyConfiguration{}
 }
 
-// hPAScalingRulesFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in HPAScalingRulesApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type hPAScalingRulesFields struct {
-	StabilizationWindowSeconds *int32                       `json:"stabilizationWindowSeconds,omitempty"`
-	SelectPolicy               *v2beta2.ScalingPolicySelect `json:"selectPolicy,omitempty"`
-	Policies                   *HPAScalingPolicyList        `json:"policies,omitempty"`
-}
-
 // SetStabilizationWindowSeconds sets the StabilizationWindowSeconds field in the declarative configuration to the given value.
 func (b *HPAScalingRulesApplyConfiguration) SetStabilizationWindowSeconds(value int32) *HPAScalingRulesApplyConfiguration {
-	b.fields.StabilizationWindowSeconds = &value
+	b.StabilizationWindowSeconds = &value
 	return b
 }
 
 // RemoveStabilizationWindowSeconds removes the StabilizationWindowSeconds field from the declarative configuration.
 func (b *HPAScalingRulesApplyConfiguration) RemoveStabilizationWindowSeconds() *HPAScalingRulesApplyConfiguration {
-	b.fields.StabilizationWindowSeconds = nil
+	b.StabilizationWindowSeconds = nil
 	return b
 }
 
 // GetStabilizationWindowSeconds gets the StabilizationWindowSeconds field from the declarative configuration.
 func (b *HPAScalingRulesApplyConfiguration) GetStabilizationWindowSeconds() (value int32, ok bool) {
-	if v := b.fields.StabilizationWindowSeconds; v != nil {
+	if v := b.StabilizationWindowSeconds; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,19 +58,19 @@ func (b *HPAScalingRulesApplyConfiguration) GetStabilizationWindowSeconds() (val
 
 // SetSelectPolicy sets the SelectPolicy field in the declarative configuration to the given value.
 func (b *HPAScalingRulesApplyConfiguration) SetSelectPolicy(value v2beta2.ScalingPolicySelect) *HPAScalingRulesApplyConfiguration {
-	b.fields.SelectPolicy = &value
+	b.SelectPolicy = &value
 	return b
 }
 
 // RemoveSelectPolicy removes the SelectPolicy field from the declarative configuration.
 func (b *HPAScalingRulesApplyConfiguration) RemoveSelectPolicy() *HPAScalingRulesApplyConfiguration {
-	b.fields.SelectPolicy = nil
+	b.SelectPolicy = nil
 	return b
 }
 
 // GetSelectPolicy gets the SelectPolicy field from the declarative configuration.
 func (b *HPAScalingRulesApplyConfiguration) GetSelectPolicy() (value v2beta2.ScalingPolicySelect, ok bool) {
-	if v := b.fields.SelectPolicy; v != nil {
+	if v := b.SelectPolicy; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -90,64 +78,22 @@ func (b *HPAScalingRulesApplyConfiguration) GetSelectPolicy() (value v2beta2.Sca
 
 // SetPolicies sets the Policies field in the declarative configuration to the given value.
 func (b *HPAScalingRulesApplyConfiguration) SetPolicies(value HPAScalingPolicyList) *HPAScalingRulesApplyConfiguration {
-	b.fields.Policies = &value
+	b.Policies = &value
 	return b
 }
 
 // RemovePolicies removes the Policies field from the declarative configuration.
 func (b *HPAScalingRulesApplyConfiguration) RemovePolicies() *HPAScalingRulesApplyConfiguration {
-	b.fields.Policies = nil
+	b.Policies = nil
 	return b
 }
 
 // GetPolicies gets the Policies field from the declarative configuration.
 func (b *HPAScalingRulesApplyConfiguration) GetPolicies() (value HPAScalingPolicyList, ok bool) {
-	if v := b.fields.Policies; v != nil {
+	if v := b.Policies; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts HPAScalingRulesApplyConfiguration to unstructured.
-func (b *HPAScalingRulesApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to HPAScalingRulesApplyConfiguration, replacing the contents
-// of HPAScalingRulesApplyConfiguration.
-func (b *HPAScalingRulesApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &hPAScalingRulesFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals HPAScalingRulesApplyConfiguration to JSON.
-func (b *HPAScalingRulesApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into HPAScalingRulesApplyConfiguration, replacing the contents of
-// HPAScalingRulesApplyConfiguration.
-func (b *HPAScalingRulesApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // HPAScalingRulesList represents a listAlias of HPAScalingRulesApplyConfiguration.
@@ -155,8 +101,3 @@ type HPAScalingRulesList []*HPAScalingRulesApplyConfiguration
 
 // HPAScalingRulesList represents a map of HPAScalingRulesApplyConfiguration.
 type HPAScalingRulesMap map[string]HPAScalingRulesApplyConfiguration
-
-func (b *HPAScalingRulesApplyConfiguration) preMarshal() {
-}
-func (b *HPAScalingRulesApplyConfiguration) postUnmarshal() {
-}

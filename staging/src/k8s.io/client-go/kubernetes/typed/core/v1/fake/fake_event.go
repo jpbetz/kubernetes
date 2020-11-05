@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
@@ -133,7 +134,7 @@ func (c *FakeEvents) Patch(ctx context.Context, name string, pt types.PatchType,
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied event.
 func (c *FakeEvents) Apply(ctx context.Context, event *applyconfigurationscorev1.EventApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Event, err error) {
-	data, err := event.MarshalJSON()
+	data, err := json.Marshal(event)
 	if err != nil {
 		return nil, err
 	}

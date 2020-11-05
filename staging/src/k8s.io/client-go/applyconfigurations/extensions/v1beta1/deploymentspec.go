@@ -19,9 +19,6 @@ limitations under the License.
 package v1beta1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	corev1 "k8s.io/client-go/applyconfigurations/core/v1"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
@@ -29,21 +26,6 @@ import (
 // DeploymentSpecApplyConfiguration represents an declarative configuration of the DeploymentSpec type for use
 // with apply.
 type DeploymentSpecApplyConfiguration struct {
-	fields deploymentSpecFields
-}
-
-// DeploymentSpecApplyConfiguration constructs an declarative configuration of the DeploymentSpec type for use with
-// apply.
-func DeploymentSpec() *DeploymentSpecApplyConfiguration {
-	return &DeploymentSpecApplyConfiguration{}
-}
-
-// deploymentSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in DeploymentSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type deploymentSpecFields struct {
 	Replicas                *int32                                    `json:"replicas,omitempty"`
 	Selector                *v1.LabelSelectorApplyConfiguration       `json:"selector,omitempty"`
 	Template                *corev1.PodTemplateSpecApplyConfiguration `json:"template,omitempty"`
@@ -55,21 +37,27 @@ type deploymentSpecFields struct {
 	ProgressDeadlineSeconds *int32                                    `json:"progressDeadlineSeconds,omitempty"`
 }
 
+// DeploymentSpecApplyConfiguration constructs an declarative configuration of the DeploymentSpec type for use with
+// apply.
+func DeploymentSpec() *DeploymentSpecApplyConfiguration {
+	return &DeploymentSpecApplyConfiguration{}
+}
+
 // SetReplicas sets the Replicas field in the declarative configuration to the given value.
 func (b *DeploymentSpecApplyConfiguration) SetReplicas(value int32) *DeploymentSpecApplyConfiguration {
-	b.fields.Replicas = &value
+	b.Replicas = &value
 	return b
 }
 
 // RemoveReplicas removes the Replicas field from the declarative configuration.
 func (b *DeploymentSpecApplyConfiguration) RemoveReplicas() *DeploymentSpecApplyConfiguration {
-	b.fields.Replicas = nil
+	b.Replicas = nil
 	return b
 }
 
 // GetReplicas gets the Replicas field from the declarative configuration.
 func (b *DeploymentSpecApplyConfiguration) GetReplicas() (value int32, ok bool) {
-	if v := b.fields.Replicas; v != nil {
+	if v := b.Replicas; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -77,70 +65,70 @@ func (b *DeploymentSpecApplyConfiguration) GetReplicas() (value int32, ok bool) 
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
 func (b *DeploymentSpecApplyConfiguration) SetSelector(value *v1.LabelSelectorApplyConfiguration) *DeploymentSpecApplyConfiguration {
-	b.fields.Selector = value
+	b.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
 func (b *DeploymentSpecApplyConfiguration) RemoveSelector() *DeploymentSpecApplyConfiguration {
-	b.fields.Selector = nil
+	b.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
 func (b *DeploymentSpecApplyConfiguration) GetSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
-	return b.fields.Selector, b.fields.Selector != nil
+	return b.Selector, b.Selector != nil
 }
 
 // SetTemplate sets the Template field in the declarative configuration to the given value.
 func (b *DeploymentSpecApplyConfiguration) SetTemplate(value *corev1.PodTemplateSpecApplyConfiguration) *DeploymentSpecApplyConfiguration {
-	b.fields.Template = value
+	b.Template = value
 	return b
 }
 
 // RemoveTemplate removes the Template field from the declarative configuration.
 func (b *DeploymentSpecApplyConfiguration) RemoveTemplate() *DeploymentSpecApplyConfiguration {
-	b.fields.Template = nil
+	b.Template = nil
 	return b
 }
 
 // GetTemplate gets the Template field from the declarative configuration.
 func (b *DeploymentSpecApplyConfiguration) GetTemplate() (value *corev1.PodTemplateSpecApplyConfiguration, ok bool) {
-	return b.fields.Template, b.fields.Template != nil
+	return b.Template, b.Template != nil
 }
 
 // SetStrategy sets the Strategy field in the declarative configuration to the given value.
 func (b *DeploymentSpecApplyConfiguration) SetStrategy(value *DeploymentStrategyApplyConfiguration) *DeploymentSpecApplyConfiguration {
-	b.fields.Strategy = value
+	b.Strategy = value
 	return b
 }
 
 // RemoveStrategy removes the Strategy field from the declarative configuration.
 func (b *DeploymentSpecApplyConfiguration) RemoveStrategy() *DeploymentSpecApplyConfiguration {
-	b.fields.Strategy = nil
+	b.Strategy = nil
 	return b
 }
 
 // GetStrategy gets the Strategy field from the declarative configuration.
 func (b *DeploymentSpecApplyConfiguration) GetStrategy() (value *DeploymentStrategyApplyConfiguration, ok bool) {
-	return b.fields.Strategy, b.fields.Strategy != nil
+	return b.Strategy, b.Strategy != nil
 }
 
 // SetMinReadySeconds sets the MinReadySeconds field in the declarative configuration to the given value.
 func (b *DeploymentSpecApplyConfiguration) SetMinReadySeconds(value int32) *DeploymentSpecApplyConfiguration {
-	b.fields.MinReadySeconds = &value
+	b.MinReadySeconds = &value
 	return b
 }
 
 // RemoveMinReadySeconds removes the MinReadySeconds field from the declarative configuration.
 func (b *DeploymentSpecApplyConfiguration) RemoveMinReadySeconds() *DeploymentSpecApplyConfiguration {
-	b.fields.MinReadySeconds = nil
+	b.MinReadySeconds = nil
 	return b
 }
 
 // GetMinReadySeconds gets the MinReadySeconds field from the declarative configuration.
 func (b *DeploymentSpecApplyConfiguration) GetMinReadySeconds() (value int32, ok bool) {
-	if v := b.fields.MinReadySeconds; v != nil {
+	if v := b.MinReadySeconds; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -148,19 +136,19 @@ func (b *DeploymentSpecApplyConfiguration) GetMinReadySeconds() (value int32, ok
 
 // SetRevisionHistoryLimit sets the RevisionHistoryLimit field in the declarative configuration to the given value.
 func (b *DeploymentSpecApplyConfiguration) SetRevisionHistoryLimit(value int32) *DeploymentSpecApplyConfiguration {
-	b.fields.RevisionHistoryLimit = &value
+	b.RevisionHistoryLimit = &value
 	return b
 }
 
 // RemoveRevisionHistoryLimit removes the RevisionHistoryLimit field from the declarative configuration.
 func (b *DeploymentSpecApplyConfiguration) RemoveRevisionHistoryLimit() *DeploymentSpecApplyConfiguration {
-	b.fields.RevisionHistoryLimit = nil
+	b.RevisionHistoryLimit = nil
 	return b
 }
 
 // GetRevisionHistoryLimit gets the RevisionHistoryLimit field from the declarative configuration.
 func (b *DeploymentSpecApplyConfiguration) GetRevisionHistoryLimit() (value int32, ok bool) {
-	if v := b.fields.RevisionHistoryLimit; v != nil {
+	if v := b.RevisionHistoryLimit; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -168,19 +156,19 @@ func (b *DeploymentSpecApplyConfiguration) GetRevisionHistoryLimit() (value int3
 
 // SetPaused sets the Paused field in the declarative configuration to the given value.
 func (b *DeploymentSpecApplyConfiguration) SetPaused(value bool) *DeploymentSpecApplyConfiguration {
-	b.fields.Paused = &value
+	b.Paused = &value
 	return b
 }
 
 // RemovePaused removes the Paused field from the declarative configuration.
 func (b *DeploymentSpecApplyConfiguration) RemovePaused() *DeploymentSpecApplyConfiguration {
-	b.fields.Paused = nil
+	b.Paused = nil
 	return b
 }
 
 // GetPaused gets the Paused field from the declarative configuration.
 func (b *DeploymentSpecApplyConfiguration) GetPaused() (value bool, ok bool) {
-	if v := b.fields.Paused; v != nil {
+	if v := b.Paused; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -188,81 +176,39 @@ func (b *DeploymentSpecApplyConfiguration) GetPaused() (value bool, ok bool) {
 
 // SetRollbackTo sets the RollbackTo field in the declarative configuration to the given value.
 func (b *DeploymentSpecApplyConfiguration) SetRollbackTo(value *RollbackConfigApplyConfiguration) *DeploymentSpecApplyConfiguration {
-	b.fields.RollbackTo = value
+	b.RollbackTo = value
 	return b
 }
 
 // RemoveRollbackTo removes the RollbackTo field from the declarative configuration.
 func (b *DeploymentSpecApplyConfiguration) RemoveRollbackTo() *DeploymentSpecApplyConfiguration {
-	b.fields.RollbackTo = nil
+	b.RollbackTo = nil
 	return b
 }
 
 // GetRollbackTo gets the RollbackTo field from the declarative configuration.
 func (b *DeploymentSpecApplyConfiguration) GetRollbackTo() (value *RollbackConfigApplyConfiguration, ok bool) {
-	return b.fields.RollbackTo, b.fields.RollbackTo != nil
+	return b.RollbackTo, b.RollbackTo != nil
 }
 
 // SetProgressDeadlineSeconds sets the ProgressDeadlineSeconds field in the declarative configuration to the given value.
 func (b *DeploymentSpecApplyConfiguration) SetProgressDeadlineSeconds(value int32) *DeploymentSpecApplyConfiguration {
-	b.fields.ProgressDeadlineSeconds = &value
+	b.ProgressDeadlineSeconds = &value
 	return b
 }
 
 // RemoveProgressDeadlineSeconds removes the ProgressDeadlineSeconds field from the declarative configuration.
 func (b *DeploymentSpecApplyConfiguration) RemoveProgressDeadlineSeconds() *DeploymentSpecApplyConfiguration {
-	b.fields.ProgressDeadlineSeconds = nil
+	b.ProgressDeadlineSeconds = nil
 	return b
 }
 
 // GetProgressDeadlineSeconds gets the ProgressDeadlineSeconds field from the declarative configuration.
 func (b *DeploymentSpecApplyConfiguration) GetProgressDeadlineSeconds() (value int32, ok bool) {
-	if v := b.fields.ProgressDeadlineSeconds; v != nil {
+	if v := b.ProgressDeadlineSeconds; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts DeploymentSpecApplyConfiguration to unstructured.
-func (b *DeploymentSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to DeploymentSpecApplyConfiguration, replacing the contents
-// of DeploymentSpecApplyConfiguration.
-func (b *DeploymentSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &deploymentSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals DeploymentSpecApplyConfiguration to JSON.
-func (b *DeploymentSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into DeploymentSpecApplyConfiguration, replacing the contents of
-// DeploymentSpecApplyConfiguration.
-func (b *DeploymentSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // DeploymentSpecList represents a listAlias of DeploymentSpecApplyConfiguration.
@@ -270,8 +216,3 @@ type DeploymentSpecList []*DeploymentSpecApplyConfiguration
 
 // DeploymentSpecList represents a map of DeploymentSpecApplyConfiguration.
 type DeploymentSpecMap map[string]DeploymentSpecApplyConfiguration
-
-func (b *DeploymentSpecApplyConfiguration) preMarshal() {
-}
-func (b *DeploymentSpecApplyConfiguration) postUnmarshal() {
-}

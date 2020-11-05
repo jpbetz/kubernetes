@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -173,7 +174,7 @@ func (c *mutatingWebhookConfigurations) Patch(ctx context.Context, name string, 
 // Apply takes the given apply declarative configuration, applies it and returns the applied mutatingWebhookConfiguration.
 func (c *mutatingWebhookConfigurations) Apply(ctx context.Context, mutatingWebhookConfiguration *admissionregistrationv1.MutatingWebhookConfigurationApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.MutatingWebhookConfiguration, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := mutatingWebhookConfiguration.MarshalJSON()
+	data, err := json.Marshal(mutatingWebhookConfiguration)
 	if err != nil {
 		return nil, err
 	}

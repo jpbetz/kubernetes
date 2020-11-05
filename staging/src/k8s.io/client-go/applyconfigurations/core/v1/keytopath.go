@@ -18,16 +18,12 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // KeyToPathApplyConfiguration represents an declarative configuration of the KeyToPath type for use
 // with apply.
 type KeyToPathApplyConfiguration struct {
-	fields keyToPathFields
+	Key  *string `json:"key,omitempty"`
+	Path *string `json:"path,omitempty"`
+	Mode *int32  `json:"mode,omitempty"`
 }
 
 // KeyToPathApplyConfiguration constructs an declarative configuration of the KeyToPath type for use with
@@ -36,32 +32,21 @@ func KeyToPath() *KeyToPathApplyConfiguration {
 	return &KeyToPathApplyConfiguration{}
 }
 
-// keyToPathFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in KeyToPathApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type keyToPathFields struct {
-	Key  *string `json:"key,omitempty"`
-	Path *string `json:"path,omitempty"`
-	Mode *int32  `json:"mode,omitempty"`
-}
-
 // SetKey sets the Key field in the declarative configuration to the given value.
 func (b *KeyToPathApplyConfiguration) SetKey(value string) *KeyToPathApplyConfiguration {
-	b.fields.Key = &value
+	b.Key = &value
 	return b
 }
 
 // RemoveKey removes the Key field from the declarative configuration.
 func (b *KeyToPathApplyConfiguration) RemoveKey() *KeyToPathApplyConfiguration {
-	b.fields.Key = nil
+	b.Key = nil
 	return b
 }
 
 // GetKey gets the Key field from the declarative configuration.
 func (b *KeyToPathApplyConfiguration) GetKey() (value string, ok bool) {
-	if v := b.fields.Key; v != nil {
+	if v := b.Key; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,19 +54,19 @@ func (b *KeyToPathApplyConfiguration) GetKey() (value string, ok bool) {
 
 // SetPath sets the Path field in the declarative configuration to the given value.
 func (b *KeyToPathApplyConfiguration) SetPath(value string) *KeyToPathApplyConfiguration {
-	b.fields.Path = &value
+	b.Path = &value
 	return b
 }
 
 // RemovePath removes the Path field from the declarative configuration.
 func (b *KeyToPathApplyConfiguration) RemovePath() *KeyToPathApplyConfiguration {
-	b.fields.Path = nil
+	b.Path = nil
 	return b
 }
 
 // GetPath gets the Path field from the declarative configuration.
 func (b *KeyToPathApplyConfiguration) GetPath() (value string, ok bool) {
-	if v := b.fields.Path; v != nil {
+	if v := b.Path; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -89,64 +74,22 @@ func (b *KeyToPathApplyConfiguration) GetPath() (value string, ok bool) {
 
 // SetMode sets the Mode field in the declarative configuration to the given value.
 func (b *KeyToPathApplyConfiguration) SetMode(value int32) *KeyToPathApplyConfiguration {
-	b.fields.Mode = &value
+	b.Mode = &value
 	return b
 }
 
 // RemoveMode removes the Mode field from the declarative configuration.
 func (b *KeyToPathApplyConfiguration) RemoveMode() *KeyToPathApplyConfiguration {
-	b.fields.Mode = nil
+	b.Mode = nil
 	return b
 }
 
 // GetMode gets the Mode field from the declarative configuration.
 func (b *KeyToPathApplyConfiguration) GetMode() (value int32, ok bool) {
-	if v := b.fields.Mode; v != nil {
+	if v := b.Mode; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts KeyToPathApplyConfiguration to unstructured.
-func (b *KeyToPathApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to KeyToPathApplyConfiguration, replacing the contents
-// of KeyToPathApplyConfiguration.
-func (b *KeyToPathApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &keyToPathFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals KeyToPathApplyConfiguration to JSON.
-func (b *KeyToPathApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into KeyToPathApplyConfiguration, replacing the contents of
-// KeyToPathApplyConfiguration.
-func (b *KeyToPathApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // KeyToPathList represents a listAlias of KeyToPathApplyConfiguration.
@@ -154,8 +97,3 @@ type KeyToPathList []*KeyToPathApplyConfiguration
 
 // KeyToPathList represents a map of KeyToPathApplyConfiguration.
 type KeyToPathMap map[string]KeyToPathApplyConfiguration
-
-func (b *KeyToPathApplyConfiguration) preMarshal() {
-}
-func (b *KeyToPathApplyConfiguration) postUnmarshal() {
-}

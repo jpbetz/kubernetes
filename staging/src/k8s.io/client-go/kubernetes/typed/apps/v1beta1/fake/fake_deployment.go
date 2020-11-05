@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	v1beta1 "k8s.io/api/apps/v1beta1"
@@ -145,7 +146,7 @@ func (c *FakeDeployments) Patch(ctx context.Context, name string, pt types.Patch
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied deployment.
 func (c *FakeDeployments) Apply(ctx context.Context, deployment *appsv1beta1.DeploymentApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.Deployment, err error) {
-	data, err := deployment.MarshalJSON()
+	data, err := json.Marshal(deployment)
 	if err != nil {
 		return nil, err
 	}

@@ -18,16 +18,13 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // HorizontalPodAutoscalerSpecApplyConfiguration represents an declarative configuration of the HorizontalPodAutoscalerSpec type for use
 // with apply.
 type HorizontalPodAutoscalerSpecApplyConfiguration struct {
-	fields horizontalPodAutoscalerSpecFields
+	ScaleTargetRef                 *CrossVersionObjectReferenceApplyConfiguration `json:"scaleTargetRef,omitempty"`
+	MinReplicas                    *int32                                         `json:"minReplicas,omitempty"`
+	MaxReplicas                    *int32                                         `json:"maxReplicas,omitempty"`
+	TargetCPUUtilizationPercentage *int32                                         `json:"targetCPUUtilizationPercentage,omitempty"`
 }
 
 // HorizontalPodAutoscalerSpecApplyConfiguration constructs an declarative configuration of the HorizontalPodAutoscalerSpec type for use with
@@ -36,50 +33,38 @@ func HorizontalPodAutoscalerSpec() *HorizontalPodAutoscalerSpecApplyConfiguratio
 	return &HorizontalPodAutoscalerSpecApplyConfiguration{}
 }
 
-// horizontalPodAutoscalerSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in HorizontalPodAutoscalerSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type horizontalPodAutoscalerSpecFields struct {
-	ScaleTargetRef                 *CrossVersionObjectReferenceApplyConfiguration `json:"scaleTargetRef,omitempty"`
-	MinReplicas                    *int32                                         `json:"minReplicas,omitempty"`
-	MaxReplicas                    *int32                                         `json:"maxReplicas,omitempty"`
-	TargetCPUUtilizationPercentage *int32                                         `json:"targetCPUUtilizationPercentage,omitempty"`
-}
-
 // SetScaleTargetRef sets the ScaleTargetRef field in the declarative configuration to the given value.
 func (b *HorizontalPodAutoscalerSpecApplyConfiguration) SetScaleTargetRef(value *CrossVersionObjectReferenceApplyConfiguration) *HorizontalPodAutoscalerSpecApplyConfiguration {
-	b.fields.ScaleTargetRef = value
+	b.ScaleTargetRef = value
 	return b
 }
 
 // RemoveScaleTargetRef removes the ScaleTargetRef field from the declarative configuration.
 func (b *HorizontalPodAutoscalerSpecApplyConfiguration) RemoveScaleTargetRef() *HorizontalPodAutoscalerSpecApplyConfiguration {
-	b.fields.ScaleTargetRef = nil
+	b.ScaleTargetRef = nil
 	return b
 }
 
 // GetScaleTargetRef gets the ScaleTargetRef field from the declarative configuration.
 func (b *HorizontalPodAutoscalerSpecApplyConfiguration) GetScaleTargetRef() (value *CrossVersionObjectReferenceApplyConfiguration, ok bool) {
-	return b.fields.ScaleTargetRef, b.fields.ScaleTargetRef != nil
+	return b.ScaleTargetRef, b.ScaleTargetRef != nil
 }
 
 // SetMinReplicas sets the MinReplicas field in the declarative configuration to the given value.
 func (b *HorizontalPodAutoscalerSpecApplyConfiguration) SetMinReplicas(value int32) *HorizontalPodAutoscalerSpecApplyConfiguration {
-	b.fields.MinReplicas = &value
+	b.MinReplicas = &value
 	return b
 }
 
 // RemoveMinReplicas removes the MinReplicas field from the declarative configuration.
 func (b *HorizontalPodAutoscalerSpecApplyConfiguration) RemoveMinReplicas() *HorizontalPodAutoscalerSpecApplyConfiguration {
-	b.fields.MinReplicas = nil
+	b.MinReplicas = nil
 	return b
 }
 
 // GetMinReplicas gets the MinReplicas field from the declarative configuration.
 func (b *HorizontalPodAutoscalerSpecApplyConfiguration) GetMinReplicas() (value int32, ok bool) {
-	if v := b.fields.MinReplicas; v != nil {
+	if v := b.MinReplicas; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -87,19 +72,19 @@ func (b *HorizontalPodAutoscalerSpecApplyConfiguration) GetMinReplicas() (value 
 
 // SetMaxReplicas sets the MaxReplicas field in the declarative configuration to the given value.
 func (b *HorizontalPodAutoscalerSpecApplyConfiguration) SetMaxReplicas(value int32) *HorizontalPodAutoscalerSpecApplyConfiguration {
-	b.fields.MaxReplicas = &value
+	b.MaxReplicas = &value
 	return b
 }
 
 // RemoveMaxReplicas removes the MaxReplicas field from the declarative configuration.
 func (b *HorizontalPodAutoscalerSpecApplyConfiguration) RemoveMaxReplicas() *HorizontalPodAutoscalerSpecApplyConfiguration {
-	b.fields.MaxReplicas = nil
+	b.MaxReplicas = nil
 	return b
 }
 
 // GetMaxReplicas gets the MaxReplicas field from the declarative configuration.
 func (b *HorizontalPodAutoscalerSpecApplyConfiguration) GetMaxReplicas() (value int32, ok bool) {
-	if v := b.fields.MaxReplicas; v != nil {
+	if v := b.MaxReplicas; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -107,64 +92,22 @@ func (b *HorizontalPodAutoscalerSpecApplyConfiguration) GetMaxReplicas() (value 
 
 // SetTargetCPUUtilizationPercentage sets the TargetCPUUtilizationPercentage field in the declarative configuration to the given value.
 func (b *HorizontalPodAutoscalerSpecApplyConfiguration) SetTargetCPUUtilizationPercentage(value int32) *HorizontalPodAutoscalerSpecApplyConfiguration {
-	b.fields.TargetCPUUtilizationPercentage = &value
+	b.TargetCPUUtilizationPercentage = &value
 	return b
 }
 
 // RemoveTargetCPUUtilizationPercentage removes the TargetCPUUtilizationPercentage field from the declarative configuration.
 func (b *HorizontalPodAutoscalerSpecApplyConfiguration) RemoveTargetCPUUtilizationPercentage() *HorizontalPodAutoscalerSpecApplyConfiguration {
-	b.fields.TargetCPUUtilizationPercentage = nil
+	b.TargetCPUUtilizationPercentage = nil
 	return b
 }
 
 // GetTargetCPUUtilizationPercentage gets the TargetCPUUtilizationPercentage field from the declarative configuration.
 func (b *HorizontalPodAutoscalerSpecApplyConfiguration) GetTargetCPUUtilizationPercentage() (value int32, ok bool) {
-	if v := b.fields.TargetCPUUtilizationPercentage; v != nil {
+	if v := b.TargetCPUUtilizationPercentage; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts HorizontalPodAutoscalerSpecApplyConfiguration to unstructured.
-func (b *HorizontalPodAutoscalerSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to HorizontalPodAutoscalerSpecApplyConfiguration, replacing the contents
-// of HorizontalPodAutoscalerSpecApplyConfiguration.
-func (b *HorizontalPodAutoscalerSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &horizontalPodAutoscalerSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals HorizontalPodAutoscalerSpecApplyConfiguration to JSON.
-func (b *HorizontalPodAutoscalerSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into HorizontalPodAutoscalerSpecApplyConfiguration, replacing the contents of
-// HorizontalPodAutoscalerSpecApplyConfiguration.
-func (b *HorizontalPodAutoscalerSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // HorizontalPodAutoscalerSpecList represents a listAlias of HorizontalPodAutoscalerSpecApplyConfiguration.
@@ -172,8 +115,3 @@ type HorizontalPodAutoscalerSpecList []*HorizontalPodAutoscalerSpecApplyConfigur
 
 // HorizontalPodAutoscalerSpecList represents a map of HorizontalPodAutoscalerSpecApplyConfiguration.
 type HorizontalPodAutoscalerSpecMap map[string]HorizontalPodAutoscalerSpecApplyConfiguration
-
-func (b *HorizontalPodAutoscalerSpecApplyConfiguration) preMarshal() {
-}
-func (b *HorizontalPodAutoscalerSpecApplyConfiguration) postUnmarshal() {
-}

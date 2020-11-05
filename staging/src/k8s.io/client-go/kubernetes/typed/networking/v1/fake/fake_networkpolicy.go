@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	networkingv1 "k8s.io/api/networking/v1"
@@ -133,7 +134,7 @@ func (c *FakeNetworkPolicies) Patch(ctx context.Context, name string, pt types.P
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied networkPolicy.
 func (c *FakeNetworkPolicies) Apply(ctx context.Context, networkPolicy *applyconfigurationsnetworkingv1.NetworkPolicyApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *networkingv1.NetworkPolicy, err error) {
-	data, err := networkPolicy.MarshalJSON()
+	data, err := json.Marshal(networkPolicy)
 	if err != nil {
 		return nil, err
 	}

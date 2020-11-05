@@ -18,16 +18,13 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // TokenReviewStatusApplyConfiguration represents an declarative configuration of the TokenReviewStatus type for use
 // with apply.
 type TokenReviewStatusApplyConfiguration struct {
-	fields tokenReviewStatusFields
+	Authenticated *bool                       `json:"authenticated,omitempty"`
+	User          *UserInfoApplyConfiguration `json:"user,omitempty"`
+	Audiences     *[]string                   `json:"audiences,omitempty"`
+	Error         *string                     `json:"error,omitempty"`
 }
 
 // TokenReviewStatusApplyConfiguration constructs an declarative configuration of the TokenReviewStatus type for use with
@@ -36,33 +33,21 @@ func TokenReviewStatus() *TokenReviewStatusApplyConfiguration {
 	return &TokenReviewStatusApplyConfiguration{}
 }
 
-// tokenReviewStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in TokenReviewStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type tokenReviewStatusFields struct {
-	Authenticated *bool                       `json:"authenticated,omitempty"`
-	User          *UserInfoApplyConfiguration `json:"user,omitempty"`
-	Audiences     *[]string                   `json:"audiences,omitempty"`
-	Error         *string                     `json:"error,omitempty"`
-}
-
 // SetAuthenticated sets the Authenticated field in the declarative configuration to the given value.
 func (b *TokenReviewStatusApplyConfiguration) SetAuthenticated(value bool) *TokenReviewStatusApplyConfiguration {
-	b.fields.Authenticated = &value
+	b.Authenticated = &value
 	return b
 }
 
 // RemoveAuthenticated removes the Authenticated field from the declarative configuration.
 func (b *TokenReviewStatusApplyConfiguration) RemoveAuthenticated() *TokenReviewStatusApplyConfiguration {
-	b.fields.Authenticated = nil
+	b.Authenticated = nil
 	return b
 }
 
 // GetAuthenticated gets the Authenticated field from the declarative configuration.
 func (b *TokenReviewStatusApplyConfiguration) GetAuthenticated() (value bool, ok bool) {
-	if v := b.fields.Authenticated; v != nil {
+	if v := b.Authenticated; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,36 +55,36 @@ func (b *TokenReviewStatusApplyConfiguration) GetAuthenticated() (value bool, ok
 
 // SetUser sets the User field in the declarative configuration to the given value.
 func (b *TokenReviewStatusApplyConfiguration) SetUser(value *UserInfoApplyConfiguration) *TokenReviewStatusApplyConfiguration {
-	b.fields.User = value
+	b.User = value
 	return b
 }
 
 // RemoveUser removes the User field from the declarative configuration.
 func (b *TokenReviewStatusApplyConfiguration) RemoveUser() *TokenReviewStatusApplyConfiguration {
-	b.fields.User = nil
+	b.User = nil
 	return b
 }
 
 // GetUser gets the User field from the declarative configuration.
 func (b *TokenReviewStatusApplyConfiguration) GetUser() (value *UserInfoApplyConfiguration, ok bool) {
-	return b.fields.User, b.fields.User != nil
+	return b.User, b.User != nil
 }
 
 // SetAudiences sets the Audiences field in the declarative configuration to the given value.
 func (b *TokenReviewStatusApplyConfiguration) SetAudiences(value []string) *TokenReviewStatusApplyConfiguration {
-	b.fields.Audiences = &value
+	b.Audiences = &value
 	return b
 }
 
 // RemoveAudiences removes the Audiences field from the declarative configuration.
 func (b *TokenReviewStatusApplyConfiguration) RemoveAudiences() *TokenReviewStatusApplyConfiguration {
-	b.fields.Audiences = nil
+	b.Audiences = nil
 	return b
 }
 
 // GetAudiences gets the Audiences field from the declarative configuration.
 func (b *TokenReviewStatusApplyConfiguration) GetAudiences() (value []string, ok bool) {
-	if v := b.fields.Audiences; v != nil {
+	if v := b.Audiences; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -107,64 +92,22 @@ func (b *TokenReviewStatusApplyConfiguration) GetAudiences() (value []string, ok
 
 // SetError sets the Error field in the declarative configuration to the given value.
 func (b *TokenReviewStatusApplyConfiguration) SetError(value string) *TokenReviewStatusApplyConfiguration {
-	b.fields.Error = &value
+	b.Error = &value
 	return b
 }
 
 // RemoveError removes the Error field from the declarative configuration.
 func (b *TokenReviewStatusApplyConfiguration) RemoveError() *TokenReviewStatusApplyConfiguration {
-	b.fields.Error = nil
+	b.Error = nil
 	return b
 }
 
 // GetError gets the Error field from the declarative configuration.
 func (b *TokenReviewStatusApplyConfiguration) GetError() (value string, ok bool) {
-	if v := b.fields.Error; v != nil {
+	if v := b.Error; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts TokenReviewStatusApplyConfiguration to unstructured.
-func (b *TokenReviewStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to TokenReviewStatusApplyConfiguration, replacing the contents
-// of TokenReviewStatusApplyConfiguration.
-func (b *TokenReviewStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &tokenReviewStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals TokenReviewStatusApplyConfiguration to JSON.
-func (b *TokenReviewStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into TokenReviewStatusApplyConfiguration, replacing the contents of
-// TokenReviewStatusApplyConfiguration.
-func (b *TokenReviewStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // TokenReviewStatusList represents a listAlias of TokenReviewStatusApplyConfiguration.
@@ -172,8 +115,3 @@ type TokenReviewStatusList []*TokenReviewStatusApplyConfiguration
 
 // TokenReviewStatusList represents a map of TokenReviewStatusApplyConfiguration.
 type TokenReviewStatusMap map[string]TokenReviewStatusApplyConfiguration
-
-func (b *TokenReviewStatusApplyConfiguration) preMarshal() {
-}
-func (b *TokenReviewStatusApplyConfiguration) postUnmarshal() {
-}

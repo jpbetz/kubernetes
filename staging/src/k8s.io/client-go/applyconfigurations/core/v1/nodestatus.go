@@ -19,30 +19,12 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // NodeStatusApplyConfiguration represents an declarative configuration of the NodeStatus type for use
 // with apply.
 type NodeStatusApplyConfiguration struct {
-	fields nodeStatusFields
-}
-
-// NodeStatusApplyConfiguration constructs an declarative configuration of the NodeStatus type for use with
-// apply.
-func NodeStatus() *NodeStatusApplyConfiguration {
-	return &NodeStatusApplyConfiguration{}
-}
-
-// nodeStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NodeStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type nodeStatusFields struct {
 	Capacity        *v1.ResourceList                       `json:"capacity,omitempty"`
 	Allocatable     *v1.ResourceList                       `json:"allocatable,omitempty"`
 	Phase           *v1.NodePhase                          `json:"phase,omitempty"`
@@ -56,21 +38,27 @@ type nodeStatusFields struct {
 	Config          *NodeConfigStatusApplyConfiguration    `json:"config,omitempty"`
 }
 
+// NodeStatusApplyConfiguration constructs an declarative configuration of the NodeStatus type for use with
+// apply.
+func NodeStatus() *NodeStatusApplyConfiguration {
+	return &NodeStatusApplyConfiguration{}
+}
+
 // SetCapacity sets the Capacity field in the declarative configuration to the given value.
 func (b *NodeStatusApplyConfiguration) SetCapacity(value v1.ResourceList) *NodeStatusApplyConfiguration {
-	b.fields.Capacity = &value
+	b.Capacity = &value
 	return b
 }
 
 // RemoveCapacity removes the Capacity field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) RemoveCapacity() *NodeStatusApplyConfiguration {
-	b.fields.Capacity = nil
+	b.Capacity = nil
 	return b
 }
 
 // GetCapacity gets the Capacity field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) GetCapacity() (value v1.ResourceList, ok bool) {
-	if v := b.fields.Capacity; v != nil {
+	if v := b.Capacity; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -78,19 +66,19 @@ func (b *NodeStatusApplyConfiguration) GetCapacity() (value v1.ResourceList, ok 
 
 // SetAllocatable sets the Allocatable field in the declarative configuration to the given value.
 func (b *NodeStatusApplyConfiguration) SetAllocatable(value v1.ResourceList) *NodeStatusApplyConfiguration {
-	b.fields.Allocatable = &value
+	b.Allocatable = &value
 	return b
 }
 
 // RemoveAllocatable removes the Allocatable field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) RemoveAllocatable() *NodeStatusApplyConfiguration {
-	b.fields.Allocatable = nil
+	b.Allocatable = nil
 	return b
 }
 
 // GetAllocatable gets the Allocatable field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) GetAllocatable() (value v1.ResourceList, ok bool) {
-	if v := b.fields.Allocatable; v != nil {
+	if v := b.Allocatable; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -98,19 +86,19 @@ func (b *NodeStatusApplyConfiguration) GetAllocatable() (value v1.ResourceList, 
 
 // SetPhase sets the Phase field in the declarative configuration to the given value.
 func (b *NodeStatusApplyConfiguration) SetPhase(value v1.NodePhase) *NodeStatusApplyConfiguration {
-	b.fields.Phase = &value
+	b.Phase = &value
 	return b
 }
 
 // RemovePhase removes the Phase field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) RemovePhase() *NodeStatusApplyConfiguration {
-	b.fields.Phase = nil
+	b.Phase = nil
 	return b
 }
 
 // GetPhase gets the Phase field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) GetPhase() (value v1.NodePhase, ok bool) {
-	if v := b.fields.Phase; v != nil {
+	if v := b.Phase; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -118,19 +106,19 @@ func (b *NodeStatusApplyConfiguration) GetPhase() (value v1.NodePhase, ok bool) 
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
 func (b *NodeStatusApplyConfiguration) SetConditions(value NodeConditionList) *NodeStatusApplyConfiguration {
-	b.fields.Conditions = &value
+	b.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) RemoveConditions() *NodeStatusApplyConfiguration {
-	b.fields.Conditions = nil
+	b.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) GetConditions() (value NodeConditionList, ok bool) {
-	if v := b.fields.Conditions; v != nil {
+	if v := b.Conditions; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -138,19 +126,19 @@ func (b *NodeStatusApplyConfiguration) GetConditions() (value NodeConditionList,
 
 // SetAddresses sets the Addresses field in the declarative configuration to the given value.
 func (b *NodeStatusApplyConfiguration) SetAddresses(value NodeAddressList) *NodeStatusApplyConfiguration {
-	b.fields.Addresses = &value
+	b.Addresses = &value
 	return b
 }
 
 // RemoveAddresses removes the Addresses field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) RemoveAddresses() *NodeStatusApplyConfiguration {
-	b.fields.Addresses = nil
+	b.Addresses = nil
 	return b
 }
 
 // GetAddresses gets the Addresses field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) GetAddresses() (value NodeAddressList, ok bool) {
-	if v := b.fields.Addresses; v != nil {
+	if v := b.Addresses; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -158,53 +146,53 @@ func (b *NodeStatusApplyConfiguration) GetAddresses() (value NodeAddressList, ok
 
 // SetDaemonEndpoints sets the DaemonEndpoints field in the declarative configuration to the given value.
 func (b *NodeStatusApplyConfiguration) SetDaemonEndpoints(value *NodeDaemonEndpointsApplyConfiguration) *NodeStatusApplyConfiguration {
-	b.fields.DaemonEndpoints = value
+	b.DaemonEndpoints = value
 	return b
 }
 
 // RemoveDaemonEndpoints removes the DaemonEndpoints field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) RemoveDaemonEndpoints() *NodeStatusApplyConfiguration {
-	b.fields.DaemonEndpoints = nil
+	b.DaemonEndpoints = nil
 	return b
 }
 
 // GetDaemonEndpoints gets the DaemonEndpoints field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) GetDaemonEndpoints() (value *NodeDaemonEndpointsApplyConfiguration, ok bool) {
-	return b.fields.DaemonEndpoints, b.fields.DaemonEndpoints != nil
+	return b.DaemonEndpoints, b.DaemonEndpoints != nil
 }
 
 // SetNodeInfo sets the NodeInfo field in the declarative configuration to the given value.
 func (b *NodeStatusApplyConfiguration) SetNodeInfo(value *NodeSystemInfoApplyConfiguration) *NodeStatusApplyConfiguration {
-	b.fields.NodeInfo = value
+	b.NodeInfo = value
 	return b
 }
 
 // RemoveNodeInfo removes the NodeInfo field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) RemoveNodeInfo() *NodeStatusApplyConfiguration {
-	b.fields.NodeInfo = nil
+	b.NodeInfo = nil
 	return b
 }
 
 // GetNodeInfo gets the NodeInfo field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) GetNodeInfo() (value *NodeSystemInfoApplyConfiguration, ok bool) {
-	return b.fields.NodeInfo, b.fields.NodeInfo != nil
+	return b.NodeInfo, b.NodeInfo != nil
 }
 
 // SetImages sets the Images field in the declarative configuration to the given value.
 func (b *NodeStatusApplyConfiguration) SetImages(value ContainerImageList) *NodeStatusApplyConfiguration {
-	b.fields.Images = &value
+	b.Images = &value
 	return b
 }
 
 // RemoveImages removes the Images field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) RemoveImages() *NodeStatusApplyConfiguration {
-	b.fields.Images = nil
+	b.Images = nil
 	return b
 }
 
 // GetImages gets the Images field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) GetImages() (value ContainerImageList, ok bool) {
-	if v := b.fields.Images; v != nil {
+	if v := b.Images; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -212,19 +200,19 @@ func (b *NodeStatusApplyConfiguration) GetImages() (value ContainerImageList, ok
 
 // SetVolumesInUse sets the VolumesInUse field in the declarative configuration to the given value.
 func (b *NodeStatusApplyConfiguration) SetVolumesInUse(value []v1.UniqueVolumeName) *NodeStatusApplyConfiguration {
-	b.fields.VolumesInUse = &value
+	b.VolumesInUse = &value
 	return b
 }
 
 // RemoveVolumesInUse removes the VolumesInUse field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) RemoveVolumesInUse() *NodeStatusApplyConfiguration {
-	b.fields.VolumesInUse = nil
+	b.VolumesInUse = nil
 	return b
 }
 
 // GetVolumesInUse gets the VolumesInUse field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) GetVolumesInUse() (value []v1.UniqueVolumeName, ok bool) {
-	if v := b.fields.VolumesInUse; v != nil {
+	if v := b.VolumesInUse; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -232,19 +220,19 @@ func (b *NodeStatusApplyConfiguration) GetVolumesInUse() (value []v1.UniqueVolum
 
 // SetVolumesAttached sets the VolumesAttached field in the declarative configuration to the given value.
 func (b *NodeStatusApplyConfiguration) SetVolumesAttached(value AttachedVolumeList) *NodeStatusApplyConfiguration {
-	b.fields.VolumesAttached = &value
+	b.VolumesAttached = &value
 	return b
 }
 
 // RemoveVolumesAttached removes the VolumesAttached field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) RemoveVolumesAttached() *NodeStatusApplyConfiguration {
-	b.fields.VolumesAttached = nil
+	b.VolumesAttached = nil
 	return b
 }
 
 // GetVolumesAttached gets the VolumesAttached field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) GetVolumesAttached() (value AttachedVolumeList, ok bool) {
-	if v := b.fields.VolumesAttached; v != nil {
+	if v := b.VolumesAttached; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -252,61 +240,19 @@ func (b *NodeStatusApplyConfiguration) GetVolumesAttached() (value AttachedVolum
 
 // SetConfig sets the Config field in the declarative configuration to the given value.
 func (b *NodeStatusApplyConfiguration) SetConfig(value *NodeConfigStatusApplyConfiguration) *NodeStatusApplyConfiguration {
-	b.fields.Config = value
+	b.Config = value
 	return b
 }
 
 // RemoveConfig removes the Config field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) RemoveConfig() *NodeStatusApplyConfiguration {
-	b.fields.Config = nil
+	b.Config = nil
 	return b
 }
 
 // GetConfig gets the Config field from the declarative configuration.
 func (b *NodeStatusApplyConfiguration) GetConfig() (value *NodeConfigStatusApplyConfiguration, ok bool) {
-	return b.fields.Config, b.fields.Config != nil
-}
-
-// ToUnstructured converts NodeStatusApplyConfiguration to unstructured.
-func (b *NodeStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to NodeStatusApplyConfiguration, replacing the contents
-// of NodeStatusApplyConfiguration.
-func (b *NodeStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &nodeStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals NodeStatusApplyConfiguration to JSON.
-func (b *NodeStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into NodeStatusApplyConfiguration, replacing the contents of
-// NodeStatusApplyConfiguration.
-func (b *NodeStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Config, b.Config != nil
 }
 
 // NodeStatusList represents a listAlias of NodeStatusApplyConfiguration.
@@ -314,8 +260,3 @@ type NodeStatusList []*NodeStatusApplyConfiguration
 
 // NodeStatusList represents a map of NodeStatusApplyConfiguration.
 type NodeStatusMap map[string]NodeStatusApplyConfiguration
-
-func (b *NodeStatusApplyConfiguration) preMarshal() {
-}
-func (b *NodeStatusApplyConfiguration) postUnmarshal() {
-}

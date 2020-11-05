@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // PriorityLevelConfigurationStatusApplyConfiguration represents an declarative configuration of the PriorityLevelConfigurationStatus type for use
 // with apply.
 type PriorityLevelConfigurationStatusApplyConfiguration struct {
-	fields priorityLevelConfigurationStatusFields
+	Conditions *PriorityLevelConfigurationConditionList `json:"conditions,omitempty"`
 }
 
 // PriorityLevelConfigurationStatusApplyConfiguration constructs an declarative configuration of the PriorityLevelConfigurationStatus type for use with
@@ -36,75 +30,24 @@ func PriorityLevelConfigurationStatus() *PriorityLevelConfigurationStatusApplyCo
 	return &PriorityLevelConfigurationStatusApplyConfiguration{}
 }
 
-// priorityLevelConfigurationStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PriorityLevelConfigurationStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type priorityLevelConfigurationStatusFields struct {
-	Conditions *PriorityLevelConfigurationConditionList `json:"conditions,omitempty"`
-}
-
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
 func (b *PriorityLevelConfigurationStatusApplyConfiguration) SetConditions(value PriorityLevelConfigurationConditionList) *PriorityLevelConfigurationStatusApplyConfiguration {
-	b.fields.Conditions = &value
+	b.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
 func (b *PriorityLevelConfigurationStatusApplyConfiguration) RemoveConditions() *PriorityLevelConfigurationStatusApplyConfiguration {
-	b.fields.Conditions = nil
+	b.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
 func (b *PriorityLevelConfigurationStatusApplyConfiguration) GetConditions() (value PriorityLevelConfigurationConditionList, ok bool) {
-	if v := b.fields.Conditions; v != nil {
+	if v := b.Conditions; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts PriorityLevelConfigurationStatusApplyConfiguration to unstructured.
-func (b *PriorityLevelConfigurationStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PriorityLevelConfigurationStatusApplyConfiguration, replacing the contents
-// of PriorityLevelConfigurationStatusApplyConfiguration.
-func (b *PriorityLevelConfigurationStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &priorityLevelConfigurationStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PriorityLevelConfigurationStatusApplyConfiguration to JSON.
-func (b *PriorityLevelConfigurationStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PriorityLevelConfigurationStatusApplyConfiguration, replacing the contents of
-// PriorityLevelConfigurationStatusApplyConfiguration.
-func (b *PriorityLevelConfigurationStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // PriorityLevelConfigurationStatusList represents a listAlias of PriorityLevelConfigurationStatusApplyConfiguration.
@@ -112,8 +55,3 @@ type PriorityLevelConfigurationStatusList []*PriorityLevelConfigurationStatusApp
 
 // PriorityLevelConfigurationStatusList represents a map of PriorityLevelConfigurationStatusApplyConfiguration.
 type PriorityLevelConfigurationStatusMap map[string]PriorityLevelConfigurationStatusApplyConfiguration
-
-func (b *PriorityLevelConfigurationStatusApplyConfiguration) preMarshal() {
-}
-func (b *PriorityLevelConfigurationStatusApplyConfiguration) postUnmarshal() {
-}

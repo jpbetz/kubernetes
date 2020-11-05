@@ -18,16 +18,13 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ReplicationControllerSpecApplyConfiguration represents an declarative configuration of the ReplicationControllerSpec type for use
 // with apply.
 type ReplicationControllerSpecApplyConfiguration struct {
-	fields replicationControllerSpecFields
+	Replicas        *int32                             `json:"replicas,omitempty"`
+	MinReadySeconds *int32                             `json:"minReadySeconds,omitempty"`
+	Selector        *map[string]string                 `json:"selector,omitempty"`
+	Template        *PodTemplateSpecApplyConfiguration `json:"template,omitempty"`
 }
 
 // ReplicationControllerSpecApplyConfiguration constructs an declarative configuration of the ReplicationControllerSpec type for use with
@@ -36,33 +33,21 @@ func ReplicationControllerSpec() *ReplicationControllerSpecApplyConfiguration {
 	return &ReplicationControllerSpecApplyConfiguration{}
 }
 
-// replicationControllerSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ReplicationControllerSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type replicationControllerSpecFields struct {
-	Replicas        *int32                             `json:"replicas,omitempty"`
-	MinReadySeconds *int32                             `json:"minReadySeconds,omitempty"`
-	Selector        *map[string]string                 `json:"selector,omitempty"`
-	Template        *PodTemplateSpecApplyConfiguration `json:"template,omitempty"`
-}
-
 // SetReplicas sets the Replicas field in the declarative configuration to the given value.
 func (b *ReplicationControllerSpecApplyConfiguration) SetReplicas(value int32) *ReplicationControllerSpecApplyConfiguration {
-	b.fields.Replicas = &value
+	b.Replicas = &value
 	return b
 }
 
 // RemoveReplicas removes the Replicas field from the declarative configuration.
 func (b *ReplicationControllerSpecApplyConfiguration) RemoveReplicas() *ReplicationControllerSpecApplyConfiguration {
-	b.fields.Replicas = nil
+	b.Replicas = nil
 	return b
 }
 
 // GetReplicas gets the Replicas field from the declarative configuration.
 func (b *ReplicationControllerSpecApplyConfiguration) GetReplicas() (value int32, ok bool) {
-	if v := b.fields.Replicas; v != nil {
+	if v := b.Replicas; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,19 +55,19 @@ func (b *ReplicationControllerSpecApplyConfiguration) GetReplicas() (value int32
 
 // SetMinReadySeconds sets the MinReadySeconds field in the declarative configuration to the given value.
 func (b *ReplicationControllerSpecApplyConfiguration) SetMinReadySeconds(value int32) *ReplicationControllerSpecApplyConfiguration {
-	b.fields.MinReadySeconds = &value
+	b.MinReadySeconds = &value
 	return b
 }
 
 // RemoveMinReadySeconds removes the MinReadySeconds field from the declarative configuration.
 func (b *ReplicationControllerSpecApplyConfiguration) RemoveMinReadySeconds() *ReplicationControllerSpecApplyConfiguration {
-	b.fields.MinReadySeconds = nil
+	b.MinReadySeconds = nil
 	return b
 }
 
 // GetMinReadySeconds gets the MinReadySeconds field from the declarative configuration.
 func (b *ReplicationControllerSpecApplyConfiguration) GetMinReadySeconds() (value int32, ok bool) {
-	if v := b.fields.MinReadySeconds; v != nil {
+	if v := b.MinReadySeconds; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -90,19 +75,19 @@ func (b *ReplicationControllerSpecApplyConfiguration) GetMinReadySeconds() (valu
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
 func (b *ReplicationControllerSpecApplyConfiguration) SetSelector(value map[string]string) *ReplicationControllerSpecApplyConfiguration {
-	b.fields.Selector = &value
+	b.Selector = &value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
 func (b *ReplicationControllerSpecApplyConfiguration) RemoveSelector() *ReplicationControllerSpecApplyConfiguration {
-	b.fields.Selector = nil
+	b.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
 func (b *ReplicationControllerSpecApplyConfiguration) GetSelector() (value map[string]string, ok bool) {
-	if v := b.fields.Selector; v != nil {
+	if v := b.Selector; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -110,61 +95,19 @@ func (b *ReplicationControllerSpecApplyConfiguration) GetSelector() (value map[s
 
 // SetTemplate sets the Template field in the declarative configuration to the given value.
 func (b *ReplicationControllerSpecApplyConfiguration) SetTemplate(value *PodTemplateSpecApplyConfiguration) *ReplicationControllerSpecApplyConfiguration {
-	b.fields.Template = value
+	b.Template = value
 	return b
 }
 
 // RemoveTemplate removes the Template field from the declarative configuration.
 func (b *ReplicationControllerSpecApplyConfiguration) RemoveTemplate() *ReplicationControllerSpecApplyConfiguration {
-	b.fields.Template = nil
+	b.Template = nil
 	return b
 }
 
 // GetTemplate gets the Template field from the declarative configuration.
 func (b *ReplicationControllerSpecApplyConfiguration) GetTemplate() (value *PodTemplateSpecApplyConfiguration, ok bool) {
-	return b.fields.Template, b.fields.Template != nil
-}
-
-// ToUnstructured converts ReplicationControllerSpecApplyConfiguration to unstructured.
-func (b *ReplicationControllerSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ReplicationControllerSpecApplyConfiguration, replacing the contents
-// of ReplicationControllerSpecApplyConfiguration.
-func (b *ReplicationControllerSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &replicationControllerSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ReplicationControllerSpecApplyConfiguration to JSON.
-func (b *ReplicationControllerSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ReplicationControllerSpecApplyConfiguration, replacing the contents of
-// ReplicationControllerSpecApplyConfiguration.
-func (b *ReplicationControllerSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Template, b.Template != nil
 }
 
 // ReplicationControllerSpecList represents a listAlias of ReplicationControllerSpecApplyConfiguration.
@@ -172,8 +115,3 @@ type ReplicationControllerSpecList []*ReplicationControllerSpecApplyConfiguratio
 
 // ReplicationControllerSpecList represents a map of ReplicationControllerSpecApplyConfiguration.
 type ReplicationControllerSpecMap map[string]ReplicationControllerSpecApplyConfiguration
-
-func (b *ReplicationControllerSpecApplyConfiguration) preMarshal() {
-}
-func (b *ReplicationControllerSpecApplyConfiguration) postUnmarshal() {
-}

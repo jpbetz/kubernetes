@@ -20,6 +20,7 @@ package v1beta1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -183,7 +184,7 @@ func (c *networkPolicies) Patch(ctx context.Context, name string, pt types.Patch
 // Apply takes the given apply declarative configuration, applies it and returns the applied networkPolicy.
 func (c *networkPolicies) Apply(ctx context.Context, networkPolicy *extensionsv1beta1.NetworkPolicyApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.NetworkPolicy, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := networkPolicy.MarshalJSON()
+	data, err := json.Marshal(networkPolicy)
 	if err != nil {
 		return nil, err
 	}

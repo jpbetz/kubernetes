@@ -20,6 +20,7 @@ package v1beta2
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -183,7 +184,7 @@ func (c *controllerRevisions) Patch(ctx context.Context, name string, pt types.P
 // Apply takes the given apply declarative configuration, applies it and returns the applied controllerRevision.
 func (c *controllerRevisions) Apply(ctx context.Context, controllerRevision *appsv1beta2.ControllerRevisionApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta2.ControllerRevision, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := controllerRevision.MarshalJSON()
+	data, err := json.Marshal(controllerRevision)
 	if err != nil {
 		return nil, err
 	}

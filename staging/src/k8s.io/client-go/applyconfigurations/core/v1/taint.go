@@ -19,17 +19,17 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // TaintApplyConfiguration represents an declarative configuration of the Taint type for use
 // with apply.
 type TaintApplyConfiguration struct {
-	fields taintFields
+	Key       *string         `json:"key,omitempty"`
+	Value     *string         `json:"value,omitempty"`
+	Effect    *v1.TaintEffect `json:"effect,omitempty"`
+	TimeAdded *metav1.Time    `json:"timeAdded,omitempty"`
 }
 
 // TaintApplyConfiguration constructs an declarative configuration of the Taint type for use with
@@ -38,33 +38,21 @@ func Taint() *TaintApplyConfiguration {
 	return &TaintApplyConfiguration{}
 }
 
-// taintFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in TaintApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type taintFields struct {
-	Key       *string         `json:"key,omitempty"`
-	Value     *string         `json:"value,omitempty"`
-	Effect    *v1.TaintEffect `json:"effect,omitempty"`
-	TimeAdded *metav1.Time    `json:"timeAdded,omitempty"`
-}
-
 // SetKey sets the Key field in the declarative configuration to the given value.
 func (b *TaintApplyConfiguration) SetKey(value string) *TaintApplyConfiguration {
-	b.fields.Key = &value
+	b.Key = &value
 	return b
 }
 
 // RemoveKey removes the Key field from the declarative configuration.
 func (b *TaintApplyConfiguration) RemoveKey() *TaintApplyConfiguration {
-	b.fields.Key = nil
+	b.Key = nil
 	return b
 }
 
 // GetKey gets the Key field from the declarative configuration.
 func (b *TaintApplyConfiguration) GetKey() (value string, ok bool) {
-	if v := b.fields.Key; v != nil {
+	if v := b.Key; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -72,19 +60,19 @@ func (b *TaintApplyConfiguration) GetKey() (value string, ok bool) {
 
 // SetValue sets the Value field in the declarative configuration to the given value.
 func (b *TaintApplyConfiguration) SetValue(value string) *TaintApplyConfiguration {
-	b.fields.Value = &value
+	b.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
 func (b *TaintApplyConfiguration) RemoveValue() *TaintApplyConfiguration {
-	b.fields.Value = nil
+	b.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
 func (b *TaintApplyConfiguration) GetValue() (value string, ok bool) {
-	if v := b.fields.Value; v != nil {
+	if v := b.Value; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -92,19 +80,19 @@ func (b *TaintApplyConfiguration) GetValue() (value string, ok bool) {
 
 // SetEffect sets the Effect field in the declarative configuration to the given value.
 func (b *TaintApplyConfiguration) SetEffect(value v1.TaintEffect) *TaintApplyConfiguration {
-	b.fields.Effect = &value
+	b.Effect = &value
 	return b
 }
 
 // RemoveEffect removes the Effect field from the declarative configuration.
 func (b *TaintApplyConfiguration) RemoveEffect() *TaintApplyConfiguration {
-	b.fields.Effect = nil
+	b.Effect = nil
 	return b
 }
 
 // GetEffect gets the Effect field from the declarative configuration.
 func (b *TaintApplyConfiguration) GetEffect() (value v1.TaintEffect, ok bool) {
-	if v := b.fields.Effect; v != nil {
+	if v := b.Effect; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -112,64 +100,22 @@ func (b *TaintApplyConfiguration) GetEffect() (value v1.TaintEffect, ok bool) {
 
 // SetTimeAdded sets the TimeAdded field in the declarative configuration to the given value.
 func (b *TaintApplyConfiguration) SetTimeAdded(value metav1.Time) *TaintApplyConfiguration {
-	b.fields.TimeAdded = &value
+	b.TimeAdded = &value
 	return b
 }
 
 // RemoveTimeAdded removes the TimeAdded field from the declarative configuration.
 func (b *TaintApplyConfiguration) RemoveTimeAdded() *TaintApplyConfiguration {
-	b.fields.TimeAdded = nil
+	b.TimeAdded = nil
 	return b
 }
 
 // GetTimeAdded gets the TimeAdded field from the declarative configuration.
 func (b *TaintApplyConfiguration) GetTimeAdded() (value metav1.Time, ok bool) {
-	if v := b.fields.TimeAdded; v != nil {
+	if v := b.TimeAdded; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts TaintApplyConfiguration to unstructured.
-func (b *TaintApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to TaintApplyConfiguration, replacing the contents
-// of TaintApplyConfiguration.
-func (b *TaintApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &taintFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals TaintApplyConfiguration to JSON.
-func (b *TaintApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into TaintApplyConfiguration, replacing the contents of
-// TaintApplyConfiguration.
-func (b *TaintApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // TaintList represents a listAlias of TaintApplyConfiguration.
@@ -177,8 +123,3 @@ type TaintList []*TaintApplyConfiguration
 
 // TaintList represents a map of TaintApplyConfiguration.
 type TaintMap map[string]TaintApplyConfiguration
-
-func (b *TaintApplyConfiguration) preMarshal() {
-}
-func (b *TaintApplyConfiguration) postUnmarshal() {
-}

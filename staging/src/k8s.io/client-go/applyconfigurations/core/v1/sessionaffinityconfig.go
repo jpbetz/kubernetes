@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // SessionAffinityConfigApplyConfiguration represents an declarative configuration of the SessionAffinityConfig type for use
 // with apply.
 type SessionAffinityConfigApplyConfiguration struct {
-	fields sessionAffinityConfigFields
+	ClientIP *ClientIPConfigApplyConfiguration `json:"clientIP,omitempty"`
 }
 
 // SessionAffinityConfigApplyConfiguration constructs an declarative configuration of the SessionAffinityConfig type for use with
@@ -36,72 +30,21 @@ func SessionAffinityConfig() *SessionAffinityConfigApplyConfiguration {
 	return &SessionAffinityConfigApplyConfiguration{}
 }
 
-// sessionAffinityConfigFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SessionAffinityConfigApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type sessionAffinityConfigFields struct {
-	ClientIP *ClientIPConfigApplyConfiguration `json:"clientIP,omitempty"`
-}
-
 // SetClientIP sets the ClientIP field in the declarative configuration to the given value.
 func (b *SessionAffinityConfigApplyConfiguration) SetClientIP(value *ClientIPConfigApplyConfiguration) *SessionAffinityConfigApplyConfiguration {
-	b.fields.ClientIP = value
+	b.ClientIP = value
 	return b
 }
 
 // RemoveClientIP removes the ClientIP field from the declarative configuration.
 func (b *SessionAffinityConfigApplyConfiguration) RemoveClientIP() *SessionAffinityConfigApplyConfiguration {
-	b.fields.ClientIP = nil
+	b.ClientIP = nil
 	return b
 }
 
 // GetClientIP gets the ClientIP field from the declarative configuration.
 func (b *SessionAffinityConfigApplyConfiguration) GetClientIP() (value *ClientIPConfigApplyConfiguration, ok bool) {
-	return b.fields.ClientIP, b.fields.ClientIP != nil
-}
-
-// ToUnstructured converts SessionAffinityConfigApplyConfiguration to unstructured.
-func (b *SessionAffinityConfigApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to SessionAffinityConfigApplyConfiguration, replacing the contents
-// of SessionAffinityConfigApplyConfiguration.
-func (b *SessionAffinityConfigApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &sessionAffinityConfigFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals SessionAffinityConfigApplyConfiguration to JSON.
-func (b *SessionAffinityConfigApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into SessionAffinityConfigApplyConfiguration, replacing the contents of
-// SessionAffinityConfigApplyConfiguration.
-func (b *SessionAffinityConfigApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.ClientIP, b.ClientIP != nil
 }
 
 // SessionAffinityConfigList represents a listAlias of SessionAffinityConfigApplyConfiguration.
@@ -109,8 +52,3 @@ type SessionAffinityConfigList []*SessionAffinityConfigApplyConfiguration
 
 // SessionAffinityConfigList represents a map of SessionAffinityConfigApplyConfiguration.
 type SessionAffinityConfigMap map[string]SessionAffinityConfigApplyConfiguration
-
-func (b *SessionAffinityConfigApplyConfiguration) preMarshal() {
-}
-func (b *SessionAffinityConfigApplyConfiguration) postUnmarshal() {
-}

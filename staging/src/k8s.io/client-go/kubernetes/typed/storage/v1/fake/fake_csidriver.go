@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	storagev1 "k8s.io/api/storage/v1"
@@ -125,7 +126,7 @@ func (c *FakeCSIDrivers) Patch(ctx context.Context, name string, pt types.PatchT
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied cSIDriver.
 func (c *FakeCSIDrivers) Apply(ctx context.Context, cSIDriver *applyconfigurationsstoragev1.CSIDriverApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *storagev1.CSIDriver, err error) {
-	data, err := cSIDriver.MarshalJSON()
+	data, err := json.Marshal(cSIDriver)
 	if err != nil {
 		return nil, err
 	}

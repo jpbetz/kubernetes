@@ -19,31 +19,13 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // ValidatingWebhookApplyConfiguration represents an declarative configuration of the ValidatingWebhook type for use
 // with apply.
 type ValidatingWebhookApplyConfiguration struct {
-	fields validatingWebhookFields
-}
-
-// ValidatingWebhookApplyConfiguration constructs an declarative configuration of the ValidatingWebhook type for use with
-// apply.
-func ValidatingWebhook() *ValidatingWebhookApplyConfiguration {
-	return &ValidatingWebhookApplyConfiguration{}
-}
-
-// validatingWebhookFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ValidatingWebhookApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type validatingWebhookFields struct {
 	Name                    *string                                    `json:"name,omitempty"`
 	ClientConfig            *WebhookClientConfigApplyConfiguration     `json:"clientConfig,omitempty"`
 	Rules                   *RuleWithOperationsList                    `json:"rules,omitempty"`
@@ -56,21 +38,27 @@ type validatingWebhookFields struct {
 	AdmissionReviewVersions *[]string                                  `json:"admissionReviewVersions,omitempty"`
 }
 
+// ValidatingWebhookApplyConfiguration constructs an declarative configuration of the ValidatingWebhook type for use with
+// apply.
+func ValidatingWebhook() *ValidatingWebhookApplyConfiguration {
+	return &ValidatingWebhookApplyConfiguration{}
+}
+
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *ValidatingWebhookApplyConfiguration) SetName(value string) *ValidatingWebhookApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) RemoveName() *ValidatingWebhookApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -78,36 +66,36 @@ func (b *ValidatingWebhookApplyConfiguration) GetName() (value string, ok bool) 
 
 // SetClientConfig sets the ClientConfig field in the declarative configuration to the given value.
 func (b *ValidatingWebhookApplyConfiguration) SetClientConfig(value *WebhookClientConfigApplyConfiguration) *ValidatingWebhookApplyConfiguration {
-	b.fields.ClientConfig = value
+	b.ClientConfig = value
 	return b
 }
 
 // RemoveClientConfig removes the ClientConfig field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) RemoveClientConfig() *ValidatingWebhookApplyConfiguration {
-	b.fields.ClientConfig = nil
+	b.ClientConfig = nil
 	return b
 }
 
 // GetClientConfig gets the ClientConfig field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) GetClientConfig() (value *WebhookClientConfigApplyConfiguration, ok bool) {
-	return b.fields.ClientConfig, b.fields.ClientConfig != nil
+	return b.ClientConfig, b.ClientConfig != nil
 }
 
 // SetRules sets the Rules field in the declarative configuration to the given value.
 func (b *ValidatingWebhookApplyConfiguration) SetRules(value RuleWithOperationsList) *ValidatingWebhookApplyConfiguration {
-	b.fields.Rules = &value
+	b.Rules = &value
 	return b
 }
 
 // RemoveRules removes the Rules field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) RemoveRules() *ValidatingWebhookApplyConfiguration {
-	b.fields.Rules = nil
+	b.Rules = nil
 	return b
 }
 
 // GetRules gets the Rules field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) GetRules() (value RuleWithOperationsList, ok bool) {
-	if v := b.fields.Rules; v != nil {
+	if v := b.Rules; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -115,19 +103,19 @@ func (b *ValidatingWebhookApplyConfiguration) GetRules() (value RuleWithOperatio
 
 // SetFailurePolicy sets the FailurePolicy field in the declarative configuration to the given value.
 func (b *ValidatingWebhookApplyConfiguration) SetFailurePolicy(value admissionregistrationv1.FailurePolicyType) *ValidatingWebhookApplyConfiguration {
-	b.fields.FailurePolicy = &value
+	b.FailurePolicy = &value
 	return b
 }
 
 // RemoveFailurePolicy removes the FailurePolicy field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) RemoveFailurePolicy() *ValidatingWebhookApplyConfiguration {
-	b.fields.FailurePolicy = nil
+	b.FailurePolicy = nil
 	return b
 }
 
 // GetFailurePolicy gets the FailurePolicy field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) GetFailurePolicy() (value admissionregistrationv1.FailurePolicyType, ok bool) {
-	if v := b.fields.FailurePolicy; v != nil {
+	if v := b.FailurePolicy; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -135,19 +123,19 @@ func (b *ValidatingWebhookApplyConfiguration) GetFailurePolicy() (value admissio
 
 // SetMatchPolicy sets the MatchPolicy field in the declarative configuration to the given value.
 func (b *ValidatingWebhookApplyConfiguration) SetMatchPolicy(value admissionregistrationv1.MatchPolicyType) *ValidatingWebhookApplyConfiguration {
-	b.fields.MatchPolicy = &value
+	b.MatchPolicy = &value
 	return b
 }
 
 // RemoveMatchPolicy removes the MatchPolicy field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) RemoveMatchPolicy() *ValidatingWebhookApplyConfiguration {
-	b.fields.MatchPolicy = nil
+	b.MatchPolicy = nil
 	return b
 }
 
 // GetMatchPolicy gets the MatchPolicy field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) GetMatchPolicy() (value admissionregistrationv1.MatchPolicyType, ok bool) {
-	if v := b.fields.MatchPolicy; v != nil {
+	if v := b.MatchPolicy; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -155,53 +143,53 @@ func (b *ValidatingWebhookApplyConfiguration) GetMatchPolicy() (value admissionr
 
 // SetNamespaceSelector sets the NamespaceSelector field in the declarative configuration to the given value.
 func (b *ValidatingWebhookApplyConfiguration) SetNamespaceSelector(value *metav1.LabelSelectorApplyConfiguration) *ValidatingWebhookApplyConfiguration {
-	b.fields.NamespaceSelector = value
+	b.NamespaceSelector = value
 	return b
 }
 
 // RemoveNamespaceSelector removes the NamespaceSelector field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) RemoveNamespaceSelector() *ValidatingWebhookApplyConfiguration {
-	b.fields.NamespaceSelector = nil
+	b.NamespaceSelector = nil
 	return b
 }
 
 // GetNamespaceSelector gets the NamespaceSelector field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) GetNamespaceSelector() (value *metav1.LabelSelectorApplyConfiguration, ok bool) {
-	return b.fields.NamespaceSelector, b.fields.NamespaceSelector != nil
+	return b.NamespaceSelector, b.NamespaceSelector != nil
 }
 
 // SetObjectSelector sets the ObjectSelector field in the declarative configuration to the given value.
 func (b *ValidatingWebhookApplyConfiguration) SetObjectSelector(value *metav1.LabelSelectorApplyConfiguration) *ValidatingWebhookApplyConfiguration {
-	b.fields.ObjectSelector = value
+	b.ObjectSelector = value
 	return b
 }
 
 // RemoveObjectSelector removes the ObjectSelector field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) RemoveObjectSelector() *ValidatingWebhookApplyConfiguration {
-	b.fields.ObjectSelector = nil
+	b.ObjectSelector = nil
 	return b
 }
 
 // GetObjectSelector gets the ObjectSelector field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) GetObjectSelector() (value *metav1.LabelSelectorApplyConfiguration, ok bool) {
-	return b.fields.ObjectSelector, b.fields.ObjectSelector != nil
+	return b.ObjectSelector, b.ObjectSelector != nil
 }
 
 // SetSideEffects sets the SideEffects field in the declarative configuration to the given value.
 func (b *ValidatingWebhookApplyConfiguration) SetSideEffects(value admissionregistrationv1.SideEffectClass) *ValidatingWebhookApplyConfiguration {
-	b.fields.SideEffects = &value
+	b.SideEffects = &value
 	return b
 }
 
 // RemoveSideEffects removes the SideEffects field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) RemoveSideEffects() *ValidatingWebhookApplyConfiguration {
-	b.fields.SideEffects = nil
+	b.SideEffects = nil
 	return b
 }
 
 // GetSideEffects gets the SideEffects field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) GetSideEffects() (value admissionregistrationv1.SideEffectClass, ok bool) {
-	if v := b.fields.SideEffects; v != nil {
+	if v := b.SideEffects; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -209,19 +197,19 @@ func (b *ValidatingWebhookApplyConfiguration) GetSideEffects() (value admissionr
 
 // SetTimeoutSeconds sets the TimeoutSeconds field in the declarative configuration to the given value.
 func (b *ValidatingWebhookApplyConfiguration) SetTimeoutSeconds(value int32) *ValidatingWebhookApplyConfiguration {
-	b.fields.TimeoutSeconds = &value
+	b.TimeoutSeconds = &value
 	return b
 }
 
 // RemoveTimeoutSeconds removes the TimeoutSeconds field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) RemoveTimeoutSeconds() *ValidatingWebhookApplyConfiguration {
-	b.fields.TimeoutSeconds = nil
+	b.TimeoutSeconds = nil
 	return b
 }
 
 // GetTimeoutSeconds gets the TimeoutSeconds field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) GetTimeoutSeconds() (value int32, ok bool) {
-	if v := b.fields.TimeoutSeconds; v != nil {
+	if v := b.TimeoutSeconds; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -229,64 +217,22 @@ func (b *ValidatingWebhookApplyConfiguration) GetTimeoutSeconds() (value int32, 
 
 // SetAdmissionReviewVersions sets the AdmissionReviewVersions field in the declarative configuration to the given value.
 func (b *ValidatingWebhookApplyConfiguration) SetAdmissionReviewVersions(value []string) *ValidatingWebhookApplyConfiguration {
-	b.fields.AdmissionReviewVersions = &value
+	b.AdmissionReviewVersions = &value
 	return b
 }
 
 // RemoveAdmissionReviewVersions removes the AdmissionReviewVersions field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) RemoveAdmissionReviewVersions() *ValidatingWebhookApplyConfiguration {
-	b.fields.AdmissionReviewVersions = nil
+	b.AdmissionReviewVersions = nil
 	return b
 }
 
 // GetAdmissionReviewVersions gets the AdmissionReviewVersions field from the declarative configuration.
 func (b *ValidatingWebhookApplyConfiguration) GetAdmissionReviewVersions() (value []string, ok bool) {
-	if v := b.fields.AdmissionReviewVersions; v != nil {
+	if v := b.AdmissionReviewVersions; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ValidatingWebhookApplyConfiguration to unstructured.
-func (b *ValidatingWebhookApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ValidatingWebhookApplyConfiguration, replacing the contents
-// of ValidatingWebhookApplyConfiguration.
-func (b *ValidatingWebhookApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &validatingWebhookFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ValidatingWebhookApplyConfiguration to JSON.
-func (b *ValidatingWebhookApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ValidatingWebhookApplyConfiguration, replacing the contents of
-// ValidatingWebhookApplyConfiguration.
-func (b *ValidatingWebhookApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ValidatingWebhookList represents a listAlias of ValidatingWebhookApplyConfiguration.
@@ -294,8 +240,3 @@ type ValidatingWebhookList []*ValidatingWebhookApplyConfiguration
 
 // ValidatingWebhookList represents a map of ValidatingWebhookApplyConfiguration.
 type ValidatingWebhookMap map[string]ValidatingWebhookApplyConfiguration
-
-func (b *ValidatingWebhookApplyConfiguration) preMarshal() {
-}
-func (b *ValidatingWebhookApplyConfiguration) postUnmarshal() {
-}

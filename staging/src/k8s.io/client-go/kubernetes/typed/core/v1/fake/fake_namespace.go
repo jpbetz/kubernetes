@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
@@ -128,7 +129,7 @@ func (c *FakeNamespaces) Patch(ctx context.Context, name string, pt types.PatchT
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied namespace.
 func (c *FakeNamespaces) Apply(ctx context.Context, namespace *applyconfigurationscorev1.NamespaceApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Namespace, err error) {
-	data, err := namespace.MarshalJSON()
+	data, err := json.Marshal(namespace)
 	if err != nil {
 		return nil, err
 	}

@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // FlowSchemaStatusApplyConfiguration represents an declarative configuration of the FlowSchemaStatus type for use
 // with apply.
 type FlowSchemaStatusApplyConfiguration struct {
-	fields flowSchemaStatusFields
+	Conditions *FlowSchemaConditionList `json:"conditions,omitempty"`
 }
 
 // FlowSchemaStatusApplyConfiguration constructs an declarative configuration of the FlowSchemaStatus type for use with
@@ -36,75 +30,24 @@ func FlowSchemaStatus() *FlowSchemaStatusApplyConfiguration {
 	return &FlowSchemaStatusApplyConfiguration{}
 }
 
-// flowSchemaStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in FlowSchemaStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type flowSchemaStatusFields struct {
-	Conditions *FlowSchemaConditionList `json:"conditions,omitempty"`
-}
-
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
 func (b *FlowSchemaStatusApplyConfiguration) SetConditions(value FlowSchemaConditionList) *FlowSchemaStatusApplyConfiguration {
-	b.fields.Conditions = &value
+	b.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
 func (b *FlowSchemaStatusApplyConfiguration) RemoveConditions() *FlowSchemaStatusApplyConfiguration {
-	b.fields.Conditions = nil
+	b.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
 func (b *FlowSchemaStatusApplyConfiguration) GetConditions() (value FlowSchemaConditionList, ok bool) {
-	if v := b.fields.Conditions; v != nil {
+	if v := b.Conditions; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts FlowSchemaStatusApplyConfiguration to unstructured.
-func (b *FlowSchemaStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to FlowSchemaStatusApplyConfiguration, replacing the contents
-// of FlowSchemaStatusApplyConfiguration.
-func (b *FlowSchemaStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &flowSchemaStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals FlowSchemaStatusApplyConfiguration to JSON.
-func (b *FlowSchemaStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into FlowSchemaStatusApplyConfiguration, replacing the contents of
-// FlowSchemaStatusApplyConfiguration.
-func (b *FlowSchemaStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // FlowSchemaStatusList represents a listAlias of FlowSchemaStatusApplyConfiguration.
@@ -112,8 +55,3 @@ type FlowSchemaStatusList []*FlowSchemaStatusApplyConfiguration
 
 // FlowSchemaStatusList represents a map of FlowSchemaStatusApplyConfiguration.
 type FlowSchemaStatusMap map[string]FlowSchemaStatusApplyConfiguration
-
-func (b *FlowSchemaStatusApplyConfiguration) preMarshal() {
-}
-func (b *FlowSchemaStatusApplyConfiguration) postUnmarshal() {
-}

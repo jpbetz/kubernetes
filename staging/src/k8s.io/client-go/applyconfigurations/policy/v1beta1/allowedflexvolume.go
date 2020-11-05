@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1beta1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // AllowedFlexVolumeApplyConfiguration represents an declarative configuration of the AllowedFlexVolume type for use
 // with apply.
 type AllowedFlexVolumeApplyConfiguration struct {
-	fields allowedFlexVolumeFields
+	Driver *string `json:"driver,omitempty"`
 }
 
 // AllowedFlexVolumeApplyConfiguration constructs an declarative configuration of the AllowedFlexVolume type for use with
@@ -36,75 +30,24 @@ func AllowedFlexVolume() *AllowedFlexVolumeApplyConfiguration {
 	return &AllowedFlexVolumeApplyConfiguration{}
 }
 
-// allowedFlexVolumeFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in AllowedFlexVolumeApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type allowedFlexVolumeFields struct {
-	Driver *string `json:"driver,omitempty"`
-}
-
 // SetDriver sets the Driver field in the declarative configuration to the given value.
 func (b *AllowedFlexVolumeApplyConfiguration) SetDriver(value string) *AllowedFlexVolumeApplyConfiguration {
-	b.fields.Driver = &value
+	b.Driver = &value
 	return b
 }
 
 // RemoveDriver removes the Driver field from the declarative configuration.
 func (b *AllowedFlexVolumeApplyConfiguration) RemoveDriver() *AllowedFlexVolumeApplyConfiguration {
-	b.fields.Driver = nil
+	b.Driver = nil
 	return b
 }
 
 // GetDriver gets the Driver field from the declarative configuration.
 func (b *AllowedFlexVolumeApplyConfiguration) GetDriver() (value string, ok bool) {
-	if v := b.fields.Driver; v != nil {
+	if v := b.Driver; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts AllowedFlexVolumeApplyConfiguration to unstructured.
-func (b *AllowedFlexVolumeApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to AllowedFlexVolumeApplyConfiguration, replacing the contents
-// of AllowedFlexVolumeApplyConfiguration.
-func (b *AllowedFlexVolumeApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &allowedFlexVolumeFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals AllowedFlexVolumeApplyConfiguration to JSON.
-func (b *AllowedFlexVolumeApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into AllowedFlexVolumeApplyConfiguration, replacing the contents of
-// AllowedFlexVolumeApplyConfiguration.
-func (b *AllowedFlexVolumeApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // AllowedFlexVolumeList represents a listAlias of AllowedFlexVolumeApplyConfiguration.
@@ -112,8 +55,3 @@ type AllowedFlexVolumeList []*AllowedFlexVolumeApplyConfiguration
 
 // AllowedFlexVolumeList represents a map of AllowedFlexVolumeApplyConfiguration.
 type AllowedFlexVolumeMap map[string]AllowedFlexVolumeApplyConfiguration
-
-func (b *AllowedFlexVolumeApplyConfiguration) preMarshal() {
-}
-func (b *AllowedFlexVolumeApplyConfiguration) postUnmarshal() {
-}

@@ -18,17 +18,13 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ConfigMapVolumeSourceApplyConfiguration represents an declarative configuration of the ConfigMapVolumeSource type for use
 // with apply.
 type ConfigMapVolumeSourceApplyConfiguration struct {
-	localObjectReference *LocalObjectReferenceApplyConfiguration // inlined type
-	fields               configMapVolumeSourceFields
+	LocalObjectReferenceApplyConfiguration `json:",inline"`
+	Items                                  *KeyToPathList `json:"items,omitempty"`
+	DefaultMode                            *int32         `json:"defaultMode,omitempty"`
+	Optional                               *bool          `json:"optional,omitempty"`
 }
 
 // ConfigMapVolumeSourceApplyConfiguration constructs an declarative configuration of the ConfigMapVolumeSource type for use with
@@ -37,50 +33,34 @@ func ConfigMapVolumeSource() *ConfigMapVolumeSourceApplyConfiguration {
 	return &ConfigMapVolumeSourceApplyConfiguration{}
 }
 
-// configMapVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ConfigMapVolumeSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type configMapVolumeSourceFields struct {
-	Name        *string        `json:"name,omitempty"` // inlined ConfigMapVolumeSourceApplyConfiguration.localObjectReference.Name field
-	Items       *KeyToPathList `json:"items,omitempty"`
-	DefaultMode *int32         `json:"defaultMode,omitempty"`
-	Optional    *bool          `json:"optional,omitempty"`
-}
-
 // SetLocalObjectReference sets the LocalObjectReference field in the declarative configuration to the given value.
 func (b *ConfigMapVolumeSourceApplyConfiguration) SetLocalObjectReference(value *LocalObjectReferenceApplyConfiguration) *ConfigMapVolumeSourceApplyConfiguration {
-	b.localObjectReference = value
-	return b
-}
-
-// RemoveLocalObjectReference removes the LocalObjectReference field from the declarative configuration.
-func (b *ConfigMapVolumeSourceApplyConfiguration) RemoveLocalObjectReference() *ConfigMapVolumeSourceApplyConfiguration {
-	b.localObjectReference = nil
+	if value != nil {
+		b.LocalObjectReferenceApplyConfiguration = *value
+	}
 	return b
 }
 
 // GetLocalObjectReference gets the LocalObjectReference field from the declarative configuration.
 func (b *ConfigMapVolumeSourceApplyConfiguration) GetLocalObjectReference() (value *LocalObjectReferenceApplyConfiguration, ok bool) {
-	return b.localObjectReference, true
+	return &b.LocalObjectReferenceApplyConfiguration, true
 }
 
 // SetItems sets the Items field in the declarative configuration to the given value.
 func (b *ConfigMapVolumeSourceApplyConfiguration) SetItems(value KeyToPathList) *ConfigMapVolumeSourceApplyConfiguration {
-	b.fields.Items = &value
+	b.Items = &value
 	return b
 }
 
 // RemoveItems removes the Items field from the declarative configuration.
 func (b *ConfigMapVolumeSourceApplyConfiguration) RemoveItems() *ConfigMapVolumeSourceApplyConfiguration {
-	b.fields.Items = nil
+	b.Items = nil
 	return b
 }
 
 // GetItems gets the Items field from the declarative configuration.
 func (b *ConfigMapVolumeSourceApplyConfiguration) GetItems() (value KeyToPathList, ok bool) {
-	if v := b.fields.Items; v != nil {
+	if v := b.Items; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -88,19 +68,19 @@ func (b *ConfigMapVolumeSourceApplyConfiguration) GetItems() (value KeyToPathLis
 
 // SetDefaultMode sets the DefaultMode field in the declarative configuration to the given value.
 func (b *ConfigMapVolumeSourceApplyConfiguration) SetDefaultMode(value int32) *ConfigMapVolumeSourceApplyConfiguration {
-	b.fields.DefaultMode = &value
+	b.DefaultMode = &value
 	return b
 }
 
 // RemoveDefaultMode removes the DefaultMode field from the declarative configuration.
 func (b *ConfigMapVolumeSourceApplyConfiguration) RemoveDefaultMode() *ConfigMapVolumeSourceApplyConfiguration {
-	b.fields.DefaultMode = nil
+	b.DefaultMode = nil
 	return b
 }
 
 // GetDefaultMode gets the DefaultMode field from the declarative configuration.
 func (b *ConfigMapVolumeSourceApplyConfiguration) GetDefaultMode() (value int32, ok bool) {
-	if v := b.fields.DefaultMode; v != nil {
+	if v := b.DefaultMode; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -108,64 +88,22 @@ func (b *ConfigMapVolumeSourceApplyConfiguration) GetDefaultMode() (value int32,
 
 // SetOptional sets the Optional field in the declarative configuration to the given value.
 func (b *ConfigMapVolumeSourceApplyConfiguration) SetOptional(value bool) *ConfigMapVolumeSourceApplyConfiguration {
-	b.fields.Optional = &value
+	b.Optional = &value
 	return b
 }
 
 // RemoveOptional removes the Optional field from the declarative configuration.
 func (b *ConfigMapVolumeSourceApplyConfiguration) RemoveOptional() *ConfigMapVolumeSourceApplyConfiguration {
-	b.fields.Optional = nil
+	b.Optional = nil
 	return b
 }
 
 // GetOptional gets the Optional field from the declarative configuration.
 func (b *ConfigMapVolumeSourceApplyConfiguration) GetOptional() (value bool, ok bool) {
-	if v := b.fields.Optional; v != nil {
+	if v := b.Optional; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ConfigMapVolumeSourceApplyConfiguration to unstructured.
-func (b *ConfigMapVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ConfigMapVolumeSourceApplyConfiguration, replacing the contents
-// of ConfigMapVolumeSourceApplyConfiguration.
-func (b *ConfigMapVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &configMapVolumeSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ConfigMapVolumeSourceApplyConfiguration to JSON.
-func (b *ConfigMapVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ConfigMapVolumeSourceApplyConfiguration, replacing the contents of
-// ConfigMapVolumeSourceApplyConfiguration.
-func (b *ConfigMapVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ConfigMapVolumeSourceList represents a listAlias of ConfigMapVolumeSourceApplyConfiguration.
@@ -173,19 +111,3 @@ type ConfigMapVolumeSourceList []*ConfigMapVolumeSourceApplyConfiguration
 
 // ConfigMapVolumeSourceList represents a map of ConfigMapVolumeSourceApplyConfiguration.
 type ConfigMapVolumeSourceMap map[string]ConfigMapVolumeSourceApplyConfiguration
-
-func (b *ConfigMapVolumeSourceApplyConfiguration) preMarshal() {
-	if b.localObjectReference != nil {
-		if v, ok := b.localObjectReference.GetName(); ok {
-			b.fields.Name = &v
-		}
-	}
-}
-func (b *ConfigMapVolumeSourceApplyConfiguration) postUnmarshal() {
-	if b.localObjectReference == nil {
-		b.localObjectReference = &LocalObjectReferenceApplyConfiguration{}
-	}
-	if b.fields.Name != nil {
-		b.localObjectReference.SetName(*b.fields.Name)
-	}
-}

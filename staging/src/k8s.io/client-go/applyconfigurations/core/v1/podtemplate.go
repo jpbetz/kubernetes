@@ -19,17 +19,15 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // PodTemplateApplyConfiguration represents an declarative configuration of the PodTemplate type for use
 // with apply.
 type PodTemplateApplyConfiguration struct {
-	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
-	fields   podTemplateFields
+	v1.TypeMetaApplyConfiguration `json:",inline"`
+	ObjectMeta                    *v1.ObjectMetaApplyConfiguration   `json:"metadata,omitempty"`
+	Template                      *PodTemplateSpecApplyConfiguration `json:"template,omitempty"`
 }
 
 // PodTemplateApplyConfiguration constructs an declarative configuration of the PodTemplate type for use with
@@ -38,109 +36,51 @@ func PodTemplate() *PodTemplateApplyConfiguration {
 	return &PodTemplateApplyConfiguration{}
 }
 
-// podTemplateFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodTemplateApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type podTemplateFields struct {
-	Kind       *string                            `json:"kind,omitempty"`       // inlined PodTemplateApplyConfiguration.typeMeta.Kind field
-	APIVersion *string                            `json:"apiVersion,omitempty"` // inlined PodTemplateApplyConfiguration.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaApplyConfiguration   `json:"metadata,omitempty"`
-	Template   *PodTemplateSpecApplyConfiguration `json:"template,omitempty"`
-}
-
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
 func (b *PodTemplateApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *PodTemplateApplyConfiguration {
-	b.typeMeta = value
-	return b
-}
-
-// RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *PodTemplateApplyConfiguration) RemoveTypeMeta() *PodTemplateApplyConfiguration {
-	b.typeMeta = nil
+	if value != nil {
+		b.TypeMetaApplyConfiguration = *value
+	}
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
 func (b *PodTemplateApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
-	return b.typeMeta, true
+	return &b.TypeMetaApplyConfiguration, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
 func (b *PodTemplateApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *PodTemplateApplyConfiguration {
-	b.fields.ObjectMeta = value
+	b.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
 func (b *PodTemplateApplyConfiguration) RemoveObjectMeta() *PodTemplateApplyConfiguration {
-	b.fields.ObjectMeta = nil
+	b.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
 func (b *PodTemplateApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
-	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
+	return b.ObjectMeta, b.ObjectMeta != nil
 }
 
 // SetTemplate sets the Template field in the declarative configuration to the given value.
 func (b *PodTemplateApplyConfiguration) SetTemplate(value *PodTemplateSpecApplyConfiguration) *PodTemplateApplyConfiguration {
-	b.fields.Template = value
+	b.Template = value
 	return b
 }
 
 // RemoveTemplate removes the Template field from the declarative configuration.
 func (b *PodTemplateApplyConfiguration) RemoveTemplate() *PodTemplateApplyConfiguration {
-	b.fields.Template = nil
+	b.Template = nil
 	return b
 }
 
 // GetTemplate gets the Template field from the declarative configuration.
 func (b *PodTemplateApplyConfiguration) GetTemplate() (value *PodTemplateSpecApplyConfiguration, ok bool) {
-	return b.fields.Template, b.fields.Template != nil
-}
-
-// ToUnstructured converts PodTemplateApplyConfiguration to unstructured.
-func (b *PodTemplateApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PodTemplateApplyConfiguration, replacing the contents
-// of PodTemplateApplyConfiguration.
-func (b *PodTemplateApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &podTemplateFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PodTemplateApplyConfiguration to JSON.
-func (b *PodTemplateApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PodTemplateApplyConfiguration, replacing the contents of
-// PodTemplateApplyConfiguration.
-func (b *PodTemplateApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Template, b.Template != nil
 }
 
 // PodTemplateList represents a listAlias of PodTemplateApplyConfiguration.
@@ -148,25 +88,3 @@ type PodTemplateList []*PodTemplateApplyConfiguration
 
 // PodTemplateList represents a map of PodTemplateApplyConfiguration.
 type PodTemplateMap map[string]PodTemplateApplyConfiguration
-
-func (b *PodTemplateApplyConfiguration) preMarshal() {
-	if b.typeMeta != nil {
-		if v, ok := b.typeMeta.GetKind(); ok {
-			b.fields.Kind = &v
-		}
-		if v, ok := b.typeMeta.GetAPIVersion(); ok {
-			b.fields.APIVersion = &v
-		}
-	}
-}
-func (b *PodTemplateApplyConfiguration) postUnmarshal() {
-	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
-	}
-	if b.fields.Kind != nil {
-		b.typeMeta.SetKind(*b.fields.Kind)
-	}
-	if b.fields.APIVersion != nil {
-		b.typeMeta.SetAPIVersion(*b.fields.APIVersion)
-	}
-}

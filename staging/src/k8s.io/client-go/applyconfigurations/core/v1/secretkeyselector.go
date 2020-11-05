@@ -18,17 +18,12 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // SecretKeySelectorApplyConfiguration represents an declarative configuration of the SecretKeySelector type for use
 // with apply.
 type SecretKeySelectorApplyConfiguration struct {
-	localObjectReference *LocalObjectReferenceApplyConfiguration // inlined type
-	fields               secretKeySelectorFields
+	LocalObjectReferenceApplyConfiguration `json:",inline"`
+	Key                                    *string `json:"key,omitempty"`
+	Optional                               *bool   `json:"optional,omitempty"`
 }
 
 // SecretKeySelectorApplyConfiguration constructs an declarative configuration of the SecretKeySelector type for use with
@@ -37,49 +32,34 @@ func SecretKeySelector() *SecretKeySelectorApplyConfiguration {
 	return &SecretKeySelectorApplyConfiguration{}
 }
 
-// secretKeySelectorFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SecretKeySelectorApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type secretKeySelectorFields struct {
-	Name     *string `json:"name,omitempty"` // inlined SecretKeySelectorApplyConfiguration.localObjectReference.Name field
-	Key      *string `json:"key,omitempty"`
-	Optional *bool   `json:"optional,omitempty"`
-}
-
 // SetLocalObjectReference sets the LocalObjectReference field in the declarative configuration to the given value.
 func (b *SecretKeySelectorApplyConfiguration) SetLocalObjectReference(value *LocalObjectReferenceApplyConfiguration) *SecretKeySelectorApplyConfiguration {
-	b.localObjectReference = value
-	return b
-}
-
-// RemoveLocalObjectReference removes the LocalObjectReference field from the declarative configuration.
-func (b *SecretKeySelectorApplyConfiguration) RemoveLocalObjectReference() *SecretKeySelectorApplyConfiguration {
-	b.localObjectReference = nil
+	if value != nil {
+		b.LocalObjectReferenceApplyConfiguration = *value
+	}
 	return b
 }
 
 // GetLocalObjectReference gets the LocalObjectReference field from the declarative configuration.
 func (b *SecretKeySelectorApplyConfiguration) GetLocalObjectReference() (value *LocalObjectReferenceApplyConfiguration, ok bool) {
-	return b.localObjectReference, true
+	return &b.LocalObjectReferenceApplyConfiguration, true
 }
 
 // SetKey sets the Key field in the declarative configuration to the given value.
 func (b *SecretKeySelectorApplyConfiguration) SetKey(value string) *SecretKeySelectorApplyConfiguration {
-	b.fields.Key = &value
+	b.Key = &value
 	return b
 }
 
 // RemoveKey removes the Key field from the declarative configuration.
 func (b *SecretKeySelectorApplyConfiguration) RemoveKey() *SecretKeySelectorApplyConfiguration {
-	b.fields.Key = nil
+	b.Key = nil
 	return b
 }
 
 // GetKey gets the Key field from the declarative configuration.
 func (b *SecretKeySelectorApplyConfiguration) GetKey() (value string, ok bool) {
-	if v := b.fields.Key; v != nil {
+	if v := b.Key; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -87,64 +67,22 @@ func (b *SecretKeySelectorApplyConfiguration) GetKey() (value string, ok bool) {
 
 // SetOptional sets the Optional field in the declarative configuration to the given value.
 func (b *SecretKeySelectorApplyConfiguration) SetOptional(value bool) *SecretKeySelectorApplyConfiguration {
-	b.fields.Optional = &value
+	b.Optional = &value
 	return b
 }
 
 // RemoveOptional removes the Optional field from the declarative configuration.
 func (b *SecretKeySelectorApplyConfiguration) RemoveOptional() *SecretKeySelectorApplyConfiguration {
-	b.fields.Optional = nil
+	b.Optional = nil
 	return b
 }
 
 // GetOptional gets the Optional field from the declarative configuration.
 func (b *SecretKeySelectorApplyConfiguration) GetOptional() (value bool, ok bool) {
-	if v := b.fields.Optional; v != nil {
+	if v := b.Optional; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts SecretKeySelectorApplyConfiguration to unstructured.
-func (b *SecretKeySelectorApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to SecretKeySelectorApplyConfiguration, replacing the contents
-// of SecretKeySelectorApplyConfiguration.
-func (b *SecretKeySelectorApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &secretKeySelectorFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals SecretKeySelectorApplyConfiguration to JSON.
-func (b *SecretKeySelectorApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into SecretKeySelectorApplyConfiguration, replacing the contents of
-// SecretKeySelectorApplyConfiguration.
-func (b *SecretKeySelectorApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // SecretKeySelectorList represents a listAlias of SecretKeySelectorApplyConfiguration.
@@ -152,19 +90,3 @@ type SecretKeySelectorList []*SecretKeySelectorApplyConfiguration
 
 // SecretKeySelectorList represents a map of SecretKeySelectorApplyConfiguration.
 type SecretKeySelectorMap map[string]SecretKeySelectorApplyConfiguration
-
-func (b *SecretKeySelectorApplyConfiguration) preMarshal() {
-	if b.localObjectReference != nil {
-		if v, ok := b.localObjectReference.GetName(); ok {
-			b.fields.Name = &v
-		}
-	}
-}
-func (b *SecretKeySelectorApplyConfiguration) postUnmarshal() {
-	if b.localObjectReference == nil {
-		b.localObjectReference = &LocalObjectReferenceApplyConfiguration{}
-	}
-	if b.fields.Name != nil {
-		b.localObjectReference.SetName(*b.fields.Name)
-	}
-}

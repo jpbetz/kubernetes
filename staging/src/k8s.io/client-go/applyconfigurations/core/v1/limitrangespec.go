@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // LimitRangeSpecApplyConfiguration represents an declarative configuration of the LimitRangeSpec type for use
 // with apply.
 type LimitRangeSpecApplyConfiguration struct {
-	fields limitRangeSpecFields
+	Limits *LimitRangeItemList `json:"limits,omitempty"`
 }
 
 // LimitRangeSpecApplyConfiguration constructs an declarative configuration of the LimitRangeSpec type for use with
@@ -36,75 +30,24 @@ func LimitRangeSpec() *LimitRangeSpecApplyConfiguration {
 	return &LimitRangeSpecApplyConfiguration{}
 }
 
-// limitRangeSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LimitRangeSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type limitRangeSpecFields struct {
-	Limits *LimitRangeItemList `json:"limits,omitempty"`
-}
-
 // SetLimits sets the Limits field in the declarative configuration to the given value.
 func (b *LimitRangeSpecApplyConfiguration) SetLimits(value LimitRangeItemList) *LimitRangeSpecApplyConfiguration {
-	b.fields.Limits = &value
+	b.Limits = &value
 	return b
 }
 
 // RemoveLimits removes the Limits field from the declarative configuration.
 func (b *LimitRangeSpecApplyConfiguration) RemoveLimits() *LimitRangeSpecApplyConfiguration {
-	b.fields.Limits = nil
+	b.Limits = nil
 	return b
 }
 
 // GetLimits gets the Limits field from the declarative configuration.
 func (b *LimitRangeSpecApplyConfiguration) GetLimits() (value LimitRangeItemList, ok bool) {
-	if v := b.fields.Limits; v != nil {
+	if v := b.Limits; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts LimitRangeSpecApplyConfiguration to unstructured.
-func (b *LimitRangeSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to LimitRangeSpecApplyConfiguration, replacing the contents
-// of LimitRangeSpecApplyConfiguration.
-func (b *LimitRangeSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &limitRangeSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals LimitRangeSpecApplyConfiguration to JSON.
-func (b *LimitRangeSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into LimitRangeSpecApplyConfiguration, replacing the contents of
-// LimitRangeSpecApplyConfiguration.
-func (b *LimitRangeSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // LimitRangeSpecList represents a listAlias of LimitRangeSpecApplyConfiguration.
@@ -112,8 +55,3 @@ type LimitRangeSpecList []*LimitRangeSpecApplyConfiguration
 
 // LimitRangeSpecList represents a map of LimitRangeSpecApplyConfiguration.
 type LimitRangeSpecMap map[string]LimitRangeSpecApplyConfiguration
-
-func (b *LimitRangeSpecApplyConfiguration) preMarshal() {
-}
-func (b *LimitRangeSpecApplyConfiguration) postUnmarshal() {
-}

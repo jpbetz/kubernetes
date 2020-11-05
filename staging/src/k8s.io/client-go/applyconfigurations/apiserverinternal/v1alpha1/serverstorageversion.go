@@ -18,16 +18,12 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ServerStorageVersionApplyConfiguration represents an declarative configuration of the ServerStorageVersion type for use
 // with apply.
 type ServerStorageVersionApplyConfiguration struct {
-	fields serverStorageVersionFields
+	APIServerID       *string   `json:"apiServerID,omitempty"`
+	EncodingVersion   *string   `json:"encodingVersion,omitempty"`
+	DecodableVersions *[]string `json:"decodableVersions,omitempty"`
 }
 
 // ServerStorageVersionApplyConfiguration constructs an declarative configuration of the ServerStorageVersion type for use with
@@ -36,32 +32,21 @@ func ServerStorageVersion() *ServerStorageVersionApplyConfiguration {
 	return &ServerStorageVersionApplyConfiguration{}
 }
 
-// serverStorageVersionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ServerStorageVersionApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type serverStorageVersionFields struct {
-	APIServerID       *string   `json:"apiServerID,omitempty"`
-	EncodingVersion   *string   `json:"encodingVersion,omitempty"`
-	DecodableVersions *[]string `json:"decodableVersions,omitempty"`
-}
-
 // SetAPIServerID sets the APIServerID field in the declarative configuration to the given value.
 func (b *ServerStorageVersionApplyConfiguration) SetAPIServerID(value string) *ServerStorageVersionApplyConfiguration {
-	b.fields.APIServerID = &value
+	b.APIServerID = &value
 	return b
 }
 
 // RemoveAPIServerID removes the APIServerID field from the declarative configuration.
 func (b *ServerStorageVersionApplyConfiguration) RemoveAPIServerID() *ServerStorageVersionApplyConfiguration {
-	b.fields.APIServerID = nil
+	b.APIServerID = nil
 	return b
 }
 
 // GetAPIServerID gets the APIServerID field from the declarative configuration.
 func (b *ServerStorageVersionApplyConfiguration) GetAPIServerID() (value string, ok bool) {
-	if v := b.fields.APIServerID; v != nil {
+	if v := b.APIServerID; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,19 +54,19 @@ func (b *ServerStorageVersionApplyConfiguration) GetAPIServerID() (value string,
 
 // SetEncodingVersion sets the EncodingVersion field in the declarative configuration to the given value.
 func (b *ServerStorageVersionApplyConfiguration) SetEncodingVersion(value string) *ServerStorageVersionApplyConfiguration {
-	b.fields.EncodingVersion = &value
+	b.EncodingVersion = &value
 	return b
 }
 
 // RemoveEncodingVersion removes the EncodingVersion field from the declarative configuration.
 func (b *ServerStorageVersionApplyConfiguration) RemoveEncodingVersion() *ServerStorageVersionApplyConfiguration {
-	b.fields.EncodingVersion = nil
+	b.EncodingVersion = nil
 	return b
 }
 
 // GetEncodingVersion gets the EncodingVersion field from the declarative configuration.
 func (b *ServerStorageVersionApplyConfiguration) GetEncodingVersion() (value string, ok bool) {
-	if v := b.fields.EncodingVersion; v != nil {
+	if v := b.EncodingVersion; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -89,64 +74,22 @@ func (b *ServerStorageVersionApplyConfiguration) GetEncodingVersion() (value str
 
 // SetDecodableVersions sets the DecodableVersions field in the declarative configuration to the given value.
 func (b *ServerStorageVersionApplyConfiguration) SetDecodableVersions(value []string) *ServerStorageVersionApplyConfiguration {
-	b.fields.DecodableVersions = &value
+	b.DecodableVersions = &value
 	return b
 }
 
 // RemoveDecodableVersions removes the DecodableVersions field from the declarative configuration.
 func (b *ServerStorageVersionApplyConfiguration) RemoveDecodableVersions() *ServerStorageVersionApplyConfiguration {
-	b.fields.DecodableVersions = nil
+	b.DecodableVersions = nil
 	return b
 }
 
 // GetDecodableVersions gets the DecodableVersions field from the declarative configuration.
 func (b *ServerStorageVersionApplyConfiguration) GetDecodableVersions() (value []string, ok bool) {
-	if v := b.fields.DecodableVersions; v != nil {
+	if v := b.DecodableVersions; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ServerStorageVersionApplyConfiguration to unstructured.
-func (b *ServerStorageVersionApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ServerStorageVersionApplyConfiguration, replacing the contents
-// of ServerStorageVersionApplyConfiguration.
-func (b *ServerStorageVersionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &serverStorageVersionFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ServerStorageVersionApplyConfiguration to JSON.
-func (b *ServerStorageVersionApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ServerStorageVersionApplyConfiguration, replacing the contents of
-// ServerStorageVersionApplyConfiguration.
-func (b *ServerStorageVersionApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ServerStorageVersionList represents a listAlias of ServerStorageVersionApplyConfiguration.
@@ -154,8 +97,3 @@ type ServerStorageVersionList []*ServerStorageVersionApplyConfiguration
 
 // ServerStorageVersionList represents a map of ServerStorageVersionApplyConfiguration.
 type ServerStorageVersionMap map[string]ServerStorageVersionApplyConfiguration
-
-func (b *ServerStorageVersionApplyConfiguration) preMarshal() {
-}
-func (b *ServerStorageVersionApplyConfiguration) postUnmarshal() {
-}

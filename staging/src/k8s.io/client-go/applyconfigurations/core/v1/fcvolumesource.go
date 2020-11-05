@@ -18,16 +18,14 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // FCVolumeSourceApplyConfiguration represents an declarative configuration of the FCVolumeSource type for use
 // with apply.
 type FCVolumeSourceApplyConfiguration struct {
-	fields fCVolumeSourceFields
+	TargetWWNs *[]string `json:"targetWWNs,omitempty"`
+	Lun        *int32    `json:"lun,omitempty"`
+	FSType     *string   `json:"fsType,omitempty"`
+	ReadOnly   *bool     `json:"readOnly,omitempty"`
+	WWIDs      *[]string `json:"wwids,omitempty"`
 }
 
 // FCVolumeSourceApplyConfiguration constructs an declarative configuration of the FCVolumeSource type for use with
@@ -36,34 +34,21 @@ func FCVolumeSource() *FCVolumeSourceApplyConfiguration {
 	return &FCVolumeSourceApplyConfiguration{}
 }
 
-// fCVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in FCVolumeSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type fCVolumeSourceFields struct {
-	TargetWWNs *[]string `json:"targetWWNs,omitempty"`
-	Lun        *int32    `json:"lun,omitempty"`
-	FSType     *string   `json:"fsType,omitempty"`
-	ReadOnly   *bool     `json:"readOnly,omitempty"`
-	WWIDs      *[]string `json:"wwids,omitempty"`
-}
-
 // SetTargetWWNs sets the TargetWWNs field in the declarative configuration to the given value.
 func (b *FCVolumeSourceApplyConfiguration) SetTargetWWNs(value []string) *FCVolumeSourceApplyConfiguration {
-	b.fields.TargetWWNs = &value
+	b.TargetWWNs = &value
 	return b
 }
 
 // RemoveTargetWWNs removes the TargetWWNs field from the declarative configuration.
 func (b *FCVolumeSourceApplyConfiguration) RemoveTargetWWNs() *FCVolumeSourceApplyConfiguration {
-	b.fields.TargetWWNs = nil
+	b.TargetWWNs = nil
 	return b
 }
 
 // GetTargetWWNs gets the TargetWWNs field from the declarative configuration.
 func (b *FCVolumeSourceApplyConfiguration) GetTargetWWNs() (value []string, ok bool) {
-	if v := b.fields.TargetWWNs; v != nil {
+	if v := b.TargetWWNs; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -71,19 +56,19 @@ func (b *FCVolumeSourceApplyConfiguration) GetTargetWWNs() (value []string, ok b
 
 // SetLun sets the Lun field in the declarative configuration to the given value.
 func (b *FCVolumeSourceApplyConfiguration) SetLun(value int32) *FCVolumeSourceApplyConfiguration {
-	b.fields.Lun = &value
+	b.Lun = &value
 	return b
 }
 
 // RemoveLun removes the Lun field from the declarative configuration.
 func (b *FCVolumeSourceApplyConfiguration) RemoveLun() *FCVolumeSourceApplyConfiguration {
-	b.fields.Lun = nil
+	b.Lun = nil
 	return b
 }
 
 // GetLun gets the Lun field from the declarative configuration.
 func (b *FCVolumeSourceApplyConfiguration) GetLun() (value int32, ok bool) {
-	if v := b.fields.Lun; v != nil {
+	if v := b.Lun; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -91,19 +76,19 @@ func (b *FCVolumeSourceApplyConfiguration) GetLun() (value int32, ok bool) {
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
 func (b *FCVolumeSourceApplyConfiguration) SetFSType(value string) *FCVolumeSourceApplyConfiguration {
-	b.fields.FSType = &value
+	b.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
 func (b *FCVolumeSourceApplyConfiguration) RemoveFSType() *FCVolumeSourceApplyConfiguration {
-	b.fields.FSType = nil
+	b.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
 func (b *FCVolumeSourceApplyConfiguration) GetFSType() (value string, ok bool) {
-	if v := b.fields.FSType; v != nil {
+	if v := b.FSType; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -111,19 +96,19 @@ func (b *FCVolumeSourceApplyConfiguration) GetFSType() (value string, ok bool) {
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
 func (b *FCVolumeSourceApplyConfiguration) SetReadOnly(value bool) *FCVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = &value
+	b.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
 func (b *FCVolumeSourceApplyConfiguration) RemoveReadOnly() *FCVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = nil
+	b.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
 func (b *FCVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
-	if v := b.fields.ReadOnly; v != nil {
+	if v := b.ReadOnly; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -131,64 +116,22 @@ func (b *FCVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
 
 // SetWWIDs sets the WWIDs field in the declarative configuration to the given value.
 func (b *FCVolumeSourceApplyConfiguration) SetWWIDs(value []string) *FCVolumeSourceApplyConfiguration {
-	b.fields.WWIDs = &value
+	b.WWIDs = &value
 	return b
 }
 
 // RemoveWWIDs removes the WWIDs field from the declarative configuration.
 func (b *FCVolumeSourceApplyConfiguration) RemoveWWIDs() *FCVolumeSourceApplyConfiguration {
-	b.fields.WWIDs = nil
+	b.WWIDs = nil
 	return b
 }
 
 // GetWWIDs gets the WWIDs field from the declarative configuration.
 func (b *FCVolumeSourceApplyConfiguration) GetWWIDs() (value []string, ok bool) {
-	if v := b.fields.WWIDs; v != nil {
+	if v := b.WWIDs; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts FCVolumeSourceApplyConfiguration to unstructured.
-func (b *FCVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to FCVolumeSourceApplyConfiguration, replacing the contents
-// of FCVolumeSourceApplyConfiguration.
-func (b *FCVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &fCVolumeSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals FCVolumeSourceApplyConfiguration to JSON.
-func (b *FCVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into FCVolumeSourceApplyConfiguration, replacing the contents of
-// FCVolumeSourceApplyConfiguration.
-func (b *FCVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // FCVolumeSourceList represents a listAlias of FCVolumeSourceApplyConfiguration.
@@ -196,8 +139,3 @@ type FCVolumeSourceList []*FCVolumeSourceApplyConfiguration
 
 // FCVolumeSourceList represents a map of FCVolumeSourceApplyConfiguration.
 type FCVolumeSourceMap map[string]FCVolumeSourceApplyConfiguration
-
-func (b *FCVolumeSourceApplyConfiguration) preMarshal() {
-}
-func (b *FCVolumeSourceApplyConfiguration) postUnmarshal() {
-}

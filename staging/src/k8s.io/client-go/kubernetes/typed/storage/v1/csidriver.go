@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -173,7 +174,7 @@ func (c *cSIDrivers) Patch(ctx context.Context, name string, pt types.PatchType,
 // Apply takes the given apply declarative configuration, applies it and returns the applied cSIDriver.
 func (c *cSIDrivers) Apply(ctx context.Context, cSIDriver *storagev1.CSIDriverApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.CSIDriver, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := cSIDriver.MarshalJSON()
+	data, err := json.Marshal(cSIDriver)
 	if err != nil {
 		return nil, err
 	}

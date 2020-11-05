@@ -18,16 +18,11 @@ limitations under the License.
 
 package v2beta2
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ExternalMetricSourceApplyConfiguration represents an declarative configuration of the ExternalMetricSource type for use
 // with apply.
 type ExternalMetricSourceApplyConfiguration struct {
-	fields externalMetricSourceFields
+	Metric *MetricIdentifierApplyConfiguration `json:"metric,omitempty"`
+	Target *MetricTargetApplyConfiguration     `json:"target,omitempty"`
 }
 
 // ExternalMetricSourceApplyConfiguration constructs an declarative configuration of the ExternalMetricSource type for use with
@@ -36,90 +31,38 @@ func ExternalMetricSource() *ExternalMetricSourceApplyConfiguration {
 	return &ExternalMetricSourceApplyConfiguration{}
 }
 
-// externalMetricSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ExternalMetricSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type externalMetricSourceFields struct {
-	Metric *MetricIdentifierApplyConfiguration `json:"metric,omitempty"`
-	Target *MetricTargetApplyConfiguration     `json:"target,omitempty"`
-}
-
 // SetMetric sets the Metric field in the declarative configuration to the given value.
 func (b *ExternalMetricSourceApplyConfiguration) SetMetric(value *MetricIdentifierApplyConfiguration) *ExternalMetricSourceApplyConfiguration {
-	b.fields.Metric = value
+	b.Metric = value
 	return b
 }
 
 // RemoveMetric removes the Metric field from the declarative configuration.
 func (b *ExternalMetricSourceApplyConfiguration) RemoveMetric() *ExternalMetricSourceApplyConfiguration {
-	b.fields.Metric = nil
+	b.Metric = nil
 	return b
 }
 
 // GetMetric gets the Metric field from the declarative configuration.
 func (b *ExternalMetricSourceApplyConfiguration) GetMetric() (value *MetricIdentifierApplyConfiguration, ok bool) {
-	return b.fields.Metric, b.fields.Metric != nil
+	return b.Metric, b.Metric != nil
 }
 
 // SetTarget sets the Target field in the declarative configuration to the given value.
 func (b *ExternalMetricSourceApplyConfiguration) SetTarget(value *MetricTargetApplyConfiguration) *ExternalMetricSourceApplyConfiguration {
-	b.fields.Target = value
+	b.Target = value
 	return b
 }
 
 // RemoveTarget removes the Target field from the declarative configuration.
 func (b *ExternalMetricSourceApplyConfiguration) RemoveTarget() *ExternalMetricSourceApplyConfiguration {
-	b.fields.Target = nil
+	b.Target = nil
 	return b
 }
 
 // GetTarget gets the Target field from the declarative configuration.
 func (b *ExternalMetricSourceApplyConfiguration) GetTarget() (value *MetricTargetApplyConfiguration, ok bool) {
-	return b.fields.Target, b.fields.Target != nil
-}
-
-// ToUnstructured converts ExternalMetricSourceApplyConfiguration to unstructured.
-func (b *ExternalMetricSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ExternalMetricSourceApplyConfiguration, replacing the contents
-// of ExternalMetricSourceApplyConfiguration.
-func (b *ExternalMetricSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &externalMetricSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ExternalMetricSourceApplyConfiguration to JSON.
-func (b *ExternalMetricSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ExternalMetricSourceApplyConfiguration, replacing the contents of
-// ExternalMetricSourceApplyConfiguration.
-func (b *ExternalMetricSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Target, b.Target != nil
 }
 
 // ExternalMetricSourceList represents a listAlias of ExternalMetricSourceApplyConfiguration.
@@ -127,8 +70,3 @@ type ExternalMetricSourceList []*ExternalMetricSourceApplyConfiguration
 
 // ExternalMetricSourceList represents a map of ExternalMetricSourceApplyConfiguration.
 type ExternalMetricSourceMap map[string]ExternalMetricSourceApplyConfiguration
-
-func (b *ExternalMetricSourceApplyConfiguration) preMarshal() {
-}
-func (b *ExternalMetricSourceApplyConfiguration) postUnmarshal() {
-}

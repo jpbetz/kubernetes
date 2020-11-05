@@ -19,17 +19,18 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // ReplicationControllerConditionApplyConfiguration represents an declarative configuration of the ReplicationControllerCondition type for use
 // with apply.
 type ReplicationControllerConditionApplyConfiguration struct {
-	fields replicationControllerConditionFields
+	Type               *v1.ReplicationControllerConditionType `json:"type,omitempty"`
+	Status             *v1.ConditionStatus                    `json:"status,omitempty"`
+	LastTransitionTime *metav1.Time                           `json:"lastTransitionTime,omitempty"`
+	Reason             *string                                `json:"reason,omitempty"`
+	Message            *string                                `json:"message,omitempty"`
 }
 
 // ReplicationControllerConditionApplyConfiguration constructs an declarative configuration of the ReplicationControllerCondition type for use with
@@ -38,34 +39,21 @@ func ReplicationControllerCondition() *ReplicationControllerConditionApplyConfig
 	return &ReplicationControllerConditionApplyConfiguration{}
 }
 
-// replicationControllerConditionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ReplicationControllerConditionApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type replicationControllerConditionFields struct {
-	Type               *v1.ReplicationControllerConditionType `json:"type,omitempty"`
-	Status             *v1.ConditionStatus                    `json:"status,omitempty"`
-	LastTransitionTime *metav1.Time                           `json:"lastTransitionTime,omitempty"`
-	Reason             *string                                `json:"reason,omitempty"`
-	Message            *string                                `json:"message,omitempty"`
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *ReplicationControllerConditionApplyConfiguration) SetType(value v1.ReplicationControllerConditionType) *ReplicationControllerConditionApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *ReplicationControllerConditionApplyConfiguration) RemoveType() *ReplicationControllerConditionApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *ReplicationControllerConditionApplyConfiguration) GetType() (value v1.ReplicationControllerConditionType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -73,19 +61,19 @@ func (b *ReplicationControllerConditionApplyConfiguration) GetType() (value v1.R
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
 func (b *ReplicationControllerConditionApplyConfiguration) SetStatus(value v1.ConditionStatus) *ReplicationControllerConditionApplyConfiguration {
-	b.fields.Status = &value
+	b.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
 func (b *ReplicationControllerConditionApplyConfiguration) RemoveStatus() *ReplicationControllerConditionApplyConfiguration {
-	b.fields.Status = nil
+	b.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
 func (b *ReplicationControllerConditionApplyConfiguration) GetStatus() (value v1.ConditionStatus, ok bool) {
-	if v := b.fields.Status; v != nil {
+	if v := b.Status; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -93,19 +81,19 @@ func (b *ReplicationControllerConditionApplyConfiguration) GetStatus() (value v1
 
 // SetLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value.
 func (b *ReplicationControllerConditionApplyConfiguration) SetLastTransitionTime(value metav1.Time) *ReplicationControllerConditionApplyConfiguration {
-	b.fields.LastTransitionTime = &value
+	b.LastTransitionTime = &value
 	return b
 }
 
 // RemoveLastTransitionTime removes the LastTransitionTime field from the declarative configuration.
 func (b *ReplicationControllerConditionApplyConfiguration) RemoveLastTransitionTime() *ReplicationControllerConditionApplyConfiguration {
-	b.fields.LastTransitionTime = nil
+	b.LastTransitionTime = nil
 	return b
 }
 
 // GetLastTransitionTime gets the LastTransitionTime field from the declarative configuration.
 func (b *ReplicationControllerConditionApplyConfiguration) GetLastTransitionTime() (value metav1.Time, ok bool) {
-	if v := b.fields.LastTransitionTime; v != nil {
+	if v := b.LastTransitionTime; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -113,19 +101,19 @@ func (b *ReplicationControllerConditionApplyConfiguration) GetLastTransitionTime
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
 func (b *ReplicationControllerConditionApplyConfiguration) SetReason(value string) *ReplicationControllerConditionApplyConfiguration {
-	b.fields.Reason = &value
+	b.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
 func (b *ReplicationControllerConditionApplyConfiguration) RemoveReason() *ReplicationControllerConditionApplyConfiguration {
-	b.fields.Reason = nil
+	b.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
 func (b *ReplicationControllerConditionApplyConfiguration) GetReason() (value string, ok bool) {
-	if v := b.fields.Reason; v != nil {
+	if v := b.Reason; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -133,64 +121,22 @@ func (b *ReplicationControllerConditionApplyConfiguration) GetReason() (value st
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
 func (b *ReplicationControllerConditionApplyConfiguration) SetMessage(value string) *ReplicationControllerConditionApplyConfiguration {
-	b.fields.Message = &value
+	b.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
 func (b *ReplicationControllerConditionApplyConfiguration) RemoveMessage() *ReplicationControllerConditionApplyConfiguration {
-	b.fields.Message = nil
+	b.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
 func (b *ReplicationControllerConditionApplyConfiguration) GetMessage() (value string, ok bool) {
-	if v := b.fields.Message; v != nil {
+	if v := b.Message; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ReplicationControllerConditionApplyConfiguration to unstructured.
-func (b *ReplicationControllerConditionApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ReplicationControllerConditionApplyConfiguration, replacing the contents
-// of ReplicationControllerConditionApplyConfiguration.
-func (b *ReplicationControllerConditionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &replicationControllerConditionFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ReplicationControllerConditionApplyConfiguration to JSON.
-func (b *ReplicationControllerConditionApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ReplicationControllerConditionApplyConfiguration, replacing the contents of
-// ReplicationControllerConditionApplyConfiguration.
-func (b *ReplicationControllerConditionApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ReplicationControllerConditionList represents a listAlias of ReplicationControllerConditionApplyConfiguration.
@@ -198,8 +144,3 @@ type ReplicationControllerConditionList []*ReplicationControllerConditionApplyCo
 
 // ReplicationControllerConditionList represents a map of ReplicationControllerConditionApplyConfiguration.
 type ReplicationControllerConditionMap map[string]ReplicationControllerConditionApplyConfiguration
-
-func (b *ReplicationControllerConditionApplyConfiguration) preMarshal() {
-}
-func (b *ReplicationControllerConditionApplyConfiguration) postUnmarshal() {
-}

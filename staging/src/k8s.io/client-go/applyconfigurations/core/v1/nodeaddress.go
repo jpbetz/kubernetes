@@ -19,16 +19,14 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // NodeAddressApplyConfiguration represents an declarative configuration of the NodeAddress type for use
 // with apply.
 type NodeAddressApplyConfiguration struct {
-	fields nodeAddressFields
+	Type    *v1.NodeAddressType `json:"type,omitempty"`
+	Address *string             `json:"address,omitempty"`
 }
 
 // NodeAddressApplyConfiguration constructs an declarative configuration of the NodeAddress type for use with
@@ -37,31 +35,21 @@ func NodeAddress() *NodeAddressApplyConfiguration {
 	return &NodeAddressApplyConfiguration{}
 }
 
-// nodeAddressFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NodeAddressApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type nodeAddressFields struct {
-	Type    *v1.NodeAddressType `json:"type,omitempty"`
-	Address *string             `json:"address,omitempty"`
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *NodeAddressApplyConfiguration) SetType(value v1.NodeAddressType) *NodeAddressApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *NodeAddressApplyConfiguration) RemoveType() *NodeAddressApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *NodeAddressApplyConfiguration) GetType() (value v1.NodeAddressType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,64 +57,22 @@ func (b *NodeAddressApplyConfiguration) GetType() (value v1.NodeAddressType, ok 
 
 // SetAddress sets the Address field in the declarative configuration to the given value.
 func (b *NodeAddressApplyConfiguration) SetAddress(value string) *NodeAddressApplyConfiguration {
-	b.fields.Address = &value
+	b.Address = &value
 	return b
 }
 
 // RemoveAddress removes the Address field from the declarative configuration.
 func (b *NodeAddressApplyConfiguration) RemoveAddress() *NodeAddressApplyConfiguration {
-	b.fields.Address = nil
+	b.Address = nil
 	return b
 }
 
 // GetAddress gets the Address field from the declarative configuration.
 func (b *NodeAddressApplyConfiguration) GetAddress() (value string, ok bool) {
-	if v := b.fields.Address; v != nil {
+	if v := b.Address; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts NodeAddressApplyConfiguration to unstructured.
-func (b *NodeAddressApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to NodeAddressApplyConfiguration, replacing the contents
-// of NodeAddressApplyConfiguration.
-func (b *NodeAddressApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &nodeAddressFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals NodeAddressApplyConfiguration to JSON.
-func (b *NodeAddressApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into NodeAddressApplyConfiguration, replacing the contents of
-// NodeAddressApplyConfiguration.
-func (b *NodeAddressApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // NodeAddressList represents a listAlias of NodeAddressApplyConfiguration.
@@ -134,8 +80,3 @@ type NodeAddressList []*NodeAddressApplyConfiguration
 
 // NodeAddressList represents a map of NodeAddressApplyConfiguration.
 type NodeAddressMap map[string]NodeAddressApplyConfiguration
-
-func (b *NodeAddressApplyConfiguration) preMarshal() {
-}
-func (b *NodeAddressApplyConfiguration) postUnmarshal() {
-}

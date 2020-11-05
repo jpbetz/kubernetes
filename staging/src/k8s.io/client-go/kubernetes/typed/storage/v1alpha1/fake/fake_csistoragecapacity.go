@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	v1alpha1 "k8s.io/api/storage/v1alpha1"
@@ -133,7 +134,7 @@ func (c *FakeCSIStorageCapacities) Patch(ctx context.Context, name string, pt ty
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied cSIStorageCapacity.
 func (c *FakeCSIStorageCapacities) Apply(ctx context.Context, cSIStorageCapacity *storagev1alpha1.CSIStorageCapacityApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.CSIStorageCapacity, err error) {
-	data, err := cSIStorageCapacity.MarshalJSON()
+	data, err := json.Marshal(cSIStorageCapacity)
 	if err != nil {
 		return nil, err
 	}

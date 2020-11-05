@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1beta1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // AllowedCSIDriverApplyConfiguration represents an declarative configuration of the AllowedCSIDriver type for use
 // with apply.
 type AllowedCSIDriverApplyConfiguration struct {
-	fields allowedCSIDriverFields
+	Name *string `json:"name,omitempty"`
 }
 
 // AllowedCSIDriverApplyConfiguration constructs an declarative configuration of the AllowedCSIDriver type for use with
@@ -36,75 +30,24 @@ func AllowedCSIDriver() *AllowedCSIDriverApplyConfiguration {
 	return &AllowedCSIDriverApplyConfiguration{}
 }
 
-// allowedCSIDriverFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in AllowedCSIDriverApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type allowedCSIDriverFields struct {
-	Name *string `json:"name,omitempty"`
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *AllowedCSIDriverApplyConfiguration) SetName(value string) *AllowedCSIDriverApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *AllowedCSIDriverApplyConfiguration) RemoveName() *AllowedCSIDriverApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *AllowedCSIDriverApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts AllowedCSIDriverApplyConfiguration to unstructured.
-func (b *AllowedCSIDriverApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to AllowedCSIDriverApplyConfiguration, replacing the contents
-// of AllowedCSIDriverApplyConfiguration.
-func (b *AllowedCSIDriverApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &allowedCSIDriverFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals AllowedCSIDriverApplyConfiguration to JSON.
-func (b *AllowedCSIDriverApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into AllowedCSIDriverApplyConfiguration, replacing the contents of
-// AllowedCSIDriverApplyConfiguration.
-func (b *AllowedCSIDriverApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // AllowedCSIDriverList represents a listAlias of AllowedCSIDriverApplyConfiguration.
@@ -112,8 +55,3 @@ type AllowedCSIDriverList []*AllowedCSIDriverApplyConfiguration
 
 // AllowedCSIDriverList represents a map of AllowedCSIDriverApplyConfiguration.
 type AllowedCSIDriverMap map[string]AllowedCSIDriverApplyConfiguration
-
-func (b *AllowedCSIDriverApplyConfiguration) preMarshal() {
-}
-func (b *AllowedCSIDriverApplyConfiguration) postUnmarshal() {
-}

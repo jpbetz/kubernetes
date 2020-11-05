@@ -20,6 +20,7 @@ package v1alpha1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -189,7 +190,7 @@ func (c *flowSchemas) Patch(ctx context.Context, name string, pt types.PatchType
 // Apply takes the given apply declarative configuration, applies it and returns the applied flowSchema.
 func (c *flowSchemas) Apply(ctx context.Context, flowSchema *flowcontrolv1alpha1.FlowSchemaApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.FlowSchema, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := flowSchema.MarshalJSON()
+	data, err := json.Marshal(flowSchema)
 	if err != nil {
 		return nil, err
 	}

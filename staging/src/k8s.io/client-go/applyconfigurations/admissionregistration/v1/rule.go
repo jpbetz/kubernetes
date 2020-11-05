@@ -19,16 +19,16 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/admissionregistration/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // RuleApplyConfiguration represents an declarative configuration of the Rule type for use
 // with apply.
 type RuleApplyConfiguration struct {
-	fields ruleFields
+	APIGroups   *[]string     `json:"apiGroups,omitempty"`
+	APIVersions *[]string     `json:"apiVersions,omitempty"`
+	Resources   *[]string     `json:"resources,omitempty"`
+	Scope       *v1.ScopeType `json:"scope,omitempty"`
 }
 
 // RuleApplyConfiguration constructs an declarative configuration of the Rule type for use with
@@ -37,33 +37,21 @@ func Rule() *RuleApplyConfiguration {
 	return &RuleApplyConfiguration{}
 }
 
-// ruleFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in RuleApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type ruleFields struct {
-	APIGroups   *[]string     `json:"apiGroups,omitempty"`
-	APIVersions *[]string     `json:"apiVersions,omitempty"`
-	Resources   *[]string     `json:"resources,omitempty"`
-	Scope       *v1.ScopeType `json:"scope,omitempty"`
-}
-
 // SetAPIGroups sets the APIGroups field in the declarative configuration to the given value.
 func (b *RuleApplyConfiguration) SetAPIGroups(value []string) *RuleApplyConfiguration {
-	b.fields.APIGroups = &value
+	b.APIGroups = &value
 	return b
 }
 
 // RemoveAPIGroups removes the APIGroups field from the declarative configuration.
 func (b *RuleApplyConfiguration) RemoveAPIGroups() *RuleApplyConfiguration {
-	b.fields.APIGroups = nil
+	b.APIGroups = nil
 	return b
 }
 
 // GetAPIGroups gets the APIGroups field from the declarative configuration.
 func (b *RuleApplyConfiguration) GetAPIGroups() (value []string, ok bool) {
-	if v := b.fields.APIGroups; v != nil {
+	if v := b.APIGroups; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -71,19 +59,19 @@ func (b *RuleApplyConfiguration) GetAPIGroups() (value []string, ok bool) {
 
 // SetAPIVersions sets the APIVersions field in the declarative configuration to the given value.
 func (b *RuleApplyConfiguration) SetAPIVersions(value []string) *RuleApplyConfiguration {
-	b.fields.APIVersions = &value
+	b.APIVersions = &value
 	return b
 }
 
 // RemoveAPIVersions removes the APIVersions field from the declarative configuration.
 func (b *RuleApplyConfiguration) RemoveAPIVersions() *RuleApplyConfiguration {
-	b.fields.APIVersions = nil
+	b.APIVersions = nil
 	return b
 }
 
 // GetAPIVersions gets the APIVersions field from the declarative configuration.
 func (b *RuleApplyConfiguration) GetAPIVersions() (value []string, ok bool) {
-	if v := b.fields.APIVersions; v != nil {
+	if v := b.APIVersions; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -91,19 +79,19 @@ func (b *RuleApplyConfiguration) GetAPIVersions() (value []string, ok bool) {
 
 // SetResources sets the Resources field in the declarative configuration to the given value.
 func (b *RuleApplyConfiguration) SetResources(value []string) *RuleApplyConfiguration {
-	b.fields.Resources = &value
+	b.Resources = &value
 	return b
 }
 
 // RemoveResources removes the Resources field from the declarative configuration.
 func (b *RuleApplyConfiguration) RemoveResources() *RuleApplyConfiguration {
-	b.fields.Resources = nil
+	b.Resources = nil
 	return b
 }
 
 // GetResources gets the Resources field from the declarative configuration.
 func (b *RuleApplyConfiguration) GetResources() (value []string, ok bool) {
-	if v := b.fields.Resources; v != nil {
+	if v := b.Resources; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -111,64 +99,22 @@ func (b *RuleApplyConfiguration) GetResources() (value []string, ok bool) {
 
 // SetScope sets the Scope field in the declarative configuration to the given value.
 func (b *RuleApplyConfiguration) SetScope(value v1.ScopeType) *RuleApplyConfiguration {
-	b.fields.Scope = &value
+	b.Scope = &value
 	return b
 }
 
 // RemoveScope removes the Scope field from the declarative configuration.
 func (b *RuleApplyConfiguration) RemoveScope() *RuleApplyConfiguration {
-	b.fields.Scope = nil
+	b.Scope = nil
 	return b
 }
 
 // GetScope gets the Scope field from the declarative configuration.
 func (b *RuleApplyConfiguration) GetScope() (value v1.ScopeType, ok bool) {
-	if v := b.fields.Scope; v != nil {
+	if v := b.Scope; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts RuleApplyConfiguration to unstructured.
-func (b *RuleApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to RuleApplyConfiguration, replacing the contents
-// of RuleApplyConfiguration.
-func (b *RuleApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &ruleFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals RuleApplyConfiguration to JSON.
-func (b *RuleApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into RuleApplyConfiguration, replacing the contents of
-// RuleApplyConfiguration.
-func (b *RuleApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // RuleList represents a listAlias of RuleApplyConfiguration.
@@ -176,8 +122,3 @@ type RuleList []*RuleApplyConfiguration
 
 // RuleList represents a map of RuleApplyConfiguration.
 type RuleMap map[string]RuleApplyConfiguration
-
-func (b *RuleApplyConfiguration) preMarshal() {
-}
-func (b *RuleApplyConfiguration) postUnmarshal() {
-}

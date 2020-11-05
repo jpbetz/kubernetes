@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -173,7 +174,7 @@ func (c *clusterRoles) Patch(ctx context.Context, name string, pt types.PatchTyp
 // Apply takes the given apply declarative configuration, applies it and returns the applied clusterRole.
 func (c *clusterRoles) Apply(ctx context.Context, clusterRole *rbacv1.ClusterRoleApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.ClusterRole, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := clusterRole.MarshalJSON()
+	data, err := json.Marshal(clusterRole)
 	if err != nil {
 		return nil, err
 	}

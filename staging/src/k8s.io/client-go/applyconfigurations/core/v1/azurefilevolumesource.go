@@ -18,16 +18,12 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // AzureFileVolumeSourceApplyConfiguration represents an declarative configuration of the AzureFileVolumeSource type for use
 // with apply.
 type AzureFileVolumeSourceApplyConfiguration struct {
-	fields azureFileVolumeSourceFields
+	SecretName *string `json:"secretName,omitempty"`
+	ShareName  *string `json:"shareName,omitempty"`
+	ReadOnly   *bool   `json:"readOnly,omitempty"`
 }
 
 // AzureFileVolumeSourceApplyConfiguration constructs an declarative configuration of the AzureFileVolumeSource type for use with
@@ -36,32 +32,21 @@ func AzureFileVolumeSource() *AzureFileVolumeSourceApplyConfiguration {
 	return &AzureFileVolumeSourceApplyConfiguration{}
 }
 
-// azureFileVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in AzureFileVolumeSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type azureFileVolumeSourceFields struct {
-	SecretName *string `json:"secretName,omitempty"`
-	ShareName  *string `json:"shareName,omitempty"`
-	ReadOnly   *bool   `json:"readOnly,omitempty"`
-}
-
 // SetSecretName sets the SecretName field in the declarative configuration to the given value.
 func (b *AzureFileVolumeSourceApplyConfiguration) SetSecretName(value string) *AzureFileVolumeSourceApplyConfiguration {
-	b.fields.SecretName = &value
+	b.SecretName = &value
 	return b
 }
 
 // RemoveSecretName removes the SecretName field from the declarative configuration.
 func (b *AzureFileVolumeSourceApplyConfiguration) RemoveSecretName() *AzureFileVolumeSourceApplyConfiguration {
-	b.fields.SecretName = nil
+	b.SecretName = nil
 	return b
 }
 
 // GetSecretName gets the SecretName field from the declarative configuration.
 func (b *AzureFileVolumeSourceApplyConfiguration) GetSecretName() (value string, ok bool) {
-	if v := b.fields.SecretName; v != nil {
+	if v := b.SecretName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,19 +54,19 @@ func (b *AzureFileVolumeSourceApplyConfiguration) GetSecretName() (value string,
 
 // SetShareName sets the ShareName field in the declarative configuration to the given value.
 func (b *AzureFileVolumeSourceApplyConfiguration) SetShareName(value string) *AzureFileVolumeSourceApplyConfiguration {
-	b.fields.ShareName = &value
+	b.ShareName = &value
 	return b
 }
 
 // RemoveShareName removes the ShareName field from the declarative configuration.
 func (b *AzureFileVolumeSourceApplyConfiguration) RemoveShareName() *AzureFileVolumeSourceApplyConfiguration {
-	b.fields.ShareName = nil
+	b.ShareName = nil
 	return b
 }
 
 // GetShareName gets the ShareName field from the declarative configuration.
 func (b *AzureFileVolumeSourceApplyConfiguration) GetShareName() (value string, ok bool) {
-	if v := b.fields.ShareName; v != nil {
+	if v := b.ShareName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -89,64 +74,22 @@ func (b *AzureFileVolumeSourceApplyConfiguration) GetShareName() (value string, 
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
 func (b *AzureFileVolumeSourceApplyConfiguration) SetReadOnly(value bool) *AzureFileVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = &value
+	b.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
 func (b *AzureFileVolumeSourceApplyConfiguration) RemoveReadOnly() *AzureFileVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = nil
+	b.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
 func (b *AzureFileVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
-	if v := b.fields.ReadOnly; v != nil {
+	if v := b.ReadOnly; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts AzureFileVolumeSourceApplyConfiguration to unstructured.
-func (b *AzureFileVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to AzureFileVolumeSourceApplyConfiguration, replacing the contents
-// of AzureFileVolumeSourceApplyConfiguration.
-func (b *AzureFileVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &azureFileVolumeSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals AzureFileVolumeSourceApplyConfiguration to JSON.
-func (b *AzureFileVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into AzureFileVolumeSourceApplyConfiguration, replacing the contents of
-// AzureFileVolumeSourceApplyConfiguration.
-func (b *AzureFileVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // AzureFileVolumeSourceList represents a listAlias of AzureFileVolumeSourceApplyConfiguration.
@@ -154,8 +97,3 @@ type AzureFileVolumeSourceList []*AzureFileVolumeSourceApplyConfiguration
 
 // AzureFileVolumeSourceList represents a map of AzureFileVolumeSourceApplyConfiguration.
 type AzureFileVolumeSourceMap map[string]AzureFileVolumeSourceApplyConfiguration
-
-func (b *AzureFileVolumeSourceApplyConfiguration) preMarshal() {
-}
-func (b *AzureFileVolumeSourceApplyConfiguration) postUnmarshal() {
-}

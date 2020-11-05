@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ObjectFieldSelectorApplyConfiguration represents an declarative configuration of the ObjectFieldSelector type for use
 // with apply.
 type ObjectFieldSelectorApplyConfiguration struct {
-	fields objectFieldSelectorFields
+	APIVersion *string `json:"apiVersion,omitempty"`
+	FieldPath  *string `json:"fieldPath,omitempty"`
 }
 
 // ObjectFieldSelectorApplyConfiguration constructs an declarative configuration of the ObjectFieldSelector type for use with
@@ -36,31 +31,21 @@ func ObjectFieldSelector() *ObjectFieldSelectorApplyConfiguration {
 	return &ObjectFieldSelectorApplyConfiguration{}
 }
 
-// objectFieldSelectorFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ObjectFieldSelectorApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type objectFieldSelectorFields struct {
-	APIVersion *string `json:"apiVersion,omitempty"`
-	FieldPath  *string `json:"fieldPath,omitempty"`
-}
-
 // SetAPIVersion sets the APIVersion field in the declarative configuration to the given value.
 func (b *ObjectFieldSelectorApplyConfiguration) SetAPIVersion(value string) *ObjectFieldSelectorApplyConfiguration {
-	b.fields.APIVersion = &value
+	b.APIVersion = &value
 	return b
 }
 
 // RemoveAPIVersion removes the APIVersion field from the declarative configuration.
 func (b *ObjectFieldSelectorApplyConfiguration) RemoveAPIVersion() *ObjectFieldSelectorApplyConfiguration {
-	b.fields.APIVersion = nil
+	b.APIVersion = nil
 	return b
 }
 
 // GetAPIVersion gets the APIVersion field from the declarative configuration.
 func (b *ObjectFieldSelectorApplyConfiguration) GetAPIVersion() (value string, ok bool) {
-	if v := b.fields.APIVersion; v != nil {
+	if v := b.APIVersion; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *ObjectFieldSelectorApplyConfiguration) GetAPIVersion() (value string, o
 
 // SetFieldPath sets the FieldPath field in the declarative configuration to the given value.
 func (b *ObjectFieldSelectorApplyConfiguration) SetFieldPath(value string) *ObjectFieldSelectorApplyConfiguration {
-	b.fields.FieldPath = &value
+	b.FieldPath = &value
 	return b
 }
 
 // RemoveFieldPath removes the FieldPath field from the declarative configuration.
 func (b *ObjectFieldSelectorApplyConfiguration) RemoveFieldPath() *ObjectFieldSelectorApplyConfiguration {
-	b.fields.FieldPath = nil
+	b.FieldPath = nil
 	return b
 }
 
 // GetFieldPath gets the FieldPath field from the declarative configuration.
 func (b *ObjectFieldSelectorApplyConfiguration) GetFieldPath() (value string, ok bool) {
-	if v := b.fields.FieldPath; v != nil {
+	if v := b.FieldPath; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ObjectFieldSelectorApplyConfiguration to unstructured.
-func (b *ObjectFieldSelectorApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ObjectFieldSelectorApplyConfiguration, replacing the contents
-// of ObjectFieldSelectorApplyConfiguration.
-func (b *ObjectFieldSelectorApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &objectFieldSelectorFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ObjectFieldSelectorApplyConfiguration to JSON.
-func (b *ObjectFieldSelectorApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ObjectFieldSelectorApplyConfiguration, replacing the contents of
-// ObjectFieldSelectorApplyConfiguration.
-func (b *ObjectFieldSelectorApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ObjectFieldSelectorList represents a listAlias of ObjectFieldSelectorApplyConfiguration.
@@ -133,8 +76,3 @@ type ObjectFieldSelectorList []*ObjectFieldSelectorApplyConfiguration
 
 // ObjectFieldSelectorList represents a map of ObjectFieldSelectorApplyConfiguration.
 type ObjectFieldSelectorMap map[string]ObjectFieldSelectorApplyConfiguration
-
-func (b *ObjectFieldSelectorApplyConfiguration) preMarshal() {
-}
-func (b *ObjectFieldSelectorApplyConfiguration) postUnmarshal() {
-}

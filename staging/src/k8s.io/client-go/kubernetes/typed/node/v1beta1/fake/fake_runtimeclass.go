@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	v1beta1 "k8s.io/api/node/v1beta1"
@@ -125,7 +126,7 @@ func (c *FakeRuntimeClasses) Patch(ctx context.Context, name string, pt types.Pa
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied runtimeClass.
 func (c *FakeRuntimeClasses) Apply(ctx context.Context, runtimeClass *nodev1beta1.RuntimeClassApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.RuntimeClass, err error) {
-	data, err := runtimeClass.MarshalJSON()
+	data, err := json.Marshal(runtimeClass)
 	if err != nil {
 		return nil, err
 	}

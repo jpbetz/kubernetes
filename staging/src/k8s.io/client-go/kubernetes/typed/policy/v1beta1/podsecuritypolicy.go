@@ -20,6 +20,7 @@ package v1beta1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -173,7 +174,7 @@ func (c *podSecurityPolicies) Patch(ctx context.Context, name string, pt types.P
 // Apply takes the given apply declarative configuration, applies it and returns the applied podSecurityPolicy.
 func (c *podSecurityPolicies) Apply(ctx context.Context, podSecurityPolicy *policyv1beta1.PodSecurityPolicyApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PodSecurityPolicy, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := podSecurityPolicy.MarshalJSON()
+	data, err := json.Marshal(podSecurityPolicy)
 	if err != nil {
 		return nil, err
 	}

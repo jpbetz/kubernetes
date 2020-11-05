@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	v1beta2 "k8s.io/api/apps/v1beta2"
@@ -133,7 +134,7 @@ func (c *FakeControllerRevisions) Patch(ctx context.Context, name string, pt typ
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied controllerRevision.
 func (c *FakeControllerRevisions) Apply(ctx context.Context, controllerRevision *appsv1beta2.ControllerRevisionApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta2.ControllerRevision, err error) {
-	data, err := controllerRevision.MarshalJSON()
+	data, err := json.Marshal(controllerRevision)
 	if err != nil {
 		return nil, err
 	}

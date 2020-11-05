@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -183,7 +184,7 @@ func (c *endpoints) Patch(ctx context.Context, name string, pt types.PatchType, 
 // Apply takes the given apply declarative configuration, applies it and returns the applied endpoints.
 func (c *endpoints) Apply(ctx context.Context, endpoints *corev1.EndpointsApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Endpoints, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := endpoints.MarshalJSON()
+	data, err := json.Marshal(endpoints)
 	if err != nil {
 		return nil, err
 	}

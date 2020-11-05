@@ -19,16 +19,14 @@ limitations under the License.
 package v1alpha1
 
 import (
-	json "encoding/json"
-
 	v1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // PriorityLevelConfigurationSpecApplyConfiguration represents an declarative configuration of the PriorityLevelConfigurationSpec type for use
 // with apply.
 type PriorityLevelConfigurationSpecApplyConfiguration struct {
-	fields priorityLevelConfigurationSpecFields
+	Type    *v1alpha1.PriorityLevelEnablement                    `json:"type,omitempty"`
+	Limited *LimitedPriorityLevelConfigurationApplyConfiguration `json:"limited,omitempty"`
 }
 
 // PriorityLevelConfigurationSpecApplyConfiguration constructs an declarative configuration of the PriorityLevelConfigurationSpec type for use with
@@ -37,31 +35,21 @@ func PriorityLevelConfigurationSpec() *PriorityLevelConfigurationSpecApplyConfig
 	return &PriorityLevelConfigurationSpecApplyConfiguration{}
 }
 
-// priorityLevelConfigurationSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PriorityLevelConfigurationSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type priorityLevelConfigurationSpecFields struct {
-	Type    *v1alpha1.PriorityLevelEnablement                    `json:"type,omitempty"`
-	Limited *LimitedPriorityLevelConfigurationApplyConfiguration `json:"limited,omitempty"`
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *PriorityLevelConfigurationSpecApplyConfiguration) SetType(value v1alpha1.PriorityLevelEnablement) *PriorityLevelConfigurationSpecApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *PriorityLevelConfigurationSpecApplyConfiguration) RemoveType() *PriorityLevelConfigurationSpecApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *PriorityLevelConfigurationSpecApplyConfiguration) GetType() (value v1alpha1.PriorityLevelEnablement, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,61 +57,19 @@ func (b *PriorityLevelConfigurationSpecApplyConfiguration) GetType() (value v1al
 
 // SetLimited sets the Limited field in the declarative configuration to the given value.
 func (b *PriorityLevelConfigurationSpecApplyConfiguration) SetLimited(value *LimitedPriorityLevelConfigurationApplyConfiguration) *PriorityLevelConfigurationSpecApplyConfiguration {
-	b.fields.Limited = value
+	b.Limited = value
 	return b
 }
 
 // RemoveLimited removes the Limited field from the declarative configuration.
 func (b *PriorityLevelConfigurationSpecApplyConfiguration) RemoveLimited() *PriorityLevelConfigurationSpecApplyConfiguration {
-	b.fields.Limited = nil
+	b.Limited = nil
 	return b
 }
 
 // GetLimited gets the Limited field from the declarative configuration.
 func (b *PriorityLevelConfigurationSpecApplyConfiguration) GetLimited() (value *LimitedPriorityLevelConfigurationApplyConfiguration, ok bool) {
-	return b.fields.Limited, b.fields.Limited != nil
-}
-
-// ToUnstructured converts PriorityLevelConfigurationSpecApplyConfiguration to unstructured.
-func (b *PriorityLevelConfigurationSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PriorityLevelConfigurationSpecApplyConfiguration, replacing the contents
-// of PriorityLevelConfigurationSpecApplyConfiguration.
-func (b *PriorityLevelConfigurationSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &priorityLevelConfigurationSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PriorityLevelConfigurationSpecApplyConfiguration to JSON.
-func (b *PriorityLevelConfigurationSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PriorityLevelConfigurationSpecApplyConfiguration, replacing the contents of
-// PriorityLevelConfigurationSpecApplyConfiguration.
-func (b *PriorityLevelConfigurationSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Limited, b.Limited != nil
 }
 
 // PriorityLevelConfigurationSpecList represents a listAlias of PriorityLevelConfigurationSpecApplyConfiguration.
@@ -131,8 +77,3 @@ type PriorityLevelConfigurationSpecList []*PriorityLevelConfigurationSpecApplyCo
 
 // PriorityLevelConfigurationSpecList represents a map of PriorityLevelConfigurationSpecApplyConfiguration.
 type PriorityLevelConfigurationSpecMap map[string]PriorityLevelConfigurationSpecApplyConfiguration
-
-func (b *PriorityLevelConfigurationSpecApplyConfiguration) preMarshal() {
-}
-func (b *PriorityLevelConfigurationSpecApplyConfiguration) postUnmarshal() {
-}

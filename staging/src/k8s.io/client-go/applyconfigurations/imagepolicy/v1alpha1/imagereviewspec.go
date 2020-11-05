@@ -18,16 +18,12 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ImageReviewSpecApplyConfiguration represents an declarative configuration of the ImageReviewSpec type for use
 // with apply.
 type ImageReviewSpecApplyConfiguration struct {
-	fields imageReviewSpecFields
+	Containers  *ImageReviewContainerSpecList `json:"containers,omitempty"`
+	Annotations *map[string]string            `json:"annotations,omitempty"`
+	Namespace   *string                       `json:"namespace,omitempty"`
 }
 
 // ImageReviewSpecApplyConfiguration constructs an declarative configuration of the ImageReviewSpec type for use with
@@ -36,32 +32,21 @@ func ImageReviewSpec() *ImageReviewSpecApplyConfiguration {
 	return &ImageReviewSpecApplyConfiguration{}
 }
 
-// imageReviewSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ImageReviewSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type imageReviewSpecFields struct {
-	Containers  *ImageReviewContainerSpecList `json:"containers,omitempty"`
-	Annotations *map[string]string            `json:"annotations,omitempty"`
-	Namespace   *string                       `json:"namespace,omitempty"`
-}
-
 // SetContainers sets the Containers field in the declarative configuration to the given value.
 func (b *ImageReviewSpecApplyConfiguration) SetContainers(value ImageReviewContainerSpecList) *ImageReviewSpecApplyConfiguration {
-	b.fields.Containers = &value
+	b.Containers = &value
 	return b
 }
 
 // RemoveContainers removes the Containers field from the declarative configuration.
 func (b *ImageReviewSpecApplyConfiguration) RemoveContainers() *ImageReviewSpecApplyConfiguration {
-	b.fields.Containers = nil
+	b.Containers = nil
 	return b
 }
 
 // GetContainers gets the Containers field from the declarative configuration.
 func (b *ImageReviewSpecApplyConfiguration) GetContainers() (value ImageReviewContainerSpecList, ok bool) {
-	if v := b.fields.Containers; v != nil {
+	if v := b.Containers; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,19 +54,19 @@ func (b *ImageReviewSpecApplyConfiguration) GetContainers() (value ImageReviewCo
 
 // SetAnnotations sets the Annotations field in the declarative configuration to the given value.
 func (b *ImageReviewSpecApplyConfiguration) SetAnnotations(value map[string]string) *ImageReviewSpecApplyConfiguration {
-	b.fields.Annotations = &value
+	b.Annotations = &value
 	return b
 }
 
 // RemoveAnnotations removes the Annotations field from the declarative configuration.
 func (b *ImageReviewSpecApplyConfiguration) RemoveAnnotations() *ImageReviewSpecApplyConfiguration {
-	b.fields.Annotations = nil
+	b.Annotations = nil
 	return b
 }
 
 // GetAnnotations gets the Annotations field from the declarative configuration.
 func (b *ImageReviewSpecApplyConfiguration) GetAnnotations() (value map[string]string, ok bool) {
-	if v := b.fields.Annotations; v != nil {
+	if v := b.Annotations; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -89,64 +74,22 @@ func (b *ImageReviewSpecApplyConfiguration) GetAnnotations() (value map[string]s
 
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
 func (b *ImageReviewSpecApplyConfiguration) SetNamespace(value string) *ImageReviewSpecApplyConfiguration {
-	b.fields.Namespace = &value
+	b.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
 func (b *ImageReviewSpecApplyConfiguration) RemoveNamespace() *ImageReviewSpecApplyConfiguration {
-	b.fields.Namespace = nil
+	b.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
 func (b *ImageReviewSpecApplyConfiguration) GetNamespace() (value string, ok bool) {
-	if v := b.fields.Namespace; v != nil {
+	if v := b.Namespace; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ImageReviewSpecApplyConfiguration to unstructured.
-func (b *ImageReviewSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ImageReviewSpecApplyConfiguration, replacing the contents
-// of ImageReviewSpecApplyConfiguration.
-func (b *ImageReviewSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &imageReviewSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ImageReviewSpecApplyConfiguration to JSON.
-func (b *ImageReviewSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ImageReviewSpecApplyConfiguration, replacing the contents of
-// ImageReviewSpecApplyConfiguration.
-func (b *ImageReviewSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ImageReviewSpecList represents a listAlias of ImageReviewSpecApplyConfiguration.
@@ -154,8 +97,3 @@ type ImageReviewSpecList []*ImageReviewSpecApplyConfiguration
 
 // ImageReviewSpecList represents a map of ImageReviewSpecApplyConfiguration.
 type ImageReviewSpecMap map[string]ImageReviewSpecApplyConfiguration
-
-func (b *ImageReviewSpecApplyConfiguration) preMarshal() {
-}
-func (b *ImageReviewSpecApplyConfiguration) postUnmarshal() {
-}

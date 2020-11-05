@@ -18,16 +18,14 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // StorageOSVolumeSourceApplyConfiguration represents an declarative configuration of the StorageOSVolumeSource type for use
 // with apply.
 type StorageOSVolumeSourceApplyConfiguration struct {
-	fields storageOSVolumeSourceFields
+	VolumeName      *string                                 `json:"volumeName,omitempty"`
+	VolumeNamespace *string                                 `json:"volumeNamespace,omitempty"`
+	FSType          *string                                 `json:"fsType,omitempty"`
+	ReadOnly        *bool                                   `json:"readOnly,omitempty"`
+	SecretRef       *LocalObjectReferenceApplyConfiguration `json:"secretRef,omitempty"`
 }
 
 // StorageOSVolumeSourceApplyConfiguration constructs an declarative configuration of the StorageOSVolumeSource type for use with
@@ -36,34 +34,21 @@ func StorageOSVolumeSource() *StorageOSVolumeSourceApplyConfiguration {
 	return &StorageOSVolumeSourceApplyConfiguration{}
 }
 
-// storageOSVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in StorageOSVolumeSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type storageOSVolumeSourceFields struct {
-	VolumeName      *string                                 `json:"volumeName,omitempty"`
-	VolumeNamespace *string                                 `json:"volumeNamespace,omitempty"`
-	FSType          *string                                 `json:"fsType,omitempty"`
-	ReadOnly        *bool                                   `json:"readOnly,omitempty"`
-	SecretRef       *LocalObjectReferenceApplyConfiguration `json:"secretRef,omitempty"`
-}
-
 // SetVolumeName sets the VolumeName field in the declarative configuration to the given value.
 func (b *StorageOSVolumeSourceApplyConfiguration) SetVolumeName(value string) *StorageOSVolumeSourceApplyConfiguration {
-	b.fields.VolumeName = &value
+	b.VolumeName = &value
 	return b
 }
 
 // RemoveVolumeName removes the VolumeName field from the declarative configuration.
 func (b *StorageOSVolumeSourceApplyConfiguration) RemoveVolumeName() *StorageOSVolumeSourceApplyConfiguration {
-	b.fields.VolumeName = nil
+	b.VolumeName = nil
 	return b
 }
 
 // GetVolumeName gets the VolumeName field from the declarative configuration.
 func (b *StorageOSVolumeSourceApplyConfiguration) GetVolumeName() (value string, ok bool) {
-	if v := b.fields.VolumeName; v != nil {
+	if v := b.VolumeName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -71,19 +56,19 @@ func (b *StorageOSVolumeSourceApplyConfiguration) GetVolumeName() (value string,
 
 // SetVolumeNamespace sets the VolumeNamespace field in the declarative configuration to the given value.
 func (b *StorageOSVolumeSourceApplyConfiguration) SetVolumeNamespace(value string) *StorageOSVolumeSourceApplyConfiguration {
-	b.fields.VolumeNamespace = &value
+	b.VolumeNamespace = &value
 	return b
 }
 
 // RemoveVolumeNamespace removes the VolumeNamespace field from the declarative configuration.
 func (b *StorageOSVolumeSourceApplyConfiguration) RemoveVolumeNamespace() *StorageOSVolumeSourceApplyConfiguration {
-	b.fields.VolumeNamespace = nil
+	b.VolumeNamespace = nil
 	return b
 }
 
 // GetVolumeNamespace gets the VolumeNamespace field from the declarative configuration.
 func (b *StorageOSVolumeSourceApplyConfiguration) GetVolumeNamespace() (value string, ok bool) {
-	if v := b.fields.VolumeNamespace; v != nil {
+	if v := b.VolumeNamespace; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -91,19 +76,19 @@ func (b *StorageOSVolumeSourceApplyConfiguration) GetVolumeNamespace() (value st
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
 func (b *StorageOSVolumeSourceApplyConfiguration) SetFSType(value string) *StorageOSVolumeSourceApplyConfiguration {
-	b.fields.FSType = &value
+	b.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
 func (b *StorageOSVolumeSourceApplyConfiguration) RemoveFSType() *StorageOSVolumeSourceApplyConfiguration {
-	b.fields.FSType = nil
+	b.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
 func (b *StorageOSVolumeSourceApplyConfiguration) GetFSType() (value string, ok bool) {
-	if v := b.fields.FSType; v != nil {
+	if v := b.FSType; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -111,19 +96,19 @@ func (b *StorageOSVolumeSourceApplyConfiguration) GetFSType() (value string, ok 
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
 func (b *StorageOSVolumeSourceApplyConfiguration) SetReadOnly(value bool) *StorageOSVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = &value
+	b.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
 func (b *StorageOSVolumeSourceApplyConfiguration) RemoveReadOnly() *StorageOSVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = nil
+	b.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
 func (b *StorageOSVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
-	if v := b.fields.ReadOnly; v != nil {
+	if v := b.ReadOnly; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -131,61 +116,19 @@ func (b *StorageOSVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok 
 
 // SetSecretRef sets the SecretRef field in the declarative configuration to the given value.
 func (b *StorageOSVolumeSourceApplyConfiguration) SetSecretRef(value *LocalObjectReferenceApplyConfiguration) *StorageOSVolumeSourceApplyConfiguration {
-	b.fields.SecretRef = value
+	b.SecretRef = value
 	return b
 }
 
 // RemoveSecretRef removes the SecretRef field from the declarative configuration.
 func (b *StorageOSVolumeSourceApplyConfiguration) RemoveSecretRef() *StorageOSVolumeSourceApplyConfiguration {
-	b.fields.SecretRef = nil
+	b.SecretRef = nil
 	return b
 }
 
 // GetSecretRef gets the SecretRef field from the declarative configuration.
 func (b *StorageOSVolumeSourceApplyConfiguration) GetSecretRef() (value *LocalObjectReferenceApplyConfiguration, ok bool) {
-	return b.fields.SecretRef, b.fields.SecretRef != nil
-}
-
-// ToUnstructured converts StorageOSVolumeSourceApplyConfiguration to unstructured.
-func (b *StorageOSVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to StorageOSVolumeSourceApplyConfiguration, replacing the contents
-// of StorageOSVolumeSourceApplyConfiguration.
-func (b *StorageOSVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &storageOSVolumeSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals StorageOSVolumeSourceApplyConfiguration to JSON.
-func (b *StorageOSVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into StorageOSVolumeSourceApplyConfiguration, replacing the contents of
-// StorageOSVolumeSourceApplyConfiguration.
-func (b *StorageOSVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.SecretRef, b.SecretRef != nil
 }
 
 // StorageOSVolumeSourceList represents a listAlias of StorageOSVolumeSourceApplyConfiguration.
@@ -193,8 +136,3 @@ type StorageOSVolumeSourceList []*StorageOSVolumeSourceApplyConfiguration
 
 // StorageOSVolumeSourceList represents a map of StorageOSVolumeSourceApplyConfiguration.
 type StorageOSVolumeSourceMap map[string]StorageOSVolumeSourceApplyConfiguration
-
-func (b *StorageOSVolumeSourceApplyConfiguration) preMarshal() {
-}
-func (b *StorageOSVolumeSourceApplyConfiguration) postUnmarshal() {
-}

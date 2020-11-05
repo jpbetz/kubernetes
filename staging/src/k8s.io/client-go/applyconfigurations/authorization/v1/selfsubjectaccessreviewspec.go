@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // SelfSubjectAccessReviewSpecApplyConfiguration represents an declarative configuration of the SelfSubjectAccessReviewSpec type for use
 // with apply.
 type SelfSubjectAccessReviewSpecApplyConfiguration struct {
-	fields selfSubjectAccessReviewSpecFields
+	ResourceAttributes    *ResourceAttributesApplyConfiguration    `json:"resourceAttributes,omitempty"`
+	NonResourceAttributes *NonResourceAttributesApplyConfiguration `json:"nonResourceAttributes,omitempty"`
 }
 
 // SelfSubjectAccessReviewSpecApplyConfiguration constructs an declarative configuration of the SelfSubjectAccessReviewSpec type for use with
@@ -36,90 +31,38 @@ func SelfSubjectAccessReviewSpec() *SelfSubjectAccessReviewSpecApplyConfiguratio
 	return &SelfSubjectAccessReviewSpecApplyConfiguration{}
 }
 
-// selfSubjectAccessReviewSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SelfSubjectAccessReviewSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type selfSubjectAccessReviewSpecFields struct {
-	ResourceAttributes    *ResourceAttributesApplyConfiguration    `json:"resourceAttributes,omitempty"`
-	NonResourceAttributes *NonResourceAttributesApplyConfiguration `json:"nonResourceAttributes,omitempty"`
-}
-
 // SetResourceAttributes sets the ResourceAttributes field in the declarative configuration to the given value.
 func (b *SelfSubjectAccessReviewSpecApplyConfiguration) SetResourceAttributes(value *ResourceAttributesApplyConfiguration) *SelfSubjectAccessReviewSpecApplyConfiguration {
-	b.fields.ResourceAttributes = value
+	b.ResourceAttributes = value
 	return b
 }
 
 // RemoveResourceAttributes removes the ResourceAttributes field from the declarative configuration.
 func (b *SelfSubjectAccessReviewSpecApplyConfiguration) RemoveResourceAttributes() *SelfSubjectAccessReviewSpecApplyConfiguration {
-	b.fields.ResourceAttributes = nil
+	b.ResourceAttributes = nil
 	return b
 }
 
 // GetResourceAttributes gets the ResourceAttributes field from the declarative configuration.
 func (b *SelfSubjectAccessReviewSpecApplyConfiguration) GetResourceAttributes() (value *ResourceAttributesApplyConfiguration, ok bool) {
-	return b.fields.ResourceAttributes, b.fields.ResourceAttributes != nil
+	return b.ResourceAttributes, b.ResourceAttributes != nil
 }
 
 // SetNonResourceAttributes sets the NonResourceAttributes field in the declarative configuration to the given value.
 func (b *SelfSubjectAccessReviewSpecApplyConfiguration) SetNonResourceAttributes(value *NonResourceAttributesApplyConfiguration) *SelfSubjectAccessReviewSpecApplyConfiguration {
-	b.fields.NonResourceAttributes = value
+	b.NonResourceAttributes = value
 	return b
 }
 
 // RemoveNonResourceAttributes removes the NonResourceAttributes field from the declarative configuration.
 func (b *SelfSubjectAccessReviewSpecApplyConfiguration) RemoveNonResourceAttributes() *SelfSubjectAccessReviewSpecApplyConfiguration {
-	b.fields.NonResourceAttributes = nil
+	b.NonResourceAttributes = nil
 	return b
 }
 
 // GetNonResourceAttributes gets the NonResourceAttributes field from the declarative configuration.
 func (b *SelfSubjectAccessReviewSpecApplyConfiguration) GetNonResourceAttributes() (value *NonResourceAttributesApplyConfiguration, ok bool) {
-	return b.fields.NonResourceAttributes, b.fields.NonResourceAttributes != nil
-}
-
-// ToUnstructured converts SelfSubjectAccessReviewSpecApplyConfiguration to unstructured.
-func (b *SelfSubjectAccessReviewSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to SelfSubjectAccessReviewSpecApplyConfiguration, replacing the contents
-// of SelfSubjectAccessReviewSpecApplyConfiguration.
-func (b *SelfSubjectAccessReviewSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &selfSubjectAccessReviewSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals SelfSubjectAccessReviewSpecApplyConfiguration to JSON.
-func (b *SelfSubjectAccessReviewSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into SelfSubjectAccessReviewSpecApplyConfiguration, replacing the contents of
-// SelfSubjectAccessReviewSpecApplyConfiguration.
-func (b *SelfSubjectAccessReviewSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.NonResourceAttributes, b.NonResourceAttributes != nil
 }
 
 // SelfSubjectAccessReviewSpecList represents a listAlias of SelfSubjectAccessReviewSpecApplyConfiguration.
@@ -127,8 +70,3 @@ type SelfSubjectAccessReviewSpecList []*SelfSubjectAccessReviewSpecApplyConfigur
 
 // SelfSubjectAccessReviewSpecList represents a map of SelfSubjectAccessReviewSpecApplyConfiguration.
 type SelfSubjectAccessReviewSpecMap map[string]SelfSubjectAccessReviewSpecApplyConfiguration
-
-func (b *SelfSubjectAccessReviewSpecApplyConfiguration) preMarshal() {
-}
-func (b *SelfSubjectAccessReviewSpecApplyConfiguration) postUnmarshal() {
-}

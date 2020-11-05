@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -173,7 +174,7 @@ func (c *cSINodes) Patch(ctx context.Context, name string, pt types.PatchType, d
 // Apply takes the given apply declarative configuration, applies it and returns the applied cSINode.
 func (c *cSINodes) Apply(ctx context.Context, cSINode *storagev1.CSINodeApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.CSINode, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := cSINode.MarshalJSON()
+	data, err := json.Marshal(cSINode)
 	if err != nil {
 		return nil, err
 	}

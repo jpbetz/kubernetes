@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
@@ -137,7 +138,7 @@ func (c *FakeServices) Patch(ctx context.Context, name string, pt types.PatchTyp
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied service.
 func (c *FakeServices) Apply(ctx context.Context, service *applyconfigurationscorev1.ServiceApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Service, err error) {
-	data, err := service.MarshalJSON()
+	data, err := json.Marshal(service)
 	if err != nil {
 		return nil, err
 	}

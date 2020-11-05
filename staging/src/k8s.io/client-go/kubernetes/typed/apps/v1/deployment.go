@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -204,7 +205,7 @@ func (c *deployments) Patch(ctx context.Context, name string, pt types.PatchType
 // Apply takes the given apply declarative configuration, applies it and returns the applied deployment.
 func (c *deployments) Apply(ctx context.Context, deployment *appsv1.DeploymentApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Deployment, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := deployment.MarshalJSON()
+	data, err := json.Marshal(deployment)
 	if err != nil {
 		return nil, err
 	}

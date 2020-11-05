@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	v1beta1 "k8s.io/api/extensions/v1beta1"
@@ -125,7 +126,7 @@ func (c *FakePodSecurityPolicies) Patch(ctx context.Context, name string, pt typ
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied podSecurityPolicy.
 func (c *FakePodSecurityPolicies) Apply(ctx context.Context, podSecurityPolicy *extensionsv1beta1.PodSecurityPolicyApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.PodSecurityPolicy, err error) {
-	data, err := podSecurityPolicy.MarshalJSON()
+	data, err := json.Marshal(podSecurityPolicy)
 	if err != nil {
 		return nil, err
 	}

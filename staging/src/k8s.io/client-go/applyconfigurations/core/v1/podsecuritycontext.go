@@ -19,30 +19,12 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	corev1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // PodSecurityContextApplyConfiguration represents an declarative configuration of the PodSecurityContext type for use
 // with apply.
 type PodSecurityContextApplyConfiguration struct {
-	fields podSecurityContextFields
-}
-
-// PodSecurityContextApplyConfiguration constructs an declarative configuration of the PodSecurityContext type for use with
-// apply.
-func PodSecurityContext() *PodSecurityContextApplyConfiguration {
-	return &PodSecurityContextApplyConfiguration{}
-}
-
-// podSecurityContextFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodSecurityContextApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type podSecurityContextFields struct {
 	SELinuxOptions      *SELinuxOptionsApplyConfiguration                `json:"seLinuxOptions,omitempty"`
 	WindowsOptions      *WindowsSecurityContextOptionsApplyConfiguration `json:"windowsOptions,omitempty"`
 	RunAsUser           *int64                                           `json:"runAsUser,omitempty"`
@@ -55,55 +37,61 @@ type podSecurityContextFields struct {
 	SeccompProfile      *SeccompProfileApplyConfiguration                `json:"seccompProfile,omitempty"`
 }
 
+// PodSecurityContextApplyConfiguration constructs an declarative configuration of the PodSecurityContext type for use with
+// apply.
+func PodSecurityContext() *PodSecurityContextApplyConfiguration {
+	return &PodSecurityContextApplyConfiguration{}
+}
+
 // SetSELinuxOptions sets the SELinuxOptions field in the declarative configuration to the given value.
 func (b *PodSecurityContextApplyConfiguration) SetSELinuxOptions(value *SELinuxOptionsApplyConfiguration) *PodSecurityContextApplyConfiguration {
-	b.fields.SELinuxOptions = value
+	b.SELinuxOptions = value
 	return b
 }
 
 // RemoveSELinuxOptions removes the SELinuxOptions field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) RemoveSELinuxOptions() *PodSecurityContextApplyConfiguration {
-	b.fields.SELinuxOptions = nil
+	b.SELinuxOptions = nil
 	return b
 }
 
 // GetSELinuxOptions gets the SELinuxOptions field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) GetSELinuxOptions() (value *SELinuxOptionsApplyConfiguration, ok bool) {
-	return b.fields.SELinuxOptions, b.fields.SELinuxOptions != nil
+	return b.SELinuxOptions, b.SELinuxOptions != nil
 }
 
 // SetWindowsOptions sets the WindowsOptions field in the declarative configuration to the given value.
 func (b *PodSecurityContextApplyConfiguration) SetWindowsOptions(value *WindowsSecurityContextOptionsApplyConfiguration) *PodSecurityContextApplyConfiguration {
-	b.fields.WindowsOptions = value
+	b.WindowsOptions = value
 	return b
 }
 
 // RemoveWindowsOptions removes the WindowsOptions field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) RemoveWindowsOptions() *PodSecurityContextApplyConfiguration {
-	b.fields.WindowsOptions = nil
+	b.WindowsOptions = nil
 	return b
 }
 
 // GetWindowsOptions gets the WindowsOptions field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) GetWindowsOptions() (value *WindowsSecurityContextOptionsApplyConfiguration, ok bool) {
-	return b.fields.WindowsOptions, b.fields.WindowsOptions != nil
+	return b.WindowsOptions, b.WindowsOptions != nil
 }
 
 // SetRunAsUser sets the RunAsUser field in the declarative configuration to the given value.
 func (b *PodSecurityContextApplyConfiguration) SetRunAsUser(value int64) *PodSecurityContextApplyConfiguration {
-	b.fields.RunAsUser = &value
+	b.RunAsUser = &value
 	return b
 }
 
 // RemoveRunAsUser removes the RunAsUser field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) RemoveRunAsUser() *PodSecurityContextApplyConfiguration {
-	b.fields.RunAsUser = nil
+	b.RunAsUser = nil
 	return b
 }
 
 // GetRunAsUser gets the RunAsUser field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) GetRunAsUser() (value int64, ok bool) {
-	if v := b.fields.RunAsUser; v != nil {
+	if v := b.RunAsUser; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -111,19 +99,19 @@ func (b *PodSecurityContextApplyConfiguration) GetRunAsUser() (value int64, ok b
 
 // SetRunAsGroup sets the RunAsGroup field in the declarative configuration to the given value.
 func (b *PodSecurityContextApplyConfiguration) SetRunAsGroup(value int64) *PodSecurityContextApplyConfiguration {
-	b.fields.RunAsGroup = &value
+	b.RunAsGroup = &value
 	return b
 }
 
 // RemoveRunAsGroup removes the RunAsGroup field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) RemoveRunAsGroup() *PodSecurityContextApplyConfiguration {
-	b.fields.RunAsGroup = nil
+	b.RunAsGroup = nil
 	return b
 }
 
 // GetRunAsGroup gets the RunAsGroup field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) GetRunAsGroup() (value int64, ok bool) {
-	if v := b.fields.RunAsGroup; v != nil {
+	if v := b.RunAsGroup; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -131,19 +119,19 @@ func (b *PodSecurityContextApplyConfiguration) GetRunAsGroup() (value int64, ok 
 
 // SetRunAsNonRoot sets the RunAsNonRoot field in the declarative configuration to the given value.
 func (b *PodSecurityContextApplyConfiguration) SetRunAsNonRoot(value bool) *PodSecurityContextApplyConfiguration {
-	b.fields.RunAsNonRoot = &value
+	b.RunAsNonRoot = &value
 	return b
 }
 
 // RemoveRunAsNonRoot removes the RunAsNonRoot field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) RemoveRunAsNonRoot() *PodSecurityContextApplyConfiguration {
-	b.fields.RunAsNonRoot = nil
+	b.RunAsNonRoot = nil
 	return b
 }
 
 // GetRunAsNonRoot gets the RunAsNonRoot field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) GetRunAsNonRoot() (value bool, ok bool) {
-	if v := b.fields.RunAsNonRoot; v != nil {
+	if v := b.RunAsNonRoot; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -151,19 +139,19 @@ func (b *PodSecurityContextApplyConfiguration) GetRunAsNonRoot() (value bool, ok
 
 // SetSupplementalGroups sets the SupplementalGroups field in the declarative configuration to the given value.
 func (b *PodSecurityContextApplyConfiguration) SetSupplementalGroups(value []int64) *PodSecurityContextApplyConfiguration {
-	b.fields.SupplementalGroups = &value
+	b.SupplementalGroups = &value
 	return b
 }
 
 // RemoveSupplementalGroups removes the SupplementalGroups field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) RemoveSupplementalGroups() *PodSecurityContextApplyConfiguration {
-	b.fields.SupplementalGroups = nil
+	b.SupplementalGroups = nil
 	return b
 }
 
 // GetSupplementalGroups gets the SupplementalGroups field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) GetSupplementalGroups() (value []int64, ok bool) {
-	if v := b.fields.SupplementalGroups; v != nil {
+	if v := b.SupplementalGroups; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -171,19 +159,19 @@ func (b *PodSecurityContextApplyConfiguration) GetSupplementalGroups() (value []
 
 // SetFSGroup sets the FSGroup field in the declarative configuration to the given value.
 func (b *PodSecurityContextApplyConfiguration) SetFSGroup(value int64) *PodSecurityContextApplyConfiguration {
-	b.fields.FSGroup = &value
+	b.FSGroup = &value
 	return b
 }
 
 // RemoveFSGroup removes the FSGroup field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) RemoveFSGroup() *PodSecurityContextApplyConfiguration {
-	b.fields.FSGroup = nil
+	b.FSGroup = nil
 	return b
 }
 
 // GetFSGroup gets the FSGroup field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) GetFSGroup() (value int64, ok bool) {
-	if v := b.fields.FSGroup; v != nil {
+	if v := b.FSGroup; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -191,19 +179,19 @@ func (b *PodSecurityContextApplyConfiguration) GetFSGroup() (value int64, ok boo
 
 // SetSysctls sets the Sysctls field in the declarative configuration to the given value.
 func (b *PodSecurityContextApplyConfiguration) SetSysctls(value SysctlList) *PodSecurityContextApplyConfiguration {
-	b.fields.Sysctls = &value
+	b.Sysctls = &value
 	return b
 }
 
 // RemoveSysctls removes the Sysctls field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) RemoveSysctls() *PodSecurityContextApplyConfiguration {
-	b.fields.Sysctls = nil
+	b.Sysctls = nil
 	return b
 }
 
 // GetSysctls gets the Sysctls field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) GetSysctls() (value SysctlList, ok bool) {
-	if v := b.fields.Sysctls; v != nil {
+	if v := b.Sysctls; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -211,19 +199,19 @@ func (b *PodSecurityContextApplyConfiguration) GetSysctls() (value SysctlList, o
 
 // SetFSGroupChangePolicy sets the FSGroupChangePolicy field in the declarative configuration to the given value.
 func (b *PodSecurityContextApplyConfiguration) SetFSGroupChangePolicy(value corev1.PodFSGroupChangePolicy) *PodSecurityContextApplyConfiguration {
-	b.fields.FSGroupChangePolicy = &value
+	b.FSGroupChangePolicy = &value
 	return b
 }
 
 // RemoveFSGroupChangePolicy removes the FSGroupChangePolicy field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) RemoveFSGroupChangePolicy() *PodSecurityContextApplyConfiguration {
-	b.fields.FSGroupChangePolicy = nil
+	b.FSGroupChangePolicy = nil
 	return b
 }
 
 // GetFSGroupChangePolicy gets the FSGroupChangePolicy field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) GetFSGroupChangePolicy() (value corev1.PodFSGroupChangePolicy, ok bool) {
-	if v := b.fields.FSGroupChangePolicy; v != nil {
+	if v := b.FSGroupChangePolicy; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -231,61 +219,19 @@ func (b *PodSecurityContextApplyConfiguration) GetFSGroupChangePolicy() (value c
 
 // SetSeccompProfile sets the SeccompProfile field in the declarative configuration to the given value.
 func (b *PodSecurityContextApplyConfiguration) SetSeccompProfile(value *SeccompProfileApplyConfiguration) *PodSecurityContextApplyConfiguration {
-	b.fields.SeccompProfile = value
+	b.SeccompProfile = value
 	return b
 }
 
 // RemoveSeccompProfile removes the SeccompProfile field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) RemoveSeccompProfile() *PodSecurityContextApplyConfiguration {
-	b.fields.SeccompProfile = nil
+	b.SeccompProfile = nil
 	return b
 }
 
 // GetSeccompProfile gets the SeccompProfile field from the declarative configuration.
 func (b *PodSecurityContextApplyConfiguration) GetSeccompProfile() (value *SeccompProfileApplyConfiguration, ok bool) {
-	return b.fields.SeccompProfile, b.fields.SeccompProfile != nil
-}
-
-// ToUnstructured converts PodSecurityContextApplyConfiguration to unstructured.
-func (b *PodSecurityContextApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PodSecurityContextApplyConfiguration, replacing the contents
-// of PodSecurityContextApplyConfiguration.
-func (b *PodSecurityContextApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &podSecurityContextFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PodSecurityContextApplyConfiguration to JSON.
-func (b *PodSecurityContextApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PodSecurityContextApplyConfiguration, replacing the contents of
-// PodSecurityContextApplyConfiguration.
-func (b *PodSecurityContextApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.SeccompProfile, b.SeccompProfile != nil
 }
 
 // PodSecurityContextList represents a listAlias of PodSecurityContextApplyConfiguration.
@@ -293,8 +239,3 @@ type PodSecurityContextList []*PodSecurityContextApplyConfiguration
 
 // PodSecurityContextList represents a map of PodSecurityContextApplyConfiguration.
 type PodSecurityContextMap map[string]PodSecurityContextApplyConfiguration
-
-func (b *PodSecurityContextApplyConfiguration) preMarshal() {
-}
-func (b *PodSecurityContextApplyConfiguration) postUnmarshal() {
-}

@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
@@ -145,7 +146,7 @@ func (c *FakePersistentVolumeClaims) Patch(ctx context.Context, name string, pt 
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied persistentVolumeClaim.
 func (c *FakePersistentVolumeClaims) Apply(ctx context.Context, persistentVolumeClaim *applyconfigurationscorev1.PersistentVolumeClaimApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.PersistentVolumeClaim, err error) {
-	data, err := persistentVolumeClaim.MarshalJSON()
+	data, err := json.Marshal(persistentVolumeClaim)
 	if err != nil {
 		return nil, err
 	}

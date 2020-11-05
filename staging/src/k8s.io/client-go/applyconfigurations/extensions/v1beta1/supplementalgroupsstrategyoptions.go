@@ -19,16 +19,14 @@ limitations under the License.
 package v1beta1
 
 import (
-	json "encoding/json"
-
 	v1beta1 "k8s.io/api/extensions/v1beta1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // SupplementalGroupsStrategyOptionsApplyConfiguration represents an declarative configuration of the SupplementalGroupsStrategyOptions type for use
 // with apply.
 type SupplementalGroupsStrategyOptionsApplyConfiguration struct {
-	fields supplementalGroupsStrategyOptionsFields
+	Rule   *v1beta1.SupplementalGroupsStrategyType `json:"rule,omitempty"`
+	Ranges *IDRangeList                            `json:"ranges,omitempty"`
 }
 
 // SupplementalGroupsStrategyOptionsApplyConfiguration constructs an declarative configuration of the SupplementalGroupsStrategyOptions type for use with
@@ -37,31 +35,21 @@ func SupplementalGroupsStrategyOptions() *SupplementalGroupsStrategyOptionsApply
 	return &SupplementalGroupsStrategyOptionsApplyConfiguration{}
 }
 
-// supplementalGroupsStrategyOptionsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SupplementalGroupsStrategyOptionsApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type supplementalGroupsStrategyOptionsFields struct {
-	Rule   *v1beta1.SupplementalGroupsStrategyType `json:"rule,omitempty"`
-	Ranges *IDRangeList                            `json:"ranges,omitempty"`
-}
-
 // SetRule sets the Rule field in the declarative configuration to the given value.
 func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) SetRule(value v1beta1.SupplementalGroupsStrategyType) *SupplementalGroupsStrategyOptionsApplyConfiguration {
-	b.fields.Rule = &value
+	b.Rule = &value
 	return b
 }
 
 // RemoveRule removes the Rule field from the declarative configuration.
 func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) RemoveRule() *SupplementalGroupsStrategyOptionsApplyConfiguration {
-	b.fields.Rule = nil
+	b.Rule = nil
 	return b
 }
 
 // GetRule gets the Rule field from the declarative configuration.
 func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) GetRule() (value v1beta1.SupplementalGroupsStrategyType, ok bool) {
-	if v := b.fields.Rule; v != nil {
+	if v := b.Rule; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,64 +57,22 @@ func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) GetRule() (value v
 
 // SetRanges sets the Ranges field in the declarative configuration to the given value.
 func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) SetRanges(value IDRangeList) *SupplementalGroupsStrategyOptionsApplyConfiguration {
-	b.fields.Ranges = &value
+	b.Ranges = &value
 	return b
 }
 
 // RemoveRanges removes the Ranges field from the declarative configuration.
 func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) RemoveRanges() *SupplementalGroupsStrategyOptionsApplyConfiguration {
-	b.fields.Ranges = nil
+	b.Ranges = nil
 	return b
 }
 
 // GetRanges gets the Ranges field from the declarative configuration.
 func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) GetRanges() (value IDRangeList, ok bool) {
-	if v := b.fields.Ranges; v != nil {
+	if v := b.Ranges; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts SupplementalGroupsStrategyOptionsApplyConfiguration to unstructured.
-func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to SupplementalGroupsStrategyOptionsApplyConfiguration, replacing the contents
-// of SupplementalGroupsStrategyOptionsApplyConfiguration.
-func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &supplementalGroupsStrategyOptionsFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals SupplementalGroupsStrategyOptionsApplyConfiguration to JSON.
-func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into SupplementalGroupsStrategyOptionsApplyConfiguration, replacing the contents of
-// SupplementalGroupsStrategyOptionsApplyConfiguration.
-func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // SupplementalGroupsStrategyOptionsList represents a listAlias of SupplementalGroupsStrategyOptionsApplyConfiguration.
@@ -134,8 +80,3 @@ type SupplementalGroupsStrategyOptionsList []*SupplementalGroupsStrategyOptionsA
 
 // SupplementalGroupsStrategyOptionsList represents a map of SupplementalGroupsStrategyOptionsApplyConfiguration.
 type SupplementalGroupsStrategyOptionsMap map[string]SupplementalGroupsStrategyOptionsApplyConfiguration
-
-func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) preMarshal() {
-}
-func (b *SupplementalGroupsStrategyOptionsApplyConfiguration) postUnmarshal() {
-}

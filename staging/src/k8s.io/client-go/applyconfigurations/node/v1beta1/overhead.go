@@ -19,16 +19,13 @@ limitations under the License.
 package v1beta1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // OverheadApplyConfiguration represents an declarative configuration of the Overhead type for use
 // with apply.
 type OverheadApplyConfiguration struct {
-	fields overheadFields
+	PodFixed *v1.ResourceList `json:"podFixed,omitempty"`
 }
 
 // OverheadApplyConfiguration constructs an declarative configuration of the Overhead type for use with
@@ -37,75 +34,24 @@ func Overhead() *OverheadApplyConfiguration {
 	return &OverheadApplyConfiguration{}
 }
 
-// overheadFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in OverheadApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type overheadFields struct {
-	PodFixed *v1.ResourceList `json:"podFixed,omitempty"`
-}
-
 // SetPodFixed sets the PodFixed field in the declarative configuration to the given value.
 func (b *OverheadApplyConfiguration) SetPodFixed(value v1.ResourceList) *OverheadApplyConfiguration {
-	b.fields.PodFixed = &value
+	b.PodFixed = &value
 	return b
 }
 
 // RemovePodFixed removes the PodFixed field from the declarative configuration.
 func (b *OverheadApplyConfiguration) RemovePodFixed() *OverheadApplyConfiguration {
-	b.fields.PodFixed = nil
+	b.PodFixed = nil
 	return b
 }
 
 // GetPodFixed gets the PodFixed field from the declarative configuration.
 func (b *OverheadApplyConfiguration) GetPodFixed() (value v1.ResourceList, ok bool) {
-	if v := b.fields.PodFixed; v != nil {
+	if v := b.PodFixed; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts OverheadApplyConfiguration to unstructured.
-func (b *OverheadApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to OverheadApplyConfiguration, replacing the contents
-// of OverheadApplyConfiguration.
-func (b *OverheadApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &overheadFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals OverheadApplyConfiguration to JSON.
-func (b *OverheadApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into OverheadApplyConfiguration, replacing the contents of
-// OverheadApplyConfiguration.
-func (b *OverheadApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // OverheadList represents a listAlias of OverheadApplyConfiguration.
@@ -113,8 +59,3 @@ type OverheadList []*OverheadApplyConfiguration
 
 // OverheadList represents a map of OverheadApplyConfiguration.
 type OverheadMap map[string]OverheadApplyConfiguration
-
-func (b *OverheadApplyConfiguration) preMarshal() {
-}
-func (b *OverheadApplyConfiguration) postUnmarshal() {
-}

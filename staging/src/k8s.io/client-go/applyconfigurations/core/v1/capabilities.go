@@ -19,16 +19,14 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // CapabilitiesApplyConfiguration represents an declarative configuration of the Capabilities type for use
 // with apply.
 type CapabilitiesApplyConfiguration struct {
-	fields capabilitiesFields
+	Add  *[]v1.Capability `json:"add,omitempty"`
+	Drop *[]v1.Capability `json:"drop,omitempty"`
 }
 
 // CapabilitiesApplyConfiguration constructs an declarative configuration of the Capabilities type for use with
@@ -37,31 +35,21 @@ func Capabilities() *CapabilitiesApplyConfiguration {
 	return &CapabilitiesApplyConfiguration{}
 }
 
-// capabilitiesFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in CapabilitiesApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type capabilitiesFields struct {
-	Add  *[]v1.Capability `json:"add,omitempty"`
-	Drop *[]v1.Capability `json:"drop,omitempty"`
-}
-
 // SetAdd sets the Add field in the declarative configuration to the given value.
 func (b *CapabilitiesApplyConfiguration) SetAdd(value []v1.Capability) *CapabilitiesApplyConfiguration {
-	b.fields.Add = &value
+	b.Add = &value
 	return b
 }
 
 // RemoveAdd removes the Add field from the declarative configuration.
 func (b *CapabilitiesApplyConfiguration) RemoveAdd() *CapabilitiesApplyConfiguration {
-	b.fields.Add = nil
+	b.Add = nil
 	return b
 }
 
 // GetAdd gets the Add field from the declarative configuration.
 func (b *CapabilitiesApplyConfiguration) GetAdd() (value []v1.Capability, ok bool) {
-	if v := b.fields.Add; v != nil {
+	if v := b.Add; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,64 +57,22 @@ func (b *CapabilitiesApplyConfiguration) GetAdd() (value []v1.Capability, ok boo
 
 // SetDrop sets the Drop field in the declarative configuration to the given value.
 func (b *CapabilitiesApplyConfiguration) SetDrop(value []v1.Capability) *CapabilitiesApplyConfiguration {
-	b.fields.Drop = &value
+	b.Drop = &value
 	return b
 }
 
 // RemoveDrop removes the Drop field from the declarative configuration.
 func (b *CapabilitiesApplyConfiguration) RemoveDrop() *CapabilitiesApplyConfiguration {
-	b.fields.Drop = nil
+	b.Drop = nil
 	return b
 }
 
 // GetDrop gets the Drop field from the declarative configuration.
 func (b *CapabilitiesApplyConfiguration) GetDrop() (value []v1.Capability, ok bool) {
-	if v := b.fields.Drop; v != nil {
+	if v := b.Drop; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts CapabilitiesApplyConfiguration to unstructured.
-func (b *CapabilitiesApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to CapabilitiesApplyConfiguration, replacing the contents
-// of CapabilitiesApplyConfiguration.
-func (b *CapabilitiesApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &capabilitiesFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals CapabilitiesApplyConfiguration to JSON.
-func (b *CapabilitiesApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into CapabilitiesApplyConfiguration, replacing the contents of
-// CapabilitiesApplyConfiguration.
-func (b *CapabilitiesApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // CapabilitiesList represents a listAlias of CapabilitiesApplyConfiguration.
@@ -134,8 +80,3 @@ type CapabilitiesList []*CapabilitiesApplyConfiguration
 
 // CapabilitiesList represents a map of CapabilitiesApplyConfiguration.
 type CapabilitiesMap map[string]CapabilitiesApplyConfiguration
-
-func (b *CapabilitiesApplyConfiguration) preMarshal() {
-}
-func (b *CapabilitiesApplyConfiguration) postUnmarshal() {
-}

@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	v1alpha1 "k8s.io/api/scheduling/v1alpha1"
@@ -125,7 +126,7 @@ func (c *FakePriorityClasses) Patch(ctx context.Context, name string, pt types.P
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied priorityClass.
 func (c *FakePriorityClasses) Apply(ctx context.Context, priorityClass *schedulingv1alpha1.PriorityClassApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1alpha1.PriorityClass, err error) {
-	data, err := priorityClass.MarshalJSON()
+	data, err := json.Marshal(priorityClass)
 	if err != nil {
 		return nil, err
 	}

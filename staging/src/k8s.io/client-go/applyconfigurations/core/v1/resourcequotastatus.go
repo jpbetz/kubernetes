@@ -19,16 +19,14 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // ResourceQuotaStatusApplyConfiguration represents an declarative configuration of the ResourceQuotaStatus type for use
 // with apply.
 type ResourceQuotaStatusApplyConfiguration struct {
-	fields resourceQuotaStatusFields
+	Hard *v1.ResourceList `json:"hard,omitempty"`
+	Used *v1.ResourceList `json:"used,omitempty"`
 }
 
 // ResourceQuotaStatusApplyConfiguration constructs an declarative configuration of the ResourceQuotaStatus type for use with
@@ -37,31 +35,21 @@ func ResourceQuotaStatus() *ResourceQuotaStatusApplyConfiguration {
 	return &ResourceQuotaStatusApplyConfiguration{}
 }
 
-// resourceQuotaStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ResourceQuotaStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type resourceQuotaStatusFields struct {
-	Hard *v1.ResourceList `json:"hard,omitempty"`
-	Used *v1.ResourceList `json:"used,omitempty"`
-}
-
 // SetHard sets the Hard field in the declarative configuration to the given value.
 func (b *ResourceQuotaStatusApplyConfiguration) SetHard(value v1.ResourceList) *ResourceQuotaStatusApplyConfiguration {
-	b.fields.Hard = &value
+	b.Hard = &value
 	return b
 }
 
 // RemoveHard removes the Hard field from the declarative configuration.
 func (b *ResourceQuotaStatusApplyConfiguration) RemoveHard() *ResourceQuotaStatusApplyConfiguration {
-	b.fields.Hard = nil
+	b.Hard = nil
 	return b
 }
 
 // GetHard gets the Hard field from the declarative configuration.
 func (b *ResourceQuotaStatusApplyConfiguration) GetHard() (value v1.ResourceList, ok bool) {
-	if v := b.fields.Hard; v != nil {
+	if v := b.Hard; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,64 +57,22 @@ func (b *ResourceQuotaStatusApplyConfiguration) GetHard() (value v1.ResourceList
 
 // SetUsed sets the Used field in the declarative configuration to the given value.
 func (b *ResourceQuotaStatusApplyConfiguration) SetUsed(value v1.ResourceList) *ResourceQuotaStatusApplyConfiguration {
-	b.fields.Used = &value
+	b.Used = &value
 	return b
 }
 
 // RemoveUsed removes the Used field from the declarative configuration.
 func (b *ResourceQuotaStatusApplyConfiguration) RemoveUsed() *ResourceQuotaStatusApplyConfiguration {
-	b.fields.Used = nil
+	b.Used = nil
 	return b
 }
 
 // GetUsed gets the Used field from the declarative configuration.
 func (b *ResourceQuotaStatusApplyConfiguration) GetUsed() (value v1.ResourceList, ok bool) {
-	if v := b.fields.Used; v != nil {
+	if v := b.Used; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ResourceQuotaStatusApplyConfiguration to unstructured.
-func (b *ResourceQuotaStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ResourceQuotaStatusApplyConfiguration, replacing the contents
-// of ResourceQuotaStatusApplyConfiguration.
-func (b *ResourceQuotaStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &resourceQuotaStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ResourceQuotaStatusApplyConfiguration to JSON.
-func (b *ResourceQuotaStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ResourceQuotaStatusApplyConfiguration, replacing the contents of
-// ResourceQuotaStatusApplyConfiguration.
-func (b *ResourceQuotaStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ResourceQuotaStatusList represents a listAlias of ResourceQuotaStatusApplyConfiguration.
@@ -134,8 +80,3 @@ type ResourceQuotaStatusList []*ResourceQuotaStatusApplyConfiguration
 
 // ResourceQuotaStatusList represents a map of ResourceQuotaStatusApplyConfiguration.
 type ResourceQuotaStatusMap map[string]ResourceQuotaStatusApplyConfiguration
-
-func (b *ResourceQuotaStatusApplyConfiguration) preMarshal() {
-}
-func (b *ResourceQuotaStatusApplyConfiguration) postUnmarshal() {
-}

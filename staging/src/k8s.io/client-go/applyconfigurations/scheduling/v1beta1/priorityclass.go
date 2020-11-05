@@ -19,18 +19,19 @@ limitations under the License.
 package v1beta1
 
 import (
-	json "encoding/json"
-
 	corev1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // PriorityClassApplyConfiguration represents an declarative configuration of the PriorityClass type for use
 // with apply.
 type PriorityClassApplyConfiguration struct {
-	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
-	fields   priorityClassFields
+	v1.TypeMetaApplyConfiguration `json:",inline"`
+	ObjectMeta                    *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Value                         *int32                           `json:"value,omitempty"`
+	GlobalDefault                 *bool                            `json:"globalDefault,omitempty"`
+	Description                   *string                          `json:"description,omitempty"`
+	PreemptionPolicy              *corev1.PreemptionPolicy         `json:"preemptionPolicy,omitempty"`
 }
 
 // PriorityClassApplyConfiguration constructs an declarative configuration of the PriorityClass type for use with
@@ -39,70 +40,51 @@ func PriorityClass() *PriorityClassApplyConfiguration {
 	return &PriorityClassApplyConfiguration{}
 }
 
-// priorityClassFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PriorityClassApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type priorityClassFields struct {
-	Kind             *string                          `json:"kind,omitempty"`       // inlined PriorityClassApplyConfiguration.typeMeta.Kind field
-	APIVersion       *string                          `json:"apiVersion,omitempty"` // inlined PriorityClassApplyConfiguration.typeMeta.APIVersion field
-	ObjectMeta       *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Value            *int32                           `json:"value,omitempty"`
-	GlobalDefault    *bool                            `json:"globalDefault,omitempty"`
-	Description      *string                          `json:"description,omitempty"`
-	PreemptionPolicy *corev1.PreemptionPolicy         `json:"preemptionPolicy,omitempty"`
-}
-
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
 func (b *PriorityClassApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *PriorityClassApplyConfiguration {
-	b.typeMeta = value
-	return b
-}
-
-// RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *PriorityClassApplyConfiguration) RemoveTypeMeta() *PriorityClassApplyConfiguration {
-	b.typeMeta = nil
+	if value != nil {
+		b.TypeMetaApplyConfiguration = *value
+	}
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
 func (b *PriorityClassApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
-	return b.typeMeta, true
+	return &b.TypeMetaApplyConfiguration, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
 func (b *PriorityClassApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *PriorityClassApplyConfiguration {
-	b.fields.ObjectMeta = value
+	b.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
 func (b *PriorityClassApplyConfiguration) RemoveObjectMeta() *PriorityClassApplyConfiguration {
-	b.fields.ObjectMeta = nil
+	b.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
 func (b *PriorityClassApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
-	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
+	return b.ObjectMeta, b.ObjectMeta != nil
 }
 
 // SetValue sets the Value field in the declarative configuration to the given value.
 func (b *PriorityClassApplyConfiguration) SetValue(value int32) *PriorityClassApplyConfiguration {
-	b.fields.Value = &value
+	b.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
 func (b *PriorityClassApplyConfiguration) RemoveValue() *PriorityClassApplyConfiguration {
-	b.fields.Value = nil
+	b.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
 func (b *PriorityClassApplyConfiguration) GetValue() (value int32, ok bool) {
-	if v := b.fields.Value; v != nil {
+	if v := b.Value; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -110,19 +92,19 @@ func (b *PriorityClassApplyConfiguration) GetValue() (value int32, ok bool) {
 
 // SetGlobalDefault sets the GlobalDefault field in the declarative configuration to the given value.
 func (b *PriorityClassApplyConfiguration) SetGlobalDefault(value bool) *PriorityClassApplyConfiguration {
-	b.fields.GlobalDefault = &value
+	b.GlobalDefault = &value
 	return b
 }
 
 // RemoveGlobalDefault removes the GlobalDefault field from the declarative configuration.
 func (b *PriorityClassApplyConfiguration) RemoveGlobalDefault() *PriorityClassApplyConfiguration {
-	b.fields.GlobalDefault = nil
+	b.GlobalDefault = nil
 	return b
 }
 
 // GetGlobalDefault gets the GlobalDefault field from the declarative configuration.
 func (b *PriorityClassApplyConfiguration) GetGlobalDefault() (value bool, ok bool) {
-	if v := b.fields.GlobalDefault; v != nil {
+	if v := b.GlobalDefault; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -130,19 +112,19 @@ func (b *PriorityClassApplyConfiguration) GetGlobalDefault() (value bool, ok boo
 
 // SetDescription sets the Description field in the declarative configuration to the given value.
 func (b *PriorityClassApplyConfiguration) SetDescription(value string) *PriorityClassApplyConfiguration {
-	b.fields.Description = &value
+	b.Description = &value
 	return b
 }
 
 // RemoveDescription removes the Description field from the declarative configuration.
 func (b *PriorityClassApplyConfiguration) RemoveDescription() *PriorityClassApplyConfiguration {
-	b.fields.Description = nil
+	b.Description = nil
 	return b
 }
 
 // GetDescription gets the Description field from the declarative configuration.
 func (b *PriorityClassApplyConfiguration) GetDescription() (value string, ok bool) {
-	if v := b.fields.Description; v != nil {
+	if v := b.Description; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -150,64 +132,22 @@ func (b *PriorityClassApplyConfiguration) GetDescription() (value string, ok boo
 
 // SetPreemptionPolicy sets the PreemptionPolicy field in the declarative configuration to the given value.
 func (b *PriorityClassApplyConfiguration) SetPreemptionPolicy(value corev1.PreemptionPolicy) *PriorityClassApplyConfiguration {
-	b.fields.PreemptionPolicy = &value
+	b.PreemptionPolicy = &value
 	return b
 }
 
 // RemovePreemptionPolicy removes the PreemptionPolicy field from the declarative configuration.
 func (b *PriorityClassApplyConfiguration) RemovePreemptionPolicy() *PriorityClassApplyConfiguration {
-	b.fields.PreemptionPolicy = nil
+	b.PreemptionPolicy = nil
 	return b
 }
 
 // GetPreemptionPolicy gets the PreemptionPolicy field from the declarative configuration.
 func (b *PriorityClassApplyConfiguration) GetPreemptionPolicy() (value corev1.PreemptionPolicy, ok bool) {
-	if v := b.fields.PreemptionPolicy; v != nil {
+	if v := b.PreemptionPolicy; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts PriorityClassApplyConfiguration to unstructured.
-func (b *PriorityClassApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PriorityClassApplyConfiguration, replacing the contents
-// of PriorityClassApplyConfiguration.
-func (b *PriorityClassApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &priorityClassFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PriorityClassApplyConfiguration to JSON.
-func (b *PriorityClassApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PriorityClassApplyConfiguration, replacing the contents of
-// PriorityClassApplyConfiguration.
-func (b *PriorityClassApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // PriorityClassList represents a listAlias of PriorityClassApplyConfiguration.
@@ -215,25 +155,3 @@ type PriorityClassList []*PriorityClassApplyConfiguration
 
 // PriorityClassList represents a map of PriorityClassApplyConfiguration.
 type PriorityClassMap map[string]PriorityClassApplyConfiguration
-
-func (b *PriorityClassApplyConfiguration) preMarshal() {
-	if b.typeMeta != nil {
-		if v, ok := b.typeMeta.GetKind(); ok {
-			b.fields.Kind = &v
-		}
-		if v, ok := b.typeMeta.GetAPIVersion(); ok {
-			b.fields.APIVersion = &v
-		}
-	}
-}
-func (b *PriorityClassApplyConfiguration) postUnmarshal() {
-	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
-	}
-	if b.fields.Kind != nil {
-		b.typeMeta.SetKind(*b.fields.Kind)
-	}
-	if b.fields.APIVersion != nil {
-		b.typeMeta.SetAPIVersion(*b.fields.APIVersion)
-	}
-}

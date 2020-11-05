@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -200,7 +201,7 @@ func (c *persistentVolumeClaims) Patch(ctx context.Context, name string, pt type
 // Apply takes the given apply declarative configuration, applies it and returns the applied persistentVolumeClaim.
 func (c *persistentVolumeClaims) Apply(ctx context.Context, persistentVolumeClaim *corev1.PersistentVolumeClaimApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.PersistentVolumeClaim, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := persistentVolumeClaim.MarshalJSON()
+	data, err := json.Marshal(persistentVolumeClaim)
 	if err != nil {
 		return nil, err
 	}

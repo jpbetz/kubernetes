@@ -19,17 +19,15 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // RoleApplyConfiguration represents an declarative configuration of the Role type for use
 // with apply.
 type RoleApplyConfiguration struct {
-	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
-	fields   roleFields
+	v1.TypeMetaApplyConfiguration `json:",inline"`
+	ObjectMeta                    *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Rules                         *PolicyRuleList                  `json:"rules,omitempty"`
 }
 
 // RoleApplyConfiguration constructs an declarative configuration of the Role type for use with
@@ -38,112 +36,54 @@ func Role() *RoleApplyConfiguration {
 	return &RoleApplyConfiguration{}
 }
 
-// roleFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in RoleApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type roleFields struct {
-	Kind       *string                          `json:"kind,omitempty"`       // inlined RoleApplyConfiguration.typeMeta.Kind field
-	APIVersion *string                          `json:"apiVersion,omitempty"` // inlined RoleApplyConfiguration.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Rules      *PolicyRuleList                  `json:"rules,omitempty"`
-}
-
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
 func (b *RoleApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *RoleApplyConfiguration {
-	b.typeMeta = value
-	return b
-}
-
-// RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *RoleApplyConfiguration) RemoveTypeMeta() *RoleApplyConfiguration {
-	b.typeMeta = nil
+	if value != nil {
+		b.TypeMetaApplyConfiguration = *value
+	}
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
 func (b *RoleApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
-	return b.typeMeta, true
+	return &b.TypeMetaApplyConfiguration, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
 func (b *RoleApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *RoleApplyConfiguration {
-	b.fields.ObjectMeta = value
+	b.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
 func (b *RoleApplyConfiguration) RemoveObjectMeta() *RoleApplyConfiguration {
-	b.fields.ObjectMeta = nil
+	b.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
 func (b *RoleApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
-	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
+	return b.ObjectMeta, b.ObjectMeta != nil
 }
 
 // SetRules sets the Rules field in the declarative configuration to the given value.
 func (b *RoleApplyConfiguration) SetRules(value PolicyRuleList) *RoleApplyConfiguration {
-	b.fields.Rules = &value
+	b.Rules = &value
 	return b
 }
 
 // RemoveRules removes the Rules field from the declarative configuration.
 func (b *RoleApplyConfiguration) RemoveRules() *RoleApplyConfiguration {
-	b.fields.Rules = nil
+	b.Rules = nil
 	return b
 }
 
 // GetRules gets the Rules field from the declarative configuration.
 func (b *RoleApplyConfiguration) GetRules() (value PolicyRuleList, ok bool) {
-	if v := b.fields.Rules; v != nil {
+	if v := b.Rules; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts RoleApplyConfiguration to unstructured.
-func (b *RoleApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to RoleApplyConfiguration, replacing the contents
-// of RoleApplyConfiguration.
-func (b *RoleApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &roleFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals RoleApplyConfiguration to JSON.
-func (b *RoleApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into RoleApplyConfiguration, replacing the contents of
-// RoleApplyConfiguration.
-func (b *RoleApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // RoleList represents a listAlias of RoleApplyConfiguration.
@@ -151,25 +91,3 @@ type RoleList []*RoleApplyConfiguration
 
 // RoleList represents a map of RoleApplyConfiguration.
 type RoleMap map[string]RoleApplyConfiguration
-
-func (b *RoleApplyConfiguration) preMarshal() {
-	if b.typeMeta != nil {
-		if v, ok := b.typeMeta.GetKind(); ok {
-			b.fields.Kind = &v
-		}
-		if v, ok := b.typeMeta.GetAPIVersion(); ok {
-			b.fields.APIVersion = &v
-		}
-	}
-}
-func (b *RoleApplyConfiguration) postUnmarshal() {
-	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
-	}
-	if b.fields.Kind != nil {
-		b.typeMeta.SetKind(*b.fields.Kind)
-	}
-	if b.fields.APIVersion != nil {
-		b.typeMeta.SetAPIVersion(*b.fields.APIVersion)
-	}
-}

@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // LocalObjectReferenceApplyConfiguration represents an declarative configuration of the LocalObjectReference type for use
 // with apply.
 type LocalObjectReferenceApplyConfiguration struct {
-	fields localObjectReferenceFields
+	Name *string `json:"name,omitempty"`
 }
 
 // LocalObjectReferenceApplyConfiguration constructs an declarative configuration of the LocalObjectReference type for use with
@@ -36,75 +30,24 @@ func LocalObjectReference() *LocalObjectReferenceApplyConfiguration {
 	return &LocalObjectReferenceApplyConfiguration{}
 }
 
-// localObjectReferenceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LocalObjectReferenceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type localObjectReferenceFields struct {
-	Name *string `json:"name,omitempty"`
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *LocalObjectReferenceApplyConfiguration) SetName(value string) *LocalObjectReferenceApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *LocalObjectReferenceApplyConfiguration) RemoveName() *LocalObjectReferenceApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *LocalObjectReferenceApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts LocalObjectReferenceApplyConfiguration to unstructured.
-func (b *LocalObjectReferenceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to LocalObjectReferenceApplyConfiguration, replacing the contents
-// of LocalObjectReferenceApplyConfiguration.
-func (b *LocalObjectReferenceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &localObjectReferenceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals LocalObjectReferenceApplyConfiguration to JSON.
-func (b *LocalObjectReferenceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into LocalObjectReferenceApplyConfiguration, replacing the contents of
-// LocalObjectReferenceApplyConfiguration.
-func (b *LocalObjectReferenceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // LocalObjectReferenceList represents a listAlias of LocalObjectReferenceApplyConfiguration.
@@ -112,8 +55,3 @@ type LocalObjectReferenceList []*LocalObjectReferenceApplyConfiguration
 
 // LocalObjectReferenceList represents a map of LocalObjectReferenceApplyConfiguration.
 type LocalObjectReferenceMap map[string]LocalObjectReferenceApplyConfiguration
-
-func (b *LocalObjectReferenceApplyConfiguration) preMarshal() {
-}
-func (b *LocalObjectReferenceApplyConfiguration) postUnmarshal() {
-}

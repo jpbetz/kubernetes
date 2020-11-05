@@ -19,16 +19,13 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // NamespaceSpecApplyConfiguration represents an declarative configuration of the NamespaceSpec type for use
 // with apply.
 type NamespaceSpecApplyConfiguration struct {
-	fields namespaceSpecFields
+	Finalizers *[]v1.FinalizerName `json:"finalizers,omitempty"`
 }
 
 // NamespaceSpecApplyConfiguration constructs an declarative configuration of the NamespaceSpec type for use with
@@ -37,75 +34,24 @@ func NamespaceSpec() *NamespaceSpecApplyConfiguration {
 	return &NamespaceSpecApplyConfiguration{}
 }
 
-// namespaceSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NamespaceSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type namespaceSpecFields struct {
-	Finalizers *[]v1.FinalizerName `json:"finalizers,omitempty"`
-}
-
 // SetFinalizers sets the Finalizers field in the declarative configuration to the given value.
 func (b *NamespaceSpecApplyConfiguration) SetFinalizers(value []v1.FinalizerName) *NamespaceSpecApplyConfiguration {
-	b.fields.Finalizers = &value
+	b.Finalizers = &value
 	return b
 }
 
 // RemoveFinalizers removes the Finalizers field from the declarative configuration.
 func (b *NamespaceSpecApplyConfiguration) RemoveFinalizers() *NamespaceSpecApplyConfiguration {
-	b.fields.Finalizers = nil
+	b.Finalizers = nil
 	return b
 }
 
 // GetFinalizers gets the Finalizers field from the declarative configuration.
 func (b *NamespaceSpecApplyConfiguration) GetFinalizers() (value []v1.FinalizerName, ok bool) {
-	if v := b.fields.Finalizers; v != nil {
+	if v := b.Finalizers; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts NamespaceSpecApplyConfiguration to unstructured.
-func (b *NamespaceSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to NamespaceSpecApplyConfiguration, replacing the contents
-// of NamespaceSpecApplyConfiguration.
-func (b *NamespaceSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &namespaceSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals NamespaceSpecApplyConfiguration to JSON.
-func (b *NamespaceSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into NamespaceSpecApplyConfiguration, replacing the contents of
-// NamespaceSpecApplyConfiguration.
-func (b *NamespaceSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // NamespaceSpecList represents a listAlias of NamespaceSpecApplyConfiguration.
@@ -113,8 +59,3 @@ type NamespaceSpecList []*NamespaceSpecApplyConfiguration
 
 // NamespaceSpecList represents a map of NamespaceSpecApplyConfiguration.
 type NamespaceSpecMap map[string]NamespaceSpecApplyConfiguration
-
-func (b *NamespaceSpecApplyConfiguration) preMarshal() {
-}
-func (b *NamespaceSpecApplyConfiguration) postUnmarshal() {
-}

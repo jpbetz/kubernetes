@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // SelfSubjectRulesReviewSpecApplyConfiguration represents an declarative configuration of the SelfSubjectRulesReviewSpec type for use
 // with apply.
 type SelfSubjectRulesReviewSpecApplyConfiguration struct {
-	fields selfSubjectRulesReviewSpecFields
+	Namespace *string `json:"namespace,omitempty"`
 }
 
 // SelfSubjectRulesReviewSpecApplyConfiguration constructs an declarative configuration of the SelfSubjectRulesReviewSpec type for use with
@@ -36,75 +30,24 @@ func SelfSubjectRulesReviewSpec() *SelfSubjectRulesReviewSpecApplyConfiguration 
 	return &SelfSubjectRulesReviewSpecApplyConfiguration{}
 }
 
-// selfSubjectRulesReviewSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SelfSubjectRulesReviewSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type selfSubjectRulesReviewSpecFields struct {
-	Namespace *string `json:"namespace,omitempty"`
-}
-
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
 func (b *SelfSubjectRulesReviewSpecApplyConfiguration) SetNamespace(value string) *SelfSubjectRulesReviewSpecApplyConfiguration {
-	b.fields.Namespace = &value
+	b.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
 func (b *SelfSubjectRulesReviewSpecApplyConfiguration) RemoveNamespace() *SelfSubjectRulesReviewSpecApplyConfiguration {
-	b.fields.Namespace = nil
+	b.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
 func (b *SelfSubjectRulesReviewSpecApplyConfiguration) GetNamespace() (value string, ok bool) {
-	if v := b.fields.Namespace; v != nil {
+	if v := b.Namespace; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts SelfSubjectRulesReviewSpecApplyConfiguration to unstructured.
-func (b *SelfSubjectRulesReviewSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to SelfSubjectRulesReviewSpecApplyConfiguration, replacing the contents
-// of SelfSubjectRulesReviewSpecApplyConfiguration.
-func (b *SelfSubjectRulesReviewSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &selfSubjectRulesReviewSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals SelfSubjectRulesReviewSpecApplyConfiguration to JSON.
-func (b *SelfSubjectRulesReviewSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into SelfSubjectRulesReviewSpecApplyConfiguration, replacing the contents of
-// SelfSubjectRulesReviewSpecApplyConfiguration.
-func (b *SelfSubjectRulesReviewSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // SelfSubjectRulesReviewSpecList represents a listAlias of SelfSubjectRulesReviewSpecApplyConfiguration.
@@ -112,8 +55,3 @@ type SelfSubjectRulesReviewSpecList []*SelfSubjectRulesReviewSpecApplyConfigurat
 
 // SelfSubjectRulesReviewSpecList represents a map of SelfSubjectRulesReviewSpecApplyConfiguration.
 type SelfSubjectRulesReviewSpecMap map[string]SelfSubjectRulesReviewSpecApplyConfiguration
-
-func (b *SelfSubjectRulesReviewSpecApplyConfiguration) preMarshal() {
-}
-func (b *SelfSubjectRulesReviewSpecApplyConfiguration) postUnmarshal() {
-}

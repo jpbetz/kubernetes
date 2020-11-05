@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	networkingv1 "k8s.io/api/networking/v1"
@@ -145,7 +146,7 @@ func (c *FakeIngresses) Patch(ctx context.Context, name string, pt types.PatchTy
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied ingress.
 func (c *FakeIngresses) Apply(ctx context.Context, ingress *applyconfigurationsnetworkingv1.IngressApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *networkingv1.Ingress, err error) {
-	data, err := ingress.MarshalJSON()
+	data, err := json.Marshal(ingress)
 	if err != nil {
 		return nil, err
 	}

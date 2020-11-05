@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	v1beta1 "k8s.io/api/discovery/v1beta1"
@@ -133,7 +134,7 @@ func (c *FakeEndpointSlices) Patch(ctx context.Context, name string, pt types.Pa
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied endpointSlice.
 func (c *FakeEndpointSlices) Apply(ctx context.Context, endpointSlice *discoveryv1beta1.EndpointSliceApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.EndpointSlice, err error) {
-	data, err := endpointSlice.MarshalJSON()
+	data, err := json.Marshal(endpointSlice)
 	if err != nil {
 		return nil, err
 	}

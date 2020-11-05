@@ -19,31 +19,13 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // PersistentVolumeClaimSpecApplyConfiguration represents an declarative configuration of the PersistentVolumeClaimSpec type for use
 // with apply.
 type PersistentVolumeClaimSpecApplyConfiguration struct {
-	fields persistentVolumeClaimSpecFields
-}
-
-// PersistentVolumeClaimSpecApplyConfiguration constructs an declarative configuration of the PersistentVolumeClaimSpec type for use with
-// apply.
-func PersistentVolumeClaimSpec() *PersistentVolumeClaimSpecApplyConfiguration {
-	return &PersistentVolumeClaimSpecApplyConfiguration{}
-}
-
-// persistentVolumeClaimSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PersistentVolumeClaimSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type persistentVolumeClaimSpecFields struct {
 	AccessModes      *[]v1.PersistentVolumeAccessMode             `json:"accessModes,omitempty"`
 	Selector         *metav1.LabelSelectorApplyConfiguration      `json:"selector,omitempty"`
 	Resources        *ResourceRequirementsApplyConfiguration      `json:"resources,omitempty"`
@@ -53,21 +35,27 @@ type persistentVolumeClaimSpecFields struct {
 	DataSource       *TypedLocalObjectReferenceApplyConfiguration `json:"dataSource,omitempty"`
 }
 
+// PersistentVolumeClaimSpecApplyConfiguration constructs an declarative configuration of the PersistentVolumeClaimSpec type for use with
+// apply.
+func PersistentVolumeClaimSpec() *PersistentVolumeClaimSpecApplyConfiguration {
+	return &PersistentVolumeClaimSpecApplyConfiguration{}
+}
+
 // SetAccessModes sets the AccessModes field in the declarative configuration to the given value.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) SetAccessModes(value []v1.PersistentVolumeAccessMode) *PersistentVolumeClaimSpecApplyConfiguration {
-	b.fields.AccessModes = &value
+	b.AccessModes = &value
 	return b
 }
 
 // RemoveAccessModes removes the AccessModes field from the declarative configuration.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) RemoveAccessModes() *PersistentVolumeClaimSpecApplyConfiguration {
-	b.fields.AccessModes = nil
+	b.AccessModes = nil
 	return b
 }
 
 // GetAccessModes gets the AccessModes field from the declarative configuration.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) GetAccessModes() (value []v1.PersistentVolumeAccessMode, ok bool) {
-	if v := b.fields.AccessModes; v != nil {
+	if v := b.AccessModes; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -75,53 +63,53 @@ func (b *PersistentVolumeClaimSpecApplyConfiguration) GetAccessModes() (value []
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) SetSelector(value *metav1.LabelSelectorApplyConfiguration) *PersistentVolumeClaimSpecApplyConfiguration {
-	b.fields.Selector = value
+	b.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) RemoveSelector() *PersistentVolumeClaimSpecApplyConfiguration {
-	b.fields.Selector = nil
+	b.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) GetSelector() (value *metav1.LabelSelectorApplyConfiguration, ok bool) {
-	return b.fields.Selector, b.fields.Selector != nil
+	return b.Selector, b.Selector != nil
 }
 
 // SetResources sets the Resources field in the declarative configuration to the given value.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) SetResources(value *ResourceRequirementsApplyConfiguration) *PersistentVolumeClaimSpecApplyConfiguration {
-	b.fields.Resources = value
+	b.Resources = value
 	return b
 }
 
 // RemoveResources removes the Resources field from the declarative configuration.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) RemoveResources() *PersistentVolumeClaimSpecApplyConfiguration {
-	b.fields.Resources = nil
+	b.Resources = nil
 	return b
 }
 
 // GetResources gets the Resources field from the declarative configuration.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) GetResources() (value *ResourceRequirementsApplyConfiguration, ok bool) {
-	return b.fields.Resources, b.fields.Resources != nil
+	return b.Resources, b.Resources != nil
 }
 
 // SetVolumeName sets the VolumeName field in the declarative configuration to the given value.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) SetVolumeName(value string) *PersistentVolumeClaimSpecApplyConfiguration {
-	b.fields.VolumeName = &value
+	b.VolumeName = &value
 	return b
 }
 
 // RemoveVolumeName removes the VolumeName field from the declarative configuration.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) RemoveVolumeName() *PersistentVolumeClaimSpecApplyConfiguration {
-	b.fields.VolumeName = nil
+	b.VolumeName = nil
 	return b
 }
 
 // GetVolumeName gets the VolumeName field from the declarative configuration.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) GetVolumeName() (value string, ok bool) {
-	if v := b.fields.VolumeName; v != nil {
+	if v := b.VolumeName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -129,19 +117,19 @@ func (b *PersistentVolumeClaimSpecApplyConfiguration) GetVolumeName() (value str
 
 // SetStorageClassName sets the StorageClassName field in the declarative configuration to the given value.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) SetStorageClassName(value string) *PersistentVolumeClaimSpecApplyConfiguration {
-	b.fields.StorageClassName = &value
+	b.StorageClassName = &value
 	return b
 }
 
 // RemoveStorageClassName removes the StorageClassName field from the declarative configuration.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) RemoveStorageClassName() *PersistentVolumeClaimSpecApplyConfiguration {
-	b.fields.StorageClassName = nil
+	b.StorageClassName = nil
 	return b
 }
 
 // GetStorageClassName gets the StorageClassName field from the declarative configuration.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) GetStorageClassName() (value string, ok bool) {
-	if v := b.fields.StorageClassName; v != nil {
+	if v := b.StorageClassName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -149,19 +137,19 @@ func (b *PersistentVolumeClaimSpecApplyConfiguration) GetStorageClassName() (val
 
 // SetVolumeMode sets the VolumeMode field in the declarative configuration to the given value.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) SetVolumeMode(value v1.PersistentVolumeMode) *PersistentVolumeClaimSpecApplyConfiguration {
-	b.fields.VolumeMode = &value
+	b.VolumeMode = &value
 	return b
 }
 
 // RemoveVolumeMode removes the VolumeMode field from the declarative configuration.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) RemoveVolumeMode() *PersistentVolumeClaimSpecApplyConfiguration {
-	b.fields.VolumeMode = nil
+	b.VolumeMode = nil
 	return b
 }
 
 // GetVolumeMode gets the VolumeMode field from the declarative configuration.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) GetVolumeMode() (value v1.PersistentVolumeMode, ok bool) {
-	if v := b.fields.VolumeMode; v != nil {
+	if v := b.VolumeMode; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -169,61 +157,19 @@ func (b *PersistentVolumeClaimSpecApplyConfiguration) GetVolumeMode() (value v1.
 
 // SetDataSource sets the DataSource field in the declarative configuration to the given value.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) SetDataSource(value *TypedLocalObjectReferenceApplyConfiguration) *PersistentVolumeClaimSpecApplyConfiguration {
-	b.fields.DataSource = value
+	b.DataSource = value
 	return b
 }
 
 // RemoveDataSource removes the DataSource field from the declarative configuration.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) RemoveDataSource() *PersistentVolumeClaimSpecApplyConfiguration {
-	b.fields.DataSource = nil
+	b.DataSource = nil
 	return b
 }
 
 // GetDataSource gets the DataSource field from the declarative configuration.
 func (b *PersistentVolumeClaimSpecApplyConfiguration) GetDataSource() (value *TypedLocalObjectReferenceApplyConfiguration, ok bool) {
-	return b.fields.DataSource, b.fields.DataSource != nil
-}
-
-// ToUnstructured converts PersistentVolumeClaimSpecApplyConfiguration to unstructured.
-func (b *PersistentVolumeClaimSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PersistentVolumeClaimSpecApplyConfiguration, replacing the contents
-// of PersistentVolumeClaimSpecApplyConfiguration.
-func (b *PersistentVolumeClaimSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &persistentVolumeClaimSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PersistentVolumeClaimSpecApplyConfiguration to JSON.
-func (b *PersistentVolumeClaimSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PersistentVolumeClaimSpecApplyConfiguration, replacing the contents of
-// PersistentVolumeClaimSpecApplyConfiguration.
-func (b *PersistentVolumeClaimSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.DataSource, b.DataSource != nil
 }
 
 // PersistentVolumeClaimSpecList represents a listAlias of PersistentVolumeClaimSpecApplyConfiguration.
@@ -231,8 +177,3 @@ type PersistentVolumeClaimSpecList []*PersistentVolumeClaimSpecApplyConfiguratio
 
 // PersistentVolumeClaimSpecList represents a map of PersistentVolumeClaimSpecApplyConfiguration.
 type PersistentVolumeClaimSpecMap map[string]PersistentVolumeClaimSpecApplyConfiguration
-
-func (b *PersistentVolumeClaimSpecApplyConfiguration) preMarshal() {
-}
-func (b *PersistentVolumeClaimSpecApplyConfiguration) postUnmarshal() {
-}

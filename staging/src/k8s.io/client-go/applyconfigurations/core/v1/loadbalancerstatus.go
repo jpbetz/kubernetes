@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // LoadBalancerStatusApplyConfiguration represents an declarative configuration of the LoadBalancerStatus type for use
 // with apply.
 type LoadBalancerStatusApplyConfiguration struct {
-	fields loadBalancerStatusFields
+	Ingress *LoadBalancerIngressList `json:"ingress,omitempty"`
 }
 
 // LoadBalancerStatusApplyConfiguration constructs an declarative configuration of the LoadBalancerStatus type for use with
@@ -36,75 +30,24 @@ func LoadBalancerStatus() *LoadBalancerStatusApplyConfiguration {
 	return &LoadBalancerStatusApplyConfiguration{}
 }
 
-// loadBalancerStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LoadBalancerStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type loadBalancerStatusFields struct {
-	Ingress *LoadBalancerIngressList `json:"ingress,omitempty"`
-}
-
 // SetIngress sets the Ingress field in the declarative configuration to the given value.
 func (b *LoadBalancerStatusApplyConfiguration) SetIngress(value LoadBalancerIngressList) *LoadBalancerStatusApplyConfiguration {
-	b.fields.Ingress = &value
+	b.Ingress = &value
 	return b
 }
 
 // RemoveIngress removes the Ingress field from the declarative configuration.
 func (b *LoadBalancerStatusApplyConfiguration) RemoveIngress() *LoadBalancerStatusApplyConfiguration {
-	b.fields.Ingress = nil
+	b.Ingress = nil
 	return b
 }
 
 // GetIngress gets the Ingress field from the declarative configuration.
 func (b *LoadBalancerStatusApplyConfiguration) GetIngress() (value LoadBalancerIngressList, ok bool) {
-	if v := b.fields.Ingress; v != nil {
+	if v := b.Ingress; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts LoadBalancerStatusApplyConfiguration to unstructured.
-func (b *LoadBalancerStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to LoadBalancerStatusApplyConfiguration, replacing the contents
-// of LoadBalancerStatusApplyConfiguration.
-func (b *LoadBalancerStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &loadBalancerStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals LoadBalancerStatusApplyConfiguration to JSON.
-func (b *LoadBalancerStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into LoadBalancerStatusApplyConfiguration, replacing the contents of
-// LoadBalancerStatusApplyConfiguration.
-func (b *LoadBalancerStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // LoadBalancerStatusList represents a listAlias of LoadBalancerStatusApplyConfiguration.
@@ -112,8 +55,3 @@ type LoadBalancerStatusList []*LoadBalancerStatusApplyConfiguration
 
 // LoadBalancerStatusList represents a map of LoadBalancerStatusApplyConfiguration.
 type LoadBalancerStatusMap map[string]LoadBalancerStatusApplyConfiguration
-
-func (b *LoadBalancerStatusApplyConfiguration) preMarshal() {
-}
-func (b *LoadBalancerStatusApplyConfiguration) postUnmarshal() {
-}

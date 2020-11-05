@@ -20,6 +20,7 @@ package v2alpha1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -200,7 +201,7 @@ func (c *cronJobs) Patch(ctx context.Context, name string, pt types.PatchType, d
 // Apply takes the given apply declarative configuration, applies it and returns the applied cronJob.
 func (c *cronJobs) Apply(ctx context.Context, cronJob *batchv2alpha1.CronJobApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v2alpha1.CronJob, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := cronJob.MarshalJSON()
+	data, err := json.Marshal(cronJob)
 	if err != nil {
 		return nil, err
 	}

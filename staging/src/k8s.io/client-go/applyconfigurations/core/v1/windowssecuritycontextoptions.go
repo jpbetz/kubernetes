@@ -18,16 +18,12 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // WindowsSecurityContextOptionsApplyConfiguration represents an declarative configuration of the WindowsSecurityContextOptions type for use
 // with apply.
 type WindowsSecurityContextOptionsApplyConfiguration struct {
-	fields windowsSecurityContextOptionsFields
+	GMSACredentialSpecName *string `json:"gmsaCredentialSpecName,omitempty"`
+	GMSACredentialSpec     *string `json:"gmsaCredentialSpec,omitempty"`
+	RunAsUserName          *string `json:"runAsUserName,omitempty"`
 }
 
 // WindowsSecurityContextOptionsApplyConfiguration constructs an declarative configuration of the WindowsSecurityContextOptions type for use with
@@ -36,32 +32,21 @@ func WindowsSecurityContextOptions() *WindowsSecurityContextOptionsApplyConfigur
 	return &WindowsSecurityContextOptionsApplyConfiguration{}
 }
 
-// windowsSecurityContextOptionsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in WindowsSecurityContextOptionsApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type windowsSecurityContextOptionsFields struct {
-	GMSACredentialSpecName *string `json:"gmsaCredentialSpecName,omitempty"`
-	GMSACredentialSpec     *string `json:"gmsaCredentialSpec,omitempty"`
-	RunAsUserName          *string `json:"runAsUserName,omitempty"`
-}
-
 // SetGMSACredentialSpecName sets the GMSACredentialSpecName field in the declarative configuration to the given value.
 func (b *WindowsSecurityContextOptionsApplyConfiguration) SetGMSACredentialSpecName(value string) *WindowsSecurityContextOptionsApplyConfiguration {
-	b.fields.GMSACredentialSpecName = &value
+	b.GMSACredentialSpecName = &value
 	return b
 }
 
 // RemoveGMSACredentialSpecName removes the GMSACredentialSpecName field from the declarative configuration.
 func (b *WindowsSecurityContextOptionsApplyConfiguration) RemoveGMSACredentialSpecName() *WindowsSecurityContextOptionsApplyConfiguration {
-	b.fields.GMSACredentialSpecName = nil
+	b.GMSACredentialSpecName = nil
 	return b
 }
 
 // GetGMSACredentialSpecName gets the GMSACredentialSpecName field from the declarative configuration.
 func (b *WindowsSecurityContextOptionsApplyConfiguration) GetGMSACredentialSpecName() (value string, ok bool) {
-	if v := b.fields.GMSACredentialSpecName; v != nil {
+	if v := b.GMSACredentialSpecName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,19 +54,19 @@ func (b *WindowsSecurityContextOptionsApplyConfiguration) GetGMSACredentialSpecN
 
 // SetGMSACredentialSpec sets the GMSACredentialSpec field in the declarative configuration to the given value.
 func (b *WindowsSecurityContextOptionsApplyConfiguration) SetGMSACredentialSpec(value string) *WindowsSecurityContextOptionsApplyConfiguration {
-	b.fields.GMSACredentialSpec = &value
+	b.GMSACredentialSpec = &value
 	return b
 }
 
 // RemoveGMSACredentialSpec removes the GMSACredentialSpec field from the declarative configuration.
 func (b *WindowsSecurityContextOptionsApplyConfiguration) RemoveGMSACredentialSpec() *WindowsSecurityContextOptionsApplyConfiguration {
-	b.fields.GMSACredentialSpec = nil
+	b.GMSACredentialSpec = nil
 	return b
 }
 
 // GetGMSACredentialSpec gets the GMSACredentialSpec field from the declarative configuration.
 func (b *WindowsSecurityContextOptionsApplyConfiguration) GetGMSACredentialSpec() (value string, ok bool) {
-	if v := b.fields.GMSACredentialSpec; v != nil {
+	if v := b.GMSACredentialSpec; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -89,64 +74,22 @@ func (b *WindowsSecurityContextOptionsApplyConfiguration) GetGMSACredentialSpec(
 
 // SetRunAsUserName sets the RunAsUserName field in the declarative configuration to the given value.
 func (b *WindowsSecurityContextOptionsApplyConfiguration) SetRunAsUserName(value string) *WindowsSecurityContextOptionsApplyConfiguration {
-	b.fields.RunAsUserName = &value
+	b.RunAsUserName = &value
 	return b
 }
 
 // RemoveRunAsUserName removes the RunAsUserName field from the declarative configuration.
 func (b *WindowsSecurityContextOptionsApplyConfiguration) RemoveRunAsUserName() *WindowsSecurityContextOptionsApplyConfiguration {
-	b.fields.RunAsUserName = nil
+	b.RunAsUserName = nil
 	return b
 }
 
 // GetRunAsUserName gets the RunAsUserName field from the declarative configuration.
 func (b *WindowsSecurityContextOptionsApplyConfiguration) GetRunAsUserName() (value string, ok bool) {
-	if v := b.fields.RunAsUserName; v != nil {
+	if v := b.RunAsUserName; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts WindowsSecurityContextOptionsApplyConfiguration to unstructured.
-func (b *WindowsSecurityContextOptionsApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to WindowsSecurityContextOptionsApplyConfiguration, replacing the contents
-// of WindowsSecurityContextOptionsApplyConfiguration.
-func (b *WindowsSecurityContextOptionsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &windowsSecurityContextOptionsFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals WindowsSecurityContextOptionsApplyConfiguration to JSON.
-func (b *WindowsSecurityContextOptionsApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into WindowsSecurityContextOptionsApplyConfiguration, replacing the contents of
-// WindowsSecurityContextOptionsApplyConfiguration.
-func (b *WindowsSecurityContextOptionsApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // WindowsSecurityContextOptionsList represents a listAlias of WindowsSecurityContextOptionsApplyConfiguration.
@@ -154,8 +97,3 @@ type WindowsSecurityContextOptionsList []*WindowsSecurityContextOptionsApplyConf
 
 // WindowsSecurityContextOptionsList represents a map of WindowsSecurityContextOptionsApplyConfiguration.
 type WindowsSecurityContextOptionsMap map[string]WindowsSecurityContextOptionsApplyConfiguration
-
-func (b *WindowsSecurityContextOptionsApplyConfiguration) preMarshal() {
-}
-func (b *WindowsSecurityContextOptionsApplyConfiguration) postUnmarshal() {
-}

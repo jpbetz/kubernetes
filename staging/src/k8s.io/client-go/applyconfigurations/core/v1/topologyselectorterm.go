@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // TopologySelectorTermApplyConfiguration represents an declarative configuration of the TopologySelectorTerm type for use
 // with apply.
 type TopologySelectorTermApplyConfiguration struct {
-	fields topologySelectorTermFields
+	MatchLabelExpressions *TopologySelectorLabelRequirementList `json:"matchLabelExpressions,omitempty"`
 }
 
 // TopologySelectorTermApplyConfiguration constructs an declarative configuration of the TopologySelectorTerm type for use with
@@ -36,75 +30,24 @@ func TopologySelectorTerm() *TopologySelectorTermApplyConfiguration {
 	return &TopologySelectorTermApplyConfiguration{}
 }
 
-// topologySelectorTermFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in TopologySelectorTermApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type topologySelectorTermFields struct {
-	MatchLabelExpressions *TopologySelectorLabelRequirementList `json:"matchLabelExpressions,omitempty"`
-}
-
 // SetMatchLabelExpressions sets the MatchLabelExpressions field in the declarative configuration to the given value.
 func (b *TopologySelectorTermApplyConfiguration) SetMatchLabelExpressions(value TopologySelectorLabelRequirementList) *TopologySelectorTermApplyConfiguration {
-	b.fields.MatchLabelExpressions = &value
+	b.MatchLabelExpressions = &value
 	return b
 }
 
 // RemoveMatchLabelExpressions removes the MatchLabelExpressions field from the declarative configuration.
 func (b *TopologySelectorTermApplyConfiguration) RemoveMatchLabelExpressions() *TopologySelectorTermApplyConfiguration {
-	b.fields.MatchLabelExpressions = nil
+	b.MatchLabelExpressions = nil
 	return b
 }
 
 // GetMatchLabelExpressions gets the MatchLabelExpressions field from the declarative configuration.
 func (b *TopologySelectorTermApplyConfiguration) GetMatchLabelExpressions() (value TopologySelectorLabelRequirementList, ok bool) {
-	if v := b.fields.MatchLabelExpressions; v != nil {
+	if v := b.MatchLabelExpressions; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts TopologySelectorTermApplyConfiguration to unstructured.
-func (b *TopologySelectorTermApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to TopologySelectorTermApplyConfiguration, replacing the contents
-// of TopologySelectorTermApplyConfiguration.
-func (b *TopologySelectorTermApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &topologySelectorTermFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals TopologySelectorTermApplyConfiguration to JSON.
-func (b *TopologySelectorTermApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into TopologySelectorTermApplyConfiguration, replacing the contents of
-// TopologySelectorTermApplyConfiguration.
-func (b *TopologySelectorTermApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // TopologySelectorTermList represents a listAlias of TopologySelectorTermApplyConfiguration.
@@ -112,8 +55,3 @@ type TopologySelectorTermList []*TopologySelectorTermApplyConfiguration
 
 // TopologySelectorTermList represents a map of TopologySelectorTermApplyConfiguration.
 type TopologySelectorTermMap map[string]TopologySelectorTermApplyConfiguration
-
-func (b *TopologySelectorTermApplyConfiguration) preMarshal() {
-}
-func (b *TopologySelectorTermApplyConfiguration) postUnmarshal() {
-}

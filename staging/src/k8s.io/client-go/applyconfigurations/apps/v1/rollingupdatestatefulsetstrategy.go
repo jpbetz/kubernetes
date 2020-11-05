@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // RollingUpdateStatefulSetStrategyApplyConfiguration represents an declarative configuration of the RollingUpdateStatefulSetStrategy type for use
 // with apply.
 type RollingUpdateStatefulSetStrategyApplyConfiguration struct {
-	fields rollingUpdateStatefulSetStrategyFields
+	Partition *int32 `json:"partition,omitempty"`
 }
 
 // RollingUpdateStatefulSetStrategyApplyConfiguration constructs an declarative configuration of the RollingUpdateStatefulSetStrategy type for use with
@@ -36,75 +30,24 @@ func RollingUpdateStatefulSetStrategy() *RollingUpdateStatefulSetStrategyApplyCo
 	return &RollingUpdateStatefulSetStrategyApplyConfiguration{}
 }
 
-// rollingUpdateStatefulSetStrategyFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in RollingUpdateStatefulSetStrategyApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type rollingUpdateStatefulSetStrategyFields struct {
-	Partition *int32 `json:"partition,omitempty"`
-}
-
 // SetPartition sets the Partition field in the declarative configuration to the given value.
 func (b *RollingUpdateStatefulSetStrategyApplyConfiguration) SetPartition(value int32) *RollingUpdateStatefulSetStrategyApplyConfiguration {
-	b.fields.Partition = &value
+	b.Partition = &value
 	return b
 }
 
 // RemovePartition removes the Partition field from the declarative configuration.
 func (b *RollingUpdateStatefulSetStrategyApplyConfiguration) RemovePartition() *RollingUpdateStatefulSetStrategyApplyConfiguration {
-	b.fields.Partition = nil
+	b.Partition = nil
 	return b
 }
 
 // GetPartition gets the Partition field from the declarative configuration.
 func (b *RollingUpdateStatefulSetStrategyApplyConfiguration) GetPartition() (value int32, ok bool) {
-	if v := b.fields.Partition; v != nil {
+	if v := b.Partition; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts RollingUpdateStatefulSetStrategyApplyConfiguration to unstructured.
-func (b *RollingUpdateStatefulSetStrategyApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to RollingUpdateStatefulSetStrategyApplyConfiguration, replacing the contents
-// of RollingUpdateStatefulSetStrategyApplyConfiguration.
-func (b *RollingUpdateStatefulSetStrategyApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &rollingUpdateStatefulSetStrategyFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals RollingUpdateStatefulSetStrategyApplyConfiguration to JSON.
-func (b *RollingUpdateStatefulSetStrategyApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into RollingUpdateStatefulSetStrategyApplyConfiguration, replacing the contents of
-// RollingUpdateStatefulSetStrategyApplyConfiguration.
-func (b *RollingUpdateStatefulSetStrategyApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // RollingUpdateStatefulSetStrategyList represents a listAlias of RollingUpdateStatefulSetStrategyApplyConfiguration.
@@ -112,8 +55,3 @@ type RollingUpdateStatefulSetStrategyList []*RollingUpdateStatefulSetStrategyApp
 
 // RollingUpdateStatefulSetStrategyList represents a map of RollingUpdateStatefulSetStrategyApplyConfiguration.
 type RollingUpdateStatefulSetStrategyMap map[string]RollingUpdateStatefulSetStrategyApplyConfiguration
-
-func (b *RollingUpdateStatefulSetStrategyApplyConfiguration) preMarshal() {
-}
-func (b *RollingUpdateStatefulSetStrategyApplyConfiguration) postUnmarshal() {
-}

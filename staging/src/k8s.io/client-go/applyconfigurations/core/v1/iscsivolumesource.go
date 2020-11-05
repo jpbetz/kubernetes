@@ -18,30 +18,9 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ISCSIVolumeSourceApplyConfiguration represents an declarative configuration of the ISCSIVolumeSource type for use
 // with apply.
 type ISCSIVolumeSourceApplyConfiguration struct {
-	fields iSCSIVolumeSourceFields
-}
-
-// ISCSIVolumeSourceApplyConfiguration constructs an declarative configuration of the ISCSIVolumeSource type for use with
-// apply.
-func ISCSIVolumeSource() *ISCSIVolumeSourceApplyConfiguration {
-	return &ISCSIVolumeSourceApplyConfiguration{}
-}
-
-// iSCSIVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ISCSIVolumeSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type iSCSIVolumeSourceFields struct {
 	TargetPortal      *string                                 `json:"targetPortal,omitempty"`
 	IQN               *string                                 `json:"iqn,omitempty"`
 	Lun               *int32                                  `json:"lun,omitempty"`
@@ -55,21 +34,27 @@ type iSCSIVolumeSourceFields struct {
 	InitiatorName     *string                                 `json:"initiatorName,omitempty"`
 }
 
+// ISCSIVolumeSourceApplyConfiguration constructs an declarative configuration of the ISCSIVolumeSource type for use with
+// apply.
+func ISCSIVolumeSource() *ISCSIVolumeSourceApplyConfiguration {
+	return &ISCSIVolumeSourceApplyConfiguration{}
+}
+
 // SetTargetPortal sets the TargetPortal field in the declarative configuration to the given value.
 func (b *ISCSIVolumeSourceApplyConfiguration) SetTargetPortal(value string) *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.TargetPortal = &value
+	b.TargetPortal = &value
 	return b
 }
 
 // RemoveTargetPortal removes the TargetPortal field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) RemoveTargetPortal() *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.TargetPortal = nil
+	b.TargetPortal = nil
 	return b
 }
 
 // GetTargetPortal gets the TargetPortal field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) GetTargetPortal() (value string, ok bool) {
-	if v := b.fields.TargetPortal; v != nil {
+	if v := b.TargetPortal; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -77,19 +62,19 @@ func (b *ISCSIVolumeSourceApplyConfiguration) GetTargetPortal() (value string, o
 
 // SetIQN sets the IQN field in the declarative configuration to the given value.
 func (b *ISCSIVolumeSourceApplyConfiguration) SetIQN(value string) *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.IQN = &value
+	b.IQN = &value
 	return b
 }
 
 // RemoveIQN removes the IQN field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) RemoveIQN() *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.IQN = nil
+	b.IQN = nil
 	return b
 }
 
 // GetIQN gets the IQN field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) GetIQN() (value string, ok bool) {
-	if v := b.fields.IQN; v != nil {
+	if v := b.IQN; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -97,19 +82,19 @@ func (b *ISCSIVolumeSourceApplyConfiguration) GetIQN() (value string, ok bool) {
 
 // SetLun sets the Lun field in the declarative configuration to the given value.
 func (b *ISCSIVolumeSourceApplyConfiguration) SetLun(value int32) *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.Lun = &value
+	b.Lun = &value
 	return b
 }
 
 // RemoveLun removes the Lun field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) RemoveLun() *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.Lun = nil
+	b.Lun = nil
 	return b
 }
 
 // GetLun gets the Lun field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) GetLun() (value int32, ok bool) {
-	if v := b.fields.Lun; v != nil {
+	if v := b.Lun; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -117,19 +102,19 @@ func (b *ISCSIVolumeSourceApplyConfiguration) GetLun() (value int32, ok bool) {
 
 // SetISCSIInterface sets the ISCSIInterface field in the declarative configuration to the given value.
 func (b *ISCSIVolumeSourceApplyConfiguration) SetISCSIInterface(value string) *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.ISCSIInterface = &value
+	b.ISCSIInterface = &value
 	return b
 }
 
 // RemoveISCSIInterface removes the ISCSIInterface field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) RemoveISCSIInterface() *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.ISCSIInterface = nil
+	b.ISCSIInterface = nil
 	return b
 }
 
 // GetISCSIInterface gets the ISCSIInterface field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) GetISCSIInterface() (value string, ok bool) {
-	if v := b.fields.ISCSIInterface; v != nil {
+	if v := b.ISCSIInterface; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -137,19 +122,19 @@ func (b *ISCSIVolumeSourceApplyConfiguration) GetISCSIInterface() (value string,
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
 func (b *ISCSIVolumeSourceApplyConfiguration) SetFSType(value string) *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.FSType = &value
+	b.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) RemoveFSType() *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.FSType = nil
+	b.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) GetFSType() (value string, ok bool) {
-	if v := b.fields.FSType; v != nil {
+	if v := b.FSType; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -157,19 +142,19 @@ func (b *ISCSIVolumeSourceApplyConfiguration) GetFSType() (value string, ok bool
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
 func (b *ISCSIVolumeSourceApplyConfiguration) SetReadOnly(value bool) *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = &value
+	b.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) RemoveReadOnly() *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = nil
+	b.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
-	if v := b.fields.ReadOnly; v != nil {
+	if v := b.ReadOnly; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -177,19 +162,19 @@ func (b *ISCSIVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool
 
 // SetPortals sets the Portals field in the declarative configuration to the given value.
 func (b *ISCSIVolumeSourceApplyConfiguration) SetPortals(value []string) *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.Portals = &value
+	b.Portals = &value
 	return b
 }
 
 // RemovePortals removes the Portals field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) RemovePortals() *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.Portals = nil
+	b.Portals = nil
 	return b
 }
 
 // GetPortals gets the Portals field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) GetPortals() (value []string, ok bool) {
-	if v := b.fields.Portals; v != nil {
+	if v := b.Portals; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -197,19 +182,19 @@ func (b *ISCSIVolumeSourceApplyConfiguration) GetPortals() (value []string, ok b
 
 // SetDiscoveryCHAPAuth sets the DiscoveryCHAPAuth field in the declarative configuration to the given value.
 func (b *ISCSIVolumeSourceApplyConfiguration) SetDiscoveryCHAPAuth(value bool) *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.DiscoveryCHAPAuth = &value
+	b.DiscoveryCHAPAuth = &value
 	return b
 }
 
 // RemoveDiscoveryCHAPAuth removes the DiscoveryCHAPAuth field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) RemoveDiscoveryCHAPAuth() *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.DiscoveryCHAPAuth = nil
+	b.DiscoveryCHAPAuth = nil
 	return b
 }
 
 // GetDiscoveryCHAPAuth gets the DiscoveryCHAPAuth field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) GetDiscoveryCHAPAuth() (value bool, ok bool) {
-	if v := b.fields.DiscoveryCHAPAuth; v != nil {
+	if v := b.DiscoveryCHAPAuth; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -217,19 +202,19 @@ func (b *ISCSIVolumeSourceApplyConfiguration) GetDiscoveryCHAPAuth() (value bool
 
 // SetSessionCHAPAuth sets the SessionCHAPAuth field in the declarative configuration to the given value.
 func (b *ISCSIVolumeSourceApplyConfiguration) SetSessionCHAPAuth(value bool) *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.SessionCHAPAuth = &value
+	b.SessionCHAPAuth = &value
 	return b
 }
 
 // RemoveSessionCHAPAuth removes the SessionCHAPAuth field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) RemoveSessionCHAPAuth() *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.SessionCHAPAuth = nil
+	b.SessionCHAPAuth = nil
 	return b
 }
 
 // GetSessionCHAPAuth gets the SessionCHAPAuth field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) GetSessionCHAPAuth() (value bool, ok bool) {
-	if v := b.fields.SessionCHAPAuth; v != nil {
+	if v := b.SessionCHAPAuth; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -237,81 +222,39 @@ func (b *ISCSIVolumeSourceApplyConfiguration) GetSessionCHAPAuth() (value bool, 
 
 // SetSecretRef sets the SecretRef field in the declarative configuration to the given value.
 func (b *ISCSIVolumeSourceApplyConfiguration) SetSecretRef(value *LocalObjectReferenceApplyConfiguration) *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.SecretRef = value
+	b.SecretRef = value
 	return b
 }
 
 // RemoveSecretRef removes the SecretRef field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) RemoveSecretRef() *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.SecretRef = nil
+	b.SecretRef = nil
 	return b
 }
 
 // GetSecretRef gets the SecretRef field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) GetSecretRef() (value *LocalObjectReferenceApplyConfiguration, ok bool) {
-	return b.fields.SecretRef, b.fields.SecretRef != nil
+	return b.SecretRef, b.SecretRef != nil
 }
 
 // SetInitiatorName sets the InitiatorName field in the declarative configuration to the given value.
 func (b *ISCSIVolumeSourceApplyConfiguration) SetInitiatorName(value string) *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.InitiatorName = &value
+	b.InitiatorName = &value
 	return b
 }
 
 // RemoveInitiatorName removes the InitiatorName field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) RemoveInitiatorName() *ISCSIVolumeSourceApplyConfiguration {
-	b.fields.InitiatorName = nil
+	b.InitiatorName = nil
 	return b
 }
 
 // GetInitiatorName gets the InitiatorName field from the declarative configuration.
 func (b *ISCSIVolumeSourceApplyConfiguration) GetInitiatorName() (value string, ok bool) {
-	if v := b.fields.InitiatorName; v != nil {
+	if v := b.InitiatorName; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ISCSIVolumeSourceApplyConfiguration to unstructured.
-func (b *ISCSIVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ISCSIVolumeSourceApplyConfiguration, replacing the contents
-// of ISCSIVolumeSourceApplyConfiguration.
-func (b *ISCSIVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &iSCSIVolumeSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ISCSIVolumeSourceApplyConfiguration to JSON.
-func (b *ISCSIVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ISCSIVolumeSourceApplyConfiguration, replacing the contents of
-// ISCSIVolumeSourceApplyConfiguration.
-func (b *ISCSIVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ISCSIVolumeSourceList represents a listAlias of ISCSIVolumeSourceApplyConfiguration.
@@ -319,8 +262,3 @@ type ISCSIVolumeSourceList []*ISCSIVolumeSourceApplyConfiguration
 
 // ISCSIVolumeSourceList represents a map of ISCSIVolumeSourceApplyConfiguration.
 type ISCSIVolumeSourceMap map[string]ISCSIVolumeSourceApplyConfiguration
-
-func (b *ISCSIVolumeSourceApplyConfiguration) preMarshal() {
-}
-func (b *ISCSIVolumeSourceApplyConfiguration) postUnmarshal() {
-}

@@ -19,18 +19,29 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // EventApplyConfiguration represents an declarative configuration of the Event type for use
 // with apply.
 type EventApplyConfiguration struct {
-	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
-	fields   eventFields
+	v1.TypeMetaApplyConfiguration `json:",inline"`
+	ObjectMeta                    *v1.ObjectMetaApplyConfiguration   `json:"metadata,omitempty"`
+	InvolvedObject                *ObjectReferenceApplyConfiguration `json:"involvedObject,omitempty"`
+	Reason                        *string                            `json:"reason,omitempty"`
+	Message                       *string                            `json:"message,omitempty"`
+	Source                        *EventSourceApplyConfiguration     `json:"source,omitempty"`
+	FirstTimestamp                *metav1.Time                       `json:"firstTimestamp,omitempty"`
+	LastTimestamp                 *metav1.Time                       `json:"lastTimestamp,omitempty"`
+	Count                         *int32                             `json:"count,omitempty"`
+	Type                          *string                            `json:"type,omitempty"`
+	EventTime                     *metav1.MicroTime                  `json:"eventTime,omitempty"`
+	Series                        *EventSeriesApplyConfiguration     `json:"series,omitempty"`
+	Action                        *string                            `json:"action,omitempty"`
+	Related                       *ObjectReferenceApplyConfiguration `json:"related,omitempty"`
+	ReportingController           *string                            `json:"reportingComponent,omitempty"`
+	ReportingInstance             *string                            `json:"reportingInstance,omitempty"`
 }
 
 // EventApplyConfiguration constructs an declarative configuration of the Event type for use with
@@ -39,97 +50,68 @@ func Event() *EventApplyConfiguration {
 	return &EventApplyConfiguration{}
 }
 
-// eventFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in EventApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type eventFields struct {
-	Kind                *string                            `json:"kind,omitempty"`       // inlined EventApplyConfiguration.typeMeta.Kind field
-	APIVersion          *string                            `json:"apiVersion,omitempty"` // inlined EventApplyConfiguration.typeMeta.APIVersion field
-	ObjectMeta          *v1.ObjectMetaApplyConfiguration   `json:"metadata,omitempty"`
-	InvolvedObject      *ObjectReferenceApplyConfiguration `json:"involvedObject,omitempty"`
-	Reason              *string                            `json:"reason,omitempty"`
-	Message             *string                            `json:"message,omitempty"`
-	Source              *EventSourceApplyConfiguration     `json:"source,omitempty"`
-	FirstTimestamp      *metav1.Time                       `json:"firstTimestamp,omitempty"`
-	LastTimestamp       *metav1.Time                       `json:"lastTimestamp,omitempty"`
-	Count               *int32                             `json:"count,omitempty"`
-	Type                *string                            `json:"type,omitempty"`
-	EventTime           *metav1.MicroTime                  `json:"eventTime,omitempty"`
-	Series              *EventSeriesApplyConfiguration     `json:"series,omitempty"`
-	Action              *string                            `json:"action,omitempty"`
-	Related             *ObjectReferenceApplyConfiguration `json:"related,omitempty"`
-	ReportingController *string                            `json:"reportingComponent,omitempty"`
-	ReportingInstance   *string                            `json:"reportingInstance,omitempty"`
-}
-
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
 func (b *EventApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *EventApplyConfiguration {
-	b.typeMeta = value
-	return b
-}
-
-// RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *EventApplyConfiguration) RemoveTypeMeta() *EventApplyConfiguration {
-	b.typeMeta = nil
+	if value != nil {
+		b.TypeMetaApplyConfiguration = *value
+	}
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
 func (b *EventApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
-	return b.typeMeta, true
+	return &b.TypeMetaApplyConfiguration, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
 func (b *EventApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *EventApplyConfiguration {
-	b.fields.ObjectMeta = value
+	b.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
 func (b *EventApplyConfiguration) RemoveObjectMeta() *EventApplyConfiguration {
-	b.fields.ObjectMeta = nil
+	b.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
 func (b *EventApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
-	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
+	return b.ObjectMeta, b.ObjectMeta != nil
 }
 
 // SetInvolvedObject sets the InvolvedObject field in the declarative configuration to the given value.
 func (b *EventApplyConfiguration) SetInvolvedObject(value *ObjectReferenceApplyConfiguration) *EventApplyConfiguration {
-	b.fields.InvolvedObject = value
+	b.InvolvedObject = value
 	return b
 }
 
 // RemoveInvolvedObject removes the InvolvedObject field from the declarative configuration.
 func (b *EventApplyConfiguration) RemoveInvolvedObject() *EventApplyConfiguration {
-	b.fields.InvolvedObject = nil
+	b.InvolvedObject = nil
 	return b
 }
 
 // GetInvolvedObject gets the InvolvedObject field from the declarative configuration.
 func (b *EventApplyConfiguration) GetInvolvedObject() (value *ObjectReferenceApplyConfiguration, ok bool) {
-	return b.fields.InvolvedObject, b.fields.InvolvedObject != nil
+	return b.InvolvedObject, b.InvolvedObject != nil
 }
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
 func (b *EventApplyConfiguration) SetReason(value string) *EventApplyConfiguration {
-	b.fields.Reason = &value
+	b.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
 func (b *EventApplyConfiguration) RemoveReason() *EventApplyConfiguration {
-	b.fields.Reason = nil
+	b.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
 func (b *EventApplyConfiguration) GetReason() (value string, ok bool) {
-	if v := b.fields.Reason; v != nil {
+	if v := b.Reason; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -137,19 +119,19 @@ func (b *EventApplyConfiguration) GetReason() (value string, ok bool) {
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
 func (b *EventApplyConfiguration) SetMessage(value string) *EventApplyConfiguration {
-	b.fields.Message = &value
+	b.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
 func (b *EventApplyConfiguration) RemoveMessage() *EventApplyConfiguration {
-	b.fields.Message = nil
+	b.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
 func (b *EventApplyConfiguration) GetMessage() (value string, ok bool) {
-	if v := b.fields.Message; v != nil {
+	if v := b.Message; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -157,36 +139,36 @@ func (b *EventApplyConfiguration) GetMessage() (value string, ok bool) {
 
 // SetSource sets the Source field in the declarative configuration to the given value.
 func (b *EventApplyConfiguration) SetSource(value *EventSourceApplyConfiguration) *EventApplyConfiguration {
-	b.fields.Source = value
+	b.Source = value
 	return b
 }
 
 // RemoveSource removes the Source field from the declarative configuration.
 func (b *EventApplyConfiguration) RemoveSource() *EventApplyConfiguration {
-	b.fields.Source = nil
+	b.Source = nil
 	return b
 }
 
 // GetSource gets the Source field from the declarative configuration.
 func (b *EventApplyConfiguration) GetSource() (value *EventSourceApplyConfiguration, ok bool) {
-	return b.fields.Source, b.fields.Source != nil
+	return b.Source, b.Source != nil
 }
 
 // SetFirstTimestamp sets the FirstTimestamp field in the declarative configuration to the given value.
 func (b *EventApplyConfiguration) SetFirstTimestamp(value metav1.Time) *EventApplyConfiguration {
-	b.fields.FirstTimestamp = &value
+	b.FirstTimestamp = &value
 	return b
 }
 
 // RemoveFirstTimestamp removes the FirstTimestamp field from the declarative configuration.
 func (b *EventApplyConfiguration) RemoveFirstTimestamp() *EventApplyConfiguration {
-	b.fields.FirstTimestamp = nil
+	b.FirstTimestamp = nil
 	return b
 }
 
 // GetFirstTimestamp gets the FirstTimestamp field from the declarative configuration.
 func (b *EventApplyConfiguration) GetFirstTimestamp() (value metav1.Time, ok bool) {
-	if v := b.fields.FirstTimestamp; v != nil {
+	if v := b.FirstTimestamp; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -194,19 +176,19 @@ func (b *EventApplyConfiguration) GetFirstTimestamp() (value metav1.Time, ok boo
 
 // SetLastTimestamp sets the LastTimestamp field in the declarative configuration to the given value.
 func (b *EventApplyConfiguration) SetLastTimestamp(value metav1.Time) *EventApplyConfiguration {
-	b.fields.LastTimestamp = &value
+	b.LastTimestamp = &value
 	return b
 }
 
 // RemoveLastTimestamp removes the LastTimestamp field from the declarative configuration.
 func (b *EventApplyConfiguration) RemoveLastTimestamp() *EventApplyConfiguration {
-	b.fields.LastTimestamp = nil
+	b.LastTimestamp = nil
 	return b
 }
 
 // GetLastTimestamp gets the LastTimestamp field from the declarative configuration.
 func (b *EventApplyConfiguration) GetLastTimestamp() (value metav1.Time, ok bool) {
-	if v := b.fields.LastTimestamp; v != nil {
+	if v := b.LastTimestamp; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -214,19 +196,19 @@ func (b *EventApplyConfiguration) GetLastTimestamp() (value metav1.Time, ok bool
 
 // SetCount sets the Count field in the declarative configuration to the given value.
 func (b *EventApplyConfiguration) SetCount(value int32) *EventApplyConfiguration {
-	b.fields.Count = &value
+	b.Count = &value
 	return b
 }
 
 // RemoveCount removes the Count field from the declarative configuration.
 func (b *EventApplyConfiguration) RemoveCount() *EventApplyConfiguration {
-	b.fields.Count = nil
+	b.Count = nil
 	return b
 }
 
 // GetCount gets the Count field from the declarative configuration.
 func (b *EventApplyConfiguration) GetCount() (value int32, ok bool) {
-	if v := b.fields.Count; v != nil {
+	if v := b.Count; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -234,19 +216,19 @@ func (b *EventApplyConfiguration) GetCount() (value int32, ok bool) {
 
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *EventApplyConfiguration) SetType(value string) *EventApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *EventApplyConfiguration) RemoveType() *EventApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *EventApplyConfiguration) GetType() (value string, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -254,19 +236,19 @@ func (b *EventApplyConfiguration) GetType() (value string, ok bool) {
 
 // SetEventTime sets the EventTime field in the declarative configuration to the given value.
 func (b *EventApplyConfiguration) SetEventTime(value metav1.MicroTime) *EventApplyConfiguration {
-	b.fields.EventTime = &value
+	b.EventTime = &value
 	return b
 }
 
 // RemoveEventTime removes the EventTime field from the declarative configuration.
 func (b *EventApplyConfiguration) RemoveEventTime() *EventApplyConfiguration {
-	b.fields.EventTime = nil
+	b.EventTime = nil
 	return b
 }
 
 // GetEventTime gets the EventTime field from the declarative configuration.
 func (b *EventApplyConfiguration) GetEventTime() (value metav1.MicroTime, ok bool) {
-	if v := b.fields.EventTime; v != nil {
+	if v := b.EventTime; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -274,36 +256,36 @@ func (b *EventApplyConfiguration) GetEventTime() (value metav1.MicroTime, ok boo
 
 // SetSeries sets the Series field in the declarative configuration to the given value.
 func (b *EventApplyConfiguration) SetSeries(value *EventSeriesApplyConfiguration) *EventApplyConfiguration {
-	b.fields.Series = value
+	b.Series = value
 	return b
 }
 
 // RemoveSeries removes the Series field from the declarative configuration.
 func (b *EventApplyConfiguration) RemoveSeries() *EventApplyConfiguration {
-	b.fields.Series = nil
+	b.Series = nil
 	return b
 }
 
 // GetSeries gets the Series field from the declarative configuration.
 func (b *EventApplyConfiguration) GetSeries() (value *EventSeriesApplyConfiguration, ok bool) {
-	return b.fields.Series, b.fields.Series != nil
+	return b.Series, b.Series != nil
 }
 
 // SetAction sets the Action field in the declarative configuration to the given value.
 func (b *EventApplyConfiguration) SetAction(value string) *EventApplyConfiguration {
-	b.fields.Action = &value
+	b.Action = &value
 	return b
 }
 
 // RemoveAction removes the Action field from the declarative configuration.
 func (b *EventApplyConfiguration) RemoveAction() *EventApplyConfiguration {
-	b.fields.Action = nil
+	b.Action = nil
 	return b
 }
 
 // GetAction gets the Action field from the declarative configuration.
 func (b *EventApplyConfiguration) GetAction() (value string, ok bool) {
-	if v := b.fields.Action; v != nil {
+	if v := b.Action; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -311,36 +293,36 @@ func (b *EventApplyConfiguration) GetAction() (value string, ok bool) {
 
 // SetRelated sets the Related field in the declarative configuration to the given value.
 func (b *EventApplyConfiguration) SetRelated(value *ObjectReferenceApplyConfiguration) *EventApplyConfiguration {
-	b.fields.Related = value
+	b.Related = value
 	return b
 }
 
 // RemoveRelated removes the Related field from the declarative configuration.
 func (b *EventApplyConfiguration) RemoveRelated() *EventApplyConfiguration {
-	b.fields.Related = nil
+	b.Related = nil
 	return b
 }
 
 // GetRelated gets the Related field from the declarative configuration.
 func (b *EventApplyConfiguration) GetRelated() (value *ObjectReferenceApplyConfiguration, ok bool) {
-	return b.fields.Related, b.fields.Related != nil
+	return b.Related, b.Related != nil
 }
 
 // SetReportingController sets the ReportingController field in the declarative configuration to the given value.
 func (b *EventApplyConfiguration) SetReportingController(value string) *EventApplyConfiguration {
-	b.fields.ReportingController = &value
+	b.ReportingController = &value
 	return b
 }
 
 // RemoveReportingController removes the ReportingController field from the declarative configuration.
 func (b *EventApplyConfiguration) RemoveReportingController() *EventApplyConfiguration {
-	b.fields.ReportingController = nil
+	b.ReportingController = nil
 	return b
 }
 
 // GetReportingController gets the ReportingController field from the declarative configuration.
 func (b *EventApplyConfiguration) GetReportingController() (value string, ok bool) {
-	if v := b.fields.ReportingController; v != nil {
+	if v := b.ReportingController; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -348,64 +330,22 @@ func (b *EventApplyConfiguration) GetReportingController() (value string, ok boo
 
 // SetReportingInstance sets the ReportingInstance field in the declarative configuration to the given value.
 func (b *EventApplyConfiguration) SetReportingInstance(value string) *EventApplyConfiguration {
-	b.fields.ReportingInstance = &value
+	b.ReportingInstance = &value
 	return b
 }
 
 // RemoveReportingInstance removes the ReportingInstance field from the declarative configuration.
 func (b *EventApplyConfiguration) RemoveReportingInstance() *EventApplyConfiguration {
-	b.fields.ReportingInstance = nil
+	b.ReportingInstance = nil
 	return b
 }
 
 // GetReportingInstance gets the ReportingInstance field from the declarative configuration.
 func (b *EventApplyConfiguration) GetReportingInstance() (value string, ok bool) {
-	if v := b.fields.ReportingInstance; v != nil {
+	if v := b.ReportingInstance; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts EventApplyConfiguration to unstructured.
-func (b *EventApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to EventApplyConfiguration, replacing the contents
-// of EventApplyConfiguration.
-func (b *EventApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &eventFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals EventApplyConfiguration to JSON.
-func (b *EventApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into EventApplyConfiguration, replacing the contents of
-// EventApplyConfiguration.
-func (b *EventApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // EventList represents a listAlias of EventApplyConfiguration.
@@ -413,25 +353,3 @@ type EventList []*EventApplyConfiguration
 
 // EventList represents a map of EventApplyConfiguration.
 type EventMap map[string]EventApplyConfiguration
-
-func (b *EventApplyConfiguration) preMarshal() {
-	if b.typeMeta != nil {
-		if v, ok := b.typeMeta.GetKind(); ok {
-			b.fields.Kind = &v
-		}
-		if v, ok := b.typeMeta.GetAPIVersion(); ok {
-			b.fields.APIVersion = &v
-		}
-	}
-}
-func (b *EventApplyConfiguration) postUnmarshal() {
-	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
-	}
-	if b.fields.Kind != nil {
-		b.typeMeta.SetKind(*b.fields.Kind)
-	}
-	if b.fields.APIVersion != nil {
-		b.typeMeta.SetAPIVersion(*b.fields.APIVersion)
-	}
-}

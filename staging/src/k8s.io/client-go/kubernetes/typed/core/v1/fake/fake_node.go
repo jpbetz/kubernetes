@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
@@ -136,7 +137,7 @@ func (c *FakeNodes) Patch(ctx context.Context, name string, pt types.PatchType, 
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied node.
 func (c *FakeNodes) Apply(ctx context.Context, node *applyconfigurationscorev1.NodeApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Node, err error) {
-	data, err := node.MarshalJSON()
+	data, err := json.Marshal(node)
 	if err != nil {
 		return nil, err
 	}

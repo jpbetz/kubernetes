@@ -20,6 +20,7 @@ package v1beta1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -189,7 +190,7 @@ func (c *certificateSigningRequests) Patch(ctx context.Context, name string, pt 
 // Apply takes the given apply declarative configuration, applies it and returns the applied certificateSigningRequest.
 func (c *certificateSigningRequests) Apply(ctx context.Context, certificateSigningRequest *certificatesv1beta1.CertificateSigningRequestApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.CertificateSigningRequest, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := certificateSigningRequest.MarshalJSON()
+	data, err := json.Marshal(certificateSigningRequest)
 	if err != nil {
 		return nil, err
 	}

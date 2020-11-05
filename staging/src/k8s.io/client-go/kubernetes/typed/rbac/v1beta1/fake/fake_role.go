@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	v1beta1 "k8s.io/api/rbac/v1beta1"
@@ -133,7 +134,7 @@ func (c *FakeRoles) Patch(ctx context.Context, name string, pt types.PatchType, 
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied role.
 func (c *FakeRoles) Apply(ctx context.Context, role *rbacv1beta1.RoleApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.Role, err error) {
-	data, err := role.MarshalJSON()
+	data, err := json.Marshal(role)
 	if err != nil {
 		return nil, err
 	}

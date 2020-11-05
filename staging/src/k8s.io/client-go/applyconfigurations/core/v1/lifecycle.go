@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // LifecycleApplyConfiguration represents an declarative configuration of the Lifecycle type for use
 // with apply.
 type LifecycleApplyConfiguration struct {
-	fields lifecycleFields
+	PostStart *HandlerApplyConfiguration `json:"postStart,omitempty"`
+	PreStop   *HandlerApplyConfiguration `json:"preStop,omitempty"`
 }
 
 // LifecycleApplyConfiguration constructs an declarative configuration of the Lifecycle type for use with
@@ -36,90 +31,38 @@ func Lifecycle() *LifecycleApplyConfiguration {
 	return &LifecycleApplyConfiguration{}
 }
 
-// lifecycleFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LifecycleApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type lifecycleFields struct {
-	PostStart *HandlerApplyConfiguration `json:"postStart,omitempty"`
-	PreStop   *HandlerApplyConfiguration `json:"preStop,omitempty"`
-}
-
 // SetPostStart sets the PostStart field in the declarative configuration to the given value.
 func (b *LifecycleApplyConfiguration) SetPostStart(value *HandlerApplyConfiguration) *LifecycleApplyConfiguration {
-	b.fields.PostStart = value
+	b.PostStart = value
 	return b
 }
 
 // RemovePostStart removes the PostStart field from the declarative configuration.
 func (b *LifecycleApplyConfiguration) RemovePostStart() *LifecycleApplyConfiguration {
-	b.fields.PostStart = nil
+	b.PostStart = nil
 	return b
 }
 
 // GetPostStart gets the PostStart field from the declarative configuration.
 func (b *LifecycleApplyConfiguration) GetPostStart() (value *HandlerApplyConfiguration, ok bool) {
-	return b.fields.PostStart, b.fields.PostStart != nil
+	return b.PostStart, b.PostStart != nil
 }
 
 // SetPreStop sets the PreStop field in the declarative configuration to the given value.
 func (b *LifecycleApplyConfiguration) SetPreStop(value *HandlerApplyConfiguration) *LifecycleApplyConfiguration {
-	b.fields.PreStop = value
+	b.PreStop = value
 	return b
 }
 
 // RemovePreStop removes the PreStop field from the declarative configuration.
 func (b *LifecycleApplyConfiguration) RemovePreStop() *LifecycleApplyConfiguration {
-	b.fields.PreStop = nil
+	b.PreStop = nil
 	return b
 }
 
 // GetPreStop gets the PreStop field from the declarative configuration.
 func (b *LifecycleApplyConfiguration) GetPreStop() (value *HandlerApplyConfiguration, ok bool) {
-	return b.fields.PreStop, b.fields.PreStop != nil
-}
-
-// ToUnstructured converts LifecycleApplyConfiguration to unstructured.
-func (b *LifecycleApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to LifecycleApplyConfiguration, replacing the contents
-// of LifecycleApplyConfiguration.
-func (b *LifecycleApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &lifecycleFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals LifecycleApplyConfiguration to JSON.
-func (b *LifecycleApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into LifecycleApplyConfiguration, replacing the contents of
-// LifecycleApplyConfiguration.
-func (b *LifecycleApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.PreStop, b.PreStop != nil
 }
 
 // LifecycleList represents a listAlias of LifecycleApplyConfiguration.
@@ -127,8 +70,3 @@ type LifecycleList []*LifecycleApplyConfiguration
 
 // LifecycleList represents a map of LifecycleApplyConfiguration.
 type LifecycleMap map[string]LifecycleApplyConfiguration
-
-func (b *LifecycleApplyConfiguration) preMarshal() {
-}
-func (b *LifecycleApplyConfiguration) postUnmarshal() {
-}

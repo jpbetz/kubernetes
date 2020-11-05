@@ -19,16 +19,15 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // LabelSelectorRequirementApplyConfiguration represents an declarative configuration of the LabelSelectorRequirement type for use
 // with apply.
 type LabelSelectorRequirementApplyConfiguration struct {
-	fields labelSelectorRequirementFields
+	Key      *string                   `json:"key,omitempty"`
+	Operator *v1.LabelSelectorOperator `json:"operator,omitempty"`
+	Values   *[]string                 `json:"values,omitempty"`
 }
 
 // LabelSelectorRequirementApplyConfiguration constructs an declarative configuration of the LabelSelectorRequirement type for use with
@@ -37,32 +36,21 @@ func LabelSelectorRequirement() *LabelSelectorRequirementApplyConfiguration {
 	return &LabelSelectorRequirementApplyConfiguration{}
 }
 
-// labelSelectorRequirementFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LabelSelectorRequirementApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type labelSelectorRequirementFields struct {
-	Key      *string                   `json:"key,omitempty"`
-	Operator *v1.LabelSelectorOperator `json:"operator,omitempty"`
-	Values   *[]string                 `json:"values,omitempty"`
-}
-
 // SetKey sets the Key field in the declarative configuration to the given value.
 func (b *LabelSelectorRequirementApplyConfiguration) SetKey(value string) *LabelSelectorRequirementApplyConfiguration {
-	b.fields.Key = &value
+	b.Key = &value
 	return b
 }
 
 // RemoveKey removes the Key field from the declarative configuration.
 func (b *LabelSelectorRequirementApplyConfiguration) RemoveKey() *LabelSelectorRequirementApplyConfiguration {
-	b.fields.Key = nil
+	b.Key = nil
 	return b
 }
 
 // GetKey gets the Key field from the declarative configuration.
 func (b *LabelSelectorRequirementApplyConfiguration) GetKey() (value string, ok bool) {
-	if v := b.fields.Key; v != nil {
+	if v := b.Key; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,19 +58,19 @@ func (b *LabelSelectorRequirementApplyConfiguration) GetKey() (value string, ok 
 
 // SetOperator sets the Operator field in the declarative configuration to the given value.
 func (b *LabelSelectorRequirementApplyConfiguration) SetOperator(value v1.LabelSelectorOperator) *LabelSelectorRequirementApplyConfiguration {
-	b.fields.Operator = &value
+	b.Operator = &value
 	return b
 }
 
 // RemoveOperator removes the Operator field from the declarative configuration.
 func (b *LabelSelectorRequirementApplyConfiguration) RemoveOperator() *LabelSelectorRequirementApplyConfiguration {
-	b.fields.Operator = nil
+	b.Operator = nil
 	return b
 }
 
 // GetOperator gets the Operator field from the declarative configuration.
 func (b *LabelSelectorRequirementApplyConfiguration) GetOperator() (value v1.LabelSelectorOperator, ok bool) {
-	if v := b.fields.Operator; v != nil {
+	if v := b.Operator; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -90,64 +78,22 @@ func (b *LabelSelectorRequirementApplyConfiguration) GetOperator() (value v1.Lab
 
 // SetValues sets the Values field in the declarative configuration to the given value.
 func (b *LabelSelectorRequirementApplyConfiguration) SetValues(value []string) *LabelSelectorRequirementApplyConfiguration {
-	b.fields.Values = &value
+	b.Values = &value
 	return b
 }
 
 // RemoveValues removes the Values field from the declarative configuration.
 func (b *LabelSelectorRequirementApplyConfiguration) RemoveValues() *LabelSelectorRequirementApplyConfiguration {
-	b.fields.Values = nil
+	b.Values = nil
 	return b
 }
 
 // GetValues gets the Values field from the declarative configuration.
 func (b *LabelSelectorRequirementApplyConfiguration) GetValues() (value []string, ok bool) {
-	if v := b.fields.Values; v != nil {
+	if v := b.Values; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts LabelSelectorRequirementApplyConfiguration to unstructured.
-func (b *LabelSelectorRequirementApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to LabelSelectorRequirementApplyConfiguration, replacing the contents
-// of LabelSelectorRequirementApplyConfiguration.
-func (b *LabelSelectorRequirementApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &labelSelectorRequirementFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals LabelSelectorRequirementApplyConfiguration to JSON.
-func (b *LabelSelectorRequirementApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into LabelSelectorRequirementApplyConfiguration, replacing the contents of
-// LabelSelectorRequirementApplyConfiguration.
-func (b *LabelSelectorRequirementApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // LabelSelectorRequirementList represents a listAlias of LabelSelectorRequirementApplyConfiguration.
@@ -155,8 +101,3 @@ type LabelSelectorRequirementList []*LabelSelectorRequirementApplyConfiguration
 
 // LabelSelectorRequirementList represents a map of LabelSelectorRequirementApplyConfiguration.
 type LabelSelectorRequirementMap map[string]LabelSelectorRequirementApplyConfiguration
-
-func (b *LabelSelectorRequirementApplyConfiguration) preMarshal() {
-}
-func (b *LabelSelectorRequirementApplyConfiguration) postUnmarshal() {
-}

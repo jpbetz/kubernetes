@@ -19,30 +19,12 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	types "k8s.io/apimachinery/pkg/types"
 )
 
 // ObjectReferenceApplyConfiguration represents an declarative configuration of the ObjectReference type for use
 // with apply.
 type ObjectReferenceApplyConfiguration struct {
-	fields objectReferenceFields
-}
-
-// ObjectReferenceApplyConfiguration constructs an declarative configuration of the ObjectReference type for use with
-// apply.
-func ObjectReference() *ObjectReferenceApplyConfiguration {
-	return &ObjectReferenceApplyConfiguration{}
-}
-
-// objectReferenceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ObjectReferenceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type objectReferenceFields struct {
 	Kind            *string    `json:"kind,omitempty"`
 	Namespace       *string    `json:"namespace,omitempty"`
 	Name            *string    `json:"name,omitempty"`
@@ -52,21 +34,27 @@ type objectReferenceFields struct {
 	FieldPath       *string    `json:"fieldPath,omitempty"`
 }
 
+// ObjectReferenceApplyConfiguration constructs an declarative configuration of the ObjectReference type for use with
+// apply.
+func ObjectReference() *ObjectReferenceApplyConfiguration {
+	return &ObjectReferenceApplyConfiguration{}
+}
+
 // SetKind sets the Kind field in the declarative configuration to the given value.
 func (b *ObjectReferenceApplyConfiguration) SetKind(value string) *ObjectReferenceApplyConfiguration {
-	b.fields.Kind = &value
+	b.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
 func (b *ObjectReferenceApplyConfiguration) RemoveKind() *ObjectReferenceApplyConfiguration {
-	b.fields.Kind = nil
+	b.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
 func (b *ObjectReferenceApplyConfiguration) GetKind() (value string, ok bool) {
-	if v := b.fields.Kind; v != nil {
+	if v := b.Kind; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -74,19 +62,19 @@ func (b *ObjectReferenceApplyConfiguration) GetKind() (value string, ok bool) {
 
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
 func (b *ObjectReferenceApplyConfiguration) SetNamespace(value string) *ObjectReferenceApplyConfiguration {
-	b.fields.Namespace = &value
+	b.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
 func (b *ObjectReferenceApplyConfiguration) RemoveNamespace() *ObjectReferenceApplyConfiguration {
-	b.fields.Namespace = nil
+	b.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
 func (b *ObjectReferenceApplyConfiguration) GetNamespace() (value string, ok bool) {
-	if v := b.fields.Namespace; v != nil {
+	if v := b.Namespace; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -94,19 +82,19 @@ func (b *ObjectReferenceApplyConfiguration) GetNamespace() (value string, ok boo
 
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *ObjectReferenceApplyConfiguration) SetName(value string) *ObjectReferenceApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *ObjectReferenceApplyConfiguration) RemoveName() *ObjectReferenceApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *ObjectReferenceApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -114,19 +102,19 @@ func (b *ObjectReferenceApplyConfiguration) GetName() (value string, ok bool) {
 
 // SetUID sets the UID field in the declarative configuration to the given value.
 func (b *ObjectReferenceApplyConfiguration) SetUID(value types.UID) *ObjectReferenceApplyConfiguration {
-	b.fields.UID = &value
+	b.UID = &value
 	return b
 }
 
 // RemoveUID removes the UID field from the declarative configuration.
 func (b *ObjectReferenceApplyConfiguration) RemoveUID() *ObjectReferenceApplyConfiguration {
-	b.fields.UID = nil
+	b.UID = nil
 	return b
 }
 
 // GetUID gets the UID field from the declarative configuration.
 func (b *ObjectReferenceApplyConfiguration) GetUID() (value types.UID, ok bool) {
-	if v := b.fields.UID; v != nil {
+	if v := b.UID; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -134,19 +122,19 @@ func (b *ObjectReferenceApplyConfiguration) GetUID() (value types.UID, ok bool) 
 
 // SetAPIVersion sets the APIVersion field in the declarative configuration to the given value.
 func (b *ObjectReferenceApplyConfiguration) SetAPIVersion(value string) *ObjectReferenceApplyConfiguration {
-	b.fields.APIVersion = &value
+	b.APIVersion = &value
 	return b
 }
 
 // RemoveAPIVersion removes the APIVersion field from the declarative configuration.
 func (b *ObjectReferenceApplyConfiguration) RemoveAPIVersion() *ObjectReferenceApplyConfiguration {
-	b.fields.APIVersion = nil
+	b.APIVersion = nil
 	return b
 }
 
 // GetAPIVersion gets the APIVersion field from the declarative configuration.
 func (b *ObjectReferenceApplyConfiguration) GetAPIVersion() (value string, ok bool) {
-	if v := b.fields.APIVersion; v != nil {
+	if v := b.APIVersion; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -154,19 +142,19 @@ func (b *ObjectReferenceApplyConfiguration) GetAPIVersion() (value string, ok bo
 
 // SetResourceVersion sets the ResourceVersion field in the declarative configuration to the given value.
 func (b *ObjectReferenceApplyConfiguration) SetResourceVersion(value string) *ObjectReferenceApplyConfiguration {
-	b.fields.ResourceVersion = &value
+	b.ResourceVersion = &value
 	return b
 }
 
 // RemoveResourceVersion removes the ResourceVersion field from the declarative configuration.
 func (b *ObjectReferenceApplyConfiguration) RemoveResourceVersion() *ObjectReferenceApplyConfiguration {
-	b.fields.ResourceVersion = nil
+	b.ResourceVersion = nil
 	return b
 }
 
 // GetResourceVersion gets the ResourceVersion field from the declarative configuration.
 func (b *ObjectReferenceApplyConfiguration) GetResourceVersion() (value string, ok bool) {
-	if v := b.fields.ResourceVersion; v != nil {
+	if v := b.ResourceVersion; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -174,64 +162,22 @@ func (b *ObjectReferenceApplyConfiguration) GetResourceVersion() (value string, 
 
 // SetFieldPath sets the FieldPath field in the declarative configuration to the given value.
 func (b *ObjectReferenceApplyConfiguration) SetFieldPath(value string) *ObjectReferenceApplyConfiguration {
-	b.fields.FieldPath = &value
+	b.FieldPath = &value
 	return b
 }
 
 // RemoveFieldPath removes the FieldPath field from the declarative configuration.
 func (b *ObjectReferenceApplyConfiguration) RemoveFieldPath() *ObjectReferenceApplyConfiguration {
-	b.fields.FieldPath = nil
+	b.FieldPath = nil
 	return b
 }
 
 // GetFieldPath gets the FieldPath field from the declarative configuration.
 func (b *ObjectReferenceApplyConfiguration) GetFieldPath() (value string, ok bool) {
-	if v := b.fields.FieldPath; v != nil {
+	if v := b.FieldPath; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ObjectReferenceApplyConfiguration to unstructured.
-func (b *ObjectReferenceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ObjectReferenceApplyConfiguration, replacing the contents
-// of ObjectReferenceApplyConfiguration.
-func (b *ObjectReferenceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &objectReferenceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ObjectReferenceApplyConfiguration to JSON.
-func (b *ObjectReferenceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ObjectReferenceApplyConfiguration, replacing the contents of
-// ObjectReferenceApplyConfiguration.
-func (b *ObjectReferenceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ObjectReferenceList represents a listAlias of ObjectReferenceApplyConfiguration.
@@ -239,8 +185,3 @@ type ObjectReferenceList []*ObjectReferenceApplyConfiguration
 
 // ObjectReferenceList represents a map of ObjectReferenceApplyConfiguration.
 type ObjectReferenceMap map[string]ObjectReferenceApplyConfiguration
-
-func (b *ObjectReferenceApplyConfiguration) preMarshal() {
-}
-func (b *ObjectReferenceApplyConfiguration) postUnmarshal() {
-}

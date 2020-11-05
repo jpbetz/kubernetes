@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // LoadBalancerIngressApplyConfiguration represents an declarative configuration of the LoadBalancerIngress type for use
 // with apply.
 type LoadBalancerIngressApplyConfiguration struct {
-	fields loadBalancerIngressFields
+	IP       *string `json:"ip,omitempty"`
+	Hostname *string `json:"hostname,omitempty"`
 }
 
 // LoadBalancerIngressApplyConfiguration constructs an declarative configuration of the LoadBalancerIngress type for use with
@@ -36,31 +31,21 @@ func LoadBalancerIngress() *LoadBalancerIngressApplyConfiguration {
 	return &LoadBalancerIngressApplyConfiguration{}
 }
 
-// loadBalancerIngressFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LoadBalancerIngressApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type loadBalancerIngressFields struct {
-	IP       *string `json:"ip,omitempty"`
-	Hostname *string `json:"hostname,omitempty"`
-}
-
 // SetIP sets the IP field in the declarative configuration to the given value.
 func (b *LoadBalancerIngressApplyConfiguration) SetIP(value string) *LoadBalancerIngressApplyConfiguration {
-	b.fields.IP = &value
+	b.IP = &value
 	return b
 }
 
 // RemoveIP removes the IP field from the declarative configuration.
 func (b *LoadBalancerIngressApplyConfiguration) RemoveIP() *LoadBalancerIngressApplyConfiguration {
-	b.fields.IP = nil
+	b.IP = nil
 	return b
 }
 
 // GetIP gets the IP field from the declarative configuration.
 func (b *LoadBalancerIngressApplyConfiguration) GetIP() (value string, ok bool) {
-	if v := b.fields.IP; v != nil {
+	if v := b.IP; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *LoadBalancerIngressApplyConfiguration) GetIP() (value string, ok bool) 
 
 // SetHostname sets the Hostname field in the declarative configuration to the given value.
 func (b *LoadBalancerIngressApplyConfiguration) SetHostname(value string) *LoadBalancerIngressApplyConfiguration {
-	b.fields.Hostname = &value
+	b.Hostname = &value
 	return b
 }
 
 // RemoveHostname removes the Hostname field from the declarative configuration.
 func (b *LoadBalancerIngressApplyConfiguration) RemoveHostname() *LoadBalancerIngressApplyConfiguration {
-	b.fields.Hostname = nil
+	b.Hostname = nil
 	return b
 }
 
 // GetHostname gets the Hostname field from the declarative configuration.
 func (b *LoadBalancerIngressApplyConfiguration) GetHostname() (value string, ok bool) {
-	if v := b.fields.Hostname; v != nil {
+	if v := b.Hostname; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts LoadBalancerIngressApplyConfiguration to unstructured.
-func (b *LoadBalancerIngressApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to LoadBalancerIngressApplyConfiguration, replacing the contents
-// of LoadBalancerIngressApplyConfiguration.
-func (b *LoadBalancerIngressApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &loadBalancerIngressFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals LoadBalancerIngressApplyConfiguration to JSON.
-func (b *LoadBalancerIngressApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into LoadBalancerIngressApplyConfiguration, replacing the contents of
-// LoadBalancerIngressApplyConfiguration.
-func (b *LoadBalancerIngressApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // LoadBalancerIngressList represents a listAlias of LoadBalancerIngressApplyConfiguration.
@@ -133,8 +76,3 @@ type LoadBalancerIngressList []*LoadBalancerIngressApplyConfiguration
 
 // LoadBalancerIngressList represents a map of LoadBalancerIngressApplyConfiguration.
 type LoadBalancerIngressMap map[string]LoadBalancerIngressApplyConfiguration
-
-func (b *LoadBalancerIngressApplyConfiguration) preMarshal() {
-}
-func (b *LoadBalancerIngressApplyConfiguration) postUnmarshal() {
-}

@@ -18,16 +18,12 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // TypedLocalObjectReferenceApplyConfiguration represents an declarative configuration of the TypedLocalObjectReference type for use
 // with apply.
 type TypedLocalObjectReferenceApplyConfiguration struct {
-	fields typedLocalObjectReferenceFields
+	APIGroup *string `json:"apiGroup,omitempty"`
+	Kind     *string `json:"kind,omitempty"`
+	Name     *string `json:"name,omitempty"`
 }
 
 // TypedLocalObjectReferenceApplyConfiguration constructs an declarative configuration of the TypedLocalObjectReference type for use with
@@ -36,32 +32,21 @@ func TypedLocalObjectReference() *TypedLocalObjectReferenceApplyConfiguration {
 	return &TypedLocalObjectReferenceApplyConfiguration{}
 }
 
-// typedLocalObjectReferenceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in TypedLocalObjectReferenceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type typedLocalObjectReferenceFields struct {
-	APIGroup *string `json:"apiGroup,omitempty"`
-	Kind     *string `json:"kind,omitempty"`
-	Name     *string `json:"name,omitempty"`
-}
-
 // SetAPIGroup sets the APIGroup field in the declarative configuration to the given value.
 func (b *TypedLocalObjectReferenceApplyConfiguration) SetAPIGroup(value string) *TypedLocalObjectReferenceApplyConfiguration {
-	b.fields.APIGroup = &value
+	b.APIGroup = &value
 	return b
 }
 
 // RemoveAPIGroup removes the APIGroup field from the declarative configuration.
 func (b *TypedLocalObjectReferenceApplyConfiguration) RemoveAPIGroup() *TypedLocalObjectReferenceApplyConfiguration {
-	b.fields.APIGroup = nil
+	b.APIGroup = nil
 	return b
 }
 
 // GetAPIGroup gets the APIGroup field from the declarative configuration.
 func (b *TypedLocalObjectReferenceApplyConfiguration) GetAPIGroup() (value string, ok bool) {
-	if v := b.fields.APIGroup; v != nil {
+	if v := b.APIGroup; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,19 +54,19 @@ func (b *TypedLocalObjectReferenceApplyConfiguration) GetAPIGroup() (value strin
 
 // SetKind sets the Kind field in the declarative configuration to the given value.
 func (b *TypedLocalObjectReferenceApplyConfiguration) SetKind(value string) *TypedLocalObjectReferenceApplyConfiguration {
-	b.fields.Kind = &value
+	b.Kind = &value
 	return b
 }
 
 // RemoveKind removes the Kind field from the declarative configuration.
 func (b *TypedLocalObjectReferenceApplyConfiguration) RemoveKind() *TypedLocalObjectReferenceApplyConfiguration {
-	b.fields.Kind = nil
+	b.Kind = nil
 	return b
 }
 
 // GetKind gets the Kind field from the declarative configuration.
 func (b *TypedLocalObjectReferenceApplyConfiguration) GetKind() (value string, ok bool) {
-	if v := b.fields.Kind; v != nil {
+	if v := b.Kind; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -89,64 +74,22 @@ func (b *TypedLocalObjectReferenceApplyConfiguration) GetKind() (value string, o
 
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *TypedLocalObjectReferenceApplyConfiguration) SetName(value string) *TypedLocalObjectReferenceApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *TypedLocalObjectReferenceApplyConfiguration) RemoveName() *TypedLocalObjectReferenceApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *TypedLocalObjectReferenceApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts TypedLocalObjectReferenceApplyConfiguration to unstructured.
-func (b *TypedLocalObjectReferenceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to TypedLocalObjectReferenceApplyConfiguration, replacing the contents
-// of TypedLocalObjectReferenceApplyConfiguration.
-func (b *TypedLocalObjectReferenceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &typedLocalObjectReferenceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals TypedLocalObjectReferenceApplyConfiguration to JSON.
-func (b *TypedLocalObjectReferenceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into TypedLocalObjectReferenceApplyConfiguration, replacing the contents of
-// TypedLocalObjectReferenceApplyConfiguration.
-func (b *TypedLocalObjectReferenceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // TypedLocalObjectReferenceList represents a listAlias of TypedLocalObjectReferenceApplyConfiguration.
@@ -154,8 +97,3 @@ type TypedLocalObjectReferenceList []*TypedLocalObjectReferenceApplyConfiguratio
 
 // TypedLocalObjectReferenceList represents a map of TypedLocalObjectReferenceApplyConfiguration.
 type TypedLocalObjectReferenceMap map[string]TypedLocalObjectReferenceApplyConfiguration
-
-func (b *TypedLocalObjectReferenceApplyConfiguration) preMarshal() {
-}
-func (b *TypedLocalObjectReferenceApplyConfiguration) postUnmarshal() {
-}

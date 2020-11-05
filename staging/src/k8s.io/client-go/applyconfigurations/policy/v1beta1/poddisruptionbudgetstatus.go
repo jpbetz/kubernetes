@@ -19,30 +19,12 @@ limitations under the License.
 package v1beta1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // PodDisruptionBudgetStatusApplyConfiguration represents an declarative configuration of the PodDisruptionBudgetStatus type for use
 // with apply.
 type PodDisruptionBudgetStatusApplyConfiguration struct {
-	fields podDisruptionBudgetStatusFields
-}
-
-// PodDisruptionBudgetStatusApplyConfiguration constructs an declarative configuration of the PodDisruptionBudgetStatus type for use with
-// apply.
-func PodDisruptionBudgetStatus() *PodDisruptionBudgetStatusApplyConfiguration {
-	return &PodDisruptionBudgetStatusApplyConfiguration{}
-}
-
-// podDisruptionBudgetStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodDisruptionBudgetStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type podDisruptionBudgetStatusFields struct {
 	ObservedGeneration *int64              `json:"observedGeneration,omitempty"`
 	DisruptedPods      *map[string]v1.Time `json:"disruptedPods,omitempty"`
 	DisruptionsAllowed *int32              `json:"disruptionsAllowed,omitempty"`
@@ -51,21 +33,27 @@ type podDisruptionBudgetStatusFields struct {
 	ExpectedPods       *int32              `json:"expectedPods,omitempty"`
 }
 
+// PodDisruptionBudgetStatusApplyConfiguration constructs an declarative configuration of the PodDisruptionBudgetStatus type for use with
+// apply.
+func PodDisruptionBudgetStatus() *PodDisruptionBudgetStatusApplyConfiguration {
+	return &PodDisruptionBudgetStatusApplyConfiguration{}
+}
+
 // SetObservedGeneration sets the ObservedGeneration field in the declarative configuration to the given value.
 func (b *PodDisruptionBudgetStatusApplyConfiguration) SetObservedGeneration(value int64) *PodDisruptionBudgetStatusApplyConfiguration {
-	b.fields.ObservedGeneration = &value
+	b.ObservedGeneration = &value
 	return b
 }
 
 // RemoveObservedGeneration removes the ObservedGeneration field from the declarative configuration.
 func (b *PodDisruptionBudgetStatusApplyConfiguration) RemoveObservedGeneration() *PodDisruptionBudgetStatusApplyConfiguration {
-	b.fields.ObservedGeneration = nil
+	b.ObservedGeneration = nil
 	return b
 }
 
 // GetObservedGeneration gets the ObservedGeneration field from the declarative configuration.
 func (b *PodDisruptionBudgetStatusApplyConfiguration) GetObservedGeneration() (value int64, ok bool) {
-	if v := b.fields.ObservedGeneration; v != nil {
+	if v := b.ObservedGeneration; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -73,19 +61,19 @@ func (b *PodDisruptionBudgetStatusApplyConfiguration) GetObservedGeneration() (v
 
 // SetDisruptedPods sets the DisruptedPods field in the declarative configuration to the given value.
 func (b *PodDisruptionBudgetStatusApplyConfiguration) SetDisruptedPods(value map[string]v1.Time) *PodDisruptionBudgetStatusApplyConfiguration {
-	b.fields.DisruptedPods = &value
+	b.DisruptedPods = &value
 	return b
 }
 
 // RemoveDisruptedPods removes the DisruptedPods field from the declarative configuration.
 func (b *PodDisruptionBudgetStatusApplyConfiguration) RemoveDisruptedPods() *PodDisruptionBudgetStatusApplyConfiguration {
-	b.fields.DisruptedPods = nil
+	b.DisruptedPods = nil
 	return b
 }
 
 // GetDisruptedPods gets the DisruptedPods field from the declarative configuration.
 func (b *PodDisruptionBudgetStatusApplyConfiguration) GetDisruptedPods() (value map[string]v1.Time, ok bool) {
-	if v := b.fields.DisruptedPods; v != nil {
+	if v := b.DisruptedPods; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -93,19 +81,19 @@ func (b *PodDisruptionBudgetStatusApplyConfiguration) GetDisruptedPods() (value 
 
 // SetDisruptionsAllowed sets the DisruptionsAllowed field in the declarative configuration to the given value.
 func (b *PodDisruptionBudgetStatusApplyConfiguration) SetDisruptionsAllowed(value int32) *PodDisruptionBudgetStatusApplyConfiguration {
-	b.fields.DisruptionsAllowed = &value
+	b.DisruptionsAllowed = &value
 	return b
 }
 
 // RemoveDisruptionsAllowed removes the DisruptionsAllowed field from the declarative configuration.
 func (b *PodDisruptionBudgetStatusApplyConfiguration) RemoveDisruptionsAllowed() *PodDisruptionBudgetStatusApplyConfiguration {
-	b.fields.DisruptionsAllowed = nil
+	b.DisruptionsAllowed = nil
 	return b
 }
 
 // GetDisruptionsAllowed gets the DisruptionsAllowed field from the declarative configuration.
 func (b *PodDisruptionBudgetStatusApplyConfiguration) GetDisruptionsAllowed() (value int32, ok bool) {
-	if v := b.fields.DisruptionsAllowed; v != nil {
+	if v := b.DisruptionsAllowed; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -113,19 +101,19 @@ func (b *PodDisruptionBudgetStatusApplyConfiguration) GetDisruptionsAllowed() (v
 
 // SetCurrentHealthy sets the CurrentHealthy field in the declarative configuration to the given value.
 func (b *PodDisruptionBudgetStatusApplyConfiguration) SetCurrentHealthy(value int32) *PodDisruptionBudgetStatusApplyConfiguration {
-	b.fields.CurrentHealthy = &value
+	b.CurrentHealthy = &value
 	return b
 }
 
 // RemoveCurrentHealthy removes the CurrentHealthy field from the declarative configuration.
 func (b *PodDisruptionBudgetStatusApplyConfiguration) RemoveCurrentHealthy() *PodDisruptionBudgetStatusApplyConfiguration {
-	b.fields.CurrentHealthy = nil
+	b.CurrentHealthy = nil
 	return b
 }
 
 // GetCurrentHealthy gets the CurrentHealthy field from the declarative configuration.
 func (b *PodDisruptionBudgetStatusApplyConfiguration) GetCurrentHealthy() (value int32, ok bool) {
-	if v := b.fields.CurrentHealthy; v != nil {
+	if v := b.CurrentHealthy; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -133,19 +121,19 @@ func (b *PodDisruptionBudgetStatusApplyConfiguration) GetCurrentHealthy() (value
 
 // SetDesiredHealthy sets the DesiredHealthy field in the declarative configuration to the given value.
 func (b *PodDisruptionBudgetStatusApplyConfiguration) SetDesiredHealthy(value int32) *PodDisruptionBudgetStatusApplyConfiguration {
-	b.fields.DesiredHealthy = &value
+	b.DesiredHealthy = &value
 	return b
 }
 
 // RemoveDesiredHealthy removes the DesiredHealthy field from the declarative configuration.
 func (b *PodDisruptionBudgetStatusApplyConfiguration) RemoveDesiredHealthy() *PodDisruptionBudgetStatusApplyConfiguration {
-	b.fields.DesiredHealthy = nil
+	b.DesiredHealthy = nil
 	return b
 }
 
 // GetDesiredHealthy gets the DesiredHealthy field from the declarative configuration.
 func (b *PodDisruptionBudgetStatusApplyConfiguration) GetDesiredHealthy() (value int32, ok bool) {
-	if v := b.fields.DesiredHealthy; v != nil {
+	if v := b.DesiredHealthy; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -153,64 +141,22 @@ func (b *PodDisruptionBudgetStatusApplyConfiguration) GetDesiredHealthy() (value
 
 // SetExpectedPods sets the ExpectedPods field in the declarative configuration to the given value.
 func (b *PodDisruptionBudgetStatusApplyConfiguration) SetExpectedPods(value int32) *PodDisruptionBudgetStatusApplyConfiguration {
-	b.fields.ExpectedPods = &value
+	b.ExpectedPods = &value
 	return b
 }
 
 // RemoveExpectedPods removes the ExpectedPods field from the declarative configuration.
 func (b *PodDisruptionBudgetStatusApplyConfiguration) RemoveExpectedPods() *PodDisruptionBudgetStatusApplyConfiguration {
-	b.fields.ExpectedPods = nil
+	b.ExpectedPods = nil
 	return b
 }
 
 // GetExpectedPods gets the ExpectedPods field from the declarative configuration.
 func (b *PodDisruptionBudgetStatusApplyConfiguration) GetExpectedPods() (value int32, ok bool) {
-	if v := b.fields.ExpectedPods; v != nil {
+	if v := b.ExpectedPods; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts PodDisruptionBudgetStatusApplyConfiguration to unstructured.
-func (b *PodDisruptionBudgetStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PodDisruptionBudgetStatusApplyConfiguration, replacing the contents
-// of PodDisruptionBudgetStatusApplyConfiguration.
-func (b *PodDisruptionBudgetStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &podDisruptionBudgetStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PodDisruptionBudgetStatusApplyConfiguration to JSON.
-func (b *PodDisruptionBudgetStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PodDisruptionBudgetStatusApplyConfiguration, replacing the contents of
-// PodDisruptionBudgetStatusApplyConfiguration.
-func (b *PodDisruptionBudgetStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // PodDisruptionBudgetStatusList represents a listAlias of PodDisruptionBudgetStatusApplyConfiguration.
@@ -218,8 +164,3 @@ type PodDisruptionBudgetStatusList []*PodDisruptionBudgetStatusApplyConfiguratio
 
 // PodDisruptionBudgetStatusList represents a map of PodDisruptionBudgetStatusApplyConfiguration.
 type PodDisruptionBudgetStatusMap map[string]PodDisruptionBudgetStatusApplyConfiguration
-
-func (b *PodDisruptionBudgetStatusApplyConfiguration) preMarshal() {
-}
-func (b *PodDisruptionBudgetStatusApplyConfiguration) postUnmarshal() {
-}

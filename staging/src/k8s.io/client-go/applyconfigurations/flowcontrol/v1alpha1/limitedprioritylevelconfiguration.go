@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // LimitedPriorityLevelConfigurationApplyConfiguration represents an declarative configuration of the LimitedPriorityLevelConfiguration type for use
 // with apply.
 type LimitedPriorityLevelConfigurationApplyConfiguration struct {
-	fields limitedPriorityLevelConfigurationFields
+	AssuredConcurrencyShares *int32                           `json:"assuredConcurrencyShares,omitempty"`
+	LimitResponse            *LimitResponseApplyConfiguration `json:"limitResponse,omitempty"`
 }
 
 // LimitedPriorityLevelConfigurationApplyConfiguration constructs an declarative configuration of the LimitedPriorityLevelConfiguration type for use with
@@ -36,31 +31,21 @@ func LimitedPriorityLevelConfiguration() *LimitedPriorityLevelConfigurationApply
 	return &LimitedPriorityLevelConfigurationApplyConfiguration{}
 }
 
-// limitedPriorityLevelConfigurationFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in LimitedPriorityLevelConfigurationApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type limitedPriorityLevelConfigurationFields struct {
-	AssuredConcurrencyShares *int32                           `json:"assuredConcurrencyShares,omitempty"`
-	LimitResponse            *LimitResponseApplyConfiguration `json:"limitResponse,omitempty"`
-}
-
 // SetAssuredConcurrencyShares sets the AssuredConcurrencyShares field in the declarative configuration to the given value.
 func (b *LimitedPriorityLevelConfigurationApplyConfiguration) SetAssuredConcurrencyShares(value int32) *LimitedPriorityLevelConfigurationApplyConfiguration {
-	b.fields.AssuredConcurrencyShares = &value
+	b.AssuredConcurrencyShares = &value
 	return b
 }
 
 // RemoveAssuredConcurrencyShares removes the AssuredConcurrencyShares field from the declarative configuration.
 func (b *LimitedPriorityLevelConfigurationApplyConfiguration) RemoveAssuredConcurrencyShares() *LimitedPriorityLevelConfigurationApplyConfiguration {
-	b.fields.AssuredConcurrencyShares = nil
+	b.AssuredConcurrencyShares = nil
 	return b
 }
 
 // GetAssuredConcurrencyShares gets the AssuredConcurrencyShares field from the declarative configuration.
 func (b *LimitedPriorityLevelConfigurationApplyConfiguration) GetAssuredConcurrencyShares() (value int32, ok bool) {
-	if v := b.fields.AssuredConcurrencyShares; v != nil {
+	if v := b.AssuredConcurrencyShares; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,61 +53,19 @@ func (b *LimitedPriorityLevelConfigurationApplyConfiguration) GetAssuredConcurre
 
 // SetLimitResponse sets the LimitResponse field in the declarative configuration to the given value.
 func (b *LimitedPriorityLevelConfigurationApplyConfiguration) SetLimitResponse(value *LimitResponseApplyConfiguration) *LimitedPriorityLevelConfigurationApplyConfiguration {
-	b.fields.LimitResponse = value
+	b.LimitResponse = value
 	return b
 }
 
 // RemoveLimitResponse removes the LimitResponse field from the declarative configuration.
 func (b *LimitedPriorityLevelConfigurationApplyConfiguration) RemoveLimitResponse() *LimitedPriorityLevelConfigurationApplyConfiguration {
-	b.fields.LimitResponse = nil
+	b.LimitResponse = nil
 	return b
 }
 
 // GetLimitResponse gets the LimitResponse field from the declarative configuration.
 func (b *LimitedPriorityLevelConfigurationApplyConfiguration) GetLimitResponse() (value *LimitResponseApplyConfiguration, ok bool) {
-	return b.fields.LimitResponse, b.fields.LimitResponse != nil
-}
-
-// ToUnstructured converts LimitedPriorityLevelConfigurationApplyConfiguration to unstructured.
-func (b *LimitedPriorityLevelConfigurationApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to LimitedPriorityLevelConfigurationApplyConfiguration, replacing the contents
-// of LimitedPriorityLevelConfigurationApplyConfiguration.
-func (b *LimitedPriorityLevelConfigurationApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &limitedPriorityLevelConfigurationFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals LimitedPriorityLevelConfigurationApplyConfiguration to JSON.
-func (b *LimitedPriorityLevelConfigurationApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into LimitedPriorityLevelConfigurationApplyConfiguration, replacing the contents of
-// LimitedPriorityLevelConfigurationApplyConfiguration.
-func (b *LimitedPriorityLevelConfigurationApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.LimitResponse, b.LimitResponse != nil
 }
 
 // LimitedPriorityLevelConfigurationList represents a listAlias of LimitedPriorityLevelConfigurationApplyConfiguration.
@@ -130,8 +73,3 @@ type LimitedPriorityLevelConfigurationList []*LimitedPriorityLevelConfigurationA
 
 // LimitedPriorityLevelConfigurationList represents a map of LimitedPriorityLevelConfigurationApplyConfiguration.
 type LimitedPriorityLevelConfigurationMap map[string]LimitedPriorityLevelConfigurationApplyConfiguration
-
-func (b *LimitedPriorityLevelConfigurationApplyConfiguration) preMarshal() {
-}
-func (b *LimitedPriorityLevelConfigurationApplyConfiguration) postUnmarshal() {
-}

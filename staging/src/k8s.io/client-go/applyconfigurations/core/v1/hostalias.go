@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // HostAliasApplyConfiguration represents an declarative configuration of the HostAlias type for use
 // with apply.
 type HostAliasApplyConfiguration struct {
-	fields hostAliasFields
+	IP        *string   `json:"ip,omitempty"`
+	Hostnames *[]string `json:"hostnames,omitempty"`
 }
 
 // HostAliasApplyConfiguration constructs an declarative configuration of the HostAlias type for use with
@@ -36,31 +31,21 @@ func HostAlias() *HostAliasApplyConfiguration {
 	return &HostAliasApplyConfiguration{}
 }
 
-// hostAliasFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in HostAliasApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type hostAliasFields struct {
-	IP        *string   `json:"ip,omitempty"`
-	Hostnames *[]string `json:"hostnames,omitempty"`
-}
-
 // SetIP sets the IP field in the declarative configuration to the given value.
 func (b *HostAliasApplyConfiguration) SetIP(value string) *HostAliasApplyConfiguration {
-	b.fields.IP = &value
+	b.IP = &value
 	return b
 }
 
 // RemoveIP removes the IP field from the declarative configuration.
 func (b *HostAliasApplyConfiguration) RemoveIP() *HostAliasApplyConfiguration {
-	b.fields.IP = nil
+	b.IP = nil
 	return b
 }
 
 // GetIP gets the IP field from the declarative configuration.
 func (b *HostAliasApplyConfiguration) GetIP() (value string, ok bool) {
-	if v := b.fields.IP; v != nil {
+	if v := b.IP; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *HostAliasApplyConfiguration) GetIP() (value string, ok bool) {
 
 // SetHostnames sets the Hostnames field in the declarative configuration to the given value.
 func (b *HostAliasApplyConfiguration) SetHostnames(value []string) *HostAliasApplyConfiguration {
-	b.fields.Hostnames = &value
+	b.Hostnames = &value
 	return b
 }
 
 // RemoveHostnames removes the Hostnames field from the declarative configuration.
 func (b *HostAliasApplyConfiguration) RemoveHostnames() *HostAliasApplyConfiguration {
-	b.fields.Hostnames = nil
+	b.Hostnames = nil
 	return b
 }
 
 // GetHostnames gets the Hostnames field from the declarative configuration.
 func (b *HostAliasApplyConfiguration) GetHostnames() (value []string, ok bool) {
-	if v := b.fields.Hostnames; v != nil {
+	if v := b.Hostnames; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts HostAliasApplyConfiguration to unstructured.
-func (b *HostAliasApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to HostAliasApplyConfiguration, replacing the contents
-// of HostAliasApplyConfiguration.
-func (b *HostAliasApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &hostAliasFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals HostAliasApplyConfiguration to JSON.
-func (b *HostAliasApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into HostAliasApplyConfiguration, replacing the contents of
-// HostAliasApplyConfiguration.
-func (b *HostAliasApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // HostAliasList represents a listAlias of HostAliasApplyConfiguration.
@@ -133,8 +76,3 @@ type HostAliasList []*HostAliasApplyConfiguration
 
 // HostAliasList represents a map of HostAliasApplyConfiguration.
 type HostAliasMap map[string]HostAliasApplyConfiguration
-
-func (b *HostAliasApplyConfiguration) preMarshal() {
-}
-func (b *HostAliasApplyConfiguration) postUnmarshal() {
-}

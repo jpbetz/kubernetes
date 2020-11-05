@@ -20,6 +20,7 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -203,7 +204,7 @@ func (c *pods) Patch(ctx context.Context, name string, pt types.PatchType, data 
 // Apply takes the given apply declarative configuration, applies it and returns the applied pod.
 func (c *pods) Apply(ctx context.Context, pod *corev1.PodApplyConfiguration, fieldManager string, opts metav1.ApplyOptions, subresources ...string) (result *v1.Pod, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := pod.MarshalJSON()
+	data, err := json.Marshal(pod)
 	if err != nil {
 		return nil, err
 	}

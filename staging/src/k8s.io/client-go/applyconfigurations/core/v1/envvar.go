@@ -18,16 +18,12 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // EnvVarApplyConfiguration represents an declarative configuration of the EnvVar type for use
 // with apply.
 type EnvVarApplyConfiguration struct {
-	fields envVarFields
+	Name      *string                         `json:"name,omitempty"`
+	Value     *string                         `json:"value,omitempty"`
+	ValueFrom *EnvVarSourceApplyConfiguration `json:"valueFrom,omitempty"`
 }
 
 // EnvVarApplyConfiguration constructs an declarative configuration of the EnvVar type for use with
@@ -36,32 +32,21 @@ func EnvVar() *EnvVarApplyConfiguration {
 	return &EnvVarApplyConfiguration{}
 }
 
-// envVarFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in EnvVarApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type envVarFields struct {
-	Name      *string                         `json:"name,omitempty"`
-	Value     *string                         `json:"value,omitempty"`
-	ValueFrom *EnvVarSourceApplyConfiguration `json:"valueFrom,omitempty"`
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *EnvVarApplyConfiguration) SetName(value string) *EnvVarApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *EnvVarApplyConfiguration) RemoveName() *EnvVarApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *EnvVarApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,19 +54,19 @@ func (b *EnvVarApplyConfiguration) GetName() (value string, ok bool) {
 
 // SetValue sets the Value field in the declarative configuration to the given value.
 func (b *EnvVarApplyConfiguration) SetValue(value string) *EnvVarApplyConfiguration {
-	b.fields.Value = &value
+	b.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
 func (b *EnvVarApplyConfiguration) RemoveValue() *EnvVarApplyConfiguration {
-	b.fields.Value = nil
+	b.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
 func (b *EnvVarApplyConfiguration) GetValue() (value string, ok bool) {
-	if v := b.fields.Value; v != nil {
+	if v := b.Value; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -89,61 +74,19 @@ func (b *EnvVarApplyConfiguration) GetValue() (value string, ok bool) {
 
 // SetValueFrom sets the ValueFrom field in the declarative configuration to the given value.
 func (b *EnvVarApplyConfiguration) SetValueFrom(value *EnvVarSourceApplyConfiguration) *EnvVarApplyConfiguration {
-	b.fields.ValueFrom = value
+	b.ValueFrom = value
 	return b
 }
 
 // RemoveValueFrom removes the ValueFrom field from the declarative configuration.
 func (b *EnvVarApplyConfiguration) RemoveValueFrom() *EnvVarApplyConfiguration {
-	b.fields.ValueFrom = nil
+	b.ValueFrom = nil
 	return b
 }
 
 // GetValueFrom gets the ValueFrom field from the declarative configuration.
 func (b *EnvVarApplyConfiguration) GetValueFrom() (value *EnvVarSourceApplyConfiguration, ok bool) {
-	return b.fields.ValueFrom, b.fields.ValueFrom != nil
-}
-
-// ToUnstructured converts EnvVarApplyConfiguration to unstructured.
-func (b *EnvVarApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to EnvVarApplyConfiguration, replacing the contents
-// of EnvVarApplyConfiguration.
-func (b *EnvVarApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &envVarFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals EnvVarApplyConfiguration to JSON.
-func (b *EnvVarApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into EnvVarApplyConfiguration, replacing the contents of
-// EnvVarApplyConfiguration.
-func (b *EnvVarApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.ValueFrom, b.ValueFrom != nil
 }
 
 // EnvVarList represents a listAlias of EnvVarApplyConfiguration.
@@ -151,8 +94,3 @@ type EnvVarList []*EnvVarApplyConfiguration
 
 // EnvVarList represents a map of EnvVarApplyConfiguration.
 type EnvVarMap map[string]EnvVarApplyConfiguration
-
-func (b *EnvVarApplyConfiguration) preMarshal() {
-}
-func (b *EnvVarApplyConfiguration) postUnmarshal() {
-}

@@ -19,16 +19,14 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	corev1 "k8s.io/client-go/applyconfigurations/core/v1"
 )
 
 // IngressBackendApplyConfiguration represents an declarative configuration of the IngressBackend type for use
 // with apply.
 type IngressBackendApplyConfiguration struct {
-	fields ingressBackendFields
+	Service  *IngressServiceBackendApplyConfiguration            `json:"service,omitempty"`
+	Resource *corev1.TypedLocalObjectReferenceApplyConfiguration `json:"resource,omitempty"`
 }
 
 // IngressBackendApplyConfiguration constructs an declarative configuration of the IngressBackend type for use with
@@ -37,90 +35,38 @@ func IngressBackend() *IngressBackendApplyConfiguration {
 	return &IngressBackendApplyConfiguration{}
 }
 
-// ingressBackendFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in IngressBackendApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type ingressBackendFields struct {
-	Service  *IngressServiceBackendApplyConfiguration            `json:"service,omitempty"`
-	Resource *corev1.TypedLocalObjectReferenceApplyConfiguration `json:"resource,omitempty"`
-}
-
 // SetService sets the Service field in the declarative configuration to the given value.
 func (b *IngressBackendApplyConfiguration) SetService(value *IngressServiceBackendApplyConfiguration) *IngressBackendApplyConfiguration {
-	b.fields.Service = value
+	b.Service = value
 	return b
 }
 
 // RemoveService removes the Service field from the declarative configuration.
 func (b *IngressBackendApplyConfiguration) RemoveService() *IngressBackendApplyConfiguration {
-	b.fields.Service = nil
+	b.Service = nil
 	return b
 }
 
 // GetService gets the Service field from the declarative configuration.
 func (b *IngressBackendApplyConfiguration) GetService() (value *IngressServiceBackendApplyConfiguration, ok bool) {
-	return b.fields.Service, b.fields.Service != nil
+	return b.Service, b.Service != nil
 }
 
 // SetResource sets the Resource field in the declarative configuration to the given value.
 func (b *IngressBackendApplyConfiguration) SetResource(value *corev1.TypedLocalObjectReferenceApplyConfiguration) *IngressBackendApplyConfiguration {
-	b.fields.Resource = value
+	b.Resource = value
 	return b
 }
 
 // RemoveResource removes the Resource field from the declarative configuration.
 func (b *IngressBackendApplyConfiguration) RemoveResource() *IngressBackendApplyConfiguration {
-	b.fields.Resource = nil
+	b.Resource = nil
 	return b
 }
 
 // GetResource gets the Resource field from the declarative configuration.
 func (b *IngressBackendApplyConfiguration) GetResource() (value *corev1.TypedLocalObjectReferenceApplyConfiguration, ok bool) {
-	return b.fields.Resource, b.fields.Resource != nil
-}
-
-// ToUnstructured converts IngressBackendApplyConfiguration to unstructured.
-func (b *IngressBackendApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to IngressBackendApplyConfiguration, replacing the contents
-// of IngressBackendApplyConfiguration.
-func (b *IngressBackendApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &ingressBackendFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals IngressBackendApplyConfiguration to JSON.
-func (b *IngressBackendApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into IngressBackendApplyConfiguration, replacing the contents of
-// IngressBackendApplyConfiguration.
-func (b *IngressBackendApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Resource, b.Resource != nil
 }
 
 // IngressBackendList represents a listAlias of IngressBackendApplyConfiguration.
@@ -128,8 +74,3 @@ type IngressBackendList []*IngressBackendApplyConfiguration
 
 // IngressBackendList represents a map of IngressBackendApplyConfiguration.
 type IngressBackendMap map[string]IngressBackendApplyConfiguration
-
-func (b *IngressBackendApplyConfiguration) preMarshal() {
-}
-func (b *IngressBackendApplyConfiguration) postUnmarshal() {
-}

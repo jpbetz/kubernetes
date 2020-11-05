@@ -19,16 +19,15 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // PersistentVolumeStatusApplyConfiguration represents an declarative configuration of the PersistentVolumeStatus type for use
 // with apply.
 type PersistentVolumeStatusApplyConfiguration struct {
-	fields persistentVolumeStatusFields
+	Phase   *v1.PersistentVolumePhase `json:"phase,omitempty"`
+	Message *string                   `json:"message,omitempty"`
+	Reason  *string                   `json:"reason,omitempty"`
 }
 
 // PersistentVolumeStatusApplyConfiguration constructs an declarative configuration of the PersistentVolumeStatus type for use with
@@ -37,32 +36,21 @@ func PersistentVolumeStatus() *PersistentVolumeStatusApplyConfiguration {
 	return &PersistentVolumeStatusApplyConfiguration{}
 }
 
-// persistentVolumeStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PersistentVolumeStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type persistentVolumeStatusFields struct {
-	Phase   *v1.PersistentVolumePhase `json:"phase,omitempty"`
-	Message *string                   `json:"message,omitempty"`
-	Reason  *string                   `json:"reason,omitempty"`
-}
-
 // SetPhase sets the Phase field in the declarative configuration to the given value.
 func (b *PersistentVolumeStatusApplyConfiguration) SetPhase(value v1.PersistentVolumePhase) *PersistentVolumeStatusApplyConfiguration {
-	b.fields.Phase = &value
+	b.Phase = &value
 	return b
 }
 
 // RemovePhase removes the Phase field from the declarative configuration.
 func (b *PersistentVolumeStatusApplyConfiguration) RemovePhase() *PersistentVolumeStatusApplyConfiguration {
-	b.fields.Phase = nil
+	b.Phase = nil
 	return b
 }
 
 // GetPhase gets the Phase field from the declarative configuration.
 func (b *PersistentVolumeStatusApplyConfiguration) GetPhase() (value v1.PersistentVolumePhase, ok bool) {
-	if v := b.fields.Phase; v != nil {
+	if v := b.Phase; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,19 +58,19 @@ func (b *PersistentVolumeStatusApplyConfiguration) GetPhase() (value v1.Persiste
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
 func (b *PersistentVolumeStatusApplyConfiguration) SetMessage(value string) *PersistentVolumeStatusApplyConfiguration {
-	b.fields.Message = &value
+	b.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
 func (b *PersistentVolumeStatusApplyConfiguration) RemoveMessage() *PersistentVolumeStatusApplyConfiguration {
-	b.fields.Message = nil
+	b.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
 func (b *PersistentVolumeStatusApplyConfiguration) GetMessage() (value string, ok bool) {
-	if v := b.fields.Message; v != nil {
+	if v := b.Message; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -90,64 +78,22 @@ func (b *PersistentVolumeStatusApplyConfiguration) GetMessage() (value string, o
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
 func (b *PersistentVolumeStatusApplyConfiguration) SetReason(value string) *PersistentVolumeStatusApplyConfiguration {
-	b.fields.Reason = &value
+	b.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
 func (b *PersistentVolumeStatusApplyConfiguration) RemoveReason() *PersistentVolumeStatusApplyConfiguration {
-	b.fields.Reason = nil
+	b.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
 func (b *PersistentVolumeStatusApplyConfiguration) GetReason() (value string, ok bool) {
-	if v := b.fields.Reason; v != nil {
+	if v := b.Reason; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts PersistentVolumeStatusApplyConfiguration to unstructured.
-func (b *PersistentVolumeStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PersistentVolumeStatusApplyConfiguration, replacing the contents
-// of PersistentVolumeStatusApplyConfiguration.
-func (b *PersistentVolumeStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &persistentVolumeStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PersistentVolumeStatusApplyConfiguration to JSON.
-func (b *PersistentVolumeStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PersistentVolumeStatusApplyConfiguration, replacing the contents of
-// PersistentVolumeStatusApplyConfiguration.
-func (b *PersistentVolumeStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // PersistentVolumeStatusList represents a listAlias of PersistentVolumeStatusApplyConfiguration.
@@ -155,8 +101,3 @@ type PersistentVolumeStatusList []*PersistentVolumeStatusApplyConfiguration
 
 // PersistentVolumeStatusList represents a map of PersistentVolumeStatusApplyConfiguration.
 type PersistentVolumeStatusMap map[string]PersistentVolumeStatusApplyConfiguration
-
-func (b *PersistentVolumeStatusApplyConfiguration) preMarshal() {
-}
-func (b *PersistentVolumeStatusApplyConfiguration) postUnmarshal() {
-}

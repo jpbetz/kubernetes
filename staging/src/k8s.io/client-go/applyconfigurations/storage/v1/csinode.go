@@ -19,17 +19,15 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // CSINodeApplyConfiguration represents an declarative configuration of the CSINode type for use
 // with apply.
 type CSINodeApplyConfiguration struct {
-	typeMeta *v1.TypeMetaApplyConfiguration // inlined type
-	fields   cSINodeFields
+	v1.TypeMetaApplyConfiguration `json:",inline"`
+	ObjectMeta                    *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
+	Spec                          *CSINodeSpecApplyConfiguration   `json:"spec,omitempty"`
 }
 
 // CSINodeApplyConfiguration constructs an declarative configuration of the CSINode type for use with
@@ -38,109 +36,51 @@ func CSINode() *CSINodeApplyConfiguration {
 	return &CSINodeApplyConfiguration{}
 }
 
-// cSINodeFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in CSINodeApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type cSINodeFields struct {
-	Kind       *string                          `json:"kind,omitempty"`       // inlined CSINodeApplyConfiguration.typeMeta.Kind field
-	APIVersion *string                          `json:"apiVersion,omitempty"` // inlined CSINodeApplyConfiguration.typeMeta.APIVersion field
-	ObjectMeta *v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec       *CSINodeSpecApplyConfiguration   `json:"spec,omitempty"`
-}
-
 // SetTypeMeta sets the TypeMeta field in the declarative configuration to the given value.
 func (b *CSINodeApplyConfiguration) SetTypeMeta(value *v1.TypeMetaApplyConfiguration) *CSINodeApplyConfiguration {
-	b.typeMeta = value
-	return b
-}
-
-// RemoveTypeMeta removes the TypeMeta field from the declarative configuration.
-func (b *CSINodeApplyConfiguration) RemoveTypeMeta() *CSINodeApplyConfiguration {
-	b.typeMeta = nil
+	if value != nil {
+		b.TypeMetaApplyConfiguration = *value
+	}
 	return b
 }
 
 // GetTypeMeta gets the TypeMeta field from the declarative configuration.
 func (b *CSINodeApplyConfiguration) GetTypeMeta() (value *v1.TypeMetaApplyConfiguration, ok bool) {
-	return b.typeMeta, true
+	return &b.TypeMetaApplyConfiguration, true
 }
 
 // SetObjectMeta sets the ObjectMeta field in the declarative configuration to the given value.
 func (b *CSINodeApplyConfiguration) SetObjectMeta(value *v1.ObjectMetaApplyConfiguration) *CSINodeApplyConfiguration {
-	b.fields.ObjectMeta = value
+	b.ObjectMeta = value
 	return b
 }
 
 // RemoveObjectMeta removes the ObjectMeta field from the declarative configuration.
 func (b *CSINodeApplyConfiguration) RemoveObjectMeta() *CSINodeApplyConfiguration {
-	b.fields.ObjectMeta = nil
+	b.ObjectMeta = nil
 	return b
 }
 
 // GetObjectMeta gets the ObjectMeta field from the declarative configuration.
 func (b *CSINodeApplyConfiguration) GetObjectMeta() (value *v1.ObjectMetaApplyConfiguration, ok bool) {
-	return b.fields.ObjectMeta, b.fields.ObjectMeta != nil
+	return b.ObjectMeta, b.ObjectMeta != nil
 }
 
 // SetSpec sets the Spec field in the declarative configuration to the given value.
 func (b *CSINodeApplyConfiguration) SetSpec(value *CSINodeSpecApplyConfiguration) *CSINodeApplyConfiguration {
-	b.fields.Spec = value
+	b.Spec = value
 	return b
 }
 
 // RemoveSpec removes the Spec field from the declarative configuration.
 func (b *CSINodeApplyConfiguration) RemoveSpec() *CSINodeApplyConfiguration {
-	b.fields.Spec = nil
+	b.Spec = nil
 	return b
 }
 
 // GetSpec gets the Spec field from the declarative configuration.
 func (b *CSINodeApplyConfiguration) GetSpec() (value *CSINodeSpecApplyConfiguration, ok bool) {
-	return b.fields.Spec, b.fields.Spec != nil
-}
-
-// ToUnstructured converts CSINodeApplyConfiguration to unstructured.
-func (b *CSINodeApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to CSINodeApplyConfiguration, replacing the contents
-// of CSINodeApplyConfiguration.
-func (b *CSINodeApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &cSINodeFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals CSINodeApplyConfiguration to JSON.
-func (b *CSINodeApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into CSINodeApplyConfiguration, replacing the contents of
-// CSINodeApplyConfiguration.
-func (b *CSINodeApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Spec, b.Spec != nil
 }
 
 // CSINodeList represents a listAlias of CSINodeApplyConfiguration.
@@ -148,25 +88,3 @@ type CSINodeList []*CSINodeApplyConfiguration
 
 // CSINodeList represents a map of CSINodeApplyConfiguration.
 type CSINodeMap map[string]CSINodeApplyConfiguration
-
-func (b *CSINodeApplyConfiguration) preMarshal() {
-	if b.typeMeta != nil {
-		if v, ok := b.typeMeta.GetKind(); ok {
-			b.fields.Kind = &v
-		}
-		if v, ok := b.typeMeta.GetAPIVersion(); ok {
-			b.fields.APIVersion = &v
-		}
-	}
-}
-func (b *CSINodeApplyConfiguration) postUnmarshal() {
-	if b.typeMeta == nil {
-		b.typeMeta = &v1.TypeMetaApplyConfiguration{}
-	}
-	if b.fields.Kind != nil {
-		b.typeMeta.SetKind(*b.fields.Kind)
-	}
-	if b.fields.APIVersion != nil {
-		b.typeMeta.SetAPIVersion(*b.fields.APIVersion)
-	}
-}

@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -125,7 +126,7 @@ func (c *FakeClusterRoleBindings) Patch(ctx context.Context, name string, pt typ
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied clusterRoleBinding.
 func (c *FakeClusterRoleBindings) Apply(ctx context.Context, clusterRoleBinding *applyconfigurationsrbacv1.ClusterRoleBindingApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *rbacv1.ClusterRoleBinding, err error) {
-	data, err := clusterRoleBinding.MarshalJSON()
+	data, err := json.Marshal(clusterRoleBinding)
 	if err != nil {
 		return nil, err
 	}

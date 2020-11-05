@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	v1beta1 "k8s.io/api/storage/v1beta1"
@@ -125,7 +126,7 @@ func (c *FakeCSINodes) Patch(ctx context.Context, name string, pt types.PatchTyp
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied cSINode.
 func (c *FakeCSINodes) Apply(ctx context.Context, cSINode *storagev1beta1.CSINodeApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.CSINode, err error) {
-	data, err := cSINode.MarshalJSON()
+	data, err := json.Marshal(cSINode)
 	if err != nil {
 		return nil, err
 	}

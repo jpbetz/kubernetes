@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // PodDNSConfigOptionApplyConfiguration represents an declarative configuration of the PodDNSConfigOption type for use
 // with apply.
 type PodDNSConfigOptionApplyConfiguration struct {
-	fields podDNSConfigOptionFields
+	Name  *string `json:"name,omitempty"`
+	Value *string `json:"value,omitempty"`
 }
 
 // PodDNSConfigOptionApplyConfiguration constructs an declarative configuration of the PodDNSConfigOption type for use with
@@ -36,31 +31,21 @@ func PodDNSConfigOption() *PodDNSConfigOptionApplyConfiguration {
 	return &PodDNSConfigOptionApplyConfiguration{}
 }
 
-// podDNSConfigOptionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodDNSConfigOptionApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type podDNSConfigOptionFields struct {
-	Name  *string `json:"name,omitempty"`
-	Value *string `json:"value,omitempty"`
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *PodDNSConfigOptionApplyConfiguration) SetName(value string) *PodDNSConfigOptionApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *PodDNSConfigOptionApplyConfiguration) RemoveName() *PodDNSConfigOptionApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *PodDNSConfigOptionApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *PodDNSConfigOptionApplyConfiguration) GetName() (value string, ok bool)
 
 // SetValue sets the Value field in the declarative configuration to the given value.
 func (b *PodDNSConfigOptionApplyConfiguration) SetValue(value string) *PodDNSConfigOptionApplyConfiguration {
-	b.fields.Value = &value
+	b.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
 func (b *PodDNSConfigOptionApplyConfiguration) RemoveValue() *PodDNSConfigOptionApplyConfiguration {
-	b.fields.Value = nil
+	b.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
 func (b *PodDNSConfigOptionApplyConfiguration) GetValue() (value string, ok bool) {
-	if v := b.fields.Value; v != nil {
+	if v := b.Value; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts PodDNSConfigOptionApplyConfiguration to unstructured.
-func (b *PodDNSConfigOptionApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PodDNSConfigOptionApplyConfiguration, replacing the contents
-// of PodDNSConfigOptionApplyConfiguration.
-func (b *PodDNSConfigOptionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &podDNSConfigOptionFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PodDNSConfigOptionApplyConfiguration to JSON.
-func (b *PodDNSConfigOptionApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PodDNSConfigOptionApplyConfiguration, replacing the contents of
-// PodDNSConfigOptionApplyConfiguration.
-func (b *PodDNSConfigOptionApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // PodDNSConfigOptionList represents a listAlias of PodDNSConfigOptionApplyConfiguration.
@@ -133,8 +76,3 @@ type PodDNSConfigOptionList []*PodDNSConfigOptionApplyConfiguration
 
 // PodDNSConfigOptionList represents a map of PodDNSConfigOptionApplyConfiguration.
 type PodDNSConfigOptionMap map[string]PodDNSConfigOptionApplyConfiguration
-
-func (b *PodDNSConfigOptionApplyConfiguration) preMarshal() {
-}
-func (b *PodDNSConfigOptionApplyConfiguration) postUnmarshal() {
-}

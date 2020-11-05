@@ -18,16 +18,13 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // GCEPersistentDiskVolumeSourceApplyConfiguration represents an declarative configuration of the GCEPersistentDiskVolumeSource type for use
 // with apply.
 type GCEPersistentDiskVolumeSourceApplyConfiguration struct {
-	fields gCEPersistentDiskVolumeSourceFields
+	PDName    *string `json:"pdName,omitempty"`
+	FSType    *string `json:"fsType,omitempty"`
+	Partition *int32  `json:"partition,omitempty"`
+	ReadOnly  *bool   `json:"readOnly,omitempty"`
 }
 
 // GCEPersistentDiskVolumeSourceApplyConfiguration constructs an declarative configuration of the GCEPersistentDiskVolumeSource type for use with
@@ -36,33 +33,21 @@ func GCEPersistentDiskVolumeSource() *GCEPersistentDiskVolumeSourceApplyConfigur
 	return &GCEPersistentDiskVolumeSourceApplyConfiguration{}
 }
 
-// gCEPersistentDiskVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in GCEPersistentDiskVolumeSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type gCEPersistentDiskVolumeSourceFields struct {
-	PDName    *string `json:"pdName,omitempty"`
-	FSType    *string `json:"fsType,omitempty"`
-	Partition *int32  `json:"partition,omitempty"`
-	ReadOnly  *bool   `json:"readOnly,omitempty"`
-}
-
 // SetPDName sets the PDName field in the declarative configuration to the given value.
 func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) SetPDName(value string) *GCEPersistentDiskVolumeSourceApplyConfiguration {
-	b.fields.PDName = &value
+	b.PDName = &value
 	return b
 }
 
 // RemovePDName removes the PDName field from the declarative configuration.
 func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) RemovePDName() *GCEPersistentDiskVolumeSourceApplyConfiguration {
-	b.fields.PDName = nil
+	b.PDName = nil
 	return b
 }
 
 // GetPDName gets the PDName field from the declarative configuration.
 func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) GetPDName() (value string, ok bool) {
-	if v := b.fields.PDName; v != nil {
+	if v := b.PDName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,19 +55,19 @@ func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) GetPDName() (value str
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
 func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) SetFSType(value string) *GCEPersistentDiskVolumeSourceApplyConfiguration {
-	b.fields.FSType = &value
+	b.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
 func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) RemoveFSType() *GCEPersistentDiskVolumeSourceApplyConfiguration {
-	b.fields.FSType = nil
+	b.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
 func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) GetFSType() (value string, ok bool) {
-	if v := b.fields.FSType; v != nil {
+	if v := b.FSType; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -90,19 +75,19 @@ func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) GetFSType() (value str
 
 // SetPartition sets the Partition field in the declarative configuration to the given value.
 func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) SetPartition(value int32) *GCEPersistentDiskVolumeSourceApplyConfiguration {
-	b.fields.Partition = &value
+	b.Partition = &value
 	return b
 }
 
 // RemovePartition removes the Partition field from the declarative configuration.
 func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) RemovePartition() *GCEPersistentDiskVolumeSourceApplyConfiguration {
-	b.fields.Partition = nil
+	b.Partition = nil
 	return b
 }
 
 // GetPartition gets the Partition field from the declarative configuration.
 func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) GetPartition() (value int32, ok bool) {
-	if v := b.fields.Partition; v != nil {
+	if v := b.Partition; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -110,64 +95,22 @@ func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) GetPartition() (value 
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
 func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) SetReadOnly(value bool) *GCEPersistentDiskVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = &value
+	b.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
 func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) RemoveReadOnly() *GCEPersistentDiskVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = nil
+	b.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
 func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
-	if v := b.fields.ReadOnly; v != nil {
+	if v := b.ReadOnly; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts GCEPersistentDiskVolumeSourceApplyConfiguration to unstructured.
-func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to GCEPersistentDiskVolumeSourceApplyConfiguration, replacing the contents
-// of GCEPersistentDiskVolumeSourceApplyConfiguration.
-func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &gCEPersistentDiskVolumeSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals GCEPersistentDiskVolumeSourceApplyConfiguration to JSON.
-func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into GCEPersistentDiskVolumeSourceApplyConfiguration, replacing the contents of
-// GCEPersistentDiskVolumeSourceApplyConfiguration.
-func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // GCEPersistentDiskVolumeSourceList represents a listAlias of GCEPersistentDiskVolumeSourceApplyConfiguration.
@@ -175,8 +118,3 @@ type GCEPersistentDiskVolumeSourceList []*GCEPersistentDiskVolumeSourceApplyConf
 
 // GCEPersistentDiskVolumeSourceList represents a map of GCEPersistentDiskVolumeSourceApplyConfiguration.
 type GCEPersistentDiskVolumeSourceMap map[string]GCEPersistentDiskVolumeSourceApplyConfiguration
-
-func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) preMarshal() {
-}
-func (b *GCEPersistentDiskVolumeSourceApplyConfiguration) postUnmarshal() {
-}

@@ -19,16 +19,17 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // TolerationApplyConfiguration represents an declarative configuration of the Toleration type for use
 // with apply.
 type TolerationApplyConfiguration struct {
-	fields tolerationFields
+	Key               *string                `json:"key,omitempty"`
+	Operator          *v1.TolerationOperator `json:"operator,omitempty"`
+	Value             *string                `json:"value,omitempty"`
+	Effect            *v1.TaintEffect        `json:"effect,omitempty"`
+	TolerationSeconds *int64                 `json:"tolerationSeconds,omitempty"`
 }
 
 // TolerationApplyConfiguration constructs an declarative configuration of the Toleration type for use with
@@ -37,34 +38,21 @@ func Toleration() *TolerationApplyConfiguration {
 	return &TolerationApplyConfiguration{}
 }
 
-// tolerationFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in TolerationApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type tolerationFields struct {
-	Key               *string                `json:"key,omitempty"`
-	Operator          *v1.TolerationOperator `json:"operator,omitempty"`
-	Value             *string                `json:"value,omitempty"`
-	Effect            *v1.TaintEffect        `json:"effect,omitempty"`
-	TolerationSeconds *int64                 `json:"tolerationSeconds,omitempty"`
-}
-
 // SetKey sets the Key field in the declarative configuration to the given value.
 func (b *TolerationApplyConfiguration) SetKey(value string) *TolerationApplyConfiguration {
-	b.fields.Key = &value
+	b.Key = &value
 	return b
 }
 
 // RemoveKey removes the Key field from the declarative configuration.
 func (b *TolerationApplyConfiguration) RemoveKey() *TolerationApplyConfiguration {
-	b.fields.Key = nil
+	b.Key = nil
 	return b
 }
 
 // GetKey gets the Key field from the declarative configuration.
 func (b *TolerationApplyConfiguration) GetKey() (value string, ok bool) {
-	if v := b.fields.Key; v != nil {
+	if v := b.Key; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -72,19 +60,19 @@ func (b *TolerationApplyConfiguration) GetKey() (value string, ok bool) {
 
 // SetOperator sets the Operator field in the declarative configuration to the given value.
 func (b *TolerationApplyConfiguration) SetOperator(value v1.TolerationOperator) *TolerationApplyConfiguration {
-	b.fields.Operator = &value
+	b.Operator = &value
 	return b
 }
 
 // RemoveOperator removes the Operator field from the declarative configuration.
 func (b *TolerationApplyConfiguration) RemoveOperator() *TolerationApplyConfiguration {
-	b.fields.Operator = nil
+	b.Operator = nil
 	return b
 }
 
 // GetOperator gets the Operator field from the declarative configuration.
 func (b *TolerationApplyConfiguration) GetOperator() (value v1.TolerationOperator, ok bool) {
-	if v := b.fields.Operator; v != nil {
+	if v := b.Operator; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -92,19 +80,19 @@ func (b *TolerationApplyConfiguration) GetOperator() (value v1.TolerationOperato
 
 // SetValue sets the Value field in the declarative configuration to the given value.
 func (b *TolerationApplyConfiguration) SetValue(value string) *TolerationApplyConfiguration {
-	b.fields.Value = &value
+	b.Value = &value
 	return b
 }
 
 // RemoveValue removes the Value field from the declarative configuration.
 func (b *TolerationApplyConfiguration) RemoveValue() *TolerationApplyConfiguration {
-	b.fields.Value = nil
+	b.Value = nil
 	return b
 }
 
 // GetValue gets the Value field from the declarative configuration.
 func (b *TolerationApplyConfiguration) GetValue() (value string, ok bool) {
-	if v := b.fields.Value; v != nil {
+	if v := b.Value; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -112,19 +100,19 @@ func (b *TolerationApplyConfiguration) GetValue() (value string, ok bool) {
 
 // SetEffect sets the Effect field in the declarative configuration to the given value.
 func (b *TolerationApplyConfiguration) SetEffect(value v1.TaintEffect) *TolerationApplyConfiguration {
-	b.fields.Effect = &value
+	b.Effect = &value
 	return b
 }
 
 // RemoveEffect removes the Effect field from the declarative configuration.
 func (b *TolerationApplyConfiguration) RemoveEffect() *TolerationApplyConfiguration {
-	b.fields.Effect = nil
+	b.Effect = nil
 	return b
 }
 
 // GetEffect gets the Effect field from the declarative configuration.
 func (b *TolerationApplyConfiguration) GetEffect() (value v1.TaintEffect, ok bool) {
-	if v := b.fields.Effect; v != nil {
+	if v := b.Effect; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -132,64 +120,22 @@ func (b *TolerationApplyConfiguration) GetEffect() (value v1.TaintEffect, ok boo
 
 // SetTolerationSeconds sets the TolerationSeconds field in the declarative configuration to the given value.
 func (b *TolerationApplyConfiguration) SetTolerationSeconds(value int64) *TolerationApplyConfiguration {
-	b.fields.TolerationSeconds = &value
+	b.TolerationSeconds = &value
 	return b
 }
 
 // RemoveTolerationSeconds removes the TolerationSeconds field from the declarative configuration.
 func (b *TolerationApplyConfiguration) RemoveTolerationSeconds() *TolerationApplyConfiguration {
-	b.fields.TolerationSeconds = nil
+	b.TolerationSeconds = nil
 	return b
 }
 
 // GetTolerationSeconds gets the TolerationSeconds field from the declarative configuration.
 func (b *TolerationApplyConfiguration) GetTolerationSeconds() (value int64, ok bool) {
-	if v := b.fields.TolerationSeconds; v != nil {
+	if v := b.TolerationSeconds; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts TolerationApplyConfiguration to unstructured.
-func (b *TolerationApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to TolerationApplyConfiguration, replacing the contents
-// of TolerationApplyConfiguration.
-func (b *TolerationApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &tolerationFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals TolerationApplyConfiguration to JSON.
-func (b *TolerationApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into TolerationApplyConfiguration, replacing the contents of
-// TolerationApplyConfiguration.
-func (b *TolerationApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // TolerationList represents a listAlias of TolerationApplyConfiguration.
@@ -197,8 +143,3 @@ type TolerationList []*TolerationApplyConfiguration
 
 // TolerationList represents a map of TolerationApplyConfiguration.
 type TolerationMap map[string]TolerationApplyConfiguration
-
-func (b *TolerationApplyConfiguration) preMarshal() {
-}
-func (b *TolerationApplyConfiguration) postUnmarshal() {
-}

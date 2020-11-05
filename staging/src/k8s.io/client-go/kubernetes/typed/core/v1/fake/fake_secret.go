@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
@@ -133,7 +134,7 @@ func (c *FakeSecrets) Patch(ctx context.Context, name string, pt types.PatchType
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied secret.
 func (c *FakeSecrets) Apply(ctx context.Context, secret *applyconfigurationscorev1.SecretApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *corev1.Secret, err error) {
-	data, err := secret.MarshalJSON()
+	data, err := json.Marshal(secret)
 	if err != nil {
 		return nil, err
 	}

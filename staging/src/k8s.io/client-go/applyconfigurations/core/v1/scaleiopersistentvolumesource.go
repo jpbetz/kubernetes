@@ -18,30 +18,9 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ScaleIOPersistentVolumeSourceApplyConfiguration represents an declarative configuration of the ScaleIOPersistentVolumeSource type for use
 // with apply.
 type ScaleIOPersistentVolumeSourceApplyConfiguration struct {
-	fields scaleIOPersistentVolumeSourceFields
-}
-
-// ScaleIOPersistentVolumeSourceApplyConfiguration constructs an declarative configuration of the ScaleIOPersistentVolumeSource type for use with
-// apply.
-func ScaleIOPersistentVolumeSource() *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	return &ScaleIOPersistentVolumeSourceApplyConfiguration{}
-}
-
-// scaleIOPersistentVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ScaleIOPersistentVolumeSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type scaleIOPersistentVolumeSourceFields struct {
 	Gateway          *string                            `json:"gateway,omitempty"`
 	System           *string                            `json:"system,omitempty"`
 	SecretRef        *SecretReferenceApplyConfiguration `json:"secretRef,omitempty"`
@@ -54,21 +33,27 @@ type scaleIOPersistentVolumeSourceFields struct {
 	ReadOnly         *bool                              `json:"readOnly,omitempty"`
 }
 
+// ScaleIOPersistentVolumeSourceApplyConfiguration constructs an declarative configuration of the ScaleIOPersistentVolumeSource type for use with
+// apply.
+func ScaleIOPersistentVolumeSource() *ScaleIOPersistentVolumeSourceApplyConfiguration {
+	return &ScaleIOPersistentVolumeSourceApplyConfiguration{}
+}
+
 // SetGateway sets the Gateway field in the declarative configuration to the given value.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) SetGateway(value string) *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.Gateway = &value
+	b.Gateway = &value
 	return b
 }
 
 // RemoveGateway removes the Gateway field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) RemoveGateway() *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.Gateway = nil
+	b.Gateway = nil
 	return b
 }
 
 // GetGateway gets the Gateway field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) GetGateway() (value string, ok bool) {
-	if v := b.fields.Gateway; v != nil {
+	if v := b.Gateway; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -76,19 +61,19 @@ func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) GetGateway() (value st
 
 // SetSystem sets the System field in the declarative configuration to the given value.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) SetSystem(value string) *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.System = &value
+	b.System = &value
 	return b
 }
 
 // RemoveSystem removes the System field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) RemoveSystem() *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.System = nil
+	b.System = nil
 	return b
 }
 
 // GetSystem gets the System field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) GetSystem() (value string, ok bool) {
-	if v := b.fields.System; v != nil {
+	if v := b.System; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -96,36 +81,36 @@ func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) GetSystem() (value str
 
 // SetSecretRef sets the SecretRef field in the declarative configuration to the given value.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) SetSecretRef(value *SecretReferenceApplyConfiguration) *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.SecretRef = value
+	b.SecretRef = value
 	return b
 }
 
 // RemoveSecretRef removes the SecretRef field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) RemoveSecretRef() *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.SecretRef = nil
+	b.SecretRef = nil
 	return b
 }
 
 // GetSecretRef gets the SecretRef field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) GetSecretRef() (value *SecretReferenceApplyConfiguration, ok bool) {
-	return b.fields.SecretRef, b.fields.SecretRef != nil
+	return b.SecretRef, b.SecretRef != nil
 }
 
 // SetSSLEnabled sets the SSLEnabled field in the declarative configuration to the given value.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) SetSSLEnabled(value bool) *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.SSLEnabled = &value
+	b.SSLEnabled = &value
 	return b
 }
 
 // RemoveSSLEnabled removes the SSLEnabled field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) RemoveSSLEnabled() *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.SSLEnabled = nil
+	b.SSLEnabled = nil
 	return b
 }
 
 // GetSSLEnabled gets the SSLEnabled field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) GetSSLEnabled() (value bool, ok bool) {
-	if v := b.fields.SSLEnabled; v != nil {
+	if v := b.SSLEnabled; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -133,19 +118,19 @@ func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) GetSSLEnabled() (value
 
 // SetProtectionDomain sets the ProtectionDomain field in the declarative configuration to the given value.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) SetProtectionDomain(value string) *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.ProtectionDomain = &value
+	b.ProtectionDomain = &value
 	return b
 }
 
 // RemoveProtectionDomain removes the ProtectionDomain field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) RemoveProtectionDomain() *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.ProtectionDomain = nil
+	b.ProtectionDomain = nil
 	return b
 }
 
 // GetProtectionDomain gets the ProtectionDomain field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) GetProtectionDomain() (value string, ok bool) {
-	if v := b.fields.ProtectionDomain; v != nil {
+	if v := b.ProtectionDomain; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -153,19 +138,19 @@ func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) GetProtectionDomain() 
 
 // SetStoragePool sets the StoragePool field in the declarative configuration to the given value.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) SetStoragePool(value string) *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.StoragePool = &value
+	b.StoragePool = &value
 	return b
 }
 
 // RemoveStoragePool removes the StoragePool field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) RemoveStoragePool() *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.StoragePool = nil
+	b.StoragePool = nil
 	return b
 }
 
 // GetStoragePool gets the StoragePool field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) GetStoragePool() (value string, ok bool) {
-	if v := b.fields.StoragePool; v != nil {
+	if v := b.StoragePool; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -173,19 +158,19 @@ func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) GetStoragePool() (valu
 
 // SetStorageMode sets the StorageMode field in the declarative configuration to the given value.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) SetStorageMode(value string) *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.StorageMode = &value
+	b.StorageMode = &value
 	return b
 }
 
 // RemoveStorageMode removes the StorageMode field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) RemoveStorageMode() *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.StorageMode = nil
+	b.StorageMode = nil
 	return b
 }
 
 // GetStorageMode gets the StorageMode field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) GetStorageMode() (value string, ok bool) {
-	if v := b.fields.StorageMode; v != nil {
+	if v := b.StorageMode; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -193,19 +178,19 @@ func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) GetStorageMode() (valu
 
 // SetVolumeName sets the VolumeName field in the declarative configuration to the given value.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) SetVolumeName(value string) *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.VolumeName = &value
+	b.VolumeName = &value
 	return b
 }
 
 // RemoveVolumeName removes the VolumeName field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) RemoveVolumeName() *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.VolumeName = nil
+	b.VolumeName = nil
 	return b
 }
 
 // GetVolumeName gets the VolumeName field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) GetVolumeName() (value string, ok bool) {
-	if v := b.fields.VolumeName; v != nil {
+	if v := b.VolumeName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -213,19 +198,19 @@ func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) GetVolumeName() (value
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) SetFSType(value string) *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.FSType = &value
+	b.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) RemoveFSType() *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.FSType = nil
+	b.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) GetFSType() (value string, ok bool) {
-	if v := b.fields.FSType; v != nil {
+	if v := b.FSType; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -233,64 +218,22 @@ func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) GetFSType() (value str
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) SetReadOnly(value bool) *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = &value
+	b.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) RemoveReadOnly() *ScaleIOPersistentVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = nil
+	b.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
 func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
-	if v := b.fields.ReadOnly; v != nil {
+	if v := b.ReadOnly; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ScaleIOPersistentVolumeSourceApplyConfiguration to unstructured.
-func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ScaleIOPersistentVolumeSourceApplyConfiguration, replacing the contents
-// of ScaleIOPersistentVolumeSourceApplyConfiguration.
-func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &scaleIOPersistentVolumeSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ScaleIOPersistentVolumeSourceApplyConfiguration to JSON.
-func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ScaleIOPersistentVolumeSourceApplyConfiguration, replacing the contents of
-// ScaleIOPersistentVolumeSourceApplyConfiguration.
-func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ScaleIOPersistentVolumeSourceList represents a listAlias of ScaleIOPersistentVolumeSourceApplyConfiguration.
@@ -298,8 +241,3 @@ type ScaleIOPersistentVolumeSourceList []*ScaleIOPersistentVolumeSourceApplyConf
 
 // ScaleIOPersistentVolumeSourceList represents a map of ScaleIOPersistentVolumeSourceApplyConfiguration.
 type ScaleIOPersistentVolumeSourceMap map[string]ScaleIOPersistentVolumeSourceApplyConfiguration
-
-func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) preMarshal() {
-}
-func (b *ScaleIOPersistentVolumeSourceApplyConfiguration) postUnmarshal() {
-}

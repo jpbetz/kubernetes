@@ -19,16 +19,16 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // ComponentConditionApplyConfiguration represents an declarative configuration of the ComponentCondition type for use
 // with apply.
 type ComponentConditionApplyConfiguration struct {
-	fields componentConditionFields
+	Type    *v1.ComponentConditionType `json:"type,omitempty"`
+	Status  *v1.ConditionStatus        `json:"status,omitempty"`
+	Message *string                    `json:"message,omitempty"`
+	Error   *string                    `json:"error,omitempty"`
 }
 
 // ComponentConditionApplyConfiguration constructs an declarative configuration of the ComponentCondition type for use with
@@ -37,33 +37,21 @@ func ComponentCondition() *ComponentConditionApplyConfiguration {
 	return &ComponentConditionApplyConfiguration{}
 }
 
-// componentConditionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ComponentConditionApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type componentConditionFields struct {
-	Type    *v1.ComponentConditionType `json:"type,omitempty"`
-	Status  *v1.ConditionStatus        `json:"status,omitempty"`
-	Message *string                    `json:"message,omitempty"`
-	Error   *string                    `json:"error,omitempty"`
-}
-
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *ComponentConditionApplyConfiguration) SetType(value v1.ComponentConditionType) *ComponentConditionApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *ComponentConditionApplyConfiguration) RemoveType() *ComponentConditionApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *ComponentConditionApplyConfiguration) GetType() (value v1.ComponentConditionType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -71,19 +59,19 @@ func (b *ComponentConditionApplyConfiguration) GetType() (value v1.ComponentCond
 
 // SetStatus sets the Status field in the declarative configuration to the given value.
 func (b *ComponentConditionApplyConfiguration) SetStatus(value v1.ConditionStatus) *ComponentConditionApplyConfiguration {
-	b.fields.Status = &value
+	b.Status = &value
 	return b
 }
 
 // RemoveStatus removes the Status field from the declarative configuration.
 func (b *ComponentConditionApplyConfiguration) RemoveStatus() *ComponentConditionApplyConfiguration {
-	b.fields.Status = nil
+	b.Status = nil
 	return b
 }
 
 // GetStatus gets the Status field from the declarative configuration.
 func (b *ComponentConditionApplyConfiguration) GetStatus() (value v1.ConditionStatus, ok bool) {
-	if v := b.fields.Status; v != nil {
+	if v := b.Status; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -91,19 +79,19 @@ func (b *ComponentConditionApplyConfiguration) GetStatus() (value v1.ConditionSt
 
 // SetMessage sets the Message field in the declarative configuration to the given value.
 func (b *ComponentConditionApplyConfiguration) SetMessage(value string) *ComponentConditionApplyConfiguration {
-	b.fields.Message = &value
+	b.Message = &value
 	return b
 }
 
 // RemoveMessage removes the Message field from the declarative configuration.
 func (b *ComponentConditionApplyConfiguration) RemoveMessage() *ComponentConditionApplyConfiguration {
-	b.fields.Message = nil
+	b.Message = nil
 	return b
 }
 
 // GetMessage gets the Message field from the declarative configuration.
 func (b *ComponentConditionApplyConfiguration) GetMessage() (value string, ok bool) {
-	if v := b.fields.Message; v != nil {
+	if v := b.Message; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -111,64 +99,22 @@ func (b *ComponentConditionApplyConfiguration) GetMessage() (value string, ok bo
 
 // SetError sets the Error field in the declarative configuration to the given value.
 func (b *ComponentConditionApplyConfiguration) SetError(value string) *ComponentConditionApplyConfiguration {
-	b.fields.Error = &value
+	b.Error = &value
 	return b
 }
 
 // RemoveError removes the Error field from the declarative configuration.
 func (b *ComponentConditionApplyConfiguration) RemoveError() *ComponentConditionApplyConfiguration {
-	b.fields.Error = nil
+	b.Error = nil
 	return b
 }
 
 // GetError gets the Error field from the declarative configuration.
 func (b *ComponentConditionApplyConfiguration) GetError() (value string, ok bool) {
-	if v := b.fields.Error; v != nil {
+	if v := b.Error; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ComponentConditionApplyConfiguration to unstructured.
-func (b *ComponentConditionApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ComponentConditionApplyConfiguration, replacing the contents
-// of ComponentConditionApplyConfiguration.
-func (b *ComponentConditionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &componentConditionFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ComponentConditionApplyConfiguration to JSON.
-func (b *ComponentConditionApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ComponentConditionApplyConfiguration, replacing the contents of
-// ComponentConditionApplyConfiguration.
-func (b *ComponentConditionApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ComponentConditionList represents a listAlias of ComponentConditionApplyConfiguration.
@@ -176,8 +122,3 @@ type ComponentConditionList []*ComponentConditionApplyConfiguration
 
 // ComponentConditionList represents a map of ComponentConditionApplyConfiguration.
 type ComponentConditionMap map[string]ComponentConditionApplyConfiguration
-
-func (b *ComponentConditionApplyConfiguration) preMarshal() {
-}
-func (b *ComponentConditionApplyConfiguration) postUnmarshal() {
-}

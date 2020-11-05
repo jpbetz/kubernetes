@@ -19,30 +19,12 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // VolumeMountApplyConfiguration represents an declarative configuration of the VolumeMount type for use
 // with apply.
 type VolumeMountApplyConfiguration struct {
-	fields volumeMountFields
-}
-
-// VolumeMountApplyConfiguration constructs an declarative configuration of the VolumeMount type for use with
-// apply.
-func VolumeMount() *VolumeMountApplyConfiguration {
-	return &VolumeMountApplyConfiguration{}
-}
-
-// volumeMountFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in VolumeMountApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type volumeMountFields struct {
 	Name             *string                  `json:"name,omitempty"`
 	ReadOnly         *bool                    `json:"readOnly,omitempty"`
 	MountPath        *string                  `json:"mountPath,omitempty"`
@@ -51,21 +33,27 @@ type volumeMountFields struct {
 	SubPathExpr      *string                  `json:"subPathExpr,omitempty"`
 }
 
+// VolumeMountApplyConfiguration constructs an declarative configuration of the VolumeMount type for use with
+// apply.
+func VolumeMount() *VolumeMountApplyConfiguration {
+	return &VolumeMountApplyConfiguration{}
+}
+
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *VolumeMountApplyConfiguration) SetName(value string) *VolumeMountApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *VolumeMountApplyConfiguration) RemoveName() *VolumeMountApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *VolumeMountApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -73,19 +61,19 @@ func (b *VolumeMountApplyConfiguration) GetName() (value string, ok bool) {
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
 func (b *VolumeMountApplyConfiguration) SetReadOnly(value bool) *VolumeMountApplyConfiguration {
-	b.fields.ReadOnly = &value
+	b.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
 func (b *VolumeMountApplyConfiguration) RemoveReadOnly() *VolumeMountApplyConfiguration {
-	b.fields.ReadOnly = nil
+	b.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
 func (b *VolumeMountApplyConfiguration) GetReadOnly() (value bool, ok bool) {
-	if v := b.fields.ReadOnly; v != nil {
+	if v := b.ReadOnly; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -93,19 +81,19 @@ func (b *VolumeMountApplyConfiguration) GetReadOnly() (value bool, ok bool) {
 
 // SetMountPath sets the MountPath field in the declarative configuration to the given value.
 func (b *VolumeMountApplyConfiguration) SetMountPath(value string) *VolumeMountApplyConfiguration {
-	b.fields.MountPath = &value
+	b.MountPath = &value
 	return b
 }
 
 // RemoveMountPath removes the MountPath field from the declarative configuration.
 func (b *VolumeMountApplyConfiguration) RemoveMountPath() *VolumeMountApplyConfiguration {
-	b.fields.MountPath = nil
+	b.MountPath = nil
 	return b
 }
 
 // GetMountPath gets the MountPath field from the declarative configuration.
 func (b *VolumeMountApplyConfiguration) GetMountPath() (value string, ok bool) {
-	if v := b.fields.MountPath; v != nil {
+	if v := b.MountPath; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -113,19 +101,19 @@ func (b *VolumeMountApplyConfiguration) GetMountPath() (value string, ok bool) {
 
 // SetSubPath sets the SubPath field in the declarative configuration to the given value.
 func (b *VolumeMountApplyConfiguration) SetSubPath(value string) *VolumeMountApplyConfiguration {
-	b.fields.SubPath = &value
+	b.SubPath = &value
 	return b
 }
 
 // RemoveSubPath removes the SubPath field from the declarative configuration.
 func (b *VolumeMountApplyConfiguration) RemoveSubPath() *VolumeMountApplyConfiguration {
-	b.fields.SubPath = nil
+	b.SubPath = nil
 	return b
 }
 
 // GetSubPath gets the SubPath field from the declarative configuration.
 func (b *VolumeMountApplyConfiguration) GetSubPath() (value string, ok bool) {
-	if v := b.fields.SubPath; v != nil {
+	if v := b.SubPath; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -133,19 +121,19 @@ func (b *VolumeMountApplyConfiguration) GetSubPath() (value string, ok bool) {
 
 // SetMountPropagation sets the MountPropagation field in the declarative configuration to the given value.
 func (b *VolumeMountApplyConfiguration) SetMountPropagation(value v1.MountPropagationMode) *VolumeMountApplyConfiguration {
-	b.fields.MountPropagation = &value
+	b.MountPropagation = &value
 	return b
 }
 
 // RemoveMountPropagation removes the MountPropagation field from the declarative configuration.
 func (b *VolumeMountApplyConfiguration) RemoveMountPropagation() *VolumeMountApplyConfiguration {
-	b.fields.MountPropagation = nil
+	b.MountPropagation = nil
 	return b
 }
 
 // GetMountPropagation gets the MountPropagation field from the declarative configuration.
 func (b *VolumeMountApplyConfiguration) GetMountPropagation() (value v1.MountPropagationMode, ok bool) {
-	if v := b.fields.MountPropagation; v != nil {
+	if v := b.MountPropagation; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -153,64 +141,22 @@ func (b *VolumeMountApplyConfiguration) GetMountPropagation() (value v1.MountPro
 
 // SetSubPathExpr sets the SubPathExpr field in the declarative configuration to the given value.
 func (b *VolumeMountApplyConfiguration) SetSubPathExpr(value string) *VolumeMountApplyConfiguration {
-	b.fields.SubPathExpr = &value
+	b.SubPathExpr = &value
 	return b
 }
 
 // RemoveSubPathExpr removes the SubPathExpr field from the declarative configuration.
 func (b *VolumeMountApplyConfiguration) RemoveSubPathExpr() *VolumeMountApplyConfiguration {
-	b.fields.SubPathExpr = nil
+	b.SubPathExpr = nil
 	return b
 }
 
 // GetSubPathExpr gets the SubPathExpr field from the declarative configuration.
 func (b *VolumeMountApplyConfiguration) GetSubPathExpr() (value string, ok bool) {
-	if v := b.fields.SubPathExpr; v != nil {
+	if v := b.SubPathExpr; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts VolumeMountApplyConfiguration to unstructured.
-func (b *VolumeMountApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to VolumeMountApplyConfiguration, replacing the contents
-// of VolumeMountApplyConfiguration.
-func (b *VolumeMountApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &volumeMountFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals VolumeMountApplyConfiguration to JSON.
-func (b *VolumeMountApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into VolumeMountApplyConfiguration, replacing the contents of
-// VolumeMountApplyConfiguration.
-func (b *VolumeMountApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // VolumeMountList represents a listAlias of VolumeMountApplyConfiguration.
@@ -218,8 +164,3 @@ type VolumeMountList []*VolumeMountApplyConfiguration
 
 // VolumeMountList represents a map of VolumeMountApplyConfiguration.
 type VolumeMountMap map[string]VolumeMountApplyConfiguration
-
-func (b *VolumeMountApplyConfiguration) preMarshal() {
-}
-func (b *VolumeMountApplyConfiguration) postUnmarshal() {
-}

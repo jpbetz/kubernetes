@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	v1beta1 "k8s.io/api/rbac/v1beta1"
@@ -125,7 +126,7 @@ func (c *FakeClusterRoles) Patch(ctx context.Context, name string, pt types.Patc
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied clusterRole.
 func (c *FakeClusterRoles) Apply(ctx context.Context, clusterRole *rbacv1beta1.ClusterRoleApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.ClusterRole, err error) {
-	data, err := clusterRole.MarshalJSON()
+	data, err := json.Marshal(clusterRole)
 	if err != nil {
 		return nil, err
 	}

@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ExecActionApplyConfiguration represents an declarative configuration of the ExecAction type for use
 // with apply.
 type ExecActionApplyConfiguration struct {
-	fields execActionFields
+	Command *[]string `json:"command,omitempty"`
 }
 
 // ExecActionApplyConfiguration constructs an declarative configuration of the ExecAction type for use with
@@ -36,75 +30,24 @@ func ExecAction() *ExecActionApplyConfiguration {
 	return &ExecActionApplyConfiguration{}
 }
 
-// execActionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ExecActionApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type execActionFields struct {
-	Command *[]string `json:"command,omitempty"`
-}
-
 // SetCommand sets the Command field in the declarative configuration to the given value.
 func (b *ExecActionApplyConfiguration) SetCommand(value []string) *ExecActionApplyConfiguration {
-	b.fields.Command = &value
+	b.Command = &value
 	return b
 }
 
 // RemoveCommand removes the Command field from the declarative configuration.
 func (b *ExecActionApplyConfiguration) RemoveCommand() *ExecActionApplyConfiguration {
-	b.fields.Command = nil
+	b.Command = nil
 	return b
 }
 
 // GetCommand gets the Command field from the declarative configuration.
 func (b *ExecActionApplyConfiguration) GetCommand() (value []string, ok bool) {
-	if v := b.fields.Command; v != nil {
+	if v := b.Command; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ExecActionApplyConfiguration to unstructured.
-func (b *ExecActionApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ExecActionApplyConfiguration, replacing the contents
-// of ExecActionApplyConfiguration.
-func (b *ExecActionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &execActionFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ExecActionApplyConfiguration to JSON.
-func (b *ExecActionApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ExecActionApplyConfiguration, replacing the contents of
-// ExecActionApplyConfiguration.
-func (b *ExecActionApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ExecActionList represents a listAlias of ExecActionApplyConfiguration.
@@ -112,8 +55,3 @@ type ExecActionList []*ExecActionApplyConfiguration
 
 // ExecActionList represents a map of ExecActionApplyConfiguration.
 type ExecActionMap map[string]ExecActionApplyConfiguration
-
-func (b *ExecActionApplyConfiguration) preMarshal() {
-}
-func (b *ExecActionApplyConfiguration) postUnmarshal() {
-}

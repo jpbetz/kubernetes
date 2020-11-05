@@ -20,6 +20,7 @@ package v1beta1
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 	"time"
 
@@ -173,7 +174,7 @@ func (c *ingressClasses) Patch(ctx context.Context, name string, pt types.PatchT
 // Apply takes the given apply declarative configuration, applies it and returns the applied ingressClass.
 func (c *ingressClasses) Apply(ctx context.Context, ingressClass *networkingv1beta1.IngressClassApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *v1beta1.IngressClass, err error) {
 	patchOpts := opts.ToPatchOptions(fieldManager)
-	data, err := ingressClass.MarshalJSON()
+	data, err := json.Marshal(ingressClass)
 	if err != nil {
 		return nil, err
 	}

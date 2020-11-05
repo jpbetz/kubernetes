@@ -18,30 +18,9 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // DeploymentStatusApplyConfiguration represents an declarative configuration of the DeploymentStatus type for use
 // with apply.
 type DeploymentStatusApplyConfiguration struct {
-	fields deploymentStatusFields
-}
-
-// DeploymentStatusApplyConfiguration constructs an declarative configuration of the DeploymentStatus type for use with
-// apply.
-func DeploymentStatus() *DeploymentStatusApplyConfiguration {
-	return &DeploymentStatusApplyConfiguration{}
-}
-
-// deploymentStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in DeploymentStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type deploymentStatusFields struct {
 	ObservedGeneration  *int64                   `json:"observedGeneration,omitempty"`
 	Replicas            *int32                   `json:"replicas,omitempty"`
 	UpdatedReplicas     *int32                   `json:"updatedReplicas,omitempty"`
@@ -52,21 +31,27 @@ type deploymentStatusFields struct {
 	CollisionCount      *int32                   `json:"collisionCount,omitempty"`
 }
 
+// DeploymentStatusApplyConfiguration constructs an declarative configuration of the DeploymentStatus type for use with
+// apply.
+func DeploymentStatus() *DeploymentStatusApplyConfiguration {
+	return &DeploymentStatusApplyConfiguration{}
+}
+
 // SetObservedGeneration sets the ObservedGeneration field in the declarative configuration to the given value.
 func (b *DeploymentStatusApplyConfiguration) SetObservedGeneration(value int64) *DeploymentStatusApplyConfiguration {
-	b.fields.ObservedGeneration = &value
+	b.ObservedGeneration = &value
 	return b
 }
 
 // RemoveObservedGeneration removes the ObservedGeneration field from the declarative configuration.
 func (b *DeploymentStatusApplyConfiguration) RemoveObservedGeneration() *DeploymentStatusApplyConfiguration {
-	b.fields.ObservedGeneration = nil
+	b.ObservedGeneration = nil
 	return b
 }
 
 // GetObservedGeneration gets the ObservedGeneration field from the declarative configuration.
 func (b *DeploymentStatusApplyConfiguration) GetObservedGeneration() (value int64, ok bool) {
-	if v := b.fields.ObservedGeneration; v != nil {
+	if v := b.ObservedGeneration; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -74,19 +59,19 @@ func (b *DeploymentStatusApplyConfiguration) GetObservedGeneration() (value int6
 
 // SetReplicas sets the Replicas field in the declarative configuration to the given value.
 func (b *DeploymentStatusApplyConfiguration) SetReplicas(value int32) *DeploymentStatusApplyConfiguration {
-	b.fields.Replicas = &value
+	b.Replicas = &value
 	return b
 }
 
 // RemoveReplicas removes the Replicas field from the declarative configuration.
 func (b *DeploymentStatusApplyConfiguration) RemoveReplicas() *DeploymentStatusApplyConfiguration {
-	b.fields.Replicas = nil
+	b.Replicas = nil
 	return b
 }
 
 // GetReplicas gets the Replicas field from the declarative configuration.
 func (b *DeploymentStatusApplyConfiguration) GetReplicas() (value int32, ok bool) {
-	if v := b.fields.Replicas; v != nil {
+	if v := b.Replicas; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -94,19 +79,19 @@ func (b *DeploymentStatusApplyConfiguration) GetReplicas() (value int32, ok bool
 
 // SetUpdatedReplicas sets the UpdatedReplicas field in the declarative configuration to the given value.
 func (b *DeploymentStatusApplyConfiguration) SetUpdatedReplicas(value int32) *DeploymentStatusApplyConfiguration {
-	b.fields.UpdatedReplicas = &value
+	b.UpdatedReplicas = &value
 	return b
 }
 
 // RemoveUpdatedReplicas removes the UpdatedReplicas field from the declarative configuration.
 func (b *DeploymentStatusApplyConfiguration) RemoveUpdatedReplicas() *DeploymentStatusApplyConfiguration {
-	b.fields.UpdatedReplicas = nil
+	b.UpdatedReplicas = nil
 	return b
 }
 
 // GetUpdatedReplicas gets the UpdatedReplicas field from the declarative configuration.
 func (b *DeploymentStatusApplyConfiguration) GetUpdatedReplicas() (value int32, ok bool) {
-	if v := b.fields.UpdatedReplicas; v != nil {
+	if v := b.UpdatedReplicas; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -114,19 +99,19 @@ func (b *DeploymentStatusApplyConfiguration) GetUpdatedReplicas() (value int32, 
 
 // SetReadyReplicas sets the ReadyReplicas field in the declarative configuration to the given value.
 func (b *DeploymentStatusApplyConfiguration) SetReadyReplicas(value int32) *DeploymentStatusApplyConfiguration {
-	b.fields.ReadyReplicas = &value
+	b.ReadyReplicas = &value
 	return b
 }
 
 // RemoveReadyReplicas removes the ReadyReplicas field from the declarative configuration.
 func (b *DeploymentStatusApplyConfiguration) RemoveReadyReplicas() *DeploymentStatusApplyConfiguration {
-	b.fields.ReadyReplicas = nil
+	b.ReadyReplicas = nil
 	return b
 }
 
 // GetReadyReplicas gets the ReadyReplicas field from the declarative configuration.
 func (b *DeploymentStatusApplyConfiguration) GetReadyReplicas() (value int32, ok bool) {
-	if v := b.fields.ReadyReplicas; v != nil {
+	if v := b.ReadyReplicas; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -134,19 +119,19 @@ func (b *DeploymentStatusApplyConfiguration) GetReadyReplicas() (value int32, ok
 
 // SetAvailableReplicas sets the AvailableReplicas field in the declarative configuration to the given value.
 func (b *DeploymentStatusApplyConfiguration) SetAvailableReplicas(value int32) *DeploymentStatusApplyConfiguration {
-	b.fields.AvailableReplicas = &value
+	b.AvailableReplicas = &value
 	return b
 }
 
 // RemoveAvailableReplicas removes the AvailableReplicas field from the declarative configuration.
 func (b *DeploymentStatusApplyConfiguration) RemoveAvailableReplicas() *DeploymentStatusApplyConfiguration {
-	b.fields.AvailableReplicas = nil
+	b.AvailableReplicas = nil
 	return b
 }
 
 // GetAvailableReplicas gets the AvailableReplicas field from the declarative configuration.
 func (b *DeploymentStatusApplyConfiguration) GetAvailableReplicas() (value int32, ok bool) {
-	if v := b.fields.AvailableReplicas; v != nil {
+	if v := b.AvailableReplicas; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -154,19 +139,19 @@ func (b *DeploymentStatusApplyConfiguration) GetAvailableReplicas() (value int32
 
 // SetUnavailableReplicas sets the UnavailableReplicas field in the declarative configuration to the given value.
 func (b *DeploymentStatusApplyConfiguration) SetUnavailableReplicas(value int32) *DeploymentStatusApplyConfiguration {
-	b.fields.UnavailableReplicas = &value
+	b.UnavailableReplicas = &value
 	return b
 }
 
 // RemoveUnavailableReplicas removes the UnavailableReplicas field from the declarative configuration.
 func (b *DeploymentStatusApplyConfiguration) RemoveUnavailableReplicas() *DeploymentStatusApplyConfiguration {
-	b.fields.UnavailableReplicas = nil
+	b.UnavailableReplicas = nil
 	return b
 }
 
 // GetUnavailableReplicas gets the UnavailableReplicas field from the declarative configuration.
 func (b *DeploymentStatusApplyConfiguration) GetUnavailableReplicas() (value int32, ok bool) {
-	if v := b.fields.UnavailableReplicas; v != nil {
+	if v := b.UnavailableReplicas; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -174,19 +159,19 @@ func (b *DeploymentStatusApplyConfiguration) GetUnavailableReplicas() (value int
 
 // SetConditions sets the Conditions field in the declarative configuration to the given value.
 func (b *DeploymentStatusApplyConfiguration) SetConditions(value DeploymentConditionList) *DeploymentStatusApplyConfiguration {
-	b.fields.Conditions = &value
+	b.Conditions = &value
 	return b
 }
 
 // RemoveConditions removes the Conditions field from the declarative configuration.
 func (b *DeploymentStatusApplyConfiguration) RemoveConditions() *DeploymentStatusApplyConfiguration {
-	b.fields.Conditions = nil
+	b.Conditions = nil
 	return b
 }
 
 // GetConditions gets the Conditions field from the declarative configuration.
 func (b *DeploymentStatusApplyConfiguration) GetConditions() (value DeploymentConditionList, ok bool) {
-	if v := b.fields.Conditions; v != nil {
+	if v := b.Conditions; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -194,64 +179,22 @@ func (b *DeploymentStatusApplyConfiguration) GetConditions() (value DeploymentCo
 
 // SetCollisionCount sets the CollisionCount field in the declarative configuration to the given value.
 func (b *DeploymentStatusApplyConfiguration) SetCollisionCount(value int32) *DeploymentStatusApplyConfiguration {
-	b.fields.CollisionCount = &value
+	b.CollisionCount = &value
 	return b
 }
 
 // RemoveCollisionCount removes the CollisionCount field from the declarative configuration.
 func (b *DeploymentStatusApplyConfiguration) RemoveCollisionCount() *DeploymentStatusApplyConfiguration {
-	b.fields.CollisionCount = nil
+	b.CollisionCount = nil
 	return b
 }
 
 // GetCollisionCount gets the CollisionCount field from the declarative configuration.
 func (b *DeploymentStatusApplyConfiguration) GetCollisionCount() (value int32, ok bool) {
-	if v := b.fields.CollisionCount; v != nil {
+	if v := b.CollisionCount; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts DeploymentStatusApplyConfiguration to unstructured.
-func (b *DeploymentStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to DeploymentStatusApplyConfiguration, replacing the contents
-// of DeploymentStatusApplyConfiguration.
-func (b *DeploymentStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &deploymentStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals DeploymentStatusApplyConfiguration to JSON.
-func (b *DeploymentStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into DeploymentStatusApplyConfiguration, replacing the contents of
-// DeploymentStatusApplyConfiguration.
-func (b *DeploymentStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // DeploymentStatusList represents a listAlias of DeploymentStatusApplyConfiguration.
@@ -259,8 +202,3 @@ type DeploymentStatusList []*DeploymentStatusApplyConfiguration
 
 // DeploymentStatusList represents a map of DeploymentStatusApplyConfiguration.
 type DeploymentStatusMap map[string]DeploymentStatusApplyConfiguration
-
-func (b *DeploymentStatusApplyConfiguration) preMarshal() {
-}
-func (b *DeploymentStatusApplyConfiguration) postUnmarshal() {
-}

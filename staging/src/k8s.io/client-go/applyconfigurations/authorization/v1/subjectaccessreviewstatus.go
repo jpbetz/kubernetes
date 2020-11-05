@@ -18,16 +18,13 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // SubjectAccessReviewStatusApplyConfiguration represents an declarative configuration of the SubjectAccessReviewStatus type for use
 // with apply.
 type SubjectAccessReviewStatusApplyConfiguration struct {
-	fields subjectAccessReviewStatusFields
+	Allowed         *bool   `json:"allowed,omitempty"`
+	Denied          *bool   `json:"denied,omitempty"`
+	Reason          *string `json:"reason,omitempty"`
+	EvaluationError *string `json:"evaluationError,omitempty"`
 }
 
 // SubjectAccessReviewStatusApplyConfiguration constructs an declarative configuration of the SubjectAccessReviewStatus type for use with
@@ -36,33 +33,21 @@ func SubjectAccessReviewStatus() *SubjectAccessReviewStatusApplyConfiguration {
 	return &SubjectAccessReviewStatusApplyConfiguration{}
 }
 
-// subjectAccessReviewStatusFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in SubjectAccessReviewStatusApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type subjectAccessReviewStatusFields struct {
-	Allowed         *bool   `json:"allowed,omitempty"`
-	Denied          *bool   `json:"denied,omitempty"`
-	Reason          *string `json:"reason,omitempty"`
-	EvaluationError *string `json:"evaluationError,omitempty"`
-}
-
 // SetAllowed sets the Allowed field in the declarative configuration to the given value.
 func (b *SubjectAccessReviewStatusApplyConfiguration) SetAllowed(value bool) *SubjectAccessReviewStatusApplyConfiguration {
-	b.fields.Allowed = &value
+	b.Allowed = &value
 	return b
 }
 
 // RemoveAllowed removes the Allowed field from the declarative configuration.
 func (b *SubjectAccessReviewStatusApplyConfiguration) RemoveAllowed() *SubjectAccessReviewStatusApplyConfiguration {
-	b.fields.Allowed = nil
+	b.Allowed = nil
 	return b
 }
 
 // GetAllowed gets the Allowed field from the declarative configuration.
 func (b *SubjectAccessReviewStatusApplyConfiguration) GetAllowed() (value bool, ok bool) {
-	if v := b.fields.Allowed; v != nil {
+	if v := b.Allowed; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -70,19 +55,19 @@ func (b *SubjectAccessReviewStatusApplyConfiguration) GetAllowed() (value bool, 
 
 // SetDenied sets the Denied field in the declarative configuration to the given value.
 func (b *SubjectAccessReviewStatusApplyConfiguration) SetDenied(value bool) *SubjectAccessReviewStatusApplyConfiguration {
-	b.fields.Denied = &value
+	b.Denied = &value
 	return b
 }
 
 // RemoveDenied removes the Denied field from the declarative configuration.
 func (b *SubjectAccessReviewStatusApplyConfiguration) RemoveDenied() *SubjectAccessReviewStatusApplyConfiguration {
-	b.fields.Denied = nil
+	b.Denied = nil
 	return b
 }
 
 // GetDenied gets the Denied field from the declarative configuration.
 func (b *SubjectAccessReviewStatusApplyConfiguration) GetDenied() (value bool, ok bool) {
-	if v := b.fields.Denied; v != nil {
+	if v := b.Denied; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -90,19 +75,19 @@ func (b *SubjectAccessReviewStatusApplyConfiguration) GetDenied() (value bool, o
 
 // SetReason sets the Reason field in the declarative configuration to the given value.
 func (b *SubjectAccessReviewStatusApplyConfiguration) SetReason(value string) *SubjectAccessReviewStatusApplyConfiguration {
-	b.fields.Reason = &value
+	b.Reason = &value
 	return b
 }
 
 // RemoveReason removes the Reason field from the declarative configuration.
 func (b *SubjectAccessReviewStatusApplyConfiguration) RemoveReason() *SubjectAccessReviewStatusApplyConfiguration {
-	b.fields.Reason = nil
+	b.Reason = nil
 	return b
 }
 
 // GetReason gets the Reason field from the declarative configuration.
 func (b *SubjectAccessReviewStatusApplyConfiguration) GetReason() (value string, ok bool) {
-	if v := b.fields.Reason; v != nil {
+	if v := b.Reason; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -110,64 +95,22 @@ func (b *SubjectAccessReviewStatusApplyConfiguration) GetReason() (value string,
 
 // SetEvaluationError sets the EvaluationError field in the declarative configuration to the given value.
 func (b *SubjectAccessReviewStatusApplyConfiguration) SetEvaluationError(value string) *SubjectAccessReviewStatusApplyConfiguration {
-	b.fields.EvaluationError = &value
+	b.EvaluationError = &value
 	return b
 }
 
 // RemoveEvaluationError removes the EvaluationError field from the declarative configuration.
 func (b *SubjectAccessReviewStatusApplyConfiguration) RemoveEvaluationError() *SubjectAccessReviewStatusApplyConfiguration {
-	b.fields.EvaluationError = nil
+	b.EvaluationError = nil
 	return b
 }
 
 // GetEvaluationError gets the EvaluationError field from the declarative configuration.
 func (b *SubjectAccessReviewStatusApplyConfiguration) GetEvaluationError() (value string, ok bool) {
-	if v := b.fields.EvaluationError; v != nil {
+	if v := b.EvaluationError; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts SubjectAccessReviewStatusApplyConfiguration to unstructured.
-func (b *SubjectAccessReviewStatusApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to SubjectAccessReviewStatusApplyConfiguration, replacing the contents
-// of SubjectAccessReviewStatusApplyConfiguration.
-func (b *SubjectAccessReviewStatusApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &subjectAccessReviewStatusFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals SubjectAccessReviewStatusApplyConfiguration to JSON.
-func (b *SubjectAccessReviewStatusApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into SubjectAccessReviewStatusApplyConfiguration, replacing the contents of
-// SubjectAccessReviewStatusApplyConfiguration.
-func (b *SubjectAccessReviewStatusApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // SubjectAccessReviewStatusList represents a listAlias of SubjectAccessReviewStatusApplyConfiguration.
@@ -175,8 +118,3 @@ type SubjectAccessReviewStatusList []*SubjectAccessReviewStatusApplyConfiguratio
 
 // SubjectAccessReviewStatusList represents a map of SubjectAccessReviewStatusApplyConfiguration.
 type SubjectAccessReviewStatusMap map[string]SubjectAccessReviewStatusApplyConfiguration
-
-func (b *SubjectAccessReviewStatusApplyConfiguration) preMarshal() {
-}
-func (b *SubjectAccessReviewStatusApplyConfiguration) postUnmarshal() {
-}

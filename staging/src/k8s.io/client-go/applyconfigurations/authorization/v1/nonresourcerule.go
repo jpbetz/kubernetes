@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // NonResourceRuleApplyConfiguration represents an declarative configuration of the NonResourceRule type for use
 // with apply.
 type NonResourceRuleApplyConfiguration struct {
-	fields nonResourceRuleFields
+	Verbs           *[]string `json:"verbs,omitempty"`
+	NonResourceURLs *[]string `json:"nonResourceURLs,omitempty"`
 }
 
 // NonResourceRuleApplyConfiguration constructs an declarative configuration of the NonResourceRule type for use with
@@ -36,31 +31,21 @@ func NonResourceRule() *NonResourceRuleApplyConfiguration {
 	return &NonResourceRuleApplyConfiguration{}
 }
 
-// nonResourceRuleFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in NonResourceRuleApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type nonResourceRuleFields struct {
-	Verbs           *[]string `json:"verbs,omitempty"`
-	NonResourceURLs *[]string `json:"nonResourceURLs,omitempty"`
-}
-
 // SetVerbs sets the Verbs field in the declarative configuration to the given value.
 func (b *NonResourceRuleApplyConfiguration) SetVerbs(value []string) *NonResourceRuleApplyConfiguration {
-	b.fields.Verbs = &value
+	b.Verbs = &value
 	return b
 }
 
 // RemoveVerbs removes the Verbs field from the declarative configuration.
 func (b *NonResourceRuleApplyConfiguration) RemoveVerbs() *NonResourceRuleApplyConfiguration {
-	b.fields.Verbs = nil
+	b.Verbs = nil
 	return b
 }
 
 // GetVerbs gets the Verbs field from the declarative configuration.
 func (b *NonResourceRuleApplyConfiguration) GetVerbs() (value []string, ok bool) {
-	if v := b.fields.Verbs; v != nil {
+	if v := b.Verbs; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *NonResourceRuleApplyConfiguration) GetVerbs() (value []string, ok bool)
 
 // SetNonResourceURLs sets the NonResourceURLs field in the declarative configuration to the given value.
 func (b *NonResourceRuleApplyConfiguration) SetNonResourceURLs(value []string) *NonResourceRuleApplyConfiguration {
-	b.fields.NonResourceURLs = &value
+	b.NonResourceURLs = &value
 	return b
 }
 
 // RemoveNonResourceURLs removes the NonResourceURLs field from the declarative configuration.
 func (b *NonResourceRuleApplyConfiguration) RemoveNonResourceURLs() *NonResourceRuleApplyConfiguration {
-	b.fields.NonResourceURLs = nil
+	b.NonResourceURLs = nil
 	return b
 }
 
 // GetNonResourceURLs gets the NonResourceURLs field from the declarative configuration.
 func (b *NonResourceRuleApplyConfiguration) GetNonResourceURLs() (value []string, ok bool) {
-	if v := b.fields.NonResourceURLs; v != nil {
+	if v := b.NonResourceURLs; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts NonResourceRuleApplyConfiguration to unstructured.
-func (b *NonResourceRuleApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to NonResourceRuleApplyConfiguration, replacing the contents
-// of NonResourceRuleApplyConfiguration.
-func (b *NonResourceRuleApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &nonResourceRuleFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals NonResourceRuleApplyConfiguration to JSON.
-func (b *NonResourceRuleApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into NonResourceRuleApplyConfiguration, replacing the contents of
-// NonResourceRuleApplyConfiguration.
-func (b *NonResourceRuleApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // NonResourceRuleList represents a listAlias of NonResourceRuleApplyConfiguration.
@@ -133,8 +76,3 @@ type NonResourceRuleList []*NonResourceRuleApplyConfiguration
 
 // NonResourceRuleList represents a map of NonResourceRuleApplyConfiguration.
 type NonResourceRuleMap map[string]NonResourceRuleApplyConfiguration
-
-func (b *NonResourceRuleApplyConfiguration) preMarshal() {
-}
-func (b *NonResourceRuleApplyConfiguration) postUnmarshal() {
-}

@@ -19,17 +19,16 @@ limitations under the License.
 package v2beta1
 
 import (
-	json "encoding/json"
-
 	v1 "k8s.io/api/core/v1"
 	resource "k8s.io/apimachinery/pkg/api/resource"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // ResourceMetricSourceApplyConfiguration represents an declarative configuration of the ResourceMetricSource type for use
 // with apply.
 type ResourceMetricSourceApplyConfiguration struct {
-	fields resourceMetricSourceFields
+	Name                     *v1.ResourceName   `json:"name,omitempty"`
+	TargetAverageUtilization *int32             `json:"targetAverageUtilization,omitempty"`
+	TargetAverageValue       *resource.Quantity `json:"targetAverageValue,omitempty"`
 }
 
 // ResourceMetricSourceApplyConfiguration constructs an declarative configuration of the ResourceMetricSource type for use with
@@ -38,32 +37,21 @@ func ResourceMetricSource() *ResourceMetricSourceApplyConfiguration {
 	return &ResourceMetricSourceApplyConfiguration{}
 }
 
-// resourceMetricSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ResourceMetricSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type resourceMetricSourceFields struct {
-	Name                     *v1.ResourceName   `json:"name,omitempty"`
-	TargetAverageUtilization *int32             `json:"targetAverageUtilization,omitempty"`
-	TargetAverageValue       *resource.Quantity `json:"targetAverageValue,omitempty"`
-}
-
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *ResourceMetricSourceApplyConfiguration) SetName(value v1.ResourceName) *ResourceMetricSourceApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *ResourceMetricSourceApplyConfiguration) RemoveName() *ResourceMetricSourceApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *ResourceMetricSourceApplyConfiguration) GetName() (value v1.ResourceName, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -71,19 +59,19 @@ func (b *ResourceMetricSourceApplyConfiguration) GetName() (value v1.ResourceNam
 
 // SetTargetAverageUtilization sets the TargetAverageUtilization field in the declarative configuration to the given value.
 func (b *ResourceMetricSourceApplyConfiguration) SetTargetAverageUtilization(value int32) *ResourceMetricSourceApplyConfiguration {
-	b.fields.TargetAverageUtilization = &value
+	b.TargetAverageUtilization = &value
 	return b
 }
 
 // RemoveTargetAverageUtilization removes the TargetAverageUtilization field from the declarative configuration.
 func (b *ResourceMetricSourceApplyConfiguration) RemoveTargetAverageUtilization() *ResourceMetricSourceApplyConfiguration {
-	b.fields.TargetAverageUtilization = nil
+	b.TargetAverageUtilization = nil
 	return b
 }
 
 // GetTargetAverageUtilization gets the TargetAverageUtilization field from the declarative configuration.
 func (b *ResourceMetricSourceApplyConfiguration) GetTargetAverageUtilization() (value int32, ok bool) {
-	if v := b.fields.TargetAverageUtilization; v != nil {
+	if v := b.TargetAverageUtilization; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -91,64 +79,22 @@ func (b *ResourceMetricSourceApplyConfiguration) GetTargetAverageUtilization() (
 
 // SetTargetAverageValue sets the TargetAverageValue field in the declarative configuration to the given value.
 func (b *ResourceMetricSourceApplyConfiguration) SetTargetAverageValue(value resource.Quantity) *ResourceMetricSourceApplyConfiguration {
-	b.fields.TargetAverageValue = &value
+	b.TargetAverageValue = &value
 	return b
 }
 
 // RemoveTargetAverageValue removes the TargetAverageValue field from the declarative configuration.
 func (b *ResourceMetricSourceApplyConfiguration) RemoveTargetAverageValue() *ResourceMetricSourceApplyConfiguration {
-	b.fields.TargetAverageValue = nil
+	b.TargetAverageValue = nil
 	return b
 }
 
 // GetTargetAverageValue gets the TargetAverageValue field from the declarative configuration.
 func (b *ResourceMetricSourceApplyConfiguration) GetTargetAverageValue() (value resource.Quantity, ok bool) {
-	if v := b.fields.TargetAverageValue; v != nil {
+	if v := b.TargetAverageValue; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ResourceMetricSourceApplyConfiguration to unstructured.
-func (b *ResourceMetricSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ResourceMetricSourceApplyConfiguration, replacing the contents
-// of ResourceMetricSourceApplyConfiguration.
-func (b *ResourceMetricSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &resourceMetricSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ResourceMetricSourceApplyConfiguration to JSON.
-func (b *ResourceMetricSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ResourceMetricSourceApplyConfiguration, replacing the contents of
-// ResourceMetricSourceApplyConfiguration.
-func (b *ResourceMetricSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ResourceMetricSourceList represents a listAlias of ResourceMetricSourceApplyConfiguration.
@@ -156,8 +102,3 @@ type ResourceMetricSourceList []*ResourceMetricSourceApplyConfiguration
 
 // ResourceMetricSourceList represents a map of ResourceMetricSourceApplyConfiguration.
 type ResourceMetricSourceMap map[string]ResourceMetricSourceApplyConfiguration
-
-func (b *ResourceMetricSourceApplyConfiguration) preMarshal() {
-}
-func (b *ResourceMetricSourceApplyConfiguration) postUnmarshal() {
-}

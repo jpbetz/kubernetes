@@ -20,6 +20,7 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
 	"fmt"
 
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
@@ -145,7 +146,7 @@ func (c *FakeHorizontalPodAutoscalers) Patch(ctx context.Context, name string, p
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied horizontalPodAutoscaler.
 func (c *FakeHorizontalPodAutoscalers) Apply(ctx context.Context, horizontalPodAutoscaler *applyconfigurationsautoscalingv1.HorizontalPodAutoscalerApplyConfiguration, fieldManager string, opts v1.ApplyOptions, subresources ...string) (result *autoscalingv1.HorizontalPodAutoscaler, err error) {
-	data, err := horizontalPodAutoscaler.MarshalJSON()
+	data, err := json.Marshal(horizontalPodAutoscaler)
 	if err != nil {
 		return nil, err
 	}

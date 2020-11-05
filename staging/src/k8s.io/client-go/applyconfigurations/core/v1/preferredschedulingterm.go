@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // PreferredSchedulingTermApplyConfiguration represents an declarative configuration of the PreferredSchedulingTerm type for use
 // with apply.
 type PreferredSchedulingTermApplyConfiguration struct {
-	fields preferredSchedulingTermFields
+	Weight     *int32                              `json:"weight,omitempty"`
+	Preference *NodeSelectorTermApplyConfiguration `json:"preference,omitempty"`
 }
 
 // PreferredSchedulingTermApplyConfiguration constructs an declarative configuration of the PreferredSchedulingTerm type for use with
@@ -36,31 +31,21 @@ func PreferredSchedulingTerm() *PreferredSchedulingTermApplyConfiguration {
 	return &PreferredSchedulingTermApplyConfiguration{}
 }
 
-// preferredSchedulingTermFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PreferredSchedulingTermApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type preferredSchedulingTermFields struct {
-	Weight     *int32                              `json:"weight,omitempty"`
-	Preference *NodeSelectorTermApplyConfiguration `json:"preference,omitempty"`
-}
-
 // SetWeight sets the Weight field in the declarative configuration to the given value.
 func (b *PreferredSchedulingTermApplyConfiguration) SetWeight(value int32) *PreferredSchedulingTermApplyConfiguration {
-	b.fields.Weight = &value
+	b.Weight = &value
 	return b
 }
 
 // RemoveWeight removes the Weight field from the declarative configuration.
 func (b *PreferredSchedulingTermApplyConfiguration) RemoveWeight() *PreferredSchedulingTermApplyConfiguration {
-	b.fields.Weight = nil
+	b.Weight = nil
 	return b
 }
 
 // GetWeight gets the Weight field from the declarative configuration.
 func (b *PreferredSchedulingTermApplyConfiguration) GetWeight() (value int32, ok bool) {
-	if v := b.fields.Weight; v != nil {
+	if v := b.Weight; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,61 +53,19 @@ func (b *PreferredSchedulingTermApplyConfiguration) GetWeight() (value int32, ok
 
 // SetPreference sets the Preference field in the declarative configuration to the given value.
 func (b *PreferredSchedulingTermApplyConfiguration) SetPreference(value *NodeSelectorTermApplyConfiguration) *PreferredSchedulingTermApplyConfiguration {
-	b.fields.Preference = value
+	b.Preference = value
 	return b
 }
 
 // RemovePreference removes the Preference field from the declarative configuration.
 func (b *PreferredSchedulingTermApplyConfiguration) RemovePreference() *PreferredSchedulingTermApplyConfiguration {
-	b.fields.Preference = nil
+	b.Preference = nil
 	return b
 }
 
 // GetPreference gets the Preference field from the declarative configuration.
 func (b *PreferredSchedulingTermApplyConfiguration) GetPreference() (value *NodeSelectorTermApplyConfiguration, ok bool) {
-	return b.fields.Preference, b.fields.Preference != nil
-}
-
-// ToUnstructured converts PreferredSchedulingTermApplyConfiguration to unstructured.
-func (b *PreferredSchedulingTermApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PreferredSchedulingTermApplyConfiguration, replacing the contents
-// of PreferredSchedulingTermApplyConfiguration.
-func (b *PreferredSchedulingTermApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &preferredSchedulingTermFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PreferredSchedulingTermApplyConfiguration to JSON.
-func (b *PreferredSchedulingTermApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PreferredSchedulingTermApplyConfiguration, replacing the contents of
-// PreferredSchedulingTermApplyConfiguration.
-func (b *PreferredSchedulingTermApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Preference, b.Preference != nil
 }
 
 // PreferredSchedulingTermList represents a listAlias of PreferredSchedulingTermApplyConfiguration.
@@ -130,8 +73,3 @@ type PreferredSchedulingTermList []*PreferredSchedulingTermApplyConfiguration
 
 // PreferredSchedulingTermList represents a map of PreferredSchedulingTermApplyConfiguration.
 type PreferredSchedulingTermMap map[string]PreferredSchedulingTermApplyConfiguration
-
-func (b *PreferredSchedulingTermApplyConfiguration) preMarshal() {
-}
-func (b *PreferredSchedulingTermApplyConfiguration) postUnmarshal() {
-}

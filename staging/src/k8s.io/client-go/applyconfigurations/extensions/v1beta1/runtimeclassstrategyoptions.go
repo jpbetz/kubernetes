@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1beta1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // RuntimeClassStrategyOptionsApplyConfiguration represents an declarative configuration of the RuntimeClassStrategyOptions type for use
 // with apply.
 type RuntimeClassStrategyOptionsApplyConfiguration struct {
-	fields runtimeClassStrategyOptionsFields
+	AllowedRuntimeClassNames *[]string `json:"allowedRuntimeClassNames,omitempty"`
+	DefaultRuntimeClassName  *string   `json:"defaultRuntimeClassName,omitempty"`
 }
 
 // RuntimeClassStrategyOptionsApplyConfiguration constructs an declarative configuration of the RuntimeClassStrategyOptions type for use with
@@ -36,31 +31,21 @@ func RuntimeClassStrategyOptions() *RuntimeClassStrategyOptionsApplyConfiguratio
 	return &RuntimeClassStrategyOptionsApplyConfiguration{}
 }
 
-// runtimeClassStrategyOptionsFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in RuntimeClassStrategyOptionsApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type runtimeClassStrategyOptionsFields struct {
-	AllowedRuntimeClassNames *[]string `json:"allowedRuntimeClassNames,omitempty"`
-	DefaultRuntimeClassName  *string   `json:"defaultRuntimeClassName,omitempty"`
-}
-
 // SetAllowedRuntimeClassNames sets the AllowedRuntimeClassNames field in the declarative configuration to the given value.
 func (b *RuntimeClassStrategyOptionsApplyConfiguration) SetAllowedRuntimeClassNames(value []string) *RuntimeClassStrategyOptionsApplyConfiguration {
-	b.fields.AllowedRuntimeClassNames = &value
+	b.AllowedRuntimeClassNames = &value
 	return b
 }
 
 // RemoveAllowedRuntimeClassNames removes the AllowedRuntimeClassNames field from the declarative configuration.
 func (b *RuntimeClassStrategyOptionsApplyConfiguration) RemoveAllowedRuntimeClassNames() *RuntimeClassStrategyOptionsApplyConfiguration {
-	b.fields.AllowedRuntimeClassNames = nil
+	b.AllowedRuntimeClassNames = nil
 	return b
 }
 
 // GetAllowedRuntimeClassNames gets the AllowedRuntimeClassNames field from the declarative configuration.
 func (b *RuntimeClassStrategyOptionsApplyConfiguration) GetAllowedRuntimeClassNames() (value []string, ok bool) {
-	if v := b.fields.AllowedRuntimeClassNames; v != nil {
+	if v := b.AllowedRuntimeClassNames; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *RuntimeClassStrategyOptionsApplyConfiguration) GetAllowedRuntimeClassNa
 
 // SetDefaultRuntimeClassName sets the DefaultRuntimeClassName field in the declarative configuration to the given value.
 func (b *RuntimeClassStrategyOptionsApplyConfiguration) SetDefaultRuntimeClassName(value string) *RuntimeClassStrategyOptionsApplyConfiguration {
-	b.fields.DefaultRuntimeClassName = &value
+	b.DefaultRuntimeClassName = &value
 	return b
 }
 
 // RemoveDefaultRuntimeClassName removes the DefaultRuntimeClassName field from the declarative configuration.
 func (b *RuntimeClassStrategyOptionsApplyConfiguration) RemoveDefaultRuntimeClassName() *RuntimeClassStrategyOptionsApplyConfiguration {
-	b.fields.DefaultRuntimeClassName = nil
+	b.DefaultRuntimeClassName = nil
 	return b
 }
 
 // GetDefaultRuntimeClassName gets the DefaultRuntimeClassName field from the declarative configuration.
 func (b *RuntimeClassStrategyOptionsApplyConfiguration) GetDefaultRuntimeClassName() (value string, ok bool) {
-	if v := b.fields.DefaultRuntimeClassName; v != nil {
+	if v := b.DefaultRuntimeClassName; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts RuntimeClassStrategyOptionsApplyConfiguration to unstructured.
-func (b *RuntimeClassStrategyOptionsApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to RuntimeClassStrategyOptionsApplyConfiguration, replacing the contents
-// of RuntimeClassStrategyOptionsApplyConfiguration.
-func (b *RuntimeClassStrategyOptionsApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &runtimeClassStrategyOptionsFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals RuntimeClassStrategyOptionsApplyConfiguration to JSON.
-func (b *RuntimeClassStrategyOptionsApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into RuntimeClassStrategyOptionsApplyConfiguration, replacing the contents of
-// RuntimeClassStrategyOptionsApplyConfiguration.
-func (b *RuntimeClassStrategyOptionsApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // RuntimeClassStrategyOptionsList represents a listAlias of RuntimeClassStrategyOptionsApplyConfiguration.
@@ -133,8 +76,3 @@ type RuntimeClassStrategyOptionsList []*RuntimeClassStrategyOptionsApplyConfigur
 
 // RuntimeClassStrategyOptionsList represents a map of RuntimeClassStrategyOptionsApplyConfiguration.
 type RuntimeClassStrategyOptionsMap map[string]RuntimeClassStrategyOptionsApplyConfiguration
-
-func (b *RuntimeClassStrategyOptionsApplyConfiguration) preMarshal() {
-}
-func (b *RuntimeClassStrategyOptionsApplyConfiguration) postUnmarshal() {
-}

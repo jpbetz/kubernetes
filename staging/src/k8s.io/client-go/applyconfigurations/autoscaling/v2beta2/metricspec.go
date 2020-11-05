@@ -19,30 +19,12 @@ limitations under the License.
 package v2beta2
 
 import (
-	json "encoding/json"
-
 	v2beta2 "k8s.io/api/autoscaling/v2beta2"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // MetricSpecApplyConfiguration represents an declarative configuration of the MetricSpec type for use
 // with apply.
 type MetricSpecApplyConfiguration struct {
-	fields metricSpecFields
-}
-
-// MetricSpecApplyConfiguration constructs an declarative configuration of the MetricSpec type for use with
-// apply.
-func MetricSpec() *MetricSpecApplyConfiguration {
-	return &MetricSpecApplyConfiguration{}
-}
-
-// metricSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in MetricSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type metricSpecFields struct {
 	Type              *v2beta2.MetricSourceType                        `json:"type,omitempty"`
 	Object            *ObjectMetricSourceApplyConfiguration            `json:"object,omitempty"`
 	Pods              *PodsMetricSourceApplyConfiguration              `json:"pods,omitempty"`
@@ -51,21 +33,27 @@ type metricSpecFields struct {
 	External          *ExternalMetricSourceApplyConfiguration          `json:"external,omitempty"`
 }
 
+// MetricSpecApplyConfiguration constructs an declarative configuration of the MetricSpec type for use with
+// apply.
+func MetricSpec() *MetricSpecApplyConfiguration {
+	return &MetricSpecApplyConfiguration{}
+}
+
 // SetType sets the Type field in the declarative configuration to the given value.
 func (b *MetricSpecApplyConfiguration) SetType(value v2beta2.MetricSourceType) *MetricSpecApplyConfiguration {
-	b.fields.Type = &value
+	b.Type = &value
 	return b
 }
 
 // RemoveType removes the Type field from the declarative configuration.
 func (b *MetricSpecApplyConfiguration) RemoveType() *MetricSpecApplyConfiguration {
-	b.fields.Type = nil
+	b.Type = nil
 	return b
 }
 
 // GetType gets the Type field from the declarative configuration.
 func (b *MetricSpecApplyConfiguration) GetType() (value v2beta2.MetricSourceType, ok bool) {
-	if v := b.fields.Type; v != nil {
+	if v := b.Type; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -73,129 +61,87 @@ func (b *MetricSpecApplyConfiguration) GetType() (value v2beta2.MetricSourceType
 
 // SetObject sets the Object field in the declarative configuration to the given value.
 func (b *MetricSpecApplyConfiguration) SetObject(value *ObjectMetricSourceApplyConfiguration) *MetricSpecApplyConfiguration {
-	b.fields.Object = value
+	b.Object = value
 	return b
 }
 
 // RemoveObject removes the Object field from the declarative configuration.
 func (b *MetricSpecApplyConfiguration) RemoveObject() *MetricSpecApplyConfiguration {
-	b.fields.Object = nil
+	b.Object = nil
 	return b
 }
 
 // GetObject gets the Object field from the declarative configuration.
 func (b *MetricSpecApplyConfiguration) GetObject() (value *ObjectMetricSourceApplyConfiguration, ok bool) {
-	return b.fields.Object, b.fields.Object != nil
+	return b.Object, b.Object != nil
 }
 
 // SetPods sets the Pods field in the declarative configuration to the given value.
 func (b *MetricSpecApplyConfiguration) SetPods(value *PodsMetricSourceApplyConfiguration) *MetricSpecApplyConfiguration {
-	b.fields.Pods = value
+	b.Pods = value
 	return b
 }
 
 // RemovePods removes the Pods field from the declarative configuration.
 func (b *MetricSpecApplyConfiguration) RemovePods() *MetricSpecApplyConfiguration {
-	b.fields.Pods = nil
+	b.Pods = nil
 	return b
 }
 
 // GetPods gets the Pods field from the declarative configuration.
 func (b *MetricSpecApplyConfiguration) GetPods() (value *PodsMetricSourceApplyConfiguration, ok bool) {
-	return b.fields.Pods, b.fields.Pods != nil
+	return b.Pods, b.Pods != nil
 }
 
 // SetResource sets the Resource field in the declarative configuration to the given value.
 func (b *MetricSpecApplyConfiguration) SetResource(value *ResourceMetricSourceApplyConfiguration) *MetricSpecApplyConfiguration {
-	b.fields.Resource = value
+	b.Resource = value
 	return b
 }
 
 // RemoveResource removes the Resource field from the declarative configuration.
 func (b *MetricSpecApplyConfiguration) RemoveResource() *MetricSpecApplyConfiguration {
-	b.fields.Resource = nil
+	b.Resource = nil
 	return b
 }
 
 // GetResource gets the Resource field from the declarative configuration.
 func (b *MetricSpecApplyConfiguration) GetResource() (value *ResourceMetricSourceApplyConfiguration, ok bool) {
-	return b.fields.Resource, b.fields.Resource != nil
+	return b.Resource, b.Resource != nil
 }
 
 // SetContainerResource sets the ContainerResource field in the declarative configuration to the given value.
 func (b *MetricSpecApplyConfiguration) SetContainerResource(value *ContainerResourceMetricSourceApplyConfiguration) *MetricSpecApplyConfiguration {
-	b.fields.ContainerResource = value
+	b.ContainerResource = value
 	return b
 }
 
 // RemoveContainerResource removes the ContainerResource field from the declarative configuration.
 func (b *MetricSpecApplyConfiguration) RemoveContainerResource() *MetricSpecApplyConfiguration {
-	b.fields.ContainerResource = nil
+	b.ContainerResource = nil
 	return b
 }
 
 // GetContainerResource gets the ContainerResource field from the declarative configuration.
 func (b *MetricSpecApplyConfiguration) GetContainerResource() (value *ContainerResourceMetricSourceApplyConfiguration, ok bool) {
-	return b.fields.ContainerResource, b.fields.ContainerResource != nil
+	return b.ContainerResource, b.ContainerResource != nil
 }
 
 // SetExternal sets the External field in the declarative configuration to the given value.
 func (b *MetricSpecApplyConfiguration) SetExternal(value *ExternalMetricSourceApplyConfiguration) *MetricSpecApplyConfiguration {
-	b.fields.External = value
+	b.External = value
 	return b
 }
 
 // RemoveExternal removes the External field from the declarative configuration.
 func (b *MetricSpecApplyConfiguration) RemoveExternal() *MetricSpecApplyConfiguration {
-	b.fields.External = nil
+	b.External = nil
 	return b
 }
 
 // GetExternal gets the External field from the declarative configuration.
 func (b *MetricSpecApplyConfiguration) GetExternal() (value *ExternalMetricSourceApplyConfiguration, ok bool) {
-	return b.fields.External, b.fields.External != nil
-}
-
-// ToUnstructured converts MetricSpecApplyConfiguration to unstructured.
-func (b *MetricSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to MetricSpecApplyConfiguration, replacing the contents
-// of MetricSpecApplyConfiguration.
-func (b *MetricSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &metricSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals MetricSpecApplyConfiguration to JSON.
-func (b *MetricSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into MetricSpecApplyConfiguration, replacing the contents of
-// MetricSpecApplyConfiguration.
-func (b *MetricSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.External, b.External != nil
 }
 
 // MetricSpecList represents a listAlias of MetricSpecApplyConfiguration.
@@ -203,8 +149,3 @@ type MetricSpecList []*MetricSpecApplyConfiguration
 
 // MetricSpecList represents a map of MetricSpecApplyConfiguration.
 type MetricSpecMap map[string]MetricSpecApplyConfiguration
-
-func (b *MetricSpecApplyConfiguration) preMarshal() {
-}
-func (b *MetricSpecApplyConfiguration) postUnmarshal() {
-}

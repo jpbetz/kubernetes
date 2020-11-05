@@ -18,16 +18,12 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // EndpointSubsetApplyConfiguration represents an declarative configuration of the EndpointSubset type for use
 // with apply.
 type EndpointSubsetApplyConfiguration struct {
-	fields endpointSubsetFields
+	Addresses         *EndpointAddressList `json:"addresses,omitempty"`
+	NotReadyAddresses *EndpointAddressList `json:"notReadyAddresses,omitempty"`
+	Ports             *EndpointPortList    `json:"ports,omitempty"`
 }
 
 // EndpointSubsetApplyConfiguration constructs an declarative configuration of the EndpointSubset type for use with
@@ -36,32 +32,21 @@ func EndpointSubset() *EndpointSubsetApplyConfiguration {
 	return &EndpointSubsetApplyConfiguration{}
 }
 
-// endpointSubsetFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in EndpointSubsetApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type endpointSubsetFields struct {
-	Addresses         *EndpointAddressList `json:"addresses,omitempty"`
-	NotReadyAddresses *EndpointAddressList `json:"notReadyAddresses,omitempty"`
-	Ports             *EndpointPortList    `json:"ports,omitempty"`
-}
-
 // SetAddresses sets the Addresses field in the declarative configuration to the given value.
 func (b *EndpointSubsetApplyConfiguration) SetAddresses(value EndpointAddressList) *EndpointSubsetApplyConfiguration {
-	b.fields.Addresses = &value
+	b.Addresses = &value
 	return b
 }
 
 // RemoveAddresses removes the Addresses field from the declarative configuration.
 func (b *EndpointSubsetApplyConfiguration) RemoveAddresses() *EndpointSubsetApplyConfiguration {
-	b.fields.Addresses = nil
+	b.Addresses = nil
 	return b
 }
 
 // GetAddresses gets the Addresses field from the declarative configuration.
 func (b *EndpointSubsetApplyConfiguration) GetAddresses() (value EndpointAddressList, ok bool) {
-	if v := b.fields.Addresses; v != nil {
+	if v := b.Addresses; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,19 +54,19 @@ func (b *EndpointSubsetApplyConfiguration) GetAddresses() (value EndpointAddress
 
 // SetNotReadyAddresses sets the NotReadyAddresses field in the declarative configuration to the given value.
 func (b *EndpointSubsetApplyConfiguration) SetNotReadyAddresses(value EndpointAddressList) *EndpointSubsetApplyConfiguration {
-	b.fields.NotReadyAddresses = &value
+	b.NotReadyAddresses = &value
 	return b
 }
 
 // RemoveNotReadyAddresses removes the NotReadyAddresses field from the declarative configuration.
 func (b *EndpointSubsetApplyConfiguration) RemoveNotReadyAddresses() *EndpointSubsetApplyConfiguration {
-	b.fields.NotReadyAddresses = nil
+	b.NotReadyAddresses = nil
 	return b
 }
 
 // GetNotReadyAddresses gets the NotReadyAddresses field from the declarative configuration.
 func (b *EndpointSubsetApplyConfiguration) GetNotReadyAddresses() (value EndpointAddressList, ok bool) {
-	if v := b.fields.NotReadyAddresses; v != nil {
+	if v := b.NotReadyAddresses; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -89,64 +74,22 @@ func (b *EndpointSubsetApplyConfiguration) GetNotReadyAddresses() (value Endpoin
 
 // SetPorts sets the Ports field in the declarative configuration to the given value.
 func (b *EndpointSubsetApplyConfiguration) SetPorts(value EndpointPortList) *EndpointSubsetApplyConfiguration {
-	b.fields.Ports = &value
+	b.Ports = &value
 	return b
 }
 
 // RemovePorts removes the Ports field from the declarative configuration.
 func (b *EndpointSubsetApplyConfiguration) RemovePorts() *EndpointSubsetApplyConfiguration {
-	b.fields.Ports = nil
+	b.Ports = nil
 	return b
 }
 
 // GetPorts gets the Ports field from the declarative configuration.
 func (b *EndpointSubsetApplyConfiguration) GetPorts() (value EndpointPortList, ok bool) {
-	if v := b.fields.Ports; v != nil {
+	if v := b.Ports; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts EndpointSubsetApplyConfiguration to unstructured.
-func (b *EndpointSubsetApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to EndpointSubsetApplyConfiguration, replacing the contents
-// of EndpointSubsetApplyConfiguration.
-func (b *EndpointSubsetApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &endpointSubsetFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals EndpointSubsetApplyConfiguration to JSON.
-func (b *EndpointSubsetApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into EndpointSubsetApplyConfiguration, replacing the contents of
-// EndpointSubsetApplyConfiguration.
-func (b *EndpointSubsetApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // EndpointSubsetList represents a listAlias of EndpointSubsetApplyConfiguration.
@@ -154,8 +97,3 @@ type EndpointSubsetList []*EndpointSubsetApplyConfiguration
 
 // EndpointSubsetList represents a map of EndpointSubsetApplyConfiguration.
 type EndpointSubsetMap map[string]EndpointSubsetApplyConfiguration
-
-func (b *EndpointSubsetApplyConfiguration) preMarshal() {
-}
-func (b *EndpointSubsetApplyConfiguration) postUnmarshal() {
-}

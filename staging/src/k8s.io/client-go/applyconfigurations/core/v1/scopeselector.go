@@ -18,16 +18,10 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ScopeSelectorApplyConfiguration represents an declarative configuration of the ScopeSelector type for use
 // with apply.
 type ScopeSelectorApplyConfiguration struct {
-	fields scopeSelectorFields
+	MatchExpressions *ScopedResourceSelectorRequirementList `json:"matchExpressions,omitempty"`
 }
 
 // ScopeSelectorApplyConfiguration constructs an declarative configuration of the ScopeSelector type for use with
@@ -36,75 +30,24 @@ func ScopeSelector() *ScopeSelectorApplyConfiguration {
 	return &ScopeSelectorApplyConfiguration{}
 }
 
-// scopeSelectorFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ScopeSelectorApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type scopeSelectorFields struct {
-	MatchExpressions *ScopedResourceSelectorRequirementList `json:"matchExpressions,omitempty"`
-}
-
 // SetMatchExpressions sets the MatchExpressions field in the declarative configuration to the given value.
 func (b *ScopeSelectorApplyConfiguration) SetMatchExpressions(value ScopedResourceSelectorRequirementList) *ScopeSelectorApplyConfiguration {
-	b.fields.MatchExpressions = &value
+	b.MatchExpressions = &value
 	return b
 }
 
 // RemoveMatchExpressions removes the MatchExpressions field from the declarative configuration.
 func (b *ScopeSelectorApplyConfiguration) RemoveMatchExpressions() *ScopeSelectorApplyConfiguration {
-	b.fields.MatchExpressions = nil
+	b.MatchExpressions = nil
 	return b
 }
 
 // GetMatchExpressions gets the MatchExpressions field from the declarative configuration.
 func (b *ScopeSelectorApplyConfiguration) GetMatchExpressions() (value ScopedResourceSelectorRequirementList, ok bool) {
-	if v := b.fields.MatchExpressions; v != nil {
+	if v := b.MatchExpressions; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ScopeSelectorApplyConfiguration to unstructured.
-func (b *ScopeSelectorApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ScopeSelectorApplyConfiguration, replacing the contents
-// of ScopeSelectorApplyConfiguration.
-func (b *ScopeSelectorApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &scopeSelectorFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ScopeSelectorApplyConfiguration to JSON.
-func (b *ScopeSelectorApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ScopeSelectorApplyConfiguration, replacing the contents of
-// ScopeSelectorApplyConfiguration.
-func (b *ScopeSelectorApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ScopeSelectorList represents a listAlias of ScopeSelectorApplyConfiguration.
@@ -112,8 +55,3 @@ type ScopeSelectorList []*ScopeSelectorApplyConfiguration
 
 // ScopeSelectorList represents a map of ScopeSelectorApplyConfiguration.
 type ScopeSelectorMap map[string]ScopeSelectorApplyConfiguration
-
-func (b *ScopeSelectorApplyConfiguration) preMarshal() {
-}
-func (b *ScopeSelectorApplyConfiguration) postUnmarshal() {
-}

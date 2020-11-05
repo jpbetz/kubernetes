@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ServiceAccountSubjectApplyConfiguration represents an declarative configuration of the ServiceAccountSubject type for use
 // with apply.
 type ServiceAccountSubjectApplyConfiguration struct {
-	fields serviceAccountSubjectFields
+	Namespace *string `json:"namespace,omitempty"`
+	Name      *string `json:"name,omitempty"`
 }
 
 // ServiceAccountSubjectApplyConfiguration constructs an declarative configuration of the ServiceAccountSubject type for use with
@@ -36,31 +31,21 @@ func ServiceAccountSubject() *ServiceAccountSubjectApplyConfiguration {
 	return &ServiceAccountSubjectApplyConfiguration{}
 }
 
-// serviceAccountSubjectFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ServiceAccountSubjectApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type serviceAccountSubjectFields struct {
-	Namespace *string `json:"namespace,omitempty"`
-	Name      *string `json:"name,omitempty"`
-}
-
 // SetNamespace sets the Namespace field in the declarative configuration to the given value.
 func (b *ServiceAccountSubjectApplyConfiguration) SetNamespace(value string) *ServiceAccountSubjectApplyConfiguration {
-	b.fields.Namespace = &value
+	b.Namespace = &value
 	return b
 }
 
 // RemoveNamespace removes the Namespace field from the declarative configuration.
 func (b *ServiceAccountSubjectApplyConfiguration) RemoveNamespace() *ServiceAccountSubjectApplyConfiguration {
-	b.fields.Namespace = nil
+	b.Namespace = nil
 	return b
 }
 
 // GetNamespace gets the Namespace field from the declarative configuration.
 func (b *ServiceAccountSubjectApplyConfiguration) GetNamespace() (value string, ok bool) {
-	if v := b.fields.Namespace; v != nil {
+	if v := b.Namespace; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *ServiceAccountSubjectApplyConfiguration) GetNamespace() (value string, 
 
 // SetName sets the Name field in the declarative configuration to the given value.
 func (b *ServiceAccountSubjectApplyConfiguration) SetName(value string) *ServiceAccountSubjectApplyConfiguration {
-	b.fields.Name = &value
+	b.Name = &value
 	return b
 }
 
 // RemoveName removes the Name field from the declarative configuration.
 func (b *ServiceAccountSubjectApplyConfiguration) RemoveName() *ServiceAccountSubjectApplyConfiguration {
-	b.fields.Name = nil
+	b.Name = nil
 	return b
 }
 
 // GetName gets the Name field from the declarative configuration.
 func (b *ServiceAccountSubjectApplyConfiguration) GetName() (value string, ok bool) {
-	if v := b.fields.Name; v != nil {
+	if v := b.Name; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ServiceAccountSubjectApplyConfiguration to unstructured.
-func (b *ServiceAccountSubjectApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ServiceAccountSubjectApplyConfiguration, replacing the contents
-// of ServiceAccountSubjectApplyConfiguration.
-func (b *ServiceAccountSubjectApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &serviceAccountSubjectFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ServiceAccountSubjectApplyConfiguration to JSON.
-func (b *ServiceAccountSubjectApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ServiceAccountSubjectApplyConfiguration, replacing the contents of
-// ServiceAccountSubjectApplyConfiguration.
-func (b *ServiceAccountSubjectApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ServiceAccountSubjectList represents a listAlias of ServiceAccountSubjectApplyConfiguration.
@@ -133,8 +76,3 @@ type ServiceAccountSubjectList []*ServiceAccountSubjectApplyConfiguration
 
 // ServiceAccountSubjectList represents a map of ServiceAccountSubjectApplyConfiguration.
 type ServiceAccountSubjectMap map[string]ServiceAccountSubjectApplyConfiguration
-
-func (b *ServiceAccountSubjectApplyConfiguration) preMarshal() {
-}
-func (b *ServiceAccountSubjectApplyConfiguration) postUnmarshal() {
-}

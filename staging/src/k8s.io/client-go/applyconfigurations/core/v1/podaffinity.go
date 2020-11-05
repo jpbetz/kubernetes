@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // PodAffinityApplyConfiguration represents an declarative configuration of the PodAffinity type for use
 // with apply.
 type PodAffinityApplyConfiguration struct {
-	fields podAffinityFields
+	RequiredDuringSchedulingIgnoredDuringExecution  *PodAffinityTermList         `json:"requiredDuringSchedulingIgnoredDuringExecution,omitempty"`
+	PreferredDuringSchedulingIgnoredDuringExecution *WeightedPodAffinityTermList `json:"preferredDuringSchedulingIgnoredDuringExecution,omitempty"`
 }
 
 // PodAffinityApplyConfiguration constructs an declarative configuration of the PodAffinity type for use with
@@ -36,31 +31,21 @@ func PodAffinity() *PodAffinityApplyConfiguration {
 	return &PodAffinityApplyConfiguration{}
 }
 
-// podAffinityFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PodAffinityApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type podAffinityFields struct {
-	RequiredDuringSchedulingIgnoredDuringExecution  *PodAffinityTermList         `json:"requiredDuringSchedulingIgnoredDuringExecution,omitempty"`
-	PreferredDuringSchedulingIgnoredDuringExecution *WeightedPodAffinityTermList `json:"preferredDuringSchedulingIgnoredDuringExecution,omitempty"`
-}
-
 // SetRequiredDuringSchedulingIgnoredDuringExecution sets the RequiredDuringSchedulingIgnoredDuringExecution field in the declarative configuration to the given value.
 func (b *PodAffinityApplyConfiguration) SetRequiredDuringSchedulingIgnoredDuringExecution(value PodAffinityTermList) *PodAffinityApplyConfiguration {
-	b.fields.RequiredDuringSchedulingIgnoredDuringExecution = &value
+	b.RequiredDuringSchedulingIgnoredDuringExecution = &value
 	return b
 }
 
 // RemoveRequiredDuringSchedulingIgnoredDuringExecution removes the RequiredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
 func (b *PodAffinityApplyConfiguration) RemoveRequiredDuringSchedulingIgnoredDuringExecution() *PodAffinityApplyConfiguration {
-	b.fields.RequiredDuringSchedulingIgnoredDuringExecution = nil
+	b.RequiredDuringSchedulingIgnoredDuringExecution = nil
 	return b
 }
 
 // GetRequiredDuringSchedulingIgnoredDuringExecution gets the RequiredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
 func (b *PodAffinityApplyConfiguration) GetRequiredDuringSchedulingIgnoredDuringExecution() (value PodAffinityTermList, ok bool) {
-	if v := b.fields.RequiredDuringSchedulingIgnoredDuringExecution; v != nil {
+	if v := b.RequiredDuringSchedulingIgnoredDuringExecution; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *PodAffinityApplyConfiguration) GetRequiredDuringSchedulingIgnoredDuring
 
 // SetPreferredDuringSchedulingIgnoredDuringExecution sets the PreferredDuringSchedulingIgnoredDuringExecution field in the declarative configuration to the given value.
 func (b *PodAffinityApplyConfiguration) SetPreferredDuringSchedulingIgnoredDuringExecution(value WeightedPodAffinityTermList) *PodAffinityApplyConfiguration {
-	b.fields.PreferredDuringSchedulingIgnoredDuringExecution = &value
+	b.PreferredDuringSchedulingIgnoredDuringExecution = &value
 	return b
 }
 
 // RemovePreferredDuringSchedulingIgnoredDuringExecution removes the PreferredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
 func (b *PodAffinityApplyConfiguration) RemovePreferredDuringSchedulingIgnoredDuringExecution() *PodAffinityApplyConfiguration {
-	b.fields.PreferredDuringSchedulingIgnoredDuringExecution = nil
+	b.PreferredDuringSchedulingIgnoredDuringExecution = nil
 	return b
 }
 
 // GetPreferredDuringSchedulingIgnoredDuringExecution gets the PreferredDuringSchedulingIgnoredDuringExecution field from the declarative configuration.
 func (b *PodAffinityApplyConfiguration) GetPreferredDuringSchedulingIgnoredDuringExecution() (value WeightedPodAffinityTermList, ok bool) {
-	if v := b.fields.PreferredDuringSchedulingIgnoredDuringExecution; v != nil {
+	if v := b.PreferredDuringSchedulingIgnoredDuringExecution; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts PodAffinityApplyConfiguration to unstructured.
-func (b *PodAffinityApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PodAffinityApplyConfiguration, replacing the contents
-// of PodAffinityApplyConfiguration.
-func (b *PodAffinityApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &podAffinityFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PodAffinityApplyConfiguration to JSON.
-func (b *PodAffinityApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PodAffinityApplyConfiguration, replacing the contents of
-// PodAffinityApplyConfiguration.
-func (b *PodAffinityApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // PodAffinityList represents a listAlias of PodAffinityApplyConfiguration.
@@ -133,8 +76,3 @@ type PodAffinityList []*PodAffinityApplyConfiguration
 
 // PodAffinityList represents a map of PodAffinityApplyConfiguration.
 type PodAffinityMap map[string]PodAffinityApplyConfiguration
-
-func (b *PodAffinityApplyConfiguration) preMarshal() {
-}
-func (b *PodAffinityApplyConfiguration) postUnmarshal() {
-}

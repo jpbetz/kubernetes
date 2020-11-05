@@ -18,16 +18,12 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // PortworxVolumeSourceApplyConfiguration represents an declarative configuration of the PortworxVolumeSource type for use
 // with apply.
 type PortworxVolumeSourceApplyConfiguration struct {
-	fields portworxVolumeSourceFields
+	VolumeID *string `json:"volumeID,omitempty"`
+	FSType   *string `json:"fsType,omitempty"`
+	ReadOnly *bool   `json:"readOnly,omitempty"`
 }
 
 // PortworxVolumeSourceApplyConfiguration constructs an declarative configuration of the PortworxVolumeSource type for use with
@@ -36,32 +32,21 @@ func PortworxVolumeSource() *PortworxVolumeSourceApplyConfiguration {
 	return &PortworxVolumeSourceApplyConfiguration{}
 }
 
-// portworxVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in PortworxVolumeSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type portworxVolumeSourceFields struct {
-	VolumeID *string `json:"volumeID,omitempty"`
-	FSType   *string `json:"fsType,omitempty"`
-	ReadOnly *bool   `json:"readOnly,omitempty"`
-}
-
 // SetVolumeID sets the VolumeID field in the declarative configuration to the given value.
 func (b *PortworxVolumeSourceApplyConfiguration) SetVolumeID(value string) *PortworxVolumeSourceApplyConfiguration {
-	b.fields.VolumeID = &value
+	b.VolumeID = &value
 	return b
 }
 
 // RemoveVolumeID removes the VolumeID field from the declarative configuration.
 func (b *PortworxVolumeSourceApplyConfiguration) RemoveVolumeID() *PortworxVolumeSourceApplyConfiguration {
-	b.fields.VolumeID = nil
+	b.VolumeID = nil
 	return b
 }
 
 // GetVolumeID gets the VolumeID field from the declarative configuration.
 func (b *PortworxVolumeSourceApplyConfiguration) GetVolumeID() (value string, ok bool) {
-	if v := b.fields.VolumeID; v != nil {
+	if v := b.VolumeID; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,19 +54,19 @@ func (b *PortworxVolumeSourceApplyConfiguration) GetVolumeID() (value string, ok
 
 // SetFSType sets the FSType field in the declarative configuration to the given value.
 func (b *PortworxVolumeSourceApplyConfiguration) SetFSType(value string) *PortworxVolumeSourceApplyConfiguration {
-	b.fields.FSType = &value
+	b.FSType = &value
 	return b
 }
 
 // RemoveFSType removes the FSType field from the declarative configuration.
 func (b *PortworxVolumeSourceApplyConfiguration) RemoveFSType() *PortworxVolumeSourceApplyConfiguration {
-	b.fields.FSType = nil
+	b.FSType = nil
 	return b
 }
 
 // GetFSType gets the FSType field from the declarative configuration.
 func (b *PortworxVolumeSourceApplyConfiguration) GetFSType() (value string, ok bool) {
-	if v := b.fields.FSType; v != nil {
+	if v := b.FSType; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -89,64 +74,22 @@ func (b *PortworxVolumeSourceApplyConfiguration) GetFSType() (value string, ok b
 
 // SetReadOnly sets the ReadOnly field in the declarative configuration to the given value.
 func (b *PortworxVolumeSourceApplyConfiguration) SetReadOnly(value bool) *PortworxVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = &value
+	b.ReadOnly = &value
 	return b
 }
 
 // RemoveReadOnly removes the ReadOnly field from the declarative configuration.
 func (b *PortworxVolumeSourceApplyConfiguration) RemoveReadOnly() *PortworxVolumeSourceApplyConfiguration {
-	b.fields.ReadOnly = nil
+	b.ReadOnly = nil
 	return b
 }
 
 // GetReadOnly gets the ReadOnly field from the declarative configuration.
 func (b *PortworxVolumeSourceApplyConfiguration) GetReadOnly() (value bool, ok bool) {
-	if v := b.fields.ReadOnly; v != nil {
+	if v := b.ReadOnly; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts PortworxVolumeSourceApplyConfiguration to unstructured.
-func (b *PortworxVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to PortworxVolumeSourceApplyConfiguration, replacing the contents
-// of PortworxVolumeSourceApplyConfiguration.
-func (b *PortworxVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &portworxVolumeSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals PortworxVolumeSourceApplyConfiguration to JSON.
-func (b *PortworxVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into PortworxVolumeSourceApplyConfiguration, replacing the contents of
-// PortworxVolumeSourceApplyConfiguration.
-func (b *PortworxVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // PortworxVolumeSourceList represents a listAlias of PortworxVolumeSourceApplyConfiguration.
@@ -154,8 +97,3 @@ type PortworxVolumeSourceList []*PortworxVolumeSourceApplyConfiguration
 
 // PortworxVolumeSourceList represents a map of PortworxVolumeSourceApplyConfiguration.
 type PortworxVolumeSourceMap map[string]PortworxVolumeSourceApplyConfiguration
-
-func (b *PortworxVolumeSourceApplyConfiguration) preMarshal() {
-}
-func (b *PortworxVolumeSourceApplyConfiguration) postUnmarshal() {
-}

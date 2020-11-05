@@ -19,16 +19,14 @@ limitations under the License.
 package v1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/core/v1"
 )
 
 // IngressClassSpecApplyConfiguration represents an declarative configuration of the IngressClassSpec type for use
 // with apply.
 type IngressClassSpecApplyConfiguration struct {
-	fields ingressClassSpecFields
+	Controller *string                                         `json:"controller,omitempty"`
+	Parameters *v1.TypedLocalObjectReferenceApplyConfiguration `json:"parameters,omitempty"`
 }
 
 // IngressClassSpecApplyConfiguration constructs an declarative configuration of the IngressClassSpec type for use with
@@ -37,31 +35,21 @@ func IngressClassSpec() *IngressClassSpecApplyConfiguration {
 	return &IngressClassSpecApplyConfiguration{}
 }
 
-// ingressClassSpecFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in IngressClassSpecApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type ingressClassSpecFields struct {
-	Controller *string                                         `json:"controller,omitempty"`
-	Parameters *v1.TypedLocalObjectReferenceApplyConfiguration `json:"parameters,omitempty"`
-}
-
 // SetController sets the Controller field in the declarative configuration to the given value.
 func (b *IngressClassSpecApplyConfiguration) SetController(value string) *IngressClassSpecApplyConfiguration {
-	b.fields.Controller = &value
+	b.Controller = &value
 	return b
 }
 
 // RemoveController removes the Controller field from the declarative configuration.
 func (b *IngressClassSpecApplyConfiguration) RemoveController() *IngressClassSpecApplyConfiguration {
-	b.fields.Controller = nil
+	b.Controller = nil
 	return b
 }
 
 // GetController gets the Controller field from the declarative configuration.
 func (b *IngressClassSpecApplyConfiguration) GetController() (value string, ok bool) {
-	if v := b.fields.Controller; v != nil {
+	if v := b.Controller; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,61 +57,19 @@ func (b *IngressClassSpecApplyConfiguration) GetController() (value string, ok b
 
 // SetParameters sets the Parameters field in the declarative configuration to the given value.
 func (b *IngressClassSpecApplyConfiguration) SetParameters(value *v1.TypedLocalObjectReferenceApplyConfiguration) *IngressClassSpecApplyConfiguration {
-	b.fields.Parameters = value
+	b.Parameters = value
 	return b
 }
 
 // RemoveParameters removes the Parameters field from the declarative configuration.
 func (b *IngressClassSpecApplyConfiguration) RemoveParameters() *IngressClassSpecApplyConfiguration {
-	b.fields.Parameters = nil
+	b.Parameters = nil
 	return b
 }
 
 // GetParameters gets the Parameters field from the declarative configuration.
 func (b *IngressClassSpecApplyConfiguration) GetParameters() (value *v1.TypedLocalObjectReferenceApplyConfiguration, ok bool) {
-	return b.fields.Parameters, b.fields.Parameters != nil
-}
-
-// ToUnstructured converts IngressClassSpecApplyConfiguration to unstructured.
-func (b *IngressClassSpecApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to IngressClassSpecApplyConfiguration, replacing the contents
-// of IngressClassSpecApplyConfiguration.
-func (b *IngressClassSpecApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &ingressClassSpecFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals IngressClassSpecApplyConfiguration to JSON.
-func (b *IngressClassSpecApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into IngressClassSpecApplyConfiguration, replacing the contents of
-// IngressClassSpecApplyConfiguration.
-func (b *IngressClassSpecApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
+	return b.Parameters, b.Parameters != nil
 }
 
 // IngressClassSpecList represents a listAlias of IngressClassSpecApplyConfiguration.
@@ -131,8 +77,3 @@ type IngressClassSpecList []*IngressClassSpecApplyConfiguration
 
 // IngressClassSpecList represents a map of IngressClassSpecApplyConfiguration.
 type IngressClassSpecMap map[string]IngressClassSpecApplyConfiguration
-
-func (b *IngressClassSpecApplyConfiguration) preMarshal() {
-}
-func (b *IngressClassSpecApplyConfiguration) postUnmarshal() {
-}

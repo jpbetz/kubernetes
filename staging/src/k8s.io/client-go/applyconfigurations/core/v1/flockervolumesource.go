@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // FlockerVolumeSourceApplyConfiguration represents an declarative configuration of the FlockerVolumeSource type for use
 // with apply.
 type FlockerVolumeSourceApplyConfiguration struct {
-	fields flockerVolumeSourceFields
+	DatasetName *string `json:"datasetName,omitempty"`
+	DatasetUUID *string `json:"datasetUUID,omitempty"`
 }
 
 // FlockerVolumeSourceApplyConfiguration constructs an declarative configuration of the FlockerVolumeSource type for use with
@@ -36,31 +31,21 @@ func FlockerVolumeSource() *FlockerVolumeSourceApplyConfiguration {
 	return &FlockerVolumeSourceApplyConfiguration{}
 }
 
-// flockerVolumeSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in FlockerVolumeSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type flockerVolumeSourceFields struct {
-	DatasetName *string `json:"datasetName,omitempty"`
-	DatasetUUID *string `json:"datasetUUID,omitempty"`
-}
-
 // SetDatasetName sets the DatasetName field in the declarative configuration to the given value.
 func (b *FlockerVolumeSourceApplyConfiguration) SetDatasetName(value string) *FlockerVolumeSourceApplyConfiguration {
-	b.fields.DatasetName = &value
+	b.DatasetName = &value
 	return b
 }
 
 // RemoveDatasetName removes the DatasetName field from the declarative configuration.
 func (b *FlockerVolumeSourceApplyConfiguration) RemoveDatasetName() *FlockerVolumeSourceApplyConfiguration {
-	b.fields.DatasetName = nil
+	b.DatasetName = nil
 	return b
 }
 
 // GetDatasetName gets the DatasetName field from the declarative configuration.
 func (b *FlockerVolumeSourceApplyConfiguration) GetDatasetName() (value string, ok bool) {
-	if v := b.fields.DatasetName; v != nil {
+	if v := b.DatasetName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *FlockerVolumeSourceApplyConfiguration) GetDatasetName() (value string, 
 
 // SetDatasetUUID sets the DatasetUUID field in the declarative configuration to the given value.
 func (b *FlockerVolumeSourceApplyConfiguration) SetDatasetUUID(value string) *FlockerVolumeSourceApplyConfiguration {
-	b.fields.DatasetUUID = &value
+	b.DatasetUUID = &value
 	return b
 }
 
 // RemoveDatasetUUID removes the DatasetUUID field from the declarative configuration.
 func (b *FlockerVolumeSourceApplyConfiguration) RemoveDatasetUUID() *FlockerVolumeSourceApplyConfiguration {
-	b.fields.DatasetUUID = nil
+	b.DatasetUUID = nil
 	return b
 }
 
 // GetDatasetUUID gets the DatasetUUID field from the declarative configuration.
 func (b *FlockerVolumeSourceApplyConfiguration) GetDatasetUUID() (value string, ok bool) {
-	if v := b.fields.DatasetUUID; v != nil {
+	if v := b.DatasetUUID; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts FlockerVolumeSourceApplyConfiguration to unstructured.
-func (b *FlockerVolumeSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to FlockerVolumeSourceApplyConfiguration, replacing the contents
-// of FlockerVolumeSourceApplyConfiguration.
-func (b *FlockerVolumeSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &flockerVolumeSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals FlockerVolumeSourceApplyConfiguration to JSON.
-func (b *FlockerVolumeSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into FlockerVolumeSourceApplyConfiguration, replacing the contents of
-// FlockerVolumeSourceApplyConfiguration.
-func (b *FlockerVolumeSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // FlockerVolumeSourceList represents a listAlias of FlockerVolumeSourceApplyConfiguration.
@@ -133,8 +76,3 @@ type FlockerVolumeSourceList []*FlockerVolumeSourceApplyConfiguration
 
 // FlockerVolumeSourceList represents a map of FlockerVolumeSourceApplyConfiguration.
 type FlockerVolumeSourceMap map[string]FlockerVolumeSourceApplyConfiguration
-
-func (b *FlockerVolumeSourceApplyConfiguration) preMarshal() {
-}
-func (b *FlockerVolumeSourceApplyConfiguration) postUnmarshal() {
-}

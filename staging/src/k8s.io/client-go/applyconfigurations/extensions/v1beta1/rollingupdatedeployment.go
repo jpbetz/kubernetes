@@ -19,16 +19,14 @@ limitations under the License.
 package v1beta1
 
 import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	intstr "k8s.io/apimachinery/pkg/util/intstr"
 )
 
 // RollingUpdateDeploymentApplyConfiguration represents an declarative configuration of the RollingUpdateDeployment type for use
 // with apply.
 type RollingUpdateDeploymentApplyConfiguration struct {
-	fields rollingUpdateDeploymentFields
+	MaxUnavailable *intstr.IntOrString `json:"maxUnavailable,omitempty"`
+	MaxSurge       *intstr.IntOrString `json:"maxSurge,omitempty"`
 }
 
 // RollingUpdateDeploymentApplyConfiguration constructs an declarative configuration of the RollingUpdateDeployment type for use with
@@ -37,31 +35,21 @@ func RollingUpdateDeployment() *RollingUpdateDeploymentApplyConfiguration {
 	return &RollingUpdateDeploymentApplyConfiguration{}
 }
 
-// rollingUpdateDeploymentFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in RollingUpdateDeploymentApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type rollingUpdateDeploymentFields struct {
-	MaxUnavailable *intstr.IntOrString `json:"maxUnavailable,omitempty"`
-	MaxSurge       *intstr.IntOrString `json:"maxSurge,omitempty"`
-}
-
 // SetMaxUnavailable sets the MaxUnavailable field in the declarative configuration to the given value.
 func (b *RollingUpdateDeploymentApplyConfiguration) SetMaxUnavailable(value intstr.IntOrString) *RollingUpdateDeploymentApplyConfiguration {
-	b.fields.MaxUnavailable = &value
+	b.MaxUnavailable = &value
 	return b
 }
 
 // RemoveMaxUnavailable removes the MaxUnavailable field from the declarative configuration.
 func (b *RollingUpdateDeploymentApplyConfiguration) RemoveMaxUnavailable() *RollingUpdateDeploymentApplyConfiguration {
-	b.fields.MaxUnavailable = nil
+	b.MaxUnavailable = nil
 	return b
 }
 
 // GetMaxUnavailable gets the MaxUnavailable field from the declarative configuration.
 func (b *RollingUpdateDeploymentApplyConfiguration) GetMaxUnavailable() (value intstr.IntOrString, ok bool) {
-	if v := b.fields.MaxUnavailable; v != nil {
+	if v := b.MaxUnavailable; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -69,64 +57,22 @@ func (b *RollingUpdateDeploymentApplyConfiguration) GetMaxUnavailable() (value i
 
 // SetMaxSurge sets the MaxSurge field in the declarative configuration to the given value.
 func (b *RollingUpdateDeploymentApplyConfiguration) SetMaxSurge(value intstr.IntOrString) *RollingUpdateDeploymentApplyConfiguration {
-	b.fields.MaxSurge = &value
+	b.MaxSurge = &value
 	return b
 }
 
 // RemoveMaxSurge removes the MaxSurge field from the declarative configuration.
 func (b *RollingUpdateDeploymentApplyConfiguration) RemoveMaxSurge() *RollingUpdateDeploymentApplyConfiguration {
-	b.fields.MaxSurge = nil
+	b.MaxSurge = nil
 	return b
 }
 
 // GetMaxSurge gets the MaxSurge field from the declarative configuration.
 func (b *RollingUpdateDeploymentApplyConfiguration) GetMaxSurge() (value intstr.IntOrString, ok bool) {
-	if v := b.fields.MaxSurge; v != nil {
+	if v := b.MaxSurge; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts RollingUpdateDeploymentApplyConfiguration to unstructured.
-func (b *RollingUpdateDeploymentApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to RollingUpdateDeploymentApplyConfiguration, replacing the contents
-// of RollingUpdateDeploymentApplyConfiguration.
-func (b *RollingUpdateDeploymentApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &rollingUpdateDeploymentFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals RollingUpdateDeploymentApplyConfiguration to JSON.
-func (b *RollingUpdateDeploymentApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into RollingUpdateDeploymentApplyConfiguration, replacing the contents of
-// RollingUpdateDeploymentApplyConfiguration.
-func (b *RollingUpdateDeploymentApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // RollingUpdateDeploymentList represents a listAlias of RollingUpdateDeploymentApplyConfiguration.
@@ -134,8 +80,3 @@ type RollingUpdateDeploymentList []*RollingUpdateDeploymentApplyConfiguration
 
 // RollingUpdateDeploymentList represents a map of RollingUpdateDeploymentApplyConfiguration.
 type RollingUpdateDeploymentMap map[string]RollingUpdateDeploymentApplyConfiguration
-
-func (b *RollingUpdateDeploymentApplyConfiguration) preMarshal() {
-}
-func (b *RollingUpdateDeploymentApplyConfiguration) postUnmarshal() {
-}

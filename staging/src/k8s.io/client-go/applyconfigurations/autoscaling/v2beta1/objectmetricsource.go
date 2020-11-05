@@ -19,17 +19,18 @@ limitations under the License.
 package v2beta1
 
 import (
-	json "encoding/json"
-
 	resource "k8s.io/apimachinery/pkg/api/resource"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // ObjectMetricSourceApplyConfiguration represents an declarative configuration of the ObjectMetricSource type for use
 // with apply.
 type ObjectMetricSourceApplyConfiguration struct {
-	fields objectMetricSourceFields
+	Target       *CrossVersionObjectReferenceApplyConfiguration `json:"target,omitempty"`
+	MetricName   *string                                        `json:"metricName,omitempty"`
+	TargetValue  *resource.Quantity                             `json:"targetValue,omitempty"`
+	Selector     *v1.LabelSelectorApplyConfiguration            `json:"selector,omitempty"`
+	AverageValue *resource.Quantity                             `json:"averageValue,omitempty"`
 }
 
 // ObjectMetricSourceApplyConfiguration constructs an declarative configuration of the ObjectMetricSource type for use with
@@ -38,51 +39,38 @@ func ObjectMetricSource() *ObjectMetricSourceApplyConfiguration {
 	return &ObjectMetricSourceApplyConfiguration{}
 }
 
-// objectMetricSourceFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ObjectMetricSourceApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type objectMetricSourceFields struct {
-	Target       *CrossVersionObjectReferenceApplyConfiguration `json:"target,omitempty"`
-	MetricName   *string                                        `json:"metricName,omitempty"`
-	TargetValue  *resource.Quantity                             `json:"targetValue,omitempty"`
-	Selector     *v1.LabelSelectorApplyConfiguration            `json:"selector,omitempty"`
-	AverageValue *resource.Quantity                             `json:"averageValue,omitempty"`
-}
-
 // SetTarget sets the Target field in the declarative configuration to the given value.
 func (b *ObjectMetricSourceApplyConfiguration) SetTarget(value *CrossVersionObjectReferenceApplyConfiguration) *ObjectMetricSourceApplyConfiguration {
-	b.fields.Target = value
+	b.Target = value
 	return b
 }
 
 // RemoveTarget removes the Target field from the declarative configuration.
 func (b *ObjectMetricSourceApplyConfiguration) RemoveTarget() *ObjectMetricSourceApplyConfiguration {
-	b.fields.Target = nil
+	b.Target = nil
 	return b
 }
 
 // GetTarget gets the Target field from the declarative configuration.
 func (b *ObjectMetricSourceApplyConfiguration) GetTarget() (value *CrossVersionObjectReferenceApplyConfiguration, ok bool) {
-	return b.fields.Target, b.fields.Target != nil
+	return b.Target, b.Target != nil
 }
 
 // SetMetricName sets the MetricName field in the declarative configuration to the given value.
 func (b *ObjectMetricSourceApplyConfiguration) SetMetricName(value string) *ObjectMetricSourceApplyConfiguration {
-	b.fields.MetricName = &value
+	b.MetricName = &value
 	return b
 }
 
 // RemoveMetricName removes the MetricName field from the declarative configuration.
 func (b *ObjectMetricSourceApplyConfiguration) RemoveMetricName() *ObjectMetricSourceApplyConfiguration {
-	b.fields.MetricName = nil
+	b.MetricName = nil
 	return b
 }
 
 // GetMetricName gets the MetricName field from the declarative configuration.
 func (b *ObjectMetricSourceApplyConfiguration) GetMetricName() (value string, ok bool) {
-	if v := b.fields.MetricName; v != nil {
+	if v := b.MetricName; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -90,19 +78,19 @@ func (b *ObjectMetricSourceApplyConfiguration) GetMetricName() (value string, ok
 
 // SetTargetValue sets the TargetValue field in the declarative configuration to the given value.
 func (b *ObjectMetricSourceApplyConfiguration) SetTargetValue(value resource.Quantity) *ObjectMetricSourceApplyConfiguration {
-	b.fields.TargetValue = &value
+	b.TargetValue = &value
 	return b
 }
 
 // RemoveTargetValue removes the TargetValue field from the declarative configuration.
 func (b *ObjectMetricSourceApplyConfiguration) RemoveTargetValue() *ObjectMetricSourceApplyConfiguration {
-	b.fields.TargetValue = nil
+	b.TargetValue = nil
 	return b
 }
 
 // GetTargetValue gets the TargetValue field from the declarative configuration.
 func (b *ObjectMetricSourceApplyConfiguration) GetTargetValue() (value resource.Quantity, ok bool) {
-	if v := b.fields.TargetValue; v != nil {
+	if v := b.TargetValue; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -110,81 +98,39 @@ func (b *ObjectMetricSourceApplyConfiguration) GetTargetValue() (value resource.
 
 // SetSelector sets the Selector field in the declarative configuration to the given value.
 func (b *ObjectMetricSourceApplyConfiguration) SetSelector(value *v1.LabelSelectorApplyConfiguration) *ObjectMetricSourceApplyConfiguration {
-	b.fields.Selector = value
+	b.Selector = value
 	return b
 }
 
 // RemoveSelector removes the Selector field from the declarative configuration.
 func (b *ObjectMetricSourceApplyConfiguration) RemoveSelector() *ObjectMetricSourceApplyConfiguration {
-	b.fields.Selector = nil
+	b.Selector = nil
 	return b
 }
 
 // GetSelector gets the Selector field from the declarative configuration.
 func (b *ObjectMetricSourceApplyConfiguration) GetSelector() (value *v1.LabelSelectorApplyConfiguration, ok bool) {
-	return b.fields.Selector, b.fields.Selector != nil
+	return b.Selector, b.Selector != nil
 }
 
 // SetAverageValue sets the AverageValue field in the declarative configuration to the given value.
 func (b *ObjectMetricSourceApplyConfiguration) SetAverageValue(value resource.Quantity) *ObjectMetricSourceApplyConfiguration {
-	b.fields.AverageValue = &value
+	b.AverageValue = &value
 	return b
 }
 
 // RemoveAverageValue removes the AverageValue field from the declarative configuration.
 func (b *ObjectMetricSourceApplyConfiguration) RemoveAverageValue() *ObjectMetricSourceApplyConfiguration {
-	b.fields.AverageValue = nil
+	b.AverageValue = nil
 	return b
 }
 
 // GetAverageValue gets the AverageValue field from the declarative configuration.
 func (b *ObjectMetricSourceApplyConfiguration) GetAverageValue() (value resource.Quantity, ok bool) {
-	if v := b.fields.AverageValue; v != nil {
+	if v := b.AverageValue; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ObjectMetricSourceApplyConfiguration to unstructured.
-func (b *ObjectMetricSourceApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ObjectMetricSourceApplyConfiguration, replacing the contents
-// of ObjectMetricSourceApplyConfiguration.
-func (b *ObjectMetricSourceApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &objectMetricSourceFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ObjectMetricSourceApplyConfiguration to JSON.
-func (b *ObjectMetricSourceApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ObjectMetricSourceApplyConfiguration, replacing the contents of
-// ObjectMetricSourceApplyConfiguration.
-func (b *ObjectMetricSourceApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ObjectMetricSourceList represents a listAlias of ObjectMetricSourceApplyConfiguration.
@@ -192,8 +138,3 @@ type ObjectMetricSourceList []*ObjectMetricSourceApplyConfiguration
 
 // ObjectMetricSourceList represents a map of ObjectMetricSourceApplyConfiguration.
 type ObjectMetricSourceMap map[string]ObjectMetricSourceApplyConfiguration
-
-func (b *ObjectMetricSourceApplyConfiguration) preMarshal() {
-}
-func (b *ObjectMetricSourceApplyConfiguration) postUnmarshal() {
-}

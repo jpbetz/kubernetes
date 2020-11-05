@@ -18,17 +18,12 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // ConfigMapProjectionApplyConfiguration represents an declarative configuration of the ConfigMapProjection type for use
 // with apply.
 type ConfigMapProjectionApplyConfiguration struct {
-	localObjectReference *LocalObjectReferenceApplyConfiguration // inlined type
-	fields               configMapProjectionFields
+	LocalObjectReferenceApplyConfiguration `json:",inline"`
+	Items                                  *KeyToPathList `json:"items,omitempty"`
+	Optional                               *bool          `json:"optional,omitempty"`
 }
 
 // ConfigMapProjectionApplyConfiguration constructs an declarative configuration of the ConfigMapProjection type for use with
@@ -37,49 +32,34 @@ func ConfigMapProjection() *ConfigMapProjectionApplyConfiguration {
 	return &ConfigMapProjectionApplyConfiguration{}
 }
 
-// configMapProjectionFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in ConfigMapProjectionApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type configMapProjectionFields struct {
-	Name     *string        `json:"name,omitempty"` // inlined ConfigMapProjectionApplyConfiguration.localObjectReference.Name field
-	Items    *KeyToPathList `json:"items,omitempty"`
-	Optional *bool          `json:"optional,omitempty"`
-}
-
 // SetLocalObjectReference sets the LocalObjectReference field in the declarative configuration to the given value.
 func (b *ConfigMapProjectionApplyConfiguration) SetLocalObjectReference(value *LocalObjectReferenceApplyConfiguration) *ConfigMapProjectionApplyConfiguration {
-	b.localObjectReference = value
-	return b
-}
-
-// RemoveLocalObjectReference removes the LocalObjectReference field from the declarative configuration.
-func (b *ConfigMapProjectionApplyConfiguration) RemoveLocalObjectReference() *ConfigMapProjectionApplyConfiguration {
-	b.localObjectReference = nil
+	if value != nil {
+		b.LocalObjectReferenceApplyConfiguration = *value
+	}
 	return b
 }
 
 // GetLocalObjectReference gets the LocalObjectReference field from the declarative configuration.
 func (b *ConfigMapProjectionApplyConfiguration) GetLocalObjectReference() (value *LocalObjectReferenceApplyConfiguration, ok bool) {
-	return b.localObjectReference, true
+	return &b.LocalObjectReferenceApplyConfiguration, true
 }
 
 // SetItems sets the Items field in the declarative configuration to the given value.
 func (b *ConfigMapProjectionApplyConfiguration) SetItems(value KeyToPathList) *ConfigMapProjectionApplyConfiguration {
-	b.fields.Items = &value
+	b.Items = &value
 	return b
 }
 
 // RemoveItems removes the Items field from the declarative configuration.
 func (b *ConfigMapProjectionApplyConfiguration) RemoveItems() *ConfigMapProjectionApplyConfiguration {
-	b.fields.Items = nil
+	b.Items = nil
 	return b
 }
 
 // GetItems gets the Items field from the declarative configuration.
 func (b *ConfigMapProjectionApplyConfiguration) GetItems() (value KeyToPathList, ok bool) {
-	if v := b.fields.Items; v != nil {
+	if v := b.Items; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -87,64 +67,22 @@ func (b *ConfigMapProjectionApplyConfiguration) GetItems() (value KeyToPathList,
 
 // SetOptional sets the Optional field in the declarative configuration to the given value.
 func (b *ConfigMapProjectionApplyConfiguration) SetOptional(value bool) *ConfigMapProjectionApplyConfiguration {
-	b.fields.Optional = &value
+	b.Optional = &value
 	return b
 }
 
 // RemoveOptional removes the Optional field from the declarative configuration.
 func (b *ConfigMapProjectionApplyConfiguration) RemoveOptional() *ConfigMapProjectionApplyConfiguration {
-	b.fields.Optional = nil
+	b.Optional = nil
 	return b
 }
 
 // GetOptional gets the Optional field from the declarative configuration.
 func (b *ConfigMapProjectionApplyConfiguration) GetOptional() (value bool, ok bool) {
-	if v := b.fields.Optional; v != nil {
+	if v := b.Optional; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts ConfigMapProjectionApplyConfiguration to unstructured.
-func (b *ConfigMapProjectionApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to ConfigMapProjectionApplyConfiguration, replacing the contents
-// of ConfigMapProjectionApplyConfiguration.
-func (b *ConfigMapProjectionApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &configMapProjectionFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals ConfigMapProjectionApplyConfiguration to JSON.
-func (b *ConfigMapProjectionApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into ConfigMapProjectionApplyConfiguration, replacing the contents of
-// ConfigMapProjectionApplyConfiguration.
-func (b *ConfigMapProjectionApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // ConfigMapProjectionList represents a listAlias of ConfigMapProjectionApplyConfiguration.
@@ -152,19 +90,3 @@ type ConfigMapProjectionList []*ConfigMapProjectionApplyConfiguration
 
 // ConfigMapProjectionList represents a map of ConfigMapProjectionApplyConfiguration.
 type ConfigMapProjectionMap map[string]ConfigMapProjectionApplyConfiguration
-
-func (b *ConfigMapProjectionApplyConfiguration) preMarshal() {
-	if b.localObjectReference != nil {
-		if v, ok := b.localObjectReference.GetName(); ok {
-			b.fields.Name = &v
-		}
-	}
-}
-func (b *ConfigMapProjectionApplyConfiguration) postUnmarshal() {
-	if b.localObjectReference == nil {
-		b.localObjectReference = &LocalObjectReferenceApplyConfiguration{}
-	}
-	if b.fields.Name != nil {
-		b.localObjectReference.SetName(*b.fields.Name)
-	}
-}

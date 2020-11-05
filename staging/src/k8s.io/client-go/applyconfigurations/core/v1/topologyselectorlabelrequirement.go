@@ -18,16 +18,11 @@ limitations under the License.
 
 package v1
 
-import (
-	json "encoding/json"
-
-	runtime "k8s.io/apimachinery/pkg/runtime"
-)
-
 // TopologySelectorLabelRequirementApplyConfiguration represents an declarative configuration of the TopologySelectorLabelRequirement type for use
 // with apply.
 type TopologySelectorLabelRequirementApplyConfiguration struct {
-	fields topologySelectorLabelRequirementFields
+	Key    *string   `json:"key,omitempty"`
+	Values *[]string `json:"values,omitempty"`
 }
 
 // TopologySelectorLabelRequirementApplyConfiguration constructs an declarative configuration of the TopologySelectorLabelRequirement type for use with
@@ -36,31 +31,21 @@ func TopologySelectorLabelRequirement() *TopologySelectorLabelRequirementApplyCo
 	return &TopologySelectorLabelRequirementApplyConfiguration{}
 }
 
-// topologySelectorLabelRequirementFields owns all fields except inlined fields.
-// Inline fields are owned by their respective inline type in TopologySelectorLabelRequirementApplyConfiguration.
-// They are copied to this type before marshalling, and are copied out
-// after unmarshalling. The inlined types cannot be embedded because they do
-// not expose their fields directly.
-type topologySelectorLabelRequirementFields struct {
-	Key    *string   `json:"key,omitempty"`
-	Values *[]string `json:"values,omitempty"`
-}
-
 // SetKey sets the Key field in the declarative configuration to the given value.
 func (b *TopologySelectorLabelRequirementApplyConfiguration) SetKey(value string) *TopologySelectorLabelRequirementApplyConfiguration {
-	b.fields.Key = &value
+	b.Key = &value
 	return b
 }
 
 // RemoveKey removes the Key field from the declarative configuration.
 func (b *TopologySelectorLabelRequirementApplyConfiguration) RemoveKey() *TopologySelectorLabelRequirementApplyConfiguration {
-	b.fields.Key = nil
+	b.Key = nil
 	return b
 }
 
 // GetKey gets the Key field from the declarative configuration.
 func (b *TopologySelectorLabelRequirementApplyConfiguration) GetKey() (value string, ok bool) {
-	if v := b.fields.Key; v != nil {
+	if v := b.Key; v != nil {
 		return *v, true
 	}
 	return value, false
@@ -68,64 +53,22 @@ func (b *TopologySelectorLabelRequirementApplyConfiguration) GetKey() (value str
 
 // SetValues sets the Values field in the declarative configuration to the given value.
 func (b *TopologySelectorLabelRequirementApplyConfiguration) SetValues(value []string) *TopologySelectorLabelRequirementApplyConfiguration {
-	b.fields.Values = &value
+	b.Values = &value
 	return b
 }
 
 // RemoveValues removes the Values field from the declarative configuration.
 func (b *TopologySelectorLabelRequirementApplyConfiguration) RemoveValues() *TopologySelectorLabelRequirementApplyConfiguration {
-	b.fields.Values = nil
+	b.Values = nil
 	return b
 }
 
 // GetValues gets the Values field from the declarative configuration.
 func (b *TopologySelectorLabelRequirementApplyConfiguration) GetValues() (value []string, ok bool) {
-	if v := b.fields.Values; v != nil {
+	if v := b.Values; v != nil {
 		return *v, true
 	}
 	return value, false
-}
-
-// ToUnstructured converts TopologySelectorLabelRequirementApplyConfiguration to unstructured.
-func (b *TopologySelectorLabelRequirementApplyConfiguration) ToUnstructured() interface{} {
-	if b == nil {
-		return nil
-	}
-	b.preMarshal()
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&b.fields)
-	if err != nil {
-		panic(err)
-	}
-	return u
-}
-
-// FromUnstructured converts unstructured to TopologySelectorLabelRequirementApplyConfiguration, replacing the contents
-// of TopologySelectorLabelRequirementApplyConfiguration.
-func (b *TopologySelectorLabelRequirementApplyConfiguration) FromUnstructured(u map[string]interface{}) error {
-	m := &topologySelectorLabelRequirementFields{}
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(u, m)
-	if err != nil {
-		return err
-	}
-	b.fields = *m
-	b.postUnmarshal()
-	return nil
-}
-
-// MarshalJSON marshals TopologySelectorLabelRequirementApplyConfiguration to JSON.
-func (b *TopologySelectorLabelRequirementApplyConfiguration) MarshalJSON() ([]byte, error) {
-	b.preMarshal()
-	return json.Marshal(b.fields)
-}
-
-// UnmarshalJSON unmarshals JSON into TopologySelectorLabelRequirementApplyConfiguration, replacing the contents of
-// TopologySelectorLabelRequirementApplyConfiguration.
-func (b *TopologySelectorLabelRequirementApplyConfiguration) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &b.fields); err != nil {
-		return err
-	}
-	b.postUnmarshal()
-	return nil
 }
 
 // TopologySelectorLabelRequirementList represents a listAlias of TopologySelectorLabelRequirementApplyConfiguration.
@@ -133,8 +76,3 @@ type TopologySelectorLabelRequirementList []*TopologySelectorLabelRequirementApp
 
 // TopologySelectorLabelRequirementList represents a map of TopologySelectorLabelRequirementApplyConfiguration.
 type TopologySelectorLabelRequirementMap map[string]TopologySelectorLabelRequirementApplyConfiguration
-
-func (b *TopologySelectorLabelRequirementApplyConfiguration) preMarshal() {
-}
-func (b *TopologySelectorLabelRequirementApplyConfiguration) postUnmarshal() {
-}
