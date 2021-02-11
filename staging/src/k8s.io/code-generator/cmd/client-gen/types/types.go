@@ -53,6 +53,14 @@ type GroupVersion struct {
 	Version Version
 }
 
+func (gv GroupVersion) ToAPIVersion() string {
+	if len(gv.Group) > 0 && gv.Group.NonEmpty() != "core" {
+		return gv.Group.String() + "/" + gv.Version.String()
+	} else {
+		return gv.Version.String()
+	}
+}
+
 type GroupVersions struct {
 	// The name of the package for this group, e.g. apps.
 	PackageName string
