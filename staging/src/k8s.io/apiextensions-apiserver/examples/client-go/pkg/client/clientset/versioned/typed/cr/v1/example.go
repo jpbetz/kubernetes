@@ -46,6 +46,7 @@ type ExampleInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.ExampleList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.Example, err error)
+
 	ExampleExpansion
 }
 

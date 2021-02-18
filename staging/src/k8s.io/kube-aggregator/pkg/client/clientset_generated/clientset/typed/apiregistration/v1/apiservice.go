@@ -47,6 +47,7 @@ type APIServiceInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.APIServiceList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.APIService, err error)
+
 	APIServiceExpansion
 }
 

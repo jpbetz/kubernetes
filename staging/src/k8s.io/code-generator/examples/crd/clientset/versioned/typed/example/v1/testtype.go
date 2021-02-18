@@ -47,6 +47,7 @@ type TestTypeInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.TestTypeList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.TestType, err error)
+
 	TestTypeExpansion
 }
 

@@ -47,6 +47,7 @@ type FooInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.FooList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Foo, err error)
+
 	FooExpansion
 }
 
