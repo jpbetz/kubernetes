@@ -37,8 +37,8 @@ func Foo(name, namespace string) *FooApplyConfiguration {
 	b := &FooApplyConfiguration{}
 	b.SetName(name)
 	b.SetNamespace(namespace)
-	b.SetKind("Foo")
-	b.SetAPIVersion("samplecontroller/v1alpha1")
+	b.Kind = "Foo"
+	b.APIVersion = "samplecontroller.k8s.io/v1alpha1"
 	return b
 }
 

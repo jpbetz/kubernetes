@@ -75,13 +75,14 @@ if [ "${GENS}" = "all" ] || grep -qw "deepcopy" <<<"${GENS}"; then
 fi
 
 if [ "${GENS}" = "all" ] || grep -qw "apply" <<<"${GENS}"; then
+  client_extra_args+=(--apply-configuration-package "${OUTPUT_PKG}/${APPLYCONFIGURATIONS_PKG_NAME:-applyconfigurations}")
   echo "Generating applyconfigurations for ${GROUPS_WITH_VERSIONS} at ${OUTPUT_PKG}/applyconfigurations"
   "${gobin}/applyconfiguration-gen" --output-package "${OUTPUT_PKG}/${APPLYCONFIGURATIONS_PKG_NAME:-applyconfigurations}" --input-dirs "$(codegen::join , "${FQ_APIS[@]}")" "$@"
 fi
 
 if [ "${GENS}" = "all" ] || grep -qw "client" <<<"${GENS}"; then
   echo "Generating clientset for ${GROUPS_WITH_VERSIONS} at ${OUTPUT_PKG}/${CLIENTSET_PKG_NAME:-clientset}"
-  "${gobin}/client-gen" --clientset-name "${CLIENTSET_NAME_VERSIONED:-versioned}" --input-base "" --input "$(codegen::join , "${FQ_APIS[@]}")" --output-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME:-clientset}" "$@"
+  "${gobin}/client-gen" --clientset-name "${CLIENTSET_NAME_VERSIONED:-versioned}" --input-base "" --input "$(codegen::join , "${FQ_APIS[@]}")" --output-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME:-clientset}" ${client_extra_args[@]} "$@"
 fi
 
 if [ "${GENS}" = "all" ] || grep -qw "lister" <<<"${GENS}"; then

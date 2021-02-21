@@ -38,6 +38,7 @@ import (
 	"k8s.io/klog/v2"
 
 	samplev1alpha1 "k8s.io/sample-controller/pkg/apis/samplecontroller/v1alpha1"
+	apply "k8s.io/sample-controller/pkg/generated/applyconfigurations/samplecontroller/v1alpha1"
 	clientset "k8s.io/sample-controller/pkg/generated/clientset/versioned"
 	samplescheme "k8s.io/sample-controller/pkg/generated/clientset/versioned/scheme"
 	informers "k8s.io/sample-controller/pkg/generated/informers/externalversions/samplecontroller/v1alpha1"
@@ -319,16 +320,16 @@ func (c *Controller) syncHandler(key string) error {
 }
 
 func (c *Controller) updateFooStatus(foo *samplev1alpha1.Foo, deployment *appsv1.Deployment) error {
-	// NEVER modify objects from the store. It's a read-only, local cache.
-	// You can use DeepCopy() to make a deep copy of original object and modify this copy
-	// Or create a copy manually for better performance
-	fooCopy := foo.DeepCopy()
-	fooCopy.Status.AvailableReplicas = deployment.Status.AvailableReplicas
+	fooApply := apply.Foo(foo.Name, foo.Namespace).
+		SetStatus(apply.FooStatus().
+			SetAvailableReplicas(deployment.Status.AvailableReplicas),
+		)
+
 	// If the CustomResourceSubresources feature gate is not enabled,
 	// we must use Update instead of UpdateStatus to update the Status block of the Foo resource.
 	// UpdateStatus will not allow changes to the Spec of the resource,
 	// which is ideal for ensuring nothing other than resource status has been updated.
-	_, err := c.sampleclientset.SamplecontrollerV1alpha1().Foos(foo.Namespace).Update(context.TODO(), fooCopy, metav1.UpdateOptions{})
+	_, err := c.sampleclientset.SamplecontrollerV1alpha1().Foos(foo.Namespace).Apply(context.TODO(), fooApply, metav1.ApplyOptions{FieldManager: "sample-controller", Force: true})
 	return err
 }
 
