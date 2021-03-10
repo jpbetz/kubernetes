@@ -26,6 +26,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/api/meta/testrestmapper"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -71,6 +72,13 @@ type ObjectTracker interface {
 type ObjectScheme interface {
 	runtime.ObjectCreater
 	runtime.ObjectTyper
+}
+
+// ApplyObjectInitializer initializes an empty object for apply patches
+// to resources that are not yet created.
+type ApplyObjectInitializer interface {
+	// NewForApplyCreate create an empty object for the gvr and returns it.
+	NewForApplyCreate(gvr schema.GroupVersionResource) (runtime.Object, error)
 }
 
 // ObjectReaction returns a ReactionFunc that applies core.Action to
@@ -131,9 +139,20 @@ func ObjectReaction(tracker ObjectTracker) ReactionFunc {
 			}
 			return true, nil, nil
 
-		case PatchActionImpl:
+		case PatchAction:
 			obj, err := tracker.Get(gvr, ns, action.GetName())
+			if errors.IsNotFound(err) && action.GetPatchType() == types.ApplyPatchType {
+				// apply patches are allowed to create objects
+				init, ok := tracker.(ApplyObjectInitializer)
+				if !ok {
+					return true, nil, fmt.Errorf("failed to initialize a object to be populated " +
+						"by Apply: ObjectTracker does not implement ApplyObjectInitializer, which " +
+						"is required for apply requests that create an object")
+				}
+				obj, err = init.NewForApplyCreate(gvr)
+			}
 			if err != nil {
+				panic(err)
 				return true, nil, err
 			}
 
@@ -178,6 +197,40 @@ func ObjectReaction(tracker ObjectTracker) ReactionFunc {
 				if err = json.Unmarshal(mergedByte, obj); err != nil {
 					return true, nil, err
 				}
+			case types.ApplyPatchType:
+				// TODO: Add objectTracker apply support on parity with update (warning: update
+				// has no defaulting, no validation, no conversion and broken subresource support).
+				//
+				// Until apply support is introduced, put "dirty" marker objects into the tracker.
+				// Why?
+				// - Common test flows are simple: Developers can validate apply
+				//   requests using actions just like they can with create and update.
+				// - Complex test flows possible: The dirty objects contain a
+				//   message explaining how to modify a test to replace the dirty objects with
+				//   objects with objects that accurately represent the post-applied state.
+				dirty := reflect.New(reflect.TypeOf(obj).Elem()).Interface().(runtime.Object)
+				m, err := meta.Accessor(dirty)
+				if err != nil {
+					return true, nil, err
+				}
+				dirty.GetObjectKind().SetGroupVersionKind(schema.GroupVersionKind{
+					Group:   "test",
+					Version: "unversioned",
+					Kind:    "DirtyObjectMarker",
+				})
+				m.SetName(action.GetName())
+				m.SetNamespace(action.GetNamespace())
+				m.SetAnnotations(map[string]string{
+					"dirty-reason": fmt.Sprintf(`
+Objects last modified by Apply are not readable by default from a fake client's tracker.
+If the Apply request only needs to be validated, use fake.Clientset.Actions() instead of reading it.
+If a readable object is needed, use fake.Clientset's PrependReactor("patch", "%s", ...)
+to match the apply request, validate it, and return an object that accurately represents post-applied
+object state.
+`, action.GetResource()),
+					"dirty-applied-configuration": string(action.GetPatch()),
+				})
+				return true, dirty, nil
 			default:
 				return true, nil, fmt.Errorf("PatchType is not supported")
 			}
@@ -196,6 +249,7 @@ func ObjectReaction(tracker ObjectTracker) ReactionFunc {
 
 type tracker struct {
 	scheme  ObjectScheme
+	mapper  meta.RESTMapper
 	decoder runtime.Decoder
 	lock    sync.RWMutex
 	objects map[schema.GroupVersionResource]map[types.NamespacedName]runtime.Object
@@ -211,9 +265,18 @@ var _ ObjectTracker = &tracker{}
 
 // NewObjectTracker returns an ObjectTracker that can be used to keep track
 // of objects for the fake clientset. Mostly useful for unit tests.
-func NewObjectTracker(scheme ObjectScheme, decoder runtime.Decoder) ObjectTracker {
+//
+// Warning: The tracker does not faithfully simulate a kube-apiserver.
+// Limitations include, but are not limited to: no defaulting, no validation, no
+// conversion and subresources are not properly handled (no wiping, non-status
+// subresources are unsupported). For Apply requests, "dirty" mark objects are
+// written to the applied objects to indicate that an apply was requested but
+// that that ObjectTracker was not capable of merging the apply request into the
+// object.
+func NewObjectTracker(scheme *runtime.Scheme, decoder runtime.Decoder) ObjectTracker {
 	return &tracker{
 		scheme:   scheme,
+		mapper:   testrestmapper.TestOnlyStaticRESTMapper(scheme),
 		decoder:  decoder,
 		objects:  make(map[schema.GroupVersionResource]map[types.NamespacedName]runtime.Object),
 		watchers: make(map[schema.GroupVersionResource]map[string][]*watch.RaceFreeFakeWatcher),
@@ -458,6 +521,14 @@ func (t *tracker) Delete(gvr schema.GroupVersionResource, ns, name string) error
 		w.Delete(obj)
 	}
 	return nil
+}
+
+func (t *tracker) NewForApplyCreate(gvr schema.GroupVersionResource) (runtime.Object, error) {
+	gvk, err := t.mapper.KindFor(gvr)
+	if err != nil {
+		return nil, err
+	}
+	return t.scheme.New(gvk)
 }
 
 // filterByNamespace returns all objects in the collection that

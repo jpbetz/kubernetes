@@ -24,6 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/diff"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	rbacv1ac "k8s.io/client-go/applyconfigurations/rbac/v1"
@@ -169,13 +170,13 @@ func TestSyncClusterRole(t *testing.T) {
 				}
 				fakeClient := fakeclient.NewSimpleClientset(objs...)
 
-				// The default reactor doesn't support apply, so we need our own (trivial) reactor
-				fakeClient.PrependReactor("patch", "clusterroles", func(action clienttesting.Action) (handled bool, ret runtime.Object, err error) {
-					if serverSideApplyEnabled == false {
+				// Simulate disabled serverSideApply
+				fakeClient.PrependReactor("patch", "*", func(action clienttesting.Action) (handled bool, ret runtime.Object, err error) {
+					if serverSideApplyEnabled == false && action.(clienttesting.PatchAction).GetPatchType() == types.ApplyPatchType {
 						// UnsupportedMediaType
 						return true, nil, errors.NewGenericServerResponse(415, "get", action.GetResource().GroupResource(), "test", "Apply not supported", 0, true)
 					}
-					return true, nil, nil // clusterroleaggregator drops returned objects so no point in constructing them
+					return false, nil, nil
 				})
 				c := ClusterRoleAggregationController{
 					clusterRoleClient: fakeClient.RbacV1(),

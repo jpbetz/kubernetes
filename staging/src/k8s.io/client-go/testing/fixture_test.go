@@ -25,8 +25,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -274,6 +276,52 @@ func TestPatchWithMissingObject(t *testing.T) {
 	assert.True(t, handled)
 	assert.Nil(t, node)
 	assert.EqualError(t, err, `nodes "node-1" not found`)
+}
+
+func TestApply(t *testing.T) {
+	testcases := []struct {
+		name   string
+		exists bool
+	}{
+		{
+			name:   "object exists",
+			exists: true,
+		},
+		{
+			name: "missing object",
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			configMapResource := schema.GroupVersionResource{Group: "", Version: "v1", Resource: "configmap"}
+			scheme := runtime.NewScheme()
+			codecs := serializer.NewCodecFactory(scheme)
+			if err := corev1.AddToScheme(scheme); err != nil {
+				t.Errorf("Error loading scheme: %v", err)
+			}
+			o := NewObjectTracker(scheme, codecs.UniversalDecoder())
+
+			reaction := ObjectReaction(o)
+			if tc.exists {
+				err := o.Add(&corev1.ConfigMap{
+					TypeMeta:   metav1.TypeMeta{APIVersion: "v1", Kind: "ConfigMap"},
+					ObjectMeta: metav1.ObjectMeta{Name: "cm-1"},
+				})
+				assert.Nil(t, err)
+			}
+
+			configMap := `{"apiVersion": "v1", "kind": "ConfigMap", "metadata": {"name": "example"}, "data": {"appliedKey": "value"}}`
+			apply := NewRootPatchSubresourceAction(configMapResource, "cm-1", types.ApplyPatchType, []byte(configMap))
+			handled, obj, err := reaction(apply)
+			assert.True(t, handled)
+			assert.NotNil(t, obj)
+			assert.Nil(t, err)
+			cm := obj.(*corev1.ConfigMap)
+			// By default objects created using Apply requests are not readable from the objectTracker
+			assert.Equal(t, cm.Kind, "DirtyObjectMarker")
+		})
+	}
 }
 
 func TestGetWithExactMatch(t *testing.T) {

@@ -137,8 +137,9 @@ func (c *FakeClusterRoles) Apply(ctx context.Context, clusterRole *applyconfigur
 	if name == nil {
 		return nil, fmt.Errorf("clusterRole.Name must be provided to Apply")
 	}
+	action := testing.NewRootApplySubresourceAction(clusterrolesResource, *name, types.ApplyPatchType, data, &rbacv1.ClusterRole{})
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(clusterrolesResource, *name, types.ApplyPatchType, data), &rbacv1.ClusterRole{})
+		Invokes(action, &rbacv1.ClusterRole{})
 	if obj == nil {
 		return nil, err
 	}
