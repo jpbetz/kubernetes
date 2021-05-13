@@ -71,16 +71,22 @@ function ensure_require_replace_directives_for_all_dependencies() {
   local require_filter='(.Version != null) and (.Version != "v0.0.0") and (.Version != "v0.0.0-00010101000000-000000000000")'
   # collect 'replace' directives that unconditionally pin versions (old=new@version)
   local replace_filter='(.Old.Version == null) and (.New.Version != null)'
+  # collect 'replace' directives that pin staging
+  local replace_staging_filter='(.Old.Version == null) and (.New.Version == null) and (.New.Path|startswith("./staging/src/k8s.io/"))'
 
   # Capture local require/replace directives before running any go commands that can modify the go.mod file
   local require_json="${local_tmp_dir}/require.json"
   local replace_json="${local_tmp_dir}/replace.json"
+  local replace_staging_json="${local_tmp_dir}/replace-staging.json"
   go mod edit -json \
       | jq -r ".Require // [] | sort | .[] | select(${require_filter})" \
       > "${require_json}"
   go mod edit -json \
       | jq -r ".Replace // [] | sort | .[] | select(${replace_filter})" \
       > "${replace_json}"
+  go mod edit -json \
+      | jq -r ".Replace // [] | sort | .[] | select(${replace_staging_filter})" \
+      > "${replace_staging_json}"
 
   # 1a. Ensure replace directives have an explicit require directive
   jq -r '"-require \(.Old.Path)@\(.New.Version)"' < "${replace_json}" \
@@ -89,6 +95,8 @@ function ensure_require_replace_directives_for_all_dependencies() {
   jq -r '"-replace \(.Path)=\(.Path)@\(.Version)"' < "${require_json}" \
       | xargs -L 100 go mod edit -fmt
   jq -r '"-replace \(.Old.Path)=\(.New.Path)@\(.New.Version)"' < "${replace_json}" \
+      | xargs -L 100 go mod edit -fmt
+  jq -r '"-replace \(.Old.Path)=\(.New.Path)"' < "${replace_staging_json}" \
       | xargs -L 100 go mod edit -fmt
 
   # 2. Propagate root replace/require directives into staging modules, in case we are downgrading, so they don't bump the root required version back up
