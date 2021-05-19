@@ -38,7 +38,7 @@ github.com/Azure/go-autorest/autorest/validation
 github.com/Azure/go-autorest/logger
 # github.com/Azure/go-autorest/tracing v0.6.0 => github.com/Azure/go-autorest/tracing v0.6.0
 github.com/Azure/go-autorest/tracing
-# github.com/GoogleCloudPlatform/k8s-cloud-provider v0.0.0-20200415212048-7901bc822317 => github.com/GoogleCloudPlatform/k8s-cloud-provider v0.0.0-20200415212048-7901bc822317
+# github.com/GoogleCloudPlatform/k8s-cloud-provider v1.15.0 => github.com/GoogleCloudPlatform/k8s-cloud-provider v1.15.0
 ## explicit
 github.com/GoogleCloudPlatform/k8s-cloud-provider/pkg/cloud
 github.com/GoogleCloudPlatform/k8s-cloud-provider/pkg/cloud/filter
@@ -982,7 +982,7 @@ golang.org/x/net/ipv6
 golang.org/x/net/proxy
 golang.org/x/net/trace
 golang.org/x/net/websocket
-# golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d => golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
+# golang.org/x/oauth2 v0.0.0-20210427180440-81ed05c6b58c => golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 ## explicit
 golang.org/x/oauth2
 golang.org/x/oauth2/google
@@ -1087,7 +1087,7 @@ gonum.org/v1/gonum/lapack/lapack64
 gonum.org/v1/gonum/mat
 # gonum.org/v1/netlib v0.0.0-20190331212654-76723241ea4e => gonum.org/v1/netlib v0.0.0-20190331212654-76723241ea4e
 ## explicit
-# google.golang.org/api v0.20.0 => google.golang.org/api v0.20.0
+# google.golang.org/api v0.46.0 => google.golang.org/api v0.20.0
 ## explicit
 google.golang.org/api/compute/v0.alpha
 google.golang.org/api/compute/v0.beta
@@ -2347,7 +2347,7 @@ sigs.k8s.io/yaml
 # github.com/Azure/go-autorest/tracing => github.com/Azure/go-autorest/tracing v0.6.0
 # github.com/BurntSushi/toml => github.com/BurntSushi/toml v0.3.1
 # github.com/BurntSushi/xgb => github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802
-# github.com/GoogleCloudPlatform/k8s-cloud-provider => github.com/GoogleCloudPlatform/k8s-cloud-provider v0.0.0-20200415212048-7901bc822317
+# github.com/GoogleCloudPlatform/k8s-cloud-provider => github.com/GoogleCloudPlatform/k8s-cloud-provider v1.15.0
 # github.com/JeffAshton/win_pdh => github.com/JeffAshton/win_pdh v0.0.0-20161109143554-76bb4ee9f0ab
 # github.com/MakeNowJust/heredoc => github.com/MakeNowJust/heredoc v0.0.0-20170808103936-bb23615498cd
 # github.com/Microsoft/go-winio => github.com/Microsoft/go-winio v0.4.15

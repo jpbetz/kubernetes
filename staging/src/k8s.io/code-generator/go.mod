@@ -31,4 +31,7 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.1 // indirect
 )
 
-replace k8s.io/code-generator => ../code-generator
+replace (
+	golang.org/x/oauth2 => golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
+	k8s.io/code-generator => ../code-generator
+)
