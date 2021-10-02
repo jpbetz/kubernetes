@@ -36,6 +36,7 @@ import (
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextensionsv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	structuralschema "k8s.io/apiextensions-apiserver/pkg/apiserver/schema"
+	celcomplilation "k8s.io/apiextensions-apiserver/pkg/apiserver/schema/cel"
 	apiservervalidation "k8s.io/apiextensions-apiserver/pkg/apiserver/validation"
 )
 
@@ -905,6 +906,28 @@ func ValidateCustomResourceDefinitionOpenAPISchema(schema *apiextensions.JSONSch
 					allErrs = append(allErrs, field.Invalid(fldPath.Child("x-kubernetes-list-map-keys"), schema.XListMapKeys, "must not contain duplicate entries"))
 				}
 				keys[k] = struct{}{}
+			}
+		}
+	}
+
+	if len(schema.XValidations) > 0 {
+		structural, err := structuralschema.NewStructural(schema)
+		if err != nil {
+			allErrs = append(allErrs, field.InternalError(fldPath.Child("x-kubernetes-validations"), err))
+		} else {
+			compResults := celcomplilation.Compile(structural)
+			if compResults.Error != nil {
+				allErrs = append(allErrs, field.InternalError(fldPath.Child("x-kubernetes-validations"), compResults.Error))
+			} else {
+				for _, cr := range compResults.Results {
+					for _, err := range cr.Errors {
+						if strings.Contains(err.Error(), "rule is not specified") {
+							allErrs = append(allErrs, field.Required(fldPath.Child("x-kubernetes-validations").Index(cr.RuleIndex).Child("rule"), "rule is not specified"))
+						} else {
+							allErrs = append(allErrs, field.InternalError(fldPath.Child("x-kubernetes-validations").Index(cr.RuleIndex).Child("rule"), err))
+						}
+					}
+				}
 			}
 		}
 	}

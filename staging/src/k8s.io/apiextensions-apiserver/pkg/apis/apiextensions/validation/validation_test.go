@@ -6104,11 +6104,13 @@ func TestValidateCustomResourceDefinitionUpdate(t *testing.T) {
 
 func TestValidateCustomResourceDefinitionValidation(t *testing.T) {
 	tests := []struct {
-		name          string
-		input         apiextensions.CustomResourceValidation
-		statusEnabled bool
-		opts          validationOptions
-		wantError     bool
+		name               string
+		input              apiextensions.CustomResourceValidation
+		statusEnabled      bool
+		opts               validationOptions
+		wantError          bool
+		checkErrorMessage  bool
+		expectedErrMessage string
 	}{
 		{
 			name:      "empty",
@@ -6895,6 +6897,220 @@ func TestValidateCustomResourceDefinitionValidation(t *testing.T) {
 			},
 			wantError: false,
 		},
+		{
+			name: "valid x-kubernetes-validations for scalar element",
+			input: apiextensions.CustomResourceValidation{
+				OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+					Type: "object",
+					Properties: map[string]apiextensions.JSONSchemaProps{
+						"subRoot": {
+							Type: "string",
+							XValidations: apiextensions.ValidationRules{
+								{
+									Rule:    "self.startsWith('s')",
+									Message: "subRoot should start with 's'.",
+								},
+								{
+									Rule:    "self.endsWith('s')",
+									Message: "subRoot should end with 's'.",
+								},
+							},
+						},
+					},
+				},
+			},
+			wantError: false,
+		},
+		{
+			name: "valid x-kubernetes-validations for object",
+			input: apiextensions.CustomResourceValidation{
+				OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+					Type: "object",
+					XValidations: apiextensions.ValidationRules{
+						{
+							Rule:    "minReplicas <= maxReplicas",
+							Message: "minReplicas should be no greater than maxReplicas",
+						},
+					},
+					Properties: map[string]apiextensions.JSONSchemaProps{
+						"minReplicas": {
+							Type: "integer",
+						},
+						"maxReplicas": {
+							Type: "integer",
+						},
+					},
+				},
+			},
+			wantError: false,
+		},
+		{
+			name: "invalid x-kubernetes-validations with empty rule",
+			input: apiextensions.CustomResourceValidation{
+				OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+					Type: "object",
+					XValidations: apiextensions.ValidationRules{
+						{Message: "empty rule"},
+					},
+				},
+			},
+			wantError:          true,
+			checkErrorMessage:  true,
+			expectedErrMessage: "rule is not specified",
+		},
+		{
+			name: "valid x-kubernetes-validations with empty validators",
+			input: apiextensions.CustomResourceValidation{
+				OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+					Type:         "object",
+					XValidations: apiextensions.ValidationRules{},
+				},
+			},
+			wantError: false,
+		},
+		{
+			name: "invalid rule in x-kubernetes-validations",
+			input: apiextensions.CustomResourceValidation{
+				OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+					Type: "object",
+					Properties: map[string]apiextensions.JSONSchemaProps{
+						"subRoot": {
+							Type: "string",
+							XValidations: apiextensions.ValidationRules{
+								{
+									Rule:    "self == true",
+									Message: "subRoot should be true.",
+								},
+								{
+									Rule:    "self.endsWith('s')",
+									Message: "subRoot should end with 's'.",
+								},
+							},
+						},
+					},
+				},
+			},
+			wantError:          true,
+			checkErrorMessage:  true,
+			expectedErrMessage: "compilation failed for rule: {self == true subRoot should be true.}",
+		},
+		{
+			name: "valid x-kubernetes-validations for nested object under multiple fields",
+			input: apiextensions.CustomResourceValidation{
+				OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+					Type: "object",
+					XValidations: apiextensions.ValidationRules{
+						{
+							Rule:    "minReplicas <= maxReplicas",
+							Message: "minReplicas should be no greater than maxReplicas.",
+						},
+					},
+					Properties: map[string]apiextensions.JSONSchemaProps{
+						"minReplicas": {
+							Type: "integer",
+						},
+						"maxReplicas": {
+							Type: "integer",
+						},
+						"subRule": {
+							Type: "object",
+							XValidations: apiextensions.ValidationRules{
+								{
+									Rule:    "isTest == true",
+									Message: "isTest should be true.",
+								},
+							},
+							Properties: map[string]apiextensions.JSONSchemaProps{
+								"isTest": {
+									Type: "boolean",
+								},
+							},
+						},
+					},
+				},
+			},
+			wantError: false,
+		},
+		{
+			name: "valid x-kubernetes-validations for object of array",
+			input: apiextensions.CustomResourceValidation{
+				OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+					Type: "object",
+					XValidations: apiextensions.ValidationRules{
+						{
+							Rule:    "size(self.nestedObj[0]) == 10",
+							Message: "size of first element in nestedObj should be equal to 10",
+						},
+					},
+					Properties: map[string]apiextensions.JSONSchemaProps{
+						"nestedObj": {
+							Type: "array",
+							Items: &apiextensions.JSONSchemaPropsOrArray{
+								Schema: &apiextensions.JSONSchemaProps{
+									Type: "array",
+									Items: &apiextensions.JSONSchemaPropsOrArray{
+										Schema: &apiextensions.JSONSchemaProps{
+											Type: "string",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			wantError: false,
+		},
+		{
+			name: "valid x-kubernetes-validations for array",
+			input: apiextensions.CustomResourceValidation{
+				OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+					Type: "array",
+					XValidations: apiextensions.ValidationRules{
+						{
+							Rule:    "size(self) > 0",
+							Message: "openAPIV3Schema should contain more than 0 element.",
+						},
+					},
+					Items: &apiextensions.JSONSchemaPropsOrArray{
+						Schema: &apiextensions.JSONSchemaProps{
+							Type: "integer",
+						},
+					},
+				},
+			},
+			wantError: false,
+		},
+		{
+			name: "valid x-kubernetes-validations for array of object",
+			input: apiextensions.CustomResourceValidation{
+				OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+					Type: "array",
+					XValidations: apiextensions.ValidationRules{
+						{
+							Rule:    "self[0].nestedObj.val > 0",
+							Message: "val should be greater than 0.",
+						},
+					},
+					Items: &apiextensions.JSONSchemaPropsOrArray{
+						Schema: &apiextensions.JSONSchemaProps{
+							Type: "object",
+							Properties: map[string]apiextensions.JSONSchemaProps{
+								"nestedObj": {
+									Type: "object",
+									Properties: map[string]apiextensions.JSONSchemaProps{
+										"val": {
+											Type: "integer",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			wantError: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -6903,6 +7119,17 @@ func TestValidateCustomResourceDefinitionValidation(t *testing.T) {
 				t.Errorf("Expected no error, but got: %v", got)
 			} else if tt.wantError && len(got) == 0 {
 				t.Error("Expected error, but got none")
+			}
+			if tt.checkErrorMessage {
+				var pass = false
+				for _, err := range got {
+					if strings.Contains(err.Error(), tt.expectedErrMessage) {
+						pass = true
+					}
+				}
+				if !pass {
+					t.Errorf("Expected error massage contains: %v, but got error: %v", tt.expectedErrMessage, got)
+				}
 			}
 		})
 	}

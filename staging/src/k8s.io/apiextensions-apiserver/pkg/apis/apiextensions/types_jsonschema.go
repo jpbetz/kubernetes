@@ -122,6 +122,26 @@ type JSONSchemaProps struct {
 	//      Atomic maps will be entirely replaced when updated.
 	// +optional
 	XMapType *string
+
+	// x-kubernetes-validations describes a list of validation rules for expression validation.
+	// This field is an alpha-level. Using this field requires the feature gate `CustomResourceValidationExpressions` to be enabled.
+	XValidations ValidationRules
+}
+
+// ValidationRules describe a list of validation rules for expression validation
+//  +listType=atomic
+type ValidationRules []ValidationRule
+
+// ValidationRule is used for expression validation.
+type ValidationRule struct {
+	// Rule represents the validation rule which will be evaluated by CEL.
+	// ref: https://github.com/google/cel-spec
+	// The validator will be scoped to the location of the x-kubernetes-validations extension in the schema
+	// and will use `self` to represent the scoped field name.
+	// If an object property collides with a RESERVED keyword, it will be escaped by prepending a _ prefix.
+	Rule string
+	// Message represents the message displayed when validation failed.
+	Message string
 }
 
 // JSON represents any valid JSON value.

@@ -549,6 +549,10 @@ message JSONSchemaProps {
   //      Atomic maps will be entirely replaced when updated.
   // +optional
   optional string xKubernetesMapType = 43;
+
+  // x-kubernetes-validations describes a list of validation rules for expression validation.
+  // This field is an alpha-level. Using this field requires the feature gate `CustomResourceValidationExpressions` to be enabled.
+  repeated ValidationRule xKubernetesValidations = 44;
 }
 
 // JSONSchemaPropsOrArray represents a value that can either be a JSONSchemaProps
@@ -593,6 +597,19 @@ message ServiceReference {
   // Defaults to 443 for backward compatibility.
   // +optional
   optional int32 port = 4;
+}
+
+// ValidationRule is used for expression validation.
+message ValidationRule {
+  // Rule represents the validation rule which will be evaluated by CEL.
+  // ref: https://github.com/google/cel-spec
+  // The validator will be scoped to the location of the x-kubernetes-validations extension in the schema
+  // and will use `self` to represent the scoped field name.
+  // If an object property collides with a RESERVED keyword, it will be escaped by prepending a _ prefix.
+  optional string rule = 1;
+
+  // Message represents the message displayed when validation failed.
+  optional string message = 2;
 }
 
 // WebhookClientConfig contains the information to make a TLS connection with the webhook.

@@ -21,6 +21,7 @@ import (
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
 	expr "google.golang.org/genproto/googleapis/api/expr/v1alpha1"
+	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	"k8s.io/apiextensions-apiserver/pkg/apiserver/schema"
 	celmodel "k8s.io/apiextensions-apiserver/third_party/forked/celopenapi/model"
 )
@@ -31,11 +32,25 @@ const ScopedTypeName = "apiextensions.k8s.io.v1alpha1.ValidationExpressionSelf"
 // ScopedVarName is the variable name assigned to the locally scoped data element of a CEL valid.
 const ScopedVarName = "self"
 
+// CompilationResults represents the compilation results got from cel compilation
+type CompilationResults struct {
+	Results []CompilationResult
+	Error   error
+}
+
+// CompilationResult represents the cel compilation result for one rule
+type CompilationResult struct {
+	Rule      apiextensions.ValidationRule
+	Program   cel.Program
+	Errors    []error
+	RuleIndex int
+}
+
 // Compile compiles all the CEL validation rules in the CelRules and returns a slice containing a compiled program for each provided CelRule, or an array of errors.
-func Compile(s *schema.Structural) ([]cel.Program, []error) {
-	var allErrors []error
+func Compile(s *schema.Structural) CompilationResults {
+	var compilationResults CompilationResults
 	if len(s.Extensions.XValidations) == 0 {
-		return nil, nil
+		return compilationResults
 	}
 	celRules := s.Extensions.XValidations
 
@@ -46,13 +61,13 @@ func Compile(s *schema.Structural) ([]cel.Program, []error) {
 	reg := celmodel.NewRegistry(env)
 	rt, err := celmodel.NewRuleTypes(ScopedTypeName, s, reg)
 	if err != nil {
-		allErrors = append(allErrors, err)
-		return nil, allErrors
+		compilationResults.Error = err
+		return compilationResults
 	}
 	opts, err := rt.EnvOptions(env.TypeProvider())
 	if err != nil {
-		allErrors = append(allErrors, err)
-		return nil, allErrors
+		compilationResults.Error = err
+		return compilationResults
 	}
 	root, ok = rt.FindDeclType(ScopedTypeName)
 	if !ok {
@@ -75,30 +90,39 @@ func Compile(s *schema.Structural) ([]cel.Program, []error) {
 	opts = append(opts, cel.Declarations(propDecls...))
 	env, err = env.Extend(opts...)
 	if err != nil {
-		allErrors = append(allErrors, err)
-		return nil, allErrors
+		compilationResults.Error = err
+		return compilationResults
 	}
-	programs := make([]cel.Program, len(celRules))
+	compResults := make([]CompilationResult, len(celRules))
 	for i, rule := range celRules {
+		var compilationResult CompilationResult
+		compilationResult.RuleIndex = i
+		compilationResult.Rule = rule
+		var errors []error
 		if rule.Rule == "" {
-			allErrors = append(allErrors, fmt.Errorf("valid is not specified"))
-			return nil, allErrors
-		}
-		ast, issues := env.Compile(rule.Rule)
-		if issues != nil {
-			allErrors = append(allErrors, fmt.Errorf("compilation failed for valid: %v with message: %v", rule, issues.Err()))
+			errors = append(errors, fmt.Errorf("rule is not specified"))
+			compilationResult.Errors = errors
 		} else {
-			prog, err := env.Program(ast)
-			if err != nil {
-				allErrors = append(allErrors, fmt.Errorf("program instantiation failed for valid: %v with message: %v", rule, err))
+			ast, issues := env.Compile(rule.Rule)
+			if issues != nil {
+				for _, issue := range issues.Errors() {
+					errors = append(errors, fmt.Errorf("compilation failed for rule: %v with message: %v", rule, issue.Message))
+				}
+				compilationResult.Errors = errors
 			} else {
-				programs[i] = prog
+				prog, err := env.Program(ast)
+				if err != nil {
+					errors = append(errors, fmt.Errorf("program instantiation failed for rule: %v with message: %v", rule, err))
+					compilationResult.Errors = errors
+				} else {
+					compilationResult.Program = prog
+				}
 			}
 		}
-	}
 
-	if len(allErrors) > 0 {
-		return nil, allErrors
+		compResults[i] = compilationResult
 	}
-	return programs, allErrors
+	compilationResults.Results = compResults
+
+	return compilationResults
 }
