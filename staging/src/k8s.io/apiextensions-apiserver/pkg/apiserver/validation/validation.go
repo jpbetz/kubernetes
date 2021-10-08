@@ -48,7 +48,11 @@ func ValidateCustomResource(fldPath *field.Path, customResource interface{}, val
 	if validator == nil {
 		return nil
 	}
-
+	// TODO(jpbetz): Add CEL validation. Looks like we might need to either:
+	// - put the CEL support into kube-openapi
+	//   OR
+	// - export a SchemaValidator.AddValueValidator() function from kube-openapi so that we
+	//   can set the CEL validation rule for schemas
 	result := validator.Validate(customResource)
 	if result.IsValid() {
 		return nil
