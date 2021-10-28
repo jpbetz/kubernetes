@@ -27,8 +27,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-	"k8s.io/kube-openapi/pkg/validation/strfmt"
-	kubeopenapivalidate "k8s.io/kube-openapi/pkg/validation/validate"
 )
 
 // ValidateDefaults checks that default values validate and are properly pruned.
@@ -66,7 +64,7 @@ func validate(pth *field.Path, s *structuralschema.Structural, rootSchema *struc
 	allErrs := field.ErrorList{}
 
 	if s.Default.Object != nil {
-		validator := kubeopenapivalidate.NewSchemaValidator(s.ToKubeOpenAPI(), nil, "", strfmt.Default)
+		validator := apiservervalidation.NewOpenapiSchemaValidator(s.ToKubeOpenAPI())
 
 		if insideMeta {
 			obj, _, err := f(runtime.DeepCopyJSONValue(s.Default.Object))

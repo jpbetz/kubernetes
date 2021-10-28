@@ -18,6 +18,8 @@ package validation
 
 import (
 	"encoding/json"
+	genericfeatures "k8s.io/apiserver/pkg/features"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"strings"
 
 	openapierrors "k8s.io/kube-openapi/pkg/validation/errors"
@@ -39,7 +41,18 @@ func NewSchemaValidator(customResourceValidation *apiextensions.CustomResourceVa
 			return nil, nil, err
 		}
 	}
-	return validate.NewSchemaValidator(openapiSchema, nil, "", strfmt.Default), openapiSchema, nil
+	return NewOpenapiSchemaValidator(openapiSchema), openapiSchema, nil
+}
+
+// NewOpenapiSchemaValidator creates a schema validator for the given openapi schema.
+// The schema validator is configured for the default set of formats, and validation expression
+// support is enabled if the CustomResourceValidationExpressions feature flag is enabled.
+func NewOpenapiSchemaValidator(openapiSchema *spec.Schema) *validate.SchemaValidator {
+	var opts []validate.Option
+	if utilfeature.DefaultFeatureGate.Enabled(genericfeatures.CustomResourceValidationExpressions) {
+		opts = append(opts, validate.ValidationRulesEnabled)
+	}
+	return validate.NewSchemaValidator(openapiSchema, nil, "", strfmt.Default, opts...)
 }
 
 // ValidateCustomResource validates the Custom Resource against the schema in the CustomResourceDefinition.
