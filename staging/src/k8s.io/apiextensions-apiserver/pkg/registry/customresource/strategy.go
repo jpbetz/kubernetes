@@ -18,6 +18,9 @@ package customresource
 
 import (
 	"context"
+	"k8s.io/apiextensions-apiserver/pkg/apiserver/schema/cel"
+	"k8s.io/apiserver/pkg/features"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -47,12 +50,22 @@ type customResourceStrategy struct {
 	namespaceScoped   bool
 	validator         customResourceValidator
 	structuralSchemas map[string]*structuralschema.Structural
+	celValidators     map[string]*cel.Validator
 	status            *apiextensions.CustomResourceSubresourceStatus
 	scale             *apiextensions.CustomResourceSubresourceScale
 	kind              schema.GroupVersionKind
 }
 
 func NewStrategy(typer runtime.ObjectTyper, namespaceScoped bool, kind schema.GroupVersionKind, schemaValidator, statusSchemaValidator *validate.SchemaValidator, structuralSchemas map[string]*structuralschema.Structural, status *apiextensions.CustomResourceSubresourceStatus, scale *apiextensions.CustomResourceSubresourceScale) customResourceStrategy {
+	var celValidators map[string]*cel.Validator
+	if utilfeature.DefaultFeatureGate.Enabled(features.CustomResourceValidationExpressions) {
+		celValidators = make(map[string]*cel.Validator, len(structuralSchemas))
+		for name, s := range structuralSchemas {
+			v := cel.NewValidator(s) // CEL programs are compiled and cached here
+			celValidators[name] = &v
+		}
+	}
+
 	return customResourceStrategy{
 		ObjectTyper:     typer,
 		NameGenerator:   names.SimpleNameGenerator,
@@ -66,6 +79,7 @@ func NewStrategy(typer runtime.ObjectTyper, namespaceScoped bool, kind schema.Gr
 			statusSchemaValidator: statusSchemaValidator,
 		},
 		structuralSchemas: structuralSchemas,
+		celValidators:     celValidators,
 		kind:              kind,
 	}
 }
@@ -156,6 +170,11 @@ func (a customResourceStrategy) Validate(ctx context.Context, obj runtime.Object
 
 		// validate x-kubernetes-list-type "map" and "set" invariant
 		errs = append(errs, structurallisttype.ValidateListSetsAndMaps(nil, a.structuralSchemas[v], u.Object)...)
+
+		// validate x-kubernetes-validations rules
+		if a.celValidators != nil {
+			errs = append(errs, a.celValidators[v].Validate(nil, a.structuralSchemas[v], u.Object)...)
+		}
 	}
 
 	return errs
