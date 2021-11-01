@@ -204,6 +204,11 @@ func (a customResourceStrategy) ValidateUpdate(ctx context.Context, obj, old run
 		errs = append(errs, structurallisttype.ValidateListSetsAndMaps(nil, a.structuralSchemas[v], uNew.Object)...)
 	}
 
+	// validate x-kubernetes-validations rules
+	if a.celValidators != nil {
+		errs = append(errs, a.celValidators[v].Validate(nil, a.structuralSchemas[v], uNew.Object)...)
+	}
+
 	return errs
 }
 

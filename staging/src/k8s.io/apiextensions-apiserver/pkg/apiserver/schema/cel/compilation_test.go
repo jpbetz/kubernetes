@@ -363,25 +363,7 @@ func TestCelCompilation(t *testing.T) {
 			expectedErrMessage: "compilation failed",
 		},
 		{
-			name: "valid is not specified",
-			input: schema.Structural{
-				Generic: schema.Generic{
-					Type: "integer",
-				},
-				Extensions: schema.Extensions{
-					XValidations: apiextensions.ValidationRules{
-						{
-							Message: "size of scoped field should be equal to 10",
-						},
-					},
-				},
-			},
-			wantError:          true,
-			checkErrorMessage:  true,
-			expectedErrMessage: "rule is not specified",
-		},
-		{
-			name: "valid is not specified",
+			name: "rule is not specified",
 			input: schema.Structural{
 				Generic: schema.Generic{
 					Type: "integer",
