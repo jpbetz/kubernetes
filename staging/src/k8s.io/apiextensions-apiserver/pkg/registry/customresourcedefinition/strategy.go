@@ -234,7 +234,7 @@ func CustomResourceDefinitionToSelectableFields(obj *apiextensions.CustomResourc
 // are not enabled.
 func dropDisabledFields(newCRD *apiextensions.CustomResourceDefinition, oldCRD *apiextensions.CustomResourceDefinition) {
 	if !utilfeature.DefaultFeatureGate.Enabled(features.CustomResourceValidationExpressions) && !xValidationsInUse(oldCRD) {
-		if newCRD.Spec.Validation != nil {
+		if newCRD.Spec.Validation != nil && newCRD.Spec.Validation.OpenAPIV3Schema != nil {
 			dropXValidationsField(newCRD.Spec.Validation.OpenAPIV3Schema)
 		}
 	}

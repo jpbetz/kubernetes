@@ -17,6 +17,7 @@ limitations under the License.
 package cel
 
 import (
+	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	"k8s.io/apiextensions-apiserver/pkg/apiserver/schema"
 	"strings"
 	"testing"
@@ -49,7 +50,7 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 				Extensions: schema.Extensions{
-					XValidations: schema.ValidationRules{
+					XValidations: apiextensions.ValidationRules{
 						{
 							Rule:    "minReplicas < maxReplicas",
 							Message: "minReplicas should be smaller than maxReplicas",
@@ -67,7 +68,7 @@ func TestCelCompilation(t *testing.T) {
 					Type: "string",
 				},
 				Extensions: schema.Extensions{
-					XValidations: schema.ValidationRules{
+					XValidations: apiextensions.ValidationRules{
 						{
 							Rule:    "self.startsWith('s')",
 							Message: "scoped field should start with 's'",
@@ -88,7 +89,7 @@ func TestCelCompilation(t *testing.T) {
 					Format: "byte",
 				},
 				Extensions: schema.Extensions{
-					XValidations: schema.ValidationRules{
+					XValidations: apiextensions.ValidationRules{
 						{
 							Rule:    "string(self).endsWith('s')",
 							Message: "scoped field should end with 's'",
@@ -106,7 +107,7 @@ func TestCelCompilation(t *testing.T) {
 					Type: "boolean",
 				},
 				Extensions: schema.Extensions{
-					XValidations: schema.ValidationRules{
+					XValidations: apiextensions.ValidationRules{
 						{
 							Rule:    "self == true",
 							Message: "scoped field should be true",
@@ -124,7 +125,7 @@ func TestCelCompilation(t *testing.T) {
 					Type: "integer",
 				},
 				Extensions: schema.Extensions{
-					XValidations: schema.ValidationRules{
+					XValidations: apiextensions.ValidationRules{
 						{
 							Rule:    "self > 0",
 							Message: "scoped field should be greater than 0",
@@ -142,7 +143,7 @@ func TestCelCompilation(t *testing.T) {
 					Type: "number",
 				},
 				Extensions: schema.Extensions{
-					XValidations: schema.ValidationRules{
+					XValidations: apiextensions.ValidationRules{
 						{
 							Rule:    "self > 1.0",
 							Message: "scoped field should be greater than 1.0",
@@ -177,7 +178,7 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 				Extensions: schema.Extensions{
-					XValidations: schema.ValidationRules{
+					XValidations: apiextensions.ValidationRules{
 						{
 							Rule:    "nestedObj.val == 10",
 							Message: "val should be equal to 10",
@@ -212,7 +213,7 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 				Extensions: schema.Extensions{
-					XValidations: schema.ValidationRules{
+					XValidations: apiextensions.ValidationRules{
 						{
 							Rule:    "size(self.nestedObj[0]) == 10",
 							Message: "size of first element in nestedObj should be equal to 10",
@@ -245,7 +246,7 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 				Extensions: schema.Extensions{
-					XValidations: schema.ValidationRules{
+					XValidations: apiextensions.ValidationRules{
 						{
 							Rule:    "size(self[0][0]) == 10",
 							Message: "size of items under items of scoped field should be equal to 10",
@@ -285,7 +286,7 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 				Extensions: schema.Extensions{
-					XValidations: schema.ValidationRules{
+					XValidations: apiextensions.ValidationRules{
 						{
 							Rule:    "self[0].nestedObj.val == 10",
 							Message: "val under nestedObj under properties under items should be equal to 10",
@@ -312,7 +313,7 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 				Extensions: schema.Extensions{
-					XValidations: schema.ValidationRules{
+					XValidations: apiextensions.ValidationRules{
 						{
 							Rule:    "size(self) > 0",
 							Message: "size of scoped field should be greater than 0",
@@ -330,7 +331,7 @@ func TestCelCompilation(t *testing.T) {
 					Type: "number",
 				},
 				Extensions: schema.Extensions{
-					XValidations: schema.ValidationRules{
+					XValidations: apiextensions.ValidationRules{
 						{
 							Rule:    "size(self) == 10",
 							Message: "size of scoped field should be equal to 10",
@@ -349,7 +350,7 @@ func TestCelCompilation(t *testing.T) {
 					Type: "integer",
 				},
 				Extensions: schema.Extensions{
-					XValidations: schema.ValidationRules{
+					XValidations: apiextensions.ValidationRules{
 						{
 							Rule:    "size(self) == 10",
 							Message: "size of scoped field should be equal to 10",
@@ -359,16 +360,16 @@ func TestCelCompilation(t *testing.T) {
 			},
 			wantError:          true,
 			checkErrorMessage:  true,
-			expectedErrMessage: "compilation failed for valid",
+			expectedErrMessage: "no matching overload for 'size' applied to '(int)",
 		},
 		{
-			name: "valid is not specified",
+			name: "rule is not specified",
 			input: schema.Structural{
 				Generic: schema.Generic{
 					Type: "integer",
 				},
 				Extensions: schema.Extensions{
-					XValidations: schema.ValidationRules{
+					XValidations: apiextensions.ValidationRules{
 						{
 							Message: "size of scoped field should be equal to 10",
 						},
@@ -377,40 +378,32 @@ func TestCelCompilation(t *testing.T) {
 			},
 			wantError:          true,
 			checkErrorMessage:  true,
-			expectedErrMessage: "valid is not specified",
-		},
-		{
-			name: "valid is not specified",
-			input: schema.Structural{
-				Generic: schema.Generic{
-					Type: "integer",
-				},
-				Extensions: schema.Extensions{
-					XValidations: schema.ValidationRules{
-						{
-							Message: "size of scoped field should be equal to 10",
-						},
-					},
-				},
-			},
-			wantError:          true,
-			checkErrorMessage:  true,
-			expectedErrMessage: "valid is not specified",
+			expectedErrMessage: "rule is not specified",
 		},
 	}
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			_, allErrors := Compile(&tt.input)
+			results := Compile(&tt.input)
+			if results.Error != nil { // we don't expect any field wide errors
+				t.Errorf("Unexpected error: %v", results.Error)
+			}
+
+			var allErrors []error
+			for _, result := range results.Results {
+				allErrors = append(allErrors, result.Errors...)
+			}
 			if tt.checkErrorMessage {
 				var pass = false
-				for _, err := range allErrors {
-					if strings.Contains(err.Error(), tt.expectedErrMessage) {
-						pass = true
+				for _, result := range results.Results {
+					for _, err := range result.Errors {
+						if strings.Contains(err.Error(), tt.expectedErrMessage) {
+							pass = true
+						}
 					}
 				}
 				if !pass {
-					t.Errorf("Expected error massage contains: %v, but got error: %v", tt.expectedErrMessage, allErrors)
+					t.Errorf("Expected error massage contains: %v, but got errors: %v", tt.expectedErrMessage, allErrors)
 				}
 			} else {
 				if !tt.wantError && len(allErrors) > 0 {

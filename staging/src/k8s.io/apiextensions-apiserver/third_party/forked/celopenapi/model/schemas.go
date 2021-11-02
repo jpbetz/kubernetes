@@ -58,7 +58,7 @@ func SchemaDeclType(s *schema.Structural) *DeclType {
 	case ListType.TypeName():
 		return NewListType(SchemaDeclType(s.Items))
 	case MapType.TypeName():
-		if s.AdditionalProperties != nil && s.AdditionalProperties.Bool == true && s.AdditionalProperties.Structural != nil {
+		if s.AdditionalProperties != nil && s.AdditionalProperties.Structural != nil {
 			return NewMapType(StringType, SchemaDeclType(s.AdditionalProperties.Structural))
 		}
 		fields := make(map[string]*DeclField, len(s.Properties))
