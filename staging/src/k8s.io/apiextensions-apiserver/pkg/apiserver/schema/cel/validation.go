@@ -18,12 +18,11 @@ package cel
 
 import (
 	"fmt"
-	"github.com/google/cel-go/common/types/ref"
+	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/interpreter"
+	"k8s.io/apiextensions-apiserver/pkg/apiserver/schema"
 	"k8s.io/apiextensions-apiserver/third_party/forked/celopenapi/model"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-
-	"k8s.io/apiextensions-apiserver/pkg/apiserver/schema"
 )
 
 // Validator provides x-kubernetes-validations validation. It compiles CEL programs when instantiated.
@@ -80,25 +79,9 @@ func (s *Validator) Validate(fldPath *field.Path, sts *schema.Structural, obj in
 }
 
 func (s *Validator) validateExpressions(fldPath *field.Path, sts *schema.Structural, obj interface{}) (errs field.ErrorList) {
-	bindings := map[string]interface{}{
-		ScopedVarName: func() ref.Val { return UnstructuredToVal(obj, sts) },
-	}
-	if m, ok := obj.(map[string]interface{}); sts.Type == "object" && ok {
-		for k, v := range m {
-			propSchema := sts.Properties[k]
-			val := v
-			if !(model.IsRootReserved(k) || k == ScopedVarName) {
-				bindings[model.Escape(k)] = func() ref.Val { return UnstructuredToVal(val, &propSchema) }
-			}
-		}
-	}
-	activation, err := interpreter.NewActivation(bindings)
-	if err != nil {
-		errs = append(errs, field.Invalid(fldPath, obj, fmt.Sprintf("failed to bind variables to due to error %v", err.Error())))
-		return errs
-	}
+	activation := &validationActivation{obj: obj, structural: sts}
 	if s.compiledRules.Error != nil {
-		errs = append(errs, field.Invalid(fldPath, obj, fmt.Sprintf("failed to compile rules due to error %v", err)))
+		errs = append(errs, field.Invalid(fldPath, obj, fmt.Sprintf("failed to compile rules due to error %v", s.compiledRules.Error)))
 		return errs
 	}
 	for _, compiled := range s.compiledRules.Results {
@@ -114,7 +97,7 @@ func (s *Validator) validateExpressions(fldPath *field.Path, sts *schema.Structu
 			errs = append(errs, field.Invalid(fldPath, obj, fmt.Sprintf("failed to execute rule '%s' due to error %v", rule.Rule, err)))
 			continue
 		}
-		if evalResult.Value() != true {
+		if evalResult != types.True {
 			if len(rule.Message) != 0 {
 				errs = append(errs, field.Invalid(fldPath, obj, rule.Message))
 			} else {
@@ -123,6 +106,30 @@ func (s *Validator) validateExpressions(fldPath *field.Path, sts *schema.Structu
 		}
 	}
 	return errs
+}
+
+type validationActivation struct {
+	obj        interface{}
+	structural *schema.Structural
+}
+
+func (a *validationActivation) ResolveName(name string) (interface{}, bool) {
+	if name == ScopedVarName {
+		return UnstructuredToVal(a.obj, a.structural), true
+	}
+	if m, ok := a.obj.(map[string]interface{}); a.structural.Type == "object" && ok {
+		k := model.Unescape(name)
+		if propSchema, ok := a.structural.Properties[k]; ok {
+			if val, ok := m[k]; ok {
+				return UnstructuredToVal(val, &propSchema), true
+			}
+		}
+	}
+	return nil, false
+}
+
+func (a *validationActivation) Parent() interpreter.Activation {
+	return nil
 }
 
 func (s *Validator) validateMap(fldPath *field.Path, sts *schema.Structural, obj map[string]interface{}) (errs field.ErrorList) {

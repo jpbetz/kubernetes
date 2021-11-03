@@ -263,6 +263,8 @@ func (t *unstructuredList) ConvertToType(typeValue ref.Type) ref.Val {
 	switch typeValue {
 	case types.ListType:
 		return t
+	case types.TypeType:
+		return types.ListType
 	}
 	return types.NewErr("type conversion error from '%s' to '%s'", t.Type(), typeValue.TypeName())
 }
@@ -388,6 +390,8 @@ func (t unstructuredMap) ConvertToType(typeValue ref.Type) ref.Val {
 	switch typeValue {
 	case types.MapType:
 		return t
+	case types.TypeType:
+		return types.MapType
 	}
 	return types.NewErr("type conversion error from '%s' to '%s'", t.Type(), typeValue.TypeName())
 }

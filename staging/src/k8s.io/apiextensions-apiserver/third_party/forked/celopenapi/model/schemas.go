@@ -45,7 +45,7 @@ func SchemaDeclType(s *schema.Structural) *DeclType {
 		return NewObjectType("embedded", map[string]*DeclField{
 			"kind":       {Name: "kind", Type: StringType},
 			"apiVersion": {Name: "apiVersion", Type: StringType},
-			"metadata": {Name: "metadata", Type: NewObjectType("metadata", map[string]*DeclField{
+			"metadata":   {Name: "metadata", Type: NewObjectType("metadata", map[string]*DeclField{
 				"name":         {Name: "name", Type: StringType},
 				"generateName": {Name: "generateName", Type: StringType, Required: false},
 			})},

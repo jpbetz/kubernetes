@@ -53,8 +53,8 @@ func TestValidationExpressions(t *testing.T) {
 				"type(val5) == int",
 			},
 			errors: map[string]string{
-				"val1 + 1": "integer overflow",
-				"val5 + 1": "integer overflow",
+				"val1 + 1 == 0": "integer overflow",
+				"val5 + 1 == 0": "integer overflow",
 			},
 		},
 		{name: "numbers",
@@ -294,7 +294,7 @@ func TestValidationExpressions(t *testing.T) {
 				"size(val.filter(k, val[k] > 1)) == 1",
 			},
 			errors: map[string]string{
-				"val['c']": "no such key: c",
+				"val['c'] == 1": "no such key: c",
 			},
 		},
 		{name: "listMap access",
