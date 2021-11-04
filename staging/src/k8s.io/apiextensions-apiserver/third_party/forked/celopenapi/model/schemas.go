@@ -79,7 +79,7 @@ func SchemaDeclType(s *schema.Structural) *DeclType {
 				Required:     required[name],
 				Type:         SchemaDeclType(&prop),
 				defaultValue: prop.Default.Object,
-				enumValues:   enumValues, // TODO: escape?
+				enumValues:   enumValues, // Enum values are represented as strings in CEL
 			}
 		}
 		return NewObjectType("object", fields)
@@ -90,9 +90,9 @@ func SchemaDeclType(s *schema.Structural) *DeclType {
 				return StringType // OpenAPIv3 byte format represents base64 encoded string
 			case "binary":
 				return BytesType
-			case "google-duration":
+			case "duration":
 				return DurationType
-			case "date", "date-time", "google-datetime":
+			case "date", "date-time":
 				return TimestampType
 			case "int64":
 				return IntType
@@ -127,8 +127,6 @@ var (
 		"integer":         IntType,
 		"null":            NullType,
 		"string":          StringType,
-		"google-duration": DurationType,
-		"google-datetime": TimestampType,
 		"date":            TimestampType,
 		"date-time":       TimestampType,
 		"array":           ListType,

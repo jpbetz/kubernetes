@@ -23,8 +23,10 @@ import (
 	"github.com/google/cel-go/common/types/traits"
 	structuralschema "k8s.io/apiextensions-apiserver/pkg/apiserver/schema"
 	"k8s.io/apiextensions-apiserver/third_party/forked/celopenapi/model"
+	"k8s.io/kube-openapi/pkg/validation/strfmt"
 	"reflect"
 	"sync"
+	"time"
 )
 
 // UnstructuredToVal converts a Kubernetes unstructured data element to a CEL Val.
@@ -75,6 +77,30 @@ func UnstructuredToVal(unstructured interface{}, schema *structuralschema.Struct
 			}
 		}
 		return &typedList
+	}
+	if schema.Type == "string" && schema.ValueValidation != nil {
+		if str, ok := unstructured.(string); ok {
+			switch schema.ValueValidation.Format {
+			case "duration":
+				d, err := strfmt.ParseDuration(str)
+				if err != nil {
+					return types.NewErr("Invalid duration %s: %v", str, err)
+				}
+				return types.DefaultTypeAdapter.NativeToValue(d)
+			case "date":
+				d, err := time.Parse(strfmt.RFC3339FullDate, str) // strfmt uses this too
+				if err != nil {
+					return types.NewErr("Invalid date %s: %v", str, err)
+				}
+				return types.DefaultTypeAdapter.NativeToValue(d)
+			case "date-time":
+				d, err := strfmt.ParseDateTime(str)
+				if err != nil {
+					return types.NewErr("Invalid date-time %s: %v", str, err)
+				}
+				return types.DefaultTypeAdapter.NativeToValue(time.Time(d))
+			}
+		}
 	}
 	return types.DefaultTypeAdapter.NativeToValue(unstructured)
 }

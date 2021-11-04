@@ -124,6 +124,48 @@ func TestValidationExpressions(t *testing.T) {
 				"type(val1) == bool",
 			},
 		},
+		{name: "durations",
+			obj:    objs("1h2m3s4ms", "1h2m3s4ms"),
+			schema: schemas(durationType, durationType),
+			valid: []string{
+				"val1 == duration('1h2m3s4ms')",
+				"val1 == duration('1h2m') + duration('3s4ms')",
+				"val1.getHours() == 1",
+				"val1.getMinutes() == 62",
+				"val1.getSeconds() == 3723",
+				"val1.getMilliseconds() == 3723004",
+				"type(val1) == google.protobuf.Duration",
+			},
+		},
+		{name: "dates",
+			obj:    objs("1997-07-16", "1997-07-16"),
+			schema: schemas(dateType, dateType),
+			valid: []string{
+				"val1.getDate() == 16",
+				"val1.getMonth() == 06", // zero based indexing
+				"val1.getFullYear() == 1997",
+				"type(val1) == google.protobuf.Timestamp",
+			},
+		},
+		{name: "datetimes",
+			obj:    objs("2011-08-18T19:03:37.010000000+01:00", "2011-08-18T19:03:37.010000000+01:00"),
+			schema: schemas(dateTimeType, dateTimeType),
+			valid: []string{
+				"val1 == timestamp('2011-08-18T19:03:37.010+01:00')",
+				"val1 == timestamp('2011-08-18T00:00:00.000+01:00') + duration('19h3m37s10ms')",
+				"val1.getDate('01:00') == 18",
+				"val1.getMonth('01:00') == 7", // zero based indexing
+				"val1.getFullYear('01:00') == 2011",
+				"val1.getHours('01:00') == 19",
+				"val1.getMinutes('01:00') == 03",
+				"val1.getSeconds('01:00') == 37",
+				"val1.getMilliseconds('01:00') == 10",
+				"val1.getHours('UTC') == 18", // TZ in string is 1hr off of UTC
+				"type(val1) == google.protobuf.Timestamp",
+			},
+		},
+
+		// 1997-07-16T19:20:30+01:00
 		{name: "conversions",
 			obj:    objs(int64(10), 10.0, 10.49, 10.5, true, "10", []byte("10")),
 			schema: schemas(integerType, numberType, numberType, numberType, booleanType, stringType, binaryType),
@@ -525,6 +567,10 @@ var (
 	byteType    = primitiveType("string", "byte")
 	binaryType  = primitiveType("string", "binary")
 	booleanType = primitiveType("boolean", "")
+
+	durationType = primitiveType("string", "duration")
+	dateType     = primitiveType("string", "date")
+	dateTimeType = primitiveType("string", "date-time")
 )
 
 func listType(items *schema.Structural) schema.Structural {
