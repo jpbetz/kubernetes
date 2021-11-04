@@ -26,8 +26,30 @@ import (
 	"testing"
 )
 
+var celBuiltinMacroIdentifiers = sets.NewString(
+	// macros and functions
+	"has", "all", "exists", "exists_one", "map", "filter",
+	"size", "contains", "dyn", "startsWith", "endsWith", "matches",
+	// time related
+	"duration", "timestamp",
+	"getDate", "getDayOfMonth", "getDayOfWeek", "getDayOfYear", "getFullYear", "getHours", "getMilliseconds", "getMinutes", "getMonth", "getSeconds",
+)
+
+// TestPropNameEscaping tests that
 func TestPropNameEscaping(t *testing.T) {
-	cases := sets.NewString("self", "_if", "__if", "___if").Union(model.AlwaysReservedIdentifiers).Union(model.RootReservedIdentifiers)
+	cases := sets.NewString(
+		"self",
+		"_if", "__if", "___if",
+		"_abc", "__abc", "___abc",
+	). //
+		Union(model.AlwaysReservedIdentifiers).
+		// Must not be bound as root variables. Doing so would result in a compilation error:
+		//"overlapping identifier for name '<identifier>'":
+		Union(model.RootReservedIdentifiers).
+		// Are allowed to be used as identifiers because the parser can disambiguate them from the function and
+		// macro identifiers:
+		Union(celBuiltinMacroIdentifiers)
+
 	for _, prop := range cases.List() {
 		escapedProp := model.Escape(prop)
 		scopedIfNonRootProp := escapedProp
@@ -62,7 +84,7 @@ func TestPropNameEscaping(t *testing.T) {
 				},
 			}
 			obj := map[string]interface{}{
-				// prop names are not escaped in the object
+				// prop name remains unescaped here in the object
 				prop: []interface{}{"a", "b", "c"},
 			}
 			celValidator := NewValidator(s)

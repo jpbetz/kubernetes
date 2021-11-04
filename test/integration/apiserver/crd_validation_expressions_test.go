@@ -276,8 +276,10 @@ func TestCustomResourceValidators(t *testing.T) {
 				Rule: "has(self.foo)",
 			},
 		}
-		apiExtensionClient.ApiextensionsV1().CustomResourceDefinitions().Update(context.TODO(), crd, metav1.UpdateOptions{})
-		// TODO: test error once code is fixed so update fails as expected
+		_, err = apiExtensionClient.ApiextensionsV1().CustomResourceDefinitions().Update(context.TODO(), crd, metav1.UpdateOptions{})
+		if err == nil {
+			t.Fatal("Expected error")
+		}
 	})
 	t.Run("CRD creation MUST fail if a x-kubernetes-validations rule accesses a metadata field other than name", func(t *testing.T) {
 		structuralWithValidators := crdWithSchema(t, "InvalidStructuralMetadata", structuralSchemaWithInvalidMetadataValidators)

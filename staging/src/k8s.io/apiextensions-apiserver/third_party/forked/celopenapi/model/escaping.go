@@ -40,25 +40,17 @@ var celLanguageIdentifiers = sets.NewString(
 	"int", "uint", "double", "bool", "string", "bytes", "list", "map", "null_type", "type",
 )
 
-var celBuiltinMacroIdentifiers = sets.NewString(
-	"has", "all", "exists", "exists_one", "map", "filter",
-)
-
-var celBuiltinFunctionIdentifiers = sets.NewString(
-	"size", "contains", "dyn", "startsWith", "endsWith", "matches",
-	// time related
-	"duration", "timestamp",
-	"getDate", "getDayOfMonth", "getDayOfWeek", "getDayOfYear", "getFullYear", "getHours", "getMilliseconds", "getMinutes", "getMonth", "getSeconds",
-)
-
 // AlwaysReservedIdentifiers is a list of identifiers that may not appear unescaped anywhere in a CEL program.
 var AlwaysReservedIdentifiers = celReservedSymbols
 
-// RootReservedIdentifiers is a list of identifiers that may not appear as bound variables in a CEL program because
-// because they would be ambiguous with the names of CEL builtin type names, macros or functions.
-var RootReservedIdentifiers = celLanguageIdentifiers.Union(celBuiltinMacroIdentifiers).Union(celBuiltinFunctionIdentifiers)
+// RootReservedIdentifiers is a list of identifiers that are reserved by CEL. Declaring root variables in CEL with
+// these identifiers is not allowed and would result in an "overlapping identifier for name '<identifier>'"
+// CEL compilation error.
+var RootReservedIdentifiers = celLanguageIdentifiers
 
-// IsRootReserved returns true if an identifier is in the RootReservedIdentifiers set.
+// IsRootReserved returns true if an identifier is reserved by CEL. Declaring root variables in CEL with
+// these identifiers is not allowed and would result in an "overlapping identifier for name '<identifier>'"
+// CEL compilation error.
 func IsRootReserved(prop string) bool {
 	return RootReservedIdentifiers.Has(prop)
 }
