@@ -41,19 +41,15 @@ func SchemaDeclType(s *schema.Structural) *DeclType {
 			"intVal": {Name: "intVal", Type: IntType},
 		})
 	}
-	if s.XEmbeddedResource {
-		return NewObjectType("embedded", map[string]*DeclField{
-			"kind":       {Name: "kind", Type: StringType},
-			"apiVersion": {Name: "apiVersion", Type: StringType},
-			"metadata":   {Name: "metadata", Type: NewObjectType("metadata", map[string]*DeclField{
-				"name":         {Name: "name", Type: StringType},
-				"generateName": {Name: "generateName", Type: StringType, Required: false},
-			})},
-			"spec":   {Name: "spec", Type: DynType},
-			"status": {Name: "status", Type: DynType, Required: false},
-		})
-	}
-	if s.XPreserveUnknownFields {
+	if  s.XPreserveUnknownFields || s.XEmbeddedResource {
+		// XPreserveUnknownFields has no restriction on properties allowed, so all type checking is deferred to runtime.
+
+		// XEmbeddedResource has no restriction on the properties allowed except that kind, apiVersion and metadata
+		// must be their expected types.
+		// Because is not possible to describe this type information to CEL, we use defer type checking to runtime
+		// and restrict metadata access to name and generateName at runtime to enforce the rule that only those
+		// metadata fields may have validation rules applied to them.
+
 		return DynType
 	}
 	switch declType.TypeName() {

@@ -34,6 +34,11 @@ func UnstructuredToVal(unstructured interface{}, schema *structuralschema.Struct
 		if !ok {
 			types.NewErr("invalid data, expected map[string]interface{} to match the provided schema with type=object")
 		}
+		if schema.XEmbeddedResource {
+			// only allow access to name and generateNames of metadata by pruning all other metadata fields.
+			return types.DefaultTypeAdapter.NativeToValue(pruneEmbeddedObjectMetadata(m))
+		}
+
 		if schema.AdditionalProperties != nil && schema.AdditionalProperties.Structural != nil {
 			return &unstructuredMap{
 				value:      m,
@@ -72,6 +77,28 @@ func UnstructuredToVal(unstructured interface{}, schema *structuralschema.Struct
 		return &typedList
 	}
 	return types.DefaultTypeAdapter.NativeToValue(unstructured)
+}
+
+// pruneEmbeddedObjectMetadata returns a shallow copy of m with m["metadata"] pruned of all properties except name and generateName.
+func pruneEmbeddedObjectMetadata(m map[string]interface{}) map[string]interface{} {
+	pruned := make(map[string]interface{}, len(m))
+	for k, v := range m {
+		if k == "metadata" {
+			if vmap, ok := v.(map[string]interface{}); ok {
+				metadata := map[string]interface{}{}
+				if name, ok := vmap["name"]; ok {
+					metadata["name"] = name
+				}
+				if generateName, ok := vmap["generateName"]; ok {
+					metadata["generateName"] = generateName
+				}
+				pruned["metadata"] = metadata
+			}
+		} else {
+			pruned[k] = v
+		}
+	}
+	return pruned
 }
 
 // unstructuredMapList represents an unstructured data instance of an OpenAPI array with x-kubernetes-list-type=map.

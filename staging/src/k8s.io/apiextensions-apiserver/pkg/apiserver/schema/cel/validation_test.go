@@ -374,7 +374,9 @@ func TestValidationExpressions(t *testing.T) {
 					"apiVersion": "v1",
 					"kind":       "Pod",
 					"metadata": map[string]interface{}{
-						"name": "foo",
+						"name":         "foo",
+						"generateName": "pickItForMe",
+						"namespace":    "xyz",
 					},
 					"spec": map[string]interface{}{
 						"field1": "a",
@@ -388,7 +390,15 @@ func TestValidationExpressions(t *testing.T) {
 				"embedded":    embeddedType(),
 				"maxReplicas": integerType,
 			}),
-			valid: []string{"embedded.kind == 'Pod' && embedded.apiVersion == 'v1' && embedded.metadata.name == 'foo' && embedded.spec.field1 == 'a' && embedded.status.health == 'ok'"},
+			valid: []string{
+				"embedded.kind == 'Pod'",
+				"embedded.apiVersion == 'v1'",
+				"embedded.metadata.name == 'foo'",
+				"embedded.metadata.generateName == 'pickItForMe'",
+				"!has(embedded.metadata.namespace)", // we prune metadata to only allow access to name and generateName
+				"embedded.spec.field1 == 'a'",
+				"embedded.status.health == 'ok'",
+			},
 		},
 		{name: "string in intOrString",
 			obj: map[string]interface{}{
