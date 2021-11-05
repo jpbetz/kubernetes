@@ -423,9 +423,6 @@ func TestValidationExpressions(t *testing.T) {
 					"spec": map[string]interface{}{
 						"field1": "a",
 					},
-					"status": map[string]interface{}{
-						"health": "ok",
-					},
 				},
 			},
 			schema: objectType(map[string]schema.Structural{
@@ -437,9 +434,10 @@ func TestValidationExpressions(t *testing.T) {
 				"embedded.apiVersion == 'v1'",
 				"embedded.metadata.name == 'foo'",
 				"embedded.metadata.generateName == 'pickItForMe'",
-				"!has(embedded.metadata.namespace)", // we prune metadata to only allow access to name and generateName
-				"embedded.spec.field1 == 'a'",
-				"embedded.status.health == 'ok'",
+			},
+			errors: map[string]string{
+				"has(embedded.metadata.namespace)": "undefined field 'namespace'",
+				"has(embedded.spec)":               "undefined field 'spec'",
 			},
 		},
 		{name: "string in intOrString",
@@ -474,7 +472,9 @@ func TestValidationExpressions(t *testing.T) {
 			schema: objectType(map[string]schema.Structural{
 				"unknown": unknownType(),
 			}),
-			valid: []string{"unknown.field1 == 'a'"},
+			errors: map[string]string{
+				"has(self.field1)": "undefined field 'field1'",
+			},
 		},
 		{name: "known and unknown fields",
 			obj: map[string]interface{}{
@@ -482,7 +482,6 @@ func TestValidationExpressions(t *testing.T) {
 					"minReplicas": 1,
 					"maxReplicas": 2,
 					"field1":      "a",
-					"field2":      "b",
 				},
 			},
 			schema: &schema.Structural{
@@ -510,7 +509,10 @@ func TestValidationExpressions(t *testing.T) {
 					},
 				},
 			},
-			valid: []string{"spec.field1 == 'a' && spec.minReplicas < spec.maxReplicas"},
+			valid: []string{"spec.minReplicas < spec.maxReplicas"},
+			errors: map[string]string{
+				"has(spec.field1)": "undefined field 'field1'",
+			},
 		},
 	}
 

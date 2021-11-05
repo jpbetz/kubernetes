@@ -38,7 +38,11 @@ func UnstructuredToVal(unstructured interface{}, schema *structuralschema.Struct
 		}
 		if schema.XEmbeddedResource {
 			// only allow access to name and generateNames of metadata by pruning all other metadata fields.
-			return types.DefaultTypeAdapter.NativeToValue(pruneEmbeddedObjectMetadata(m))
+			return &unstructuredMap{
+				value:      m,
+				schema:     embeddedSchema,
+				propSchema: func(key string) *structuralschema.Structural { schema := schema.Properties[key]; return &schema },
+			}
 		}
 
 		if schema.AdditionalProperties != nil && schema.AdditionalProperties.Structural != nil {
@@ -103,28 +107,6 @@ func UnstructuredToVal(unstructured interface{}, schema *structuralschema.Struct
 		}
 	}
 	return types.DefaultTypeAdapter.NativeToValue(unstructured)
-}
-
-// pruneEmbeddedObjectMetadata returns a shallow copy of m with m["metadata"] pruned of all properties except name and generateName.
-func pruneEmbeddedObjectMetadata(m map[string]interface{}) map[string]interface{} {
-	pruned := make(map[string]interface{}, len(m))
-	for k, v := range m {
-		if k == "metadata" {
-			if vmap, ok := v.(map[string]interface{}); ok {
-				metadata := map[string]interface{}{}
-				if name, ok := vmap["name"]; ok {
-					metadata["name"] = name
-				}
-				if generateName, ok := vmap["generateName"]; ok {
-					metadata["generateName"] = generateName
-				}
-				pruned["metadata"] = metadata
-			}
-		} else {
-			pruned[k] = v
-		}
-	}
-	return pruned
 }
 
 // unstructuredMapList represents an unstructured data instance of an OpenAPI array with x-kubernetes-list-type=map.
@@ -538,4 +520,39 @@ func (t *unstructuredMap) Find(key ref.Val) (ref.Val, bool) {
 	}
 
 	return nil, false
+}
+
+var embeddedSchema = &structuralschema.Structural{
+	Generic: structuralschema.Generic{
+		Type: "object",
+	},
+	Properties: map[string]structuralschema.Structural{
+		"apiVersion": {
+			Generic: structuralschema.Generic{
+				Type: "string",
+			},
+		},
+		"kind": {
+			Generic: structuralschema.Generic{
+				Type: "string",
+			},
+		},
+		"metadata": {
+			Generic: structuralschema.Generic{
+				Type: "object",
+			},
+			Properties: map[string]structuralschema.Structural{
+				"name": {
+					Generic: structuralschema.Generic{
+						Type: "string",
+					},
+				},
+				"generateName": {
+					Generic: structuralschema.Generic{
+						Type: "string",
+					},
+				},
+			},
+		},
+	},
 }

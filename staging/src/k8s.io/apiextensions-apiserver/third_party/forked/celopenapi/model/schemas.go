@@ -15,9 +15,6 @@
 package model
 
 import (
-	"strings"
-
-	"gopkg.in/yaml.v3"
 	"k8s.io/apiextensions-apiserver/pkg/apiserver/schema"
 )
 
@@ -36,22 +33,13 @@ func SchemaDeclType(s *schema.Structural) *DeclType {
 		return nil
 	}
 	if s.XIntOrString {
-		return NewObjectType("intOrString", map[string]*DeclField{
-			"strVal": {Name: "strVal", Type: StringType},
-			"intVal": {Name: "intVal", Type: IntType},
-		})
+		return intOrStringType
 	}
-	if  s.XPreserveUnknownFields || s.XEmbeddedResource {
-		// XPreserveUnknownFields has no restriction on properties allowed, so all type checking is deferred to runtime.
-
-		// XEmbeddedResource has no restriction on the properties allowed except that kind, apiVersion and metadata
-		// must be their expected types.
-		// Because is not possible to describe this type information to CEL, we use defer type checking to runtime
-		// and restrict metadata access to name and generateName at runtime to enforce the rule that only those
-		// metadata fields may have validation rules applied to them.
-
-		return DynType
+	if s.XEmbeddedResource {
+		return embeddedType
 	}
+	// We ignore XPreserveUnknownFields since we don't support validation rules on data that we don't have schema
+	// information for.
 	switch declType.TypeName() {
 	case ListType.TypeName():
 		return NewListType(SchemaDeclType(s.Items))
@@ -94,10 +82,6 @@ func SchemaDeclType(s *schema.Structural) *DeclType {
 				return DurationType
 			case "date", "date-time":
 				return TimestampType
-			case "int64":
-				return IntType
-			case "uint64":
-				return UintType
 			}
 		}
 	}
@@ -105,309 +89,27 @@ func SchemaDeclType(s *schema.Structural) *DeclType {
 }
 
 var (
-	// SchemaDef defines an Open API Schema definition in terms of an Open API Schema.
-	schemaDef *schema.Structural
-
-	// AnySchema indicates that the value may be of any type.
-	AnySchema *schema.Structural
-
-	// EnvSchema defines the schema for CEL environments referenced within Policy Templates.
-	envSchema *schema.Structural
-
-	// InstanceSchema defines a basic schema for defining Policy Instances where the instance rule
-	// references a TemplateSchema derived from the Instance's template kind.
-	instanceSchema *schema.Structural
-
-	// TemplateSchema defines a schema for defining Policy Templates.
-	templateSchema *schema.Structural
-
 	openAPISchemaTypes = map[string]*DeclType{
 		"boolean":         BoolType,
 		"number":          DoubleType,
 		"integer":         IntType,
 		"null":            NullType,
 		"string":          StringType,
-		"date":            TimestampType,
-		"date-time":       TimestampType,
 		"array":           ListType,
 		"object":          MapType,
-		"":                AnyType,
 	}
+
+	intOrStringType = NewObjectType("intOrString", map[string]*DeclField{
+		"strVal": {Name: "strVal", Type: StringType},
+		"intVal": {Name: "intVal", Type: IntType},
+	})
+
+	embeddedType = NewObjectType("embedded", map[string]*DeclField{
+		"kind":       {Name: "kind", Type: StringType},
+		"apiVersion": {Name: "apiVersion", Type: StringType},
+		"metadata": {Name: "metadata", Type: NewObjectType("metadata", map[string]*DeclField{
+			"name":         {Name: "name", Type: StringType},
+			"generateName": {Name: "generateName", Type: StringType},
+		})},
+	})
 )
-
-const (
-	schemaDefYaml = `
-type: object
-properties:
-  $ref:
-    type: string
-  type:
-    type: string
-  type_param:  # prohibited unless used within an environment.
-    type: string
-  format:
-    type: string
-  description:
-    type: string
-  required:
-    type: array
-    items:
-      type: string
-  enum:
-    type: array
-    items:
-      type: string
-  enumDescriptions:
-    type: array
-    items:
-      type: string
-  default: {}
-  items:
-    $ref: "#openAPISchema"
-  properties:
-    type: object
-    additionalProperties:
-      $ref: "#openAPISchema"
-  additionalProperties:
-    $ref: "#openAPISchema"
-  metadata:
-    type: object
-    additionalProperties:
-      type: string
-`
-
-	templateSchemaYaml = `
-type: object
-required:
-  - apiVersion
-  - kind
-  - metadata
-  - evaluator
-properties:
-  apiVersion:
-    type: string
-  kind:
-    type: string
-  metadata:
-    type: object
-    required:
-      - name
-    properties:
-      uid:
-        type: string
-      name:
-        type: string
-      namespace:
-        type: string
-        default: "default"
-      etag:
-        type: string
-      labels:
-        type: object
-        additionalProperties:
-          type: string
-      pluralName:
-        type: string
-  description:
-    type: string
-  schema:
-    $ref: "#openAPISchema"
-  validator:
-    type: object
-    required:
-      - productions
-    properties:
-      description:
-        type: string
-      environment:
-        type: string
-      terms:
-        type: object
-        additionalProperties: {}
-      productions:
-        type: array
-        items:
-          type: object
-          required:
-            - message
-          properties:
-            match:
-              type: string
-              default: true
-            field:
-              type: string
-            message:
-              type: string
-            details: {}
-  evaluator:
-    type: object
-    required:
-      - productions
-    properties:
-      description:
-        type: string
-      environment:
-        type: string
-      ranges:
-        type: array
-        items:
-          type: object
-          required:
-            - in
-          properties:
-            in:
-              type: string
-            key:
-              type: string
-            index:
-              type: string
-            value:
-              type: string
-      terms:
-        type: object
-        additionalProperties:
-          type: string
-      productions:
-        type: array
-        items:
-          type: object
-          properties:
-            match:
-              type: string
-              default: "true"
-            decision:
-              type: string
-            decisionRef:
-              type: string
-            output: {}
-            decisions:
-              type: array
-              items:
-                type: object
-                required:
-                  - output
-                properties:
-                  decision:
-                    type: string
-                  decisionRef:
-                    type: string
-                  output: {}
-`
-
-	instanceSchemaYaml = `
-type: object
-required:
-  - apiVersion
-  - kind
-  - metadata
-properties:
-  apiVersion:
-    type: string
-  kind:
-    type: string
-  metadata:
-    type: object
-    additionalProperties:
-      type: string
-  description:
-    type: string
-  selector:
-    type: object
-    properties:
-      matchLabels:
-        type: object
-        additionalProperties:
-          type: string
-      matchExpressions:
-        type: array
-        items:
-          type: object
-          required:
-            - key
-            - operator
-          properties:
-            key:
-              type: string
-            operator:
-              type: string
-              enum: ["DoesNotExist", "Exists", "In", "NotIn"]
-            values:
-              type: array
-              items: {}
-              default: []
-  rule:
-    $ref: "#templateRuleSchema"
-  rules:
-    type: array
-    items:
-      $ref: "#templateRuleSchema"
-`
-
-	// TODO: support subsetting of built-in functions and macros
-	// TODO: support naming anonymous types within rule schema and making them accessible to
-	// declarations.
-	// TODO: consider supporting custom macros
-	envSchemaYaml = `
-type: object
-required:
-  - name
-properties:
-  name:
-    type: string
-  container:
-    type: string
-  variables:
-    type: object
-    additionalProperties:
-      $ref: "#openAPISchema"
-  functions:
-    type: object
-    properties:
-      extensions:
-        type: object
-        additionalProperties:
-          type: object   # function name
-          additionalProperties:
-            type: object # overload name
-            required:
-              - return
-            properties:
-              free_function:
-                type: boolean
-              args:
-                type: array
-                items:
-                  $ref: "#openAPISchema"
-              return:
-                $ref: "#openAPISchema"
-`
-)
-
-func init() {
-	AnySchema = &schema.Structural{}
-
-	instanceSchema = &schema.Structural{}
-	in := strings.ReplaceAll(instanceSchemaYaml, "\t", "  ")
-	err := yaml.Unmarshal([]byte(in), instanceSchema)
-	if err != nil {
-		panic(err)
-	}
-	envSchema = &schema.Structural{}
-	in = strings.ReplaceAll(envSchemaYaml, "\t", "  ")
-	err = yaml.Unmarshal([]byte(in), envSchema)
-	if err != nil {
-		panic(err)
-	}
-	schemaDef = &schema.Structural{}
-	in = strings.ReplaceAll(schemaDefYaml, "\t", "  ")
-	err = yaml.Unmarshal([]byte(in), schemaDef)
-	if err != nil {
-		panic(err)
-	}
-	templateSchema = &schema.Structural{}
-	in = strings.ReplaceAll(templateSchemaYaml, "\t", "  ")
-	err = yaml.Unmarshal([]byte(in), templateSchema)
-	if err != nil {
-		panic(err)
-	}
-}

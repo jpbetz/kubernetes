@@ -45,13 +45,6 @@ const (
 	LiteralStyle
 )
 
-// ParsedValue represents a top-level object representing either a template or instance value.
-type ParsedValue struct {
-	ID    int64
-	Value *MapValue
-	Meta  SourceMetadata
-}
-
 // NewEmptyDynValue returns the zero-valued DynValue.
 func NewEmptyDynValue() *DynValue {
 	// note: 0 is not a valid parse node identifier.

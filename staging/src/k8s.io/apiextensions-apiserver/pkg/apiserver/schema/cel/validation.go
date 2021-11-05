@@ -32,17 +32,19 @@ type Validator struct {
 
 	AdditionalProperties *Validator
 
+	compiledRules []CompilationResult
+
 	// Program compilation is pre-checked at CRD creation/update time, so we don't expect compilation to fail here,
 	// and it is an internal bug if compilation does fail.
 	// But if somehow we get any compilation errors, we track them and then surface them as part of validation.
-	compiledRules CompilationResults
+	compilationErr error
 }
 
 // NewValidator returns compiles all the CEL programs defined in x-kubernetes-validations extensions
 // of the Structural schema and returns a custom resource validator.
 func NewValidator(s *schema.Structural) Validator {
-	compiledRules := Compile(s)
-	result := Validator{compiledRules: compiledRules}
+	compiledRules, err := Compile(s)
+	result := Validator{compiledRules: compiledRules, compilationErr: err}
 	if s.Items != nil {
 		compiledItem := NewValidator(s.Items)
 		result.Items = &compiledItem
@@ -80,16 +82,14 @@ func (s *Validator) Validate(fldPath *field.Path, sts *schema.Structural, obj in
 
 func (s *Validator) validateExpressions(fldPath *field.Path, sts *schema.Structural, obj interface{}) (errs field.ErrorList) {
 	activation := &validationActivation{obj: obj, structural: sts}
-	if s.compiledRules.Error != nil {
-		errs = append(errs, field.Invalid(fldPath, obj, fmt.Sprintf("failed to compile rules due to error %v", s.compiledRules.Error)))
+	if s.compilationErr != nil {
+		errs = append(errs, field.Invalid(fldPath, obj, fmt.Sprintf("failed to compile rules due to error %v", s.compilationErr)))
 		return errs
 	}
-	for _, compiled := range s.compiledRules.Results {
+	for _, compiled := range s.compiledRules {
 		rule := compiled.Rule
-		if compiled.Errors != nil {
-			for _, err := range compiled.Errors {
-				errs = append(errs, field.Invalid(fldPath, obj, fmt.Sprintf("failed to compile rule '%s' due to error %v", rule.Rule, err)))
-			}
+		if compiled.Error.Type != "" {
+			errs = append(errs, field.Invalid(fldPath, obj, fmt.Sprintf("failed to compile rule '%s' due to error %v", rule.Rule, compiled.Error)))
 			continue
 		}
 		evalResult, _, err := compiled.Program.Eval(activation)

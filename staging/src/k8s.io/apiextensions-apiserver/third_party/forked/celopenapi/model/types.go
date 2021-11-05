@@ -429,7 +429,6 @@ func (rt *RuleTypes) FindFieldType(typeName, fieldName string) (*ref.FieldType, 
 // NativeToValue is an implementation of the ref.TypeAdapater interface which supports conversion
 // of policy template values to CEL ref.Val instances.
 func (rt *RuleTypes) NativeToValue(val interface{}) ref.Val {
-	// TODO(jpbetz): add unstructured support here?
 	return rt.typeAdapter.NativeToValue(val)
 }
 
