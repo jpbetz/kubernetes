@@ -36,7 +36,7 @@ const ScopedVarName = "self"
 type CompilationResult struct {
 	Rule      apiextensions.ValidationRule
 	Program   cel.Program
-	Error     Error
+	Error     *Error
 	RuleIndex int
 }
 
@@ -87,17 +87,17 @@ func Compile(s *schema.Structural) ([]CompilationResult, error) {
 		compilationResult.RuleIndex = i
 		compilationResult.Rule = rule
 		if rule.Rule == "" {
-			compilationResult.Error = Error{ErrorTypeRequired, "rule is not specified"}
+			compilationResult.Error = &Error{ErrorTypeRequired, "rule is not specified"}
 		} else {
 			ast, issues := env.Compile(rule.Rule)
 			if issues != nil {
-				compilationResult.Error = Error{ErrorTypeInvalid, "compilation failed: " + issues.String()}
+				compilationResult.Error = &Error{ErrorTypeInvalid, "compilation failed: " + issues.String()}
 			} else if !proto.Equal(ast.ResultType(), decls.Bool) {
-				compilationResult.Error = Error{ErrorTypeInvalid, "cel expression should evaluate to a bool"}
+				compilationResult.Error = &Error{ErrorTypeInvalid, "cel expression should evaluate to a bool"}
 			} else {
 				prog, err := env.Program(ast)
 				if err != nil {
-					compilationResult.Error = Error{ErrorTypeInvalid, "program instantiation failed: " + err.Error()}
+					compilationResult.Error = &Error{ErrorTypeInvalid, "program instantiation failed: " + err.Error()}
 				} else {
 					compilationResult.Program = prog
 				}

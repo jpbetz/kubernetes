@@ -923,7 +923,7 @@ func ValidateCustomResourceDefinitionOpenAPISchema(schema *apiextensions.JSONSch
 					allErrs = append(allErrs, field.InternalError(fldPath.Child("x-kubernetes-validations"), err))
 				} else {
 					for _, cr := range compResults {
-						if cr.Error.Type != "" {
+						if cr.Error != nil {
 							if cr.Error.Type == cel.ErrorTypeRequired {
 								allErrs = append(allErrs, field.Required(fldPath.Child("x-kubernetes-validations").Index(cr.RuleIndex).Child("rule"), cr.Error.Detail))
 							} else {

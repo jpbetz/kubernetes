@@ -88,7 +88,7 @@ func (s *Validator) validateExpressions(fldPath *field.Path, sts *schema.Structu
 	}
 	for _, compiled := range s.compiledRules {
 		rule := compiled.Rule
-		if compiled.Error.Type != "" {
+		if compiled.Error != nil {
 			errs = append(errs, field.Invalid(fldPath, obj, fmt.Sprintf("failed to compile rule '%s' due to error %v", rule.Rule, compiled.Error)))
 			continue
 		}

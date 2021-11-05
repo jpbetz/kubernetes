@@ -23,13 +23,27 @@ import (
 	"testing"
 )
 
+type validationMatch struct {
+	errorType ErrorType
+	contains  string
+}
+
+func requiredError(contains string) validationMatch {
+	return validationMatch{errorType: ErrorTypeRequired, contains: contains}
+}
+func invalidError(contains string) validationMatch {
+	return validationMatch{errorType: ErrorTypeInvalid, contains: contains}
+}
+
+func (v validationMatch) matches(err *Error) bool {
+	return err.Type == v.errorType && strings.Contains(err.Error(), v.contains)
+}
+
 func TestCelCompilation(t *testing.T) {
 	cases := []struct {
-		name               string
-		input              schema.Structural
-		wantError          bool
-		checkErrorMessage  bool
-		expectedErrMessage string
+		name           string
+		input          schema.Structural
+		expectedErrors []validationMatch
 	}{
 		{
 			name: "valid object",
@@ -58,8 +72,6 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 			},
-			wantError:         false,
-			checkErrorMessage: false,
 		},
 		{
 			name: "valid for string",
@@ -76,8 +88,6 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 			},
-			wantError:         false,
-			checkErrorMessage: false,
 		},
 		{
 			name: "valid for byte",
@@ -97,8 +107,6 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 			},
-			wantError:         false,
-			checkErrorMessage: false,
 		},
 		{
 			name: "valid for boolean",
@@ -115,8 +123,6 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 			},
-			wantError:         false,
-			checkErrorMessage: false,
 		},
 		{
 			name: "valid for integer",
@@ -133,8 +139,6 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 			},
-			wantError:         false,
-			checkErrorMessage: false,
 		},
 		{
 			name: "valid for number",
@@ -151,8 +155,6 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 			},
-			wantError:         false,
-			checkErrorMessage: false,
 		},
 		{
 			name: "valid nested object of object",
@@ -186,8 +188,6 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 			},
-			wantError:         false,
-			checkErrorMessage: false,
 		},
 		{
 			name: "valid nested object of array",
@@ -221,8 +221,6 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 			},
-			wantError:         false,
-			checkErrorMessage: false,
 		},
 		{
 			name: "valid nested array of array",
@@ -254,8 +252,6 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 			},
-			wantError:         false,
-			checkErrorMessage: false,
 		},
 		{
 			name: "valid nested array of object",
@@ -294,8 +290,6 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 			},
-			wantError:         false,
-			checkErrorMessage: false,
 		},
 		{
 			name: "valid map",
@@ -321,8 +315,6 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 			},
-			wantError:         false,
-			checkErrorMessage: false,
 		},
 		{
 			name: "invalid checking for number",
@@ -339,9 +331,9 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 			},
-			wantError:          true,
-			checkErrorMessage:  true,
-			expectedErrMessage: "compilation failed",
+			expectedErrors: []validationMatch{
+				invalidError("compilation failed"),
+			},
 		},
 		{
 			name: "compilation failure",
@@ -358,9 +350,9 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 			},
-			wantError:          true,
-			checkErrorMessage:  true,
-			expectedErrMessage: "compilation failed",
+			expectedErrors: []validationMatch{
+				invalidError("compilation failed"),
+			},
 		},
 		{
 			name: "rule is not specified",
@@ -376,9 +368,112 @@ func TestCelCompilation(t *testing.T) {
 					},
 				},
 			},
-			wantError:          true,
-			checkErrorMessage:  true,
-			expectedErrMessage: "rule is not specified",
+			expectedErrors: []validationMatch{
+				requiredError("rule is not specified"),
+			},
+		},
+		{
+			name: "valid for escaping",
+			input: schema.Structural{
+				Generic: schema.Generic{
+					Type: "object",
+				},
+				Properties: map[string]schema.Structural{
+					"namespace": {
+						Generic: schema.Generic{
+							Type: "array",
+						},
+						Items: &schema.Structural{
+							Generic: schema.Generic{
+								Type: "array",
+							},
+							Items: &schema.Structural{
+								Generic: schema.Generic{
+									Type: "string",
+								},
+							},
+						},
+					},
+					"_pre": {
+						Generic: schema.Generic{
+							Type: "integer",
+						},
+					},
+					"self": {
+						Generic: schema.Generic{
+							Type: "integer",
+						},
+					},
+				},
+				Extensions: schema.Extensions{
+					XValidations: apiextensions.ValidationRules{
+						{
+							Rule:    "size(self._namespace[0]) == 10",
+							Message: "size of first element in nestedObj should be equal to 10",
+						},
+						{
+							Rule: "self.__pre == 10",
+						},
+						{
+							Rule: "self.self == 10",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "invalid for escaping",
+			input: schema.Structural{
+				Generic: schema.Generic{
+					Type: "object",
+				},
+				Properties: map[string]schema.Structural{
+					"namespace": {
+						Generic: schema.Generic{
+							Type: "array",
+						},
+						Items: &schema.Structural{
+							Generic: schema.Generic{
+								Type: "array",
+							},
+							Items: &schema.Structural{
+								Generic: schema.Generic{
+									Type: "string",
+								},
+							},
+						},
+					},
+					"_pre": {
+						Generic: schema.Generic{
+							Type: "integer",
+						},
+					},
+					"self": {
+						Generic: schema.Generic{
+							Type: "integer",
+						},
+					},
+				},
+				Extensions: schema.Extensions{
+					XValidations: apiextensions.ValidationRules{
+						{
+							Rule:    "size(self.namespace[0]) == 10",
+							Message: "size of first element in nestedObj should be equal to 10",
+						},
+						{
+							Rule: "self._pre == 10",
+						},
+						{
+							Rule: "self == 10",
+						},
+					},
+				},
+			},
+			expectedErrors: []validationMatch{
+				invalidError("undefined field 'namespace'"),
+				invalidError("undefined field '_pre'"),
+				invalidError("found no matching overload"),
+			},
 		},
 	}
 
@@ -388,23 +483,28 @@ func TestCelCompilation(t *testing.T) {
 			if err != nil {
 				t.Errorf("Expected no error, but got: %v", err)
 			}
-			var allErrors []Error
-			var pass = false
-			for _, compilationResult := range compilationResults {
-				if compilationResult.Error.Type != "" {
-					allErrors = append(allErrors, compilationResult.Error)
-					if strings.Contains(compilationResult.Error.Detail, tt.expectedErrMessage) {
-						pass = true
+
+			seenErrs := make([]bool, len(compilationResults))
+
+			for _, expectedError := range tt.expectedErrors {
+				found := false
+				for i, result := range compilationResults {
+					if expectedError.matches(result.Error) && !seenErrs[i] {
+						found = true
+						seenErrs[i] = true
+						break
 					}
 				}
+
+				if !found {
+					t.Errorf("expected error: %v", expectedError)
+				}
 			}
-			if tt.checkErrorMessage && !pass {
-				t.Errorf("Expected error massage contains: %v, but got error: %v", tt.expectedErrMessage, allErrors)
-			}
-			if !tt.wantError && len(allErrors) > 0 {
-				t.Errorf("Expected no error, but got: %v", allErrors)
-			} else if tt.wantError && len(allErrors) == 0 {
-				t.Error("Expected error, but got none")
+
+			for i, seen := range seenErrs {
+				if !seen && compilationResults[i].Error != nil {
+					t.Errorf("unexpected error: %v", compilationResults[i].Error)
+				}
 			}
 		})
 	}
