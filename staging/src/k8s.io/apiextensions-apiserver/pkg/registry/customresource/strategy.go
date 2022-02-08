@@ -174,7 +174,7 @@ func (a customResourceStrategy) Validate(ctx context.Context, obj runtime.Object
 
 		// validate x-kubernetes-validations rules
 		if celValidator, ok := a.celValidators[v]; ok {
-			errs = append(errs, celValidator.Validate(nil, a.structuralSchemas[v], u.Object)...)
+			errs = append(errs, celValidator.Validate(nil, a.structuralSchemas[v], u.Object, nil)...)
 		}
 	}
 
@@ -226,7 +226,7 @@ func (a customResourceStrategy) ValidateUpdate(ctx context.Context, obj, old run
 
 	// validate x-kubernetes-validations rules
 	if celValidator, ok := a.celValidators[v]; ok {
-		errs = append(errs, celValidator.Validate(nil, a.structuralSchemas[v], uNew.Object)...)
+		errs = append(errs, celValidator.Validate(nil, a.structuralSchemas[v], uNew.Object, uOld.Object)...)
 	}
 
 	return errs

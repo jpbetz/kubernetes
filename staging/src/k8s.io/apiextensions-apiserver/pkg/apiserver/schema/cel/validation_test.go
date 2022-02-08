@@ -1596,7 +1596,7 @@ func TestValidationExpressions(t *testing.T) {
 					if celValidator == nil {
 						t.Fatal("expected non nil validator")
 					}
-					errs := celValidator.Validate(field.NewPath("root"), &s, tt.obj)
+					errs := celValidator.Validate(field.NewPath("root"), &s, tt.obj, nil)
 					for _, err := range errs {
 						t.Errorf("unexpected error: %v", err)
 					}
@@ -1609,7 +1609,7 @@ func TestValidationExpressions(t *testing.T) {
 					if celValidator == nil {
 						t.Fatal("expected non nil validator")
 					}
-					errs := celValidator.Validate(field.NewPath("root"), &s, tt.obj)
+					errs := celValidator.Validate(field.NewPath("root"), &s, tt.obj, nil)
 					if len(errs) == 0 {
 						t.Error("expected validation errors but got none")
 					}

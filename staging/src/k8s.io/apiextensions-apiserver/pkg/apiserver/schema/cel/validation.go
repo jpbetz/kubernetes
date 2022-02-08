@@ -92,22 +92,24 @@ func validator(s *schema.Structural, isResourceRoot bool) *Validator {
 }
 
 // Validate validates all x-kubernetes-validations rules in Validator against obj and returns any errors.
-func (s *Validator) Validate(fldPath *field.Path, sts *schema.Structural, obj interface{}) field.ErrorList {
+func (s *Validator) Validate(fldPath *field.Path, sts *schema.Structural, obj, oldObj interface{}) field.ErrorList {
 	if s == nil || obj == nil {
 		return nil
 	}
 
-	errs := s.validateExpressions(fldPath, sts, obj)
+	errs := s.validateExpressions(fldPath, sts, obj, oldObj)
 	switch obj := obj.(type) {
 	case []interface{}:
-		return append(errs, s.validateArray(fldPath, sts, obj)...)
+		oldArray, _ := oldObj.([]interface{})
+		return append(errs, s.validateArray(fldPath, sts, obj, oldArray)...)
 	case map[string]interface{}:
-		return append(errs, s.validateMap(fldPath, sts, obj)...)
+		oldMap, _ := oldObj.(map[string]interface{})
+		return append(errs, s.validateMap(fldPath, sts, obj, oldMap)...)
 	}
 	return errs
 }
 
-func (s *Validator) validateExpressions(fldPath *field.Path, sts *schema.Structural, obj interface{}) (errs field.ErrorList) {
+func (s *Validator) validateExpressions(fldPath *field.Path, sts *schema.Structural, obj, oldObj interface{}) (errs field.ErrorList) {
 	if obj == nil {
 		// We only validate non-null values. Rules that need to check for the state of a nullable value or the presence of an optional
 		// field must do so from the surrounding schema. E.g. if an array has nullable string items, a rule on the array
@@ -124,7 +126,10 @@ func (s *Validator) validateExpressions(fldPath *field.Path, sts *schema.Structu
 	if s.isResourceRoot {
 		sts = model.WithTypeAndObjectMeta(sts)
 	}
-	activation := NewValidationActivation(obj, sts)
+	var activation interpreter.Activation = NewValidationActivation(ScopedVarName, obj, sts)
+	if oldObj != nil {
+		activation = interpreter.NewHierarchicalActivation(activation, NewValidationActivation(OldScopedVarName, oldObj, sts))
+	}
 	for i, compiled := range s.compiledRules {
 		rule := sts.XValidations[i]
 		if compiled.Error != nil {
@@ -135,10 +140,9 @@ func (s *Validator) validateExpressions(fldPath *field.Path, sts *schema.Structu
 			// rule is empty
 			continue
 		}
-		if compiled.TransitionRule {
+		if compiled.TransitionRule && oldObj == nil {
 			// transition rules are evaluated only if there is a comparable existing value
-			errs = append(errs, field.InternalError(fldPath, fmt.Errorf("oldSelf validation not implemented")))
-			continue // todo: wire oldObj parameter
+			continue
 		}
 		evalResult, _, err := compiled.Program.Eval(activation)
 		if err != nil {
@@ -174,16 +178,21 @@ func ruleErrorString(rule apiextensions.ValidationRule) string {
 }
 
 type validationActivation struct {
-	self ref.Val
+	name string
+	val  ref.Val
 }
 
-func NewValidationActivation(obj interface{}, structural *schema.Structural) *validationActivation {
-	return &validationActivation{self: UnstructuredToVal(obj, structural)}
+func NewValidationActivation(name string, obj interface{}, structural *schema.Structural) *validationActivation {
+	va := &validationActivation{
+		name: name,
+		val:  UnstructuredToVal(obj, structural),
+	}
+	return va
 }
 
 func (a *validationActivation) ResolveName(name string) (interface{}, bool) {
-	if name == ScopedVarName {
-		return a.self, true
+	if name == a.name {
+		return a.val, true
 	}
 	return nil, false
 }
@@ -192,14 +201,22 @@ func (a *validationActivation) Parent() interpreter.Activation {
 	return nil
 }
 
-func (s *Validator) validateMap(fldPath *field.Path, sts *schema.Structural, obj map[string]interface{}) (errs field.ErrorList) {
+func (s *Validator) validateMap(fldPath *field.Path, sts *schema.Structural, obj, oldObj map[string]interface{}) (errs field.ErrorList) {
 	if s == nil || obj == nil {
 		return nil
 	}
 
+	// if a third map type is introduced, assume it's not correlatable. granular is the default if unspecified.
+	correlatable := sts.XMapType == nil || *sts.XMapType == "granular" || *sts.XMapType == "atomic"
+
 	if s.AdditionalProperties != nil && sts.AdditionalProperties != nil && sts.AdditionalProperties.Structural != nil {
 		for k, v := range obj {
-			errs = append(errs, s.AdditionalProperties.Validate(fldPath.Key(k), sts.AdditionalProperties.Structural, v)...)
+			var oldV interface{}
+			if correlatable {
+				oldV = oldObj[k]
+			}
+
+			errs = append(errs, s.AdditionalProperties.Validate(fldPath.Key(k), sts.AdditionalProperties.Structural, v, oldV)...)
 		}
 	}
 	if s.Properties != nil && sts.Properties != nil {
@@ -207,7 +224,11 @@ func (s *Validator) validateMap(fldPath *field.Path, sts *schema.Structural, obj
 			stsProp, stsOk := sts.Properties[k]
 			sub, ok := s.Properties[k]
 			if ok && stsOk {
-				errs = append(errs, sub.Validate(fldPath.Child(k), &stsProp, v)...)
+				var oldV interface{}
+				if correlatable {
+					oldV = oldObj[k]
+				}
+				errs = append(errs, sub.Validate(fldPath.Child(k), &stsProp, v, oldV)...)
 			}
 		}
 	}
@@ -215,12 +236,16 @@ func (s *Validator) validateMap(fldPath *field.Path, sts *schema.Structural, obj
 	return errs
 }
 
-func (s *Validator) validateArray(fldPath *field.Path, sts *schema.Structural, obj []interface{}) field.ErrorList {
+func (s *Validator) validateArray(fldPath *field.Path, sts *schema.Structural, obj, oldObj []interface{}) field.ErrorList {
 	var errs field.ErrorList
+
+	// only map-type lists support self-oldSelf correlation for cel rules. if this isn't a
+	// map-type list, then makeMapList returns an implementation that always returns nil
+	correlatableOldItems := makeMapList(sts, oldObj)
 
 	if s.Items != nil && sts.Items != nil {
 		for i := range obj {
-			errs = append(errs, s.Items.Validate(fldPath.Index(i), sts.Items, obj[i])...)
+			errs = append(errs, s.Items.Validate(fldPath.Index(i), sts.Items, obj[i], correlatableOldItems.get(obj[i]))...)
 		}
 	}
 

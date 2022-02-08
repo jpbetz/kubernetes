@@ -86,7 +86,7 @@ func validate(pth *field.Path, s *structuralschema.Structural, rootSchema *struc
 			} else if errs := apiservervalidation.ValidateCustomResource(pth.Child("default"), s.Default.Object, validator); len(errs) > 0 {
 				allErrs = append(allErrs, errs...)
 			} else if celValidator := cel.NewValidator(s); celValidator != nil {
-				allErrs = append(allErrs, celValidator.Validate(pth.Child("default"), s, s.Default.Object)...)
+				allErrs = append(allErrs, celValidator.Validate(pth.Child("default"), s, s.Default.Object, nil)...)
 			}
 		} else {
 			// check whether default is pruned
@@ -106,7 +106,7 @@ func validate(pth *field.Path, s *structuralschema.Structural, rootSchema *struc
 			} else if errs := apiservervalidation.ValidateCustomResource(pth.Child("default"), s.Default.Object, validator); len(errs) > 0 {
 				allErrs = append(allErrs, errs...)
 			} else if celValidator := cel.NewValidator(s); celValidator != nil {
-				allErrs = append(allErrs, celValidator.Validate(pth.Child("default"), s, s.Default.Object)...)
+				allErrs = append(allErrs, celValidator.Validate(pth.Child("default"), s, s.Default.Object, nil)...)
 			}
 		}
 	}

@@ -58,13 +58,6 @@ func immutable(path ...string) validationMatch {
 func forbidden(path ...string) validationMatch {
 	return validationMatch{path: field.NewPath(path[0], path[1:]...), errorType: field.ErrorTypeForbidden}
 }
-func notImplemented(path ...string) validationMatch {
-	return validationMatch{
-		path:      field.NewPath(path[0], path[1:]...),
-		errorType: field.ErrorTypeInvalid,
-		contains:  "not yet implemented",
-	}
-}
 
 func (v validationMatch) matches(err *field.Error) bool {
 	return err.Type == v.errorType && err.Field == v.path.String() && strings.Contains(err.Error(), v.contains)
@@ -7665,9 +7658,6 @@ func TestValidateCustomResourceDefinitionValidation(t *testing.T) {
 					},
 				},
 			},
-			expectedErrors: []validationMatch{
-				notImplemented("spec.validation.openAPIV3Schema.properties[value].x-kubernetes-validations[0].rule"),
-			},
 		},
 		{
 			name: "allow transition rule on list defaulting to type atomic",
@@ -7688,9 +7678,6 @@ func TestValidateCustomResourceDefinitionValidation(t *testing.T) {
 						},
 					},
 				},
-			},
-			expectedErrors: []validationMatch{
-				notImplemented("spec.validation.openAPIV3Schema.properties[value].x-kubernetes-validations[0].rule"),
 			},
 		},
 		{
@@ -7739,9 +7726,6 @@ func TestValidateCustomResourceDefinitionValidation(t *testing.T) {
 					},
 				},
 			},
-			expectedErrors: []validationMatch{
-				notImplemented("spec.validation.openAPIV3Schema.properties[value].x-kubernetes-validations[0].rule"),
-			},
 		},
 		{
 			name: "allow transition rule on element of list of type map",
@@ -7768,9 +7752,6 @@ func TestValidateCustomResourceDefinitionValidation(t *testing.T) {
 						},
 					},
 				},
-			},
-			expectedErrors: []validationMatch{
-				notImplemented("spec.validation.openAPIV3Schema.properties[value].items.x-kubernetes-validations[0].rule"),
 			},
 		},
 		{
@@ -7799,9 +7780,6 @@ func TestValidateCustomResourceDefinitionValidation(t *testing.T) {
 					},
 				},
 			},
-			expectedErrors: []validationMatch{
-				notImplemented("spec.validation.openAPIV3Schema.properties[value].x-kubernetes-validations[0].rule"),
-			},
 		},
 		{
 			name: "allow transition rule on element of map of type granular",
@@ -7823,9 +7801,6 @@ func TestValidateCustomResourceDefinitionValidation(t *testing.T) {
 						},
 					},
 				},
-			},
-			expectedErrors: []validationMatch{
-				notImplemented("spec.validation.openAPIV3Schema.properties[value].properties[subfield].x-kubernetes-validations[0].rule"),
 			},
 		},
 		{
@@ -7874,9 +7849,6 @@ func TestValidateCustomResourceDefinitionValidation(t *testing.T) {
 					},
 				},
 			},
-			expectedErrors: []validationMatch{
-				notImplemented("spec.validation.openAPIV3Schema.properties[value].properties[subfield].x-kubernetes-validations[0].rule"),
-			},
 		},
 		{
 			name: "allow transition rule on map of type granular",
@@ -7894,9 +7866,6 @@ func TestValidateCustomResourceDefinitionValidation(t *testing.T) {
 					},
 				},
 			},
-			expectedErrors: []validationMatch{
-				notImplemented("spec.validation.openAPIV3Schema.properties[value].x-kubernetes-validations[0].rule"),
-			},
 		},
 		{
 			name: "allow transition rule on map defaulting to type granular",
@@ -7912,9 +7881,6 @@ func TestValidateCustomResourceDefinitionValidation(t *testing.T) {
 						},
 					},
 				},
-			},
-			expectedErrors: []validationMatch{
-				notImplemented("spec.validation.openAPIV3Schema.properties[value].x-kubernetes-validations[0].rule"),
 			},
 		},
 		{
@@ -7938,9 +7904,6 @@ func TestValidateCustomResourceDefinitionValidation(t *testing.T) {
 					},
 				},
 			},
-			expectedErrors: []validationMatch{
-				notImplemented("spec.validation.openAPIV3Schema.properties[value].properties[subfield].x-kubernetes-validations[0].rule"),
-			},
 		},
 		{
 			name: "allow transition rule on map of type atomic",
@@ -7957,9 +7920,6 @@ func TestValidateCustomResourceDefinitionValidation(t *testing.T) {
 						},
 					},
 				},
-			},
-			expectedErrors: []validationMatch{
-				notImplemented("spec.validation.openAPIV3Schema.properties[value].x-kubernetes-validations[0].rule"),
 			},
 		},
 	}
