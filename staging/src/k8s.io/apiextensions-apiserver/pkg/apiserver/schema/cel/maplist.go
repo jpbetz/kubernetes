@@ -52,15 +52,11 @@ func (ks *singleKeyStrategy) CompositeKeyFor(obj map[string]interface{}) (interf
 	}
 
 	switch v.(type) {
-	case bool:
-	case float64:
-	case int64:
-	case string:
+	case bool, float64, int64, string:
+		return v, true
 	default:
 		return nil, false // non-scalar
 	}
-
-	return v, true
 }
 
 // hashKeyStrategy computes a hash of all key values.

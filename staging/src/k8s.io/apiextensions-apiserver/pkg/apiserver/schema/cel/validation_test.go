@@ -33,6 +33,7 @@ func TestValidationExpressions(t *testing.T) {
 		name   string
 		schema *schema.Structural
 		obj    map[string]interface{}
+		oldObj map[string]interface{}
 		valid  []string
 		errors map[string]string // rule -> string that error message must contain
 	}{
@@ -1585,6 +1586,21 @@ func TestValidationExpressions(t *testing.T) {
 				"isURL('../relative-path') == false",
 			},
 		},
+		{name: "transition rules",
+			obj: map[string]interface{}{
+				"v": "new",
+			},
+			oldObj: map[string]interface{}{
+				"v": "old",
+			},
+			schema: objectTypePtr(map[string]schema.Structural{
+				"v": stringType,
+			}),
+			valid: []string{
+				"oldSelf.v != self.v",
+				"oldSelf.v == 'old' && self.v == 'new'",
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -1596,7 +1612,7 @@ func TestValidationExpressions(t *testing.T) {
 					if celValidator == nil {
 						t.Fatal("expected non nil validator")
 					}
-					errs := celValidator.Validate(field.NewPath("root"), &s, tt.obj, nil)
+					errs := celValidator.Validate(field.NewPath("root"), &s, tt.obj, tt.oldObj)
 					for _, err := range errs {
 						t.Errorf("unexpected error: %v", err)
 					}
@@ -1609,7 +1625,7 @@ func TestValidationExpressions(t *testing.T) {
 					if celValidator == nil {
 						t.Fatal("expected non nil validator")
 					}
-					errs := celValidator.Validate(field.NewPath("root"), &s, tt.obj, nil)
+					errs := celValidator.Validate(field.NewPath("root"), &s, tt.obj, tt.oldObj)
 					if len(errs) == 0 {
 						t.Error("expected validation errors but got none")
 					}
