@@ -762,9 +762,17 @@ func validateCustomResourceDefinitionValidation(ctx context.Context, customResou
 	return allErrs
 }
 
+// unbounded uses nil to represent an unbounded cardinality value.
+var unbounded *uint64 = nil
+
 type costInfo struct {
-	// MaxCardinality tracks the largest number of times a rule in the current schema node could possibly get executed
-	// due to being the child of arrays/maps/etc.
+	// MaxCardinality represents a limit to the number of data elements that can exist for the current
+	// schema based on MaxProperties or MaxItems limits present on parent schemas, If all parent
+	// map and array schemas have MaxProperties or MaxItems limits declared MaxCardinality is
+	// an int pointer representing the product of these limits.  If least one parent map or list schema
+	// does not have a MaxProperties or MaxItems limits set, the MaxCardinality is nil, indicating
+	// that the parent schemas offer no bound to the number of times a data element for the current
+	// schema can exist.
 	MaxCardinality *uint64
 	CRDCost        *crdCost
 }
@@ -796,6 +804,10 @@ type ruleCost struct {
 	Cost uint64
 }
 
+// MultiplyByElementCost returns a costInfo where the MaxCardinality is multiplied by the
+// factor that the schema increases the cardinality of its children. If the costInfo's
+// MaxCardinality is unbounded (nil) or the factor that the schema increase the cardinality
+// is unbounded, the resulting costInfo's MaxCardinality is also unbounded.
 func (c *costInfo) MultiplyByElementCost(schema *apiextensions.JSONSchemaProps) costInfo {
 	result := costInfo{CRDCost: c.CRDCost}
 	if schema == nil {
@@ -803,15 +815,54 @@ func (c *costInfo) MultiplyByElementCost(schema *apiextensions.JSONSchemaProps) 
 		// before ValidateCustomResourceDefinitionOpenAPISchema performs its nil check
 		return result
 	}
-	if c.MaxCardinality == nil {
+	if c.MaxCardinality == unbounded {
 		return result
 	}
 	maxElements := extractMaxElements(schema)
-	if maxElements == nil {
+	if maxElements == unbounded {
 		return result
 	}
 	result.MaxCardinality = uint64ptr(multiplyWithOverflowGuard(*c.MaxCardinality, *maxElements))
 	return result
+}
+
+// extractMaxElements returns the factor by which the schema increases the cardinality
+// (number of possible data elements) of its children.  If schema is a map and has
+// MaxProperties or an array has MaxItems, the int pointer of the max value is returned.
+// If schema is a map or array and does not have MaxProperties or MaxItems,
+// unbounded (nil) is returned to indicate that there is no limit to the possible
+// number of data elements imposed by the current schema.  If the schema is an object, 1 is
+// returned to indicate that there is no increase to the number of possible data elements
+// for its children.  Primitives do not have children, but 1 is returned for simplicity.
+func extractMaxElements(schema *apiextensions.JSONSchemaProps) *uint64 {
+	switch schema.Type {
+	case "object":
+		if schema.AdditionalProperties != nil {
+			if schema.MaxProperties != nil {
+				maxProps := uint64(zeroIfNegative(*schema.MaxProperties))
+				return &maxProps
+			}
+			return unbounded
+		}
+		// return 1 to indicate that all fields of an object exist at most one for
+		// each occurrence of the object they are fields of
+		return uint64ptr(1)
+	case "array":
+		if schema.MaxItems != nil {
+			maxItems := uint64(zeroIfNegative(*schema.MaxItems))
+			return &maxItems
+		}
+		return unbounded
+	default:
+		return uint64ptr(1)
+	}
+}
+
+func zeroIfNegative(v int64) int64 {
+	if v < 0 {
+		return 0
+	}
+	return v
 }
 
 func uint64ptr(i uint64) *uint64 {
@@ -1077,32 +1128,6 @@ func ValidateCustomResourceDefinitionOpenAPISchema(schema *apiextensions.JSONSch
 	return allErrs
 }
 
-func extractMaxElements(schema *apiextensions.JSONSchemaProps) *uint64 {
-	switch schema.Type {
-	case "object":
-		if schema.AdditionalProperties != nil {
-			if schema.MaxProperties != nil {
-				maxProps := uint64(*schema.MaxProperties)
-				return &maxProps
-			}
-			return nil
-		}
-		// return 1, and not nil, because even if we're
-		// not looking at a map here, we can assume the object still preserves
-		// the cardinality of its parents
-		cardOne := uint64(1)
-		return &cardOne
-	case "array":
-		if schema.MaxItems != nil {
-			maxItems := uint64(*schema.MaxItems)
-			return &maxItems
-		}
-		return nil
-	default:
-		return nil
-	}
-}
-
 // multiplyWithOverflowGuard returns the product of baseCost and cardinality unless that product
 // would exceed math.MaxUint, in which case math.MaxUint is returned.
 func multiplyWithOverflowGuard(baseCost, cardinality uint64) uint64 {
@@ -1116,7 +1141,7 @@ func multiplyWithOverflowGuard(baseCost, cardinality uint64) uint64 {
 }
 
 func getExpressionCost(baseCost uint64, cardinalityCost costInfo) uint64 {
-	if cardinalityCost.MaxCardinality != nil {
+	if cardinalityCost.MaxCardinality != unbounded {
 		return multiplyWithOverflowGuard(baseCost, *cardinalityCost.MaxCardinality)
 	}
 	return baseCost
