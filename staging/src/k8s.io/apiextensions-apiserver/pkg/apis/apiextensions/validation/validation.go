@@ -809,7 +809,7 @@ type ruleCost struct {
 // MaxCardinality is unbounded (nil) or the factor that the schema increase the cardinality
 // is unbounded, the resulting costInfo's MaxCardinality is also unbounded.
 func (c *costInfo) MultiplyByElementCost(schema *apiextensions.JSONSchemaProps) costInfo {
-	result := costInfo{CRDCost: c.CRDCost}
+	result := costInfo{CRDCost: c.CRDCost, MaxCardinality: unbounded}
 	if schema == nil {
 		// nil schemas can be passed since we call MultiplyByElementCost
 		// before ValidateCustomResourceDefinitionOpenAPISchema performs its nil check
