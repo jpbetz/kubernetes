@@ -334,6 +334,10 @@ type ListOptions struct {
 	// Defaults to everything.
 	// +optional
 	FieldSelector string `json:"fieldSelector,omitempty" protobuf:"bytes,2,opt,name=fieldSelector"`
+	// A selector to restrict the list of returned objects by a CEL expression.
+	// Defaults to everything.
+	// +optional
+	RuleSelector string `json:"ruleSelector,omitempty" protobuf:"bytes,11,opt,name=ruleSelector"`
 
 	// +k8s:deprecated=includeUninitialized,protobuf=6
 

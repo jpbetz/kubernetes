@@ -22,6 +22,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/expressions"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -86,6 +87,7 @@ type IndexerFuncs map[string]IndexerFunc
 var Everything = SelectionPredicate{
 	Label: labels.Everything(),
 	Field: fields.Everything(),
+	Rule:  expressions.Everything(),
 }
 
 // MatchValue defines a pair (`<index name>`, `<value for that index>`).

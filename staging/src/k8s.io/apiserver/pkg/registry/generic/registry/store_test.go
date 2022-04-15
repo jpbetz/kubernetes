@@ -29,12 +29,14 @@ import (
 	"time"
 
 	fuzz "github.com/google/gofuzz"
+
 	apitesting "k8s.io/apimachinery/pkg/api/apitesting"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metainternalversion "k8s.io/apimachinery/pkg/apis/meta/internalversion"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/expressions"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -157,6 +159,7 @@ func matchPodName(names ...string) storage.SelectionPredicate {
 	return storage.SelectionPredicate{
 		Label:    labels.Everything().Add(*l),
 		Field:    fields.Everything(),
+		Rule:     expressions.Everything(),
 		GetAttrs: getPodAttrs,
 	}
 }
@@ -165,6 +168,7 @@ func matchEverything() storage.SelectionPredicate {
 	return storage.SelectionPredicate{
 		Label: labels.Everything(),
 		Field: fields.Everything(),
+		Rule:  expressions.Everything(),
 		GetAttrs: func(obj runtime.Object) (label labels.Set, field fields.Set, err error) {
 			return nil, nil, nil
 		},
@@ -2355,10 +2359,11 @@ func newTestGenericStoreRegistry(t *testing.T, scheme *runtime.Scheme, hasCacheE
 			return path.Join(podPrefix, id), nil
 		},
 		ObjectNameFunc: func(obj runtime.Object) (string, error) { return obj.(*example.Pod).Name, nil },
-		PredicateFunc: func(label labels.Selector, field fields.Selector) storage.SelectionPredicate {
+		PredicateFunc: func(label labels.Selector, field fields.Selector, rule expressions.Selector) storage.SelectionPredicate {
 			return storage.SelectionPredicate{
 				Label: label,
 				Field: field,
+				Rule:  rule,
 				GetAttrs: func(obj runtime.Object) (labels.Set, fields.Set, error) {
 					pod, ok := obj.(*example.Pod)
 					if !ok {

@@ -25,11 +25,13 @@ import (
 	"time"
 
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
+	structuralschema "k8s.io/apiextensions-apiserver/pkg/apiserver/schema"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metainternal "k8s.io/apimachinery/pkg/apis/meta/internalversion"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/expressions"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/diff"
@@ -101,7 +103,34 @@ func newStorage(t *testing.T) (customresource.CustomResourceStorage, *etcd3testi
 			kind,
 			nil,
 			nil,
-			nil,
+			map[string]*structuralschema.Structural{
+				"v1": {
+					Generic: structuralschema.Generic{Type: "object"},
+					Properties: map[string]structuralschema.Structural{
+						"spec": {
+							Generic: structuralschema.Generic{Type: "object"},
+							Properties: map[string]structuralschema.Structural{
+								"replicas": {
+									Generic: structuralschema.Generic{Type: "integer"},
+								},
+							},
+						},
+					},
+				},
+				"v1beta1": {
+					Generic: structuralschema.Generic{Type: "object"},
+					Properties: map[string]structuralschema.Structural{
+						"spec": {
+							Generic: structuralschema.Generic{Type: "object"},
+							Properties: map[string]structuralschema.Structural{
+								"replicas": {
+									Generic: structuralschema.Generic{Type: "integer"},
+								},
+							},
+						},
+					},
+				},
+			},
 			status,
 			scale,
 		),
@@ -705,6 +734,38 @@ func TestScaleUpdateWithResourceVersionWithConflicts(t *testing.T) {
 	}
 	if !errors.IsConflict(err) {
 		t.Fatalf("unexpected error, expecting an update conflict but got %v", err)
+	}
+}
+
+func TestListWithRuleSelector(t *testing.T) {
+	storage, server := newStorage(t)
+	defer server.Terminate(t)
+	defer storage.CustomResource.Store.DestroyFunc()
+
+	name := "foo"
+	var cr unstructured.Unstructured
+	ctx := genericapirequest.WithNamespace(genericapirequest.NewContext(), metav1.NamespaceDefault)
+	key := "/noxus/" + metav1.NamespaceDefault + "/" + name
+	if err := storage.CustomResource.Storage.Create(ctx, key, &validCustomResource, &cr, 0, false); err != nil {
+		t.Fatalf("error setting new custom resource (key: %s) %v: %v", key, validCustomResource, err)
+	}
+
+	obj, err := storage.CustomResource.List(ctx, &metainternal.ListOptions{RuleSelector: expressions.RuleSelector("self.spec.replicas > 5")})
+	if err != nil {
+		t.Fatalf("unexpected error %v", err)
+	}
+	l := obj.(*unstructured.UnstructuredList)
+	if len(l.Items) != 1 {
+		t.Errorf("expected list size 1 but got %d", len(l.Items))
+	}
+
+	obj, err = storage.CustomResource.List(ctx, &metainternal.ListOptions{RuleSelector: expressions.RuleSelector("self.spec.replicas > 10")})
+	if err != nil {
+		t.Fatalf("unexpected error %v", err)
+	}
+	l = obj.(*unstructured.UnstructuredList)
+	if len(l.Items) != 0 {
+		t.Errorf("expected list size 0 but got %d", len(l.Items))
 	}
 }
 

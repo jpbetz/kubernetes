@@ -19,6 +19,8 @@ package customresource
 import (
 	"context"
 
+	"k8s.io/kube-openapi/pkg/validation/validate"
+
 	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	structuralschema "k8s.io/apiextensions-apiserver/pkg/apiserver/schema"
 	"k8s.io/apiextensions-apiserver/pkg/apiserver/schema/cel"
@@ -28,6 +30,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/expressions"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -37,7 +40,6 @@ import (
 	apiserverstorage "k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
-	"k8s.io/kube-openapi/pkg/validation/validate"
 
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
@@ -272,10 +274,11 @@ func objectMetaFieldsSet(objectMeta metav1.Object, namespaceScoped bool) fields.
 // MatchCustomResourceDefinitionStorage is the filter used by the generic etcd backend to route
 // watch events from etcd to clients of the apiserver only interested in specific
 // labels/fields.
-func (a customResourceStrategy) MatchCustomResourceDefinitionStorage(label labels.Selector, field fields.Selector) apiserverstorage.SelectionPredicate {
+func (a customResourceStrategy) MatchCustomResourceDefinitionStorage(label labels.Selector, field fields.Selector, rule expressions.Selector) apiserverstorage.SelectionPredicate {
 	return apiserverstorage.SelectionPredicate{
 		Label:    label,
 		Field:    field,
+		Rule:     rule, // TODO: use a.structuralSchemas here?
 		GetAttrs: a.GetAttrs,
 	}
 }

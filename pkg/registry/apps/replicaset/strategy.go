@@ -26,6 +26,7 @@ import (
 	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
+	"k8s.io/apimachinery/pkg/expressions"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -36,11 +37,12 @@ import (
 	"k8s.io/apiserver/pkg/registry/rest"
 	apistorage "k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
+	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
+
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	"k8s.io/kubernetes/pkg/api/pod"
 	"k8s.io/kubernetes/pkg/apis/apps"
 	"k8s.io/kubernetes/pkg/apis/apps/validation"
-	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
 // rsStrategy implements verification logic for ReplicaSets.
@@ -195,7 +197,7 @@ func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
 // MatchReplicaSet is the filter used by the generic etcd backend to route
 // watch events from etcd to clients of the apiserver only interested in specific
 // labels/fields.
-func MatchReplicaSet(label labels.Selector, field fields.Selector) apistorage.SelectionPredicate {
+func MatchReplicaSet(label labels.Selector, field fields.Selector, rule expressions.Selector) apistorage.SelectionPredicate {
 	return apistorage.SelectionPredicate{
 		Label:    label,
 		Field:    field,

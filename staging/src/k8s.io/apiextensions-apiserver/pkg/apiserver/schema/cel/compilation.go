@@ -81,7 +81,10 @@ func Compile(s *schema.Structural, isResourceRoot bool, perCallLimit uint64) ([]
 		return nil, nil
 	}
 	celRules := s.Extensions.XValidations
+	return CompileRules(celRules, s, isResourceRoot, perCallLimit)
+}
 
+func CompileRules(celRules apiextensions.ValidationRules, s *schema.Structural, isResourceRoot bool, perCallLimit uint64) ([]CompilationResult, error) {
 	var propDecls []*expr.Decl
 	var root *celmodel.DeclType
 	var ok bool

@@ -21,18 +21,26 @@ import (
 	"fmt"
 	"strings"
 
+	cel2 "github.com/google/cel-go/cel"
+	"github.com/google/cel-go/common/types"
+	"github.com/google/cel-go/common/types/ref"
+	"k8s.io/klog/v2"
+	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
+
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
+	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	"k8s.io/apiextensions-apiserver/pkg/apiserver/schema/cel"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metainternalversion "k8s.io/apimachinery/pkg/apis/meta/internalversion"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/expressions"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/endpoints/handlers/fieldmanager"
 	"k8s.io/apiserver/pkg/registry/generic"
 	genericregistry "k8s.io/apiserver/pkg/registry/generic/registry"
 	"k8s.io/apiserver/pkg/registry/rest"
-	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
 // CustomResourceStorage includes dummy storage for CustomResources, and their Status and Scale subresources.
@@ -93,7 +101,36 @@ func newREST(resource schema.GroupResource, kind, listKind schema.GroupVersionKi
 			ret.SetGroupVersionKind(listKind)
 			return ret
 		},
-		PredicateFunc:            strategy.MatchCustomResourceDefinitionStorage,
+		PredicateFunc: strategy.MatchCustomResourceDefinitionStorage,
+		RuleStrategy: genericregistry.RuleStrategy{
+			Compile: func(rule expressions.Selector, version string) (expressions.Selector, error) {
+				if rule.Empty() {
+					klog.Errorf("skipping empty rule: %s", rule.String())
+					return rule, nil // TODO
+				}
+				s, ok := strategy.structuralSchemas[version]
+				if !ok {
+					klog.Errorf("failed to find structural schema for version: %s", version)
+					return rule, nil // TODO
+				}
+				result, err := cel.CompileRules(v1.ValidationRules{v1.ValidationRule{Rule: rule.String()}}, s, true, 1000)
+				if err != nil {
+					klog.Errorf("error compiling rule: %v", err)
+					return nil, err
+				}
+				if len(result) == 0 {
+					klog.Error("got empty compile rules back")
+					return rule, nil
+				}
+				if result[0].Error != nil {
+					return nil, result[0].Error
+				}
+				converter := func(object runtime.Object) ref.Val { // TODO: promote to top level?
+					return cel.UnstructuredToVal(object.(*unstructured.Unstructured).Object, s)
+				}
+				return ruleSelector{Rule: rule.String(), Program: result[0].Program, Convert: converter}, nil
+			},
+		},
 		DefaultQualifiedResource: resource,
 
 		CreateStrategy:      strategy,
@@ -431,4 +468,31 @@ func (i *scaleUpdatedObjectInfo) UpdatedObject(ctx context.Context, oldObj runti
 	cr.SetManagedFields(updatedEntries)
 
 	return cr, nil
+}
+
+type ruleSelector struct {
+	Rule    string
+	Program cel2.Program
+	// TODO: instead of the below provide an Eval(object) func ?
+	Convert func(object runtime.Object) ref.Val
+}
+
+func (r ruleSelector) Matches(object runtime.Object) bool {
+	result, _, err := r.Program.Eval(map[string]interface{}{"self": r.Convert(object)})
+	if err != nil {
+		klog.Errorf("program error: %v", err) // TODO: return an error
+	}
+	return result == types.True
+}
+
+func (r ruleSelector) Empty() bool {
+	return false
+}
+
+func (r ruleSelector) String() string {
+	return r.Rule
+}
+
+func (r ruleSelector) DeepCopySelector() expressions.Selector {
+	return ruleSelector{Rule: r.Rule, Program: r.Program, Convert: r.Convert}
 }

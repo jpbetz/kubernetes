@@ -18,6 +18,7 @@ package internalversion
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/expressions"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -33,6 +34,8 @@ type ListOptions struct {
 	LabelSelector labels.Selector
 	// A selector based on fields
 	FieldSelector fields.Selector
+	// A selector based on a CEL expression // TODO
+	RuleSelector expressions.Selector
 	// If true, watch for changes to this list
 	Watch bool
 	// allowWatchBookmarks requests watch events with type "BOOKMARK".

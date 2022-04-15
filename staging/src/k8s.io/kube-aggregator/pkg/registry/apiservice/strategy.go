@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 
+	"k8s.io/apimachinery/pkg/expressions"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -29,9 +30,10 @@ import (
 	"k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
 
+	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
+
 	"k8s.io/kube-aggregator/pkg/apis/apiregistration"
 	"k8s.io/kube-aggregator/pkg/apis/apiregistration/validation"
-	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
 type apiServerStrategy struct {
@@ -182,7 +184,7 @@ func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
 
 // MatchAPIService is the filter used by the generic etcd backend to watch events
 // from etcd to clients of the apiserver only interested in specific labels/fields.
-func MatchAPIService(label labels.Selector, field fields.Selector) storage.SelectionPredicate {
+func MatchAPIService(label labels.Selector, field fields.Selector, rule expressions.Selector) storage.SelectionPredicate {
 	return storage.SelectionPredicate{
 		Label:    label,
 		Field:    field,

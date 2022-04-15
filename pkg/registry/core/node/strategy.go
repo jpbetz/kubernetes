@@ -25,6 +25,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/expressions"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -35,13 +36,14 @@ import (
 	pkgstorage "k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
+
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	api "k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
 	"k8s.io/kubernetes/pkg/features"
 	"k8s.io/kubernetes/pkg/kubelet/client"
 	proxyutil "k8s.io/kubernetes/pkg/proxy/util"
-	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
 // nodeStrategy implements behavior for nodes
@@ -223,7 +225,7 @@ func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
 }
 
 // MatchNode returns a generic matcher for a given label and field selector.
-func MatchNode(label labels.Selector, field fields.Selector) pkgstorage.SelectionPredicate {
+func MatchNode(label labels.Selector, field fields.Selector, rule expressions.Selector) pkgstorage.SelectionPredicate {
 	return pkgstorage.SelectionPredicate{
 		Label:       label,
 		Field:       field,

@@ -27,6 +27,7 @@ import (
 
 	resource "k8s.io/apimachinery/pkg/api/resource"
 	conversion "k8s.io/apimachinery/pkg/conversion"
+	expressions "k8s.io/apimachinery/pkg/expressions"
 	fields "k8s.io/apimachinery/pkg/fields"
 	labels "k8s.io/apimachinery/pkg/labels"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -156,6 +157,11 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
+	if err := s.AddConversionFunc((*expressions.Selector)(nil), (*string)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_expressions_Selector_To_string(a.(*expressions.Selector), b.(*string), scope)
+	}); err != nil {
+		return err
+	}
 	if err := s.AddConversionFunc((*fields.Selector)(nil), (*string)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_fields_Selector_To_string(a.(*fields.Selector), b.(*string), scope)
 	}); err != nil {
@@ -203,6 +209,11 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}
 	if err := s.AddConversionFunc((*string)(nil), (**string)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_string_To_Pointer_string(a.(*string), b.(**string), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddConversionFunc((*string)(nil), (*expressions.Selector)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_string_To_expressions_Selector(a.(*string), b.(*expressions.Selector), scope)
 	}); err != nil {
 		return err
 	}
@@ -376,6 +387,13 @@ func autoConvert_url_Values_To_v1_ListOptions(in *url.Values, out *ListOptions, 
 		}
 	} else {
 		out.FieldSelector = ""
+	}
+	if values, ok := map[string][]string(*in)["ruleSelector"]; ok && len(values) > 0 {
+		if err := runtime.Convert_Slice_string_To_string(&values, &out.RuleSelector, s); err != nil {
+			return err
+		}
+	} else {
+		out.RuleSelector = ""
 	}
 	if values, ok := map[string][]string(*in)["watch"]; ok && len(values) > 0 {
 		if err := runtime.Convert_Slice_string_To_bool(&values, &out.Watch, s); err != nil {

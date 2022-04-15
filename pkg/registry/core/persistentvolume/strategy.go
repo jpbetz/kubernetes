@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 
+	"k8s.io/apimachinery/pkg/expressions"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -27,11 +28,12 @@ import (
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
+	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
+
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	api "k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
 	volumevalidation "k8s.io/kubernetes/pkg/volume/validation"
-	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
 // persistentvolumeStrategy implements behavior for PersistentVolume objects
@@ -153,7 +155,7 @@ func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
 }
 
 // MatchPersistentVolume returns a generic matcher for a given label and field selector.
-func MatchPersistentVolumes(label labels.Selector, field fields.Selector) storage.SelectionPredicate {
+func MatchPersistentVolumes(label labels.Selector, field fields.Selector, rule expressions.Selector) storage.SelectionPredicate {
 	return storage.SelectionPredicate{
 		Label:    label,
 		Field:    field,

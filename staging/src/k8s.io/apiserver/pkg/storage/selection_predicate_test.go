@@ -21,6 +21,7 @@ import (
 	"reflect"
 	"testing"
 
+	"k8s.io/apimachinery/pkg/expressions"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -93,6 +94,7 @@ func TestSelectionPredicate(t *testing.T) {
 		sp := &SelectionPredicate{
 			Label: parsedLabel,
 			Field: parsedField,
+			Rule:  expressions.Everything(), // TODO
 			GetAttrs: func(runtime.Object) (label labels.Set, field fields.Set, err error) {
 				return item.labels, item.fields, item.err
 			},
@@ -191,6 +193,7 @@ func TestSelectionPredicateMatcherIndex(t *testing.T) {
 		sp := &SelectionPredicate{
 			Label:       parsedLabel,
 			Field:       parsedField,
+			Rule:        expressions.Everything(), // TODO
 			IndexLabels: testCase.indexLabels,
 			IndexFields: testCase.indexFields,
 		}

@@ -24,6 +24,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/conversion"
+	"k8s.io/apimachinery/pkg/expressions"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
@@ -250,6 +251,23 @@ func Convert_labels_Selector_To_string(in *labels.Selector, out *string, s conve
 }
 
 func Convert_fields_Selector_To_string(in *fields.Selector, out *string, s conversion.Scope) error {
+	if *in == nil {
+		return nil
+	}
+	*out = (*in).String()
+	return nil
+}
+
+func Convert_string_To_expressions_Selector(in *string, out *expressions.Selector, s conversion.Scope) error {
+	selector, err := expressions.ParseSelector(*in)
+	if err != nil {
+		return err
+	}
+	*out = selector
+	return nil
+}
+
+func Convert_expressions_Selector_To_string(in *expressions.Selector, out *string, s conversion.Scope) error {
 	if *in == nil {
 		return nil
 	}

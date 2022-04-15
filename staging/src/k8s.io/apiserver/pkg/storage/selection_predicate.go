@@ -18,6 +18,7 @@ package storage
 
 import (
 	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/expressions"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -73,6 +74,7 @@ func (f AttrFunc) WithFieldMutation(fieldMutator FieldMutationFunc) AttrFunc {
 type SelectionPredicate struct {
 	Label               labels.Selector
 	Field               fields.Selector
+	Rule                expressions.Selector
 	GetAttrs            AttrFunc
 	IndexLabels         []string
 	IndexFields         []string
@@ -95,6 +97,9 @@ func (s *SelectionPredicate) Matches(obj runtime.Object) (bool, error) {
 	matched := s.Label.Matches(labels)
 	if matched && s.Field != nil {
 		matched = matched && s.Field.Matches(fields)
+	}
+	if matched && s.Rule != nil {
+		matched = matched && s.Rule.Matches(obj)
 	}
 	return matched, nil
 }
@@ -127,7 +132,7 @@ func (s *SelectionPredicate) MatchesSingle() (string, bool) {
 
 // Empty returns true if the predicate performs no filtering.
 func (s *SelectionPredicate) Empty() bool {
-	return s.Label.Empty() && s.Field.Empty()
+	return s.Label.Empty() && s.Field.Empty() && (s.Rule == nil || s.Rule.Empty()) // TODO: plug Rule in everywhere
 }
 
 // For any index defined by IndexFields, if a matcher can match only (a subset)

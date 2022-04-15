@@ -26,6 +26,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
+	"k8s.io/apimachinery/pkg/expressions"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -36,12 +37,13 @@ import (
 	"k8s.io/apiserver/pkg/registry/rest"
 	apistorage "k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
+	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
+
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	"k8s.io/kubernetes/pkg/api/pod"
 	api "k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/apis/core/helper"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
-	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
 // rcStrategy implements verification logic for Replication Controllers.
@@ -207,7 +209,7 @@ func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
 // MatchController is the filter used by the generic etcd backend to route
 // watch events from etcd to clients of the apiserver only interested in specific
 // labels/fields.
-func MatchController(label labels.Selector, field fields.Selector) apistorage.SelectionPredicate {
+func MatchController(label labels.Selector, field fields.Selector, rule expressions.Selector) apistorage.SelectionPredicate {
 	return apistorage.SelectionPredicate{
 		Label:    label,
 		Field:    field,

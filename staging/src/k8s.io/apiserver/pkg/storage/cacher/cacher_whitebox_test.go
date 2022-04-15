@@ -27,10 +27,14 @@ import (
 	"testing"
 	"time"
 
+	"k8s.io/utils/clock"
+	testingclock "k8s.io/utils/clock/testing"
+
 	v1 "k8s.io/api/core/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/expressions"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -43,8 +47,6 @@ import (
 	examplev1 "k8s.io/apiserver/pkg/apis/example/v1"
 	"k8s.io/apiserver/pkg/storage"
 	utilflowcontrol "k8s.io/apiserver/pkg/util/flowcontrol"
-	"k8s.io/utils/clock"
-	testingclock "k8s.io/utils/clock/testing"
 )
 
 var (
@@ -1248,10 +1250,12 @@ func TestCachingDeleteEvents(t *testing.T) {
 	fooPredicate := storage.SelectionPredicate{
 		Label: labels.SelectorFromSet(map[string]string{"foo": "true"}),
 		Field: fields.Everything(),
+		Rule:  expressions.Everything(),
 	}
 	barPredicate := storage.SelectionPredicate{
 		Label: labels.SelectorFromSet(map[string]string{"bar": "true"}),
 		Field: fields.Everything(),
+		Rule:  expressions.Everything(),
 	}
 
 	createWatch := func(pred storage.SelectionPredicate) watch.Interface {

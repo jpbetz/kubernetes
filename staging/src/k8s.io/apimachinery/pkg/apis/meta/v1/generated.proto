@@ -504,6 +504,11 @@ message ListOptions {
   // +optional
   optional string fieldSelector = 2;
 
+  // A selector to restrict the list of returned objects by a CEL expression.
+  // Defaults to everything.
+  // +optional
+  optional string ruleSelector = 11;
+
   // Watch for changes to the described resources and return them as a stream of
   // add, update, and remove notifications. Specify resourceVersion.
   // +optional

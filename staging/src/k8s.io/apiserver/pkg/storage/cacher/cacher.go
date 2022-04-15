@@ -24,10 +24,15 @@ import (
 	"sync"
 	"time"
 
+	"k8s.io/klog/v2"
+	"k8s.io/utils/clock"
+	utiltrace "k8s.io/utils/trace"
+
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/conversion"
+	"k8s.io/apimachinery/pkg/expressions"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -40,9 +45,6 @@ import (
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	utilflowcontrol "k8s.io/apiserver/pkg/util/flowcontrol"
 	"k8s.io/client-go/tools/cache"
-	"k8s.io/klog/v2"
-	"k8s.io/utils/clock"
-	utiltrace "k8s.io/utils/trace"
 )
 
 var (
@@ -1068,6 +1070,7 @@ func (lw *cacherListerWatcher) List(options metav1.ListOptions) (runtime.Object,
 	pred := storage.SelectionPredicate{
 		Label:    labels.Everything(),
 		Field:    fields.Everything(),
+		Rule:     expressions.Everything(),
 		Limit:    options.Limit,
 		Continue: options.Continue,
 	}

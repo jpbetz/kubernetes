@@ -1182,6 +1182,13 @@ func schema_pkg_apis_meta_v1_ListOptions(ref common.ReferenceCallback) common.Op
 							Format:      "",
 						},
 					},
+					"ruleSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "A selector to restrict the list of returned objects by a CEL expression. Defaults to everything.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"watch": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",

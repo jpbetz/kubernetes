@@ -3,6 +3,7 @@
   "apiVersion": "v1",
   "labelSelector": "labelSelectorValue",
   "fieldSelector": "fieldSelectorValue",
+  "ruleSelector": "ruleSelectorValue",
   "watch": true,
   "allowWatchBookmarks": true,
   "resourceVersion": "resourceVersionValue",

@@ -23,11 +23,14 @@ import (
 	"sync"
 	"time"
 
+	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
+
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/validation/path"
 	metainternalversion "k8s.io/apimachinery/pkg/apis/meta/internalversion"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/expressions"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -46,7 +49,6 @@ import (
 	"k8s.io/apiserver/pkg/util/dryrun"
 	flowcontrolrequest "k8s.io/apiserver/pkg/util/flowcontrol/request"
 	"k8s.io/client-go/tools/cache"
-	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 
 	"k8s.io/klog/v2"
 )
@@ -138,7 +140,7 @@ type Store struct {
 	// PredicateFunc returns a matcher corresponding to the provided labels
 	// and fields. The SelectionPredicate returned should return true if the
 	// object matches the given field and label selectors.
-	PredicateFunc func(label labels.Selector, field fields.Selector) storage.SelectionPredicate
+	PredicateFunc func(label labels.Selector, field fields.Selector, rule expressions.Selector) storage.SelectionPredicate
 
 	// EnableGarbageCollection affects the handling of Update and Delete
 	// requests. Enabling garbage collection allows finalizers to do work to
@@ -219,6 +221,12 @@ type Store struct {
 	StorageVersioner runtime.GroupVersioner
 	// Called to cleanup clients used by the underlying Storage; optional.
 	DestroyFunc func()
+
+	RuleStrategy RuleStrategy
+}
+
+type RuleStrategy struct {
+	Compile func(rule expressions.Selector, version string) (expressions.Selector, error)
 }
 
 // Note: the rest.StandardStorage interface aggregates the common REST verbs
@@ -322,7 +330,18 @@ func (e *Store) List(ctx context.Context, options *metainternalversion.ListOptio
 	if options != nil && options.FieldSelector != nil {
 		field = options.FieldSelector
 	}
-	out, err := e.ListPredicate(ctx, e.PredicateFunc(label, field), options)
+	compiledRule := expressions.Everything()
+	if options != nil && options.RuleSelector != nil {
+		if e.RuleStrategy.Compile != nil {
+			var err error
+			compiledRule, err = e.RuleStrategy.Compile(options.RuleSelector, "v1") // TODO: wire in version
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	out, err := e.ListPredicate(ctx, e.PredicateFunc(label, field, compiledRule), options)
 	if err != nil {
 		return nil, err
 	}
@@ -1239,7 +1258,17 @@ func (e *Store) Watch(ctx context.Context, options *metainternalversion.ListOpti
 	if options != nil && options.FieldSelector != nil {
 		field = options.FieldSelector
 	}
-	predicate := e.PredicateFunc(label, field)
+	compiledRule := expressions.Everything()
+	if options != nil && options.RuleSelector != nil {
+		if e.RuleStrategy.Compile != nil {
+			var err error
+			compiledRule, err = e.RuleStrategy.Compile(options.RuleSelector, "v1")
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	predicate := e.PredicateFunc(label, field, compiledRule)
 
 	resourceVersion := ""
 	if options != nil {
@@ -1339,10 +1368,11 @@ func (e *Store) CompleteWithOptions(options *generic.StoreOptions) error {
 		}
 	}
 	if e.PredicateFunc == nil {
-		e.PredicateFunc = func(label labels.Selector, field fields.Selector) storage.SelectionPredicate {
+		e.PredicateFunc = func(label labels.Selector, field fields.Selector, rule expressions.Selector) storage.SelectionPredicate {
 			return storage.SelectionPredicate{
 				Label:    label,
 				Field:    field,
+				Rule:     rule,
 				GetAttrs: attrFunc,
 			}
 		}
