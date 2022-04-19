@@ -559,3 +559,171 @@ type ServiceReference struct {
 	// +optional
 	Port *int32 `json:"port,omitempty" protobuf:"varint,4,opt,name=port"`
 }
+
+// +genclient
+// +genclient:nonNamespaced
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+// ValidatingRuleConfiguration describes the configuration of and admission rule that accepts or rejects an object without changing it.
+type ValidatingRuleConfiguration struct {
+	metav1.TypeMeta `json:",inline"`
+	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
+	// +optional
+	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+	// validatingRules is a list of validation rules.
+	// +optional
+	// +patchMergeKey=name
+	// +patchStrategy=merge
+	// +listType=map
+	// +listMapKey=name
+	ValidatingRules []ValidatingRule `json:"validatingRules,omitempty" patchStrategy:"merge" patchMergeKey:"name" protobuf:"bytes,2,rep,name=validatingRules"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+// ValidatingRuleConfigurationList is a list of ValidatingRuleConfiguration.
+type ValidatingRuleConfigurationList struct {
+	metav1.TypeMeta `json:",inline"`
+	// Standard list metadata.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	// +optional
+	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+	// List of ValidatingRuleConfiguration.
+	Items []ValidatingRuleConfiguration `json:"items" protobuf:"bytes,2,rep,name=items"`
+}
+
+// ValidatingRule describes a validation rule and the resources and operations it applies to.
+type ValidatingRule struct {
+	// The name of the admission rule.
+	// Name should be fully qualified, e.g., imagepolicy.kubernetes.io, where
+	// "imagepolicy" is the name of the rule, and kubernetes.io is the name
+	// of the organization.
+	// Required.
+	Name string `json:"name" protobuf:"bytes,1,opt,name=name"`
+
+	// validations defines the validation rules checked by this admission rule.
+	// +optional
+	// +patchMergeKey=rule
+	// +patchStrategy=merge
+	// +listType=map
+	// +listMapKey=rule
+	Validations []Validation `json:"validations,omitempty" patchStrategy:"merge" patchMergeKey:"rule" protobuf:"bytes,2,rep,name=validations"`
+
+	// lookups defines which additional resources are available to the validation rule's CEL expressions.
+	// +optional
+	// +patchMergeKey=id
+	// +patchStrategy=merge
+	// +listType=map
+	// +listMapKey=id
+	Lookups []Lookup `json:"lookups,omitempty" patchStrategy:"merge" patchMergeKey:"id" protobuf:"bytes,3,rep,name=lookups"`
+
+	// matchRules describes what operations on what resources/subresources the webhook cares about.
+	// The webhook cares about an operation if it matches _any_ Rule.
+	// However, in order to prevent ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks
+	// from putting the cluster in a state which cannot be recovered from without completely
+	// disabling the plugin, ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks are never called
+	// on admission requests for ValidatingWebhookConfiguration and MutatingWebhookConfiguration objects.
+	// +listType=atomic
+	MatchRules []RuleWithOperations `json:"matchRules,omitempty" protobuf:"bytes,4,rep,name=matchRules"`
+
+	// matchPolicy defines how the "rules" list is used to match incoming requests.
+	// Allowed values are "Exact" or "Equivalent".
+	//
+	// - Exact: match a request only if it exactly matches a specified rule.
+	// For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1,
+	// but "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`,
+	// a request to apps/v1beta1 or extensions/v1beta1 would not be sent to the rules.
+	//
+	// - Equivalent: match a request if modifies a resource listed in rules, even via another API group or version.
+	// For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1,
+	// and "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`,
+	// a request to apps/v1beta1 or extensions/v1beta1 would be converted to apps/v1 and sent to the rules.
+	//
+	// Defaults to "Equivalent"
+	// +optional
+	MatchPolicy *MatchPolicyType `json:"matchPolicy,omitempty" protobuf:"bytes,5,opt,name=matchPolicy,casttype=MatchPolicyType"`
+
+	// NamespaceSelector decides whether to run the rule on an object based
+	// on whether the namespace for that object matches the selector. If the
+	// object itself is a namespace, the matching is performed on
+	// object.metadata.labels. If the object is another cluster scoped resource,
+	// it never skips the rule.
+	//
+	// For example, to run the rules on any objects whose namespace is not
+	// associated with "runlevel" of "0" or "1";  you will set the selector as
+	// follows:
+	// "namespaceSelector": {
+	//   "matchExpressions": [
+	//     {
+	//       "key": "runlevel",
+	//       "operator": "NotIn",
+	//       "values": [
+	//         "0",
+	//         "1"
+	//       ]
+	//     }
+	//   ]
+	// }
+	//
+	// If instead you want to only run the rules on any objects whose
+	// namespace is associated with the "environment" of "prod" or "staging";
+	// you will set the selector as follows:
+	// "namespaceSelector": {
+	//   "matchExpressions": [
+	//     {
+	//       "key": "environment",
+	//       "operator": "In",
+	//       "values": [
+	//         "prod",
+	//         "staging"
+	//       ]
+	//     }
+	//   ]
+	// }
+	//
+	// See
+	// https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+	// for more examples of label selectors.
+	//
+	// Default to the empty LabelSelector, which matches everything.
+	// +optional
+	NamespaceSelector *metav1.LabelSelector `json:"namespaceSelector,omitempty" protobuf:"bytes,6,opt,name=namespaceSelector"`
+
+	// ObjectSelector decides whether to run the rules based on if the
+	// object has matching labels. objectSelector is evaluated against both
+	// the oldObject and newObject that would be sent to the rules, and
+	// is considered to match if either object matches the selector. A null
+	// object (oldObject in the case of create, or newObject in the case of
+	// delete) or an object that cannot have labels (like a
+	// DeploymentRollback or a PodProxyOptions object) is not considered to
+	// match.
+	// Use the object selector only if the rules are opt-in, because end
+	// users may skip the admission rules by setting the labels.
+	// Default to the empty LabelSelector, which matches everything.
+	// +optional
+	ObjectSelector *metav1.LabelSelector `json:"objectSelector,omitempty" protobuf:"bytes,7,opt,name=objectSelector"`
+}
+
+type Validation struct {
+	// TODO: The CEL expression.
+	Rule string `json:"rule,omitempty" protobuf:"bytes,1,opt,name=rule"`
+	// TODO: messaging
+}
+
+type Lookup struct {
+	// The CEL field name of the looked up resource.
+	// TODO
+	ID string `json:"id,omitempty" protobuf:"bytes,1,opt,name=id"`
+	// The API version of the resource to look up.
+	APIVersion string `json:"apiVersion,omitempty" protobuf:"bytes,2,opt,name=apiVersion"`
+	// The kind of the resource to look up.
+	Kind string `json:"kind,omitempty" protobuf:"bytes,3,opt,name=kind"`
+	// An expression that evaluates to the name of the resource to look up.
+	Name string `json:"name,omitempty" protobuf:"bytes,4,opt,name=name"`
+	// An expression that evaluates to the namespace of the resource to look up.
+	Namespace string `json:"namespace,omitempty" protobuf:"bytes,5,opt,name=namespace"`
+
+	// TODO: Support selectors as a way of looking up other resources?
+	// TODO: Can this lookup feature somehow be used in an exfiltration attack? The rule author is able to write a
+	// an expression that will access objects using the privileges of the user that made the request.
+}
