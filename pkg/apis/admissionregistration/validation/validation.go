@@ -26,6 +26,7 @@ import (
 	utilvalidation "k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/util/webhook"
+
 	"k8s.io/kubernetes/pkg/apis/admissionregistration"
 	admissionregistrationv1 "k8s.io/kubernetes/pkg/apis/admissionregistration/v1"
 	admissionregistrationv1beta1 "k8s.io/kubernetes/pkg/apis/admissionregistration/v1beta1"
@@ -513,4 +514,14 @@ func ValidateMutatingWebhookConfigurationUpdate(newC, oldC *admissionregistratio
 		requireRecognizedAdmissionReviewVersion: mutatingHasAcceptedAdmissionReviewVersions(oldC.Webhooks),
 		requireUniqueWebhookNames:               mutatingHasUniqueWebhookNames(oldC.Webhooks),
 	})
+}
+
+// ValidateValidatingRuleConfiguration validates a rule before creation.
+func ValidateValidatingRuleConfiguration(e *admissionregistration.ValidatingRuleConfiguration) field.ErrorList {
+	return nil
+}
+
+// ValidateValidatingRuleConfigurationUpdate validates a rule before creation.
+func ValidateValidatingRuleConfigurationUpdate(newC, oldC *admissionregistration.ValidatingRuleConfiguration) field.ErrorList {
+	return nil
 }
