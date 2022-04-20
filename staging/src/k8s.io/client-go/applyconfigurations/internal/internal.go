@@ -39,6 +39,24 @@ func Parser() *typed.Parser {
 var parserOnce sync.Once
 var parser *typed.Parser
 var schemaYAML = typed.YAMLObject(`types:
+- name: io.k8s.api.admissionregistration.v1.Lookup
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: id
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: name
+      type:
+        scalar: string
+    - name: namespace
+      type:
+        scalar: string
 - name: io.k8s.api.admissionregistration.v1.MutatingWebhook
   map:
     fields:
@@ -151,6 +169,65 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: port
       type:
         scalar: numeric
+- name: io.k8s.api.admissionregistration.v1.ValidatingRule
+  map:
+    fields:
+    - name: lookups
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.api.admissionregistration.v1.Lookup
+          elementRelationship: associative
+          keys:
+          - id
+    - name: matchPolicy
+      type:
+        scalar: string
+    - name: matchRules
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.api.admissionregistration.v1.RuleWithOperations
+          elementRelationship: atomic
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: namespaceSelector
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
+    - name: objectSelector
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
+    - name: validations
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.api.admissionregistration.v1.Validation
+          elementRelationship: associative
+          keys:
+          - rule
+- name: io.k8s.api.admissionregistration.v1.ValidatingRuleConfiguration
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: validatingRules
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.api.admissionregistration.v1.ValidatingRule
+          elementRelationship: associative
+          keys:
+          - name
 - name: io.k8s.api.admissionregistration.v1.ValidatingWebhook
   map:
     fields:
@@ -213,6 +290,12 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: associative
           keys:
           - name
+- name: io.k8s.api.admissionregistration.v1.Validation
+  map:
+    fields:
+    - name: rule
+      type:
+        scalar: string
 - name: io.k8s.api.admissionregistration.v1.WebhookClientConfig
   map:
     fields:

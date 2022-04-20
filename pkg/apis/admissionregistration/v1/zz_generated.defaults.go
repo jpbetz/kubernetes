@@ -36,6 +36,12 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 	scheme.AddTypeDefaultingFunc(&v1.MutatingWebhookConfigurationList{}, func(obj interface{}) {
 		SetObjectDefaults_MutatingWebhookConfigurationList(obj.(*v1.MutatingWebhookConfigurationList))
 	})
+	scheme.AddTypeDefaultingFunc(&v1.ValidatingRuleConfiguration{}, func(obj interface{}) {
+		SetObjectDefaults_ValidatingRuleConfiguration(obj.(*v1.ValidatingRuleConfiguration))
+	})
+	scheme.AddTypeDefaultingFunc(&v1.ValidatingRuleConfigurationList{}, func(obj interface{}) {
+		SetObjectDefaults_ValidatingRuleConfigurationList(obj.(*v1.ValidatingRuleConfigurationList))
+	})
 	scheme.AddTypeDefaultingFunc(&v1.ValidatingWebhookConfiguration{}, func(obj interface{}) {
 		SetObjectDefaults_ValidatingWebhookConfiguration(obj.(*v1.ValidatingWebhookConfiguration))
 	})
@@ -63,6 +69,23 @@ func SetObjectDefaults_MutatingWebhookConfigurationList(in *v1.MutatingWebhookCo
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_MutatingWebhookConfiguration(a)
+	}
+}
+
+func SetObjectDefaults_ValidatingRuleConfiguration(in *v1.ValidatingRuleConfiguration) {
+	for i := range in.ValidatingRules {
+		a := &in.ValidatingRules[i]
+		for j := range a.MatchRules {
+			b := &a.MatchRules[j]
+			SetDefaults_Rule(&b.Rule)
+		}
+	}
+}
+
+func SetObjectDefaults_ValidatingRuleConfigurationList(in *v1.ValidatingRuleConfigurationList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_ValidatingRuleConfiguration(a)
 	}
 }
 

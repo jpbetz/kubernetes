@@ -22,6 +22,10 @@ package v1
 // MutatingWebhookConfigurationLister.
 type MutatingWebhookConfigurationListerExpansion interface{}
 
+// ValidatingRuleConfigurationListerExpansion allows custom methods to be added to
+// ValidatingRuleConfigurationLister.
+type ValidatingRuleConfigurationListerExpansion interface{}
+
 // ValidatingWebhookConfigurationListerExpansion allows custom methods to be added to
 // ValidatingWebhookConfigurationLister.
 type ValidatingWebhookConfigurationListerExpansion interface{}

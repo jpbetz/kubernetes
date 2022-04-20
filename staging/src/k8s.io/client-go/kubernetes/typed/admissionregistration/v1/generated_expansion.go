@@ -20,4 +20,6 @@ package v1
 
 type MutatingWebhookConfigurationExpansion interface{}
 
+type ValidatingRuleConfigurationExpansion interface{}
+
 type ValidatingWebhookConfigurationExpansion interface{}

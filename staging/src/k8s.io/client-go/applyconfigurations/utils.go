@@ -115,6 +115,8 @@ import (
 func ForKind(kind schema.GroupVersionKind) interface{} {
 	switch kind {
 	// Group=admissionregistration.k8s.io, Version=v1
+	case v1.SchemeGroupVersion.WithKind("Lookup"):
+		return &admissionregistrationv1.LookupApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("MutatingWebhook"):
 		return &admissionregistrationv1.MutatingWebhookApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("MutatingWebhookConfiguration"):
@@ -125,10 +127,16 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &admissionregistrationv1.RuleWithOperationsApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ServiceReference"):
 		return &admissionregistrationv1.ServiceReferenceApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ValidatingRule"):
+		return &admissionregistrationv1.ValidatingRuleApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ValidatingRuleConfiguration"):
+		return &admissionregistrationv1.ValidatingRuleConfigurationApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ValidatingWebhook"):
 		return &admissionregistrationv1.ValidatingWebhookApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ValidatingWebhookConfiguration"):
 		return &admissionregistrationv1.ValidatingWebhookConfigurationApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("Validation"):
+		return &admissionregistrationv1.ValidationApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("WebhookClientConfig"):
 		return &admissionregistrationv1.WebhookClientConfigApplyConfiguration{}
 

@@ -96,6 +96,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 	// Group=admissionregistration.k8s.io, Version=v1
 	case v1.SchemeGroupVersion.WithResource("mutatingwebhookconfigurations"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Admissionregistration().V1().MutatingWebhookConfigurations().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("validatingruleconfigurations"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Admissionregistration().V1().ValidatingRuleConfigurations().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("validatingwebhookconfigurations"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Admissionregistration().V1().ValidatingWebhookConfigurations().Informer()}, nil
 

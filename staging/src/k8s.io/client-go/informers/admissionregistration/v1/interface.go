@@ -26,6 +26,8 @@ import (
 type Interface interface {
 	// MutatingWebhookConfigurations returns a MutatingWebhookConfigurationInformer.
 	MutatingWebhookConfigurations() MutatingWebhookConfigurationInformer
+	// ValidatingRuleConfigurations returns a ValidatingRuleConfigurationInformer.
+	ValidatingRuleConfigurations() ValidatingRuleConfigurationInformer
 	// ValidatingWebhookConfigurations returns a ValidatingWebhookConfigurationInformer.
 	ValidatingWebhookConfigurations() ValidatingWebhookConfigurationInformer
 }
@@ -44,6 +46,11 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 // MutatingWebhookConfigurations returns a MutatingWebhookConfigurationInformer.
 func (v *version) MutatingWebhookConfigurations() MutatingWebhookConfigurationInformer {
 	return &mutatingWebhookConfigurationInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// ValidatingRuleConfigurations returns a ValidatingRuleConfigurationInformer.
+func (v *version) ValidatingRuleConfigurations() ValidatingRuleConfigurationInformer {
+	return &validatingRuleConfigurationInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // ValidatingWebhookConfigurations returns a ValidatingWebhookConfigurationInformer.
