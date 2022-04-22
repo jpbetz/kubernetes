@@ -17,13 +17,15 @@ limitations under the License.
 package object
 
 import (
+	"k8s.io/klog/v2"
+
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/admission"
+	"k8s.io/apiserver/pkg/admission/plugin/rules"
 	"k8s.io/apiserver/pkg/admission/plugin/webhook"
-	"k8s.io/klog/v2"
 )
 
 // Matcher decides if a request selected by the ObjectSelector.
@@ -43,9 +45,22 @@ func matchObject(obj runtime.Object, selector labels.Selector) bool {
 
 }
 
-// MatchObjectSelector decideds whether the request matches the ObjectSelector
+// MatchObjectSelector decides whether the request matches the ObjectSelector
 // of the webhook. Only when they match, the webhook is called.
 func (m *Matcher) MatchObjectSelector(h webhook.WebhookAccessor, attr admission.Attributes) (bool, *apierrors.StatusError) {
+	selector, err := h.GetParsedObjectSelector()
+	if err != nil {
+		return false, apierrors.NewInternalError(err)
+	}
+	if selector.Empty() {
+		return true, nil
+	}
+	return matchObject(attr.GetObject(), selector) || matchObject(attr.GetOldObject(), selector), nil
+}
+
+// MatchObjectSelectorForRule decides whether the request matches the ObjectSelector
+// of the webhook. Only when they match, the webhook is called.
+func (m *Matcher) MatchObjectSelectorForRule(h rules.RuleAccessor, attr admission.Attributes) (bool, *apierrors.StatusError) {
 	selector, err := h.GetParsedObjectSelector()
 	if err != nil {
 		return false, apierrors.NewInternalError(err)

@@ -26,6 +26,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/apiserver/pkg/admission"
+	"k8s.io/apiserver/pkg/admission/plugin/rules"
 	"k8s.io/apiserver/pkg/admission/plugin/webhook"
 	clientset "k8s.io/client-go/kubernetes"
 	corelisters "k8s.io/client-go/listers/core/v1"
@@ -88,6 +89,41 @@ func (m *Matcher) GetNamespaceLabels(attr admission.Attributes) (map[string]stri
 // MatchNamespaceSelector decideds whether the request matches the
 // namespaceSelctor of the webhook. Only when they match, the webhook is called.
 func (m *Matcher) MatchNamespaceSelector(h webhook.WebhookAccessor, attr admission.Attributes) (bool, *apierrors.StatusError) {
+	namespaceName := attr.GetNamespace()
+	if len(namespaceName) == 0 && attr.GetResource().Resource != "namespaces" {
+		// If the request is about a cluster scoped resource, and it is not a
+		// namespace, it is never exempted.
+		// TODO: figure out a way selective exempt cluster scoped resources.
+		// Also update the comment in types.go
+		return true, nil
+	}
+	selector, err := h.GetParsedNamespaceSelector()
+	if err != nil {
+		return false, apierrors.NewInternalError(err)
+	}
+	if selector.Empty() {
+		return true, nil
+	}
+
+	namespaceLabels, err := m.GetNamespaceLabels(attr)
+	// this means the namespace is not found, for backwards compatibility,
+	// return a 404
+	if apierrors.IsNotFound(err) {
+		status, ok := err.(apierrors.APIStatus)
+		if !ok {
+			return false, apierrors.NewInternalError(err)
+		}
+		return false, &apierrors.StatusError{status.Status()}
+	}
+	if err != nil {
+		return false, apierrors.NewInternalError(err)
+	}
+	return selector.Matches(labels.Set(namespaceLabels)), nil
+}
+
+// MatchNamespaceSelectorForRule decideds whether the request matches the
+// namespaceSelctor of the webhook. Only when they match, the webhook is called.
+func (m *Matcher) MatchNamespaceSelectorForRule(h rules.RuleAccessor, attr admission.Attributes) (bool, *apierrors.StatusError) {
 	namespaceName := attr.GetNamespace()
 	if len(namespaceName) == 0 && attr.GetResource().Resource != "namespaces" {
 		// If the request is about a cluster scoped resource, and it is not a
