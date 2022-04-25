@@ -34,6 +34,7 @@ import (
 	"k8s.io/apiserver/pkg/admission/plugin/webhook/rules"
 	webhookutil "k8s.io/apiserver/pkg/util/webhook"
 	"k8s.io/client-go/informers"
+	clientset "k8s.io/client-go/kubernetes"
 )
 
 // Rules is an abstract admission plugin with all the infrastructure to define Admit or Validate on-top.
@@ -88,6 +89,22 @@ func NewRules(handler *admission.Handler, configFile io.Reader, sourceFactory so
 		objectMatcher:    &object.Matcher{},
 		evaluator:        evaluatorFactory(),
 	}, nil
+}
+
+// SetExternalKubeClientSet implements the WantsExternalKubeInformerFactory interface.
+// It sets external ClientSet for admission plugins that need it
+func (a *Rules) SetExternalKubeClientSet(client clientset.Interface) {
+	a.namespaceMatcher.Client = client
+}
+
+// SetExternalKubeInformerFactory implements the WantsExternalKubeInformerFactory interface.
+func (a *Rules) SetExternalKubeInformerFactory(f informers.SharedInformerFactory) {
+	namespaceInformer := f.Core().V1().Namespaces()
+	a.namespaceMatcher.NamespaceLister = namespaceInformer.Lister()
+	a.hookSource = a.sourceFactory(f)
+	a.SetReadyFunc(func() bool {
+		return namespaceInformer.Informer().HasSynced() && a.hookSource.HasSynced()
+	})
 }
 
 // ValidateInitialization implements the InitializationValidator interface.

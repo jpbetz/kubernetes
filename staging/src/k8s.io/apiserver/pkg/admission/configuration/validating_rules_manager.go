@@ -68,7 +68,7 @@ func NewValidatingRulesConfigurationManager(f informers.SharedInformerFactory) g
 	return manager
 }
 
-// Ruless returns the merged ValidatingRulesConfiguration.
+// Rules returns the merged ValidatingRulesConfiguration.
 func (v *validatingRulesConfigurationManager) Rules() []rules.RuleAccessor {
 	return v.configuration.Load().([]rules.RuleAccessor)
 }
@@ -109,7 +109,7 @@ func (v *validatingRulesConfigurationManager) updateConfiguration() {
 
 func mergeValidatingRulesConfigurations(configurations []*v1.ValidatingRuleConfiguration) []rules.RuleAccessor {
 	sort.SliceStable(configurations, ValidatingRulesConfigurationSorter(configurations).ByName)
-	accessors := []rules.RuleAccessor{}
+	var accessors []rules.RuleAccessor
 	for _, c := range configurations {
 		// Rules names are not validated for uniqueness, so we check for duplicates and
 		// add a int suffix to distinguish between them

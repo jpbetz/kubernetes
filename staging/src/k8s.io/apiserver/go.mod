@@ -5,6 +5,7 @@ module k8s.io/apiserver
 go 1.16
 
 require (
+	github.com/google/cel-go v0.10.1
 	github.com/NYTimes/gziphandler v1.1.1 // indirect
 	github.com/coreos/go-oidc v2.1.0+incompatible
 	github.com/coreos/go-systemd/v22 v22.3.2

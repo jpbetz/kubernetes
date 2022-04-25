@@ -22,6 +22,8 @@ import (
 
 	restful "github.com/emicklei/go-restful"
 
+	openapiproto "k8s.io/kube-openapi/pkg/util/proto"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -33,7 +35,6 @@ import (
 	"k8s.io/apiserver/pkg/endpoints/handlers/fieldmanager"
 	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/storageversion"
-	openapiproto "k8s.io/kube-openapi/pkg/util/proto"
 )
 
 // ConvertabilityChecker indicates what versions a GroupKind is available in.
@@ -82,6 +83,7 @@ type APIGroupVersion struct {
 	Namer                 runtime.Namer
 	UnsafeConvertor       runtime.ObjectConvertor
 	TypeConverter         fieldmanager.TypeConverter
+	// TODO: Add CEL converter here?
 
 	EquivalentResourceRegistry runtime.EquivalentResourceRegistry
 
