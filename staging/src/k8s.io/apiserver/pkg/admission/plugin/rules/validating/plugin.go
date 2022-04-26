@@ -47,11 +47,6 @@ type Plugin struct {
 	*generic.Rules
 }
 
-func (a *Plugin) Handles(operation admission.Operation) bool {
-	//TODO implement me
-	panic("implement me")
-}
-
 var _ admission.ValidationInterface = &Plugin{}
 
 // NewValidatingAdmissionRules returns a generic admission webhook plugin.

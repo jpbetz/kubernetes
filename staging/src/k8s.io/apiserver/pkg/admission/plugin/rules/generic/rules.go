@@ -32,6 +32,7 @@ import (
 	"k8s.io/apiserver/pkg/admission/plugin/webhook/namespace"
 	"k8s.io/apiserver/pkg/admission/plugin/webhook/object"
 	"k8s.io/apiserver/pkg/admission/plugin/webhook/rules"
+	"k8s.io/apiserver/pkg/endpoints/handlers/cel"
 	webhookutil "k8s.io/apiserver/pkg/util/webhook"
 	"k8s.io/client-go/informers"
 	clientset "k8s.io/client-go/kubernetes"
@@ -47,6 +48,7 @@ type Rules struct {
 	namespaceMatcher *namespace.Matcher
 	objectMatcher    *object.Matcher
 	evaluator        Evaluator
+	runtime          cel.ExpressionRuntime
 }
 
 var (
@@ -89,6 +91,10 @@ func NewRules(handler *admission.Handler, configFile io.Reader, sourceFactory so
 		objectMatcher:    &object.Matcher{},
 		evaluator:        evaluatorFactory(),
 	}, nil
+}
+
+func (a *Rules) SetExpressionRuntime(runtime cel.ExpressionRuntime) {
+	a.runtime = runtime
 }
 
 // SetExternalKubeClientSet implements the WantsExternalKubeInformerFactory interface.
@@ -206,5 +212,5 @@ func (a *Rules) Evaluate(ctx context.Context, attr admission.Attributes, o admis
 		return admission.NewForbidden(attr, fmt.Errorf("not yet ready to handle request"))
 	}
 	rules := a.hookSource.Rules()
-	return a.evaluator.Evaluate(ctx, attr, o, rules)
+	return a.evaluator.Evaluate(ctx, attr, o, rules, a.runtime)
 }

@@ -17,15 +17,15 @@ limitations under the License.
 package cel
 
 import (
+	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types/ref"
-	expr "google.golang.org/genproto/googleapis/api/expr/v1alpha1"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
-// ExpressionConverter
-type ExpressionConverter interface {
-	ObjectToCelVal(runtime.Object) (ref.Val, error)
-	ObjectKindToCelType(schema.ObjectKind) expr.Type
+// ExpressionRuntime compiles and runs CEL expressions.
+type ExpressionRuntime interface {
+	Eval(program cel.Program, object runtime.Object) (ref.Val, error)
+	Compile(rule string, kind schema.GroupVersionKind) (cel.Program, error)
 }

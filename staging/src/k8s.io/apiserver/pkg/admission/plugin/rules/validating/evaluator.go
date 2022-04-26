@@ -21,16 +21,17 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/google/cel-go/common/types"
 	"k8s.io/klog/v2"
 
 	v1 "k8s.io/api/admissionregistration/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/admission/plugin/rules"
 	"k8s.io/apiserver/pkg/admission/plugin/rules/generic"
+	"k8s.io/apiserver/pkg/endpoints/handlers/cel"
 )
 
 type validatingEvaluator struct {
@@ -45,7 +46,7 @@ func newValidatingEvaluator(p *Plugin) func() generic.Evaluator {
 
 var _ generic.Evaluator = &validatingEvaluator{}
 
-func (d *validatingEvaluator) Evaluate(ctx context.Context, attr admission.Attributes, o admission.ObjectInterfaces, hooks []rules.RuleAccessor) error {
+func (d *validatingEvaluator) Evaluate(ctx context.Context, attr admission.Attributes, o admission.ObjectInterfaces, hooks []rules.RuleAccessor, converter cel.ExpressionRuntime) error {
 	var relevantHooks []*generic.RuleInvocation
 	// Construct all the versions we need to call our webhooks
 	versionedAttrs := map[schema.GroupVersionKind]*generic.VersionedAttributes{}
@@ -86,7 +87,7 @@ func (d *validatingEvaluator) Evaluate(ctx context.Context, attr admission.Attri
 				return
 			}
 			versionedAttr := versionedAttrs[invocation.Kind]
-			err := d.evalRule(ctx, r, invocation, versionedAttr)
+			err := d.evalRule(ctx, r, invocation, versionedAttr, converter)
 			if err != nil {
 				klog.Warningf("rejected by rule %q: %#v", r.Name, err)
 			}
@@ -112,21 +113,22 @@ func (d *validatingEvaluator) Evaluate(ctx context.Context, attr admission.Attri
 	return errs[0]
 }
 
-func (d *validatingEvaluator) evalRule(ctx context.Context, h *v1.ValidatingRule, invocation *generic.RuleInvocation, attr *generic.VersionedAttributes) error {
+func (d *validatingEvaluator) evalRule(ctx context.Context, h *v1.ValidatingRule, invocation *generic.RuleInvocation, attr *generic.VersionedAttributes, expressionRuntime cel.ExpressionRuntime) error {
 	// TODO need to load the handler for the type?
 
 	for _, validation := range h.Validations {
 		//validation.Rule
 		obj := attr.GetObject()
-		switch obj.(type) {
-		case *unstructured.Unstructured:
-			// TODO: need the schema from the CRD
-			//cel.Compile() // TODO: compile ahead of time
-			//t.Object
-			klog.Infof("validating rule %s for custom resource", validation.Rule)
-		default:
-
-			klog.Infof("validating rule %s", validation.Rule)
+		program, err := expressionRuntime.Compile(validation.Rule, attr.GetKind())
+		if err != nil {
+			return err
+		}
+		val, err := expressionRuntime.Eval(program, obj)
+		if err != nil {
+			return err
+		}
+		if val != types.True {
+			return fmt.Errorf("vaildation rule failed: %s", validation.Rule)
 		}
 	}
 	return nil

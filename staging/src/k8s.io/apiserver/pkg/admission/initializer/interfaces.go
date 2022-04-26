@@ -19,6 +19,7 @@ package initializer
 import (
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
+	"k8s.io/apiserver/pkg/endpoints/handlers/cel"
 	quota "k8s.io/apiserver/pkg/quota/v1"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
@@ -58,4 +59,8 @@ type WantsQuotaConfiguration interface {
 type WantsFeatures interface {
 	InspectFeatureGates(featuregate.FeatureGate)
 	admission.InitializationValidator
+}
+
+type WantsExpressionRuntime interface {
+	SetExpressionRuntime(cel.ExpressionRuntime)
 }

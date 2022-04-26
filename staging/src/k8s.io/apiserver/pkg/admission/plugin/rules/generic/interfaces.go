@@ -23,6 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/admission/plugin/rules"
+	"k8s.io/apiserver/pkg/endpoints/handlers/cel"
 )
 
 // Source can list dynamic webhook plugins.
@@ -66,5 +67,5 @@ type RuleInvocation struct {
 }
 
 type Evaluator interface {
-	Evaluate(ctx context.Context, a admission.Attributes, o admission.ObjectInterfaces, rules []rules.RuleAccessor) error
+	Evaluate(ctx context.Context, a admission.Attributes, o admission.ObjectInterfaces, rules []rules.RuleAccessor, runtime cel.ExpressionRuntime) error
 }
