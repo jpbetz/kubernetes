@@ -68,7 +68,7 @@ func (i pluginInitializer) Initialize(plugin admission.Interface) {
 		wants.SetAuthorizer(i.authorizer)
 	}
 
-	if _, ok := plugin.(WantsExpressionConverter); ok {
+	if _, ok := plugin.(WantsExpressionRuntime); ok {
 		// TODO
 	}
 }

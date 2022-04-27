@@ -75,6 +75,7 @@ func SetObjectDefaults_MutatingWebhookConfigurationList(in *v1.MutatingWebhookCo
 func SetObjectDefaults_ValidatingRuleConfiguration(in *v1.ValidatingRuleConfiguration) {
 	for i := range in.ValidatingRules {
 		a := &in.ValidatingRules[i]
+		SetDefaults_ValidatingRule(a)
 		for j := range a.MatchRules {
 			b := &a.MatchRules[j]
 			SetDefaults_Rule(&b.Rule)

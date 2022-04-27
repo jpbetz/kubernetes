@@ -114,12 +114,10 @@ func (d *validatingEvaluator) Evaluate(ctx context.Context, attr admission.Attri
 }
 
 func (d *validatingEvaluator) evalRule(ctx context.Context, h *v1.ValidatingRule, invocation *generic.RuleInvocation, attr *generic.VersionedAttributes, expressionRuntime cel.ExpressionRuntime) error {
-	// TODO need to load the handler for the type?
-
 	for _, validation := range h.Validations {
 		//validation.Rule
 		obj := attr.GetObject()
-		program, err := expressionRuntime.Compile(validation.Rule, attr.GetKind())
+		program, err := expressionRuntime.Compile(validation.Rule, attr.GetKind()) // TODO: move compilation to when rule is written
 		if err != nil {
 			return err
 		}

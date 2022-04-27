@@ -107,6 +107,31 @@ func NewFakeMutatingDataSource(name string, webhooks []registrationv1.MutatingWe
 	return client, informerFactory
 }
 
+// NewFakeValidatingDataSource returns a mock client and informer returning the given webhooks.
+func NewFakeValidatingRuleDataSource(name string, rules []registrationv1.ValidatingRule, stopCh <-chan struct{}) (clientset kubernetes.Interface, factory informers.SharedInformerFactory) {
+	var objs = []runtime.Object{
+		&corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: name,
+				Labels: map[string]string{
+					"runlevel": "0",
+				},
+			},
+		},
+	}
+	objs = append(objs, &registrationv1.ValidatingRuleConfiguration{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "test-webhooks",
+		},
+		ValidatingRules: rules,
+	})
+
+	client := fakeclientset.NewSimpleClientset(objs...)
+	informerFactory := informers.NewSharedInformerFactory(client, 0)
+
+	return client, informerFactory
+}
+
 func newAttributesRecord(object metav1.Object, oldObject metav1.Object, kind schema.GroupVersionKind, namespace string, name string, resource string, labels map[string]string, dryRun bool) admission.Attributes {
 	object.SetName(name)
 	object.SetNamespace(namespace)
@@ -231,6 +256,22 @@ type ValidatingTest struct {
 type MutatingTest struct {
 	Name                   string
 	Webhooks               []registrationv1.MutatingWebhook
+	Path                   string
+	IsCRD                  bool
+	IsDryRun               bool
+	AdditionalLabels       map[string]string
+	SkipBenchmark          bool
+	ExpectLabels           map[string]string
+	ExpectAllow            bool
+	ErrorContains          string
+	ExpectAnnotations      map[string]string
+	ExpectStatusCode       int32
+	ExpectReinvokeWebhooks map[string]bool
+}
+
+type ValidatingRuleTest struct {
+	Name                   string
+	Rules                  []registrationv1.ValidatingRule
 	Path                   string
 	IsCRD                  bool
 	IsDryRun               bool
@@ -688,6 +729,57 @@ func NewNonMutatingTestCases(url *url.URL) []ValidatingTest {
 		},
 		// No need to test everything with the url case, since only the
 		// connection is different.
+	}
+}
+
+// NewNonMutatingRuleTestCases returns test cases with a given base url.
+// All test cases in NewNonMutatingRuleTestCases have no Patch set in
+// AdmissionResponse. The test cases are used by both MutatingAdmissionWebhook
+// and ValidatingAdmissionWebhook.
+func NewNonMutatingRuleTestCases(url *url.URL) []ValidatingRuleTest {
+	return []ValidatingRuleTest{
+		{
+			Name: "no match",
+			Rules: []registrationv1.ValidatingRule{{
+				Name: "nomatch",
+				MatchRules: []registrationv1.RuleWithOperations{{
+					Operations: []registrationv1.OperationType{registrationv1.Create},
+				}},
+				NamespaceSelector: &metav1.LabelSelector{},
+				ObjectSelector:    &metav1.LabelSelector{},
+				Validations: []registrationv1.Validation{
+					{Rule: "false"},
+				},
+			}},
+			ExpectAllow: true,
+		},
+		{
+			Name: "match & allow",
+			Rules: []registrationv1.ValidatingRule{{
+				Name:              "allow.example.com",
+				MatchRules:        matchEverythingRules,
+				NamespaceSelector: &metav1.LabelSelector{},
+				ObjectSelector:    &metav1.LabelSelector{},
+				Validations: []registrationv1.Validation{
+					{Rule: "true"},
+				},
+			}},
+			ExpectAllow: true,
+		},
+		{
+			Name: "match & disallow",
+			Rules: []registrationv1.ValidatingRule{{
+				Name:              "allow.example.com",
+				MatchRules:        matchEverythingRules,
+				NamespaceSelector: &metav1.LabelSelector{},
+				ObjectSelector:    &metav1.LabelSelector{},
+				Validations: []registrationv1.Validation{
+					{Rule: "false"},
+				},
+			}},
+			ErrorContains: "vaildation rule failed: false",
+			ExpectAllow:   false,
+		},
 	}
 }
 

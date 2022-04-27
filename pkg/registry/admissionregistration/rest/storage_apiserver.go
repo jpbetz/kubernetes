@@ -22,9 +22,11 @@ import (
 	"k8s.io/apiserver/pkg/registry/rest"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
+
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	"k8s.io/kubernetes/pkg/apis/admissionregistration"
 	mutatingwebhookconfigurationstorage "k8s.io/kubernetes/pkg/registry/admissionregistration/mutatingwebhookconfiguration/storage"
+	validatingruleconfigurationstorage "k8s.io/kubernetes/pkg/registry/admissionregistration/validatingruleconfiguration/storage"
 	validatingwebhookconfigurationstorage "k8s.io/kubernetes/pkg/registry/admissionregistration/validatingwebhookconfiguration/storage"
 )
 
@@ -62,6 +64,15 @@ func (p RESTStorageProvider) v1Storage(apiResourceConfigSource serverstorage.API
 			return storage, err
 		}
 		storage[resource] = mutatingStorage
+	}
+
+	// validatingruleconfigurations
+	if resource := "validatingruleconfigurations"; apiResourceConfigSource.ResourceEnabled(admissionregistrationv1.SchemeGroupVersion.WithResource(resource)) {
+		validatingStorage, err := validatingruleconfigurationstorage.NewREST(restOptionsGetter)
+		if err != nil {
+			return storage, err
+		}
+		storage[resource] = validatingStorage
 	}
 
 	return storage, nil

@@ -79,6 +79,22 @@ func SetDefaults_MutatingWebhook(obj *admissionregistrationv1.MutatingWebhook) {
 	}
 }
 
+// SetDefaults_ValidatingWebhook sets defaults for webhook validating
+func SetDefaults_ValidatingRule(obj *admissionregistrationv1.ValidatingRule) {
+	if obj.MatchPolicy == nil {
+		policy := admissionregistrationv1.Equivalent
+		obj.MatchPolicy = &policy
+	}
+	if obj.NamespaceSelector == nil {
+		selector := metav1.LabelSelector{}
+		obj.NamespaceSelector = &selector
+	}
+	if obj.ObjectSelector == nil {
+		selector := metav1.LabelSelector{}
+		obj.ObjectSelector = &selector
+	}
+}
+
 // SetDefaults_Rule sets defaults for webhook rule
 func SetDefaults_Rule(obj *admissionregistrationv1.Rule) {
 	if obj.Scope == nil {
