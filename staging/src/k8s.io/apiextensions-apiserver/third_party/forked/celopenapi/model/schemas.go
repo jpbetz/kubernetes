@@ -219,7 +219,8 @@ func zeroIfNegative(v int64) int64 {
 // WithTypeAndObjectMeta ensures the kind, apiVersion and
 // metadata.name and metadata.generateName properties are specified, making a shallow copy of the provided schema if needed.
 func WithTypeAndObjectMeta(s *schema.Structural) *schema.Structural {
-	if s.Properties != nil &&
+	if s.Type == "object" &&
+		s.Properties != nil &&
 		s.Properties["kind"].Type == "string" &&
 		s.Properties["apiVersion"].Type == "string" &&
 		s.Properties["metadata"].Type == "object" &&
@@ -228,8 +229,12 @@ func WithTypeAndObjectMeta(s *schema.Structural) *schema.Structural {
 		s.Properties["metadata"].Properties["generateName"].Type == "string" {
 		return s
 	}
+	generic := s.Generic
+	if generic.Type != "object" {
+		generic.Type = "object"
+	}
 	result := &schema.Structural{
-		Generic:         s.Generic,
+		Generic:         generic,
 		Extensions:      s.Extensions,
 		ValueValidation: s.ValueValidation,
 	}

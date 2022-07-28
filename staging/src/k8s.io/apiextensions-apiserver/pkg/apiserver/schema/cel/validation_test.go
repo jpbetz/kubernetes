@@ -604,6 +604,7 @@ func TestValidationExpressions(t *testing.T) {
 			},
 		},
 		{name: "typemeta and objectmeta access specified",
+			isRoot: true,
 			obj: map[string]interface{}{
 				"apiVersion": "v1",
 				"kind":       "Pod",
@@ -657,6 +658,33 @@ func TestValidationExpressions(t *testing.T) {
 				"self.metadata.generateName == 'pickItForMe'",
 				"self.spec.field1 == 'a'",
 			},
+			errors: map[string]string{
+				"has(self.metadata.namespace)": "undefined field 'namespace'",
+			},
+		},
+		{name: "type not specified",
+			isRoot: true,
+			obj: map[string]interface{}{
+				"apiVersion": "v1",
+				"kind":       "Pod",
+				"metadata": map[string]interface{}{
+					"name":         "foo",
+					"generateName": "pickItForMe",
+					"namespace":    "xyz",
+				},
+			},
+			schema: &schema.Structural{
+				// type == "object" intentionally omitted
+				Properties: map[string]schema.Structural{
+					"kind":       stringType,
+					"apiVersion": stringType,
+					"metadata": objectType(map[string]schema.Structural{
+						"name":         stringType,
+						"generateName": stringType,
+					}),
+				},
+			},
+			// Sanity check that CEL rules are still enforced
 			errors: map[string]string{
 				"has(self.metadata.namespace)": "undefined field 'namespace'",
 			},
