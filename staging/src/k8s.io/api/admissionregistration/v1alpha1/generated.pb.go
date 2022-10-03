@@ -44,15 +44,15 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-func (m *MutatingWebhook) Reset()      { *m = MutatingWebhook{} }
-func (*MutatingWebhook) ProtoMessage() {}
-func (*MutatingWebhook) Descriptor() ([]byte, []int) {
-	return fileDescriptor_aaac5994f79683e8, []int{0}
+func (m *MatchResources) Reset()      { *m = MatchResources{} }
+func (*MatchResources) ProtoMessage() {}
+func (*MatchResources) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c3be8d256e3ae3cf, []int{0}
 }
-func (m *MutatingWebhook) XXX_Unmarshal(b []byte) error {
+func (m *MatchResources) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MutatingWebhook) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MatchResources) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	b = b[:cap(b)]
 	n, err := m.MarshalToSizedBuffer(b)
 	if err != nil {
@@ -60,27 +60,27 @@ func (m *MutatingWebhook) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 	}
 	return b[:n], nil
 }
-func (m *MutatingWebhook) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MutatingWebhook.Merge(m, src)
+func (m *MatchResources) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MatchResources.Merge(m, src)
 }
-func (m *MutatingWebhook) XXX_Size() int {
+func (m *MatchResources) XXX_Size() int {
 	return m.Size()
 }
-func (m *MutatingWebhook) XXX_DiscardUnknown() {
-	xxx_messageInfo_MutatingWebhook.DiscardUnknown(m)
+func (m *MatchResources) XXX_DiscardUnknown() {
+	xxx_messageInfo_MatchResources.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MutatingWebhook proto.InternalMessageInfo
+var xxx_messageInfo_MatchResources proto.InternalMessageInfo
 
-func (m *MutatingWebhookConfiguration) Reset()      { *m = MutatingWebhookConfiguration{} }
-func (*MutatingWebhookConfiguration) ProtoMessage() {}
-func (*MutatingWebhookConfiguration) Descriptor() ([]byte, []int) {
-	return fileDescriptor_aaac5994f79683e8, []int{1}
+func (m *ParamSource) Reset()      { *m = ParamSource{} }
+func (*ParamSource) ProtoMessage() {}
+func (*ParamSource) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c3be8d256e3ae3cf, []int{1}
 }
-func (m *MutatingWebhookConfiguration) XXX_Unmarshal(b []byte) error {
+func (m *ParamSource) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MutatingWebhookConfiguration) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ParamSource) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	b = b[:cap(b)]
 	n, err := m.MarshalToSizedBuffer(b)
 	if err != nil {
@@ -88,27 +88,27 @@ func (m *MutatingWebhookConfiguration) XXX_Marshal(b []byte, deterministic bool)
 	}
 	return b[:n], nil
 }
-func (m *MutatingWebhookConfiguration) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MutatingWebhookConfiguration.Merge(m, src)
+func (m *ParamSource) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ParamSource.Merge(m, src)
 }
-func (m *MutatingWebhookConfiguration) XXX_Size() int {
+func (m *ParamSource) XXX_Size() int {
 	return m.Size()
 }
-func (m *MutatingWebhookConfiguration) XXX_DiscardUnknown() {
-	xxx_messageInfo_MutatingWebhookConfiguration.DiscardUnknown(m)
+func (m *ParamSource) XXX_DiscardUnknown() {
+	xxx_messageInfo_ParamSource.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MutatingWebhookConfiguration proto.InternalMessageInfo
+var xxx_messageInfo_ParamSource proto.InternalMessageInfo
 
-func (m *MutatingWebhookConfigurationList) Reset()      { *m = MutatingWebhookConfigurationList{} }
-func (*MutatingWebhookConfigurationList) ProtoMessage() {}
-func (*MutatingWebhookConfigurationList) Descriptor() ([]byte, []int) {
-	return fileDescriptor_aaac5994f79683e8, []int{2}
+func (m *PolicyBinding) Reset()      { *m = PolicyBinding{} }
+func (*PolicyBinding) ProtoMessage() {}
+func (*PolicyBinding) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c3be8d256e3ae3cf, []int{2}
 }
-func (m *MutatingWebhookConfigurationList) XXX_Unmarshal(b []byte) error {
+func (m *PolicyBinding) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MutatingWebhookConfigurationList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *PolicyBinding) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	b = b[:cap(b)]
 	n, err := m.MarshalToSizedBuffer(b)
 	if err != nil {
@@ -116,22 +116,78 @@ func (m *MutatingWebhookConfigurationList) XXX_Marshal(b []byte, deterministic b
 	}
 	return b[:n], nil
 }
-func (m *MutatingWebhookConfigurationList) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MutatingWebhookConfigurationList.Merge(m, src)
+func (m *PolicyBinding) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PolicyBinding.Merge(m, src)
 }
-func (m *MutatingWebhookConfigurationList) XXX_Size() int {
+func (m *PolicyBinding) XXX_Size() int {
 	return m.Size()
 }
-func (m *MutatingWebhookConfigurationList) XXX_DiscardUnknown() {
-	xxx_messageInfo_MutatingWebhookConfigurationList.DiscardUnknown(m)
+func (m *PolicyBinding) XXX_DiscardUnknown() {
+	xxx_messageInfo_PolicyBinding.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MutatingWebhookConfigurationList proto.InternalMessageInfo
+var xxx_messageInfo_PolicyBinding proto.InternalMessageInfo
+
+func (m *PolicyBindingList) Reset()      { *m = PolicyBindingList{} }
+func (*PolicyBindingList) ProtoMessage() {}
+func (*PolicyBindingList) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c3be8d256e3ae3cf, []int{3}
+}
+func (m *PolicyBindingList) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *PolicyBindingList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *PolicyBindingList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PolicyBindingList.Merge(m, src)
+}
+func (m *PolicyBindingList) XXX_Size() int {
+	return m.Size()
+}
+func (m *PolicyBindingList) XXX_DiscardUnknown() {
+	xxx_messageInfo_PolicyBindingList.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PolicyBindingList proto.InternalMessageInfo
+
+func (m *PolicyBindingSpec) Reset()      { *m = PolicyBindingSpec{} }
+func (*PolicyBindingSpec) ProtoMessage() {}
+func (*PolicyBindingSpec) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c3be8d256e3ae3cf, []int{4}
+}
+func (m *PolicyBindingSpec) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *PolicyBindingSpec) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *PolicyBindingSpec) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PolicyBindingSpec.Merge(m, src)
+}
+func (m *PolicyBindingSpec) XXX_Size() int {
+	return m.Size()
+}
+func (m *PolicyBindingSpec) XXX_DiscardUnknown() {
+	xxx_messageInfo_PolicyBindingSpec.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PolicyBindingSpec proto.InternalMessageInfo
 
 func (m *Rule) Reset()      { *m = Rule{} }
 func (*Rule) ProtoMessage() {}
 func (*Rule) Descriptor() ([]byte, []int) {
-	return fileDescriptor_aaac5994f79683e8, []int{3}
+	return fileDescriptor_c3be8d256e3ae3cf, []int{5}
 }
 func (m *Rule) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -159,7 +215,7 @@ var xxx_messageInfo_Rule proto.InternalMessageInfo
 func (m *RuleWithOperations) Reset()      { *m = RuleWithOperations{} }
 func (*RuleWithOperations) ProtoMessage() {}
 func (*RuleWithOperations) Descriptor() ([]byte, []int) {
-	return fileDescriptor_aaac5994f79683e8, []int{4}
+	return fileDescriptor_c3be8d256e3ae3cf, []int{6}
 }
 func (m *RuleWithOperations) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -184,15 +240,15 @@ func (m *RuleWithOperations) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_RuleWithOperations proto.InternalMessageInfo
 
-func (m *ServiceReference) Reset()      { *m = ServiceReference{} }
-func (*ServiceReference) ProtoMessage() {}
-func (*ServiceReference) Descriptor() ([]byte, []int) {
-	return fileDescriptor_aaac5994f79683e8, []int{5}
+func (m *ValidatingAdmissionPolicy) Reset()      { *m = ValidatingAdmissionPolicy{} }
+func (*ValidatingAdmissionPolicy) ProtoMessage() {}
+func (*ValidatingAdmissionPolicy) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c3be8d256e3ae3cf, []int{7}
 }
-func (m *ServiceReference) XXX_Unmarshal(b []byte) error {
+func (m *ValidatingAdmissionPolicy) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *ServiceReference) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ValidatingAdmissionPolicy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	b = b[:cap(b)]
 	n, err := m.MarshalToSizedBuffer(b)
 	if err != nil {
@@ -200,27 +256,27 @@ func (m *ServiceReference) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 	}
 	return b[:n], nil
 }
-func (m *ServiceReference) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ServiceReference.Merge(m, src)
+func (m *ValidatingAdmissionPolicy) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ValidatingAdmissionPolicy.Merge(m, src)
 }
-func (m *ServiceReference) XXX_Size() int {
+func (m *ValidatingAdmissionPolicy) XXX_Size() int {
 	return m.Size()
 }
-func (m *ServiceReference) XXX_DiscardUnknown() {
-	xxx_messageInfo_ServiceReference.DiscardUnknown(m)
+func (m *ValidatingAdmissionPolicy) XXX_DiscardUnknown() {
+	xxx_messageInfo_ValidatingAdmissionPolicy.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ServiceReference proto.InternalMessageInfo
+var xxx_messageInfo_ValidatingAdmissionPolicy proto.InternalMessageInfo
 
-func (m *ValidatingWebhook) Reset()      { *m = ValidatingWebhook{} }
-func (*ValidatingWebhook) ProtoMessage() {}
-func (*ValidatingWebhook) Descriptor() ([]byte, []int) {
-	return fileDescriptor_aaac5994f79683e8, []int{6}
+func (m *ValidatingAdmissionPolicyList) Reset()      { *m = ValidatingAdmissionPolicyList{} }
+func (*ValidatingAdmissionPolicyList) ProtoMessage() {}
+func (*ValidatingAdmissionPolicyList) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c3be8d256e3ae3cf, []int{8}
 }
-func (m *ValidatingWebhook) XXX_Unmarshal(b []byte) error {
+func (m *ValidatingAdmissionPolicyList) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *ValidatingWebhook) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ValidatingAdmissionPolicyList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	b = b[:cap(b)]
 	n, err := m.MarshalToSizedBuffer(b)
 	if err != nil {
@@ -228,27 +284,27 @@ func (m *ValidatingWebhook) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 	}
 	return b[:n], nil
 }
-func (m *ValidatingWebhook) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ValidatingWebhook.Merge(m, src)
+func (m *ValidatingAdmissionPolicyList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ValidatingAdmissionPolicyList.Merge(m, src)
 }
-func (m *ValidatingWebhook) XXX_Size() int {
+func (m *ValidatingAdmissionPolicyList) XXX_Size() int {
 	return m.Size()
 }
-func (m *ValidatingWebhook) XXX_DiscardUnknown() {
-	xxx_messageInfo_ValidatingWebhook.DiscardUnknown(m)
+func (m *ValidatingAdmissionPolicyList) XXX_DiscardUnknown() {
+	xxx_messageInfo_ValidatingAdmissionPolicyList.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ValidatingWebhook proto.InternalMessageInfo
+var xxx_messageInfo_ValidatingAdmissionPolicyList proto.InternalMessageInfo
 
-func (m *ValidatingWebhookConfiguration) Reset()      { *m = ValidatingWebhookConfiguration{} }
-func (*ValidatingWebhookConfiguration) ProtoMessage() {}
-func (*ValidatingWebhookConfiguration) Descriptor() ([]byte, []int) {
-	return fileDescriptor_aaac5994f79683e8, []int{7}
+func (m *ValidatingAdmissionPolicySpec) Reset()      { *m = ValidatingAdmissionPolicySpec{} }
+func (*ValidatingAdmissionPolicySpec) ProtoMessage() {}
+func (*ValidatingAdmissionPolicySpec) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c3be8d256e3ae3cf, []int{9}
 }
-func (m *ValidatingWebhookConfiguration) XXX_Unmarshal(b []byte) error {
+func (m *ValidatingAdmissionPolicySpec) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *ValidatingWebhookConfiguration) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ValidatingAdmissionPolicySpec) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	b = b[:cap(b)]
 	n, err := m.MarshalToSizedBuffer(b)
 	if err != nil {
@@ -256,27 +312,27 @@ func (m *ValidatingWebhookConfiguration) XXX_Marshal(b []byte, deterministic boo
 	}
 	return b[:n], nil
 }
-func (m *ValidatingWebhookConfiguration) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ValidatingWebhookConfiguration.Merge(m, src)
+func (m *ValidatingAdmissionPolicySpec) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ValidatingAdmissionPolicySpec.Merge(m, src)
 }
-func (m *ValidatingWebhookConfiguration) XXX_Size() int {
+func (m *ValidatingAdmissionPolicySpec) XXX_Size() int {
 	return m.Size()
 }
-func (m *ValidatingWebhookConfiguration) XXX_DiscardUnknown() {
-	xxx_messageInfo_ValidatingWebhookConfiguration.DiscardUnknown(m)
+func (m *ValidatingAdmissionPolicySpec) XXX_DiscardUnknown() {
+	xxx_messageInfo_ValidatingAdmissionPolicySpec.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ValidatingWebhookConfiguration proto.InternalMessageInfo
+var xxx_messageInfo_ValidatingAdmissionPolicySpec proto.InternalMessageInfo
 
-func (m *ValidatingWebhookConfigurationList) Reset()      { *m = ValidatingWebhookConfigurationList{} }
-func (*ValidatingWebhookConfigurationList) ProtoMessage() {}
-func (*ValidatingWebhookConfigurationList) Descriptor() ([]byte, []int) {
-	return fileDescriptor_aaac5994f79683e8, []int{8}
+func (m *Validation) Reset()      { *m = Validation{} }
+func (*Validation) ProtoMessage() {}
+func (*Validation) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c3be8d256e3ae3cf, []int{10}
 }
-func (m *ValidatingWebhookConfigurationList) XXX_Unmarshal(b []byte) error {
+func (m *Validation) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *ValidatingWebhookConfigurationList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *Validation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	b = b[:cap(b)]
 	n, err := m.MarshalToSizedBuffer(b)
 	if err != nil {
@@ -284,138 +340,117 @@ func (m *ValidatingWebhookConfigurationList) XXX_Marshal(b []byte, deterministic
 	}
 	return b[:n], nil
 }
-func (m *ValidatingWebhookConfigurationList) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ValidatingWebhookConfigurationList.Merge(m, src)
+func (m *Validation) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Validation.Merge(m, src)
 }
-func (m *ValidatingWebhookConfigurationList) XXX_Size() int {
+func (m *Validation) XXX_Size() int {
 	return m.Size()
 }
-func (m *ValidatingWebhookConfigurationList) XXX_DiscardUnknown() {
-	xxx_messageInfo_ValidatingWebhookConfigurationList.DiscardUnknown(m)
+func (m *Validation) XXX_DiscardUnknown() {
+	xxx_messageInfo_Validation.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ValidatingWebhookConfigurationList proto.InternalMessageInfo
-
-func (m *WebhookClientConfig) Reset()      { *m = WebhookClientConfig{} }
-func (*WebhookClientConfig) ProtoMessage() {}
-func (*WebhookClientConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_aaac5994f79683e8, []int{9}
-}
-func (m *WebhookClientConfig) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *WebhookClientConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalToSizedBuffer(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *WebhookClientConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_WebhookClientConfig.Merge(m, src)
-}
-func (m *WebhookClientConfig) XXX_Size() int {
-	return m.Size()
-}
-func (m *WebhookClientConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_WebhookClientConfig.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_WebhookClientConfig proto.InternalMessageInfo
+var xxx_messageInfo_Validation proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterType((*MutatingWebhook)(nil), "k8s.io.api.admissionregistration.v1.MutatingWebhook")
-	proto.RegisterType((*MutatingWebhookConfiguration)(nil), "k8s.io.api.admissionregistration.v1.MutatingWebhookConfiguration")
-	proto.RegisterType((*MutatingWebhookConfigurationList)(nil), "k8s.io.api.admissionregistration.v1.MutatingWebhookConfigurationList")
-	proto.RegisterType((*Rule)(nil), "k8s.io.api.admissionregistration.v1.Rule")
-	proto.RegisterType((*RuleWithOperations)(nil), "k8s.io.api.admissionregistration.v1.RuleWithOperations")
-	proto.RegisterType((*ServiceReference)(nil), "k8s.io.api.admissionregistration.v1.ServiceReference")
-	proto.RegisterType((*ValidatingWebhook)(nil), "k8s.io.api.admissionregistration.v1.ValidatingWebhook")
-	proto.RegisterType((*ValidatingWebhookConfiguration)(nil), "k8s.io.api.admissionregistration.v1.ValidatingWebhookConfiguration")
-	proto.RegisterType((*ValidatingWebhookConfigurationList)(nil), "k8s.io.api.admissionregistration.v1.ValidatingWebhookConfigurationList")
-	proto.RegisterType((*WebhookClientConfig)(nil), "k8s.io.api.admissionregistration.v1.WebhookClientConfig")
+	proto.RegisterType((*MatchResources)(nil), "k8s.io.api.admissionregistration.v1alpha1.MatchResources")
+	proto.RegisterType((*ParamSource)(nil), "k8s.io.api.admissionregistration.v1alpha1.ParamSource")
+	proto.RegisterType((*PolicyBinding)(nil), "k8s.io.api.admissionregistration.v1alpha1.PolicyBinding")
+	proto.RegisterType((*PolicyBindingList)(nil), "k8s.io.api.admissionregistration.v1alpha1.PolicyBindingList")
+	proto.RegisterType((*PolicyBindingSpec)(nil), "k8s.io.api.admissionregistration.v1alpha1.PolicyBindingSpec")
+	proto.RegisterType((*Rule)(nil), "k8s.io.api.admissionregistration.v1alpha1.Rule")
+	proto.RegisterType((*RuleWithOperations)(nil), "k8s.io.api.admissionregistration.v1alpha1.RuleWithOperations")
+	proto.RegisterType((*ValidatingAdmissionPolicy)(nil), "k8s.io.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy")
+	proto.RegisterType((*ValidatingAdmissionPolicyList)(nil), "k8s.io.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicyList")
+	proto.RegisterType((*ValidatingAdmissionPolicySpec)(nil), "k8s.io.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicySpec")
+	proto.RegisterType((*Validation)(nil), "k8s.io.api.admissionregistration.v1alpha1.Validation")
 }
 
 func init() {
-	proto.RegisterFile("k8s.io/kubernetes/vendor/k8s.io/api/admissionregistration/v1/generated.proto", fileDescriptor_aaac5994f79683e8)
+	proto.RegisterFile("k8s.io/kubernetes/vendor/k8s.io/api/admissionregistration/v1alpha1/generated.proto", fileDescriptor_c3be8d256e3ae3cf)
 }
 
-var fileDescriptor_aaac5994f79683e8 = []byte{
-	// 1105 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x57, 0x4f, 0x6f, 0x1b, 0x45,
-	0x14, 0xcf, 0xc6, 0x76, 0x63, 0x8f, 0xf3, 0xa7, 0x19, 0xa0, 0x35, 0xa1, 0xf2, 0x5a, 0xae, 0x84,
-	0x8c, 0x80, 0xdd, 0x26, 0x94, 0x52, 0x71, 0x41, 0xd9, 0xf0, 0x47, 0x11, 0x49, 0x1b, 0x4d, 0xda,
-	0x14, 0xa1, 0x1c, 0x3a, 0x5e, 0x8f, 0xed, 0x21, 0xf6, 0xce, 0x6a, 0x66, 0xd6, 0x90, 0x1b, 0x1f,
-	0x81, 0xaf, 0x00, 0x9f, 0x82, 0x1b, 0xe2, 0x96, 0x63, 0x8f, 0x39, 0xa0, 0x85, 0x2c, 0x17, 0x0e,
-	0x7c, 0x82, 0x9c, 0xd0, 0xcc, 0xae, 0x77, 0xfd, 0x27, 0x09, 0x56, 0x0e, 0x3d, 0xe5, 0xe6, 0xf9,
-	0xbd, 0x79, 0xbf, 0x37, 0xef, 0xed, 0x7b, 0xef, 0x27, 0x83, 0x9d, 0xa3, 0xc7, 0xc2, 0xa2, 0xcc,
-	0x3e, 0x0a, 0x9a, 0x84, 0x7b, 0x44, 0x12, 0x61, 0x0f, 0x88, 0xd7, 0x62, 0xdc, 0x4e, 0x0c, 0xd8,
-	0xa7, 0x36, 0x6e, 0xf5, 0xa9, 0x10, 0x94, 0x79, 0x9c, 0x74, 0xa8, 0x90, 0x1c, 0x4b, 0xca, 0x3c,
-	0x7b, 0xb0, 0x6e, 0x77, 0x88, 0x47, 0x38, 0x96, 0xa4, 0x65, 0xf9, 0x9c, 0x49, 0x06, 0xef, 0xc7,
-	0x4e, 0x16, 0xf6, 0xa9, 0x75, 0xa1, 0x93, 0x35, 0x58, 0x5f, 0xfb, 0xb0, 0x43, 0x65, 0x37, 0x68,
-	0x5a, 0x2e, 0xeb, 0xdb, 0x1d, 0xd6, 0x61, 0xb6, 0xf6, 0x6d, 0x06, 0x6d, 0x7d, 0xd2, 0x07, 0xfd,
-	0x2b, 0xe6, 0x5c, 0x7b, 0x98, 0x3d, 0xa4, 0x8f, 0xdd, 0x2e, 0xf5, 0x08, 0x3f, 0xb6, 0xfd, 0xa3,
-	0x8e, 0x02, 0x84, 0xdd, 0x27, 0x12, 0x5f, 0xf0, 0x92, 0x35, 0xfb, 0x32, 0x2f, 0x1e, 0x78, 0x92,
-	0xf6, 0xc9, 0x94, 0xc3, 0xa3, 0xff, 0x73, 0x10, 0x6e, 0x97, 0xf4, 0xf1, 0xa4, 0x5f, 0xfd, 0xb7,
-	0x05, 0xb0, 0xb2, 0x1b, 0x48, 0x2c, 0xa9, 0xd7, 0x79, 0x41, 0x9a, 0x5d, 0xc6, 0x8e, 0x60, 0x0d,
-	0xe4, 0x3d, 0xdc, 0x27, 0x15, 0xa3, 0x66, 0x34, 0x4a, 0xce, 0xe2, 0x49, 0x68, 0xce, 0x45, 0xa1,
-	0x99, 0x7f, 0x82, 0xfb, 0x04, 0x69, 0x0b, 0xe4, 0x60, 0xd1, 0xed, 0x51, 0xe2, 0xc9, 0x2d, 0xe6,
-	0xb5, 0x69, 0xa7, 0x32, 0x5f, 0x33, 0x1a, 0xe5, 0x8d, 0xc7, 0xd6, 0x0c, 0xf5, 0xb3, 0x92, 0x28,
-	0x5b, 0x23, 0xfe, 0xce, 0x9b, 0x49, 0x8c, 0xc5, 0x51, 0x14, 0x8d, 0xc5, 0x80, 0x87, 0xa0, 0xc0,
-	0x83, 0x1e, 0x11, 0x95, 0x5c, 0x2d, 0xd7, 0x28, 0x6f, 0x7c, 0x32, 0x53, 0x30, 0x14, 0xf4, 0xc8,
-	0x0b, 0x2a, 0xbb, 0x4f, 0x7d, 0x12, 0x83, 0xc2, 0x59, 0x4a, 0x62, 0x15, 0x94, 0x4d, 0xa0, 0x98,
-	0x14, 0xee, 0x80, 0xa5, 0x36, 0xa6, 0xbd, 0x80, 0x93, 0x3d, 0xd6, 0xa3, 0xee, 0x71, 0x25, 0xaf,
-	0x93, 0x7f, 0x37, 0x0a, 0xcd, 0xa5, 0x2f, 0x47, 0x0d, 0xe7, 0xa1, 0xb9, 0x3a, 0x06, 0x3c, 0x3b,
-	0xf6, 0x09, 0x1a, 0x77, 0x86, 0x9f, 0x83, 0x72, 0x1f, 0x4b, 0xb7, 0x9b, 0x70, 0x95, 0x34, 0x57,
-	0x3d, 0x0a, 0xcd, 0xf2, 0x6e, 0x06, 0x9f, 0x87, 0xe6, 0xca, 0xc8, 0x51, 0xf3, 0x8c, 0xba, 0xc1,
-	0x1f, 0xc0, 0xaa, 0xaa, 0xb6, 0xf0, 0xb1, 0x4b, 0xf6, 0x49, 0x8f, 0xb8, 0x92, 0xf1, 0x4a, 0x41,
-	0x97, 0xfa, 0xa3, 0x91, 0xec, 0xd3, 0xef, 0x6d, 0xf9, 0x47, 0x1d, 0x05, 0x08, 0x4b, 0xb5, 0x95,
-	0x4a, 0x7f, 0x07, 0x37, 0x49, 0x6f, 0xe8, 0xea, 0xbc, 0x15, 0x85, 0xe6, 0xea, 0x93, 0x49, 0x46,
-	0x34, 0x1d, 0x04, 0x32, 0xb0, 0xcc, 0x9a, 0xdf, 0x11, 0x57, 0xa6, 0x61, 0xcb, 0xd7, 0x0f, 0x0b,
-	0xa3, 0xd0, 0x5c, 0x7e, 0x3a, 0x46, 0x87, 0x26, 0xe8, 0x55, 0xc1, 0x04, 0x6d, 0x91, 0x2f, 0xda,
-	0x6d, 0xe2, 0x4a, 0x51, 0xb9, 0x95, 0x15, 0x6c, 0x3f, 0x83, 0x55, 0xc1, 0xb2, 0xe3, 0x56, 0x0f,
-	0x0b, 0x81, 0x46, 0xdd, 0xe0, 0xa7, 0x60, 0x59, 0xf5, 0x3a, 0x0b, 0xe4, 0x3e, 0x71, 0x99, 0xd7,
-	0x12, 0x95, 0x85, 0x9a, 0xd1, 0x28, 0xc4, 0x2f, 0x78, 0x36, 0x66, 0x41, 0x13, 0x37, 0xe1, 0x73,
-	0x70, 0x37, 0xed, 0x22, 0x44, 0x06, 0x94, 0x7c, 0x7f, 0x40, 0xb8, 0x3a, 0x88, 0x4a, 0xb1, 0x96,
-	0x6b, 0x94, 0x9c, 0x77, 0xa2, 0xd0, 0xbc, 0xbb, 0x79, 0xf1, 0x15, 0x74, 0x99, 0x2f, 0x7c, 0x09,
-	0x20, 0x27, 0xd4, 0x1b, 0x30, 0x57, 0xb7, 0x5f, 0xd2, 0x10, 0x40, 0xe7, 0xf7, 0x20, 0x0a, 0x4d,
-	0x88, 0xa6, 0xac, 0xe7, 0xa1, 0x79, 0x67, 0x1a, 0xd5, 0xed, 0x71, 0x01, 0x57, 0xfd, 0xd4, 0x00,
-	0xf7, 0x26, 0x26, 0x38, 0x9e, 0x98, 0x20, 0xee, 0x78, 0xf8, 0x12, 0x14, 0xd5, 0x87, 0x69, 0x61,
-	0x89, 0xf5, 0x48, 0x97, 0x37, 0x1e, 0xcc, 0xf6, 0x19, 0xe3, 0x6f, 0xb6, 0x4b, 0x24, 0x76, 0x60,
-	0x32, 0x34, 0x20, 0xc3, 0x50, 0xca, 0x0a, 0x0f, 0x40, 0x31, 0x89, 0x2c, 0x2a, 0xf3, 0x7a, 0x3a,
-	0x1f, 0xce, 0x34, 0x9d, 0x13, 0xcf, 0x76, 0xf2, 0x2a, 0x0a, 0x4a, 0xb9, 0xea, 0xff, 0x18, 0xa0,
-	0x76, 0x55, 0x6a, 0x3b, 0x54, 0x48, 0x78, 0x38, 0x95, 0x9e, 0x35, 0x63, 0x97, 0x52, 0x11, 0x27,
-	0x77, 0x3b, 0x49, 0xae, 0x38, 0x44, 0x46, 0x52, 0x6b, 0x83, 0x02, 0x95, 0xa4, 0x3f, 0xcc, 0x6b,
-	0xf3, 0x3a, 0x79, 0x8d, 0xbd, 0x39, 0xdb, 0x3f, 0xdb, 0x8a, 0x17, 0xc5, 0xf4, 0xf5, 0xdf, 0x0d,
-	0x90, 0x57, 0x0b, 0x09, 0xbe, 0x0f, 0x4a, 0xd8, 0xa7, 0x5f, 0x71, 0x16, 0xf8, 0xa2, 0x62, 0xe8,
-	0xce, 0x5b, 0x8a, 0x42, 0xb3, 0xb4, 0xb9, 0xb7, 0x1d, 0x83, 0x28, 0xb3, 0xc3, 0x75, 0x50, 0xc6,
-	0x3e, 0x4d, 0x1b, 0x75, 0x5e, 0x5f, 0x5f, 0x51, 0x63, 0xb3, 0xb9, 0xb7, 0x9d, 0x36, 0xe7, 0xe8,
-	0x1d, 0xc5, 0xcf, 0x89, 0x60, 0x01, 0x77, 0x93, 0x55, 0x9a, 0xf0, 0xa3, 0x21, 0x88, 0x32, 0x3b,
-	0xfc, 0x00, 0x14, 0x84, 0xcb, 0x7c, 0x92, 0x6c, 0xc3, 0x3b, 0xea, 0xd9, 0xfb, 0x0a, 0x38, 0x0f,
-	0xcd, 0x92, 0xfe, 0xa1, 0xdb, 0x32, 0xbe, 0x54, 0xff, 0xc5, 0x00, 0x70, 0x7a, 0xe1, 0xc2, 0xcf,
-	0x00, 0x60, 0xe9, 0x29, 0x49, 0xc9, 0xd4, 0xbd, 0x94, 0xa2, 0xe7, 0xa1, 0xb9, 0x94, 0x9e, 0x34,
-	0xe5, 0x88, 0x0b, 0xfc, 0x1a, 0xe4, 0xd5, 0x92, 0x4e, 0x54, 0xe6, 0xbd, 0x99, 0x17, 0x7f, 0x26,
-	0x5d, 0xea, 0x84, 0x34, 0x49, 0xfd, 0x67, 0x03, 0xdc, 0xde, 0x27, 0x7c, 0x40, 0x5d, 0x82, 0x48,
-	0x9b, 0x70, 0xe2, 0xb9, 0x04, 0xda, 0xa0, 0x94, 0x2e, 0xc1, 0x44, 0xf6, 0x56, 0x13, 0xdf, 0x52,
-	0xba, 0x30, 0x51, 0x76, 0x27, 0x95, 0xc8, 0xf9, 0x4b, 0x25, 0xf2, 0x1e, 0xc8, 0xfb, 0x58, 0x76,
-	0x2b, 0x39, 0x7d, 0xa3, 0xa8, 0xac, 0x7b, 0x58, 0x76, 0x91, 0x46, 0xb5, 0x95, 0x71, 0xa9, 0xeb,
-	0x5a, 0x48, 0xac, 0x8c, 0x4b, 0xa4, 0xd1, 0xfa, 0x9f, 0xb7, 0xc0, 0xea, 0x01, 0xee, 0xd1, 0xd6,
-	0x8d, 0x2c, 0xdf, 0xc8, 0xf2, 0x95, 0xb2, 0x0c, 0x6e, 0x64, 0xf9, 0x3a, 0xb2, 0x5c, 0xff, 0xc3,
-	0x00, 0xd5, 0xa9, 0x09, 0x7b, 0xdd, 0xb2, 0xf9, 0xcd, 0x94, 0x6c, 0x3e, 0x9a, 0x69, 0x7a, 0xa6,
-	0x1e, 0x3e, 0x25, 0x9c, 0xff, 0x1a, 0xa0, 0x7e, 0x75, 0x7a, 0xaf, 0x41, 0x3a, 0xbb, 0xe3, 0xd2,
-	0xb9, 0x75, 0xbd, 0xdc, 0x66, 0x11, 0xcf, 0x5f, 0x0d, 0xf0, 0xc6, 0x05, 0xfb, 0x0b, 0xbe, 0x0d,
-	0x72, 0x01, 0xef, 0x25, 0x2b, 0x78, 0x21, 0x0a, 0xcd, 0xdc, 0x73, 0xb4, 0x83, 0x14, 0x06, 0x0f,
-	0xc1, 0x82, 0x88, 0x55, 0x20, 0xc9, 0xfc, 0xe3, 0x99, 0x9e, 0x37, 0xa9, 0x1c, 0x4e, 0x39, 0x0a,
-	0xcd, 0x85, 0x21, 0x3a, 0xa4, 0x84, 0x0d, 0x50, 0x74, 0xb1, 0x13, 0x78, 0xad, 0x44, 0xb5, 0x16,
-	0x9d, 0x45, 0x55, 0xa4, 0xad, 0xcd, 0x18, 0x43, 0xa9, 0xd5, 0xd9, 0x3e, 0x39, 0xab, 0xce, 0xbd,
-	0x3a, 0xab, 0xce, 0x9d, 0x9e, 0x55, 0xe7, 0x7e, 0x8c, 0xaa, 0xc6, 0x49, 0x54, 0x35, 0x5e, 0x45,
-	0x55, 0xe3, 0x34, 0xaa, 0x1a, 0x7f, 0x45, 0x55, 0xe3, 0xa7, 0xbf, 0xab, 0x73, 0xdf, 0xde, 0x9f,
-	0xe1, 0xdf, 0xec, 0x7f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x43, 0x44, 0x86, 0xf5, 0x0c, 0x0f, 0x00,
-	0x00,
+var fileDescriptor_c3be8d256e3ae3cf = []byte{
+	// 1214 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x57, 0xcd, 0x6e, 0x1c, 0xc5,
+	0x13, 0xf7, 0xc4, 0xbb, 0x8e, 0xb7, 0x36, 0xeb, 0x78, 0x3b, 0x1f, 0xff, 0x49, 0xf4, 0x67, 0xc7,
+	0x5a, 0x50, 0xe4, 0x88, 0x30, 0x83, 0x97, 0x10, 0x05, 0x09, 0x84, 0xbc, 0x89, 0x01, 0x8b, 0x38,
+	0x31, 0x6d, 0x14, 0x24, 0x04, 0x88, 0xf6, 0x6c, 0x67, 0xb7, 0xe3, 0xf9, 0xd2, 0xf4, 0xac, 0x65,
+	0x73, 0x81, 0x07, 0x40, 0x82, 0x33, 0x4f, 0xc0, 0x6b, 0xc0, 0xc9, 0x12, 0x17, 0x73, 0x8b, 0x84,
+	0x34, 0xc2, 0xc3, 0x05, 0x5e, 0xc1, 0x27, 0xd4, 0x3d, 0xbd, 0xf3, 0xb1, 0x6b, 0x83, 0x6d, 0xa2,
+	0xdc, 0xa6, 0xab, 0xea, 0xf7, 0xab, 0xaa, 0xee, 0xaa, 0xea, 0x1e, 0xc0, 0x5b, 0x77, 0xb9, 0xc9,
+	0x7c, 0x6b, 0x6b, 0xb8, 0x49, 0x43, 0x8f, 0x46, 0x94, 0x5b, 0xdb, 0xd4, 0xeb, 0xf9, 0xa1, 0xa5,
+	0x14, 0x24, 0x60, 0x16, 0xe9, 0xb9, 0x8c, 0x73, 0xe6, 0x7b, 0x21, 0xed, 0x33, 0x1e, 0x85, 0x24,
+	0x62, 0xbe, 0x67, 0x6d, 0x2f, 0x11, 0x27, 0x18, 0x90, 0x25, 0xab, 0x4f, 0x3d, 0x1a, 0x92, 0x88,
+	0xf6, 0xcc, 0x20, 0xf4, 0x23, 0x1f, 0xdd, 0x4c, 0xa1, 0x26, 0x09, 0x98, 0x79, 0x24, 0xd4, 0x1c,
+	0x41, 0xaf, 0xbf, 0xd6, 0x67, 0xd1, 0x60, 0xb8, 0x69, 0xda, 0xbe, 0x6b, 0xf5, 0xfd, 0xbe, 0x6f,
+	0x49, 0x86, 0xcd, 0xe1, 0x13, 0xb9, 0x92, 0x0b, 0xf9, 0x95, 0x32, 0x5f, 0xbf, 0x9d, 0x07, 0xe5,
+	0x12, 0x7b, 0xc0, 0x3c, 0x1a, 0xee, 0x5a, 0xc1, 0x56, 0x5f, 0x08, 0xb8, 0xe5, 0xd2, 0x88, 0x58,
+	0xdb, 0x13, 0xf1, 0x5c, 0xb7, 0x8e, 0x43, 0x85, 0x43, 0x2f, 0x62, 0x2e, 0x9d, 0x00, 0xdc, 0xf9,
+	0x37, 0x00, 0xb7, 0x07, 0xd4, 0x25, 0xe3, 0xb8, 0xf6, 0xcf, 0x33, 0x30, 0xb7, 0x46, 0x22, 0x7b,
+	0x80, 0x29, 0xf7, 0x87, 0xa1, 0x4d, 0x39, 0x32, 0x01, 0x3c, 0xe2, 0x52, 0x1e, 0x10, 0x9b, 0x72,
+	0x5d, 0x5b, 0x98, 0x5e, 0xac, 0x75, 0xe7, 0x92, 0xd8, 0x80, 0x87, 0x99, 0x14, 0x17, 0x2c, 0xd0,
+	0x3d, 0x68, 0xd2, 0x1d, 0xdb, 0x19, 0xf6, 0x68, 0x6e, 0xa0, 0x9f, 0x93, 0xb0, 0x2b, 0x49, 0x6c,
+	0x34, 0x57, 0xc6, 0x95, 0x78, 0xd2, 0x1e, 0xed, 0x40, 0x33, 0xa3, 0xdc, 0xa0, 0x0e, 0xb5, 0x23,
+	0x3f, 0xd4, 0xa7, 0x17, 0xb4, 0xc5, 0x7a, 0xe7, 0x0d, 0x33, 0x3f, 0x9c, 0x2c, 0x37, 0x33, 0xd8,
+	0xea, 0x0b, 0x01, 0x37, 0xc5, 0x16, 0x9a, 0xdb, 0x4b, 0xe6, 0x03, 0xb2, 0x49, 0x9d, 0x11, 0x34,
+	0xf5, 0xfc, 0x70, 0x9c, 0x11, 0x4f, 0x3a, 0x41, 0x0e, 0x34, 0x9c, 0x22, 0x54, 0xaf, 0x9c, 0xdd,
+	0x6b, 0x33, 0x89, 0x8d, 0x46, 0x49, 0x84, 0xcb, 0xe4, 0xe8, 0x2b, 0x68, 0x84, 0x6a, 0xa7, 0xf1,
+	0xd0, 0xa1, 0x5c, 0xaf, 0x2e, 0x4c, 0x2f, 0xd6, 0x3b, 0xef, 0x98, 0x27, 0x2e, 0x40, 0x53, 0xe0,
+	0x3e, 0x61, 0xd1, 0xe0, 0x51, 0x40, 0x53, 0x15, 0xef, 0x5e, 0xd9, 0x8b, 0x8d, 0x29, 0xe1, 0x1b,
+	0x17, 0xb9, 0x71, 0xd9, 0x15, 0xfa, 0x4e, 0x83, 0xcb, 0x6a, 0xe7, 0x4b, 0x76, 0xfa, 0xcc, 0xf3,
+	0x88, 0xe1, 0xff, 0x2a, 0x86, 0xcb, 0x2b, 0x47, 0xb8, 0xc0, 0x47, 0x3a, 0x46, 0xb7, 0xe1, 0xc2,
+	0x28, 0x44, 0x71, 0x56, 0xfa, 0x79, 0x59, 0x35, 0xf3, 0x49, 0x6c, 0x5c, 0xc0, 0x05, 0x39, 0x2e,
+	0x59, 0xa1, 0x55, 0xb8, 0x34, 0xc6, 0x26, 0xc1, 0xb3, 0x12, 0xfc, 0xbf, 0x24, 0x36, 0x2e, 0xad,
+	0x4c, 0xaa, 0xf1, 0x51, 0x18, 0x74, 0x1f, 0xea, 0xae, 0xa8, 0xfe, 0x75, 0xdf, 0x61, 0xf6, 0xae,
+	0x5e, 0x5b, 0xd0, 0x16, 0x6b, 0xdd, 0x76, 0x12, 0x1b, 0xf5, 0xb5, 0x5c, 0x7c, 0x18, 0x1b, 0x17,
+	0x0b, 0xcb, 0x8f, 0x77, 0x03, 0x8a, 0x8b, 0xb0, 0xf6, 0x0f, 0x1a, 0xd4, 0xd7, 0x49, 0x48, 0xdc,
+	0x0d, 0xc9, 0x8c, 0x6e, 0xc1, 0x2c, 0x09, 0xd8, 0xfb, 0xa1, 0x3f, 0x0c, 0x74, 0x4d, 0x52, 0xce,
+	0xab, 0xcd, 0x99, 0x5d, 0x5e, 0x5f, 0x95, 0x72, 0x9c, 0x59, 0xa0, 0x0e, 0x00, 0x09, 0xd8, 0x63,
+	0x1a, 0x8a, 0xed, 0xd6, 0xcf, 0x49, 0x7b, 0xa4, 0xec, 0x61, 0x79, 0x7d, 0x55, 0x69, 0x70, 0xc1,
+	0x0a, 0xdd, 0x84, 0xf3, 0x24, 0x60, 0x1f, 0x32, 0xaf, 0x27, 0x9b, 0xa4, 0xd6, 0xbd, 0xa8, 0x00,
+	0xe7, 0x97, 0xd7, 0x57, 0x85, 0x18, 0x8f, 0xf4, 0xed, 0x5f, 0x35, 0x68, 0xa4, 0x71, 0x76, 0x99,
+	0xd7, 0x63, 0x5e, 0x1f, 0x7d, 0x09, 0xb3, 0xa2, 0x7c, 0x7b, 0x24, 0x22, 0x32, 0xbc, 0x7a, 0xe7,
+	0xf5, 0x93, 0x15, 0xfb, 0xa3, 0xcd, 0xa7, 0xd4, 0x8e, 0xd6, 0x68, 0x44, 0xf2, 0x00, 0x73, 0x19,
+	0xce, 0x58, 0xd1, 0x17, 0x50, 0xe1, 0x01, 0xb5, 0x65, 0x32, 0xf5, 0xce, 0xdb, 0xa7, 0x28, 0xac,
+	0x52, 0xa4, 0x1b, 0x01, 0xb5, 0xbb, 0x17, 0x94, 0xa7, 0x8a, 0x58, 0x61, 0xc9, 0xdb, 0xde, 0xd7,
+	0xa0, 0x59, 0xb2, 0x7c, 0xc0, 0x78, 0x84, 0x3e, 0x9b, 0xc8, 0xcb, 0x3c, 0x61, 0x13, 0x33, 0x9e,
+	0x66, 0x95, 0x1d, 0xd3, 0x48, 0x52, 0xc8, 0xe9, 0x73, 0xa8, 0xb2, 0x88, 0xba, 0xe9, 0x68, 0xab,
+	0x77, 0xee, 0x9e, 0x35, 0xa9, 0x6e, 0x43, 0x39, 0xa9, 0xae, 0x0a, 0x3a, 0x9c, 0xb2, 0xb6, 0x7f,
+	0x1b, 0x4f, 0x49, 0xa4, 0x8b, 0x6e, 0xc0, 0x4c, 0x90, 0x96, 0x66, 0x5a, 0x47, 0x73, 0x0a, 0x3b,
+	0x93, 0x9a, 0x62, 0xa5, 0x45, 0x2f, 0x43, 0x35, 0x10, 0x05, 0xa8, 0xca, 0x27, 0x73, 0x21, 0xab,
+	0x12, 0xa7, 0x3a, 0xb4, 0x0b, 0x73, 0x6e, 0x69, 0xd4, 0xab, 0x01, 0xfb, 0xd6, 0x29, 0x52, 0x29,
+	0xdf, 0x15, 0xdd, 0xab, 0xca, 0xd1, 0xd8, 0x1d, 0x82, 0xc7, 0x1c, 0xb5, 0x7f, 0xd2, 0xa0, 0x22,
+	0x5a, 0x1e, 0xbd, 0x0a, 0xb5, 0x51, 0xe1, 0x8f, 0xee, 0x96, 0x46, 0x12, 0x1b, 0xb5, 0x51, 0x5f,
+	0x70, 0x9c, 0xeb, 0xd1, 0x12, 0xd4, 0xf3, 0x9a, 0x1f, 0xdd, 0x29, 0x17, 0x45, 0x77, 0xe6, 0x6d,
+	0xc1, 0x71, 0xd1, 0x46, 0xf0, 0x87, 0x85, 0xf4, 0x32, 0xfe, 0x3c, 0xb4, 0x5c, 0x8f, 0x6e, 0x41,
+	0x95, 0xdb, 0x7e, 0x40, 0xe5, 0xc8, 0xaf, 0x75, 0xaf, 0x8a, 0x1d, 0xdb, 0x10, 0x82, 0xc3, 0xd8,
+	0xa8, 0xc9, 0x0f, 0xd9, 0xeb, 0xa9, 0x51, 0xfb, 0x47, 0x0d, 0xd0, 0xe4, 0xdc, 0x43, 0xef, 0x02,
+	0xf8, 0xd9, 0x4a, 0xa5, 0x64, 0xc8, 0xce, 0xc8, 0xa4, 0x87, 0xb1, 0xd1, 0xc8, 0x56, 0x92, 0xb2,
+	0x00, 0x41, 0x1f, 0x41, 0x25, 0x1c, 0x3a, 0x54, 0x35, 0x8b, 0x75, 0xca, 0x29, 0x9c, 0xf7, 0x87,
+	0x58, 0x61, 0x49, 0xd5, 0xfe, 0x4b, 0x83, 0x6b, 0x8f, 0x89, 0xc3, 0x7a, 0x24, 0x62, 0x5e, 0x7f,
+	0x79, 0xc4, 0x92, 0x16, 0xcd, 0x0b, 0xe8, 0xff, 0xa7, 0xa5, 0xfe, 0xff, 0xe0, 0x14, 0x29, 0x1d,
+	0x1b, 0xf5, 0xb1, 0xb3, 0xe0, 0x4f, 0x0d, 0x5e, 0x3a, 0x16, 0xf5, 0x02, 0xe6, 0x02, 0x2b, 0xcf,
+	0x85, 0xfb, 0xcf, 0x23, 0xd9, 0x63, 0x66, 0xc4, 0x2f, 0xd3, 0xff, 0x90, 0xaa, 0x9c, 0x17, 0x2e,
+	0xd4, 0x83, 0xfc, 0x22, 0x52, 0xd9, 0xde, 0x39, 0xcd, 0xa8, 0xca, 0xd1, 0xdd, 0x4b, 0x2a, 0x88,
+	0xe2, 0xdd, 0x86, 0x8b, 0xfc, 0xe8, 0x6b, 0x98, 0x97, 0x8d, 0x7e, 0xcf, 0xf7, 0x04, 0x15, 0xf3,
+	0x22, 0xae, 0xce, 0xfc, 0x3f, 0xcc, 0x14, 0x5d, 0xb9, 0x9d, 0x5f, 0x1b, 0xa3, 0xc6, 0x13, 0xce,
+	0x90, 0x03, 0xf5, 0x6d, 0xb5, 0x21, 0xa2, 0xfb, 0xa6, 0xe5, 0x11, 0xbc, 0x79, 0x86, 0x23, 0xf0,
+	0xbd, 0x3c, 0xdd, 0x5c, 0xc6, 0x71, 0x91, 0x1e, 0x3d, 0x80, 0xc6, 0x13, 0xc2, 0x9c, 0x61, 0x48,
+	0xd5, 0x7b, 0x21, 0x9d, 0x1b, 0x37, 0xc4, 0xcb, 0xeb, 0xbd, 0xa2, 0xe2, 0x30, 0x36, 0x9a, 0x25,
+	0x81, 0x6c, 0xfa, 0x32, 0xb8, 0xfd, 0xed, 0x39, 0x80, 0xdc, 0x15, 0x5a, 0x80, 0x8a, 0x78, 0x9c,
+	0xaa, 0x41, 0x9f, 0x55, 0xba, 0x7c, 0xbb, 0x48, 0x0d, 0x7a, 0x05, 0x60, 0x65, 0x27, 0x08, 0x29,
+	0x2f, 0x3c, 0x14, 0x2a, 0xc2, 0x0e, 0x17, 0xe4, 0xe2, 0x69, 0xe0, 0x52, 0xce, 0x49, 0x9f, 0x8e,
+	0x3f, 0x0d, 0xd6, 0x52, 0x31, 0x1e, 0xe9, 0xd1, 0x32, 0xcc, 0xd1, 0x14, 0xa8, 0x54, 0x2a, 0xa1,
+	0x6b, 0x0a, 0xd1, 0x54, 0xe2, 0x9c, 0x1d, 0x8f, 0x01, 0xc4, 0x05, 0x15, 0x52, 0xc2, 0x7d, 0x4f,
+	0xaf, 0x96, 0x2f, 0x28, 0x2c, 0xa5, 0x58, 0x69, 0x45, 0x76, 0xb6, 0xdf, 0xa3, 0xfa, 0x4c, 0x39,
+	0xbb, 0x7b, 0x7e, 0x8f, 0x62, 0xa9, 0xe9, 0x3e, 0xda, 0x3b, 0x68, 0x4d, 0xed, 0x1f, 0xb4, 0xa6,
+	0x9e, 0x1d, 0xb4, 0xa6, 0xbe, 0x49, 0x5a, 0xda, 0x5e, 0xd2, 0xd2, 0xf6, 0x93, 0x96, 0xf6, 0x2c,
+	0x69, 0x69, 0xbf, 0x27, 0x2d, 0xed, 0xfb, 0x3f, 0x5a, 0x53, 0x9f, 0xde, 0x3c, 0xf1, 0x3f, 0xde,
+	0xdf, 0x01, 0x00, 0x00, 0xff, 0xff, 0x96, 0x48, 0x09, 0x24, 0x28, 0x0e, 0x00, 0x00,
 }
 
-func (m *MutatingWebhook) Marshal() (dAtA []byte, err error) {
+func (m *MatchResources) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -425,35 +460,16 @@ func (m *MutatingWebhook) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MutatingWebhook) MarshalTo(dAtA []byte) (int, error) {
+func (m *MatchResources) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MutatingWebhook) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MatchResources) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.ObjectSelector != nil {
-		{
-			size, err := m.ObjectSelector.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintGenerated(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x5a
-	}
-	if m.ReinvocationPolicy != nil {
-		i -= len(*m.ReinvocationPolicy)
-		copy(dAtA[i:], *m.ReinvocationPolicy)
-		i = encodeVarintGenerated(dAtA, i, uint64(len(*m.ReinvocationPolicy)))
-		i--
-		dAtA[i] = 0x52
-	}
 	if m.MatchPolicy != nil {
 		i -= len(*m.MatchPolicy)
 		copy(dAtA[i:], *m.MatchPolicy)
@@ -461,26 +477,63 @@ func (m *MutatingWebhook) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x4a
 	}
-	if len(m.AdmissionReviewVersions) > 0 {
-		for iNdEx := len(m.AdmissionReviewVersions) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.AdmissionReviewVersions[iNdEx])
-			copy(dAtA[i:], m.AdmissionReviewVersions[iNdEx])
-			i = encodeVarintGenerated(dAtA, i, uint64(len(m.AdmissionReviewVersions[iNdEx])))
+	if len(m.ExcludeResourceName) > 0 {
+		for iNdEx := len(m.ExcludeResourceName) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.ExcludeResourceName[iNdEx])
+			copy(dAtA[i:], m.ExcludeResourceName[iNdEx])
+			i = encodeVarintGenerated(dAtA, i, uint64(len(m.ExcludeResourceName[iNdEx])))
 			i--
 			dAtA[i] = 0x42
 		}
 	}
-	if m.TimeoutSeconds != nil {
-		i = encodeVarintGenerated(dAtA, i, uint64(*m.TimeoutSeconds))
-		i--
-		dAtA[i] = 0x38
+	if len(m.ResourceName) > 0 {
+		for iNdEx := len(m.ResourceName) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.ResourceName[iNdEx])
+			copy(dAtA[i:], m.ResourceName[iNdEx])
+			i = encodeVarintGenerated(dAtA, i, uint64(len(m.ResourceName[iNdEx])))
+			i--
+			dAtA[i] = 0x3a
+		}
 	}
-	if m.SideEffects != nil {
-		i -= len(*m.SideEffects)
-		copy(dAtA[i:], *m.SideEffects)
-		i = encodeVarintGenerated(dAtA, i, uint64(len(*m.SideEffects)))
+	if len(m.ExcludeResourceRules) > 0 {
+		for iNdEx := len(m.ExcludeResourceRules) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.ExcludeResourceRules[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGenerated(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x32
+		}
+	}
+	if len(m.ResourceRules) > 0 {
+		for iNdEx := len(m.ResourceRules) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.ResourceRules[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGenerated(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x2a
+		}
+	}
+	if m.LabelSelector != nil {
+		{
+			size, err := m.LabelSelector.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGenerated(dAtA, i, uint64(size))
+		}
 		i--
-		dAtA[i] = 0x32
+		dAtA[i] = 0x22
 	}
 	if m.NamespaceSelector != nil {
 		{
@@ -492,48 +545,30 @@ func (m *MutatingWebhook) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintGenerated(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x1a
 	}
-	if m.FailurePolicy != nil {
-		i -= len(*m.FailurePolicy)
-		copy(dAtA[i:], *m.FailurePolicy)
-		i = encodeVarintGenerated(dAtA, i, uint64(len(*m.FailurePolicy)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.Rules) > 0 {
-		for iNdEx := len(m.Rules) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Rules[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintGenerated(dAtA, i, uint64(size))
-			}
+	if len(m.ExcludeNamespaces) > 0 {
+		for iNdEx := len(m.ExcludeNamespaces) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.ExcludeNamespaces[iNdEx])
+			copy(dAtA[i:], m.ExcludeNamespaces[iNdEx])
+			i = encodeVarintGenerated(dAtA, i, uint64(len(m.ExcludeNamespaces[iNdEx])))
 			i--
-			dAtA[i] = 0x1a
+			dAtA[i] = 0x12
 		}
 	}
-	{
-		size, err := m.ClientConfig.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
+	if len(m.Namespaces) > 0 {
+		for iNdEx := len(m.Namespaces) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Namespaces[iNdEx])
+			copy(dAtA[i:], m.Namespaces[iNdEx])
+			i = encodeVarintGenerated(dAtA, i, uint64(len(m.Namespaces[iNdEx])))
+			i--
+			dAtA[i] = 0xa
 		}
-		i -= size
-		i = encodeVarintGenerated(dAtA, i, uint64(size))
 	}
-	i--
-	dAtA[i] = 0x12
-	i -= len(m.Name)
-	copy(dAtA[i:], m.Name)
-	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Name)))
-	i--
-	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
-func (m *MutatingWebhookConfiguration) Marshal() (dAtA []byte, err error) {
+func (m *ParamSource) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -543,30 +578,64 @@ func (m *MutatingWebhookConfiguration) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MutatingWebhookConfiguration) MarshalTo(dAtA []byte) (int, error) {
+func (m *ParamSource) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MutatingWebhookConfiguration) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ParamSource) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Webhooks) > 0 {
-		for iNdEx := len(m.Webhooks) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Webhooks[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintGenerated(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x12
-		}
+	i -= len(m.APIKind)
+	copy(dAtA[i:], m.APIKind)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.APIKind)))
+	i--
+	dAtA[i] = 0x1a
+	i -= len(m.APIVersion)
+	copy(dAtA[i:], m.APIVersion)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.APIVersion)))
+	i--
+	dAtA[i] = 0x12
+	i -= len(m.APIGroup)
+	copy(dAtA[i:], m.APIGroup)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.APIGroup)))
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *PolicyBinding) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
 	}
+	return dAtA[:n], nil
+}
+
+func (m *PolicyBinding) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PolicyBinding) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.Spec.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGenerated(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
 	{
 		size, err := m.ObjectMeta.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
@@ -580,7 +649,7 @@ func (m *MutatingWebhookConfiguration) MarshalToSizedBuffer(dAtA []byte) (int, e
 	return len(dAtA) - i, nil
 }
 
-func (m *MutatingWebhookConfigurationList) Marshal() (dAtA []byte, err error) {
+func (m *PolicyBindingList) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -590,12 +659,12 @@ func (m *MutatingWebhookConfigurationList) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MutatingWebhookConfigurationList) MarshalTo(dAtA []byte) (int, error) {
+func (m *PolicyBindingList) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MutatingWebhookConfigurationList) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *PolicyBindingList) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -622,6 +691,49 @@ func (m *MutatingWebhookConfigurationList) MarshalToSizedBuffer(dAtA []byte) (in
 		i -= size
 		i = encodeVarintGenerated(dAtA, i, uint64(size))
 	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *PolicyBindingSpec) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PolicyBindingSpec) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PolicyBindingSpec) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.MatchResources.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGenerated(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
+	i -= len(m.Param)
+	copy(dAtA[i:], m.Param)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Param)))
+	i--
+	dAtA[i] = 0x12
+	i -= len(m.Policy)
+	copy(dAtA[i:], m.Policy)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Policy)))
 	i--
 	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
@@ -726,7 +838,7 @@ func (m *RuleWithOperations) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *ServiceReference) Marshal() (dAtA []byte, err error) {
+func (m *ValidatingAdmissionPolicy) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -736,136 +848,18 @@ func (m *ServiceReference) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ServiceReference) MarshalTo(dAtA []byte) (int, error) {
+func (m *ValidatingAdmissionPolicy) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *ServiceReference) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ValidatingAdmissionPolicy) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Port != nil {
-		i = encodeVarintGenerated(dAtA, i, uint64(*m.Port))
-		i--
-		dAtA[i] = 0x20
-	}
-	if m.Path != nil {
-		i -= len(*m.Path)
-		copy(dAtA[i:], *m.Path)
-		i = encodeVarintGenerated(dAtA, i, uint64(len(*m.Path)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	i -= len(m.Name)
-	copy(dAtA[i:], m.Name)
-	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Name)))
-	i--
-	dAtA[i] = 0x12
-	i -= len(m.Namespace)
-	copy(dAtA[i:], m.Namespace)
-	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Namespace)))
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
-func (m *ValidatingWebhook) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ValidatingWebhook) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ValidatingWebhook) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.ObjectSelector != nil {
-		{
-			size, err := m.ObjectSelector.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintGenerated(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x52
-	}
-	if m.MatchPolicy != nil {
-		i -= len(*m.MatchPolicy)
-		copy(dAtA[i:], *m.MatchPolicy)
-		i = encodeVarintGenerated(dAtA, i, uint64(len(*m.MatchPolicy)))
-		i--
-		dAtA[i] = 0x4a
-	}
-	if len(m.AdmissionReviewVersions) > 0 {
-		for iNdEx := len(m.AdmissionReviewVersions) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.AdmissionReviewVersions[iNdEx])
-			copy(dAtA[i:], m.AdmissionReviewVersions[iNdEx])
-			i = encodeVarintGenerated(dAtA, i, uint64(len(m.AdmissionReviewVersions[iNdEx])))
-			i--
-			dAtA[i] = 0x42
-		}
-	}
-	if m.TimeoutSeconds != nil {
-		i = encodeVarintGenerated(dAtA, i, uint64(*m.TimeoutSeconds))
-		i--
-		dAtA[i] = 0x38
-	}
-	if m.SideEffects != nil {
-		i -= len(*m.SideEffects)
-		copy(dAtA[i:], *m.SideEffects)
-		i = encodeVarintGenerated(dAtA, i, uint64(len(*m.SideEffects)))
-		i--
-		dAtA[i] = 0x32
-	}
-	if m.NamespaceSelector != nil {
-		{
-			size, err := m.NamespaceSelector.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintGenerated(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x2a
-	}
-	if m.FailurePolicy != nil {
-		i -= len(*m.FailurePolicy)
-		copy(dAtA[i:], *m.FailurePolicy)
-		i = encodeVarintGenerated(dAtA, i, uint64(len(*m.FailurePolicy)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.Rules) > 0 {
-		for iNdEx := len(m.Rules) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Rules[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintGenerated(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x1a
-		}
-	}
 	{
-		size, err := m.ClientConfig.MarshalToSizedBuffer(dAtA[:i])
+		size, err := m.Spec.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -874,48 +868,6 @@ func (m *ValidatingWebhook) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	i--
 	dAtA[i] = 0x12
-	i -= len(m.Name)
-	copy(dAtA[i:], m.Name)
-	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Name)))
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
-func (m *ValidatingWebhookConfiguration) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ValidatingWebhookConfiguration) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ValidatingWebhookConfiguration) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Webhooks) > 0 {
-		for iNdEx := len(m.Webhooks) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Webhooks[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintGenerated(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x12
-		}
-	}
 	{
 		size, err := m.ObjectMeta.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
@@ -929,7 +881,7 @@ func (m *ValidatingWebhookConfiguration) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
-func (m *ValidatingWebhookConfigurationList) Marshal() (dAtA []byte, err error) {
+func (m *ValidatingAdmissionPolicyList) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -939,12 +891,12 @@ func (m *ValidatingWebhookConfigurationList) Marshal() (dAtA []byte, err error) 
 	return dAtA[:n], nil
 }
 
-func (m *ValidatingWebhookConfigurationList) MarshalTo(dAtA []byte) (int, error) {
+func (m *ValidatingAdmissionPolicyList) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *ValidatingWebhookConfigurationList) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ValidatingAdmissionPolicyList) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -976,7 +928,7 @@ func (m *ValidatingWebhookConfigurationList) MarshalToSizedBuffer(dAtA []byte) (
 	return len(dAtA) - i, nil
 }
 
-func (m *WebhookClientConfig) Marshal() (dAtA []byte, err error) {
+func (m *ValidatingAdmissionPolicySpec) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -986,42 +938,110 @@ func (m *WebhookClientConfig) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *WebhookClientConfig) MarshalTo(dAtA []byte) (int, error) {
+func (m *ValidatingAdmissionPolicySpec) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *WebhookClientConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ValidatingAdmissionPolicySpec) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.URL != nil {
-		i -= len(*m.URL)
-		copy(dAtA[i:], *m.URL)
-		i = encodeVarintGenerated(dAtA, i, uint64(len(*m.URL)))
+	if m.FailurePolicy != nil {
+		i -= len(*m.FailurePolicy)
+		copy(dAtA[i:], *m.FailurePolicy)
+		i = encodeVarintGenerated(dAtA, i, uint64(len(*m.FailurePolicy)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x22
 	}
-	if m.CABundle != nil {
-		i -= len(m.CABundle)
-		copy(dAtA[i:], m.CABundle)
-		i = encodeVarintGenerated(dAtA, i, uint64(len(m.CABundle)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.Service != nil {
-		{
-			size, err := m.Service.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
+	if len(m.Validations) > 0 {
+		for iNdEx := len(m.Validations) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Validations[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGenerated(dAtA, i, uint64(size))
 			}
-			i -= size
-			i = encodeVarintGenerated(dAtA, i, uint64(size))
+			i--
+			dAtA[i] = 0x1a
 		}
-		i--
-		dAtA[i] = 0xa
 	}
+	{
+		size, err := m.MatchConstraints.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGenerated(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.ParamSource.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGenerated(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *Validation) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Validation) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Validation) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	i -= len(m.Code)
+	copy(dAtA[i:], m.Code)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Code)))
+	i--
+	dAtA[i] = 0x32
+	i -= len(m.Reason)
+	copy(dAtA[i:], m.Reason)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Reason)))
+	i--
+	dAtA[i] = 0x2a
+	i -= len(m.MessageExpression)
+	copy(dAtA[i:], m.MessageExpression)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.MessageExpression)))
+	i--
+	dAtA[i] = 0x22
+	i -= len(m.Message)
+	copy(dAtA[i:], m.Message)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Message)))
+	i--
+	dAtA[i] = 0x1a
+	i -= len(m.Expression)
+	copy(dAtA[i:], m.Expression)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Expression)))
+	i--
+	dAtA[i] = 0x12
+	i -= len(m.Name)
+	copy(dAtA[i:], m.Name)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Name)))
+	i--
+	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -1036,39 +1056,52 @@ func encodeVarintGenerated(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *MutatingWebhook) Size() (n int) {
+func (m *MatchResources) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.Name)
-	n += 1 + l + sovGenerated(uint64(l))
-	l = m.ClientConfig.Size()
-	n += 1 + l + sovGenerated(uint64(l))
-	if len(m.Rules) > 0 {
-		for _, e := range m.Rules {
-			l = e.Size()
+	if len(m.Namespaces) > 0 {
+		for _, s := range m.Namespaces {
+			l = len(s)
 			n += 1 + l + sovGenerated(uint64(l))
 		}
 	}
-	if m.FailurePolicy != nil {
-		l = len(*m.FailurePolicy)
-		n += 1 + l + sovGenerated(uint64(l))
+	if len(m.ExcludeNamespaces) > 0 {
+		for _, s := range m.ExcludeNamespaces {
+			l = len(s)
+			n += 1 + l + sovGenerated(uint64(l))
+		}
 	}
 	if m.NamespaceSelector != nil {
 		l = m.NamespaceSelector.Size()
 		n += 1 + l + sovGenerated(uint64(l))
 	}
-	if m.SideEffects != nil {
-		l = len(*m.SideEffects)
+	if m.LabelSelector != nil {
+		l = m.LabelSelector.Size()
 		n += 1 + l + sovGenerated(uint64(l))
 	}
-	if m.TimeoutSeconds != nil {
-		n += 1 + sovGenerated(uint64(*m.TimeoutSeconds))
+	if len(m.ResourceRules) > 0 {
+		for _, e := range m.ResourceRules {
+			l = e.Size()
+			n += 1 + l + sovGenerated(uint64(l))
+		}
 	}
-	if len(m.AdmissionReviewVersions) > 0 {
-		for _, s := range m.AdmissionReviewVersions {
+	if len(m.ExcludeResourceRules) > 0 {
+		for _, e := range m.ExcludeResourceRules {
+			l = e.Size()
+			n += 1 + l + sovGenerated(uint64(l))
+		}
+	}
+	if len(m.ResourceName) > 0 {
+		for _, s := range m.ResourceName {
+			l = len(s)
+			n += 1 + l + sovGenerated(uint64(l))
+		}
+	}
+	if len(m.ExcludeResourceName) > 0 {
+		for _, s := range m.ExcludeResourceName {
 			l = len(s)
 			n += 1 + l + sovGenerated(uint64(l))
 		}
@@ -1077,18 +1110,25 @@ func (m *MutatingWebhook) Size() (n int) {
 		l = len(*m.MatchPolicy)
 		n += 1 + l + sovGenerated(uint64(l))
 	}
-	if m.ReinvocationPolicy != nil {
-		l = len(*m.ReinvocationPolicy)
-		n += 1 + l + sovGenerated(uint64(l))
-	}
-	if m.ObjectSelector != nil {
-		l = m.ObjectSelector.Size()
-		n += 1 + l + sovGenerated(uint64(l))
-	}
 	return n
 }
 
-func (m *MutatingWebhookConfiguration) Size() (n int) {
+func (m *ParamSource) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.APIGroup)
+	n += 1 + l + sovGenerated(uint64(l))
+	l = len(m.APIVersion)
+	n += 1 + l + sovGenerated(uint64(l))
+	l = len(m.APIKind)
+	n += 1 + l + sovGenerated(uint64(l))
+	return n
+}
+
+func (m *PolicyBinding) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1096,16 +1136,12 @@ func (m *MutatingWebhookConfiguration) Size() (n int) {
 	_ = l
 	l = m.ObjectMeta.Size()
 	n += 1 + l + sovGenerated(uint64(l))
-	if len(m.Webhooks) > 0 {
-		for _, e := range m.Webhooks {
-			l = e.Size()
-			n += 1 + l + sovGenerated(uint64(l))
-		}
-	}
+	l = m.Spec.Size()
+	n += 1 + l + sovGenerated(uint64(l))
 	return n
 }
 
-func (m *MutatingWebhookConfigurationList) Size() (n int) {
+func (m *PolicyBindingList) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1119,6 +1155,21 @@ func (m *MutatingWebhookConfigurationList) Size() (n int) {
 			n += 1 + l + sovGenerated(uint64(l))
 		}
 	}
+	return n
+}
+
+func (m *PolicyBindingSpec) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Policy)
+	n += 1 + l + sovGenerated(uint64(l))
+	l = len(m.Param)
+	n += 1 + l + sovGenerated(uint64(l))
+	l = m.MatchResources.Size()
+	n += 1 + l + sovGenerated(uint64(l))
 	return n
 }
 
@@ -1170,75 +1221,7 @@ func (m *RuleWithOperations) Size() (n int) {
 	return n
 }
 
-func (m *ServiceReference) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Namespace)
-	n += 1 + l + sovGenerated(uint64(l))
-	l = len(m.Name)
-	n += 1 + l + sovGenerated(uint64(l))
-	if m.Path != nil {
-		l = len(*m.Path)
-		n += 1 + l + sovGenerated(uint64(l))
-	}
-	if m.Port != nil {
-		n += 1 + sovGenerated(uint64(*m.Port))
-	}
-	return n
-}
-
-func (m *ValidatingWebhook) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Name)
-	n += 1 + l + sovGenerated(uint64(l))
-	l = m.ClientConfig.Size()
-	n += 1 + l + sovGenerated(uint64(l))
-	if len(m.Rules) > 0 {
-		for _, e := range m.Rules {
-			l = e.Size()
-			n += 1 + l + sovGenerated(uint64(l))
-		}
-	}
-	if m.FailurePolicy != nil {
-		l = len(*m.FailurePolicy)
-		n += 1 + l + sovGenerated(uint64(l))
-	}
-	if m.NamespaceSelector != nil {
-		l = m.NamespaceSelector.Size()
-		n += 1 + l + sovGenerated(uint64(l))
-	}
-	if m.SideEffects != nil {
-		l = len(*m.SideEffects)
-		n += 1 + l + sovGenerated(uint64(l))
-	}
-	if m.TimeoutSeconds != nil {
-		n += 1 + sovGenerated(uint64(*m.TimeoutSeconds))
-	}
-	if len(m.AdmissionReviewVersions) > 0 {
-		for _, s := range m.AdmissionReviewVersions {
-			l = len(s)
-			n += 1 + l + sovGenerated(uint64(l))
-		}
-	}
-	if m.MatchPolicy != nil {
-		l = len(*m.MatchPolicy)
-		n += 1 + l + sovGenerated(uint64(l))
-	}
-	if m.ObjectSelector != nil {
-		l = m.ObjectSelector.Size()
-		n += 1 + l + sovGenerated(uint64(l))
-	}
-	return n
-}
-
-func (m *ValidatingWebhookConfiguration) Size() (n int) {
+func (m *ValidatingAdmissionPolicy) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1246,16 +1229,12 @@ func (m *ValidatingWebhookConfiguration) Size() (n int) {
 	_ = l
 	l = m.ObjectMeta.Size()
 	n += 1 + l + sovGenerated(uint64(l))
-	if len(m.Webhooks) > 0 {
-		for _, e := range m.Webhooks {
-			l = e.Size()
-			n += 1 + l + sovGenerated(uint64(l))
-		}
-	}
+	l = m.Spec.Size()
+	n += 1 + l + sovGenerated(uint64(l))
 	return n
 }
 
-func (m *ValidatingWebhookConfigurationList) Size() (n int) {
+func (m *ValidatingAdmissionPolicyList) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1272,24 +1251,47 @@ func (m *ValidatingWebhookConfigurationList) Size() (n int) {
 	return n
 }
 
-func (m *WebhookClientConfig) Size() (n int) {
+func (m *ValidatingAdmissionPolicySpec) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.Service != nil {
-		l = m.Service.Size()
+	l = m.ParamSource.Size()
+	n += 1 + l + sovGenerated(uint64(l))
+	l = m.MatchConstraints.Size()
+	n += 1 + l + sovGenerated(uint64(l))
+	if len(m.Validations) > 0 {
+		for _, e := range m.Validations {
+			l = e.Size()
+			n += 1 + l + sovGenerated(uint64(l))
+		}
+	}
+	if m.FailurePolicy != nil {
+		l = len(*m.FailurePolicy)
 		n += 1 + l + sovGenerated(uint64(l))
 	}
-	if m.CABundle != nil {
-		l = len(m.CABundle)
-		n += 1 + l + sovGenerated(uint64(l))
+	return n
+}
+
+func (m *Validation) Size() (n int) {
+	if m == nil {
+		return 0
 	}
-	if m.URL != nil {
-		l = len(*m.URL)
-		n += 1 + l + sovGenerated(uint64(l))
-	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	n += 1 + l + sovGenerated(uint64(l))
+	l = len(m.Expression)
+	n += 1 + l + sovGenerated(uint64(l))
+	l = len(m.Message)
+	n += 1 + l + sovGenerated(uint64(l))
+	l = len(m.MessageExpression)
+	n += 1 + l + sovGenerated(uint64(l))
+	l = len(m.Reason)
+	n += 1 + l + sovGenerated(uint64(l))
+	l = len(m.Code)
+	n += 1 + l + sovGenerated(uint64(l))
 	return n
 }
 
@@ -1299,59 +1301,81 @@ func sovGenerated(x uint64) (n int) {
 func sozGenerated(x uint64) (n int) {
 	return sovGenerated(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (this *MutatingWebhook) String() string {
+func (this *MatchResources) String() string {
 	if this == nil {
 		return "nil"
 	}
-	repeatedStringForRules := "[]RuleWithOperations{"
-	for _, f := range this.Rules {
-		repeatedStringForRules += strings.Replace(strings.Replace(f.String(), "RuleWithOperations", "RuleWithOperations", 1), `&`, ``, 1) + ","
+	repeatedStringForResourceRules := "[]RuleWithOperations{"
+	for _, f := range this.ResourceRules {
+		repeatedStringForResourceRules += strings.Replace(strings.Replace(f.String(), "RuleWithOperations", "RuleWithOperations", 1), `&`, ``, 1) + ","
 	}
-	repeatedStringForRules += "}"
-	s := strings.Join([]string{`&MutatingWebhook{`,
-		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
-		`ClientConfig:` + strings.Replace(strings.Replace(this.ClientConfig.String(), "WebhookClientConfig", "WebhookClientConfig", 1), `&`, ``, 1) + `,`,
-		`Rules:` + repeatedStringForRules + `,`,
-		`FailurePolicy:` + valueToStringGenerated(this.FailurePolicy) + `,`,
+	repeatedStringForResourceRules += "}"
+	repeatedStringForExcludeResourceRules := "[]RuleWithOperations{"
+	for _, f := range this.ExcludeResourceRules {
+		repeatedStringForExcludeResourceRules += strings.Replace(strings.Replace(f.String(), "RuleWithOperations", "RuleWithOperations", 1), `&`, ``, 1) + ","
+	}
+	repeatedStringForExcludeResourceRules += "}"
+	s := strings.Join([]string{`&MatchResources{`,
+		`Namespaces:` + fmt.Sprintf("%v", this.Namespaces) + `,`,
+		`ExcludeNamespaces:` + fmt.Sprintf("%v", this.ExcludeNamespaces) + `,`,
 		`NamespaceSelector:` + strings.Replace(fmt.Sprintf("%v", this.NamespaceSelector), "LabelSelector", "v1.LabelSelector", 1) + `,`,
-		`SideEffects:` + valueToStringGenerated(this.SideEffects) + `,`,
-		`TimeoutSeconds:` + valueToStringGenerated(this.TimeoutSeconds) + `,`,
-		`AdmissionReviewVersions:` + fmt.Sprintf("%v", this.AdmissionReviewVersions) + `,`,
+		`LabelSelector:` + strings.Replace(fmt.Sprintf("%v", this.LabelSelector), "LabelSelector", "v1.LabelSelector", 1) + `,`,
+		`ResourceRules:` + repeatedStringForResourceRules + `,`,
+		`ExcludeResourceRules:` + repeatedStringForExcludeResourceRules + `,`,
+		`ResourceName:` + fmt.Sprintf("%v", this.ResourceName) + `,`,
+		`ExcludeResourceName:` + fmt.Sprintf("%v", this.ExcludeResourceName) + `,`,
 		`MatchPolicy:` + valueToStringGenerated(this.MatchPolicy) + `,`,
-		`ReinvocationPolicy:` + valueToStringGenerated(this.ReinvocationPolicy) + `,`,
-		`ObjectSelector:` + strings.Replace(fmt.Sprintf("%v", this.ObjectSelector), "LabelSelector", "v1.LabelSelector", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *MutatingWebhookConfiguration) String() string {
+func (this *ParamSource) String() string {
 	if this == nil {
 		return "nil"
 	}
-	repeatedStringForWebhooks := "[]MutatingWebhook{"
-	for _, f := range this.Webhooks {
-		repeatedStringForWebhooks += strings.Replace(strings.Replace(f.String(), "MutatingWebhook", "MutatingWebhook", 1), `&`, ``, 1) + ","
+	s := strings.Join([]string{`&ParamSource{`,
+		`APIGroup:` + fmt.Sprintf("%v", this.APIGroup) + `,`,
+		`APIVersion:` + fmt.Sprintf("%v", this.APIVersion) + `,`,
+		`APIKind:` + fmt.Sprintf("%v", this.APIKind) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *PolicyBinding) String() string {
+	if this == nil {
+		return "nil"
 	}
-	repeatedStringForWebhooks += "}"
-	s := strings.Join([]string{`&MutatingWebhookConfiguration{`,
+	s := strings.Join([]string{`&PolicyBinding{`,
 		`ObjectMeta:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ObjectMeta), "ObjectMeta", "v1.ObjectMeta", 1), `&`, ``, 1) + `,`,
-		`Webhooks:` + repeatedStringForWebhooks + `,`,
+		`Spec:` + strings.Replace(strings.Replace(this.Spec.String(), "PolicyBindingSpec", "PolicyBindingSpec", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *MutatingWebhookConfigurationList) String() string {
+func (this *PolicyBindingList) String() string {
 	if this == nil {
 		return "nil"
 	}
-	repeatedStringForItems := "[]MutatingWebhookConfiguration{"
+	repeatedStringForItems := "[]PolicyBinding{"
 	for _, f := range this.Items {
-		repeatedStringForItems += strings.Replace(strings.Replace(f.String(), "MutatingWebhookConfiguration", "MutatingWebhookConfiguration", 1), `&`, ``, 1) + ","
+		repeatedStringForItems += strings.Replace(strings.Replace(f.String(), "PolicyBinding", "PolicyBinding", 1), `&`, ``, 1) + ","
 	}
 	repeatedStringForItems += "}"
-	s := strings.Join([]string{`&MutatingWebhookConfigurationList{`,
+	s := strings.Join([]string{`&PolicyBindingList{`,
 		`ListMeta:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ListMeta), "ListMeta", "v1.ListMeta", 1), `&`, ``, 1) + `,`,
 		`Items:` + repeatedStringForItems + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *PolicyBindingSpec) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&PolicyBindingSpec{`,
+		`Policy:` + fmt.Sprintf("%v", this.Policy) + `,`,
+		`Param:` + fmt.Sprintf("%v", this.Param) + `,`,
+		`MatchResources:` + strings.Replace(strings.Replace(this.MatchResources.String(), "MatchResources", "MatchResources", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1380,83 +1404,62 @@ func (this *RuleWithOperations) String() string {
 	}, "")
 	return s
 }
-func (this *ServiceReference) String() string {
+func (this *ValidatingAdmissionPolicy) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&ServiceReference{`,
-		`Namespace:` + fmt.Sprintf("%v", this.Namespace) + `,`,
-		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
-		`Path:` + valueToStringGenerated(this.Path) + `,`,
-		`Port:` + valueToStringGenerated(this.Port) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *ValidatingWebhook) String() string {
-	if this == nil {
-		return "nil"
-	}
-	repeatedStringForRules := "[]RuleWithOperations{"
-	for _, f := range this.Rules {
-		repeatedStringForRules += strings.Replace(strings.Replace(f.String(), "RuleWithOperations", "RuleWithOperations", 1), `&`, ``, 1) + ","
-	}
-	repeatedStringForRules += "}"
-	s := strings.Join([]string{`&ValidatingWebhook{`,
-		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
-		`ClientConfig:` + strings.Replace(strings.Replace(this.ClientConfig.String(), "WebhookClientConfig", "WebhookClientConfig", 1), `&`, ``, 1) + `,`,
-		`Rules:` + repeatedStringForRules + `,`,
-		`FailurePolicy:` + valueToStringGenerated(this.FailurePolicy) + `,`,
-		`NamespaceSelector:` + strings.Replace(fmt.Sprintf("%v", this.NamespaceSelector), "LabelSelector", "v1.LabelSelector", 1) + `,`,
-		`SideEffects:` + valueToStringGenerated(this.SideEffects) + `,`,
-		`TimeoutSeconds:` + valueToStringGenerated(this.TimeoutSeconds) + `,`,
-		`AdmissionReviewVersions:` + fmt.Sprintf("%v", this.AdmissionReviewVersions) + `,`,
-		`MatchPolicy:` + valueToStringGenerated(this.MatchPolicy) + `,`,
-		`ObjectSelector:` + strings.Replace(fmt.Sprintf("%v", this.ObjectSelector), "LabelSelector", "v1.LabelSelector", 1) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *ValidatingWebhookConfiguration) String() string {
-	if this == nil {
-		return "nil"
-	}
-	repeatedStringForWebhooks := "[]ValidatingWebhook{"
-	for _, f := range this.Webhooks {
-		repeatedStringForWebhooks += strings.Replace(strings.Replace(f.String(), "ValidatingWebhook", "ValidatingWebhook", 1), `&`, ``, 1) + ","
-	}
-	repeatedStringForWebhooks += "}"
-	s := strings.Join([]string{`&ValidatingWebhookConfiguration{`,
+	s := strings.Join([]string{`&ValidatingAdmissionPolicy{`,
 		`ObjectMeta:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ObjectMeta), "ObjectMeta", "v1.ObjectMeta", 1), `&`, ``, 1) + `,`,
-		`Webhooks:` + repeatedStringForWebhooks + `,`,
+		`Spec:` + strings.Replace(strings.Replace(this.Spec.String(), "ValidatingAdmissionPolicySpec", "ValidatingAdmissionPolicySpec", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *ValidatingWebhookConfigurationList) String() string {
+func (this *ValidatingAdmissionPolicyList) String() string {
 	if this == nil {
 		return "nil"
 	}
-	repeatedStringForItems := "[]ValidatingWebhookConfiguration{"
+	repeatedStringForItems := "[]ValidatingAdmissionPolicy{"
 	for _, f := range this.Items {
-		repeatedStringForItems += strings.Replace(strings.Replace(f.String(), "ValidatingWebhookConfiguration", "ValidatingWebhookConfiguration", 1), `&`, ``, 1) + ","
+		repeatedStringForItems += strings.Replace(strings.Replace(f.String(), "ValidatingAdmissionPolicy", "ValidatingAdmissionPolicy", 1), `&`, ``, 1) + ","
 	}
 	repeatedStringForItems += "}"
-	s := strings.Join([]string{`&ValidatingWebhookConfigurationList{`,
+	s := strings.Join([]string{`&ValidatingAdmissionPolicyList{`,
 		`ListMeta:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.ListMeta), "ListMeta", "v1.ListMeta", 1), `&`, ``, 1) + `,`,
 		`Items:` + repeatedStringForItems + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *WebhookClientConfig) String() string {
+func (this *ValidatingAdmissionPolicySpec) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&WebhookClientConfig{`,
-		`Service:` + strings.Replace(this.Service.String(), "ServiceReference", "ServiceReference", 1) + `,`,
-		`CABundle:` + valueToStringGenerated(this.CABundle) + `,`,
-		`URL:` + valueToStringGenerated(this.URL) + `,`,
+	repeatedStringForValidations := "[]Validation{"
+	for _, f := range this.Validations {
+		repeatedStringForValidations += strings.Replace(strings.Replace(f.String(), "Validation", "Validation", 1), `&`, ``, 1) + ","
+	}
+	repeatedStringForValidations += "}"
+	s := strings.Join([]string{`&ValidatingAdmissionPolicySpec{`,
+		`ParamSource:` + strings.Replace(strings.Replace(this.ParamSource.String(), "ParamSource", "ParamSource", 1), `&`, ``, 1) + `,`,
+		`MatchConstraints:` + strings.Replace(strings.Replace(this.MatchConstraints.String(), "MatchResources", "MatchResources", 1), `&`, ``, 1) + `,`,
+		`Validations:` + repeatedStringForValidations + `,`,
+		`FailurePolicy:` + valueToStringGenerated(this.FailurePolicy) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *Validation) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&Validation{`,
+		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`Expression:` + fmt.Sprintf("%v", this.Expression) + `,`,
+		`Message:` + fmt.Sprintf("%v", this.Message) + `,`,
+		`MessageExpression:` + fmt.Sprintf("%v", this.MessageExpression) + `,`,
+		`Reason:` + fmt.Sprintf("%v", this.Reason) + `,`,
+		`Code:` + fmt.Sprintf("%v", this.Code) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1469,7 +1472,7 @@ func valueToStringGenerated(v interface{}) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
 }
-func (m *MutatingWebhook) Unmarshal(dAtA []byte) error {
+func (m *MatchResources) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1492,15 +1495,15 @@ func (m *MutatingWebhook) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MutatingWebhook: wiretype end group for non-group")
+			return fmt.Errorf("proto: MatchResources: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MutatingWebhook: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MatchResources: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Namespaces", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1528,78 +1531,11 @@ func (m *MutatingWebhook) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Name = string(dAtA[iNdEx:postIndex])
+			m.Namespaces = append(m.Namespaces, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientConfig", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenerated
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.ClientConfig.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Rules", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenerated
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Rules = append(m.Rules, RuleWithOperations{})
-			if err := m.Rules[len(m.Rules)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FailurePolicy", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ExcludeNamespaces", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1627,10 +1563,9 @@ func (m *MutatingWebhook) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			s := FailurePolicyType(dAtA[iNdEx:postIndex])
-			m.FailurePolicy = &s
+			m.ExcludeNamespaces = append(m.ExcludeNamespaces, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
-		case 5:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NamespaceSelector", wireType)
 			}
@@ -1666,11 +1601,81 @@ func (m *MutatingWebhook) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LabelSelector", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.LabelSelector == nil {
+				m.LabelSelector = &v1.LabelSelector{}
+			}
+			if err := m.LabelSelector.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ResourceRules", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ResourceRules = append(m.ResourceRules, RuleWithOperations{})
+			if err := m.ResourceRules[len(m.ResourceRules)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SideEffects", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ExcludeResourceRules", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGenerated
@@ -1680,48 +1685,29 @@ func (m *MutatingWebhook) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthGenerated
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthGenerated
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			s := SideEffectClass(dAtA[iNdEx:postIndex])
-			m.SideEffects = &s
+			m.ExcludeResourceRules = append(m.ExcludeResourceRules, RuleWithOperations{})
+			if err := m.ExcludeResourceRules[len(m.ExcludeResourceRules)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 7:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TimeoutSeconds", wireType)
-			}
-			var v int32
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenerated
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.TimeoutSeconds = &v
-		case 8:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AdmissionReviewVersions", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ResourceName", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1749,7 +1735,39 @@ func (m *MutatingWebhook) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.AdmissionReviewVersions = append(m.AdmissionReviewVersions, string(dAtA[iNdEx:postIndex]))
+			m.ResourceName = append(m.ResourceName, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ExcludeResourceName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ExcludeResourceName = append(m.ExcludeResourceName, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 9:
 			if wireType != 2 {
@@ -1784,9 +1802,59 @@ func (m *MutatingWebhook) Unmarshal(dAtA []byte) error {
 			s := MatchPolicyType(dAtA[iNdEx:postIndex])
 			m.MatchPolicy = &s
 			iNdEx = postIndex
-		case 10:
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGenerated(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ParamSource) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGenerated
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ParamSource: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ParamSource: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ReinvocationPolicy", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field APIGroup", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1814,14 +1882,13 @@ func (m *MutatingWebhook) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			s := ReinvocationPolicyType(dAtA[iNdEx:postIndex])
-			m.ReinvocationPolicy = &s
+			m.APIGroup = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 11:
+		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ObjectSelector", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field APIVersion", wireType)
 			}
-			var msglen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGenerated
@@ -1831,27 +1898,55 @@ func (m *MutatingWebhook) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthGenerated
 			}
-			postIndex := iNdEx + msglen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthGenerated
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.ObjectSelector == nil {
-				m.ObjectSelector = &v1.LabelSelector{}
+			m.APIVersion = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field APIKind", wireType)
 			}
-			if err := m.ObjectSelector.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
 			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.APIKind = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1874,7 +1969,7 @@ func (m *MutatingWebhook) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MutatingWebhookConfiguration) Unmarshal(dAtA []byte) error {
+func (m *PolicyBinding) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1897,10 +1992,10 @@ func (m *MutatingWebhookConfiguration) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MutatingWebhookConfiguration: wiretype end group for non-group")
+			return fmt.Errorf("proto: PolicyBinding: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MutatingWebhookConfiguration: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: PolicyBinding: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1938,7 +2033,7 @@ func (m *MutatingWebhookConfiguration) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Webhooks", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1965,8 +2060,7 @@ func (m *MutatingWebhookConfiguration) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Webhooks = append(m.Webhooks, MutatingWebhook{})
-			if err := m.Webhooks[len(m.Webhooks)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1991,7 +2085,7 @@ func (m *MutatingWebhookConfiguration) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MutatingWebhookConfigurationList) Unmarshal(dAtA []byte) error {
+func (m *PolicyBindingList) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2014,10 +2108,10 @@ func (m *MutatingWebhookConfigurationList) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MutatingWebhookConfigurationList: wiretype end group for non-group")
+			return fmt.Errorf("proto: PolicyBindingList: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MutatingWebhookConfigurationList: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: PolicyBindingList: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2082,8 +2176,155 @@ func (m *MutatingWebhookConfigurationList) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Items = append(m.Items, MutatingWebhookConfiguration{})
+			m.Items = append(m.Items, PolicyBinding{})
 			if err := m.Items[len(m.Items)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGenerated(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PolicyBindingSpec) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGenerated
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PolicyBindingSpec: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PolicyBindingSpec: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Policy", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Policy = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Param", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Param = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MatchResources", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.MatchResources.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2402,7 +2643,7 @@ func (m *RuleWithOperations) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ServiceReference) Unmarshal(dAtA []byte) error {
+func (m *ValidatingAdmissionPolicy) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2425,549 +2666,10 @@ func (m *ServiceReference) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ServiceReference: wiretype end group for non-group")
+			return fmt.Errorf("proto: ValidatingAdmissionPolicy: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ServiceReference: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenerated
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Namespace = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenerated
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Name = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Path", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenerated
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(dAtA[iNdEx:postIndex])
-			m.Path = &s
-			iNdEx = postIndex
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Port", wireType)
-			}
-			var v int32
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenerated
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Port = &v
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGenerated(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ValidatingWebhook) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGenerated
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ValidatingWebhook: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ValidatingWebhook: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenerated
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Name = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientConfig", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenerated
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.ClientConfig.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Rules", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenerated
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Rules = append(m.Rules, RuleWithOperations{})
-			if err := m.Rules[len(m.Rules)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FailurePolicy", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenerated
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := FailurePolicyType(dAtA[iNdEx:postIndex])
-			m.FailurePolicy = &s
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NamespaceSelector", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenerated
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.NamespaceSelector == nil {
-				m.NamespaceSelector = &v1.LabelSelector{}
-			}
-			if err := m.NamespaceSelector.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SideEffects", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenerated
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := SideEffectClass(dAtA[iNdEx:postIndex])
-			m.SideEffects = &s
-			iNdEx = postIndex
-		case 7:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TimeoutSeconds", wireType)
-			}
-			var v int32
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenerated
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.TimeoutSeconds = &v
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AdmissionReviewVersions", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenerated
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.AdmissionReviewVersions = append(m.AdmissionReviewVersions, string(dAtA[iNdEx:postIndex]))
-			iNdEx = postIndex
-		case 9:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MatchPolicy", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenerated
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := MatchPolicyType(dAtA[iNdEx:postIndex])
-			m.MatchPolicy = &s
-			iNdEx = postIndex
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ObjectSelector", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenerated
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ObjectSelector == nil {
-				m.ObjectSelector = &v1.LabelSelector{}
-			}
-			if err := m.ObjectSelector.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGenerated(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthGenerated
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ValidatingWebhookConfiguration) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGenerated
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ValidatingWebhookConfiguration: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ValidatingWebhookConfiguration: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ValidatingAdmissionPolicy: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -3005,7 +2707,7 @@ func (m *ValidatingWebhookConfiguration) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Webhooks", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3032,8 +2734,7 @@ func (m *ValidatingWebhookConfiguration) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Webhooks = append(m.Webhooks, ValidatingWebhook{})
-			if err := m.Webhooks[len(m.Webhooks)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3058,7 +2759,7 @@ func (m *ValidatingWebhookConfiguration) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ValidatingWebhookConfigurationList) Unmarshal(dAtA []byte) error {
+func (m *ValidatingAdmissionPolicyList) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3081,10 +2782,10 @@ func (m *ValidatingWebhookConfigurationList) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ValidatingWebhookConfigurationList: wiretype end group for non-group")
+			return fmt.Errorf("proto: ValidatingAdmissionPolicyList: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ValidatingWebhookConfigurationList: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ValidatingAdmissionPolicyList: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -3149,7 +2850,7 @@ func (m *ValidatingWebhookConfigurationList) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Items = append(m.Items, ValidatingWebhookConfiguration{})
+			m.Items = append(m.Items, ValidatingAdmissionPolicy{})
 			if err := m.Items[len(m.Items)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -3175,7 +2876,7 @@ func (m *ValidatingWebhookConfigurationList) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *WebhookClientConfig) Unmarshal(dAtA []byte) error {
+func (m *ValidatingAdmissionPolicySpec) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3198,15 +2899,15 @@ func (m *WebhookClientConfig) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: WebhookClientConfig: wiretype end group for non-group")
+			return fmt.Errorf("proto: ValidatingAdmissionPolicySpec: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: WebhookClientConfig: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ValidatingAdmissionPolicySpec: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Service", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ParamSource", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3233,18 +2934,15 @@ func (m *WebhookClientConfig) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Service == nil {
-				m.Service = &ServiceReference{}
-			}
-			if err := m.Service.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.ParamSource.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CABundle", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MatchConstraints", wireType)
 			}
-			var byteLen int
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGenerated
@@ -3254,29 +2952,62 @@ func (m *WebhookClientConfig) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthGenerated
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthGenerated
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CABundle = append(m.CABundle[:0], dAtA[iNdEx:postIndex]...)
-			if m.CABundle == nil {
-				m.CABundle = []byte{}
+			if err := m.MatchConstraints.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field URL", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Validations", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Validations = append(m.Validations, Validation{})
+			if err := m.Validations[len(m.Validations)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FailurePolicy", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3304,8 +3035,250 @@ func (m *WebhookClientConfig) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			s := string(dAtA[iNdEx:postIndex])
-			m.URL = &s
+			s := FailurePolicyType(dAtA[iNdEx:postIndex])
+			m.FailurePolicy = &s
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGenerated(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Validation) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGenerated
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Validation: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Validation: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Expression", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Expression = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Message = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MessageExpression", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.MessageExpression = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Reason", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Reason = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenerated
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenerated
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Code = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

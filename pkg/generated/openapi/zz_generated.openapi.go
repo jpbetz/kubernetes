@@ -45,6 +45,17 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"k8s.io/api/admissionregistration/v1.ValidatingWebhookConfiguration":                              schema_k8sio_api_admissionregistration_v1_ValidatingWebhookConfiguration(ref),
 		"k8s.io/api/admissionregistration/v1.ValidatingWebhookConfigurationList":                          schema_k8sio_api_admissionregistration_v1_ValidatingWebhookConfigurationList(ref),
 		"k8s.io/api/admissionregistration/v1.WebhookClientConfig":                                         schema_k8sio_api_admissionregistration_v1_WebhookClientConfig(ref),
+		"k8s.io/api/admissionregistration/v1alpha1.MatchResources":                                        schema_k8sio_api_admissionregistration_v1alpha1_MatchResources(ref),
+		"k8s.io/api/admissionregistration/v1alpha1.ParamSource":                                           schema_k8sio_api_admissionregistration_v1alpha1_ParamSource(ref),
+		"k8s.io/api/admissionregistration/v1alpha1.PolicyBinding":                                         schema_k8sio_api_admissionregistration_v1alpha1_PolicyBinding(ref),
+		"k8s.io/api/admissionregistration/v1alpha1.PolicyBindingList":                                     schema_k8sio_api_admissionregistration_v1alpha1_PolicyBindingList(ref),
+		"k8s.io/api/admissionregistration/v1alpha1.PolicyBindingSpec":                                     schema_k8sio_api_admissionregistration_v1alpha1_PolicyBindingSpec(ref),
+		"k8s.io/api/admissionregistration/v1alpha1.Rule":                                                  schema_k8sio_api_admissionregistration_v1alpha1_Rule(ref),
+		"k8s.io/api/admissionregistration/v1alpha1.RuleWithOperations":                                    schema_k8sio_api_admissionregistration_v1alpha1_RuleWithOperations(ref),
+		"k8s.io/api/admissionregistration/v1alpha1.ValidatingAdmissionPolicy":                             schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicy(ref),
+		"k8s.io/api/admissionregistration/v1alpha1.ValidatingAdmissionPolicyList":                         schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyList(ref),
+		"k8s.io/api/admissionregistration/v1alpha1.ValidatingAdmissionPolicySpec":                         schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicySpec(ref),
+		"k8s.io/api/admissionregistration/v1alpha1.Validation":                                            schema_k8sio_api_admissionregistration_v1alpha1_Validation(ref),
 		"k8s.io/api/admissionregistration/v1beta1.MutatingWebhook":                                        schema_k8sio_api_admissionregistration_v1beta1_MutatingWebhook(ref),
 		"k8s.io/api/admissionregistration/v1beta1.MutatingWebhookConfiguration":                           schema_k8sio_api_admissionregistration_v1beta1_MutatingWebhookConfiguration(ref),
 		"k8s.io/api/admissionregistration/v1beta1.MutatingWebhookConfigurationList":                       schema_k8sio_api_admissionregistration_v1beta1_MutatingWebhookConfigurationList(ref),
@@ -1773,6 +1784,643 @@ func schema_k8sio_api_admissionregistration_v1_WebhookClientConfig(ref common.Re
 		},
 		Dependencies: []string{
 			"k8s.io/api/admissionregistration/v1.ServiceReference"},
+	}
+}
+
+func schema_k8sio_api_admissionregistration_v1alpha1_MatchResources(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "MatchResources decides whether to run the admission control policy on an object based on whether meet the match criteria.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"namespaces": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Namespaces specifies the namespaces which the admission control policy should validate on.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"excludeNamespaces": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ExcludeNamespaces specifies the namespaces which the validating admission policy should not validate on.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"namespaceSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NamespaceSelector decides whether to run the admission control policy on an object based on whether the namespace for that object matches the selector. If the object itself is a namespace, the matching is performed on object.metadata.labels. If the object is another cluster scoped resource, it never skips the admission control policy.\n\nSee https://kubernetes.io/docs/concepts/overview/working-with-objects/labels for examples of label selectors.\n\nDefault to the empty LabelSelector, which matches everything.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
+						},
+					},
+					"labelSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LabelSelector decides the match criteria on resource based on its labels. See https://kubernetes.io/docs/concepts/overview/working-with-objects/labels for examples of label selectors.\n\nDefault to the empty LabelSelector, which matches everything.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
+						},
+					},
+					"resourceRules": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ResourceRules describes what operations on what resources/subresources the ValidatingAdmissionPolicy matches.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/api/admissionregistration/v1alpha1.RuleWithOperations"),
+									},
+								},
+							},
+						},
+					},
+					"excluderResourceRules": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ExcludeResourceRules describes what operations on what resources/subresources the ValidatingAdmissionPolicy should not care about.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/api/admissionregistration/v1alpha1.RuleWithOperations"),
+									},
+								},
+							},
+						},
+					},
+					"resourceName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ResourceName specifies the resource name which the admission control policy should validate on.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"excludeResourceName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ExcludeResourceName specifies the resource name which the admission control policy should not validate on.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"matchPolicy": {
+						SchemaProps: spec.SchemaProps{
+							Description: "matchPolicy defines how the \"MatchResources\" list is used to match incoming requests. Allowed values are \"Exact\" or \"Equivalent\".\n\n- Exact: match a request only if it exactly matches a specified rule. For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1, but \"rules\" only included `apiGroups:[\"apps\"], apiVersions:[\"v1\"], resources: [\"deployments\"]`, a request to apps/v1beta1 or extensions/v1beta1 would not be sent to the ValidatingAdmissionPolicy.\n\n- Equivalent: match a request if modifies a resource listed in rules, even via another API group or version. For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1, and \"rules\" only included `apiGroups:[\"apps\"], apiVersions:[\"v1\"], resources: [\"deployments\"]`, a request to apps/v1beta1 or extensions/v1beta1 would be converted to apps/v1 and sent to the ValidatingAdmissionPolicy.\n\nDefaults to \"Equivalent\"",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/admissionregistration/v1alpha1.RuleWithOperations", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
+	}
+}
+
+func schema_k8sio_api_admissionregistration_v1alpha1_ParamSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ParamSource is a tuple of Group Kind and Version.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"apiGroup": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIGroup is the API group the resources belong to. Required.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion is the API version the resources belong to. Required.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiKind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIKind is the API kind the resources belong to. Required.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func schema_k8sio_api_admissionregistration_v1alpha1_PolicyBinding(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PolicyBinding binds the ValidatingAdmissionPolicy with paramerized resources. PolicyBinding and parameter CRDs together define how cluster administrators configure policies for clusters.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Specification of the desired behavior of the AdmissionPolicy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/api/admissionregistration/v1alpha1.PolicyBindingSpec"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/admissionregistration/v1alpha1.PolicyBindingSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_k8sio_api_admissionregistration_v1alpha1_PolicyBindingList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PolicyBindingList is a list of PolicyBinding.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Description: "List of PolicyBinding.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/api/admissionregistration/v1alpha1.PolicyBinding"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/admissionregistration/v1alpha1.PolicyBinding", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_k8sio_api_admissionregistration_v1alpha1_PolicyBindingSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PolicyBindingSpec is the specification of the PolicyBinding.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"policy": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Policy references a ValidatingAdmissionPolicy which the policyBinding binds to. Required.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"param": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Param specifies the parameter resource used to configure the admission control policy. It should point to a Customer Resource which is created out of the CRD specified in ParamSource of ValidatingAdmissionPolicy it binded.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"matchResources": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MatchResources describe a list of match options which could be used to filter the resources.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/api/admissionregistration/v1alpha1.MatchResources"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/admissionregistration/v1alpha1.MatchResources"},
+	}
+}
+
+func schema_k8sio_api_admissionregistration_v1alpha1_Rule(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Rule is a tuple of APIGroups, APIVersion, and Resources.It is recommended to make sure that all the tuple expansions are valid.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"apiGroups": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIGroups is the API groups the resources belong to. '*' is all groups. If '*' is present, the length of the slice must be one. Required.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"apiVersions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersions is the API versions the resources belong to. '*' is all versions. If '*' is present, the length of the slice must be one. Required.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"resources": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Resources is a list of resources this rule applies to.\n\nFor example: 'pods' means pods. 'pods/log' means the log subresource of pods. '*' means all resources, but not subresources. 'pods/*' means all subresources of pods. '*/scale' means all scale subresources. '*/*' means all resources and their subresources.\n\nIf wildcard is present, the validation rule will ensure resources do not overlap with each other.\n\nDepending on the enclosing object, subresources might not be allowed. Required.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"scope": {
+						SchemaProps: spec.SchemaProps{
+							Description: "scope specifies the scope of this rule. Valid values are \"Cluster\", \"Namespaced\", and \"*\" \"Cluster\" means that only cluster-scoped resources will match this rule. Namespace API objects are cluster-scoped. \"Namespaced\" means that only namespaced resources will match this rule. \"*\" means that there are no scope restrictions. Subresources match the scope of their parent resource. Default is \"*\".",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func schema_k8sio_api_admissionregistration_v1alpha1_RuleWithOperations(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "RuleWithOperations is a tuple of Operations and Resources. It is recommended to make sure that all the tuple expansions are valid.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"operations": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Operations is the operations the admission hook cares about - CREATE, UPDATE, DELETE, CONNECT or * for all of those operations and any future admission operations that are added. If '*' is present, the length of the slice must be one. Required.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"apiGroups": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIGroups is the API groups the resources belong to. '*' is all groups. If '*' is present, the length of the slice must be one. Required.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"apiVersions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersions is the API versions the resources belong to. '*' is all versions. If '*' is present, the length of the slice must be one. Required.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"resources": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Resources is a list of resources this rule applies to.\n\nFor example: 'pods' means pods. 'pods/log' means the log subresource of pods. '*' means all resources, but not subresources. 'pods/*' means all subresources of pods. '*/scale' means all scale subresources. '*/*' means all resources and their subresources.\n\nIf wildcard is present, the validation rule will ensure resources do not overlap with each other.\n\nDepending on the enclosing object, subresources might not be allowed. Required.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"scope": {
+						SchemaProps: spec.SchemaProps{
+							Description: "scope specifies the scope of this rule. Valid values are \"Cluster\", \"Namespaced\", and \"*\" \"Cluster\" means that only cluster-scoped resources will match this rule. Namespace API objects are cluster-scoped. \"Namespaced\" means that only namespaced resources will match this rule. \"*\" means that there are no scope restrictions. Subresources match the scope of their parent resource. Default is \"*\".",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ValidatingAdmissionPolicy describes the definition of an admission validation policy that accepts or rejects and object without changing it.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Specification of the desired behavior of the AdmissionPolicy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/api/admissionregistration/v1alpha1.ValidatingAdmissionPolicySpec"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/admissionregistration/v1alpha1.ValidatingAdmissionPolicySpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ValidatingAdmissionPolicyList is a list of ValidatingAdmissionPolicy.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Description: "List of ValidatingAdmissionPolicy.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/api/admissionregistration/v1alpha1.ValidatingAdmissionPolicy"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/admissionregistration/v1alpha1.ValidatingAdmissionPolicy", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicySpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ValidatingAdmissionPolicySpec is the specification of the desired behavior of the AdmissionPolicy.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"paramSource": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ParamSource specifies the kind of resources used to parameterize this policy which has to be a CRD.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/api/admissionregistration/v1alpha1.ParamSource"),
+						},
+					},
+					"matchConstraints": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MatchConstraints specifies what resources this policy is designed to validate. The AdmissionPolicy cares about a validation if it matches _any_ Constriant. However, in order to prevent clusters from being put into a unustable state that cannot be recoverd from via the API alidatingAdmissionPolicy cannot match ValidatingAdmissionPolicy/PolicyBinding/param resources. ValidatingWebhookConfiguration cannot match MutatingWebhookConfiguration or ValidatingAdmissionPolicy/PolicyBinding/param resources.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/api/admissionregistration/v1alpha1.MatchResources"),
+						},
+					},
+					"validations": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Validations contain CEL expressions which is used to apply the validation. Required.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/api/admissionregistration/v1alpha1.Validation"),
+									},
+								},
+							},
+						},
+					},
+					"failurePolicy": {
+						SchemaProps: spec.SchemaProps{
+							Description: "FailurePolicy defines how unrecognized errors from the admission endpoint are handled - allowed values are Ignore or Fail. Defaults to Fail.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/admissionregistration/v1alpha1.MatchResources", "k8s.io/api/admissionregistration/v1alpha1.ParamSource", "k8s.io/api/admissionregistration/v1alpha1.Validation"},
+	}
+}
+
+func schema_k8sio_api_admissionregistration_v1alpha1_Validation(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Validation specified the CEL expression which is used to apply the validation.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The name of the validation rule. Required.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"expression": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Expression represents the expression which will be evaluated by CEL. ref: https://github.com/google/cel-spec CEL expressions have access to the contents of the AdmissionReview type, organized into CEL variables as well as some other useful variables:\n\n'object' 'oldObject' 'review' 'requestResource' (GVR) 'resource' (GVR) 'name' 'namespace' 'operation' 'userInfo' 'dryRun' 'options' 'config' - configuration data of the policy configuration being validated The `object` variable in the expression is bound to the resource this policy is designed to validate.\n\nThe `apiVersion`, `kind`, `metadata.name` and `metadata.generateName` are always accessible from the root of the object. No other metadata properties are accessible.\n\nOnly property names of the form `[a-zA-Z_.-/][a-zA-Z0-9_.-/]*` are accessible. Accessible property names are escaped according to the following rules when accessed in the expression: - '__' escapes to '__underscores__' - '.' escapes to '__dot__' - '-' escapes to '__dash__' - '/' escapes to '__slash__' - Property names that exactly match a CEL RESERVED keyword escape to '__{keyword}__'. The keywords are:\n\t  \"true\", \"false\", \"null\", \"in\", \"as\", \"break\", \"const\", \"continue\", \"else\", \"for\", \"function\", \"if\",\n\t  \"import\", \"let\", \"loop\", \"package\", \"namespace\", \"return\".\nExamples:\n  - Expression accessing a property named \"namespace\": {\"Expression\": \"object.__namespace__ > 0\"}\n  - Expression accessing a property named \"x-prop\": {\"Expression\": \"object.x__dash__prop > 0\"}\n  - Expression accessing a property named \"redact__d\": {\"Expression\": \"object.redact__underscores__d > 0\"}\n\nEquality on arrays with list type of 'set' or 'map' ignores element order, i.e. [1, 2] == [2, 1]. Concatenation on arrays with x-kubernetes-list-type use the semantics of the list type:\n  - 'set': `X + Y` performs a union where the array positions of all elements in `X` are preserved and\n    non-intersecting elements in `Y` are appended, retaining their partial order.\n  - 'map': `X + Y` performs a merge where the array positions of all keys in `X` are preserved but the values\n    are overwritten by values in `Y` when the key sets of `X` and `Y` intersect. Elements in `Y` with\n    non-intersecting keys are appended, retaining their partial order.\nRequired.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"message": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Message represents the message displayed when validation fails. The message is required if the Expression contains line breaks. The message must not contain line breaks. If unset, the message is \"failed rule: {Rule}\". e.g. \"must be a URL with the host matching spec.host\" If ExpressMessage is specified, Message will be ignored If the Expression contains line breaks. Eith Message or ExpressMessage is required. The message must not contain line breaks. If unset, the message is \"failed Expression: {Expression}\".",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"expressMessage": {
+						SchemaProps: spec.SchemaProps{
+							Description: "If the MessageExpression evaluates to an error, the Message field is used to provide the message. The MessageExpression retured when failed the validation of specified. If MessageExpression is specified, Message will be ignored If the Expression contains line breaks. Either Message or MessageExpression is required. The MessageExpression must not contain line breaks.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"reason": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Reason returned when failed the validation.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"code": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Code returned when failed the validation.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"name", "expression", "code"},
+			},
+		},
 	}
 }
 

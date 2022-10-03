@@ -28,175 +28,126 @@ import "k8s.io/apimachinery/pkg/runtime/schema/generated.proto";
 // Package-wide variables from generator "generated".
 option go_package = "k8s.io/api/admissionregistration/v1alpha1";
 
-// MutatingWebhook describes an admission webhook and the resources and operations it applies to.
-message MutatingWebhook {
-  // The name of the admission webhook.
-  // Name should be fully qualified, e.g., imagepolicy.kubernetes.io, where
-  // "imagepolicy" is the name of the webhook, and kubernetes.io is the name
-  // of the organization.
-  // Required.
-  optional string name = 1;
-
-  // ClientConfig defines how to communicate with the hook.
-  // Required
-  optional WebhookClientConfig clientConfig = 2;
-
-  // Rules describes what operations on what resources/subresources the webhook cares about.
-  // The webhook cares about an operation if it matches _any_ Rule.
-  // However, in order to prevent ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks
-  // from putting the cluster in a state which cannot be recovered from without completely
-  // disabling the plugin, ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks are never called
-  // on admission requests for ValidatingWebhookConfiguration and MutatingWebhookConfiguration objects.
-  repeated RuleWithOperations rules = 3;
-
-  // FailurePolicy defines how unrecognized errors from the admission endpoint are handled -
-  // allowed values are Ignore or Fail. Defaults to Fail.
+// MatchResources decides whether to run the admission control policy on an object based
+// on whether meet the match criteria.
+message MatchResources {
+  // Namespaces specifies the namespaces which the admission control policy should validate on.
   // +optional
-  optional string failurePolicy = 4;
+  repeated string namespaces = 1;
 
-  // matchPolicy defines how the "rules" list is used to match incoming requests.
+  // ExcludeNamespaces specifies the namespaces which the validating admission policy should not validate on.
+  // +optional
+  repeated string excludeNamespaces = 2;
+
+  // NamespaceSelector decides whether to run the admission control policy on an object based
+  // on whether the namespace for that object matches the selector. If the
+  // object itself is a namespace, the matching is performed on
+  // object.metadata.labels. If the object is another cluster scoped resource,
+  // it never skips the admission control policy.
+  //
+  // See
+  // https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
+  // for examples of label selectors.
+  //
+  // Default to the empty LabelSelector, which matches everything.
+  // +optional
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector namespaceSelector = 3;
+
+  // LabelSelector decides the match criteria on resource based on its labels.
+  // See
+  // https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
+  // for examples of label selectors.
+  //
+  // Default to the empty LabelSelector, which matches everything.
+  // +optional
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector labelSelector = 4;
+
+  // ResourceRules describes what operations on what resources/subresources the ValidatingAdmissionPolicy matches.
+  // +optional
+  repeated RuleWithOperations resourceRules = 5;
+
+  // ExcludeResourceRules describes what operations on what resources/subresources the ValidatingAdmissionPolicy should not care about.
+  // +optional
+  repeated RuleWithOperations excludeResourceRules = 6;
+
+  // ResourceName specifies the resource name which the admission control policy should validate on.
+  // +optional
+  repeated string resourceName = 7;
+
+  // ExcludeResourceName specifies the resource name which the admission control policy should not validate on.
+  // +optional
+  repeated string excludeResourceName = 8;
+
+  // matchPolicy defines how the "MatchResources" list is used to match incoming requests.
   // Allowed values are "Exact" or "Equivalent".
   //
   // - Exact: match a request only if it exactly matches a specified rule.
   // For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1,
   // but "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`,
-  // a request to apps/v1beta1 or extensions/v1beta1 would not be sent to the webhook.
+  // a request to apps/v1beta1 or extensions/v1beta1 would not be sent to the ValidatingAdmissionPolicy.
   //
   // - Equivalent: match a request if modifies a resource listed in rules, even via another API group or version.
   // For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1,
   // and "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`,
-  // a request to apps/v1beta1 or extensions/v1beta1 would be converted to apps/v1 and sent to the webhook.
+  // a request to apps/v1beta1 or extensions/v1beta1 would be converted to apps/v1 and sent to the ValidatingAdmissionPolicy.
   //
   // Defaults to "Equivalent"
   // +optional
   optional string matchPolicy = 9;
-
-  // NamespaceSelector decides whether to run the webhook on an object based
-  // on whether the namespace for that object matches the selector. If the
-  // object itself is a namespace, the matching is performed on
-  // object.metadata.labels. If the object is another cluster scoped resource,
-  // it never skips the webhook.
-  //
-  // For example, to run the webhook on any objects whose namespace is not
-  // associated with "runlevel" of "0" or "1";  you will set the selector as
-  // follows:
-  // "namespaceSelector": {
-  //   "matchExpressions": [
-  //     {
-  //       "key": "runlevel",
-  //       "operator": "NotIn",
-  //       "values": [
-  //         "0",
-  //         "1"
-  //       ]
-  //     }
-  //   ]
-  // }
-  //
-  // If instead you want to only run the webhook on any objects whose
-  // namespace is associated with the "environment" of "prod" or "staging";
-  // you will set the selector as follows:
-  // "namespaceSelector": {
-  //   "matchExpressions": [
-  //     {
-  //       "key": "environment",
-  //       "operator": "In",
-  //       "values": [
-  //         "prod",
-  //         "staging"
-  //       ]
-  //     }
-  //   ]
-  // }
-  //
-  // See
-  // https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-  // for more examples of label selectors.
-  //
-  // Default to the empty LabelSelector, which matches everything.
-  // +optional
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector namespaceSelector = 5;
-
-  // ObjectSelector decides whether to run the webhook based on if the
-  // object has matching labels. objectSelector is evaluated against both
-  // the oldObject and newObject that would be sent to the webhook, and
-  // is considered to match if either object matches the selector. A null
-  // object (oldObject in the case of create, or newObject in the case of
-  // delete) or an object that cannot have labels (like a
-  // DeploymentRollback or a PodProxyOptions object) is not considered to
-  // match.
-  // Use the object selector only if the webhook is opt-in, because end
-  // users may skip the admission webhook by setting the labels.
-  // Default to the empty LabelSelector, which matches everything.
-  // +optional
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector objectSelector = 11;
-
-  // SideEffects states whether this webhook has side effects.
-  // Acceptable values are: None, NoneOnDryRun (webhooks created via v1beta1 may also specify Some or Unknown).
-  // Webhooks with side effects MUST implement a reconciliation system, since a request may be
-  // rejected by a future step in the admission chain and the side effects therefore need to be undone.
-  // Requests with the dryRun attribute will be auto-rejected if they match a webhook with
-  // sideEffects == Unknown or Some.
-  optional string sideEffects = 6;
-
-  // TimeoutSeconds specifies the timeout for this webhook. After the timeout passes,
-  // the webhook call will be ignored or the API call will fail based on the
-  // failure policy.
-  // The timeout value must be between 1 and 30 seconds.
-  // Default to 10 seconds.
-  // +optional
-  optional int32 timeoutSeconds = 7;
-
-  // AdmissionReviewVersions is an ordered list of preferred `AdmissionReview`
-  // versions the Webhook expects. API server will try to use first version in
-  // the list which it supports. If none of the versions specified in this list
-  // supported by API server, validation will fail for this object.
-  // If a persisted webhook configuration specifies allowed versions and does not
-  // include any versions known to the API Server, calls to the webhook will fail
-  // and be subject to the failure policy.
-  repeated string admissionReviewVersions = 8;
-
-  // reinvocationPolicy indicates whether this webhook should be called multiple times as part of a single admission evaluation.
-  // Allowed values are "Never" and "IfNeeded".
-  //
-  // Never: the webhook will not be called more than once in a single admission evaluation.
-  //
-  // IfNeeded: the webhook will be called at least one additional time as part of the admission evaluation
-  // if the object being admitted is modified by other admission plugins after the initial webhook call.
-  // Webhooks that specify this option *must* be idempotent, able to process objects they previously admitted.
-  // Note:
-  // * the number of additional invocations is not guaranteed to be exactly one.
-  // * if additional invocations result in further modifications to the object, webhooks are not guaranteed to be invoked again.
-  // * webhooks that use this option may be reordered to minimize the number of additional invocations.
-  // * to validate an object after all mutations are guaranteed complete, use a validating admission webhook instead.
-  //
-  // Defaults to "Never".
-  // +optional
-  optional string reinvocationPolicy = 10;
 }
 
-// MutatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and may change the object.
-message MutatingWebhookConfiguration {
+// ParamSource is a tuple of Group Kind and Version.
+message ParamSource {
+  // APIGroup is the API group the resources belong to.
+  // Required.
+  optional string apiGroup = 1;
+
+  // APIVersion is the API version the resources belong to.
+  // Required.
+  optional string apiVersion = 2;
+
+  // APIKind is the API kind the resources belong to.
+  // Required.
+  optional string apiKind = 3;
+}
+
+// PolicyBinding binds the ValidatingAdmissionPolicy with paramerized resources.
+// PolicyBinding and parameter CRDs together define how cluster administrators configure policies for clusters.
+message PolicyBinding {
   // Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
   // +optional
   optional k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
-  // Webhooks is a list of webhooks and the affected resources and operations.
+  // Specification of the desired behavior of the AdmissionPolicy.
   // +optional
-  // +patchMergeKey=name
-  // +patchStrategy=merge
-  repeated MutatingWebhook Webhooks = 2;
+  optional PolicyBindingSpec spec = 2;
 }
 
-// MutatingWebhookConfigurationList is a list of MutatingWebhookConfiguration.
-message MutatingWebhookConfigurationList {
+// PolicyBindingList is a list of PolicyBinding.
+message PolicyBindingList {
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
-  // List of MutatingWebhookConfiguration.
-  repeated MutatingWebhookConfiguration items = 2;
+  // List of PolicyBinding.
+  repeated PolicyBinding items = 2;
+}
+
+// PolicyBindingSpec is the specification of the PolicyBinding.
+message PolicyBindingSpec {
+  // Policy references a ValidatingAdmissionPolicy which the policyBinding binds to.
+  // Required.
+  optional string policy = 1;
+
+  // Param specifies the parameter resource used to configure the admission control policy.
+  // It should point to a Customer Resource which is created out of the CRD specified in ParamSource of ValidatingAdmissionPolicy it binded.
+  // +optional
+  optional string param = 2;
+
+  // MatchResources describe a list of match options which could be used to filter the resources.
+  // +optional
+  optional MatchResources matchResources = 3;
 }
 
 // Rule is a tuple of APIGroups, APIVersion, and Resources.It is recommended
@@ -256,224 +207,127 @@ message RuleWithOperations {
   optional Rule rule = 2;
 }
 
-// ServiceReference holds a reference to Service.legacy.k8s.io
-message ServiceReference {
-  // `namespace` is the namespace of the service.
-  // Required
-  optional string namespace = 1;
-
-  // `name` is the name of the service.
-  // Required
-  optional string name = 2;
-
-  // `path` is an optional URL path which will be sent in any request to
-  // this service.
-  // +optional
-  optional string path = 3;
-
-  // If specified, the port on the service that hosting webhook.
-  // Default to 443 for backward compatibility.
-  // `port` should be a valid port number (1-65535, inclusive).
-  // +optional
-  optional int32 port = 4;
-}
-
-// ValidatingWebhook describes an admission webhook and the resources and operations it applies to.
-message ValidatingWebhook {
-  // The name of the admission webhook.
-  // Name should be fully qualified, e.g., imagepolicy.kubernetes.io, where
-  // "imagepolicy" is the name of the webhook, and kubernetes.io is the name
-  // of the organization.
-  // Required.
-  optional string name = 1;
-
-  // ClientConfig defines how to communicate with the hook.
-  // Required
-  optional WebhookClientConfig clientConfig = 2;
-
-  // Rules describes what operations on what resources/subresources the webhook cares about.
-  // The webhook cares about an operation if it matches _any_ Rule.
-  // However, in order to prevent ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks
-  // from putting the cluster in a state which cannot be recovered from without completely
-  // disabling the plugin, ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks are never called
-  // on admission requests for ValidatingWebhookConfiguration and MutatingWebhookConfiguration objects.
-  repeated RuleWithOperations rules = 3;
-
-  // FailurePolicy defines how unrecognized errors from the admission endpoint are handled -
-  // allowed values are Ignore or Fail. Defaults to Fail.
-  // +optional
-  optional string failurePolicy = 4;
-
-  // matchPolicy defines how the "rules" list is used to match incoming requests.
-  // Allowed values are "Exact" or "Equivalent".
-  //
-  // - Exact: match a request only if it exactly matches a specified rule.
-  // For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1,
-  // but "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`,
-  // a request to apps/v1beta1 or extensions/v1beta1 would not be sent to the webhook.
-  //
-  // - Equivalent: match a request if modifies a resource listed in rules, even via another API group or version.
-  // For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1,
-  // and "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`,
-  // a request to apps/v1beta1 or extensions/v1beta1 would be converted to apps/v1 and sent to the webhook.
-  //
-  // Defaults to "Equivalent"
-  // +optional
-  optional string matchPolicy = 9;
-
-  // NamespaceSelector decides whether to run the webhook on an object based
-  // on whether the namespace for that object matches the selector. If the
-  // object itself is a namespace, the matching is performed on
-  // object.metadata.labels. If the object is another cluster scoped resource,
-  // it never skips the webhook.
-  //
-  // For example, to run the webhook on any objects whose namespace is not
-  // associated with "runlevel" of "0" or "1";  you will set the selector as
-  // follows:
-  // "namespaceSelector": {
-  //   "matchExpressions": [
-  //     {
-  //       "key": "runlevel",
-  //       "operator": "NotIn",
-  //       "values": [
-  //         "0",
-  //         "1"
-  //       ]
-  //     }
-  //   ]
-  // }
-  //
-  // If instead you want to only run the webhook on any objects whose
-  // namespace is associated with the "environment" of "prod" or "staging";
-  // you will set the selector as follows:
-  // "namespaceSelector": {
-  //   "matchExpressions": [
-  //     {
-  //       "key": "environment",
-  //       "operator": "In",
-  //       "values": [
-  //         "prod",
-  //         "staging"
-  //       ]
-  //     }
-  //   ]
-  // }
-  //
-  // See
-  // https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
-  // for more examples of label selectors.
-  //
-  // Default to the empty LabelSelector, which matches everything.
-  // +optional
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector namespaceSelector = 5;
-
-  // ObjectSelector decides whether to run the webhook based on if the
-  // object has matching labels. objectSelector is evaluated against both
-  // the oldObject and newObject that would be sent to the webhook, and
-  // is considered to match if either object matches the selector. A null
-  // object (oldObject in the case of create, or newObject in the case of
-  // delete) or an object that cannot have labels (like a
-  // DeploymentRollback or a PodProxyOptions object) is not considered to
-  // match.
-  // Use the object selector only if the webhook is opt-in, because end
-  // users may skip the admission webhook by setting the labels.
-  // Default to the empty LabelSelector, which matches everything.
-  // +optional
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector objectSelector = 10;
-
-  // SideEffects states whether this webhook has side effects.
-  // Acceptable values are: None, NoneOnDryRun (webhooks created via v1beta1 may also specify Some or Unknown).
-  // Webhooks with side effects MUST implement a reconciliation system, since a request may be
-  // rejected by a future step in the admission chain and the side effects therefore need to be undone.
-  // Requests with the dryRun attribute will be auto-rejected if they match a webhook with
-  // sideEffects == Unknown or Some.
-  optional string sideEffects = 6;
-
-  // TimeoutSeconds specifies the timeout for this webhook. After the timeout passes,
-  // the webhook call will be ignored or the API call will fail based on the
-  // failure policy.
-  // The timeout value must be between 1 and 30 seconds.
-  // Default to 10 seconds.
-  // +optional
-  optional int32 timeoutSeconds = 7;
-
-  // AdmissionReviewVersions is an ordered list of preferred `AdmissionReview`
-  // versions the Webhook expects. API server will try to use first version in
-  // the list which it supports. If none of the versions specified in this list
-  // supported by API server, validation will fail for this object.
-  // If a persisted webhook configuration specifies allowed versions and does not
-  // include any versions known to the API Server, calls to the webhook will fail
-  // and be subject to the failure policy.
-  repeated string admissionReviewVersions = 8;
-}
-
-// ValidatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and object without changing it.
-message ValidatingWebhookConfiguration {
+// ValidatingAdmissionPolicy describes the definition of an admission validation policy that accepts or rejects and object without changing it.
+message ValidatingAdmissionPolicy {
   // Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
   // +optional
   optional k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
-  // Webhooks is a list of webhooks and the affected resources and operations.
+  // Specification of the desired behavior of the AdmissionPolicy.
   // +optional
-  // +patchMergeKey=name
-  // +patchStrategy=merge
-  repeated ValidatingWebhook Webhooks = 2;
+  optional ValidatingAdmissionPolicySpec spec = 2;
 }
 
-// ValidatingWebhookConfigurationList is a list of ValidatingWebhookConfiguration.
-message ValidatingWebhookConfigurationList {
+// ValidatingAdmissionPolicyList is a list of ValidatingAdmissionPolicy.
+message ValidatingAdmissionPolicyList {
   // Standard list metadata.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
-  // List of ValidatingWebhookConfiguration.
-  repeated ValidatingWebhookConfiguration items = 2;
+  // List of ValidatingAdmissionPolicy.
+  repeated ValidatingAdmissionPolicy items = 2;
 }
 
-// WebhookClientConfig contains the information to make a TLS
-// connection with the webhook
-message WebhookClientConfig {
-  // `url` gives the location of the webhook, in standard URL form
-  // (`scheme://host:port/path`). Exactly one of `url` or `service`
-  // must be specified.
-  //
-  // The `host` should not refer to a service running in the cluster; use
-  // the `service` field instead. The host might be resolved via external
-  // DNS in some apiservers (e.g., `kube-apiserver` cannot resolve
-  // in-cluster DNS as that would be a layering violation). `host` may
-  // also be an IP address.
-  //
-  // Please note that using `localhost` or `127.0.0.1` as a `host` is
-  // risky unless you take great care to run this webhook on all hosts
-  // which run an apiserver which might need to make calls to this
-  // webhook. Such installs are likely to be non-portable, i.e., not easy
-  // to turn up in a new cluster.
-  //
-  // The scheme must be "https"; the URL must begin with "https://".
-  //
-  // A path is optional, and if present may be any string permissible in
-  // a URL. You may use the path to pass an arbitrary string to the
-  // webhook, for example, a cluster identifier.
-  //
-  // Attempting to use a user or basic auth e.g. "user:password@" is not
-  // allowed. Fragments ("#...") and query parameters ("?...") are not
-  // allowed, either.
-  //
+// ValidatingAdmissionPolicySpec is the specification of the desired behavior of the AdmissionPolicy.
+message ValidatingAdmissionPolicySpec {
+  // ParamSource specifies the kind of resources used to parameterize this policy which has to be a CRD.
   // +optional
-  optional string url = 3;
+  optional ParamSource paramSource = 1;
 
-  // `service` is a reference to the service for this webhook. Either
-  // `service` or `url` must be specified.
-  //
-  // If the webhook is running within the cluster, then you should use `service`.
-  //
+  // MatchConstraints specifies what resources this policy is designed to validate.
+  // The AdmissionPolicy cares about a validation if it matches _any_ Constriant.
+  // However, in order to prevent clusters from being put into a unustable state that cannot be recoverd from via the API
+  // alidatingAdmissionPolicy cannot match ValidatingAdmissionPolicy/PolicyBinding/param resources.
+  // ValidatingWebhookConfiguration cannot match MutatingWebhookConfiguration or ValidatingAdmissionPolicy/PolicyBinding/param resources.
   // +optional
-  optional ServiceReference service = 1;
+  optional MatchResources matchConstraints = 2;
 
-  // `caBundle` is a PEM encoded CA bundle which will be used to validate the webhook's server certificate.
-  // If unspecified, system trust roots on the apiserver are used.
+  // Validations contain CEL expressions which is used to apply the validation.
+  // Required.
+  repeated Validation validations = 3;
+
+  // FailurePolicy defines how unrecognized errors from the admission endpoint are handled -
+  // allowed values are Ignore or Fail. Defaults to Fail.
   // +optional
-  optional bytes caBundle = 2;
+  optional string failurePolicy = 4;
+}
+
+// Validation specified the CEL expression which is used to apply the validation.
+message Validation {
+  // The name of the validation rule.
+  // Required.
+  optional string name = 1;
+
+  // Expression represents the expression which will be evaluated by CEL.
+  // ref: https://github.com/google/cel-spec
+  // CEL expressions have access to the contents of the AdmissionReview type, organized into CEL variables as well as some other useful variables:
+  //
+  // 'object'
+  // 'oldObject'
+  // 'review'
+  // 'requestResource' (GVR)
+  // 'resource' (GVR)
+  // 'name'
+  // 'namespace'
+  // 'operation'
+  // 'userInfo'
+  // 'dryRun'
+  // 'options'
+  // 'config' - configuration data of the policy configuration being validated
+  // The `object` variable in the expression is bound to the resource this policy is designed to validate.
+  //
+  // The `apiVersion`, `kind`, `metadata.name` and `metadata.generateName` are always accessible from the root of the
+  // object. No other metadata properties are accessible.
+  //
+  // Only property names of the form `[a-zA-Z_.-/][a-zA-Z0-9_.-/]*` are accessible.
+  // Accessible property names are escaped according to the following rules when accessed in the expression:
+  // - '__' escapes to '__underscores__'
+  // - '.' escapes to '__dot__'
+  // - '-' escapes to '__dash__'
+  // - '/' escapes to '__slash__'
+  // - Property names that exactly match a CEL RESERVED keyword escape to '__{keyword}__'. The keywords are:
+  // 	  "true", "false", "null", "in", "as", "break", "const", "continue", "else", "for", "function", "if",
+  // 	  "import", "let", "loop", "package", "namespace", "return".
+  // Examples:
+  //   - Expression accessing a property named "namespace": {"Expression": "object.__namespace__ > 0"}
+  //   - Expression accessing a property named "x-prop": {"Expression": "object.x__dash__prop > 0"}
+  //   - Expression accessing a property named "redact__d": {"Expression": "object.redact__underscores__d > 0"}
+  //
+  // Equality on arrays with list type of 'set' or 'map' ignores element order, i.e. [1, 2] == [2, 1].
+  // Concatenation on arrays with x-kubernetes-list-type use the semantics of the list type:
+  //   - 'set': `X + Y` performs a union where the array positions of all elements in `X` are preserved and
+  //     non-intersecting elements in `Y` are appended, retaining their partial order.
+  //   - 'map': `X + Y` performs a merge where the array positions of all keys in `X` are preserved but the values
+  //     are overwritten by values in `Y` when the key sets of `X` and `Y` intersect. Elements in `Y` with
+  //     non-intersecting keys are appended, retaining their partial order.
+  // Required.
+  optional string Expression = 2;
+
+  // Message represents the message displayed when validation fails. The message is required if the Expression contains
+  // line breaks. The message must not contain line breaks.
+  // If unset, the message is "failed rule: {Rule}".
+  // e.g. "must be a URL with the host matching spec.host"
+  // If ExpressMessage is specified, Message will be ignored
+  // If the Expression contains line breaks. Eith Message or ExpressMessage is required.
+  // The message must not contain line breaks.
+  // If unset, the message is "failed Expression: {Expression}".
+  // +optional
+  optional string message = 3;
+
+  // If the MessageExpression evaluates to an error, the Message field is used to provide the message.
+  // The MessageExpression retured when failed the validation of specified.
+  // If MessageExpression is specified, Message will be ignored
+  // If the Expression contains line breaks. Either Message or MessageExpression is required.
+  // The MessageExpression must not contain line breaks.
+  // +optional
+  optional string expressMessage = 4;
+
+  // Reason returned when failed the validation.
+  // +optional
+  optional string reason = 5;
+
+  // Code returned when failed the validation.
+  optional string code = 6;
 }
 
