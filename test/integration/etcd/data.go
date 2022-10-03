@@ -386,6 +386,17 @@ func GetEtcdStorageDataForNamespace(namespace string) map[schema.GroupVersionRes
 		},
 		// --
 
+		// k8s.io/kubernetes/pkg/apis/admissionregistration/v1alpha1
+		gvr("admissionregistration.k8s.io", "v1alpha1", "validatingadmissionpolicy"): {
+			Stub:             `{"metadata":{"name":"vap1","creationTimestamp":null},"spec":{"paramSource":{"apiGroup":"group","apiVersion":"version","kind":"kind"},"matchConstraints":{"namespaces":["ns"]},"validations":[{"name":"max-replicas","expression":"object.spec.replicas <= params.maxReplicas", "messageExpression":"'object.spec.replicas must be no greater than ' + string(params.maxReplicas)"}]}}`,
+			ExpectedEtcdPath: "/registry/validatingadmissionpolicy/vap1",
+		},
+		gvr("admissionregistration.k8s.io", "v1alpha1", "policybinding"): {
+			Stub:             `{"metadata":{"name":"pb1","creationTimestamp":null},"spec":{"policy":"replicalimit-policy.example.com","param":"replica-limit-test.example.com","matchResources":{"namespaces":["ns"]}}}`,
+			ExpectedEtcdPath: "/registry/policybinding/pb1",
+		},
+		// --
+
 		// k8s.io/kubernetes/pkg/apis/scheduling/v1
 		gvr("scheduling.k8s.io", "v1", "priorityclasses"): {
 			Stub:             `{"metadata":{"name":"pc3"},"Value":1000}`,

@@ -50,6 +50,10 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&ValidatingWebhookConfigurationList{},
 		&MutatingWebhookConfiguration{},
 		&MutatingWebhookConfigurationList{},
+		&ValidatingAdmissionPolicy{},
+		&ValidatingAdmissionPolicyList{},
+		&PolicyBinding{},
+		&PolicyBindingList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
