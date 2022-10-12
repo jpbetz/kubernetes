@@ -1,204 +1,108 @@
 {
   "components": {
     "schemas": {
-      "io.k8s.api.autoscaling.v2.ContainerResourceMetricSource": {
-        "description": "ContainerResourceMetricSource indicates how to scale on a resource metric known to Kubernetes, as specified in requests and limits, describing each pod in the current scale target (e.g. CPU or memory).  The values will be averaged together before being compared to the target.  Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the \"pods\" source.  Only one \"target\" type should be set.",
+      "io.k8s.api.admissionregistration.v1alpha1.MatchResources": {
+        "description": "MatchResources decides whether to run the admission control policy on an object based on whether meet the match criteria.",
         "properties": {
-          "container": {
-            "default": "",
-            "description": "container is the name of the container in the pods of the scaling target",
-            "type": "string"
+          "excludeNamespaces": {
+            "description": "ExcludeNamespaces specifies the namespaces which the validating admission policy should not validate on.",
+            "items": {
+              "default": "",
+              "type": "string"
+            },
+            "type": "array"
           },
-          "name": {
-            "default": "",
-            "description": "name is the name of the resource in question.",
-            "type": "string"
+          "excludeResourceName": {
+            "description": "ExcludeResourceName specifies the resource name which the admission control policy should not validate on.",
+            "items": {
+              "default": "",
+              "type": "string"
+            },
+            "type": "array"
           },
-          "target": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.MetricTarget"
-              }
-            ],
-            "default": {},
-            "description": "target specifies the target value for the given metric"
-          }
-        },
-        "required": [
-          "name",
-          "target",
-          "container"
-        ],
-        "type": "object"
-      },
-      "io.k8s.api.autoscaling.v2.ContainerResourceMetricStatus": {
-        "description": "ContainerResourceMetricStatus indicates the current value of a resource metric known to Kubernetes, as specified in requests and limits, describing a single container in each pod in the current scale target (e.g. CPU or memory).  Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the \"pods\" source.",
-        "properties": {
-          "container": {
-            "default": "",
-            "description": "Container is the name of the container in the pods of the scaling target",
-            "type": "string"
-          },
-          "current": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.MetricValueStatus"
-              }
-            ],
-            "default": {},
-            "description": "current contains the current value for the given metric"
-          },
-          "name": {
-            "default": "",
-            "description": "Name is the name of the resource in question.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "name",
-          "current",
-          "container"
-        ],
-        "type": "object"
-      },
-      "io.k8s.api.autoscaling.v2.CrossVersionObjectReference": {
-        "description": "CrossVersionObjectReference contains enough information to let you identify the referred resource.",
-        "properties": {
-          "apiVersion": {
-            "description": "API version of the referent",
-            "type": "string"
-          },
-          "kind": {
-            "default": "",
-            "description": "Kind of the referent; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-            "type": "string"
-          },
-          "name": {
-            "default": "",
-            "description": "Name of the referent; More info: http://kubernetes.io/docs/user-guide/identifiers#names",
-            "type": "string"
-          }
-        },
-        "required": [
-          "kind",
-          "name"
-        ],
-        "type": "object"
-      },
-      "io.k8s.api.autoscaling.v2.ExternalMetricSource": {
-        "description": "ExternalMetricSource indicates how to scale on a metric not associated with any Kubernetes object (for example length of queue in cloud messaging service, or QPS from loadbalancer running outside of cluster).",
-        "properties": {
-          "metric": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.MetricIdentifier"
-              }
-            ],
-            "default": {},
-            "description": "metric identifies the target metric by name and selector"
-          },
-          "target": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.MetricTarget"
-              }
-            ],
-            "default": {},
-            "description": "target specifies the target value for the given metric"
-          }
-        },
-        "required": [
-          "metric",
-          "target"
-        ],
-        "type": "object"
-      },
-      "io.k8s.api.autoscaling.v2.ExternalMetricStatus": {
-        "description": "ExternalMetricStatus indicates the current value of a global metric not associated with any Kubernetes object.",
-        "properties": {
-          "current": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.MetricValueStatus"
-              }
-            ],
-            "default": {},
-            "description": "current contains the current value for the given metric"
-          },
-          "metric": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.MetricIdentifier"
-              }
-            ],
-            "default": {},
-            "description": "metric identifies the target metric by name and selector"
-          }
-        },
-        "required": [
-          "metric",
-          "current"
-        ],
-        "type": "object"
-      },
-      "io.k8s.api.autoscaling.v2.HPAScalingPolicy": {
-        "description": "HPAScalingPolicy is a single policy which must hold true for a specified past interval.",
-        "properties": {
-          "periodSeconds": {
-            "default": 0,
-            "description": "PeriodSeconds specifies the window of time for which the policy should hold true. PeriodSeconds must be greater than zero and less than or equal to 1800 (30 min).",
-            "format": "int32",
-            "type": "integer"
-          },
-          "type": {
-            "default": "",
-            "description": "Type is used to specify the scaling policy.",
-            "type": "string"
-          },
-          "value": {
-            "default": 0,
-            "description": "Value contains the amount of change which is permitted by the policy. It must be greater than zero",
-            "format": "int32",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "type",
-          "value",
-          "periodSeconds"
-        ],
-        "type": "object"
-      },
-      "io.k8s.api.autoscaling.v2.HPAScalingRules": {
-        "description": "HPAScalingRules configures the scaling behavior for one direction. These Rules are applied after calculating DesiredReplicas from metrics for the HPA. They can limit the scaling velocity by specifying scaling policies. They can prevent flapping by specifying the stabilization window, so that the number of replicas is not set instantly, instead, the safest value from the stabilization window is chosen.",
-        "properties": {
-          "policies": {
-            "description": "policies is a list of potential scaling polices which can be used during scaling. At least one policy must be specified, otherwise the HPAScalingRules will be discarded as invalid",
+          "excluderResourceRules": {
+            "description": "ExcludeResourceRules describes what operations on what resources/subresources the ValidatingAdmissionPolicy should not care about.",
             "items": {
               "allOf": [
                 {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HPAScalingPolicy"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.RuleWithOperations"
                 }
               ],
               "default": {}
             },
-            "type": "array",
-            "x-kubernetes-list-type": "atomic"
+            "type": "array"
           },
-          "selectPolicy": {
-            "description": "selectPolicy is used to specify which policy should be used. If not set, the default value Max is used.",
+          "labelSelector": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector"
+              }
+            ],
+            "description": "LabelSelector decides the match criteria on resource based on its labels. See https://kubernetes.io/docs/concepts/overview/working-with-objects/labels for examples of label selectors.\n\nDefault to the empty LabelSelector, which matches everything."
+          },
+          "matchPolicy": {
+            "description": "matchPolicy defines how the \"MatchResources\" list is used to match incoming requests. Allowed values are \"Exact\" or \"Equivalent\".\n\n- Exact: match a request only if it exactly matches a specified rule. For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1, but \"rules\" only included `apiGroups:[\"apps\"], apiVersions:[\"v1\"], resources: [\"deployments\"]`, a request to apps/v1beta1 or extensions/v1beta1 would not be sent to the ValidatingAdmissionPolicy.\n\n- Equivalent: match a request if modifies a resource listed in rules, even via another API group or version. For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1, and \"rules\" only included `apiGroups:[\"apps\"], apiVersions:[\"v1\"], resources: [\"deployments\"]`, a request to apps/v1beta1 or extensions/v1beta1 would be converted to apps/v1 and sent to the ValidatingAdmissionPolicy.\n\nDefaults to \"Equivalent\"",
             "type": "string"
           },
-          "stabilizationWindowSeconds": {
-            "description": "StabilizationWindowSeconds is the number of seconds for which past recommendations should be considered while scaling up or scaling down. StabilizationWindowSeconds must be greater than or equal to zero and less than or equal to 3600 (one hour). If not set, use the default values: - For scale up: 0 (i.e. no stabilization is done). - For scale down: 300 (i.e. the stabilization window is 300 seconds long).",
-            "format": "int32",
-            "type": "integer"
+          "namespaceSelector": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector"
+              }
+            ],
+            "description": "NamespaceSelector decides whether to run the admission control policy on an object based on whether the namespace for that object matches the selector. If the object itself is a namespace, the matching is performed on object.metadata.labels. If the object is another cluster scoped resource, it never skips the admission control policy.\n\nSee https://kubernetes.io/docs/concepts/overview/working-with-objects/labels for examples of label selectors.\n\nDefault to the empty LabelSelector, which matches everything."
+          },
+          "namespaces": {
+            "description": "Namespaces specifies the namespaces which the admission control policy should validate on.",
+            "items": {
+              "default": "",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "resourceName": {
+            "description": "ResourceName specifies the resource name which the admission control policy should validate on.",
+            "items": {
+              "default": "",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "resourceRules": {
+            "description": "ResourceRules describes what operations on what resources/subresources the ValidatingAdmissionPolicy matches.",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.RuleWithOperations"
+                }
+              ],
+              "default": {}
+            },
+            "type": "array"
           }
         },
         "type": "object"
       },
-      "io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler": {
-        "description": "HorizontalPodAutoscaler is the configuration for a horizontal pod autoscaler, which automatically manages the replica count of any resource implementing the scale subresource based on the metrics specified.",
+      "io.k8s.api.admissionregistration.v1alpha1.ParamSource": {
+        "description": "ParamSource is a tuple of Group Kind and Version.",
+        "properties": {
+          "apiGroup": {
+            "description": "APIGroup is the API group the resources belong to. Required.",
+            "type": "string"
+          },
+          "apiKind": {
+            "description": "APIKind is the API kind the resources belong to. Required.",
+            "type": "string"
+          },
+          "apiVersion": {
+            "description": "APIVersion is the API version the resources belong to. Required.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "io.k8s.api.admissionregistration.v1alpha1.PolicyBinding": {
+        "description": "PolicyBinding binds the ValidatingAdmissionPolicy with paramerized resources. PolicyBinding and parameter CRDs together define how cluster administrators configure policies for clusters.",
         "properties": {
           "apiVersion": {
             "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
@@ -215,108 +119,40 @@
               }
             ],
             "default": {},
-            "description": "metadata is the standard object metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata"
+            "description": "Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata."
           },
           "spec": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerSpec"
+                "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBindingSpec"
               }
             ],
             "default": {},
-            "description": "spec is the specification for the behaviour of the autoscaler. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status."
-          },
-          "status": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerStatus"
-              }
-            ],
-            "default": {},
-            "description": "status is the current information about the autoscaler."
+            "description": "Specification of the desired behavior of the AdmissionPolicy."
           }
         },
         "type": "object",
         "x-kubernetes-group-version-kind": [
           {
-            "group": "autoscaling",
-            "kind": "HorizontalPodAutoscaler",
-            "version": "v2"
+            "group": "admissionregistration.k8s.io",
+            "kind": "PolicyBinding",
+            "version": "v1alpha1"
           }
         ]
       },
-      "io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerBehavior": {
-        "description": "HorizontalPodAutoscalerBehavior configures the scaling behavior of the target in both Up and Down directions (scaleUp and scaleDown fields respectively).",
-        "properties": {
-          "scaleDown": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HPAScalingRules"
-              }
-            ],
-            "description": "scaleDown is scaling policy for scaling Down. If not set, the default value is to allow to scale down to minReplicas pods, with a 300 second stabilization window (i.e., the highest recommendation for the last 300sec is used)."
-          },
-          "scaleUp": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HPAScalingRules"
-              }
-            ],
-            "description": "scaleUp is scaling policy for scaling Up. If not set, the default value is the higher of:\n  * increase no more than 4 pods per 60 seconds\n  * double the number of pods per 60 seconds\nNo stabilization is used."
-          }
-        },
-        "type": "object"
-      },
-      "io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerCondition": {
-        "description": "HorizontalPodAutoscalerCondition describes the state of a HorizontalPodAutoscaler at a certain point.",
-        "properties": {
-          "lastTransitionTime": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
-              }
-            ],
-            "default": {},
-            "description": "lastTransitionTime is the last time the condition transitioned from one status to another"
-          },
-          "message": {
-            "description": "message is a human-readable explanation containing details about the transition",
-            "type": "string"
-          },
-          "reason": {
-            "description": "reason is the reason for the condition's last transition.",
-            "type": "string"
-          },
-          "status": {
-            "default": "",
-            "description": "status is the status of the condition (True, False, Unknown)",
-            "type": "string"
-          },
-          "type": {
-            "default": "",
-            "description": "type describes the current condition",
-            "type": "string"
-          }
-        },
-        "required": [
-          "type",
-          "status"
-        ],
-        "type": "object"
-      },
-      "io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerList": {
-        "description": "HorizontalPodAutoscalerList is a list of horizontal pod autoscaler objects.",
+      "io.k8s.api.admissionregistration.v1alpha1.PolicyBindingList": {
+        "description": "PolicyBindingList is a list of PolicyBinding.",
         "properties": {
           "apiVersion": {
             "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
             "type": "string"
           },
           "items": {
-            "description": "items is the list of horizontal pod autoscaler objects.",
+            "description": "List of PolicyBinding.",
             "items": {
               "allOf": [
                 {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               ],
               "default": {}
@@ -334,7 +170,7 @@
               }
             ],
             "default": {},
-            "description": "metadata is the standard list metadata."
+            "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
           }
         },
         "required": [
@@ -343,509 +179,241 @@
         "type": "object",
         "x-kubernetes-group-version-kind": [
           {
-            "group": "autoscaling",
-            "kind": "HorizontalPodAutoscalerList",
-            "version": "v2"
+            "group": "admissionregistration.k8s.io",
+            "kind": "PolicyBindingList",
+            "version": "v1alpha1"
           }
         ]
       },
-      "io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerSpec": {
-        "description": "HorizontalPodAutoscalerSpec describes the desired functionality of the HorizontalPodAutoscaler.",
+      "io.k8s.api.admissionregistration.v1alpha1.PolicyBindingSpec": {
+        "description": "PolicyBindingSpec is the specification of the PolicyBinding.",
         "properties": {
-          "behavior": {
+          "matchResources": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerBehavior"
+                "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.MatchResources"
               }
             ],
-            "description": "behavior configures the scaling behavior of the target in both Up and Down directions (scaleUp and scaleDown fields respectively). If not set, the default HPAScalingRules for scale up and scale down are used."
+            "default": {},
+            "description": "MatchResources describe a list of match options which could be used to filter the resources."
           },
-          "maxReplicas": {
-            "default": 0,
-            "description": "maxReplicas is the upper limit for the number of replicas to which the autoscaler can scale up. It cannot be less that minReplicas.",
-            "format": "int32",
-            "type": "integer"
+          "param": {
+            "description": "Param specifies the parameter resource used to configure the admission control policy. It should point to a Customer Resource which is created out of the CRD specified in ParamSource of ValidatingAdmissionPolicy it binded.",
+            "type": "string"
           },
-          "metrics": {
-            "description": "metrics contains the specifications for which to use to calculate the desired replica count (the maximum replica count across all metrics will be used).  The desired replica count is calculated multiplying the ratio between the target value and the current value by the current number of pods.  Ergo, metrics used must decrease as the pod count is increased, and vice-versa.  See the individual metric source types for more information about how each type of metric must respond. If not set, the default metric will be set to 80% average CPU utilization.",
+          "policy": {
+            "description": "Policy references a ValidatingAdmissionPolicy which the policyBinding binds to. Required.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "io.k8s.api.admissionregistration.v1alpha1.RuleWithOperations": {
+        "description": "RuleWithOperations is a tuple of Operations and Resources. It is recommended to make sure that all the tuple expansions are valid.",
+        "properties": {
+          "apiGroups": {
+            "description": "APIGroups is the API groups the resources belong to. '*' is all groups. If '*' is present, the length of the slice must be one. Required.",
+            "items": {
+              "default": "",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "apiVersions": {
+            "description": "APIVersions is the API versions the resources belong to. '*' is all versions. If '*' is present, the length of the slice must be one. Required.",
+            "items": {
+              "default": "",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "operations": {
+            "description": "Operations is the operations the admission hook cares about - CREATE, UPDATE, DELETE, CONNECT or * for all of those operations and any future admission operations that are added. If '*' is present, the length of the slice must be one. Required.",
+            "items": {
+              "default": "",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "resources": {
+            "description": "Resources is a list of resources this rule applies to.\n\nFor example: 'pods' means pods. 'pods/log' means the log subresource of pods. '*' means all resources, but not subresources. 'pods/*' means all subresources of pods. '*/scale' means all scale subresources. '*/*' means all resources and their subresources.\n\nIf wildcard is present, the validation rule will ensure resources do not overlap with each other.\n\nDepending on the enclosing object, subresources might not be allowed. Required.",
+            "items": {
+              "default": "",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "scope": {
+            "description": "scope specifies the scope of this rule. Valid values are \"Cluster\", \"Namespaced\", and \"*\" \"Cluster\" means that only cluster-scoped resources will match this rule. Namespace API objects are cluster-scoped. \"Namespaced\" means that only namespaced resources will match this rule. \"*\" means that there are no scope restrictions. Subresources match the scope of their parent resource. Default is \"*\".",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy": {
+        "description": "ValidatingAdmissionPolicy describes the definition of an admission validation policy that accepts or rejects and object without changing it.",
+        "properties": {
+          "apiVersion": {
+            "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+            "type": "string"
+          },
+          "kind": {
+            "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+            "type": "string"
+          },
+          "metadata": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+              }
+            ],
+            "default": {},
+            "description": "Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata."
+          },
+          "spec": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicySpec"
+              }
+            ],
+            "default": {},
+            "description": "Specification of the desired behavior of the AdmissionPolicy."
+          }
+        },
+        "type": "object",
+        "x-kubernetes-group-version-kind": [
+          {
+            "group": "admissionregistration.k8s.io",
+            "kind": "ValidatingAdmissionPolicy",
+            "version": "v1alpha1"
+          }
+        ]
+      },
+      "io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicyList": {
+        "description": "ValidatingAdmissionPolicyList is a list of ValidatingAdmissionPolicy.",
+        "properties": {
+          "apiVersion": {
+            "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+            "type": "string"
+          },
+          "items": {
+            "description": "List of ValidatingAdmissionPolicy.",
             "items": {
               "allOf": [
                 {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.MetricSpec"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
                 }
               ],
               "default": {}
             },
-            "type": "array",
-            "x-kubernetes-list-type": "atomic"
+            "type": "array"
           },
-          "minReplicas": {
-            "description": "minReplicas is the lower limit for the number of replicas to which the autoscaler can scale down.  It defaults to 1 pod.  minReplicas is allowed to be 0 if the alpha feature gate HPAScaleToZero is enabled and at least one Object or External metric is configured.  Scaling is active as long as at least one metric value is available.",
-            "format": "int32",
-            "type": "integer"
+          "kind": {
+            "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+            "type": "string"
           },
-          "scaleTargetRef": {
+          "metadata": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.CrossVersionObjectReference"
+                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
               }
             ],
             "default": {},
-            "description": "scaleTargetRef points to the target resource to scale, and is used to the pods for which metrics should be collected, as well as to actually change the replica count."
+            "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
           }
         },
         "required": [
-          "scaleTargetRef",
-          "maxReplicas"
+          "items"
         ],
-        "type": "object"
+        "type": "object",
+        "x-kubernetes-group-version-kind": [
+          {
+            "group": "admissionregistration.k8s.io",
+            "kind": "ValidatingAdmissionPolicyList",
+            "version": "v1alpha1"
+          }
+        ]
       },
-      "io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerStatus": {
-        "description": "HorizontalPodAutoscalerStatus describes the current status of a horizontal pod autoscaler.",
+      "io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicySpec": {
+        "description": "ValidatingAdmissionPolicySpec is the specification of the desired behavior of the AdmissionPolicy.",
         "properties": {
-          "conditions": {
-            "description": "conditions is the set of conditions required for this autoscaler to scale its target, and indicates whether or not those conditions are met.",
+          "failurePolicy": {
+            "description": "FailurePolicy defines how unrecognized errors from the admission endpoint are handled - allowed values are Ignore or Fail. Defaults to Fail.",
+            "type": "string"
+          },
+          "matchConstraints": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.MatchResources"
+              }
+            ],
+            "default": {},
+            "description": "MatchConstraints specifies what resources this policy is designed to validate. The AdmissionPolicy cares about a validation if it matches _any_ Constriant. However, in order to prevent clusters from being put into a unustable state that cannot be recoverd from via the API alidatingAdmissionPolicy cannot match ValidatingAdmissionPolicy/PolicyBinding/param resources. ValidatingWebhookConfiguration cannot match MutatingWebhookConfiguration or ValidatingAdmissionPolicy/PolicyBinding/param resources."
+          },
+          "paramSource": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ParamSource"
+              }
+            ],
+            "default": {},
+            "description": "ParamSource specifies the kind of resources used to parameterize this policy which has to be a CRD."
+          },
+          "validations": {
+            "description": "Validations contain CEL expressions which is used to apply the validation. Required.",
             "items": {
               "allOf": [
                 {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerCondition"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.Validation"
                 }
               ],
               "default": {}
             },
-            "type": "array",
-            "x-kubernetes-list-map-keys": [
-              "type"
-            ],
-            "x-kubernetes-list-type": "map",
-            "x-kubernetes-patch-merge-key": "type",
-            "x-kubernetes-patch-strategy": "merge"
-          },
-          "currentMetrics": {
-            "description": "currentMetrics is the last read state of the metrics used by this autoscaler.",
-            "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.MetricStatus"
-                }
-              ],
-              "default": {}
-            },
-            "type": "array",
-            "x-kubernetes-list-type": "atomic"
-          },
-          "currentReplicas": {
-            "description": "currentReplicas is current number of replicas of pods managed by this autoscaler, as last seen by the autoscaler.",
-            "format": "int32",
-            "type": "integer"
-          },
-          "desiredReplicas": {
-            "default": 0,
-            "description": "desiredReplicas is the desired number of replicas of pods managed by this autoscaler, as last calculated by the autoscaler.",
-            "format": "int32",
-            "type": "integer"
-          },
-          "lastScaleTime": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
-              }
-            ],
-            "description": "lastScaleTime is the last time the HorizontalPodAutoscaler scaled the number of pods, used by the autoscaler to control how often the number of pods is changed."
-          },
-          "observedGeneration": {
-            "description": "observedGeneration is the most recent generation observed by this autoscaler.",
-            "format": "int64",
-            "type": "integer"
+            "type": "array"
           }
         },
-        "required": [
-          "desiredReplicas"
-        ],
         "type": "object"
       },
-      "io.k8s.api.autoscaling.v2.MetricIdentifier": {
-        "description": "MetricIdentifier defines the name and optionally selector for a metric",
+      "io.k8s.api.admissionregistration.v1alpha1.Validation": {
+        "description": "Validation specified the CEL expression which is used to apply the validation.",
         "properties": {
-          "name": {
+          "code": {
             "default": "",
-            "description": "name is the name of the given metric",
+            "description": "Code returned when failed the validation.",
             "type": "string"
           },
-          "selector": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector"
-              }
-            ],
-            "description": "selector is the string-encoded form of a standard kubernetes label selector for the given metric When set, it is passed as an additional parameter to the metrics server for more specific metrics scoping. When unset, just the metricName will be used to gather metrics."
-          }
-        },
-        "required": [
-          "name"
-        ],
-        "type": "object"
-      },
-      "io.k8s.api.autoscaling.v2.MetricSpec": {
-        "description": "MetricSpec specifies how to scale based on a single metric (only `type` and one other matching field should be set at once).",
-        "properties": {
-          "containerResource": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.ContainerResourceMetricSource"
-              }
-            ],
-            "description": "containerResource refers to a resource metric (such as those specified in requests and limits) known to Kubernetes describing a single container in each pod of the current scale target (e.g. CPU or memory). Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the \"pods\" source. This is an alpha feature and can be enabled by the HPAContainerMetrics feature flag."
-          },
-          "external": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.ExternalMetricSource"
-              }
-            ],
-            "description": "external refers to a global metric that is not associated with any Kubernetes object. It allows autoscaling based on information coming from components running outside of cluster (for example length of queue in cloud messaging service, or QPS from loadbalancer running outside of cluster)."
-          },
-          "object": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.ObjectMetricSource"
-              }
-            ],
-            "description": "object refers to a metric describing a single kubernetes object (for example, hits-per-second on an Ingress object)."
-          },
-          "pods": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.PodsMetricSource"
-              }
-            ],
-            "description": "pods refers to a metric describing each pod in the current scale target (for example, transactions-processed-per-second).  The values will be averaged together before being compared to the target value."
-          },
-          "resource": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.ResourceMetricSource"
-              }
-            ],
-            "description": "resource refers to a resource metric (such as those specified in requests and limits) known to Kubernetes describing each pod in the current scale target (e.g. CPU or memory). Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the \"pods\" source."
-          },
-          "type": {
+          "expressMessage": {
             "default": "",
-            "description": "type is the type of metric source.  It should be one of \"ContainerResource\", \"External\", \"Object\", \"Pods\" or \"Resource\", each mapping to a matching field in the object. Note: \"ContainerResource\" type is available on when the feature-gate HPAContainerMetrics is enabled",
-            "type": "string"
-          }
-        },
-        "required": [
-          "type"
-        ],
-        "type": "object"
-      },
-      "io.k8s.api.autoscaling.v2.MetricStatus": {
-        "description": "MetricStatus describes the last-read state of a single metric.",
-        "properties": {
-          "containerResource": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.ContainerResourceMetricStatus"
-              }
-            ],
-            "description": "container resource refers to a resource metric (such as those specified in requests and limits) known to Kubernetes describing a single container in each pod in the current scale target (e.g. CPU or memory). Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the \"pods\" source."
-          },
-          "external": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.ExternalMetricStatus"
-              }
-            ],
-            "description": "external refers to a global metric that is not associated with any Kubernetes object. It allows autoscaling based on information coming from components running outside of cluster (for example length of queue in cloud messaging service, or QPS from loadbalancer running outside of cluster)."
-          },
-          "object": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.ObjectMetricStatus"
-              }
-            ],
-            "description": "object refers to a metric describing a single kubernetes object (for example, hits-per-second on an Ingress object)."
-          },
-          "pods": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.PodsMetricStatus"
-              }
-            ],
-            "description": "pods refers to a metric describing each pod in the current scale target (for example, transactions-processed-per-second).  The values will be averaged together before being compared to the target value."
-          },
-          "resource": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.ResourceMetricStatus"
-              }
-            ],
-            "description": "resource refers to a resource metric (such as those specified in requests and limits) known to Kubernetes describing each pod in the current scale target (e.g. CPU or memory). Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the \"pods\" source."
-          },
-          "type": {
-            "default": "",
-            "description": "type is the type of metric source.  It will be one of \"ContainerResource\", \"External\", \"Object\", \"Pods\" or \"Resource\", each corresponds to a matching field in the object. Note: \"ContainerResource\" type is available on when the feature-gate HPAContainerMetrics is enabled",
-            "type": "string"
-          }
-        },
-        "required": [
-          "type"
-        ],
-        "type": "object"
-      },
-      "io.k8s.api.autoscaling.v2.MetricTarget": {
-        "description": "MetricTarget defines the target value, average value, or average utilization of a specific metric",
-        "properties": {
-          "averageUtilization": {
-            "description": "averageUtilization is the target value of the average of the resource metric across all relevant pods, represented as a percentage of the requested value of the resource for the pods. Currently only valid for Resource metric source type",
-            "format": "int32",
-            "type": "integer"
-          },
-          "averageValue": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
-              }
-            ],
-            "description": "averageValue is the target value of the average of the metric across all relevant pods (as a quantity)"
-          },
-          "type": {
-            "default": "",
-            "description": "type represents whether the metric type is Utilization, Value, or AverageValue",
+            "description": "If the MessageExpression evaluates to an error, the Message field is used to provide the message. The MessageExpression retured when failed the validation of specified. If MessageExpression is specified, Message will be ignored If the Expression contains line breaks. Either Message or MessageExpression is required. The MessageExpression must not contain line breaks.",
             "type": "string"
           },
-          "value": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
-              }
-            ],
-            "description": "value is the target value of the metric (as a quantity)."
-          }
-        },
-        "required": [
-          "type"
-        ],
-        "type": "object"
-      },
-      "io.k8s.api.autoscaling.v2.MetricValueStatus": {
-        "description": "MetricValueStatus holds the current value for a metric",
-        "properties": {
-          "averageUtilization": {
-            "description": "currentAverageUtilization is the current value of the average of the resource metric across all relevant pods, represented as a percentage of the requested value of the resource for the pods.",
-            "format": "int32",
-            "type": "integer"
-          },
-          "averageValue": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
-              }
-            ],
-            "description": "averageValue is the current value of the average of the metric across all relevant pods (as a quantity)"
-          },
-          "value": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
-              }
-            ],
-            "description": "value is the current value of the metric (as a quantity)."
-          }
-        },
-        "type": "object"
-      },
-      "io.k8s.api.autoscaling.v2.ObjectMetricSource": {
-        "description": "ObjectMetricSource indicates how to scale on a metric describing a kubernetes object (for example, hits-per-second on an Ingress object).",
-        "properties": {
-          "describedObject": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.CrossVersionObjectReference"
-              }
-            ],
-            "default": {},
-            "description": "describedObject specifies the descriptions of a object,such as kind,name apiVersion"
-          },
-          "metric": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.MetricIdentifier"
-              }
-            ],
-            "default": {},
-            "description": "metric identifies the target metric by name and selector"
-          },
-          "target": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.MetricTarget"
-              }
-            ],
-            "default": {},
-            "description": "target specifies the target value for the given metric"
-          }
-        },
-        "required": [
-          "describedObject",
-          "target",
-          "metric"
-        ],
-        "type": "object"
-      },
-      "io.k8s.api.autoscaling.v2.ObjectMetricStatus": {
-        "description": "ObjectMetricStatus indicates the current value of a metric describing a kubernetes object (for example, hits-per-second on an Ingress object).",
-        "properties": {
-          "current": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.MetricValueStatus"
-              }
-            ],
-            "default": {},
-            "description": "current contains the current value for the given metric"
-          },
-          "describedObject": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.CrossVersionObjectReference"
-              }
-            ],
-            "default": {},
-            "description": "DescribedObject specifies the descriptions of a object,such as kind,name apiVersion"
-          },
-          "metric": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.MetricIdentifier"
-              }
-            ],
-            "default": {},
-            "description": "metric identifies the target metric by name and selector"
-          }
-        },
-        "required": [
-          "metric",
-          "current",
-          "describedObject"
-        ],
-        "type": "object"
-      },
-      "io.k8s.api.autoscaling.v2.PodsMetricSource": {
-        "description": "PodsMetricSource indicates how to scale on a metric describing each pod in the current scale target (for example, transactions-processed-per-second). The values will be averaged together before being compared to the target value.",
-        "properties": {
-          "metric": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.MetricIdentifier"
-              }
-            ],
-            "default": {},
-            "description": "metric identifies the target metric by name and selector"
-          },
-          "target": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.MetricTarget"
-              }
-            ],
-            "default": {},
-            "description": "target specifies the target value for the given metric"
-          }
-        },
-        "required": [
-          "metric",
-          "target"
-        ],
-        "type": "object"
-      },
-      "io.k8s.api.autoscaling.v2.PodsMetricStatus": {
-        "description": "PodsMetricStatus indicates the current value of a metric describing each pod in the current scale target (for example, transactions-processed-per-second).",
-        "properties": {
-          "current": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.MetricValueStatus"
-              }
-            ],
-            "default": {},
-            "description": "current contains the current value for the given metric"
-          },
-          "metric": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.MetricIdentifier"
-              }
-            ],
-            "default": {},
-            "description": "metric identifies the target metric by name and selector"
-          }
-        },
-        "required": [
-          "metric",
-          "current"
-        ],
-        "type": "object"
-      },
-      "io.k8s.api.autoscaling.v2.ResourceMetricSource": {
-        "description": "ResourceMetricSource indicates how to scale on a resource metric known to Kubernetes, as specified in requests and limits, describing each pod in the current scale target (e.g. CPU or memory).  The values will be averaged together before being compared to the target.  Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the \"pods\" source.  Only one \"target\" type should be set.",
-        "properties": {
-          "name": {
+          "expression": {
             "default": "",
-            "description": "name is the name of the resource in question.",
+            "description": "Expression represents the expression which will be evaluated by CEL. ref: https://github.com/google/cel-spec CEL expressions have access to the contents of the AdmissionReview type, organized into CEL variables as well as some other useful variables:\n\n'object' 'oldObject' 'review' 'requestResource' (GVR) 'resource' (GVR) 'name' 'namespace' 'operation' 'userInfo' 'dryRun' 'options' 'config' - configuration data of the policy configuration being validated The `object` variable in the expression is bound to the resource this policy is designed to validate.\n\nThe `apiVersion`, `kind`, `metadata.name` and `metadata.generateName` are always accessible from the root of the object. No other metadata properties are accessible.\n\nOnly property names of the form `[a-zA-Z_.-/][a-zA-Z0-9_.-/]*` are accessible. Accessible property names are escaped according to the following rules when accessed in the expression: - '__' escapes to '__underscores__' - '.' escapes to '__dot__' - '-' escapes to '__dash__' - '/' escapes to '__slash__' - Property names that exactly match a CEL RESERVED keyword escape to '__{keyword}__'. The keywords are:\n\t  \"true\", \"false\", \"null\", \"in\", \"as\", \"break\", \"const\", \"continue\", \"else\", \"for\", \"function\", \"if\",\n\t  \"import\", \"let\", \"loop\", \"package\", \"namespace\", \"return\".\nExamples:\n  - Expression accessing a property named \"namespace\": {\"Expression\": \"object.__namespace__ > 0\"}\n  - Expression accessing a property named \"x-prop\": {\"Expression\": \"object.x__dash__prop > 0\"}\n  - Expression accessing a property named \"redact__d\": {\"Expression\": \"object.redact__underscores__d > 0\"}\n\nEquality on arrays with list type of 'set' or 'map' ignores element order, i.e. [1, 2] == [2, 1]. Concatenation on arrays with x-kubernetes-list-type use the semantics of the list type:\n  - 'set': `X + Y` performs a union where the array positions of all elements in `X` are preserved and\n    non-intersecting elements in `Y` are appended, retaining their partial order.\n  - 'map': `X + Y` performs a merge where the array positions of all keys in `X` are preserved but the values\n    are overwritten by values in `Y` when the key sets of `X` and `Y` intersect. Elements in `Y` with\n    non-intersecting keys are appended, retaining their partial order.\nRequired.",
             "type": "string"
           },
-          "target": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.MetricTarget"
-              }
-            ],
-            "default": {},
-            "description": "target specifies the target value for the given metric"
-          }
-        },
-        "required": [
-          "name",
-          "target"
-        ],
-        "type": "object"
-      },
-      "io.k8s.api.autoscaling.v2.ResourceMetricStatus": {
-        "description": "ResourceMetricStatus indicates the current value of a resource metric known to Kubernetes, as specified in requests and limits, describing each pod in the current scale target (e.g. CPU or memory).  Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the \"pods\" source.",
-        "properties": {
-          "current": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.MetricValueStatus"
-              }
-            ],
-            "default": {},
-            "description": "current contains the current value for the given metric"
+          "message": {
+            "default": "",
+            "description": "Message represents the message displayed when validation fails. The message is required if the Expression contains line breaks. The message must not contain line breaks. If unset, the message is \"failed rule: {Rule}\". e.g. \"must be a URL with the host matching spec.host\" If ExpressMessage is specified, Message will be ignored If the Expression contains line breaks. Eith Message or ExpressMessage is required. The message must not contain line breaks. If unset, the message is \"failed Expression: {Expression}\".",
+            "type": "string"
           },
           "name": {
             "default": "",
-            "description": "Name is the name of the resource in question.",
+            "description": "The name of the validation rule. Required.",
+            "type": "string"
+          },
+          "reason": {
+            "default": "",
+            "description": "Reason returned when failed the validation.",
             "type": "string"
           }
         },
         "required": [
           "name",
-          "current"
+          "expression",
+          "code"
         ],
         "type": "object"
-      },
-      "io.k8s.apimachinery.pkg.api.resource.Quantity": {
-        "description": "Quantity is a fixed-point representation of a number. It provides convenient marshaling/unmarshaling in JSON and YAML, in addition to String() and AsInt64() accessors.\n\nThe serialization format is:\n\n``` <quantity>        ::= <signedNumber><suffix>\n\n\t(Note that <suffix> may be empty, from the \"\" case in <decimalSI>.)\n\n<digit>           ::= 0 | 1 | ... | 9 <digits>          ::= <digit> | <digit><digits> <number>          ::= <digits> | <digits>.<digits> | <digits>. | .<digits> <sign>            ::= \"+\" | \"-\" <signedNumber>    ::= <number> | <sign><number> <suffix>          ::= <binarySI> | <decimalExponent> | <decimalSI> <binarySI>        ::= Ki | Mi | Gi | Ti | Pi | Ei\n\n\t(International System of units; See: http://physics.nist.gov/cuu/Units/binary.html)\n\n<decimalSI>       ::= m | \"\" | k | M | G | T | P | E\n\n\t(Note that 1024 = 1Ki but 1000 = 1k; I didn't choose the capitalization.)\n\n<decimalExponent> ::= \"e\" <signedNumber> | \"E\" <signedNumber> ```\n\nNo matter which of the three exponent forms is used, no quantity may represent a number greater than 2^63-1 in magnitude, nor may it have more than 3 decimal places. Numbers larger or more precise will be capped or rounded up. (E.g.: 0.1m will rounded up to 1m.) This may be extended in the future if we require larger or smaller quantities.\n\nWhen a Quantity is parsed from a string, it will remember the type of suffix it had, and will use the same type again when it is serialized.\n\nBefore serializing, Quantity will be put in \"canonical form\". This means that Exponent/suffix will be adjusted up or down (with a corresponding increase or decrease in Mantissa) such that:\n\n- No precision is lost - No fractional digits will be emitted - The exponent (or suffix) is as large as possible.\n\nThe sign will be omitted unless the number is negative.\n\nExamples:\n\n- 1.5 will be serialized as \"1500m\" - 1.5Gi will be serialized as \"1536Mi\"\n\nNote that the quantity will NEVER be internally represented by a floating point number. That is the whole point of this exercise.\n\nNon-canonical values will still parse as long as they are well formed, but will be re-emitted in their canonical form. (So always use canonical form, or don't diff.)\n\nThis format is intended to make it difficult to use these numbers without writing some sort of special handling code in the hopes that that will cause implementors to also use a fixed point implementation.",
-        "oneOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "number"
-          }
-        ]
       },
       "io.k8s.apimachinery.pkg.apis.meta.v1.APIResource": {
         "description": "APIResource specifies the name of a resource and whether it is namespaced.",
@@ -2018,10 +1586,10 @@
   },
   "openapi": "3.0.0",
   "paths": {
-    "/apis/autoscaling/v2/": {
+    "/apis/admissionregistration.k8s.io/v1alpha1/": {
       "get": {
         "description": "get available resources",
-        "operationId": "getAutoscalingV2APIResources",
+        "operationId": "getAdmissionregistrationV1alpha1APIResources",
         "responses": {
           "200": {
             "content": {
@@ -2048,156 +1616,14 @@
           }
         },
         "tags": [
-          "autoscaling_v2"
+          "admissionregistration_v1alpha1"
         ]
       }
     },
-    "/apis/autoscaling/v2/horizontalpodautoscalers": {
-      "get": {
-        "description": "list or watch objects of kind HorizontalPodAutoscaler",
-        "operationId": "listAutoscalingV2HorizontalPodAutoscalerForAllNamespaces",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerList"
-                }
-              },
-              "application/json;stream=watch": {
-                "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerList"
-                }
-              },
-              "application/vnd.kubernetes.protobuf": {
-                "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerList"
-                }
-              },
-              "application/vnd.kubernetes.protobuf;stream=watch": {
-                "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerList"
-                }
-              },
-              "application/yaml": {
-                "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerList"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "tags": [
-          "autoscaling_v2"
-        ],
-        "x-kubernetes-action": "list",
-        "x-kubernetes-group-version-kind": {
-          "group": "autoscaling",
-          "kind": "HorizontalPodAutoscaler",
-          "version": "v2"
-        }
-      },
-      "parameters": [
-        {
-          "description": "allowWatchBookmarks requests watch events with type \"BOOKMARK\". Servers that do not implement bookmarks may ignore this flag and bookmarks are sent at the server's discretion. Clients should not assume bookmarks are returned at any specific interval, nor may they assume the server will send any BOOKMARK event during a session. If this is not a watch, this field is ignored.",
-          "in": "query",
-          "name": "allowWatchBookmarks",
-          "schema": {
-            "type": "boolean",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "The continue option should be set when retrieving more results from the server. Since this value is server defined, clients may only use the continue value from a previous query result with identical query parameters (except for the value of continue) and the server may reject a continue value it does not recognize. If the specified continue value is no longer valid whether due to expiration (generally five to fifteen minutes) or a configuration change on the server, the server will respond with a 410 ResourceExpired error together with a continue token. If the client needs a consistent list, it must restart their list without the continue field. Otherwise, the client may send another list request with the token received with the 410 error, the server will respond with a list starting from the next key, but from the latest snapshot, which is inconsistent from the previous list results - objects that are created, modified, or deleted after the first list request will be included in the response, as long as their keys are after the \"next key\".\n\nThis field is not supported when watch is true. Clients may start a watch from the last resourceVersion value returned by the server and not miss any modifications.",
-          "in": "query",
-          "name": "continue",
-          "schema": {
-            "type": "string",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
-          "in": "query",
-          "name": "fieldSelector",
-          "schema": {
-            "type": "string",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
-          "in": "query",
-          "name": "labelSelector",
-          "schema": {
-            "type": "string",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "limit is a maximum number of responses to return for a list call. If more items exist, the server will set the `continue` field on the list metadata to a value that can be used with the same initial query to retrieve the next set of results. Setting a limit may return fewer than the requested amount of items (up to zero items) in the event all requested objects are filtered out and clients should only use the presence of the continue field to determine whether more results are available. Servers may choose not to support the limit argument and will return all of the available results. If limit is specified and the continue field is empty, clients may assume that no more results are available. This field is not supported if watch is true.\n\nThe server guarantees that the objects returned when using continue will be identical to issuing a single list call without a limit - that is, no objects created, modified, or deleted after the first request is issued will be included in any subsequent continued requests. This is sometimes referred to as a consistent snapshot, and ensures that a client that is using limit to receive smaller chunks of a very large result can ensure they see all possible objects. If objects are updated during a chunked list the version of the object that was present at the time the first list result was calculated is returned.",
-          "in": "query",
-          "name": "limit",
-          "schema": {
-            "type": "integer",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "If 'true', then the output is pretty printed.",
-          "in": "query",
-          "name": "pretty",
-          "schema": {
-            "type": "string",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "resourceVersion sets a constraint on what resource versions a request may be served from. See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
-          "in": "query",
-          "name": "resourceVersion",
-          "schema": {
-            "type": "string",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "resourceVersionMatch determines how resourceVersion is applied to list calls. It is highly recommended that resourceVersionMatch be set for list calls where resourceVersion is set See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
-          "in": "query",
-          "name": "resourceVersionMatch",
-          "schema": {
-            "type": "string",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "Timeout for the list/watch call. This limits the duration of the call, regardless of any activity or inactivity.",
-          "in": "query",
-          "name": "timeoutSeconds",
-          "schema": {
-            "type": "integer",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
-          "in": "query",
-          "name": "watch",
-          "schema": {
-            "type": "boolean",
-            "uniqueItems": true
-          }
-        }
-      ]
-    },
-    "/apis/autoscaling/v2/namespaces/{namespace}/horizontalpodautoscalers": {
+    "/apis/admissionregistration.k8s.io/v1alpha1/policybinding": {
       "delete": {
-        "description": "delete collection of HorizontalPodAutoscaler",
-        "operationId": "deleteAutoscalingV2CollectionNamespacedHorizontalPodAutoscaler",
+        "description": "delete collection of PolicyBinding",
+        "operationId": "deleteAdmissionregistrationV1alpha1CollectionPolicyBinding",
         "parameters": [
           {
             "description": "The continue option should be set when retrieving more results from the server. Since this value is server defined, clients may only use the continue value from a previous query result with identical query parameters (except for the value of continue) and the server may reject a continue value it does not recognize. If the specified continue value is no longer valid whether due to expiration (generally five to fifteen minutes) or a configuration change on the server, the server will respond with a 410 ResourceExpired error together with a continue token. If the client needs a consistent list, it must restart their list without the continue field. Otherwise, the client may send another list request with the token received with the 410 error, the server will respond with a list starting from the next key, but from the latest snapshot, which is inconsistent from the previous list results - objects that are created, modified, or deleted after the first list request will be included in the response, as long as their keys are after the \"next key\".\n\nThis field is not supported when watch is true. Clients may start a watch from the last resourceVersion value returned by the server and not miss any modifications.",
@@ -2334,18 +1760,18 @@
           }
         },
         "tags": [
-          "autoscaling_v2"
+          "admissionregistration_v1alpha1"
         ],
         "x-kubernetes-action": "deletecollection",
         "x-kubernetes-group-version-kind": {
-          "group": "autoscaling",
-          "kind": "HorizontalPodAutoscaler",
-          "version": "v2"
+          "group": "admissionregistration.k8s.io",
+          "kind": "PolicyBinding",
+          "version": "v1alpha1"
         }
       },
       "get": {
-        "description": "list or watch objects of kind HorizontalPodAutoscaler",
-        "operationId": "listAutoscalingV2NamespacedHorizontalPodAutoscaler",
+        "description": "list or watch objects of kind PolicyBinding",
+        "operationId": "listAdmissionregistrationV1alpha1PolicyBinding",
         "parameters": [
           {
             "description": "allowWatchBookmarks requests watch events with type \"BOOKMARK\". Servers that do not implement bookmarks may ignore this flag and bookmarks are sent at the server's discretion. Clients should not assume bookmarks are returned at any specific interval, nor may they assume the server will send any BOOKMARK event during a session. If this is not a watch, this field is ignored.",
@@ -2434,27 +1860,27 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerList"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBindingList"
                 }
               },
               "application/json;stream=watch": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerList"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBindingList"
                 }
               },
               "application/vnd.kubernetes.protobuf": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerList"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBindingList"
                 }
               },
               "application/vnd.kubernetes.protobuf;stream=watch": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerList"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBindingList"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerList"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBindingList"
                 }
               }
             },
@@ -2465,26 +1891,16 @@
           }
         },
         "tags": [
-          "autoscaling_v2"
+          "admissionregistration_v1alpha1"
         ],
         "x-kubernetes-action": "list",
         "x-kubernetes-group-version-kind": {
-          "group": "autoscaling",
-          "kind": "HorizontalPodAutoscaler",
-          "version": "v2"
+          "group": "admissionregistration.k8s.io",
+          "kind": "PolicyBinding",
+          "version": "v1alpha1"
         }
       },
       "parameters": [
-        {
-          "description": "object name and auth scope, such as for teams and projects",
-          "in": "path",
-          "name": "namespace",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "uniqueItems": true
-          }
-        },
         {
           "description": "If 'true', then the output is pretty printed.",
           "in": "query",
@@ -2496,8 +1912,8 @@
         }
       ],
       "post": {
-        "description": "create a HorizontalPodAutoscaler",
-        "operationId": "createAutoscalingV2NamespacedHorizontalPodAutoscaler",
+        "description": "create a PolicyBinding",
+        "operationId": "createAdmissionregistrationV1alpha1PolicyBinding",
         "parameters": [
           {
             "description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
@@ -2531,7 +1947,7 @@
           "content": {
             "*/*": {
               "schema": {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
               }
             }
           }
@@ -2541,17 +1957,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               },
               "application/vnd.kubernetes.protobuf": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               }
             },
@@ -2561,17 +1977,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               },
               "application/vnd.kubernetes.protobuf": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               }
             },
@@ -2581,17 +1997,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               },
               "application/vnd.kubernetes.protobuf": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               }
             },
@@ -2602,20 +2018,20 @@
           }
         },
         "tags": [
-          "autoscaling_v2"
+          "admissionregistration_v1alpha1"
         ],
         "x-kubernetes-action": "post",
         "x-kubernetes-group-version-kind": {
-          "group": "autoscaling",
-          "kind": "HorizontalPodAutoscaler",
-          "version": "v2"
+          "group": "admissionregistration.k8s.io",
+          "kind": "PolicyBinding",
+          "version": "v1alpha1"
         }
       }
     },
-    "/apis/autoscaling/v2/namespaces/{namespace}/horizontalpodautoscalers/{name}": {
+    "/apis/admissionregistration.k8s.io/v1alpha1/policybinding/{name}": {
       "delete": {
-        "description": "delete a HorizontalPodAutoscaler",
-        "operationId": "deleteAutoscalingV2NamespacedHorizontalPodAutoscaler",
+        "description": "delete a PolicyBinding",
+        "operationId": "deleteAdmissionregistrationV1alpha1PolicyBinding",
         "parameters": [
           {
             "description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
@@ -2709,34 +2125,34 @@
           }
         },
         "tags": [
-          "autoscaling_v2"
+          "admissionregistration_v1alpha1"
         ],
         "x-kubernetes-action": "delete",
         "x-kubernetes-group-version-kind": {
-          "group": "autoscaling",
-          "kind": "HorizontalPodAutoscaler",
-          "version": "v2"
+          "group": "admissionregistration.k8s.io",
+          "kind": "PolicyBinding",
+          "version": "v1alpha1"
         }
       },
       "get": {
-        "description": "read the specified HorizontalPodAutoscaler",
-        "operationId": "readAutoscalingV2NamespacedHorizontalPodAutoscaler",
+        "description": "read the specified PolicyBinding",
+        "operationId": "readAdmissionregistrationV1alpha1PolicyBinding",
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               },
               "application/vnd.kubernetes.protobuf": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               }
             },
@@ -2747,30 +2163,20 @@
           }
         },
         "tags": [
-          "autoscaling_v2"
+          "admissionregistration_v1alpha1"
         ],
         "x-kubernetes-action": "get",
         "x-kubernetes-group-version-kind": {
-          "group": "autoscaling",
-          "kind": "HorizontalPodAutoscaler",
-          "version": "v2"
+          "group": "admissionregistration.k8s.io",
+          "kind": "PolicyBinding",
+          "version": "v1alpha1"
         }
       },
       "parameters": [
         {
-          "description": "name of the HorizontalPodAutoscaler",
+          "description": "name of the PolicyBinding",
           "in": "path",
           "name": "name",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "object name and auth scope, such as for teams and projects",
-          "in": "path",
-          "name": "namespace",
           "required": true,
           "schema": {
             "type": "string",
@@ -2788,8 +2194,8 @@
         }
       ],
       "patch": {
-        "description": "partially update the specified HorizontalPodAutoscaler",
-        "operationId": "patchAutoscalingV2NamespacedHorizontalPodAutoscaler",
+        "description": "partially update the specified PolicyBinding",
+        "operationId": "patchAdmissionregistrationV1alpha1PolicyBinding",
         "parameters": [
           {
             "description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
@@ -2857,17 +2263,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               },
               "application/vnd.kubernetes.protobuf": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               }
             },
@@ -2877,17 +2283,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               },
               "application/vnd.kubernetes.protobuf": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               }
             },
@@ -2898,18 +2304,18 @@
           }
         },
         "tags": [
-          "autoscaling_v2"
+          "admissionregistration_v1alpha1"
         ],
         "x-kubernetes-action": "patch",
         "x-kubernetes-group-version-kind": {
-          "group": "autoscaling",
-          "kind": "HorizontalPodAutoscaler",
-          "version": "v2"
+          "group": "admissionregistration.k8s.io",
+          "kind": "PolicyBinding",
+          "version": "v1alpha1"
         }
       },
       "put": {
-        "description": "replace the specified HorizontalPodAutoscaler",
-        "operationId": "replaceAutoscalingV2NamespacedHorizontalPodAutoscaler",
+        "description": "replace the specified PolicyBinding",
+        "operationId": "replaceAdmissionregistrationV1alpha1PolicyBinding",
         "parameters": [
           {
             "description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
@@ -2943,7 +2349,7 @@
           "content": {
             "*/*": {
               "schema": {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
               }
             }
           }
@@ -2953,17 +2359,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               },
               "application/vnd.kubernetes.protobuf": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               }
             },
@@ -2973,17 +2379,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               },
               "application/vnd.kubernetes.protobuf": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.PolicyBinding"
                 }
               }
             },
@@ -2994,36 +2400,146 @@
           }
         },
         "tags": [
-          "autoscaling_v2"
+          "admissionregistration_v1alpha1"
         ],
         "x-kubernetes-action": "put",
         "x-kubernetes-group-version-kind": {
-          "group": "autoscaling",
-          "kind": "HorizontalPodAutoscaler",
-          "version": "v2"
+          "group": "admissionregistration.k8s.io",
+          "kind": "PolicyBinding",
+          "version": "v1alpha1"
         }
       }
     },
-    "/apis/autoscaling/v2/namespaces/{namespace}/horizontalpodautoscalers/{name}/status": {
-      "get": {
-        "description": "read status of the specified HorizontalPodAutoscaler",
-        "operationId": "readAutoscalingV2NamespacedHorizontalPodAutoscalerStatus",
+    "/apis/admissionregistration.k8s.io/v1alpha1/validatingadmissionpolicy": {
+      "delete": {
+        "description": "delete collection of ValidatingAdmissionPolicy",
+        "operationId": "deleteAdmissionregistrationV1alpha1CollectionValidatingAdmissionPolicy",
+        "parameters": [
+          {
+            "description": "The continue option should be set when retrieving more results from the server. Since this value is server defined, clients may only use the continue value from a previous query result with identical query parameters (except for the value of continue) and the server may reject a continue value it does not recognize. If the specified continue value is no longer valid whether due to expiration (generally five to fifteen minutes) or a configuration change on the server, the server will respond with a 410 ResourceExpired error together with a continue token. If the client needs a consistent list, it must restart their list without the continue field. Otherwise, the client may send another list request with the token received with the 410 error, the server will respond with a list starting from the next key, but from the latest snapshot, which is inconsistent from the previous list results - objects that are created, modified, or deleted after the first list request will be included in the response, as long as their keys are after the \"next key\".\n\nThis field is not supported when watch is true. Clients may start a watch from the last resourceVersion value returned by the server and not miss any modifications.",
+            "in": "query",
+            "name": "continue",
+            "schema": {
+              "type": "string",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+            "in": "query",
+            "name": "dryRun",
+            "schema": {
+              "type": "string",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "string",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.",
+            "in": "query",
+            "name": "gracePeriodSeconds",
+            "schema": {
+              "type": "integer",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "limit is a maximum number of responses to return for a list call. If more items exist, the server will set the `continue` field on the list metadata to a value that can be used with the same initial query to retrieve the next set of results. Setting a limit may return fewer than the requested amount of items (up to zero items) in the event all requested objects are filtered out and clients should only use the presence of the continue field to determine whether more results are available. Servers may choose not to support the limit argument and will return all of the available results. If limit is specified and the continue field is empty, clients may assume that no more results are available. This field is not supported if watch is true.\n\nThe server guarantees that the objects returned when using continue will be identical to issuing a single list call without a limit - that is, no objects created, modified, or deleted after the first request is issued will be included in any subsequent continued requests. This is sometimes referred to as a consistent snapshot, and ensures that a client that is using limit to receive smaller chunks of a very large result can ensure they see all possible objects. If objects are updated during a chunked list the version of the object that was present at the time the first list result was calculated is returned.",
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "Deprecated: please use the PropagationPolicy, this field will be deprecated in 1.7. Should the dependent objects be orphaned. If true/false, the \"orphan\" finalizer will be added to/removed from the object's finalizers list. Either this field or PropagationPolicy may be set, but not both.",
+            "in": "query",
+            "name": "orphanDependents",
+            "schema": {
+              "type": "boolean",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "Whether and how garbage collection will be performed. Either this field or OrphanDependents may be set, but not both. The default policy is decided by the existing finalizer set in the metadata.finalizers and the resource-specific default policy. Acceptable values are: 'Orphan' - orphan the dependents; 'Background' - allow the garbage collector to delete the dependents in the background; 'Foreground' - a cascading policy that deletes all dependents in the foreground.",
+            "in": "query",
+            "name": "propagationPolicy",
+            "schema": {
+              "type": "string",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "resourceVersion sets a constraint on what resource versions a request may be served from. See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+            "in": "query",
+            "name": "resourceVersion",
+            "schema": {
+              "type": "string",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "resourceVersionMatch determines how resourceVersion is applied to list calls. It is highly recommended that resourceVersionMatch be set for list calls where resourceVersion is set See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+            "in": "query",
+            "name": "resourceVersionMatch",
+            "schema": {
+              "type": "string",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "Timeout for the list/watch call. This limits the duration of the call, regardless of any activity or inactivity.",
+            "in": "query",
+            "name": "timeoutSeconds",
+            "schema": {
+              "type": "integer",
+              "uniqueItems": true
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.DeleteOptions"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
                 }
               },
               "application/vnd.kubernetes.protobuf": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
                 }
               }
             },
@@ -3034,30 +2550,423 @@
           }
         },
         "tags": [
-          "autoscaling_v2"
+          "admissionregistration_v1alpha1"
         ],
-        "x-kubernetes-action": "get",
+        "x-kubernetes-action": "deletecollection",
         "x-kubernetes-group-version-kind": {
-          "group": "autoscaling",
-          "kind": "HorizontalPodAutoscaler",
-          "version": "v2"
+          "group": "admissionregistration.k8s.io",
+          "kind": "ValidatingAdmissionPolicy",
+          "version": "v1alpha1"
+        }
+      },
+      "get": {
+        "description": "list or watch objects of kind ValidatingAdmissionPolicy",
+        "operationId": "listAdmissionregistrationV1alpha1ValidatingAdmissionPolicy",
+        "parameters": [
+          {
+            "description": "allowWatchBookmarks requests watch events with type \"BOOKMARK\". Servers that do not implement bookmarks may ignore this flag and bookmarks are sent at the server's discretion. Clients should not assume bookmarks are returned at any specific interval, nor may they assume the server will send any BOOKMARK event during a session. If this is not a watch, this field is ignored.",
+            "in": "query",
+            "name": "allowWatchBookmarks",
+            "schema": {
+              "type": "boolean",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "The continue option should be set when retrieving more results from the server. Since this value is server defined, clients may only use the continue value from a previous query result with identical query parameters (except for the value of continue) and the server may reject a continue value it does not recognize. If the specified continue value is no longer valid whether due to expiration (generally five to fifteen minutes) or a configuration change on the server, the server will respond with a 410 ResourceExpired error together with a continue token. If the client needs a consistent list, it must restart their list without the continue field. Otherwise, the client may send another list request with the token received with the 410 error, the server will respond with a list starting from the next key, but from the latest snapshot, which is inconsistent from the previous list results - objects that are created, modified, or deleted after the first list request will be included in the response, as long as their keys are after the \"next key\".\n\nThis field is not supported when watch is true. Clients may start a watch from the last resourceVersion value returned by the server and not miss any modifications.",
+            "in": "query",
+            "name": "continue",
+            "schema": {
+              "type": "string",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+            "in": "query",
+            "name": "fieldSelector",
+            "schema": {
+              "type": "string",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "limit is a maximum number of responses to return for a list call. If more items exist, the server will set the `continue` field on the list metadata to a value that can be used with the same initial query to retrieve the next set of results. Setting a limit may return fewer than the requested amount of items (up to zero items) in the event all requested objects are filtered out and clients should only use the presence of the continue field to determine whether more results are available. Servers may choose not to support the limit argument and will return all of the available results. If limit is specified and the continue field is empty, clients may assume that no more results are available. This field is not supported if watch is true.\n\nThe server guarantees that the objects returned when using continue will be identical to issuing a single list call without a limit - that is, no objects created, modified, or deleted after the first request is issued will be included in any subsequent continued requests. This is sometimes referred to as a consistent snapshot, and ensures that a client that is using limit to receive smaller chunks of a very large result can ensure they see all possible objects. If objects are updated during a chunked list the version of the object that was present at the time the first list result was calculated is returned.",
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "resourceVersion sets a constraint on what resource versions a request may be served from. See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+            "in": "query",
+            "name": "resourceVersion",
+            "schema": {
+              "type": "string",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "resourceVersionMatch determines how resourceVersion is applied to list calls. It is highly recommended that resourceVersionMatch be set for list calls where resourceVersion is set See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+            "in": "query",
+            "name": "resourceVersionMatch",
+            "schema": {
+              "type": "string",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "Timeout for the list/watch call. This limits the duration of the call, regardless of any activity or inactivity.",
+            "in": "query",
+            "name": "timeoutSeconds",
+            "schema": {
+              "type": "integer",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+            "in": "query",
+            "name": "watch",
+            "schema": {
+              "type": "boolean",
+              "uniqueItems": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicyList"
+                }
+              },
+              "application/json;stream=watch": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicyList"
+                }
+              },
+              "application/vnd.kubernetes.protobuf": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicyList"
+                }
+              },
+              "application/vnd.kubernetes.protobuf;stream=watch": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicyList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicyList"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "admissionregistration_v1alpha1"
+        ],
+        "x-kubernetes-action": "list",
+        "x-kubernetes-group-version-kind": {
+          "group": "admissionregistration.k8s.io",
+          "kind": "ValidatingAdmissionPolicy",
+          "version": "v1alpha1"
         }
       },
       "parameters": [
         {
-          "description": "name of the HorizontalPodAutoscaler",
-          "in": "path",
-          "name": "name",
-          "required": true,
+          "description": "If 'true', then the output is pretty printed.",
+          "in": "query",
+          "name": "pretty",
           "schema": {
             "type": "string",
             "uniqueItems": true
           }
+        }
+      ],
+      "post": {
+        "description": "create a ValidatingAdmissionPolicy",
+        "operationId": "createAdmissionregistrationV1alpha1ValidatingAdmissionPolicy",
+        "parameters": [
+          {
+            "description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+            "in": "query",
+            "name": "dryRun",
+            "schema": {
+              "type": "string",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "fieldManager is a name associated with the actor or entity that is making these changes. The value must be less than or 128 characters long, and only contain printable characters, as defined by https://golang.org/pkg/unicode/#IsPrint.",
+            "in": "query",
+            "name": "fieldManager",
+            "schema": {
+              "type": "string",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields, provided that the `ServerSideFieldValidation` feature gate is also enabled. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23 and is the default behavior when the `ServerSideFieldValidation` feature gate is disabled. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default when the `ServerSideFieldValidation` feature gate is enabled. - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+            "in": "query",
+            "name": "fieldValidation",
+            "schema": {
+              "type": "string",
+              "uniqueItems": true
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
+              }
+            }
+          }
         },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
+                }
+              },
+              "application/vnd.kubernetes.protobuf": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
+                }
+              },
+              "application/vnd.kubernetes.protobuf": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
+                }
+              },
+              "application/vnd.kubernetes.protobuf": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
+                }
+              }
+            },
+            "description": "Accepted"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "admissionregistration_v1alpha1"
+        ],
+        "x-kubernetes-action": "post",
+        "x-kubernetes-group-version-kind": {
+          "group": "admissionregistration.k8s.io",
+          "kind": "ValidatingAdmissionPolicy",
+          "version": "v1alpha1"
+        }
+      }
+    },
+    "/apis/admissionregistration.k8s.io/v1alpha1/validatingadmissionpolicy/{name}": {
+      "delete": {
+        "description": "delete a ValidatingAdmissionPolicy",
+        "operationId": "deleteAdmissionregistrationV1alpha1ValidatingAdmissionPolicy",
+        "parameters": [
+          {
+            "description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+            "in": "query",
+            "name": "dryRun",
+            "schema": {
+              "type": "string",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.",
+            "in": "query",
+            "name": "gracePeriodSeconds",
+            "schema": {
+              "type": "integer",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "Deprecated: please use the PropagationPolicy, this field will be deprecated in 1.7. Should the dependent objects be orphaned. If true/false, the \"orphan\" finalizer will be added to/removed from the object's finalizers list. Either this field or PropagationPolicy may be set, but not both.",
+            "in": "query",
+            "name": "orphanDependents",
+            "schema": {
+              "type": "boolean",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "Whether and how garbage collection will be performed. Either this field or OrphanDependents may be set, but not both. The default policy is decided by the existing finalizer set in the metadata.finalizers and the resource-specific default policy. Acceptable values are: 'Orphan' - orphan the dependents; 'Background' - allow the garbage collector to delete the dependents in the background; 'Foreground' - a cascading policy that deletes all dependents in the foreground.",
+            "in": "query",
+            "name": "propagationPolicy",
+            "schema": {
+              "type": "string",
+              "uniqueItems": true
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.DeleteOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+                }
+              },
+              "application/vnd.kubernetes.protobuf": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+                }
+              },
+              "application/vnd.kubernetes.protobuf": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+                }
+              }
+            },
+            "description": "Accepted"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "admissionregistration_v1alpha1"
+        ],
+        "x-kubernetes-action": "delete",
+        "x-kubernetes-group-version-kind": {
+          "group": "admissionregistration.k8s.io",
+          "kind": "ValidatingAdmissionPolicy",
+          "version": "v1alpha1"
+        }
+      },
+      "get": {
+        "description": "read the specified ValidatingAdmissionPolicy",
+        "operationId": "readAdmissionregistrationV1alpha1ValidatingAdmissionPolicy",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
+                }
+              },
+              "application/vnd.kubernetes.protobuf": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "admissionregistration_v1alpha1"
+        ],
+        "x-kubernetes-action": "get",
+        "x-kubernetes-group-version-kind": {
+          "group": "admissionregistration.k8s.io",
+          "kind": "ValidatingAdmissionPolicy",
+          "version": "v1alpha1"
+        }
+      },
+      "parameters": [
         {
-          "description": "object name and auth scope, such as for teams and projects",
+          "description": "name of the ValidatingAdmissionPolicy",
           "in": "path",
-          "name": "namespace",
+          "name": "name",
           "required": true,
           "schema": {
             "type": "string",
@@ -3075,8 +2984,8 @@
         }
       ],
       "patch": {
-        "description": "partially update status of the specified HorizontalPodAutoscaler",
-        "operationId": "patchAutoscalingV2NamespacedHorizontalPodAutoscalerStatus",
+        "description": "partially update the specified ValidatingAdmissionPolicy",
+        "operationId": "patchAdmissionregistrationV1alpha1ValidatingAdmissionPolicy",
         "parameters": [
           {
             "description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
@@ -3144,17 +3053,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
                 }
               },
               "application/vnd.kubernetes.protobuf": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
                 }
               }
             },
@@ -3164,17 +3073,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
                 }
               },
               "application/vnd.kubernetes.protobuf": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
                 }
               }
             },
@@ -3185,18 +3094,18 @@
           }
         },
         "tags": [
-          "autoscaling_v2"
+          "admissionregistration_v1alpha1"
         ],
         "x-kubernetes-action": "patch",
         "x-kubernetes-group-version-kind": {
-          "group": "autoscaling",
-          "kind": "HorizontalPodAutoscaler",
-          "version": "v2"
+          "group": "admissionregistration.k8s.io",
+          "kind": "ValidatingAdmissionPolicy",
+          "version": "v1alpha1"
         }
       },
       "put": {
-        "description": "replace status of the specified HorizontalPodAutoscaler",
-        "operationId": "replaceAutoscalingV2NamespacedHorizontalPodAutoscalerStatus",
+        "description": "replace the specified ValidatingAdmissionPolicy",
+        "operationId": "replaceAdmissionregistrationV1alpha1ValidatingAdmissionPolicy",
         "parameters": [
           {
             "description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
@@ -3230,7 +3139,7 @@
           "content": {
             "*/*": {
               "schema": {
-                "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
               }
             }
           }
@@ -3240,17 +3149,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
                 }
               },
               "application/vnd.kubernetes.protobuf": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
                 }
               }
             },
@@ -3260,17 +3169,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
                 }
               },
               "application/vnd.kubernetes.protobuf": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "#/components/schemas/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+                  "$ref": "#/components/schemas/io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy"
                 }
               }
             },
@@ -3281,20 +3190,20 @@
           }
         },
         "tags": [
-          "autoscaling_v2"
+          "admissionregistration_v1alpha1"
         ],
         "x-kubernetes-action": "put",
         "x-kubernetes-group-version-kind": {
-          "group": "autoscaling",
-          "kind": "HorizontalPodAutoscaler",
-          "version": "v2"
+          "group": "admissionregistration.k8s.io",
+          "kind": "ValidatingAdmissionPolicy",
+          "version": "v1alpha1"
         }
       }
     },
-    "/apis/autoscaling/v2/watch/horizontalpodautoscalers": {
+    "/apis/admissionregistration.k8s.io/v1alpha1/watch/policybinding": {
       "get": {
-        "description": "watch individual changes to a list of HorizontalPodAutoscaler. deprecated: use the 'watch' parameter with a list operation instead.",
-        "operationId": "watchAutoscalingV2HorizontalPodAutoscalerListForAllNamespaces",
+        "description": "watch individual changes to a list of PolicyBinding. deprecated: use the 'watch' parameter with a list operation instead.",
+        "operationId": "watchAdmissionregistrationV1alpha1PolicyBindingList",
         "responses": {
           "200": {
             "content": {
@@ -3331,13 +3240,13 @@
           }
         },
         "tags": [
-          "autoscaling_v2"
+          "admissionregistration_v1alpha1"
         ],
         "x-kubernetes-action": "watchlist",
         "x-kubernetes-group-version-kind": {
-          "group": "autoscaling",
-          "kind": "HorizontalPodAutoscaler",
-          "version": "v2"
+          "group": "admissionregistration.k8s.io",
+          "kind": "PolicyBinding",
+          "version": "v1alpha1"
         }
       },
       "parameters": [
@@ -3433,10 +3342,10 @@
         }
       ]
     },
-    "/apis/autoscaling/v2/watch/namespaces/{namespace}/horizontalpodautoscalers": {
+    "/apis/admissionregistration.k8s.io/v1alpha1/watch/policybinding/{name}": {
       "get": {
-        "description": "watch individual changes to a list of HorizontalPodAutoscaler. deprecated: use the 'watch' parameter with a list operation instead.",
-        "operationId": "watchAutoscalingV2NamespacedHorizontalPodAutoscalerList",
+        "description": "watch changes to an object of kind PolicyBinding. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.",
+        "operationId": "watchAdmissionregistrationV1alpha1PolicyBinding",
         "responses": {
           "200": {
             "content": {
@@ -3473,165 +3382,13 @@
           }
         },
         "tags": [
-          "autoscaling_v2"
-        ],
-        "x-kubernetes-action": "watchlist",
-        "x-kubernetes-group-version-kind": {
-          "group": "autoscaling",
-          "kind": "HorizontalPodAutoscaler",
-          "version": "v2"
-        }
-      },
-      "parameters": [
-        {
-          "description": "allowWatchBookmarks requests watch events with type \"BOOKMARK\". Servers that do not implement bookmarks may ignore this flag and bookmarks are sent at the server's discretion. Clients should not assume bookmarks are returned at any specific interval, nor may they assume the server will send any BOOKMARK event during a session. If this is not a watch, this field is ignored.",
-          "in": "query",
-          "name": "allowWatchBookmarks",
-          "schema": {
-            "type": "boolean",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "The continue option should be set when retrieving more results from the server. Since this value is server defined, clients may only use the continue value from a previous query result with identical query parameters (except for the value of continue) and the server may reject a continue value it does not recognize. If the specified continue value is no longer valid whether due to expiration (generally five to fifteen minutes) or a configuration change on the server, the server will respond with a 410 ResourceExpired error together with a continue token. If the client needs a consistent list, it must restart their list without the continue field. Otherwise, the client may send another list request with the token received with the 410 error, the server will respond with a list starting from the next key, but from the latest snapshot, which is inconsistent from the previous list results - objects that are created, modified, or deleted after the first list request will be included in the response, as long as their keys are after the \"next key\".\n\nThis field is not supported when watch is true. Clients may start a watch from the last resourceVersion value returned by the server and not miss any modifications.",
-          "in": "query",
-          "name": "continue",
-          "schema": {
-            "type": "string",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
-          "in": "query",
-          "name": "fieldSelector",
-          "schema": {
-            "type": "string",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
-          "in": "query",
-          "name": "labelSelector",
-          "schema": {
-            "type": "string",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "limit is a maximum number of responses to return for a list call. If more items exist, the server will set the `continue` field on the list metadata to a value that can be used with the same initial query to retrieve the next set of results. Setting a limit may return fewer than the requested amount of items (up to zero items) in the event all requested objects are filtered out and clients should only use the presence of the continue field to determine whether more results are available. Servers may choose not to support the limit argument and will return all of the available results. If limit is specified and the continue field is empty, clients may assume that no more results are available. This field is not supported if watch is true.\n\nThe server guarantees that the objects returned when using continue will be identical to issuing a single list call without a limit - that is, no objects created, modified, or deleted after the first request is issued will be included in any subsequent continued requests. This is sometimes referred to as a consistent snapshot, and ensures that a client that is using limit to receive smaller chunks of a very large result can ensure they see all possible objects. If objects are updated during a chunked list the version of the object that was present at the time the first list result was calculated is returned.",
-          "in": "query",
-          "name": "limit",
-          "schema": {
-            "type": "integer",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "object name and auth scope, such as for teams and projects",
-          "in": "path",
-          "name": "namespace",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "If 'true', then the output is pretty printed.",
-          "in": "query",
-          "name": "pretty",
-          "schema": {
-            "type": "string",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "resourceVersion sets a constraint on what resource versions a request may be served from. See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
-          "in": "query",
-          "name": "resourceVersion",
-          "schema": {
-            "type": "string",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "resourceVersionMatch determines how resourceVersion is applied to list calls. It is highly recommended that resourceVersionMatch be set for list calls where resourceVersion is set See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
-          "in": "query",
-          "name": "resourceVersionMatch",
-          "schema": {
-            "type": "string",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "Timeout for the list/watch call. This limits the duration of the call, regardless of any activity or inactivity.",
-          "in": "query",
-          "name": "timeoutSeconds",
-          "schema": {
-            "type": "integer",
-            "uniqueItems": true
-          }
-        },
-        {
-          "description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
-          "in": "query",
-          "name": "watch",
-          "schema": {
-            "type": "boolean",
-            "uniqueItems": true
-          }
-        }
-      ]
-    },
-    "/apis/autoscaling/v2/watch/namespaces/{namespace}/horizontalpodautoscalers/{name}": {
-      "get": {
-        "description": "watch changes to an object of kind HorizontalPodAutoscaler. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.",
-        "operationId": "watchAutoscalingV2NamespacedHorizontalPodAutoscaler",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-                }
-              },
-              "application/json;stream=watch": {
-                "schema": {
-                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-                }
-              },
-              "application/vnd.kubernetes.protobuf": {
-                "schema": {
-                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-                }
-              },
-              "application/vnd.kubernetes.protobuf;stream=watch": {
-                "schema": {
-                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-                }
-              },
-              "application/yaml": {
-                "schema": {
-                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "tags": [
-          "autoscaling_v2"
+          "admissionregistration_v1alpha1"
         ],
         "x-kubernetes-action": "watch",
         "x-kubernetes-group-version-kind": {
-          "group": "autoscaling",
-          "kind": "HorizontalPodAutoscaler",
-          "version": "v2"
+          "group": "admissionregistration.k8s.io",
+          "kind": "PolicyBinding",
+          "version": "v1alpha1"
         }
       },
       "parameters": [
@@ -3681,7 +3438,7 @@
           }
         },
         {
-          "description": "name of the HorizontalPodAutoscaler",
+          "description": "name of the PolicyBinding",
           "in": "path",
           "name": "name",
           "required": true,
@@ -3691,9 +3448,293 @@
           }
         },
         {
-          "description": "object name and auth scope, such as for teams and projects",
+          "description": "If 'true', then the output is pretty printed.",
+          "in": "query",
+          "name": "pretty",
+          "schema": {
+            "type": "string",
+            "uniqueItems": true
+          }
+        },
+        {
+          "description": "resourceVersion sets a constraint on what resource versions a request may be served from. See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+          "in": "query",
+          "name": "resourceVersion",
+          "schema": {
+            "type": "string",
+            "uniqueItems": true
+          }
+        },
+        {
+          "description": "resourceVersionMatch determines how resourceVersion is applied to list calls. It is highly recommended that resourceVersionMatch be set for list calls where resourceVersion is set See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+          "in": "query",
+          "name": "resourceVersionMatch",
+          "schema": {
+            "type": "string",
+            "uniqueItems": true
+          }
+        },
+        {
+          "description": "Timeout for the list/watch call. This limits the duration of the call, regardless of any activity or inactivity.",
+          "in": "query",
+          "name": "timeoutSeconds",
+          "schema": {
+            "type": "integer",
+            "uniqueItems": true
+          }
+        },
+        {
+          "description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+          "in": "query",
+          "name": "watch",
+          "schema": {
+            "type": "boolean",
+            "uniqueItems": true
+          }
+        }
+      ]
+    },
+    "/apis/admissionregistration.k8s.io/v1alpha1/watch/validatingadmissionpolicy": {
+      "get": {
+        "description": "watch individual changes to a list of ValidatingAdmissionPolicy. deprecated: use the 'watch' parameter with a list operation instead.",
+        "operationId": "watchAdmissionregistrationV1alpha1ValidatingAdmissionPolicyList",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+                }
+              },
+              "application/json;stream=watch": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+                }
+              },
+              "application/vnd.kubernetes.protobuf": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+                }
+              },
+              "application/vnd.kubernetes.protobuf;stream=watch": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "admissionregistration_v1alpha1"
+        ],
+        "x-kubernetes-action": "watchlist",
+        "x-kubernetes-group-version-kind": {
+          "group": "admissionregistration.k8s.io",
+          "kind": "ValidatingAdmissionPolicy",
+          "version": "v1alpha1"
+        }
+      },
+      "parameters": [
+        {
+          "description": "allowWatchBookmarks requests watch events with type \"BOOKMARK\". Servers that do not implement bookmarks may ignore this flag and bookmarks are sent at the server's discretion. Clients should not assume bookmarks are returned at any specific interval, nor may they assume the server will send any BOOKMARK event during a session. If this is not a watch, this field is ignored.",
+          "in": "query",
+          "name": "allowWatchBookmarks",
+          "schema": {
+            "type": "boolean",
+            "uniqueItems": true
+          }
+        },
+        {
+          "description": "The continue option should be set when retrieving more results from the server. Since this value is server defined, clients may only use the continue value from a previous query result with identical query parameters (except for the value of continue) and the server may reject a continue value it does not recognize. If the specified continue value is no longer valid whether due to expiration (generally five to fifteen minutes) or a configuration change on the server, the server will respond with a 410 ResourceExpired error together with a continue token. If the client needs a consistent list, it must restart their list without the continue field. Otherwise, the client may send another list request with the token received with the 410 error, the server will respond with a list starting from the next key, but from the latest snapshot, which is inconsistent from the previous list results - objects that are created, modified, or deleted after the first list request will be included in the response, as long as their keys are after the \"next key\".\n\nThis field is not supported when watch is true. Clients may start a watch from the last resourceVersion value returned by the server and not miss any modifications.",
+          "in": "query",
+          "name": "continue",
+          "schema": {
+            "type": "string",
+            "uniqueItems": true
+          }
+        },
+        {
+          "description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+          "in": "query",
+          "name": "fieldSelector",
+          "schema": {
+            "type": "string",
+            "uniqueItems": true
+          }
+        },
+        {
+          "description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+          "in": "query",
+          "name": "labelSelector",
+          "schema": {
+            "type": "string",
+            "uniqueItems": true
+          }
+        },
+        {
+          "description": "limit is a maximum number of responses to return for a list call. If more items exist, the server will set the `continue` field on the list metadata to a value that can be used with the same initial query to retrieve the next set of results. Setting a limit may return fewer than the requested amount of items (up to zero items) in the event all requested objects are filtered out and clients should only use the presence of the continue field to determine whether more results are available. Servers may choose not to support the limit argument and will return all of the available results. If limit is specified and the continue field is empty, clients may assume that no more results are available. This field is not supported if watch is true.\n\nThe server guarantees that the objects returned when using continue will be identical to issuing a single list call without a limit - that is, no objects created, modified, or deleted after the first request is issued will be included in any subsequent continued requests. This is sometimes referred to as a consistent snapshot, and ensures that a client that is using limit to receive smaller chunks of a very large result can ensure they see all possible objects. If objects are updated during a chunked list the version of the object that was present at the time the first list result was calculated is returned.",
+          "in": "query",
+          "name": "limit",
+          "schema": {
+            "type": "integer",
+            "uniqueItems": true
+          }
+        },
+        {
+          "description": "If 'true', then the output is pretty printed.",
+          "in": "query",
+          "name": "pretty",
+          "schema": {
+            "type": "string",
+            "uniqueItems": true
+          }
+        },
+        {
+          "description": "resourceVersion sets a constraint on what resource versions a request may be served from. See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+          "in": "query",
+          "name": "resourceVersion",
+          "schema": {
+            "type": "string",
+            "uniqueItems": true
+          }
+        },
+        {
+          "description": "resourceVersionMatch determines how resourceVersion is applied to list calls. It is highly recommended that resourceVersionMatch be set for list calls where resourceVersion is set See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for details.\n\nDefaults to unset",
+          "in": "query",
+          "name": "resourceVersionMatch",
+          "schema": {
+            "type": "string",
+            "uniqueItems": true
+          }
+        },
+        {
+          "description": "Timeout for the list/watch call. This limits the duration of the call, regardless of any activity or inactivity.",
+          "in": "query",
+          "name": "timeoutSeconds",
+          "schema": {
+            "type": "integer",
+            "uniqueItems": true
+          }
+        },
+        {
+          "description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+          "in": "query",
+          "name": "watch",
+          "schema": {
+            "type": "boolean",
+            "uniqueItems": true
+          }
+        }
+      ]
+    },
+    "/apis/admissionregistration.k8s.io/v1alpha1/watch/validatingadmissionpolicy/{name}": {
+      "get": {
+        "description": "watch changes to an object of kind ValidatingAdmissionPolicy. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.",
+        "operationId": "watchAdmissionregistrationV1alpha1ValidatingAdmissionPolicy",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+                }
+              },
+              "application/json;stream=watch": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+                }
+              },
+              "application/vnd.kubernetes.protobuf": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+                }
+              },
+              "application/vnd.kubernetes.protobuf;stream=watch": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "admissionregistration_v1alpha1"
+        ],
+        "x-kubernetes-action": "watch",
+        "x-kubernetes-group-version-kind": {
+          "group": "admissionregistration.k8s.io",
+          "kind": "ValidatingAdmissionPolicy",
+          "version": "v1alpha1"
+        }
+      },
+      "parameters": [
+        {
+          "description": "allowWatchBookmarks requests watch events with type \"BOOKMARK\". Servers that do not implement bookmarks may ignore this flag and bookmarks are sent at the server's discretion. Clients should not assume bookmarks are returned at any specific interval, nor may they assume the server will send any BOOKMARK event during a session. If this is not a watch, this field is ignored.",
+          "in": "query",
+          "name": "allowWatchBookmarks",
+          "schema": {
+            "type": "boolean",
+            "uniqueItems": true
+          }
+        },
+        {
+          "description": "The continue option should be set when retrieving more results from the server. Since this value is server defined, clients may only use the continue value from a previous query result with identical query parameters (except for the value of continue) and the server may reject a continue value it does not recognize. If the specified continue value is no longer valid whether due to expiration (generally five to fifteen minutes) or a configuration change on the server, the server will respond with a 410 ResourceExpired error together with a continue token. If the client needs a consistent list, it must restart their list without the continue field. Otherwise, the client may send another list request with the token received with the 410 error, the server will respond with a list starting from the next key, but from the latest snapshot, which is inconsistent from the previous list results - objects that are created, modified, or deleted after the first list request will be included in the response, as long as their keys are after the \"next key\".\n\nThis field is not supported when watch is true. Clients may start a watch from the last resourceVersion value returned by the server and not miss any modifications.",
+          "in": "query",
+          "name": "continue",
+          "schema": {
+            "type": "string",
+            "uniqueItems": true
+          }
+        },
+        {
+          "description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+          "in": "query",
+          "name": "fieldSelector",
+          "schema": {
+            "type": "string",
+            "uniqueItems": true
+          }
+        },
+        {
+          "description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+          "in": "query",
+          "name": "labelSelector",
+          "schema": {
+            "type": "string",
+            "uniqueItems": true
+          }
+        },
+        {
+          "description": "limit is a maximum number of responses to return for a list call. If more items exist, the server will set the `continue` field on the list metadata to a value that can be used with the same initial query to retrieve the next set of results. Setting a limit may return fewer than the requested amount of items (up to zero items) in the event all requested objects are filtered out and clients should only use the presence of the continue field to determine whether more results are available. Servers may choose not to support the limit argument and will return all of the available results. If limit is specified and the continue field is empty, clients may assume that no more results are available. This field is not supported if watch is true.\n\nThe server guarantees that the objects returned when using continue will be identical to issuing a single list call without a limit - that is, no objects created, modified, or deleted after the first request is issued will be included in any subsequent continued requests. This is sometimes referred to as a consistent snapshot, and ensures that a client that is using limit to receive smaller chunks of a very large result can ensure they see all possible objects. If objects are updated during a chunked list the version of the object that was present at the time the first list result was calculated is returned.",
+          "in": "query",
+          "name": "limit",
+          "schema": {
+            "type": "integer",
+            "uniqueItems": true
+          }
+        },
+        {
+          "description": "name of the ValidatingAdmissionPolicy",
           "in": "path",
-          "name": "namespace",
+          "name": "name",
           "required": true,
           "schema": {
             "type": "string",
