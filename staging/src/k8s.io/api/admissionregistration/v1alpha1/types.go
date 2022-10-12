@@ -102,6 +102,7 @@ const (
 // +genclient
 // +genclient:nonNamespaced
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +k8s:prerelease-lifecycle-gen:introduced=1.26
 
 // ValidatingAdmissionPolicy describes the definition of an admission validation policy that accepts or rejects and object without changing it.
 type ValidatingAdmissionPolicy struct {
@@ -115,6 +116,7 @@ type ValidatingAdmissionPolicy struct {
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +k8s:prerelease-lifecycle-gen:introduced=1.26
 
 // ValidatingAdmissionPolicyList is a list of ValidatingAdmissionPolicy.
 type ValidatingAdmissionPolicyList struct {
@@ -242,6 +244,7 @@ type Validation struct {
 // +genclient
 // +genclient:nonNamespaced
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +k8s:prerelease-lifecycle-gen:introduced=1.26
 
 // PolicyBinding binds the ValidatingAdmissionPolicy with paramerized resources.
 // PolicyBinding and parameter CRDs together define how cluster administrators configure policies for clusters.
@@ -256,6 +259,7 @@ type PolicyBinding struct {
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +k8s:prerelease-lifecycle-gen:introduced=1.26
 
 // PolicyBindingList is a list of PolicyBinding.
 type PolicyBindingList struct {
