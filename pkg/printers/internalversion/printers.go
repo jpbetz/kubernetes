@@ -553,6 +553,22 @@ func AddHandlers(h printers.PrintHandler) {
 	h.TableHandler(validatingWebhookColumnDefinitions, printValidatingWebhook)
 	h.TableHandler(validatingWebhookColumnDefinitions, printValidatingWebhookList)
 
+	validatingAdmissionPolicy := []metav1.TableColumnDefinition{
+		{Name: "Name", Type: "string", Format: "name", Description: metav1.ObjectMeta{}.SwaggerDoc()["name"]},
+		{Name: "Validations", Type: "integer", Description: "Validations indicates the number of validation rules defined in this configuration"},
+		{Name: "Age", Type: "string", Description: metav1.ObjectMeta{}.SwaggerDoc()["creationTimestamp"]},
+	}
+	h.TableHandler(validatingAdmissionPolicy, printValidatingAdmissionPolicy)
+	h.TableHandler(validatingAdmissionPolicy, printValidatingAdmissionPolicyList)
+
+	policyBinding := []metav1.TableColumnDefinition{
+		{Name: "Name", Type: "string", Format: "name", Description: metav1.ObjectMeta{}.SwaggerDoc()["name"]},
+		{Name: "Policy", Type: "string", Description: "Policy indicates the policy definition which the policy binding binded to"},
+		{Name: "Age", Type: "string", Description: metav1.ObjectMeta{}.SwaggerDoc()["creationTimestamp"]},
+	}
+	h.TableHandler(policyBinding, printPolicyBinding)
+	h.TableHandler(policyBinding, printPolicyBindingList)
+
 	flowSchemaColumnDefinitions := []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: metav1.ObjectMeta{}.SwaggerDoc()["name"]},
 		{Name: "PriorityLevel", Type: "string", Description: flowcontrolv1beta3.PriorityLevelConfigurationReference{}.SwaggerDoc()["name"]},
@@ -1522,6 +1538,46 @@ func printValidatingWebhookList(list *admissionregistration.ValidatingWebhookCon
 	rows := make([]metav1.TableRow, 0, len(list.Items))
 	for i := range list.Items {
 		r, err := printValidatingWebhook(&list.Items[i], options)
+		if err != nil {
+			return nil, err
+		}
+		rows = append(rows, r...)
+	}
+	return rows, nil
+}
+
+func printValidatingAdmissionPolicy(obj *admissionregistration.ValidatingAdmissionPolicy, options printers.GenerateOptions) ([]metav1.TableRow, error) {
+	row := metav1.TableRow{
+		Object: runtime.RawExtension{Object: obj},
+	}
+	row.Cells = append(row.Cells, obj.Name, int64(len(obj.Spec.Validations)), translateTimestampSince(obj.CreationTimestamp))
+	return []metav1.TableRow{row}, nil
+}
+
+func printValidatingAdmissionPolicyList(list *admissionregistration.ValidatingAdmissionPolicyList, options printers.GenerateOptions) ([]metav1.TableRow, error) {
+	rows := make([]metav1.TableRow, 0, len(list.Items))
+	for i := range list.Items {
+		r, err := printValidatingAdmissionPolicy(&list.Items[i], options)
+		if err != nil {
+			return nil, err
+		}
+		rows = append(rows, r...)
+	}
+	return rows, nil
+}
+
+func printPolicyBinding(obj *admissionregistration.PolicyBinding, options printers.GenerateOptions) ([]metav1.TableRow, error) {
+	row := metav1.TableRow{
+		Object: runtime.RawExtension{Object: obj},
+	}
+	row.Cells = append(row.Cells, obj.Name, obj.Spec.Policy, translateTimestampSince(obj.CreationTimestamp))
+	return []metav1.TableRow{row}, nil
+}
+
+func printPolicyBindingList(list *admissionregistration.PolicyBindingList, options printers.GenerateOptions) ([]metav1.TableRow, error) {
+	rows := make([]metav1.TableRow, 0, len(list.Items))
+	for i := range list.Items {
+		r, err := printPolicyBinding(&list.Items[i], options)
 		if err != nil {
 			return nil, err
 		}
