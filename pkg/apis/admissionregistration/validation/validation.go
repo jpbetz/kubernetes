@@ -18,15 +18,18 @@ package validation
 
 import (
 	"fmt"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"regexp"
 	"strings"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	genericvalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	utilvalidation "k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	plugincel "k8s.io/apiserver/pkg/admission/plugin/cel"
+	"k8s.io/apiserver/pkg/cel"
 	"k8s.io/apiserver/pkg/util/webhook"
 	"k8s.io/kubernetes/pkg/apis/admissionregistration"
 	admissionregistrationv1 "k8s.io/kubernetes/pkg/apis/admissionregistration/v1"
@@ -570,7 +573,7 @@ func validateValidatingAdmissionPolicySpec(spec *admissionregistration.Validatin
 		allErrors = append(allErrors, field.Required(fldPath.Child("validations"), ""))
 	} else {
 		for i, validation := range spec.Validations {
-			allErrors = append(allErrors, validateValidation(&validation, fldPath.Child("validations").Index(i))...)
+			allErrors = append(allErrors, validateValidation(&validation, spec.ParamSource, fldPath.Child("validations").Index(i))...)
 		}
 	}
 
@@ -667,13 +670,28 @@ func validateMatchResources(mc *admissionregistration.MatchResources, fldPath *f
 	return allErrors
 }
 
-func validateValidation(v *admissionregistration.Validation, fldPath *field.Path) field.ErrorList {
+func validateValidation(v *admissionregistration.Validation, paramKind *admissionregistration.ParamSource, fldPath *field.Path) field.ErrorList {
 	var allErrors field.ErrorList
 	trimmedExpression := strings.TrimSpace(v.Expression)
 	trimmedMsg := strings.TrimSpace(v.Message)
 	if len(trimmedExpression) == 0 {
 		allErrors = append(allErrors, field.Required(fldPath.Child("expression"), "expression is not specified"))
-	} else if len(v.Message) > 0 && len(trimmedMsg) == 0 {
+	} else {
+		result := plugincel.CompileValidatingPolicyExpression(trimmedExpression, paramKind != nil)
+		if result.Error != nil {
+			switch result.Error.Type {
+			case cel.ErrorTypeRequired:
+				allErrors = append(allErrors, field.Required(fldPath.Child("expression"), result.Error.Detail))
+			case cel.ErrorTypeInvalid:
+				allErrors = append(allErrors, field.Invalid(fldPath.Child("expression"), v.Expression, result.Error.Detail))
+			case cel.ErrorTypeInternal:
+				allErrors = append(allErrors, field.InternalError(fldPath.Child("expression"), result.Error))
+			default:
+				allErrors = append(allErrors, field.InternalError(fldPath.Child("expression"), fmt.Errorf("unsupported error type: %w", result.Error)))
+			}
+		}
+	}
+	if len(v.Message) > 0 && len(trimmedMsg) == 0 {
 		allErrors = append(allErrors, field.Invalid(fldPath.Child("message"), v.Message, "message must be non-empty if specified"))
 	} else if hasNewlines(trimmedMsg) {
 		allErrors = append(allErrors, field.Invalid(fldPath.Child("message"), v.Message, "message must not contain line breaks"))

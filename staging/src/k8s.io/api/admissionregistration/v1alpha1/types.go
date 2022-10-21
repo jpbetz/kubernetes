@@ -174,11 +174,10 @@ type Validation struct {
 	// ref: https://github.com/google/cel-spec
 	// CEL expressions have access to the contents of the Admission request/response, organized into CEL variables as well as some other useful variables:
 	//
-	//'object' - the object being validated
-	//'oldObject' - the existing object identified by AdmissionReview
-	//'review' - the context of admission request
-	//'params' - configuration data of the policy configuration being validated
-	// The `object` variable in the expression is bound to the resource this policy is designed to validate.
+	//'object' - The object from the incoming request. The value is null for DELETE requests.
+	//'oldObject' - The existing object. The value is null for CREATE requests.
+	//'request' - Attributes of the admission request.
+	//'params' - Parameter resource refered to by policy binding being evaluated. Only populated if the policy has a ParamSource.
 	//
 	// The `apiVersion`, `kind`, `metadata.name` and `metadata.generateName` are always accessible from the root of the
 	// object. No other metadata properties are accessible.

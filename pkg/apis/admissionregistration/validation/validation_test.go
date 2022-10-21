@@ -1889,7 +1889,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 					}(),
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 				},
@@ -1920,7 +1920,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					ParamSource: &admissionregistration.ParamSource{
@@ -1940,7 +1940,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					ParamSource: &admissionregistration.ParamSource{
@@ -1960,7 +1960,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					ParamSource: &admissionregistration.ParamSource{
@@ -1979,7 +1979,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					ParamSource: &admissionregistration.ParamSource{
@@ -1999,7 +1999,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					ParamSource: &admissionregistration.ParamSource{
@@ -2030,7 +2030,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 							Reason: func() *metav1.StatusReason {
 								r := metav1.StatusReason("other")
 								return &r
@@ -2051,7 +2051,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 				},
@@ -2081,7 +2081,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					MatchConstraints: &admissionregistration.MatchResources{
@@ -2100,7 +2100,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					MatchConstraints: &admissionregistration.MatchResources{
@@ -2119,7 +2119,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					MatchConstraints: &admissionregistration.MatchResources{
@@ -2141,7 +2141,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					MatchConstraints: &admissionregistration.MatchResources{
@@ -2195,7 +2195,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					MatchConstraints: &admissionregistration.MatchResources{
@@ -2223,7 +2223,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					MatchConstraints: &admissionregistration.MatchResources{
@@ -2251,7 +2251,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					MatchConstraints: &admissionregistration.MatchResources{
@@ -2279,7 +2279,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					MatchConstraints: &admissionregistration.MatchResources{
@@ -2306,7 +2306,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					MatchConstraints: &admissionregistration.MatchResources{
@@ -2334,7 +2334,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					MatchConstraints: &admissionregistration.MatchResources{
@@ -2362,7 +2362,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					MatchConstraints: &admissionregistration.MatchResources{
@@ -2389,7 +2389,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					MatchConstraints: &admissionregistration.MatchResources{
@@ -2417,7 +2417,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					MatchConstraints: &admissionregistration.MatchResources{
@@ -2435,6 +2435,34 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 				},
 			},
 			expectedError: `spec.matchConstraints.resourceRules[0].resources: Invalid value: []string{"*/*", "a"}: if '*/*' is present, must not specify other resources`,
+		},
+		{
+			name: "invalid expression",
+			config: &admissionregistration.ValidatingAdmissionPolicy{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "config",
+				},
+				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
+					Validations: []admissionregistration.Validation{
+						{
+							Expression: "object.x in [1, 2, ",
+						},
+					},
+					MatchConstraints: &admissionregistration.MatchResources{
+						ResourceRules: []admissionregistration.RuleWithOperations{
+							{
+								Operations: []admissionregistration.OperationType{"CREATE"},
+								Rule: admissionregistration.Rule{
+									APIGroups:   []string{"a"},
+									APIVersions: []string{"a"},
+									Resources:   []string{"*/*"},
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedError: `spec.validations[0].expression: Invalid value: "object.x in [1, 2, ": compilation failed: ERROR: <input>:1:19: Syntax error: missing ']' at '<EOF>`,
 		},
 	}
 	for _, test := range tests {
@@ -2471,7 +2499,7 @@ func TestValidateValidatingAdmissionPolicyUpdate(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					MatchConstraints: &admissionregistration.MatchResources{
@@ -2495,7 +2523,7 @@ func TestValidateValidatingAdmissionPolicyUpdate(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					MatchConstraints: &admissionregistration.MatchResources{
@@ -2522,7 +2550,7 @@ func TestValidateValidatingAdmissionPolicyUpdate(t *testing.T) {
 				Spec: admissionregistration.ValidatingAdmissionPolicySpec{
 					Validations: []admissionregistration.Validation{
 						{
-							Expression: "fake expression",
+							Expression: "object.x < 100",
 						},
 					},
 					MatchConstraints: &admissionregistration.MatchResources{
