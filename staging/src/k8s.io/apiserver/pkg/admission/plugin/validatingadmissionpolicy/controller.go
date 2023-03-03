@@ -320,7 +320,7 @@ func (c *celAdmissionController) Validate(
 				versionedAttr = va
 			}
 
-			decisions := bindingInfo.validator.Validate(versionedAttr, param)
+			decisions := bindingInfo.validator.Validate(ctx, versionedAttr, param)
 
 			for _, decision := range decisions {
 				switch decision.Action {

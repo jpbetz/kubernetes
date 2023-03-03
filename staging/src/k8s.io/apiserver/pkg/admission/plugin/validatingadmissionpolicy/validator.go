@@ -17,6 +17,7 @@ limitations under the License.
 package validatingadmissionpolicy
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -54,7 +55,7 @@ func policyDecisionActionForError(f v1.FailurePolicyType) PolicyDecisionAction {
 }
 
 // Validate takes a list of Evaluation and a failure policy and converts them into actionable PolicyDecisions
-func (v *validator) Validate(versionedAttr *generic.VersionedAttributes, versionedParams runtime.Object) []PolicyDecision {
+func (v *validator) Validate(ctx context.Context, versionedAttr *generic.VersionedAttributes, versionedParams runtime.Object) []PolicyDecision {
 	var f v1.FailurePolicyType
 	if v.failPolicy == nil {
 		f = v1.Fail
@@ -63,7 +64,7 @@ func (v *validator) Validate(versionedAttr *generic.VersionedAttributes, version
 	}
 
 	optionalVars := cel.OptionalVariableBindings{VersionedParams: versionedParams, Authorizer: v.authorizer}
-	evalResults, err := v.filter.ForInput(versionedAttr, cel.CreateAdmissionRequest(versionedAttr.Attributes), optionalVars)
+	evalResults, err := v.filter.ForInput(ctx, versionedAttr, cel.CreateAdmissionRequest(versionedAttr.Attributes), optionalVars)
 	if err != nil {
 		return []PolicyDecision{
 			{

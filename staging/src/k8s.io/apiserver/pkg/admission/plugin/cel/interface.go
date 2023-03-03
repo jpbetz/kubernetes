@@ -17,6 +17,7 @@ limitations under the License.
 package cel
 
 import (
+	"context"
 	"time"
 
 	"github.com/google/cel-go/common/types/ref"
@@ -84,7 +85,7 @@ type OptionalVariableBindings struct {
 // by the underlying CEL code (which is indicated by the match criteria of a policy definition).
 type Filter interface {
 	// ForInput converts compiled CEL-typed values into evaluated CEL-typed values
-	ForInput(versionedAttr *generic.VersionedAttributes, request *v1.AdmissionRequest, optionalVars OptionalVariableBindings) ([]EvaluationResult, error)
+	ForInput(ctx context.Context, versionedAttr *generic.VersionedAttributes, request *v1.AdmissionRequest, optionalVars OptionalVariableBindings) ([]EvaluationResult, error)
 
 	// CompilationErrors returns a list of errors from the compilation of the evaluator
 	CompilationErrors() []error

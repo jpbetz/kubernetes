@@ -635,7 +635,8 @@ func TestFilter(t *testing.T) {
 			}
 
 			optionalVars := OptionalVariableBindings{VersionedParams: tc.params, Authorizer: tc.authorizer}
-			evalResults, err := f.ForInput(versionedAttr, CreateAdmissionRequest(versionedAttr.Attributes), optionalVars)
+		    ctx := context.TODO()
+			evalResults, err := f.ForInput(ctx, versionedAttr, CreateAdmissionRequest(versionedAttr.Attributes), optionalVars)
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}

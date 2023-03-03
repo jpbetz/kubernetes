@@ -17,6 +17,7 @@ limitations under the License.
 package validatingadmissionpolicy
 
 import (
+	"context"
 	"errors"
 	"strings"
 	"testing"
@@ -41,7 +42,7 @@ type fakeCelFilter struct {
 	throwError  bool
 }
 
-func (f *fakeCelFilter) ForInput(*generic.VersionedAttributes, *admissionv1.AdmissionRequest, cel.OptionalVariableBindings) ([]cel.EvaluationResult, error) {
+func (f *fakeCelFilter) ForInput(context.Context, *generic.VersionedAttributes, *admissionv1.AdmissionRequest, cel.OptionalVariableBindings) ([]cel.EvaluationResult, error) {
 	if f.throwError {
 		return nil, errors.New("test error")
 	}
@@ -464,8 +465,8 @@ func TestValidate(t *testing.T) {
 					throwError:  tc.throwError,
 				},
 			}
-
-			policyResults := v.Validate(fakeVersionedAttr, nil)
+			ctx := context.TODO()
+			policyResults := v.Validate(ctx, fakeVersionedAttr, nil)
 
 			require.Equal(t, len(policyResults), len(tc.policyDecision))
 

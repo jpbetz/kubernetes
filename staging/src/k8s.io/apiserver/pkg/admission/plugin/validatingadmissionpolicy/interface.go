@@ -17,6 +17,8 @@ limitations under the License.
 package validatingadmissionpolicy
 
 import (
+	"context"
+
 	"k8s.io/api/admissionregistration/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -55,5 +57,5 @@ type Matcher interface {
 // Validator is contains logic for converting ValidationEvaluation to PolicyDecisions
 type Validator interface {
 	// Validate is used to take cel evaluations and convert into decisions
-	Validate(versionedAttr *generic.VersionedAttributes, versionedParams runtime.Object) []PolicyDecision
+	Validate(ctx context.Context, versionedAttr *generic.VersionedAttributes, versionedParams runtime.Object) []PolicyDecision
 }
