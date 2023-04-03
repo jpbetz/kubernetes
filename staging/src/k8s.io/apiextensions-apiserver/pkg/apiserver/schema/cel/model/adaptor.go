@@ -54,6 +54,13 @@ func (s *Structural) Format() string {
 	return s.Structural.ValueValidation.Format
 }
 
+func (s *Structural) Pattern() string {
+	if s.Structural.ValueValidation == nil {
+		return ""
+	}
+	return s.Structural.ValueValidation.Pattern
+}
+
 func (s *Structural) Items() common.Schema {
 	return &Structural{Structural: s.Structural.Items}
 }
@@ -81,6 +88,48 @@ func (s *Structural) Default() any {
 	return s.Structural.Default.Object
 }
 
+func (s *Structural) Minimum() *float64 {
+	if s.Structural.ValueValidation == nil {
+		return nil
+	}
+	return s.Structural.ValueValidation.Minimum
+}
+
+func (s *Structural) ExclusiveMinimum() bool {
+	if s.Structural.ValueValidation == nil {
+		return false
+	}
+	return s.Structural.ValueValidation.ExclusiveMinimum
+}
+
+func (s *Structural) Maximum() *float64 {
+	if s.Structural.ValueValidation == nil {
+		return nil
+	}
+	return s.Structural.ValueValidation.Maximum
+}
+
+func (s *Structural) ExclusiveMaximum() bool {
+	if s.Structural.ValueValidation == nil {
+		return false
+	}
+	return s.Structural.ValueValidation.ExclusiveMaximum
+}
+
+func (s *Structural) MultipleOf() *float64 {
+	if s.Structural.ValueValidation == nil {
+		return nil
+	}
+	return s.Structural.ValueValidation.MultipleOf
+}
+
+func (s *Structural) MinItems() *int64 {
+	if s.Structural.ValueValidation == nil {
+		return nil
+	}
+	return s.Structural.ValueValidation.MinItems
+}
+
 func (s *Structural) MaxItems() *int64 {
 	if s.Structural.ValueValidation == nil {
 		return nil
@@ -88,11 +137,25 @@ func (s *Structural) MaxItems() *int64 {
 	return s.Structural.ValueValidation.MaxItems
 }
 
+func (s *Structural) MinLength() *int64 {
+	if s.Structural.ValueValidation == nil {
+		return nil
+	}
+	return s.Structural.ValueValidation.MinLength
+}
+
 func (s *Structural) MaxLength() *int64 {
 	if s.Structural.ValueValidation == nil {
 		return nil
 	}
 	return s.Structural.ValueValidation.MaxLength
+}
+
+func (s *Structural) MinProperties() *int64 {
+	if s.Structural.ValueValidation == nil {
+		return nil
+	}
+	return s.Structural.ValueValidation.MinProperties
 }
 
 func (s *Structural) MaxProperties() *int64 {
@@ -143,8 +206,40 @@ func (s *Structural) XListType() string {
 	return *s.Structural.XListType
 }
 
+func (s *Structural) XMapType() string {
+	if s.Structural.XMapType == nil {
+		return ""
+	}
+	return *s.Structural.XMapType
+}
+
 func (s *Structural) XListMapKeys() []string {
 	return s.Structural.XListMapKeys
+}
+
+type StructuralValidationRule struct {
+	rule, message, messageExpression string
+}
+
+func (s *StructuralValidationRule) Rule() string {
+	return s.rule
+}
+func (s *StructuralValidationRule) Message() string {
+	return s.message
+}
+func (s *StructuralValidationRule) MessageExpression() string {
+	return s.messageExpression
+}
+
+func (s *Structural) XValidations() []common.ValidationRule {
+	if len(s.Structural.XValidations) == 0 {
+		return nil
+	}
+	result := make([]common.ValidationRule, len(s.Structural.XValidations))
+	for i, v := range s.Structural.XValidations {
+		result[i] = &StructuralValidationRule{rule: v.Rule, message: v.Message, messageExpression: v.MessageExpression}
+	}
+	return result
 }
 
 func (s *Structural) WithTypeAndObjectMeta() common.Schema {

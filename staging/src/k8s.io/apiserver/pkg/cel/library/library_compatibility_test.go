@@ -50,6 +50,7 @@ func TestLibraryCompatibility(t *testing.T) {
 		// Kubernetes <1.27>:
 		"path", "group", "serviceAccount", "resource", "subresource", "namespace", "name", "check", "allowed", "denied", "reason",
 		// Kubernetes <1.??>:
+		"isFormat", "isGenerateNameOfFormat",
 	}
 	for _, fn := range knownFunctions {
 		delete(functionNames, fn)

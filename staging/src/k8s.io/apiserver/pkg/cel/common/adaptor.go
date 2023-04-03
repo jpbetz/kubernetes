@@ -56,8 +56,17 @@ type Schema interface {
 
 // Validations contains OpenAPI validation that the CEL library uses.
 type Validations interface {
+	Pattern() string
+	Minimum() *float64
+	ExclusiveMinimum() bool
+	Maximum() *float64
+	ExclusiveMaximum() bool
+	MultipleOf() *float64
+	MinItems() *int64
 	MaxItems() *int64
+	MinLength() *int64
 	MaxLength() *int64
+	MinProperties() *int64
 	MaxProperties() *int64
 	Required() []string
 	Enum() []any
@@ -70,7 +79,16 @@ type KubeExtensions interface {
 	IsXEmbeddedResource() bool
 	IsXPreserveUnknownFields() bool
 	XListType() string
+	XMapType() string
 	XListMapKeys() []string
+	XValidations() []ValidationRule
+}
+
+// ValidationRule represents a single x-kubernetes-validations rule.
+type ValidationRule interface {
+	Rule() string
+	Message() string
+	MessageExpression() string
 }
 
 // SchemaOrBool contains either a schema or a boolean indicating if the object

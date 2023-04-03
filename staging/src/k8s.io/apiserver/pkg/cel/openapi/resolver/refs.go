@@ -38,6 +38,10 @@ func populateRefs(schemaOf func(ref string) (*spec.Schema, bool), schema *spec.S
 			return nil, fmt.Errorf("internal error: cannot resolve Ref %q: %w", ref, ErrSchemaNotFound)
 		}
 		result = *resolved
+
+		// TODO: this was getting dropped. There are probably other fields dropped too.
+		result.VendorExtensible = schema.VendorExtensible
+
 		changed = true
 	}
 	// schema is an object, populate its properties and additionalProperties

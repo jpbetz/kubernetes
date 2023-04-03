@@ -18,10 +18,10 @@ package openapi
 
 import (
 	"github.com/google/cel-go/common/types/ref"
+	"k8s.io/kube-openapi/pkg/validation/spec"
 
 	apiservercel "k8s.io/apiserver/pkg/cel"
 	"k8s.io/apiserver/pkg/cel/common"
-	"k8s.io/kube-openapi/pkg/validation/spec"
 )
 
 var _ common.Schema = (*Schema)(nil)
@@ -52,6 +52,10 @@ func (s *Schema) Type() string {
 
 func (s *Schema) Format() string {
 	return s.Schema.Format
+}
+
+func (s *Schema) Pattern() string {
+	return s.Schema.Pattern
 }
 
 func (s *Schema) Items() common.Schema {
@@ -86,12 +90,48 @@ func (s *Schema) Default() any {
 	return s.Schema.Default
 }
 
+func (s *Schema) Minimum() *float64 {
+	return s.Schema.Minimum
+}
+
+func (s *Schema) ExclusiveMinimum() bool {
+	return s.Schema.ExclusiveMinimum
+}
+
+func (s *Schema) Maximum() *float64 {
+	return s.Schema.Maximum
+}
+
+func (s *Schema) ExclusiveMaximum() bool {
+	return s.Schema.ExclusiveMaximum
+}
+
+func (s *Schema) MultipleOf() *float64 {
+	return s.Schema.MultipleOf
+}
+
+func (s *Schema) UniqueItems() bool {
+	return s.Schema.UniqueItems
+}
+
+func (s *Schema) MinItems() *int64 {
+	return s.Schema.MinItems
+}
+
 func (s *Schema) MaxItems() *int64 {
 	return s.Schema.MaxItems
 }
 
+func (s *Schema) MinLength() *int64 {
+	return s.Schema.MinLength
+}
+
 func (s *Schema) MaxLength() *int64 {
 	return s.Schema.MaxLength
+}
+
+func (s *Schema) MinProperties() *int64 {
+	return s.Schema.MinProperties
 }
 
 func (s *Schema) MaxProperties() *int64 {
@@ -126,8 +166,16 @@ func (s *Schema) XListType() string {
 	return getXListType(s.Schema)
 }
 
+func (s *Schema) XMapType() string {
+	return getXMapType(s.Schema)
+}
+
 func (s *Schema) XListMapKeys() []string {
 	return getXListMapKeys(s.Schema)
+}
+
+func (s *Schema) XValidations() []common.ValidationRule {
+	return getXValidations(s.Schema)
 }
 
 func (s *Schema) WithTypeAndObjectMeta() common.Schema {

@@ -1701,6 +1701,36 @@ func TestValidationExpressions(t *testing.T) {
 				"isURL('../relative-path') == false",
 			},
 		},
+		{name: "isFormat",
+			obj: map[string]interface{}{
+				"validsubdomain": "iamapod",
+			},
+			schema: objectTypePtr(map[string]schema.Structural{
+				"validsubdomain": stringType,
+			}),
+			valid: []string{
+				// dns1123subdomain - lowercase, alphanumeric, '-', '.' as separators
+				`"i.am.a.pod".isFormat("dns1123subdomain")`,
+				`"1-meToo?".isFormat("dns1123subdomain") == false`,
+				`"i-am-a-pod-".isFormat("dns1123subdomain") == false`,
+				`"i-am-a-pod-".isGenerateNameOfFormat("dns1123subdomain")`,
+
+				// dns1035label - lowercase, must start with letter, alphanumeric, '-', as separator
+				`"i-am-a-pod".isFormat("dns1035label")`,
+				`"9.am.a.pod".isFormat("dns1035label") == false`,
+				`"i.am.a.pod-".isFormat("dns1035label") == false`,
+				`"i-am-a-pod-".isGenerateNameOfFormat("dns1035label")`,
+
+				// dns1123label - lowercase, alphanumeric, '-', as separator
+				`"i-am-a-pod".isFormat("dns1123label")`,
+				`"9-am-a-pod".isFormat("dns1123label")`,
+				`"i.am.a.pod-".isFormat("dns1123label") == false`,
+				`"i-am-a-pod-".isGenerateNameOfFormat("dns1123label")`,
+			},
+			errors: map[string]string{
+				`"".isFormat("not-a-format")`: "invalid format: not-a-format",
+			},
+		},
 		{name: "transition rules",
 			obj: map[string]interface{}{
 				"v": "new",
