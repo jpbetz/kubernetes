@@ -1,0 +1,25 @@
+apiVersion: wardle.example.com/v1alpha1
+kind: Flunder
+metadata:
+  name: my-first-flunder
+spec:
+  widgets: ["mistake-o-tron", "deflunderer", "deflunderer"] # duplicate, too few
+  primary: Saphire # not supported enum value
+  priority: 1000000000 # value more than maximum
+  #weight: 0.0123 # required
+  specializations:
+    cross-feed: "bidirectional"
+    hull-strength: "tier 4"
+    microfilaments: "7 nanos"
+    shielding: "hE 12.0"
+  componentValues:
+  - name: supports
+    stage: 1
+  - name: flanges
+    stage: 2
+  - name: panels
+    stage: 5
+  - name: intakes # duplicate keys (not supported yet)
+  - name: intakes
+  reference: "{A:3:B:2039}" # invalid format
+  referenceType: Flunder

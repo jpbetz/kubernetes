@@ -19,22 +19,33 @@ package flunder
 import (
 	"context"
 	"fmt"
+	"math"
 
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	celconfig "k8s.io/apiserver/pkg/apis/cel"
+	"k8s.io/apiserver/pkg/cel/apivalidation"
+	openapiresolver "k8s.io/apiserver/pkg/cel/openapi/resolver"
+	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
+	k8sscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/sample-apiserver/pkg/apis/wardle/validation"
 
 	"k8s.io/sample-apiserver/pkg/apis/wardle"
+	"k8s.io/sample-apiserver/pkg/apis/wardle/install"
+	"k8s.io/sample-apiserver/pkg/generated/openapi"
 )
 
 // NewStrategy creates and returns a flunderStrategy instance
 func NewStrategy(typer runtime.ObjectTyper) flunderStrategy {
-	return flunderStrategy{typer, names.SimpleNameGenerator}
+	schemaResolver := openapiresolver.NewDefinitionsSchemaResolver(k8sscheme.Scheme, openapi.GetOpenAPIDefinitions)
+	declarativeValidator := apivalidation.NewDeclarativeValidator(schemaResolver, celconfig.PerCallLimit)
+	return flunderStrategy{typer, names.SimpleNameGenerator, declarativeValidator}
 }
 
 // GetAttrs returns labels.Set, fields.Set, and error in case the given runtime.Object is not a Flunder
@@ -64,6 +75,7 @@ func SelectableFields(obj *wardle.Flunder) fields.Set {
 type flunderStrategy struct {
 	runtime.ObjectTyper
 	names.NameGenerator
+	declarativeValidator *apivalidation.DeclarativeValidator
 }
 
 func (flunderStrategy) NamespaceScoped() bool {
@@ -76,7 +88,27 @@ func (flunderStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object)
 func (flunderStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
 }
 
-func (flunderStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
+var scheme = runtime.NewScheme()
+
+func init() {
+	install.Install(scheme)
+}
+
+func (f flunderStrategy) Validate(ctx context.Context, obj runtime.Object) (errors field.ErrorList) {
+	// TODO: This is a hack for prototyping declarative validation.
+	// The hack grabs the GroupVersion from the request info and then converts the object from the internal
+	// type to the GroupVersion and validates it declaratively.
+	if requestInfo, found := genericapirequest.RequestInfoFrom(ctx); found {
+		groupVersion := schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}
+		versionedObj, err := scheme.ConvertToVersion(obj, groupVersion)
+		if err != nil {
+			errors = field.ErrorList{field.InternalError(field.NewPath("root"), fmt.Errorf("unexpected error converting to versioned type: %w", err))}
+			return errors
+		}
+		declErrors, _ := f.declarativeValidator.ValidateSpec(ctx, versionedObj, nil, math.MaxInt64)
+		errors = append(errors, declErrors...)
+	}
+
 	flunder := obj.(*wardle.Flunder)
 	return validation.ValidateFlunder(flunder)
 }

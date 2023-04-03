@@ -1,0 +1,23 @@
+apiVersion: wardle.example.com/v1alpha1
+kind: Flunder
+metadata:
+  name: my-first-flunder
+spec:
+  widgets: ["wardlizer", "deflunderer", "fizzbuzz-matic", "aero-tron", "criologic"]
+  primary: Blue
+  priority: 80
+  weight: 0.0123
+  specializations:
+    cross-feed: "bidirectional"
+    hull-strength: "tier 4"
+    shielding: "hE 12.0"
+  componentValues:
+  - name: supports
+    stage: "1"
+  - name: flanges
+    stage: "2"
+  - name: panels
+    stage: "5"
+  - name: intakes
+  reference: "192.168.1.1"
+  referenceType: Flunder
