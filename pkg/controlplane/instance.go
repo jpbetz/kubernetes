@@ -66,6 +66,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/uuid"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 	"k8s.io/apiserver/pkg/endpoints/discovery"
 	apiserverfeatures "k8s.io/apiserver/pkg/features"
 	"k8s.io/apiserver/pkg/registry/generic"
@@ -75,10 +76,13 @@ import (
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
+	k8sscheme "k8s.io/client-go/kubernetes/scheme"
 	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	discoveryclient "k8s.io/client-go/kubernetes/typed/discovery/v1"
 	"k8s.io/component-helpers/apimachinery/lease"
 	"k8s.io/klog/v2"
+	"k8s.io/utils/clock"
+
 	api "k8s.io/kubernetes/pkg/apis/core"
 	flowcontrolv1beta1 "k8s.io/kubernetes/pkg/apis/flowcontrol/v1beta1"
 	flowcontrolv1beta2 "k8s.io/kubernetes/pkg/apis/flowcontrol/v1beta2"
@@ -92,7 +96,6 @@ import (
 	kubeletclient "k8s.io/kubernetes/pkg/kubelet/client"
 	"k8s.io/kubernetes/pkg/routes"
 	"k8s.io/kubernetes/pkg/serviceaccount"
-	"k8s.io/utils/clock"
 
 	// RESTStorage installers
 	admissionregistrationrest "k8s.io/kubernetes/pkg/registry/admissionregistration/rest"
@@ -439,7 +442,10 @@ func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget)
 		// keep apps after extensions so legacy clients resolve the extensions versions of shared resource names.
 		// See https://github.com/kubernetes/kubernetes/issues/42392
 		appsrest.StorageProvider{},
-		admissionregistrationrest.RESTStorageProvider{Authorizer: c.GenericConfig.Authorization.Authorizer, DiscoveryClient: discoveryClientForAdmissionRegistration},
+		admissionregistrationrest.RESTStorageProvider{
+			Authorizer: c.GenericConfig.Authorization.Authorizer, DiscoveryClient: discoveryClientForAdmissionRegistration,
+			SchemaResolver: resolver.NewDefinitionsSchemaResolver(k8sscheme.Scheme, c.GenericConfig.OpenAPIConfig.GetDefinitions),
+		},
 		eventsrest.RESTStorageProvider{TTL: c.ExtraConfig.EventTTL},
 		resourcerest.RESTStorageProvider{},
 	}

@@ -1960,11 +1960,21 @@ func schema_k8sio_api_admissionregistration_v1alpha1_AuditAnnotation(ref common.
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"key": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-validations": []interface{}{
+									map[string]string{
+										"rule":    "size(self) < 30",
+										"message": "test message",
+									},
+								},
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "key specifies the audit annotation key. The audit annotation keys of a ValidatingAdmissionPolicy must be unique. The key must be a qualified name ([A-Za-z0-9][-A-Za-z0-9_.]*) no more than 63 bytes in length.\n\nThe key is combined with the resource name of the ValidatingAdmissionPolicy to construct an audit annotation key: \"{ValidatingAdmissionPolicy name}/{key}\".\n\nIf an admission webhook uses the same resource name as this ValidatingAdmissionPolicy and the same audit annotation key, the annotation key will be identical. In this case, the first annotation written with the key will be included in the audit event and all subsequent annotations with the same key will be discarded.\n\nRequired.",
 							Default:     "",
 							Type:        []string{"string"},
-							Format:      "",
+							Format:      "dnssubdomain",
 						},
 					},
 					"valueExpression": {
@@ -2371,6 +2381,15 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicy(r
 						},
 					},
 					"spec": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-validations": []interface{}{
+									map[string]string{
+										"rule": "(has(self.validations) && size(self.validations) > 0) || (has(self.auditAnnotations) && size(self.auditAnnotations) > 0)",
+									},
+								},
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "Specification of the desired behavior of the ValidatingAdmissionPolicy.",
 							Default:     map[string]interface{}{},
@@ -2382,6 +2401,16 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicy(r
 							Description: "The status of the ValidatingAdmissionPolicy, including warnings that are useful to determine if the policy behaves in the expected way. Populated by the system. Read-only.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("k8s.io/api/admissionregistration/v1alpha1.ValidatingAdmissionPolicyStatus"),
+						},
+					},
+				},
+			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-validations": []interface{}{
+						map[string]string{
+							"rule":    "size(self.metadata.name) < 253 ",
+							"message": "must be no more than 253 characters",
 						},
 					},
 				},
@@ -2515,6 +2544,11 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyBi
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
 								"x-kubernetes-list-type": "set",
+								"x-kubernetes-validations": []interface{}{
+									map[string]string{
+										"rule": "",
+									},
+								},
 							},
 						},
 						SchemaProps: spec.SchemaProps{
@@ -2642,6 +2676,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicySp
 							},
 						},
 						SchemaProps: spec.SchemaProps{
+							MaxItems:    common.Int64Pointer(20),
 							Description: "auditAnnotations contains CEL expressions which are used to produce audit annotations for the audit event of the API request. validations and auditAnnotations may not both be empty; a least one of validations or auditAnnotations is required.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{

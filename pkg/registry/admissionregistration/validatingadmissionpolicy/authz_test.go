@@ -21,9 +21,15 @@ import (
 	"testing"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	celconfig "k8s.io/apiserver/pkg/apis/cel"
 	"k8s.io/apiserver/pkg/authentication/user"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
+	"k8s.io/apiserver/pkg/cel/apivalidation"
+	openapiresolver "k8s.io/apiserver/pkg/cel/openapi/resolver"
 	"k8s.io/apiserver/pkg/endpoints/request"
+	k8sscheme "k8s.io/client-go/kubernetes/scheme"
+
+	"k8s.io/kubernetes/pkg/generated/openapi"
 	"k8s.io/kubernetes/pkg/registry/admissionregistration/resolver"
 )
 
@@ -81,7 +87,9 @@ func TestAuthorization(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			strategy := NewStrategy(tc.auth, tc.resourceResolver)
+			schemaResolver := openapiresolver.NewDefinitionsSchemaResolver(k8sscheme.Scheme, openapi.GetOpenAPIDefinitions)
+			declarativeValidator := apivalidation.NewDeclarativeValidator(schemaResolver, celconfig.PerCallLimit)
+			strategy := NewStrategy(tc.auth, tc.resourceResolver, declarativeValidator)
 			t.Run("create", func(t *testing.T) {
 				ctx := request.WithUser(context.Background(), tc.userInfo)
 				errs := strategy.Validate(ctx, validValidatingAdmissionPolicy())

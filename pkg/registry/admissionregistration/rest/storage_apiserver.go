@@ -20,11 +20,13 @@ import (
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 	admissionregistrationv1alpha1 "k8s.io/api/admissionregistration/v1alpha1"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
+	resolver2 "k8s.io/apiserver/pkg/cel/openapi/resolver"
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/registry/rest"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
 	"k8s.io/client-go/discovery"
+
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	"k8s.io/kubernetes/pkg/apis/admissionregistration"
 	mutatingwebhookconfigurationstorage "k8s.io/kubernetes/pkg/registry/admissionregistration/mutatingwebhookconfiguration/storage"
@@ -37,6 +39,7 @@ import (
 type RESTStorageProvider struct {
 	Authorizer      authorizer.Authorizer
 	DiscoveryClient discovery.DiscoveryInterface
+	SchemaResolver  resolver2.SchemaResolver
 }
 
 func (p RESTStorageProvider) NewRESTStorage(apiResourceConfigSource serverstorage.APIResourceConfigSource, restOptionsGetter generic.RESTOptionsGetter) (genericapiserver.APIGroupInfo, error) {
@@ -95,7 +98,7 @@ func (p RESTStorageProvider) v1alpha1Storage(apiResourceConfigSource serverstora
 
 	// validatingadmissionpolicies
 	if resource := "validatingadmissionpolicies"; apiResourceConfigSource.ResourceEnabled(admissionregistrationv1alpha1.SchemeGroupVersion.WithResource(resource)) {
-		policyStorage, policyStatusStorage, err := validatingadmissionpolicystorage.NewREST(restOptionsGetter, p.Authorizer, r)
+		policyStorage, policyStatusStorage, err := validatingadmissionpolicystorage.NewREST(restOptionsGetter, p.Authorizer, r, p.SchemaResolver)
 		if err != nil {
 			return storage, err
 		}

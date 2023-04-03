@@ -2554,6 +2554,18 @@ func schema_pkg_apis_wardle_v1alpha1_ComponentTarget(ref common.ReferenceCallbac
 							Format:      "int32",
 						},
 					},
+					"id": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"stageID": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
 				},
 			},
 		},
@@ -2680,6 +2692,18 @@ func schema_pkg_apis_wardle_v1alpha1_Flunder(ref common.ReferenceCallback) commo
 						},
 					},
 					"metadata": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-validations": []interface{}{
+									map[string]string{
+										"rule": "!has(self.name) || self.name.isFormat('dns1123subdomain')",
+									},
+									map[string]string{
+										"rule": "!has(self.generateName) || self.generateName.replace('-$', 'a').isFormat('dns1123subdomain')",
+									},
+								},
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
 							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
@@ -2704,18 +2728,6 @@ func schema_pkg_apis_wardle_v1alpha1_Flunder(ref common.ReferenceCallback) commo
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
 							Ref:     ref("k8s.io/sample-apiserver/pkg/apis/wardle/v1alpha1.FlunderStatus"),
-						},
-					},
-				},
-			},
-			VendorExtensible: spec.VendorExtensible{
-				Extensions: spec.Extensions{
-					"x-kubernetes-validations": []interface{}{
-						map[string]string{
-							"rule": "!has(self.metadata.name) || self.metadata.name.isFormat('dns1123subdomain')",
-						},
-						map[string]string{
-							"rule": "!has(self.metadata.generateName) || self.metadata.generateName.isGenerateNameOfFormat('dns1123subdomain')",
 						},
 					},
 				},

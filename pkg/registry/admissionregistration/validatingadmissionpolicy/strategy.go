@@ -18,7 +18,12 @@ package validatingadmissionpolicy
 
 import (
 	"context"
+	"fmt"
+	"math"
 
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apiserver/pkg/cel/apivalidation"
+	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
@@ -27,8 +32,10 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
 	"k8s.io/apiserver/pkg/storage/names"
+
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	"k8s.io/kubernetes/pkg/apis/admissionregistration"
+	"k8s.io/kubernetes/pkg/apis/admissionregistration/install"
 	"k8s.io/kubernetes/pkg/apis/admissionregistration/validation"
 	"k8s.io/kubernetes/pkg/registry/admissionregistration/resolver"
 )
@@ -37,17 +44,19 @@ import (
 type validatingAdmissionPolicyStrategy struct {
 	runtime.ObjectTyper
 	names.NameGenerator
-	authorizer       authorizer.Authorizer
-	resourceResolver resolver.ResourceResolver
+	authorizer           authorizer.Authorizer
+	resourceResolver     resolver.ResourceResolver
+	declarativeValidator *apivalidation.DeclarativeValidator
 }
 
 // NewStrategy is the default logic that applies when creating and updating validatingAdmissionPolicy objects.
-func NewStrategy(authorizer authorizer.Authorizer, resourceResolver resolver.ResourceResolver) *validatingAdmissionPolicyStrategy {
+func NewStrategy(authorizer authorizer.Authorizer, resourceResolver resolver.ResourceResolver, declarativeValidator *apivalidation.DeclarativeValidator) *validatingAdmissionPolicyStrategy {
 	return &validatingAdmissionPolicyStrategy{
-		ObjectTyper:      legacyscheme.Scheme,
-		NameGenerator:    names.SimpleNameGenerator,
-		authorizer:       authorizer,
-		resourceResolver: resourceResolver,
+		ObjectTyper:          legacyscheme.Scheme,
+		NameGenerator:        names.SimpleNameGenerator,
+		authorizer:           authorizer,
+		resourceResolver:     resourceResolver,
+		declarativeValidator: declarativeValidator,
 	}
 }
 
@@ -79,16 +88,36 @@ func (v *validatingAdmissionPolicyStrategy) PrepareForUpdate(ctx context.Context
 	}
 }
 
+// TODO: What is the preferred way to get a converter between versioned type and internal type?
+var scheme = runtime.NewScheme()
+
+func init() {
+	install.Install(scheme)
+}
+
 // Validate validates a new validatingAdmissionPolicy.
-func (v *validatingAdmissionPolicyStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
-	errs := validation.ValidateValidatingAdmissionPolicy(obj.(*admissionregistration.ValidatingAdmissionPolicy))
-	if len(errs) == 0 {
+func (v *validatingAdmissionPolicyStrategy) Validate(ctx context.Context, obj runtime.Object) (errors field.ErrorList) {
+
+	// TODO: This is a hack for prototyping declarative validation
+	if requestInfo, found := genericapirequest.RequestInfoFrom(ctx); found {
+		groupVersion := schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}
+		versionedObj, err := scheme.ConvertToVersion(obj, groupVersion)
+		if err != nil {
+			errors = field.ErrorList{field.InternalError(field.NewPath("root"), fmt.Errorf("unexpected error converting to versioned type: %w", err))}
+			return errors
+		}
+		declErrors, _ := v.declarativeValidator.ValidateSpec(ctx, versionedObj, nil, math.MaxInt64)
+		errors = append(errors, declErrors...)
+	}
+
+	errors = append(errors, validation.ValidateValidatingAdmissionPolicy(obj.(*admissionregistration.ValidatingAdmissionPolicy))...)
+	if len(errors) == 0 {
 		// if the object is well-formed, also authorize the paramKind
 		if err := v.authorizeCreate(ctx, obj); err != nil {
-			errs = append(errs, field.Forbidden(field.NewPath("spec", "paramKind"), err.Error()))
+			errors = append(errors, field.Forbidden(field.NewPath("spec", "paramKind"), err.Error()))
 		}
 	}
-	return errs
+	return errors
 }
 
 // WarningsOnCreate returns warnings for the creation of the given object.

@@ -19,10 +19,11 @@ package v1alpha1
 import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 // Flunder
-// +validations=rule:"!has(self.metadata.name) || self.metadata.name.isFormat('dns1123subdomain')"
-// +validations=rule:"!has(self.metadata.generateName) || self.metadata.generateName.isGenerateNameOfFormat('dns1123subdomain')"
 type Flunder struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+
+	// +validations=rule:"!has(self.name) || self.name.isFormat('dns1123subdomain')"
+	// +validations=rule:"!has(self.generateName) || self.generateName.replace('-$', 'a').isFormat('dns1123subdomain')"
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
 	// +validations=rule:"has(self.specializations) || has(self.componentValues)"
@@ -87,7 +88,22 @@ type ComponentTarget struct {
 	// name
 	// +optional
 	Grade int32 `json:"grade,omitempty" protobuf:"bytes,3,opt,name=grade"`
+
+	// +optional
+	ID PartID `json:"id,omitempty" protobuf:"bytes,4,opt,name=id"`
+
+	// +optional
+	StageID StageID `json:"stageID,omitempty" protobuf:"bytes,5,opt,name=stageID"`
 }
+
+// +maxLength=20
+type PartID = Identifier // type alias
+
+// +format=dns1123label
+type Identifier string
+
+// +maxLength=10
+type StageID Identifier // type declaration
 
 // Color
 // +enum

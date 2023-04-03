@@ -66,13 +66,19 @@ const (
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +k8s:prerelease-lifecycle-gen:introduced=1.26
 
+// TODO: define how 'validations' work when set on types and not fields.
+
+// ---validations=rule:`self.metadata.name.matches("[a-z]([-a-z0-9]*[a-z0-9])?")`,message:"a DNS-1035 label must consist of lower case alphanumeric characters or '-', start with an alphabetic character, and end with an alphanumeric character"
+
 // ValidatingAdmissionPolicy describes the definition of an admission validation policy that accepts or rejects an object without changing it.
+// +validations=rule:"size(self.metadata.name) < 253", message:"must be no more than 253 characters"
 type ValidatingAdmissionPolicy struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 	// Specification of the desired behavior of the ValidatingAdmissionPolicy.
+	// +validations=rule:"(has(self.validations) && size(self.validations) > 0) || (has(self.auditAnnotations) && size(self.auditAnnotations) > 0)"
 	Spec ValidatingAdmissionPolicySpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
 	// The status of the ValidatingAdmissionPolicy, including warnings that are useful to determine if the policy
 	// behaves in the expected way.
@@ -170,6 +176,8 @@ type ValidatingAdmissionPolicySpec struct {
 	//
 	// Allowed values are Ignore or Fail. Defaults to Fail.
 	// +optional
+	// TODO: validate required
+	// TODO: validate enum
 	FailurePolicy *FailurePolicyType `json:"failurePolicy,omitempty" protobuf:"bytes,4,opt,name=failurePolicy,casttype=FailurePolicyType"`
 
 	// auditAnnotations contains CEL expressions which are used to produce audit
@@ -178,6 +186,7 @@ type ValidatingAdmissionPolicySpec struct {
 	// required.
 	// +listType=atomic
 	// +optional
+	// +maxItems=20
 	AuditAnnotations []AuditAnnotation `json:"auditAnnotations,omitempty" protobuf:"bytes,5,rep,name=auditAnnotations"`
 
 	// MatchConditions is a list of conditions that must be met for a request to be validated.
@@ -211,10 +220,14 @@ type ParamKind struct {
 	// APIVersion is the API group version the resources belong to.
 	// In format of "group/version".
 	// Required.
+	// TODO: validate required
+	// TODO: validate groupVersion string
+	// TODO: validate group is IsDNS1123Subdomain
 	APIVersion string `json:"apiVersion,omitempty" protobuf:"bytes,1,rep,name=apiVersion"`
 
 	// Kind is the API kind the resources belong to.
 	// Required.
+	// TODO: validate IsDNS1035Label
 	Kind string `json:"kind,omitempty" protobuf:"bytes,2,rep,name=kind"`
 }
 
@@ -307,6 +320,8 @@ type AuditAnnotation struct {
 	// will be discarded.
 	//
 	// Required.
+	// +validations=rule:"size(self) < 30", message:"test message"
+	// +format=dnssubdomain
 	Key string `json:"key" protobuf:"bytes,1,opt,name=key"`
 
 	// valueExpression represents the expression which is evaluated by CEL to
@@ -418,6 +433,7 @@ type ValidatingAdmissionPolicyBindingSpec struct {
 	//
 	// Required.
 	// +listType=set
+	// +validations=rule:"!('Deny' in self && 'Warn' in self)", message="must not contain both Deny and Warn (repeating the same validation failure information in the API response and headers serves no purpose)"
 	ValidationActions []ValidationAction `json:"validationActions,omitempty" protobuf:"bytes,4,rep,name=validationActions"`
 }
 

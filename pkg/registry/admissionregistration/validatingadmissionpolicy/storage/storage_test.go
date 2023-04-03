@@ -24,10 +24,14 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
+	resolver2 "k8s.io/apiserver/pkg/cel/openapi/resolver"
 	"k8s.io/apiserver/pkg/registry/generic"
 	genericregistrytest "k8s.io/apiserver/pkg/registry/generic/testing"
 	etcd3testing "k8s.io/apiserver/pkg/storage/etcd3/testing"
+	k8sscheme "k8s.io/client-go/kubernetes/scheme"
+
 	"k8s.io/kubernetes/pkg/apis/admissionregistration"
+	"k8s.io/kubernetes/pkg/generated/openapi"
 	"k8s.io/kubernetes/pkg/registry/admissionregistration/resolver"
 	"k8s.io/kubernetes/pkg/registry/registrytest"
 
@@ -211,7 +215,8 @@ func newStorage(t *testing.T, authorizer authorizer.Authorizer, resourceResolver
 		Decorator:               generic.UndecoratedStorage,
 		DeleteCollectionWorkers: 1,
 		ResourcePrefix:          "validatingadmissionpolicies"}
-	storage, _, err := NewREST(restOptions, authorizer, resourceResolver)
+	schemaResolver := resolver2.NewDefinitionsSchemaResolver(k8sscheme.Scheme, openapi.GetOpenAPIDefinitions)
+	storage, _, err := NewREST(restOptions, authorizer, resourceResolver, schemaResolver)
 	if err != nil {
 		t.Fatalf("unexpected error from REST storage: %v", err)
 	}

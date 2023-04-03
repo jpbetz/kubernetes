@@ -21,17 +21,21 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	celconfig "k8s.io/apiserver/pkg/apis/cel"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
+	"k8s.io/apiserver/pkg/cel/apivalidation"
+	openapiresolver "k8s.io/apiserver/pkg/cel/openapi/resolver"
 	"k8s.io/apiserver/pkg/registry/generic"
 	genericregistry "k8s.io/apiserver/pkg/registry/generic/registry"
 	"k8s.io/apiserver/pkg/registry/rest"
+	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
+
 	"k8s.io/kubernetes/pkg/apis/admissionregistration"
 	"k8s.io/kubernetes/pkg/printers"
 	printersinternal "k8s.io/kubernetes/pkg/printers/internalversion"
 	printerstorage "k8s.io/kubernetes/pkg/printers/storage"
 	"k8s.io/kubernetes/pkg/registry/admissionregistration/resolver"
 	"k8s.io/kubernetes/pkg/registry/admissionregistration/validatingadmissionpolicy"
-	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
 // REST implements a RESTStorage for validatingAdmissionPolicy against etcd
@@ -48,9 +52,10 @@ type StatusREST struct {
 var groupResource = admissionregistration.Resource("validatingadmissionpolicies")
 
 // NewREST returns two RESTStorage objects that will work against validatingAdmissionPolicy and its status.
-func NewREST(optsGetter generic.RESTOptionsGetter, authorizer authorizer.Authorizer, resourceResolver resolver.ResourceResolver) (*REST, *StatusREST, error) {
+func NewREST(optsGetter generic.RESTOptionsGetter, authorizer authorizer.Authorizer, resourceResolver resolver.ResourceResolver, schemaResolver openapiresolver.SchemaResolver) (*REST, *StatusREST, error) {
 	r := &REST{}
-	strategy := validatingadmissionpolicy.NewStrategy(authorizer, resourceResolver)
+	declarativeValidator := apivalidation.NewDeclarativeValidator(schemaResolver, celconfig.PerCallLimit)
+	strategy := validatingadmissionpolicy.NewStrategy(authorizer, resourceResolver, declarativeValidator)
 	store := &genericregistry.Store{
 		NewFunc:     func() runtime.Object { return &admissionregistration.ValidatingAdmissionPolicy{} },
 		NewListFunc: func() runtime.Object { return &admissionregistration.ValidatingAdmissionPolicyList{} },
