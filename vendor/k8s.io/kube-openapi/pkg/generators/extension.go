@@ -23,16 +23,19 @@ import (
 
 	"k8s.io/gengo/examples/set-gen/sets"
 	"k8s.io/gengo/types"
+
+	"k8s.io/kube-openapi/pkg/generators/tags"
 )
 
 const extensionPrefix = "x-kubernetes-"
 
 // extensionAttributes encapsulates common traits for particular extensions.
 type extensionAttributes struct {
-	xName         string
-	kind          types.Kind
-	allowedValues sets.String
-	enforceArray  bool
+	xName                 string
+	kind                  types.Kind
+	allowedValues         sets.String
+	enforceArray          bool
+	isFieldValueExtension bool
 }
 
 // Extension tag to openapi extension attributes
@@ -67,16 +70,18 @@ var tagToExtension = map[string]extensionAttributes{
 		allowedValues: sets.NewString("atomic", "granular"),
 	},
 	"validations": {
-		xName: "x-kubernetes-validations",
-		kind:  types.Slice,
+		xName:                 "x-kubernetes-validations",
+		enforceArray:          true,
+		isFieldValueExtension: true,
 	},
 }
 
 // Extension encapsulates information necessary to generate an OpenAPI extension.
 type extension struct {
-	idlTag string   // Example: listType
-	xName  string   // Example: x-kubernetes-list-type
-	values []string // Example: [atomic]
+	idlTag      string   // Example: listType
+	xName       string   // Example: x-kubernetes-list-type
+	values      []string // Example: [atomic]
+	fieldValues []tags.FieldValue
 }
 
 func (e extension) hasAllowedValues() bool {
@@ -177,11 +182,24 @@ func parseExtensions(comments []string) ([]extension, []error) {
 		if !exists {
 			continue
 		}
+
 		values := tagValues[idlTag]
+		var fieldValues []tags.FieldValue
+		if xAttrs.isFieldValueExtension {
+			for _, value := range values {
+				fieldValue, err := tags.ParseFieldValues(value)
+				if err != nil {
+					errors = append(errors, err)
+				}
+				fieldValues = append(fieldValues, fieldValue)
+			}
+			values = nil
+		}
 		e := extension{
-			idlTag: idlTag,       // listType
-			xName:  xAttrs.xName, // x-kubernetes-list-type
-			values: values,       // [atomic]
+			idlTag:      idlTag,       // listType
+			xName:       xAttrs.xName, // x-kubernetes-list-type
+			values:      values,       // [atomic]
+			fieldValues: fieldValues,  // 'rule':'x<y','message':'x must be less than y'
 		}
 		extensions = append(extensions, e)
 	}

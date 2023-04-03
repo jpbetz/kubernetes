@@ -24,11 +24,13 @@ import (
 	"path/filepath"
 	"reflect"
 	"sort"
+	"strconv"
 	"strings"
 
 	"k8s.io/gengo/generator"
 	"k8s.io/gengo/namer"
 	"k8s.io/gengo/types"
+
 	openapi "k8s.io/kube-openapi/pkg/common"
 
 	"k8s.io/klog/v2"
@@ -50,6 +52,31 @@ const (
 var tempPatchTags = [...]string{
 	"patchMergeKey",
 	"patchStrategy",
+}
+
+type valueValidation struct {
+	goFieldName    string
+	idlTagName     string
+	kind           reflect.Kind
+	requiresQuotes bool
+}
+
+// value validations
+var supportedValueValidations = []valueValidation{
+	// 'format' is also supported, but it is handled separately due to how go types map to both OpenAPI type and format fields.
+	{goFieldName: "Pattern", idlTagName: "pattern", kind: reflect.String, requiresQuotes: true},
+	{goFieldName: "Maximum", idlTagName: "maximum", kind: reflect.Float64},
+	{goFieldName: "ExclusiveMaximum", idlTagName: "exclusiveMaximum", kind: reflect.Bool},
+	{goFieldName: "Minimum", idlTagName: "minimum", kind: reflect.Float64},
+	{goFieldName: "ExclusiveMinimum", idlTagName: "exclusiveMinimum", kind: reflect.Bool},
+	{goFieldName: "UniqueItems", idlTagName: "uniqueItems", kind: reflect.Bool},
+	{goFieldName: "MultipleOf", idlTagName: "multipleOf", kind: reflect.Float64},
+	{goFieldName: "MaxLength", idlTagName: "maxLength", kind: reflect.Int64},
+	{goFieldName: "MinLength", idlTagName: "minLength", kind: reflect.Int64},
+	{goFieldName: "MaxItems", idlTagName: "maxItems", kind: reflect.Int64},
+	{goFieldName: "MinItems", idlTagName: "minItems", kind: reflect.Int64},
+	{goFieldName: "MaxProperties", idlTagName: "maxProperties", kind: reflect.Int64},
+	{goFieldName: "MinProperties", idlTagName: "minProperties", kind: reflect.Int64},
 }
 
 func getOpenAPITagValue(comments []string) []string {
@@ -519,8 +546,32 @@ func (g openAPITypeWriter) emitExtensions(extensions []extension, unions []union
 		if extension.hasMultipleValues() || extension.isAlwaysArrayFormat() {
 			g.Do("[]interface{}{\n", nil)
 		}
-		for _, value := range extension.values {
-			g.Do("\"$.$\",\n", value)
+		if extension.fieldValues != nil {
+			for _, fieldMap := range extension.fieldValues {
+				g.Do("map[string]string {\n", nil)
+				keys := make([]string, 0, len(fieldMap))
+				for k := range fieldMap {
+					keys = append(keys, k)
+					sort.Strings(keys) // output map into generated code in a consistent order
+					for _, k := range keys {
+						value := fieldMap[k]
+						var vStr string
+						switch v := value.(type) {
+						case string:
+							vStr = strconv.Quote(v)
+						default:
+							vStr = fmt.Sprintf("%v", value)
+						}
+						g.Do("$.key$: $.value$,\n", map[string]string{"key": strconv.Quote(k), "value": vStr})
+					}
+				}
+
+				g.Do("},\n", nil)
+			}
+		} else {
+			for _, value := range extension.values {
+				g.Do("\"$.$\",\n", value)
+			}
 		}
 		if extension.hasMultipleValues() || extension.isAlwaysArrayFormat() {
 			g.Do("},\n", nil)
@@ -668,10 +719,23 @@ func (g openAPITypeWriter) generateProperty(m *types.Member, parent *types.Type)
 	if enumType, isEnum := g.enumContext.EnumType(m.Type); isEnum {
 		extraComments = enumType.DescriptionLines()
 	}
+
+	err := g.generateValueValidations(m, parent)
+	if err != nil {
+		return err
+	}
+
 	g.generateDescription(append(m.CommentLines, extraComments...))
 	jsonTags := getJsonTags(m)
 	if len(jsonTags) > 1 && jsonTags[1] == "string" {
-		g.generateSimpleProperty("string", "")
+
+		// Use value validation format if it is specified
+		format, err := getSingleTagsValue(m.CommentLines, "format")
+		if err != nil {
+			return fmt.Errorf("%w in %v: %v", err, parent, m.Name)
+		}
+
+		g.generateSimpleProperty("string", format)
 		g.Do("},\n},\n", nil)
 		return nil
 	}
@@ -682,6 +746,20 @@ func (g openAPITypeWriter) generateProperty(m *types.Member, parent *types.Type)
 	t := resolveAliasAndPtrType(m.Type)
 	// If we can get a openAPI type and format for this type, we consider it to be simple property
 	typeString, format := openapi.OpenAPITypeFormat(t.String())
+
+	formatFromTag, err := getSingleTagsValue(m.CommentLines, "format")
+	if err != nil {
+		return err
+	}
+
+	if len(format) > 0 {
+		if len(formatFromTag) > 0 {
+			return fmt.Errorf("'format' tag of '%s' may not be used on type %v that already has format of '%s'", formatFromTag, t, format)
+		}
+	} else {
+		format = formatFromTag
+	}
+
 	if typeString != "" {
 		g.generateSimpleProperty(typeString, format)
 		if enumType, isEnum := g.enumContext.EnumType(m.Type); isEnum {
@@ -761,6 +839,7 @@ func (g openAPITypeWriter) generateMapProperty(t *types.Type) error {
 	}
 
 	g.Do("Type: []string{\"object\"},\n", nil)
+
 	g.Do("AdditionalProperties: &spec.SchemaOrBool{\nAllows: true,\nSchema: &spec.Schema{\nSchemaProps: spec.SchemaProps{\n", nil)
 	if err := g.generateDefault(t.Elem.CommentLines, t.Elem, false); err != nil {
 		return err
@@ -794,6 +873,7 @@ func (g openAPITypeWriter) generateMapProperty(t *types.Type) error {
 func (g openAPITypeWriter) generateSliceProperty(t *types.Type) error {
 	elemType := resolveAliasAndPtrType(t.Elem)
 	g.Do("Type: []string{\"array\"},\n", nil)
+
 	g.Do("Items: &spec.SchemaOrArray{\nSchema: &spec.Schema{\nSchemaProps: spec.SchemaProps{\n", nil)
 	if err := g.generateDefault(t.Elem.CommentLines, t.Elem, false); err != nil {
 		return err
@@ -822,4 +902,83 @@ func (g openAPITypeWriter) generateSliceProperty(t *types.Type) error {
 	}
 	g.Do("},\n},\n},\n", nil)
 	return nil
+}
+
+func (g openAPITypeWriter) generateValueValidations(m *types.Member, parent *types.Type) error {
+	tags := types.ExtractCommentTags("+", m.CommentLines)
+
+	for _, valueValidation := range supportedValueValidations {
+		if err := g.generateValueValidation(tags, valueValidation); err != nil {
+			return fmt.Errorf("%w in %v: %v", err, parent, m.Name)
+		}
+	}
+
+	return nil
+}
+
+func (g openAPITypeWriter) generateValueValidation(tags map[string][]string, valueValidation valueValidation) error {
+	value, ok, err := getSingleTagValue(tags, valueValidation)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return nil
+	}
+
+	var pointerFn string
+	switch valueValidation.kind {
+	case reflect.Int64:
+		pointerFn = "Int64Pointer"
+	case reflect.Float64:
+		pointerFn = "Float64Pointer"
+	}
+
+	args := generator.Args{
+		"Field": valueValidation.goFieldName,
+		"Value": value,
+	}
+	if len(pointerFn) == 0 {
+		g.Do("$.Field$: $.Value$,\n", args)
+	} else {
+		args = args.WithArgs(generator.Args{
+			"Converter": types.Ref(openAPICommonPackagePath, pointerFn),
+		})
+		g.Do("$.Field$: $.Converter|raw$($.Value$),\n", args)
+	}
+	return nil
+}
+
+func getSingleTagValue(commentTags map[string][]string, ftag valueValidation) (interface{}, bool, error) {
+	tags, ok := commentTags[ftag.idlTagName]
+	if !ok || len(tags) == 0 {
+		return 0, false, nil
+	}
+	switch len(tags) {
+	case 0:
+		return 0, false, nil
+	case 1:
+		value := tags[0]
+
+		// parse to validate
+		var err error
+		switch ftag.kind {
+		case reflect.Int64:
+			_, err = strconv.ParseInt(value, 10, 64)
+		case reflect.Float64:
+			_, err = strconv.ParseFloat(value, 64)
+		case reflect.Bool:
+			_, err = strconv.ParseBool(value)
+		case reflect.String:
+			if ftag.requiresQuotes {
+				_, err = strconv.Unquote(value)
+			}
+		}
+		if err != nil {
+			return 0, false, fmt.Errorf("value must be an number for tag %s but was %s: %w", ftag.idlTagName, value, err)
+		}
+
+		return value, true, nil
+	default:
+		return 0, false, fmt.Errorf("multiple values are not allowed for tag %s", ftag.idlTagName)
+	}
 }

@@ -35,4 +35,5 @@ replace (
 	k8s.io/api => ../api
 	k8s.io/apimachinery => ../apimachinery
 	k8s.io/csi-translation-lib => ../csi-translation-lib
+	k8s.io/kube-openapi => github.com/jpbetz/kube-openapi v0.0.0-20230331173311-795566e5a8b3
 )

@@ -27,3 +27,5 @@ replace (
 	k8s.io/client-go => ../../../../client-go
 	k8s.io/kms => ../../../../kms
 )
+
+replace k8s.io/kube-openapi => github.com/jpbetz/kube-openapi v0.0.0-20230331173311-795566e5a8b3
