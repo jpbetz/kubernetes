@@ -30,13 +30,15 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/interpreter"
 
+	"k8s.io/klog/v2"
+
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apiextensions-apiserver/pkg/apiserver/schema"
 	"k8s.io/apiextensions-apiserver/pkg/apiserver/schema/cel/model"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/cel"
+	"k8s.io/apiserver/pkg/cel/common"
 	"k8s.io/apiserver/pkg/cel/metrics"
-	"k8s.io/klog/v2"
 
 	celconfig "k8s.io/apiserver/pkg/apis/cel"
 )
@@ -81,7 +83,7 @@ func NewValidator(s *schema.Structural, isResourceRoot bool, perCallLimit uint64
 // returns the Validator if any x-kubernetes-validations exist in the schema, or nil if no x-kubernetes-validations
 // exist. declType is expected to be a CEL DeclType corresponding to the structural schema.
 // perCallLimit was added for testing purpose only. Callers should always use const PerCallLimit from k8s.io/apiserver/pkg/apis/cel/config.go as input.
-func validator(s *schema.Structural, isResourceRoot bool, declType *cel.DeclType, perCallLimit uint64) *Validator {
+func validator(s *schema.Structural, isResourceRoot bool, declType *common.DeclType, perCallLimit uint64) *Validator {
 	compiledRules, err := Compile(s, declType, perCallLimit)
 	var itemsValidator, additionalPropertiesValidator *Validator
 	var propertiesValidators map[string]Validator
@@ -92,7 +94,7 @@ func validator(s *schema.Structural, isResourceRoot bool, declType *cel.DeclType
 		propertiesValidators = make(map[string]Validator, len(s.Properties))
 		for k, p := range s.Properties {
 			prop := p
-			var fieldType *cel.DeclType
+			var fieldType *common.DeclType
 			if escapedPropName, ok := cel.Escape(k); ok {
 				if f, ok := declType.Fields[escapedPropName]; ok {
 					fieldType = f.Type

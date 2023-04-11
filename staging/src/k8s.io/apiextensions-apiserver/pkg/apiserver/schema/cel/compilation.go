@@ -29,6 +29,7 @@ import (
 	"k8s.io/apiextensions-apiserver/pkg/apiserver/schema"
 	celconfig "k8s.io/apiserver/pkg/apis/cel"
 	apiservercel "k8s.io/apiserver/pkg/cel"
+	"k8s.io/apiserver/pkg/cel/common"
 	"k8s.io/apiserver/pkg/cel/library"
 	"k8s.io/apiserver/pkg/cel/metrics"
 )
@@ -98,7 +99,7 @@ func getBaseEnv() (*cel.Env, error) {
 //   - nil Program, nil Error: The provided rule was empty so compilation was not attempted
 //
 // perCallLimit was added for testing purpose only. Callers should always use const PerCallLimit from k8s.io/apiserver/pkg/apis/cel/config.go as input.
-func Compile(s *schema.Structural, declType *apiservercel.DeclType, perCallLimit uint64) ([]CompilationResult, error) {
+func Compile(s *schema.Structural, declType *common.DeclType, perCallLimit uint64) ([]CompilationResult, error) {
 	t := time.Now()
 	defer func() {
 		metrics.Metrics.ObserveCompilation(time.Since(t))
@@ -110,26 +111,22 @@ func Compile(s *schema.Structural, declType *apiservercel.DeclType, perCallLimit
 	celRules := s.Extensions.XValidations
 
 	var propDecls []cel.EnvOption
-	var root *apiservercel.DeclType
+	var root *common.DeclType
 	var ok bool
 	baseEnv, err := getBaseEnv()
 	if err != nil {
 		return nil, err
 	}
-	reg := apiservercel.NewRegistry(baseEnv)
 	scopedTypeName := generateUniqueSelfTypeName()
-	rt, err := apiservercel.NewRuleTypes(scopedTypeName, declType, reg)
+	typeProvider, err := common.NewOpenAPITypeProvider(declType.MaybeAssignTypeName(scopedTypeName))
 	if err != nil {
 		return nil, err
 	}
-	if rt == nil {
-		return nil, nil
-	}
-	opts, err := rt.EnvOptions(baseEnv.TypeProvider())
+	opts, err := typeProvider.EnvOptions(baseEnv.TypeProvider())
 	if err != nil {
 		return nil, err
 	}
-	root, ok = rt.FindDeclType(scopedTypeName)
+	root, ok = typeProvider.FindDeclType(scopedTypeName)
 	if !ok {
 		if declType == nil {
 			return nil, fmt.Errorf("rule declared on schema that does not support validation rules type: '%s' x-kubernetes-preserve-unknown-fields: '%t'", s.Type, s.XPreserveUnknownFields)
@@ -250,12 +247,12 @@ func generateUniqueSelfTypeName() string {
 	return fmt.Sprintf("selfType%d", time.Now().Nanosecond())
 }
 
-func newCostEstimator(root *apiservercel.DeclType) *library.CostEstimator {
+func newCostEstimator(root *common.DeclType) *library.CostEstimator {
 	return &library.CostEstimator{SizeEstimator: &sizeEstimator{root: root}}
 }
 
 type sizeEstimator struct {
-	root *apiservercel.DeclType
+	root *common.DeclType
 }
 
 func (c *sizeEstimator) EstimateSize(element checker.AstNode) *checker.SizeEstimate {

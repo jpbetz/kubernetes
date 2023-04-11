@@ -25,6 +25,8 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	apiservercel "k8s.io/apiserver/pkg/cel"
+	"k8s.io/apiserver/pkg/cel/common"
+
 	"k8s.io/kube-openapi/pkg/validation/spec"
 )
 
@@ -86,15 +88,15 @@ func TestSchemaDeclType(t *testing.T) {
 func TestSchemaDeclTypes(t *testing.T) {
 	ts := testSchema()
 	cust := SchemaDeclType(ts, true).MaybeAssignTypeName("CustomObject")
-	typeMap := apiservercel.FieldTypeMap("CustomObject", cust)
+	typeMap := common.FieldTypeMap("CustomObject", cust)
 	nested, _ := cust.FindField("nested")
 	metadata, _ := cust.FindField("metadata")
-	expectedObjTypeMap := map[string]*apiservercel.DeclType{
+	expectedObjTypeMap := map[string]*common.DeclType{
 		"CustomObject":          cust,
 		"CustomObject.nested":   nested.Type,
 		"CustomObject.metadata": metadata.Type,
 	}
-	objTypeMap := map[string]*apiservercel.DeclType{}
+	objTypeMap := map[string]*common.DeclType{}
 	for name, t := range typeMap {
 		if t.IsObject() {
 			objTypeMap[name] = t

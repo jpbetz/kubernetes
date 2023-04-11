@@ -26,9 +26,10 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/common/types/traits"
 
+	"k8s.io/kube-openapi/pkg/validation/strfmt"
+
 	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apiserver/pkg/cel"
-	"k8s.io/kube-openapi/pkg/validation/strfmt"
 )
 
 // UnstructuredToVal converts a Kubernetes unstructured data element to a CEL Val.
@@ -553,6 +554,10 @@ type unstructuredMap struct {
 }
 
 var _ = traits.Mapper(&unstructuredMap{})
+
+func (t *unstructuredMap) Schema() Schema {
+	return t.schema
+}
 
 func (t *unstructuredMap) ConvertToNative(typeDesc reflect.Type) (interface{}, error) {
 	switch typeDesc.Kind() {

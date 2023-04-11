@@ -19,9 +19,9 @@ package openapi
 import (
 	"github.com/google/cel-go/common/types/ref"
 
-	apiservercel "k8s.io/apiserver/pkg/cel"
-	"k8s.io/apiserver/pkg/cel/common"
 	"k8s.io/kube-openapi/pkg/validation/spec"
+
+	"k8s.io/apiserver/pkg/cel/common"
 )
 
 var _ common.Schema = (*Schema)(nil)
@@ -138,7 +138,7 @@ func UnstructuredToVal(unstructured any, schema *spec.Schema) ref.Val {
 	return common.UnstructuredToVal(unstructured, &Schema{schema})
 }
 
-func SchemaDeclType(s *spec.Schema, isResourceRoot bool) *apiservercel.DeclType {
+func SchemaDeclType(s *spec.Schema, isResourceRoot bool) *common.DeclType {
 	return common.SchemaDeclType(&Schema{Schema: s}, isResourceRoot)
 }
 

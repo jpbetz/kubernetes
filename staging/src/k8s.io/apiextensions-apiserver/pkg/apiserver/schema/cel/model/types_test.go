@@ -24,39 +24,37 @@ import (
 
 	exprpb "google.golang.org/genproto/googleapis/api/expr/v1alpha1"
 
-	apiservercel "k8s.io/apiserver/pkg/cel"
+	"k8s.io/apiserver/pkg/cel/common"
 )
 
 func TestTypes_RuleTypesFieldMapping(t *testing.T) {
 	stdEnv, _ := cel.NewEnv()
-	reg := apiservercel.NewRegistry(stdEnv)
-	rt, err := apiservercel.NewRuleTypes("CustomObject", SchemaDeclType(testSchema(), true), reg)
+	tp, err := common.NewOpenAPITypeProvider(SchemaDeclType(testSchema(), true).MaybeAssignTypeName("CustomObject"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	rt.TypeProvider = stdEnv.TypeProvider()
-	nestedFieldType, found := rt.FindFieldType("CustomObject", "nested")
+	nestedFieldType, found := tp.FindFieldType("CustomObject", "nested")
 	if !found {
 		t.Fatal("got field not found for 'CustomObject.nested', wanted found")
 	}
 	if nestedFieldType.Type.GetMessageType() != "CustomObject.nested" {
 		t.Errorf("got field type %v, wanted mock_template.nested", nestedFieldType.Type)
 	}
-	subnameFieldType, found := rt.FindFieldType("CustomObject.nested", "subname")
+	subnameFieldType, found := tp.FindFieldType("CustomObject.nested", "subname")
 	if !found {
 		t.Fatal("got field not found for 'CustomObject.nested.subname', wanted found")
 	}
 	if subnameFieldType.Type.GetPrimitive() != exprpb.Type_STRING {
 		t.Errorf("got field type %v, wanted string", subnameFieldType.Type)
 	}
-	flagsFieldType, found := rt.FindFieldType("CustomObject.nested", "flags")
+	flagsFieldType, found := tp.FindFieldType("CustomObject.nested", "flags")
 	if !found {
 		t.Fatal("got field not found for 'CustomObject.nested.flags', wanted found")
 	}
 	if flagsFieldType.Type.GetMapType() == nil {
 		t.Errorf("got field type %v, wanted map", flagsFieldType.Type)
 	}
-	flagFieldType, found := rt.FindFieldType("CustomObject.nested.flags", "my_flag")
+	flagFieldType, found := tp.FindFieldType("CustomObject.nested.flags", "my_flag")
 	if !found {
 		t.Fatal("got field not found for 'CustomObject.nested.flags.my_flag', wanted found")
 	}
@@ -65,37 +63,37 @@ func TestTypes_RuleTypesFieldMapping(t *testing.T) {
 	}
 
 	// Manually constructed instance of the schema.
-	name := apiservercel.NewField(1, "name")
+	name := common.NewField(1, "name")
 	name.Ref = testValue(t, 2, "test-instance")
-	nestedVal := apiservercel.NewMapValue()
-	flags := apiservercel.NewField(5, "flags")
-	flagsVal := apiservercel.NewMapValue()
-	myFlag := apiservercel.NewField(6, "my_flag")
+	nestedVal := common.NewMapValue()
+	flags := common.NewField(5, "flags")
+	flagsVal := common.NewMapValue()
+	myFlag := common.NewField(6, "my_flag")
 	myFlag.Ref = testValue(t, 7, true)
 	flagsVal.AddField(myFlag)
 	flags.Ref = testValue(t, 8, flagsVal)
-	dates := apiservercel.NewField(9, "dates")
-	dates.Ref = testValue(t, 10, apiservercel.NewListValue())
+	dates := common.NewField(9, "dates")
+	dates.Ref = testValue(t, 10, common.NewListValue())
 	nestedVal.AddField(flags)
 	nestedVal.AddField(dates)
-	nested := apiservercel.NewField(3, "nested")
+	nested := common.NewField(3, "nested")
 	nested.Ref = testValue(t, 4, nestedVal)
-	mapVal := apiservercel.NewMapValue()
+	mapVal := common.NewMapValue()
 	mapVal.AddField(name)
 	mapVal.AddField(nested)
-	//rule := rt.ConvertToRule(testValue(t, 11, mapVal))
+	//rule := tp.ConvertToRule(testValue(t, 11, mapVal))
 	//if rule == nil {
 	//	t.Error("map could not be converted to rule")
 	//}
 	//if rule.GetID() != 11 {
 	//	t.Errorf("got %d as the rule id, wanted 11", rule.GetID())
 	//}
-	//ruleVal := rt.NativeToValue(rule)
+	//ruleVal := tp.NativeToValue(rule)
 	//if ruleVal == nil {
 	//	t.Error("got CEL rule value of nil, wanted non-nil")
 	//}
 
-	opts, err := rt.EnvOptions(stdEnv.TypeProvider())
+	opts, err := tp.EnvOptions(stdEnv.TypeProvider())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -109,9 +107,9 @@ func TestTypes_RuleTypesFieldMapping(t *testing.T) {
 	}
 }
 
-func testValue(t *testing.T, id int64, val interface{}) *apiservercel.DynValue {
+func testValue(t *testing.T, id int64, val interface{}) *common.DynValue {
 	t.Helper()
-	dv, err := apiservercel.NewDynValue(id, val)
+	dv, err := common.NewDynValue(id, val)
 	if err != nil {
 		t.Fatalf("NewDynValue(%d, %v) failed: %v", id, val, err)
 	}

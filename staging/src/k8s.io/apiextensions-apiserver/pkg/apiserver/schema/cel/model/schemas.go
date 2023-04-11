@@ -17,7 +17,6 @@ limitations under the License.
 package model
 
 import (
-	apiservercel "k8s.io/apiserver/pkg/cel"
 	"k8s.io/apiserver/pkg/cel/common"
 
 	"k8s.io/apiextensions-apiserver/pkg/apiserver/schema"
@@ -32,7 +31,7 @@ import (
 // if their schema is not exposed.
 //
 // The CEL declaration for objects with XPreserveUnknownFields does not expose unknown fields.
-func SchemaDeclType(s *schema.Structural, isResourceRoot bool) *apiservercel.DeclType {
+func SchemaDeclType(s *schema.Structural, isResourceRoot bool) *common.DeclType {
 	return common.SchemaDeclType(&Structural{Structural: s}, isResourceRoot)
 }
 

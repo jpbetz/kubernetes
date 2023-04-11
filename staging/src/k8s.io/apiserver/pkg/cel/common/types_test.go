@@ -14,14 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cel
+package common
 
 import (
 	"testing"
 )
 
 func TestTypes_ListType(t *testing.T) {
-	list := NewListType(StringType, -1)
+	list := NewListType(nil, StringType, -1)
 	if !list.IsList() {
 		t.Error("list type not identifiable as list")
 	}
@@ -44,7 +44,7 @@ func TestTypes_ListType(t *testing.T) {
 }
 
 func TestTypes_MapType(t *testing.T) {
-	mp := NewMapType(StringType, IntType, -1)
+	mp := NewMapType(nil, StringType, IntType, -1)
 	if !mp.IsMap() {
 		t.Error("map type not identifiable as map")
 	}

@@ -18,8 +18,10 @@ package cel
 
 import (
 	"fmt"
-	celconfig "k8s.io/apiserver/pkg/apis/cel"
 	"sync"
+
+	celconfig "k8s.io/apiserver/pkg/apis/cel"
+	"k8s.io/apiserver/pkg/cel/common"
 
 	"github.com/google/cel-go/cel"
 
@@ -79,17 +81,12 @@ func buildRequiredVarsEnv() (*cel.Env, error) {
 		return nil, err
 	}
 	var propDecls []cel.EnvOption
-	reg := apiservercel.NewRegistry(baseEnv)
-
 	requestType := BuildRequestType()
-	rt, err := apiservercel.NewRuleTypes(requestType.TypeName(), requestType, reg)
+	typeProvider, err := common.NewOpenAPITypeProvider(requestType)
 	if err != nil {
 		return nil, err
 	}
-	if rt == nil {
-		return nil, nil
-	}
-	opts, err := rt.EnvOptions(baseEnv.TypeProvider())
+	opts, err := typeProvider.EnvOptions(baseEnv.TypeProvider())
 	if err != nil {
 		return nil, err
 	}
@@ -138,46 +135,46 @@ func buildWithOptionalVarsEnvs(requiredVarsEnv *cel.Env) (envs, error) {
 // converts the native type definition to apiservercel.DeclType once such a utility becomes available.
 // The 'uid' field is omitted since it is not needed for in-process admission review.
 // The 'object' and 'oldObject' fields are omitted since they are exposed as root level CEL variables.
-func BuildRequestType() *apiservercel.DeclType {
-	field := func(name string, declType *apiservercel.DeclType, required bool) *apiservercel.DeclField {
-		return apiservercel.NewDeclField(name, declType, required, nil, nil)
+func BuildRequestType() *common.DeclType {
+	field := func(name string, declType *common.DeclType, required bool) *common.DeclField {
+		return common.NewDeclField(name, declType, required, nil, nil)
 	}
-	fields := func(fields ...*apiservercel.DeclField) map[string]*apiservercel.DeclField {
-		result := make(map[string]*apiservercel.DeclField, len(fields))
+	fields := func(fields ...*common.DeclField) map[string]*common.DeclField {
+		result := make(map[string]*common.DeclField, len(fields))
 		for _, f := range fields {
 			result[f.Name] = f
 		}
 		return result
 	}
-	gvkType := apiservercel.NewObjectType("kubernetes.GroupVersionKind", fields(
-		field("group", apiservercel.StringType, true),
-		field("version", apiservercel.StringType, true),
-		field("kind", apiservercel.StringType, true),
+	gvkType := common.NewObjectType(nil, "kubernetes.GroupVersionKind", fields(
+		field("group", common.StringType, true),
+		field("version", common.StringType, true),
+		field("kind", common.StringType, true),
 	))
-	gvrType := apiservercel.NewObjectType("kubernetes.GroupVersionResource", fields(
-		field("group", apiservercel.StringType, true),
-		field("version", apiservercel.StringType, true),
-		field("resource", apiservercel.StringType, true),
+	gvrType := common.NewObjectType(nil, "kubernetes.GroupVersionResource", fields(
+		field("group", common.StringType, true),
+		field("version", common.StringType, true),
+		field("resource", common.StringType, true),
 	))
-	userInfoType := apiservercel.NewObjectType("kubernetes.UserInfo", fields(
-		field("username", apiservercel.StringType, false),
-		field("uid", apiservercel.StringType, false),
-		field("groups", apiservercel.NewListType(apiservercel.StringType, -1), false),
-		field("extra", apiservercel.NewMapType(apiservercel.StringType, apiservercel.NewListType(apiservercel.StringType, -1), -1), false),
+	userInfoType := common.NewObjectType(nil, "kubernetes.UserInfo", fields(
+		field("username", common.StringType, false),
+		field("uid", common.StringType, false),
+		field("groups", common.NewListType(nil, common.StringType, -1), false),
+		field("extra", common.NewMapType(nil, common.StringType, common.NewListType(nil, common.StringType, -1), -1), false),
 	))
-	return apiservercel.NewObjectType("kubernetes.AdmissionRequest", fields(
+	return common.NewObjectType(nil, "kubernetes.AdmissionRequest", fields(
 		field("kind", gvkType, true),
 		field("resource", gvrType, true),
-		field("subResource", apiservercel.StringType, false),
+		field("subResource", common.StringType, false),
 		field("requestKind", gvkType, true),
 		field("requestResource", gvrType, true),
-		field("requestSubResource", apiservercel.StringType, false),
-		field("name", apiservercel.StringType, true),
-		field("namespace", apiservercel.StringType, false),
-		field("operation", apiservercel.StringType, true),
+		field("requestSubResource", common.StringType, false),
+		field("name", common.StringType, true),
+		field("namespace", common.StringType, false),
+		field("operation", common.StringType, true),
 		field("userInfo", userInfoType, true),
-		field("dryRun", apiservercel.BoolType, false),
-		field("options", apiservercel.DynType, false),
+		field("dryRun", common.BoolType, false),
+		field("options", common.DynType, false),
 	))
 }
 

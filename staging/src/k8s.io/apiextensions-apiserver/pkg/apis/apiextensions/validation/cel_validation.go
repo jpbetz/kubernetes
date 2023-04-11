@@ -26,6 +26,7 @@ import (
 	"k8s.io/apiextensions-apiserver/pkg/apiserver/schema/cel/model"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/cel"
+	"k8s.io/apiserver/pkg/cel/common"
 )
 
 // unbounded uses nil to represent an unbounded cardinality value.
@@ -110,7 +111,7 @@ type CELTypeInfo struct {
 	// Schema is a structural schema for this CELSchemaContext node. It must be non-nil.
 	Schema *structuralschema.Structural
 	// DeclType is a CEL declaration representation of Schema of this CELSchemaContext node. It must be non-nil.
-	DeclType *cel.DeclType
+	DeclType *common.DeclType
 }
 
 // converter converts from JSON schema to a structural schema and a CEL declType, or returns an error if the conversion

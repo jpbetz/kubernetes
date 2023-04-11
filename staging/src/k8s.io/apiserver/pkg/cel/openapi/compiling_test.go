@@ -24,10 +24,11 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/interpreter"
 
+	"k8s.io/kube-openapi/pkg/validation/spec"
+
 	apiservercel "k8s.io/apiserver/pkg/cel"
 	"k8s.io/apiserver/pkg/cel/common"
 	"k8s.io/apiserver/pkg/cel/library"
-	"k8s.io/kube-openapi/pkg/validation/spec"
 )
 
 func TestMultipleTypes(t *testing.T) {
@@ -111,10 +112,8 @@ func buildTestEnv() (*cel.Env, error) {
 	if err != nil {
 		return nil, err
 	}
-	reg := apiservercel.NewRegistry(env)
-
 	declType := common.SchemaDeclType(simpleMapSchema("foo", spec.StringProperty()), true)
-	fooRT, err := apiservercel.NewRuleTypes("fooType", declType, reg)
+	fooRT, err := common.NewOpenAPITypeProvider(declType.MaybeAssignTypeName("fooType"))
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +124,7 @@ func buildTestEnv() (*cel.Env, error) {
 	fooType, _ := fooRT.FindDeclType("fooType")
 
 	declType = common.SchemaDeclType(simpleMapSchema("bar", spec.Int64Property()), true)
-	barRT, err := apiservercel.NewRuleTypes("barType", declType, reg)
+	barRT, err := common.NewOpenAPITypeProvider(declType.MaybeAssignTypeName("barType"))
 	if err != nil {
 		return nil, err
 	}

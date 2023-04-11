@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cel
+package common
 
 import (
 	"fmt"
@@ -28,7 +28,7 @@ import (
 )
 
 func TestConvertToType(t *testing.T) {
-	objType := NewObjectType("TestObject", map[string]*DeclField{})
+	objType := NewObjectType(nil, "TestObject", map[string]*DeclField{})
 	tests := []struct {
 		val interface{}
 		typ ref.Type
@@ -65,7 +65,7 @@ func TestEqual(t *testing.T) {
 	vals := []interface{}{
 		true, []byte("bytes"), float64(1.2), int64(-42), uint64(63), time.Duration(300),
 		time.Now().UTC(), types.NullValue, NewListValue(), NewMapValue(),
-		NewObjectValue(NewObjectType("TestObject", map[string]*DeclField{})),
+		NewObjectValue(NewObjectType(nil, "TestObject", map[string]*DeclField{})),
 	}
 	for i, v := range vals {
 		dv := testValue(t, int64(i), v)
@@ -323,7 +323,7 @@ func TestMapValueIsSet(t *testing.T) {
 }
 
 func TestObjectValueEqual(t *testing.T) {
-	objType := NewObjectType("Notice", map[string]*DeclField{
+	objType := NewObjectType(nil, "Notice", map[string]*DeclField{
 		"name":     {Name: "name", Type: StringType},
 		"priority": {Name: "priority", Type: IntType},
 		"message":  {Name: "message", Type: StringType, defaultValue: "<eom>"},

@@ -26,6 +26,8 @@ import (
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types/ref"
 
+	"k8s.io/klog/v2"
+
 	"k8s.io/api/admissionregistration/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -37,7 +39,6 @@ import (
 	"k8s.io/apiserver/pkg/cel/library"
 	"k8s.io/apiserver/pkg/cel/openapi"
 	"k8s.io/apiserver/pkg/cel/openapi/resolver"
-	"k8s.io/klog/v2"
 )
 
 const maxTypesToCheck = 10
@@ -48,8 +49,8 @@ type TypeChecker struct {
 }
 
 type typeOverwrite struct {
-	object *apiservercel.DeclType
-	params *apiservercel.DeclType
+	object *common.DeclType
+	params *common.DeclType
 }
 
 // typeCheckingResult holds the issues found during type checking, any returned
@@ -161,7 +162,7 @@ func (c *TypeChecker) formatWarning(results []typeCheckingResult) string {
 	return strings.TrimSuffix(sb.String(), "\n")
 }
 
-func (c *TypeChecker) declType(gvk schema.GroupVersionKind) (*apiservercel.DeclType, error) {
+func (c *TypeChecker) declType(gvk schema.GroupVersionKind) (*common.DeclType, error) {
 	if gvk.Empty() {
 		return nil, nil
 	}
@@ -318,14 +319,13 @@ func buildEnv(hasParams bool, types typeOverwrite) (*cel.Env, error) {
 	if err != nil {
 		return nil, err
 	}
-	reg := apiservercel.NewRegistry(baseEnv)
 	requestType := plugincel.BuildRequestType()
 
 	var varOpts []cel.EnvOption
-	var rts []*apiservercel.RuleTypes
+	var rts []*common.OpenAPITypeProvider
 
 	// request, hand-crafted type
-	rt, opts, err := createRuleTypesAndOptions(reg, requestType, plugincel.RequestVarName)
+	rt, opts, err := createRuleTypesAndOptions(requestType, plugincel.RequestVarName)
 	if err != nil {
 		return nil, err
 	}
@@ -333,7 +333,7 @@ func buildEnv(hasParams bool, types typeOverwrite) (*cel.Env, error) {
 	varOpts = append(varOpts, opts...)
 
 	// object and oldObject, same type, type(s) resolved from constraints
-	rt, opts, err = createRuleTypesAndOptions(reg, types.object, plugincel.ObjectVarName, plugincel.OldObjectVarName)
+	rt, opts, err = createRuleTypesAndOptions(types.object, plugincel.ObjectVarName, plugincel.OldObjectVarName)
 	if err != nil {
 		return nil, err
 	}
@@ -342,7 +342,7 @@ func buildEnv(hasParams bool, types typeOverwrite) (*cel.Env, error) {
 
 	// params, defined by ParamKind
 	if hasParams {
-		rt, opts, err := createRuleTypesAndOptions(reg, types.params, plugincel.ParamsVarName)
+		rt, opts, err := createRuleTypesAndOptions(types.params, plugincel.ParamsVarName)
 		if err != nil {
 			return nil, err
 		}
@@ -362,10 +362,10 @@ func buildEnv(hasParams bool, types typeOverwrite) (*cel.Env, error) {
 	return env, nil
 }
 
-// createRuleTypeAndOptions creates the cel RuleTypes and a slice of EnvOption
+// createRuleTypeAndOptions creates the cel OpenAPITypeProvider and a slice of EnvOption
 // that can be used for creating a CEL env containing variables of declType.
 // declType can be nil, in which case the variables will be of DynType.
-func createRuleTypesAndOptions(registry *apiservercel.Registry, declType *apiservercel.DeclType, variables ...string) (*apiservercel.RuleTypes, []cel.EnvOption, error) {
+func createRuleTypesAndOptions(declType *common.DeclType, variables ...string) (*common.OpenAPITypeProvider, []cel.EnvOption, error) {
 	opts := make([]cel.EnvOption, 0, len(variables))
 	// untyped, use DynType
 	if declType == nil {
@@ -374,21 +374,18 @@ func createRuleTypesAndOptions(registry *apiservercel.Registry, declType *apiser
 		}
 		return nil, opts, nil
 	}
-	// create a RuleType for the given type
-	rt, err := apiservercel.NewRuleTypes(declType.TypeName(), declType, registry)
+	// create a type provider for the given type
+	tp, err := common.NewOpenAPITypeProvider(declType)
 	if err != nil {
 		return nil, nil, err
-	}
-	if rt == nil {
-		return nil, nil, nil
 	}
 	for _, v := range variables {
 		opts = append(opts, cel.Variable(v, declType.CelType()))
 	}
-	return rt, opts, nil
+	return tp, opts, nil
 }
 
-func ruleTypesOpts(ruleTypes []*apiservercel.RuleTypes, underlyingTypeProvider ref.TypeProvider) ([]cel.EnvOption, error) {
+func ruleTypesOpts(ruleTypes []*common.OpenAPITypeProvider, underlyingTypeProvider ref.TypeProvider) ([]cel.EnvOption, error) {
 	var providers []ref.TypeProvider // may be unused, too small to matter
 	var adapters []ref.TypeAdapter
 	for _, rt := range ruleTypes {
