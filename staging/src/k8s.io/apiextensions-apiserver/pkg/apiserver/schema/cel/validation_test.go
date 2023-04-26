@@ -1701,6 +1701,36 @@ func TestValidationExpressions(t *testing.T) {
 				"isURL('../relative-path') == false",
 			},
 		},
+		{name: "Networking",
+			obj: map[string]interface{}{
+				"ip_1":   "127.0.0.1",
+				"ip_2":   "::1",
+				"cidr_1": "192.168.129.23/17",
+			},
+			schema: objectTypePtr(map[string]schema.Structural{
+				"ip_1":   stringType,
+				"ip_2":   stringType,
+				"cidr_1": stringType,
+			}),
+			valid: []string{
+				"ip('127.0.0.1') == ip('127.0.0.1')",
+				//"ip('127.0.0.2') > ip('127.0.0.1')",
+				"ip('::1') == ip('::1')",
+				"ip(self.ip_1) == ip('127.0.0.1')",
+				"ip(self.ip_2) == ip('::1')",
+
+				"cidr('192.168.129.23/17') == cidr('192.168.129.23/17')",
+				"cidr(self.cidr_1) == cidr('192.168.129.23/17')",
+
+				"cidr('192.168.129.23/17').containsIP(ip('192.168.129.23'))",
+				"cidr('192.168.129.23/17').overlaps(cidr('192.168.129.23/12'))",
+
+				"ip('127.0.0.1').is4()",
+				"ip('127.0.0.1').isLoopback()",
+				"ip('::1').is6()",
+				"ip('::1').isLoopback()",
+			},
+		},
 		{name: "transition rules",
 			obj: map[string]interface{}{
 				"v": "new",
