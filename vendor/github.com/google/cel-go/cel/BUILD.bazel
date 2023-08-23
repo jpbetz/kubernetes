@@ -57,6 +57,7 @@ go_test(
         "decls_test.go",
         "env_test.go",
         "io_test.go",
+        "validator_test.go",
     ],
     data = [
         "//cel/testdata:gen_test_fds",
