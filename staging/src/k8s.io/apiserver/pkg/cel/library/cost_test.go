@@ -23,6 +23,7 @@ import (
 
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker"
+	"github.com/google/cel-go/common/ast"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/ext"
 	exprpb "google.golang.org/genproto/googleapis/api/expr/v1alpha1"
@@ -451,11 +452,11 @@ func testCost(t *testing.T, expr string, expectEsimatedCost checker.CostEstimate
 }
 
 func TestSize(t *testing.T) {
-	exactSize := func(size int) checker.SizeEstimate {
-		return checker.SizeEstimate{Min: uint64(size), Max: uint64(size)}
+	exactSize := func(size int) checker.AstNode {
+		return sizeNode(uint64(size), uint64(size))
 	}
-	exactSizes := func(sizes ...int) []checker.SizeEstimate {
-		results := make([]checker.SizeEstimate, len(sizes))
+	exactSizes := func(sizes ...int) []checker.AstNode {
+		results := make([]checker.AstNode, len(sizes))
 		for i, size := range sizes {
 			results[i] = exactSize(size)
 		}
@@ -465,62 +466,71 @@ func TestSize(t *testing.T) {
 		name       string
 		function   string
 		overload   string
-		targetSize checker.SizeEstimate
-		argSizes   []checker.SizeEstimate
+		target     checker.AstNode
+		args       []checker.AstNode
 		expectSize checker.SizeEstimate
 	}{
 		{
 			name:       "replace empty with char",
 			function:   "replace",
-			targetSize: exactSize(3),     // e.g. abc
-			argSizes:   exactSizes(0, 1), // e.g. replace "" with "_"
-			expectSize: exactSize(7),     // e.g. _a_b_c_
+			target:     exactSize(3),                         // e.g. abc
+			args:       exactSizes(0, 1),                     // e.g. replace "" with "_"
+			expectSize: checker.SizeEstimate{Min: 7, Max: 7}, // e.g. _a_b_c_
 		},
 		{
 			name:       "maybe replace char with empty",
 			function:   "replace",
-			targetSize: exactSize(3),
-			argSizes:   exactSizes(1, 0),
+			target:     exactSize(3),
+			args:       exactSizes(1, 0),
 			expectSize: checker.SizeEstimate{Min: 0, Max: 3},
 		},
 		{
 			name:       "maybe replace repeated",
 			function:   "replace",
-			targetSize: exactSize(4),
-			argSizes:   exactSizes(2, 4),
+			target:     exactSize(4),
+			args:       exactSizes(2, 4),
 			expectSize: checker.SizeEstimate{Min: 4, Max: 8},
 		},
 		{
 			name:       "maybe replace empty",
 			function:   "replace",
-			targetSize: exactSize(4),
-			argSizes:   []checker.SizeEstimate{{Min: 0, Max: 1}, {Min: 0, Max: 2}},
+			target:     exactSize(4),
+			args:       []checker.AstNode{sizeNode(0, 1), sizeNode(0, 2)},
 			expectSize: checker.SizeEstimate{Min: 0, Max: 14}, // len(__a__a__a__a__) == 14
 		},
 		{
 			name:       "replace non-empty size range, maybe larger",
 			function:   "replace",
-			targetSize: exactSize(4),
-			argSizes:   []checker.SizeEstimate{{Min: 1, Max: 1}, {Min: 1, Max: 2}},
+			target:     exactSize(4),
+			args:       []checker.AstNode{sizeNode(1, 1), sizeNode(1, 2)},
 			expectSize: checker.SizeEstimate{Min: 4, Max: 8},
 		},
 		{
 			name:       "replace non-empty size range, maybe smaller",
 			function:   "replace",
-			targetSize: exactSize(4),
-			argSizes:   []checker.SizeEstimate{{Min: 1, Max: 2}, {Min: 1, Max: 1}},
+			target:     exactSize(4),
+			args:       []checker.AstNode{sizeNode(1, 2), sizeNode(1, 1)},
 			expectSize: checker.SizeEstimate{Min: 2, Max: 4},
+		},
+		{
+			name:       "split",
+			function:   "split",
+			target:     exactSize(4),
+			args:       []checker.AstNode{sizeNode(2, 2)},
+			expectSize: checker.SizeEstimate{Min: 0, Max: 4},
+		},
+		{
+			name:       "split with max",
+			function:   "split",
+			target:     exactSize(4),
+			args:       []checker.AstNode{sizeNode(2, 2), intNode(5)},
+			expectSize: checker.SizeEstimate{Min: 0, Max: 5},
 		},
 	}
 	est := &CostEstimator{SizeEstimator: &testCostEstimator{}}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var targetNode checker.AstNode = testSizeNode{size: tc.targetSize}
-			argNodes := make([]checker.AstNode, len(tc.argSizes))
-			for i, arg := range tc.argSizes {
-				argNodes[i] = testSizeNode{size: arg}
-			}
-			result := est.EstimateCallCost(tc.function, tc.overload, &targetNode, argNodes)
+			result := est.EstimateCallCost(tc.function, tc.overload, &tc.target, tc.args)
 			if result.ResultSize == nil {
 				t.Fatalf("Expected ResultSize but got none")
 			}
@@ -531,8 +541,17 @@ func TestSize(t *testing.T) {
 	}
 }
 
+func sizeNode(min, max uint64) checker.AstNode {
+	return testSizeNode{size: checker.SizeEstimate{Min: min, Max: max}}
+}
+
+func intNode(value int64) checker.AstNode {
+	return testSizeNode{expr: ast.NewExprFactory().NewLiteral(1, types.Int(value))}
+}
+
 type testSizeNode struct {
 	size checker.SizeEstimate
+	expr ast.Expr
 }
 
 func (t testSizeNode) Path() []string {
@@ -543,8 +562,8 @@ func (t testSizeNode) Type() *types.Type {
 	return nil // not needed
 }
 
-func (t testSizeNode) Expr() *exprpb.Expr {
-	return nil // not needed
+func (t testSizeNode) Expr() ast.Expr {
+	return t.expr
 }
 
 func (t testSizeNode) ComputedSize() *checker.SizeEstimate {
