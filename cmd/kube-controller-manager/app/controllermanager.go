@@ -483,6 +483,8 @@ func NewControllerInitializers(loopMode ControllerLoopMode) map[string]InitFunc 
 	if utilfeature.DefaultFeatureGate.Enabled(genericfeatures.ValidatingAdmissionPolicy) {
 		register(names.ValidatingAdmissionPolicyStatusController, startValidatingAdmissionPolicyStatusController)
 	}
+	// TODO: Add feature gate
+	register(names.LeaderElectionController, startLeaderElectionController)
 
 	return controllers
 }
