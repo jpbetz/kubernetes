@@ -332,10 +332,14 @@ func (le *LeaderElector) tryAcquireOrRenew(ctx context.Context) bool {
 			klog.Errorf("error retrieving resource lock %v: %v", le.config.Lock.Describe(), err)
 			return false
 		}
-		if err = le.config.Lock.Create(ctx, leaderElectionRecord); err != nil {
-			klog.Errorf("error initially creating leader election record: %v", err)
-			return false
-		}
+
+		// TODO: We need to skip this create if we want to only do handoffs from the leader election controller
+		// TODO: We should make this configurable via LeaderElectionConfig
+
+		//if err = le.config.Lock.Create(ctx, leaderElectionRecord); err != nil {
+		//	klog.Errorf("error initially creating leader election record: %v", err)
+		//	return false
+		//}
 
 		le.setObservedRecord(&leaderElectionRecord)
 
@@ -352,6 +356,16 @@ func (le *LeaderElector) tryAcquireOrRenew(ctx context.Context) bool {
 		le.observedTime.Add(time.Second*time.Duration(oldLeaderElectionRecord.LeaseDurationSeconds)).After(now.Time) &&
 		!le.IsLeader() {
 		klog.V(4).Infof("lock is held by %v and has not yet expired", oldLeaderElectionRecord.HolderIdentity)
+		return false
+	}
+
+	// 2b. If the lease has been marked as "end of term", don't renew it
+	if oldLeaderElectionRecord.EndOfTerm {
+		klog.V(4).Infof("lock is marked as 'end of term', yielding lease ownership")
+		// TODO: Instead of letting lease expire, deleted it directly (or set a very show duration until it expires?), so when we can be sure that
+		// This will not be compatible with all controllers, so it needs to be opt-in behavior..
+		// Usually once this returns false, the process is terminated..
+		// xref: OnStoppedLeading
 		return false
 	}
 
