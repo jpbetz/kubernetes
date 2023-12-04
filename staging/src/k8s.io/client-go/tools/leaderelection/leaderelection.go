@@ -342,11 +342,11 @@ func (le *LeaderElector) tryAcquireOrRenew(ctx context.Context) bool {
 		//	return false
 		//}
 
-		klog.Info("lease lock not found: %v", le.config.Lock.Describe())
+		//klog.Info("lease lock not found: %v", le.config.Lock.Describe())
 		return true
 	}
 
-	klog.Info("lease lock found: %v", le.config.Lock.Describe())
+	//klog.Info("lease lock found: %v", le.config.Lock.Describe())
 	// 2. Record obtained, check the Identity & Time
 	if !bytes.Equal(le.observedRawRecord, oldLeaderElectionRawRecord) {
 		le.setObservedRecord(oldLeaderElectionRecord)
@@ -363,7 +363,7 @@ func (le *LeaderElector) tryAcquireOrRenew(ctx context.Context) bool {
 
 	if !le.IsLeader() {
 		//klog.V(4).Infof("lock is held by %v and has not yet expired", oldLeaderElectionRecord.HolderIdentity)
-		klog.Infof("lock is held by %v and has not yet expired: %v", oldLeaderElectionRecord.HolderIdentity, le.config.Lock.Describe())
+		//klog.Infof("lock is held by %v and has not yet expired: %v", oldLeaderElectionRecord.HolderIdentity, le.config.Lock.Describe())
 		return false
 	}
 
@@ -423,7 +423,6 @@ func (le *LeaderElector) Check(maxTolerableExpiredLease time.Duration) error {
 // setObservedRecord will set a new observedRecord and update observedTime to the current time.
 // Protect critical sections with lock.
 func (le *LeaderElector) setObservedRecord(observedRecord *rl.LeaderElectionRecord) {
-	klog.Info("setObservedRecord")
 	le.observedRecordLock.Lock()
 	defer le.observedRecordLock.Unlock()
 
