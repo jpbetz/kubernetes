@@ -286,7 +286,8 @@ func handleInternal(storage map[string]rest.Storage, admissionControl admission.
 		return requestInfo.Verb == "watch" || requestInfo.Verb == "proxy"
 	}
 	fakeRuleEvaluator := auditpolicy.NewFakePolicyRuleEvaluator(auditinternal.LevelRequestResponse, nil)
-	handler := genericapifilters.WithAudit(mux, auditSink, fakeRuleEvaluator, longRunningCheck)
+	handler := genericapifilters.WithRetryGenerateName(mux)
+	handler = genericapifilters.WithAudit(handler, auditSink, fakeRuleEvaluator, longRunningCheck)
 	handler = genericapifilters.WithRequestDeadline(handler, auditSink, fakeRuleEvaluator, longRunningCheck, codecs, 60*time.Second)
 	handler = genericapifilters.WithRequestInfo(handler, testRequestInfoResolver())
 	handler = genericapifilters.WithAuditInit(handler)
