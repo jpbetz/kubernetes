@@ -19,6 +19,8 @@ package schema
 import (
 	"fmt"
 	"strings"
+
+	"k8s.io/apimachinery/pkg/util/version"
 )
 
 // ParseResourceArg takes the common style of string which may be either `resource.group.com` or `resource.version.group.com`
@@ -302,4 +304,15 @@ func FromAPIVersionAndKind(apiVersion, kind string) GroupVersionKind {
 		return GroupVersionKind{Group: gv.Group, Version: gv.Version, Kind: kind}
 	}
 	return GroupVersionKind{Kind: kind}
+}
+
+type APILifecycle struct {
+	// optional, nil IntroducedVersion means "it's been around long enough that we don't track the introduced version".
+	IntroducedVersion *version.Version
+	// optional, nil RemovedVersion means "it' never been assigned a removal version".
+	RemovedVersion *version.Version
+}
+
+func (v APILifecycle) EqualTo(other APILifecycle) bool {
+	return v.IntroducedVersion.EqualTo(other.IntroducedVersion) && v.RemovedVersion.EqualTo(other.RemovedVersion)
 }
