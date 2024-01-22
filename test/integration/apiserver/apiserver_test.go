@@ -2934,6 +2934,112 @@ func TestDedupOwnerReferences(t *testing.T) {
 	}
 }
 
+func TestEnableEmulationVersion(t *testing.T) {
+	server := kubeapiservertesting.StartTestServerOrDie(t, nil, []string{"--emulation-version=1.22", "--feature-gates=EmulationVersion=true"}, framework.SharedEtcd())
+	defer server.TearDownFn()
+
+	rt, err := restclient.TransportFor(server.ClientConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tcs := []struct {
+		path               string
+		expectedStatusCode int
+	}{
+		{
+			path:               "/",
+			expectedStatusCode: 200,
+		},
+		{
+			path:               "/apis/apps/v1/deployments",
+			expectedStatusCode: 200,
+		},
+		{
+			path:               "/apis/flowcontrol.apiserver.k8s.io/v1beta1/flowschemas", // introduced at 1.20, removed at 1.26
+			expectedStatusCode: 200,
+		},
+		{
+			path:               "/apis/flowcontrol.apiserver.k8s.io/v1beta2/flowschemas", // introduced at 1.23, removed at 1.29
+			expectedStatusCode: 404,
+		},
+		{
+			path:               "/apis/flowcontrol.apiserver.k8s.io/v1beta3/flowschemas", // introduced at 1.26, removed at 1.32
+			expectedStatusCode: 404,
+		},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.path, func(t *testing.T) {
+			req, err := http.NewRequest("GET", server.ClientConfig.Host+tc.path, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			resp, err := rt.RoundTrip(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if resp.StatusCode != tc.expectedStatusCode {
+				t.Errorf("expect status code: %d, got : %d\n", tc.expectedStatusCode, resp.StatusCode)
+			}
+			defer resp.Body.Close()
+		})
+	}
+}
+
+func TestDisableEmulationVersion(t *testing.T) {
+	server := kubeapiservertesting.StartTestServerOrDie(t, nil, []string{"--feature-gates=EmulationVersion=false"}, framework.SharedEtcd())
+	defer server.TearDownFn()
+
+	rt, err := restclient.TransportFor(server.ClientConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tcs := []struct {
+		path               string
+		expectedStatusCode int
+	}{
+		{
+			path:               "/",
+			expectedStatusCode: 200,
+		},
+		{
+			path:               "/apis/apps/v1/deployments",
+			expectedStatusCode: 200,
+		},
+		{
+			path:               "/apis/flowcontrol.apiserver.k8s.io/v1beta1/flowschemas", // introduced at 1.20, removed at 1.26
+			expectedStatusCode: 200,
+		},
+		{
+			path:               "/apis/flowcontrol.apiserver.k8s.io/v1beta2/flowschemas", // introduced at 1.23, removed at 1.29
+			expectedStatusCode: 200,
+		},
+		{
+			path:               "/apis/flowcontrol.apiserver.k8s.io/v1beta3/flowschemas", // introduced at 1.26, removed at 1.32
+			expectedStatusCode: 200,
+		},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.path, func(t *testing.T) {
+			req, err := http.NewRequest("GET", server.ClientConfig.Host+tc.path, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			resp, err := rt.RoundTrip(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if resp.StatusCode != tc.expectedStatusCode {
+				t.Errorf("expect status code: %d, got : %d\n", tc.expectedStatusCode, resp.StatusCode)
+			}
+			defer resp.Body.Close()
+		})
+	}
+}
+
 type dependentClient struct {
 	t      *testing.T
 	client dynamic.ResourceInterface

@@ -59,10 +59,11 @@ func CreateAPIExtensionsConfig(
 		return nil, err
 	}
 
+	genericConfig.EmulationVersion = commandOptions.APIEnablement.EmulationVersion
 	// override MergedResourceConfig with apiextensions defaults and registry
 	if err := commandOptions.APIEnablement.ApplyTo(
 		&genericConfig,
-		apiextensionsapiserver.DefaultAPIResourceConfigSource("", apiextensionsapiserver.Scheme)); err != nil {
+		apiextensionsapiserver.DefaultAPIResourceConfigSource(genericConfig.EmulationVersion, apiextensionsapiserver.Scheme)); err != nil {
 		return nil, err
 	}
 	apiextensionsConfig := &apiextensionsapiserver.Config{

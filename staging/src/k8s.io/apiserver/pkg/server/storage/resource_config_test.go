@@ -22,6 +22,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/version"
+	"k8s.io/apiserver/pkg/features"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	featuregatetesting "k8s.io/component-base/featuregate/testing"
 )
 
 func TestDisabledVersion(t *testing.T) {
@@ -179,7 +182,52 @@ func TestAnyVersionForGroupEnabled(t *testing.T) {
 	}
 }
 
+func TestEnabledVersionWithEmulationVersionOff(t *testing.T) {
+	defer featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.EmulationVersion, false)()
+	g1v1 := schema.GroupVersion{Group: "group1", Version: "version1"}
+	g1v2 := schema.GroupVersion{Group: "group1", Version: "version2"}
+	g2v1 := schema.GroupVersion{Group: "group2", Version: "version1"}
+	g2v2 := schema.GroupVersion{Group: "group2", Version: "version2"}
+	g2v3 := schema.GroupVersion{Group: "group2", Version: "version3"}
+
+	scheme := runtime.NewScheme()
+	scheme.SetGroupVersionLifecycle(g1v2, schema.APILifecycle{
+		IntroducedVersion: version.MajorMinor(1, 29),
+	})
+	scheme.SetGroupVersionLifecycle(g2v1, schema.APILifecycle{
+		RemovedVersion: version.MajorMinor(1, 27),
+	})
+	scheme.SetGroupVersionLifecycle(g2v2, schema.APILifecycle{
+		IntroducedVersion: version.MajorMinor(1, 26),
+	})
+	scheme.SetGroupVersionLifecycle(g2v3, schema.APILifecycle{
+		RemovedVersion: version.MajorMinor(1, 28),
+	})
+
+	config := NewResourceConfig("1.28.2", scheme)
+
+	config.DisableVersions(g1v1)
+	config.EnableVersions(g1v2, g2v1, g2v2, g2v3)
+
+	if config.versionEnabled(g1v1) {
+		t.Errorf("expected disabled for %v, from %v", g1v1, config)
+	}
+	if !config.versionEnabled(g1v2) {
+		t.Errorf("expected enabled for %v, from %v", g1v2, config)
+	}
+	if !config.versionEnabled(g2v1) {
+		t.Errorf("expected enabled for %v, from %v", g2v1, config)
+	}
+	if !config.versionEnabled(g2v2) {
+		t.Errorf("expected enabled for %v, from %v", g2v2, config)
+	}
+	if !config.versionEnabled(g2v3) {
+		t.Errorf("expected enabled for %v, from %v", g2v3, config)
+	}
+}
+
 func TestEnabledVersionWithEmulationVersion(t *testing.T) {
+	defer featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.EmulationVersion, true)()
 	g1v1 := schema.GroupVersion{Group: "group1", Version: "version1"}
 	g1v2 := schema.GroupVersion{Group: "group1", Version: "version2"}
 	g2v1 := schema.GroupVersion{Group: "group2", Version: "version1"}
@@ -354,6 +402,7 @@ func TestEnabledResourceWithEmulationVersion(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			defer featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.EmulationVersion, true)()
 			scheme := runtime.NewScheme()
 			config := NewResourceConfig("1.28", scheme)
 			gv := schema.GroupVersion{Group: "group", Version: "version"}

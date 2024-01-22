@@ -69,6 +69,7 @@ func createAggregatorConfig(
 	// prevent generic API server from installing the OpenAPI handler. Aggregator server
 	// has its own customized OpenAPI handler.
 	genericConfig.SkipOpenAPIInstallation = true
+	genericConfig.EmulationVersion = commandOptions.APIEnablement.EmulationVersion
 
 	if utilfeature.DefaultFeatureGate.Enabled(genericfeatures.StorageVersionAPI) &&
 		utilfeature.DefaultFeatureGate.Enabled(genericfeatures.APIServerIdentity) {
@@ -102,7 +103,7 @@ func createAggregatorConfig(
 	// override MergedResourceConfig with aggregator defaults and registry
 	if err := commandOptions.APIEnablement.ApplyTo(
 		&genericConfig,
-		aggregatorapiserver.DefaultAPIResourceConfigSource("", aggregatorscheme.Scheme)); err != nil {
+		aggregatorapiserver.DefaultAPIResourceConfigSource(genericConfig.EmulationVersion, aggregatorscheme.Scheme)); err != nil {
 		return nil, err
 	}
 

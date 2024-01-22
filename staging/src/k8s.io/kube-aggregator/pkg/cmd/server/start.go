@@ -133,7 +133,8 @@ func (o AggregatorOptions) RunAggregator(stopCh <-chan struct{}) error {
 	if err := o.RecommendedOptions.ApplyTo(serverConfig); err != nil {
 		return err
 	}
-	if err := o.APIEnablement.ApplyTo(&serverConfig.Config, apiserver.DefaultAPIResourceConfigSource("", aggregatorscheme.Scheme)); err != nil {
+	serverConfig.EmulationVersion = o.APIEnablement.EmulationVersion
+	if err := o.APIEnablement.ApplyTo(&serverConfig.Config, apiserver.DefaultAPIResourceConfigSource(serverConfig.EmulationVersion, aggregatorscheme.Scheme)); err != nil {
 		return err
 	}
 	serverConfig.LongRunningFunc = filters.BasicLongRunningRequestCheck(

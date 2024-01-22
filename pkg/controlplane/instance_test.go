@@ -102,6 +102,7 @@ func setUp(t *testing.T) (*etcd3testing.EtcdTestServer, Config, *assert.Assertio
 	kubeVersion := kubeversion.Get()
 	config.GenericConfig.Authorization.Authorizer = authorizerfactory.NewAlwaysAllowAuthorizer()
 	config.GenericConfig.Version = &kubeVersion
+	config.GenericConfig.EmulationVersion = kubeVersion.GitVersion
 	config.ExtraConfig.StorageFactory = storageFactory
 	config.GenericConfig.LoopbackClientConfig = &restclient.Config{APIPath: "/api", ContentConfig: restclient.ContentConfig{NegotiatedSerializer: legacyscheme.Codecs}}
 	config.GenericConfig.PublicAddress = netutils.ParseIPSloppy("192.168.10.4")

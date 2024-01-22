@@ -24,6 +24,7 @@ import (
 	apiextensionsapiserver "k8s.io/apiextensions-apiserver/pkg/apiserver"
 	genericfeatures "k8s.io/apiserver/pkg/features"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	"k8s.io/component-base/version"
 	aggregatorscheme "k8s.io/kube-aggregator/pkg/apiserver/scheme"
 	"k8s.io/kubernetes/pkg/features"
 
@@ -96,6 +97,18 @@ func validateUnknownVersionInteroperabilityProxyFlags(options *Options) []error 
 	return err
 }
 
+func validateEmulationVersionFeature(options *Options) []error {
+	err := []error{}
+	if !utilfeature.DefaultFeatureGate.Enabled(genericfeatures.EmulationVersion) && options.APIEnablement.EmulationVersion != version.Get().GitVersion {
+		err = append(err, fmt.Errorf("emulation version %s different from binary version %s when EmulationVersion feature gate is disabled",
+			options.APIEnablement.EmulationVersion, version.Get().GitVersion))
+	}
+	if len(options.APIEnablement.EmulationVersion) == 0 {
+		err = append(err, fmt.Errorf("empty APIEnablement.EmulationVersion"))
+	}
+	return err
+}
+
 // Validate checks Options and return a slice of found errs.
 func (s *Options) Validate() []error {
 	var errs []error
@@ -112,6 +125,7 @@ func (s *Options) Validate() []error {
 	errs = append(errs, s.Metrics.Validate()...)
 	errs = append(errs, validateUnknownVersionInteroperabilityProxyFeature()...)
 	errs = append(errs, validateUnknownVersionInteroperabilityProxyFlags(s)...)
+	errs = append(errs, validateEmulationVersionFeature(s)...)
 
 	return errs
 }

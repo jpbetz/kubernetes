@@ -625,6 +625,8 @@ resources:
 		defer featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, "AllBeta", true)()
 		// Need to enable this explicitly as the feature is deprecated
 		defer featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.KMSv1, true)()
+		// Need to disable this explicitly as this feature affects rest apis.
+		defer featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.EmulationVersion, false)()
 
 		test, err := newTransformTest(t, encryptionConfig, false, "", nil)
 		if err != nil {

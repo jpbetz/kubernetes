@@ -237,6 +237,9 @@ type GenericAPIServer struct {
 
 	// Version will enable the /version endpoint if non-nil
 	Version *version.Info
+	// EmulationVersion enables/disables api based on the specified version, which
+	// could be different from the binary version.
+	EmulationVersion string
 
 	// lifecycleSignals provides access to the various signals that happen during the life cycle of the apiserver.
 	lifecycleSignals lifecycleSignals

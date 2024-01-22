@@ -35,6 +35,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/apiserver/pkg/features"
 	"k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/client-go/dynamic"
 	featuregatetesting "k8s.io/component-base/featuregate/testing"
@@ -74,6 +75,8 @@ var allowMissingTestdataFixtures = map[schema.GroupVersionKind]bool{
 func TestEtcdStoragePath(t *testing.T) {
 	defer featuregatetesting.SetFeatureGateDuringTest(t, feature.DefaultFeatureGate, "AllAlpha", true)()
 	defer featuregatetesting.SetFeatureGateDuringTest(t, feature.DefaultFeatureGate, "AllBeta", true)()
+	// Need to disable this explicitly as this feature affects rest apis.
+	defer featuregatetesting.SetFeatureGateDuringTest(t, feature.DefaultFeatureGate, features.EmulationVersion, false)()
 	apiServer := StartRealAPIServerOrDie(t, func(opts *options.ServerRunOptions) {
 	})
 	defer apiServer.Cleanup()

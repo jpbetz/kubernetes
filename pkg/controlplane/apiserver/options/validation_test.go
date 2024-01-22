@@ -21,10 +21,12 @@ import (
 	"testing"
 
 	kubeapiserveradmission "k8s.io/apiserver/pkg/admission"
+	genericfeatures "k8s.io/apiserver/pkg/features"
 	genericoptions "k8s.io/apiserver/pkg/server/options"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/component-base/featuregate"
 	basemetrics "k8s.io/component-base/metrics"
+	"k8s.io/component-base/version"
 	"k8s.io/kubernetes/pkg/features"
 
 	peerreconcilers "k8s.io/apiserver/pkg/reconcilers"
@@ -185,6 +187,87 @@ func TestValidateUnknownVersionInteroperabilityProxyFeature(t *testing.T) {
 			}
 			if !strings.Contains(errMessageGot, conflict) {
 				t.Errorf("Expected error message to contain: %q, but got: %q", conflict, errMessageGot)
+			}
+		})
+	}
+}
+
+func TestValidateEmulationVersionFeature(t *testing.T) {
+	gitVersion := version.Get().GitVersion
+	tests := []struct {
+		name            string
+		featuresEnabled []featuregate.Feature
+		options         *Options
+		expectErrors    bool
+	}{
+		{
+			name: "binary version ok when EmulationVersion enabled",
+			options: &Options{
+				APIEnablement: &genericoptions.APIEnablementOptions{
+					EmulationVersion: gitVersion,
+				},
+			},
+			featuresEnabled: []featuregate.Feature{genericfeatures.EmulationVersion},
+		},
+		{
+			name: "non binary version ok when EmulationVersion enabled",
+			options: &Options{
+				APIEnablement: &genericoptions.APIEnablementOptions{
+					EmulationVersion: "1.29",
+				},
+			},
+			featuresEnabled: []featuregate.Feature{genericfeatures.EmulationVersion},
+		},
+		{
+			name: "empty version not ok when EmulationVersion enabled",
+			options: &Options{
+				APIEnablement: &genericoptions.APIEnablementOptions{
+					EmulationVersion: "",
+				},
+			},
+			featuresEnabled: []featuregate.Feature{genericfeatures.EmulationVersion},
+			expectErrors:    true,
+		},
+		{
+			name: "binary version ok when EmulationVersion not enabled",
+			options: &Options{
+				APIEnablement: &genericoptions.APIEnablementOptions{
+					EmulationVersion: gitVersion,
+				},
+			},
+		},
+		{
+			name: "non binary version not ok when EmulationVersion not enabled",
+			options: &Options{
+				APIEnablement: &genericoptions.APIEnablementOptions{
+					EmulationVersion: "1.29",
+				},
+			},
+			expectErrors: true,
+		},
+		{
+			name: "empty version not ok when EmulationVersion not enabled",
+			options: &Options{
+				APIEnablement: &genericoptions.APIEnablementOptions{
+					EmulationVersion: "",
+				},
+			},
+			expectErrors: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			for _, feature := range test.featuresEnabled {
+				defer featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, feature, true)()
+			}
+			errs := validateEmulationVersionFeature(test.options)
+			if len(errs) > 0 && !test.expectErrors {
+				t.Errorf("expected no errors, errors found %+v", errs)
+			}
+
+			if len(errs) == 0 && test.expectErrors {
+				t.Errorf("expected errors, no errors found")
 			}
 		})
 	}

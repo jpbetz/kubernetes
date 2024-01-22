@@ -304,6 +304,9 @@ type Config struct {
 	// This grace period is orthogonal to other grace periods, and
 	// it is not overridden by any other grace period.
 	ShutdownWatchTerminationGracePeriod time.Duration
+	// EmulationVersion enables/disables api based on the specified version, which
+	// could be different from the binary version.
+	EmulationVersion string
 }
 
 type RecommendedConfig struct {
@@ -814,7 +817,8 @@ func (c completedConfig) New(name string, delegationTarget DelegationTarget) (*G
 		APIServerID:           c.APIServerID,
 		StorageVersionManager: c.StorageVersionManager,
 
-		Version: c.Version,
+		Version:          c.Version,
+		EmulationVersion: c.EmulationVersion,
 
 		muxAndDiscoveryCompleteSignals: map[string]<-chan struct{}{},
 	}

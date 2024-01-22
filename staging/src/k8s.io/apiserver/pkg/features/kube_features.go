@@ -97,6 +97,13 @@ const (
 	// Enables expression validation in Admission Control
 	ValidatingAdmissionPolicy featuregate.Feature = "ValidatingAdmissionPolicy"
 
+	// owner: @siyuanfoundation @jpbetz
+	// kep: http://kep.k8s.io/4330
+	// alpha: v1.30
+	//
+	// Introduce emulation version in Kubernetes components to enhance Kubernetes control-plane upgrade
+	EmulationVersion featuregate.Feature = "EmulationVersion"
+
 	// owner: @cici37
 	// kep: https://kep.k8s.io/2876
 	// alpha: v1.23
@@ -279,6 +286,8 @@ var defaultKubernetesFeatureGates = map[featuregate.Feature]featuregate.FeatureS
 	APIServerTracing: {Default: true, PreRelease: featuregate.Beta},
 
 	ValidatingAdmissionPolicy: {Default: false, PreRelease: featuregate.Beta},
+
+	EmulationVersion: {Default: false, PreRelease: featuregate.Alpha},
 
 	CustomResourceValidationExpressions: {Default: true, PreRelease: featuregate.GA, LockToDefault: true}, // remove in 1.31
 

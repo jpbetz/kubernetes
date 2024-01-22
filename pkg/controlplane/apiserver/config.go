@@ -66,7 +66,8 @@ func BuildGenericConfig(
 	lastErr error,
 ) {
 	genericConfig = genericapiserver.NewConfig(legacyscheme.Codecs)
-	genericConfig.MergedResourceConfig = controlplane.DefaultAPIResourceConfigSource("", legacyscheme.Scheme)
+	genericConfig.EmulationVersion = s.APIEnablement.EmulationVersion
+	genericConfig.MergedResourceConfig = controlplane.DefaultAPIResourceConfigSource(genericConfig.EmulationVersion, legacyscheme.Scheme)
 
 	if lastErr = s.GenericServerRunOptions.ApplyTo(genericConfig); lastErr != nil {
 		return
@@ -96,7 +97,7 @@ func BuildGenericConfig(
 	if lastErr = s.Features.ApplyTo(genericConfig, clientgoExternalClient, versionedInformers); lastErr != nil {
 		return
 	}
-	if lastErr = s.APIEnablement.ApplyTo(genericConfig, controlplane.DefaultAPIResourceConfigSource("", legacyscheme.Scheme)); lastErr != nil {
+	if lastErr = s.APIEnablement.ApplyTo(genericConfig, controlplane.DefaultAPIResourceConfigSource(genericConfig.EmulationVersion, legacyscheme.Scheme)); lastErr != nil {
 		return
 	}
 	if lastErr = s.EgressSelector.ApplyTo(genericConfig); lastErr != nil {

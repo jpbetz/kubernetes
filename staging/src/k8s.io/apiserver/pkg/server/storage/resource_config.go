@@ -21,6 +21,8 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/version"
+	"k8s.io/apiserver/pkg/features"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/klog/v2"
 )
 
@@ -55,7 +57,7 @@ type ResourceConfig struct {
 
 func NewResourceConfig(emulationVersion string, registry GroupVersionRegistry) *ResourceConfig {
 	var ver *version.Version
-	if len(emulationVersion) > 0 {
+	if utilfeature.DefaultFeatureGate.Enabled(features.EmulationVersion) && len(emulationVersion) > 0 {
 		ver = version.MustParseMajorMinor(emulationVersion)
 	}
 	return &ResourceConfig{GroupVersionConfigs: map[schema.GroupVersion]bool{}, ResourceConfigs: map[schema.GroupVersionResource]bool{},
