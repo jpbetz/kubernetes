@@ -25,52 +25,36 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/dump"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/apimachinery/pkg/version"
+	apimachineryversion "k8s.io/apimachinery/pkg/util/version"
 	"k8s.io/apiserver/pkg/registry/rest"
 )
 
 func Test_newResourceExpirationEvaluator(t *testing.T) {
 	tests := []struct {
 		name           string
-		currentVersion version.Info
+		currentVersion string
 		expected       resourceExpirationEvaluator
 		expectedErr    string
 	}{
 		{
-			name: "beta",
-			currentVersion: version.Info{
-				Major:      "1",
-				Minor:      "20+",
-				GitVersion: "v1.20.0-beta.0.62+a5d22854a2ac21",
-			},
-			expected: resourceExpirationEvaluator{currentMajor: 1, currentMinor: 20},
+			name:           "beta",
+			currentVersion: "v1.20.0-beta.0.62+a5d22854a2ac21",
+			expected:       resourceExpirationEvaluator{emulationVersion: apimachineryversion.MajorMinor(1, 20)},
 		},
 		{
-			name: "alpha",
-			currentVersion: version.Info{
-				Major:      "1",
-				Minor:      "20+",
-				GitVersion: "v1.20.0-alpha.0.62+a5d22854a2ac21",
-			},
-			expected: resourceExpirationEvaluator{currentMajor: 1, currentMinor: 20, isAlpha: true},
+			name:           "alpha",
+			currentVersion: "v1.20.0-alpha.0.62+a5d22854a2ac21",
+			expected:       resourceExpirationEvaluator{emulationVersion: apimachineryversion.MajorMinor(1, 20), isAlpha: true},
 		},
 		{
-			name: "maintenance",
-			currentVersion: version.Info{
-				Major:      "1",
-				Minor:      "20+",
-				GitVersion: "v1.20.1",
-			},
-			expected: resourceExpirationEvaluator{currentMajor: 1, currentMinor: 20},
+			name:           "maintenance",
+			currentVersion: "v1.20.1",
+			expected:       resourceExpirationEvaluator{emulationVersion: apimachineryversion.MajorMinor(1, 20)},
 		},
 		{
-			name: "bad",
-			currentVersion: version.Info{
-				Major:      "1",
-				Minor:      "20something+",
-				GitVersion: "v1.20.1",
-			},
-			expectedErr: `strconv.ParseInt: parsing "20something": invalid syntax`,
+			name:           "bad",
+			currentVersion: "v1.something20.1",
+			expectedErr:    `illegal version string "v1.something20.1"`,
 		},
 	}
 	for _, tt := range tests {
@@ -147,8 +131,7 @@ func Test_resourceExpirationEvaluator_shouldServe(t *testing.T) {
 		{
 			name: "removed-in-curr",
 			resourceExpirationEvaluator: resourceExpirationEvaluator{
-				currentMajor: 1,
-				currentMinor: 20,
+				emulationVersion: apimachineryversion.MajorMinor(1, 20),
 			},
 			restStorage: storageRemovedIn(1, 20),
 			expected:    false,
@@ -156,8 +139,7 @@ func Test_resourceExpirationEvaluator_shouldServe(t *testing.T) {
 		{
 			name: "removed-in-curr-but-deferred",
 			resourceExpirationEvaluator: resourceExpirationEvaluator{
-				currentMajor:                   1,
-				currentMinor:                   20,
+				emulationVersion:               apimachineryversion.MajorMinor(1, 20),
 				serveRemovedAPIsOneMoreRelease: true,
 			},
 			restStorage: storageRemovedIn(1, 20),
@@ -166,9 +148,8 @@ func Test_resourceExpirationEvaluator_shouldServe(t *testing.T) {
 		{
 			name: "removed-in-curr-but-alpha",
 			resourceExpirationEvaluator: resourceExpirationEvaluator{
-				currentMajor: 1,
-				currentMinor: 20,
-				isAlpha:      true,
+				emulationVersion: apimachineryversion.MajorMinor(1, 20),
+				isAlpha:          true,
 			},
 			restStorage: storageRemovedIn(1, 20),
 			expected:    true,
@@ -176,8 +157,7 @@ func Test_resourceExpirationEvaluator_shouldServe(t *testing.T) {
 		{
 			name: "removed-in-curr-but-alpha-but-strict",
 			resourceExpirationEvaluator: resourceExpirationEvaluator{
-				currentMajor:                 1,
-				currentMinor:                 20,
+				emulationVersion:             apimachineryversion.MajorMinor(1, 20),
 				isAlpha:                      true,
 				strictRemovedHandlingInAlpha: true,
 			},
@@ -187,8 +167,7 @@ func Test_resourceExpirationEvaluator_shouldServe(t *testing.T) {
 		{
 			name: "removed-in-prev-deferral-does-not-help",
 			resourceExpirationEvaluator: resourceExpirationEvaluator{
-				currentMajor:                   1,
-				currentMinor:                   21,
+				emulationVersion:               apimachineryversion.MajorMinor(1, 21),
 				serveRemovedAPIsOneMoreRelease: true,
 			},
 			restStorage: storageRemovedIn(1, 20),
@@ -197,8 +176,7 @@ func Test_resourceExpirationEvaluator_shouldServe(t *testing.T) {
 		{
 			name: "removed-in-prev-major",
 			resourceExpirationEvaluator: resourceExpirationEvaluator{
-				currentMajor:                   2,
-				currentMinor:                   20,
+				emulationVersion:               apimachineryversion.MajorMinor(2, 20),
 				serveRemovedAPIsOneMoreRelease: true,
 			},
 			restStorage: storageRemovedIn(1, 20),
@@ -207,8 +185,7 @@ func Test_resourceExpirationEvaluator_shouldServe(t *testing.T) {
 		{
 			name: "removed-in-future",
 			resourceExpirationEvaluator: resourceExpirationEvaluator{
-				currentMajor: 1,
-				currentMinor: 20,
+				emulationVersion: apimachineryversion.MajorMinor(1, 20),
 			},
 			restStorage: storageRemovedIn(1, 21),
 			expected:    true,
@@ -216,8 +193,7 @@ func Test_resourceExpirationEvaluator_shouldServe(t *testing.T) {
 		{
 			name: "never-removed",
 			resourceExpirationEvaluator: resourceExpirationEvaluator{
-				currentMajor: 1,
-				currentMinor: 20,
+				emulationVersion: apimachineryversion.MajorMinor(1, 20),
 			},
 			restStorage: storageNeverRemoved(),
 			expected:    true,
@@ -269,8 +245,7 @@ func Test_removeDeletedKinds(t *testing.T) {
 		{
 			name: "remove-one-of-two",
 			resourceExpirationEvaluator: resourceExpirationEvaluator{
-				currentMajor: 1,
-				currentMinor: 20,
+				emulationVersion: apimachineryversion.MajorMinor(1, 20),
 			},
 			versionedResourcesStorageMap: map[string]map[string]rest.Storage{
 				"v1": {
@@ -287,8 +262,7 @@ func Test_removeDeletedKinds(t *testing.T) {
 		{
 			name: "remove-nested-not-expired",
 			resourceExpirationEvaluator: resourceExpirationEvaluator{
-				currentMajor: 1,
-				currentMinor: 20,
+				emulationVersion: apimachineryversion.MajorMinor(1, 20),
 			},
 			versionedResourcesStorageMap: map[string]map[string]rest.Storage{
 				"v1": {
@@ -306,8 +280,7 @@ func Test_removeDeletedKinds(t *testing.T) {
 		{
 			name: "remove-all-of-version",
 			resourceExpirationEvaluator: resourceExpirationEvaluator{
-				currentMajor: 1,
-				currentMinor: 20,
+				emulationVersion: apimachineryversion.MajorMinor(1, 20),
 			},
 			versionedResourcesStorageMap: map[string]map[string]rest.Storage{
 				"v1": {

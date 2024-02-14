@@ -676,7 +676,7 @@ func (m *Instance) InstallAPIs(apiResourceConfigSource serverstorage.APIResource
 	nonLegacy := []*genericapiserver.APIGroupInfo{}
 
 	// used later in the loop to filter the served resource by those that have expired.
-	resourceExpirationEvaluator, err := genericapiserver.NewResourceExpirationEvaluator(*m.GenericAPIServer.Version)
+	resourceExpirationEvaluator, err := genericapiserver.NewResourceExpirationEvaluator(m.GenericAPIServer.EmulationVersion)
 	if err != nil {
 		return err
 	}
