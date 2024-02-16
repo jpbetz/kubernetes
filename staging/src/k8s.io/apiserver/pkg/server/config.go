@@ -42,6 +42,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
+	utilversion "k8s.io/apimachinery/pkg/util/version"
 	utilwaitgroup "k8s.io/apimachinery/pkg/util/waitgroup"
 	"k8s.io/apimachinery/pkg/version"
 	"k8s.io/apiserver/pkg/admission"
@@ -70,6 +71,7 @@ import (
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	utilflowcontrol "k8s.io/apiserver/pkg/util/flowcontrol"
 	flowcontrolrequest "k8s.io/apiserver/pkg/util/flowcontrol/request"
+	serverversion "k8s.io/apiserver/pkg/util/version"
 	"k8s.io/client-go/informers"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/component-base/logs"
@@ -740,6 +742,13 @@ func (c completedConfig) New(name string, delegationTarget DelegationTarget) (*G
 	if c.Serializer == nil {
 		return nil, fmt.Errorf("Genericapiserver.New() called with config.Serializer == nil")
 	}
+
+	// TODO: Where would something like this go?
+	binaryVer := utilversion.MustParseGeneric(c.Version.String())
+	emuVer := utilversion.MustParseGeneric(c.EmulationVersion)
+	minCompatVer := utilversion.MajorMinor(emuVer.Major(), emuVer.Minor()-1)
+	serverversion.Effective.Set(binaryVer, emuVer, minCompatVer)
+
 	for _, info := range c.Serializer.SupportedMediaTypes() {
 		var ok bool
 		for _, mt := range allowedMediaTypes {

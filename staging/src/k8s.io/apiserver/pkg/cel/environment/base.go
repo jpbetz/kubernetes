@@ -30,6 +30,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/version"
 	celconfig "k8s.io/apiserver/pkg/apis/cel"
 	"k8s.io/apiserver/pkg/cel/library"
+	utilversion "k8s.io/apiserver/pkg/util/version"
 )
 
 // DefaultCompatibilityVersion returns a default compatibility version for use with EnvSet
@@ -43,7 +44,7 @@ import (
 // desirable because it means that CEL expressions are portable across a wider range
 // of Kubernetes versions.
 func DefaultCompatibilityVersion() *version.Version {
-	return version.MajorMinor(1, 29)
+	return utilversion.Effective.MinCompatibilityVersion()
 }
 
 var baseOpts = []VersionedOptions{
