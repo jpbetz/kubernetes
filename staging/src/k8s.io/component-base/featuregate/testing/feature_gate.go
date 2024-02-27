@@ -17,7 +17,6 @@ limitations under the License.
 package testing
 
 import (
-	"fmt"
 	"testing"
 
 	"k8s.io/component-base/featuregate"
@@ -46,12 +45,12 @@ func SetFeatureGateDuringTest(tb testing.TB, gate featuregate.FeatureGate, f fea
 		}
 	}
 
-	if err := gate.(featuregate.MutableFeatureGate).Set(fmt.Sprintf("%s=%v", f, value)); err != nil {
+	if err := gate.(featuregate.MutableVersionedFeatureGateForTests).ForceSet(f, value); err != nil {
 		tb.Errorf("error setting %s=%v: %v", f, value, err)
 	}
 
 	return func() {
-		if err := gate.(featuregate.MutableFeatureGate).Set(fmt.Sprintf("%s=%v", f, originalValue)); err != nil {
+		if err := gate.(featuregate.MutableVersionedFeatureGateForTests).ForceSet(f, originalValue); err != nil {
 			tb.Errorf("error restoring %s=%v: %v", f, originalValue, err)
 		}
 		for _, cleanup := range cleanups {
