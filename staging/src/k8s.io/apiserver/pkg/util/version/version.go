@@ -19,9 +19,12 @@ package version
 import (
 	"fmt"
 	"strings"
+	"sync"
 	"sync/atomic"
 
 	"github.com/spf13/pflag"
+
+	util "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/version"
 	genericfeatures "k8s.io/apiserver/pkg/features"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
@@ -33,8 +36,10 @@ var Effective MutableEffectiveVersions = newEffectiveVersion()
 
 type EffectiveVersions interface {
 	BinaryVersion() *version.Version
-	EmulationVersion() *version.Version
-	MinCompatibilityVersion() *version.Version
+	EmulationVersion() *version.Version // TODO: remove
+	EmulationVersionFor(component string) *version.Version
+	MinCompatibilityVersion() *version.Version // TODO: remove
+	MinCompatibilityVersionFor(component string) *version.Version
 }
 
 type MutableEffectiveVersions interface {
@@ -42,7 +47,9 @@ type MutableEffectiveVersions interface {
 	// SetBinaryVersionForTests updates the binaryVersion.
 	// Should only be used in tests.
 	SetBinaryVersionForTests(binaryVersion *version.Version) func()
-	Set(binaryVersion, emulationVersion, minCompatibilityVersion *version.Version)
+	Set(binaryVersion, emulationVersion, minCompatibilityVersion *version.Version) // TODO: remove
+	SetBinaryVersion(binaryVersion *version.Version)
+	SetVersionFor(component string, emulationVersion, minCompatibilityVersion *version.Version)
 	AddFlags(fs *pflag.FlagSet)
 	Validate() []error
 }
@@ -78,6 +85,34 @@ func (v *VersionVar) Type() string {
 
 type effectiveVersions struct {
 	binaryVersion atomic.Pointer[version.Version]
+
+	// TODO: godoc
+	// componentVersions is a map of component name to componentEffectiveVersions
+	componentVersions sync.Map
+}
+
+func (m *effectiveVersions) BinaryVersion() *version.Version {
+	return m.binaryVersion.Load()
+}
+
+func (m *effectiveVersions) getComponentVersions(component string) *componentEffectiveVersions {
+	v, ok := m.componentVersions.Load(component)
+	if !ok {
+		return nil
+	}
+	cv, ok := v.(*componentEffectiveVersions)
+	if !ok {
+		util.HandleError(fmt.Errorf("expected componentEffectiveVersions but got %T", v))
+		return nil
+	}
+	return cv
+}
+
+func (m *effectiveVersions) setComponentVersions(component string, effectiveVersions *componentEffectiveVersions) {
+	m.componentVersions.Store(component, effectiveVersions)
+}
+
+type componentEffectiveVersions struct {
 	// If the emulationVersion is set by the users, it could only contain major and minor versions.
 	// In tests, emulationVersion could be the same as the binary version, or set directly,
 	// which can have "alpha" as pre-release to continue serving expired apis while we clean up the test.
@@ -86,35 +121,67 @@ type effectiveVersions struct {
 	minCompatibilityVersion VersionVar
 }
 
-func (m *effectiveVersions) BinaryVersion() *version.Version {
-	return m.binaryVersion.Load()
+func (m *effectiveVersions) EmulationVersion() *version.Version {
+	// TODO: remove
+	return nil
 }
 
-func (m *effectiveVersions) EmulationVersion() *version.Version {
+// TODO: Godoc
+func (m *effectiveVersions) EmulationVersionFor(component string) *version.Version {
 	// Emulation version can have "alpha" as pre-release to continue serving expired apis while we clean up the test.
 	// The pre-release should not be accessible to the users.
-	return m.emulationVersion.Val.Load().WithPreRelease(m.BinaryVersion().PreRelease())
+
+	cv := m.getComponentVersions(component)
+	if cv == nil {
+		return nil
+	}
+	return cv.emulationVersion.Val.Load().WithPreRelease(m.BinaryVersion().PreRelease())
 }
 
 func (m *effectiveVersions) MinCompatibilityVersion() *version.Version {
-	return m.minCompatibilityVersion.Val.Load()
+	// TODO: remove
+	return nil
+}
+
+// TODO: Godoc
+func (m *effectiveVersions) MinCompatibilityVersionFor(component string) *version.Version {
+	cv := m.getComponentVersions(component)
+	if cv == nil {
+		return nil
+	}
+	return cv.minCompatibilityVersion.Val.Load()
 }
 
 func (m *effectiveVersions) Set(binaryVersion, emulationVersion, minCompatibilityVersion *version.Version) {
+	// TODO: remove
+}
+
+func (m *effectiveVersions) SetBinaryVersion(binaryVersion *version.Version) {
 	m.binaryVersion.Store(binaryVersion)
-	m.emulationVersion.Val.Store(emulationVersion)
-	m.minCompatibilityVersion.Val.Store(minCompatibilityVersion)
+}
+
+// TODO: Godoc
+func (m *effectiveVersions) SetVersionFor(component string, emulationVersion, minCompatibilityVersion *version.Version) {
+	cv := m.getComponentVersions(component)
+	if cv == nil {
+		cv = &componentEffectiveVersions{}
+		m.setComponentVersions(component, cv)
+	}
+	cv.emulationVersion.Val.Store(emulationVersion)
+	cv.minCompatibilityVersion.Val.Store(minCompatibilityVersion)
 }
 
 func (m *effectiveVersions) SetBinaryVersionForTests(binaryVersion *version.Version) func() {
 	oldBinaryVersion := m.binaryVersion.Load()
-	m.Set(binaryVersion, binaryVersion, version.MajorMinor(binaryVersion.Major(), binaryVersion.SubtractMinor(1).Minor()))
+	m.SetBinaryVersion(binaryVersion)
+	m.SetVersionFor("k8s.io/apiserver", binaryVersion, version.MajorMinor(binaryVersion.Major(), binaryVersion.SubtractMinor(1).Minor()))
 	oldFeatureGateVersion := utilfeature.DefaultVersionedFeatureGate.EmulationVersion()
 	if err := utilfeature.DefaultMutableVersionedFeatureGate.SetEmulationVersion(binaryVersion); err != nil {
 		panic(err)
 	}
 	return func() {
-		m.Set(oldBinaryVersion, oldBinaryVersion, version.MajorMinor(oldBinaryVersion.Major(), oldBinaryVersion.SubtractMinor(1).Minor()))
+		m.SetBinaryVersion(oldBinaryVersion)
+		m.SetVersionFor("k8s.io/apiserver", oldBinaryVersion, version.MajorMinor(oldBinaryVersion.Major(), oldBinaryVersion.SubtractMinor(1).Minor()))
 		utilfeature.DefaultMutableVersionedFeatureGate.(featuregate.MutableVersionedFeatureGateForTests).Reset()
 		if err := utilfeature.DefaultMutableVersionedFeatureGate.SetEmulationVersion(oldFeatureGateVersion); err != nil {
 			panic(err)
@@ -169,7 +236,9 @@ func newEffectiveVersion() MutableEffectiveVersions {
 	effective := &effectiveVersions{}
 	binaryVersionInfo := baseversion.Get()
 	binaryVersion := version.MustParse(binaryVersionInfo.String())
-	compatVersion := version.MajorMinor(binaryVersion.Major(), binaryVersion.SubtractMinor(1).Minor())
-	effective.Set(binaryVersion, binaryVersion, compatVersion)
+	// compatVersion := version.MajorMinor(binaryVersion.Major(), binaryVersion.SubtractMinor(1).Minor())
+	effective.SetBinaryVersion(binaryVersion)
+	// TODO: apiserver configuration should allow for binary version -> apiserver component version mapping
+	// effective.SetVersionFor("k8s.io/kube-apiserver", binaryVersion, compatVersion)
 	return effective
 }

@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/spf13/pflag"
+
 	"k8s.io/apimachinery/pkg/util/version"
 	genericfeatures "k8s.io/apiserver/pkg/features"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
@@ -111,7 +112,8 @@ func TestValidateWhenEmulationVersionEnabled(t *testing.T) {
 			effective := &effectiveVersions{}
 			emulationVersion := version.MustParseGeneric(test.emulationVersion)
 			minCompatibilityVersion := version.MustParseGeneric(test.minCompatibilityVersion)
-			effective.Set(binaryVersion, emulationVersion, minCompatibilityVersion)
+			effective.SetBinaryVersion(binaryVersion)
+			effective.SetVersionFor("k8s.io/apiserver", emulationVersion, minCompatibilityVersion)
 
 			errs := effective.Validate()
 			if len(errs) > 0 && !test.expectErrors {
@@ -207,7 +209,8 @@ func TestValidateWhenEmulationVersionDisabled(t *testing.T) {
 			effective := &effectiveVersions{}
 			emulationVersion := version.MustParseGeneric(test.emulationVersion)
 			minCompatibilityVersion := version.MustParseGeneric(test.minCompatibilityVersion)
-			effective.Set(binaryVersion, emulationVersion, minCompatibilityVersion)
+			effective.SetBinaryVersion(binaryVersion)
+			effective.SetVersionFor("k8s.io/apiserver", emulationVersion, minCompatibilityVersion)
 
 			errs := effective.Validate()
 			if len(errs) > 0 && !test.expectErrors {
@@ -265,8 +268,8 @@ func TestEffectiveVersionsFlag(t *testing.T) {
 			if err != nil {
 				t.Fatalf("%d: Parse() Expected nil, Got %v", i, err)
 			}
-			if !effective.EmulationVersion().EqualTo(test.expectedEmulationVersion) {
-				t.Errorf("%d: EmulationVersion Expected %s, Got %s", i, test.expectedEmulationVersion.String(), effective.EmulationVersion().String())
+			if !effective.EmulationVersionFor("k8s.io/apiserver").EqualTo(test.expectedEmulationVersion) {
+				t.Errorf("%d: EmulationVersion Expected %s, Got %s", i, test.expectedEmulationVersion.String(), effective.EmulationVersionFor("k8s.io/apiserver").String())
 			}
 		})
 	}
