@@ -19,6 +19,7 @@ package storage
 import (
 	"fmt"
 
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/version"
 	"k8s.io/apiserver/pkg/features"
@@ -56,15 +57,15 @@ type ResourceConfig struct {
 	GroupVersionRegistry
 }
 
-func NewResourceConfig(registry GroupVersionRegistry) *ResourceConfig {
+func NewResourceConfigWithScheme(scheme *runtime.Scheme) *ResourceConfig {
 	emuVer := utilversion.Effective.EmulationVersion()
 	return &ResourceConfig{GroupVersionConfigs: map[schema.GroupVersion]bool{}, ResourceConfigs: map[schema.GroupVersionResource]bool{},
-		emulationVersion: version.MajorMinor(emuVer.Major(), emuVer.Minor()), GroupVersionRegistry: registry}
+		emulationVersion: version.MajorMinor(emuVer.Major(), emuVer.Minor()), GroupVersionRegistry: scheme}
 }
 
 // NewResourceConfigIgnoreLifecycle creates a ResourceConfig that allows enabling/disabling resources regardless of their APILifecycle.
 // Mainly used in tests.
-func NewResourceConfigIgnoreLifecycle() *ResourceConfig {
+func NewResourceConfig() *ResourceConfig {
 	return &ResourceConfig{GroupVersionConfigs: map[schema.GroupVersion]bool{}, ResourceConfigs: map[schema.GroupVersionResource]bool{},
 		emulationVersion: version.MajorMinor(0, 0)}
 }

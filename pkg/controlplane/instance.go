@@ -54,6 +54,7 @@ import (
 	storageapiv1alpha1 "k8s.io/api/storage/v1alpha1"
 	storageapiv1beta1 "k8s.io/api/storage/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	kruntime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilnet "k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/apimachinery/pkg/util/runtime"
@@ -785,8 +786,8 @@ var (
 )
 
 // DefaultAPIResourceConfigSource returns default configuration for an APIResource.
-func DefaultAPIResourceConfigSource(registry serverstorage.GroupVersionRegistry) *serverstorage.ResourceConfig {
-	ret := serverstorage.NewResourceConfig(registry)
+func DefaultAPIResourceConfigSource(scheme *kruntime.Scheme) *serverstorage.ResourceConfig {
+	ret := serverstorage.NewResourceConfigWithScheme(scheme)
 	// NOTE: GroupVersions listed here will be enabled by default. Don't put alpha or beta versions in the list.
 	ret.EnableVersions(stableAPIGroupVersionsEnabledByDefault...)
 

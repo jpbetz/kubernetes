@@ -24,6 +24,7 @@ import (
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -607,8 +608,8 @@ func (s *APIAggregator) RemoveAPIService(apiServiceName string) {
 }
 
 // DefaultAPIResourceConfigSource returns default configuration for an APIResource.
-func DefaultAPIResourceConfigSource(registry serverstorage.GroupVersionRegistry) *serverstorage.ResourceConfig {
-	ret := serverstorage.NewResourceConfig(registry)
+func DefaultAPIResourceConfigSource(scheme *runtime.Scheme) *serverstorage.ResourceConfig {
+	ret := serverstorage.NewResourceConfigWithScheme(scheme)
 	// NOTE: GroupVersions listed here will be enabled by default. Don't put alpha versions in the list.
 	ret.EnableVersions(
 		v1.SchemeGroupVersion,
