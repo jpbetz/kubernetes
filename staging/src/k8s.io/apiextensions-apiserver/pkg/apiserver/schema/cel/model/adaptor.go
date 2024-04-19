@@ -201,6 +201,10 @@ func (s *Structural) IsXEmbeddedResource() bool {
 	return s.Structural.XEmbeddedResource
 }
 
+func (s *Structural) IsXEmbeddedResourceValidation() bool {
+	return s.Structural.XEmbeddedResourceValidation
+}
+
 func (s *Structural) IsXPreserveUnknownFields() bool {
 	return s.Structural.XPreserveUnknownFields
 }

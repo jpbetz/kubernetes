@@ -1467,6 +1467,11 @@ func (v *specStandardValidatorV3) validate(schema *apiextensions.JSONSchemaProps
 		allErrs = append(allErrs, field.Forbidden(fldPath.Child("x-kubernetes-embedded-resource"), "must not be used inside of resource meta"))
 	}
 
+	if schema.XEmbeddedResourceValidation && !schema.XEmbeddedResource {
+		allErrs = append(allErrs, field.Forbidden(fldPath.Child("x-kubernetes-embedded-resource-validation"), "must only be used where x-kubernetes-embedded-resource is true"))
+	}
+	// TODO: Decide how to handle x-kubernetes-prune-unknown-fields with XEmbeddedResourceValidation
+
 	return allErrs
 }
 
@@ -1690,7 +1695,7 @@ func specHasKubernetesExtensions(spec *apiextensions.CustomResourceDefinitionSpe
 
 func schemaHasKubernetesExtensions(s *apiextensions.JSONSchemaProps) bool {
 	return SchemaHas(s, func(s *apiextensions.JSONSchemaProps) bool {
-		return s.XEmbeddedResource || s.XPreserveUnknownFields != nil || s.XIntOrString || len(s.XListMapKeys) > 0 || s.XListType != nil || len(s.XValidations) > 0
+		return s.XEmbeddedResource || s.XEmbeddedResourceValidation || s.XPreserveUnknownFields != nil || s.XIntOrString || len(s.XListMapKeys) > 0 || s.XListType != nil || len(s.XValidations) > 0
 	})
 }
 

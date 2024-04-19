@@ -75,6 +75,9 @@ func (x *Extensions) toKubeOpenAPI(ret *spec.Schema) {
 	if x.XEmbeddedResource {
 		ret.VendorExtensible.AddExtension("x-kubernetes-embedded-resource", true)
 	}
+	if x.XEmbeddedResourceValidation {
+		ret.VendorExtensible.AddExtension("x-kubernetes-embedded-resource-validation", true)
+	}
 	if x.XIntOrString {
 		ret.VendorExtensible.AddExtension("x-kubernetes-int-or-string", true)
 	}

@@ -242,11 +242,12 @@ func newExtensions(s *apiextensions.JSONSchemaProps) (*Extensions, error) {
 	}
 
 	ret := &Extensions{
-		XEmbeddedResource: s.XEmbeddedResource,
-		XIntOrString:      s.XIntOrString,
-		XListMapKeys:      s.XListMapKeys,
-		XListType:         s.XListType,
-		XMapType:          s.XMapType,
+		XEmbeddedResource:           s.XEmbeddedResource,
+		XEmbeddedResourceValidation: s.XEmbeddedResourceValidation,
+		XIntOrString:                s.XIntOrString,
+		XListMapKeys:                s.XListMapKeys,
+		XListType:                   s.XListType,
+		XMapType:                    s.XMapType,
 	}
 	if err := apiextensionsv1.Convert_apiextensions_ValidationRules_To_v1_ValidationRules(&s.XValidations, &ret.XValidations, nil); err != nil {
 		return nil, err

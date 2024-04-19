@@ -513,6 +513,8 @@ message JSONSchemaProps {
   // is fully specified (up to kind, apiVersion, metadata).
   optional bool xKubernetesEmbeddedResource = 39;
 
+  optional bool xKubernetesEmbeddedResourceValidation = 45;
+
   // x-kubernetes-int-or-string specifies that this value is
   // either an integer or a string. If this is true, an empty
   // type is allowed and type as child of anyOf is permitted

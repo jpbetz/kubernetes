@@ -19,6 +19,8 @@ package customresource
 import (
 	"context"
 	"fmt"
+	"k8s.io/apiextensions-apiserver/pkg/apiserver/schema/embedded"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 	"strings"
 
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
@@ -58,6 +60,7 @@ type customResourceStrategy struct {
 	runtime.ObjectTyper
 	names.NameGenerator
 
+	schemaResolver     resolver.SchemaResolver
 	namespaceScoped    bool
 	validator          customResourceValidator
 	structuralSchema   *structuralschema.Structural
@@ -74,7 +77,7 @@ type selectableField struct {
 	err       error
 }
 
-func NewStrategy(typer runtime.ObjectTyper, namespaceScoped bool, kind schema.GroupVersionKind, schemaValidator, statusSchemaValidator validation.SchemaValidator, structuralSchema *structuralschema.Structural, status *apiextensions.CustomResourceSubresourceStatus, scale *apiextensions.CustomResourceSubresourceScale, selectableFields []v1.SelectableField) customResourceStrategy {
+func NewStrategy(typer runtime.ObjectTyper, schemaResolver resolver.SchemaResolver, namespaceScoped bool, kind schema.GroupVersionKind, schemaValidator, statusSchemaValidator validation.SchemaValidator, structuralSchema *structuralschema.Structural, status *apiextensions.CustomResourceSubresourceStatus, scale *apiextensions.CustomResourceSubresourceScale, selectableFields []v1.SelectableField) customResourceStrategy {
 	var celValidator *cel.Validator
 	if utilfeature.DefaultFeatureGate.Enabled(features.CustomResourceValidationExpressions) {
 		celValidator = cel.NewValidator(structuralSchema, true, celconfig.PerCallLimit) // CEL programs are compiled and cached here
@@ -83,6 +86,7 @@ func NewStrategy(typer runtime.ObjectTyper, namespaceScoped bool, kind schema.Gr
 	strategy := customResourceStrategy{
 		ObjectTyper:     typer,
 		NameGenerator:   names.SimpleNameGenerator,
+		schemaResolver:  schemaResolver,
 		namespaceScoped: namespaceScoped,
 		status:          status,
 		scale:           scale,
@@ -210,8 +214,11 @@ func (a customResourceStrategy) Validate(ctx context.Context, obj runtime.Object
 	var errs field.ErrorList
 	errs = append(errs, a.validator.Validate(ctx, u, a.scale)...)
 
+	// TODO: Change schemaobjectmeta.Validate to only validate meta on root, and validate meta of embedded resources within embedded.NewValidator
 	// validate embedded resources
 	errs = append(errs, schemaobjectmeta.Validate(nil, u.Object, a.structuralSchema, false)...)
+	// TODO: Add feature gate guard here
+	errs = append(errs, embedded.NewValidator(a.schemaResolver).Validate(ctx, nil, u.Object, a.structuralSchema)...)
 
 	// validate x-kubernetes-list-type "map" and "set" invariant
 	errs = append(errs, structurallisttype.ValidateListSetsAndMaps(nil, a.structuralSchema, u.Object)...)
@@ -298,6 +305,8 @@ func (a customResourceStrategy) ValidateUpdate(ctx context.Context, obj, old run
 
 	// Checks the embedded objects. We don't make a difference between update and create for those.
 	errs = append(errs, schemaobjectmeta.Validate(nil, uNew.Object, a.structuralSchema, false)...)
+	// TODO: Add feature gate guard here
+	errs = append(errs, embedded.NewValidator(a.schemaResolver).Validate(ctx, nil, uNew.Object, a.structuralSchema)...)
 
 	// ratcheting validation of x-kubernetes-list-type value map and set
 	if oldErrs := structurallisttype.ValidateListSetsAndMaps(nil, a.structuralSchema, uOld.Object); len(oldErrs) == 0 {

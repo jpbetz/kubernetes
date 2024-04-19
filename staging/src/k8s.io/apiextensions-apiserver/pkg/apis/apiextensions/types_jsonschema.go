@@ -92,6 +92,8 @@ type JSONSchemaProps struct {
 	// must be true.
 	XEmbeddedResource bool
 
+	XEmbeddedResourceValidation bool
+
 	// x-kubernetes-int-or-string specifies that this value is
 	// either an integer or a string. If this is true, an empty
 	// type is allowed and type as child of anyOf is permitted

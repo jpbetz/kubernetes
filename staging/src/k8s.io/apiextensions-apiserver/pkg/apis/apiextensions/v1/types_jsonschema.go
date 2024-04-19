@@ -129,6 +129,8 @@ type JSONSchemaProps struct {
 	// is fully specified (up to kind, apiVersion, metadata).
 	XEmbeddedResource bool `json:"x-kubernetes-embedded-resource,omitempty" protobuf:"bytes,39,opt,name=xKubernetesEmbeddedResource"`
 
+	XEmbeddedResourceValidation bool `json:"x-kubernetes-embedded-resource-validation,omitempty" protobuf:"bytes,45,opt,name=xKubernetesEmbeddedResourceValidation"`
+
 	// x-kubernetes-int-or-string specifies that this value is
 	// either an integer or a string. If this is true, an empty
 	// type is allowed and type as child of anyOf is permitted

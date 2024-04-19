@@ -388,6 +388,9 @@ func ConvertJSONSchemaPropsWithPostProcess(in *apiextensions.JSONSchemaProps, ou
 	if in.XEmbeddedResource {
 		out.VendorExtensible.AddExtension("x-kubernetes-embedded-resource", true)
 	}
+	if in.XEmbeddedResourceValidation {
+		out.VendorExtensible.AddExtension("x-kubernetes-embedded-resource-validation", true)
+	}
 	if len(in.XListMapKeys) != 0 {
 		out.VendorExtensible.AddExtension("x-kubernetes-list-map-keys", convertSliceToInterfaceSlice(in.XListMapKeys))
 	}

@@ -231,6 +231,10 @@ func validateExtensions(x *Extensions, fldPath *field.Path) field.ErrorList {
 	if x.XIntOrString && x.XEmbeddedResource {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("x-kubernetes-embedded-resource"), x.XEmbeddedResource, "must be false if x-kubernetes-int-or-string is true"))
 	}
+	if x.XEmbeddedResourceValidation && !x.XEmbeddedResource {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("x-kubernetes-embedded-resource-validation"), x.XEmbeddedResource, "must be false if x-kubernetes-embedded-resource is not true"))
+	}
+	// TODO: Decide how XPreserveUnknownFields should be handled when XEmbeddedResourceValidation is true
 
 	return allErrs
 }
