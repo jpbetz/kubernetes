@@ -306,7 +306,7 @@ func (a customResourceStrategy) ValidateUpdate(ctx context.Context, obj, old run
 	// Checks the embedded objects. We don't make a difference between update and create for those.
 	errs = append(errs, schemaobjectmeta.Validate(nil, uNew.Object, a.structuralSchema, false)...)
 	// TODO: Add feature gate guard here
-	errs = append(errs, embedded.NewValidator(a.schemaResolver).Validate(ctx, nil, uNew.Object, a.structuralSchema)...)
+	errs = append(errs, embedded.NewValidator(a.schemaResolver).ValidateUpdate(ctx, nil, uNew.Object, correlatedObject, a.structuralSchema)...)
 
 	// ratcheting validation of x-kubernetes-list-type value map and set
 	if oldErrs := structurallisttype.ValidateListSetsAndMaps(nil, a.structuralSchema, uOld.Object); len(oldErrs) == 0 {
