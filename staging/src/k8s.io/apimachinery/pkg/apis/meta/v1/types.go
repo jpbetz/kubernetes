@@ -56,6 +56,12 @@ type TypeMeta struct {
 	APIVersion string `json:"apiVersion,omitempty" protobuf:"bytes,2,opt,name=apiVersion"`
 }
 
+type ExtensionMeta struct {
+	// TODO: Can I inline the map in JSON form (keeping it under a name in protobuf?)
+	// https://goplay.tools/snippet/5uQKYqVinIR (can't find a way...  `,inline` does not appear to be supported for maps)
+	Extensions map[string]runtime.RawExtension `json:"extensions,omitempty" protobuf:"bytes,1,opt,name=extensions"`
+}
+
 // ListMeta describes metadata that synthetic resources must have, including lists and
 // various status objects. A resource may have only one of {ObjectMeta, ListMeta}.
 type ListMeta struct {

@@ -39,6 +39,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"k8s.io/apimachinery/pkg/apis/meta/v1.CreateOptions":             schema_pkg_apis_meta_v1_CreateOptions(ref),
 		"k8s.io/apimachinery/pkg/apis/meta/v1.DeleteOptions":             schema_pkg_apis_meta_v1_DeleteOptions(ref),
 		"k8s.io/apimachinery/pkg/apis/meta/v1.Duration":                  schema_pkg_apis_meta_v1_Duration(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.ExtensionMeta":             schema_pkg_apis_meta_v1_ExtensionMeta(ref),
 		"k8s.io/apimachinery/pkg/apis/meta/v1.FieldsV1":                  schema_pkg_apis_meta_v1_FieldsV1(ref),
 		"k8s.io/apimachinery/pkg/apis/meta/v1.GetOptions":                schema_pkg_apis_meta_v1_GetOptions(ref),
 		"k8s.io/apimachinery/pkg/apis/meta/v1.GroupKind":                 schema_pkg_apis_meta_v1_GroupKind(ref),
@@ -745,6 +746,33 @@ func schema_pkg_apis_meta_v1_Duration(ref common.ReferenceCallback) common.OpenA
 				Format:      v1.Duration{}.OpenAPISchemaFormat(),
 			},
 		},
+	}
+}
+
+func schema_pkg_apis_meta_v1_ExtensionMeta(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"extensions": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/apimachinery/pkg/runtime.RawExtension"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/runtime.RawExtension"},
 	}
 }
 

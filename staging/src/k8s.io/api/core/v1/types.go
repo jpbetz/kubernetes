@@ -4694,6 +4694,8 @@ type Pod struct {
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
+	metav1.ExtensionMeta `json:",inline" protobuf:"bytes,4,opt,name=extensionMeta"`
+
 	// Specification of the desired behavior of the pod.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
@@ -7102,6 +7104,8 @@ type ConfigMap struct {
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+
+	metav1.ExtensionMeta `json:",inline" protobuf:"bytes,5,opt,name=extensionMeta"`
 
 	// Immutable, if set to true, ensures that data stored in the ConfigMap cannot
 	// be updated (only object metadata can be modified).

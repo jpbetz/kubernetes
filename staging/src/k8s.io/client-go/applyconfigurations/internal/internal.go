@@ -4743,6 +4743,11 @@ var schemaYAML = typed.YAMLObject(`types:
         map:
           elementType:
             scalar: string
+    - name: extensions
+      type:
+        map:
+          elementType:
+            namedType: __untyped_atomic_
     - name: immutable
       type:
         scalar: boolean
@@ -6606,6 +6611,11 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: apiVersion
       type:
         scalar: string
+    - name: extensions
+      type:
+        map:
+          elementType:
+            namedType: __untyped_atomic_
     - name: kind
       type:
         scalar: string

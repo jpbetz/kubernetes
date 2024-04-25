@@ -31,6 +31,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/google/go-cmp/cmp"
+
 	v1 "k8s.io/api/core/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -6600,7 +6601,6 @@ var ValidateConfigMapName = apimachineryvalidation.NameIsDNSSubdomain
 func ValidateConfigMap(cfg *core.ConfigMap) field.ErrorList {
 	allErrs := field.ErrorList{}
 	allErrs = append(allErrs, ValidateObjectMeta(&cfg.ObjectMeta, true, ValidateConfigMapName, field.NewPath("metadata"))...)
-
 	totalSize := 0
 
 	for key, value := range cfg.Data {

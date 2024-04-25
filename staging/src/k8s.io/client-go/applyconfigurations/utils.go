@@ -1321,6 +1321,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationsmetav1.ConditionApplyConfiguration{}
 	case metav1.SchemeGroupVersion.WithKind("DeleteOptions"):
 		return &applyconfigurationsmetav1.DeleteOptionsApplyConfiguration{}
+	case metav1.SchemeGroupVersion.WithKind("ExtensionMeta"):
+		return &applyconfigurationsmetav1.ExtensionMetaApplyConfiguration{}
 	case metav1.SchemeGroupVersion.WithKind("LabelSelector"):
 		return &applyconfigurationsmetav1.LabelSelectorApplyConfiguration{}
 	case metav1.SchemeGroupVersion.WithKind("LabelSelectorRequirement"):

@@ -17,17 +17,21 @@ limitations under the License.
 package validation
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	v1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 )
 
 // FieldImmutableErrorMsg is a error message for field is immutable.
@@ -147,6 +151,20 @@ func ValidateObjectMeta(objMeta *metav1.ObjectMeta, requiresNamespace bool, name
 		return allErrs
 	}
 	return ValidateObjectMetaAccessor(metadata, requiresNamespace, nameFn, fldPath)
+}
+
+func ValidateExtensions(extensions map[string]runtime.RawExtension, fldPath *field.Path, resolver resolver.SchemaResolver) (errs field.ErrorList) {
+	for k, extObj := range extensions {
+		parts := strings.SplitN(k, ".", 1)
+		if len(parts) < 2 {
+			errs = append(errs, field.Invalid(fldPath, k, "invalid extension key, expected key of the form <kind>.<group>/<version>"))
+		}
+		kind, apiVersion := parts[0], parts[1]
+		gvk := schema.FromAPIVersionAndKind(apiVersion, kind)
+		validator := NewExtensionValidator(resolver)
+		errs = append(errs, validator.Validate(context.TODO(), fldPath, gvk, extObj.Object.(*unstructured.Unstructured).Object)...)
+	}
+	return errs
 }
 
 // ValidateObjectMetaAccessor validates an object's metadata on creation. It expects that name generation has already

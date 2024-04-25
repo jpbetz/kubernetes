@@ -2927,6 +2927,7 @@ func Convert_core_ComponentStatusList_To_v1_ComponentStatusList(in *core.Compone
 
 func autoConvert_v1_ConfigMap_To_core_ConfigMap(in *v1.ConfigMap, out *core.ConfigMap, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
+	out.ExtensionMeta = in.ExtensionMeta
 	out.Immutable = (*bool)(unsafe.Pointer(in.Immutable))
 	out.Data = *(*map[string]string)(unsafe.Pointer(&in.Data))
 	out.BinaryData = *(*map[string][]byte)(unsafe.Pointer(&in.BinaryData))
@@ -2940,6 +2941,7 @@ func Convert_v1_ConfigMap_To_core_ConfigMap(in *v1.ConfigMap, out *core.ConfigMa
 
 func autoConvert_core_ConfigMap_To_v1_ConfigMap(in *core.ConfigMap, out *v1.ConfigMap, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
+	out.ExtensionMeta = in.ExtensionMeta
 	out.Immutable = (*bool)(unsafe.Pointer(in.Immutable))
 	out.Data = *(*map[string]string)(unsafe.Pointer(&in.Data))
 	out.BinaryData = *(*map[string][]byte)(unsafe.Pointer(&in.BinaryData))
@@ -5808,6 +5810,7 @@ func Convert_core_PhotonPersistentDiskVolumeSource_To_v1_PhotonPersistentDiskVol
 
 func autoConvert_v1_Pod_To_core_Pod(in *v1.Pod, out *core.Pod, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
+	out.ExtensionMeta = in.ExtensionMeta
 	if err := Convert_v1_PodSpec_To_core_PodSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
 	}
@@ -5819,6 +5822,7 @@ func autoConvert_v1_Pod_To_core_Pod(in *v1.Pod, out *core.Pod, s conversion.Scop
 
 func autoConvert_core_Pod_To_v1_Pod(in *core.Pod, out *v1.Pod, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
+	out.ExtensionMeta = in.ExtensionMeta
 	if err := Convert_core_PodSpec_To_v1_PodSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
 	}

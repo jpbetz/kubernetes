@@ -17,6 +17,7 @@ limitations under the License.
 package v1
 
 import (
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 )
@@ -77,6 +78,10 @@ type Common interface {
 	SetResourceVersion(version string)
 	GetSelfLink() string
 	SetSelfLink(selfLink string)
+}
+
+type Extensions interface {
+	GetExtensions() map[string]runtime.RawExtension
 }
 
 // ListInterface lets you work with list metadata from any of the versioned or
@@ -174,3 +179,5 @@ func (meta *ObjectMeta) GetManagedFields() []ManagedFieldsEntry { return meta.Ma
 func (meta *ObjectMeta) SetManagedFields(managedFields []ManagedFieldsEntry) {
 	meta.ManagedFields = managedFields
 }
+
+func (meta *ExtensionMeta) GetExtensions() map[string]runtime.RawExtension { return meta.Extensions }

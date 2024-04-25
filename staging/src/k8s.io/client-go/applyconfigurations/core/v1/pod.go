@@ -21,6 +21,7 @@ package v1
 import (
 	apicorev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	runtime "k8s.io/apimachinery/pkg/runtime"
 	types "k8s.io/apimachinery/pkg/types"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
 	internal "k8s.io/client-go/applyconfigurations/internal"
@@ -30,10 +31,11 @@ import (
 // PodApplyConfiguration represents an declarative configuration of the Pod type for use
 // with apply.
 type PodApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
-	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                             *PodSpecApplyConfiguration   `json:"spec,omitempty"`
-	Status                           *PodStatusApplyConfiguration `json:"status,omitempty"`
+	v1.TypeMetaApplyConfiguration      `json:",inline"`
+	*v1.ObjectMetaApplyConfiguration   `json:"metadata,omitempty"`
+	v1.ExtensionMetaApplyConfiguration `json:",inline"`
+	Spec                               *PodSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status                             *PodStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // Pod constructs an declarative configuration of the Pod type for use with
@@ -239,6 +241,20 @@ func (b *PodApplyConfiguration) ensureObjectMetaApplyConfigurationExists() {
 	if b.ObjectMetaApplyConfiguration == nil {
 		b.ObjectMetaApplyConfiguration = &v1.ObjectMetaApplyConfiguration{}
 	}
+}
+
+// WithExtensions puts the entries into the Extensions field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, the entries provided by each call will be put on the Extensions field,
+// overwriting an existing map entries in Extensions field with the same key.
+func (b *PodApplyConfiguration) WithExtensions(entries map[string]runtime.RawExtension) *PodApplyConfiguration {
+	if b.Extensions == nil && len(entries) > 0 {
+		b.Extensions = make(map[string]runtime.RawExtension, len(entries))
+	}
+	for k, v := range entries {
+		b.Extensions[k] = v
+	}
+	return b
 }
 
 // WithSpec sets the Spec field in the declarative configuration to the given value

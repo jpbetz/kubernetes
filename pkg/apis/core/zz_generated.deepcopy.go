@@ -608,6 +608,7 @@ func (in *ConfigMap) DeepCopyInto(out *ConfigMap) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
 	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	in.ExtensionMeta.DeepCopyInto(&out.ExtensionMeta)
 	if in.Immutable != nil {
 		in, out := &in.Immutable, &out.Immutable
 		*out = new(bool)
@@ -3539,6 +3540,7 @@ func (in *Pod) DeepCopyInto(out *Pod) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
 	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	in.ExtensionMeta.DeepCopyInto(&out.ExtensionMeta)
 	in.Spec.DeepCopyInto(&out.Spec)
 	in.Status.DeepCopyInto(&out.Status)
 	return

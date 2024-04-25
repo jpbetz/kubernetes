@@ -3999,6 +3999,8 @@ type Pod struct {
 	// +optional
 	metav1.ObjectMeta
 
+	metav1.ExtensionMeta
+
 	// Spec defines the behavior of a pod.
 	// +optional
 	Spec PodSpec
@@ -5958,6 +5960,8 @@ type ConfigMap struct {
 	metav1.TypeMeta
 	// +optional
 	metav1.ObjectMeta
+
+	metav1.ExtensionMeta
 
 	// Immutable field, if set, ensures that data stored in the ConfigMap cannot
 	// be updated (only object metadata can be modified).

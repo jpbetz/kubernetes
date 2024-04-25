@@ -60,7 +60,6 @@ func (strategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
 
 func (strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	cfg := obj.(*api.ConfigMap)
-
 	return validation.ValidateConfigMap(cfg)
 }
 

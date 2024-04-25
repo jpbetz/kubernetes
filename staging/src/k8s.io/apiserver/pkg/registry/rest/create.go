@@ -29,9 +29,12 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/admission"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/storage/names"
 	"k8s.io/apiserver/pkg/warning"
+	k8sscheme "k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/kubernetes/pkg/generated/openapi"
 )
 
 // RESTCreateStrategy defines the minimum validation, accepted input, and
@@ -128,6 +131,15 @@ func BeforeCreate(strategy RESTCreateStrategy, ctx context.Context, obj runtime.
 	// Do this *after* custom validation so that specific error messages are shown whenever possible
 	if errs := genericvalidation.ValidateObjectMetaAccessor(objectMeta, strategy.NamespaceScoped(), path.ValidatePathSegmentName, field.NewPath("metadata")); len(errs) > 0 {
 		return errors.NewInvalid(kind.GroupKind(), objectMeta.GetName(), errs)
+	}
+
+	r := resolver.NewDefinitionsSchemaResolver(openapi.GetOpenAPIDefinitions, k8sscheme.Scheme)
+	// TODO:
+	//.Combine(&resolver.ClientDiscoveryResolver{Discovery: discovery.NewDiscoveryClientForConfigOrDie(genericConfig.LoopbackClientConfig)}),
+	if ext, ok := obj.(metav1.Extensions); ok {
+		if errs := genericvalidation.ValidateExtensions(ext.GetExtensions(), field.NewPath("extensions"), r); len(errs) > 0 {
+			return errors.NewInvalid(kind.GroupKind(), objectMeta.GetName(), errs)
+		}
 	}
 
 	for _, w := range strategy.WarningsOnCreate(ctx, obj) {

@@ -324,6 +324,11 @@ message Duration {
   optional int64 duration = 1;
 }
 
+message ExtensionMeta {
+  // TODO: Can I inline the map in JSON form (keeping it under a name in protobuf?)
+  map<string, .k8s.io.apimachinery.pkg.runtime.RawExtension> extensions = 1;
+}
+
 // FieldsV1 stores a set of fields in a data structure like a Trie, in JSON format.
 //
 // Each key is either a '.' representing the field itself, and will always map to an empty set,

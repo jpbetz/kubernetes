@@ -546,6 +546,8 @@ message ConfigMap {
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ExtensionMeta extensionMeta = 5;
+
   // Immutable, if set to true, ensures that data stored in the ConfigMap cannot
   // be updated (only object metadata can be modified).
   // If not set to true, the field can be modified at any time.
@@ -3423,6 +3425,8 @@ message Pod {
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
+
+  optional .k8s.io.apimachinery.pkg.apis.meta.v1.ExtensionMeta extensionMeta = 4;
 
   // Specification of the desired behavior of the pod.
   // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status

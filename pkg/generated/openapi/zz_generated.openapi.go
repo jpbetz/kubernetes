@@ -1041,6 +1041,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"k8s.io/apimachinery/pkg/apis/meta/v1.CreateOptions":                                                    schema_pkg_apis_meta_v1_CreateOptions(ref),
 		"k8s.io/apimachinery/pkg/apis/meta/v1.DeleteOptions":                                                    schema_pkg_apis_meta_v1_DeleteOptions(ref),
 		"k8s.io/apimachinery/pkg/apis/meta/v1.Duration":                                                         schema_pkg_apis_meta_v1_Duration(ref),
+		"k8s.io/apimachinery/pkg/apis/meta/v1.ExtensionMeta":                                                    schema_pkg_apis_meta_v1_ExtensionMeta(ref),
 		"k8s.io/apimachinery/pkg/apis/meta/v1.FieldsV1":                                                         schema_pkg_apis_meta_v1_FieldsV1(ref),
 		"k8s.io/apimachinery/pkg/apis/meta/v1.GetOptions":                                                       schema_pkg_apis_meta_v1_GetOptions(ref),
 		"k8s.io/apimachinery/pkg/apis/meta/v1.GroupKind":                                                        schema_pkg_apis_meta_v1_GroupKind(ref),
@@ -19980,6 +19981,19 @@ func schema_k8sio_api_core_v1_ConfigMap(ref common.ReferenceCallback) common.Ope
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
+					"extensions": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/apimachinery/pkg/runtime.RawExtension"),
+									},
+								},
+							},
+						},
+					},
 					"immutable": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Immutable, if set to true, ensures that data stored in the ConfigMap cannot be updated (only object metadata can be modified). If not set to true, the field can be modified at any time. Defaulted to nil.",
@@ -20022,7 +20036,7 @@ func schema_k8sio_api_core_v1_ConfigMap(ref common.ReferenceCallback) common.Ope
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "k8s.io/apimachinery/pkg/runtime.RawExtension"},
 	}
 }
 
@@ -26134,6 +26148,19 @@ func schema_k8sio_api_core_v1_Pod(ref common.ReferenceCallback) common.OpenAPIDe
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
+					"extensions": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/apimachinery/pkg/runtime.RawExtension"),
+									},
+								},
+							},
+						},
+					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Specification of the desired behavior of the pod. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
@@ -26152,7 +26179,7 @@ func schema_k8sio_api_core_v1_Pod(ref common.ReferenceCallback) common.OpenAPIDe
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/api/core/v1.PodSpec", "k8s.io/api/core/v1.PodStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"k8s.io/api/core/v1.PodSpec", "k8s.io/api/core/v1.PodStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "k8s.io/apimachinery/pkg/runtime.RawExtension"},
 	}
 }
 
@@ -53506,6 +53533,33 @@ func schema_pkg_apis_meta_v1_Duration(ref common.ReferenceCallback) common.OpenA
 				Format:      metav1.Duration{}.OpenAPISchemaFormat(),
 			},
 		},
+	}
+}
+
+func schema_pkg_apis_meta_v1_ExtensionMeta(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"extensions": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/apimachinery/pkg/runtime.RawExtension"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/runtime.RawExtension"},
 	}
 }
 

@@ -21,6 +21,7 @@ package v1
 import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	runtime "k8s.io/apimachinery/pkg/runtime"
 	types "k8s.io/apimachinery/pkg/types"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
 	internal "k8s.io/client-go/applyconfigurations/internal"
@@ -30,11 +31,12 @@ import (
 // ConfigMapApplyConfiguration represents an declarative configuration of the ConfigMap type for use
 // with apply.
 type ConfigMapApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
-	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Immutable                        *bool             `json:"immutable,omitempty"`
-	Data                             map[string]string `json:"data,omitempty"`
-	BinaryData                       map[string][]byte `json:"binaryData,omitempty"`
+	v1.TypeMetaApplyConfiguration      `json:",inline"`
+	*v1.ObjectMetaApplyConfiguration   `json:"metadata,omitempty"`
+	v1.ExtensionMetaApplyConfiguration `json:",inline"`
+	Immutable                          *bool             `json:"immutable,omitempty"`
+	Data                               map[string]string `json:"data,omitempty"`
+	BinaryData                         map[string][]byte `json:"binaryData,omitempty"`
 }
 
 // ConfigMap constructs an declarative configuration of the ConfigMap type for use with
@@ -240,6 +242,20 @@ func (b *ConfigMapApplyConfiguration) ensureObjectMetaApplyConfigurationExists()
 	if b.ObjectMetaApplyConfiguration == nil {
 		b.ObjectMetaApplyConfiguration = &v1.ObjectMetaApplyConfiguration{}
 	}
+}
+
+// WithExtensions puts the entries into the Extensions field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, the entries provided by each call will be put on the Extensions field,
+// overwriting an existing map entries in Extensions field with the same key.
+func (b *ConfigMapApplyConfiguration) WithExtensions(entries map[string]runtime.RawExtension) *ConfigMapApplyConfiguration {
+	if b.Extensions == nil && len(entries) > 0 {
+		b.Extensions = make(map[string]runtime.RawExtension, len(entries))
+	}
+	for k, v := range entries {
+		b.Extensions[k] = v
+	}
+	return b
 }
 
 // WithImmutable sets the Immutable field in the declarative configuration to the given value
