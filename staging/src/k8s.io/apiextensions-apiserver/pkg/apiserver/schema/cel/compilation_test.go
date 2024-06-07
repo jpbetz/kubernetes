@@ -1322,12 +1322,16 @@ func genMapWithCustomItemRule(item *schema.Structural, rule string) func(maxProp
 	}
 }
 
-// schemaChecker checks the cost of the validation rule declared in the provided schema (it requires there be exactly one rule)
-// and checks that the resulting equals the expectedCost if expectedCost is non-zero, and that the resulting cost is >= expectedCostExceedsLimit
+// schemaChecker checks the cost of the validation rule declared in the provided schema (it requires there be exactly one rule),
+// for a given compatibilityVersion.
+// It checks that the resulting equals the expectedCost if expectedCost is non-zero, and that the resulting cost is >= expectedCostExceedsLimit
 // if expectedCostExceedsLimit is non-zero. Typically, only expectedCost or expectedCostExceedsLimit is non-zero, not both.
-func schemaChecker(schema *schema.Structural, expectedCost uint64, expectedCostExceedsLimit uint64, t *testing.T) func(t *testing.T) {
+func schemaChecker(schema *schema.Structural, compatibilityVersion *version.Version, expectedCost uint64, expectedCostExceedsLimit uint64, t *testing.T) func(t *testing.T) {
+	if compatibilityVersion == nil {
+		compatibilityVersion = environment.DefaultCompatibilityVersion()
+	}
 	return func(t *testing.T) {
-		compilationResults, err := Compile(schema, model.SchemaDeclType(schema, false), celconfig.PerCallLimit, environment.MustBaseEnvSet(environment.DefaultCompatibilityVersion(), true), NewExpressionsEnvLoader())
+		compilationResults, err := Compile(schema, model.SchemaDeclType(schema, false), celconfig.PerCallLimit, environment.MustBaseEnvSet(compatibilityVersion, true), NewExpressionsEnvLoader())
 		if err != nil {
 			t.Fatalf("Expected no error, got: %v", err)
 		}
@@ -1876,10 +1880,10 @@ func TestCostEstimation(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			// dynamic maxLength case
 			schema := testCase.schemaGenerator(nil)
-			t.Run("calc maxLength", schemaChecker(schema, testCase.expectedCalcCost, testCase.expectCalcCostExceedsLimit, t))
+			t.Run("calc maxLength", schemaChecker(schema, environment.DefaultCompatibilityVersion(), testCase.expectedCalcCost, testCase.expectCalcCostExceedsLimit, t))
 			// static maxLength case
 			setSchema := testCase.schemaGenerator(&testCase.setMaxElements)
-			t.Run("set maxLength", schemaChecker(setSchema, testCase.expectedSetCost, testCase.expectedSetCostExceedsLimit, t))
+			t.Run("set maxLength", schemaChecker(setSchema, environment.DefaultCompatibilityVersion(), testCase.expectedSetCost, testCase.expectedSetCostExceedsLimit, t))
 		})
 	}
 }

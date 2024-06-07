@@ -24,7 +24,9 @@ import (
 
 	"k8s.io/apiextensions-apiserver/pkg/apiserver/schema"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	"k8s.io/apimachinery/pkg/util/version"
 	celconfig "k8s.io/apiserver/pkg/apis/cel"
+	"k8s.io/apiserver/pkg/cel/environment"
 	"k8s.io/utils/ptr"
 )
 
@@ -1210,9 +1212,10 @@ func buildLargeArray(size int) []interface{} {
 
 func TestCelEstimatedCostStability(t *testing.T) {
 	cases := []struct {
-		name       string
-		schema     *schema.Structural
-		expectCost map[string]uint64
+		name              string
+		introducedVersion *version.Version
+		schema            *schema.Structural
+		expectCost        map[string]uint64
 	}{
 		{name: "integers",
 			// 1st obj and schema args are for "self.val1" field, 2nd for "self.val2" and so on.
@@ -2020,6 +2023,14 @@ func TestCelEstimatedCostStability(t *testing.T) {
 				`quantity(self.val1).isInteger()`:                                                                                        314576,
 			},
 		},
+		{name: "bindings",
+			introducedVersion: version.MajorMinor(1, 31),
+			schema:            schemas(stringType, stringType),
+			expectCost: map[string]uint64{
+				`self.val1 == 'x'`:                 3,
+				`cel.bind(v, self.val1, v == 'x')`: 13,
+			},
+		},
 	}
 
 	for _, tt := range cases {
@@ -2036,7 +2047,11 @@ func TestCelEstimatedCostStability(t *testing.T) {
 				t.Run(testName, func(t *testing.T) {
 					t.Parallel()
 					s := withRule(*tt.schema, validRule)
-					t.Run("calc maxLength", schemaChecker(&s, uint64(expectedCost), 0, t))
+					v := tt.introducedVersion
+					if v == nil {
+						v = environment.DefaultCompatibilityVersion()
+					}
+					t.Run("calc maxLength", schemaChecker(&s, v, uint64(expectedCost), 0, t))
 				})
 			}
 		})

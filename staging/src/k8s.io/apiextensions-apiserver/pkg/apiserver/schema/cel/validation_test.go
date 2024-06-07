@@ -563,10 +563,29 @@ func TestValidationExpressions(t *testing.T) {
 				})),
 			}),
 			valid: []string{
-				"self.objs[0] == self.objs[1]",
+				"cel.bind(v, self.objs[0].f1, v == 'a')",
 			},
 			errors: map[string]string{
 				"self.objs[0] == {'f1': 'a', 'f2': 'b'}": "found no matching overload for '_==_'", // objects cannot be compared against a data literal map
+			},
+		},
+		{name: "bindings",
+			obj: map[string]interface{}{
+				"objs": []interface{}{
+					map[string]interface{}{"f1": "a", "f2": "b"},
+				},
+			},
+			schema: objectTypePtr(map[string]schema.Structural{
+				"objs": listType(objectTypePtr(map[string]schema.Structural{
+					"f1": stringType,
+				})),
+			}),
+			valid: []string{
+				"cel.bind(v, self.objs[0].f1, v == 'a')",
+				"cel.bind(v, 'plain string', v == 'plain string')",
+			},
+			errors: map[string]string{
+				"cel.bind(v, self.nosuchfield, v == 'a')": "undefined field 'nosuchfield'",
 			},
 		},
 		{name: "object access",
