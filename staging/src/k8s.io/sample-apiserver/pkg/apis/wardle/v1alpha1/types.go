@@ -41,10 +41,20 @@ type FlunderSpec struct {
 	// A name of another flunder or fischer, depending on the reference type.
 	//
 	// +k8s:validation:maxLength=128
-	// +default="this"
 	Reference string `json:"reference,omitempty" protobuf:"bytes,1,opt,name=reference"`
 	// The reference type, defaults to "Flunder" if reference is set.
 	ReferenceType *ReferenceType `json:"referenceType,omitempty" protobuf:"bytes,2,opt,name=referenceType"`
+
+	Primary Widget `json:"primary,omitempty" protobuf:"bytes,3,opt,name=primary"`
+
+	Extras []Widget `json:"extras,omitempty" protobuf:"bytes,4,rep,name=extras"`
+
+	More map[string]Widget `json:"more,omitempty" protobuf:"bytes,5,rep,name=more"`
+}
+
+type Widget struct {
+	// +k8s:validation:maxLength=128
+	Name string `json:"name,omitempty" protobuf:"bytes,1,opt,name=name"`
 }
 
 type FlunderStatus struct {
@@ -75,6 +85,8 @@ type Fischer struct {
 	// DisallowedFlunders holds a list of Flunder.Names that are disallowed.
 	// +listType=atomic
 	DisallowedFlunders []string `json:"disallowedFlunders,omitempty" protobuf:"bytes,2,rep,name=disallowedFlunders"`
+
+	Primary Widget `json:"primary,omitempty" protobuf:"bytes,3,opt,name=primary"`
 }
 
 // +genclient:nonNamespaced
