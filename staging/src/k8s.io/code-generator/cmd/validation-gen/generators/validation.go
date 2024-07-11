@@ -416,11 +416,18 @@ func (c *callTreeForType) build(t *types.Type, root bool) *callNode {
 					name = field.Type.Name.Name
 				}
 			}
+			// TODO: find the tag name of the field
+			jsonName := "<missing name>"
+			if tags, ok := lookupJSONTags(field); ok {
+				jsonName = tags.name
+			}
 			if child := c.build(field.Type, false); child != nil {
 				child.field = name
+				child.jsonName = jsonName
 				parent.children = append(parent.children, *child)
 			} else if child := populateValidations(child, field.Type, field.CommentLines); child != nil {
 				child.field = name
+				child.jsonName = jsonName
 				parent.children = append(parent.children, *child)
 			}
 		}
@@ -434,7 +441,10 @@ func (c *callTreeForType) build(t *types.Type, root bool) *callNode {
 	}
 
 	if t.Kind == types.Struct && !parent.index && !parent.key {
+		baseT, _ := resolveTypeAndDepth(t)
+		parent.validationIsPrimitive = baseT.IsPrimitive()
 		parent.validationType = t
+		parent.validationTopLevelType = baseT
 	}
 	return parent
 }
@@ -553,7 +563,8 @@ func (g *genValidations) generateValidations(c *generator.Context, inType *types
 	}
 
 	sw.Do("func $.inType|objectvalidationfn$(in *$.inType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", args)
-	callTree.WriteMethod(c, "in", 0, nil, sw)
+	// TODO: is it OK to pass an empty fieldName here? How do we document/justify this?
+	callTree.WriteMethod(c, "in", pathPart{}, 0, nil, sw)
 	sw.Do("return errs\n", nil)
 	sw.Do("}\n\n", nil)
 }
@@ -589,6 +600,8 @@ func (g *genValidations) generateValidations(c *generator.Context, inType *types
 type callNode struct {
 	// field is the name of the Go member to access
 	field string
+	// jsonName is the json name of the member to access
+	jsonName string
 	// key is true if this is a map and we must range over the key and values
 	key bool
 	// index is true if this is a slice and we must range over the slice values
@@ -616,7 +629,7 @@ type callNode struct {
 	validationType *types.Type
 
 	// validationTopLevelType is the final type the value should resolve to
-	// This is in constrast with default type, which resolves aliases and pointers.
+	// This is in contrast to the default type, which resolves aliases and pointers.
 	validationTopLevelType *types.Type
 }
 
@@ -658,45 +671,10 @@ func varsForDepth(depth int) (index, local string) {
 	return
 }
 
-// writeCalls generates a list of function calls based on the calls field for the provided variable
-// name and pointer.
-func (n *callNode) writeCall(varName string, isVarPointer bool, sw *generator.SnippetWriter) {
-	accessor := varName
-	if !isVarPointer {
-		accessor = "&" + accessor
-	}
-	sw.Do("errs = append(errs, $.fn|objectvalidationfn$($.var$, fldPath)...)\n", generator.Args{
-		"fn":  n.validationType,
-		"var": accessor,
-	})
-}
-
-func (n *callNode) writeValidations(c *generator.Context, varName string, index string, isVarPointer bool, sw *generator.SnippetWriter) {
-	if n.validations.IsEmpty() {
-		return
-	}
-	args := generator.Args{
-		"typeValidations": n.validations,
-		"varName":         varName,
-		"fieldName":       "TODO",
-		"index":           index,
-		"varTopType":      n.validationTopLevelType,
-		"invalid":         c.Universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/util/validation/field", Name: "Invalid"}),
-	}
-
-	// TODO: handle fieldNames
-	// TODO: Call into kube-openapi for all the validation functions?  OR should we instead call into the exact same functions
-	//       we have already defined for hand written types?
-	if n.validations.MaxLength != nil {
-		// If default value is a literal then it can be assigned via var stmt
-		sw.Do("if len($.varName$) > $.typeValidations.MaxLength$ { errs = append(errs, $.invalid|raw$(fldPath.Child(\"$.fieldName$\"), $.varName$, \"must not be longer than 128 characters\"))}\n", args)
-	}
-}
-
 // WriteMethod performs an in-order traversal of the calltree, generating loops and if blocks as necessary
 // to correctly turn the call tree into a method body that invokes all calls on all child nodes of the call tree.
 // Depth is used to generate local variables at the proper depth.
-func (n *callNode) WriteMethod(c *generator.Context, varName string, depth int, ancestors []*callNode, sw *generator.SnippetWriter) {
+func (n *callNode) WriteMethod(c *generator.Context, varName string, path pathPart, depth int, ancestors []*callNode, sw *generator.SnippetWriter) {
 	isCallable := func(n callNode) bool {
 		return n.validationType != nil && n.validationType.Kind == types.Struct && !n.index && !n.key
 	}
@@ -719,12 +697,12 @@ func (n *callNode) WriteMethod(c *generator.Context, varName string, depth int, 
 			}()
 		}
 		if isCallable(*n) {
-			n.writeCall(varName, isPointer(*n), sw)
+			n.writeCall(varName, path, isPointer(*n), sw)
 			return
 		}
 	}
 
-	n.writeValidations(c, varName, index, isPointer(*n), sw)
+	n.writeValidations(c, varName, path, index, isPointer(*n), sw)
 
 	switch {
 	case n.index:
@@ -736,14 +714,15 @@ func (n *callNode) WriteMethod(c *generator.Context, varName string, depth int, 
 		}
 
 		for _, child := range n.children { // TODO: only one child is expected
+			childVarName := varName
+			if len(child.field) > 0 {
+				childVarName = local + "." + child.field
+			}
 			if n.validationType != nil && n.validationType.Kind == types.Struct {
-				n.writeCall(local, true, sw)
+				n.writeCall(local, pathPart{Index: index}, true, sw)
 			} else {
-				childVarName := varName
-				if len(child.field) > 0 {
-					childVarName = local + "." + child.field
-				}
-				child.WriteMethod(c, childVarName, depth+1, append(ancestors, n), sw)
+
+				child.WriteMethod(c, childVarName, pathPart{Index: index}, depth+1, append(ancestors, n), sw)
 			}
 		}
 		sw.Do("}\n", nil)
@@ -751,16 +730,16 @@ func (n *callNode) WriteMethod(c *generator.Context, varName string, depth int, 
 		// Map keys are typed and cannot share the same index variable as arrays and other maps
 		index = index + "_" + ancestors[len(ancestors)-1].field
 		vars["index"] = index
-		sw.Do("for _, $.index$ := range $.var$ {\n", vars)
+		sw.Do("for $.index$_idx, $.index$ := range $.var$ {\n", vars)
 		for _, child := range n.children {
 			if n.validationType != nil && n.validationType.Kind == types.Struct {
-				n.writeCall(index, false, sw)
+				n.writeCall(index, pathPart{Key: index + "_idx"}, false, sw)
 			} else {
 				childVarName := index
 				if len(child.field) > 0 {
 					childVarName = index + "." + child.field
 				}
-				child.WriteMethod(c, childVarName, depth, append(ancestors, n), sw)
+				child.WriteMethod(c, childVarName, pathPart{Key: index + "_idx"}, depth+1, append(ancestors, n), sw)
 			}
 		}
 		sw.Do("}\n", nil)
@@ -770,7 +749,144 @@ func (n *callNode) WriteMethod(c *generator.Context, varName string, depth int, 
 			if len(child.field) > 0 {
 				childVarName = varName + "." + child.field
 			}
-			child.WriteMethod(c, childVarName, depth+1, append(ancestors, n), sw)
+			child.WriteMethod(c, childVarName, pathPart{Name: child.jsonName}, depth+1, append(ancestors, n), sw)
 		}
 	}
+}
+
+// writeCall generates a list of function calls based on the calls field for the provided variable
+// name and pointer.
+func (n *callNode) writeCall(varName string, path pathPart, isVarPointer bool, sw *generator.SnippetWriter) {
+	accessor := varName
+	if !isVarPointer {
+		accessor = "&" + accessor
+	}
+
+	args := generator.Args{
+		"fn":   n.validationType,
+		"var":  accessor,
+		"path": path,
+	}
+
+	sw.Do("errs = append(errs, $.fn|objectvalidationfn$($.var$, ", args)
+
+	if len(path.Key) > 0 {
+		sw.Do("fldPath.Key($.path.Key$)", args)
+	} else if len(path.Name) > 0 {
+		sw.Do("fldPath.Child(\"$.path.Name$\")", args)
+	} else {
+		sw.Do("fldPath.Index($.path.Index$)", args)
+	}
+	sw.Do(")...)\n", args)
+}
+
+type pathPart struct {
+	Index string
+	Key   string
+	Name  string
+}
+
+func (n *callNode) writeValidations(c *generator.Context, varName string, path pathPart, index string, isVarPointer bool, sw *generator.SnippetWriter) {
+	if n.validations.IsEmpty() {
+		return
+	}
+	args := generator.Args{
+		"typeValidations": n.validations,
+		"varName":         varName,
+		"path":            path,
+		"index":           index,
+		"varTopType":      n.validationTopLevelType,
+		"invalid":         c.Universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/util/validation/field", Name: "Invalid"}),
+	}
+
+	// TODO: handle fieldNames
+	// TODO: Call into kube-openapi for all the validation functions?  OR should we instead call into the exact same functions
+	//       we have already defined for hand written types?
+	if n.validations.MaxLength != nil {
+		// If default value is a literal then it can be assigned via var stmt
+		sw.Do("if len($.varName$) > $.typeValidations.MaxLength$ { errs = append(errs, $.invalid|raw$(", args)
+		if len(path.Key) > 0 {
+			sw.Do("fldPath.Key($.path.Key$)", args)
+		} else if len(path.Name) > 0 {
+			sw.Do("fldPath.Child(\"$.path.Name$\")", args)
+		} else {
+			sw.Do("fldPath.Index($.path.Index$)", args)
+		}
+
+		sw.Do(", $.varName$, \"must not be longer than 128 characters\"))}\n", args)
+	}
+}
+
+// TODO: This was copied from apply configurations.  Somehow share or otherwise de-dup
+
+// JSONTags represents a go json field tag.
+type JSONTags struct {
+	name      string
+	omit      bool
+	inline    bool
+	omitempty bool
+}
+
+func (t JSONTags) String() string {
+	var tag string
+	if !t.inline {
+		tag += t.name
+	}
+	if t.omitempty {
+		tag += ",omitempty"
+	}
+	if t.inline {
+		tag += ",inline"
+	}
+	return tag
+}
+
+func lookupJSONTags(m types.Member) (JSONTags, bool) {
+	tag := reflect.StructTag(m.Tags).Get("json")
+	if tag == "" || tag == "-" {
+		return JSONTags{}, false
+	}
+	name, opts := parseTag(tag)
+	if name == "" {
+		name = m.Name
+	}
+	return JSONTags{
+		name:      name,
+		omit:      false,
+		inline:    opts.Contains("inline"),
+		omitempty: opts.Contains("omitempty"),
+	}, true
+}
+
+type tagOptions string
+
+// parseTag splits a struct field's json tag into its name and
+// comma-separated options.
+func parseTag(tag string) (string, tagOptions) {
+	if idx := strings.Index(tag, ","); idx != -1 {
+		return tag[:idx], tagOptions(tag[idx+1:])
+	}
+	return tag, ""
+}
+
+// Contains reports whether a comma-separated listAlias of options
+// contains a particular substr flag. substr must be surrounded by a
+// string boundary or commas.
+func (o tagOptions) Contains(optionName string) bool {
+	if len(o) == 0 {
+		return false
+	}
+	s := string(o)
+	for s != "" {
+		var next string
+		i := strings.Index(s, ",")
+		if i >= 0 {
+			s, next = s[:i], s[i+1:]
+		}
+		if s == optionName {
+			return true
+		}
+		s = next
+	}
+	return false
 }

@@ -26,33 +26,33 @@ import (
 )
 
 func Validate_Fischer(in *Fischer, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, Validate_Widget(&in.Primary, fldPath)...)
+	errs = append(errs, Validate_Widget(&in.Primary, fldPath.Child("primary"))...)
 	return errs
 }
 
 func Validate_Widget(in *Widget, fldPath *field.Path) (errs field.ErrorList) {
 	if len(in.Name) > 128 {
-		errs = append(errs, field.Invalid(fldPath.Child("TODO"), in.Name, "must not be longer than 128 characters"))
+		errs = append(errs, field.Invalid(fldPath.Child("name"), in.Name, "must not be longer than 128 characters"))
 	}
 	return errs
 }
 
 func Validate_Flunder(in *Flunder, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, Validate_FlunderSpec(&in.Spec, fldPath)...)
+	errs = append(errs, Validate_FlunderSpec(&in.Spec, fldPath.Child("spec"))...)
 	return errs
 }
 
 func Validate_FlunderSpec(in *FlunderSpec, fldPath *field.Path) (errs field.ErrorList) {
 	if len(in.Reference) > 128 {
-		errs = append(errs, field.Invalid(fldPath.Child("TODO"), in.Reference, "must not be longer than 128 characters"))
+		errs = append(errs, field.Invalid(fldPath.Child("reference"), in.Reference, "must not be longer than 128 characters"))
 	}
-	errs = append(errs, Validate_Widget(&in.Primary, fldPath)...)
+	errs = append(errs, Validate_Widget(&in.Primary, fldPath.Child("primary"))...)
 	for k := range in.Extras {
 		c := &in.Extras[k]
-		errs = append(errs, Validate_Widget(c, fldPath)...)
+		errs = append(errs, Validate_Widget(c, fldPath.Index(k))...)
 	}
-	for _, k_More := range in.More {
-		errs = append(errs, Validate_Widget(&k_More, fldPath)...)
+	for k_More_idx, k_More := range in.More {
+		errs = append(errs, Validate_Widget(&k_More, fldPath.Key(k_More_idx))...)
 	}
 	return errs
 }
