@@ -6,13 +6,13 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-func Validate_Flunder(s *Flunder) field.ErrorList {
+func x_Validate_Flunder(s *Flunder) field.ErrorList {
 	allErrs := field.ErrorList{}
-	allErrs = append(allErrs, Validate_FlunderSpec(&s.Spec, field.NewPath("spec"))...)
+	allErrs = append(allErrs, x_Validate_FlunderSpec(&s.Spec, field.NewPath("spec"))...)
 	return allErrs
 }
 
-func Validate_FlunderSpec(s *FlunderSpec, fldPath *field.Path) field.ErrorList {
+func x_Validate_FlunderSpec(s *FlunderSpec, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 
 	if len(s.Reference) > 128 {

@@ -2841,6 +2841,7 @@ func schema_pkg_apis_wardle_v1alpha1_FlunderSpec(ref common.ReferenceCallback) c
 					"reference": {
 						SchemaProps: spec.SchemaProps{
 							Description: "A name of another flunder or fischer, depending on the reference type.",
+							Default:     "this",
 							MaxLength:   ptr.To[int64](128),
 							Type:        []string{"string"},
 							Format:      "",
