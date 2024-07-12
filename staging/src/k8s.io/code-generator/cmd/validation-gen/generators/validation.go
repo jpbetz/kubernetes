@@ -23,11 +23,11 @@ import (
 	"io"
 	"path"
 	"reflect"
-	"strconv"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/code-generator/cmd/validation-gen/args"
+	"k8s.io/code-generator/cmd/validation-gen/generators/validators"
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/namer"
@@ -37,9 +37,8 @@ import (
 
 // These are the comment tags that carry parameters for defaulter generation.
 const (
-	tagName          = "k8s:validation-gen"
-	inputTagName     = "k8s:validation-gen-input"
-	maxLengthTagName = "k8s:validation:maxLength"
+	tagName      = "k8s:validation-gen"
+	inputTagName = "k8s:validation-gen-input"
 )
 
 func extractTag(comments []string) []string {
@@ -50,17 +49,16 @@ func extractInputTag(comments []string) []string {
 	return gengo.ExtractCommentTags("+", comments)[inputTagName]
 }
 
-func extractValueValidationsTags(comments []string) *validations {
-	maxLengths := gengo.ExtractCommentTags("+", comments)[maxLengthTagName]
-	var maxLength *int
-	for _, l := range maxLengths {
-		if i, err := strconv.Atoi(l); err == nil { // TODO: Add error handling
-			if maxLength == nil || *maxLength < i {
-				maxLength = &i
+func extractValueValidationsTags(u types.Universe, comments []string) validations {
+	var v []validators.DeclarativeValidator
+	for tag, values := range gengo.ExtractCommentTags("+", comments) {
+		if validator, ok := validators.Registry.Lookup(tag); ok {
+			for _, value := range values {
+				v = append(v, validator.PrepareValidation(u, value))
 			}
 		}
 	}
-	return &validations{MaxLength: maxLength}
+	return v
 }
 
 func checkTag(comments []string, require ...string) bool {
@@ -106,15 +104,10 @@ type typeValidations struct {
 
 // TODO: Should this instead be function calls into kube-openapi validation utils?
 // such as https://github.com/kubernetes/kube-openapi/blob/3c01b740850fe616122fe83225f9280f28471f40/pkg/validation/validate/values.go#L104
-type validations struct {
-	MaxLength *int
-}
+type validations []validators.DeclarativeValidator
 
-func (v *validations) IsEmpty() bool {
-	if v == nil {
-		return true
-	}
-	return v.MaxLength == nil
+func (v validations) IsEmpty() bool {
+	return len(v) == 0
 }
 
 type validationFuncMap map[*types.Type]typeValidations
@@ -240,7 +233,7 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 			if _, ok := validations[t]; ok { // already found
 				continue
 			}
-			if node := newCallTreeForType(validations).build(t, true); node != nil {
+			if node := newCallTreeForType(context.Universe, validations).build(t, true); node != nil {
 				sw.Do("$.inType|objectdefaultfn$", validationArgsFromType(t)) // write the name to buffer
 				validations[t] = typeValidations{
 					object: &types.Type{
@@ -282,12 +275,14 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 
 // callTreeForType contains fields necessary to build a tree for types.
 type callTreeForType struct {
+	u                      types.Universe
 	validations            validationFuncMap
 	currentlyBuildingTypes map[*types.Type]bool
 }
 
-func newCallTreeForType(validations validationFuncMap) *callTreeForType {
+func newCallTreeForType(u types.Universe, validations validationFuncMap) *callTreeForType {
 	return &callTreeForType{
+		u:                      u,
 		validations:            validations,
 		currentlyBuildingTypes: make(map[*types.Type]bool),
 	}
@@ -311,11 +306,11 @@ func resolveTypeAndDepth(t *types.Type) (*types.Type, int) {
 }
 
 // getNestedValidations returns the first validation when resolving alias types
-func getNestedValidations(t *types.Type) *validations {
+func getNestedValidations(u types.Universe, t *types.Type) validations {
 	var prev *types.Type
 	for prev != t {
 		prev = t
-		valueValidations := extractValueValidationsTags(t.CommentLines)
+		valueValidations := extractValueValidationsTags(u, t.CommentLines)
 		if !valueValidations.IsEmpty() {
 			return valueValidations
 		}
@@ -325,15 +320,15 @@ func getNestedValidations(t *types.Type) *validations {
 			t = t.Elem
 		}
 	}
-	return &validations{}
+	return validations{}
 }
 
-func populateValidations(node *callNode, t *types.Type, commentLines []string) *callNode {
-	valueValidations := extractValueValidationsTags(commentLines)
+func populateValidations(u types.Universe, node *callNode, t *types.Type, commentLines []string) *callNode {
+	valueValidations := extractValueValidationsTags(u, commentLines)
 
 	baseT, depth := resolveTypeAndDepth(t)
 	if depth > 0 && valueValidations.IsEmpty() {
-		valueValidations = getNestedValidations(t)
+		valueValidations = getNestedValidations(u, t)
 	}
 
 	if valueValidations.IsEmpty() {
@@ -406,7 +401,7 @@ func (c *callTreeForType) build(t *types.Type, root bool) *callNode {
 		}
 
 	case types.Struct:
-		populateValidations(parent, t, t.CommentLines)
+		populateValidations(c.u, parent, t, t.CommentLines)
 		for _, field := range t.Members {
 			name := field.Name
 			if len(name) == 0 {
@@ -425,7 +420,7 @@ func (c *callTreeForType) build(t *types.Type, root bool) *callNode {
 				child.field = name
 				child.jsonName = jsonName
 				parent.children = append(parent.children, *child)
-			} else if child := populateValidations(child, field.Type, field.CommentLines); child != nil {
+			} else if child := populateValidations(c.u, child, field.Type, field.CommentLines); child != nil {
 				child.field = name
 				child.jsonName = jsonName
 				parent.children = append(parent.children, *child)
@@ -524,7 +519,7 @@ func (g *genValidations) GenerateType(c *generator.Context, t *types.Type, w io.
 
 	klog.V(5).Infof("generating for type %v", t)
 
-	callTree := newCallTreeForType(g.validations).build(t, true)
+	callTree := newCallTreeForType(c.Universe, g.validations).build(t, true)
 	if callTree == nil {
 		klog.V(5).Infof("  no validations defined")
 		return nil
@@ -613,7 +608,7 @@ type callNode struct {
 	children []callNode
 
 	// validations is the validations for the node
-	validations *validations
+	validations validations
 
 	// validationIsPrimitive tracks if the field is a primitive.
 	validationIsPrimitive bool
@@ -790,21 +785,22 @@ func (n *callNode) writeValidations(c *generator.Context, varName string, path p
 	if n.validations.IsEmpty() {
 		return
 	}
-	args := generator.Args{
-		"typeValidations": n.validations,
-		"varName":         varName,
-		"path":            path,
-		"index":           index,
-		"varTopType":      n.validationTopLevelType,
-		"invalid":         c.Universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/util/validation/field", Name: "Invalid"}),
-	}
 
-	// TODO: handle fieldNames
-	// TODO: Call into kube-openapi for all the validation functions?  OR should we instead call into the exact same functions
-	//       we have already defined for hand written types?
-	if n.validations.MaxLength != nil {
+	for _, v := range n.validations {
+		fn, arg := v.Validator()
+		args := generator.Args{
+			"typeValidations": n.validations,
+			"varName":         varName,
+			"path":            path,
+			"index":           index,
+			"varTopType":      n.validationTopLevelType,
+			"invalid":         c.Universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/util/validation/field", Name: "Invalid"}),
+			"validationFn":    fn,
+			"arg":             arg,
+		}
+
 		// If default value is a literal then it can be assigned via var stmt
-		sw.Do("if len($.varName$) > $.typeValidations.MaxLength$ { errs = append(errs, $.invalid|raw$(", args)
+		sw.Do("errs = append(errs, $.validationFn|raw$(", args)
 		if len(path.Key) > 0 {
 			sw.Do("fldPath.Key($.path.Key$)", args)
 		} else if len(path.Name) > 0 {
@@ -812,8 +808,8 @@ func (n *callNode) writeValidations(c *generator.Context, varName string, path p
 		} else {
 			sw.Do("fldPath.Index($.path.Index$)", args)
 		}
-
-		sw.Do(", $.varName$, \"must not be longer than 128 characters\"))}\n", args)
+		// TODO: pass in arg
+		sw.Do(", $.varName$)...)\n", args)
 	}
 }
 

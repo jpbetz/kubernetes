@@ -22,6 +22,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	validation "k8s.io/apimachinery/pkg/util/validation"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
 )
 
@@ -31,9 +32,7 @@ func Validate_Fischer(in *Fischer, fldPath *field.Path) (errs field.ErrorList) {
 }
 
 func Validate_Widget(in *Widget, fldPath *field.Path) (errs field.ErrorList) {
-	if len(in.Name) > 128 {
-		errs = append(errs, field.Invalid(fldPath.Child("name"), in.Name, "must not be longer than 128 characters"))
-	}
+	errs = append(errs, validation.IsFullyQualifiedName(fldPath.Child("name"), in.Name)...)
 	return errs
 }
 
@@ -43,9 +42,7 @@ func Validate_Flunder(in *Flunder, fldPath *field.Path) (errs field.ErrorList) {
 }
 
 func Validate_FlunderSpec(in *FlunderSpec, fldPath *field.Path) (errs field.ErrorList) {
-	if len(in.Reference) > 128 {
-		errs = append(errs, field.Invalid(fldPath.Child("reference"), in.Reference, "must not be longer than 128 characters"))
-	}
+	errs = append(errs, validation.IsValidIP(fldPath.Child("reference"), in.Reference)...)
 	errs = append(errs, Validate_Widget(&in.Primary, fldPath.Child("primary"))...)
 	for k := range in.Extras {
 		c := &in.Extras[k]
