@@ -16,48 +16,48 @@ limitations under the License.
 
 package validators
 
-import "k8s.io/gengo/v2/types"
+import (
+	"k8s.io/gengo/v2/types"
+	"k8s.io/kube-openapi/pkg/generators"
+)
 
-func NewFormatValidator(universe types.Universe, arg string) DeclarativeValidator {
-	// TODO: Optimize into consts
+const (
+	markerPrefix = "+k8s:validation:"
+
+	utilValidationPkg = "k8s.io/apimachinery/pkg/util/validation"
+)
+
+var (
+	isFullyQualifiedNameValidator = types.Name{Package: utilValidationPkg, Name: "IsFullyQualifiedName"}
+	isValidIPValidator            = types.Name{Package: utilValidationPkg, Name: "IsValidIP"}
+	maxLengthValidator            = types.Name{Package: utilValidationPkg, Name: "ValidateMaxLength"}
+	enumValidator                 = types.Name{Package: utilValidationPkg, Name: "ValidateEnum"}
+)
+
+func ExtractOpenAPIValidations(t *types.Type, comments []string) ([]DeclarativeValidator, error) {
+	var v []DeclarativeValidator
+
+	// Leverage the kube-openapi parser for 'k8s:validation:' validations.
+	schema, err := generators.ParseCommentTags(t, comments, markerPrefix)
+	if err != nil {
+		return nil, err
+	}
+	if schema.MaxLength != nil {
+		v = append(v, NewValidator(maxLengthValidator, *schema.MaxLength))
+	}
+	if len(schema.Format) > 0 {
+		v = append(v, NewFormatValidator(schema.Format))
+	}
+
+	return v, nil
+}
+
+func NewFormatValidator(arg string) DeclarativeValidator {
 	if arg == "fullyQualifiedName" {
-		return &FormatValidator{
-			function: universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/util/validation", Name: "IsFullyQualifiedName"}),
-		}
+		return NewValidator(isFullyQualifiedNameValidator)
 	}
 	if arg == "ip" {
-		return &FormatValidator{
-			function: universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/util/validation", Name: "IsValidIP"}),
-		}
+		return NewValidator(isValidIPValidator)
 	}
 	return nil
-}
-
-type FormatValidator struct {
-	function *types.Type
-}
-
-func (v *FormatValidator) ValidationSignature() (function *types.Type, args []string) {
-	return v.function, nil
-}
-
-func NewMaxLengthValidator(universe types.Universe, arg string) DeclarativeValidator {
-	return &MaxLengthValidator{
-		function: universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/util/validation", Name: "ValidateMaxLength"}),
-		length:   arg,
-	}
-}
-
-type MaxLengthValidator struct {
-	function *types.Type
-	length   string
-}
-
-func (v *MaxLengthValidator) ValidationSignature() (function *types.Type, args []string) {
-	return v.function, []string{v.length}
-}
-
-func init() {
-	Registry.Register("k8s:validation:format", NewFormatValidator)
-	Registry.Register("k8s:validation:maxLength", NewMaxLengthValidator)
 }

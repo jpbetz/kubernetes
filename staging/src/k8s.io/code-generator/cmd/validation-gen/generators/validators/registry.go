@@ -16,18 +16,33 @@ limitations under the License.
 
 package validators
 
-// TODO: Should this eventually go in the scheme?
-var Registry = &ValidationRegistry{validators: map[string]DeclarativeValidation{}}
+import (
+	"k8s.io/gengo/v2/generator"
+	"k8s.io/gengo/v2/types"
+)
 
-type ValidationRegistry struct {
-	validators map[string]DeclarativeValidation
+func BuildValidatorContext(c *generator.Context) *ValidatorContext {
+	return &ValidatorContext{enumContext: parseEnums(c)}
 }
 
-func (r *ValidationRegistry) Register(name string, validator DeclarativeValidation) {
-	r.validators[name] = validator
+type ValidatorContext struct {
+	enumContext enumMap
 }
 
-func (r *ValidationRegistry) Lookup(name string) (DeclarativeValidation, bool) {
-	v, ok := r.validators[name]
-	return v, ok
+func ExtractValidations(c *ValidatorContext, t *types.Type, comments []string) ([]DeclarativeValidator, error) {
+	// TODO: extract additional validations (e.g. for SMD), here.
+
+	// TODO: Organize this as an extensible registry...
+	v, err := ExtractOpenAPIValidations(t, comments)
+	if err != nil {
+		return nil, err
+	}
+	if enum, ok := c.enumContext[t.Name]; ok {
+		symbols := make([]any, len(enum.Values))
+		for i, s := range enum.Values {
+			symbols[i] = s.Value
+		}
+		v = append(v, NewValidator(enumValidator, symbols...))
+	}
+	return v, nil
 }

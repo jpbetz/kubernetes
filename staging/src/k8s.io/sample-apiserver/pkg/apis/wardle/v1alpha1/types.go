@@ -30,6 +30,9 @@ type FlunderList struct {
 	Items []Flunder `json:"items" protobuf:"bytes,2,rep,name=items"`
 }
 
+// ReferenceType
+//
+// +enum
 type ReferenceType string
 
 const (
@@ -40,8 +43,10 @@ const (
 type FlunderSpec struct {
 	// A name of another flunder or fischer, depending on the reference type.
 	//
-	// +k8s:validation:format=ip
+	// +k8s:validation:format="ip"
 	// +k8s:validation:maxLength=128
+	// +k8s:validation:cel[0]:rule="oldSelf == self"
+	// +k8s:validation:cel[0]:message="immutable field"
 	Reference string `json:"reference,omitempty" protobuf:"bytes,1,opt,name=reference"`
 	// The reference type, defaults to "Flunder" if reference is set.
 	ReferenceType *ReferenceType `json:"referenceType,omitempty" protobuf:"bytes,2,opt,name=referenceType"`
@@ -54,7 +59,7 @@ type FlunderSpec struct {
 }
 
 type Widget struct {
-	// +k8s:validation:format=fullyQualifiedName
+	// +k8s:validation:format="fullyQualifiedName"
 	Name string `json:"name,omitempty" protobuf:"bytes,1,opt,name=name"`
 }
 
