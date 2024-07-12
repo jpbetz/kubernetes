@@ -59,7 +59,7 @@ type FlunderSpec struct {
 }
 
 type Widget struct {
-	// +k8s:validation:format="fullyQualifiedName"
+	// +k8s:validation:format="ip"
 	Name string `json:"name,omitempty" protobuf:"bytes,1,opt,name=name"`
 }
 

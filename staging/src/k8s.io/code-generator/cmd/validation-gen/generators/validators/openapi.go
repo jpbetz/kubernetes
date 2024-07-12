@@ -38,10 +38,9 @@ const (
 )
 
 var (
-	isFullyQualifiedNameValidator = types.Name{Package: utilValidationPkg, Name: "IsFullyQualifiedName"}
-	isValidIPValidator            = types.Name{Package: utilValidationPkg, Name: "IsValidIP"}
-	maxLengthValidator            = types.Name{Package: utilValidationPkg, Name: "ValidateMaxLength"}
-	enumValidator                 = types.Name{Package: utilValidationPkg, Name: "ValidateEnum"}
+	isValidIPValidator = types.Name{Package: utilValidationPkg, Name: "IsValidIP"}
+	maxLengthValidator = types.Name{Package: utilValidationPkg, Name: "ValidateMaxLength"}
+	enumValidator      = types.Name{Package: utilValidationPkg, Name: "ValidateEnum"}
 )
 
 func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error) {
@@ -56,18 +55,20 @@ func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []
 		v = append(v, Function(maxLengthValidator, *schema.MaxLength))
 	}
 	if len(schema.Format) > 0 {
-		v = append(v, FormatValidationFunction(schema.Format))
+		formatFunction := FormatValidationFunction(schema.Format)
+		if formatFunction != nil {
+			v = append(v, formatFunction)
+		}
 	}
 
 	return v, nil
 }
 
 func FormatValidationFunction(format string) FunctionGen {
-	if format == "fullyQualifiedName" {
-		return Function(isFullyQualifiedNameValidator)
-	}
 	if format == "ip" {
 		return Function(isValidIPValidator)
 	}
-	return nil
+	// TODO: Flesh out the list of validation functions
+
+	return nil // ignore unsupported formats
 }

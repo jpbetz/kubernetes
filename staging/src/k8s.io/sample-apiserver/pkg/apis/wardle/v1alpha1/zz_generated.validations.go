@@ -33,14 +33,13 @@ func Validate_Fischer(in *Fischer, fldPath *field.Path) (errs field.ErrorList) {
 }
 
 func Validate_Widget(in *Widget, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.IsFullyQualifiedName(fldPath.Child("name"), in.Name)...)
+	errs = append(errs, validation.IsValidIP(fldPath.Child("name"), in.Name)...)
 	return errs
 }
 
 func Validate_FischerList(in *FischerList, fldPath *field.Path) (errs field.ErrorList) {
 	for k := range in.Items {
 		c := &in.Items[k]
-		errs = append(errs, Validate_Fischer(c, fldPath.Index(k))...)
 		errs = append(errs, Validate_Fischer(c, fldPath.Index(k))...)
 	}
 	return errs

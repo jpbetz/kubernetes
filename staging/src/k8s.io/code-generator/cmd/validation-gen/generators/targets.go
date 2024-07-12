@@ -77,7 +77,7 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 
 		pkg := context.Universe[i]
 
-		// if the types are not in the same package where the validation functions are to be generated
+		// if the types are not in the same package where the validation functions are to be visited
 		inputTags := extractInputTag(pkg.Comments)
 		if len(inputTags) > 1 {
 			panic(fmt.Sprintf("there may only be one input tag, got %#v", inputTags))
@@ -175,31 +175,25 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 		}
 
 		// Find types use declarative validation, either directly or indirectly.
-		validations := validationFuncMap{}
+		rootTypestoValidate := sets.New[*types.Type]()
 		for t := range candidates {
-			if _, ok := validations[t]; ok { // already found
+			if rootTypestoValidate.Has(t) { // already found
 				continue
 			}
-			node, err := newCallTreeForType(validatorContext, validations).build(t, true)
+			node, err := newCallTreeForType(validatorContext).build(t, true)
 			if err != nil {
 				klog.Fatalf("Failed to build call tree to generate validation for type: %v: %v", t.Name, err)
 			}
 			if node != nil {
-				sw.Do("$.inType|objectdefaultfn$", validationArgsFromType(t)) // write the name to buffer
-				validations[t] = typeValidations{
-					object: &types.Type{
-						Name: types.Name{
-							Package: pkg.Path,
-							Name:    buffer.String(),
-						},
-						Kind: types.Func,
-					},
-				}
+				sw.Do("$.inType|objectdefaultfn$", generator.Args{
+					"inType": t,
+				}) // write the name to buffer
+				rootTypestoValidate.Insert(t)
 				buffer.Reset()
 			}
 		}
 
-		if len(validations) == 0 {
+		if len(rootTypestoValidate) == 0 {
 			klog.V(5).Infof("no typeValidations in package %s", pkg.Name)
 		}
 
@@ -216,7 +210,7 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 
 				GeneratorsFunc: func(c *generator.Context) (generators []generator.Generator) {
 					return []generator.Generator{
-						NewGenValidations(args.OutputFile, typesPkg.Path, pkg.Path, validations, peerPkgs, validatorContext),
+						NewGenValidations(args.OutputFile, typesPkg.Path, pkg.Path, rootTypestoValidate, peerPkgs, validatorContext),
 					}
 				},
 			})
