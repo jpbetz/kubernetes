@@ -27,12 +27,22 @@ import (
 )
 
 func Validate_Fischer(in *Fischer, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validation.IsValidIP(fldPath.Child("reference"), in.Reference)...)
 	errs = append(errs, Validate_Widget(&in.Primary, fldPath.Child("primary"))...)
 	return errs
 }
 
 func Validate_Widget(in *Widget, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs, validation.IsFullyQualifiedName(fldPath.Child("name"), in.Name)...)
+	return errs
+}
+
+func Validate_FischerList(in *FischerList, fldPath *field.Path) (errs field.ErrorList) {
+	for k := range in.Items {
+		c := &in.Items[k]
+		errs = append(errs, Validate_Fischer(c, fldPath.Index(k))...)
+		errs = append(errs, Validate_Fischer(c, fldPath.Index(k))...)
+	}
 	return errs
 }
 
@@ -54,6 +64,14 @@ func Validate_FlunderSpec(in *FlunderSpec, fldPath *field.Path) (errs field.Erro
 	}
 	for k_More_idx, k_More := range in.More {
 		errs = append(errs, Validate_Widget(&k_More, fldPath.Key(k_More_idx))...)
+	}
+	return errs
+}
+
+func Validate_FlunderList(in *FlunderList, fldPath *field.Path) (errs field.ErrorList) {
+	for k := range in.Items {
+		c := &in.Items[k]
+		errs = append(errs, Validate_Flunder(c, fldPath.Index(k))...)
 	}
 	return errs
 }

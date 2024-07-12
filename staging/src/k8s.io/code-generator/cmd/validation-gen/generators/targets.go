@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"fmt"
 	"path"
+	"reflect"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -221,4 +222,20 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 			})
 	}
 	return targets
+}
+
+func extractTag(comments []string) []string {
+	return gengo.ExtractCommentTags("+", comments)[tagName]
+}
+
+func extractInputTag(comments []string) []string {
+	return gengo.ExtractCommentTags("+", comments)[inputTagName]
+}
+
+func checkTag(comments []string, require ...string) bool {
+	values := gengo.ExtractCommentTags("+", comments)[tagName]
+	if len(require) == 0 {
+		return len(values) == 1 && values[0] == ""
+	}
+	return reflect.DeepEqual(values, require)
 }

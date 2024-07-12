@@ -53,14 +53,14 @@ func Function(function types.Name, extraArgs ...any) FunctionGen {
 			anyArgs[i] = arg
 		}
 	}
-	return &basicValidator{function: function, extraArgs: anyArgs}
+	return &functionGen{function: function, extraArgs: anyArgs}
 }
 
-type basicValidator struct {
+type functionGen struct {
 	function  types.Name
 	extraArgs []any
 }
 
-func (v *basicValidator) SignatureAndArgs() (function types.Name, args []any) {
+func (v *functionGen) SignatureAndArgs() (function types.Name, args []any) {
 	return v.function, v.extraArgs
 }

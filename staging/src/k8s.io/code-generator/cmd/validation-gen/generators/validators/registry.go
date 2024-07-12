@@ -53,11 +53,7 @@ type compositeValidator struct {
 }
 
 func (c *compositeValidator) ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error) {
-	// TODO: extract additional validations (e.g. for SMD), here.
-
-	// TODO: Organize this as an extensible registry...
 	var result []FunctionGen
-
 	for _, v := range c.validators {
 		validations, err := v.ExtractValidations(t, comments)
 		if err != nil {
@@ -65,6 +61,5 @@ func (c *compositeValidator) ExtractValidations(t *types.Type, comments []string
 		}
 		result = append(result, validations...)
 	}
-
 	return result, nil
 }

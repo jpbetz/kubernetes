@@ -92,6 +92,9 @@ type Fischer struct {
 	// +listType=atomic
 	DisallowedFlunders []string `json:"disallowedFlunders,omitempty" protobuf:"bytes,2,rep,name=disallowedFlunders"`
 
+	// +k8s:validation:format="ip"
+	Reference string `json:"reference,omitempty" protobuf:"bytes,4,opt,name=reference"`
+
 	Primary Widget `json:"primary,omitempty" protobuf:"bytes,3,opt,name=primary"`
 }
 
