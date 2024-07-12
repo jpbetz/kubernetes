@@ -18,15 +18,9 @@ package validators
 
 import "k8s.io/gengo/v2/types"
 
-type DeclarativeValidation interface {
-	// Name returns to go tag name of this validation.
-	Name() string
-
-	// TODO: Support multiple args
-	PrepareValidation(universe types.Universe, arg string) DeclarativeValidator
-}
+type DeclarativeValidation func(universe types.Universe, arg string) DeclarativeValidator
 
 type DeclarativeValidator interface {
 	// TODO: Support more control of arguments in call
-	Validator() (*types.Type, []string)
+	ValidationSignature() (*types.Type, []string)
 }

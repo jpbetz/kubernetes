@@ -54,7 +54,7 @@ func extractValueValidationsTags(u types.Universe, comments []string) validation
 	for tag, values := range gengo.ExtractCommentTags("+", comments) {
 		if validator, ok := validators.Registry.Lookup(tag); ok {
 			for _, value := range values {
-				v = append(v, validator.PrepareValidation(u, value))
+				v = append(v, validator(u, value))
 			}
 		}
 	}
@@ -787,7 +787,7 @@ func (n *callNode) writeValidations(c *generator.Context, varName string, path p
 	}
 
 	for _, v := range n.validations {
-		fn, arg := v.Validator()
+		fn, fnArgs := v.ValidationSignature()
 		args := generator.Args{
 			"typeValidations": n.validations,
 			"varName":         varName,
@@ -796,7 +796,6 @@ func (n *callNode) writeValidations(c *generator.Context, varName string, path p
 			"varTopType":      n.validationTopLevelType,
 			"invalid":         c.Universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/util/validation/field", Name: "Invalid"}),
 			"validationFn":    fn,
-			"arg":             arg,
 		}
 
 		// If default value is a literal then it can be assigned via var stmt
@@ -808,8 +807,11 @@ func (n *callNode) writeValidations(c *generator.Context, varName string, path p
 		} else {
 			sw.Do("fldPath.Index($.path.Index$)", args)
 		}
-		// TODO: pass in arg
-		sw.Do(", $.varName$)...)\n", args)
+		sw.Do(", $.varName$", args)
+		for _, fnArg := range fnArgs {
+			sw.Do(", "+fnArg, args)
+		}
+		sw.Do(")...)\n", args)
 	}
 }
 

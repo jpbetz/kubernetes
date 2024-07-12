@@ -23,8 +23,8 @@ type ValidationRegistry struct {
 	validators map[string]DeclarativeValidation
 }
 
-func (r *ValidationRegistry) Register(validator DeclarativeValidation) {
-	r.validators[validator.Name()] = validator
+func (r *ValidationRegistry) Register(name string, validator DeclarativeValidation) {
+	r.validators[name] = validator
 }
 
 func (r *ValidationRegistry) Lookup(name string) (DeclarativeValidation, bool) {

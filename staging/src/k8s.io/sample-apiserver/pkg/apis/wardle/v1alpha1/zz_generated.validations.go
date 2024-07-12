@@ -43,6 +43,7 @@ func Validate_Flunder(in *Flunder, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_FlunderSpec(in *FlunderSpec, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs, validation.IsValidIP(fldPath.Child("reference"), in.Reference)...)
+	errs = append(errs, validation.ValidateMaxLength(fldPath.Child("reference"), in.Reference, 128)...)
 	errs = append(errs, Validate_Widget(&in.Primary, fldPath.Child("primary"))...)
 	for k := range in.Extras {
 		c := &in.Extras[k]

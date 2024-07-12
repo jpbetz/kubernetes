@@ -18,18 +18,8 @@ package validators
 
 import "k8s.io/gengo/v2/types"
 
-const (
-	format = "k8s:validation:format"
-)
-
-type FormatValidation struct{}
-
-func (*FormatValidation) Name() string {
-	return format
-}
-
-// TODO: add error handling
-func (*FormatValidation) PrepareValidation(universe types.Universe, arg string) DeclarativeValidator {
+func NewFormatValidator(universe types.Universe, arg string) DeclarativeValidator {
+	// TODO: Optimize into consts
 	if arg == "fullyQualifiedName" {
 		return &FormatValidator{
 			function: universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/util/validation", Name: "IsFullyQualifiedName"}),
@@ -47,10 +37,27 @@ type FormatValidator struct {
 	function *types.Type
 }
 
-func (v *FormatValidator) Validator() (function *types.Type, args []string) {
+func (v *FormatValidator) ValidationSignature() (function *types.Type, args []string) {
 	return v.function, nil
 }
 
+func NewMaxLengthValidator(universe types.Universe, arg string) DeclarativeValidator {
+	return &MaxLengthValidator{
+		function: universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/util/validation", Name: "ValidateMaxLength"}),
+		length:   arg,
+	}
+}
+
+type MaxLengthValidator struct {
+	function *types.Type
+	length   string
+}
+
+func (v *MaxLengthValidator) ValidationSignature() (function *types.Type, args []string) {
+	return v.function, []string{v.length}
+}
+
 func init() {
-	Registry.Register(&FormatValidation{})
+	Registry.Register("k8s:validation:format", NewFormatValidator)
+	Registry.Register("k8s:validation:maxLength", NewMaxLengthValidator)
 }

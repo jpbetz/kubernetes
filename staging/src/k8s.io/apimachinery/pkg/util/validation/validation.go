@@ -70,6 +70,13 @@ func IsQualifiedName(value string) []string {
 	return errs
 }
 
+func ValidateMaxLength(fldPath *field.Path, value string, max int) field.ErrorList {
+	if len(value) > max {
+		return field.ErrorList{field.Invalid(fldPath, value, MaxLenError(max))}
+	}
+	return nil
+}
+
 // IsFullyQualifiedName checks if the name is fully qualified. This is similar
 // to IsFullyQualifiedDomainName but requires a minimum of 3 segments instead of
 // 2 and does not accept a trailing . as valid.
