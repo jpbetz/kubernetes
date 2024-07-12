@@ -21,28 +21,50 @@ import (
 	"k8s.io/gengo/v2/types"
 )
 
-func BuildValidatorContext(c *generator.Context) *ValidatorContext {
-	return &ValidatorContext{enumContext: parseEnums(c)}
+var registry = &Registry{}
+
+type DeclarativeValidatorInit func(c *generator.Context) DeclarativeValidator
+
+// AddToRegistry adds a DeclarativeValidator to the registry by providing the
+// registry with an initializer it can use to construct a DeclarativeValidator for each
+// generator context.
+func AddToRegistry(validator DeclarativeValidatorInit) {
+	registry.Add(validator)
 }
 
-type ValidatorContext struct {
-	enumContext enumMap
+type Registry struct {
+	inits []DeclarativeValidatorInit
 }
 
-func ExtractValidations(c *ValidatorContext, t *types.Type, comments []string) ([]DeclarativeValidator, error) {
+func (r *Registry) Add(validator DeclarativeValidatorInit) {
+	r.inits = append(r.inits, validator)
+}
+
+func NewValidator(c *generator.Context) DeclarativeValidator {
+	validators := make([]DeclarativeValidator, len(registry.inits))
+	for i, init := range registry.inits {
+		validators[i] = init(c)
+	}
+	return &compositeValidator{validators: validators}
+}
+
+type compositeValidator struct {
+	validators []DeclarativeValidator
+}
+
+func (c *compositeValidator) ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error) {
 	// TODO: extract additional validations (e.g. for SMD), here.
 
 	// TODO: Organize this as an extensible registry...
-	v, err := ExtractOpenAPIValidations(t, comments)
-	if err != nil {
-		return nil, err
-	}
-	if enum, ok := c.enumContext[t.Name]; ok {
-		symbols := make([]any, len(enum.Values))
-		for i, s := range enum.Values {
-			symbols[i] = s.Value
+	var result []FunctionGen
+
+	for _, v := range c.validators {
+		validations, err := v.ExtractValidations(t, comments)
+		if err != nil {
+			return nil, err
 		}
-		v = append(v, NewValidator(enumValidator, symbols...))
+		result = append(result, validations...)
 	}
-	return v, nil
+
+	return result, nil
 }

@@ -17,16 +17,13 @@ limitations under the License.
 package generators
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
-	"path"
 	"reflect"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/code-generator/cmd/validation-gen/args"
 	"k8s.io/code-generator/cmd/validation-gen/generators/validators"
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
@@ -35,455 +32,36 @@ import (
 	"k8s.io/klog/v2"
 )
 
-// These are the comment tags that carry parameters for defaulter generation.
-const (
-	tagName      = "k8s:validation-gen"
-	inputTagName = "k8s:validation-gen-input"
-)
-
-func extractTag(comments []string) []string {
-	return gengo.ExtractCommentTags("+", comments)[tagName]
-}
-
-func extractInputTag(comments []string) []string {
-	return gengo.ExtractCommentTags("+", comments)[inputTagName]
-}
-
-func checkTag(comments []string, require ...string) bool {
-	values := gengo.ExtractCommentTags("+", comments)[tagName]
-	if len(require) == 0 {
-		return len(values) == 1 && values[0] == ""
-	}
-	return reflect.DeepEqual(values, require)
-}
-
-func validationFnNamer() *namer.NameStrategy {
-	return &namer.NameStrategy{
-		Prefix: "Validate_",
-		Join: func(pre string, in []string, post string) string {
-			return pre + strings.Join(in, "_") + post
-		},
-	}
-}
-
-// NameSystems returns the name system used by the generators in this package.
-func NameSystems() namer.NameSystems {
-	return namer.NameSystems{
-		"public":             namer.NewPublicNamer(1),
-		"raw":                namer.NewRawNamer("", nil),
-		"objectvalidationfn": validationFnNamer(), // TODO: Have separate object and struct validation functions?
-	}
-}
-
-// DefaultNameSystem returns the default name system for ordering the types to be
-// processed by the generators in this package.
-func DefaultNameSystem() string {
-	return "public"
-}
-
-// typeValidations holds the type that a validation should be generated for,
-// and the validations that should be generated for that type.
-type typeValidations struct {
-	object *types.Type
-
-	// validations validate the object
-	validations *validations
-}
-
-// TODO: Should this instead be function calls into kube-openapi validation utils?
-// such as https://github.com/kubernetes/kube-openapi/blob/3c01b740850fe616122fe83225f9280f28471f40/pkg/validation/validate/values.go#L104
-type validations []validators.DeclarativeValidator
-
-func (v validations) IsEmpty() bool {
-	return len(v) == 0
-}
-
-type validationFuncMap map[*types.Type]typeValidations
-
-func GetTargets(context *generator.Context, args *args.Args) []generator.Target {
-	boilerplate, err := gengo.GoBoilerplate(args.GoHeaderFile, gengo.StdBuildTag, gengo.StdGeneratedBy)
-	if err != nil {
-		klog.Fatalf("Failed loading boilerplate: %v", err)
-	}
-
-	var targets []generator.Target
-
-	buffer := &bytes.Buffer{}
-	sw := generator.NewSnippetWriter(buffer, context, "$", "$")
-
-	// First load other "input" packages.  We do this as a single call because
-	// it is MUCH faster.
-	inputPkgs := make([]string, 0, len(context.Inputs))
-	pkgToInput := map[string]string{}
-	for _, i := range context.Inputs {
-		klog.V(5).Infof("considering pkg %q", i)
-
-		pkg := context.Universe[i]
-
-		// if the types are not in the same package where the validation functions are to be generated
-		inputTags := extractInputTag(pkg.Comments)
-		if len(inputTags) > 1 {
-			panic(fmt.Sprintf("there may only be one input tag, got %#v", inputTags))
-		}
-		if len(inputTags) == 1 {
-			inputPath := inputTags[0]
-			if strings.HasPrefix(inputPath, "./") || strings.HasPrefix(inputPath, "../") {
-				// this is a relative dir, which will not work under gomodules.
-				// join with the local package path, but warn
-				klog.Warningf("relative path %s=%s will not work under gomodule mode; use full package path (as used by 'import') instead", inputTagName, inputPath)
-				inputPath = path.Join(pkg.Path, inputTags[0])
-			}
-
-			klog.V(5).Infof("  input pkg %v", inputPath)
-			inputPkgs = append(inputPkgs, inputPath)
-			pkgToInput[i] = inputPath
-		} else {
-			pkgToInput[i] = i
-		}
-	}
-
-	// Make sure explicit peer-packages are added.
-	var peerPkgs []string
-	for _, pkg := range args.ExtraPeerDirs {
-		// In case someone specifies a peer as a path into vendor, convert
-		// it to its "real" package path.
-		if i := strings.Index(pkg, "/vendor/"); i != -1 {
-			pkg = pkg[i+len("/vendor/"):]
-		}
-		peerPkgs = append(peerPkgs, pkg)
-	}
-	if expanded, err := context.FindPackages(peerPkgs...); err != nil {
-		klog.Fatalf("cannot find peer packages: %v", err)
-	} else {
-		peerPkgs = expanded // now in fully canonical form
-	}
-	inputPkgs = append(inputPkgs, peerPkgs...)
-
-	if len(inputPkgs) > 0 {
-		if _, err := context.LoadPackages(inputPkgs...); err != nil {
-			klog.Fatalf("cannot load packages: %v", err)
-		}
-	}
-	// update context.Order to the latest context.Universe
-	orderer := namer.Orderer{Namer: namer.NewPublicNamer(1)}
-	context.Order = orderer.OrderUniverse(context.Universe)
-
-	validatorContext := validators.BuildValidatorContext(context)
-
-	for _, i := range context.Inputs {
-		pkg := context.Universe[i]
-
-		// typesPkg is where the types that need validation are defined.
-		// Sometimes it is different from pkg. For example, kubernetes core/v1
-		// types are defined in k8s.io/api/core/v1, while the pkg which holds
-		// defaulter code is at k/k/pkg/api/v1.
-		typesPkg := pkg
-
-		typesWith := extractTag(pkg.Comments)
-		shouldCreateObjectValidationFn := func(t *types.Type) bool {
-			// opt-out
-			if checkTag(t.SecondClosestCommentLines, "false") {
-				return false
-			}
-			// opt-in
-			if checkTag(t.SecondClosestCommentLines, "true") {
-				return true
-			}
-			// For every k8s:validation-gen tag at the package level, interpret the value as a
-			// field name (like TypeMeta, ListMeta, ObjectMeta) and trigger validation generation
-			// for any type with any of the matching field names. Provides a more useful package
-			// level validation than global (because we only need typeValidations on a subset of objects -
-			// usually those with TypeMeta).
-			if t.Kind == types.Struct && len(typesWith) > 0 {
-				for _, field := range t.Members {
-					for _, s := range typesWith {
-						if field.Name == s {
-							return true
-						}
-					}
-				}
-			}
-			return false
-		}
-
-		// Find the right input pkg, which might not be this one.
-		inputPath := pkgToInput[i]
-		typesPkg = context.Universe[inputPath]
-
-		candidates := sets.New[*types.Type]()
-		for _, t := range typesPkg.Types {
-			if shouldCreateObjectValidationFn(t) {
-				candidates.Insert(t)
-			}
-		}
-
-		// Find types use declarative validation, either directly or indirectly.
-		validations := validationFuncMap{}
-		for t := range candidates {
-			if _, ok := validations[t]; ok { // already found
-				continue
-			}
-			if node := newCallTreeForType(validatorContext, validations).build(t, true); node != nil {
-				sw.Do("$.inType|objectdefaultfn$", validationArgsFromType(t)) // write the name to buffer
-				validations[t] = typeValidations{
-					object: &types.Type{
-						Name: types.Name{
-							Package: pkg.Path,
-							Name:    buffer.String(),
-						},
-						Kind: types.Func,
-					},
-				}
-				buffer.Reset()
-			}
-		}
-
-		if len(validations) == 0 {
-			klog.V(5).Infof("no typeValidations in package %s", pkg.Name)
-		}
-
-		targets = append(targets,
-			&generator.SimpleTarget{
-				PkgName:       path.Base(pkg.Path),
-				PkgPath:       pkg.Path,
-				PkgDir:        pkg.Dir, // output pkg is the same as the input
-				HeaderComment: boilerplate,
-
-				FilterFunc: func(c *generator.Context, t *types.Type) bool {
-					return t.Name.Package == typesPkg.Path
-				},
-
-				GeneratorsFunc: func(c *generator.Context) (generators []generator.Generator) {
-					return []generator.Generator{
-						NewGenValidations(args.OutputFile, typesPkg.Path, pkg.Path, validations, peerPkgs, validatorContext),
-					}
-				},
-			})
-	}
-	return targets
-}
-
-// callTreeForType contains fields necessary to build a tree for types.
-type callTreeForType struct {
-	context                *validators.ValidatorContext
-	validations            validationFuncMap
-	currentlyBuildingTypes map[*types.Type]bool
-}
-
-func newCallTreeForType(c *validators.ValidatorContext, validations validationFuncMap) *callTreeForType {
-	return &callTreeForType{
-		context:                c,
-		validations:            validations,
-		currentlyBuildingTypes: make(map[*types.Type]bool),
-	}
-}
-
-// resolveType follows pointers and aliases of `t` until reaching the first
-// non-pointer type in `t's` hierarchy
-func resolveTypeAndDepth(t *types.Type) (*types.Type, int) {
-	var prev *types.Type
-	depth := 0
-	for prev != t {
-		prev = t
-		if t.Kind == types.Alias {
-			t = t.Underlying
-		} else if t.Kind == types.Pointer {
-			t = t.Elem
-			depth += 1
-		}
-	}
-	return t, depth
-}
-
-// getNestedValidations returns the first validation when resolving alias types
-func (c *callTreeForType) getNestedValidations(t *types.Type) (validations, error) {
-	var prev *types.Type
-	var valueValidations validations
-	for prev != t {
-		prev = t
-		v, err := validators.ExtractValidations(c.context, t, t.CommentLines)
-		if err != nil {
-			return nil, err
-		}
-		if len(v) > 0 {
-			return v, nil
-		}
-		if t.Kind == types.Alias {
-			t = t.Underlying
-		} else if t.Kind == types.Pointer {
-			t = t.Elem
-		}
-	}
-	return valueValidations, nil
-}
-
-func (c *callTreeForType) populateValidations(node *callNode, t *types.Type, commentLines []string) (*callNode, error) {
-	valueValidations, err := validators.ExtractValidations(c.context, t, commentLines)
-	if err != nil {
-		return nil, err
-	}
-
-	baseT, depth := resolveTypeAndDepth(t)
-	if depth > 0 && len(valueValidations) == 0 {
-		valueValidations, err = c.getNestedValidations(t)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if len(valueValidations) == 0 {
-		return node, nil
-	}
-
-	// callNodes are not automatically generated for primitive types. Generate one if the callNode does not exist
-	if node == nil {
-		node = &callNode{}
-	}
-
-	node.validationIsPrimitive = baseT.IsPrimitive()
-	node.validationType = baseT
-	node.validationTopLevelType = t
-	node.elem = t.Kind == types.Pointer
-
-	node.validations = valueValidations
-	return node, nil
-}
-
-// build creates a tree of paths to fields (based on how they would be accessed in Go - pointer, elem,
-// slice, or key) and the functions that should be invoked on each field. An in-order traversal of the resulting tree
-// can be used to generate a Go function that invokes each nested function on the appropriate type. The return
-// value may be nil if there are no functions to call on type or the type is a primitive (validation functions are only generated for
-// structs today).
-func (c *callTreeForType) build(t *types.Type, root bool) *callNode {
-	parent := &callNode{}
-
-	// TODO: Clarify or improve, this is what drops the list type generation right now
-	if _, exists := c.validations[t]; !root && exists {
-		return nil
-	}
-
-	if root {
-		// the root node is always a pointer
-		parent.elem = true
-	}
-
-	// if the type already exists, don't build the tree for it and don't generate anything.
-	// This is used to avoid recursion for nested recursive types.
-	if c.currentlyBuildingTypes[t] {
-		return nil
-	}
-	// if type doesn't exist, mark it as existing
-	c.currentlyBuildingTypes[t] = true
-
-	defer func() {
-		// The type will now acts as a parent, not a nested recursive type.
-		// We can now build the tree for it safely.
-		c.currentlyBuildingTypes[t] = false
-	}()
-
-	switch t.Kind {
-	case types.Pointer:
-		if child := c.build(t.Elem, false); child != nil {
-			child.elem = true
-			parent.children = append(parent.children, *child)
-		}
-	case types.Slice, types.Array:
-		if child := c.build(t.Elem, false); child != nil {
-			child.index = true
-			if t.Elem.Kind == types.Pointer {
-				child.elem = true
-			}
-			parent.children = append(parent.children, *child)
-		}
-	case types.Map:
-		if child := c.build(t.Elem, false); child != nil {
-			child.key = true
-			parent.children = append(parent.children, *child)
-		}
-
-	case types.Struct:
-		_, err := c.populateValidations(parent, t, t.CommentLines)
-		if err != nil {
-			panic(err) // TODO: handle
-		}
-		for _, field := range t.Members {
-			name := field.Name
-			if len(name) == 0 {
-				if field.Type.Kind == types.Pointer {
-					name = field.Type.Elem.Name.Name
-				} else {
-					name = field.Type.Name.Name
-				}
-			}
-			// TODO: find the tag name of the field
-			jsonName := "<missing name>"
-			if tags, ok := lookupJSONTags(field); ok {
-				jsonName = tags.name
-			}
-			if child := c.build(field.Type, false); child != nil {
-				child.field = name
-				child.jsonName = jsonName
-				parent.children = append(parent.children, *child)
-			} else {
-				child, err := c.populateValidations(child, field.Type, field.CommentLines)
-				if err != nil {
-					panic(err) // TODO: handle
-				}
-				if child != nil {
-					child.field = name
-					child.jsonName = jsonName
-					parent.children = append(parent.children, *child)
-				}
-			}
-		}
-	case types.Alias:
-		if child := c.build(t.Underlying, false); child != nil {
-			parent.children = append(parent.children, *child)
-		}
-	}
-	if len(parent.children) == 0 && parent.validations.IsEmpty() {
-		return nil
-	}
-
-	if t.Kind == types.Struct && !parent.index && !parent.key {
-		baseT, _ := resolveTypeAndDepth(t)
-		parent.validationIsPrimitive = baseT.IsPrimitive()
-		parent.validationType = t
-		parent.validationTopLevelType = baseT
-	}
-	return parent
-}
-
-// genValidations produces a file with a autogenerated conversions.
+// genValidations produces a file with autogenerated validations.
 type genValidations struct {
 	generator.GoGenerator
-	typesPackage     string
-	outputPackage    string
-	peerPackages     []string
-	validations      validationFuncMap
-	imports          namer.ImportTracker
-	typesForInit     []*types.Type
-	generated        sets.Set[*types.Type]
-	validatorContext *validators.ValidatorContext
+	typesPackage         string
+	outputPackage        string
+	peerPackages         []string
+	validations          validationFuncMap
+	imports              namer.ImportTracker
+	typesForInit         []*types.Type
+	generated            sets.Set[*types.Type]
+	declarativeValidator validators.DeclarativeValidator
 }
 
-func NewGenValidations(outputFilename, typesPackage, outputPackage string, validations validationFuncMap, peerPkgs []string, validatorContext *validators.ValidatorContext) generator.Generator {
+func NewGenValidations(outputFilename, typesPackage, outputPackage string, validations validationFuncMap, peerPkgs []string, declarativeValidator validators.DeclarativeValidator) generator.Generator {
 	return &genValidations{
 		GoGenerator: generator.GoGenerator{
 			OutputFilename: outputFilename,
 		},
-		typesPackage:     typesPackage,
-		outputPackage:    outputPackage,
-		peerPackages:     peerPkgs,
-		validations:      validations,
-		imports:          generator.NewImportTrackerForPackage(outputPackage),
-		typesForInit:     make([]*types.Type, 0),
-		generated:        sets.New[*types.Type](),
-		validatorContext: validatorContext,
+		typesPackage:         typesPackage,
+		outputPackage:        outputPackage,
+		peerPackages:         peerPkgs,
+		validations:          validations,
+		imports:              generator.NewImportTrackerForPackage(outputPackage),
+		typesForInit:         make([]*types.Type, 0),
+		generated:            sets.New[*types.Type](),
+		declarativeValidator: declarativeValidator,
 	}
 }
 
-func (g *genValidations) Namers(c *generator.Context) namer.NameSystems {
+func (g *genValidations) Namers(_ *generator.Context) namer.NameSystems {
 	// Have the raw namer for this file track what it imports.
 	return namer.NameSystems{
 		"raw": namer.NewRawNamer(g.outputPackage, g.imports),
@@ -500,7 +78,7 @@ func (g *genValidations) isOtherPackage(pkg string) bool {
 	return true
 }
 
-func (g *genValidations) Filter(c *generator.Context, t *types.Type) bool {
+func (g *genValidations) Filter(_ *generator.Context, t *types.Type) bool {
 	validations, ok := g.validations[t]
 	if !ok || validations.object == nil {
 		return false
@@ -509,7 +87,7 @@ func (g *genValidations) Filter(c *generator.Context, t *types.Type) bool {
 	return true
 }
 
-func (g *genValidations) Imports(c *generator.Context) (imports []string) {
+func (g *genValidations) Imports(_ *generator.Context) (imports []string) {
 	var importLines []string
 	for _, singleImport := range g.imports.ImportLines() {
 		if g.isOtherPackage(singleImport) {
@@ -519,11 +97,6 @@ func (g *genValidations) Imports(c *generator.Context) (imports []string) {
 	return importLines
 }
 
-func (g *genValidations) Init(c *generator.Context, w io.Writer) error {
-	// TODO: Can I just remove this function entirely?
-	return nil
-}
-
 func (g *genValidations) GenerateType(c *generator.Context, t *types.Type, w io.Writer) error {
 	if _, ok := g.validations[t]; !ok {
 		return nil
@@ -531,13 +104,15 @@ func (g *genValidations) GenerateType(c *generator.Context, t *types.Type, w io.
 
 	klog.V(5).Infof("generating for type %v", t)
 
-	callTree := newCallTreeForType(g.validatorContext, g.validations).build(t, true)
+	callTree, err := newCallTreeForType(g.declarativeValidator, g.validations).build(t, true)
+	if err != nil {
+		return err
+	}
 	if callTree == nil {
 		klog.V(5).Infof("  no validations defined")
 		return nil
 	}
 	var errs []error
-	// TODO: Should all this happen in GetTargets?  We're de-duping deep in this code..
 	callTree.VisitInOrder(func(ancestors []*callNode, current *callNode) {
 		sw := generator.NewSnippetWriter(w, c, "$", "$")
 		if current.validationType != nil && current.validationType.Kind == types.Struct {
@@ -574,6 +149,256 @@ func (g *genValidations) generateValidations(c *generator.Context, inType *types
 	callTree.WriteMethod(c, "in", pathPart{}, 0, nil, sw)
 	sw.Do("return errs\n", nil)
 	sw.Do("}\n\n", nil)
+}
+
+// These are the comment tags that carry parameters for defaulter generation.
+const (
+	tagName      = "k8s:validation-gen"
+	inputTagName = "k8s:validation-gen-input"
+)
+
+func extractTag(comments []string) []string {
+	return gengo.ExtractCommentTags("+", comments)[tagName]
+}
+
+func extractInputTag(comments []string) []string {
+	return gengo.ExtractCommentTags("+", comments)[inputTagName]
+}
+
+func checkTag(comments []string, require ...string) bool {
+	values := gengo.ExtractCommentTags("+", comments)[tagName]
+	if len(require) == 0 {
+		return len(values) == 1 && values[0] == ""
+	}
+	return reflect.DeepEqual(values, require)
+}
+
+// typeValidations holds the type that a validation should be generated for,
+// and the validations that should be generated for that type.
+type typeValidations struct {
+	object *types.Type
+
+	// validations validate the object
+	validations *validations
+}
+
+// TODO: Should this instead be function calls into kube-openapi validation utils?
+// such as https://github.com/kubernetes/kube-openapi/blob/3c01b740850fe616122fe83225f9280f28471f40/pkg/validation/validate/values.go#L104
+type validations []validators.FunctionGen
+
+type validationFuncMap map[*types.Type]typeValidations
+
+// callTreeForType contains fields necessary to build a tree for types.
+type callTreeForType struct {
+	declarativeValidator   validators.DeclarativeValidator
+	validations            validationFuncMap
+	currentlyBuildingTypes map[*types.Type]bool
+}
+
+func newCallTreeForType(declarativeValidator validators.DeclarativeValidator, validations validationFuncMap) *callTreeForType {
+	return &callTreeForType{
+		declarativeValidator:   declarativeValidator,
+		validations:            validations,
+		currentlyBuildingTypes: make(map[*types.Type]bool),
+	}
+}
+
+// resolveType follows pointers and aliases of `t` until reaching the first
+// non-pointer type in `t's` hierarchy
+func resolveTypeAndDepth(t *types.Type) (*types.Type, int) {
+	var prev *types.Type
+	depth := 0
+	for prev != t {
+		prev = t
+		if t.Kind == types.Alias {
+			t = t.Underlying
+		} else if t.Kind == types.Pointer {
+			t = t.Elem
+			depth += 1
+		}
+	}
+	return t, depth
+}
+
+// getNestedValidations returns the first validation when resolving alias types
+func (c *callTreeForType) getNestedValidations(t *types.Type) (validations, error) {
+	var prev *types.Type
+	var valueValidations validations
+	for prev != t {
+		prev = t
+		v, err := c.declarativeValidator.ExtractValidations(t, t.CommentLines)
+		if err != nil {
+			return nil, err
+		}
+		// TODO: Find and return all validations?
+		if len(v) > 0 {
+			return v, nil
+		}
+		if t.Kind == types.Alias {
+			t = t.Underlying
+		} else if t.Kind == types.Pointer {
+			t = t.Elem
+		}
+	}
+	return valueValidations, nil
+}
+
+func (c *callTreeForType) populateValidations(node *callNode, t *types.Type, commentLines []string) (*callNode, error) {
+	valueValidations, err := c.declarativeValidator.ExtractValidations(t, commentLines)
+	if err != nil {
+		return nil, err
+	}
+
+	baseT, depth := resolveTypeAndDepth(t)
+	if depth > 0 && len(valueValidations) == 0 {
+		valueValidations, err = c.getNestedValidations(t)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if len(valueValidations) == 0 {
+		return node, nil
+	}
+
+	// callNodes are not automatically generated for primitive types. Generate one if the callNode does not exist
+	if node == nil {
+		node = &callNode{}
+	}
+
+	node.validationIsPrimitive = baseT.IsPrimitive()
+	node.validationType = baseT
+	node.validationTopLevelType = t
+	node.elem = t.Kind == types.Pointer
+
+	node.validations = valueValidations
+	return node, nil
+}
+
+// build creates a tree of paths to fields (based on how they would be accessed in Go - pointer, elem,
+// slice, or key) and the functions that should be invoked on each field. An in-order traversal of the resulting tree
+// can be used to generate a Go function that invokes each nested function on the appropriate type. The return
+// value may be nil if there are no functions to call on type or the type is a primitive (validation functions are only generated for
+// structs today).
+func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
+	parent := &callNode{}
+
+	// TODO: Clarify or improve, this is what drops the list type generation right now
+	if _, exists := c.validations[t]; !root && exists {
+		return nil, nil
+	}
+
+	if root {
+		// the root node is always a pointer
+		parent.elem = true
+	}
+
+	// if the type already exists, don't build the tree for it and don't generate anything.
+	// This is used to avoid recursion for nested recursive types.
+	if c.currentlyBuildingTypes[t] {
+		return nil, nil
+	}
+	// if type doesn't exist, mark it as existing
+	c.currentlyBuildingTypes[t] = true
+
+	defer func() {
+		// The type will now acts as a parent, not a nested recursive type.
+		// We can now build the tree for it safely.
+		c.currentlyBuildingTypes[t] = false
+	}()
+
+	switch t.Kind {
+	case types.Pointer:
+		child, err := c.build(t.Elem, false)
+		if err != nil {
+			return nil, err
+		}
+		if child != nil {
+			child.elem = true
+			parent.children = append(parent.children, *child)
+		}
+	case types.Slice, types.Array:
+		child, err := c.build(t.Elem, false)
+		if err != nil {
+			return nil, err
+		}
+		if child != nil {
+			child.index = true
+			if t.Elem.Kind == types.Pointer {
+				child.elem = true
+			}
+			parent.children = append(parent.children, *child)
+		}
+	case types.Map:
+		child, err := c.build(t.Elem, false)
+		if err != nil {
+			return nil, err
+		}
+		if child != nil {
+			child.key = true
+			parent.children = append(parent.children, *child)
+		}
+
+	case types.Struct:
+		_, err := c.populateValidations(parent, t, t.CommentLines)
+		if err != nil {
+			return nil, err
+		}
+		for _, field := range t.Members {
+			name := field.Name
+			if len(name) == 0 {
+				if field.Type.Kind == types.Pointer {
+					name = field.Type.Elem.Name.Name
+				} else {
+					name = field.Type.Name.Name
+				}
+			}
+
+			jsonName := "<unknown>"
+			if tags, ok := lookupJSONTags(field); ok {
+				jsonName = tags.name
+			}
+
+			child, err := c.build(field.Type, false)
+			if err != nil {
+				return nil, err
+			}
+			if child != nil {
+				child.field = name
+				child.jsonName = jsonName
+				parent.children = append(parent.children, *child)
+			} else {
+				child, err := c.populateValidations(child, field.Type, field.CommentLines)
+				if err != nil {
+					return nil, err
+				}
+				if child != nil {
+					child.field = name
+					child.jsonName = jsonName
+					parent.children = append(parent.children, *child)
+				}
+			}
+		}
+	case types.Alias:
+		child, err := c.build(t.Underlying, false)
+		if err != nil {
+			return nil, err
+		}
+		if child != nil {
+			parent.children = append(parent.children, *child)
+		}
+	}
+	if len(parent.children) == 0 && len(parent.validations) == 0 {
+		return nil, nil
+	}
+
+	if t.Kind == types.Struct && !parent.index && !parent.key {
+		baseT, _ := resolveTypeAndDepth(t)
+		parent.validationIsPrimitive = baseT.IsPrimitive()
+		parent.validationType = t
+		parent.validationTopLevelType = baseT
+	}
+	return parent, nil
 }
 
 // callNode represents an entry in a tree of Go type accessors - the path from the root to a leaf represents
@@ -688,7 +513,7 @@ func (n *callNode) WriteMethod(c *generator.Context, varName string, path pathPa
 	isPointer := n.elem && !n.index
 
 	index, local := varsForDepth(depth)
-	vars := generator.Args{
+	targs := generator.Args{
 		"index": index,
 		"local": local,
 		"var":   varName,
@@ -696,7 +521,7 @@ func (n *callNode) WriteMethod(c *generator.Context, varName string, path pathPa
 
 	if len(ancestors) > 0 {
 		if isPointer {
-			sw.Do("if $.var$ != nil {\n", vars)
+			sw.Do("if $.var$ != nil {\n", targs)
 			defer func() {
 				sw.Do("}\n", nil)
 			}()
@@ -711,11 +536,11 @@ func (n *callNode) WriteMethod(c *generator.Context, varName string, path pathPa
 
 	switch {
 	case n.index:
-		sw.Do("for $.index$ := range $.var$ {\n", vars)
+		sw.Do("for $.index$ := range $.var$ {\n", targs)
 		if n.elem {
-			sw.Do("$.local$ := $.var$[$.index$]\n", vars)
+			sw.Do("$.local$ := $.var$[$.index$]\n", targs)
 		} else {
-			sw.Do("$.local$ := &$.var$[$.index$]\n", vars)
+			sw.Do("$.local$ := &$.var$[$.index$]\n", targs)
 		}
 
 		for _, child := range n.children { // TODO: only one child is expected
@@ -734,8 +559,8 @@ func (n *callNode) WriteMethod(c *generator.Context, varName string, path pathPa
 	case n.key:
 		// Map keys are typed and cannot share the same index variable as arrays and other maps
 		index = index + "_" + ancestors[len(ancestors)-1].field
-		vars["index"] = index
-		sw.Do("for $.index$_idx, $.index$ := range $.var$ {\n", vars)
+		targs["index"] = index
+		sw.Do("for $.index$_idx, $.index$ := range $.var$ {\n", targs)
 		for _, child := range n.children {
 			if n.validationType != nil && n.validationType.Kind == types.Struct {
 				n.writeCall(index, pathPart{Key: index + "_idx"}, false, sw)
@@ -767,22 +592,22 @@ func (n *callNode) writeCall(varName string, path pathPart, isVarPointer bool, s
 		accessor = "&" + accessor
 	}
 
-	args := generator.Args{
+	targs := generator.Args{
 		"fn":   n.validationType,
 		"var":  accessor,
 		"path": path,
 	}
 
-	sw.Do("errs = append(errs, $.fn|objectvalidationfn$($.var$, ", args)
+	sw.Do("errs = append(errs, $.fn|objectvalidationfn$($.var$, ", targs)
 
 	if len(path.Key) > 0 {
-		sw.Do("fldPath.Key($.path.Key$)", args)
+		sw.Do("fldPath.Key($.path.Key$)", targs)
 	} else if len(path.Name) > 0 {
-		sw.Do("fldPath.Child(\"$.path.Name$\")", args)
+		sw.Do("fldPath.Child(\"$.path.Name$\")", targs)
 	} else {
-		sw.Do("fldPath.Index($.path.Index$)", args)
+		sw.Do("fldPath.Index($.path.Index$)", targs)
 	}
-	sw.Do(")...)\n", args)
+	sw.Do(")...)\n", targs)
 }
 
 type pathPart struct {
@@ -797,13 +622,13 @@ func (n *callNode) writeValidations(c *generator.Context, varName string, path p
 		accessor = "*" + accessor
 	}
 
-	if n.validations.IsEmpty() {
+	if len(n.validations) == 0 {
 		return
 	}
 
 	for _, v := range n.validations {
-		fn, extraArgs := v.ValidatorSignature()
-		args := generator.Args{
+		fn, extraArgs := v.SignatureAndArgs()
+		targs := generator.Args{
 			"typeValidations": n.validations,
 			"varName":         accessor,
 			"path":            path,
@@ -814,20 +639,20 @@ func (n *callNode) writeValidations(c *generator.Context, varName string, path p
 		}
 
 		// If default value is a literal then it can be assigned via var stmt
-		sw.Do("errs = append(errs, $.validationFn|raw$(", args)
+		sw.Do("errs = append(errs, $.validationFn|raw$(", targs)
 		if len(path.Key) > 0 {
-			sw.Do("fldPath.Key($.path.Key$)", args)
+			sw.Do("fldPath.Key($.path.Key$)", targs)
 		} else if len(path.Name) > 0 {
-			sw.Do("fldPath.Child(\"$.path.Name$\")", args)
+			sw.Do("fldPath.Child(\"$.path.Name$\")", targs)
 		} else {
-			sw.Do("fldPath.Index($.path.Index$)", args)
+			sw.Do("fldPath.Index($.path.Index$)", targs)
 		}
-		sw.Do(", $.varName$", args)
+		sw.Do(", $.varName$", targs)
 		for _, extraArg := range extraArgs {
 			// TODO: Ideally we would not apply templating to values, but instead write them directly.
-			sw.Do(toGolangSourceDataLiteral(extraArg), nil)
+			sw.Do(", "+toGolangSourceDataLiteral(extraArg), nil)
 		}
-		sw.Do(")...)\n", args)
+		sw.Do(")...)\n", targs)
 	}
 }
 
@@ -836,84 +661,10 @@ func toGolangSourceDataLiteral(value any) string {
 	// are quoted.
 	switch value.(type) {
 	case uint, uint8, uint16, uint32, uint64, int8, int16, int32, int64, float32, float64, bool:
-		return fmt.Sprintf(", %v", value)
+		return fmt.Sprintf("%v", value)
 	case string:
-		return fmt.Sprintf(", %q", value)
+		return fmt.Sprintf("%q", value)
 	default:
 		panic(fmt.Sprintf("Unsupported extraArg type: %T", value)) // TODO: handle error
 	}
-}
-
-// TODO: This was copied from apply configurations.  Somehow share or otherwise de-dup
-
-// JSONTags represents a go json field tag.
-type JSONTags struct {
-	name      string
-	omit      bool
-	inline    bool
-	omitempty bool
-}
-
-func (t JSONTags) String() string {
-	var tag string
-	if !t.inline {
-		tag += t.name
-	}
-	if t.omitempty {
-		tag += ",omitempty"
-	}
-	if t.inline {
-		tag += ",inline"
-	}
-	return tag
-}
-
-func lookupJSONTags(m types.Member) (JSONTags, bool) {
-	tag := reflect.StructTag(m.Tags).Get("json")
-	if tag == "" || tag == "-" {
-		return JSONTags{}, false
-	}
-	name, opts := parseTag(tag)
-	if name == "" {
-		name = m.Name
-	}
-	return JSONTags{
-		name:      name,
-		omit:      false,
-		inline:    opts.Contains("inline"),
-		omitempty: opts.Contains("omitempty"),
-	}, true
-}
-
-type tagOptions string
-
-// parseTag splits a struct field's json tag into its name and
-// comma-separated options.
-func parseTag(tag string) (string, tagOptions) {
-	if idx := strings.Index(tag, ","); idx != -1 {
-		return tag[:idx], tagOptions(tag[idx+1:])
-	}
-	return tag, ""
-}
-
-// Contains reports whether a comma-separated listAlias of options
-// contains a particular substr flag. substr must be surrounded by a
-// string boundary or commas.
-func (o tagOptions) Contains(optionName string) bool {
-	if len(o) == 0 {
-		return false
-	}
-	s := string(o)
-	for s != "" {
-		var next string
-		i := strings.Index(s, ",")
-		if i >= 0 {
-			s, next = s[:i], s[i+1:]
-		}
-		if s == optionName {
-			return true
-		}
-		s = next
-	}
-	return false
 }

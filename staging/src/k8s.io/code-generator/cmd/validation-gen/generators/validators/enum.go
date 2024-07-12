@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// TODO: This is an exact copy of kube-openapi's enum.go.
 package validators
 
 import (
@@ -27,6 +26,37 @@ import (
 	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
 )
+
+func init() {
+	AddToRegistry(InitEnumDeclarativeValidator)
+}
+
+func InitEnumDeclarativeValidator(c *generator.Context) DeclarativeValidator {
+	return &enumDeclarativeValidator{enumContext: newEnumContext(c)}
+}
+
+type enumDeclarativeValidator struct {
+	enumContext *enumContext
+}
+
+func (c *enumDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error) {
+	var result []FunctionGen
+	if enum, ok := c.enumContext.EnumType(t); ok {
+		result = append(result, Function(enumValidator, enum.ValueArgs()...))
+	}
+	return result, nil
+}
+
+func (et *enumType) ValueArgs() []any {
+	var values []any
+	for _, value := range et.Values {
+		// use "%q" format to generate a Go literal of the string const value
+		values = append(values, value.Value)
+	}
+	return values
+}
+
+// TODO: Everything below this comment is an exact copy of kube-openapi's enum.go.
 
 const tagEnumType = "enum"
 const enumTypeDescriptionHeader = "Possible enum values:"
@@ -63,18 +93,6 @@ func (ec *enumContext) EnumType(t *types.Type) (enum *enumType, isEnum bool) {
 	}
 	enum, ok := ec.enumTypes[t.Name]
 	return enum, ok
-}
-
-// ValueStrings returns all possible values of the enum type as strings
-// the results are sorted and quoted as Go literals.
-func (et *enumType) ValueStrings() []string {
-	var values []string
-	for _, value := range et.Values {
-		// use "%q" format to generate a Go literal of the string const value
-		values = append(values, fmt.Sprintf("%q", value.Value))
-	}
-	sort.Strings(values)
-	return values
 }
 
 // DescriptionLines returns a description of the enum in this format:

@@ -18,10 +18,19 @@ package validators
 
 import "k8s.io/gengo/v2/types"
 
-// DeclarativeValidator provides validation-gen with the information needed to generate a
-// validation function invocation.
+// DeclarativeValidator is able to extract validation function generators from
+// types.go files.
 type DeclarativeValidator interface {
-	// ValidatorSignature returns the function name and value literals, in string form, to be passed as extraArg.
+	// ExtractValidations returns a FunctionGen for each validation this DeclarativeValidator
+	// supports for the given go type, and it's corresponding comment strings.
+	ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error)
+}
+
+// FunctionGen provides validation-gen with the information needed to generate a
+// validation function invocation.
+type FunctionGen interface {
+	// SignatureAndArgs returns the function name and all extraArg value literals that are passed when the function
+	// invocation is generated.
 	//
 	// The function signature must be of the form:
 	//   func(field.Path, <valueType>, extraArgs[0] <extraArgs[0]Type>, ..., extraArgs[N] <extraArgs[N]Type>)
@@ -30,12 +39,21 @@ type DeclarativeValidator interface {
 	//
 	// If validation function to be called does not have a signature of this form, please introduce
 	// a function that does and use that function to call the validation function.
-	ValidatorSignature() (function types.Name, extraArgs []any)
+	SignatureAndArgs() (function types.Name, extraArgs []any)
 }
 
-// NewValidator creates a validator for a given function name and extraArgs.
-func NewValidator(function types.Name, extraArgs ...any) DeclarativeValidator {
-	return &basicValidator{function: function, extraArgs: extraArgs}
+// Function creates a FunctionGen for a given function name and extraArgs.
+func Function(function types.Name, extraArgs ...any) FunctionGen {
+	// Callers of Signature don't care if the args are all of a known type, it just
+	// makes it easier to declare validators.
+	var anyArgs []any
+	if len(extraArgs) > 0 {
+		anyArgs = make([]any, len(extraArgs))
+		for i, arg := range extraArgs {
+			anyArgs[i] = arg
+		}
+	}
+	return &basicValidator{function: function, extraArgs: anyArgs}
 }
 
 type basicValidator struct {
@@ -43,6 +61,6 @@ type basicValidator struct {
 	extraArgs []any
 }
 
-func (v *basicValidator) ValidatorSignature() (function types.Name, args []any) {
+func (v *basicValidator) SignatureAndArgs() (function types.Name, args []any) {
 	return v.function, v.extraArgs
 }

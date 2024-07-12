@@ -17,13 +17,23 @@ limitations under the License.
 package validators
 
 import (
+	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
 	"k8s.io/kube-openapi/pkg/generators"
 )
 
-const (
-	markerPrefix = "+k8s:validation:"
+func init() {
+	AddToRegistry(InitOpenAPIDeclarativeValidator)
+}
 
+func InitOpenAPIDeclarativeValidator(c *generator.Context) DeclarativeValidator {
+	return &openAPIDeclarativeValidator{}
+}
+
+type openAPIDeclarativeValidator struct{}
+
+const (
+	markerPrefix      = "+k8s:validation:"
 	utilValidationPkg = "k8s.io/apimachinery/pkg/util/validation"
 )
 
@@ -34,8 +44,8 @@ var (
 	enumValidator                 = types.Name{Package: utilValidationPkg, Name: "ValidateEnum"}
 )
 
-func ExtractOpenAPIValidations(t *types.Type, comments []string) ([]DeclarativeValidator, error) {
-	var v []DeclarativeValidator
+func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error) {
+	var v []FunctionGen
 
 	// Leverage the kube-openapi parser for 'k8s:validation:' validations.
 	schema, err := generators.ParseCommentTags(t, comments, markerPrefix)
@@ -43,21 +53,21 @@ func ExtractOpenAPIValidations(t *types.Type, comments []string) ([]DeclarativeV
 		return nil, err
 	}
 	if schema.MaxLength != nil {
-		v = append(v, NewValidator(maxLengthValidator, *schema.MaxLength))
+		v = append(v, Function(maxLengthValidator, *schema.MaxLength))
 	}
 	if len(schema.Format) > 0 {
-		v = append(v, NewFormatValidator(schema.Format))
+		v = append(v, FormatValidationFunction(schema.Format))
 	}
 
 	return v, nil
 }
 
-func NewFormatValidator(arg string) DeclarativeValidator {
-	if arg == "fullyQualifiedName" {
-		return NewValidator(isFullyQualifiedNameValidator)
+func FormatValidationFunction(format string) FunctionGen {
+	if format == "fullyQualifiedName" {
+		return Function(isFullyQualifiedNameValidator)
 	}
-	if arg == "ip" {
-		return NewValidator(isValidIPValidator)
+	if format == "ip" {
+		return Function(isValidIPValidator)
 	}
 	return nil
 }
