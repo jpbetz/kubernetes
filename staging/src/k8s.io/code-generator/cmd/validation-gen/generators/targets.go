@@ -179,7 +179,7 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 			// For every k8s:validation-gen tag at the package level, interpret the value as a
 			// field name (like TypeMeta, ListMeta, ObjectMeta) and trigger validation generation
 			// for any type with any of the matching field names. Provides a more useful package
-			// level validation than global (because we only need typeValidations on a subset of objects -
+			// level validation than global (because we only need validations on a subset of objects -
 			// usually those with TypeMeta).
 			if t.Kind == types.Struct && len(typesWith) > 0 {
 				for _, field := range t.Members {

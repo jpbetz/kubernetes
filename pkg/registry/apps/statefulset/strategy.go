@@ -19,6 +19,8 @@ package statefulset
 import (
 	"context"
 
+	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
+
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -31,7 +33,6 @@ import (
 	"k8s.io/kubernetes/pkg/apis/apps"
 	"k8s.io/kubernetes/pkg/apis/apps/validation"
 	"k8s.io/kubernetes/pkg/features"
-	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
 // statefulSetStrategy implements verification logic for Replication StatefulSets.
@@ -140,7 +141,11 @@ func dropStatefulSetDisabledFields(newSS *apps.StatefulSet, oldSS *apps.Stateful
 func (statefulSetStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	statefulSet := obj.(*apps.StatefulSet)
 	opts := pod.GetValidationOptionsFromPodTemplate(&statefulSet.Spec.Template, nil)
-	return validation.ValidateStatefulSet(statefulSet, opts)
+
+	errs := validation.ValidateStatefulSet(statefulSet, opts)
+	// TODO: Need to find the original GVK, convert to it and then call:
+	// errs = append(errs, legacyscheme.Scheme.Validate(obj)...)
+	return errs
 }
 
 // WarningsOnCreate returns warnings for the creation of the given object.

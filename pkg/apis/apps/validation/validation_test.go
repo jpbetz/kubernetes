@@ -25,6 +25,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 
+	v1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -33,6 +34,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	featuregatetesting "k8s.io/component-base/featuregate/testing"
+	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	"k8s.io/kubernetes/pkg/api/pod"
 	podtest "k8s.io/kubernetes/pkg/api/pod/testing"
 	"k8s.io/kubernetes/pkg/apis/apps"
@@ -40,6 +42,8 @@ import (
 	corevalidation "k8s.io/kubernetes/pkg/apis/core/validation"
 	"k8s.io/kubernetes/pkg/features"
 	"k8s.io/utils/ptr"
+
+	_ "k8s.io/kubernetes/pkg/apis/apps/install"
 )
 
 type statefulSetTweak func(ss *apps.StatefulSet)
@@ -107,6 +111,12 @@ func tweakPodManagementPolicy(policy apps.PodManagementPolicyType) statefulSetTw
 func tweakReplicas(replicas int32) statefulSetTweak {
 	return func(ss *apps.StatefulSet) {
 		ss.Spec.Replicas = replicas
+	}
+}
+
+func tweakServiceName(serviceName string) statefulSetTweak {
+	return func(ss *apps.StatefulSet) {
+		ss.Spec.ServiceName = serviceName
 	}
 }
 
@@ -525,6 +535,14 @@ func TestValidateStatefulSet(t *testing.T) {
 		errs: field.ErrorList{
 			field.Invalid(field.NewPath("spec", "ordinals.start"), nil, ""),
 		},
+	}, {
+		name: "invalid service name",
+		set: mkStatefulSet(&validPodTemplate,
+			tweakServiceName("0123456789012345678901234567890123456789"),
+		),
+		errs: field.ErrorList{
+			field.Invalid(field.NewPath("spec", "serviceName"), nil, ""),
+		},
 	},
 	}
 
@@ -544,6 +562,16 @@ func TestValidateStatefulSet(t *testing.T) {
 			}
 
 			errs := ValidateStatefulSet(&testCase.set, pod.GetValidationOptionsFromPodTemplate(&testCase.set.Spec.Template, nil))
+
+			// TODO: HACK: To test declarative validation, we need to run tests against all versions.
+			//       For now, I'm converting to just one version and making sure that works.
+			versioned := &v1.StatefulSet{}
+			err := legacyscheme.Scheme.Convert(&testCase.set, versioned, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			errs = append(errs, legacyscheme.Scheme.Validate(versioned)...)
+
 			wantErrs := testCase.errs
 			if diff := cmp.Diff(wantErrs, errs, cmpOpts...); diff != "" {
 				t.Errorf("Unexpected validation errors (-want,+got):\n%s", diff)

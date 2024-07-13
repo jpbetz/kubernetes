@@ -58,6 +58,7 @@ type FlunderSpec struct {
 	More map[string]Widget `json:"more,omitempty" protobuf:"bytes,5,rep,name=more"`
 }
 
+// Widget
 type Widget struct {
 	// +k8s:validation:format="ip"
 	Name string `json:"name,omitempty" protobuf:"bytes,1,opt,name=name"`

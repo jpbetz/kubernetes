@@ -23,9 +23,20 @@ package v1
 
 import (
 	v1 "k8s.io/api/apps/v1"
+	runtime "k8s.io/apimachinery/pkg/runtime"
 	validation "k8s.io/apimachinery/pkg/util/validation"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
 )
+
+func init() { localSchemeBuilder.Register(RegisterValidations) }
+
+// RegisterValidations adds validation functions to the given scheme.
+// Public to allow building arbitrary schemes.
+func RegisterValidations(scheme *runtime.Scheme) error {
+	scheme.AddValidationFunc(&v1.StatefulSetList{}, func(obj interface{}) field.ErrorList { return Validate_StatefulSetList(obj.(*v1.StatefulSetList), nil) })
+	scheme.AddValidationFunc(&v1.StatefulSet{}, func(obj interface{}) field.ErrorList { return Validate_StatefulSet(obj.(*v1.StatefulSet), nil) })
+	return nil
+}
 
 func Validate_StatefulSet(in *v1.StatefulSet, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs, Validate_StatefulSetSpec(&in.Spec, fldPath.Child("spec"))...)
@@ -33,7 +44,7 @@ func Validate_StatefulSet(in *v1.StatefulSet, fldPath *field.Path) (errs field.E
 }
 
 func Validate_StatefulSetSpec(in *v1.StatefulSetSpec, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateMaxLength(fldPath.Child("serviceName"), in.ServiceName, 128)...)
+	errs = append(errs, validation.ValidateMaxLength(fldPath.Child("serviceName"), in.ServiceName, 32)...)
 	return errs
 }
 

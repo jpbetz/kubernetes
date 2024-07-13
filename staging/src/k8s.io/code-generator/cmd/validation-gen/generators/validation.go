@@ -94,6 +94,36 @@ func (g *genValidations) isOtherPackage(pkg string) bool {
 	return true
 }
 
+//	func RegisterValidations(scheme *runtime.Scheme) error {
+//		scheme.AddTypeDefaultingFunc(&v1.StatefulSet{}, func(obj interface{}) { Validate_StatefulSet(obj.(*v1.StatefulSet), nil) })
+//		return nil
+//	}
+func (g *genValidations) Init(c *generator.Context, w io.Writer) error {
+	sw := generator.NewSnippetWriter(w, c, "$", "$")
+
+	scheme := c.Universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/runtime", Name: "Scheme"})
+	schemePtr := &types.Type{
+		Kind: types.Pointer,
+		Elem: scheme,
+	}
+	sw.Do("func init() { localSchemeBuilder.Register(RegisterValidations)}\n\n", nil)
+
+	sw.Do("// RegisterValidations adds validation functions to the given scheme.\n", nil)
+	sw.Do("// Public to allow building arbitrary schemes.\n", nil)
+	sw.Do("func RegisterValidations(scheme $.|raw$) error {\n", schemePtr)
+	for t := range g.rootTypesToValidate {
+		targs := generator.Args{
+			"inType":    t,
+			"errorList": c.Universe.Type(errorListType),
+			"fieldPath": c.Universe.Type(fieldPathType),
+		}
+		sw.Do("scheme.AddValidationFunc(&$.inType|raw${}, func(obj interface{}) $.errorList|raw$ { return $.inType|objectvalidationfn$(obj.(*$.inType|raw$), nil) })\n", targs)
+	}
+	sw.Do("return nil\n", nil)
+	sw.Do("}\n\n", nil)
+	return sw.Error()
+}
+
 func (g *genValidations) GenerateType(c *generator.Context, t *types.Type, w io.Writer) error {
 	klog.V(5).Infof("generating for type %v", t)
 

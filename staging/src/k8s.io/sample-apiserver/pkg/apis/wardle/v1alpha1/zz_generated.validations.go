@@ -22,9 +22,22 @@ limitations under the License.
 package v1alpha1
 
 import (
+	runtime "k8s.io/apimachinery/pkg/runtime"
 	validation "k8s.io/apimachinery/pkg/util/validation"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
 )
+
+func init() { localSchemeBuilder.Register(RegisterValidations) }
+
+// RegisterValidations adds validation functions to the given scheme.
+// Public to allow building arbitrary schemes.
+func RegisterValidations(scheme *runtime.Scheme) error {
+	scheme.AddValidationFunc(&Fischer{}, func(obj interface{}) field.ErrorList { return Validate_Fischer(obj.(*Fischer), nil) })
+	scheme.AddValidationFunc(&FischerList{}, func(obj interface{}) field.ErrorList { return Validate_FischerList(obj.(*FischerList), nil) })
+	scheme.AddValidationFunc(&Flunder{}, func(obj interface{}) field.ErrorList { return Validate_Flunder(obj.(*Flunder), nil) })
+	scheme.AddValidationFunc(&FlunderList{}, func(obj interface{}) field.ErrorList { return Validate_FlunderList(obj.(*FlunderList), nil) })
+	return nil
+}
 
 func Validate_Fischer(in *Fischer, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs, validation.IsValidIP(fldPath.Child("reference"), in.Reference)...)

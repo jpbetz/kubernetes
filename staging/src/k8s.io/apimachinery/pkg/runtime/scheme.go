@@ -26,6 +26,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/naming"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 // Scheme defines methods for serializing and deserializing API objects, a type
@@ -68,6 +69,10 @@ type Scheme struct {
 	// the provided object must be a pointer.
 	defaulterFuncs map[reflect.Type]func(interface{})
 
+	// validationFuncs is a map to funcs to be called with an object to perform validation.
+	// The provided object must be a pointer.
+	validationFuncs map[reflect.Type]func(interface{}) field.ErrorList
+
 	// converter stores all registered conversion functions. It also has
 	// default converting behavior.
 	converter *conversion.Converter
@@ -96,6 +101,7 @@ func NewScheme() *Scheme {
 		unversionedKinds:          map[string]reflect.Type{},
 		fieldLabelConversionFuncs: map[schema.GroupVersionKind]FieldLabelConversionFunc{},
 		defaulterFuncs:            map[reflect.Type]func(interface{}){},
+		validationFuncs:           map[reflect.Type]func(interface{}) field.ErrorList{},
 		versionPriority:           map[string][]string{},
 		schemeName:                naming.GetNameFromCallsite(internalPackages...),
 	}
@@ -345,6 +351,25 @@ func (s *Scheme) Default(src Object) {
 	if fn, ok := s.defaulterFuncs[reflect.TypeOf(src)]; ok {
 		fn(src)
 	}
+}
+
+// AddValidationFunc registered a function that is passed a pointer to an
+// object and can validate the object. These functions will be invoked
+// when Validate() is called. The function will never be called unless the
+// validated object matches srcType. If this function is invoked twice with the
+// same srcType, the fn passed to the later call will be used instead.
+func (s *Scheme) AddValidationFunc(srcType Object, fn func(interface{}) field.ErrorList) {
+	s.validationFuncs[reflect.TypeOf(srcType)] = fn
+}
+
+// Validate validates the provided Object according to the generated declarative validation code.
+// WARNING: This does not validate all objects!  The handwritten validation code in validation.go
+// is not run when this is called.  Only the generated zz_generated.validations.go validation code is run.
+func (s *Scheme) Validate(src Object) field.ErrorList {
+	if fn, ok := s.validationFuncs[reflect.TypeOf(src)]; ok {
+		return fn(src)
+	}
+	return nil
 }
 
 // Convert will attempt to convert in into out. Both must be pointers. For easy

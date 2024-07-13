@@ -122,6 +122,9 @@ func BeforeCreate(strategy RESTCreateStrategy, ctx context.Context, obj runtime.
 	if errs := strategy.Validate(ctx, obj); len(errs) > 0 {
 		return errors.NewInvalid(kind.GroupKind(), objectMeta.GetName(), errs)
 	}
+	// TODO: Put declarative validation call here make it fully automatic. Merge errors with above Validate call.
+	//       Use kind.Version to load up the appropriate validator (it should be registered to a scheme)
+	//       xref: https://github.com/kubernetes/kubernetes/compare/master...jpbetz:kubernetes:cel-for-native#diff-7860873c945b2bba0b6dbb5927f68fb58c5b40b19972bf94472b1d3d21445a37R99
 
 	// Custom validation (including name validation) passed
 	// Now run common validation on object meta

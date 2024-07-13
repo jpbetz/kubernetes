@@ -71,8 +71,9 @@ func (c *compositeValidator) ExtractValidations(t *types.Type, comments []string
 }
 
 func (c *compositeValidator) allow(tagName string) bool {
-	if len(c.enabledTags) == 0 {
-		return !c.disabledTags.Has(tagName)
+	if c.disabledTags.Has(tagName) {
+		return false
 	}
-	return c.enabledTags.Has(tagName) && !c.disabledTags.Has(tagName)
+
+	return len(c.enabledTags) == 0 || c.enabledTags.Has(tagName)
 }
