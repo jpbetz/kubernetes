@@ -30,12 +30,6 @@ import (
 	"k8s.io/klog/v2"
 )
 
-// These are the comment tags that carry parameters for defaulter generation.
-const (
-	tagName      = "k8s:validation-gen"
-	inputTagName = "k8s:validation-gen-input"
-)
-
 var (
 	fieldPkg      = "k8s.io/apimachinery/pkg/util/validation/field"
 	errorListType = types.Name{Package: fieldPkg, Name: "ErrorList"}

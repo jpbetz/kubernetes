@@ -35,6 +35,9 @@ type openAPIDeclarativeValidator struct{}
 const (
 	markerPrefix      = "+k8s:validation:"
 	utilValidationPkg = "k8s.io/apimachinery/pkg/util/validation"
+
+	formatTagName    = "k8s:validation:format"
+	maxLengthTagName = "k8s:validation:maxLength"
 )
 
 var (
@@ -52,7 +55,7 @@ func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []
 		return nil, err
 	}
 	if schema.MaxLength != nil {
-		v = append(v, Function(maxLengthValidator, *schema.MaxLength))
+		v = append(v, Function(formatTagName, maxLengthValidator, *schema.MaxLength))
 	}
 	if len(schema.Format) > 0 {
 		formatFunction := FormatValidationFunction(schema.Format)
@@ -66,7 +69,7 @@ func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []
 
 func FormatValidationFunction(format string) FunctionGen {
 	if format == "ip" {
-		return Function(isValidIPValidator)
+		return Function(maxLengthTagName, isValidIPValidator)
 	}
 	// TODO: Flesh out the list of validation functions
 

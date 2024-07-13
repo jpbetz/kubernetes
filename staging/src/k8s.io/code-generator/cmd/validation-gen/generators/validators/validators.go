@@ -29,6 +29,8 @@ type DeclarativeValidator interface {
 // FunctionGen provides validation-gen with the information needed to generate a
 // validation function invocation.
 type FunctionGen interface {
+	TagName() string
+
 	// SignatureAndArgs returns the function name and all extraArg value literals that are passed when the function
 	// invocation is generated.
 	//
@@ -43,7 +45,7 @@ type FunctionGen interface {
 }
 
 // Function creates a FunctionGen for a given function name and extraArgs.
-func Function(function types.Name, extraArgs ...any) FunctionGen {
+func Function(tagName string, function types.Name, extraArgs ...any) FunctionGen {
 	// Callers of Signature don't care if the args are all of a known type, it just
 	// makes it easier to declare validators.
 	var anyArgs []any
@@ -53,12 +55,17 @@ func Function(function types.Name, extraArgs ...any) FunctionGen {
 			anyArgs[i] = arg
 		}
 	}
-	return &functionGen{function: function, extraArgs: anyArgs}
+	return &functionGen{tagName: tagName, function: function, extraArgs: anyArgs}
 }
 
 type functionGen struct {
+	tagName   string
 	function  types.Name
 	extraArgs []any
+}
+
+func (v *functionGen) TagName() string {
+	return v.tagName
 }
 
 func (v *functionGen) SignatureAndArgs() (function types.Name, args []any) {

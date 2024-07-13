@@ -17,6 +17,7 @@ limitations under the License.
 package validators
 
 import (
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
 )
@@ -40,16 +41,17 @@ func (r *Registry) Add(validator DeclarativeValidatorInit) {
 	r.inits = append(r.inits, validator)
 }
 
-func NewValidator(c *generator.Context) DeclarativeValidator {
+func NewValidator(c *generator.Context, enabledTags, disabledTags []string) DeclarativeValidator {
 	validators := make([]DeclarativeValidator, len(registry.inits))
 	for i, init := range registry.inits {
 		validators[i] = init(c)
 	}
-	return &compositeValidator{validators: validators}
+	return &compositeValidator{validators: validators, enabledTags: sets.New(enabledTags...), disabledTags: sets.New(disabledTags...)}
 }
 
 type compositeValidator struct {
-	validators []DeclarativeValidator
+	validators                []DeclarativeValidator
+	enabledTags, disabledTags sets.Set[string]
 }
 
 func (c *compositeValidator) ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error) {
@@ -59,7 +61,18 @@ func (c *compositeValidator) ExtractValidations(t *types.Type, comments []string
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, validations...)
+		for _, f := range validations {
+			if c.allow(f.TagName()) {
+				result = append(result, f)
+			}
+		}
 	}
 	return result, nil
+}
+
+func (c *compositeValidator) allow(tagName string) bool {
+	if len(c.enabledTags) == 0 {
+		return !c.disabledTags.Has(tagName)
+	}
+	return c.enabledTags.Has(tagName) && !c.disabledTags.Has(tagName)
 }

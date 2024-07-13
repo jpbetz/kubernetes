@@ -33,6 +33,35 @@ import (
 	"k8s.io/klog/v2"
 )
 
+// These are the comment tags that carry parameters for validation generation.
+const (
+	tagName         = "k8s:validation-gen"
+	inputTagName    = "k8s:validation-gen-input"
+	enabledTagName  = "k8s:validation-gen-enabled-tags"
+	disabledTagName = "k8s:validation-gen-disabled-tags"
+)
+
+func extractTag(comments []string) []string {
+	return gengo.ExtractCommentTags("+", comments)[tagName]
+}
+
+func extractInputTag(comments []string) []string {
+	return gengo.ExtractCommentTags("+", comments)[inputTagName]
+}
+
+func extractFiltersTags(comments []string) (enabled, disabled []string) {
+	return gengo.ExtractCommentTags("+", comments)[enabledTagName],
+		gengo.ExtractCommentTags("+", comments)[disabledTagName]
+}
+
+func checkTag(comments []string, require ...string) bool {
+	values := gengo.ExtractCommentTags("+", comments)[tagName]
+	if len(require) == 0 {
+		return len(values) == 1 && values[0] == ""
+	}
+	return reflect.DeepEqual(values, require)
+}
+
 // NameSystems returns the name system used by the generators in this package.
 func NameSystems() namer.NameSystems {
 	return namer.NameSystems{
@@ -125,8 +154,6 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 	orderer := namer.Orderer{Namer: namer.NewPublicNamer(1)}
 	context.Order = orderer.OrderUniverse(context.Universe)
 
-	validatorContext := validators.NewValidator(context)
-
 	for _, i := range context.Inputs {
 		pkg := context.Universe[i]
 
@@ -135,6 +162,9 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 		// types are defined in k8s.io/api/core/v1, while the pkg which holds
 		// defaulter code is at k/k/pkg/api/v1.
 		typesPkg := pkg
+
+		enabledTags, disabledTags := extractFiltersTags(pkg.Comments)
+		validatorContext := validators.NewValidator(context, enabledTags, disabledTags)
 
 		typesWith := extractTag(pkg.Comments)
 		shouldCreateObjectValidationFn := func(t *types.Type) bool {
@@ -174,10 +204,10 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 			}
 		}
 
-		// Find types use declarative validation, either directly or indirectly.
-		rootTypestoValidate := sets.New[*types.Type]()
+		// Find types that use declarative validation, either directly or indirectly.
+		rootTypesToValidate := sets.New[*types.Type]()
 		for t := range candidates {
-			if rootTypestoValidate.Has(t) { // already found
+			if rootTypesToValidate.Has(t) { // already found
 				continue
 			}
 			node, err := newCallTreeForType(validatorContext).build(t, true)
@@ -188,12 +218,12 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 				sw.Do("$.inType|objectdefaultfn$", generator.Args{
 					"inType": t,
 				}) // write the name to buffer
-				rootTypestoValidate.Insert(t)
+				rootTypesToValidate.Insert(t)
 				buffer.Reset()
 			}
 		}
 
-		if len(rootTypestoValidate) == 0 {
+		if len(rootTypesToValidate) == 0 {
 			klog.V(5).Infof("no typeValidations in package %s", pkg.Name)
 		}
 
@@ -210,26 +240,10 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 
 				GeneratorsFunc: func(c *generator.Context) (generators []generator.Generator) {
 					return []generator.Generator{
-						NewGenValidations(args.OutputFile, typesPkg.Path, pkg.Path, rootTypestoValidate, peerPkgs, validatorContext),
+						NewGenValidations(args.OutputFile, typesPkg.Path, pkg.Path, rootTypesToValidate, peerPkgs, validatorContext),
 					}
 				},
 			})
 	}
 	return targets
-}
-
-func extractTag(comments []string) []string {
-	return gengo.ExtractCommentTags("+", comments)[tagName]
-}
-
-func extractInputTag(comments []string) []string {
-	return gengo.ExtractCommentTags("+", comments)[inputTagName]
-}
-
-func checkTag(comments []string, require ...string) bool {
-	values := gengo.ExtractCommentTags("+", comments)[tagName]
-	if len(require) == 0 {
-		return len(values) == 1 && values[0] == ""
-	}
-	return reflect.DeepEqual(values, require)
 }
