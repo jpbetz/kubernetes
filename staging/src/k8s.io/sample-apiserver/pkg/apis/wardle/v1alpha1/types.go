@@ -56,10 +56,23 @@ type FlunderSpec struct {
 	Extras []Widget `json:"extras,omitempty" protobuf:"bytes,4,rep,name=extras"`
 
 	More map[string]Widget `json:"more,omitempty" protobuf:"bytes,5,rep,name=more"`
+
+	Layer *Layer `json:"layer,omitempty" protobuf:"bytes,6,opt,name=layer"`
+}
+
+type Layer struct {
+	Extras []Widget `json:"extras" protobuf:"bytes,1,rep,name=extras"`
 }
 
 // Widget
 type Widget struct {
+	// +k8s:validation:format="ip"
+	Name string `json:"name,omitempty" protobuf:"bytes,1,opt,name=name"`
+
+	Something []Something `json:"something" protobuf:"bytes,2,rep,name=something"`
+}
+
+type Something struct {
 	// +k8s:validation:format="ip"
 	Name string `json:"name,omitempty" protobuf:"bytes,1,opt,name=name"`
 }

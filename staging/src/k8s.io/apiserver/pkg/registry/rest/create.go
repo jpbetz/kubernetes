@@ -124,6 +124,13 @@ func BeforeCreate(strategy RESTCreateStrategy, ctx context.Context, obj runtime.
 		return errors.NewInvalid(kind.GroupKind(), objectMeta.GetName(), errs)
 	}
 	// TODO: HACK: This jack-hammers in versioned type declarative validation, but it's clearly "pretty bad".
+	//       Specifically, it doesn't respect the strategy. So it doesn't validate only spec or only status depending on which stanza is being updated.
+	//       This code should probably go into a supplementary interface on the strategy.
+	//           See rest.GarbageCollectionDeleteStrategy as an example.
+	//       	 But the whole reason I wanted it here is so that each strategy doesn't need to implement it since it's generic.
+	//              The missing bit to execute it here would be to know if a subresource is being validated..
+	//                 But that's what the strategy is already suppose to have resolved.
+	//                   So logically we want the validation in the strategy, we just want to make it super simple to add..
 	if requestInfo, found := genericapirequest.RequestInfoFrom(ctx); found {
 		groupVersion := schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}
 		versionedObj, err := legacyscheme.Scheme.ConvertToVersion(obj, groupVersion)

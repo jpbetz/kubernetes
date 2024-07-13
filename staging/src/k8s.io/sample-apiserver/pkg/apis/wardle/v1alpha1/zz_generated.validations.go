@@ -33,8 +33,8 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
 	scheme.AddValidationFunc(&Fischer{}, func(obj interface{}) field.ErrorList { return Validate_Fischer(obj.(*Fischer), nil) })
-	scheme.AddValidationFunc(&FischerList{}, func(obj interface{}) field.ErrorList { return Validate_FischerList(obj.(*FischerList), nil) })
 	scheme.AddValidationFunc(&Flunder{}, func(obj interface{}) field.ErrorList { return Validate_Flunder(obj.(*Flunder), nil) })
+	scheme.AddValidationFunc(&FischerList{}, func(obj interface{}) field.ErrorList { return Validate_FischerList(obj.(*FischerList), nil) })
 	scheme.AddValidationFunc(&FlunderList{}, func(obj interface{}) field.ErrorList { return Validate_FlunderList(obj.(*FlunderList), nil) })
 	return nil
 }
@@ -46,6 +46,15 @@ func Validate_Fischer(in *Fischer, fldPath *field.Path) (errs field.ErrorList) {
 }
 
 func Validate_Widget(in *Widget, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validation.IsValidIP(fldPath.Child("name"), in.Name)...)
+	for k := range in.Something {
+		c := &in.Something[k]
+		errs = append(errs, Validate_Something(c, fldPath.Index(k))...)
+	}
+	return errs
+}
+
+func Validate_Something(in *Something, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs, validation.IsValidIP(fldPath.Child("name"), in.Name)...)
 	return errs
 }
@@ -64,7 +73,11 @@ func Validate_Flunder(in *Flunder, fldPath *field.Path) (errs field.ErrorList) {
 }
 
 func Validate_FlunderSpec(in *FlunderSpec, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validation.ValidateMaxLength(fldPath.Child("reference"), in.Reference, 128)...)
 	errs = append(errs, validation.IsValidIP(fldPath.Child("reference"), in.Reference)...)
+	if in.ReferenceType != nil {
+		errs = append(errs, validation.ValidateEnum(fldPath.Child("referenceType"), *in.ReferenceType, "Fischer", "Flunder")...)
+	}
 	errs = append(errs, Validate_Widget(&in.Primary, fldPath.Child("primary"))...)
 	for k := range in.Extras {
 		c := &in.Extras[k]
@@ -72,6 +85,18 @@ func Validate_FlunderSpec(in *FlunderSpec, fldPath *field.Path) (errs field.Erro
 	}
 	for k_More_idx, k_More := range in.More {
 		errs = append(errs, Validate_Widget(&k_More, fldPath.Key(k_More_idx))...)
+		errs = append(errs, Validate_Widget(&k_More, fldPath.Key(k_More_idx))...)
+	}
+	if in.Layer != nil {
+		errs = append(errs, Validate_Layer(in.Layer, fldPath.Child("layer"))...)
+	}
+	return errs
+}
+
+func Validate_Layer(in *Layer, fldPath *field.Path) (errs field.ErrorList) {
+	for k := range in.Extras {
+		c := &in.Extras[k]
+		errs = append(errs, Validate_Widget(c, fldPath.Index(k))...)
 	}
 	return errs
 }

@@ -204,6 +204,10 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 			}
 		}
 
+		// TODO: To fix the generation problems I have, I need to add back the defaulter code that finds all root methods to generate here.
+		// The call build code collapses lists/pointers into combined state on nodes, so if I try to generate a root from that, I end up with
+		// lots of problems... I might hack something, but this needs to be fixed!
+
 		// Find types that use declarative validation, either directly or indirectly.
 		rootTypesToValidate := sets.New[*types.Type]()
 		for t := range candidates {

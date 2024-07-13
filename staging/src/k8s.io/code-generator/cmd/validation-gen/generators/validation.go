@@ -108,6 +108,8 @@ func (g *genValidations) Init(c *generator.Context, w io.Writer) error {
 	}
 	sw.Do("func init() { localSchemeBuilder.Register(RegisterValidations)}\n\n", nil)
 
+	// TODO: Register validators functions that only validate spec and status, then modify the registry to include "ValidateSpec" and "ValidateStatus" functions.
+
 	sw.Do("// RegisterValidations adds validation functions to the given scheme.\n", nil)
 	sw.Do("// Public to allow building arbitrary schemes.\n", nil)
 	sw.Do("func RegisterValidations(scheme $.|raw$) error {\n", schemePtr)
@@ -144,7 +146,12 @@ func (g *genValidations) GenerateType(c *generator.Context, t *types.Type, w io.
 		g.generated.Insert(current.validationType)
 		sw := generator.NewSnippetWriter(w, c, "$", "$")
 		if current.validationType != nil && current.validationType.Kind == types.Struct {
-			g.generateValidationFunction(c, current.validationType, current, sw)
+			// TODO: HACK: To hide the combined state problems. See GetTargets for what needs to really be fixed.
+			var copy = &callNode{}
+			*copy = *current
+			copy.index = false
+			copy.elem = false
+			g.generateValidationFunction(c, copy.validationType, copy, sw)
 			if err := sw.Error(); err != nil {
 				errs = append(errs, err)
 			}
@@ -538,7 +545,11 @@ func (n *callNode) writeValidationFunctionBody(c *generator.Context, varName str
 			if len(child.field) > 0 {
 				childVarName = varName + "." + child.field
 			}
-			child.writeValidationFunctionBody(c, childVarName, pathPart{Name: child.jsonName}, depth+1, append(ancestors, n), sw)
+			childPath := pathPart{Name: child.jsonName}
+			if child.elem && childPath == (pathPart{}) { // TODO: Clean this up. It fixes pointers to structs, but without the empty check, it breaks pointers to enums.
+				childPath = path
+			}
+			child.writeValidationFunctionBody(c, childVarName, childPath, depth+1, append(ancestors, n), sw)
 		}
 	}
 }
@@ -560,8 +571,10 @@ func (n *callNode) writeChildValidatorCall(varName string, path pathPart, isVarP
 		sw.Do("fldPath.Key($.path.Key$)", targs)
 	} else if len(path.Name) > 0 {
 		sw.Do("fldPath.Child(\"$.path.Name$\")", targs)
-	} else {
+	} else if len(path.Index) > 0 {
 		sw.Do("fldPath.Index($.path.Index$)", targs)
+	} else {
+		sw.Do("nil", targs)
 	}
 	sw.Do(")...)\n", targs)
 }
@@ -592,8 +605,10 @@ func (n *callNode) writeValidationFunctionCalls(c *generator.Context, varName st
 			sw.Do("fldPath.Key($.path.Key$)", targs)
 		} else if len(path.Name) > 0 {
 			sw.Do("fldPath.Child(\"$.path.Name$\")", targs)
-		} else {
+		} else if len(path.Index) > 0 {
 			sw.Do("fldPath.Index($.path.Index$)", targs)
+		} else {
+			sw.Do("<no-path-part>", targs)
 		}
 		sw.Do(", $.varName$", targs)
 		for _, extraArg := range extraArgs {

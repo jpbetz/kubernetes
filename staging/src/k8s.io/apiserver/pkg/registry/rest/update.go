@@ -159,6 +159,8 @@ func BeforeUpdate(strategy RESTUpdateStrategy, ctx context.Context, obj, old run
 	}
 
 	// TODO: HACK: This jack-hammers in versioned type declarative validation, but it's clearly "pretty bad".
+	//       Specifically, it doesn't respect the strategy. So it doesn't validate only spec or only status depending on which stanza is being updated.
+	//       So this code needs to be somehow
 	if requestInfo, found := genericapirequest.RequestInfoFrom(ctx); found {
 		groupVersion := schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}
 		versionedObj, err := legacyscheme.Scheme.ConvertToVersion(obj, groupVersion)

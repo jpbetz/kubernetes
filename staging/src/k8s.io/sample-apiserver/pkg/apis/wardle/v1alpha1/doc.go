@@ -19,8 +19,6 @@ limitations under the License.
 // +k8s:conversion-gen=k8s.io/sample-apiserver/pkg/apis/wardle
 // +k8s:defaulter-gen=TypeMeta
 // +k8s:validation-gen=TypeMeta
-// +k8s:validation-gen-disabled-tags=k8s:validation:format
-// +k8s:validation-gen-disabled-tags=enum
 // +k8s:prerelease-lifecycle-gen=true
 // +groupName=wardle.example.com
 

@@ -34,8 +34,58 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
 	scheme.AddValidationFunc(&v1.StatefulSetList{}, func(obj interface{}) field.ErrorList { return Validate_StatefulSetList(obj.(*v1.StatefulSetList), nil) })
+	scheme.AddValidationFunc(&v1.DaemonSet{}, func(obj interface{}) field.ErrorList { return Validate_DaemonSet(obj.(*v1.DaemonSet), nil) })
+	scheme.AddValidationFunc(&v1.DaemonSetList{}, func(obj interface{}) field.ErrorList { return Validate_DaemonSetList(obj.(*v1.DaemonSetList), nil) })
+	scheme.AddValidationFunc(&v1.Deployment{}, func(obj interface{}) field.ErrorList { return Validate_Deployment(obj.(*v1.Deployment), nil) })
 	scheme.AddValidationFunc(&v1.StatefulSet{}, func(obj interface{}) field.ErrorList { return Validate_StatefulSet(obj.(*v1.StatefulSet), nil) })
+	scheme.AddValidationFunc(&v1.DeploymentList{}, func(obj interface{}) field.ErrorList { return Validate_DeploymentList(obj.(*v1.DeploymentList), nil) })
 	return nil
+}
+
+func Validate_DaemonSet(in *v1.DaemonSet, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, Validate_DaemonSetSpec(&in.Spec, fldPath.Child("spec"))...)
+	return errs
+}
+
+func Validate_DaemonSetSpec(in *v1.DaemonSetSpec, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, Validate_DaemonSetUpdateStrategy(&in.UpdateStrategy, fldPath.Child("updateStrategy"))...)
+	return errs
+}
+
+func Validate_DaemonSetUpdateStrategy(in *v1.DaemonSetUpdateStrategy, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validation.ValidateEnum(fldPath.Child("type"), in.Type, "OnDelete", "RollingUpdate")...)
+	return errs
+}
+
+func Validate_DaemonSetList(in *v1.DaemonSetList, fldPath *field.Path) (errs field.ErrorList) {
+	for k := range in.Items {
+		c := &in.Items[k]
+		errs = append(errs, Validate_DaemonSet(c, fldPath.Index(k))...)
+	}
+	return errs
+}
+
+func Validate_Deployment(in *v1.Deployment, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, Validate_DeploymentSpec(&in.Spec, fldPath.Child("spec"))...)
+	return errs
+}
+
+func Validate_DeploymentSpec(in *v1.DeploymentSpec, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, Validate_DeploymentStrategy(&in.Strategy, fldPath.Child("strategy"))...)
+	return errs
+}
+
+func Validate_DeploymentStrategy(in *v1.DeploymentStrategy, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validation.ValidateEnum(fldPath.Child("type"), in.Type, "Recreate", "RollingUpdate")...)
+	return errs
+}
+
+func Validate_DeploymentList(in *v1.DeploymentList, fldPath *field.Path) (errs field.ErrorList) {
+	for k := range in.Items {
+		c := &in.Items[k]
+		errs = append(errs, Validate_Deployment(c, fldPath.Index(k))...)
+	}
+	return errs
 }
 
 func Validate_StatefulSet(in *v1.StatefulSet, fldPath *field.Path) (errs field.ErrorList) {
@@ -45,6 +95,13 @@ func Validate_StatefulSet(in *v1.StatefulSet, fldPath *field.Path) (errs field.E
 
 func Validate_StatefulSetSpec(in *v1.StatefulSetSpec, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs, validation.ValidateMaxLength(fldPath.Child("serviceName"), in.ServiceName, 32)...)
+	errs = append(errs, validation.ValidateEnum(fldPath.Child("podManagementPolicy"), in.PodManagementPolicy, "OrderedReady", "Parallel")...)
+	errs = append(errs, Validate_StatefulSetUpdateStrategy(&in.UpdateStrategy, fldPath.Child("updateStrategy"))...)
+	return errs
+}
+
+func Validate_StatefulSetUpdateStrategy(in *v1.StatefulSetUpdateStrategy, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validation.ValidateEnum(fldPath.Child("type"), in.Type, "OnDelete", "RollingUpdate")...)
 	return errs
 }
 
