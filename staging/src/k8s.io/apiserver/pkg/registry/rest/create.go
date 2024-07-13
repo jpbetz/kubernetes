@@ -32,6 +32,7 @@ import (
 	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/storage/names"
 	"k8s.io/apiserver/pkg/warning"
+	"k8s.io/kubernetes/pkg/api/legacyscheme"
 )
 
 // RESTCreateStrategy defines the minimum validation, accepted input, and
@@ -122,9 +123,19 @@ func BeforeCreate(strategy RESTCreateStrategy, ctx context.Context, obj runtime.
 	if errs := strategy.Validate(ctx, obj); len(errs) > 0 {
 		return errors.NewInvalid(kind.GroupKind(), objectMeta.GetName(), errs)
 	}
-	// TODO: Put declarative validation call here make it fully automatic. Merge errors with above Validate call.
-	//       Use kind.Version to load up the appropriate validator (it should be registered to a scheme)
-	//       xref: https://github.com/kubernetes/kubernetes/compare/master...jpbetz:kubernetes:cel-for-native#diff-7860873c945b2bba0b6dbb5927f68fb58c5b40b19972bf94472b1d3d21445a37R99
+	// TODO: HACK: This jack-hammers in versioned type declarative validation, but it's clearly "pretty bad".
+	if requestInfo, found := genericapirequest.RequestInfoFrom(ctx); found {
+		groupVersion := schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}
+		versionedObj, err := legacyscheme.Scheme.ConvertToVersion(obj, groupVersion)
+		if err != nil {
+			errs := field.ErrorList{field.InternalError(field.NewPath("root"), fmt.Errorf("unexpected error converting to versioned type: %w", err))}
+			return errors.NewInvalid(kind.GroupKind(), objectMeta.GetName(), errs)
+		}
+		// TODO: I need to separate out spec and status validation!  grrr...
+		if errs := legacyscheme.Scheme.Validate(versionedObj); len(errs) > 0 {
+			return errors.NewInvalid(kind.GroupKind(), objectMeta.GetName(), errs)
+		}
+	}
 
 	// Custom validation (including name validation) passed
 	// Now run common validation on object meta

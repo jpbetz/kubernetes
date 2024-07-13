@@ -18,7 +18,6 @@ package statefulset
 
 import (
 	"context"
-
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
@@ -142,10 +141,7 @@ func (statefulSetStrategy) Validate(ctx context.Context, obj runtime.Object) fie
 	statefulSet := obj.(*apps.StatefulSet)
 	opts := pod.GetValidationOptionsFromPodTemplate(&statefulSet.Spec.Template, nil)
 
-	errs := validation.ValidateStatefulSet(statefulSet, opts)
-	// TODO: Need to find the original GVK, convert to it and then call:
-	// errs = append(errs, legacyscheme.Scheme.Validate(obj)...)
-	return errs
+	return validation.ValidateStatefulSet(statefulSet, opts)
 }
 
 // WarningsOnCreate returns warnings for the creation of the given object.

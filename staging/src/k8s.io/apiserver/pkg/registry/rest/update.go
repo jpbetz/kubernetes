@@ -26,10 +26,12 @@ import (
 	"k8s.io/apimachinery/pkg/api/validation/path"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/admission"
 	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/warning"
+	"k8s.io/kubernetes/pkg/api/legacyscheme"
 )
 
 // RESTUpdateStrategy defines the minimum validation, accepted input, and
@@ -154,6 +156,20 @@ func BeforeUpdate(strategy RESTUpdateStrategy, ctx context.Context, obj, old run
 	errs = append(errs, strategy.ValidateUpdate(ctx, obj, old)...)
 	if len(errs) > 0 {
 		return errors.NewInvalid(kind.GroupKind(), objectMeta.GetName(), errs)
+	}
+
+	// TODO: HACK: This jack-hammers in versioned type declarative validation, but it's clearly "pretty bad".
+	if requestInfo, found := genericapirequest.RequestInfoFrom(ctx); found {
+		groupVersion := schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}
+		versionedObj, err := legacyscheme.Scheme.ConvertToVersion(obj, groupVersion)
+		if err != nil {
+			errs := field.ErrorList{field.InternalError(field.NewPath("root"), fmt.Errorf("unexpected error converting to versioned type: %w", err))}
+			return errors.NewInvalid(kind.GroupKind(), objectMeta.GetName(), errs)
+		}
+		// TODO: I need to separate out spec and status validation!  grrr...
+		if errs := legacyscheme.Scheme.Validate(versionedObj); len(errs) > 0 {
+			return errors.NewInvalid(kind.GroupKind(), objectMeta.GetName(), errs)
+		}
 	}
 
 	for _, w := range strategy.WarningsOnUpdate(ctx, obj, old) {
