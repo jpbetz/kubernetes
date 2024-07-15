@@ -33,9 +33,9 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
 	scheme.AddValidationFunc(&Fischer{}, func(obj interface{}) field.ErrorList { return Validate_Fischer(obj.(*Fischer), nil) })
+	scheme.AddValidationFunc(&FischerList{}, func(obj interface{}) field.ErrorList { return Validate_FischerList(obj.(*FischerList), nil) })
 	scheme.AddValidationFunc(&Flunder{}, func(obj interface{}) field.ErrorList { return Validate_Flunder(obj.(*Flunder), nil) })
 	scheme.AddValidationFunc(&FlunderList{}, func(obj interface{}) field.ErrorList { return Validate_FlunderList(obj.(*FlunderList), nil) })
-	scheme.AddValidationFunc(&FischerList{}, func(obj interface{}) field.ErrorList { return Validate_FischerList(obj.(*FischerList), nil) })
 	return nil
 }
 

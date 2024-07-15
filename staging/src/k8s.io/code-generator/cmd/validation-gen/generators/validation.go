@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -113,7 +114,7 @@ func (g *genValidations) Init(c *generator.Context, w io.Writer) error {
 	sw.Do("// RegisterValidations adds validation functions to the given scheme.\n", nil)
 	sw.Do("// Public to allow building arbitrary schemes.\n", nil)
 	sw.Do("func RegisterValidations(scheme $.|raw$) error {\n", schemePtr)
-	for t := range g.rootTypesToValidate { // TODO: Sort
+	for _, t := range sortTypeSet(g.rootTypesToValidate) {
 		targs := generator.Args{
 			"inType":    t,
 			"errorList": c.Universe.Type(errorListType),
@@ -517,7 +518,6 @@ func (n *callNode) writeValidationFunctionBody(c *generator.Context, varName str
 		if n.validationType != nil && n.validationType.Kind == types.Struct {
 			n.writeChildValidatorCall(local, pathPart{Index: index}, true, sw)
 		} else {
-			// TODO: This doesn't work for a list of lists
 			for _, child := range n.children {
 				child.writeValidationFunctionBody(c, local, pathPart{Index: index}, depth+1, append(ancestors, n), sw)
 			}
@@ -638,4 +638,12 @@ type pathPart struct {
 	Index string
 	Key   string
 	Name  string
+}
+
+func sortTypeSet(s sets.Set[*types.Type]) []*types.Type {
+	list := s.UnsortedList()
+	sort.Slice(list, func(i int, j int) bool {
+		return strings.ToLower(list[i].Name.Name) < strings.ToLower(list[j].Name.Name)
+	})
+	return list
 }
