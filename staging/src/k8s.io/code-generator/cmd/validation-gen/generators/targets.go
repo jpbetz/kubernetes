@@ -17,7 +17,6 @@ limitations under the License.
 package generators
 
 import (
-	"bytes"
 	"fmt"
 	"path"
 	"reflect"
@@ -94,9 +93,6 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 
 	var targets []generator.Target
 
-	buffer := &bytes.Buffer{}
-	sw := generator.NewSnippetWriter(buffer, context, "$", "$")
-
 	// First load other "input" packages.  We do this as a single call because
 	// it is MUCH faster.
 	inputPkgs := make([]string, 0, len(context.Inputs))
@@ -164,7 +160,7 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 		typesPkg := pkg
 
 		enabledTags, disabledTags := extractFiltersTags(pkg.Comments)
-		validatorContext := validators.NewValidator(context, enabledTags, disabledTags)
+		declarativeValidator := validators.NewValidator(context, enabledTags, disabledTags)
 
 		typesWith := extractTag(pkg.Comments)
 		shouldCreateObjectValidationFn := func(t *types.Type) bool {
@@ -214,16 +210,12 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 			if rootTypesToValidate.Has(t) { // already found
 				continue
 			}
-			node, err := newCallTreeForType(validatorContext).build(t, true)
+			node, err := buildCallTree(declarativeValidator, t)
 			if err != nil {
 				klog.Fatalf("Failed to build call tree to generate validation for type: %v: %v", t.Name, err)
 			}
 			if node != nil {
-				sw.Do("$.inType|objectdefaultfn$", generator.Args{
-					"inType": t,
-				}) // write the name to buffer
 				rootTypesToValidate.Insert(t)
-				buffer.Reset()
 			}
 		}
 
@@ -244,7 +236,7 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 
 				GeneratorsFunc: func(c *generator.Context) (generators []generator.Generator) {
 					return []generator.Generator{
-						NewGenValidations(args.OutputFile, typesPkg.Path, pkg.Path, rootTypesToValidate, peerPkgs, validatorContext),
+						NewGenValidations(args.OutputFile, typesPkg.Path, pkg.Path, rootTypesToValidate, peerPkgs, declarativeValidator),
 					}
 				},
 			})

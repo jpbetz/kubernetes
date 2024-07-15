@@ -113,7 +113,7 @@ func (g *genValidations) Init(c *generator.Context, w io.Writer) error {
 	sw.Do("// RegisterValidations adds validation functions to the given scheme.\n", nil)
 	sw.Do("// Public to allow building arbitrary schemes.\n", nil)
 	sw.Do("func RegisterValidations(scheme $.|raw$) error {\n", schemePtr)
-	for t := range g.rootTypesToValidate {
+	for t := range g.rootTypesToValidate { // TODO: Sort
 		targs := generator.Args{
 			"inType":    t,
 			"errorList": c.Universe.Type(errorListType),
@@ -129,7 +129,7 @@ func (g *genValidations) Init(c *generator.Context, w io.Writer) error {
 func (g *genValidations) GenerateType(c *generator.Context, t *types.Type, w io.Writer) error {
 	klog.V(5).Infof("generating for type %v", t)
 
-	callTree, err := newCallTreeForType(g.declarativeValidator).build(t, true)
+	callTree, err := buildCallTree(g.declarativeValidator, t)
 	if err != nil {
 		return err
 	}
@@ -146,12 +146,7 @@ func (g *genValidations) GenerateType(c *generator.Context, t *types.Type, w io.
 		g.generated.Insert(current.validationType)
 		sw := generator.NewSnippetWriter(w, c, "$", "$")
 		if current.validationType != nil && current.validationType.Kind == types.Struct {
-			// TODO: HACK: To hide the combined state problems. See GetTargets for what needs to really be fixed.
-			var copy = &callNode{}
-			*copy = *current
-			copy.index = false
-			copy.elem = false
-			g.generateValidationFunction(c, copy.validationType, copy, sw)
+			g.generateValidationFunction(c, current, sw)
 			if err := sw.Error(); err != nil {
 				errs = append(errs, err)
 			}
@@ -160,15 +155,21 @@ func (g *genValidations) GenerateType(c *generator.Context, t *types.Type, w io.
 	return errors.Join(errs...)
 }
 
-func (g *genValidations) generateValidationFunction(c *generator.Context, inType *types.Type, callTree *callNode, sw *generator.SnippetWriter) {
+func (g *genValidations) generateValidationFunction(c *generator.Context, callTree *callNode, sw *generator.SnippetWriter) {
+	// TODO: HACK: To hide the combined state problems, clear out any state we use only for non-roots
+	var functionNode = &callNode{}
+	*functionNode = *callTree
+	functionNode.index = false
+	functionNode.elem = false
+
 	targs := generator.Args{
-		"inType":    inType,
+		"inType":    functionNode.validationType,
 		"errorList": c.Universe.Type(errorListType),
 		"fieldPath": c.Universe.Type(fieldPathType),
 	}
 
 	sw.Do("func $.inType|objectvalidationfn$(in *$.inType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
-	callTree.writeValidationFunctionBody(c, "in", pathPart{}, 0, nil, sw)
+	functionNode.writeValidationFunctionBody(c, "in", pathPart{}, 0, nil, sw)
 	sw.Do("return errs\n", nil)
 	sw.Do("}\n\n", nil)
 }
@@ -179,11 +180,12 @@ type callTreeForType struct {
 	currentlyBuildingTypes map[*types.Type]bool
 }
 
-func newCallTreeForType(declarativeValidator validators.DeclarativeValidator) *callTreeForType {
-	return &callTreeForType{
+func buildCallTree(declarativeValidator validators.DeclarativeValidator, t *types.Type) (*callNode, error) {
+	tree := &callTreeForType{
 		declarativeValidator:   declarativeValidator,
 		currentlyBuildingTypes: make(map[*types.Type]bool),
 	}
+	return tree.build(t, true)
 }
 
 // build creates a tree of paths to fields (based on how they would be accessed in Go - pointer, elem,
