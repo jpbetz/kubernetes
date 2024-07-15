@@ -22,7 +22,10 @@ limitations under the License.
 package v1
 
 import (
+	fmt "fmt"
+
 	v1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	validation "k8s.io/apimachinery/pkg/util/validation"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
@@ -33,27 +36,74 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc(&v1.StatefulSetList{}, func(obj interface{}) field.ErrorList { return Validate_StatefulSetList(obj.(*v1.StatefulSetList), nil) })
-	scheme.AddValidationFunc(&v1.DaemonSet{}, func(obj interface{}) field.ErrorList { return Validate_DaemonSet(obj.(*v1.DaemonSet), nil) })
-	scheme.AddValidationFunc(&v1.DaemonSetList{}, func(obj interface{}) field.ErrorList { return Validate_DaemonSetList(obj.(*v1.DaemonSetList), nil) })
-	scheme.AddValidationFunc(&v1.Deployment{}, func(obj interface{}) field.ErrorList { return Validate_Deployment(obj.(*v1.Deployment), nil) })
-	scheme.AddValidationFunc(&v1.StatefulSet{}, func(obj interface{}) field.ErrorList { return Validate_StatefulSet(obj.(*v1.StatefulSet), nil) })
-	scheme.AddValidationFunc(&v1.DeploymentList{}, func(obj interface{}) field.ErrorList { return Validate_DeploymentList(obj.(*v1.DeploymentList), nil) })
+	scheme.AddValidationFunc(&v1.DaemonSet{}, func(obj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			root := obj.(*v1.DaemonSet)
+			return Validate_DaemonSetSpec(&root.Spec, nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc(&v1.DaemonSetList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			return Validate_DaemonSetList(obj.(*v1.DaemonSetList), nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc(&v1.Deployment{}, func(obj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			root := obj.(*v1.Deployment)
+			return Validate_DeploymentSpec(&root.Spec, nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc(&v1.DeploymentList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			return Validate_DeploymentList(obj.(*v1.DeploymentList), nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc(&corev1.PersistentVolumeClaim{}, func(obj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			root := obj.(*corev1.PersistentVolumeClaim)
+			return Validate_PersistentVolumeClaimSpec(&root.Spec, nil)
+		}
+		if len(subresources) == 1 && subresources[0] == "status" {
+			root := obj.(*corev1.PersistentVolumeClaim)
+			return Validate_PersistentVolumeClaimStatus(&root.Status, nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc(&v1.ReplicaSet{}, func(obj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			root := obj.(*v1.ReplicaSet)
+			return Validate_ReplicaSetSpec(&root.Spec, nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc(&v1.ReplicaSetList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			return Validate_ReplicaSetList(obj.(*v1.ReplicaSetList), nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc(&v1.StatefulSet{}, func(obj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			root := obj.(*v1.StatefulSet)
+			return Validate_StatefulSetSpec(&root.Spec, nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc(&v1.StatefulSetList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			return Validate_StatefulSetList(obj.(*v1.StatefulSetList), nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
 	return nil
 }
 
 func Validate_DaemonSet(in *v1.DaemonSet, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs, Validate_DaemonSetSpec(&in.Spec, fldPath.Child("spec"))...)
-	return errs
-}
-
-func Validate_DaemonSetSpec(in *v1.DaemonSetSpec, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, Validate_DaemonSetUpdateStrategy(&in.UpdateStrategy, fldPath.Child("updateStrategy"))...)
-	return errs
-}
-
-func Validate_DaemonSetUpdateStrategy(in *v1.DaemonSetUpdateStrategy, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("type"), in.Type, "OnDelete", "RollingUpdate")...)
 	return errs
 }
 
@@ -65,18 +115,19 @@ func Validate_DaemonSetList(in *v1.DaemonSetList, fldPath *field.Path) (errs fie
 	return errs
 }
 
+func Validate_DaemonSetSpec(in *v1.DaemonSetSpec, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, Validate_PodTemplateSpec(&in.Template, fldPath.Child("template"))...)
+	errs = append(errs, Validate_DaemonSetUpdateStrategy(&in.UpdateStrategy, fldPath.Child("updateStrategy"))...)
+	return errs
+}
+
+func Validate_DaemonSetUpdateStrategy(in *v1.DaemonSetUpdateStrategy, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validation.ValidateEnum(fldPath.Child("type"), in.Type, "OnDelete", "RollingUpdate")...)
+	return errs
+}
+
 func Validate_Deployment(in *v1.Deployment, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs, Validate_DeploymentSpec(&in.Spec, fldPath.Child("spec"))...)
-	return errs
-}
-
-func Validate_DeploymentSpec(in *v1.DeploymentSpec, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, Validate_DeploymentStrategy(&in.Strategy, fldPath.Child("strategy"))...)
-	return errs
-}
-
-func Validate_DeploymentStrategy(in *v1.DeploymentStrategy, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("type"), in.Type, "Recreate", "RollingUpdate")...)
 	return errs
 }
 
@@ -88,20 +139,37 @@ func Validate_DeploymentList(in *v1.DeploymentList, fldPath *field.Path) (errs f
 	return errs
 }
 
+func Validate_DeploymentSpec(in *v1.DeploymentSpec, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, Validate_PodTemplateSpec(&in.Template, fldPath.Child("template"))...)
+	errs = append(errs, Validate_DeploymentStrategy(&in.Strategy, fldPath.Child("strategy"))...)
+	return errs
+}
+
+func Validate_DeploymentStrategy(in *v1.DeploymentStrategy, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validation.ValidateEnum(fldPath.Child("type"), in.Type, "Recreate", "RollingUpdate")...)
+	return errs
+}
+
+func Validate_ReplicaSet(in *v1.ReplicaSet, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, Validate_ReplicaSetSpec(&in.Spec, fldPath.Child("spec"))...)
+	return errs
+}
+
+func Validate_ReplicaSetList(in *v1.ReplicaSetList, fldPath *field.Path) (errs field.ErrorList) {
+	for k := range in.Items {
+		c := &in.Items[k]
+		errs = append(errs, Validate_ReplicaSet(c, fldPath.Index(k))...)
+	}
+	return errs
+}
+
+func Validate_ReplicaSetSpec(in *v1.ReplicaSetSpec, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, Validate_PodTemplateSpec(&in.Template, fldPath.Child("template"))...)
+	return errs
+}
+
 func Validate_StatefulSet(in *v1.StatefulSet, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs, Validate_StatefulSetSpec(&in.Spec, fldPath.Child("spec"))...)
-	return errs
-}
-
-func Validate_StatefulSetSpec(in *v1.StatefulSetSpec, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateMaxLength(fldPath.Child("serviceName"), in.ServiceName, 32)...)
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("podManagementPolicy"), in.PodManagementPolicy, "OrderedReady", "Parallel")...)
-	errs = append(errs, Validate_StatefulSetUpdateStrategy(&in.UpdateStrategy, fldPath.Child("updateStrategy"))...)
-	return errs
-}
-
-func Validate_StatefulSetUpdateStrategy(in *v1.StatefulSetUpdateStrategy, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("type"), in.Type, "OnDelete", "RollingUpdate")...)
 	return errs
 }
 
@@ -110,5 +178,22 @@ func Validate_StatefulSetList(in *v1.StatefulSetList, fldPath *field.Path) (errs
 		c := &in.Items[k]
 		errs = append(errs, Validate_StatefulSet(c, fldPath.Index(k))...)
 	}
+	return errs
+}
+
+func Validate_StatefulSetSpec(in *v1.StatefulSetSpec, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, Validate_PodTemplateSpec(&in.Template, fldPath.Child("template"))...)
+	for k := range in.VolumeClaimTemplates {
+		c := &in.VolumeClaimTemplates[k]
+		errs = append(errs, Validate_PersistentVolumeClaim(c, fldPath.Index(k))...)
+	}
+	errs = append(errs, validation.ValidateMaxLength(fldPath.Child("serviceName"), in.ServiceName, 32)...)
+	errs = append(errs, validation.ValidateEnum(fldPath.Child("podManagementPolicy"), in.PodManagementPolicy, "OrderedReady", "Parallel")...)
+	errs = append(errs, Validate_StatefulSetUpdateStrategy(&in.UpdateStrategy, fldPath.Child("updateStrategy"))...)
+	return errs
+}
+
+func Validate_StatefulSetUpdateStrategy(in *v1.StatefulSetUpdateStrategy, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validation.ValidateEnum(fldPath.Child("type"), in.Type, "OnDelete", "RollingUpdate")...)
 	return errs
 }

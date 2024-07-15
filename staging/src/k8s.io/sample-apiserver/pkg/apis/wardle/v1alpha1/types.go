@@ -78,6 +78,8 @@ type Something struct {
 }
 
 type FlunderStatus struct {
+	// +k8s:validation:format="ip"
+	Name string `json:"name,omitempty" protobuf:"bytes,1,opt,name=name"`
 }
 
 // +genclient

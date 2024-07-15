@@ -22,6 +22,8 @@ limitations under the License.
 package v1
 
 import (
+	fmt "fmt"
+
 	v1 "k8s.io/api/batch/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	validation "k8s.io/apimachinery/pkg/util/validation"
@@ -33,10 +35,32 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc(&v1.Job{}, func(obj interface{}) field.ErrorList { return Validate_Job(obj.(*v1.Job), nil) })
-	scheme.AddValidationFunc(&v1.CronJobList{}, func(obj interface{}) field.ErrorList { return Validate_CronJobList(obj.(*v1.CronJobList), nil) })
-	scheme.AddValidationFunc(&v1.CronJob{}, func(obj interface{}) field.ErrorList { return Validate_CronJob(obj.(*v1.CronJob), nil) })
-	scheme.AddValidationFunc(&v1.JobList{}, func(obj interface{}) field.ErrorList { return Validate_JobList(obj.(*v1.JobList), nil) })
+	scheme.AddValidationFunc(&v1.CronJob{}, func(obj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			root := obj.(*v1.CronJob)
+			return Validate_CronJobSpec(&root.Spec, nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc(&v1.CronJobList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			return Validate_CronJobList(obj.(*v1.CronJobList), nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc(&v1.Job{}, func(obj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			root := obj.(*v1.Job)
+			return Validate_JobSpec(&root.Spec, nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc(&v1.JobList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			return Validate_JobList(obj.(*v1.JobList), nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
 	return nil
 }
 
@@ -45,56 +69,17 @@ func Validate_CronJob(in *v1.CronJob, fldPath *field.Path) (errs field.ErrorList
 	return errs
 }
 
-func Validate_CronJobSpec(in *v1.CronJobSpec, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("concurrencyPolicy"), in.ConcurrencyPolicy, "Allow", "Forbid", "Replace")...)
-	errs = append(errs, Validate_JobTemplateSpec(&in.JobTemplate, fldPath.Child("jobTemplate"))...)
-	return errs
-}
-
-func Validate_JobTemplateSpec(in *v1.JobTemplateSpec, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, Validate_JobSpec(&in.Spec, fldPath.Child("spec"))...)
-	return errs
-}
-
-func Validate_JobSpec(in *v1.JobSpec, fldPath *field.Path) (errs field.ErrorList) {
-	if in.PodFailurePolicy != nil {
-		errs = append(errs, Validate_PodFailurePolicy(in.PodFailurePolicy, fldPath.Child("podFailurePolicy"))...)
-	}
-	if in.CompletionMode != nil {
-		errs = append(errs, validation.ValidateEnum(fldPath.Child("completionMode"), *in.CompletionMode, "Indexed", "NonIndexed")...)
-	}
-	if in.PodReplacementPolicy != nil {
-		errs = append(errs, validation.ValidateEnum(fldPath.Child("podReplacementPolicy"), *in.PodReplacementPolicy, "Failed", "TerminatingOrFailed")...)
-	}
-	return errs
-}
-
-func Validate_PodFailurePolicy(in *v1.PodFailurePolicy, fldPath *field.Path) (errs field.ErrorList) {
-	for k := range in.Rules {
-		c := &in.Rules[k]
-		errs = append(errs, Validate_PodFailurePolicyRule(c, fldPath.Index(k))...)
-	}
-	return errs
-}
-
-func Validate_PodFailurePolicyRule(in *v1.PodFailurePolicyRule, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("action"), in.Action, "Count", "FailIndex", "FailJob", "Ignore")...)
-	if in.OnExitCodes != nil {
-		errs = append(errs, Validate_PodFailurePolicyOnExitCodesRequirement(in.OnExitCodes, fldPath.Child("onExitCodes"))...)
-	}
-	return errs
-}
-
-func Validate_PodFailurePolicyOnExitCodesRequirement(in *v1.PodFailurePolicyOnExitCodesRequirement, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("operator"), in.Operator, "In", "NotIn")...)
-	return errs
-}
-
 func Validate_CronJobList(in *v1.CronJobList, fldPath *field.Path) (errs field.ErrorList) {
 	for k := range in.Items {
 		c := &in.Items[k]
 		errs = append(errs, Validate_CronJob(c, fldPath.Index(k))...)
 	}
+	return errs
+}
+
+func Validate_CronJobSpec(in *v1.CronJobSpec, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validation.ValidateEnum(fldPath.Child("concurrencyPolicy"), in.ConcurrencyPolicy, "Allow", "Forbid", "Replace")...)
+	errs = append(errs, Validate_JobTemplateSpec(&in.JobTemplate, fldPath.Child("jobTemplate"))...)
 	return errs
 }
 
@@ -107,6 +92,46 @@ func Validate_JobList(in *v1.JobList, fldPath *field.Path) (errs field.ErrorList
 	for k := range in.Items {
 		c := &in.Items[k]
 		errs = append(errs, Validate_Job(c, fldPath.Index(k))...)
+	}
+	return errs
+}
+
+func Validate_JobSpec(in *v1.JobSpec, fldPath *field.Path) (errs field.ErrorList) {
+	if in.PodFailurePolicy != nil {
+		errs = append(errs, Validate_PodFailurePolicy(in.PodFailurePolicy, fldPath.Child("podFailurePolicy"))...)
+	}
+	errs = append(errs, Validate_PodTemplateSpec(&in.Template, fldPath.Child("template"))...)
+	if in.CompletionMode != nil {
+		errs = append(errs, validation.ValidateEnum(fldPath.Child("completionMode"), *in.CompletionMode, "Indexed", "NonIndexed")...)
+	}
+	if in.PodReplacementPolicy != nil {
+		errs = append(errs, validation.ValidateEnum(fldPath.Child("podReplacementPolicy"), *in.PodReplacementPolicy, "Failed", "TerminatingOrFailed")...)
+	}
+	return errs
+}
+
+func Validate_JobTemplateSpec(in *v1.JobTemplateSpec, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, Validate_JobSpec(&in.Spec, fldPath.Child("spec"))...)
+	return errs
+}
+
+func Validate_PodFailurePolicy(in *v1.PodFailurePolicy, fldPath *field.Path) (errs field.ErrorList) {
+	for k := range in.Rules {
+		c := &in.Rules[k]
+		errs = append(errs, Validate_PodFailurePolicyRule(c, fldPath.Index(k))...)
+	}
+	return errs
+}
+
+func Validate_PodFailurePolicyOnExitCodesRequirement(in *v1.PodFailurePolicyOnExitCodesRequirement, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validation.ValidateEnum(fldPath.Child("operator"), in.Operator, "In", "NotIn")...)
+	return errs
+}
+
+func Validate_PodFailurePolicyRule(in *v1.PodFailurePolicyRule, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validation.ValidateEnum(fldPath.Child("action"), in.Action, "Count", "FailIndex", "FailJob", "Ignore")...)
+	if in.OnExitCodes != nil {
+		errs = append(errs, Validate_PodFailurePolicyOnExitCodesRequirement(in.OnExitCodes, fldPath.Child("onExitCodes"))...)
 	}
 	return errs
 }

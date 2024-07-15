@@ -201,16 +201,19 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 			if err != nil {
 				klog.Fatalf("Failed to build call tree to generate validations for type: %v: %v", t.Name, err)
 			}
+			if callTree == nil {
+				continue
+			}
 			callTree.VisitInOrder(func(ancestors []*callNode, current *callNode) {
 				if visited.Has(current.underlyingType) {
 					return
 				}
 				visited.Insert(current.underlyingType)
+				// Generate a validation function for each struct.
 				if current.underlyingType != nil && current.underlyingType.Kind == types.Struct {
 					validationFunctionTypes.Insert(current.underlyingType)
 				}
 			})
-
 		}
 
 		if len(validationFunctionTypes) == 0 {

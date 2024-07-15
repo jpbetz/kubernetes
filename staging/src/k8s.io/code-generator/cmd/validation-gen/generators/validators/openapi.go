@@ -43,7 +43,6 @@ const (
 var (
 	isValidIPValidator = types.Name{Package: utilValidationPkg, Name: "IsValidIP"}
 	maxLengthValidator = types.Name{Package: utilValidationPkg, Name: "ValidateMaxLength"}
-	enumValidator      = types.Name{Package: utilValidationPkg, Name: "ValidateEnum"}
 )
 
 func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error) {
@@ -73,5 +72,5 @@ func FormatValidationFunction(format string) FunctionGen {
 	}
 	// TODO: Flesh out the list of validation functions
 
-	return nil // ignore unsupported formats
+	return nil // TODO: ignore unsupported formats?
 }
