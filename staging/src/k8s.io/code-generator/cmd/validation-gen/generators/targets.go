@@ -177,16 +177,7 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 			// for any type with any of the matching field names. Provides a more useful package
 			// level validation than global (because we only need validations on a subset of objects -
 			// usually those with TypeMeta).
-			if t.Kind == types.Struct && len(typesWith) > 0 {
-				for _, field := range t.Members {
-					for _, s := range typesWith {
-						if field.Name == s {
-							return true
-						}
-					}
-				}
-			}
-			return false
+			return isTypeWith(t, typesWith)
 		}
 
 		// Find the right input pkg, which might not be this one.
@@ -206,17 +197,25 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 
 		// Find types that use declarative validation, either directly or indirectly.
 		rootTypesToValidate := sets.New[*types.Type]()
+		visited := sets.New[*types.Type]()
 		for t := range candidates {
 			if rootTypesToValidate.Has(t) { // already found
 				continue
 			}
-			node, err := buildCallTree(declarativeValidator, t)
+			callTree, err := buildCallTree(declarativeValidator, t)
 			if err != nil {
 				klog.Fatalf("Failed to build call tree to generate validation for type: %v: %v", t.Name, err)
 			}
-			if node != nil {
-				rootTypesToValidate.Insert(t)
-			}
+			callTree.VisitInOrder(func(ancestors []*callNode, current *callNode) {
+				if visited.Has(current.validationType) {
+					return
+				}
+				visited.Insert(current.validationType)
+				if current.validationType != nil && current.validationType.Kind == types.Struct {
+					rootTypesToValidate.Insert(current.validationType)
+				}
+			})
+
 		}
 
 		if len(rootTypesToValidate) == 0 {
@@ -242,4 +241,17 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 			})
 	}
 	return targets
+}
+
+func isTypeWith(t *types.Type, typesWith []string) bool {
+	if t.Kind == types.Struct && len(typesWith) > 0 {
+		for _, field := range t.Members {
+			for _, s := range typesWith {
+				if field.Name == s {
+					return true
+				}
+			}
+		}
+	}
+	return false
 }

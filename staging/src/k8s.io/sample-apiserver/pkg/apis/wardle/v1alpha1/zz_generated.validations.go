@@ -45,20 +45,6 @@ func Validate_Fischer(in *Fischer, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_Widget(in *Widget, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.IsValidIP(fldPath.Child("name"), in.Name)...)
-	for k := range in.Something {
-		c := &in.Something[k]
-		errs = append(errs, Validate_Something(c, fldPath.Index(k))...)
-	}
-	return errs
-}
-
-func Validate_Something(in *Something, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.IsValidIP(fldPath.Child("name"), in.Name)...)
-	return errs
-}
-
 func Validate_FischerList(in *FischerList, fldPath *field.Path) (errs field.ErrorList) {
 	for k := range in.Items {
 		c := &in.Items[k]
@@ -69,6 +55,14 @@ func Validate_FischerList(in *FischerList, fldPath *field.Path) (errs field.Erro
 
 func Validate_Flunder(in *Flunder, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs, Validate_FlunderSpec(&in.Spec, fldPath.Child("spec"))...)
+	return errs
+}
+
+func Validate_FlunderList(in *FlunderList, fldPath *field.Path) (errs field.ErrorList) {
+	for k := range in.Items {
+		c := &in.Items[k]
+		errs = append(errs, Validate_Flunder(c, fldPath.Index(k))...)
+	}
 	return errs
 }
 
@@ -101,10 +95,16 @@ func Validate_Layer(in *Layer, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_FlunderList(in *FlunderList, fldPath *field.Path) (errs field.ErrorList) {
-	for k := range in.Items {
-		c := &in.Items[k]
-		errs = append(errs, Validate_Flunder(c, fldPath.Index(k))...)
+func Validate_Something(in *Something, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validation.IsValidIP(fldPath.Child("name"), in.Name)...)
+	return errs
+}
+
+func Validate_Widget(in *Widget, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validation.IsValidIP(fldPath.Child("name"), in.Name)...)
+	for k := range in.Something {
+		c := &in.Something[k]
+		errs = append(errs, Validate_Something(c, fldPath.Index(k))...)
 	}
 	return errs
 }
