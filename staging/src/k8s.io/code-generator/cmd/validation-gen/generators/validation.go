@@ -46,10 +46,9 @@ type genValidations struct {
 	validationFunctionTypes sets.Set[*types.Type]
 	imports                 namer.ImportTracker
 	declarativeValidator    validators.DeclarativeValidator
-	generated               sets.Set[*types.Type] // TODO: This should probably be somehow tracked by GetTargets?
 }
 
-func NewGenValidations(outputFilename, typesPackage, outputPackage string, rootTypesToValidate sets.Set[*types.Type], peerPkgs []string, declarativeValidator validators.DeclarativeValidator) generator.Generator {
+func NewGenValidations(outputFilename, typesPackage, outputPackage string, validationFunctionTypes sets.Set[*types.Type], peerPkgs []string, declarativeValidator validators.DeclarativeValidator) generator.Generator {
 	return &genValidations{
 		GoGenerator: generator.GoGenerator{
 			OutputFilename: outputFilename,
@@ -57,10 +56,9 @@ func NewGenValidations(outputFilename, typesPackage, outputPackage string, rootT
 		typesPackage:            typesPackage,
 		outputPackage:           outputPackage,
 		peerPackages:            peerPkgs,
-		validationFunctionTypes: rootTypesToValidate,
+		validationFunctionTypes: validationFunctionTypes,
 		imports:                 generator.NewImportTrackerForPackage(outputPackage),
 		declarativeValidator:    declarativeValidator,
-		generated:               sets.New[*types.Type](),
 	}
 }
 
@@ -152,20 +150,14 @@ func (g *genValidations) GenerateType(c *generator.Context, t *types.Type, w io.
 }
 
 func (g *genValidations) generateValidationFunction(c *generator.Context, callTree *callNode, sw *generator.SnippetWriter) {
-	// TODO: HACK: To hide the combined state problems, clear out any state we use only for non-roots
-	var functionNode = &callNode{}
-	*functionNode = *callTree
-	functionNode.index = false
-	functionNode.elem = false
-
 	targs := generator.Args{
-		"inType":    functionNode.validationType,
+		"inType":    callTree.underlyingType,
 		"errorList": c.Universe.Type(errorListType),
 		"fieldPath": c.Universe.Type(fieldPathType),
 	}
 
 	sw.Do("func $.inType|objectvalidationfn$(in *$.inType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
-	functionNode.writeValidationFunctionBody(c, "in", pathPart{}, 0, nil, sw)
+	callTree.writeValidationFunctionBody(c, "in", pathPart{}, 0, nil, sw)
 	sw.Do("return errs\n", nil)
 	sw.Do("}\n\n", nil)
 }
@@ -245,9 +237,8 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 		}
 
 	case types.Struct:
-		// track the types of all structs for later validation function name generation
-		parent.validationType = t
-		parent.validationTopLevelType = baseT
+		parent.underlyingType = t
+		parent.t = baseT
 		_, err := c.populateValidations(parent, t, t.CommentLines)
 		if err != nil {
 			return nil, err
@@ -320,8 +311,8 @@ func (c *callTreeForType) populateValidations(node *callNode, t *types.Type, com
 	}
 
 	node.validationIsPrimitive = baseT.IsPrimitive()
-	node.validationType = baseT
-	node.validationTopLevelType = t
+	node.underlyingType = baseT
+	node.t = t
 	node.elem = t.Kind == types.Pointer
 
 	node.validations = valueValidations
@@ -418,7 +409,7 @@ type callNode struct {
 	// validationIsPrimitive tracks if the field is a primitive.
 	validationIsPrimitive bool
 
-	// validationType is the transitive underlying/element type of the node.
+	// underlyingType is the transitive underlying/element type of the node.
 	// The provided default value literal or reference is expected to be
 	// convertible to this type.
 	//
@@ -426,11 +417,11 @@ type callNode struct {
 	//	node type = *string 			-> 	defaultType = string
 	//	node type = StringPointerAlias 	-> 	defaultType = string
 	// Only populated if validationIsPrimitive is true
-	validationType *types.Type
+	underlyingType *types.Type
 
-	// validationTopLevelType is the final type the value should resolve to
+	// t is the final type the value should resolve to
 	// This is in contrast to the default type, which resolves aliases and pointers.
-	validationTopLevelType *types.Type
+	t *types.Type
 }
 
 // CallNodeVisitorFunc is a function for visiting a call tree. ancestors is the list of all parents
@@ -476,7 +467,7 @@ func varsForDepth(depth int) (index, local string) {
 // Depth is used to generate local variables at the proper depth.
 func (n *callNode) writeValidationFunctionBody(c *generator.Context, varName string, path pathPart, depth int, ancestors []*callNode, sw *generator.SnippetWriter) {
 	isCallable := func(n callNode) bool {
-		return n.validationType != nil && n.validationType.Kind == types.Struct && !n.index && !n.key
+		return n.underlyingType != nil && n.underlyingType.Kind == types.Struct && !n.index && !n.key
 	}
 	isPointer := n.elem && !n.index
 
@@ -510,7 +501,7 @@ func (n *callNode) writeValidationFunctionBody(c *generator.Context, varName str
 		} else {
 			sw.Do("$.local$ := &$.var$[$.index$]\n", targs)
 		}
-		if n.validationType != nil && n.validationType.Kind == types.Struct {
+		if n.underlyingType != nil && n.underlyingType.Kind == types.Struct {
 			n.writeChildValidatorCall(local, pathPart{Index: index}, true, sw)
 		} else {
 			for _, child := range n.children {
@@ -525,7 +516,7 @@ func (n *callNode) writeValidationFunctionBody(c *generator.Context, varName str
 		targs["index"] = index
 		sw.Do("for $.index$_idx, $.index$ := range $.var$ {\n", targs)
 		for _, child := range n.children {
-			if n.validationType != nil && n.validationType.Kind == types.Struct {
+			if n.underlyingType != nil && n.underlyingType.Kind == types.Struct {
 				n.writeChildValidatorCall(index, pathPart{Key: index + "_idx"}, false, sw)
 			} else {
 				childVarName := index
@@ -559,7 +550,7 @@ func (n *callNode) writeChildValidatorCall(varName string, path pathPart, isVarP
 	}
 
 	targs := generator.Args{
-		"fn":   n.validationType,
+		"fn":   n.underlyingType,
 		"var":  accessor,
 		"path": path,
 	}

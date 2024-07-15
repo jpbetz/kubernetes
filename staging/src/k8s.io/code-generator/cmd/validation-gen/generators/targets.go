@@ -191,35 +191,30 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 			}
 		}
 
-		// TODO: To fix the generation problems I have, I need to add back the defaulter code that finds all root methods to generate here.
-		// The call build code collapses lists/pointers into combined state on nodes, so if I try to generate a root from that, I end up with
-		// lots of problems... I might hack something, but this needs to be fixed!
-
-		// Find types that use declarative validation, either directly or indirectly.
-		rootTypesToValidate := sets.New[*types.Type]()
+		validationFunctionTypes := sets.New[*types.Type]()
 		visited := sets.New[*types.Type]()
 		for t := range candidates {
-			if rootTypesToValidate.Has(t) { // already found
+			if validationFunctionTypes.Has(t) { // already found
 				continue
 			}
 			callTree, err := buildCallTree(declarativeValidator, t)
 			if err != nil {
-				klog.Fatalf("Failed to build call tree to generate validation for type: %v: %v", t.Name, err)
+				klog.Fatalf("Failed to build call tree to generate validations for type: %v: %v", t.Name, err)
 			}
 			callTree.VisitInOrder(func(ancestors []*callNode, current *callNode) {
-				if visited.Has(current.validationType) {
+				if visited.Has(current.underlyingType) {
 					return
 				}
-				visited.Insert(current.validationType)
-				if current.validationType != nil && current.validationType.Kind == types.Struct {
-					rootTypesToValidate.Insert(current.validationType)
+				visited.Insert(current.underlyingType)
+				if current.underlyingType != nil && current.underlyingType.Kind == types.Struct {
+					validationFunctionTypes.Insert(current.underlyingType)
 				}
 			})
 
 		}
 
-		if len(rootTypesToValidate) == 0 {
-			klog.V(5).Infof("no typeValidations in package %s", pkg.Name)
+		if len(validationFunctionTypes) == 0 {
+			klog.V(5).Infof("no validations in package %s", pkg.Name)
 		}
 
 		targets = append(targets,
@@ -235,7 +230,7 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 
 				GeneratorsFunc: func(c *generator.Context) (generators []generator.Generator) {
 					return []generator.Generator{
-						NewGenValidations(args.OutputFile, typesPkg.Path, pkg.Path, rootTypesToValidate, peerPkgs, declarativeValidator),
+						NewGenValidations(args.OutputFile, typesPkg.Path, pkg.Path, validationFunctionTypes, peerPkgs, declarativeValidator),
 					}
 				},
 			})
