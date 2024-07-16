@@ -44,14 +44,14 @@ type genValidations struct {
 	typesPackage            string
 	outputPackage           string
 	peerPackages            []string
-	pkgToInput              map[string]string // TODO: Document and rename, this is input->package now
+	inputToPkg              map[string]string // Maps input packages to generated validation packages
 	initTypes               []*types.Type
 	validationFunctionTypes sets.Set[*types.Type]
 	imports                 namer.ImportTracker
 	declarativeValidator    validators.DeclarativeValidator
 }
 
-func NewGenValidations(outputFilename, typesPackage, outputPackage string, initTypes []*types.Type, validationFunctionTypes sets.Set[*types.Type], peerPkgs []string, pkgToInput map[string]string, declarativeValidator validators.DeclarativeValidator) generator.Generator {
+func NewGenValidations(outputFilename, typesPackage, outputPackage string, initTypes []*types.Type, validationFunctionTypes sets.Set[*types.Type], peerPkgs []string, inputToPkg map[string]string, declarativeValidator validators.DeclarativeValidator) generator.Generator {
 	return &genValidations{
 		GoGenerator: generator.GoGenerator{
 			OutputFilename: outputFilename,
@@ -59,7 +59,7 @@ func NewGenValidations(outputFilename, typesPackage, outputPackage string, initT
 		typesPackage:            typesPackage,
 		outputPackage:           outputPackage,
 		peerPackages:            peerPkgs,
-		pkgToInput:              pkgToInput,
+		inputToPkg:              inputToPkg,
 		initTypes:               initTypes,
 		validationFunctionTypes: validationFunctionTypes,
 		imports:                 generator.NewImportTrackerForPackage(outputPackage),
@@ -117,7 +117,7 @@ func (g *genValidations) Init(c *generator.Context, w io.Writer) error {
 	sw.Do("func RegisterValidations(scheme $.|raw$) error {\n", schemePtr)
 	for _, t := range sortTypes(g.initTypes) {
 		// TODO: avoid redundant calls to build
-		callTree, err := buildCallTree(g.declarativeValidator, t)
+		callTree, err := buildCallTree(g.declarativeValidator, g.inputToPkg, t)
 		if err != nil {
 			return err
 		}
@@ -178,7 +178,7 @@ func (g *genValidations) Init(c *generator.Context, w io.Writer) error {
 func (g *genValidations) GenerateType(c *generator.Context, t *types.Type, w io.Writer) error {
 	klog.V(5).Infof("generating for type %v", t)
 
-	callTree, err := buildCallTree(g.declarativeValidator, t)
+	callTree, err := buildCallTree(g.declarativeValidator, g.inputToPkg, t)
 	if err != nil {
 		return err
 	}
@@ -204,7 +204,7 @@ func (g *genValidations) generateValidationFunction(c *generator.Context, callTr
 	}
 
 	sw.Do("func $.inType|objectvalidationfn$(in *$.inType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
-	callTree.writeValidationFunctionBody(c, g.pkgToInput, "in", pathPart{}, 0, nil, sw)
+	callTree.writeValidationFunctionBody(c, "in", pathPart{}, 0, nil, sw)
 	sw.Do("return errs\n", nil)
 	sw.Do("}\n\n", nil)
 }
@@ -212,15 +212,25 @@ func (g *genValidations) generateValidationFunction(c *generator.Context, callTr
 // callTreeForType contains fields necessary to build a tree for types.
 type callTreeForType struct {
 	declarativeValidator   validators.DeclarativeValidator
+	inputToPkg             map[string]string
 	currentlyBuildingTypes map[*types.Type]bool
 }
 
-func buildCallTree(declarativeValidator validators.DeclarativeValidator, t *types.Type) (*callNode, error) {
+func buildCallTree(declarativeValidator validators.DeclarativeValidator, inputToPkg map[string]string, t *types.Type) (*callNode, error) {
 	tree := &callTreeForType{
 		declarativeValidator:   declarativeValidator,
+		inputToPkg:             inputToPkg,
 		currentlyBuildingTypes: make(map[*types.Type]bool),
 	}
 	return tree.build(t, true)
+}
+
+func (c *callTreeForType) findValidationFunction(t *types.Type) (types.Name, bool) {
+	pkg, ok := c.inputToPkg[t.Name.Package]
+	if !ok {
+		return types.Name{}, false
+	}
+	return types.Name{Package: pkg, Name: "Validate_" + t.Name.Name}, true
 }
 
 // build creates a tree of paths to fields (based on how they would be accessed in Go - pointer, elem,
@@ -284,6 +294,11 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 		}
 
 	case types.Struct:
+		fn, ok := c.findValidationFunction(t)
+		if !ok {
+			return nil, nil
+		}
+		parent.validatorFunction = fn
 		parent.underlyingType = t
 		parent.t = baseT
 		_, err := c.populateValidations(parent, t, t.CommentLines)
@@ -479,6 +494,8 @@ type callNode struct {
 	// Only populated if isPrimitive is true
 	underlyingType *types.Type
 
+	validatorFunction types.Name
+
 	// t is the final type the value should resolve to
 	// This is in contrast to the default type, which resolves aliases and pointers.
 	t *types.Type
@@ -525,7 +542,7 @@ func varsForDepth(depth int) (index, local string) {
 // writeValidationMethod performs an in-order traversal of the calltree, generating loops and if blocks as necessary
 // to correctly turn the call tree into a method body that invokes all calls on all child nodes of the call tree.
 // Depth is used to generate local variables at the proper depth.
-func (n *callNode) writeValidationFunctionBody(c *generator.Context, pkgToInput map[string]string, varName string, path pathPart, depth int, ancestors []*callNode, sw *generator.SnippetWriter) {
+func (n *callNode) writeValidationFunctionBody(c *generator.Context, varName string, path pathPart, depth int, ancestors []*callNode, sw *generator.SnippetWriter) {
 	isCallable := func(n callNode) bool {
 		return n.underlyingType != nil && n.underlyingType.Kind == types.Struct && !n.index && !n.key
 	}
@@ -546,7 +563,7 @@ func (n *callNode) writeValidationFunctionBody(c *generator.Context, pkgToInput 
 			}()
 		}
 		if isCallable(*n) {
-			n.writeChildValidatorCall(c, pkgToInput, varName, path, isPointer, sw)
+			n.writeChildValidatorCall(c, varName, path, isPointer, sw)
 			return
 		}
 	}
@@ -562,10 +579,10 @@ func (n *callNode) writeValidationFunctionBody(c *generator.Context, pkgToInput 
 			sw.Do("$.local$ := &$.var$[$.index$]\n", targs)
 		}
 		if n.underlyingType != nil && n.underlyingType.Kind == types.Struct {
-			n.writeChildValidatorCall(c, pkgToInput, local, pathPart{Index: index}, true, sw)
+			n.writeChildValidatorCall(c, local, pathPart{Index: index}, true, sw)
 		} else {
 			for _, child := range n.children {
-				child.writeValidationFunctionBody(c, pkgToInput, local, pathPart{Index: index}, depth+1, append(ancestors, n), sw)
+				child.writeValidationFunctionBody(c, local, pathPart{Index: index}, depth+1, append(ancestors, n), sw)
 			}
 		}
 
@@ -577,13 +594,13 @@ func (n *callNode) writeValidationFunctionBody(c *generator.Context, pkgToInput 
 		sw.Do("for $.index$_idx, $.index$ := range $.var$ {\n", targs)
 		for _, child := range n.children {
 			if n.underlyingType != nil && n.underlyingType.Kind == types.Struct {
-				n.writeChildValidatorCall(c, pkgToInput, index, pathPart{Key: index + "_idx"}, false, sw)
+				n.writeChildValidatorCall(c, index, pathPart{Key: index + "_idx"}, false, sw)
 			} else {
 				childVarName := index
 				if len(child.field) > 0 {
 					childVarName = index + "." + child.field
 				}
-				child.writeValidationFunctionBody(c, pkgToInput, childVarName, pathPart{Key: index + "_idx"}, depth+1, append(ancestors, n), sw)
+				child.writeValidationFunctionBody(c, childVarName, pathPart{Key: index + "_idx"}, depth+1, append(ancestors, n), sw)
 			}
 		}
 		sw.Do("}\n", nil)
@@ -597,13 +614,13 @@ func (n *callNode) writeValidationFunctionBody(c *generator.Context, pkgToInput 
 			if child.elem && childPath == (pathPart{}) { // TODO: Clean this up. It fixes pointers to structs, but without the empty check, it breaks pointers to enums.
 				childPath = path
 			}
-			child.writeValidationFunctionBody(c, pkgToInput, childVarName, childPath, depth+1, append(ancestors, n), sw)
+			child.writeValidationFunctionBody(c, childVarName, childPath, depth+1, append(ancestors, n), sw)
 		}
 	}
 }
 
 // writeChildValidatorCall generates a call to a child generated validation function.
-func (n *callNode) writeChildValidatorCall(c *generator.Context, pkgToInput map[string]string, varName string, path pathPart, isVarPointer bool, sw *generator.SnippetWriter) {
+func (n *callNode) writeChildValidatorCall(c *generator.Context, varName string, path pathPart, isVarPointer bool, sw *generator.SnippetWriter) {
 	accessor := varName
 	if !isVarPointer {
 		accessor = "&" + accessor
@@ -612,19 +629,9 @@ func (n *callNode) writeChildValidatorCall(c *generator.Context, pkgToInput map[
 	targs := generator.Args{
 		"var":  accessor,
 		"path": path,
+		"fn":   c.Universe.Type(n.validatorFunction),
 	}
-
-	// TODO: Stop passing pkgToInput on the stack and generally organize the way
-	//       types are referenced between packages.
-	if pkg := pkgToInput[n.underlyingType.Name.Package]; len(pkg) > 0 {
-		fn := types.Name{Package: pkg, Name: "Validate_" + n.underlyingType.Name.Name}
-		targs["fn"] = c.Universe.Type(fn)
-		sw.Do("errs = append(errs, $.fn|raw$($.var$, ", targs)
-	} else {
-		targs["fn"] = "Validate_" + n.underlyingType.Name.Name
-		sw.Do("errs = append(errs, $.fn$($.var$, ", targs)
-	}
-
+	sw.Do("errs = append(errs, $.fn|raw$($.var$, ", targs)
 	if len(path.Key) > 0 {
 		sw.Do("fldPath.Key($.path.Key$)", targs)
 	} else if len(path.Name) > 0 {
