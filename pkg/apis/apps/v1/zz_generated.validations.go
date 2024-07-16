@@ -36,15 +36,29 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
+	scheme.AddValidationFunc(&v1.DaemonSet{}, func(obj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			root := obj.(*v1.DaemonSet)
+			return Validate_DaemonSetSpec(&root.Spec, nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
 	scheme.AddValidationFunc(&v1.DaemonSetList{}, func(obj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_DaemonSetList(obj.(*v1.DaemonSetList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.StatefulSetList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.Deployment{}, func(obj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_StatefulSetList(obj.(*v1.StatefulSetList), nil)
+			root := obj.(*v1.Deployment)
+			return Validate_DeploymentSpec(&root.Spec, nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc(&v1.DeploymentList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			return Validate_DeploymentList(obj.(*v1.DeploymentList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
@@ -55,15 +69,22 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.DeploymentList{}, func(obj interface{}, subresources ...string) field.ErrorList {
-		if len(subresources) == 0 {
-			return Validate_DeploymentList(obj.(*v1.DeploymentList), nil)
-		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
-	})
 	scheme.AddValidationFunc(&v1.ReplicaSetList{}, func(obj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_ReplicaSetList(obj.(*v1.ReplicaSetList), nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc(&v1.StatefulSet{}, func(obj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			root := obj.(*v1.StatefulSet)
+			return Validate_StatefulSetSpec(&root.Spec, nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc(&v1.StatefulSetList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			return Validate_StatefulSetList(obj.(*v1.StatefulSetList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})

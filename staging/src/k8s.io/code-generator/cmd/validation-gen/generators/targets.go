@@ -189,22 +189,22 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 		inputPath := pkgToInput[i]
 		typesPkg = context.Universe[inputPath]
 
+		var initTypes []*types.Type
 		candidates := sets.New[*types.Type]()
 		for _, t := range typesPkg.Types {
 			if shouldCreateObjectValidationFn(t) {
 				candidates.Insert(t)
+				initTypes = append(initTypes, t)
 			}
 		}
 
 		// TODO: Not all of these should be registered for each input, why is that happening?
 		validationFunctionTypes := sets.New[*types.Type]()
-		var initTypes []*types.Type
 		visited := sets.New[*types.Type]()
 		for t := range candidates {
 			if validationFunctionTypes.Has(t) { // already found
 				continue
 			}
-			initTypes = append(initTypes, t)
 			callTree, err := buildCallTree(declarativeValidator, t)
 			if err != nil {
 				klog.Fatalf("Failed to build call tree to generate validations for type: %v: %v", t.Name, err)

@@ -44,7 +44,7 @@ type genValidations struct {
 	typesPackage            string
 	outputPackage           string
 	peerPackages            []string
-	pkgToInput              map[string]string // TODO: Document
+	pkgToInput              map[string]string // TODO: Document and rename, this is input->package now
 	initTypes               []*types.Type
 	validationFunctionTypes sets.Set[*types.Type]
 	imports                 namer.ImportTracker
@@ -115,7 +115,7 @@ func (g *genValidations) Init(c *generator.Context, w io.Writer) error {
 	sw.Do("// RegisterValidations adds validation functions to the given scheme.\n", nil)
 	sw.Do("// Public to allow building arbitrary schemes.\n", nil)
 	sw.Do("func RegisterValidations(scheme $.|raw$) error {\n", schemePtr)
-	for _, t := range g.initTypes {
+	for _, t := range sortTypes(g.initTypes) {
 		// TODO: avoid redundant calls to build
 		callTree, err := buildCallTree(g.declarativeValidator, t)
 		if err != nil {
@@ -614,6 +614,8 @@ func (n *callNode) writeChildValidatorCall(c *generator.Context, pkgToInput map[
 		"path": path,
 	}
 
+	// TODO: Stop passing pkgToInput on the stack and generally organize the way
+	//       types are referenced between packages.
 	if pkg := pkgToInput[n.underlyingType.Name.Package]; len(pkg) > 0 {
 		fn := types.Name{Package: pkg, Name: "Validate_" + n.underlyingType.Name.Name}
 		targs["fn"] = c.Universe.Type(fn)
