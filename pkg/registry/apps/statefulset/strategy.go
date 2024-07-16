@@ -141,9 +141,9 @@ func (statefulSetStrategy) Validate(ctx context.Context, obj runtime.Object) fie
 	statefulSet := obj.(*apps.StatefulSet)
 	opts := pod.GetValidationOptionsFromPodTemplate(&statefulSet.Spec.Template, nil)
 
-	errs := validation.ValidateStatefulSet(statefulSet, opts)
-	errs = append(errs, rest.ValidateDeclaratively(ctx, obj)...)
-	return errs
+	allErrs := validation.ValidateStatefulSet(statefulSet, opts)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, obj)...)
+	return allErrs
 }
 
 // WarningsOnCreate returns warnings for the creation of the given object.
@@ -171,9 +171,9 @@ func (statefulSetStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.
 	oldStatefulSet := old.(*apps.StatefulSet)
 
 	opts := pod.GetValidationOptionsFromPodTemplate(&newStatefulSet.Spec.Template, &oldStatefulSet.Spec.Template)
-	errs := validation.ValidateStatefulSetUpdate(newStatefulSet, oldStatefulSet, opts)
-	errs = append(errs, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
-	return errs
+	allErrs := validation.ValidateStatefulSetUpdate(newStatefulSet, oldStatefulSet, opts)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
+	return allErrs
 }
 
 // WarningsOnUpdate returns warnings for the given update.
@@ -224,9 +224,9 @@ func (statefulSetStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old 
 // ValidateUpdate is the default update validation for an end user updating status
 func (statefulSetStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	// TODO: Validate status updates.
-	errs := validation.ValidateStatefulSetStatusUpdate(obj.(*apps.StatefulSet), old.(*apps.StatefulSet))
-	errs = append(errs, rest.ValidateDeclaratively(ctx, obj, "status")...)
-	return errs
+	allErrs := validation.ValidateStatefulSetStatusUpdate(obj.(*apps.StatefulSet), old.(*apps.StatefulSet))
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, obj, "status")...)
+	return allErrs
 }
 
 // WarningsOnUpdate returns warnings for the given update.
