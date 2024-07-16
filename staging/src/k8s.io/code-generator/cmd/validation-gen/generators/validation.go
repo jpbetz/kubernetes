@@ -319,6 +319,7 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 				}
 				// TODO: Add more information to the node about field correlation for use with ValidateUpdate.
 				//       In particular, we need to track associative list keys.
+				//if isAssociativeList() {}
 				parent.children = append(parent.children, *child)
 			}
 		}

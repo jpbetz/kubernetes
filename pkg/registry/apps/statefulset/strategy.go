@@ -141,7 +141,9 @@ func (statefulSetStrategy) Validate(ctx context.Context, obj runtime.Object) fie
 	statefulSet := obj.(*apps.StatefulSet)
 	opts := pod.GetValidationOptionsFromPodTemplate(&statefulSet.Spec.Template, nil)
 
-	return validation.ValidateStatefulSet(statefulSet, opts)
+	errs := validation.ValidateStatefulSet(statefulSet, opts)
+	errs = append(errs, rest.ValidateDeclaratively(ctx, obj)...)
+	return errs
 }
 
 // WarningsOnCreate returns warnings for the creation of the given object.
@@ -169,7 +171,9 @@ func (statefulSetStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.
 	oldStatefulSet := old.(*apps.StatefulSet)
 
 	opts := pod.GetValidationOptionsFromPodTemplate(&newStatefulSet.Spec.Template, &oldStatefulSet.Spec.Template)
-	return validation.ValidateStatefulSetUpdate(newStatefulSet, oldStatefulSet, opts)
+	errs := validation.ValidateStatefulSetUpdate(newStatefulSet, oldStatefulSet, opts)
+	errs = append(errs, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
+	return errs
 }
 
 // WarningsOnUpdate returns warnings for the given update.
@@ -220,7 +224,9 @@ func (statefulSetStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old 
 // ValidateUpdate is the default update validation for an end user updating status
 func (statefulSetStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	// TODO: Validate status updates.
-	return validation.ValidateStatefulSetStatusUpdate(obj.(*apps.StatefulSet), old.(*apps.StatefulSet))
+	errs := validation.ValidateStatefulSetStatusUpdate(obj.(*apps.StatefulSet), old.(*apps.StatefulSet))
+	errs = append(errs, rest.ValidateDeclaratively(ctx, obj, "status")...)
+	return errs
 }
 
 // WarningsOnUpdate returns warnings for the given update.

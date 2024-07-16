@@ -158,22 +158,6 @@ func BeforeUpdate(strategy RESTUpdateStrategy, ctx context.Context, obj, old run
 		return errors.NewInvalid(kind.GroupKind(), objectMeta.GetName(), errs)
 	}
 
-	// TODO: HACK: This jack-hammers in versioned type declarative validation, but it's clearly "pretty bad".
-	//       Specifically, it doesn't respect the strategy. So it doesn't validate only spec or only status depending on which stanza is being updated.
-	//       So this code needs to be somehow
-	if requestInfo, found := genericapirequest.RequestInfoFrom(ctx); found {
-		groupVersion := schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}
-		versionedObj, err := legacyscheme.Scheme.ConvertToVersion(obj, groupVersion)
-		if err != nil {
-			errs := field.ErrorList{field.InternalError(field.NewPath("root"), fmt.Errorf("unexpected error converting to versioned type: %w", err))}
-			return errors.NewInvalid(kind.GroupKind(), objectMeta.GetName(), errs)
-		}
-		// TODO: I need to separate out spec and status validation!  grrr...
-		if errs := legacyscheme.Scheme.Validate(versionedObj); len(errs) > 0 {
-			return errors.NewInvalid(kind.GroupKind(), objectMeta.GetName(), errs)
-		}
-	}
-
 	for _, w := range strategy.WarningsOnUpdate(ctx, obj, old) {
 		warning.AddWarning(ctx, "", w)
 	}
@@ -309,5 +293,19 @@ func AdmissionToValidateObjectUpdateFunc(admit admission.Interface, staticAttrib
 			return nil
 		}
 		return validatingAdmission.Validate(ctx, finalAttributes, o)
+	}
+}
+
+func ValidateUpdateDeclaratively(ctx context.Context, obj, old runtime.Object, subresources ...string) field.ErrorList {
+	if requestInfo, found := genericapirequest.RequestInfoFrom(ctx); found {
+		groupVersion := schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}
+		versionedObj, err := legacyscheme.Scheme.ConvertToVersion(obj, groupVersion)
+		if err != nil {
+			return field.ErrorList{field.InternalError(nil, fmt.Errorf("unexpected error converting to versioned type: %w", err))}
+		}
+		// TODO: Call ValidateUpdate once implemented
+		return legacyscheme.Scheme.Validate(versionedObj, subresources...)
+	} else {
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("could not find requestInfo in context"))}
 	}
 }

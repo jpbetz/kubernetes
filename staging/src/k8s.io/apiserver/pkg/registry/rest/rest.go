@@ -22,12 +22,13 @@ import (
 	"net/http"
 	"net/url"
 
+	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
+
 	metainternalversion "k8s.io/apimachinery/pkg/apis/meta/internalversion"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/watch"
-	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
 //TODO:

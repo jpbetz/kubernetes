@@ -123,30 +123,6 @@ func BeforeCreate(strategy RESTCreateStrategy, ctx context.Context, obj runtime.
 	if errs := strategy.Validate(ctx, obj); len(errs) > 0 {
 		return errors.NewInvalid(kind.GroupKind(), objectMeta.GetName(), errs)
 	}
-	// TODO: HACK: This jack-hammers in versioned type declarative validation, but it's clearly "pretty bad".
-	//       Specifically, it doesn't respect the strategy. So it doesn't validate only spec or only status (or scale) fully correctly, depending on which stanza is being updated.
-	//       This code should probably go into a supplementary interface on the strategy.
-	//           See rest.GarbageCollectionDeleteStrategy as an example.
-	//       	 But the whole reason I wanted it here is so that each strategy doesn't need to implement it since it's generic.
-	//              The missing bit to execute it here would be to know if a subresource is being validated..
-	//                 But that's what the strategy is already suppose to have resolved.
-	//                   So logically we want the validation in the strategy, we just want to make it super simple to add..
-	if requestInfo, found := genericapirequest.RequestInfoFrom(ctx); found {
-		var subresources []string
-		if len(requestInfo.Subresource) > 0 {
-			subresources = []string{requestInfo.Subresource}
-		}
-		groupVersion := schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}
-		versionedObj, err := legacyscheme.Scheme.ConvertToVersion(obj, groupVersion)
-		if err != nil {
-			errs := field.ErrorList{field.InternalError(field.NewPath("root"), fmt.Errorf("unexpected error converting to versioned type: %w", err))}
-			return errors.NewInvalid(kind.GroupKind(), objectMeta.GetName(), errs)
-		}
-		// TODO: I need to separate out spec and status validation!  grrr...
-		if errs := legacyscheme.Scheme.Validate(versionedObj, subresources...); len(errs) > 0 {
-			return errors.NewInvalid(kind.GroupKind(), objectMeta.GetName(), errs)
-		}
-	}
 
 	// Custom validation (including name validation) passed
 	// Now run common validation on object meta
@@ -244,5 +220,18 @@ func AdmissionToValidateObjectFunc(admit admission.Interface, staticAttributes a
 			return nil
 		}
 		return validatingAdmission.Validate(ctx, finalAttributes, o)
+	}
+}
+
+func ValidateDeclaratively(ctx context.Context, obj runtime.Object, subresources ...string) field.ErrorList {
+	if requestInfo, found := genericapirequest.RequestInfoFrom(ctx); found {
+		groupVersion := schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}
+		versionedObj, err := legacyscheme.Scheme.ConvertToVersion(obj, groupVersion)
+		if err != nil {
+			return field.ErrorList{field.InternalError(nil, fmt.Errorf("unexpected error converting to versioned type: %w", err))}
+		}
+		return legacyscheme.Scheme.Validate(versionedObj, subresources...)
+	} else {
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("could not find requestInfo in context"))}
 	}
 }
