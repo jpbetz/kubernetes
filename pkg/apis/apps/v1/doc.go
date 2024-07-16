@@ -20,7 +20,5 @@ limitations under the License.
 // +k8s:defaulter-gen-input=k8s.io/api/apps/v1
 // +k8s:validation-gen=TypeMeta
 // +k8s:validation-gen-input=k8s.io/api/apps/v1
-// //+k8s:validation-gen-enabled-tags=k8s:validation:format
-// //+k8s:validation-gen-disabled-tags=enum
 
 package v1 // import "k8s.io/kubernetes/pkg/apis/apps/v1"

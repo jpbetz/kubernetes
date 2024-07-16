@@ -150,6 +150,11 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 	orderer := namer.Orderer{Namer: namer.NewPublicNamer(1)}
 	context.Order = orderer.OrderUniverse(context.Universe)
 
+	inputToPkg := make(map[string]string, len(pkgToInput))
+	for k, v := range pkgToInput {
+		inputToPkg[v] = k
+	}
+
 	for _, i := range context.Inputs {
 		pkg := context.Universe[i]
 
@@ -191,12 +196,15 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 			}
 		}
 
+		// TODO: Not all of these should be registered for each input, why is that happening?
 		validationFunctionTypes := sets.New[*types.Type]()
+		var initTypes []*types.Type
 		visited := sets.New[*types.Type]()
 		for t := range candidates {
 			if validationFunctionTypes.Has(t) { // already found
 				continue
 			}
+			initTypes = append(initTypes, t)
 			callTree, err := buildCallTree(declarativeValidator, t)
 			if err != nil {
 				klog.Fatalf("Failed to build call tree to generate validations for type: %v: %v", t.Name, err)
@@ -233,7 +241,7 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 
 				GeneratorsFunc: func(c *generator.Context) (generators []generator.Generator) {
 					return []generator.Generator{
-						NewGenValidations(args.OutputFile, typesPkg.Path, pkg.Path, validationFunctionTypes, peerPkgs, declarativeValidator),
+						NewGenValidations(args.OutputFile, typesPkg.Path, pkg.Path, initTypes, validationFunctionTypes, peerPkgs, inputToPkg, declarativeValidator),
 					}
 				},
 			})
