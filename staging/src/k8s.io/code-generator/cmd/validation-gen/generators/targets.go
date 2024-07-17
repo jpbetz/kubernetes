@@ -197,7 +197,6 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 			}
 		}
 
-		// TODO: Not all of these should be registered for each input, why is that happening?
 		validationFunctionTypes := sets.New[*types.Type]()
 		visited := sets.New[*types.Type]()
 		for _, t := range rootTypes {
