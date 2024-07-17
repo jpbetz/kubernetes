@@ -147,7 +147,7 @@ func (g *genValidations) Init(c *generator.Context, w io.Writer) error {
 			"fmtErrorf":   c.Universe.Type(errorfType),
 		}
 		if isTypeWith(t, []string{"TypeMeta"}) {
-			sw.Do("scheme.AddValidationFunc(&$.rootType|raw${}, func(obj interface{}, subresources ...string) $.errorList|raw$ {\n", targs)
+			sw.Do("scheme.AddValidationFunc(&$.rootType|raw${}, func(obj, oldObj interface{}, subresources ...string) $.errorList|raw$ {\n", targs)
 			sw.Do("  if len(subresources) == 0 {\n", targs)
 			if specType != t {
 				sw.Do("    root := obj.(*$.rootType|raw$)\n", targs)
@@ -167,8 +167,8 @@ func (g *genValidations) Init(c *generator.Context, w io.Writer) error {
 			sw.Do("})\n", targs)
 		}
 
-		// TODO: register update validations
-		// TODO: This will require correlating old object
+		// TODO: Support update validations
+		//       This will require correlating old object.
 	}
 	sw.Do("return nil\n", nil)
 	sw.Do("}\n\n", nil)

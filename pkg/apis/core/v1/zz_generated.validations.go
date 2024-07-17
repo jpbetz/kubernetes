@@ -35,19 +35,19 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc(&v1.Endpoints{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.Endpoints{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_Endpoints(obj.(*v1.Endpoints), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.EndpointsList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.EndpointsList{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_EndpointsList(obj.(*v1.EndpointsList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.Namespace{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.Namespace{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_Namespace(obj.(*v1.Namespace), nil)
 		}
@@ -57,13 +57,13 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.NamespaceList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.NamespaceList{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_NamespaceList(obj.(*v1.NamespaceList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.Node{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.Node{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			root := obj.(*v1.Node)
 			return Validate_NodeSpec(&root.Spec, nil)
@@ -74,13 +74,13 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.NodeList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.NodeList{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_NodeList(obj.(*v1.NodeList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.PersistentVolume{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.PersistentVolume{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			root := obj.(*v1.PersistentVolume)
 			return Validate_PersistentVolumeSpec(&root.Spec, nil)
@@ -91,7 +91,7 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.PersistentVolumeClaim{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.PersistentVolumeClaim{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			root := obj.(*v1.PersistentVolumeClaim)
 			return Validate_PersistentVolumeClaimSpec(&root.Spec, nil)
@@ -102,19 +102,19 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.PersistentVolumeClaimList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.PersistentVolumeClaimList{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_PersistentVolumeClaimList(obj.(*v1.PersistentVolumeClaimList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.PersistentVolumeList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.PersistentVolumeList{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_PersistentVolumeList(obj.(*v1.PersistentVolumeList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.Pod{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.Pod{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			root := obj.(*v1.Pod)
 			return Validate_PodSpec(&root.Spec, nil)
@@ -125,13 +125,13 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.PodList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.PodList{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_PodList(obj.(*v1.PodList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.PodStatusResult{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.PodStatusResult{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_PodStatusResult(obj.(*v1.PodStatusResult), nil)
 		}
@@ -141,45 +141,45 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.PodTemplate{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.PodTemplate{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_PodTemplate(obj.(*v1.PodTemplate), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.PodTemplateList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.PodTemplateList{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_PodTemplateList(obj.(*v1.PodTemplateList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.ReplicationController{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.ReplicationController{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			root := obj.(*v1.ReplicationController)
 			return Validate_ReplicationControllerSpec(&root.Spec, nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.ReplicationControllerList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.ReplicationControllerList{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_ReplicationControllerList(obj.(*v1.ReplicationControllerList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.ResourceQuota{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.ResourceQuota{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			root := obj.(*v1.ResourceQuota)
 			return Validate_ResourceQuotaSpec(&root.Spec, nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.ResourceQuotaList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.ResourceQuotaList{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_ResourceQuotaList(obj.(*v1.ResourceQuotaList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.Service{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.Service{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			root := obj.(*v1.Service)
 			return Validate_ServiceSpec(&root.Spec, nil)
@@ -190,7 +190,7 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&v1.ServiceList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&v1.ServiceList{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_ServiceList(obj.(*v1.ServiceList), nil)
 		}

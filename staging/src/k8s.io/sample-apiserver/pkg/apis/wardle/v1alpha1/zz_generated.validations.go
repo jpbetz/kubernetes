@@ -34,19 +34,19 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc(&Fischer{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&Fischer{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_Fischer(obj.(*Fischer), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&FischerList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&FischerList{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_FischerList(obj.(*FischerList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&Flunder{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&Flunder{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			root := obj.(*Flunder)
 			return Validate_FlunderSpec(&root.Spec, nil)
@@ -57,7 +57,7 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&FlunderList{}, func(obj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(&FlunderList{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_FlunderList(obj.(*FlunderList), nil)
 		}
