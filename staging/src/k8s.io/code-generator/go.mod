@@ -14,7 +14,7 @@ require (
 	golang.org/x/text v0.17.0
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/apimachinery v0.0.0
-	k8s.io/gengo/v2 v2.0.0-20240812201722-3b05ca7b6e59
+	k8s.io/gengo/v2 v2.0.0-20240815230951-44b8d154562d
 	k8s.io/klog/v2 v2.130.1
 	k8s.io/kube-openapi v0.0.0-20240812233141-91dab695df6f
 )
