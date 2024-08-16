@@ -21,9 +21,36 @@ import "k8s.io/gengo/v2/types"
 // DeclarativeValidator is able to extract validation function generators from
 // types.go files.
 type DeclarativeValidator interface {
-	// ExtractValidations returns a FunctionGen for each validation this DeclarativeValidator
+	// ExtractValidations returns a ValidatorGen for the validation this DeclarativeValidator
 	// supports for the given go type, and it's corresponding comment strings.
-	ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error)
+	ExtractValidations(t *types.Type, comments []string) (ValidatorGen, error)
+}
+
+// ValidatorGen defines the function calls and variables to generate to perform validation.
+type ValidatorGen struct {
+	Functions []FunctionGen
+	Variables []VariableGen
+}
+
+func (v *ValidatorGen) Empty() bool {
+	return len(v.Functions) == 0 && len(v.Variables) == 0
+}
+
+func (v *ValidatorGen) Len() int {
+	return len(v.Functions) + len(v.Variables)
+}
+
+func (v *ValidatorGen) AddFunction(f FunctionGen) {
+	v.Functions = append(v.Functions, f)
+}
+
+func (v *ValidatorGen) AddVariable(variable VariableGen) {
+	v.Variables = append(v.Variables, variable)
+}
+
+func (v *ValidatorGen) Add(o ValidatorGen) {
+	v.Functions = append(v.Functions, o.Functions...)
+	v.Variables = append(v.Variables, o.Variables...)
 }
 
 // FunctionFlags define optional properties of a validator.  Most validators
@@ -43,7 +70,7 @@ const (
 	// validator fails. Most validators are not fatal.
 	IsFatal FunctionFlags = 1 << iota
 
-	// PtrOK indicates that when validating a pointer fiel, this validator
+	// PtrOK indicates that when validating a pointer field, this validator
 	// wants the pointer value, rather than the dereferenced value.  Most
 	// validators want the value, not the pointer.
 	PtrOK
@@ -61,18 +88,44 @@ type FunctionGen interface {
 	// The function signature must be of the form:
 	//   func(field.Path, <valueType>, extraArgs[0] <extraArgs[0]Type>, ..., extraArgs[N] <extraArgs[N]Type>)
 	//
-	// extraArgs may contain strings, ints, floats and bools.
+	// extraArgs may contain:
+	// - data literals comprised of maps, slices, strings, ints, floats and bools
+	// - references, represented by types.Type (to reference any type in the universe), and types.Member (to reference members of the current value)
 	//
 	// If validation function to be called does not have a signature of this form, please introduce
 	// a function that does and use that function to call the validation function.
 	SignatureAndArgs() (function types.Name, extraArgs []any)
 
+	// TypeArgs assigns types to the type parameters of the function, for invocation.
+	TypeArgs() []types.Name
+
 	// Flags returns the options for this validator function.
 	Flags() FunctionFlags
 }
 
+// PrivateVar is a variable name that the generator will output as a private identifier.
+type PrivateVar types.Name
+
+// VariableGen provides validation-gen with the information needed to generate variable.
+// Variables typically support generated functions by providing static information such
+// as the list of supported symbols for an enum.
+type VariableGen interface {
+	// TagName returns the tag which triggers this validator.
+	TagName() string
+
+	// Var returns the variable identifier.
+	Var() PrivateVar
+
+	// Init generates the function call that the variable is assigned to.
+	Init() FunctionGen
+}
+
 // Function creates a FunctionGen for a given function name and extraArgs.
 func Function(tagName string, flags FunctionFlags, function types.Name, extraArgs ...any) FunctionGen {
+	return GenericFunction(tagName, flags, function, nil, extraArgs...)
+}
+
+func GenericFunction(tagName string, flags FunctionFlags, function types.Name, typeArgs []types.Name, extraArgs ...any) FunctionGen {
 	// Callers of Signature don't care if the args are all of a known type, it just
 	// makes it easier to declare validators.
 	var anyArgs []any
@@ -82,13 +135,14 @@ func Function(tagName string, flags FunctionFlags, function types.Name, extraArg
 			anyArgs[i] = arg
 		}
 	}
-	return &functionGen{tagName: tagName, flags: flags, function: function, extraArgs: anyArgs}
+	return &functionGen{tagName: tagName, flags: flags, function: function, extraArgs: anyArgs, typeArgs: typeArgs}
 }
 
 type functionGen struct {
 	tagName   string
 	function  types.Name
 	extraArgs []any
+	typeArgs  []types.Name
 	flags     FunctionFlags
 }
 
@@ -100,6 +154,33 @@ func (v *functionGen) SignatureAndArgs() (function types.Name, args []any) {
 	return v.function, v.extraArgs
 }
 
+func (v *functionGen) TypeArgs() []types.Name { return v.typeArgs }
+
 func (v *functionGen) Flags() FunctionFlags {
 	return v.flags
+}
+
+// Variable creates a VariableGen for a given function name and extraArgs.
+func Variable(variable PrivateVar, init FunctionGen) VariableGen {
+	return &variableGen{
+		variable: variable,
+		init:     init,
+	}
+}
+
+type variableGen struct {
+	variable PrivateVar
+	init     FunctionGen
+}
+
+func (v variableGen) TagName() string {
+	return v.init.TagName()
+}
+
+func (v variableGen) Var() PrivateVar {
+	return v.variable
+}
+
+func (v variableGen) Init() FunctionGen {
+	return v.init
 }

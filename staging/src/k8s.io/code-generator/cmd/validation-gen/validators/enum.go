@@ -41,10 +41,10 @@ type enumDeclarativeValidator struct {
 	enumContext *enumContext
 }
 
-func (c *enumDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error) {
-	var result []FunctionGen
-	if enum, ok := c.enumContext.EnumType(t); ok {
-		result = append(result, Function("enum", DefaultFlags, enumValidator, enum.ValueArgs()...))
+func (c *enumDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (ValidatorGen, error) {
+	var result ValidatorGen
+ 	if enum, ok := c.enumContext.EnumType(t); ok {
+		result.AddFunction(Function("enum", DefaultFlags, enumValidator, enum.ValueArgs()...))
 	}
 	return result, nil
 }

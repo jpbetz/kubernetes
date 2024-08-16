@@ -54,16 +54,21 @@ type compositeValidator struct {
 	enabledTags, disabledTags sets.Set[string]
 }
 
-func (c *compositeValidator) ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error) {
-	var result []FunctionGen
+func (c *compositeValidator) ExtractValidations(t *types.Type, comments []string) (ValidatorGen, error) {
+	var result ValidatorGen
 	for _, v := range c.validators {
-		validations, err := v.ExtractValidations(t, comments)
+		validationGen, err := v.ExtractValidations(t, comments)
 		if err != nil {
-			return nil, err
+			return result, err
 		}
-		for _, f := range validations {
+		for _, f := range validationGen.Functions {
 			if c.allow(f.TagName()) {
-				result = append(result, f)
+				result.Functions = append(result.Functions, f)
+			}
+		}
+		for _, v := range validationGen.Variables {
+			if c.allow(v.TagName()) {
+				result.Variables = append(result.Variables, v)
 			}
 		}
 	}

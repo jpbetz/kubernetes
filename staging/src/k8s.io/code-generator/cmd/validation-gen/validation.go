@@ -18,8 +18,11 @@ package main
 
 import (
 	"bytes"
+	"cmp"
 	"fmt"
 	"io"
+	"reflect"
+	"slices"
 	"strconv"
 	"strings"
 	"unicode"
@@ -29,6 +32,7 @@ import (
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/namer"
+	"k8s.io/gengo/v2/parser/tags"
 	"k8s.io/gengo/v2/types"
 	"k8s.io/klog/v2"
 )
@@ -124,6 +128,7 @@ func (g *genValidations) GenerateType(c *generator.Context, t *types.Type, w io.
 	klog.V(5).Infof("emitting validation code for type %v", t)
 
 	sw := generator.NewSnippetWriter(w, c, "$", "$")
+	g.emitValidationVariables(c, t, sw)
 	g.emitValidationFunction(c, t, sw)
 	if err := sw.Error(); err != nil {
 		return err
@@ -142,7 +147,7 @@ func (g *genValidations) hasValidations(n *typeNode) bool {
 
 // Called in case of a cache miss.
 func (g *genValidations) hasValidationsMiss(n *typeNode) bool {
-	if len(n.typeValidations) > 0 {
+	if !n.typeValidations.Empty() {
 		return true
 	}
 	allChildren := n.fields
@@ -153,7 +158,7 @@ func (g *genValidations) hasValidationsMiss(n *typeNode) bool {
 		allChildren = append(allChildren, n.elem)
 	}
 	for _, c := range allChildren {
-		if len(c.fieldValidations)+len(c.keyValidations)+len(c.elemValidations) > 0 {
+		if !c.fieldValidations.Empty() || !c.keyValidations.Empty() || !c.elemValidations.Empty() {
 			return true
 		}
 		if g.hasValidations(c.node) {
@@ -163,7 +168,7 @@ func (g *genValidations) hasValidationsMiss(n *typeNode) bool {
 	return false
 }
 
-// typeDiscoverer contains fields necessary to build graphs of types.
+// typeDiscoverer contains fields necessary to build a tree of types.
 type typeDiscoverer struct {
 	validator  validators.DeclarativeValidator
 	inputToPkg map[string]string
@@ -190,9 +195,9 @@ type childNode struct {
 	childType *types.Type // the real type of the child (may be a pointer)
 	node      *typeNode   // the node of the child's value type
 
-	fieldValidations []validators.FunctionGen // validations on the field
-	keyValidations   []validators.FunctionGen // validations on each key of a map field
-	elemValidations  []validators.FunctionGen // validations on each value of a list or map
+	fieldValidations validators.ValidatorGen // validations on the field
+	keyValidations   validators.ValidatorGen // validations on each key of a map field
+	elemValidations  validators.ValidatorGen // validations on each value of a list or map
 }
 
 // typeNode represents a node in the type-graph, annotated with information
@@ -208,9 +213,9 @@ type typeNode struct {
 	elem       *childNode   // populated when this type is a map or slice
 	underlying *childNode   // populated when this type is an alias
 
-	typeValidations []validators.FunctionGen // validations on the type
-	keyValidations  []validators.FunctionGen // validations on each key of a map type
-	elemValidations []validators.FunctionGen // validations on each value of a list or map
+	typeValidations validators.ValidatorGen // validations on the type
+	keyValidations  validators.ValidatorGen // validations on each key of a map type
+	elemValidations validators.ValidatorGen // validations on each value of a list or map
 }
 
 // lookupField returns the childNode with the specified JSON name.
@@ -248,10 +253,14 @@ func (n *typeNode) doDump(buf *bytes.Buffer, indent int, visited map[*typeNode]b
 	}
 	visited[n] = true
 
-	for _, val := range n.typeValidations {
+	for _, val := range n.typeValidations.Functions {
 		n.dumpIndent(buf, indent)
 		fn, args := val.SignatureAndArgs()
 		buf.WriteString(fmt.Sprintf("type-validation: %v(%+v)\n", fn, args))
+	}
+	for _, val := range n.typeValidations.Variables {
+		n.dumpIndent(buf, indent)
+		buf.WriteString(fmt.Sprintf("type-validation variable: %s := %v(%+v)\n", val.Var().Name, val.Init()))
 	}
 	n.dumpChildren(buf, indent, visited)
 }
@@ -260,17 +269,17 @@ func (n *typeNode) dumpChildren(buf *bytes.Buffer, indent int, visited map[*type
 	for _, fld := range n.fields {
 		n.dumpIndent(buf, indent)
 		buf.WriteString(fmt.Sprintf("field %s: %s {\n", fld.name, fld.childType))
-		for _, val := range fld.fieldValidations {
+		for _, val := range fld.fieldValidations.Functions {
 			fn, args := val.SignatureAndArgs()
 			n.dumpIndent(buf, indent+1)
 			buf.WriteString(fmt.Sprintf("field-validation: %v(%+v)\n", fn, args))
 		}
-		for _, val := range fld.keyValidations {
+		for _, val := range fld.keyValidations.Functions {
 			fn, args := val.SignatureAndArgs()
 			n.dumpIndent(buf, indent+1)
 			buf.WriteString(fmt.Sprintf("key-validation: %v(%+v)\n", fn, args))
 		}
-		for _, val := range fld.elemValidations {
+		for _, val := range fld.elemValidations.Functions {
 			fn, args := val.SignatureAndArgs()
 			n.dumpIndent(buf, indent+1)
 			buf.WriteString(fmt.Sprintf("val-validation: %v(%+v)\n", fn, args))
@@ -336,8 +345,8 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 	if validations, err := td.validator.ExtractValidations(t, t.CommentLines); err != nil {
 		return nil, fmt.Errorf("%v: %w", fldPath, err)
 	} else {
-		if len(validations) > 0 {
-			klog.V(5).InfoS("found type-attached validations", "n", len(validations))
+		if !validations.Empty() {
+			klog.V(5).InfoS("found type-attached validations", "n", validations.Len())
 			thisNode.typeValidations = validations
 		}
 	}
@@ -423,8 +432,8 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		// If we try to emit code for this field and find no JSON name, we
 		// will abort.
 		jsonName := ""
-		if tags, ok := lookupJSONTags(memb); ok {
-			jsonName = tags.name
+		if commentTags, ok := tags.LookupJSON(memb); ok {
+			jsonName = commentTags.Name
 		}
 
 		klog.V(5).InfoS("field", "name", name, "jsonName", jsonName, "type", memb.Type)
@@ -448,9 +457,12 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		if validations, err := td.validator.ExtractValidations(memb.Type, memb.CommentLines); err != nil {
 			return fmt.Errorf("field %s: %w", childPath.String(), err)
 		} else {
-			if len(validations) > 0 {
-				klog.V(5).InfoS("found field-attached validations", "n", len(validations))
-				child.fieldValidations = append(child.fieldValidations, validations...)
+			if !validations.Empty() {
+				klog.V(5).InfoS("found field-attached validations", "n", validations.Len())
+				child.fieldValidations.Add(validations)
+				if len(validations.Variables) > 0 {
+					return fmt.Errorf("variable generation not supported for field-attached validations, but validations on %s require variable generation", childPath.String())
+				}
 			}
 		}
 
@@ -462,9 +474,12 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			if validations, err := td.extractEmbeddedValidations(eachValTag, memb.CommentLines, childType.Elem); err != nil {
 				return fmt.Errorf("%v: %w", childPath.Key("vals"), err)
 			} else {
-				if len(validations) > 0 {
-					klog.V(5).InfoS("found list-validations", "n", len(validations))
+				if !validations.Empty() {
+					klog.V(5).InfoS("found list-validations", "n", validations.Len())
 					child.elemValidations = validations
+					if len(validations.Variables) > 0 {
+						return fmt.Errorf("variable generation not supported for field-attached validations, but validations on %s require variable generation", childPath.String())
+					}
 				}
 			}
 		case types.Map:
@@ -473,9 +488,12 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			if validations, err := td.extractEmbeddedValidations(eachKeyTag, memb.CommentLines, childType.Key); err != nil {
 				return fmt.Errorf("%v: %w", childPath.Key("keys"), err)
 			} else {
-				if len(validations) > 0 {
-					klog.V(5).InfoS("found key-validations", "n", len(validations))
+				if !validations.Empty() {
+					klog.V(5).InfoS("found key-validations", "n", validations.Len())
 					child.keyValidations = validations
+					if len(validations.Variables) > 0 {
+						return fmt.Errorf("variable generation not supported for field-attached validations, but validations on %s require variable generation", childPath.String())
+					}
 				}
 			}
 			// Extract any embedded val-validation rules.
@@ -483,9 +501,12 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			if validations, err := td.extractEmbeddedValidations(eachValTag, memb.CommentLines, childType.Elem); err != nil {
 				return fmt.Errorf("%v: %w", childPath.Key("vals"), err)
 			} else {
-				if len(validations) > 0 {
-					klog.V(5).InfoS("found list-validations", "n", len(validations))
+				if !validations.Empty() {
+					klog.V(5).InfoS("found list-validations", "n", validations.Len())
 					child.elemValidations = validations
+					if len(validations.Variables) > 0 {
+						return fmt.Errorf("variable generation not supported for field-attached validations, but validations on %s require variable generation", childPath.String())
+					}
 				}
 			}
 		}
@@ -543,8 +564,8 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 		if validations, err := td.extractEmbeddedValidations(eachValTag, thisNode.valueType.CommentLines, underlying); err != nil {
 			return fmt.Errorf("%v: %w", fldPath.Key("vals"), err)
 		} else {
-			if len(validations) > 0 {
-				klog.V(5).InfoS("found list-validations", "n", len(validations))
+			if !validations.Empty() {
+				klog.V(5).InfoS("found list-validations", "n", validations.Len())
 				child.elemValidations = validations
 			}
 		}
@@ -554,8 +575,8 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 		if validations, err := td.extractEmbeddedValidations(eachKeyTag, thisNode.valueType.CommentLines, underlying); err != nil {
 			return fmt.Errorf("%v: %w", fldPath.Key("keys"), err)
 		} else {
-			if len(validations) > 0 {
-				klog.V(5).InfoS("found key-validations", "n", len(validations))
+			if !validations.Empty() {
+				klog.V(5).InfoS("found key-validations", "n", validations.Len())
 				child.keyValidations = validations
 			}
 		}
@@ -564,8 +585,8 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 		if validations, err := td.extractEmbeddedValidations(eachValTag, thisNode.valueType.CommentLines, underlying); err != nil {
 			return fmt.Errorf("%v: %w", fldPath.Key("vals"), err)
 		} else {
-			if len(validations) > 0 {
-				klog.V(5).InfoS("found val-validations", "n", len(validations))
+			if !validations.Empty() {
+				klog.V(5).InfoS("found val-validations", "n", validations.Len())
 				child.elemValidations = validations
 			}
 		}
@@ -574,15 +595,15 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 	return nil
 }
 
-func (td *typeDiscoverer) extractEmbeddedValidations(tag string, comments []string, t *types.Type) ([]validators.FunctionGen, error) {
-	var result []validators.FunctionGen
+func (td *typeDiscoverer) extractEmbeddedValidations(tag string, comments []string, t *types.Type) (validators.ValidatorGen, error) {
+	var result validators.ValidatorGen
 	if tagVals, found := gengo.ExtractCommentTags("+", comments)[tag]; found {
 		for _, tagVal := range tagVals {
 			fakeComments := []string{tagVal}
 			if validations, err := td.validator.ExtractValidations(t, fakeComments); err != nil {
-				return nil, err
+				return result, err
 			} else {
-				result = append(result, validations...)
+				result.Add(validations)
 			}
 		}
 	}
@@ -700,9 +721,9 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 	didSome := false // for prettier output later
 
 	// Emit code for type-attached validations.
-	if validations := thisNode.typeValidations; len(validations) > 0 {
+	if validations := thisNode.typeValidations; !validations.Empty() {
 		sw.Do("// type $.inType|raw$\n", targs)
-		emitCallsToValidators(c, validations, objIsPtr, sw)
+		emitCallsToValidators(c, validations.Functions, objIsPtr, sw)
 		sw.Do("\n", nil)
 		didSome = true
 	}
@@ -733,7 +754,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			bufsw := sw.Dup(buf)
 
 			validations := fld.fieldValidations
-			if len(validations) > 0 {
+			if !validations.Empty() {
 				// When calling registered validators, we always pass the
 				// underlying value-type.  E.g. if the field's type is string,
 				// we pass string, and if the field's type is *string, we also
@@ -742,7 +763,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 				// means that large structs will be passed by value.  If this
 				// turns out to be a real problem, we could change this to pass
 				// everything by pointer.
-				emitCallsToValidators(c, validations, childIsPtr, bufsw)
+				emitCallsToValidators(c, validations.Functions, childIsPtr, bufsw)
 			}
 
 			// Get to the real type.
@@ -762,7 +783,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 
 			if buf.Len() > 0 {
 				if len(fld.jsonName) == 0 {
-					panic(fmt.Sprintf("missing JSON name for field %s.%s", fld.node.valueType, fld.name))
+					continue // TODO: Embedded (inline) types are expected to be unnamed.
 				}
 
 				if didSome {
@@ -797,8 +818,8 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 
 		// Validate each value.
 		validations := thisNode.elemValidations
-		validations = append(validations, thisChild.elemValidations...)
-		if len(validations) > 0 {
+		validations.Add(thisChild.elemValidations)
+		if !validations.Empty() {
 			// When calling registered validators, we always pass the
 			// underlying value-type.  E.g. if the field's type is string,
 			// we pass string, and if the field's type is *string, we also
@@ -807,7 +828,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			// means that large structs will be passed by value.  If this
 			// turns out to be a real problem, we could change this to pass
 			// everything by pointer.
-			emitCallsToValidators(c, validations, elemIsPtr, elemSW)
+			emitCallsToValidators(c, validations.Functions, elemIsPtr, elemSW)
 		}
 
 		switch thisNode.elem.node.valueType.Kind {
@@ -856,8 +877,8 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 
 		// Validate each key.
 		keyValidations := thisNode.keyValidations
-		keyValidations = append(keyValidations, thisChild.keyValidations...)
-		if len(keyValidations) > 0 {
+		keyValidations.Add(thisChild.keyValidations)
+		if !keyValidations.Empty() {
 			// When calling registered validators, we always pass the
 			// underlying value-type.  E.g. if the field's type is string,
 			// we pass string, and if the field's type is *string, we also
@@ -866,7 +887,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			// means that large structs will be passed by value.  If this
 			// turns out to be a real problem, we could change this to pass
 			// everything by pointer.
-			emitCallsToValidators(c, keyValidations, keyIsPtr, keySW)
+			emitCallsToValidators(c, keyValidations.Functions, keyIsPtr, keySW)
 		}
 
 		switch thisNode.key.node.valueType.Kind {
@@ -887,8 +908,8 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 
 		// Validate each value.
 		valValidations := thisNode.elemValidations
-		valValidations = append(valValidations, thisChild.elemValidations...)
-		if len(valValidations) > 0 {
+		valValidations.Add(thisChild.elemValidations)
+		if !valValidations.Empty() {
 			// When calling registered validators, we always pass the
 			// underlying value-type.  E.g. if the field's type is string,
 			// we pass string, and if the field's type is *string, we also
@@ -897,7 +918,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			// means that large structs will be passed by value.  If this
 			// turns out to be a real problem, we could change this to pass
 			// everything by pointer.
-			emitCallsToValidators(c, valValidations, valIsPtr, valSW)
+			emitCallsToValidators(c, valValidations.Functions, valIsPtr, valSW)
 		}
 
 		switch thisNode.elem.node.valueType.Kind {
@@ -1042,9 +1063,22 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 		}
 
 		emitCall := func() {
-			sw.Do("$.funcName|raw$(fldPath, $.deref$obj", targs)
+			sw.Do("$.funcName|raw$", targs)
+			typeArgs := v.TypeArgs()
+			if len(typeArgs) > 0 {
+				sw.Do("[", nil)
+				for i, typeArg := range typeArgs {
+					sw.Do("$.|raw$", c.Universe.Type(typeArg))
+					if i < len(typeArgs)-1 {
+						sw.Do(",", nil)
+					}
+				}
+				sw.Do("]", nil)
+			}
+			sw.Do("(fldPath, $.deref$obj", targs)
 			for _, arg := range extraArgs {
-				sw.Do(", "+toGolangSourceDataLiteral(arg), nil)
+				sw.Do(", ", nil)
+				toGolangSourceDataLiteral(sw, c, arg)
 			}
 			sw.Do(")", targs)
 		}
@@ -1067,21 +1101,96 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 	}
 }
 
-func toGolangSourceDataLiteral(value any) string {
+// emitValidationVariables emits a list of variable declarations. Each variable declaration has a
+// private (unexported) variable name, and a function invocation declaration that is expected
+// to initialize the value of the variable.
+func (g *genValidations) emitValidationVariables(c *generator.Context, t *types.Type, sw *generator.SnippetWriter) {
+	tn := g.discovered.typeNodes[t]
+
+	variables := tn.typeValidations.Variables
+	slices.SortFunc(variables, func(a, b validators.VariableGen) int {
+		return cmp.Compare(a.Var().Name, b.Var().Name)
+	})
+	for _, variable := range variables {
+		supportInitFn, supportInitArgs := variable.Init().SignatureAndArgs()
+		targs := generator.Args{
+			"varName": c.Universe.Type(types.Name(variable.Var())),
+			"initFn":  c.Universe.Type(supportInitFn),
+		}
+		sw.Do("var $.varName|private$ = $.initFn|raw$", targs)
+		typeArgs := variable.Init().TypeArgs()
+		if len(typeArgs) > 0 {
+			sw.Do("[", nil)
+			for i, typeArg := range typeArgs {
+				sw.Do("$.|raw$", c.Universe.Type(typeArg))
+				if i < len(typeArgs)-1 {
+					sw.Do(",", nil)
+				}
+			}
+			sw.Do("]", nil)
+		}
+		sw.Do("(", targs)
+		for i, arg := range supportInitArgs {
+			toGolangSourceDataLiteral(sw, c, arg)
+			if i < len(supportInitArgs)-1 {
+				sw.Do(", ", nil)
+			}
+		}
+		sw.Do(")\n", nil)
+
+	}
+}
+
+func toGolangSourceDataLiteral(sw *generator.SnippetWriter, c *generator.Context, value any) {
 	// For safety, be strict in what values we output to visited source, and ensure strings
 	// are quoted.
-	switch value.(type) {
-	case uint, uint8, uint16, uint32, uint64, int8, int16, int32, int64, float32, float64, bool:
-		return fmt.Sprintf("%v", value)
+
+	switch v := value.(type) {
+	case uint, uint8, uint16, uint32, uint64, int, int8, int16, int32, int64, float32, float64, bool:
+		sw.Do(fmt.Sprintf("%v", value), nil)
 	case string:
 		// If the incoming string was quoted, we still do it ourselves, JIC.
 		str := value.(string)
 		if s, err := strconv.Unquote(str); err == nil {
 			str = s
 		}
-		return fmt.Sprintf("%q", str)
+		sw.Do(fmt.Sprintf("%q", str), nil)
+	case *types.Type:
+		sw.Do("$.|raw$", v)
+	case types.Member:
+		sw.Do("obj."+v.Name, nil)
+	case validators.PrivateVar:
+		sw.Do("$.|private$", c.Universe.Type(types.Name(v)))
+	case *validators.PrivateVar:
+		sw.Do("$.|private$", c.Universe.Type(types.Name(*v)))
+	default:
+		rv := reflect.ValueOf(value)
+		switch rv.Kind() {
+		case reflect.Slice, reflect.Array:
+			arraySize := ""
+			if rv.Kind() == reflect.Array {
+				arraySize = strconv.Itoa(rv.Len())
+			}
+			var itemType string
+			switch rv.Type().Elem().Kind() {
+			case reflect.String: // For now, only support lists of strings.
+				itemType = rv.Type().Elem().Name()
+			default:
+				panic(fmt.Sprintf("Unsupported extraArg type: %T", value))
+			}
+			rv.Type().Elem()
+			sw.Do("[$.arraySize$]$.itemType${", map[string]string{"arraySize": arraySize, "itemType": itemType})
+			for i := 0; i < rv.Len(); i++ {
+				val := rv.Index(i)
+				toGolangSourceDataLiteral(sw, c, val.Interface())
+				if i < rv.Len()-1 {
+					sw.Do(", ", nil)
+				}
+			}
+			sw.Do("}", nil)
+		default:
+			// TODO: check this during discovery and emit an error with more useful information
+			panic(fmt.Sprintf("Unsupported extraArg type: %T", value))
+		}
 	}
-	// TODO: check this during discovery and emit an error with more useful information
-	klog.Fatalf("unsupported extraArg type: %T", value)
-	return ""
 }

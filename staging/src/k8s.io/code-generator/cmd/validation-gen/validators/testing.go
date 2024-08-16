@@ -19,6 +19,7 @@ package validators
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
@@ -56,6 +57,7 @@ const (
 	//   {
 	//     "flags": <list-of-string>  # optional: "PtrOK" or "IsFatal"
 	//     "msg":   <string>          # required
+	//     "typeArg" <string>         # optional. If set, binds the type arg. Example: "time.Duration"
 	//   }
 	validateTrueTagName  = "validateTrue"  // TODO: also support k8s:...
 	validateFalseTagName = "validateFalse" // TODO: also support k8s:...
@@ -68,52 +70,59 @@ var (
 	fixedResultValidator = types.Name{Package: libValidationPkg, Name: "FixedResult"}
 )
 
-func (v fixedResultDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error) {
-	var result []FunctionGen
+func (v fixedResultDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (ValidatorGen, error) {
+	var result ValidatorGen
 
 	if v.result {
 		vals := gengo.ExtractCommentTags("+", comments)[validateTrueTagName]
 		for _, val := range vals {
-			flags, msg, err := v.parseTagVal(val)
+			tag, err := v.parseTagVal(val)
 			if err != nil {
-				return nil, fmt.Errorf("can't extract +%s tag: %w", validateTrueTagName, err)
+				return result, fmt.Errorf("can't extract +%s tag: %w", validateTrueTagName, err)
 			}
-			result = append(result, Function(validateTrueTagName, flags, fixedResultValidator, true, msg))
+			result.AddFunction(GenericFunction(validateTrueTagName, tag.flags, fixedResultValidator, tag.typeArgs, true, tag.msg))
 		}
 	} else {
 		vals := gengo.ExtractCommentTags("+", comments)[validateFalseTagName]
 		for _, val := range vals {
-			flags, msg, err := v.parseTagVal(val)
+			tag, err := v.parseTagVal(val)
 			if err != nil {
-				return nil, fmt.Errorf("can't extract +%s tag: %w", validateFalseTagName, err)
+				return result, fmt.Errorf("can't extract +%s tag: %w", validateFalseTagName, err)
 			}
-			result = append(result, Function(validateFalseTagName, flags, fixedResultValidator, false, msg))
+			result.AddFunction(GenericFunction(validateFalseTagName, tag.flags, fixedResultValidator, tag.typeArgs, false, tag.msg))
 		}
 	}
 
 	return result, nil
 }
 
-func (_ fixedResultDeclarativeValidator) parseTagVal(in string) (FunctionFlags, string, error) {
+type tagVal struct {
+	flags    FunctionFlags
+	msg      string
+	typeArgs []types.Name
+}
+
+func (_ fixedResultDeclarativeValidator) parseTagVal(in string) (tagVal, error) {
 	type payload struct {
-		Flags []string `json:"flags"`
-		Msg   string   `json:"msg"`
+		Flags   []string `json:"flags"`
+		Msg     string   `json:"msg"`
+		TypeArg string   `json:"type_arg,omitempty"`
 	}
 	// We expect either a string (maybe empty) or a JSON object.
 	if len(in) == 0 {
-		return 0, "", nil
+		return tagVal{}, nil
 	}
 	var pl payload
 	if err := json.Unmarshal([]byte(in), &pl); err != nil {
 		s := ""
 		if err := json.Unmarshal([]byte(in), &s); err != nil {
-			return 0, "", fmt.Errorf("error parsing JSON value: %v (%q)", err, in)
+			return tagVal{}, fmt.Errorf("error parsing JSON value: %v (%q)", err, in)
 		}
-		return 0, s, nil
+		return tagVal{msg: s}, nil
 	}
 	// The msg field is required in JSON mode.
 	if pl.Msg == "" {
-		return 0, "", fmt.Errorf("JSON msg is required")
+		return tagVal{}, fmt.Errorf("JSON msg is required")
 	}
 	var flags FunctionFlags
 	for _, fl := range pl.Flags {
@@ -123,17 +132,30 @@ func (_ fixedResultDeclarativeValidator) parseTagVal(in string) (FunctionFlags, 
 		case "PtrOK":
 			flags |= PtrOK
 		default:
-			return 0, "", fmt.Errorf("unknown flag: %q", fl)
+			return tagVal{}, fmt.Errorf("unknown flag: %q", fl)
 		}
 	}
+	var typeArgs []types.Name
+	if len(pl.TypeArg) > 0 {
+		index := strings.LastIndex(pl.TypeArg, ".")
+		var pkg, name string
+		if index <= 0 {
+			name = pl.TypeArg
+		} else {
+			pkg = pl.TypeArg[0:index]
+			name = pl.TypeArg[index+1:]
+		}
+		typeArgs = []types.Name{{Package: pkg, Name: name}}
+	}
 
-	return flags, pl.Msg, nil
+	return tagVal{flags, pl.Msg, typeArgs}, nil
 }
 
-func (v errorDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error) {
+func (v errorDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (ValidatorGen, error) {
+	var result ValidatorGen
 	vals, found := gengo.ExtractCommentTags("+", comments)[validateErrorTagName]
 	if found {
-		return nil, fmt.Errorf("forced error: %q", vals)
+		return result, fmt.Errorf("forced error: %q", vals)
 	}
-	return nil, nil
+	return result, nil
 }

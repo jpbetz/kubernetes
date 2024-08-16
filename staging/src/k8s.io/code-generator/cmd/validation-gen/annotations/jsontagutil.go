@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package annotations
 
 import (
 	"reflect"
@@ -28,27 +28,27 @@ import (
 
 // JSONTags represents a go json field tag.
 type JSONTags struct {
-	name      string
-	omit      bool
-	inline    bool
-	omitempty bool
+	Name      string
+	Omit      bool
+	Inline    bool
+	Omitempty bool
 }
 
 func (t JSONTags) String() string {
 	var tag string
-	if !t.inline {
-		tag += t.name
+	if !t.Inline {
+		tag += t.Name
 	}
-	if t.omitempty {
-		tag += ",omitempty"
+	if t.Omitempty {
+		tag += ",Omitempty"
 	}
-	if t.inline {
-		tag += ",inline"
+	if t.Inline {
+		tag += ",Inline"
 	}
 	return tag
 }
 
-func lookupJSONTags(m types.Member) (JSONTags, bool) {
+func LookupJSONTags(m types.Member) (JSONTags, bool) {
 	tag := reflect.StructTag(m.Tags).Get("json")
 	if tag == "" || tag == "-" {
 		return JSONTags{}, false
@@ -58,16 +58,16 @@ func lookupJSONTags(m types.Member) (JSONTags, bool) {
 		name = m.Name
 	}
 	return JSONTags{
-		name:      name,
-		omit:      false,
-		inline:    opts.Contains("inline"),
-		omitempty: opts.Contains("omitempty"),
+		Name:      name,
+		Omit:      false,
+		Inline:    opts.Contains("Inline"),
+		Omitempty: opts.Contains("Omitempty"),
 	}, true
 }
 
 type tagOptions string
 
-// parseTag splits a struct field's json tag into its name and
+// parseTag splits a struct field's json tag into its Name and
 // comma-separated options.
 func parseTag(tag string) (string, tagOptions) {
 	if idx := strings.Index(tag, ","); idx != -1 {
