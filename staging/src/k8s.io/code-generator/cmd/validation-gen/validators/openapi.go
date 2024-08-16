@@ -33,7 +33,7 @@ func InitOpenAPIDeclarativeValidator(c *generator.Context) DeclarativeValidator 
 type openAPIDeclarativeValidator struct{}
 
 const (
-	markerPrefix     = "+k8s:validation:"
+	markerPrefix     = "k8s:validation:"
 	formatTagName    = markerPrefix + ":format"
 	maxLengthTagName = markerPrefix + ":maxLength"
 )
@@ -47,7 +47,7 @@ var (
 func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
 	var result Validations
 	// Leverage the kube-openapi parser for 'k8s:validation:' validations.
-	schema, err := generators.ParseCommentTags(t, comments, markerPrefix)
+	schema, err := generators.ParseCommentTags(t, comments, "+"+markerPrefix)
 	if err != nil {
 		return result, err
 	}
@@ -62,6 +62,29 @@ func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []
 	}
 
 	return result, nil
+}
+
+func (openAPIDeclarativeValidator) Docs() []TagDoc {
+	return []TagDoc{{
+		Tag:         formatTagName,
+		Description: "Indicates that a string field has a particular format.",
+		Contexts:    []TagContext{TagContextType, TagContextField},
+		Payloads: []TagPayload{{
+			Description: "ip",
+			Docs:        "This field holds an IP address value, either IPv4 or IPv6.",
+		}, {
+			Description: "dns-label",
+			Docs:        "This field holds a DNS label value.",
+		}},
+	}, {
+		Tag:         maxLengthTagName,
+		Description: "Indicates that a string field has a limit on its length.",
+		Contexts:    []TagContext{TagContextType, TagContextField},
+		Payloads: []TagPayload{{
+			Description: "<non-negative integer>",
+			Docs:        "This field must be no more than X characters long.",
+		}},
+	}}
 }
 
 func FormatValidationFunction(format string) FunctionGen {

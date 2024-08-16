@@ -47,3 +47,11 @@ func (requiredDeclarativeValidator) ExtractValidations(t *types.Type, comments [
 	}
 	return Validations{Functions: []FunctionGen{Function(requiredTagName, IsFatal|PtrOK, requiredValidator)}}, nil
 }
+
+func (requiredDeclarativeValidator) Docs() []TagDoc {
+	return []TagDoc{{
+		Tag:         requiredTagName,
+		Description: "Indicates that a field is required to be specified.",
+		Contexts:    []TagContext{TagContextType, TagContextField},
+	}}
+}

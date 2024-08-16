@@ -82,3 +82,11 @@ func (c *compositeValidator) allow(tagName string) bool {
 
 	return len(c.enabledTags) == 0 || c.enabledTags.Has(tagName)
 }
+
+func (c *compositeValidator) Docs() []TagDoc {
+	var result []TagDoc
+	for _, v := range c.validators {
+		result = append(result, v.Docs()...)
+	}
+	return result
+}
