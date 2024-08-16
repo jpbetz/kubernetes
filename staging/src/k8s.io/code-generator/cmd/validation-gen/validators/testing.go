@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/lithammer/dedent"
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
@@ -96,6 +97,50 @@ func (v fixedResultDeclarativeValidator) ExtractValidations(t *types.Type, comme
 	return result, nil
 }
 
+func (v fixedResultDeclarativeValidator) Docs() []TagDoc {
+	if v.result {
+		return []TagDoc{{
+			Tag:         validateTrueTagName,
+			Description: "Always passes validation (useful for testing).",
+			Contexts:    []TagContext{TagContextType, TagContextField},
+			Payloads: []TagPayload{{
+				Description: "<none>",
+				Docs:        "The generated code will have no arguments.",
+			}, {
+				Description: "<quoted-string>",
+				Docs:        "The generated code will include this string.",
+			}, {
+				Description: "<json-object>",
+				Docs: dedent.Dedent(`
+				Schema:
+				  "flags": <list-of-string>  # optional: "PtrOK" or "IsFatal"
+				  "msg":   <string>          # the generated code will include this string"
+			`),
+			}},
+		}}
+	} else {
+		return []TagDoc{{
+			Tag:         validateFalseTagName,
+			Description: "Always fails validation (useful for testing).",
+			Contexts:    []TagContext{TagContextType, TagContextField},
+			Payloads: []TagPayload{{
+				Description: "<none>",
+				Docs:        "The generated code will have no arguments.",
+			}, {
+				Description: "<quoted-string>",
+				Docs:        "The generated code will include this string.",
+			}, {
+				Description: "<json-object>",
+				Docs: dedent.Dedent(`
+				Schema:
+				  "flags": <list-of-string>  # optional: "PtrOK" or "IsFatal"
+				  "msg":   <string>          # the generated code will include this string"
+			`),
+			}},
+		}}
+	}
+}
+
 type tagVal struct {
 	flags    FunctionFlags
 	msg      string
@@ -158,4 +203,16 @@ func (v errorDeclarativeValidator) ExtractValidations(t *types.Type, comments []
 		return result, fmt.Errorf("forced error: %q", vals)
 	}
 	return result, nil
+}
+
+func (errorDeclarativeValidator) Docs() []TagDoc {
+	return []TagDoc{{
+		Tag:         validateErrorTagName,
+		Description: "Always fails code generation (useful for testing).",
+		Contexts:    []TagContext{TagContextType, TagContextField},
+		Payloads: []TagPayload{{
+			Description: "<string>",
+			Docs:        "This string will be included in the error message.",
+		}},
+	}}
 }

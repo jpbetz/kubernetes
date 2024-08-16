@@ -298,6 +298,27 @@ const (
 	eachValTag = "eachVal"
 )
 
+// builtinTagDocs returns information about the hard-coded tags.
+func builtinTagDocs() []validators.TagDoc {
+	return []validators.TagDoc{{
+		Tag:         eachKeyTag,
+		Description: "Declares a validation for map keys.",
+		Contexts:    []validators.TagContext{validators.TagContextType, validators.TagContextField},
+		Payloads: []validators.TagPayload{{
+			Description: "<validation-tag>",
+			Docs:        "This tag will be evaluated for each key of a map.",
+		}},
+	}, {
+		Tag:         eachValTag,
+		Description: "Declares a validation for map and slice values.",
+		Contexts:    []validators.TagContext{validators.TagContextType, validators.TagContextField},
+		Payloads: []validators.TagPayload{{
+			Description: "<validation-tag>",
+			Docs:        "This tag will be evaluated for each value of a map or slice.",
+		}},
+	}}
+}
+
 // DiscoverType walks the given type recursively, building a type-graph in this
 // typeDiscoverer.  If this is called multiple times for different types, the
 // multiple graphs will be stored, and where types overlap, they will be

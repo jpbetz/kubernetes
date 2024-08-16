@@ -72,6 +72,10 @@
 - "inner" validation
 - Generator unit tests need updating
 - How to handle feature gates and options structs
+- rename or eliminate the peer-dirs flag
+
+
+Later:
 - Try to link typedef-of-typedef to chain validations?
   ```
   Get pos in walkType

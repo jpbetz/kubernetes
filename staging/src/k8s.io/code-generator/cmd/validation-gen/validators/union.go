@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/lithammer/dedent"
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/parser/tags"
@@ -182,4 +183,31 @@ func (c *unionDeclarativeValidator) ExtractValidations(t *types.Type, comments [
 	}
 
 	return result, nil
+}
+
+func (unionDeclarativeValidator) Docs() []TagDoc {
+	return []TagDoc{{
+		Tag:         discriminatorTagName,
+		Description: "Indicates that this field is the discriminator for a union.",
+		Contexts:    []TagContext{TagContextField},
+		Payloads: []TagPayload{{
+			Description: "<json-object>",
+			Docs: dedent.Dedent(`
+                Schema:
+                  "union": <string>  # optional: the name of the union, if more than one exists
+            `),
+		}},
+	}, {
+		Tag:         memberTagName,
+		Description: "Indicates that this field is a member of a union.",
+		Contexts:    []TagContext{TagContextField},
+		Payloads: []TagPayload{{
+			Description: "<json-object>",
+			Docs: dedent.Dedent(`
+                Schema:
+                  "union": <string>       # optional: the name of the union, if more than one exists
+                  "memberName": <string>  # optional: the discriminator value for this member, default is the field name
+            `),
+		}},
+	}}
 }

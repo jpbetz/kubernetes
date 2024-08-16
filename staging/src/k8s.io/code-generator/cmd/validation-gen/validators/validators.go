@@ -26,6 +26,10 @@ type DeclarativeValidator interface {
 	// ExtractValidations returns a Validations for the validation this DeclarativeValidator
 	// supports for the given go type, and it's corresponding comment strings.
 	ExtractValidations(t *types.Type, comments []string) (Validations, error)
+
+	// Docs returns user-friendly documentation for all of the tags that this
+	// validator supports.
+	Docs() []TagDoc
 }
 
 // Validations defines the function calls and variables to generate to perform validation.
@@ -185,4 +189,38 @@ func (v variableGen) Var() PrivateVar {
 
 func (v variableGen) Init() FunctionGen {
 	return v.init
+}
+
+// TagDoc describes a comment-tag and its usage.
+type TagDoc struct {
+	// Tag is the tag name, without the leading '+'.
+	Tag string
+	// Description is a short description of this tag's purpose.
+	Description string
+	// Contexts lists the place or places this tag may be used.  Tags used in
+	// the wrong context may or may not cause errors.
+	Contexts []TagContext
+	// Payloads lists zero or more varieties of value for this tag. If this tag
+	// never has a payload, this list should be empty, but if the payload is
+	// optional, this list should include an entry for "<none>".
+	Payloads []TagPayload
+}
+
+// TagContext describes where a tag may be attached.
+type TagContext string
+
+const (
+	// TagContextType indicates that a tag may be attached to a type
+	// definition.
+	TagContextType TagContext = "Type"
+	// TagContextField indicates that a tag may be attached to a struct
+	// field, the keys of a map, or the values of a map or slice.
+	TagContextField TagContext = "Field"
+)
+
+// TagPayload describes a value for a tag (e.g `+tagName=tagValue`).  Some
+// tags upport multiple payloads, including <none> (e.g. `+tagName`).
+type TagPayload struct {
+	Description string
+	Docs        string
 }

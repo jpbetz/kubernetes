@@ -49,6 +49,15 @@ func (c *enumDeclarativeValidator) ExtractValidations(t *types.Type, comments []
 	return result, nil
 }
 
+func (enumDeclarativeValidator) Docs() []TagDoc {
+	return []TagDoc{{
+		Tag:         tagEnumType,
+		Description: "Indicates that a string type is an enum. All const values of this type are considered values in the enum.",
+		Contexts:    []TagContext{TagContextType},
+		Payloads:    nil,
+	}}
+}
+
 func (et *enumType) ValueArgs() []any {
 	var values []any
 	for _, value := range et.Symbols() {
