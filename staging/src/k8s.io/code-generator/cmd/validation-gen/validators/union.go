@@ -88,7 +88,8 @@ type union struct {
 	fieldMembers []any
 
 	// discriminator is the name of the discriminator field
-	discriminator       *string
+	discriminator *string
+	// discriminatorMember is the types.Member of the discriminator field.
 	discriminatorMember any
 }
 
