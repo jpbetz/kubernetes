@@ -19,7 +19,6 @@ package validators
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
@@ -54,25 +53,49 @@ const (
 	memberTagName        = "unionMember"
 )
 
+// discriminatorParams defines JSON the parameter value for the +unionDiscriminator tag.
 type discriminatorParams struct {
+	// Union sets the name of the union this discriminator belongs to.
+	// This is only needed for go structs that contain more than one union.
+	// Optional.
 	Union string `json:"union,omitempty"`
 }
 
+// memberParams defines the JSON parameter value for the +unionMember tag.
 type memberParams struct {
-	Union      string `json:"union,omitempty"`
+	// Union sets the name of the union this member belongs to.
+	// This is only needed for go structs that contain more than one union.
+	// Optional.
+	Union string `json:"union,omitempty"`
+	// MemberName provides a name for a union member. If the union has a
+	// discriminator, the member name must match the value the discriminator
+	// is set to when this member is specified.
+	// Optional.
+	// Defaults to the go field name.
 	MemberName string `json:"memberName,omitempty"`
 }
 
+// union defines how a union validation will be generated, based
+// on +unionMember and +unionDiscriminator tags found in a go struct.
 type union struct {
-	fields       []any
+	// fields provides field information about all the members of the union.
+	// Each slice element is a [2]string to provide a fieldName and memberName pair, where
+	// [0] identifies the field name and [1] identifies the union member Name.
+	// fields is index aligned with fieldMembers.
+	// If member name is not set, it defaults to the go struct field name.
+	fields []any
+	// fieldMembers is a list of types.Member for all the members of the union.
 	fieldMembers []any
 
+	// discriminator is the name of the discriminator field
 	discriminator       *string
 	discriminatorMember any
 }
 
+// unions represents all the unions for a go struct.
 type unions map[string]*union
 
+// getOrCreate gets a union by name, or initializes a new union by the given name.
 func (us unions) getOrCreate(name string) *union {
 	var u *union
 	var ok bool
@@ -85,45 +108,41 @@ func (us unions) getOrCreate(name string) *union {
 
 func (c *unionDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (ValidatorGen, error) {
 	result := ValidatorGen{}
-
-	// TODO: handle multiple unions
-	// This really only works if we name each union
-	// so the most obvious approach is to track data by union
 	unions := unions{}
-
 	for _, member := range t.Members {
 		commentTags := gengo.ExtractCommentTags("+", member.CommentLines)
-		if commentTags, ok := commentTags[memberTagName]; ok {
-			if len(commentTags) != 1 {
+		if commentTag, ok := commentTags[memberTagName]; ok {
+			if len(commentTag) != 1 {
 				return result, fmt.Errorf("must have one %q tag", memberTagName)
 			}
-			tag := commentTags[0]
+			tag := commentTag[0]
 			var fieldName string
-			if jsonAnnotation, ok := tags.LookupJSON(member); ok {
-				fieldName = jsonAnnotation.Name
-				if len(fieldName) > 0 {
-					p := &memberParams{MemberName: member.Name}
-					if len(tag) > 0 {
-						if err := json.Unmarshal([]byte(tag), &p); err != nil {
-							return result, fmt.Errorf("error parsing JSON value: %v (%q)", err, tag)
-						}
-					}
-					u := unions.getOrCreate(p.Union)
+			jsonTag, ok := tags.LookupJSON(member)
+			if !ok {
+				return result, fmt.Errorf("field %q is a union member but has no JSON struct field tag", member)
+			}
+			fieldName = jsonTag.Name
+			if len(fieldName) == 0 {
+				return result, fmt.Errorf("field %q is a union member but has no JSON name", member)
+			}
 
-					if fieldName == strings.ToLower(p.MemberName[:1])+p.MemberName[1:] {
-						u.fields = append(u.fields, fieldName) // member name follows conventions, only track field name
-					} else {
-						u.fields = append(u.fields, [2]string{fieldName, p.MemberName}) // member name is custom, track it
-					}
-					u.fieldMembers = append(u.fieldMembers, member)
+			p := &memberParams{MemberName: member.Name}
+			if len(tag) > 0 {
+				// Name may optionally be overridden by tag's memberName field.
+				if err := json.Unmarshal([]byte(tag), &p); err != nil {
+					return result, fmt.Errorf("error parsing JSON value: %v (%q)", err, tag)
 				}
 			}
+			u := unions.getOrCreate(p.Union)
+			u.fields = append(u.fields, [2]string{fieldName, p.MemberName})
+			u.fieldMembers = append(u.fieldMembers, member)
 		}
-		if commentTags, ok := commentTags[discriminatorTagName]; ok {
-			if len(commentTags) != 1 {
+
+		if commentTag, ok := commentTags[discriminatorTagName]; ok {
+			if len(commentTag) != 1 {
 				return result, fmt.Errorf("must have one %q tag", memberTagName)
 			}
-			tag := commentTags[0]
+			tag := commentTag[0]
 
 			p := &discriminatorParams{}
 			if len(tag) > 0 {
