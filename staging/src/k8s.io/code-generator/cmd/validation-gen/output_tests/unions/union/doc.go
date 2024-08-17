@@ -17,23 +17,39 @@ limitations under the License.
 // +k8s:validation-gen=TypeMeta
 
 // This is a test package.
-package type_args
+package union
 
-import "k8s.io/code-generator/cmd/validation-gen/output_tests/primitives"
+// Non-discriminated union
+type U struct {
+	TypeMeta int
 
-// Empty discriminated union
+	// +unionMember
+	M1 *M1 `json:"m1"`
+
+	// +unionMember
+	M2 *M2 `json:"m2"`
+
+	T1 *T1 `json:"t1"` // not part of the union
+}
+
+// +validateTrue="type M1"
+type M1 struct {
+	// +validateTrue="field M1.S"
+	S string `json:"s"`
+}
+
+// +validateTrue="type M2"
+type M2 struct {
+	// +validateTrue="field M2.S"
+	S string `json:"s"`
+}
+
+// +validateTrue="type T1"
 type T1 struct {
 	TypeMeta int
 
-	// +validateTrue={"type_arg": "k8s.io/code-generator/cmd/validation-gen/output_tests/primitives.T1", "msg": "T1.S1"}
-	S1 primitives.T1 `json:"s1"`
-
-	// +validateTrue={"type_arg": "k8s.io/code-generator/cmd/validation-gen/output_tests/type_args.E1", "msg": "T1.E1"}
-	E1 `json:"e1"`
-
-	// +validateTrue={"type_arg": "int", "msg": "T1.I1"}
-	I1 int `json:"i1"`
+	// +validateTrue="field T1.LS"
+	// +eachVal=+validateTrue="field T1.LS[*]"
+	// +eachVal=+required
+	LS []string `json:"ls"`
 }
-
-// +validateTrue={"msg": "T1.E1.E1"}
-type E1 string

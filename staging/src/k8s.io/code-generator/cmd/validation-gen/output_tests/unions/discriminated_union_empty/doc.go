@@ -17,23 +17,14 @@ limitations under the License.
 // +k8s:validation-gen=TypeMeta
 
 // This is a test package.
-package type_args
-
-import "k8s.io/code-generator/cmd/validation-gen/output_tests/primitives"
+package discriminated_union_empty
 
 // Empty discriminated union
-type T1 struct {
+type DU1 struct {
 	TypeMeta int
 
-	// +validateTrue={"type_arg": "k8s.io/code-generator/cmd/validation-gen/output_tests/primitives.T1", "msg": "T1.S1"}
-	S1 primitives.T1 `json:"s1"`
-
-	// +validateTrue={"type_arg": "k8s.io/code-generator/cmd/validation-gen/output_tests/type_args.E1", "msg": "T1.E1"}
-	E1 `json:"e1"`
-
-	// +validateTrue={"type_arg": "int", "msg": "T1.I1"}
-	I1 int `json:"i1"`
+	// +unionDiscriminator
+	D D `json:"d"`
 }
 
-// +validateTrue={"msg": "T1.E1.E1"}
-type E1 string
+type D string
