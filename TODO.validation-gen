@@ -104,3 +104,6 @@
                           out = u.Type(name)
                           if out.Kind != types.Unknown {
   ```
+- Exclude all fields that do not have a json struct tag with a name from validation.
+- Add a Doc() function to the validators interface so that we can declare and expose documentation about the available
+  validations.
