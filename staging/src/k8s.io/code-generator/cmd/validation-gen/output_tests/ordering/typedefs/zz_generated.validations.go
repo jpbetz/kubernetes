@@ -364,8 +364,8 @@ func Validate_EMultiple(obj *EMultiple, fldPath *field.Path) (errs field.ErrorLi
 	errs = append(errs, validate.FixedResult(fldPath, obj, true, "EMultiple, PtrOK 1")...)
 	errs = append(errs, validate.FixedResult(fldPath, obj, true, "EMultiple, PtrOK 2")...)
 	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "EMultiple, no flags 1")...)
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "E0, string payload")...)
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "EMultiple, no flags 1")...)
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "EMultiple, no flags 2")...)
 	}
 

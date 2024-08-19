@@ -1210,8 +1210,8 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 	errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple, PtrOK 1")...)
 	errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple, PtrOK 2")...)
 	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple, no flags 1")...)
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T0, string payload")...)
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple, no flags 1")...)
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple, no flags 2")...)
 	}
 
@@ -1238,8 +1238,8 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.S, PtrOK 1")...)
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.S, PtrOK 2")...)
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.S, no flags 1")...)
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T0, string payload")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.S, no flags 1")...)
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.S, no flags 2")...)
 			return
 		}(obj.S, fldPath.Child("s"))...)
@@ -1268,8 +1268,8 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.PS, PtrOK 1")...)
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.PS, PtrOK 2")...)
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple.PS, no flags 1")...)
 				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T0, string payload")...)
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple.PS, no flags 1")...)
 				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple.PS, no flags 2")...)
 			}
 			return
@@ -1296,8 +1296,8 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.T, PtrOK 1")...)
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.T, PtrOK 2")...)
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.T, no flags 1")...)
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T0, string payload")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.T, no flags 1")...)
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.T, no flags 2")...)
 			errs = append(errs, Validate_Tother(&obj, fldPath)...)
 			return
@@ -1327,8 +1327,8 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.PT, PtrOK 1")...)
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.PT, PtrOK 2")...)
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple.PT, no flags 1")...)
 				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T0, string payload")...)
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple.PT, no flags 1")...)
 				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple.PT, no flags 2")...)
 			}
 			if obj != nil {
