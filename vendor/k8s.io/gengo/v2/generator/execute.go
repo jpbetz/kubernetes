@@ -24,6 +24,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"golang.org/x/tools/imports"
 	"k8s.io/gengo/v2/namer"
@@ -53,6 +54,7 @@ type DefaultFileType struct {
 }
 
 func (ft DefaultFileType) AssembleFile(f *File, pathname string) error {
+	s := time.Now()
 	klog.V(5).Infof("Assembling file %q", pathname)
 
 	destFile, err := os.Create(pathname)
@@ -60,6 +62,8 @@ func (ft DefaultFileType) AssembleFile(f *File, pathname string) error {
 		return err
 	}
 	defer destFile.Close()
+	fmt.Printf("AssembleFile - %v create\n", time.Now().Sub(s))
+	s = time.Now()
 
 	b := &bytes.Buffer{}
 	et := NewErrorTracker(b)
@@ -67,15 +71,24 @@ func (ft DefaultFileType) AssembleFile(f *File, pathname string) error {
 	if et.Error() != nil {
 		return et.Error()
 	}
+	fmt.Printf("AssembleFile - %v assemble\n", time.Now().Sub(s))
+	s = time.Now()
 	if formatted, err := ft.Format(b.Bytes()); err != nil {
 		err = fmt.Errorf("unable to format file %q (%v)", pathname, err)
+		fmt.Printf("AssembleFile - %v format\n", time.Now().Sub(s))
+		s = time.Now()
 		// Write the file anyway, so they can see what's going wrong and fix the generator.
 		if _, err2 := destFile.Write(b.Bytes()); err2 != nil {
 			return err2
 		}
+		fmt.Printf("AssembleFile - %v write\n", time.Now().Sub(s))
+		s = time.Now()
 		return err
 	} else {
+		fmt.Printf("AssembleFile - %v format\n", time.Now().Sub(s))
+		s = time.Now()
 		_, err = destFile.Write(formatted)
+		fmt.Printf("AssembleFile - %v write\n", time.Now().Sub(s))
 		return err
 	}
 }
@@ -114,7 +127,13 @@ func assembleGoFile(w io.Writer, f *File) {
 }
 
 func importsWrapper(src []byte) ([]byte, error) {
-	return imports.Process("", src, nil)
+	opt := imports.Options{
+		Comments:   true,
+		TabIndent:  true,
+		TabWidth:   8,
+		FormatOnly: true,
+	}
+	return imports.Process("", src, &opt)
 }
 
 func NewGoFile() *DefaultFileType {
@@ -165,6 +184,12 @@ func (c *Context) addNameSystems(namers namer.NameSystems) *Context {
 
 // ExecuteTarget runs the generators for a single target.
 func (c *Context) ExecuteTarget(tgt Target) error {
+	start := time.Now()
+	defer func() {
+		if time.Now().Sub(start) > time.Millisecond*1 {
+			fmt.Printf("ExecuteTarget - %v %v\n", tgt.Name(), time.Now().Sub(start))
+		}
+	}()
 	tgtDir := tgt.Dir()
 	if tgtDir == "" {
 		return fmt.Errorf("no directory for target %s", tgt.Path())
@@ -239,6 +264,12 @@ func (c *Context) ExecuteTarget(tgt Target) error {
 		if !ok {
 			return fmt.Errorf("the file type %q registered for file %q does not exist in the context", f.FileType, f.Name)
 		}
+		start2 := time.Now()
+		defer func() {
+			if time.Now().Sub(start2) > time.Millisecond*1 {
+				fmt.Printf("AssembleFile - %v %v - %+#v\n", tgt.Name(), time.Now().Sub(start2), finalPath)
+			}
+		}()
 		if err := assembler.AssembleFile(f, finalPath); err != nil {
 			errs = append(errs, err)
 		}

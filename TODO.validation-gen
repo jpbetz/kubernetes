@@ -104,3 +104,5 @@
                           out = u.Type(name)
                           if out.Kind != types.Unknown {
   ```
+- Code formatting dominates code generation. Each execution has about 150ms overhead due to goimports execution.
+  https://github.com/kubernetes/kubernetes/commit/f63343f78a396615e09b15098c6b82f84178c08a provides some background on the problem.
