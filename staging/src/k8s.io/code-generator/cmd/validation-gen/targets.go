@@ -68,6 +68,7 @@ func NameSystems() namer.NameSystems {
 		"public":             namer.NewPublicNamer(1),
 		"raw":                namer.NewRawNamer("", nil),
 		"objectvalidationfn": validationFnNamer(),
+		"private":            namer.NewPrivateNamer(0),
 	}
 }
 

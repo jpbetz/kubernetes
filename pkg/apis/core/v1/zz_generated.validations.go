@@ -331,6 +331,19 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	return nil
 }
 
+var unionMembershipForAppArmorProfile = validate.NewDiscriminatedUnionMembership("type")
+
+func Validate_AppArmorProfile(obj *v1.AppArmorProfile, fldPath *field.Path) (errs field.ErrorList) {
+	// type v1.AppArmorProfile
+	if obj != nil {
+		errs = append(errs, validate.DiscriminatedUnion(fldPath, *obj, unionMembershipForAppArmorProfile, obj.Type)...)
+	}
+
+	// field v1.AppArmorProfile.Type has no validation
+	// field v1.AppArmorProfile.LocalhostProfile has no validation
+	return errs
+}
+
 func Validate_Binding(obj *v1.Binding, fldPath *field.Path) (errs field.ErrorList) {
 	// field v1.Binding.TypeMeta has no validation
 	// field v1.Binding.ObjectMeta has no validation
@@ -365,6 +378,43 @@ func Validate_ConfigMapList(obj *v1.ConfigMapList, fldPath *field.Path) (errs fi
 	// field v1.ConfigMapList.TypeMeta has no validation
 	// field v1.ConfigMapList.ListMeta has no validation
 	// field v1.ConfigMapList.Items has no validation
+	return errs
+}
+
+func Validate_Container(obj *v1.Container, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.Container.Name has no validation
+	// field v1.Container.Image has no validation
+	// field v1.Container.Command has no validation
+	// field v1.Container.Args has no validation
+	// field v1.Container.WorkingDir has no validation
+	// field v1.Container.Ports has no validation
+	// field v1.Container.EnvFrom has no validation
+	// field v1.Container.Env has no validation
+	// field v1.Container.Resources has no validation
+	// field v1.Container.ResizePolicy has no validation
+	// field v1.Container.RestartPolicy has no validation
+	// field v1.Container.VolumeMounts has no validation
+	// field v1.Container.VolumeDevices has no validation
+	// field v1.Container.LivenessProbe has no validation
+	// field v1.Container.ReadinessProbe has no validation
+	// field v1.Container.StartupProbe has no validation
+	// field v1.Container.Lifecycle has no validation
+	// field v1.Container.TerminationMessagePath has no validation
+	// field v1.Container.TerminationMessagePolicy has no validation
+	// field v1.Container.ImagePullPolicy has no validation
+
+	// field v1.Container.SecurityContext
+	errs = append(errs,
+		func(obj *v1.SecurityContext, fldPath *field.Path) (errs field.ErrorList) {
+			if obj != nil {
+				errs = append(errs, Validate_SecurityContext(obj, fldPath)...)
+			}
+			return
+		}(obj.SecurityContext, fldPath.Child("securityContext"))...)
+
+	// field v1.Container.Stdin has no validation
+	// field v1.Container.StdinOnce has no validation
+	// field v1.Container.TTY has no validation
 	return errs
 }
 
@@ -410,6 +460,48 @@ func Validate_EndpointsList(obj *v1.EndpointsList, fldPath *field.Path) (errs fi
 	// field v1.EndpointsList.TypeMeta has no validation
 	// field v1.EndpointsList.ListMeta has no validation
 	// field v1.EndpointsList.Items has no validation
+	return errs
+}
+
+func Validate_EphemeralContainer(obj *v1.EphemeralContainer, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.EphemeralContainer.TargetContainerName has no validation
+	return errs
+}
+
+func Validate_EphemeralContainerCommon(obj *v1.EphemeralContainerCommon, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.EphemeralContainerCommon.Name has no validation
+	// field v1.EphemeralContainerCommon.Image has no validation
+	// field v1.EphemeralContainerCommon.Command has no validation
+	// field v1.EphemeralContainerCommon.Args has no validation
+	// field v1.EphemeralContainerCommon.WorkingDir has no validation
+	// field v1.EphemeralContainerCommon.Ports has no validation
+	// field v1.EphemeralContainerCommon.EnvFrom has no validation
+	// field v1.EphemeralContainerCommon.Env has no validation
+	// field v1.EphemeralContainerCommon.Resources has no validation
+	// field v1.EphemeralContainerCommon.ResizePolicy has no validation
+	// field v1.EphemeralContainerCommon.RestartPolicy has no validation
+	// field v1.EphemeralContainerCommon.VolumeMounts has no validation
+	// field v1.EphemeralContainerCommon.VolumeDevices has no validation
+	// field v1.EphemeralContainerCommon.LivenessProbe has no validation
+	// field v1.EphemeralContainerCommon.ReadinessProbe has no validation
+	// field v1.EphemeralContainerCommon.StartupProbe has no validation
+	// field v1.EphemeralContainerCommon.Lifecycle has no validation
+	// field v1.EphemeralContainerCommon.TerminationMessagePath has no validation
+	// field v1.EphemeralContainerCommon.TerminationMessagePolicy has no validation
+	// field v1.EphemeralContainerCommon.ImagePullPolicy has no validation
+
+	// field v1.EphemeralContainerCommon.SecurityContext
+	errs = append(errs,
+		func(obj *v1.SecurityContext, fldPath *field.Path) (errs field.ErrorList) {
+			if obj != nil {
+				errs = append(errs, Validate_SecurityContext(obj, fldPath)...)
+			}
+			return
+		}(obj.SecurityContext, fldPath.Child("securityContext"))...)
+
+	// field v1.EphemeralContainerCommon.Stdin has no validation
+	// field v1.EphemeralContainerCommon.StdinOnce has no validation
+	// field v1.EphemeralContainerCommon.TTY has no validation
 	return errs
 }
 
@@ -658,6 +750,39 @@ func Validate_PodProxyOptions(obj *v1.PodProxyOptions, fldPath *field.Path) (err
 	return errs
 }
 
+func Validate_PodSecurityContext(obj *v1.PodSecurityContext, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodSecurityContext.SELinuxOptions has no validation
+	// field v1.PodSecurityContext.WindowsOptions has no validation
+	// field v1.PodSecurityContext.RunAsUser has no validation
+	// field v1.PodSecurityContext.RunAsGroup has no validation
+	// field v1.PodSecurityContext.RunAsNonRoot has no validation
+	// field v1.PodSecurityContext.SupplementalGroups has no validation
+	// field v1.PodSecurityContext.SupplementalGroupsPolicy has no validation
+	// field v1.PodSecurityContext.FSGroup has no validation
+	// field v1.PodSecurityContext.Sysctls has no validation
+	// field v1.PodSecurityContext.FSGroupChangePolicy has no validation
+
+	// field v1.PodSecurityContext.SeccompProfile
+	errs = append(errs,
+		func(obj *v1.SeccompProfile, fldPath *field.Path) (errs field.ErrorList) {
+			if obj != nil {
+				errs = append(errs, Validate_SeccompProfile(obj, fldPath)...)
+			}
+			return
+		}(obj.SeccompProfile, fldPath.Child("seccompProfile"))...)
+
+	// field v1.PodSecurityContext.AppArmorProfile
+	errs = append(errs,
+		func(obj *v1.AppArmorProfile, fldPath *field.Path) (errs field.ErrorList) {
+			if obj != nil {
+				errs = append(errs, Validate_AppArmorProfile(obj, fldPath)...)
+			}
+			return
+		}(obj.AppArmorProfile, fldPath.Child("appArmorProfile"))...)
+
+	return errs
+}
+
 func Validate_PodSpec(obj *v1.PodSpec, fldPath *field.Path) (errs field.ErrorList) {
 	// field v1.PodSpec.Volumes
 	errs = append(errs,
@@ -672,9 +797,45 @@ func Validate_PodSpec(obj *v1.PodSpec, fldPath *field.Path) (errs field.ErrorLis
 			return
 		}(obj.Volumes, fldPath.Child("volumes"))...)
 
-	// field v1.PodSpec.InitContainers has no validation
-	// field v1.PodSpec.Containers has no validation
-	// field v1.PodSpec.EphemeralContainers has no validation
+	// field v1.PodSpec.InitContainers
+	errs = append(errs,
+		func(obj []v1.Container, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj v1.Container, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Container(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.InitContainers, fldPath.Child("initContainers"))...)
+
+	// field v1.PodSpec.Containers
+	errs = append(errs,
+		func(obj []v1.Container, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj v1.Container, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Container(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Containers, fldPath.Child("containers"))...)
+
+	// field v1.PodSpec.EphemeralContainers
+	errs = append(errs,
+		func(obj []v1.EphemeralContainer, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj v1.EphemeralContainer, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_EphemeralContainer(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.EphemeralContainers, fldPath.Child("ephemeralContainers"))...)
+
 	// field v1.PodSpec.RestartPolicy has no validation
 	// field v1.PodSpec.TerminationGracePeriodSeconds has no validation
 	// field v1.PodSpec.ActiveDeadlineSeconds has no validation
@@ -688,7 +849,16 @@ func Validate_PodSpec(obj *v1.PodSpec, fldPath *field.Path) (errs field.ErrorLis
 	// field v1.PodSpec.HostPID has no validation
 	// field v1.PodSpec.HostIPC has no validation
 	// field v1.PodSpec.ShareProcessNamespace has no validation
-	// field v1.PodSpec.SecurityContext has no validation
+
+	// field v1.PodSpec.SecurityContext
+	errs = append(errs,
+		func(obj *v1.PodSecurityContext, fldPath *field.Path) (errs field.ErrorList) {
+			if obj != nil {
+				errs = append(errs, Validate_PodSecurityContext(obj, fldPath)...)
+			}
+			return
+		}(obj.SecurityContext, fldPath.Child("securityContext"))...)
+
 	// field v1.PodSpec.ImagePullSecrets has no validation
 	// field v1.PodSpec.Hostname has no validation
 	// field v1.PodSpec.Subdomain has no validation
@@ -961,6 +1131,19 @@ func Validate_ResourceStatus(obj *v1.ResourceStatus, fldPath *field.Path) (errs 
 	return errs
 }
 
+var unionMembershipForSeccompProfile = validate.NewDiscriminatedUnionMembership("type")
+
+func Validate_SeccompProfile(obj *v1.SeccompProfile, fldPath *field.Path) (errs field.ErrorList) {
+	// type v1.SeccompProfile
+	if obj != nil {
+		errs = append(errs, validate.DiscriminatedUnion(fldPath, *obj, unionMembershipForSeccompProfile, obj.Type)...)
+	}
+
+	// field v1.SeccompProfile.Type has no validation
+	// field v1.SeccompProfile.LocalhostProfile has no validation
+	return errs
+}
+
 func Validate_Secret(obj *v1.Secret, fldPath *field.Path) (errs field.ErrorList) {
 	// field v1.Secret.TypeMeta has no validation
 	// field v1.Secret.ObjectMeta has no validation
@@ -975,6 +1158,39 @@ func Validate_SecretList(obj *v1.SecretList, fldPath *field.Path) (errs field.Er
 	// field v1.SecretList.TypeMeta has no validation
 	// field v1.SecretList.ListMeta has no validation
 	// field v1.SecretList.Items has no validation
+	return errs
+}
+
+func Validate_SecurityContext(obj *v1.SecurityContext, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.SecurityContext.Capabilities has no validation
+	// field v1.SecurityContext.Privileged has no validation
+	// field v1.SecurityContext.SELinuxOptions has no validation
+	// field v1.SecurityContext.WindowsOptions has no validation
+	// field v1.SecurityContext.RunAsUser has no validation
+	// field v1.SecurityContext.RunAsGroup has no validation
+	// field v1.SecurityContext.RunAsNonRoot has no validation
+	// field v1.SecurityContext.ReadOnlyRootFilesystem has no validation
+	// field v1.SecurityContext.AllowPrivilegeEscalation has no validation
+	// field v1.SecurityContext.ProcMount has no validation
+
+	// field v1.SecurityContext.SeccompProfile
+	errs = append(errs,
+		func(obj *v1.SeccompProfile, fldPath *field.Path) (errs field.ErrorList) {
+			if obj != nil {
+				errs = append(errs, Validate_SeccompProfile(obj, fldPath)...)
+			}
+			return
+		}(obj.SeccompProfile, fldPath.Child("seccompProfile"))...)
+
+	// field v1.SecurityContext.AppArmorProfile
+	errs = append(errs,
+		func(obj *v1.AppArmorProfile, fldPath *field.Path) (errs field.ErrorList) {
+			if obj != nil {
+				errs = append(errs, Validate_AppArmorProfile(obj, fldPath)...)
+			}
+			return
+		}(obj.AppArmorProfile, fldPath.Child("appArmorProfile"))...)
+
 	return errs
 }
 

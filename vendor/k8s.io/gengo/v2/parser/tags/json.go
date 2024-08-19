@@ -14,7 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+// This is based on the highly efficient approach from https://golang.org/src/encoding/json/encode.go
+
+package tags
 
 import (
 	"reflect"
@@ -23,55 +25,54 @@ import (
 	"k8s.io/gengo/v2/types"
 )
 
-// TODO: This implements the same functionality as https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/apimachinery/pkg/runtime/converter.go#L236
-// but is based on the highly efficient approach from https://golang.org/src/encoding/json/encode.go
-
-// JSONTags represents a go json field tag.
-type JSONTags struct {
-	name      string
-	omit      bool
-	inline    bool
-	omitempty bool
+// JSON represents a go json field tag.
+type JSON struct {
+	Name      string
+	Omit      bool
+	Inline    bool
+	Omitempty bool
 }
 
-func (t JSONTags) String() string {
+func (t JSON) String() string {
 	var tag string
-	if !t.inline {
-		tag += t.name
+	if !t.Inline {
+		tag += t.Name
 	}
-	if t.omitempty {
+	if t.Omitempty {
 		tag += ",omitempty"
 	}
-	if t.inline {
+	if t.Inline {
 		tag += ",inline"
 	}
 	return tag
 }
 
-func lookupJSONTags(m types.Member) (JSONTags, bool) {
+func LookupJSON(m types.Member) (JSON, bool) {
 	tag := reflect.StructTag(m.Tags).Get("json")
-	if tag == "" || tag == "-" {
-		return JSONTags{}, false
+	if tag == "-" {
+		return JSON{Omit: true}, true
 	}
-	name, opts := parseTag(tag)
-	if name == "" {
+	name, opts := parse(tag)
+	inline := opts.Contains("inline")
+	omitempty := opts.Contains("omitempty")
+	if !inline && name == "" {
 		name = m.Name
 	}
-	return JSONTags{
-		name:      name,
-		omit:      false,
-		inline:    opts.Contains("inline"),
-		omitempty: opts.Contains("omitempty"),
+	return JSON{
+		Name:      name,
+		Omit:      false,
+		Inline:    inline,
+		Omitempty: omitempty,
 	}, true
 }
 
-type tagOptions string
+type options string
 
-// parseTag splits a struct field's json tag into its name and
+// parse splits a struct field's json tag into its Name and
 // comma-separated options.
-func parseTag(tag string) (string, tagOptions) {
+func parse(tag string) (string, options) {
 	if idx := strings.Index(tag, ","); idx != -1 {
-		return tag[:idx], tagOptions(tag[idx+1:])
+		return tag[:idx], options(tag[idx+1:])
 	}
 	return tag, ""
 }
@@ -79,7 +80,7 @@ func parseTag(tag string) (string, tagOptions) {
 // Contains reports whether a comma-separated listAlias of options
 // contains a particular substr flag. substr must be surrounded by a
 // string boundary or commas.
-func (o tagOptions) Contains(optionName string) bool {
+func (o options) Contains(optionName string) bool {
 	if len(o) == 0 {
 		return false
 	}

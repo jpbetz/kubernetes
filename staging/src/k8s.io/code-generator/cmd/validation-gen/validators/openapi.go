@@ -44,24 +44,24 @@ var (
 	maxLengthValidator = types.Name{Package: libValidationPkg, Name: "MaxLength"}
 )
 
-func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error) {
-	var v []FunctionGen
+func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
+	var result Validations
 	// Leverage the kube-openapi parser for 'k8s:validation:' validations.
 	schema, err := generators.ParseCommentTags(t, comments, markerPrefix)
 	if err != nil {
-		return nil, err
+		return result, err
 	}
 	if schema.MaxLength != nil {
-		v = append(v, Function(maxLengthTagName, DefaultFlags, maxLengthValidator, *schema.MaxLength))
+		result.AddFunction(Function(maxLengthTagName, DefaultFlags, maxLengthValidator, *schema.MaxLength))
 	}
 	if len(schema.Format) > 0 {
 		formatFunction := FormatValidationFunction(schema.Format)
 		if formatFunction != nil {
-			v = append(v, formatFunction)
+			result.AddFunction(formatFunction)
 		}
 	}
 
-	return v, nil
+	return result, nil
 }
 
 func FormatValidationFunction(format string) FunctionGen {
