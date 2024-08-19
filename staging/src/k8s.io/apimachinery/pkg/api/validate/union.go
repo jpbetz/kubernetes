@@ -85,14 +85,10 @@ func DiscriminatedUnion[T ~string](fldPath *field.Path, in any, union *UnionMemb
 		isSpecified := rv.IsValid() && !rv.IsZero()
 		if isSpecified && !isDiscriminatedMember {
 			errs = append(errs, field.Invalid(fldPath.Child(member.fieldName), "",
-				fmt.Sprintf("may only be specified when `%s` is %q",
-					fmt.Sprint(union.discriminatorName),
-					fmt.Sprint(discriminatorValue))))
+				fmt.Sprintf("may only be specified when `%s` is %q", union.discriminatorName, discriminatorValue)))
 		} else if !isSpecified && isDiscriminatedMember {
 			errs = append(errs, field.Invalid(fldPath.Child(member.fieldName), "",
-				fmt.Sprintf("may only be specified when `%s` is %q",
-					fmt.Sprint(union.discriminatorName),
-					fmt.Sprint(discriminatorValue))))
+				fmt.Sprintf("may only be specified when `%s` is %q", union.discriminatorName, discriminatorValue)))
 		}
 	}
 	return errs
@@ -114,20 +110,17 @@ type UnionMembership struct {
 // [0] identifies the field name and [1] identifies the union member Name.
 //
 // Field names must be unique.
-func NewUnionMembership(member ...any) *UnionMembership {
+func NewUnionMembership(member ...[2]string) *UnionMembership {
 	return NewDiscriminatedUnionMembership("", member...)
 }
 
 // NewDiscriminatedUnionMembership returns a new UnionMembership for the given discriminator field and list of members.
 // members are provided in the same way as for NewUnionMembership.
-func NewDiscriminatedUnionMembership(discriminatorFieldName string, members ...any) *UnionMembership {
+func NewDiscriminatedUnionMembership(discriminatorFieldName string, members ...[2]string) *UnionMembership {
 	u := &UnionMembership{}
 	u.discriminatorName = discriminatorFieldName
 	for _, fieldName := range members {
-		switch f := fieldName.(type) {
-		case [2]string:
-			u.members = append(u.members, member{fieldName: f[0], memberName: f[1]})
-		}
+		u.members = append(u.members, member{fieldName: fieldName[0], memberName: fieldName[1]})
 	}
 	return u
 }

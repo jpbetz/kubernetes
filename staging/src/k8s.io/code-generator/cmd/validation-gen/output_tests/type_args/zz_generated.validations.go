@@ -47,7 +47,7 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 func Validate_E1(obj *E1, fldPath *field.Path) (errs field.ErrorList) {
 	// type E1
 	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T1.E1.E1")...)
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type E1")...)
 	}
 
 	return errs

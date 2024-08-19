@@ -107,8 +107,8 @@ func (us unions) getOrCreate(name string) *union {
 	return u
 }
 
-func (c *unionDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (ValidatorGen, error) {
-	result := ValidatorGen{}
+func (c *unionDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
+	result := Validations{}
 	unions := unions{}
 	for _, member := range t.Members {
 		commentTags := gengo.ExtractCommentTags("+", member.CommentLines)

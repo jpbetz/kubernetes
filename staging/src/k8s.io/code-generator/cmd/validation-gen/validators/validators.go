@@ -16,39 +16,41 @@ limitations under the License.
 
 package validators
 
-import "k8s.io/gengo/v2/types"
+import (
+	"k8s.io/gengo/v2/types"
+)
 
 // DeclarativeValidator is able to extract validation function generators from
 // types.go files.
 type DeclarativeValidator interface {
-	// ExtractValidations returns a ValidatorGen for the validation this DeclarativeValidator
+	// ExtractValidations returns a Validations for the validation this DeclarativeValidator
 	// supports for the given go type, and it's corresponding comment strings.
-	ExtractValidations(t *types.Type, comments []string) (ValidatorGen, error)
+	ExtractValidations(t *types.Type, comments []string) (Validations, error)
 }
 
-// ValidatorGen defines the function calls and variables to generate to perform validation.
-type ValidatorGen struct {
+// Validations defines the function calls and variables to generate to perform validation.
+type Validations struct {
 	Functions []FunctionGen
 	Variables []VariableGen
 }
 
-func (v *ValidatorGen) Empty() bool {
+func (v *Validations) Empty() bool {
 	return len(v.Functions) == 0 && len(v.Variables) == 0
 }
 
-func (v *ValidatorGen) Len() int {
+func (v *Validations) Len() int {
 	return len(v.Functions) + len(v.Variables)
 }
 
-func (v *ValidatorGen) AddFunction(f FunctionGen) {
+func (v *Validations) AddFunction(f FunctionGen) {
 	v.Functions = append(v.Functions, f)
 }
 
-func (v *ValidatorGen) AddVariable(variable VariableGen) {
+func (v *Validations) AddVariable(variable VariableGen) {
 	v.Variables = append(v.Variables, variable)
 }
 
-func (v *ValidatorGen) Add(o ValidatorGen) {
+func (v *Validations) Add(o Validations) {
 	v.Functions = append(v.Functions, o.Functions...)
 	v.Variables = append(v.Variables, o.Variables...)
 }

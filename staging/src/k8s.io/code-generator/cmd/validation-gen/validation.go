@@ -168,7 +168,7 @@ func (g *genValidations) hasValidationsMiss(n *typeNode) bool {
 	return false
 }
 
-// typeDiscoverer contains fields necessary to build a tree of types.
+// typeDiscoverer contains fields necessary to build graphs of types.
 type typeDiscoverer struct {
 	validator  validators.DeclarativeValidator
 	inputToPkg map[string]string
@@ -195,9 +195,9 @@ type childNode struct {
 	childType *types.Type // the real type of the child (may be a pointer)
 	node      *typeNode   // the node of the child's value type
 
-	fieldValidations validators.ValidatorGen // validations on the field
-	keyValidations   validators.ValidatorGen // validations on each key of a map field
-	elemValidations  validators.ValidatorGen // validations on each value of a list or map
+	fieldValidations validators.Validations // validations on the field
+	keyValidations   validators.Validations // validations on each key of a map field
+	elemValidations  validators.Validations // validations on each value of a list or map
 }
 
 // typeNode represents a node in the type-graph, annotated with information
@@ -213,9 +213,9 @@ type typeNode struct {
 	elem       *childNode   // populated when this type is a map or slice
 	underlying *childNode   // populated when this type is an alias
 
-	typeValidations validators.ValidatorGen // validations on the type
-	keyValidations  validators.ValidatorGen // validations on each key of a map type
-	elemValidations validators.ValidatorGen // validations on each value of a list or map
+	typeValidations validators.Validations // validations on the type
+	keyValidations  validators.Validations // validations on each key of a map type
+	elemValidations validators.Validations // validations on each value of a list or map
 }
 
 // lookupField returns the childNode with the specified JSON name.
@@ -595,8 +595,8 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 	return nil
 }
 
-func (td *typeDiscoverer) extractEmbeddedValidations(tag string, comments []string, t *types.Type) (validators.ValidatorGen, error) {
-	var result validators.ValidatorGen
+func (td *typeDiscoverer) extractEmbeddedValidations(tag string, comments []string, t *types.Type) (validators.Validations, error) {
+	var result validators.Validations
 	if tagVals, found := gengo.ExtractCommentTags("+", comments)[tag]; found {
 		for _, tagVal := range tagVals {
 			fakeComments := []string{tagVal}

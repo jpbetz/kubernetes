@@ -70,8 +70,8 @@ var (
 	fixedResultValidator = types.Name{Package: libValidationPkg, Name: "FixedResult"}
 )
 
-func (v fixedResultDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (ValidatorGen, error) {
-	var result ValidatorGen
+func (v fixedResultDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
+	var result Validations
 
 	if v.result {
 		vals := gengo.ExtractCommentTags("+", comments)[validateTrueTagName]
@@ -106,7 +106,7 @@ func (_ fixedResultDeclarativeValidator) parseTagVal(in string) (tagVal, error) 
 	type payload struct {
 		Flags   []string `json:"flags"`
 		Msg     string   `json:"msg"`
-		TypeArg string   `json:"type_arg,omitempty"`
+		TypeArg string   `json:"typeArg,omitempty"`
 	}
 	// We expect either a string (maybe empty) or a JSON object.
 	if len(in) == 0 {
@@ -151,8 +151,8 @@ func (_ fixedResultDeclarativeValidator) parseTagVal(in string) (tagVal, error) 
 	return tagVal{flags, pl.Msg, typeArgs}, nil
 }
 
-func (v errorDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (ValidatorGen, error) {
-	var result ValidatorGen
+func (v errorDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
+	var result Validations
 	vals, found := gengo.ExtractCommentTags("+", comments)[validateErrorTagName]
 	if found {
 		return result, fmt.Errorf("forced error: %q", vals)

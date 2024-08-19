@@ -40,12 +40,6 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*T1)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
-		if len(subresources) == 0 {
-			return Validate_T1(obj.(*T1), nil)
-		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
-	})
 	return nil
 }
 
@@ -55,8 +49,8 @@ var unionMembershipForDUunion2 = validate.NewDiscriminatedUnionMembership("du2",
 func Validate_DU(obj *DU, fldPath *field.Path) (errs field.ErrorList) {
 	// type DU
 	if obj != nil {
-		errs = append(errs, validate.DiscriminatedUnion(fldPath, *obj, unionMembershipForDUunion2, obj.DU2, obj.U2M1, obj.U2M2)...)
 		errs = append(errs, validate.DiscriminatedUnion(fldPath, *obj, unionMembershipForDUunion1, obj.DU1, obj.U1M1, obj.U1M2)...)
+		errs = append(errs, validate.DiscriminatedUnion(fldPath, *obj, unionMembershipForDUunion2, obj.DU2, obj.U2M1, obj.U2M2)...)
 	}
 
 	// field DU.TypeMeta has no validation
@@ -100,15 +94,6 @@ func Validate_DU(obj *DU, fldPath *field.Path) (errs field.ErrorList) {
 			return
 		}(obj.U2M2, fldPath.Child("u2m2"))...)
 
-	// field DU.T1
-	errs = append(errs,
-		func(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, Validate_T1(obj, fldPath)...)
-			}
-			return
-		}(obj.T1, fldPath.Child("t1"))...)
-
 	return errs
 }
 
@@ -140,35 +125,6 @@ func Validate_M2(obj *M2, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field M2.S")...)
 			return
 		}(obj.S, fldPath.Child("s"))...)
-
-	return errs
-}
-
-func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
-	// type T1
-	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type T1")...)
-	}
-
-	// field T1.TypeMeta has no validation
-
-	// field T1.LS
-	errs = append(errs,
-		func(obj []string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.LS")...)
-			for i, val := range obj {
-				errs = append(errs,
-					func(obj string, fldPath *field.Path) (errs field.ErrorList) {
-						if e := validate.Required(fldPath, obj); len(e) != 0 {
-							errs = append(errs, e...)
-							return // fatal
-						}
-						errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.LS[*]")...)
-						return
-					}(val, fldPath.Index(i))...)
-			}
-			return
-		}(obj.LS, fldPath.Child("ls"))...)
 
 	return errs
 }

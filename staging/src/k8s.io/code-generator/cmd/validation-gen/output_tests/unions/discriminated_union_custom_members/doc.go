@@ -31,8 +31,6 @@ type DU struct {
 
 	// +unionMember={"memberName": "CustomM2"}
 	M2 *M2 `json:"m2"`
-
-	T1 *T1 `json:"t1"` // not part of the union
 }
 
 type D string
@@ -52,14 +50,4 @@ type M1 struct {
 type M2 struct {
 	// +validateTrue="field M2.S"
 	S string `json:"s"`
-}
-
-// +validateTrue="type T1"
-type T1 struct {
-	TypeMeta int
-
-	// +validateTrue="field T1.LS"
-	// +eachVal=+validateTrue="field T1.LS[*]"
-	// +eachVal=+required
-	LS []string `json:"ls"`
 }

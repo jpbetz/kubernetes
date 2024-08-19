@@ -25,15 +25,15 @@ import "k8s.io/code-generator/cmd/validation-gen/output_tests/primitives"
 type T1 struct {
 	TypeMeta int
 
-	// +validateTrue={"type_arg": "k8s.io/code-generator/cmd/validation-gen/output_tests/primitives.T1", "msg": "T1.S1"}
+	// +validateTrue={"typeArg": "k8s.io/code-generator/cmd/validation-gen/output_tests/primitives.T1", "msg": "T1.S1"}
 	S1 primitives.T1 `json:"s1"`
 
-	// +validateTrue={"type_arg": "k8s.io/code-generator/cmd/validation-gen/output_tests/type_args.E1", "msg": "T1.E1"}
+	// +validateTrue={"typeArg": "k8s.io/code-generator/cmd/validation-gen/output_tests/type_args.E1", "msg": "T1.E1"}
 	E1 `json:"e1"`
 
-	// +validateTrue={"type_arg": "int", "msg": "T1.I1"}
+	// +validateTrue={"typeArg": "int", "msg": "T1.I1"}
 	I1 int `json:"i1"`
 }
 
-// +validateTrue={"msg": "T1.E1.E1"}
+// +validateTrue={"msg": "type E1"}
 type E1 string
