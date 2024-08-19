@@ -203,7 +203,7 @@ type TagDoc struct {
 	// Payloads lists zero or more varieties of value for this tag. If this tag
 	// never has a payload, this list should be empty, but if the payload is
 	// optional, this list should include an entry for "<none>".
-	Payloads []TagPayload
+	Payloads []TagPayloadDoc
 }
 
 // TagContext describes where a tag may be attached.
@@ -212,15 +212,24 @@ type TagContext string
 const (
 	// TagContextType indicates that a tag may be attached to a type
 	// definition.
-	TagContextType TagContext = "Type"
+	TagContextType TagContext = "Type definition"
 	// TagContextField indicates that a tag may be attached to a struct
 	// field, the keys of a map, or the values of a map or slice.
-	TagContextField TagContext = "Field"
+	TagContextField TagContext = "Field definition, map key, map/slice value"
 )
 
-// TagPayload describes a value for a tag (e.g `+tagName=tagValue`).  Some
+// TagPayloadDoc describes a value for a tag (e.g `+tagName=tagValue`).  Some
 // tags upport multiple payloads, including <none> (e.g. `+tagName`).
-type TagPayload struct {
+type TagPayloadDoc struct {
 	Description string
-	Docs        string
+	Docs        string             `json:",omitempty"`
+	Schema      []TagPayloadSchema `json:",omitempty"`
+}
+
+// TagPayloadSchema describes a JSON tag payload.
+type TagPayloadSchema struct {
+	Key     string // required
+	Value   string // required
+	Docs    string `json:",omitempty"`
+	Default string `json:",omitempty"`
 }

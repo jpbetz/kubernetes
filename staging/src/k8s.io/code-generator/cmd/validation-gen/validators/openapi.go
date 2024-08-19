@@ -69,7 +69,7 @@ func (openAPIDeclarativeValidator) Docs() []TagDoc {
 		Tag:         formatTagName,
 		Description: "Indicates that a string field has a particular format.",
 		Contexts:    []TagContext{TagContextType, TagContextField},
-		Payloads: []TagPayload{{
+		Payloads: []TagPayloadDoc{{
 			Description: "ip",
 			Docs:        "This field holds an IP address value, either IPv4 or IPv6.",
 		}, {
@@ -80,7 +80,7 @@ func (openAPIDeclarativeValidator) Docs() []TagDoc {
 		Tag:         maxLengthTagName,
 		Description: "Indicates that a string field has a limit on its length.",
 		Contexts:    []TagContext{TagContextType, TagContextField},
-		Payloads: []TagPayload{{
+		Payloads: []TagPayloadDoc{{
 			Description: "<non-negative integer>",
 			Docs:        "This field must be no more than X characters long.",
 		}},

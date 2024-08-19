@@ -18,13 +18,12 @@ limitations under the License.
 package main
 
 import (
-	"bytes"
 	"cmp"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
 	"slices"
-	"strings"
 
 	"github.com/spf13/pflag"
 
@@ -99,11 +98,6 @@ func (args *Args) Validate() error {
 	return nil
 }
 
-var friendlyContextNames = map[validators.TagContext]string{
-	validators.TagContextType:  "type definitions",
-	validators.TagContextField: "field definitions (including map keys and map/slice values)",
-}
-
 func printDocs() {
 	// We need a fake context to init the validator plugins.
 	c := &generator.Context{
@@ -121,36 +115,9 @@ func printDocs() {
 		return cmp.Compare(a.Tag, b.Tag)
 	})
 
-	for _, doc := range docs {
-		fmt.Printf("Tag: +%s\n", clean(doc.Tag))
-		fmt.Printf("Description: %s\n", clean(doc.Description))
-		fmt.Printf("Attach to:\n")
-		for _, c := range doc.Contexts {
-			friendly, found := friendlyContextNames[c]
-			if !found {
-				friendly = fmt.Sprintf("<unknown tag context: %q>", c)
-			}
-			fmt.Printf("    - %s\n", friendly)
-		}
-		fmt.Printf("Tag value(s):\n")
-		for _, p := range doc.Payloads {
-			fmt.Printf("    %s:  %s\n", clean(p.Description), indent(clean(p.Docs), "      "))
-		}
-		fmt.Printf("\n")
+	if jb, err := json.MarshalIndent(docs, "", "    "); err != nil {
+		klog.Fatalf("failed to marshal docs: %v", err)
+	} else {
+		fmt.Println(string(jb))
 	}
-}
-
-func clean(in string) string {
-	return strings.TrimSpace(in)
-}
-
-func indent(in string, indent string) string {
-	buf := bytes.Buffer{}
-	for _, r := range in {
-		buf.WriteRune(r)
-		if r == '\n' {
-			buf.WriteString(indent)
-		}
-	}
-	return buf.String()
 }
