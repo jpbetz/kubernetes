@@ -17,6 +17,11 @@ limitations under the License.
 package validators
 
 import (
+	"cmp"
+	"fmt"
+	"slices"
+	"strings"
+
 	"k8s.io/gengo/v2/types"
 )
 
@@ -109,6 +114,60 @@ type FunctionGen interface {
 	Flags() FunctionFlags
 }
 
+// SortFunctions returns a shallow copy of the slice, sorted in
+// stable order that accounts for ordering rules, such that the rule
+// that fatal functions be called before non-fatal.
+func SortFunctions(functions []FunctionGen) []FunctionGen {
+	result := make([]FunctionGen, len(functions))
+	copy(result, functions)
+	slices.SortFunc(result, func(a, b FunctionGen) int {
+		aFlags := a.Flags()
+		bFlags := b.Flags()
+
+		for _, f := range []FunctionFlags{IsFatal, PtrOK} { // Primary sort is by priority flags
+			isA := aFlags.IsSet(f)
+			isB := bFlags.IsSet(f)
+			if isA != isB {
+				if isA {
+					return -1
+				}
+				return 1
+			}
+		}
+		// Secondary sort is by function name and arguments
+		aName, aArgs := a.SignatureAndArgs()
+		bName, bArgs := b.SignatureAndArgs()
+		if c := strings.Compare(aName.Package, bName.Package); c != 0 {
+			return c
+		}
+		if c := strings.Compare(aName.Name, bName.Name); c != 0 {
+			return c
+		}
+		if len(aArgs) != len(bArgs) {
+			return len(aArgs) - len(bArgs)
+		}
+		for i, a := range aArgs {
+			b := bArgs[i]
+			switch a.(type) {
+			case string:
+				if c := strings.Compare(a.(string), b.(string)); c != 0 {
+					return c
+				}
+			case int:
+				if c := a.(int) - b.(int); c != 0 {
+					return c
+				}
+			case PrivateVar:
+				if c := strings.Compare(a.(PrivateVar).Name, b.(PrivateVar).Name); c != 0 {
+					return c
+				}
+			}
+		}
+		return 0
+	})
+	return result
+}
+
 // PrivateVar is a variable name that the generator will output as a private identifier.
 type PrivateVar types.Name
 
@@ -124,6 +183,15 @@ type VariableGen interface {
 
 	// Init generates the function call that the variable is assigned to.
 	Init() FunctionGen
+}
+
+func SortVariables(variables []VariableGen) []VariableGen {
+	result := make([]VariableGen, len(variables))
+	copy(result, variables)
+	slices.SortFunc(variables, func(a, b VariableGen) int {
+		return cmp.Compare(a.Var().Name, b.Var().Name)
+	})
+	return result
 }
 
 // Function creates a FunctionGen for a given function name and extraArgs.
@@ -150,6 +218,10 @@ type functionGen struct {
 	extraArgs []any
 	typeArgs  []types.Name
 	flags     FunctionFlags
+}
+
+func (v *functionGen) String() string {
+	return fmt.Sprintf("%s[%s](%s)", v.function, v.typeArgs, v.extraArgs)
 }
 
 func (v *functionGen) TagName() string {

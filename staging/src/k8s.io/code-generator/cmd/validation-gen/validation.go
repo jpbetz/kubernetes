@@ -18,11 +18,9 @@ package main
 
 import (
 	"bytes"
-	"cmp"
 	"fmt"
 	"io"
 	"reflect"
-	"slices"
 	"strconv"
 	"strings"
 	"unicode"
@@ -1029,38 +1027,8 @@ func (g *genValidations) emitCallToOtherTypeFunc(c *generator.Context, node *typ
 // the "obj" variable is a pointer.
 func emitCallsToValidators(c *generator.Context, validations []validators.FunctionGen, objIsPtr bool, sw *generator.SnippetWriter) {
 	// Helper func
-	sort := func(in []validators.FunctionGen) []validators.FunctionGen {
-		fatal := make([]validators.FunctionGen, 0, len(in))
-		fatalPtr := make([]validators.FunctionGen, 0, len(in))
-		nonfatal := make([]validators.FunctionGen, 0, len(in))
-		nonfatalPtr := make([]validators.FunctionGen, 0, len(in))
 
-		for _, fg := range in {
-			isFatal := (fg.Flags().IsSet(validators.IsFatal))
-			isPtrOK := (fg.Flags().IsSet(validators.PtrOK))
-
-			if isFatal {
-				if isPtrOK {
-					fatalPtr = append(fatalPtr, fg)
-				} else {
-					fatal = append(fatal, fg)
-				}
-			} else {
-				if isPtrOK {
-					nonfatalPtr = append(nonfatalPtr, fg)
-				} else {
-					nonfatal = append(nonfatal, fg)
-				}
-			}
-		}
-		result := fatalPtr
-		result = append(result, fatal...)
-		result = append(result, nonfatalPtr...)
-		result = append(result, nonfatal...)
-		return result
-	}
-
-	validations = sort(validations)
+	validations = validators.SortFunctions(validations)
 
 	insideNilCheck := false
 	for _, v := range validations {
@@ -1129,11 +1097,7 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 // to initialize the value of the variable.
 func (g *genValidations) emitValidationVariables(c *generator.Context, t *types.Type, sw *generator.SnippetWriter) {
 	tn := g.discovered.typeNodes[t]
-
-	variables := tn.typeValidations.Variables
-	slices.SortFunc(variables, func(a, b validators.VariableGen) int {
-		return cmp.Compare(a.Var().Name, b.Var().Name)
-	})
+	variables := validators.SortVariables(tn.typeValidations.Variables)
 	for _, variable := range variables {
 		supportInitFn, supportInitArgs := variable.Init().SignatureAndArgs()
 		targs := generator.Args{
