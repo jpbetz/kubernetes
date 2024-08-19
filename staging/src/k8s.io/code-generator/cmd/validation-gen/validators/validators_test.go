@@ -25,6 +25,10 @@ import (
 
 func TestSortFunctions(t *testing.T) {
 	typeX := types.Name{Name: "x", Package: "x/x"}
+	typeFor := func(name types.Name) *types.Type {
+		return &types.Type{Name: name}
+	}
+
 	cases := []struct {
 		name  string
 		input []FunctionGen

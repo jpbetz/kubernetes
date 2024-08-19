@@ -137,10 +137,7 @@ func SortFunctions(functions []FunctionGen) []FunctionGen {
 		// Secondary sort is by function name and arguments
 		aName, aArgs := a.SignatureAndArgs()
 		bName, bArgs := b.SignatureAndArgs()
-		if c := strings.Compare(aName.Package, bName.Package); c != 0 {
-			return c
-		}
-		if c := strings.Compare(aName.Name, bName.Name); c != 0 {
+		if c := compareNames(aName, bName); c != 0 {
 			return c
 		}
 		if len(aArgs) != len(bArgs) {
@@ -153,8 +150,8 @@ func SortFunctions(functions []FunctionGen) []FunctionGen {
 				if c := strings.Compare(a.(string), b.(string)); c != 0 {
 					return c
 				}
-			case int:
-				if c := a.(int) - b.(int); c != 0 {
+			case *PrivateVar:
+				if c := strings.Compare(a.(*PrivateVar).Name, b.(*PrivateVar).Name); c != 0 {
 					return c
 				}
 			case PrivateVar:
@@ -166,6 +163,16 @@ func SortFunctions(functions []FunctionGen) []FunctionGen {
 		return 0
 	})
 	return result
+}
+
+func compareNames(a, b types.Name) int {
+	if c := strings.Compare(a.Package, b.Package); c != 0 {
+		return c
+	}
+	if c := strings.Compare(a.Name, b.Name); c != 0 {
+		return c
+	}
+	return 0
 }
 
 // PrivateVar is a variable name that the generator will output as a private identifier.
