@@ -304,7 +304,7 @@ func builtinTagDocs() []validators.TagDoc {
 		Tag:         eachKeyTag,
 		Description: "Declares a validation for map keys.",
 		Contexts:    []validators.TagContext{validators.TagContextType, validators.TagContextField},
-		Payloads: []validators.TagPayload{{
+		Payloads: []validators.TagPayloadDoc{{
 			Description: "<validation-tag>",
 			Docs:        "This tag will be evaluated for each key of a map.",
 		}},
@@ -312,7 +312,7 @@ func builtinTagDocs() []validators.TagDoc {
 		Tag:         eachValTag,
 		Description: "Declares a validation for map and slice values.",
 		Contexts:    []validators.TagContext{validators.TagContextType, validators.TagContextField},
-		Payloads: []validators.TagPayload{{
+		Payloads: []validators.TagPayloadDoc{{
 			Description: "<validation-tag>",
 			Docs:        "This tag will be evaluated for each value of a map or slice.",
 		}},

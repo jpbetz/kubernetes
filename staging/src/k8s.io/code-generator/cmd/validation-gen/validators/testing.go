@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lithammer/dedent"
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
@@ -103,19 +102,24 @@ func (v fixedResultDeclarativeValidator) Docs() []TagDoc {
 			Tag:         validateTrueTagName,
 			Description: "Always passes validation (useful for testing).",
 			Contexts:    []TagContext{TagContextType, TagContextField},
-			Payloads: []TagPayload{{
+			Payloads: []TagPayloadDoc{{
 				Description: "<none>",
-				Docs:        "The generated code will have no arguments.",
+				Docs:        "",
 			}, {
 				Description: "<quoted-string>",
 				Docs:        "The generated code will include this string.",
 			}, {
 				Description: "<json-object>",
-				Docs: dedent.Dedent(`
-				Schema:
-				  "flags": <list-of-string>  # optional: "PtrOK" or "IsFatal"
-				  "msg":   <string>          # the generated code will include this string"
-			`),
+				Docs:        "",
+				Schema: []TagPayloadSchema{{
+					Key:   "flags",
+					Value: "<list-of-flag-string>",
+					Docs:  `PtrOK | IsFatal`,
+				}, {
+					Key:   "msg",
+					Value: "<string>",
+					Docs:  "The generated code will include this string.",
+				}},
 			}},
 		}}
 	} else {
@@ -123,19 +127,24 @@ func (v fixedResultDeclarativeValidator) Docs() []TagDoc {
 			Tag:         validateFalseTagName,
 			Description: "Always fails validation (useful for testing).",
 			Contexts:    []TagContext{TagContextType, TagContextField},
-			Payloads: []TagPayload{{
+			Payloads: []TagPayloadDoc{{
 				Description: "<none>",
-				Docs:        "The generated code will have no arguments.",
+				Docs:        "",
 			}, {
 				Description: "<quoted-string>",
 				Docs:        "The generated code will include this string.",
 			}, {
 				Description: "<json-object>",
-				Docs: dedent.Dedent(`
-				Schema:
-				  "flags": <list-of-string>  # optional: "PtrOK" or "IsFatal"
-				  "msg":   <string>          # the generated code will include this string"
-			`),
+				Docs:        "",
+				Schema: []TagPayloadSchema{{
+					Key:   "flags",
+					Value: "<list-of-flag-string>",
+					Docs:  `PtrOK | IsFatal`,
+				}, {
+					Key:   "msg",
+					Value: "<string>",
+					Docs:  "The generated code will include this string.",
+				}},
 			}},
 		}}
 	}
@@ -210,7 +219,7 @@ func (errorDeclarativeValidator) Docs() []TagDoc {
 		Tag:         validateErrorTagName,
 		Description: "Always fails code generation (useful for testing).",
 		Contexts:    []TagContext{TagContextType, TagContextField},
-		Payloads: []TagPayload{{
+		Payloads: []TagPayloadDoc{{
 			Description: "<string>",
 			Docs:        "This string will be included in the error message.",
 		}},
