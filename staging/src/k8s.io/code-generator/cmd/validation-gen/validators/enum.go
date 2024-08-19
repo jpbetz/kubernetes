@@ -17,8 +17,10 @@ limitations under the License.
 package validators
 
 import (
+	"cmp"
 	"fmt"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 
@@ -28,6 +30,8 @@ import (
 )
 
 var enumValidator = types.Name{Package: libValidationPkg, Name: "Enum"}
+
+var setsNew = types.Name{Package: "k8s.io/apimachinery/pkg/util/sets", Name: "New"}
 
 func init() {
 	AddToRegistry(InitEnumDeclarativeValidator)
@@ -43,8 +47,19 @@ type enumDeclarativeValidator struct {
 
 func (c *enumDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
 	var result Validations
-	if enum, ok := c.enumContext.EnumType(t); ok {
-		result.AddFunction(Function("enum", DefaultFlags, enumValidator, enum.ValueArgs()...))
+	commentTags := gengo.ExtractCommentTags("+", comments)
+	if _, ok := commentTags[tagEnumType]; ok {
+		if enum, ok := c.enumContext.EnumType(t); ok {
+			// TODO: Avoid the "local" here. This was added to to avoid errors caused when the package is an empty string.
+			//       The correct package would be the output package but is not known here. This does not show up in generated code.
+			// TODO: Append a consistent hash suffix to avoid generated name conflicts?
+			supportVarName := PrivateVar{Name: "SymbolsFor" + t.Name.Name, Package: "local"}
+			supportVar := Variable(supportVarName, GenericFunction("enum", DefaultFlags, setsNew, []types.Name{enum.Name}, enum.ValueArgs()...))
+			result.AddVariable(supportVar)
+			fn := Function("enum", DefaultFlags, enumValidator, supportVarName)
+			result.AddFunction(fn)
+		}
+		return result, nil
 	}
 	return result, nil
 }
@@ -60,18 +75,20 @@ func (enumDeclarativeValidator) Docs() []TagDoc {
 
 func (et *enumType) ValueArgs() []any {
 	var values []any
-	for _, value := range et.Symbols() {
+	for _, value := range et.SymbolConstants() {
 		values = append(values, value)
 	}
 	return values
 }
 
-func (et *enumType) Symbols() []string {
-	var values []string
+func (et *enumType) SymbolConstants() []PrivateVar {
+	var values []PrivateVar
 	for _, value := range et.Values {
-		values = append(values, value.Value)
+		values = append(values, PrivateVar(value.Name))
 	}
-	sort.Strings(values)
+	slices.SortFunc(values, func(a, b PrivateVar) int {
+		return cmp.Compare(a.Name, b.Name)
+	})
 	return values
 }
 
@@ -81,7 +98,7 @@ const tagEnumType = "enum"
 const enumTypeDescriptionHeader = "Possible enum values:"
 
 type enumValue struct {
-	Name    string
+	Name    types.Name
 	Value   string
 	Comment string
 }
@@ -168,7 +185,7 @@ func parseEnums(c *generator.Context) enumMap {
 			enumType := c.Underlying
 			if _, ok := enumTypes[enumType.Name]; ok {
 				value := &enumValue{
-					Name:    c.Name.Name,
+					Name:    c.Name,
 					Value:   *c.ConstValue,
 					Comment: strings.Join(c.CommentLines, " "),
 				}
@@ -204,7 +221,7 @@ func (et *enumType) addIfNotPresent(value *enumValue) {
 func (ev *enumValue) Description() string {
 	comment := strings.TrimSpace(ev.Comment)
 	// The comment should starts with the type name, trim it first.
-	comment = strings.TrimPrefix(comment, ev.Name)
+	comment = strings.TrimPrefix(comment, ev.Name.Name)
 	// Trim the possible space after previous step.
 	comment = strings.TrimSpace(comment)
 	// The comment may be multiline, cascade all consecutive whitespaces.

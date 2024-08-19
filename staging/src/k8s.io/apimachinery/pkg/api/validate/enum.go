@@ -17,25 +17,19 @@ limitations under the License.
 package validate
 
 import (
-	"k8s.io/apimachinery/pkg/api/validate/content"
+	"slices"
+
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-// MaxLength verifies that the specified value is not longer than max
-// characters.
-func MaxLength(fldPath *field.Path, value string, max int) field.ErrorList {
-	if len(value) > max {
-		return field.ErrorList{field.Invalid(fldPath, value, content.MaxLenError(max))}
-	}
-	return nil
-}
-
-// Required verifies that the specified value is not the zero-value for its
-// type.
-func Required[T comparable](fldPath *field.Path, value T) field.ErrorList {
-	var zero T
-	if value == zero {
-		return field.ErrorList{field.Required(fldPath, "")}
+// Enum verifies that the specified value is one of the valid symbols.
+// This is for string enums only.
+func Enum[T ~string](fldPath *field.Path, value T, symbols sets.Set[T]) field.ErrorList {
+	if !symbols.Has(value) {
+		symbolList := symbols.UnsortedList()
+		slices.Sort(symbolList)
+		return field.ErrorList{field.NotSupported[T](fldPath, value, symbolList)}
 	}
 	return nil
 }
