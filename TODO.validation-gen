@@ -26,7 +26,6 @@
 - Add metadata.name/generateName validation (+nameFormat?)
 - Add SMD/SSA validation (+listType, +listMapKey, +patchMergeKey, +patchStrategy)
 - Add CEL validation rules
-- Fix enum generator to generate refs to enum constants instead of string literals.  Also generate a sets.Set for each enum?
 - Deduplicate `jsontagutil.go`. It was copy-pasted in from applyconfig-gen
 - Deduplicate most of enum.go, it was copy-pasted in from kube-openapi
 - Add opt-in/opt-out controls
