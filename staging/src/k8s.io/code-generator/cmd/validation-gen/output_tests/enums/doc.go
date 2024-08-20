@@ -39,11 +39,11 @@ type E0 string // Note: this enum has no values
 type E1 string // Note: this enum has 1 value
 
 const (
-	E1V1 E1 = "e2v1"
+	E1V1 E1 = "e1v1"
 )
 
 // +enum
-type E2 string // Note: this enum has 2 value
+type E2 string // Note: this enum has 2 values
 
 const (
 	E2V1 E2 = "e2v1"
