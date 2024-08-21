@@ -35,7 +35,7 @@ import (
 //		errs = append(errs, Union(fldPath, in, abcUnionMembership, in.A, in.B, in.C)...)
 //		return errs
 //	}
-func Union(fldPath *field.Path, in any, union *UnionMembership, fieldValues ...any) field.ErrorList {
+func Union(fldPath *field.Path, _ any, union *UnionMembership, fieldValues ...any) field.ErrorList {
 	if len(union.members) != len(fieldValues) {
 		return field.ErrorList{field.InternalError(fldPath, fmt.Errorf("unexpected difference in length between fields defined in UnionMembership and fieldValues"))}
 	}
@@ -73,7 +73,7 @@ func Union(fldPath *field.Path, in any, union *UnionMembership, fieldValues ...a
 //		errs = append(errs, DiscriminatedUnion(fldPath, in, abcUnionMembership, in.Type, in.A, in.B, in.C)...)
 //		return errs
 //	}
-func DiscriminatedUnion[T ~string](fldPath *field.Path, in any, union *UnionMembership, discriminatorValue T, fieldValues ...any) (errs field.ErrorList) {
+func DiscriminatedUnion[T ~string](fldPath *field.Path, _ any, union *UnionMembership, discriminatorValue T, fieldValues ...any) (errs field.ErrorList) {
 	discriminatorStrValue := string(discriminatorValue)
 	if len(union.members) != len(fieldValues) {
 		return field.ErrorList{field.InternalError(fldPath, fmt.Errorf("unexpected difference in length between fields defined in UnionMembership and fieldValues"))}

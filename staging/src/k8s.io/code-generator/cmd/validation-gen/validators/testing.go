@@ -55,7 +55,7 @@ const (
 	// These tags can take no value or a quoted string or a JSON object, which will be used in the
 	// error message.  The JSON object schema is:
 	//   {
-	//     "flags": <list-of-string>  # optional: "PtrOK" or "IsFatal"
+	//     "flags": <list-of-string>  # optional, values: "IsFatal"
 	//     "msg":   <string>          # required
 	//     "typeArg" <string>         # optional. If set, binds the type arg. Example: "time.Duration"
 	//   }
@@ -114,7 +114,7 @@ func (v fixedResultDeclarativeValidator) Docs() []TagDoc {
 				Schema: []TagPayloadSchema{{
 					Key:   "flags",
 					Value: "<list-of-flag-string>",
-					Docs:  `PtrOK | IsFatal`,
+					Docs:  `values: IsFatal`,
 				}, {
 					Key:   "msg",
 					Value: "<string>",
@@ -139,7 +139,7 @@ func (v fixedResultDeclarativeValidator) Docs() []TagDoc {
 				Schema: []TagPayloadSchema{{
 					Key:   "flags",
 					Value: "<list-of-flag-string>",
-					Docs:  `PtrOK | IsFatal`,
+					Docs:  `values: IsFatal`,
 				}, {
 					Key:   "msg",
 					Value: "<string>",
@@ -183,8 +183,6 @@ func (_ fixedResultDeclarativeValidator) parseTagVal(in string) (tagVal, error) 
 		switch fl {
 		case "IsFatal":
 			flags |= IsFatal
-		case "PtrOK":
-			flags |= PtrOK
 		default:
 			return tagVal{}, fmt.Errorf("unknown flag: %q", fl)
 		}

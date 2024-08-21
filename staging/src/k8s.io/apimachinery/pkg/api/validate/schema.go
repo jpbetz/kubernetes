@@ -23,8 +23,11 @@ import (
 
 // MaxLength verifies that the specified value is not longer than max
 // characters.
-func MaxLength(fldPath *field.Path, value string, max int) field.ErrorList {
-	if len(value) > max {
+func MaxLength(fldPath *field.Path, value *string, max int) field.ErrorList {
+	if value == nil {
+		return nil
+	}
+	if len(*value) > max {
 		return field.ErrorList{field.Invalid(fldPath, value, content.MaxLenError(max))}
 	}
 	return nil
@@ -32,10 +35,12 @@ func MaxLength(fldPath *field.Path, value string, max int) field.ErrorList {
 
 // Required verifies that the specified value is not the zero-value for its
 // type.
-func Required[T comparable](fldPath *field.Path, value T) field.ErrorList {
-	var zero T
-	if value == zero {
-		return field.ErrorList{field.Required(fldPath, "")}
+func Required[T comparable](fldPath *field.Path, value *T) field.ErrorList {
+	if value != nil {
+		var zero T
+		if *value != zero {
+			return nil
+		}
 	}
-	return nil
+	return field.ErrorList{field.Required(fldPath, "")}
 }

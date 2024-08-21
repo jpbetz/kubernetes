@@ -18,5 +18,5 @@ limitations under the License.
 // with the k8s.io/code-generator/cmd/validation-gen tool.  Each validation
 // function has a similar fingerprint:
 //
-//	func <Name>(fldPath *field.Path, value <type>, <other args...>) field.ErrorList
+//	func <Name>(fldPath *field.Path, value <nilable type>, <other args...>) field.ErrorList
 package validate

@@ -719,7 +719,7 @@ func (g *genValidations) emitValidationFunction(c *generator.Context, t *types.T
 		node:      node,
 		childType: t,
 	}
-	g.emitValidationForChild(c, fakeChild, true, sw)
+	g.emitValidationForChild(c, fakeChild, sw)
 	sw.Do("return errs\n", nil)
 	sw.Do("}\n\n", nil)
 }
@@ -728,10 +728,9 @@ func (g *genValidations) emitValidationFunction(c *generator.Context, t *types.T
 // type-attached validations and then descending into the type (e.g. struct
 // fields).
 //
-// Emitted code can assume that the value in question is always named "obj" and
-// the field path to this value is named "fldPath".  objIsPtr indicates whether
-// the "obj" variable is a pointer.
-func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild *childNode, objIsPtr bool, sw *generator.SnippetWriter) {
+// Emitted code assumes that the value in question is always a nilable
+// variable named "obj" and the field path to this value is named "fldPath".
+func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild *childNode, sw *generator.SnippetWriter) {
 	thisNode := thisChild.node
 	inType := thisNode.valueType
 
@@ -746,7 +745,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 	// Emit code for type-attached validations.
 	if validations := thisNode.typeValidations; !validations.Empty() {
 		sw.Do("// type $.inType|raw$\n", targs)
-		emitCallsToValidators(c, validations.Functions, objIsPtr, sw)
+		emitCallsToValidators(c, validations.Functions, sw)
 		sw.Do("\n", nil)
 		didSome = true
 	}
@@ -756,7 +755,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 	case types.Builtin:
 		// Nothing further.
 	case types.Alias:
-		g.emitValidationForChild(c, thisNode.underlying, objIsPtr, sw)
+		g.emitValidationForChild(c, thisNode.underlying, sw)
 	case types.Struct:
 		for _, fld := range thisNode.fields {
 			if len(fld.name) == 0 {
@@ -764,44 +763,28 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			}
 			// Missing JSON name is checked iff we have code to emit.
 
-			targs := targs.WithArgs(generator.Args{
-				"fieldName": fld.name,
-				"fieldJSON": fld.jsonName,
-				"fieldType": fld.childType,
-			})
-
-			childIsPtr := fld.childType.Kind == types.Pointer
-
 			// Accumulate into a buffer so we don't emit empty functions.
 			buf := bytes.NewBuffer(nil)
 			bufsw := sw.Dup(buf)
 
 			validations := fld.fieldValidations
 			if !validations.Empty() {
-				// When calling registered validators, we always pass the
-				// underlying value-type.  E.g. if the field's type is string,
-				// we pass string, and if the field's type is *string, we also
-				// pass string (checking for nil, first).  This means those
-				// validators don't have to know the difference, but it also
-				// means that large structs will be passed by value.  If this
-				// turns out to be a real problem, we could change this to pass
-				// everything by pointer.
-				emitCallsToValidators(c, validations.Functions, childIsPtr, bufsw)
+				emitCallsToValidators(c, validations.Functions, bufsw)
 			}
 
 			// Get to the real type.
 			switch fld.node.valueType.Kind {
 			case types.Alias:
 				// Emit for the underlying type.
-				g.emitValidationForChild(c, fld.node.underlying, childIsPtr, bufsw)
+				g.emitValidationForChild(c, fld.node.underlying, bufsw)
 				// Call the type's validation function.
-				g.emitCallToOtherTypeFunc(c, fld.node, childIsPtr, bufsw)
+				g.emitCallToOtherTypeFunc(c, fld.node, bufsw)
 			case types.Struct:
 				// Call the type's validation function.
-				g.emitCallToOtherTypeFunc(c, fld.node, childIsPtr, bufsw)
+				g.emitCallToOtherTypeFunc(c, fld.node, bufsw)
 			default:
 				// Descend into this field.
-				g.emitValidationForChild(c, fld, childIsPtr, bufsw)
+				g.emitValidationForChild(c, fld, bufsw)
 			}
 
 			if buf.Len() > 0 {
@@ -809,32 +792,38 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 					continue // TODO: Embedded (inline) types are expected to be unnamed.
 				}
 
+				targs := targs.WithArgs(generator.Args{
+					"fieldName": fld.name,
+					"fieldJSON": fld.jsonName,
+					"fieldType": fld.childType,
+					"maybeAddr": "",
+					"maybePtr":  "",
+				})
+				childIsNilable := isNilableType(fld.childType)
+				if !childIsNilable {
+					targs["maybeAddr"] = "&"
+					targs["maybePtr"] = "*"
+				}
+
 				if didSome {
 					sw.Do("\n", nil)
 				}
 				sw.Do("// field $.inType|raw$.$.fieldName$\n", targs)
 				sw.Do("errs = append(errs,\n", targs)
-				sw.Do("  func(obj $.fieldType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
+				sw.Do("  func(obj $.maybePtr$$.fieldType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
 				sw.Append(buf)
 				sw.Do("    return\n", targs)
-				sw.Do("  }(obj.$.fieldName$, fldPath.Child(\"$.fieldJSON$\"))...)\n", targs)
+				sw.Do("  }($.maybeAddr$obj.$.fieldName$, fldPath.Child(\"$.fieldJSON$\"))...)\n", targs)
 				sw.Do("\n", nil)
 			} else {
+				targs := targs.WithArgs(generator.Args{
+					"fieldName": fld.name,
+				})
 				sw.Do("// field $.inType|raw$.$.fieldName$ has no validation\n", targs)
 			}
 			didSome = true
 		}
 	case types.Slice, types.Array:
-		targs := targs.WithArgs(generator.Args{
-			"elemType": inType.Elem,
-			"deref":    "", // updated below if needed
-		})
-		if objIsPtr {
-			targs["deref"] = "*"
-		}
-
-		elemIsPtr := inType.Elem.Kind == types.Pointer
-
 		// Accumulate into a buffer so we don't emit empty functions.
 		elemBuf := bytes.NewBuffer(nil)
 		elemSW := sw.Dup(elemBuf)
@@ -843,22 +832,14 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 		validations := thisNode.elemValidations
 		validations.Add(thisChild.elemValidations)
 		if !validations.Empty() {
-			// When calling registered validators, we always pass the
-			// underlying value-type.  E.g. if the field's type is string,
-			// we pass string, and if the field's type is *string, we also
-			// pass string (checking for nil, first).  This means those
-			// validators don't have to know the difference, but it also
-			// means that large structs will be passed by value.  If this
-			// turns out to be a real problem, we could change this to pass
-			// everything by pointer.
-			emitCallsToValidators(c, validations.Functions, elemIsPtr, elemSW)
+			emitCallsToValidators(c, validations.Functions, elemSW)
 		}
 
 		switch thisNode.elem.node.valueType.Kind {
 		case types.Struct, types.Alias:
 			// If this field is another type, call its validation function.
 			// Checking for nil is handled inside this call.
-			g.emitCallToOtherTypeFunc(c, thisNode.elem.node, elemIsPtr, elemSW)
+			g.emitCallToOtherTypeFunc(c, thisNode.elem.node, elemSW)
 		default:
 			// No need to go further.  Struct- or alias-typed fields might have
 			// validations attached to the type, but anything else (e.g.
@@ -867,33 +848,25 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 		}
 
 		if elemBuf.Len() > 0 {
-			if objIsPtr {
-				sw.Do("if obj != nil {\n", targs)
+			targs := targs.WithArgs(generator.Args{
+				"elemType":  inType.Elem,
+				"maybeAddr": "",
+				"maybePtr":  "",
+			})
+			elemIsNilable := isNilableType(inType.Elem)
+			if !elemIsNilable {
+				targs["maybeAddr"] = "&"
+				targs["maybePtr"] = "*"
 			}
-			sw.Do("for i, val := range $.deref$obj {\n", targs)
+			sw.Do("for i, val := range obj {\n", targs)
 			sw.Do("  errs = append(errs,\n", targs)
-			sw.Do("    func(obj $.elemType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
+			sw.Do("    func(obj $.maybePtr$$.elemType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
 			sw.Append(elemBuf)
 			sw.Do("      return\n", targs)
-			sw.Do("    }(val, fldPath.Index(i))...)\n", targs)
+			sw.Do("    }($.maybeAddr$val, fldPath.Index(i))...)\n", targs)
 			sw.Do("}\n", nil)
-			if objIsPtr {
-				sw.Do("}\n", targs)
-			}
 		}
 	case types.Map:
-		targs := targs.WithArgs(generator.Args{
-			"keyType": inType.Key,
-			"valType": inType.Elem,
-			"deref":   "", // updated below if needed
-		})
-		if objIsPtr {
-			targs["deref"] = "*"
-		}
-
-		keyIsPtr := inType.Key.Kind == types.Pointer
-		valIsPtr := inType.Elem.Kind == types.Pointer
-
 		// Accumulate into a buffer so we don't emit empty functions.
 		keyBuf := bytes.NewBuffer(nil)
 		keySW := sw.Dup(keyBuf)
@@ -902,22 +875,14 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 		keyValidations := thisNode.keyValidations
 		keyValidations.Add(thisChild.keyValidations)
 		if !keyValidations.Empty() {
-			// When calling registered validators, we always pass the
-			// underlying value-type.  E.g. if the field's type is string,
-			// we pass string, and if the field's type is *string, we also
-			// pass string (checking for nil, first).  This means those
-			// validators don't have to know the difference, but it also
-			// means that large structs will be passed by value.  If this
-			// turns out to be a real problem, we could change this to pass
-			// everything by pointer.
-			emitCallsToValidators(c, keyValidations.Functions, keyIsPtr, keySW)
+			emitCallsToValidators(c, keyValidations.Functions, keySW)
 		}
 
 		switch thisNode.key.node.valueType.Kind {
 		case types.Struct, types.Alias:
 			// If this field is another type, call its validation function.
 			// Checking for nil is handled inside this call.
-			g.emitCallToOtherTypeFunc(c, thisNode.key.node, keyIsPtr, keySW)
+			g.emitCallToOtherTypeFunc(c, thisNode.key.node, keySW)
 		default:
 			// No need to go further.  Struct- or alias-typed fields might have
 			// validations attached to the type, but anything else (e.g.
@@ -933,22 +898,14 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 		valValidations := thisNode.elemValidations
 		valValidations.Add(thisChild.elemValidations)
 		if !valValidations.Empty() {
-			// When calling registered validators, we always pass the
-			// underlying value-type.  E.g. if the field's type is string,
-			// we pass string, and if the field's type is *string, we also
-			// pass string (checking for nil, first).  This means those
-			// validators don't have to know the difference, but it also
-			// means that large structs will be passed by value.  If this
-			// turns out to be a real problem, we could change this to pass
-			// everything by pointer.
-			emitCallsToValidators(c, valValidations.Functions, valIsPtr, valSW)
+			emitCallsToValidators(c, valValidations.Functions, valSW)
 		}
 
 		switch thisNode.elem.node.valueType.Kind {
 		case types.Struct, types.Alias:
 			// If this field is another type, call its validation function.
 			// Checking for nil is handled inside this call.
-			g.emitCallToOtherTypeFunc(c, thisNode.elem.node, valIsPtr, valSW)
+			g.emitCallToOtherTypeFunc(c, thisNode.elem.node, valSW)
 		default:
 			// No need to go further.  Struct- or alias-typed fields might have
 			// validations attached to the type, but anything else (e.g.
@@ -961,28 +918,40 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			vName = "val"
 		}
 		if keyBuf.Len()+valBuf.Len() > 0 {
-			if objIsPtr {
-				sw.Do("if obj != nil {\n", targs)
+			targs := targs.WithArgs(generator.Args{
+				"keyType":      inType.Key,
+				"valType":      inType.Elem,
+				"keyMaybeAddr": "",
+				"keyMaybePtr":  "",
+				"valMaybeAddr": "",
+				"valMaybePtr":  "",
+			})
+			keyIsNilable := isNilableType(inType.Key)
+			if !keyIsNilable {
+				targs["keyMaybeAddr"] = "&"
+				targs["keyMaybePtr"] = "*"
 			}
-			sw.Do("for key, $.val$ := range $.deref$obj {\n", targs.With("val", vName))
+			valIsNilable := isNilableType(inType.Elem)
+			if !valIsNilable {
+				targs["valMaybeAddr"] = "&"
+				targs["valMaybePtr"] = "*"
+			}
+
+			sw.Do("for key, $.val$ := range obj {\n", targs.With("val", vName))
 			if keyBuf.Len() > 0 {
 				sw.Do("  errs = append(errs,\n", targs)
-				sw.Do("    func(obj $.keyType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
+				sw.Do("    func(obj $.keyMaybePtr$$.keyType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
 				sw.Append(keyBuf)
 				sw.Do("      return\n", targs)
-				sw.Do("    }(key, fldPath)...)\n", targs)
+				sw.Do("    }($.keyMaybeAddr$key, fldPath)...)\n", targs)
 			}
 			if valBuf.Len() > 0 {
 				sw.Do("  errs = append(errs,\n", targs)
-				sw.Do("    func(obj $.valType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
+				sw.Do("    func(obj $.valMaybePtr$$.valType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
 				sw.Append(valBuf)
 				sw.Do("      return\n", targs)
-				sw.Do("    }(val, fldPath.Key(key))...)\n", nil) // TODO: what if the key is not a string?
+				sw.Do("    }($.valMaybeAddr$val, fldPath.Key(key))...)\n", targs) // TODO: what if the key is not a string?
 			}
-			if objIsPtr {
-				sw.Do("}\n", targs)
-			}
-
 			sw.Do("}\n", nil)
 		}
 	default:
@@ -993,96 +962,61 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 // emitCallToOtherTypeFunc generates a call to the specified node's generated
 // validation function for a field in some parent context.
 //
-// Emitted code can assume that the value in question is always named "obj" and
-// the field path to this value is named "fldPath".  objIsPtr indicates whether
-// the "obj" variable is a pointer.
-func (g *genValidations) emitCallToOtherTypeFunc(c *generator.Context, node *typeNode, objIsPtr bool, sw *generator.SnippetWriter) {
+// Emitted code assumes that the value in question is always a nilable
+// variable named "obj" and the field path to this value is named "fldPath".
+func (g *genValidations) emitCallToOtherTypeFunc(c *generator.Context, node *typeNode, sw *generator.SnippetWriter) {
 	// If this type has no validations (transitively) then we don't need to do
 	// anything.
 	if !g.hasValidations(node) {
 		return
 	}
 
-	addr := "" // adjusted below if needed
-	if objIsPtr {
-		sw.Do("if obj != nil {\n", nil)
-		defer func() {
-			sw.Do("}\n", nil)
-		}()
-	} else {
-		addr = "&"
-	}
-
 	targs := generator.Args{
-		"addr":     addr,
 		"funcName": c.Universe.Type(node.funcName),
 	}
-	sw.Do("errs = append(errs, $.funcName|raw$($.addr$obj, fldPath)...)\n", targs)
+	sw.Do("errs = append(errs, $.funcName|raw$(obj, fldPath)...)\n", targs)
 }
 
 // emitCallsToValidators emits calls to a list of validation functions for
 // a single field or type. validations is a list of functions to call, with
 // arguments.
 //
-// Emitted code can assume that the value in question is always named "obj" and
-// the field path to this value is named "fldPath".  objIsPtr indicates whether
-// the "obj" variable is a pointer.
-func emitCallsToValidators(c *generator.Context, validations []validators.FunctionGen, objIsPtr bool, sw *generator.SnippetWriter) {
+// When calling registered validators, we always pass a nilable type.  E.g. if
+// the field's type is string, we pass *string, and if the field's type is
+// *string, we also pass *string.  This means that validators need to do
+// nil-checks themselves, if they intend to dereference the pointer.  This
+// makes updates more consistent.
+//
+// Emitted code assumes that the value in question is always a nilable
+// variable named "obj" and the field path to this value is named "fldPath".
+func emitCallsToValidators(c *generator.Context, validations []validators.FunctionGen, sw *generator.SnippetWriter) {
 	// Helper func
 	sort := func(in []validators.FunctionGen) []validators.FunctionGen {
 		fatal := make([]validators.FunctionGen, 0, len(in))
-		fatalPtr := make([]validators.FunctionGen, 0, len(in))
 		nonfatal := make([]validators.FunctionGen, 0, len(in))
-		nonfatalPtr := make([]validators.FunctionGen, 0, len(in))
 
 		for _, fg := range in {
 			isFatal := (fg.Flags().IsSet(validators.IsFatal))
-			isPtrOK := (fg.Flags().IsSet(validators.PtrOK))
 
 			if isFatal {
-				if isPtrOK {
-					fatalPtr = append(fatalPtr, fg)
-				} else {
-					fatal = append(fatal, fg)
-				}
+				fatal = append(fatal, fg)
 			} else {
-				if isPtrOK {
-					nonfatalPtr = append(nonfatalPtr, fg)
-				} else {
-					nonfatal = append(nonfatal, fg)
-				}
+				nonfatal = append(nonfatal, fg)
 			}
 		}
-		result := fatalPtr
-		result = append(result, fatal...)
-		result = append(result, nonfatalPtr...)
+		result := fatal
 		result = append(result, nonfatal...)
 		return result
 	}
 
 	validations = sort(validations)
 
-	insideNilCheck := false
 	for _, v := range validations {
-		ptrOK := (v.Flags().IsSet(validators.PtrOK))
 		isFatal := (v.Flags().IsSet(validators.IsFatal))
 
 		fn, extraArgs := v.SignatureAndArgs()
 		targs := generator.Args{
 			"funcName": c.Universe.Type(fn),
-			"deref":    "", // updated below if needed
-		}
-		if objIsPtr && !ptrOK {
-			if !insideNilCheck {
-				sw.Do("if obj != nil {\n", targs)
-				insideNilCheck = true
-			}
-			targs["deref"] = "*"
-		} else {
-			if insideNilCheck {
-				sw.Do("}\n", nil)
-				insideNilCheck = false
-			}
 		}
 
 		emitCall := func() {
@@ -1098,7 +1032,7 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 				}
 				sw.Do("]", nil)
 			}
-			sw.Do("(fldPath, $.deref$obj", targs)
+			sw.Do("(fldPath, obj", targs)
 			for _, arg := range extraArgs {
 				sw.Do(", ", nil)
 				toGolangSourceDataLiteral(sw, c, arg)
@@ -1118,9 +1052,6 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 			emitCall()
 			sw.Do("...)\n", nil)
 		}
-	}
-	if insideNilCheck {
-		sw.Do("}\n", nil)
 	}
 }
 
@@ -1162,6 +1093,14 @@ func (g *genValidations) emitValidationVariables(c *generator.Context, t *types.
 		sw.Do(")\n", nil)
 
 	}
+}
+
+func isNilableType(t *types.Type) bool {
+	switch t.Kind {
+	case types.Pointer, types.Slice, types.Map, types.Interface:
+		return true
+	}
+	return false
 }
 
 func toGolangSourceDataLiteral(sw *generator.SnippetWriter, c *generator.Context, value any) {

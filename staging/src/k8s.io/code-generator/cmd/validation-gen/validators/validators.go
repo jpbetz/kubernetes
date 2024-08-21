@@ -23,8 +23,9 @@ import (
 // DeclarativeValidator is able to extract validation function generators from
 // types.go files.
 type DeclarativeValidator interface {
-	// ExtractValidations returns a Validations for the validation this DeclarativeValidator
-	// supports for the given go type, and it's corresponding comment strings.
+	// ExtractValidations returns a Validations for the validation this
+	// DeclarativeValidator supports for the given go type, and it's
+	// corresponding comment strings.
 	ExtractValidations(t *types.Type, comments []string) (Validations, error)
 
 	// Docs returns user-friendly documentation for all of the tags that this
@@ -32,7 +33,8 @@ type DeclarativeValidator interface {
 	Docs() []TagDoc
 }
 
-// Validations defines the function calls and variables to generate to perform validation.
+// Validations defines the function calls and variables to generate to perform
+// validation.
 type Validations struct {
 	Functions []FunctionGen
 	Variables []VariableGen
@@ -75,11 +77,6 @@ const (
 	// IsFatal indicates that further validations should be skipped if this
 	// validator fails. Most validators are not fatal.
 	IsFatal FunctionFlags = 1 << iota
-
-	// PtrOK indicates that when validating a pointer field, this validator
-	// wants the pointer value, rather than the dereferenced value.  Most
-	// validators want the value, not the pointer.
-	PtrOK
 )
 
 // FunctionGen provides validation-gen with the information needed to generate a
@@ -88,33 +85,42 @@ type FunctionGen interface {
 	// TagName returns the tag which triggers this validator.
 	TagName() string
 
-	// SignatureAndArgs returns the function name and all extraArg value literals that are passed when the function
-	// invocation is generated.
+	// SignatureAndArgs returns the function name and all extraArg value
+	// literals that are passed when the function invocation is generated.
 	//
 	// The function signature must be of the form:
-	//   func(field.Path, <valueType>, extraArgs[0] <extraArgs[0]Type>, ..., extraArgs[N] <extraArgs[N]Type>)
+	//   func(field.Path,
+	//        <valueType>,                     // always nilable
+	//        extraArgs[0] <extraArgs[0]Type>, // optional
+	//        ...,
+	//        extraArgs[N] <extraArgs[N]Type>)
 	//
 	// extraArgs may contain:
-	// - data literals comprised of maps, slices, strings, ints, floats and bools
-	// - references, represented by types.Type (to reference any type in the universe), and types.Member (to reference members of the current value)
+	// - data literals comprised of maps, slices, strings, ints, floats and
+	//   bools
+	// - references, represented by types.Type (to reference any type in the
+	//   Universe), or types.Member (to reference members of the current value)
 	//
-	// If validation function to be called does not have a signature of this form, please introduce
-	// a function that does and use that function to call the validation function.
+	// If validation function to be called does not have a signature of this
+	// form, please introduce a function that does and use that function to
+	// call the validation function.
 	SignatureAndArgs() (function types.Name, extraArgs []any)
 
-	// TypeArgs assigns types to the type parameters of the function, for invocation.
+	// TypeArgs assigns types to the type parameters of the function, for
+	// invocation.
 	TypeArgs() []types.Name
 
 	// Flags returns the options for this validator function.
 	Flags() FunctionFlags
 }
 
-// PrivateVar is a variable name that the generator will output as a private identifier.
+// PrivateVar is a variable name that the generator will output as a private
+// identifier.
 type PrivateVar types.Name
 
-// VariableGen provides validation-gen with the information needed to generate variable.
-// Variables typically support generated functions by providing static information such
-// as the list of supported symbols for an enum.
+// VariableGen provides validation-gen with the information needed to generate
+// variable.  Variables typically support generated functions by providing
+// static information such as the list of supported symbols for an enum.
 type VariableGen interface {
 	// TagName returns the tag which triggers this validator.
 	TagName() string
@@ -132,8 +138,8 @@ func Function(tagName string, flags FunctionFlags, function types.Name, extraArg
 }
 
 func GenericFunction(tagName string, flags FunctionFlags, function types.Name, typeArgs []types.Name, extraArgs ...any) FunctionGen {
-	// Callers of Signature don't care if the args are all of a known type, it just
-	// makes it easier to declare validators.
+	// Callers of Signature don't care if the args are all of a known type, it
+	// just makes it easier to declare validators.
 	var anyArgs []any
 	if len(extraArgs) > 0 {
 		anyArgs = make([]any, len(extraArgs))
