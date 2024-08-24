@@ -24,6 +24,7 @@ package crosspkg
 import (
 	fmt "fmt"
 
+	operation "k8s.io/apimachinery/pkg/api/operation"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
 	primitives "k8s.io/code-generator/cmd/validation-gen/output_tests/primitives"
@@ -34,29 +35,29 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc((*T1)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*T1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_T1(obj.(*T1), nil)
+			return Validate_T1(opCtx, obj.(*T1), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_T1(opCtx operation.Context, obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// field T1.TypeMeta has no validation
 
 	// field T1.PrimitivesT1
 	errs = append(errs,
 		func(obj primitives.T1, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, primitives.Validate_T1(&obj, fldPath)...)
+			errs = append(errs, primitives.Validate_T1(opCtx, &obj, fldPath)...)
 			return
 		}(obj.PrimitivesT1, fldPath.Child("primitivest1"))...)
 
 	// field T1.PrimitivesT2
 	errs = append(errs,
 		func(obj primitives.T2, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, primitives.Validate_T2(&obj, fldPath)...)
+			errs = append(errs, primitives.Validate_T2(opCtx, &obj, fldPath)...)
 			return
 		}(obj.PrimitivesT2, fldPath.Child("primitivest2"))...)
 
@@ -65,7 +66,7 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// field T1.PrimitivesT4
 	errs = append(errs,
 		func(obj primitives.T4, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, primitives.Validate_T4(&obj, fldPath)...)
+			errs = append(errs, primitives.Validate_T4(opCtx, &obj, fldPath)...)
 			return
 		}(obj.PrimitivesT4, fldPath.Child("primitivest4"))...)
 

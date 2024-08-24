@@ -24,6 +24,7 @@ package union_custom_members
 import (
 	fmt "fmt"
 
+	operation "k8s.io/apimachinery/pkg/api/operation"
 	validate "k8s.io/apimachinery/pkg/api/validate"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
@@ -34,22 +35,22 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc((*T1)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*T1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_T1(obj.(*T1), nil)
+			return Validate_T1(opCtx, obj.(*T1), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*U)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*U)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_U(obj.(*U), nil)
+			return Validate_U(opCtx, obj.(*U), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_M1(obj *M1, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_M1(opCtx operation.Context, obj *M1, fldPath *field.Path) (errs field.ErrorList) {
 	// type M1
 	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type M1")...)
@@ -65,7 +66,7 @@ func Validate_M1(obj *M1, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_M2(obj *M2, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_M2(opCtx operation.Context, obj *M2, fldPath *field.Path) (errs field.ErrorList) {
 	// type M2
 	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type M2")...)
@@ -81,7 +82,7 @@ func Validate_M2(obj *M2, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_T1(opCtx operation.Context, obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// type T1
 	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type T1")...)
@@ -112,7 +113,7 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 
 var unionMembershipForU = validate.NewUnionMembership([2]string{"m1", "CustomM1"}, [2]string{"m2", "CustomM2"})
 
-func Validate_U(obj *U, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_U(opCtx operation.Context, obj *U, fldPath *field.Path) (errs field.ErrorList) {
 	// type U
 	if obj != nil {
 		errs = append(errs, validate.Union(fldPath, *obj, unionMembershipForU, obj.M1, obj.M2)...)
@@ -124,7 +125,7 @@ func Validate_U(obj *U, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs,
 		func(obj *M1, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, Validate_M1(obj, fldPath)...)
+				errs = append(errs, Validate_M1(opCtx, obj, fldPath)...)
 			}
 			return
 		}(obj.M1, fldPath.Child("m1"))...)
@@ -133,7 +134,7 @@ func Validate_U(obj *U, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs,
 		func(obj *M2, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, Validate_M2(obj, fldPath)...)
+				errs = append(errs, Validate_M2(opCtx, obj, fldPath)...)
 			}
 			return
 		}(obj.M2, fldPath.Child("m2"))...)
@@ -142,7 +143,7 @@ func Validate_U(obj *U, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs,
 		func(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, Validate_T1(obj, fldPath)...)
+				errs = append(errs, Validate_T1(opCtx, obj, fldPath)...)
 			}
 			return
 		}(obj.T1, fldPath.Child("t1"))...)

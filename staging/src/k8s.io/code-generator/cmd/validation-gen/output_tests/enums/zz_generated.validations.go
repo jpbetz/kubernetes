@@ -24,6 +24,7 @@ package enums
 import (
 	fmt "fmt"
 
+	operation "k8s.io/apimachinery/pkg/api/operation"
 	validate "k8s.io/apimachinery/pkg/api/validate"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	sets "k8s.io/apimachinery/pkg/util/sets"
@@ -35,9 +36,9 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc((*T1)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*T1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_T1(obj.(*T1), nil)
+			return Validate_T1(opCtx, obj.(*T1), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
@@ -46,7 +47,7 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 
 var symbolsForE0 = sets.New[E0]()
 
-func Validate_E0(obj *E0, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E0(opCtx operation.Context, obj *E0, fldPath *field.Path) (errs field.ErrorList) {
 	// type E0
 	if obj != nil {
 		errs = append(errs, validate.Enum(fldPath, *obj, symbolsForE0)...)
@@ -57,7 +58,7 @@ func Validate_E0(obj *E0, fldPath *field.Path) (errs field.ErrorList) {
 
 var symbolsForE1 = sets.New[E1](e1V1)
 
-func Validate_E1(obj *E1, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E1(opCtx operation.Context, obj *E1, fldPath *field.Path) (errs field.ErrorList) {
 	// type E1
 	if obj != nil {
 		errs = append(errs, validate.Enum(fldPath, *obj, symbolsForE1)...)
@@ -68,7 +69,7 @@ func Validate_E1(obj *E1, fldPath *field.Path) (errs field.ErrorList) {
 
 var symbolsForE2 = sets.New[E2](e2V1, e2V2)
 
-func Validate_E2(obj *E2, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E2(opCtx operation.Context, obj *E2, fldPath *field.Path) (errs field.ErrorList) {
 	// type E2
 	if obj != nil {
 		errs = append(errs, validate.Enum(fldPath, *obj, symbolsForE2)...)
@@ -77,13 +78,13 @@ func Validate_E2(obj *E2, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_T1(opCtx operation.Context, obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// field T1.TypeMeta has no validation
 
 	// field T1.E0
 	errs = append(errs,
 		func(obj E0, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_E0(&obj, fldPath)...)
+			errs = append(errs, Validate_E0(opCtx, &obj, fldPath)...)
 			return
 		}(obj.E0, fldPath.Child("e0"))...)
 
@@ -91,7 +92,7 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs,
 		func(obj *E0, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, Validate_E0(obj, fldPath)...)
+				errs = append(errs, Validate_E0(opCtx, obj, fldPath)...)
 			}
 			return
 		}(obj.PE0, fldPath.Child("pe0"))...)
@@ -99,7 +100,7 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// field T1.E1
 	errs = append(errs,
 		func(obj E1, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_E1(&obj, fldPath)...)
+			errs = append(errs, Validate_E1(opCtx, &obj, fldPath)...)
 			return
 		}(obj.E1, fldPath.Child("e1"))...)
 
@@ -107,7 +108,7 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs,
 		func(obj *E1, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, Validate_E1(obj, fldPath)...)
+				errs = append(errs, Validate_E1(opCtx, obj, fldPath)...)
 			}
 			return
 		}(obj.PE1, fldPath.Child("pe1"))...)
@@ -115,7 +116,7 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// field T1.E2
 	errs = append(errs,
 		func(obj E2, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_E2(&obj, fldPath)...)
+			errs = append(errs, Validate_E2(opCtx, &obj, fldPath)...)
 			return
 		}(obj.E2, fldPath.Child("e2"))...)
 
@@ -123,7 +124,7 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs,
 		func(obj *E2, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, Validate_E2(obj, fldPath)...)
+				errs = append(errs, Validate_E2(opCtx, obj, fldPath)...)
 			}
 			return
 		}(obj.PE2, fldPath.Child("pe2"))...)

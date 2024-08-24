@@ -24,6 +24,7 @@ package discriminated_union
 import (
 	fmt "fmt"
 
+	operation "k8s.io/apimachinery/pkg/api/operation"
 	validate "k8s.io/apimachinery/pkg/api/validate"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
@@ -34,9 +35,9 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc((*DU)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*DU)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_DU(obj.(*DU), nil)
+			return Validate_DU(opCtx, obj.(*DU), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
@@ -45,7 +46,7 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 
 var unionMembershipForDU = validate.NewDiscriminatedUnionMembership("d", [2]string{"m1", "M1"}, [2]string{"m2", "M2"})
 
-func Validate_DU(obj *DU, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_DU(opCtx operation.Context, obj *DU, fldPath *field.Path) (errs field.ErrorList) {
 	// type DU
 	if obj != nil {
 		errs = append(errs, validate.DiscriminatedUnion(fldPath, *obj, unionMembershipForDU, obj.D, obj.M1, obj.M2)...)
@@ -58,7 +59,7 @@ func Validate_DU(obj *DU, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs,
 		func(obj *M1, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, Validate_M1(obj, fldPath)...)
+				errs = append(errs, Validate_M1(opCtx, obj, fldPath)...)
 			}
 			return
 		}(obj.M1, fldPath.Child("m1"))...)
@@ -67,7 +68,7 @@ func Validate_DU(obj *DU, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs,
 		func(obj *M2, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, Validate_M2(obj, fldPath)...)
+				errs = append(errs, Validate_M2(opCtx, obj, fldPath)...)
 			}
 			return
 		}(obj.M2, fldPath.Child("m2"))...)
@@ -75,7 +76,7 @@ func Validate_DU(obj *DU, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_M1(obj *M1, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_M1(opCtx operation.Context, obj *M1, fldPath *field.Path) (errs field.ErrorList) {
 	// type M1
 	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type M1")...)
@@ -91,7 +92,7 @@ func Validate_M1(obj *M1, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_M2(obj *M2, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_M2(opCtx operation.Context, obj *M2, fldPath *field.Path) (errs field.ErrorList) {
 	// type M2
 	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type M2")...)
