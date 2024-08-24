@@ -19,4 +19,8 @@ limitations under the License.
 // function has a similar fingerprint:
 //
 //	func <Name>(fldPath *field.Path, value <type>, <other args...>) field.ErrorList
+//
+// For update validation functions, an additional "oldValue" argument is provided:
+//
+//	func <Name>(fldPath *field.Path, value, oldValue <type>, <other args...>) field.ErrorList
 package validate

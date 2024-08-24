@@ -30,3 +30,14 @@ func FixedResult[T any](fldPath *field.Path, value T, result bool, arg string) f
 		field.Invalid(fldPath, value, "forced failure: "+arg),
 	}
 }
+
+// FixedResultUpdate asserts a fixed boolean result.  This is mostly useful for
+// testing updates.
+func FixedResultUpdate[T any](fldPath *field.Path, value, oldValue T, result bool, arg string) field.ErrorList {
+	if result {
+		return nil
+	}
+	return field.ErrorList{
+		field.Invalid(fldPath, value, "forced failure: "+arg),
+	}
+}
