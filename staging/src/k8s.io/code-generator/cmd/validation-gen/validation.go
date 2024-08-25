@@ -260,7 +260,7 @@ func (n *typeNode) doDump(buf *bytes.Buffer, indent int, visited map[*typeNode]b
 	}
 	for _, val := range n.typeValidations.Variables {
 		n.dumpIndent(buf, indent)
-		buf.WriteString(fmt.Sprintf("type-validation variable: %s := %v(%+v)\n", val.Var().Name, val.Init()))
+		buf.WriteString(fmt.Sprintf("type-validation variable: %s := %v\n", val.Var().Name, val.Init()))
 	}
 	n.dumpChildren(buf, indent, visited)
 }
