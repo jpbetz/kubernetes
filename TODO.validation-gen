@@ -87,6 +87,8 @@
 - Handle +optional as a short-circuit but not an error
 - If a field is not +required and not +optional, do we pass nil values to
   validators?  Do they all need to nil-check?
+- sort unions (validation-gen/output_tests/unions/multiple_discriminated_unions
+  is unstable)
 
 
 

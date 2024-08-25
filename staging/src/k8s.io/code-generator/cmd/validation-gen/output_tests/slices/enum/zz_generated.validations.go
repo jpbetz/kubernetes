@@ -45,9 +45,7 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 
 func Validate_E1(obj *E1, fldPath *field.Path) (errs field.ErrorList) {
 	// type E1
-	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type E1")...)
-	}
+	errs = append(errs, validate.FixedResult(fldPath, obj, true, "type E1")...)
 
 	return errs
 }
@@ -61,11 +59,11 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.LE1")...)
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj E1, fldPath *field.Path) (errs field.ErrorList) {
+					func(obj *E1, fldPath *field.Path) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(fldPath, obj, true, "T1.LE1[vals]")...)
-						errs = append(errs, Validate_E1(&obj, fldPath)...)
+						errs = append(errs, Validate_E1(obj, fldPath)...)
 						return
-					}(val, fldPath.Index(i))...)
+					}(&val, fldPath.Index(i))...)
 			}
 			return
 		}(obj.LE1, fldPath.Child("le1"))...)
@@ -77,12 +75,8 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
 					func(obj *E1, fldPath *field.Path) (errs field.ErrorList) {
-						if obj != nil {
-							errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T1.LPE1[vals]")...)
-						}
-						if obj != nil {
-							errs = append(errs, Validate_E1(obj, fldPath)...)
-						}
+						errs = append(errs, validate.FixedResult(fldPath, obj, true, "T1.LPE1[vals]")...)
+						errs = append(errs, Validate_E1(obj, fldPath)...)
 						return
 					}(val, fldPath.Index(i))...)
 			}

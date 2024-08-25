@@ -335,9 +335,7 @@ var unionMembershipForAppArmorProfile = validate.NewDiscriminatedUnionMembership
 
 func Validate_AppArmorProfile(obj *v1.AppArmorProfile, fldPath *field.Path) (errs field.ErrorList) {
 	// type v1.AppArmorProfile
-	if obj != nil {
-		errs = append(errs, validate.DiscriminatedUnion(fldPath, *obj, unionMembershipForAppArmorProfile, obj.Type)...)
-	}
+	errs = append(errs, validate.DiscriminatedUnion(fldPath, obj, unionMembershipForAppArmorProfile, obj.Type)...)
 
 	// field v1.AppArmorProfile.Type has no validation
 	// field v1.AppArmorProfile.LocalhostProfile has no validation
@@ -406,9 +404,7 @@ func Validate_Container(obj *v1.Container, fldPath *field.Path) (errs field.Erro
 	// field v1.Container.SecurityContext
 	errs = append(errs,
 		func(obj *v1.SecurityContext, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, Validate_SecurityContext(obj, fldPath)...)
-			}
+			errs = append(errs, Validate_SecurityContext(obj, fldPath)...)
 			return
 		}(obj.SecurityContext, fldPath.Child("securityContext"))...)
 
@@ -438,10 +434,10 @@ func Validate_ContainerStatus(obj *v1.ContainerStatus, fldPath *field.Path) (err
 		func(obj []v1.ResourceStatus, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj v1.ResourceStatus, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, Validate_ResourceStatus(&obj, fldPath)...)
+					func(obj *v1.ResourceStatus, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ResourceStatus(obj, fldPath)...)
 						return
-					}(val, fldPath.Index(i))...)
+					}(&val, fldPath.Index(i))...)
 			}
 			return
 		}(obj.AllocatedResourcesStatus, fldPath.Child("allocatedResourcesStatus"))...)
@@ -493,9 +489,7 @@ func Validate_EphemeralContainerCommon(obj *v1.EphemeralContainerCommon, fldPath
 	// field v1.EphemeralContainerCommon.SecurityContext
 	errs = append(errs,
 		func(obj *v1.SecurityContext, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, Validate_SecurityContext(obj, fldPath)...)
-			}
+			errs = append(errs, Validate_SecurityContext(obj, fldPath)...)
 			return
 		}(obj.SecurityContext, fldPath.Child("securityContext"))...)
 
@@ -535,13 +529,13 @@ func Validate_EventList(obj *v1.EventList, fldPath *field.Path) (errs field.Erro
 func Validate_HostAlias(obj *v1.HostAlias, fldPath *field.Path) (errs field.ErrorList) {
 	// field v1.HostAlias.IP
 	errs = append(errs,
-		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.Required(fldPath, obj); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
 			return
-		}(obj.IP, fldPath.Child("ip"))...)
+		}(&obj.IP, fldPath.Child("ip"))...)
 
 	// field v1.HostAlias.Hostnames has no validation
 	return errs
@@ -550,13 +544,13 @@ func Validate_HostAlias(obj *v1.HostAlias, fldPath *field.Path) (errs field.Erro
 func Validate_HostIP(obj *v1.HostIP, fldPath *field.Path) (errs field.ErrorList) {
 	// field v1.HostIP.IP
 	errs = append(errs,
-		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.Required(fldPath, obj); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
 			return
-		}(obj.IP, fldPath.Child("ip"))...)
+		}(&obj.IP, fldPath.Child("ip"))...)
 
 	return errs
 }
@@ -654,17 +648,17 @@ func Validate_Pod(obj *v1.Pod, fldPath *field.Path) (errs field.ErrorList) {
 
 	// field v1.Pod.Spec
 	errs = append(errs,
-		func(obj v1.PodSpec, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_PodSpec(&obj, fldPath)...)
+		func(obj *v1.PodSpec, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_PodSpec(obj, fldPath)...)
 			return
-		}(obj.Spec, fldPath.Child("spec"))...)
+		}(&obj.Spec, fldPath.Child("spec"))...)
 
 	// field v1.Pod.Status
 	errs = append(errs,
-		func(obj v1.PodStatus, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_PodStatus(&obj, fldPath)...)
+		func(obj *v1.PodStatus, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_PodStatus(obj, fldPath)...)
 			return
-		}(obj.Status, fldPath.Child("status"))...)
+		}(&obj.Status, fldPath.Child("status"))...)
 
 	return errs
 }
@@ -693,13 +687,13 @@ func Validate_PodExecOptions(obj *v1.PodExecOptions, fldPath *field.Path) (errs 
 func Validate_PodIP(obj *v1.PodIP, fldPath *field.Path) (errs field.ErrorList) {
 	// field v1.PodIP.IP
 	errs = append(errs,
-		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.Required(fldPath, obj); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
 			return
-		}(obj.IP, fldPath.Child("ip"))...)
+		}(&obj.IP, fldPath.Child("ip"))...)
 
 	return errs
 }
@@ -713,10 +707,10 @@ func Validate_PodList(obj *v1.PodList, fldPath *field.Path) (errs field.ErrorLis
 		func(obj []v1.Pod, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj v1.Pod, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, Validate_Pod(&obj, fldPath)...)
+					func(obj *v1.Pod, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Pod(obj, fldPath)...)
 						return
-					}(val, fldPath.Index(i))...)
+					}(&val, fldPath.Index(i))...)
 			}
 			return
 		}(obj.Items, fldPath.Child("items"))...)
@@ -765,18 +759,14 @@ func Validate_PodSecurityContext(obj *v1.PodSecurityContext, fldPath *field.Path
 	// field v1.PodSecurityContext.SeccompProfile
 	errs = append(errs,
 		func(obj *v1.SeccompProfile, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, Validate_SeccompProfile(obj, fldPath)...)
-			}
+			errs = append(errs, Validate_SeccompProfile(obj, fldPath)...)
 			return
 		}(obj.SeccompProfile, fldPath.Child("seccompProfile"))...)
 
 	// field v1.PodSecurityContext.AppArmorProfile
 	errs = append(errs,
 		func(obj *v1.AppArmorProfile, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, Validate_AppArmorProfile(obj, fldPath)...)
-			}
+			errs = append(errs, Validate_AppArmorProfile(obj, fldPath)...)
 			return
 		}(obj.AppArmorProfile, fldPath.Child("appArmorProfile"))...)
 
@@ -789,10 +779,10 @@ func Validate_PodSpec(obj *v1.PodSpec, fldPath *field.Path) (errs field.ErrorLis
 		func(obj []v1.Volume, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj v1.Volume, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, Validate_Volume(&obj, fldPath)...)
+					func(obj *v1.Volume, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Volume(obj, fldPath)...)
 						return
-					}(val, fldPath.Index(i))...)
+					}(&val, fldPath.Index(i))...)
 			}
 			return
 		}(obj.Volumes, fldPath.Child("volumes"))...)
@@ -802,10 +792,10 @@ func Validate_PodSpec(obj *v1.PodSpec, fldPath *field.Path) (errs field.ErrorLis
 		func(obj []v1.Container, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj v1.Container, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, Validate_Container(&obj, fldPath)...)
+					func(obj *v1.Container, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Container(obj, fldPath)...)
 						return
-					}(val, fldPath.Index(i))...)
+					}(&val, fldPath.Index(i))...)
 			}
 			return
 		}(obj.InitContainers, fldPath.Child("initContainers"))...)
@@ -815,10 +805,10 @@ func Validate_PodSpec(obj *v1.PodSpec, fldPath *field.Path) (errs field.ErrorLis
 		func(obj []v1.Container, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj v1.Container, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, Validate_Container(&obj, fldPath)...)
+					func(obj *v1.Container, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Container(obj, fldPath)...)
 						return
-					}(val, fldPath.Index(i))...)
+					}(&val, fldPath.Index(i))...)
 			}
 			return
 		}(obj.Containers, fldPath.Child("containers"))...)
@@ -828,10 +818,10 @@ func Validate_PodSpec(obj *v1.PodSpec, fldPath *field.Path) (errs field.ErrorLis
 		func(obj []v1.EphemeralContainer, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj v1.EphemeralContainer, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, Validate_EphemeralContainer(&obj, fldPath)...)
+					func(obj *v1.EphemeralContainer, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_EphemeralContainer(obj, fldPath)...)
 						return
-					}(val, fldPath.Index(i))...)
+					}(&val, fldPath.Index(i))...)
 			}
 			return
 		}(obj.EphemeralContainers, fldPath.Child("ephemeralContainers"))...)
@@ -853,9 +843,7 @@ func Validate_PodSpec(obj *v1.PodSpec, fldPath *field.Path) (errs field.ErrorLis
 	// field v1.PodSpec.SecurityContext
 	errs = append(errs,
 		func(obj *v1.PodSecurityContext, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, Validate_PodSecurityContext(obj, fldPath)...)
-			}
+			errs = append(errs, Validate_PodSecurityContext(obj, fldPath)...)
 			return
 		}(obj.SecurityContext, fldPath.Child("securityContext"))...)
 
@@ -871,10 +859,10 @@ func Validate_PodSpec(obj *v1.PodSpec, fldPath *field.Path) (errs field.ErrorLis
 		func(obj []v1.HostAlias, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj v1.HostAlias, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, Validate_HostAlias(&obj, fldPath)...)
+					func(obj *v1.HostAlias, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_HostAlias(obj, fldPath)...)
 						return
-					}(val, fldPath.Index(i))...)
+					}(&val, fldPath.Index(i))...)
 			}
 			return
 		}(obj.HostAliases, fldPath.Child("hostAliases"))...)
@@ -909,10 +897,10 @@ func Validate_PodStatus(obj *v1.PodStatus, fldPath *field.Path) (errs field.Erro
 		func(obj []v1.HostIP, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj v1.HostIP, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, Validate_HostIP(&obj, fldPath)...)
+					func(obj *v1.HostIP, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_HostIP(obj, fldPath)...)
 						return
-					}(val, fldPath.Index(i))...)
+					}(&val, fldPath.Index(i))...)
 			}
 			return
 		}(obj.HostIPs, fldPath.Child("hostIPs"))...)
@@ -924,10 +912,10 @@ func Validate_PodStatus(obj *v1.PodStatus, fldPath *field.Path) (errs field.Erro
 		func(obj []v1.PodIP, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj v1.PodIP, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, Validate_PodIP(&obj, fldPath)...)
+					func(obj *v1.PodIP, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_PodIP(obj, fldPath)...)
 						return
-					}(val, fldPath.Index(i))...)
+					}(&val, fldPath.Index(i))...)
 			}
 			return
 		}(obj.PodIPs, fldPath.Child("podIPs"))...)
@@ -939,10 +927,10 @@ func Validate_PodStatus(obj *v1.PodStatus, fldPath *field.Path) (errs field.Erro
 		func(obj []v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, Validate_ContainerStatus(&obj, fldPath)...)
+					func(obj *v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ContainerStatus(obj, fldPath)...)
 						return
-					}(val, fldPath.Index(i))...)
+					}(&val, fldPath.Index(i))...)
 			}
 			return
 		}(obj.InitContainerStatuses, fldPath.Child("initContainerStatuses"))...)
@@ -952,10 +940,10 @@ func Validate_PodStatus(obj *v1.PodStatus, fldPath *field.Path) (errs field.Erro
 		func(obj []v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, Validate_ContainerStatus(&obj, fldPath)...)
+					func(obj *v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ContainerStatus(obj, fldPath)...)
 						return
-					}(val, fldPath.Index(i))...)
+					}(&val, fldPath.Index(i))...)
 			}
 			return
 		}(obj.ContainerStatuses, fldPath.Child("containerStatuses"))...)
@@ -967,10 +955,10 @@ func Validate_PodStatus(obj *v1.PodStatus, fldPath *field.Path) (errs field.Erro
 		func(obj []v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, Validate_ContainerStatus(&obj, fldPath)...)
+					func(obj *v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ContainerStatus(obj, fldPath)...)
 						return
-					}(val, fldPath.Index(i))...)
+					}(&val, fldPath.Index(i))...)
 			}
 			return
 		}(obj.EphemeralContainerStatuses, fldPath.Child("ephemeralContainerStatuses"))...)
@@ -986,10 +974,10 @@ func Validate_PodStatusResult(obj *v1.PodStatusResult, fldPath *field.Path) (err
 
 	// field v1.PodStatusResult.Status
 	errs = append(errs,
-		func(obj v1.PodStatus, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_PodStatus(&obj, fldPath)...)
+		func(obj *v1.PodStatus, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_PodStatus(obj, fldPath)...)
 			return
-		}(obj.Status, fldPath.Child("status"))...)
+		}(&obj.Status, fldPath.Child("status"))...)
 
 	return errs
 }
@@ -1000,10 +988,10 @@ func Validate_PodTemplate(obj *v1.PodTemplate, fldPath *field.Path) (errs field.
 
 	// field v1.PodTemplate.Template
 	errs = append(errs,
-		func(obj v1.PodTemplateSpec, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_PodTemplateSpec(&obj, fldPath)...)
+		func(obj *v1.PodTemplateSpec, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_PodTemplateSpec(obj, fldPath)...)
 			return
-		}(obj.Template, fldPath.Child("template"))...)
+		}(&obj.Template, fldPath.Child("template"))...)
 
 	return errs
 }
@@ -1017,10 +1005,10 @@ func Validate_PodTemplateList(obj *v1.PodTemplateList, fldPath *field.Path) (err
 		func(obj []v1.PodTemplate, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj v1.PodTemplate, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, Validate_PodTemplate(&obj, fldPath)...)
+					func(obj *v1.PodTemplate, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_PodTemplate(obj, fldPath)...)
 						return
-					}(val, fldPath.Index(i))...)
+					}(&val, fldPath.Index(i))...)
 			}
 			return
 		}(obj.Items, fldPath.Child("items"))...)
@@ -1033,10 +1021,10 @@ func Validate_PodTemplateSpec(obj *v1.PodTemplateSpec, fldPath *field.Path) (err
 
 	// field v1.PodTemplateSpec.Spec
 	errs = append(errs,
-		func(obj v1.PodSpec, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_PodSpec(&obj, fldPath)...)
+		func(obj *v1.PodSpec, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_PodSpec(obj, fldPath)...)
 			return
-		}(obj.Spec, fldPath.Child("spec"))...)
+		}(&obj.Spec, fldPath.Child("spec"))...)
 
 	return errs
 }
@@ -1055,10 +1043,10 @@ func Validate_ReplicationController(obj *v1.ReplicationController, fldPath *fiel
 
 	// field v1.ReplicationController.Spec
 	errs = append(errs,
-		func(obj v1.ReplicationControllerSpec, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_ReplicationControllerSpec(&obj, fldPath)...)
+		func(obj *v1.ReplicationControllerSpec, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_ReplicationControllerSpec(obj, fldPath)...)
 			return
-		}(obj.Spec, fldPath.Child("spec"))...)
+		}(&obj.Spec, fldPath.Child("spec"))...)
 
 	// field v1.ReplicationController.Status has no validation
 	return errs
@@ -1073,10 +1061,10 @@ func Validate_ReplicationControllerList(obj *v1.ReplicationControllerList, fldPa
 		func(obj []v1.ReplicationController, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj v1.ReplicationController, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, Validate_ReplicationController(&obj, fldPath)...)
+					func(obj *v1.ReplicationController, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ReplicationController(obj, fldPath)...)
 						return
-					}(val, fldPath.Index(i))...)
+					}(&val, fldPath.Index(i))...)
 			}
 			return
 		}(obj.Items, fldPath.Child("items"))...)
@@ -1092,9 +1080,7 @@ func Validate_ReplicationControllerSpec(obj *v1.ReplicationControllerSpec, fldPa
 	// field v1.ReplicationControllerSpec.Template
 	errs = append(errs,
 		func(obj *v1.PodTemplateSpec, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, Validate_PodTemplateSpec(obj, fldPath)...)
-			}
+			errs = append(errs, Validate_PodTemplateSpec(obj, fldPath)...)
 			return
 		}(obj.Template, fldPath.Child("template"))...)
 
@@ -1119,13 +1105,13 @@ func Validate_ResourceQuotaList(obj *v1.ResourceQuotaList, fldPath *field.Path) 
 func Validate_ResourceStatus(obj *v1.ResourceStatus, fldPath *field.Path) (errs field.ErrorList) {
 	// field v1.ResourceStatus.Name
 	errs = append(errs,
-		func(obj v1.ResourceName, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj *v1.ResourceName, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.Required(fldPath, obj); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
 			return
-		}(obj.Name, fldPath.Child("name"))...)
+		}(&obj.Name, fldPath.Child("name"))...)
 
 	// field v1.ResourceStatus.Resources has no validation
 	return errs
@@ -1135,9 +1121,7 @@ var unionMembershipForSeccompProfile = validate.NewDiscriminatedUnionMembership(
 
 func Validate_SeccompProfile(obj *v1.SeccompProfile, fldPath *field.Path) (errs field.ErrorList) {
 	// type v1.SeccompProfile
-	if obj != nil {
-		errs = append(errs, validate.DiscriminatedUnion(fldPath, *obj, unionMembershipForSeccompProfile, obj.Type)...)
-	}
+	errs = append(errs, validate.DiscriminatedUnion(fldPath, obj, unionMembershipForSeccompProfile, obj.Type)...)
 
 	// field v1.SeccompProfile.Type has no validation
 	// field v1.SeccompProfile.LocalhostProfile has no validation
@@ -1176,18 +1160,14 @@ func Validate_SecurityContext(obj *v1.SecurityContext, fldPath *field.Path) (err
 	// field v1.SecurityContext.SeccompProfile
 	errs = append(errs,
 		func(obj *v1.SeccompProfile, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, Validate_SeccompProfile(obj, fldPath)...)
-			}
+			errs = append(errs, Validate_SeccompProfile(obj, fldPath)...)
 			return
 		}(obj.SeccompProfile, fldPath.Child("seccompProfile"))...)
 
 	// field v1.SecurityContext.AppArmorProfile
 	errs = append(errs,
 		func(obj *v1.AppArmorProfile, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, Validate_AppArmorProfile(obj, fldPath)...)
-			}
+			errs = append(errs, Validate_AppArmorProfile(obj, fldPath)...)
 			return
 		}(obj.AppArmorProfile, fldPath.Child("appArmorProfile"))...)
 
@@ -1240,14 +1220,14 @@ func Validate_ServiceProxyOptions(obj *v1.ServiceProxyOptions, fldPath *field.Pa
 func Validate_Volume(obj *v1.Volume, fldPath *field.Path) (errs field.ErrorList) {
 	// field v1.Volume.Name
 	errs = append(errs,
-		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.Required(fldPath, obj); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
 			errs = append(errs, validate.DNSLabel(fldPath, obj)...)
 			return
-		}(obj.Name, fldPath.Child("name"))...)
+		}(&obj.Name, fldPath.Child("name"))...)
 
 	// field v1.Volume.VolumeSource has no validation
 	return errs

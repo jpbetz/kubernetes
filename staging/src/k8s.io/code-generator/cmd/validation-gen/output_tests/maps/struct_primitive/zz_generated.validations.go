@@ -45,9 +45,7 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 
 func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// type T1
-	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type T1")...)
-	}
+	errs = append(errs, validate.FixedResult(fldPath, obj, true, "type T1")...)
 
 	// field T1.TypeMeta has no validation
 
@@ -57,16 +55,16 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.MT2S")...)
 			for key, val := range obj {
 				errs = append(errs,
-					func(obj T2, fldPath *field.Path) (errs field.ErrorList) {
+					func(obj *T2, fldPath *field.Path) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(fldPath, obj, true, "T1.MT2S[keys]")...)
-						errs = append(errs, Validate_T2(&obj, fldPath)...)
+						errs = append(errs, Validate_T2(obj, fldPath)...)
 						return
-					}(key, fldPath)...)
+					}(&key, fldPath)...)
 				errs = append(errs,
-					func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+					func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(fldPath, obj, true, "T1.MT2S[vals]")...)
 						return
-					}(val, fldPath.Key(key))...)
+					}(&val, fldPath.Key(key))...)
 			}
 			return
 		}(obj.MT2S, fldPath.Child("mt2s"))...)
@@ -78,19 +76,15 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 			for key, val := range obj {
 				errs = append(errs,
 					func(obj *T2, fldPath *field.Path) (errs field.ErrorList) {
-						if obj != nil {
-							errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T1.MPT2S[keys]")...)
-						}
-						if obj != nil {
-							errs = append(errs, Validate_T2(obj, fldPath)...)
-						}
+						errs = append(errs, validate.FixedResult(fldPath, obj, true, "T1.MPT2S[keys]")...)
+						errs = append(errs, Validate_T2(obj, fldPath)...)
 						return
 					}(key, fldPath)...)
 				errs = append(errs,
-					func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+					func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(fldPath, obj, true, "T1.MPT2S[vals]")...)
 						return
-					}(val, fldPath.Key(key))...)
+					}(&val, fldPath.Key(key))...)
 			}
 			return
 		}(obj.MPT2S, fldPath.Child("mpt2s"))...)
@@ -100,16 +94,14 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_T2(obj *T2, fldPath *field.Path) (errs field.ErrorList) {
 	// type T2
-	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type T2")...)
-	}
+	errs = append(errs, validate.FixedResult(fldPath, obj, true, "type T2")...)
 
 	// field T2.S
 	errs = append(errs,
-		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.S")...)
 			return
-		}(obj.S, fldPath.Child("s"))...)
+		}(&obj.S, fldPath.Child("s"))...)
 
 	return errs
 }

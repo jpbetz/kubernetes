@@ -48,26 +48,26 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 
 	// field T1.PrimitivesT1
 	errs = append(errs,
-		func(obj primitives.T1, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, primitives.Validate_T1(&obj, fldPath)...)
+		func(obj *primitives.T1, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, primitives.Validate_T1(obj, fldPath)...)
 			return
-		}(obj.PrimitivesT1, fldPath.Child("primitivest1"))...)
+		}(&obj.PrimitivesT1, fldPath.Child("primitivest1"))...)
 
 	// field T1.PrimitivesT2
 	errs = append(errs,
-		func(obj primitives.T2, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, primitives.Validate_T2(&obj, fldPath)...)
+		func(obj *primitives.T2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, primitives.Validate_T2(obj, fldPath)...)
 			return
-		}(obj.PrimitivesT2, fldPath.Child("primitivest2"))...)
+		}(&obj.PrimitivesT2, fldPath.Child("primitivest2"))...)
 
 	// field T1.PrimitivesT3 has no validation
 
 	// field T1.PrimitivesT4
 	errs = append(errs,
-		func(obj primitives.T4, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, primitives.Validate_T4(&obj, fldPath)...)
+		func(obj *primitives.T4, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, primitives.Validate_T4(obj, fldPath)...)
 			return
-		}(obj.PrimitivesT4, fldPath.Child("primitivest4"))...)
+		}(&obj.PrimitivesT4, fldPath.Child("primitivest4"))...)
 
 	// field T1.PrimitivesT5 has no validation
 	return errs

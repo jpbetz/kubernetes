@@ -63,9 +63,7 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 
 func Validate_E1(obj *E1, fldPath *field.Path) (errs field.ErrorList) {
 	// type E1
-	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type E1")...)
-	}
+	errs = append(errs, validate.FixedResult(fldPath, obj, true, "type E1")...)
 
 	return errs
 }
@@ -76,16 +74,14 @@ func Validate_E2(obj *E2, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// type T1
-	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type T1")...)
-	}
+	errs = append(errs, validate.FixedResult(fldPath, obj, true, "type T1")...)
 
 	// field T1.S
 	errs = append(errs,
-		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.S")...)
 			return
-		}(obj.S, fldPath.Child("s"))...)
+		}(&obj.S, fldPath.Child("s"))...)
 
 	return errs
 }

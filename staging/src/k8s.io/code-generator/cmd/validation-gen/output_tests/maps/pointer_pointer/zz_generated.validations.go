@@ -45,9 +45,7 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 
 func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// type T1
-	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type T1")...)
-	}
+	errs = append(errs, validate.FixedResult(fldPath, obj, true, "type T1")...)
 
 	// field T1.TypeMeta has no validation
 
@@ -58,16 +56,12 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 			for key, val := range obj {
 				errs = append(errs,
 					func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
-						if obj != nil {
-							errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T1.MPSPS[keys]")...)
-						}
+						errs = append(errs, validate.FixedResult(fldPath, obj, true, "T1.MPSPS[keys]")...)
 						return
 					}(key, fldPath)...)
 				errs = append(errs,
 					func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
-						if obj != nil {
-							errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T1.MPSPS[vals]")...)
-						}
+						errs = append(errs, validate.FixedResult(fldPath, obj, true, "T1.MPSPS[vals]")...)
 						return
 					}(val, fldPath.Key(key))...)
 			}

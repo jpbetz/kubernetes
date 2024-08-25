@@ -49,48 +49,36 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// field T1.PS
 	errs = append(errs,
 		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T1.PS")...)
-			}
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.PS")...)
 			return
 		}(obj.PS, fldPath.Child("ps"))...)
 
 	// field T1.PI
 	errs = append(errs,
 		func(obj *int, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T1.PI")...)
-			}
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.PI")...)
 			return
 		}(obj.PI, fldPath.Child("pi"))...)
 
 	// field T1.PB
 	errs = append(errs,
 		func(obj *bool, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T1.PB")...)
-			}
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.PB")...)
 			return
 		}(obj.PB, fldPath.Child("pb"))...)
 
 	// field T1.PF
 	errs = append(errs,
 		func(obj *float64, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T1.PF")...)
-			}
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.PF")...)
 			return
 		}(obj.PF, fldPath.Child("pf"))...)
 
 	// field T1.PT2
 	errs = append(errs,
 		func(obj *T2, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T1.PT2")...)
-			}
-			if obj != nil {
-				errs = append(errs, Validate_T2(obj, fldPath)...)
-			}
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.PT2")...)
+			errs = append(errs, Validate_T2(obj, fldPath)...)
 			return
 		}(obj.PT2, fldPath.Child("pt2"))...)
 
@@ -105,36 +93,28 @@ func Validate_T2(obj *T2, fldPath *field.Path) (errs field.ErrorList) {
 	// field T2.PS
 	errs = append(errs,
 		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T2.PS")...)
-			}
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.PS")...)
 			return
 		}(obj.PS, fldPath.Child("ps"))...)
 
 	// field T2.PI
 	errs = append(errs,
 		func(obj *int, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T2.PI")...)
-			}
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.PI")...)
 			return
 		}(obj.PI, fldPath.Child("pi"))...)
 
 	// field T2.PB
 	errs = append(errs,
 		func(obj *bool, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T2.PB")...)
-			}
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.PB")...)
 			return
 		}(obj.PB, fldPath.Child("pb"))...)
 
 	// field T2.PF
 	errs = append(errs,
 		func(obj *float64, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T2.PF")...)
-			}
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.PF")...)
 			return
 		}(obj.PF, fldPath.Child("pf"))...)
 

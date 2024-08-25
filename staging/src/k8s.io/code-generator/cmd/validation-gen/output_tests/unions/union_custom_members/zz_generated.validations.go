@@ -51,41 +51,35 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 
 func Validate_M1(obj *M1, fldPath *field.Path) (errs field.ErrorList) {
 	// type M1
-	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type M1")...)
-	}
+	errs = append(errs, validate.FixedResult(fldPath, obj, true, "type M1")...)
 
 	// field M1.S
 	errs = append(errs,
-		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field M1.S")...)
 			return
-		}(obj.S, fldPath.Child("s"))...)
+		}(&obj.S, fldPath.Child("s"))...)
 
 	return errs
 }
 
 func Validate_M2(obj *M2, fldPath *field.Path) (errs field.ErrorList) {
 	// type M2
-	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type M2")...)
-	}
+	errs = append(errs, validate.FixedResult(fldPath, obj, true, "type M2")...)
 
 	// field M2.S
 	errs = append(errs,
-		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field M2.S")...)
 			return
-		}(obj.S, fldPath.Child("s"))...)
+		}(&obj.S, fldPath.Child("s"))...)
 
 	return errs
 }
 
 func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// type T1
-	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type T1")...)
-	}
+	errs = append(errs, validate.FixedResult(fldPath, obj, true, "type T1")...)
 
 	// field T1.TypeMeta has no validation
 
@@ -95,14 +89,14 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.LS")...)
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+					func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
 						if e := validate.Required(fldPath, obj); len(e) != 0 {
 							errs = append(errs, e...)
 							return // fatal
 						}
 						errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.LS[*]")...)
 						return
-					}(val, fldPath.Index(i))...)
+					}(&val, fldPath.Index(i))...)
 			}
 			return
 		}(obj.LS, fldPath.Child("ls"))...)
@@ -114,36 +108,28 @@ var unionMembershipForU = validate.NewUnionMembership([2]string{"m1", "CustomM1"
 
 func Validate_U(obj *U, fldPath *field.Path) (errs field.ErrorList) {
 	// type U
-	if obj != nil {
-		errs = append(errs, validate.Union(fldPath, *obj, unionMembershipForU, obj.M1, obj.M2)...)
-	}
+	errs = append(errs, validate.Union(fldPath, obj, unionMembershipForU, obj.M1, obj.M2)...)
 
 	// field U.TypeMeta has no validation
 
 	// field U.M1
 	errs = append(errs,
 		func(obj *M1, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, Validate_M1(obj, fldPath)...)
-			}
+			errs = append(errs, Validate_M1(obj, fldPath)...)
 			return
 		}(obj.M1, fldPath.Child("m1"))...)
 
 	// field U.M2
 	errs = append(errs,
 		func(obj *M2, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, Validate_M2(obj, fldPath)...)
-			}
+			errs = append(errs, Validate_M2(obj, fldPath)...)
 			return
 		}(obj.M2, fldPath.Child("m2"))...)
 
 	// field U.T1
 	errs = append(errs,
 		func(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, Validate_T1(obj, fldPath)...)
-			}
+			errs = append(errs, Validate_T1(obj, fldPath)...)
 			return
 		}(obj.T1, fldPath.Child("t1"))...)
 

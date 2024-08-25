@@ -47,9 +47,7 @@ var unionMembershipForDU1 = validate.NewDiscriminatedUnionMembership("d")
 
 func Validate_DU1(obj *DU1, fldPath *field.Path) (errs field.ErrorList) {
 	// type DU1
-	if obj != nil {
-		errs = append(errs, validate.DiscriminatedUnion(fldPath, *obj, unionMembershipForDU1, obj.D)...)
-	}
+	errs = append(errs, validate.DiscriminatedUnion(fldPath, obj, unionMembershipForDU1, obj.D)...)
 
 	// field DU1.TypeMeta has no validation
 	// field DU1.D has no validation
