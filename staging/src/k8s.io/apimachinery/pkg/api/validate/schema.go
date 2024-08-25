@@ -44,3 +44,16 @@ func Required[T comparable](fldPath *field.Path, value *T) field.ErrorList {
 	}
 	return field.ErrorList{field.Required(fldPath, "")}
 }
+
+// Optional verifies that the specified value is not the zero-value for its
+// type. This is identical to Required, but the caller should treat an error
+// here as an indication that the optional value was not specified.
+func Optional[T comparable](fldPath *field.Path, value *T) field.ErrorList {
+	if value != nil {
+		var zero T
+		if *value != zero {
+			return nil
+		}
+	}
+	return field.ErrorList{field.Required(fldPath, "optional value was not specified")}
+}

@@ -52,13 +52,6 @@ type errorDeclarativeValidator struct {
 }
 
 const (
-	// These tags can take no value or a quoted string or a JSON object, which will be used in the
-	// error message.  The JSON object schema is:
-	//   {
-	//     "flags": <list-of-string>  # optional, values: "IsFatal"
-	//     "msg":   <string>          # required
-	//     "typeArg" <string>         # optional. If set, binds the type arg. Example: "time.Duration"
-	//   }
 	validateTrueTagName  = "validateTrue"  // TODO: also support k8s:...
 	validateFalseTagName = "validateFalse" // TODO: also support k8s:...
 
@@ -114,7 +107,7 @@ func (v fixedResultDeclarativeValidator) Docs() []TagDoc {
 				Schema: []TagPayloadSchema{{
 					Key:   "flags",
 					Value: "<list-of-flag-string>",
-					Docs:  `values: IsFatal`,
+					Docs:  `values: IsFatal, NonError`,
 				}, {
 					Key:   "msg",
 					Value: "<string>",
@@ -139,7 +132,7 @@ func (v fixedResultDeclarativeValidator) Docs() []TagDoc {
 				Schema: []TagPayloadSchema{{
 					Key:   "flags",
 					Value: "<list-of-flag-string>",
-					Docs:  `values: IsFatal`,
+					Docs:  `values: IsFatal, NonError`,
 				}, {
 					Key:   "msg",
 					Value: "<string>",
@@ -183,6 +176,8 @@ func (_ fixedResultDeclarativeValidator) parseTagVal(in string) (tagVal, error) 
 		switch fl {
 		case "IsFatal":
 			flags |= IsFatal
+		case "NonError":
+			flags |= NonError
 		default:
 			return tagVal{}, fmt.Errorf("unknown flag: %q", fl)
 		}

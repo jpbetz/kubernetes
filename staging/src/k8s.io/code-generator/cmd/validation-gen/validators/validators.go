@@ -77,6 +77,11 @@ const (
 	// IsFatal indicates that further validations should be skipped if this
 	// validator fails. Most validators are not fatal.
 	IsFatal FunctionFlags = 1 << iota
+
+	// NonError indicates that a failure of this validator should not be
+	// accumulated as an error, but should trigger other aspects of the failure
+	// path (e.g. early return when combined with IsFatal).
+	NonError
 )
 
 // FunctionGen provides validation-gen with the information needed to generate a

@@ -1013,6 +1013,7 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 
 	for _, v := range validations {
 		isFatal := (v.Flags().IsSet(validators.IsFatal))
+		isNonError := (v.Flags().IsSet(validators.NonError))
 
 		fn, extraArgs := v.SignatureAndArgs()
 		targs := generator.Args{
@@ -1044,13 +1045,19 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 			sw.Do("if e := ", nil)
 			emitCall()
 			sw.Do("; len(e) != 0 {\n", nil)
-			sw.Do("errs = append(errs, e...)\n", nil)
+			if !isNonError {
+				sw.Do("errs = append(errs, e...)\n", nil)
+			}
 			sw.Do("    return // fatal\n", nil)
 			sw.Do("}\n", nil)
 		} else {
-			sw.Do("errs = append(errs, ", nil)
-			emitCall()
-			sw.Do("...)\n", nil)
+			if isNonError {
+				emitCall()
+			} else {
+				sw.Do("errs = append(errs, ", nil)
+				emitCall()
+				sw.Do("...)\n", nil)
+			}
 		}
 	}
 }
