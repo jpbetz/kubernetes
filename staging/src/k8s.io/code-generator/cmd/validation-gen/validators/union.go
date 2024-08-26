@@ -19,6 +19,7 @@ package validators
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
@@ -161,7 +162,15 @@ func (c *unionDeclarativeValidator) ExtractValidations(t *types.Type, comments [
 			}
 		}
 	}
-	for unionName, u := range unions {
+
+	// Sort the keys for stable output.
+	keys := make([]string, 0, len(unions))
+	for k := range unions {
+		keys = append(keys, k)
+	}
+	slices.Sort(keys)
+	for _, unionName := range keys {
+		u := unions[unionName]
 		if len(u.fieldMembers) > 0 || u.discriminator != nil {
 			// TODO: Avoid the "local" here. This was added to to avoid errors caused when the package is an empty string.
 			//       The correct package would be the output package but is not known here. This does not show up in generated code.
