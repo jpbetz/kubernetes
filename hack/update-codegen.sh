@@ -52,7 +52,11 @@ fi
 # Generate a list of directories we don't want to play in.
 DIRS_TO_AVOID=()
 kube::util::read-array DIRS_TO_AVOID < <(
-    git ls-files -cmo --exclude-standard -- ':!:vendor/*' ':(glob)*/**/go.work' \
+    git ls-files -cmo --exclude-standard \
+        -- \
+        ':!:vendor/*' \
+        ':(glob)*/**/go.work' \
+        ':(glob)**/_codegenignore/**' \
         | while read -r F; do \
             echo ':!:'"$(dirname "${F}")"; \
         done
@@ -62,7 +66,10 @@ function git_find() {
     # Similar to find but faster and easier to understand.  We want to include
     # modified and untracked files because this might be running against code
     # which is not tracked by git yet.
-    git ls-files -cmo --exclude-standard ':!:vendor/*' "${DIRS_TO_AVOID[@]}" "$@"
+    git ls-files -cmo --exclude-standard \
+        ':!:vendor/*' \
+        "${DIRS_TO_AVOID[@]}" \
+        "$@"
 }
 
 function git_grep() {
@@ -70,7 +77,9 @@ function git_grep() {
     # running against code which is not tracked by git yet.
     # We need vendor exclusion added at the end since it has to be part of
     # the pathspecs which are specified last.
-    git grep --untracked "$@" ':!:vendor/*' "${DIRS_TO_AVOID[@]}"
+    git grep --untracked "$@" \
+        ':!:vendor/*' \
+        "${DIRS_TO_AVOID[@]}"
 }
 
 # Generate a list of all files that have a `+k8s:` comment-tag.  This will be
