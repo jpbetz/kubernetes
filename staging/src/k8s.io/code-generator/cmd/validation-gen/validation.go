@@ -148,6 +148,9 @@ func (g *genValidations) GenerateType(c *generator.Context, t *types.Type, w io.
 }
 
 func (g *genValidations) hasValidations(n *typeNode) bool {
+	if n == nil {
+		return false
+	}
 	if r, found := g.hasValidationsCache[n]; found {
 		return r
 	}
@@ -204,7 +207,7 @@ type childNode struct {
 	name      string      // the field name in the parent, populated when this node is a struct field
 	jsonName  string      // always populated when name is populated
 	childType *types.Type // the real type of the child (may be a pointer)
-	node      *typeNode   // the node of the child's value type
+	node      *typeNode   // the node of the child's value type, or nil if it is in a foreign package
 
 	fieldValidations validators.Validations // validations on the field
 	keyValidations   validators.Validations // validations on each key of a map field
@@ -217,7 +220,7 @@ type childNode struct {
 // a field in a struct.
 type typeNode struct {
 	valueType *types.Type // never a pointer, but may be a map, slice, struct, etc.
-	funcName  types.Name  // populated when this type is "opaque"
+	funcName  types.Name  // populated when this type is has a validation function
 
 	fields      []*childNode   // populated when this type is a struct
 	key         *childNode     // populated when this type is a map
@@ -297,7 +300,9 @@ func (n *typeNode) dumpChildren(buf *bytes.Buffer, indent int, visited map[*type
 			n.dumpIndent(buf, indent+1)
 			buf.WriteString(fmt.Sprintf("val-validation: %v(%+v)\n", fn, args))
 		}
-		fld.node.doDump(buf, indent+1, visited)
+		if fld.node != nil {
+			fld.node.doDump(buf, indent+1, visited)
+		}
 		n.dumpIndent(buf, indent)
 		buf.WriteString("}\n")
 	}
@@ -309,6 +314,9 @@ const (
 	// This tag defines a validation which is to be run on each value in a map
 	// or slice.
 	eachValTag = "eachVal"
+	// This tag designates a child field as part of the list-map key for a list
+	// of structs.
+	listMapKeyTag = "listMapKey"
 )
 
 // builtinTagDocs returns information about the hard-coded tags.
@@ -329,6 +337,14 @@ func builtinTagDocs() []validators.TagDoc {
 			Description: "<validation-tag>",
 			Docs:        "This tag will be evaluated for each value of a map or slice.",
 		}},
+	}, {
+		Tag:         listMapKeyTag,
+		Description: "Declares a named field of a list's value type as part of the list-map key.",
+		Contexts:    []validators.TagContext{validators.TagContextType, validators.TagContextField},
+		Payloads: []validators.TagPayloadDoc{{
+			Description: "<field-name>",
+			Docs:        "This values names a field of a list's value type.",
+		}},
 	}}
 }
 
@@ -343,6 +359,8 @@ func (td *typeDiscoverer) DiscoverType(t *types.Type) error {
 	fldPath := field.NewPath(t.Name.String())
 	if node, err := td.discover(t, fldPath); err != nil {
 		return err
+	} else if node == nil {
+		panic(fmt.Sprintf("discovered a nil node for type %v", t))
 	} else {
 		fmt.Println(node.dump()) //FIXME: remove
 	}
@@ -352,6 +370,14 @@ func (td *typeDiscoverer) DiscoverType(t *types.Type) error {
 // discover walks the given type recursively and returns a typeNode
 // representing it.
 func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNode, error) {
+	// With the exception of builtins (which gengo puts in package ""), we
+	// can't traverse into packages which are not being processed by this tool.
+	if t.Name.Package != "" {
+		_, ok := td.inputToPkg[t.Name.Package]
+		if !ok {
+			return nil, nil
+		}
+	}
 	if t.Kind == types.Pointer {
 		if t.Elem.Kind == types.Pointer {
 			return nil, fmt.Errorf("field %s (%s): pointers to pointers are not supported", fldPath.String(), t)
@@ -361,7 +387,7 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 	}
 	// If we have done this type already, we can stop here and break any
 	// recursion.
-	if node := td.typeNodes[t]; node != nil {
+	if node, found := td.typeNodes[t]; found {
 		return node, nil
 	}
 
@@ -388,12 +414,10 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 		}
 	}
 
-	// If this is an opaque, named type, we can call its validation function.
+	// If this is an known, named type, we can call its validation function.
 	switch t.Kind {
 	case types.Alias, types.Struct:
-		if fn, ok := td.getValidationFunctionName(t); !ok {
-			return thisNode, nil
-		} else {
+		if fn, ok := td.getValidationFunctionName(t); ok {
 			thisNode.funcName = fn
 		}
 	}
@@ -488,9 +512,43 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 				childType: childType,
 				node:      node,
 			}
-			// Extract +listMapKeys for correlating object and oldObject
-			// during update validation.
-			node.listMapKeys = extractListMapKeys(memb)
+			// Extract +listMapKeys for correlating object and oldObject during
+			// update validation.
+			if listMapKeyNames, ok := gengo.ExtractCommentTags("+", memb.CommentLines)[listMapKeyTag]; ok {
+				// List-maps can only be list types.
+				switch childType.Kind {
+				case types.Slice, types.Array:
+					// OK
+				default:
+					return fmt.Errorf("%v: +%s was specified on a field of non-list type %s", childPath, listMapKeyTag, memb.Type)
+				}
+
+				// Discard any pointerness.
+				elem := childType.Elem
+				for elem.Kind == types.Pointer {
+					elem = elem.Elem
+				}
+				// If we find a nil node, it's not a type we can handle.
+				if td.typeNodes[elem] == nil {
+					return fmt.Errorf("%v: +%s was specified on a field of non-included type %s", childPath, listMapKeyTag, elem)
+				}
+
+				// Discard any alias indirection.
+				underlying := elem
+				for elem.Kind == types.Alias {
+					underlying = elem.Underlying
+				}
+				// List-maps can only be lists of structs.
+				if underlying.Kind != types.Struct {
+					return fmt.Errorf("%v: +%s was specified on a list of non-struct type %s", childPath, listMapKeyTag, elem)
+				}
+
+				if keys, err := extractListMapKeys(underlying, listMapKeyNames); err != nil {
+					return fmt.Errorf("%v: %w", childPath, err)
+				} else {
+					node.listMapKeys = keys
+				}
+			}
 		}
 
 		// Extract any field-attached validation rules.
@@ -501,7 +559,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 				klog.V(5).InfoS("found field-attached validations", "n", validations.Len())
 				child.fieldValidations.Add(validations)
 				if len(validations.Variables) > 0 {
-					return fmt.Errorf("variable generation not supported for field-attached validations, but validations on %s require variable generation", childPath.String())
+					return fmt.Errorf("%v: variable generation is not supported for field validations", childPath)
 				}
 			}
 		}
@@ -518,7 +576,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 					klog.V(5).InfoS("found list-validations", "n", validations.Len())
 					child.elemValidations = validations
 					if len(validations.Variables) > 0 {
-						return fmt.Errorf("variable generation not supported for field-attached validations, but validations on %s require variable generation", childPath.String())
+						return fmt.Errorf("%v: variable generation is not supported for list value validations", childPath)
 					}
 				}
 			}
@@ -532,7 +590,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 					klog.V(5).InfoS("found key-validations", "n", validations.Len())
 					child.keyValidations = validations
 					if len(validations.Variables) > 0 {
-						return fmt.Errorf("variable generation not supported for field-attached validations, but validations on %s require variable generation", childPath.String())
+						return fmt.Errorf("%v: variable generation is not supported for map key validations", childPath)
 					}
 				}
 			}
@@ -545,7 +603,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 					klog.V(5).InfoS("found list-validations", "n", validations.Len())
 					child.elemValidations = validations
 					if len(validations.Variables) > 0 {
-						return fmt.Errorf("variable generation not supported for field-attached validations, but validations on %s require variable generation", childPath.String())
+						return fmt.Errorf("%v: variable generation not supported for map value validations", childPath)
 					}
 				}
 			}
@@ -785,6 +843,8 @@ func (g *genValidations) emitValidationFunction(c *generator.Context, t *types.T
 // Emitted code assumes that the value in question is always a pair of nilable
 // variables named "obj" and "oldObj", and the field path to this value is
 // named "fldPath".
+//
+// This function assumes that thisChild.node is not nil.
 func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild *childNode, sw *generator.SnippetWriter) {
 	thisNode := thisChild.node
 	inType := thisNode.valueType
@@ -827,19 +887,29 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 				emitCallsToValidators(c, validations.Functions, bufsw)
 			}
 
-			// Get to the real type.
-			switch fld.node.valueType.Kind {
-			case types.Alias:
-				// Emit for the underlying type.
-				g.emitValidationForChild(c, fld.node.underlying, bufsw)
-				// Call the type's validation function.
-				g.emitCallToOtherTypeFunc(c, fld.node, bufsw)
-			case types.Struct:
-				// Call the type's validation function.
-				g.emitCallToOtherTypeFunc(c, fld.node, bufsw)
-			default:
-				// Descend into this field.
-				g.emitValidationForChild(c, fld, bufsw)
+			// If the node is nil, this must be a type in a package we are not
+			// handling - it's effectively opaque to us.
+			if fld.node == nil {
+				targs := targs.WithArgs(generator.Args{
+					"fieldType": fld.childType,
+				})
+				bufsw.Do("// NOTE: Type $.fieldType|raw$ is in a non-included package.\n", targs)
+				bufsw.Do("//       Any validations defined on this type are not available from here.\n", targs)
+			} else {
+				// Get to the real type.
+				switch fld.node.valueType.Kind {
+				case types.Alias:
+					// Emit for the underlying type.
+					g.emitValidationForChild(c, fld.node.underlying, bufsw)
+					// Call the type's validation function.
+					g.emitCallToOtherTypeFunc(c, fld.node, bufsw)
+				case types.Struct:
+					// Call the type's validation function.
+					g.emitCallToOtherTypeFunc(c, fld.node, bufsw)
+				default:
+					// Descend into this field.
+					g.emitValidationForChild(c, fld, bufsw)
+				}
 			}
 
 			if buf.Len() > 0 {
@@ -891,16 +961,26 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			emitCallsToValidators(c, validations.Functions, elemSW)
 		}
 
-		switch thisNode.elem.node.valueType.Kind {
-		case types.Struct, types.Alias:
-			// If this field is another type, call its validation function.
-			// Checking for nil is handled inside this call.
-			g.emitCallToOtherTypeFunc(c, thisNode.elem.node, elemSW)
-		default:
-			// No need to go further.  Struct- or alias-typed fields might have
-			// validations attached to the type, but anything else (e.g.
-			// string) can't, and we already emitted code for the field
-			// validations.
+		// If the node is nil, this must be a type in a package we are not
+		// handling - it's effectively opaque to us.
+		if thisNode.elem.node == nil {
+			targs := targs.WithArgs(generator.Args{
+				"elemType": thisNode.elem.childType,
+			})
+			elemSW.Do("// NOTE: Type $.elemType|raw$ is in a non-included package.\n", targs)
+			elemSW.Do("//       Any validations defined on this type are not available from here.\n", targs)
+		} else {
+			switch thisNode.elem.node.valueType.Kind {
+			case types.Struct, types.Alias:
+				// If this field is another type, call its validation function.
+				// Checking for nil is handled inside this call.
+				g.emitCallToOtherTypeFunc(c, thisNode.elem.node, elemSW)
+			default:
+				// No need to go further.  Struct- or alias-typed fields might have
+				// validations attached to the type, but anything else (e.g.
+				// string) can't, and we already emitted code for the field
+				// validations.
+			}
 		}
 
 		if elemBuf.Len() > 0 {
@@ -950,16 +1030,26 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			emitCallsToValidators(c, keyValidations.Functions, keySW)
 		}
 
-		switch thisNode.key.node.valueType.Kind {
-		case types.Struct, types.Alias:
-			// If this field is another type, call its validation function.
-			// Checking for nil is handled inside this call.
-			g.emitCallToOtherTypeFunc(c, thisNode.key.node, keySW)
-		default:
-			// No need to go further.  Struct- or alias-typed fields might have
-			// validations attached to the type, but anything else (e.g.
-			// string) can't, and we already emitted code for the field
-			// validations.
+		// If the node is nil, this must be a type in a package we are not
+		// handling - it's effectively opaque to us.
+		if thisNode.key.node == nil {
+			targs := targs.WithArgs(generator.Args{
+				"keyType": thisNode.key.childType,
+			})
+			keySW.Do("// NOTE: Type $.keyType|raw$ is in a non-included package.\n", targs)
+			keySW.Do("//       Any validations defined on this type are not available from here.\n", targs)
+		} else {
+			switch thisNode.key.node.valueType.Kind {
+			case types.Struct, types.Alias:
+				// If this field is another type, call its validation function.
+				// Checking for nil is handled inside this call.
+				g.emitCallToOtherTypeFunc(c, thisNode.key.node, keySW)
+			default:
+				// No need to go further.  Struct- or alias-typed fields might have
+				// validations attached to the type, but anything else (e.g.
+				// string) can't, and we already emitted code for the field
+				// validations.
+			}
 		}
 
 		// Accumulate into a buffer so we don't emit empty functions.
@@ -973,16 +1063,26 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			emitCallsToValidators(c, valValidations.Functions, valSW)
 		}
 
-		switch thisNode.elem.node.valueType.Kind {
-		case types.Struct, types.Alias:
-			// If this field is another type, call its validation function.
-			// Checking for nil is handled inside this call.
-			g.emitCallToOtherTypeFunc(c, thisNode.elem.node, valSW)
-		default:
-			// No need to go further.  Struct- or alias-typed fields might have
-			// validations attached to the type, but anything else (e.g.
-			// string) can't, and we already emitted code for the field
-			// validations.
+		// If the node is nil, this must be a type in a package we are not
+		// handling - it's effectively opaque to us.
+		if thisNode.elem.node == nil {
+			targs := targs.WithArgs(generator.Args{
+				"valType": thisNode.elem.childType,
+			})
+			valSW.Do("// NOTE: Type $.valType|raw$ is in a non-included package.\n", targs)
+			valSW.Do("//       Any validations defined on this type are not available from here.\n", targs)
+		} else {
+			switch thisNode.elem.node.valueType.Kind {
+			case types.Struct, types.Alias:
+				// If this field is another type, call its validation function.
+				// Checking for nil is handled inside this call.
+				g.emitCallToOtherTypeFunc(c, thisNode.elem.node, valSW)
+			default:
+				// No need to go further.  Struct- or alias-typed fields might have
+				// validations attached to the type, but anything else (e.g.
+				// string) can't, and we already emitted code for the field
+				// validations.
+			}
 		}
 
 		vName := "_"
@@ -1253,24 +1353,46 @@ func toGolangSourceDataLiteral(sw *generator.SnippetWriter, c *generator.Context
 	}
 }
 
-func extractListMapKeys(member types.Member) []types.Member {
+// extractListMapKeys looks at all fields of the specified type to find the
+// fields which match the specified keyNames, and returns a list of Member
+// structs.  If t is not a struct this does nothing.
+func extractListMapKeys(t *types.Type, keyNames []string) ([]types.Member, error) {
 	var result []types.Member
-	if values, ok := gengo.ExtractCommentTags("+", member.CommentLines)["listMapKey"]; ok {
-		for _, val := range values {
-			for _, m := range member.Type.Elem.Members {
-				tags, ok := tags.LookupJSON(m)
-				if !ok {
-					panic(fmt.Sprintf("listMapKey refers to field that does not have a JSON go struct tag: %v", m.Name))
-				}
-				if tags.Name == val {
-					result = append(result, m)
-				}
-			}
+	for _, name := range keyNames {
+		m, found := findMemberByFieldName(t, name)
+		if !found {
+			return nil, fmt.Errorf("list-map key %q refers to a field that does not exist", name)
 		}
+		result = append(result, m)
 	}
-	return result
+	return result, nil
 }
 
+// findMemberByFieldName finds the member which matches the specified name.
+// The name is expected to be the "JSON name", rather than the Go name.  This
+// function will descend into embedded types which would appear in JSON to be
+// directly in the parent struct.  If t is not a struct this does nothing.
+func findMemberByFieldName(t *types.Type, name string) (types.Member, bool) {
+	for _, m := range t.Members {
+		if jsonTag, found := tags.LookupJSON(m); found {
+			// If there is a JSON tag of the exact name, use it.
+			if jsonTag.Name == name {
+				return m, true
+			}
+			// If there is a (non-standard) "inline" tag, look in the type.
+			if jsonTag.Inline {
+				return findMemberByFieldName(m.Type, name)
+			}
+		}
+		// If this field was embedded, look in that type.
+		if m.Embedded {
+			return findMemberByFieldName(m.Type, name)
+		}
+	}
+	return types.Member{}, false
+}
+
+// isNilableType returns true if the argument type can be compared to nil.
 func isNilableType(t *types.Type) bool {
 	for t.Kind == types.Alias {
 		t = t.Underlying

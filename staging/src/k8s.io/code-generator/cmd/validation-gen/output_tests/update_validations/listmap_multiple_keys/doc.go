@@ -29,6 +29,22 @@ type T1 struct {
 	// +listMapKey=k1
 	// +listMapKey=k2
 	LM1 []M1 `json:"lm1"`
+
+	// +listType=map
+	// +listMapKey=k1
+	// +listMapKey=k2
+	LM2 []M2 `json:"lm2"`
+
+	// +listType=map
+	// +listMapKey=k1
+	// +listMapKey=k2
+	LM3 []M3 `json:"lm3"`
+
+	// +listType=map
+	// +listType=map
+	// +listMapKey=k1
+	// +listMapKey=k2
+	LM4 []M4 `json:"lm4"`
 }
 
 type M1 struct {
@@ -40,4 +56,16 @@ type M1 struct {
 
 	// +validateTrue="M1.S"
 	S string `json:"s"`
+}
+
+type M2 struct {
+	M1 // embedded, no JSON tag
+}
+
+type M3 struct {
+	M1 `json:",inline"` // embedded
+}
+
+type M4 struct {
+	M2
 }
