@@ -72,13 +72,13 @@ const (
 	// DefaultFlags is defined for clarity.
 	DefaultFlags FunctionFlags = 0
 
-	// IsFatal indicates that further validations should be skipped if this
+	// Fatal indicates that further validations should be skipped if this
 	// validator fails. Most validators are not fatal.
-	IsFatal FunctionFlags = 1 << iota
+	Fatal FunctionFlags = 1 << iota
 
 	// NonError indicates that a failure of this validator should not be
 	// accumulated as an error, but should trigger other aspects of the failure
-	// path (e.g. early return when combined with IsFatal).
+	// path (e.g. early return when combined with Fatal).
 	NonError
 )
 
