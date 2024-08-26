@@ -24,9 +24,12 @@ package crosspkg
 import (
 	fmt "fmt"
 
+	validate "k8s.io/apimachinery/pkg/api/validate"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
+	other "k8s.io/code-generator/cmd/validation-gen/output_tests/_codegenignore/other"
 	primitives "k8s.io/code-generator/cmd/validation-gen/output_tests/primitives"
+	typedefs "k8s.io/code-generator/cmd/validation-gen/output_tests/typedefs"
 )
 
 func init() { localSchemeBuilder.Register(RegisterValidations) }
@@ -49,6 +52,7 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// field T1.PrimitivesT1
 	errs = append(errs,
 		func(obj *primitives.T1, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.PrimitivesT1")...)
 			errs = append(errs, primitives.Validate_T1(obj, fldPath)...)
 			return
 		}(&obj.PrimitivesT1, fldPath.Child("primitivest1"))...)
@@ -56,19 +60,78 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// field T1.PrimitivesT2
 	errs = append(errs,
 		func(obj *primitives.T2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.PrimitivesT2")...)
 			errs = append(errs, primitives.Validate_T2(obj, fldPath)...)
 			return
 		}(&obj.PrimitivesT2, fldPath.Child("primitivest2"))...)
 
-	// field T1.PrimitivesT3 has no validation
+	// field T1.PrimitivesT3
+	errs = append(errs,
+		func(obj *primitives.T3, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.PrimitivesT3")...)
+			return
+		}(&obj.PrimitivesT3, fldPath.Child("primitivest3"))...)
 
 	// field T1.PrimitivesT4
 	errs = append(errs,
 		func(obj *primitives.T4, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.PrimitivesT4")...)
 			errs = append(errs, primitives.Validate_T4(obj, fldPath)...)
 			return
 		}(&obj.PrimitivesT4, fldPath.Child("primitivest4"))...)
 
-	// field T1.PrimitivesT5 has no validation
+	// field T1.TypedefsE1
+	errs = append(errs,
+		func(obj *typedefs.E1, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.TypedefsE1")...)
+			errs = append(errs, typedefs.Validate_E1(obj, fldPath)...)
+			return
+		}(&obj.TypedefsE1, fldPath.Child("typedefse1"))...)
+
+	// field T1.TypedefsE2
+	errs = append(errs,
+		func(obj *typedefs.E2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.TypedefsE2")...)
+			errs = append(errs, typedefs.Validate_E2(obj, fldPath)...)
+			return
+		}(&obj.TypedefsE2, fldPath.Child("typedefse2"))...)
+
+	// field T1.TypedefsE3
+	errs = append(errs,
+		func(obj *typedefs.E3, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.TypedefsE3")...)
+			errs = append(errs, typedefs.Validate_E3(obj, fldPath)...)
+			return
+		}(&obj.TypedefsE3, fldPath.Child("typedefse3"))...)
+
+	// field T1.TypedefsE4
+	errs = append(errs,
+		func(obj *typedefs.E4, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.TypedefsE4")...)
+			errs = append(errs, typedefs.Validate_E4(obj, fldPath)...)
+			return
+		}(&obj.TypedefsE4, fldPath.Child("typedefse4"))...)
+
+	// field T1.OtherString
+	errs = append(errs,
+		func(obj *other.StringType, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.OtherString")...)
+			return
+		}(&obj.OtherString, fldPath.Child("otherString"))...)
+
+	// field T1.OtherInt
+	errs = append(errs,
+		func(obj *other.IntType, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.OtherInt")...)
+			return
+		}(&obj.OtherInt, fldPath.Child("otherInt"))...)
+
+	// field T1.OtherStruct
+	errs = append(errs,
+		func(obj *other.StructType, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.OtherStruct")...)
+			return
+		}(&obj.OtherStruct, fldPath.Child("otherStruct"))...)
+
 	return errs
 }
