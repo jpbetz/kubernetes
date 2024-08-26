@@ -80,7 +80,7 @@ func Validate_E01(obj *E01, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_E02(obj *E02, fldPath *field.Path) (errs field.ErrorList) {
 	// type E02
-	if e := validate.FixedResult(fldPath, obj, true, "E02, IsFatal"); len(e) != 0 {
+	if e := validate.FixedResult(fldPath, obj, true, "E02, Fatal"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // fatal
 	}
@@ -90,7 +90,7 @@ func Validate_E02(obj *E02, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_E03(obj *E03, fldPath *field.Path) (errs field.ErrorList) {
 	// type E03
-	if e := validate.FixedResult(fldPath, obj, true, "E03, IsFatal"); len(e) != 0 {
+	if e := validate.FixedResult(fldPath, obj, true, "E03, Fatal"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // fatal
 	}
@@ -101,11 +101,11 @@ func Validate_E03(obj *E03, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_EMultiple(obj *EMultiple, fldPath *field.Path) (errs field.ErrorList) {
 	// type EMultiple
-	if e := validate.FixedResult(fldPath, obj, true, "EMultiple, IsFatal 1"); len(e) != 0 {
+	if e := validate.FixedResult(fldPath, obj, true, "EMultiple, Fatal 1"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // fatal
 	}
-	if e := validate.FixedResult(fldPath, obj, true, "EMultiple, IsFatal 2"); len(e) != 0 {
+	if e := validate.FixedResult(fldPath, obj, true, "EMultiple, Fatal 2"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // fatal
 	}

@@ -26,7 +26,7 @@ type Tother struct {
 
 // Treat these as 4 bits, and ensure all combinations
 //   bit 0: no flags
-//   bit 1: IsFatal
+//   bit 1: Fatal
 
 // Note: No validations.
 type T00 struct {
@@ -50,67 +50,67 @@ type T01 struct {
 	PT *Tother `json:"pt"`
 }
 
-// +validateTrue={"flags":["IsFatal"], "msg":"T02, IsFatal"}
+// +validateTrue={"flags":["Fatal"], "msg":"T02, Fatal"}
 type T02 struct {
 	TypeMeta int
-	// +validateTrue={"flags":["IsFatal"], "msg":"T02.S, IsFatal"}
+	// +validateTrue={"flags":["Fatal"], "msg":"T02.S, Fatal"}
 	S string `json:"s"`
-	// +validateTrue={"flags":["IsFatal"], "msg":"T02.PS, IsFatal"}
+	// +validateTrue={"flags":["Fatal"], "msg":"T02.PS, Fatal"}
 	PS *string `json:"ps"`
-	// +validateTrue={"flags":["IsFatal"], "msg":"T02.T, IsFatal"}
+	// +validateTrue={"flags":["Fatal"], "msg":"T02.T, Fatal"}
 	T Tother `json:"t"`
-	// +validateTrue={"flags":["IsFatal"], "msg":"T02.PT, IsFatal"}
+	// +validateTrue={"flags":["Fatal"], "msg":"T02.PT, Fatal"}
 	PT *Tother `json:"pt"`
 }
 
 // +validateTrue={"flags":[], "msg":"T03, no flags"}
-// +validateTrue={"flags":["IsFatal"], "msg":"T03, IsFatal"}
+// +validateTrue={"flags":["Fatal"], "msg":"T03, Fatal"}
 type T03 struct {
 	TypeMeta int
 	// +validateTrue={"flags":[], "msg":"T03.S, no flags"}
-	// +validateTrue={"flags":["IsFatal"], "msg":"T03.S, IsFatal"}
+	// +validateTrue={"flags":["Fatal"], "msg":"T03.S, Fatal"}
 	S string `json:"s"`
 	// +validateTrue={"flags":[], "msg":"T03.PS, no flags"}
-	// +validateTrue={"flags":["IsFatal"], "msg":"T03.PS, IsFatal"}
+	// +validateTrue={"flags":["Fatal"], "msg":"T03.PS, Fatal"}
 	PS *string `json:"ps"`
 	// +validateTrue={"flags":[], "msg":"T03.T, no flags"}
-	// +validateTrue={"flags":["IsFatal"], "msg":"T03.T, IsFatal"}
+	// +validateTrue={"flags":["Fatal"], "msg":"T03.T, Fatal"}
 	T Tother `json:"t"`
 	// +validateTrue={"flags":[], "msg":"T03.PT, no flags"}
-	// +validateTrue={"flags":["IsFatal"], "msg":"T03.PT, IsFatal"}
+	// +validateTrue={"flags":["Fatal"], "msg":"T03.PT, Fatal"}
 	PT *Tother `json:"pt"`
 }
 
 // Note: these are intentionally in the wrong final order.
 // +validateTrue={"flags":[], "msg":"TMultiple, no flags 1"}
-// +validateTrue={"flags":["IsFatal"], "msg":"TMultiple, IsFatal 1"}
+// +validateTrue={"flags":["Fatal"], "msg":"TMultiple, Fatal 1"}
 // +validateTrue="T0, string payload"
 // +validateTrue={"flags":[], "msg":"TMultiple, no flags 2"}
-// +validateTrue={"flags":["IsFatal"], "msg":"TMultiple, IsFatal 2"}
+// +validateTrue={"flags":["Fatal"], "msg":"TMultiple, Fatal 2"}
 type TMultiple struct {
 	TypeMeta int
 	// +validateTrue={"flags":[], "msg":"TMultiple.S, no flags 1"}
-	// +validateTrue={"flags":["IsFatal"], "msg":"TMultiple.S, IsFatal 1"}
+	// +validateTrue={"flags":["Fatal"], "msg":"TMultiple.S, Fatal 1"}
 	// +validateTrue="T0, string payload"
 	// +validateTrue={"flags":[], "msg":"TMultiple.S, no flags 2"}
-	// +validateTrue={"flags":["IsFatal"], "msg":"TMultiple.S, IsFatal 2"}
+	// +validateTrue={"flags":["Fatal"], "msg":"TMultiple.S, Fatal 2"}
 	S string `json:"s"`
 	// +validateTrue={"flags":[], "msg":"TMultiple.PS, no flags 1"}
-	// +validateTrue={"flags":["IsFatal"], "msg":"TMultiple.PS, IsFatal 1"}
+	// +validateTrue={"flags":["Fatal"], "msg":"TMultiple.PS, Fatal 1"}
 	// +validateTrue="T0, string payload"
 	// +validateTrue={"flags":[], "msg":"TMultiple.PS, no flags 2"}
-	// +validateTrue={"flags":["IsFatal"], "msg":"TMultiple.PS, IsFatal 2"}
+	// +validateTrue={"flags":["Fatal"], "msg":"TMultiple.PS, Fatal 2"}
 	PS *string `json:"ps"`
 	// +validateTrue={"flags":[], "msg":"TMultiple.T, no flags 1"}
-	// +validateTrue={"flags":["IsFatal"], "msg":"TMultiple.T, IsFatal 1"}
+	// +validateTrue={"flags":["Fatal"], "msg":"TMultiple.T, Fatal 1"}
 	// +validateTrue="T0, string payload"
 	// +validateTrue={"flags":[], "msg":"TMultiple.T, no flags 2"}
-	// +validateTrue={"flags":["IsFatal"], "msg":"TMultiple.T, IsFatal 2"}
+	// +validateTrue={"flags":["Fatal"], "msg":"TMultiple.T, Fatal 2"}
 	T Tother `json:"t"`
 	// +validateTrue={"flags":[], "msg":"TMultiple.PT, no flags 1"}
-	// +validateTrue={"flags":["IsFatal"], "msg":"TMultiple.PT, IsFatal 1"}
+	// +validateTrue={"flags":["Fatal"], "msg":"TMultiple.PT, Fatal 1"}
 	// +validateTrue="T0, string payload"
 	// +validateTrue={"flags":[], "msg":"TMultiple.PT, no flags 2"}
-	// +validateTrue={"flags":["IsFatal"], "msg":"TMultiple.PT, IsFatal 2"}
+	// +validateTrue={"flags":["Fatal"], "msg":"TMultiple.PT, Fatal 2"}
 	PT *Tother `json:"pt"`
 }

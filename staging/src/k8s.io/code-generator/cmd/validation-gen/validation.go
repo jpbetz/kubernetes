@@ -1027,7 +1027,7 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 		nonfatal := make([]validators.FunctionGen, 0, len(in))
 
 		for _, fg := range in {
-			isFatal := (fg.Flags().IsSet(validators.IsFatal))
+			isFatal := (fg.Flags().IsSet(validators.Fatal))
 
 			if isFatal {
 				fatal = append(fatal, fg)
@@ -1043,7 +1043,7 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 	validations = sort(validations)
 
 	for _, v := range validations {
-		isFatal := (v.Flags().IsSet(validators.IsFatal))
+		isFatal := (v.Flags().IsSet(validators.Fatal))
 		isNonError := (v.Flags().IsSet(validators.NonError))
 
 		fn, extraArgs := v.SignatureAndArgs()
