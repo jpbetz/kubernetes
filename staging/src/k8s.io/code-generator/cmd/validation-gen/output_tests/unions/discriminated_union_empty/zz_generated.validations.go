@@ -24,6 +24,8 @@ package discriminated_union_empty
 import (
 	fmt "fmt"
 
+	operation "k8s.io/apimachinery/pkg/api/operation"
+	safe "k8s.io/apimachinery/pkg/api/safe"
 	validate "k8s.io/apimachinery/pkg/api/validate"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
@@ -34,9 +36,9 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc((*DU1)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*DU1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_DU1(obj.(*DU1), nil)
+			return Validate_DU1(opCtx, obj.(*DU1), safe.Cast[DU1](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
@@ -45,7 +47,7 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 
 var unionMembershipForDU1 = validate.NewDiscriminatedUnionMembership("d")
 
-func Validate_DU1(obj *DU1, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_DU1(opCtx operation.Context, obj, oldObj *DU1, fldPath *field.Path) (errs field.ErrorList) {
 	// type DU1
 	if obj != nil {
 		errs = append(errs, validate.DiscriminatedUnion(fldPath, *obj, unionMembershipForDU1, obj.D)...)

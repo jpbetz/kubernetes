@@ -24,6 +24,8 @@ package crosspkg
 import (
 	fmt "fmt"
 
+	operation "k8s.io/apimachinery/pkg/api/operation"
+	safe "k8s.io/apimachinery/pkg/api/safe"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
 	primitives "k8s.io/code-generator/cmd/validation-gen/output_tests/primitives"
@@ -34,40 +36,40 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc((*T1)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*T1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_T1(obj.(*T1), nil)
+			return Validate_T1(opCtx, obj.(*T1), safe.Cast[T1](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// field T1.TypeMeta has no validation
 
 	// field T1.PrimitivesT1
 	errs = append(errs,
-		func(obj primitives.T1, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, primitives.Validate_T1(&obj, fldPath)...)
+		func(obj primitives.T1, oldObj *primitives.T1, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, primitives.Validate_T1(opCtx, &obj, oldObj, fldPath)...)
 			return
-		}(obj.PrimitivesT1, fldPath.Child("primitivest1"))...)
+		}(obj.PrimitivesT1, safe.Field(oldObj, func(oldObj T1) *primitives.T1 { return &oldObj.PrimitivesT1 }), fldPath.Child("primitivest1"))...)
 
 	// field T1.PrimitivesT2
 	errs = append(errs,
-		func(obj primitives.T2, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, primitives.Validate_T2(&obj, fldPath)...)
+		func(obj primitives.T2, oldObj *primitives.T2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, primitives.Validate_T2(opCtx, &obj, oldObj, fldPath)...)
 			return
-		}(obj.PrimitivesT2, fldPath.Child("primitivest2"))...)
+		}(obj.PrimitivesT2, safe.Field(oldObj, func(oldObj T1) *primitives.T2 { return &oldObj.PrimitivesT2 }), fldPath.Child("primitivest2"))...)
 
 	// field T1.PrimitivesT3 has no validation
 
 	// field T1.PrimitivesT4
 	errs = append(errs,
-		func(obj primitives.T4, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, primitives.Validate_T4(&obj, fldPath)...)
+		func(obj primitives.T4, oldObj *primitives.T4, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, primitives.Validate_T4(opCtx, &obj, oldObj, fldPath)...)
 			return
-		}(obj.PrimitivesT4, fldPath.Child("primitivest4"))...)
+		}(obj.PrimitivesT4, safe.Field(oldObj, func(oldObj T1) *primitives.T4 { return &oldObj.PrimitivesT4 }), fldPath.Child("primitivest4"))...)
 
 	// field T1.PrimitivesT5 has no validation
 	return errs

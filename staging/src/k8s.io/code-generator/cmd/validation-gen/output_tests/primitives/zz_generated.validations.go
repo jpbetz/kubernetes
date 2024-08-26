@@ -24,6 +24,8 @@ package primitives
 import (
 	fmt "fmt"
 
+	operation "k8s.io/apimachinery/pkg/api/operation"
+	safe "k8s.io/apimachinery/pkg/api/safe"
 	validate "k8s.io/apimachinery/pkg/api/validate"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
@@ -34,53 +36,53 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc((*T1)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*T1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_T1(obj.(*T1), nil)
+			return Validate_T1(opCtx, obj.(*T1), safe.Cast[T1](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// field T1.TypeMeta has no validation
 
 	// field T1.S
 	errs = append(errs,
-		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.S")...)
 			return
-		}(obj.S, fldPath.Child("s"))...)
+		}(obj.S, safe.Field(oldObj, func(oldObj T1) *string { return &oldObj.S }), fldPath.Child("s"))...)
 
 	// field T1.I
 	errs = append(errs,
-		func(obj int, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj int, oldObj *int, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.I")...)
 			return
-		}(obj.I, fldPath.Child("i"))...)
+		}(obj.I, safe.Field(oldObj, func(oldObj T1) *int { return &oldObj.I }), fldPath.Child("i"))...)
 
 	// field T1.B
 	errs = append(errs,
-		func(obj bool, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj bool, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.B")...)
 			return
-		}(obj.B, fldPath.Child("b"))...)
+		}(obj.B, safe.Field(oldObj, func(oldObj T1) *bool { return &oldObj.B }), fldPath.Child("b"))...)
 
 	// field T1.F
 	errs = append(errs,
-		func(obj float64, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj float64, oldObj *float64, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.F")...)
 			return
-		}(obj.F, fldPath.Child("f"))...)
+		}(obj.F, safe.Field(oldObj, func(oldObj T1) *float64 { return &oldObj.F }), fldPath.Child("f"))...)
 
 	// field T1.T2
 	errs = append(errs,
-		func(obj T2, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj T2, oldObj *T2, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.T2")...)
-			errs = append(errs, Validate_T2(&obj, fldPath)...)
+			errs = append(errs, Validate_T2(opCtx, &obj, oldObj, fldPath)...)
 			return
-		}(obj.T2, fldPath.Child("t2"))...)
+		}(obj.T2, safe.Field(oldObj, func(oldObj T1) *T2 { return &oldObj.T2 }), fldPath.Child("t2"))...)
 
 	// field T1.T3 has no validation
 	// field T1.AnotherS has no validation
@@ -90,42 +92,42 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 
 	// field T1.AnotherT2
 	errs = append(errs,
-		func(obj T2, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_T2(&obj, fldPath)...)
+		func(obj T2, oldObj *T2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_T2(opCtx, &obj, oldObj, fldPath)...)
 			return
-		}(obj.AnotherT2, fldPath.Child("anothert2"))...)
+		}(obj.AnotherT2, safe.Field(oldObj, func(oldObj T1) *T2 { return &oldObj.AnotherT2 }), fldPath.Child("anothert2"))...)
 
 	return errs
 }
 
-func Validate_T2(obj *T2, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_T2(opCtx operation.Context, obj, oldObj *T2, fldPath *field.Path) (errs field.ErrorList) {
 	// field T2.S
 	errs = append(errs,
-		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.S")...)
 			return
-		}(obj.S, fldPath.Child("s"))...)
+		}(obj.S, safe.Field(oldObj, func(oldObj T2) *string { return &oldObj.S }), fldPath.Child("s"))...)
 
 	// field T2.I
 	errs = append(errs,
-		func(obj int, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj int, oldObj *int, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.I")...)
 			return
-		}(obj.I, fldPath.Child("i"))...)
+		}(obj.I, safe.Field(oldObj, func(oldObj T2) *int { return &oldObj.I }), fldPath.Child("i"))...)
 
 	// field T2.B
 	errs = append(errs,
-		func(obj bool, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj bool, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.B")...)
 			return
-		}(obj.B, fldPath.Child("b"))...)
+		}(obj.B, safe.Field(oldObj, func(oldObj T2) *bool { return &oldObj.B }), fldPath.Child("b"))...)
 
 	// field T2.F
 	errs = append(errs,
-		func(obj float64, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj float64, oldObj *float64, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.F")...)
 			return
-		}(obj.F, fldPath.Child("f"))...)
+		}(obj.F, safe.Field(oldObj, func(oldObj T2) *float64 { return &oldObj.F }), fldPath.Child("f"))...)
 
 	return errs
 }

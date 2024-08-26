@@ -24,6 +24,8 @@ package discriminated_union
 import (
 	fmt "fmt"
 
+	operation "k8s.io/apimachinery/pkg/api/operation"
+	safe "k8s.io/apimachinery/pkg/api/safe"
 	validate "k8s.io/apimachinery/pkg/api/validate"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
@@ -34,9 +36,9 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc((*DU)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*DU)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_DU(obj.(*DU), nil)
+			return Validate_DU(opCtx, obj.(*DU), safe.Cast[DU](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
@@ -45,7 +47,7 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 
 var unionMembershipForDU = validate.NewDiscriminatedUnionMembership("d", [2]string{"m1", "M1"}, [2]string{"m2", "M2"})
 
-func Validate_DU(obj *DU, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_DU(opCtx operation.Context, obj, oldObj *DU, fldPath *field.Path) (errs field.ErrorList) {
 	// type DU
 	if obj != nil {
 		errs = append(errs, validate.DiscriminatedUnion(fldPath, *obj, unionMembershipForDU, obj.D, obj.M1, obj.M2)...)
@@ -56,26 +58,26 @@ func Validate_DU(obj *DU, fldPath *field.Path) (errs field.ErrorList) {
 
 	// field DU.M1
 	errs = append(errs,
-		func(obj *M1, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj *M1, oldObj *M1, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, Validate_M1(obj, fldPath)...)
+				errs = append(errs, Validate_M1(opCtx, obj, oldObj, fldPath)...)
 			}
 			return
-		}(obj.M1, fldPath.Child("m1"))...)
+		}(obj.M1, safe.Field(oldObj, func(oldObj DU) *M1 { return oldObj.M1 }), fldPath.Child("m1"))...)
 
 	// field DU.M2
 	errs = append(errs,
-		func(obj *M2, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj *M2, oldObj *M2, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, Validate_M2(obj, fldPath)...)
+				errs = append(errs, Validate_M2(opCtx, obj, oldObj, fldPath)...)
 			}
 			return
-		}(obj.M2, fldPath.Child("m2"))...)
+		}(obj.M2, safe.Field(oldObj, func(oldObj DU) *M2 { return oldObj.M2 }), fldPath.Child("m2"))...)
 
 	return errs
 }
 
-func Validate_M1(obj *M1, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_M1(opCtx operation.Context, obj, oldObj *M1, fldPath *field.Path) (errs field.ErrorList) {
 	// type M1
 	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type M1")...)
@@ -83,15 +85,15 @@ func Validate_M1(obj *M1, fldPath *field.Path) (errs field.ErrorList) {
 
 	// field M1.S
 	errs = append(errs,
-		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field M1.S")...)
 			return
-		}(obj.S, fldPath.Child("s"))...)
+		}(obj.S, safe.Field(oldObj, func(oldObj M1) *string { return &oldObj.S }), fldPath.Child("s"))...)
 
 	return errs
 }
 
-func Validate_M2(obj *M2, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_M2(opCtx operation.Context, obj, oldObj *M2, fldPath *field.Path) (errs field.ErrorList) {
 	// type M2
 	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type M2")...)
@@ -99,10 +101,10 @@ func Validate_M2(obj *M2, fldPath *field.Path) (errs field.ErrorList) {
 
 	// field M2.S
 	errs = append(errs,
-		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field M2.S")...)
 			return
-		}(obj.S, fldPath.Child("s"))...)
+		}(obj.S, safe.Field(oldObj, func(oldObj M2) *string { return &oldObj.S }), fldPath.Child("s"))...)
 
 	return errs
 }
