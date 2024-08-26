@@ -137,6 +137,9 @@ func (g *genValidations) GenerateType(c *generator.Context, t *types.Type, w io.
 }
 
 func (g *genValidations) hasValidations(n *typeNode) bool {
+	if n == nil {
+		return false
+	}
 	if r, found := g.hasValidationsCache[n]; found {
 		return r
 	}
@@ -193,7 +196,7 @@ type childNode struct {
 	name      string      // the field name in the parent, populated when this node is a struct field
 	jsonName  string      // always populated when name is populated
 	childType *types.Type // the real type of the child (may be a pointer)
-	node      *typeNode   // the node of the child's value type
+	node      *typeNode   // the node of the child's value type, or nil if it is in a foreign package
 
 	fieldValidations validators.Validations // validations on the field
 	keyValidations   validators.Validations // validations on each key of a map field
@@ -284,7 +287,9 @@ func (n *typeNode) dumpChildren(buf *bytes.Buffer, indent int, visited map[*type
 			n.dumpIndent(buf, indent+1)
 			buf.WriteString(fmt.Sprintf("val-validation: %v(%+v)\n", fn, args))
 		}
-		fld.node.doDump(buf, indent+1, visited)
+		if fld.node != nil {
+			fld.node.doDump(buf, indent+1, visited)
+		}
 		n.dumpIndent(buf, indent)
 		buf.WriteString("}\n")
 	}
@@ -327,6 +332,8 @@ func (td *typeDiscoverer) DiscoverType(t *types.Type) error {
 	fldPath := field.NewPath(t.Name.String())
 	if node, err := td.discover(t, fldPath); err != nil {
 		return err
+	} else if node == nil {
+		panic(fmt.Sprintf("discovered a nil node for type %v", t))
 	} else {
 		fmt.Println(node.dump()) //FIXME: remove
 	}
@@ -336,6 +343,14 @@ func (td *typeDiscoverer) DiscoverType(t *types.Type) error {
 // discover walks the given type recursively and returns a typeNode
 // representing it.
 func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNode, error) {
+	// With the exception of builtins (which gengo puts in package ""), we
+	// can't traverse into packages which are not being processed by this tool.
+	if t.Name.Package != "" {
+		_, ok := td.inputToPkg[t.Name.Package]
+		if !ok {
+			return nil, nil
+		}
+	}
 	if t.Kind == types.Pointer {
 		if t.Elem.Kind == types.Pointer {
 			return nil, fmt.Errorf("field %s (%s): pointers to pointers are not supported", fldPath.String(), t)
@@ -345,7 +360,7 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 	}
 	// If we have done this type already, we can stop here and break any
 	// recursion.
-	if node := td.typeNodes[t]; node != nil {
+	if node, found := td.typeNodes[t]; found {
 		return node, nil
 	}
 
@@ -375,9 +390,7 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 	// If this is an opaque, named type, we can call its validation function.
 	switch t.Kind {
 	case types.Alias, types.Struct:
-		if fn, ok := td.getValidationFunctionName(t); !ok {
-			return thisNode, nil
-		} else {
+		if fn, ok := td.getValidationFunctionName(t); ok {
 			thisNode.funcName = fn
 		}
 	}
@@ -730,6 +743,8 @@ func (g *genValidations) emitValidationFunction(c *generator.Context, t *types.T
 //
 // Emitted code assumes that the value in question is always a nilable
 // variable named "obj" and the field path to this value is named "fldPath".
+//
+// This function assumes that thisChild.node is not nil.
 func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild *childNode, sw *generator.SnippetWriter) {
 	thisNode := thisChild.node
 	inType := thisNode.valueType
@@ -772,19 +787,23 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 				emitCallsToValidators(c, validations.Functions, bufsw)
 			}
 
-			// Get to the real type.
-			switch fld.node.valueType.Kind {
-			case types.Alias:
-				// Emit for the underlying type.
-				g.emitValidationForChild(c, fld.node.underlying, bufsw)
-				// Call the type's validation function.
-				g.emitCallToOtherTypeFunc(c, fld.node, bufsw)
-			case types.Struct:
-				// Call the type's validation function.
-				g.emitCallToOtherTypeFunc(c, fld.node, bufsw)
-			default:
-				// Descend into this field.
-				g.emitValidationForChild(c, fld, bufsw)
+			// If the node is nil, this must be a type in a package we are not
+			// handling - it's effectively opaque to us.
+			if fld.node != nil {
+				// Get to the real type.
+				switch fld.node.valueType.Kind {
+				case types.Alias:
+					// Emit for the underlying type.
+					g.emitValidationForChild(c, fld.node.underlying, bufsw)
+					// Call the type's validation function.
+					g.emitCallToOtherTypeFunc(c, fld.node, bufsw)
+				case types.Struct:
+					// Call the type's validation function.
+					g.emitCallToOtherTypeFunc(c, fld.node, bufsw)
+				default:
+					// Descend into this field.
+					g.emitValidationForChild(c, fld, bufsw)
+				}
 			}
 
 			if buf.Len() > 0 {
@@ -835,16 +854,20 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			emitCallsToValidators(c, validations.Functions, elemSW)
 		}
 
-		switch thisNode.elem.node.valueType.Kind {
-		case types.Struct, types.Alias:
-			// If this field is another type, call its validation function.
-			// Checking for nil is handled inside this call.
-			g.emitCallToOtherTypeFunc(c, thisNode.elem.node, elemSW)
-		default:
-			// No need to go further.  Struct- or alias-typed fields might have
-			// validations attached to the type, but anything else (e.g.
-			// string) can't, and we already emitted code for the field
-			// validations.
+		// If the node is nil, this must be a type in a package we are not
+		// handling - it's effectively opaque to us.
+		if thisNode.elem.node != nil {
+			switch thisNode.elem.node.valueType.Kind {
+			case types.Struct, types.Alias:
+				// If this field is another type, call its validation function.
+				// Checking for nil is handled inside this call.
+				g.emitCallToOtherTypeFunc(c, thisNode.elem.node, elemSW)
+			default:
+				// No need to go further.  Struct- or alias-typed fields might have
+				// validations attached to the type, but anything else (e.g.
+				// string) can't, and we already emitted code for the field
+				// validations.
+			}
 		}
 
 		if elemBuf.Len() > 0 {
@@ -878,16 +901,20 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			emitCallsToValidators(c, keyValidations.Functions, keySW)
 		}
 
-		switch thisNode.key.node.valueType.Kind {
-		case types.Struct, types.Alias:
-			// If this field is another type, call its validation function.
-			// Checking for nil is handled inside this call.
-			g.emitCallToOtherTypeFunc(c, thisNode.key.node, keySW)
-		default:
-			// No need to go further.  Struct- or alias-typed fields might have
-			// validations attached to the type, but anything else (e.g.
-			// string) can't, and we already emitted code for the field
-			// validations.
+		// If the node is nil, this must be a type in a package we are not
+		// handling - it's effectively opaque to us.
+		if thisNode.key.node != nil {
+			switch thisNode.key.node.valueType.Kind {
+			case types.Struct, types.Alias:
+				// If this field is another type, call its validation function.
+				// Checking for nil is handled inside this call.
+				g.emitCallToOtherTypeFunc(c, thisNode.key.node, keySW)
+			default:
+				// No need to go further.  Struct- or alias-typed fields might have
+				// validations attached to the type, but anything else (e.g.
+				// string) can't, and we already emitted code for the field
+				// validations.
+			}
 		}
 
 		// Accumulate into a buffer so we don't emit empty functions.
@@ -901,16 +928,20 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			emitCallsToValidators(c, valValidations.Functions, valSW)
 		}
 
-		switch thisNode.elem.node.valueType.Kind {
-		case types.Struct, types.Alias:
-			// If this field is another type, call its validation function.
-			// Checking for nil is handled inside this call.
-			g.emitCallToOtherTypeFunc(c, thisNode.elem.node, valSW)
-		default:
-			// No need to go further.  Struct- or alias-typed fields might have
-			// validations attached to the type, but anything else (e.g.
-			// string) can't, and we already emitted code for the field
-			// validations.
+		// If the node is nil, this must be a type in a package we are not
+		// handling - it's effectively opaque to us.
+		if thisNode.elem.node != nil {
+			switch thisNode.elem.node.valueType.Kind {
+			case types.Struct, types.Alias:
+				// If this field is another type, call its validation function.
+				// Checking for nil is handled inside this call.
+				g.emitCallToOtherTypeFunc(c, thisNode.elem.node, valSW)
+			default:
+				// No need to go further.  Struct- or alias-typed fields might have
+				// validations attached to the type, but anything else (e.g.
+				// string) can't, and we already emitted code for the field
+				// validations.
+			}
 		}
 
 		vName := "_"
