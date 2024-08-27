@@ -42,8 +42,6 @@ var (
 	errorListType    = types.Name{Package: fieldPkg, Name: "ErrorList"}
 	fieldPathType    = types.Name{Package: fieldPkg, Name: "Path"}
 	errorfType       = types.Name{Package: "fmt", Name: "Errorf"}
-	runtimePkg       = "k8s.io/apimachinery/pkg/runtime"
-	schemeType       = types.Name{Package: runtimePkg, Name: "Scheme"}
 	safePkg          = "k8s.io/apimachinery/pkg/api/safe"
 	newListMapType   = types.Name{Package: safePkg, Name: "NewListMap"}
 	fieldType        = types.Name{Package: safePkg, Name: "Field"}
@@ -65,10 +63,11 @@ type genValidations struct {
 	imports             namer.ImportTracker
 	validator           validators.DeclarativeValidator
 	hasValidationsCache map[*typeNode]bool
+	schemaRegistry      types.Name
 }
 
 // NewGenValidations cretes a new generator for the specified package.
-func NewGenValidations(outputFilename, outputPackage string, rootTypes []*types.Type, discovered *typeDiscoverer, inputToPkg map[string]string, validator validators.DeclarativeValidator) generator.Generator {
+func NewGenValidations(outputFilename, outputPackage string, rootTypes []*types.Type, discovered *typeDiscoverer, inputToPkg map[string]string, validator validators.DeclarativeValidator, schemaRegistry types.Name) generator.Generator {
 	return &genValidations{
 		GoGenerator: generator.GoGenerator{
 			OutputFilename: outputFilename,
@@ -80,6 +79,7 @@ func NewGenValidations(outputFilename, outputPackage string, rootTypes []*types.
 		imports:             generator.NewImportTrackerForPackage(outputPackage),
 		validator:           validator,
 		hasValidationsCache: map[*typeNode]bool{},
+		schemaRegistry:      schemaRegistry,
 	}
 }
 
@@ -126,7 +126,7 @@ func (g *genValidations) isOtherPackage(pkg string) bool {
 func (g *genValidations) Init(c *generator.Context, w io.Writer) error {
 	klog.V(5).Infof("emitting registration code")
 	sw := generator.NewSnippetWriter(w, c, "$", "$")
-	g.emitRegisterFunction(c, sw)
+	g.emitRegisterFunction(c, g.schemaRegistry, sw)
 	if err := sw.Error(); err != nil {
 		return err
 	}
@@ -655,8 +655,8 @@ func (td *typeDiscoverer) getValidationFunctionName(t *types.Type) (types.Name, 
 
 // emitRegisterFunction emits the type-registration logic for validation
 // functions.
-func (g *genValidations) emitRegisterFunction(c *generator.Context, sw *generator.SnippetWriter) {
-	scheme := c.Universe.Type(schemeType)
+func (g *genValidations) emitRegisterFunction(c *generator.Context, schemeRegistry types.Name, sw *generator.SnippetWriter) {
+	scheme := c.Universe.Type(schemeRegistry)
 	schemePtr := &types.Type{
 		Kind: types.Pointer,
 		Elem: scheme,

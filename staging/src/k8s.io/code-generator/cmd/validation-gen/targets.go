@@ -33,10 +33,16 @@ import (
 
 // These are the comment tags that carry parameters for validation generation.
 const (
-	tagName         = "k8s:validation-gen"
-	inputTagName    = "k8s:validation-gen-input"
-	enabledTagName  = "k8s:validation-gen-enabled-tags"
-	disabledTagName = "k8s:validation-gen-disabled-tags"
+	tagName               = "k8s:validation-gen"
+	inputTagName          = "k8s:validation-gen-input"
+	enabledTagName        = "k8s:validation-gen-enabled-tags"
+	disabledTagName       = "k8s:validation-gen-disabled-tags"
+	schemeRegistryTagName = "k8s:validation-gen-scheme-registry" // defaults to k8s.io/apimachinery/pkg.runtime.Scheme
+)
+
+var (
+	runtimePkg = "k8s.io/apimachinery/pkg/runtime"
+	schemeType = types.Name{Package: runtimePkg, Name: "Scheme"}
 )
 
 func extractTag(comments []string) ([]string, bool) {
@@ -60,6 +66,18 @@ func checkTag(comments []string, require ...string) bool {
 		return len(values) == 1 && values[0] == ""
 	}
 	return reflect.DeepEqual(values, require)
+}
+
+func schemeRegistryTag(pkg *types.Package) types.Name {
+	values := gengo.ExtractCommentTags("+", pkg.Comments)[schemeRegistryTagName]
+	switch len(values) {
+	case 0:
+		return schemeType // default
+	case 1:
+		return types.ParseFullyQualifiedName(values[0])
+	default:
+		panic(fmt.Sprintf("Package %q contains more than usage of %q", pkg.Path, schemeRegistryTagName))
+	}
 }
 
 // NameSystems returns the name system used by the generators in this package.
@@ -167,6 +185,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 
 		enabledTags, disabledTags := extractFiltersTags(pkg.Comments)
 		declarativeValidator := validators.NewValidator(context, enabledTags, disabledTags)
+		schemaRegistry := schemeRegistryTag(pkg)
 
 		typesWith, found := extractTag(pkg.Comments)
 		if !found {
@@ -242,7 +261,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 
 				GeneratorsFunc: func(c *generator.Context) (generators []generator.Generator) {
 					return []generator.Generator{
-						NewGenValidations(args.OutputFile, pkg.Path, rootTypes, td, inputToPkg, declarativeValidator),
+						NewGenValidations(args.OutputFile, pkg.Path, rootTypes, td, inputToPkg, declarativeValidator, schemaRegistry),
 					}
 				},
 			})
