@@ -24,6 +24,8 @@ package typedefs
 import (
 	fmt "fmt"
 
+	operation "k8s.io/apimachinery/pkg/api/operation"
+	safe "k8s.io/apimachinery/pkg/api/safe"
 	validate "k8s.io/apimachinery/pkg/api/validate"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
@@ -34,116 +36,116 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc((*E00)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*E00)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E00(obj.(*E00), nil)
+			return Validate_E00(opCtx, obj.(*E00), safe.Cast[E00](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*E01)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*E01)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E01(obj.(*E01), nil)
+			return Validate_E01(opCtx, obj.(*E01), safe.Cast[E01](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*E02)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*E02)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E02(obj.(*E02), nil)
+			return Validate_E02(opCtx, obj.(*E02), safe.Cast[E02](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*E03)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*E03)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E03(obj.(*E03), nil)
+			return Validate_E03(opCtx, obj.(*E03), safe.Cast[E03](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*E04)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*E04)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E04(obj.(*E04), nil)
+			return Validate_E04(opCtx, obj.(*E04), safe.Cast[E04](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*E05)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*E05)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E05(obj.(*E05), nil)
+			return Validate_E05(opCtx, obj.(*E05), safe.Cast[E05](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*E06)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*E06)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E06(obj.(*E06), nil)
+			return Validate_E06(opCtx, obj.(*E06), safe.Cast[E06](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*E07)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*E07)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E07(obj.(*E07), nil)
+			return Validate_E07(opCtx, obj.(*E07), safe.Cast[E07](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*E08)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*E08)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E08(obj.(*E08), nil)
+			return Validate_E08(opCtx, obj.(*E08), safe.Cast[E08](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*E09)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*E09)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E09(obj.(*E09), nil)
+			return Validate_E09(opCtx, obj.(*E09), safe.Cast[E09](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*E10)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*E10)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E10(obj.(*E10), nil)
+			return Validate_E10(opCtx, obj.(*E10), safe.Cast[E10](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*E11)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*E11)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E11(obj.(*E11), nil)
+			return Validate_E11(opCtx, obj.(*E11), safe.Cast[E11](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*E12)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*E12)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E12(obj.(*E12), nil)
+			return Validate_E12(opCtx, obj.(*E12), safe.Cast[E12](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*E13)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*E13)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E13(obj.(*E13), nil)
+			return Validate_E13(opCtx, obj.(*E13), safe.Cast[E13](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*E14)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*E14)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E14(obj.(*E14), nil)
+			return Validate_E14(opCtx, obj.(*E14), safe.Cast[E14](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*E15)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*E15)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E15(obj.(*E15), nil)
+			return Validate_E15(opCtx, obj.(*E15), safe.Cast[E15](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*EMultiple)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*EMultiple)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_EMultiple(obj.(*EMultiple), nil)
+			return Validate_EMultiple(opCtx, obj.(*EMultiple), safe.Cast[EMultiple](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_E00(obj *E00, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E00(opCtx operation.Context, obj, oldObj *E00, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_E01(obj *E01, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E01(opCtx operation.Context, obj, oldObj *E01, fldPath *field.Path) (errs field.ErrorList) {
 	// type E01
 	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "E01, no flags")...)
@@ -152,14 +154,14 @@ func Validate_E01(obj *E01, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_E02(obj *E02, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E02(opCtx operation.Context, obj, oldObj *E02, fldPath *field.Path) (errs field.ErrorList) {
 	// type E02
 	errs = append(errs, validate.FixedResult(fldPath, obj, true, "E02, PtrOK")...)
 
 	return errs
 }
 
-func Validate_E03(obj *E03, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E03(opCtx operation.Context, obj, oldObj *E03, fldPath *field.Path) (errs field.ErrorList) {
 	// type E03
 	errs = append(errs, validate.FixedResult(fldPath, obj, true, "E03, PtrOK")...)
 	if obj != nil {
@@ -169,7 +171,7 @@ func Validate_E03(obj *E03, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_E04(obj *E04, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E04(opCtx operation.Context, obj, oldObj *E04, fldPath *field.Path) (errs field.ErrorList) {
 	// type E04
 	if obj != nil {
 		if e := validate.FixedResult(fldPath, *obj, true, "E04, IsFatal"); len(e) != 0 {
@@ -181,7 +183,7 @@ func Validate_E04(obj *E04, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_E05(obj *E05, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E05(opCtx operation.Context, obj, oldObj *E05, fldPath *field.Path) (errs field.ErrorList) {
 	// type E05
 	if obj != nil {
 		if e := validate.FixedResult(fldPath, *obj, true, "E05, IsFatal"); len(e) != 0 {
@@ -194,7 +196,7 @@ func Validate_E05(obj *E05, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_E06(obj *E06, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E06(opCtx operation.Context, obj, oldObj *E06, fldPath *field.Path) (errs field.ErrorList) {
 	// type E06
 	if obj != nil {
 		if e := validate.FixedResult(fldPath, *obj, true, "E06, IsFatal"); len(e) != 0 {
@@ -207,7 +209,7 @@ func Validate_E06(obj *E06, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_E07(obj *E07, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E07(opCtx operation.Context, obj, oldObj *E07, fldPath *field.Path) (errs field.ErrorList) {
 	// type E07
 	if obj != nil {
 		if e := validate.FixedResult(fldPath, *obj, true, "E07, IsFatal"); len(e) != 0 {
@@ -223,7 +225,7 @@ func Validate_E07(obj *E07, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_E08(obj *E08, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E08(opCtx operation.Context, obj, oldObj *E08, fldPath *field.Path) (errs field.ErrorList) {
 	// type E08
 	if e := validate.FixedResult(fldPath, obj, true, "E08, PtrOK|IsFatal"); len(e) != 0 {
 		errs = append(errs, e...)
@@ -233,7 +235,7 @@ func Validate_E08(obj *E08, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_E09(obj *E09, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E09(opCtx operation.Context, obj, oldObj *E09, fldPath *field.Path) (errs field.ErrorList) {
 	// type E09
 	if e := validate.FixedResult(fldPath, obj, true, "E09, PtrOK|IsFatal"); len(e) != 0 {
 		errs = append(errs, e...)
@@ -246,7 +248,7 @@ func Validate_E09(obj *E09, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_E10(obj *E10, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E10(opCtx operation.Context, obj, oldObj *E10, fldPath *field.Path) (errs field.ErrorList) {
 	// type E10
 	if e := validate.FixedResult(fldPath, obj, true, "E10, PtrOK|IsFatal"); len(e) != 0 {
 		errs = append(errs, e...)
@@ -257,7 +259,7 @@ func Validate_E10(obj *E10, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_E11(obj *E11, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E11(opCtx operation.Context, obj, oldObj *E11, fldPath *field.Path) (errs field.ErrorList) {
 	// type E11
 	if e := validate.FixedResult(fldPath, obj, true, "E11, PtrOK|IsFatal"); len(e) != 0 {
 		errs = append(errs, e...)
@@ -271,7 +273,7 @@ func Validate_E11(obj *E11, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_E12(obj *E12, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E12(opCtx operation.Context, obj, oldObj *E12, fldPath *field.Path) (errs field.ErrorList) {
 	// type E12
 	if e := validate.FixedResult(fldPath, obj, true, "E12, PtrOK|IsFatal"); len(e) != 0 {
 		errs = append(errs, e...)
@@ -287,7 +289,7 @@ func Validate_E12(obj *E12, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_E13(obj *E13, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E13(opCtx operation.Context, obj, oldObj *E13, fldPath *field.Path) (errs field.ErrorList) {
 	// type E13
 	if e := validate.FixedResult(fldPath, obj, true, "E13, PtrOK|IsFatal"); len(e) != 0 {
 		errs = append(errs, e...)
@@ -304,7 +306,7 @@ func Validate_E13(obj *E13, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_E14(obj *E14, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E14(opCtx operation.Context, obj, oldObj *E14, fldPath *field.Path) (errs field.ErrorList) {
 	// type E14
 	if e := validate.FixedResult(fldPath, obj, true, "E14, PtrOK|IsFatal"); len(e) != 0 {
 		errs = append(errs, e...)
@@ -321,7 +323,7 @@ func Validate_E14(obj *E14, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_E15(obj *E15, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E15(opCtx operation.Context, obj, oldObj *E15, fldPath *field.Path) (errs field.ErrorList) {
 	// type E15
 	if e := validate.FixedResult(fldPath, obj, true, "E15, PtrOK|IsFatal"); len(e) != 0 {
 		errs = append(errs, e...)
@@ -341,7 +343,7 @@ func Validate_E15(obj *E15, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
-func Validate_EMultiple(obj *EMultiple, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_EMultiple(opCtx operation.Context, obj, oldObj *EMultiple, fldPath *field.Path) (errs field.ErrorList) {
 	// type EMultiple
 	if e := validate.FixedResult(fldPath, obj, true, "EMultiple, PtrOK|IsFatal 1"); len(e) != 0 {
 		errs = append(errs, e...)

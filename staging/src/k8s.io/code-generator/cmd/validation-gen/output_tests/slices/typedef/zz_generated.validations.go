@@ -24,6 +24,8 @@ package typedef
 import (
 	fmt "fmt"
 
+	operation "k8s.io/apimachinery/pkg/api/operation"
+	safe "k8s.io/apimachinery/pkg/api/safe"
 	validate "k8s.io/apimachinery/pkg/api/validate"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
@@ -34,16 +36,16 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc((*T1)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*T1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_T1(obj.(*T1), nil)
+			return Validate_T1(opCtx, obj.(*T1), safe.Cast[T1](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_ALS(obj *ALS, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_ALS(opCtx operation.Context, obj, oldObj *ALS, fldPath *field.Path) (errs field.ErrorList) {
 	// type ALS
 	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type ALS")...)
@@ -52,16 +54,16 @@ func Validate_ALS(obj *ALS, fldPath *field.Path) (errs field.ErrorList) {
 	if obj != nil {
 		for i, val := range *obj {
 			errs = append(errs,
-				func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+				func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 					errs = append(errs, validate.FixedResult(fldPath, obj, true, "ALS[vals]")...)
 					return
-				}(val, fldPath.Index(i))...)
+				}(val, nil, fldPath.Index(i))...)
 		}
 	}
 	return errs
 }
 
-func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// type T1
 	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type T1")...)
@@ -71,33 +73,33 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 
 	// field T1.ALS
 	errs = append(errs,
-		func(obj ALS, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj ALS, oldObj *ALS, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.ALS")...)
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+					func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(fldPath, obj, true, "ALS[vals]")...)
 						return
-					}(val, fldPath.Index(i))...)
+					}(val, nil, fldPath.Index(i))...)
 			}
-			errs = append(errs, Validate_ALS(&obj, fldPath)...)
+			errs = append(errs, Validate_ALS(opCtx, &obj, oldObj, fldPath)...)
 			return
-		}(obj.ALS, fldPath.Child("als"))...)
+		}(obj.ALS, safe.Field(oldObj, func(oldObj T1) *ALS { return &oldObj.ALS }), fldPath.Child("als"))...)
 
 	// field T1.LALS
 	errs = append(errs,
-		func(obj []ALS, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj []ALS, oldObj []ALS, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.LALS")...)
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj ALS, fldPath *field.Path) (errs field.ErrorList) {
+					func(obj ALS, oldObj *ALS, fldPath *field.Path) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(fldPath, obj, true, "T1.LALS[vals]")...)
-						errs = append(errs, Validate_ALS(&obj, fldPath)...)
+						errs = append(errs, Validate_ALS(opCtx, &obj, oldObj, fldPath)...)
 						return
-					}(val, fldPath.Index(i))...)
+					}(val, nil, fldPath.Index(i))...)
 			}
 			return
-		}(obj.LALS, fldPath.Child("lals"))...)
+		}(obj.LALS, safe.Field(oldObj, func(oldObj T1) []ALS { return oldObj.LALS }), fldPath.Child("lals"))...)
 
 	return errs
 }

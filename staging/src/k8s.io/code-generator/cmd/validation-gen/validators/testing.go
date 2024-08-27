@@ -55,7 +55,7 @@ const (
 	// These tags can take no value or a quoted string or a JSON object, which will be used in the
 	// error message.  The JSON object schema is:
 	//   {
-	//     "flags": <list-of-string>  # optional: "PtrOK" or "IsFatal"
+	//     "flags": <list-of-string>  # optional: "PtrOK" ,"IsFatal" or "UpdateOnly"
 	//     "msg":   <string>          # required
 	//     "typeArg" <string>         # optional. If set, binds the type arg. Example: "time.Duration"
 	//   }
@@ -67,7 +67,8 @@ const (
 )
 
 var (
-	fixedResultValidator = types.Name{Package: libValidationPkg, Name: "FixedResult"}
+	fixedResultValidator       = types.Name{Package: libValidationPkg, Name: "FixedResult"}
+	fixedResultUpdateValidator = types.Name{Package: libValidationPkg, Name: "FixedResultUpdate"}
 )
 
 func (v fixedResultDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
@@ -80,7 +81,11 @@ func (v fixedResultDeclarativeValidator) ExtractValidations(t *types.Type, comme
 			if err != nil {
 				return result, fmt.Errorf("can't extract +%s tag: %w", validateTrueTagName, err)
 			}
-			result.AddFunction(GenericFunction(validateTrueTagName, tag.flags, fixedResultValidator, tag.typeArgs, true, tag.msg))
+			validator := fixedResultValidator
+			if tag.flags.IsSet(UpdateOnly) {
+				validator = fixedResultUpdateValidator
+			}
+			result.AddFunction(GenericFunction(validateTrueTagName, tag.flags, validator, tag.typeArgs, true, tag.msg))
 		}
 	} else {
 		vals := gengo.ExtractCommentTags("+", comments)[validateFalseTagName]
@@ -89,7 +94,11 @@ func (v fixedResultDeclarativeValidator) ExtractValidations(t *types.Type, comme
 			if err != nil {
 				return result, fmt.Errorf("can't extract +%s tag: %w", validateFalseTagName, err)
 			}
-			result.AddFunction(GenericFunction(validateFalseTagName, tag.flags, fixedResultValidator, tag.typeArgs, false, tag.msg))
+			validator := fixedResultValidator
+			if tag.flags.IsSet(UpdateOnly) {
+				validator = fixedResultUpdateValidator
+			}
+			result.AddFunction(GenericFunction(validateFalseTagName, tag.flags, validator, tag.typeArgs, false, tag.msg))
 		}
 	}
 
@@ -185,6 +194,8 @@ func (_ fixedResultDeclarativeValidator) parseTagVal(in string) (tagVal, error) 
 			flags |= IsFatal
 		case "PtrOK":
 			flags |= PtrOK
+		case "UpdateOnly":
+			flags |= UpdateOnly
 		default:
 			return tagVal{}, fmt.Errorf("unknown flag: %q", fl)
 		}

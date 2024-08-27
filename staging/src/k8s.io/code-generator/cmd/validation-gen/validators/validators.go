@@ -59,6 +59,16 @@ func (v *Validations) Add(o Validations) {
 	v.Variables = append(v.Variables, o.Variables...)
 }
 
+// HasFunctionsWith returns true if any of the validation functions have the given flags.
+func (v *Validations) HasFunctionsWith(flags FunctionFlags) bool {
+	for _, f := range v.Functions {
+		if f.Flags().IsSet(flags) {
+			return true
+		}
+	}
+	return false
+}
+
 // FunctionFlags define optional properties of a validator.  Most validators
 // can just use DefaultFlags.
 type FunctionFlags uint32
@@ -80,6 +90,10 @@ const (
 	// wants the pointer value, rather than the dereferenced value.  Most
 	// validators want the value, not the pointer.
 	PtrOK
+
+	// UpdateOnly indicates that this function must only be called for updates
+	// and accepts an old value parameter.
+	UpdateOnly
 )
 
 // FunctionGen provides validation-gen with the information needed to generate a
@@ -91,8 +105,11 @@ type FunctionGen interface {
 	// SignatureAndArgs returns the function name and all extraArg value literals that are passed when the function
 	// invocation is generated.
 	//
-	// The function signature must be of the form:
-	//   func(field.Path, <valueType>, extraArgs[0] <extraArgs[0]Type>, ..., extraArgs[N] <extraArgs[N]Type>)
+	// The function signature must either be of the form:
+	//   func(fldPath field.Path, value <valueType>, extraArgs[0] <extraArgs[0]Type>, ..., extraArgs[N] <extraArgs[N]Type>)
+	//
+	// Or, if the UpdateOnly flag is set, it must be of the form:
+	//   func(fldPath field.Path, value <valueType>, oldValue <ValueType>, extraArgs[0] <extraArgs[0]Type>, ..., extraArgs[N] <extraArgs[N]Type>)
 	//
 	// extraArgs may contain:
 	// - data literals comprised of maps, slices, strings, ints, floats and bools

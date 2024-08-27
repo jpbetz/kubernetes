@@ -24,6 +24,8 @@ package elidenovalidations
 import (
 	fmt "fmt"
 
+	operation "k8s.io/apimachinery/pkg/api/operation"
+	safe "k8s.io/apimachinery/pkg/api/safe"
 	validate "k8s.io/apimachinery/pkg/api/validate"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
@@ -34,27 +36,27 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc((*T1)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*T1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_T1(obj.(*T1), nil)
+			return Validate_T1(opCtx, obj.(*T1), safe.Cast[T1](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_HasFieldVal(obj *HasFieldVal, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_HasFieldVal(opCtx operation.Context, obj, oldObj *HasFieldVal, fldPath *field.Path) (errs field.ErrorList) {
 	// field HasFieldVal.S
 	errs = append(errs,
-		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field HasFieldVal.S")...)
 			return
-		}(obj.S, fldPath.Child("s"))...)
+		}(obj.S, safe.Field(oldObj, func(oldObj HasFieldVal) *string { return &oldObj.S }), fldPath.Child("s"))...)
 
 	return errs
 }
 
-func Validate_HasTypeVal(obj *HasTypeVal, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_HasTypeVal(opCtx operation.Context, obj, oldObj *HasTypeVal, fldPath *field.Path) (errs field.ErrorList) {
 	// type HasTypeVal
 	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type HasTypeVal")...)
@@ -64,31 +66,31 @@ func Validate_HasTypeVal(obj *HasTypeVal, fldPath *field.Path) (errs field.Error
 	return errs
 }
 
-func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// field T1.TypeMeta has no validation
 
 	// field T1.HasTypeVal
 	errs = append(errs,
-		func(obj HasTypeVal, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_HasTypeVal(&obj, fldPath)...)
+		func(obj HasTypeVal, oldObj *HasTypeVal, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_HasTypeVal(opCtx, &obj, oldObj, fldPath)...)
 			return
-		}(obj.HasTypeVal, fldPath.Child("hasTypeVal"))...)
+		}(obj.HasTypeVal, safe.Field(oldObj, func(oldObj T1) *HasTypeVal { return &oldObj.HasTypeVal }), fldPath.Child("hasTypeVal"))...)
 
 	// field T1.HasFieldVal
 	errs = append(errs,
-		func(obj HasFieldVal, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_HasFieldVal(&obj, fldPath)...)
+		func(obj HasFieldVal, oldObj *HasFieldVal, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_HasFieldVal(opCtx, &obj, oldObj, fldPath)...)
 			return
-		}(obj.HasFieldVal, fldPath.Child("hasFieldVal"))...)
+		}(obj.HasFieldVal, safe.Field(oldObj, func(oldObj T1) *HasFieldVal { return &oldObj.HasFieldVal }), fldPath.Child("hasFieldVal"))...)
 
 	// field T1.HasNoVal has no validation
 
 	// field T1.HasNoValFieldVal
 	errs = append(errs,
-		func(obj HasNoVal, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj HasNoVal, oldObj *HasNoVal, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.HasNoValFieldVal")...)
 			return
-		}(obj.HasNoValFieldVal, fldPath.Child("hasNoValFieldVal"))...)
+		}(obj.HasNoValFieldVal, safe.Field(oldObj, func(oldObj T1) *HasNoVal { return &oldObj.HasNoValFieldVal }), fldPath.Child("hasNoValFieldVal"))...)
 
 	return errs
 }
