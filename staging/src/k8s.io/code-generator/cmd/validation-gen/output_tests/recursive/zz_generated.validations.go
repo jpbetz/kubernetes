@@ -27,15 +27,15 @@ import (
 	operation "k8s.io/apimachinery/pkg/api/operation"
 	safe "k8s.io/apimachinery/pkg/api/safe"
 	validate "k8s.io/apimachinery/pkg/api/validate"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
+	testscheme "k8s.io/code-generator/cmd/validation-gen/testscheme"
 )
 
 func init() { localSchemeBuilder.Register(RegisterValidations) }
 
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
-func RegisterValidations(scheme *runtime.Scheme) error {
+func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*E1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_E1(opCtx, obj.(*E1), safe.Cast[E1](oldObj), nil)

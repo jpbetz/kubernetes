@@ -22,13 +22,13 @@ limitations under the License.
 package notypesmatch
 
 import (
-	runtime "k8s.io/apimachinery/pkg/runtime"
+	testscheme "k8s.io/code-generator/cmd/validation-gen/testscheme"
 )
 
 func init() { localSchemeBuilder.Register(RegisterValidations) }
 
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
-func RegisterValidations(scheme *runtime.Scheme) error {
+func RegisterValidations(scheme *testscheme.Scheme) error {
 	return nil
 }
