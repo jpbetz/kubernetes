@@ -15,9 +15,14 @@ limitations under the License.
 */
 
 // +k8s:validation-gen=TypeMeta
+// +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
 
 // This is a test package.
 package discriminated_union_custom_members
+
+import "k8s.io/code-generator/cmd/validation-gen/testscheme"
+
+var localSchemeBuilder = testscheme.New()
 
 // Discriminated union with custom member names
 type DU struct {

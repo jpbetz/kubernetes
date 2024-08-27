@@ -16,9 +16,14 @@ limitations under the License.
 
 // Note: this selects all types in the package.
 // +k8s:validation-gen=*
+// +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
 
 // This is a test package.
 package withfieldvalidations
+
+import "k8s.io/code-generator/cmd/validation-gen/testscheme"
+
+var localSchemeBuilder = testscheme.New()
 
 type T1 struct {
 	// +validateTrue="field T1.S"

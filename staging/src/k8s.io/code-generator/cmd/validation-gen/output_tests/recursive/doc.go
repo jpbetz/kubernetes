@@ -15,9 +15,14 @@ limitations under the License.
 */
 
 // +k8s:validation-gen=*
+// +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
 
 // This is a test package.
 package recursvie
+
+import "k8s.io/code-generator/cmd/validation-gen/testscheme"
+
+var localSchemeBuilder = testscheme.New()
 
 // +validateTrue="type T1"
 type T1 struct {
