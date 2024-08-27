@@ -19,6 +19,10 @@ limitations under the License.
 // This is a test package.
 package nogeneration
 
+import "k8s.io/code-generator/cmd/validation-gen/testscheme"
+
+var localSchemeBuilder = testscheme.New()
+
 type T1 struct {
 	// +validateTrue="from field T1.S"
 	S string

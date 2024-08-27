@@ -15,9 +15,14 @@ limitations under the License.
 */
 
 // +k8s:validation-gen=TypeMeta
+// +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
 
 // This is a test package.
 package elidenovalidations
+
+import "k8s.io/code-generator/cmd/validation-gen/testscheme"
+
+var localSchemeBuilder = testscheme.New()
 
 type T1 struct {
 	TypeMeta int
