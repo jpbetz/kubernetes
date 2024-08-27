@@ -19,6 +19,10 @@ limitations under the License.
 // This is a test package.
 package primitive_pointers
 
+import "k8s.io/code-generator/cmd/validation-gen/testscheme"
+
+var localSchemeBuilder = testscheme.New()
+
 type T1 struct {
 	// +validateTrue={"flags":["UpdateOnly"], "msg":"T1.SP, UpdateOnly"}
 	SP *string `json:"sp"`
