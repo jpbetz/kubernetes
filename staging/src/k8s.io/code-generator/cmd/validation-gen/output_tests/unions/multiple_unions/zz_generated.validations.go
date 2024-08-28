@@ -83,8 +83,8 @@ var unionMembershipForUunion2 = validate.NewUnionMembership([2]string{"u2m1", "U
 func Validate_U(opCtx operation.Context, obj, oldObj *U, fldPath *field.Path) (errs field.ErrorList) {
 	// type U
 	if obj != nil {
-		errs = append(errs, validate.Union(fldPath, *obj, unionMembershipForUunion1, obj.U1M1, obj.U1M2)...)
 		errs = append(errs, validate.Union(fldPath, *obj, unionMembershipForUunion2, obj.U2M1, obj.U2M2)...)
+		errs = append(errs, validate.Union(fldPath, *obj, unionMembershipForUunion1, obj.U1M1, obj.U1M2)...)
 	}
 
 	// field U.TypeMeta has no validation
