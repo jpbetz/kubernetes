@@ -55,7 +55,7 @@ func Validate_LM1(opCtx operation.Context, obj, oldObj *LM1, fldPath *field.Path
 	// field LM1.S
 	errs = append(errs,
 		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if vContext.Operation == k8s.io/apimachinery/pkg/api/operation.Update && oldObj != nil {
+			if opCtx.Operation == operation.Update && oldObj != nil {
 				errs = append(errs, validate.FixedResultUpdate(fldPath, obj, *oldObj, true, "T1.LM1.S, UpdateOnly")...)
 			}
 			return

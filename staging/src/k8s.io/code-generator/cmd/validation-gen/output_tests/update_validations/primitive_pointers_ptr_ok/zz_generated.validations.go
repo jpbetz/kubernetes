@@ -49,7 +49,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	// field T1.SP
 	errs = append(errs,
 		func(obj *string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if vContext.Operation == k8s.io/apimachinery/pkg/api/operation.Update {
+			if opCtx.Operation == operation.Update {
 				errs = append(errs, validate.FixedResultUpdate(fldPath, obj, oldObj, true, "T1.SP, UpdateOnly, PtrOK")...)
 			}
 			return
@@ -58,7 +58,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	// field T1.IP
 	errs = append(errs,
 		func(obj *int, oldObj *int, fldPath *field.Path) (errs field.ErrorList) {
-			if vContext.Operation == k8s.io/apimachinery/pkg/api/operation.Update {
+			if opCtx.Operation == operation.Update {
 				errs = append(errs, validate.FixedResultUpdate(fldPath, obj, oldObj, true, "T1.IP, UpdateOnly, PtrOK")...)
 			}
 			return
@@ -67,7 +67,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	// field T1.BP
 	errs = append(errs,
 		func(obj *bool, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
-			if vContext.Operation == k8s.io/apimachinery/pkg/api/operation.Update {
+			if opCtx.Operation == operation.Update {
 				errs = append(errs, validate.FixedResultUpdate(fldPath, obj, oldObj, true, "T1.BP, UpdateOnly, PtrOK")...)
 			}
 			return
@@ -76,7 +76,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	// field T1.FP
 	errs = append(errs,
 		func(obj *float64, oldObj *float64, fldPath *field.Path) (errs field.ErrorList) {
-			if vContext.Operation == k8s.io/apimachinery/pkg/api/operation.Update {
+			if opCtx.Operation == operation.Update {
 				errs = append(errs, validate.FixedResultUpdate(fldPath, obj, oldObj, true, "T1.FP, UpdateOnly, PtrOK")...)
 			}
 			return
