@@ -126,7 +126,12 @@ type FunctionGen interface {
 	Flags() FunctionFlags
 }
 
+// Identifier is a name that the generator will output as an identifier.
+// Identifiers are generated using the RawNamer strategy.
+type Identifier types.Name
+
 // PrivateVar is a variable name that the generator will output as a private identifier.
+// PrivateVars are generated using the PrivateNamer strategy.
 type PrivateVar types.Name
 
 // VariableGen provides validation-gen with the information needed to generate variable.
