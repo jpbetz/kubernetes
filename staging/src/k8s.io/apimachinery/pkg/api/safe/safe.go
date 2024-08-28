@@ -20,42 +20,43 @@ package safe
 // a function that traverses to a target type T (a typical use case is to dereference a field),
 // and returns the result of the traversal, or the zero value of the target type.
 // This is roughly equivalent to "value != nil ? fn(value) : nil" in languages that support the ternary operator.
-func Field[V any, T any](value *V, fn func(V) T) T {
-	var zero T
+func Field[V any, T any](value *V, fn func(*V) T) T {
 	if value == nil {
+		var zero T
 		return zero
 	}
-	o := fn(*value)
+	o := fn(value)
 	return o
 }
 
-// Lookup takes a map, which may or may not be nil,
-// and a key, and either returns a pointer to the value in the map matching the
-// key, or returns nil.
-func Lookup[K comparable, V any](m map[K]V, k K) *V {
+// Lookup looks up the specified key in the map and, if found, applies a
+// transform function.  If the map is nil or the key is not found, it returns
+// the zero-value for the map's value type.  The transform function will only
+// be called if the map is non-nil and the key is found.
+func Lookup[K comparable, V any, R any](m map[K]V, key K, xform func(V) R) R {
+	var zero R
 	if m == nil {
-		return nil
+		return zero
 	}
-	v, ok := m[k]
-	if !ok {
-		return nil
+	val, found := m[key]
+	if !found {
+		return zero
 	}
-	return &v
+	return xform(val)
 }
 
-// LookupOrZero takes a map, which may or may not be nil,
-// and a key, and either returns the value in the map matching the
-// key, or returns the zero value of the map value type.
-func LookupOrZero[K comparable, V any](m map[K]V, k K) V {
-	var zero V
-	if m == nil {
-		return zero
-	}
-	v, ok := m[k]
-	if !ok {
-		return zero
-	}
-	return v
+// PtrTo returns a pointer to the argument value.  This works as a transform
+// function for Lookup, e.g. given a map with non-pointer values, this will
+// produce a pointer.
+func PtrTo[T any](val T) *T {
+	return &val
+}
+
+// Ident returns the input argument.  This works as a transform function for
+// Lookup, e.g. given a map with pointer values, this will return the pointer
+// directly.
+func Ident[T any](val T) T {
+	return val
 }
 
 // Cast takes any value, which may or may not be nil,
@@ -67,12 +68,13 @@ func Cast[T any](value any) *T {
 }
 
 // NewListMap creates a ListMap from the given elements and keyer.
-func NewListMap[T any, K comparable](elements []T, keyer func(v T) K) *ListMap[T, K] {
+func NewListMap[T any, K comparable](elements []T, keyer func(v *T) K) *ListMap[T, K] {
 	if len(elements) == 0 { // optimize for empty maps since this is a common case
 		return nil
 	}
-	keyed := map[K]T{}
-	for _, e := range elements {
+	keyed := map[K]*T{}
+	for i := range elements {
+		e := &elements[i]
 		keyed[keyer(e)] = e
 	}
 	return &ListMap[T, K]{Map: keyed, Keyer: keyer}
@@ -81,8 +83,8 @@ func NewListMap[T any, K comparable](elements []T, keyer func(v T) K) *ListMap[T
 // ListMap provides map access to a slice where each element in the slice
 // has a key that can be computed from the element by the provided keyer function.
 type ListMap[T any, K comparable] struct {
-	Map   map[K]T
-	Keyer func(v T) K
+	Map   map[K]*T
+	Keyer func(v *T) K
 }
 
 // Get returns the element in the ListMap matching the key, or nil if there is no matching element.
@@ -91,7 +93,7 @@ func (lm *ListMap[T, K]) Get(key K) *T {
 		return nil
 	}
 	if v, ok := lm.Map[key]; ok {
-		return &v
+		return v
 	}
 	return nil
 }
@@ -102,9 +104,9 @@ func (lm *ListMap[T, K]) WithMatchingKey(value T) *T {
 	if lm == nil {
 		return nil
 	}
-	k := lm.Keyer(value)
+	k := lm.Keyer(&value)
 	if v, ok := lm.Map[k]; ok {
-		return &v
+		return v
 	}
 	return nil
 }

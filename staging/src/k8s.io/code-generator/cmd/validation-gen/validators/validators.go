@@ -75,11 +75,6 @@ const (
 	// IsFatal indicates that further validations should be skipped if this
 	// validator fails. Most validators are not fatal.
 	IsFatal FunctionFlags = 1 << iota
-
-	// PtrOK indicates that when validating a pointer field, this validator
-	// wants the pointer value, rather than the dereferenced value.  Most
-	// validators want the value, not the pointer.
-	PtrOK
 )
 
 // FunctionGen provides validation-gen with the information needed to generate a
@@ -94,8 +89,10 @@ type FunctionGen interface {
 	// The function signature must be of the form:
 	//   func(opCtx operation.Context,
 	//        fldPath field.Path,
-	//        value, oldValue <ValueType>,
-	//        extraArgs[0] <extraArgs[0]Type>, ..., extraArgs[N] <extraArgs[N]Type>)
+	//        value, oldValue <ValueType>,     // always nilable
+	//        extraArgs[0] <extraArgs[0]Type>, // optional
+	//        ...,
+	//        extraArgs[N] <extraArgs[N]Type>)
 	//
 	// extraArgs may contain:
 	// - data literals comprised of maps, slices, strings, ints, floats and bools

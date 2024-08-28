@@ -26,8 +26,11 @@ import (
 
 // Enum verifies that the specified value is one of the valid symbols.
 // This is for string enums only.
-func Enum[T ~string](opCtx operation.Context, fldPath *field.Path, value T, _ *T, symbols sets.Set[T]) field.ErrorList {
-	if !symbols.Has(value) {
+func Enum[T ~string](opCtx operation.Context, fldPath *field.Path, value, _ *T, symbols sets.Set[T]) field.ErrorList {
+	if value == nil {
+		return nil
+	}
+	if !symbols.Has(*value) {
 		symbolList := symbols.UnsortedList()
 		slices.Sort(symbolList)
 		return field.ErrorList{field.NotSupported[T](fldPath, value, symbolList)}

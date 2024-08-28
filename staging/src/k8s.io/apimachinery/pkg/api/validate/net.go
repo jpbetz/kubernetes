@@ -23,8 +23,11 @@ import (
 )
 
 // IP verifies that the specified value is a valid IP address.
-func IP(opCtx operation.Context, fldPath *field.Path, value string, _ *string) field.ErrorList {
-	if netutils.ParseIPSloppy(value) == nil {
+func IP(opCtx operation.Context, fldPath *field.Path, value, _ *string) field.ErrorList {
+	if value == nil {
+		return nil
+	}
+	if netutils.ParseIPSloppy(*value) == nil {
 		return field.ErrorList{
 			field.Invalid(fldPath, value, "must be a valid IP address (e.g. 10.9.8.7 or 2001:db8::ffff)"),
 		}

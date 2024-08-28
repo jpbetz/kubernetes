@@ -65,7 +65,6 @@
 - rename "disabled-tags" to "disabled-tag" and document as repeated
 - Error when calling eachVal on non-list types or ignore?
 - Add conditional validation (cross-field)
-- Rename PtrOK - it's an awkward name
 - failure tests for error messages
 - Test for registration / init func
 - "inner" validation
@@ -74,19 +73,14 @@
 - rename or eliminate the peer-dirs flag
 - enums: pass the sorted list of value rather than a set, do a linear/binary search
 - Revisit whether eachKey/eachVal can be a single function call
-- Revisit whether update tracking wants a helper util
-  func ptr.SafeCall[Tin any, Tout any](old *Tin, fn func(in *Tin) *Tout) *Tout {
-    if in == nil {
-    	return nil
-    }
-    return fn(in)
-  }
-- Maybe: for updates, move local vars into the functions or a { scope }
 - How to deal with fields which are +optional and +default - they need a
   required-check, but only on server-side, never client-side.
 - Think of a better name and home for operation.Context
+- Handle +optional as a short-circuit but not an error
 - If a field is not +required and not +optional, do we pass nil values to
   validators?  Do they all need to nil-check?
+- Linear or bin-search ListMap rather thsan build a map?
+
 
 
 Later:

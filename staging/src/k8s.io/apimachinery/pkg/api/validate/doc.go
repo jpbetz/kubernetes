@@ -20,11 +20,19 @@ limitations under the License.
 //
 //	func <Name>(opCtx operation.Context,
 //	            fldPath *field.Path,
-//	            value, oldValue <type>,
+//	            value, oldValue <nilable type>,
 //	            <other args...>) field.ErrorList
+//
+// The value and oldValue arguments will always be a nilable type.  If the
+// original value was a string, these will be a *string.  If the original value
+// was a slice or map, these will be the same slice or map type.
 //
 // For a CREATE operation, the oldValue will always be nil.  For an UPDATE
 // operation, either value or oldValue may be nil, e.g. when adding or removing
 // a value in a list-map.  Validators which care about UPDATE operations should
 // look at the opCtx argument to know which operation is being executed.
+//
+// In general, we cannot distinguish a non-specified slice or map from one that
+// is specified but empty.  Validators should not rely on nil values, but use
+// len() instead.
 package validate

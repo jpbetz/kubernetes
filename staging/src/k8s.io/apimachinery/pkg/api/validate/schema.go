@@ -24,8 +24,11 @@ import (
 
 // MaxLength verifies that the specified value is not longer than max
 // characters.
-func MaxLength(opCtx operation.Context, fldPath *field.Path, value string, _ *string, max int) field.ErrorList {
-	if len(value) > max {
+func MaxLength(opCtx operation.Context, fldPath *field.Path, value, _ *string, max int) field.ErrorList {
+	if value == nil {
+		return nil
+	}
+	if len(*value) > max {
 		return field.ErrorList{field.Invalid(fldPath, value, content.MaxLenError(max))}
 	}
 	return nil
@@ -33,10 +36,12 @@ func MaxLength(opCtx operation.Context, fldPath *field.Path, value string, _ *st
 
 // Required verifies that the specified value is not the zero-value for its
 // type.
-func Required[T comparable](opCtx operation.Context, fldPath *field.Path, value T, _ *T) field.ErrorList {
-	var zero T
-	if value == zero {
-		return field.ErrorList{field.Required(fldPath, "")}
+func Required[T comparable](opCtx operation.Context, fldPath *field.Path, value, _ *T) field.ErrorList {
+	if value != nil {
+		var zero T
+		if *value != zero {
+			return nil
+		}
 	}
-	return nil
+	return field.ErrorList{field.Required(fldPath, "")}
 }

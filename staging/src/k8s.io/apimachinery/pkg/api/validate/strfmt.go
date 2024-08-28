@@ -26,9 +26,12 @@ import (
 //   - start and end with lower-case alphanumeric characters
 //   - contain only lower-case alphanumeric characters or dashes
 //   - be less than 64 character long
-func DNSLabel(opCtx operation.Context, fldPath *field.Path, value string, _ *string) field.ErrorList {
+func DNSLabel(opCtx operation.Context, fldPath *field.Path, value, _ *string) field.ErrorList {
+	if value == nil {
+		return nil
+	}
 	var allErrs field.ErrorList
-	for _, msg := range content.IsDNS1123Label(value) {
+	for _, msg := range content.IsDNS1123Label(*value) {
 		allErrs = append(allErrs, field.Invalid(fldPath, value, msg))
 	}
 	return allErrs

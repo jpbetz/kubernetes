@@ -45,7 +45,7 @@ func (requiredDeclarativeValidator) ExtractValidations(t *types.Type, comments [
 	if !required {
 		return Validations{}, nil
 	}
-	return Validations{Functions: []FunctionGen{Function(requiredTagName, IsFatal|PtrOK, requiredValidator)}}, nil
+	return Validations{Functions: []FunctionGen{Function(requiredTagName, IsFatal, requiredValidator)}}, nil
 }
 
 func (requiredDeclarativeValidator) Docs() []TagDoc {
