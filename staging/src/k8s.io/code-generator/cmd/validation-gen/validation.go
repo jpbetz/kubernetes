@@ -1213,7 +1213,7 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 		}
 
 		if updateOnly {
-			sw.Do("if vContext.Operation == $.update$ ", targs)
+			sw.Do("if opCtx.Operation == $.update|raw$ ", targs)
 			if !ptrOK {
 				sw.Do("&& oldObj != nil ", targs)
 			}
