@@ -47,34 +47,28 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 
 func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// type T1
-	if obj != nil {
-		errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "type T1")...)
-	}
+	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "type T1")...)
 
 	// field T1.TypeMeta has no validation
 
 	// field T1.MPSPS
 	errs = append(errs,
-		func(obj map[*string]*string, oldObj map[*string]*string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, *oldObj, true, "field T1.MPSPS")...)
+		func(obj, oldObj map[*string]*string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.MPSPS")...)
 			for key, val := range obj {
 				errs = append(errs,
-					func(obj *string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-						if obj != nil {
-							errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "T1.MPSPS[keys]")...)
-						}
+					func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T1.MPSPS[keys]")...)
 						return
 					}(key, nil, fldPath)...)
 				errs = append(errs,
-					func(obj *string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-						if obj != nil {
-							errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "T1.MPSPS[vals]")...)
-						}
+					func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T1.MPSPS[vals]")...)
 						return
-					}(val, safe.LookupOrZero(oldObj, key), fldPath.Key(key))...)
+					}(val, safe.Lookup(oldObj, key, safe.Ident), fldPath.Key(string(key)))...)
 			}
 			return
-		}(obj.MPSPS, safe.Field(oldObj, func(oldObj T1) map[*string]*string { return oldObj.MPSPS }), fldPath.Child("mpsps"))...)
+		}(obj.MPSPS, safe.Field(oldObj, func(oldObj *T1) map[*string]*string { return oldObj.MPSPS }), fldPath.Child("mpsps"))...)
 
 	// field T1.AnotherMPSPS has no validation
 	return errs

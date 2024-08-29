@@ -49,62 +49,52 @@ var unionMembershipForDU = validate.NewDiscriminatedUnionMembership("d", [2]stri
 
 func Validate_DU(opCtx operation.Context, obj, oldObj *DU, fldPath *field.Path) (errs field.ErrorList) {
 	// type DU
-	if obj != nil {
-		errs = append(errs, validate.DiscriminatedUnion(opCtx, fldPath, *obj, *oldObj, unionMembershipForDU, obj.D, obj.M1, obj.M2)...)
-	}
+	errs = append(errs, validate.DiscriminatedUnion(opCtx, fldPath, obj, oldObj, unionMembershipForDU, obj.D, obj.M1, obj.M2)...)
 
 	// field DU.TypeMeta has no validation
 	// field DU.D has no validation
 
 	// field DU.M1
 	errs = append(errs,
-		func(obj *M1, oldObj *M1, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, Validate_M1(opCtx, obj, oldObj, fldPath)...)
-			}
+		func(obj, oldObj *M1, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_M1(opCtx, obj, oldObj, fldPath)...)
 			return
-		}(obj.M1, safe.Field(oldObj, func(oldObj DU) *M1 { return oldObj.M1 }), fldPath.Child("m1"))...)
+		}(obj.M1, safe.Field(oldObj, func(oldObj *DU) *M1 { return oldObj.M1 }), fldPath.Child("m1"))...)
 
 	// field DU.M2
 	errs = append(errs,
-		func(obj *M2, oldObj *M2, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, Validate_M2(opCtx, obj, oldObj, fldPath)...)
-			}
+		func(obj, oldObj *M2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_M2(opCtx, obj, oldObj, fldPath)...)
 			return
-		}(obj.M2, safe.Field(oldObj, func(oldObj DU) *M2 { return oldObj.M2 }), fldPath.Child("m2"))...)
+		}(obj.M2, safe.Field(oldObj, func(oldObj *DU) *M2 { return oldObj.M2 }), fldPath.Child("m2"))...)
 
 	return errs
 }
 
 func Validate_M1(opCtx operation.Context, obj, oldObj *M1, fldPath *field.Path) (errs field.ErrorList) {
 	// type M1
-	if obj != nil {
-		errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "type M1")...)
-	}
+	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "type M1")...)
 
 	// field M1.S
 	errs = append(errs,
-		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, *oldObj, true, "field M1.S")...)
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field M1.S")...)
 			return
-		}(obj.S, safe.Field(oldObj, func(oldObj M1) *string { return &oldObj.S }), fldPath.Child("s"))...)
+		}(&obj.S, safe.Field(oldObj, func(oldObj *M1) *string { return &oldObj.S }), fldPath.Child("s"))...)
 
 	return errs
 }
 
 func Validate_M2(opCtx operation.Context, obj, oldObj *M2, fldPath *field.Path) (errs field.ErrorList) {
 	// type M2
-	if obj != nil {
-		errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "type M2")...)
-	}
+	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "type M2")...)
 
 	// field M2.S
 	errs = append(errs,
-		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, *oldObj, true, "field M2.S")...)
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field M2.S")...)
 			return
-		}(obj.S, safe.Field(oldObj, func(oldObj M2) *string { return &oldObj.S }), fldPath.Child("s"))...)
+		}(&obj.S, safe.Field(oldObj, func(oldObj *M2) *string { return &oldObj.S }), fldPath.Child("s"))...)
 
 	return errs
 }

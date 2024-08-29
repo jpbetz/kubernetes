@@ -50,9 +50,7 @@ var symbolsForE0 = sets.New[E0]()
 
 func Validate_E0(opCtx operation.Context, obj, oldObj *E0, fldPath *field.Path) (errs field.ErrorList) {
 	// type E0
-	if obj != nil {
-		errs = append(errs, validate.Enum(opCtx, fldPath, *obj, *oldObj, symbolsForE0)...)
-	}
+	errs = append(errs, validate.Enum(opCtx, fldPath, obj, oldObj, symbolsForE0)...)
 
 	return errs
 }
@@ -61,9 +59,7 @@ var symbolsForE1 = sets.New[E1](E1V1)
 
 func Validate_E1(opCtx operation.Context, obj, oldObj *E1, fldPath *field.Path) (errs field.ErrorList) {
 	// type E1
-	if obj != nil {
-		errs = append(errs, validate.Enum(opCtx, fldPath, *obj, *oldObj, symbolsForE1)...)
-	}
+	errs = append(errs, validate.Enum(opCtx, fldPath, obj, oldObj, symbolsForE1)...)
 
 	return errs
 }
@@ -72,9 +68,7 @@ var symbolsForE2 = sets.New[E2](E2V1, E2V2)
 
 func Validate_E2(opCtx operation.Context, obj, oldObj *E2, fldPath *field.Path) (errs field.ErrorList) {
 	// type E2
-	if obj != nil {
-		errs = append(errs, validate.Enum(opCtx, fldPath, *obj, *oldObj, symbolsForE2)...)
-	}
+	errs = append(errs, validate.Enum(opCtx, fldPath, obj, oldObj, symbolsForE2)...)
 
 	return errs
 }
@@ -84,51 +78,45 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 
 	// field T1.E0
 	errs = append(errs,
-		func(obj E0, oldObj *E0, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_E0(opCtx, &obj, oldObj, fldPath)...)
+		func(obj, oldObj *E0, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_E0(opCtx, obj, oldObj, fldPath)...)
 			return
-		}(obj.E0, safe.Field(oldObj, func(oldObj T1) *E0 { return &oldObj.E0 }), fldPath.Child("e0"))...)
+		}(&obj.E0, safe.Field(oldObj, func(oldObj *T1) *E0 { return &oldObj.E0 }), fldPath.Child("e0"))...)
 
 	// field T1.PE0
 	errs = append(errs,
-		func(obj *E0, oldObj *E0, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, Validate_E0(opCtx, obj, oldObj, fldPath)...)
-			}
+		func(obj, oldObj *E0, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_E0(opCtx, obj, oldObj, fldPath)...)
 			return
-		}(obj.PE0, safe.Field(oldObj, func(oldObj T1) *E0 { return oldObj.PE0 }), fldPath.Child("pe0"))...)
+		}(obj.PE0, safe.Field(oldObj, func(oldObj *T1) *E0 { return oldObj.PE0 }), fldPath.Child("pe0"))...)
 
 	// field T1.E1
 	errs = append(errs,
-		func(obj E1, oldObj *E1, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_E1(opCtx, &obj, oldObj, fldPath)...)
+		func(obj, oldObj *E1, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_E1(opCtx, obj, oldObj, fldPath)...)
 			return
-		}(obj.E1, safe.Field(oldObj, func(oldObj T1) *E1 { return &oldObj.E1 }), fldPath.Child("e1"))...)
+		}(&obj.E1, safe.Field(oldObj, func(oldObj *T1) *E1 { return &oldObj.E1 }), fldPath.Child("e1"))...)
 
 	// field T1.PE1
 	errs = append(errs,
-		func(obj *E1, oldObj *E1, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, Validate_E1(opCtx, obj, oldObj, fldPath)...)
-			}
+		func(obj, oldObj *E1, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_E1(opCtx, obj, oldObj, fldPath)...)
 			return
-		}(obj.PE1, safe.Field(oldObj, func(oldObj T1) *E1 { return oldObj.PE1 }), fldPath.Child("pe1"))...)
+		}(obj.PE1, safe.Field(oldObj, func(oldObj *T1) *E1 { return oldObj.PE1 }), fldPath.Child("pe1"))...)
 
 	// field T1.E2
 	errs = append(errs,
-		func(obj E2, oldObj *E2, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_E2(opCtx, &obj, oldObj, fldPath)...)
+		func(obj, oldObj *E2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_E2(opCtx, obj, oldObj, fldPath)...)
 			return
-		}(obj.E2, safe.Field(oldObj, func(oldObj T1) *E2 { return &oldObj.E2 }), fldPath.Child("e2"))...)
+		}(&obj.E2, safe.Field(oldObj, func(oldObj *T1) *E2 { return &oldObj.E2 }), fldPath.Child("e2"))...)
 
 	// field T1.PE2
 	errs = append(errs,
-		func(obj *E2, oldObj *E2, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, Validate_E2(opCtx, obj, oldObj, fldPath)...)
-			}
+		func(obj, oldObj *E2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_E2(opCtx, obj, oldObj, fldPath)...)
 			return
-		}(obj.PE2, safe.Field(oldObj, func(oldObj T1) *E2 { return oldObj.PE2 }), fldPath.Child("pe2"))...)
+		}(obj.PE2, safe.Field(oldObj, func(oldObj *T1) *E2 { return oldObj.PE2 }), fldPath.Child("pe2"))...)
 
 	return errs
 }

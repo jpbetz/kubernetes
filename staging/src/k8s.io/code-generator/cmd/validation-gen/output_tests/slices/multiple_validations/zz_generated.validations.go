@@ -47,27 +47,25 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 
 func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// type T1
-	if obj != nil {
-		errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "type T1")...)
-	}
+	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "type T1")...)
 
 	// field T1.TypeMeta has no validation
 
 	// field T1.LS
 	errs = append(errs,
-		func(obj []string, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, *oldObj, true, "field T1.LS #1")...)
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, *oldObj, true, "field T1.LS #2")...)
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.LS #1")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.LS #2")...)
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, *oldObj, true, "T1.LS[vals] #1")...)
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, *oldObj, true, "T1.LS[vals] #2")...)
+					func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T1.LS[vals] #1")...)
+						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T1.LS[vals] #2")...)
 						return
-					}(val, nil, fldPath.Index(i))...)
+					}(&val, nil, fldPath.Index(i))...)
 			}
 			return
-		}(obj.LS, safe.Field(oldObj, func(oldObj T1) []string { return oldObj.LS }), fldPath.Child("ls"))...)
+		}(obj.LS, safe.Field(oldObj, func(oldObj *T1) []string { return oldObj.LS }), fldPath.Child("ls"))...)
 
 	// field T1.AnotherLS has no validation
 	return errs

@@ -50,26 +50,26 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 
 	// field T1.PrimitivesT1
 	errs = append(errs,
-		func(obj primitives.T1, oldObj *primitives.T1, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, primitives.Validate_T1(opCtx, &obj, oldObj, fldPath)...)
+		func(obj, oldObj *primitives.T1, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, primitives.Validate_T1(opCtx, obj, oldObj, fldPath)...)
 			return
-		}(obj.PrimitivesT1, safe.Field(oldObj, func(oldObj T1) *primitives.T1 { return &oldObj.PrimitivesT1 }), fldPath.Child("primitivest1"))...)
+		}(&obj.PrimitivesT1, safe.Field(oldObj, func(oldObj *T1) *primitives.T1 { return &oldObj.PrimitivesT1 }), fldPath.Child("primitivest1"))...)
 
 	// field T1.PrimitivesT2
 	errs = append(errs,
-		func(obj primitives.T2, oldObj *primitives.T2, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, primitives.Validate_T2(opCtx, &obj, oldObj, fldPath)...)
+		func(obj, oldObj *primitives.T2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, primitives.Validate_T2(opCtx, obj, oldObj, fldPath)...)
 			return
-		}(obj.PrimitivesT2, safe.Field(oldObj, func(oldObj T1) *primitives.T2 { return &oldObj.PrimitivesT2 }), fldPath.Child("primitivest2"))...)
+		}(&obj.PrimitivesT2, safe.Field(oldObj, func(oldObj *T1) *primitives.T2 { return &oldObj.PrimitivesT2 }), fldPath.Child("primitivest2"))...)
 
 	// field T1.PrimitivesT3 has no validation
 
 	// field T1.PrimitivesT4
 	errs = append(errs,
-		func(obj primitives.T4, oldObj *primitives.T4, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, primitives.Validate_T4(opCtx, &obj, oldObj, fldPath)...)
+		func(obj, oldObj *primitives.T4, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, primitives.Validate_T4(opCtx, obj, oldObj, fldPath)...)
 			return
-		}(obj.PrimitivesT4, safe.Field(oldObj, func(oldObj T1) *primitives.T4 { return &oldObj.PrimitivesT4 }), fldPath.Child("primitivest4"))...)
+		}(&obj.PrimitivesT4, safe.Field(oldObj, func(oldObj *T1) *primitives.T4 { return &oldObj.PrimitivesT4 }), fldPath.Child("primitivest4"))...)
 
 	// field T1.PrimitivesT5 has no validation
 	return errs
