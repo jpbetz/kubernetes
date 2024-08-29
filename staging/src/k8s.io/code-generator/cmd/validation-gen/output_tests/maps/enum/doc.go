@@ -44,9 +44,4 @@ type T1 struct {
 	// +eachKey=+validateTrue="T1.ME1S[keys]"
 	// +eachVal=+validateTrue="T1.ME1S[vals]"
 	ME1S map[E1]string `json:"me1s"`
-
-	// +validateTrue="field T1.MPE1S"
-	// +eachKey=+validateTrue="T1.MPE1S[keys]"
-	// +eachVal=+validateTrue="T1.MPE1S[vals]"
-	MPE1S map[*E1]string `json:"mpe1s"`
 }
