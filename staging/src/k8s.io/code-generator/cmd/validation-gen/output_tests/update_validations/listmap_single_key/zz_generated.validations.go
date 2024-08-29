@@ -55,16 +55,14 @@ func Validate_M1(opCtx operation.Context, obj, oldObj *M1, fldPath *field.Path) 
 	// field M1.K1
 	errs = append(errs,
 		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "M1.K1")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, *oldObj, true, "M1.K1")...)
 			return
 		}(obj.K1, safe.Field(oldObj, func(oldObj M1) *string { return &oldObj.K1 }), fldPath.Child("k1"))...)
 
 	// field M1.S
 	errs = append(errs,
 		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if opCtx.Operation == operation.Update && oldObj != nil {
-				errs = append(errs, validate.FixedResultUpdate(fldPath, obj, *oldObj, true, "T1.M1.S, UpdateOnly")...)
-			}
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, *oldObj, true, "M1.S")...)
 			return
 		}(obj.S, safe.Field(oldObj, func(oldObj M1) *string { return &oldObj.S }), fldPath.Child("s"))...)
 

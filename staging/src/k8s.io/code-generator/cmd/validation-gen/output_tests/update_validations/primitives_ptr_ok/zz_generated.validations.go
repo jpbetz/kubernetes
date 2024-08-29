@@ -46,67 +46,31 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 }
 
 func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) (errs field.ErrorList) {
-	// field T1.US
-	errs = append(errs,
-		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if opCtx.Operation == operation.Update {
-				errs = append(errs, validate.FixedResultUpdate(fldPath, &obj, oldObj, true, "T1.US, UpdateOnly, PtrOK")...)
-			}
-			return
-		}(obj.US, safe.Field(oldObj, func(oldObj T1) *string { return &oldObj.US }), fldPath.Child("us"))...)
-
-	// field T1.UI
-	errs = append(errs,
-		func(obj int, oldObj *int, fldPath *field.Path) (errs field.ErrorList) {
-			if opCtx.Operation == operation.Update {
-				errs = append(errs, validate.FixedResultUpdate(fldPath, &obj, oldObj, true, "T1.UI, UpdateOnly, PtrOK")...)
-			}
-			return
-		}(obj.UI, safe.Field(oldObj, func(oldObj T1) *int { return &oldObj.UI }), fldPath.Child("ui"))...)
-
-	// field T1.UB
-	errs = append(errs,
-		func(obj bool, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
-			if opCtx.Operation == operation.Update {
-				errs = append(errs, validate.FixedResultUpdate(fldPath, &obj, oldObj, true, "T1.UB, UpdateOnly, PtrOK")...)
-			}
-			return
-		}(obj.UB, safe.Field(oldObj, func(oldObj T1) *bool { return &oldObj.UB }), fldPath.Child("ub"))...)
-
-	// field T1.UF
-	errs = append(errs,
-		func(obj float64, oldObj *float64, fldPath *field.Path) (errs field.ErrorList) {
-			if opCtx.Operation == operation.Update {
-				errs = append(errs, validate.FixedResultUpdate(fldPath, &obj, oldObj, true, "T1.UF, UpdateOnly, PtrOK")...)
-			}
-			return
-		}(obj.UF, safe.Field(oldObj, func(oldObj T1) *float64 { return &oldObj.UF }), fldPath.Child("uf"))...)
-
 	// field T1.S
 	errs = append(errs,
 		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T1.S")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, &obj, oldObj, true, "T1.S")...)
 			return
 		}(obj.S, safe.Field(oldObj, func(oldObj T1) *string { return &oldObj.S }), fldPath.Child("s"))...)
 
 	// field T1.I
 	errs = append(errs,
 		func(obj int, oldObj *int, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T1.I")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, &obj, oldObj, true, "T1.I")...)
 			return
 		}(obj.I, safe.Field(oldObj, func(oldObj T1) *int { return &oldObj.I }), fldPath.Child("i"))...)
 
 	// field T1.B
 	errs = append(errs,
 		func(obj bool, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T1.B")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, &obj, oldObj, true, "T1.B")...)
 			return
 		}(obj.B, safe.Field(oldObj, func(oldObj T1) *bool { return &oldObj.B }), fldPath.Child("b"))...)
 
 	// field T1.F
 	errs = append(errs,
 		func(obj float64, oldObj *float64, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T1.F")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, &obj, oldObj, true, "T1.F")...)
 			return
 		}(obj.F, safe.Field(oldObj, func(oldObj T1) *float64 { return &oldObj.F }), fldPath.Child("f"))...)
 

@@ -50,7 +50,7 @@ var unionMembershipForDU = validate.NewDiscriminatedUnionMembership("d", [2]stri
 func Validate_DU(opCtx operation.Context, obj, oldObj *DU, fldPath *field.Path) (errs field.ErrorList) {
 	// type DU
 	if obj != nil {
-		errs = append(errs, validate.DiscriminatedUnion(fldPath, *obj, unionMembershipForDU, obj.D, obj.M1, obj.M2)...)
+		errs = append(errs, validate.DiscriminatedUnion(opCtx, fldPath, *obj, *oldObj, unionMembershipForDU, obj.D, obj.M1, obj.M2)...)
 	}
 
 	// field DU.TypeMeta has no validation
@@ -80,13 +80,13 @@ func Validate_DU(opCtx operation.Context, obj, oldObj *DU, fldPath *field.Path) 
 func Validate_M1(opCtx operation.Context, obj, oldObj *M1, fldPath *field.Path) (errs field.ErrorList) {
 	// type M1
 	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type M1")...)
+		errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "type M1")...)
 	}
 
 	// field M1.S
 	errs = append(errs,
 		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field M1.S")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, *oldObj, true, "field M1.S")...)
 			return
 		}(obj.S, safe.Field(oldObj, func(oldObj M1) *string { return &oldObj.S }), fldPath.Child("s"))...)
 
@@ -96,13 +96,13 @@ func Validate_M1(opCtx operation.Context, obj, oldObj *M1, fldPath *field.Path) 
 func Validate_M2(opCtx operation.Context, obj, oldObj *M2, fldPath *field.Path) (errs field.ErrorList) {
 	// type M2
 	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type M2")...)
+		errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "type M2")...)
 	}
 
 	// field M2.S
 	errs = append(errs,
 		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field M2.S")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, *oldObj, true, "field M2.S")...)
 			return
 		}(obj.S, safe.Field(oldObj, func(oldObj M2) *string { return &oldObj.S }), fldPath.Child("s"))...)
 

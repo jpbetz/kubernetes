@@ -55,23 +55,21 @@ func Validate_M1(opCtx operation.Context, obj, oldObj *M1, fldPath *field.Path) 
 	// field M1.K1
 	errs = append(errs,
 		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "M1.K1")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, *oldObj, true, "M1.K1")...)
 			return
 		}(obj.K1, safe.Field(oldObj, func(oldObj M1) *string { return &oldObj.K1 }), fldPath.Child("k1"))...)
 
 	// field M1.K2
 	errs = append(errs,
 		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "M1.K2")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, *oldObj, true, "M1.K2")...)
 			return
 		}(obj.K2, safe.Field(oldObj, func(oldObj M1) *string { return &oldObj.K2 }), fldPath.Child("k2"))...)
 
 	// field M1.S
 	errs = append(errs,
 		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if opCtx.Operation == operation.Update && oldObj != nil {
-				errs = append(errs, validate.FixedResultUpdate(fldPath, obj, *oldObj, true, "T1.M1.S, UpdateOnly")...)
-			}
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, *oldObj, true, "M1.S")...)
 			return
 		}(obj.S, safe.Field(oldObj, func(oldObj M1) *string { return &oldObj.S }), fldPath.Child("s"))...)
 
@@ -79,7 +77,7 @@ func Validate_M1(opCtx operation.Context, obj, oldObj *M1, fldPath *field.Path) 
 }
 
 func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) (errs field.ErrorList) {
-	// field T1.LM2
+	// field T1.LM1
 	errs = append(errs,
 		func(obj []M1, oldObj []M1, fldPath *field.Path) (errs field.ErrorList) {
 			oldListMap := safe.NewListMap(oldObj, func(o M1) any { return [2]any{o.K1, o.K2} })
@@ -91,7 +89,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 					}(val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
 			}
 			return
-		}(obj.LM2, safe.Field(oldObj, func(oldObj T1) []M1 { return oldObj.LM2 }), fldPath.Child("lm1"))...)
+		}(obj.LM1, safe.Field(oldObj, func(oldObj T1) []M1 { return oldObj.LM1 }), fldPath.Child("lm1"))...)
 
 	return errs
 }

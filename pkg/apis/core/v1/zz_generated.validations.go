@@ -338,7 +338,7 @@ var unionMembershipForAppArmorProfile = validate.NewDiscriminatedUnionMembership
 func Validate_AppArmorProfile(opCtx operation.Context, obj, oldObj *v1.AppArmorProfile, fldPath *field.Path) (errs field.ErrorList) {
 	// type v1.AppArmorProfile
 	if obj != nil {
-		errs = append(errs, validate.DiscriminatedUnion(fldPath, *obj, unionMembershipForAppArmorProfile, obj.Type)...)
+		errs = append(errs, validate.DiscriminatedUnion(opCtx, fldPath, *obj, *oldObj, unionMembershipForAppArmorProfile, obj.Type)...)
 	}
 
 	// field v1.AppArmorProfile.Type has no validation
@@ -539,7 +539,7 @@ func Validate_HostAlias(opCtx operation.Context, obj, oldObj *v1.HostAlias, fldP
 	// field v1.HostAlias.IP
 	errs = append(errs,
 		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.Required(fldPath, obj); len(e) != 0 {
+			if e := validate.Required(opCtx, fldPath, &obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
@@ -554,7 +554,7 @@ func Validate_HostIP(opCtx operation.Context, obj, oldObj *v1.HostIP, fldPath *f
 	// field v1.HostIP.IP
 	errs = append(errs,
 		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.Required(fldPath, obj); len(e) != 0 {
+			if e := validate.Required(opCtx, fldPath, &obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
@@ -697,7 +697,7 @@ func Validate_PodIP(opCtx operation.Context, obj, oldObj *v1.PodIP, fldPath *fie
 	// field v1.PodIP.IP
 	errs = append(errs,
 		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.Required(fldPath, obj); len(e) != 0 {
+			if e := validate.Required(opCtx, fldPath, &obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
@@ -1128,7 +1128,7 @@ func Validate_ResourceStatus(opCtx operation.Context, obj, oldObj *v1.ResourceSt
 	// field v1.ResourceStatus.Name
 	errs = append(errs,
 		func(obj v1.ResourceName, oldObj *v1.ResourceName, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.Required(fldPath, obj); len(e) != 0 {
+			if e := validate.Required(opCtx, fldPath, &obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
@@ -1144,7 +1144,7 @@ var unionMembershipForSeccompProfile = validate.NewDiscriminatedUnionMembership(
 func Validate_SeccompProfile(opCtx operation.Context, obj, oldObj *v1.SeccompProfile, fldPath *field.Path) (errs field.ErrorList) {
 	// type v1.SeccompProfile
 	if obj != nil {
-		errs = append(errs, validate.DiscriminatedUnion(fldPath, *obj, unionMembershipForSeccompProfile, obj.Type)...)
+		errs = append(errs, validate.DiscriminatedUnion(opCtx, fldPath, *obj, *oldObj, unionMembershipForSeccompProfile, obj.Type)...)
 	}
 
 	// field v1.SeccompProfile.Type has no validation
@@ -1249,11 +1249,11 @@ func Validate_Volume(opCtx operation.Context, obj, oldObj *v1.Volume, fldPath *f
 	// field v1.Volume.Name
 	errs = append(errs,
 		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.Required(fldPath, obj); len(e) != 0 {
+			if e := validate.Required(opCtx, fldPath, &obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
-			errs = append(errs, validate.DNSLabel(fldPath, obj)...)
+			errs = append(errs, validate.DNSLabel(opCtx, fldPath, obj, *oldObj)...)
 			return
 		}(obj.Name, safe.Field(oldObj, func(oldObj v1.Volume) *string { return &oldObj.Name }), fldPath.Child("name"))...)
 

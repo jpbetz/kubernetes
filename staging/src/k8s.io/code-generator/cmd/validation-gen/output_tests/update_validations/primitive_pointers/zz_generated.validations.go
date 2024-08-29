@@ -50,9 +50,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	errs = append(errs,
 		func(obj *string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				if opCtx.Operation == operation.Update && oldObj != nil {
-					errs = append(errs, validate.FixedResultUpdate(fldPath, *obj, *oldObj, true, "T1.SP, UpdateOnly")...)
-				}
+				errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "T1.SP")...)
 			}
 			return
 		}(obj.SP, safe.Field(oldObj, func(oldObj T1) *string { return oldObj.SP }), fldPath.Child("sp"))...)
@@ -61,9 +59,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	errs = append(errs,
 		func(obj *int, oldObj *int, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				if opCtx.Operation == operation.Update && oldObj != nil {
-					errs = append(errs, validate.FixedResultUpdate(fldPath, *obj, *oldObj, true, "T1.IP, UpdateOnly")...)
-				}
+				errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "T1.IP")...)
 			}
 			return
 		}(obj.IP, safe.Field(oldObj, func(oldObj T1) *int { return oldObj.IP }), fldPath.Child("ip"))...)
@@ -72,9 +68,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	errs = append(errs,
 		func(obj *bool, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				if opCtx.Operation == operation.Update && oldObj != nil {
-					errs = append(errs, validate.FixedResultUpdate(fldPath, *obj, *oldObj, true, "T1.BP, UpdateOnly")...)
-				}
+				errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "T1.BP")...)
 			}
 			return
 		}(obj.BP, safe.Field(oldObj, func(oldObj T1) *bool { return oldObj.BP }), fldPath.Child("bp"))...)
@@ -83,9 +77,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	errs = append(errs,
 		func(obj *float64, oldObj *float64, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				if opCtx.Operation == operation.Update && oldObj != nil {
-					errs = append(errs, validate.FixedResultUpdate(fldPath, *obj, *oldObj, true, "T1.FP, UpdateOnly")...)
-				}
+				errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "T1.FP")...)
 			}
 			return
 		}(obj.FP, safe.Field(oldObj, func(oldObj T1) *float64 { return oldObj.FP }), fldPath.Child("fp"))...)

@@ -51,7 +51,7 @@ var symbolsForE0 = sets.New[E0]()
 func Validate_E0(opCtx operation.Context, obj, oldObj *E0, fldPath *field.Path) (errs field.ErrorList) {
 	// type E0
 	if obj != nil {
-		errs = append(errs, validate.Enum(fldPath, *obj, symbolsForE0)...)
+		errs = append(errs, validate.Enum(opCtx, fldPath, *obj, *oldObj, symbolsForE0)...)
 	}
 
 	return errs
@@ -62,7 +62,7 @@ var symbolsForE1 = sets.New[E1](E1V1)
 func Validate_E1(opCtx operation.Context, obj, oldObj *E1, fldPath *field.Path) (errs field.ErrorList) {
 	// type E1
 	if obj != nil {
-		errs = append(errs, validate.Enum(fldPath, *obj, symbolsForE1)...)
+		errs = append(errs, validate.Enum(opCtx, fldPath, *obj, *oldObj, symbolsForE1)...)
 	}
 
 	return errs
@@ -73,7 +73,7 @@ var symbolsForE2 = sets.New[E2](E2V1, E2V2)
 func Validate_E2(opCtx operation.Context, obj, oldObj *E2, fldPath *field.Path) (errs field.ErrorList) {
 	// type E2
 	if obj != nil {
-		errs = append(errs, validate.Enum(fldPath, *obj, symbolsForE2)...)
+		errs = append(errs, validate.Enum(opCtx, fldPath, *obj, *oldObj, symbolsForE2)...)
 	}
 
 	return errs

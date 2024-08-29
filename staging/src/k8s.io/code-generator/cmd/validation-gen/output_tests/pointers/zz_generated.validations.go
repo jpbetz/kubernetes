@@ -52,7 +52,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	errs = append(errs,
 		func(obj *string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T1.PS")...)
+				errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "field T1.PS")...)
 			}
 			return
 		}(obj.PS, safe.Field(oldObj, func(oldObj T1) *string { return oldObj.PS }), fldPath.Child("ps"))...)
@@ -61,7 +61,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	errs = append(errs,
 		func(obj *int, oldObj *int, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T1.PI")...)
+				errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "field T1.PI")...)
 			}
 			return
 		}(obj.PI, safe.Field(oldObj, func(oldObj T1) *int { return oldObj.PI }), fldPath.Child("pi"))...)
@@ -70,7 +70,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	errs = append(errs,
 		func(obj *bool, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T1.PB")...)
+				errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "field T1.PB")...)
 			}
 			return
 		}(obj.PB, safe.Field(oldObj, func(oldObj T1) *bool { return oldObj.PB }), fldPath.Child("pb"))...)
@@ -79,7 +79,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	errs = append(errs,
 		func(obj *float64, oldObj *float64, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T1.PF")...)
+				errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "field T1.PF")...)
 			}
 			return
 		}(obj.PF, safe.Field(oldObj, func(oldObj T1) *float64 { return oldObj.PF }), fldPath.Child("pf"))...)
@@ -88,7 +88,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	errs = append(errs,
 		func(obj *T2, oldObj *T2, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T1.PT2")...)
+				errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "field T1.PT2")...)
 			}
 			if obj != nil {
 				errs = append(errs, Validate_T2(opCtx, obj, oldObj, fldPath)...)
@@ -108,7 +108,7 @@ func Validate_T2(opCtx operation.Context, obj, oldObj *T2, fldPath *field.Path) 
 	errs = append(errs,
 		func(obj *string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T2.PS")...)
+				errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "field T2.PS")...)
 			}
 			return
 		}(obj.PS, safe.Field(oldObj, func(oldObj T2) *string { return oldObj.PS }), fldPath.Child("ps"))...)
@@ -117,7 +117,7 @@ func Validate_T2(opCtx operation.Context, obj, oldObj *T2, fldPath *field.Path) 
 	errs = append(errs,
 		func(obj *int, oldObj *int, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T2.PI")...)
+				errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "field T2.PI")...)
 			}
 			return
 		}(obj.PI, safe.Field(oldObj, func(oldObj T2) *int { return oldObj.PI }), fldPath.Child("pi"))...)
@@ -126,7 +126,7 @@ func Validate_T2(opCtx operation.Context, obj, oldObj *T2, fldPath *field.Path) 
 	errs = append(errs,
 		func(obj *bool, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T2.PB")...)
+				errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "field T2.PB")...)
 			}
 			return
 		}(obj.PB, safe.Field(oldObj, func(oldObj T2) *bool { return oldObj.PB }), fldPath.Child("pb"))...)
@@ -135,7 +135,7 @@ func Validate_T2(opCtx operation.Context, obj, oldObj *T2, fldPath *field.Path) 
 	errs = append(errs,
 		func(obj *float64, oldObj *float64, fldPath *field.Path) (errs field.ErrorList) {
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T2.PF")...)
+				errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "field T2.PF")...)
 			}
 			return
 		}(obj.PF, safe.Field(oldObj, func(oldObj T2) *float64 { return oldObj.PF }), fldPath.Child("pf"))...)

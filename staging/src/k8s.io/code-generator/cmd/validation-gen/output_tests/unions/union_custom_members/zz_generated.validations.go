@@ -54,13 +54,13 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 func Validate_M1(opCtx operation.Context, obj, oldObj *M1, fldPath *field.Path) (errs field.ErrorList) {
 	// type M1
 	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type M1")...)
+		errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "type M1")...)
 	}
 
 	// field M1.S
 	errs = append(errs,
 		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field M1.S")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, *oldObj, true, "field M1.S")...)
 			return
 		}(obj.S, safe.Field(oldObj, func(oldObj M1) *string { return &oldObj.S }), fldPath.Child("s"))...)
 
@@ -70,13 +70,13 @@ func Validate_M1(opCtx operation.Context, obj, oldObj *M1, fldPath *field.Path) 
 func Validate_M2(opCtx operation.Context, obj, oldObj *M2, fldPath *field.Path) (errs field.ErrorList) {
 	// type M2
 	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type M2")...)
+		errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "type M2")...)
 	}
 
 	// field M2.S
 	errs = append(errs,
 		func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field M2.S")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, *oldObj, true, "field M2.S")...)
 			return
 		}(obj.S, safe.Field(oldObj, func(oldObj M2) *string { return &oldObj.S }), fldPath.Child("s"))...)
 
@@ -86,7 +86,7 @@ func Validate_M2(opCtx operation.Context, obj, oldObj *M2, fldPath *field.Path) 
 func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// type T1
 	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type T1")...)
+		errs = append(errs, validate.FixedResult(opCtx, fldPath, *obj, *oldObj, true, "type T1")...)
 	}
 
 	// field T1.TypeMeta has no validation
@@ -94,15 +94,15 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	// field T1.LS
 	errs = append(errs,
 		func(obj []string, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.LS")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, *oldObj, true, "field T1.LS")...)
 			for i, val := range obj {
 				errs = append(errs,
 					func(obj string, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-						if e := validate.Required(fldPath, obj); len(e) != 0 {
+						if e := validate.Required(opCtx, fldPath, &obj, oldObj); len(e) != 0 {
 							errs = append(errs, e...)
 							return // fatal
 						}
-						errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.LS[*]")...)
+						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, *oldObj, true, "field T1.LS[*]")...)
 						return
 					}(val, nil, fldPath.Index(i))...)
 			}
@@ -117,7 +117,7 @@ var unionMembershipForU = validate.NewUnionMembership([2]string{"m1", "CustomM1"
 func Validate_U(opCtx operation.Context, obj, oldObj *U, fldPath *field.Path) (errs field.ErrorList) {
 	// type U
 	if obj != nil {
-		errs = append(errs, validate.Union(fldPath, *obj, unionMembershipForU, obj.M1, obj.M2)...)
+		errs = append(errs, validate.Union(opCtx, fldPath, *obj, *oldObj, unionMembershipForU, obj.M1, obj.M2)...)
 	}
 
 	// field U.TypeMeta has no validation
