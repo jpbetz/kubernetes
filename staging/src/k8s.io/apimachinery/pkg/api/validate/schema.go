@@ -17,13 +17,14 @@ limitations under the License.
 package validate
 
 import (
+	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/api/validate/content"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 // MaxLength verifies that the specified value is not longer than max
 // characters.
-func MaxLength(fldPath *field.Path, value string, max int) field.ErrorList {
+func MaxLength(opCtx operation.Context, fldPath *field.Path, value string, _ *string, max int) field.ErrorList {
 	if len(value) > max {
 		return field.ErrorList{field.Invalid(fldPath, value, content.MaxLenError(max))}
 	}
@@ -32,7 +33,7 @@ func MaxLength(fldPath *field.Path, value string, max int) field.ErrorList {
 
 // Required verifies that the specified value is not the zero-value for its
 // type.
-func Required[T comparable](fldPath *field.Path, value T) field.ErrorList {
+func Required[T comparable](opCtx operation.Context, fldPath *field.Path, value T, _ *T) field.ErrorList {
 	var zero T
 	if value == zero {
 		return field.ErrorList{field.Required(fldPath, "")}

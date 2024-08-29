@@ -21,6 +21,7 @@ import (
 	"reflect"
 	"strings"
 
+	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
@@ -31,11 +32,11 @@ import (
 // For example:
 //
 //	var abcUnionMembership := schema.NewUnionMembership("a", "b", "c")
-//	func ValidateABC(fldPath *field.Path, in *ABC) (errs fields.ErrorList) {
-//		errs = append(errs, Union(fldPath, in, abcUnionMembership, in.A, in.B, in.C)...)
+//	func ValidateABC(opCtx operation.Context, fldPath *field.Path, in *ABC) (errs fields.ErrorList) {
+//		errs = append(errs, Union(opCtx, fldPath, in, abcUnionMembership, in.A, in.B, in.C)...)
 //		return errs
 //	}
-func Union(fldPath *field.Path, in any, union *UnionMembership, fieldValues ...any) field.ErrorList {
+func Union(opCtx operation.Context, fldPath *field.Path, _, _ any, union *UnionMembership, fieldValues ...any) field.ErrorList {
 	if len(union.members) != len(fieldValues) {
 		return field.ErrorList{field.InternalError(fldPath, fmt.Errorf("unexpected difference in length between fields defined in UnionMembership and fieldValues"))}
 	}
@@ -69,11 +70,11 @@ func Union(fldPath *field.Path, in any, union *UnionMembership, fieldValues ...a
 // For example:
 //
 //	var abcUnionMembership := schema.NewDiscriminatedUnionMembership("type", "a", "b", "c")
-//	func ValidateABC(fldPath, *field.Path, in *ABC) (errs fields.ErrorList) {
-//		errs = append(errs, DiscriminatedUnion(fldPath, in, abcUnionMembership, in.Type, in.A, in.B, in.C)...)
+//	func ValidateABC(opCtx operation.Context, fldPath, *field.Path, in *ABC) (errs fields.ErrorList) {
+//		errs = append(errs, DiscriminatedUnion(opCtx, fldPath, in, abcUnionMembership, in.Type, in.A, in.B, in.C)...)
 //		return errs
 //	}
-func DiscriminatedUnion[T ~string](fldPath *field.Path, in any, union *UnionMembership, discriminatorValue T, fieldValues ...any) (errs field.ErrorList) {
+func DiscriminatedUnion[T ~string](opCtx operation.Context, fldPath *field.Path, _, _ any, union *UnionMembership, discriminatorValue T, fieldValues ...any) (errs field.ErrorList) {
 	discriminatorStrValue := string(discriminatorValue)
 	if len(union.members) != len(fieldValues) {
 		return field.ErrorList{field.InternalError(fldPath, fmt.Errorf("unexpected difference in length between fields defined in UnionMembership and fieldValues"))}

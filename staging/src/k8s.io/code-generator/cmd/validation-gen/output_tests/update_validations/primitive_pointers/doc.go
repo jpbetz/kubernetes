@@ -25,12 +25,12 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 var localSchemeBuilder = testscheme.New()
 
 type T1 struct {
-	// +validateTrue={"flags":["UpdateOnly"], "msg":"T1.SP, UpdateOnly"}
+	// +validateTrue="T1.SP"
 	SP *string `json:"sp"`
-	// +validateTrue={"flags":["UpdateOnly"], "msg":"T1.IP, UpdateOnly"}
+	// +validateTrue="T1.IP"
 	IP *int `json:"ip"`
-	// +validateTrue={"flags":["UpdateOnly"], "msg":"T1.BP, UpdateOnly"}
+	// +validateTrue="T1.BP"
 	BP *bool `json:"bp"`
-	// +validateTrue={"flags":["UpdateOnly"], "msg":"T1.FP, UpdateOnly"}
+	// +validateTrue="T1.FP"
 	FP *float64 `json:"fp"`
 }

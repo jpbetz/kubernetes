@@ -1161,14 +1161,12 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 	for _, v := range validations {
 		ptrOK := v.Flags().IsSet(validators.PtrOK)
 		isFatal := v.Flags().IsSet(validators.IsFatal)
-		updateOnly := v.Flags().IsSet(validators.UpdateOnly)
 
 		fn, extraArgs := v.SignatureAndArgs()
 		targs := generator.Args{
 			"funcName":    c.Universe.Type(fn),
 			"deref":       "", // updated below if needed
 			"oldObjDeref": "", // updated below if needed
-			"operation":   mkSymbolArgs(c, operationPkgSymbols),
 		}
 		if objIsPtr && !ptrOK {
 			if !insideNilCheck {
@@ -1182,7 +1180,7 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 				sw.Do("}\n", nil)
 				insideNilCheck = false
 			}
-			if !objIsPtr && updateOnly {
+			if !objIsPtr {
 				if ptrOK {
 					targs["deref"] = "&"
 				} else {
@@ -1204,23 +1202,12 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 				}
 				sw.Do("]", nil)
 			}
-			sw.Do("(fldPath, $.deref$obj", targs)
-			if updateOnly {
-				sw.Do(", $.oldObjDeref$oldObj", targs)
-			}
+			sw.Do("(opCtx, fldPath, $.deref$obj, $.oldObjDeref$oldObj", targs)
 			for _, arg := range extraArgs {
 				sw.Do(", ", nil)
 				toGolangSourceDataLiteral(sw, c, arg)
 			}
 			sw.Do(")", targs)
-		}
-
-		if updateOnly {
-			sw.Do("if opCtx.Operation == $.operation.Update|raw$ ", targs)
-			if !ptrOK {
-				sw.Do("&& oldObj != nil ", targs)
-			}
-			sw.Do("{\n", targs)
 		}
 
 		if isFatal {
@@ -1234,10 +1221,6 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 			sw.Do("errs = append(errs, ", nil)
 			emitCall()
 			sw.Do("...)\n", nil)
-		}
-
-		if updateOnly {
-			sw.Do("}\n", targs)
 		}
 	}
 	if insideNilCheck {

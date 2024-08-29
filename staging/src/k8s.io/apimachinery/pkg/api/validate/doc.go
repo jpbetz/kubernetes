@@ -18,9 +18,13 @@ limitations under the License.
 // with the k8s.io/code-generator/cmd/validation-gen tool.  Each validation
 // function has a similar fingerprint:
 //
-//	func <Name>(fldPath *field.Path, value <type>, <other args...>) field.ErrorList
+//	func <Name>(opCtx operation.Context,
+//	            fldPath *field.Path,
+//	            value, oldValue <type>,
+//	            <other args...>) field.ErrorList
 //
-// For update validation functions, an additional "oldValue" argument is provided:
-//
-//	func <Name>(fldPath *field.Path, value, oldValue <type>, <other args...>) field.ErrorList
+// For a CREATE operation, the oldValue will always be nil.  For an UPDATE
+// operation, either value or oldValue may be nil, e.g. when adding or removing
+// a value in a list-map.  Validators which care about UPDATE operations should
+// look at the opCtx argument to know which operation is being executed.
 package validate

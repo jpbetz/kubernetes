@@ -34,6 +34,6 @@ type M1 struct {
 	// +validateTrue="M1.K1"
 	K1 string `json:"k1"`
 
-	// +validateTrue={"flags":["UpdateOnly"], "msg":"T1.M1.S, UpdateOnly"}
+	// +validateTrue="M1.S"
 	S string `json:"s"`
 }

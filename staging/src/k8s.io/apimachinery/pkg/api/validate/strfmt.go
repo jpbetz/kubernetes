@@ -17,6 +17,7 @@ limitations under the License.
 package validate
 
 import (
+	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/api/validate/content"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
@@ -25,7 +26,7 @@ import (
 //   - start and end with lower-case alphanumeric characters
 //   - contain only lower-case alphanumeric characters or dashes
 //   - be less than 64 character long
-func DNSLabel(fldPath *field.Path, value string) field.ErrorList {
+func DNSLabel(opCtx operation.Context, fldPath *field.Path, value string, _ *string) field.ErrorList {
 	var allErrs field.ErrorList
 	for _, msg := range content.IsDNS1123Label(value) {
 		allErrs = append(allErrs, field.Invalid(fldPath, value, msg))

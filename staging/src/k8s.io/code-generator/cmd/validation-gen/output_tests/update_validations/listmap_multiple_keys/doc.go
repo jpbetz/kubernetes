@@ -28,7 +28,7 @@ type T1 struct {
 	// +listType=map
 	// +listMapKey=k1
 	// +listMapKey=k2
-	LM2 []M1 `json:"lm1"`
+	LM1 []M1 `json:"lm1"`
 }
 
 type M1 struct {
@@ -38,6 +38,6 @@ type M1 struct {
 	// +validateTrue="M1.K2"
 	K2 string `json:"k2"`
 
-	// +validateTrue={"flags":["UpdateOnly"], "msg":"T1.M1.S, UpdateOnly"}
+	// +validateTrue="M1.S"
 	S string `json:"s"`
 }

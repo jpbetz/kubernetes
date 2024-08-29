@@ -25,10 +25,10 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 var localSchemeBuilder = testscheme.New()
 
 type T1 struct {
-	M1 []LM1 `json:"lm1"`
+	LM1 []M1 `json:"lm1"`
 }
 
-type LM1 struct {
-	// +validateTrue={"flags":["UpdateOnly"], "msg":"T1.LM1.S, UpdateOnly"}
+type M1 struct {
+	// +validateTrue="M1.S"
 	S string `json:"s"`
 }

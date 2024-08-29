@@ -17,12 +17,13 @@ limitations under the License.
 package validate
 
 import (
+	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	netutils "k8s.io/utils/net"
 )
 
 // IP verifies that the specified value is a valid IP address.
-func IP(fldPath *field.Path, value string) field.ErrorList {
+func IP(opCtx operation.Context, fldPath *field.Path, value string, _ *string) field.ErrorList {
 	if netutils.ParseIPSloppy(value) == nil {
 		return field.ErrorList{
 			field.Invalid(fldPath, value, "must be a valid IP address (e.g. 10.9.8.7 or 2001:db8::ffff)"),

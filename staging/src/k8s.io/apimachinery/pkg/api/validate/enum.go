@@ -19,13 +19,14 @@ package validate
 import (
 	"slices"
 
+	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 // Enum verifies that the specified value is one of the valid symbols.
 // This is for string enums only.
-func Enum[T ~string](fldPath *field.Path, value T, symbols sets.Set[T]) field.ErrorList {
+func Enum[T ~string](opCtx operation.Context, fldPath *field.Path, value T, _ *T, symbols sets.Set[T]) field.ErrorList {
 	if !symbols.Has(value) {
 		symbolList := symbols.UnsortedList()
 		slices.Sort(symbolList)
