@@ -119,6 +119,10 @@ func (v fixedResultDeclarativeValidator) Docs() []TagDoc {
 					Key:   "msg",
 					Value: "<string>",
 					Docs:  "The generated code will include this string.",
+				}, {
+					Key:   "typeArg",
+					Value: "<string>",
+					Docs:  "The type arg in generated code (must be the value-type, not pointer).",
 				}},
 			}},
 		}}
@@ -188,16 +192,11 @@ func (_ fixedResultDeclarativeValidator) parseTagVal(in string) (tagVal, error) 
 		}
 	}
 	var typeArgs []types.Name
-	if len(pl.TypeArg) > 0 {
-		index := strings.LastIndex(pl.TypeArg, ".")
-		var pkg, name string
-		if index <= 0 {
-			name = pl.TypeArg
-		} else {
-			pkg = pl.TypeArg[0:index]
-			name = pl.TypeArg[index+1:]
+	if tn := pl.TypeArg; len(tn) > 0 {
+		if !strings.HasPrefix(tn, "*") {
+			tn = "*" + tn // We always need the pointer type.
 		}
-		typeArgs = []types.Name{{Package: pkg, Name: name}}
+		typeArgs = []types.Name{{Package: "", Name: tn}}
 	}
 
 	return tagVal{flags, pl.Msg, typeArgs}, nil

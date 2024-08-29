@@ -27,18 +27,26 @@ import (
 
 var localSchemeBuilder = testscheme.New()
 
-// Empty discriminated union
+// Explicitly set the type-arg to prove it renders properly.
+// NOTE: because of how validation code is generated, these must always be
+// pointers, because that is what gets passed around.
 type T1 struct {
 	TypeMeta int
 
-	// +validateTrue={"typeArg": "k8s.io/code-generator/cmd/validation-gen/output_tests/primitives.T1", "msg": "T1.S1"}
-	S1 primitives.T1 `json:"s1"`
+	// +validateTrue={"typeArg":"k8s.io/code-generator/cmd/validation-gen/output_tests/primitives.T1", "msg":"T1.S1"}
+	S1 *primitives.T1 `json:"s1"`
+	// +validateTrue={"typeArg":"k8s.io/code-generator/cmd/validation-gen/output_tests/primitives.T1", "msg":"PT1.PS1"}
+	PS1 *primitives.T1 `json:"ps1"`
 
-	// +validateTrue={"typeArg": "k8s.io/code-generator/cmd/validation-gen/output_tests/type_args.E1", "msg": "T1.E1"}
-	E1 `json:"e1"`
+	// +validateTrue={"typeArg":"k8s.io/code-generator/cmd/validation-gen/output_tests/type_args.E1", "msg":"T1.E1"}
+	E1 E1 `json:"e1"`
+	// +validateTrue={"typeArg":"k8s.io/code-generator/cmd/validation-gen/output_tests/type_args.E1", "msg":"T1.PE1"}
+	PE1 *E1 `json:"pe1"`
 
-	// +validateTrue={"typeArg": "int", "msg": "T1.I1"}
+	// +validateTrue={"typeArg":"int", "msg":"T1.I1"}
 	I1 int `json:"i1"`
+	// +validateTrue={"typeArg":"int", "msg":"T1.PI1"}
+	PI1 *int `json:"pi1"`
 }
 
 // +validateTrue={"msg": "type E1"}
