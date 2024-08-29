@@ -32,7 +32,7 @@ func DNSLabel(opCtx operation.Context, fldPath *field.Path, value, _ *string) fi
 	}
 	var allErrs field.ErrorList
 	for _, msg := range content.IsDNS1123Label(*value) {
-		allErrs = append(allErrs, field.Invalid(fldPath, value, msg))
+		allErrs = append(allErrs, field.Invalid(fldPath, *value, msg))
 	}
 	return allErrs
 }

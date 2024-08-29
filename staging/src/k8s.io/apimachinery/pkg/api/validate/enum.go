@@ -33,7 +33,7 @@ func Enum[T ~string](opCtx operation.Context, fldPath *field.Path, value, _ *T, 
 	if !symbols.Has(*value) {
 		symbolList := symbols.UnsortedList()
 		slices.Sort(symbolList)
-		return field.ErrorList{field.NotSupported[T](fldPath, value, symbolList)}
+		return field.ErrorList{field.NotSupported[T](fldPath, *value, symbolList)}
 	}
 	return nil
 }

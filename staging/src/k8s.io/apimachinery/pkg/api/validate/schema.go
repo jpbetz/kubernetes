@@ -29,7 +29,7 @@ func MaxLength(opCtx operation.Context, fldPath *field.Path, value, _ *string, m
 		return nil
 	}
 	if len(*value) > max {
-		return field.ErrorList{field.Invalid(fldPath, value, content.MaxLenError(max))}
+		return field.ErrorList{field.Invalid(fldPath, *value, content.MaxLenError(max))}
 	}
 	return nil
 }
