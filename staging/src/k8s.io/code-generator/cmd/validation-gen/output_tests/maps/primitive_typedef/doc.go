@@ -32,6 +32,11 @@ type T1 struct {
 	// +eachKey=+validateTrue="T1.MSAMSS[keys]"
 	// +eachVal=+validateTrue="T1.MSAMSS[vals]"
 	MSAMSS map[string]AMSS `json:"msamss"`
+
+	// +validateTrue="field T1.MSPAMSS"
+	// +eachKey=+validateTrue="T1.MSPAMSS[keys]"
+	// +eachVal=+validateTrue="T1.MSPAMSS[vals]"
+	MSPAMSS map[string]*AMSS `json:"mspamss"`
 }
 
 // +validateTrue="type AMSS"

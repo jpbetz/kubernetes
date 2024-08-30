@@ -50,7 +50,7 @@ var (
 	fieldPkgSymbols     = mkPkgNames(fieldPkg, "ErrorList", "InternalError", "Path")
 	fmtPkgSymbols       = mkPkgNames("fmt", "Errorf")
 	safePkg             = "k8s.io/apimachinery/pkg/api/safe"
-	safePkgSymbols      = mkPkgNames(safePkg, "NewListMap", "Field", "Lookup", "Cast", "PtrTo", "Ident")
+	safePkgSymbols      = mkPkgNames(safePkg, "NewListMap", "Field", "Lookup", "Cast", "PtrTo", "Deref", "Ident")
 	operationPkg        = "k8s.io/apimachinery/pkg/api/operation"
 	operationPkgSymbols = mkPkgNames(operationPkg, "Context", "Update")
 )
@@ -337,6 +337,9 @@ func builtinTagDocs() []validators.TagDoc {
 // multiple graphs will be stored, and where types overlap, they will be
 // merged.
 func (td *typeDiscoverer) DiscoverType(t *types.Type) error {
+	if t.Kind == types.Pointer {
+		return fmt.Errorf("type %v: pointer root-types are not supported", t)
+	}
 	fldPath := field.NewPath(t.Name.String())
 	if node, err := td.discover(t, fldPath); err != nil {
 		return err
@@ -677,10 +680,10 @@ func (g *genValidations) emitRegisterFunction(c *generator.Context, schemeRegist
 	sw.Do("// RegisterValidations adds validation functions to the given scheme.\n", nil)
 	sw.Do("// Public to allow building arbitrary schemes.\n", nil)
 	sw.Do("func RegisterValidations(scheme $.|raw$) error {\n", schemePtr)
-	for _, t := range g.rootTypes {
-		node := g.discovered.typeNodes[t]
+	for _, rootType := range g.rootTypes {
+		node := g.discovered.typeNodes[rootType]
 		if node == nil {
-			panic(fmt.Sprintf("found nil node for root-type %v", t))
+			panic(fmt.Sprintf("found nil node for root-type %v", rootType))
 		}
 
 		// TODO: It would be nice if these were not hard-coded.
@@ -692,7 +695,8 @@ func (g *genValidations) emitRegisterFunction(c *generator.Context, schemeRegist
 		}
 
 		targs := generator.Args{
-			"rootType":    t,
+			"rootType":    rootType,
+			"typePfx":     "",
 			"statusType":  statusType,
 			"statusField": statusField,
 			"field":       mkSymbolArgs(c, fieldPkgSymbols),
@@ -700,18 +704,22 @@ func (g *genValidations) emitRegisterFunction(c *generator.Context, schemeRegist
 			"operation":   mkSymbolArgs(c, operationPkgSymbols),
 			"safe":        mkSymbolArgs(c, safePkgSymbols),
 		}
+		if !isNilableType(rootType) {
+			targs["typePfx"] = "*"
+		}
+
 		// This uses a typed nil pointer, rather than a real instance because
 		// we need the type information, but not an instance of the type.
-		sw.Do("scheme.AddValidationFunc((*$.rootType|raw$)(nil), func(opCtx $.operation.Context|raw$, obj, oldObj interface{}, subresources ...string) $.field.ErrorList|raw$ {\n", targs)
+		sw.Do("scheme.AddValidationFunc(($.typePfx$$.rootType|raw$)(nil), func(opCtx $.operation.Context|raw$, obj, oldObj interface{}, subresources ...string) $.field.ErrorList|raw$ {\n", targs)
 		sw.Do("  if len(subresources) == 0 {\n", targs)
-		sw.Do("    return $.rootType|objectvalidationfn$(opCtx, obj.(*$.rootType|raw$), $.safe.Cast|raw$[$.rootType|raw$](oldObj), nil)\n", targs)
+		sw.Do("    return $.rootType|objectvalidationfn$(opCtx, obj.($.typePfx$$.rootType|raw$), $.safe.Cast|raw$[$.typePfx$$.rootType|raw$](oldObj), nil)\n", targs)
 		sw.Do("  }\n", targs)
 
 		if statusType != nil {
 			sw.Do("  if len(subresources) == 1 && subresources[0] == \"status\" {\n", targs)
 			if g.hasValidations(g.discovered.typeNodes[statusType]) {
-				sw.Do("    root := obj.(*$.rootType|raw$)\n", targs)
-				sw.Do("    return $.statusType|objectvalidationfn$(opCtx, &root.$.statusField$, $.safe.Field|raw$($.safe.Cast|raw$[$.rootType|raw$](oldObj), func(oldObj $.rootType|raw$) $.statusType|raw$ { return oldObj.$.statusField$ }), nil)\n", targs)
+				sw.Do("    root := obj.($.typePfx$$.rootType|raw$)\n", targs)
+				sw.Do("    return $.statusType|objectvalidationfn$(opCtx, &root.$.statusField$, $.safe.Field|raw$($.safe.Cast|raw$[$.typePfx$$.rootType|raw$](oldObj), func(oldObj $.typePfx$$.rootType|raw$) $.statusType|raw$ { return oldObj.$.statusField$ }), nil)\n", targs)
 			} else {
 				sw.Do("    return nil // $.statusType|raw$ has no validation\n", targs)
 			}
@@ -730,16 +738,20 @@ func (g *genValidations) emitRegisterFunction(c *generator.Context, schemeRegist
 // emitValidationFunction emits a validation function for the specified type.
 func (g *genValidations) emitValidationFunction(c *generator.Context, t *types.Type, sw *generator.SnippetWriter) {
 	targs := generator.Args{
-		"inType":    t,
-		"field":     mkSymbolArgs(c, fieldPkgSymbols),
-		"operation": mkSymbolArgs(c, operationPkgSymbols),
+		"inType":     t,
+		"field":      mkSymbolArgs(c, fieldPkgSymbols),
+		"operation":  mkSymbolArgs(c, operationPkgSymbols),
+		"objTypePfx": "*",
+	}
+	if isNilableType(t) {
+		targs["objTypePfx"] = ""
 	}
 
 	node := g.discovered.typeNodes[t]
 	if node == nil {
 		panic(fmt.Sprintf("found nil node for root-type %v", t))
 	}
-	sw.Do("func $.inType|objectvalidationfn$(opCtx $.operation.Context|raw$, obj, oldObj *$.inType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
+	sw.Do("func $.inType|objectvalidationfn$(opCtx $.operation.Context|raw$, obj, oldObj $.objTypePfx$$.inType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
 	fakeChild := &childNode{
 		node:      node,
 		childType: t,
@@ -818,30 +830,27 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 					continue // TODO: Embedded (inline) types are expected to be unnamed.
 				}
 
+				leafType, typePfx, exprPfx := getLeafTypeAndPrefixes(fld.childType)
 				targs := targs.WithArgs(generator.Args{
-					"fieldName": fld.name,
-					"fieldJSON": fld.jsonName,
-					"fieldType": fld.childType,
-					"maybeAddr": "",
-					"maybePtr":  "",
+					"fieldName":    fld.name,
+					"fieldJSON":    fld.jsonName,
+					"fieldType":    leafType,
+					"fieldTypePfx": typePfx,
+					"fieldExprPfx": exprPfx,
 				})
-				if !isNilableType(fld.childType) {
-					targs["maybeAddr"] = "&"
-					targs["maybePtr"] = "*"
-				}
 
 				if didSome {
 					sw.Do("\n", nil)
 				}
 				sw.Do("// field $.inType|raw$.$.fieldName$\n", targs)
 				sw.Do("errs = append(errs,\n", targs)
-				sw.Do("  func(obj, oldObj $.maybePtr$$.fieldType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
+				sw.Do("  func(obj, oldObj $.fieldTypePfx$$.fieldType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
 				sw.Append(buf)
 				sw.Do("    return\n", targs)
-				sw.Do("  }($.maybeAddr$obj.$.fieldName$, ", targs)
+				sw.Do("  }($.fieldExprPfx$obj.$.fieldName$, ", targs)
 				sw.Do("    $.safe.Field|raw$(oldObj, ", targs)
-				sw.Do("        func(oldObj *$.inType|raw$) $.maybePtr$$.fieldType|raw$ {", targs)
-				sw.Do("            return $.maybeAddr$oldObj.$.fieldName$", targs)
+				sw.Do("        func(oldObj *$.inType|raw$) $.fieldTypePfx$$.fieldType|raw$ {", targs)
+				sw.Do("            return $.fieldExprPfx$oldObj.$.fieldName$", targs)
 				sw.Do("        }),", targs)
 				sw.Do("    fldPath.Child(\"$.fieldJSON$\"))...)\n", targs)
 				sw.Do("\n", nil)
@@ -878,15 +887,12 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 		}
 
 		if elemBuf.Len() > 0 {
+			leafType, typePfx, exprPfx := getLeafTypeAndPrefixes(inType.Elem)
 			targs := targs.WithArgs(generator.Args{
-				"elemType":  inType.Elem,
-				"maybeAddr": "",
-				"maybePtr":  "",
+				"elemType":    leafType,
+				"elemTypePfx": typePfx,
+				"elemExprPfx": exprPfx,
 			})
-			if !isNilableType(inType.Elem) {
-				targs["maybeAddr"] = "&"
-				targs["maybePtr"] = "*"
-			}
 
 			isCorrelatable := len(thisNode.listMapKeys) > 0
 			oldVal := "nil" // updated below if needed
@@ -899,7 +905,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 				// slice) of 'any', and those should always be comparable, so
 				// we should not see runtime errors ("comparing uncomparable
 				// type").
-				sw.Do("oldListMap := $.safe.NewListMap|raw$(oldObj, func(o $.maybePtr$$.elemType|raw$) any {", targs)
+				sw.Do("oldListMap := $.safe.NewListMap|raw$(oldObj, func(o $.elemTypePfx$$.elemType|raw$) any {", targs)
 				sw.Do(" return ", targs)
 				emitListMapKey(sw, "o", thisNode)
 				sw.Do("})\n", targs)
@@ -909,10 +915,10 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 
 			sw.Do("for i, val := range obj {\n", targs)
 			sw.Do("  errs = append(errs,\n", targs)
-			sw.Do("    func(obj, oldObj $.maybePtr$$.elemType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
+			sw.Do("    func(obj, oldObj $.elemTypePfx$$.elemType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
 			sw.Append(elemBuf)
 			sw.Do("      return\n", targs)
-			sw.Do("    }($.maybeAddr$val, $.oldVal$, fldPath.Index(i))...)\n", targs)
+			sw.Do("    }($.elemExprPfx$val, $.oldVal$, fldPath.Index(i))...)\n", targs)
 			sw.Do("}\n", nil)
 		}
 	case types.Map:
@@ -967,39 +973,38 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			vName = "val"
 		}
 		if keyBuf.Len()+valBuf.Len() > 0 {
+			valLeafType, valTypePfx, valExprPfx := getLeafTypeAndPrefixes(inType.Elem)
 			targs := targs.WithArgs(generator.Args{
-				"keyType":      inType.Key,
-				"valType":      inType.Elem,
-				"keyMaybeAddr": "",
-				"keyMaybePtr":  "",
-				"valMaybeAddr": "",
-				"valMaybePtr":  "",
-				"xform":        targs["safe"].(generator.Args)["Ident"],
+				"keyType":    inType.Key, // we only handle ~string keys
+				"valType":    valLeafType,
+				"valTypePfx": valTypePfx,
+				"valExprPfx": valExprPfx,
 			})
-			if !isNilableType(inType.Key) {
-				targs["keyMaybeAddr"] = "&"
-				targs["keyMaybePtr"] = "*"
-			}
 			if !isNilableType(inType.Elem) {
-				targs["valMaybeAddr"] = "&"
-				targs["valMaybePtr"] = "*"
+				// E.g. map[string]StructType => *StructType
 				targs["xform"] = targs["safe"].(generator.Args)["PtrTo"]
+			} else if inType.Elem.Kind == types.Pointer && isNilableType(inType.Elem.Elem) {
+				// E.g. given type E []StructType, map[string]*E => E
+				targs["xform"] = targs["safe"].(generator.Args)["Deref"]
+			} else {
+				// E.g. map[string]*StructType => StructType
+				targs["xform"] = targs["safe"].(generator.Args)["Ident"]
 			}
 
 			sw.Do("for key, $.val$ := range obj {\n", targs.With("val", vName))
 			if keyBuf.Len() > 0 {
 				sw.Do("  errs = append(errs,\n", targs)
-				sw.Do("    func(obj, oldObj $.keyMaybePtr$$.keyType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
+				sw.Do("    func(obj, oldObj *$.keyType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
 				sw.Append(keyBuf)
 				sw.Do("      return\n", targs)
-				sw.Do("    }($.keyMaybeAddr$key, nil, fldPath)...)\n", targs) // We don't match up map keys with a corresponding old value
+				sw.Do("    }(&key, nil, fldPath)...)\n", targs) // We don't match up map keys with a corresponding old value
 			}
 			if valBuf.Len() > 0 {
 				sw.Do("  errs = append(errs,\n", targs)
-				sw.Do("    func(obj, oldObj $.valMaybePtr$$.valType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
+				sw.Do("    func(obj, oldObj $.valTypePfx$$.valType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
 				sw.Append(valBuf)
 				sw.Do("      return\n", targs)
-				sw.Do("    }($.valMaybeAddr$val, $.safe.Lookup|raw$(oldObj, key, $.xform|raw$), fldPath.Key(string(key)))...)\n", targs)
+				sw.Do("    }($.valExprPfx$val, $.safe.Lookup|raw$(oldObj, key, $.xform|raw$), fldPath.Key(string(key)))...)\n", targs)
 			}
 
 			sw.Do("}\n", nil)
@@ -1243,9 +1248,51 @@ func extractListMapKeys(member types.Member) []types.Member {
 }
 
 func isNilableType(t *types.Type) bool {
+	for t.Kind == types.Alias {
+		t = t.Underlying
+	}
 	switch t.Kind {
 	case types.Pointer, types.Map, types.Slice, types.Interface: // Note: Arrays are not nillable
 		return true
 	}
 	return false
+}
+
+// getLeafTypeAndPrefixes returns the "leaf value type" for a given type, as
+// well as type and expression prefix strings for the input type.  The type
+// prefix can be prepended to the given type's name to produce the nilable form
+// of that type.  The expression prefix can be prepended to a variable of the
+// given type to produce the nilable form of that value.
+//
+// Example: Given an input type "string" this should produce (string, "*", "&").
+// That is to say: the value-type is "string", which yields "*string" when the
+// type prefix is applied, and a variable "x" becomes "&x" when the expression
+// prefix is applied.
+//
+// Example: Given an input type "*string" this should produce (string, "*", "").
+// That is to say: the value-type is "string", which yields "*string" when the
+// type prefix is applied, and a variable "x" remains "x" when the expression
+// prefix is applied.
+func getLeafTypeAndPrefixes(inType *types.Type) (*types.Type, string, string) {
+	leafType := inType
+	typePfx := ""
+	exprPfx := ""
+
+	nPtrs := 0
+	for leafType.Kind == types.Pointer {
+		nPtrs++
+		leafType = leafType.Elem
+	}
+	if !isNilableType(leafType) {
+		typePfx = "*"
+		if nPtrs == 0 {
+			exprPfx = "&"
+		} else {
+			exprPfx = strings.Repeat("*", nPtrs-1)
+		}
+	} else {
+		exprPfx = strings.Repeat("*", nPtrs)
+	}
+
+	return leafType, typePfx, exprPfx
 }

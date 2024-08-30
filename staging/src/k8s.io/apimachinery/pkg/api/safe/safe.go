@@ -17,12 +17,12 @@ limitations under the License.
 package safe
 
 // Field takes a pointer to any value (which may or may not be nil) and
-// a function that traverses to a target type T (a typical use case is to dereference a field),
+// a function that traverses to a target type R (a typical use case is to dereference a field),
 // and returns the result of the traversal, or the zero value of the target type.
 // This is roughly equivalent to "value != nil ? fn(value) : nil" in languages that support the ternary operator.
-func Field[V any, T any](value *V, fn func(*V) T) T {
+func Field[V any, R any](value *V, fn func(*V) R) R {
 	if value == nil {
-		var zero T
+		var zero R
 		return zero
 	}
 	o := fn(value)
@@ -52,6 +52,17 @@ func PtrTo[T any](val T) *T {
 	return &val
 }
 
+// Deref returns the value pointed to by the argument pointer, or the zero
+// value if the pointer is nil.  This works as a transform function for Lookup,
+// e.g. given a map with pointer-to-slice values, this will produce a slice.
+func Deref[T any](val *T) T {
+	if val == nil {
+		var zero T
+		return zero
+	}
+	return *val
+}
+
 // Ident returns the input argument.  This works as a transform function for
 // Lookup, e.g. given a map with pointer values, this will return the pointer
 // directly.
@@ -59,11 +70,10 @@ func Ident[T any](val T) T {
 	return val
 }
 
-// Cast takes any value, which may or may not be nil,
-// attempts to cast it to *T and returns *T if the cast is successful, else
-// return nil.
-func Cast[T any](value any) *T {
-	result, _ := value.(*T)
+// Cast takes any value, attempts to cast it to T, and returns the T value if
+// the cast is successful, or else the zero value of T.
+func Cast[T any](value any) T {
+	result, _ := value.(T)
 	return result
 }
 
