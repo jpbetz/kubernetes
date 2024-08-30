@@ -81,12 +81,12 @@ func (et *enumType) ValueArgs() []any {
 	return values
 }
 
-func (et *enumType) SymbolConstants() []PrivateVar {
-	var values []PrivateVar
+func (et *enumType) SymbolConstants() []Identifier {
+	var values []Identifier
 	for _, value := range et.Values {
-		values = append(values, PrivateVar(value.Name))
+		values = append(values, Identifier(value.Name))
 	}
-	slices.SortFunc(values, func(a, b PrivateVar) int {
+	slices.SortFunc(values, func(a, b Identifier) int {
 		return cmp.Compare(a.Name, b.Name)
 	})
 	return values

@@ -1300,6 +1300,10 @@ func toGolangSourceDataLiteral(sw *generator.SnippetWriter, c *generator.Context
 		sw.Do("$.|raw$", v)
 	case types.Member:
 		sw.Do("obj."+v.Name, nil)
+	case validators.Identifier:
+		sw.Do("$.|raw$", c.Universe.Type(types.Name(v)))
+	case *validators.Identifier:
+		sw.Do("$.|raw$", c.Universe.Type(types.Name(*v)))
 	case validators.PrivateVar:
 		sw.Do("$.|private$", c.Universe.Type(types.Name(v)))
 	case *validators.PrivateVar:
