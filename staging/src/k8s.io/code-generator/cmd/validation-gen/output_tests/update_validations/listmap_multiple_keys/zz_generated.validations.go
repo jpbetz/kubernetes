@@ -42,6 +42,24 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
+	scheme.AddValidationFunc((*M2)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			return Validate_M2(opCtx, obj.(*M2), safe.Cast[*M2](oldObj), nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc((*M3)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			return Validate_M3(opCtx, obj.(*M3), safe.Cast[*M3](oldObj), nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc((*M4)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			return Validate_M4(opCtx, obj.(*M4), safe.Cast[*M4](oldObj), nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
+	})
 	scheme.AddValidationFunc((*T1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_T1(opCtx, obj.(*T1), safe.Cast[*T1](oldObj), nil)
@@ -76,6 +94,32 @@ func Validate_M1(opCtx operation.Context, obj, oldObj *M1, fldPath *field.Path) 
 	return errs
 }
 
+func Validate_M2(opCtx operation.Context, obj, oldObj *M2, fldPath *field.Path) (errs field.ErrorList) {
+	// field M2.M1
+	errs = append(errs,
+		func(obj, oldObj *M1, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_M1(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.M1, safe.Field(oldObj, func(oldObj *M2) *M1 { return &oldObj.M1 }), fldPath.Child("M1"))...)
+
+	return errs
+}
+
+func Validate_M3(opCtx operation.Context, obj, oldObj *M3, fldPath *field.Path) (errs field.ErrorList) {
+	return errs
+}
+
+func Validate_M4(opCtx operation.Context, obj, oldObj *M4, fldPath *field.Path) (errs field.ErrorList) {
+	// field M4.M2
+	errs = append(errs,
+		func(obj, oldObj *M2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_M2(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.M2, safe.Field(oldObj, func(oldObj *M4) *M2 { return &oldObj.M2 }), fldPath.Child("M2"))...)
+
+	return errs
+}
+
 func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// field T1.LM1
 	errs = append(errs,
@@ -90,6 +134,48 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 			}
 			return
 		}(obj.LM1, safe.Field(oldObj, func(oldObj *T1) []M1 { return oldObj.LM1 }), fldPath.Child("lm1"))...)
+
+	// field T1.LM2
+	errs = append(errs,
+		func(obj, oldObj []M2, fldPath *field.Path) (errs field.ErrorList) {
+			oldListMap := safe.NewListMap(oldObj, func(o *M2) any { return [2]any{o.K1, o.K2} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *M2, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_M2(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.LM2, safe.Field(oldObj, func(oldObj *T1) []M2 { return oldObj.LM2 }), fldPath.Child("lm2"))...)
+
+	// field T1.LM3
+	errs = append(errs,
+		func(obj, oldObj []M3, fldPath *field.Path) (errs field.ErrorList) {
+			oldListMap := safe.NewListMap(oldObj, func(o *M3) any { return [2]any{o.K1, o.K2} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *M3, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_M3(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.LM3, safe.Field(oldObj, func(oldObj *T1) []M3 { return oldObj.LM3 }), fldPath.Child("lm3"))...)
+
+	// field T1.LM4
+	errs = append(errs,
+		func(obj, oldObj []M4, fldPath *field.Path) (errs field.ErrorList) {
+			oldListMap := safe.NewListMap(oldObj, func(o *M4) any { return [2]any{o.K1, o.K2} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *M4, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_M4(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.LM4, safe.Field(oldObj, func(oldObj *T1) []M4 { return oldObj.LM4 }), fldPath.Child("lm4"))...)
 
 	return errs
 }
