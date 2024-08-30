@@ -430,6 +430,10 @@ function codegen::validation() {
         tag_pkgs+=("./$dir")
     done
 
+    local extra_pkgs=(
+        k8s.io/apimachinery/pkg/apis/meta/v1
+    )
+
     kube::log::status "Generating validation code for ${#tag_pkgs[@]} targets"
     if [[ "${DBG_CODEGEN}" == 1 ]]; then
         kube::log::status "DBG: running validation-gen for:"
@@ -444,6 +448,7 @@ function codegen::validation() {
         -v "${KUBE_VERBOSE}" \
         --go-header-file "${BOILERPLATE_FILENAME}" \
         --output-file "${output_file}" \
+        $(printf -- " --extra-pkg %s" "${extra_pkgs[@]}") \
         "${tag_pkgs[@]}" \
         "$@"
 

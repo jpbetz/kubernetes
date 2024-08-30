@@ -71,18 +71,18 @@ func main() {
 }
 
 type Args struct {
-	OutputFile    string
-	ExtraPeerDirs []string // Always consider these as last-ditch possibilities for validations.
-	GoHeaderFile  string
-	PrintDocs     bool
+	OutputFile   string
+	ExtraPkgs    []string // Always consider these as last-ditch possibilities for validations.
+	GoHeaderFile string
+	PrintDocs    bool
 }
 
 // AddFlags add the generator flags to the flag set.
 func (args *Args) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&args.OutputFile, "output-file", "generated.validations.go",
 		"the name of the file to be generated")
-	fs.StringSliceVar(&args.ExtraPeerDirs, "extra-peer-dirs", args.ExtraPeerDirs, //FIXME: need this?
-		"comma-separated list of import paths which are considered, after tag-specified peers, for validations")
+	fs.StringSliceVar(&args.ExtraPkgs, "extra-pkg", args.ExtraPkgs,
+		"the import path of a package whose validation can be used by generated code, but is not being generated for")
 	fs.StringVar(&args.GoHeaderFile, "go-header-file", "",
 		"the path to a file containing boilerplate header text; the string \"YEAR\" will be replaced with the current 4-digit year")
 	fs.BoolVar(&args.PrintDocs, "docs", false,

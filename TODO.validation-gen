@@ -70,7 +70,6 @@
 - "inner" validation
 - Generator unit tests need updating
 - How to handle feature gates and options structs
-- rename or eliminate the peer-dirs flag
 - enums: pass the sorted list of value rather than a set, do a linear/binary search
 - Revisit whether eachKey/eachVal can be a single function call
 - How to deal with fields which are +optional and +default - they need a

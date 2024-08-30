@@ -145,22 +145,31 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 		}
 	}
 
-	// Make sure explicit peer-packages are added.
-	var peerPkgs []string
-	for _, pkg := range args.ExtraPeerDirs {
-		// In case someone specifies a peer as a path into vendor, convert
+	// Make sure explicit extra-packages are added.
+	var extraPkgs []string
+	for _, pkg := range args.ExtraPkgs {
+		// In case someone specifies an extra as a path into vendor, convert
 		// it to its "real" package path.
 		if i := strings.Index(pkg, "/vendor/"); i != -1 {
 			pkg = pkg[i+len("/vendor/"):]
 		}
-		peerPkgs = append(peerPkgs, pkg)
+		extraPkgs = append(extraPkgs, pkg)
 	}
-	if expanded, err := context.FindPackages(peerPkgs...); err != nil {
-		klog.Fatalf("cannot find peer packages: %v", err)
+	if expanded, err := context.FindPackages(extraPkgs...); err != nil {
+		klog.Fatalf("cannot find extra packages: %v", err)
 	} else {
-		peerPkgs = expanded // now in fully canonical form
+		extraPkgs = expanded // now in fully canonical form
 	}
-	inputPkgs = append(inputPkgs, peerPkgs...)
+	for _, extra := range extraPkgs {
+		inputPkgs = append(inputPkgs, extra)
+		pkgToInput[extra] = extra
+	}
+
+	// We also need the to be able to look up the packages of inputs
+	inputToPkg := make(map[string]string, len(pkgToInput))
+	for k, v := range pkgToInput {
+		inputToPkg[v] = k
+	}
 
 	if len(inputPkgs) > 0 {
 		if _, err := context.LoadPackages(inputPkgs...); err != nil {
@@ -170,12 +179,6 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 	// update context.Order to the latest context.Universe
 	orderer := namer.Orderer{Namer: namer.NewPublicNamer(1)}
 	context.Order = orderer.OrderUniverse(context.Universe)
-
-	// We also need the to be able to look up the packages of inputs
-	inputToPkg := make(map[string]string, len(pkgToInput))
-	for k, v := range pkgToInput {
-		inputToPkg[v] = k
-	}
 
 	// Build a cache of type->callNode for every type we need.
 	for _, input := range context.Inputs {
