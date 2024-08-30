@@ -26,9 +26,13 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	operation "k8s.io/apimachinery/pkg/api/operation"
+	resource "k8s.io/apimachinery/pkg/api/resource"
 	safe "k8s.io/apimachinery/pkg/api/safe"
 	validate "k8s.io/apimachinery/pkg/api/validate"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
+	types "k8s.io/apimachinery/pkg/types"
+	intstr "k8s.io/apimachinery/pkg/util/intstr"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
 )
 
@@ -114,7 +118,8 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 			return Validate_Namespace(opCtx, obj.(*v1.Namespace), safe.Cast[*v1.Namespace](oldObj), nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
-			return nil // v1.NamespaceStatus has no validation
+			root := obj.(*v1.Namespace)
+			return Validate_NamespaceStatus(opCtx, &root.Status, safe.Field(safe.Cast[*v1.Namespace](oldObj), func(oldObj *v1.Namespace) v1.NamespaceStatus { return oldObj.Status }), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
@@ -129,7 +134,8 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 			return Validate_Node(opCtx, obj.(*v1.Node), safe.Cast[*v1.Node](oldObj), nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
-			return nil // v1.NodeStatus has no validation
+			root := obj.(*v1.Node)
+			return Validate_NodeStatus(opCtx, &root.Status, safe.Field(safe.Cast[*v1.Node](oldObj), func(oldObj *v1.Node) v1.NodeStatus { return oldObj.Status }), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
@@ -150,7 +156,8 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 			return Validate_PersistentVolume(opCtx, obj.(*v1.PersistentVolume), safe.Cast[*v1.PersistentVolume](oldObj), nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
-			return nil // v1.PersistentVolumeStatus has no validation
+			root := obj.(*v1.PersistentVolume)
+			return Validate_PersistentVolumeStatus(opCtx, &root.Status, safe.Field(safe.Cast[*v1.PersistentVolume](oldObj), func(oldObj *v1.PersistentVolume) v1.PersistentVolumeStatus { return oldObj.Status }), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
@@ -159,7 +166,8 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 			return Validate_PersistentVolumeClaim(opCtx, obj.(*v1.PersistentVolumeClaim), safe.Cast[*v1.PersistentVolumeClaim](oldObj), nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
-			return nil // v1.PersistentVolumeClaimStatus has no validation
+			root := obj.(*v1.PersistentVolumeClaim)
+			return Validate_PersistentVolumeClaimStatus(opCtx, &root.Status, safe.Field(safe.Cast[*v1.PersistentVolumeClaim](oldObj), func(oldObj *v1.PersistentVolumeClaim) v1.PersistentVolumeClaimStatus { return oldObj.Status }), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
@@ -254,7 +262,8 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 			return Validate_ReplicationController(opCtx, obj.(*v1.ReplicationController), safe.Cast[*v1.ReplicationController](oldObj), nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
-			return nil // v1.ReplicationControllerStatus has no validation
+			root := obj.(*v1.ReplicationController)
+			return Validate_ReplicationControllerStatus(opCtx, &root.Status, safe.Field(safe.Cast[*v1.ReplicationController](oldObj), func(oldObj *v1.ReplicationController) v1.ReplicationControllerStatus { return oldObj.Status }), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
@@ -269,7 +278,8 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 			return Validate_ResourceQuota(opCtx, obj.(*v1.ResourceQuota), safe.Cast[*v1.ResourceQuota](oldObj), nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
-			return nil // v1.ResourceQuotaStatus has no validation
+			root := obj.(*v1.ResourceQuota)
+			return Validate_ResourceQuotaStatus(opCtx, &root.Status, safe.Field(safe.Cast[*v1.ResourceQuota](oldObj), func(oldObj *v1.ResourceQuota) v1.ResourceQuotaStatus { return oldObj.Status }), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
@@ -302,7 +312,8 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 			return Validate_Service(opCtx, obj.(*v1.Service), safe.Cast[*v1.Service](oldObj), nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
-			return nil // v1.ServiceStatus has no validation
+			root := obj.(*v1.Service)
+			return Validate_ServiceStatus(opCtx, &root.Status, safe.Field(safe.Cast[*v1.Service](oldObj), func(oldObj *v1.Service) v1.ServiceStatus { return oldObj.Status }), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
@@ -333,6 +344,73 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	return nil
 }
 
+func Validate_AWSElasticBlockStoreVolumeSource(opCtx operation.Context, obj, oldObj *v1.AWSElasticBlockStoreVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.AWSElasticBlockStoreVolumeSource.VolumeID has no validation
+
+	// field v1.AWSElasticBlockStoreVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FSType, safe.Field(oldObj, func(oldObj *v1.AWSElasticBlockStoreVolumeSource) *string { return &oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.AWSElasticBlockStoreVolumeSource.Partition
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Partition, safe.Field(oldObj, func(oldObj *v1.AWSElasticBlockStoreVolumeSource) *int32 { return &oldObj.Partition }), fldPath.Child("partition"))...)
+
+	// field v1.AWSElasticBlockStoreVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.AWSElasticBlockStoreVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	return errs
+}
+
+func Validate_Affinity(opCtx operation.Context, obj, oldObj *v1.Affinity, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.Affinity.NodeAffinity
+	errs = append(errs,
+		func(obj, oldObj *v1.NodeAffinity, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_NodeAffinity(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.NodeAffinity, safe.Field(oldObj, func(oldObj *v1.Affinity) *v1.NodeAffinity { return oldObj.NodeAffinity }), fldPath.Child("nodeAffinity"))...)
+
+	// field v1.Affinity.PodAffinity
+	errs = append(errs,
+		func(obj, oldObj *v1.PodAffinity, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_PodAffinity(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.PodAffinity, safe.Field(oldObj, func(oldObj *v1.Affinity) *v1.PodAffinity { return oldObj.PodAffinity }), fldPath.Child("podAffinity"))...)
+
+	// field v1.Affinity.PodAntiAffinity
+	errs = append(errs,
+		func(obj, oldObj *v1.PodAntiAffinity, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_PodAntiAffinity(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.PodAntiAffinity, safe.Field(oldObj, func(oldObj *v1.Affinity) *v1.PodAntiAffinity { return oldObj.PodAntiAffinity }), fldPath.Child("podAntiAffinity"))...)
+
+	return errs
+}
+
 var unionMembershipForAppArmorProfile = validate.NewDiscriminatedUnionMembership("type")
 
 func Validate_AppArmorProfile(opCtx operation.Context, obj, oldObj *v1.AppArmorProfile, fldPath *field.Path) (errs field.ErrorList) {
@@ -340,100 +418,1319 @@ func Validate_AppArmorProfile(opCtx operation.Context, obj, oldObj *v1.AppArmorP
 	errs = append(errs, validate.DiscriminatedUnion(opCtx, fldPath, obj, oldObj, unionMembershipForAppArmorProfile, obj.Type)...)
 
 	// field v1.AppArmorProfile.Type has no validation
-	// field v1.AppArmorProfile.LocalhostProfile has no validation
+
+	// field v1.AppArmorProfile.LocalhostProfile
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.LocalhostProfile, safe.Field(oldObj, func(oldObj *v1.AppArmorProfile) *string { return oldObj.LocalhostProfile }), fldPath.Child("localhostProfile"))...)
+
+	return errs
+}
+
+func Validate_AzureDiskVolumeSource(opCtx operation.Context, obj, oldObj *v1.AzureDiskVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.AzureDiskVolumeSource.DiskName has no validation
+	// field v1.AzureDiskVolumeSource.DataDiskURI has no validation
+
+	// field v1.AzureDiskVolumeSource.CachingMode
+	errs = append(errs,
+		func(obj, oldObj *v1.AzureDataDiskCachingMode, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.CachingMode, safe.Field(oldObj, func(oldObj *v1.AzureDiskVolumeSource) *v1.AzureDataDiskCachingMode { return oldObj.CachingMode }), fldPath.Child("cachingMode"))...)
+
+	// field v1.AzureDiskVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.FSType, safe.Field(oldObj, func(oldObj *v1.AzureDiskVolumeSource) *string { return oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.AzureDiskVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.AzureDiskVolumeSource) *bool { return oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	// field v1.AzureDiskVolumeSource.Kind has no validation
+	return errs
+}
+
+func Validate_AzureFilePersistentVolumeSource(opCtx operation.Context, obj, oldObj *v1.AzureFilePersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.AzureFilePersistentVolumeSource.SecretName has no validation
+	// field v1.AzureFilePersistentVolumeSource.ShareName has no validation
+
+	// field v1.AzureFilePersistentVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.AzureFilePersistentVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	// field v1.AzureFilePersistentVolumeSource.SecretNamespace
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.SecretNamespace, safe.Field(oldObj, func(oldObj *v1.AzureFilePersistentVolumeSource) *string { return oldObj.SecretNamespace }), fldPath.Child("secretNamespace"))...)
+
+	return errs
+}
+
+func Validate_AzureFileVolumeSource(opCtx operation.Context, obj, oldObj *v1.AzureFileVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.AzureFileVolumeSource.SecretName has no validation
+	// field v1.AzureFileVolumeSource.ShareName has no validation
+
+	// field v1.AzureFileVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.AzureFileVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
 	return errs
 }
 
 func Validate_Binding(opCtx operation.Context, obj, oldObj *v1.Binding, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.Binding.TypeMeta has no validation
-	// field v1.Binding.ObjectMeta has no validation
-	// field v1.Binding.Target has no validation
+	// field v1.Binding.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.Binding) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.Binding.Target
+	errs = append(errs,
+		func(obj, oldObj *v1.ObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_ObjectReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Target, safe.Field(oldObj, func(oldObj *v1.Binding) *v1.ObjectReference { return &oldObj.Target }), fldPath.Child("target"))...)
+
+	return errs
+}
+
+func Validate_CSIPersistentVolumeSource(opCtx operation.Context, obj, oldObj *v1.CSIPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.CSIPersistentVolumeSource.Driver has no validation
+	// field v1.CSIPersistentVolumeSource.VolumeHandle has no validation
+
+	// field v1.CSIPersistentVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.CSIPersistentVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	// field v1.CSIPersistentVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FSType, safe.Field(oldObj, func(oldObj *v1.CSIPersistentVolumeSource) *string { return &oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.CSIPersistentVolumeSource.VolumeAttributes
+	errs = append(errs,
+		func(obj, oldObj map[string]string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.VolumeAttributes, safe.Field(oldObj, func(oldObj *v1.CSIPersistentVolumeSource) map[string]string { return oldObj.VolumeAttributes }), fldPath.Child("volumeAttributes"))...)
+
+	// field v1.CSIPersistentVolumeSource.ControllerPublishSecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.SecretReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_SecretReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ControllerPublishSecretRef, safe.Field(oldObj, func(oldObj *v1.CSIPersistentVolumeSource) *v1.SecretReference {
+			return oldObj.ControllerPublishSecretRef
+		}), fldPath.Child("controllerPublishSecretRef"))...)
+
+	// field v1.CSIPersistentVolumeSource.NodeStageSecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.SecretReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_SecretReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.NodeStageSecretRef, safe.Field(oldObj, func(oldObj *v1.CSIPersistentVolumeSource) *v1.SecretReference { return oldObj.NodeStageSecretRef }), fldPath.Child("nodeStageSecretRef"))...)
+
+	// field v1.CSIPersistentVolumeSource.NodePublishSecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.SecretReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_SecretReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.NodePublishSecretRef, safe.Field(oldObj, func(oldObj *v1.CSIPersistentVolumeSource) *v1.SecretReference { return oldObj.NodePublishSecretRef }), fldPath.Child("nodePublishSecretRef"))...)
+
+	// field v1.CSIPersistentVolumeSource.ControllerExpandSecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.SecretReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_SecretReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ControllerExpandSecretRef, safe.Field(oldObj, func(oldObj *v1.CSIPersistentVolumeSource) *v1.SecretReference {
+			return oldObj.ControllerExpandSecretRef
+		}), fldPath.Child("controllerExpandSecretRef"))...)
+
+	// field v1.CSIPersistentVolumeSource.NodeExpandSecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.SecretReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_SecretReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.NodeExpandSecretRef, safe.Field(oldObj, func(oldObj *v1.CSIPersistentVolumeSource) *v1.SecretReference { return oldObj.NodeExpandSecretRef }), fldPath.Child("nodeExpandSecretRef"))...)
+
+	return errs
+}
+
+func Validate_CSIVolumeSource(opCtx operation.Context, obj, oldObj *v1.CSIVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.CSIVolumeSource.Driver has no validation
+
+	// field v1.CSIVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.CSIVolumeSource) *bool { return oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	// field v1.CSIVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.FSType, safe.Field(oldObj, func(oldObj *v1.CSIVolumeSource) *string { return oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.CSIVolumeSource.VolumeAttributes
+	errs = append(errs,
+		func(obj, oldObj map[string]string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.VolumeAttributes, safe.Field(oldObj, func(oldObj *v1.CSIVolumeSource) map[string]string { return oldObj.VolumeAttributes }), fldPath.Child("volumeAttributes"))...)
+
+	// field v1.CSIVolumeSource.NodePublishSecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.LocalObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_LocalObjectReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.NodePublishSecretRef, safe.Field(oldObj, func(oldObj *v1.CSIVolumeSource) *v1.LocalObjectReference { return oldObj.NodePublishSecretRef }), fldPath.Child("nodePublishSecretRef"))...)
+
+	return errs
+}
+
+func Validate_Capabilities(opCtx operation.Context, obj, oldObj *v1.Capabilities, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.Capabilities.Add
+	errs = append(errs,
+		func(obj, oldObj []v1.Capability, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Add, safe.Field(oldObj, func(oldObj *v1.Capabilities) []v1.Capability { return oldObj.Add }), fldPath.Child("add"))...)
+
+	// field v1.Capabilities.Drop
+	errs = append(errs,
+		func(obj, oldObj []v1.Capability, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Drop, safe.Field(oldObj, func(oldObj *v1.Capabilities) []v1.Capability { return oldObj.Drop }), fldPath.Child("drop"))...)
+
+	return errs
+}
+
+func Validate_CephFSPersistentVolumeSource(opCtx operation.Context, obj, oldObj *v1.CephFSPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.CephFSPersistentVolumeSource.Monitors has no validation
+
+	// field v1.CephFSPersistentVolumeSource.Path
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Path, safe.Field(oldObj, func(oldObj *v1.CephFSPersistentVolumeSource) *string { return &oldObj.Path }), fldPath.Child("path"))...)
+
+	// field v1.CephFSPersistentVolumeSource.User
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.User, safe.Field(oldObj, func(oldObj *v1.CephFSPersistentVolumeSource) *string { return &oldObj.User }), fldPath.Child("user"))...)
+
+	// field v1.CephFSPersistentVolumeSource.SecretFile
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.SecretFile, safe.Field(oldObj, func(oldObj *v1.CephFSPersistentVolumeSource) *string { return &oldObj.SecretFile }), fldPath.Child("secretFile"))...)
+
+	// field v1.CephFSPersistentVolumeSource.SecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.SecretReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_SecretReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SecretRef, safe.Field(oldObj, func(oldObj *v1.CephFSPersistentVolumeSource) *v1.SecretReference { return oldObj.SecretRef }), fldPath.Child("secretRef"))...)
+
+	// field v1.CephFSPersistentVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.CephFSPersistentVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	return errs
+}
+
+func Validate_CephFSVolumeSource(opCtx operation.Context, obj, oldObj *v1.CephFSVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.CephFSVolumeSource.Monitors has no validation
+
+	// field v1.CephFSVolumeSource.Path
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Path, safe.Field(oldObj, func(oldObj *v1.CephFSVolumeSource) *string { return &oldObj.Path }), fldPath.Child("path"))...)
+
+	// field v1.CephFSVolumeSource.User
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.User, safe.Field(oldObj, func(oldObj *v1.CephFSVolumeSource) *string { return &oldObj.User }), fldPath.Child("user"))...)
+
+	// field v1.CephFSVolumeSource.SecretFile
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.SecretFile, safe.Field(oldObj, func(oldObj *v1.CephFSVolumeSource) *string { return &oldObj.SecretFile }), fldPath.Child("secretFile"))...)
+
+	// field v1.CephFSVolumeSource.SecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.LocalObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_LocalObjectReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SecretRef, safe.Field(oldObj, func(oldObj *v1.CephFSVolumeSource) *v1.LocalObjectReference { return oldObj.SecretRef }), fldPath.Child("secretRef"))...)
+
+	// field v1.CephFSVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.CephFSVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	return errs
+}
+
+func Validate_CinderPersistentVolumeSource(opCtx operation.Context, obj, oldObj *v1.CinderPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.CinderPersistentVolumeSource.VolumeID has no validation
+
+	// field v1.CinderPersistentVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FSType, safe.Field(oldObj, func(oldObj *v1.CinderPersistentVolumeSource) *string { return &oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.CinderPersistentVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.CinderPersistentVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	// field v1.CinderPersistentVolumeSource.SecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.SecretReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_SecretReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SecretRef, safe.Field(oldObj, func(oldObj *v1.CinderPersistentVolumeSource) *v1.SecretReference { return oldObj.SecretRef }), fldPath.Child("secretRef"))...)
+
+	return errs
+}
+
+func Validate_CinderVolumeSource(opCtx operation.Context, obj, oldObj *v1.CinderVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.CinderVolumeSource.VolumeID has no validation
+
+	// field v1.CinderVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FSType, safe.Field(oldObj, func(oldObj *v1.CinderVolumeSource) *string { return &oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.CinderVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.CinderVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	// field v1.CinderVolumeSource.SecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.LocalObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_LocalObjectReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SecretRef, safe.Field(oldObj, func(oldObj *v1.CinderVolumeSource) *v1.LocalObjectReference { return oldObj.SecretRef }), fldPath.Child("secretRef"))...)
+
+	return errs
+}
+
+func Validate_ClientIPConfig(opCtx operation.Context, obj, oldObj *v1.ClientIPConfig, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ClientIPConfig.TimeoutSeconds
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.TimeoutSeconds, safe.Field(oldObj, func(oldObj *v1.ClientIPConfig) *int32 { return oldObj.TimeoutSeconds }), fldPath.Child("timeoutSeconds"))...)
+
+	return errs
+}
+
+func Validate_ClusterTrustBundleProjection(opCtx operation.Context, obj, oldObj *v1.ClusterTrustBundleProjection, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ClusterTrustBundleProjection.Name
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Name, safe.Field(oldObj, func(oldObj *v1.ClusterTrustBundleProjection) *string { return oldObj.Name }), fldPath.Child("name"))...)
+
+	// field v1.ClusterTrustBundleProjection.SignerName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.SignerName, safe.Field(oldObj, func(oldObj *v1.ClusterTrustBundleProjection) *string { return oldObj.SignerName }), fldPath.Child("signerName"))...)
+
+	// field v1.ClusterTrustBundleProjection.LabelSelector
+	errs = append(errs,
+		func(obj, oldObj *metav1.LabelSelector, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_LabelSelector(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.LabelSelector, safe.Field(oldObj, func(oldObj *v1.ClusterTrustBundleProjection) *metav1.LabelSelector { return oldObj.LabelSelector }), fldPath.Child("labelSelector"))...)
+
+	// field v1.ClusterTrustBundleProjection.Optional
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Optional, safe.Field(oldObj, func(oldObj *v1.ClusterTrustBundleProjection) *bool { return oldObj.Optional }), fldPath.Child("optional"))...)
+
+	// field v1.ClusterTrustBundleProjection.Path has no validation
+	return errs
+}
+
+func Validate_ComponentCondition(opCtx operation.Context, obj, oldObj *v1.ComponentCondition, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ComponentCondition.Type has no validation
+	// field v1.ComponentCondition.Status has no validation
+
+	// field v1.ComponentCondition.Message
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Message, safe.Field(oldObj, func(oldObj *v1.ComponentCondition) *string { return &oldObj.Message }), fldPath.Child("message"))...)
+
+	// field v1.ComponentCondition.Error
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Error, safe.Field(oldObj, func(oldObj *v1.ComponentCondition) *string { return &oldObj.Error }), fldPath.Child("error"))...)
+
 	return errs
 }
 
 func Validate_ComponentStatus(opCtx operation.Context, obj, oldObj *v1.ComponentStatus, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ComponentStatus.TypeMeta has no validation
-	// field v1.ComponentStatus.ObjectMeta has no validation
-	// field v1.ComponentStatus.Conditions has no validation
+	// field v1.ComponentStatus.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.ComponentStatus) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.ComponentStatus.Conditions
+	errs = append(errs,
+		func(obj, oldObj []v1.ComponentCondition, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.ComponentCondition) any { return [1]any{o.Type} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.ComponentCondition, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ComponentCondition(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.Conditions, safe.Field(oldObj, func(oldObj *v1.ComponentStatus) []v1.ComponentCondition { return oldObj.Conditions }), fldPath.Child("conditions"))...)
+
 	return errs
 }
 
 func Validate_ComponentStatusList(opCtx operation.Context, obj, oldObj *v1.ComponentStatusList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ComponentStatusList.TypeMeta has no validation
-	// field v1.ComponentStatusList.ListMeta has no validation
-	// field v1.ComponentStatusList.Items has no validation
+	// field v1.ComponentStatusList.ListMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ListMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ListMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ListMeta, safe.Field(oldObj, func(oldObj *v1.ComponentStatusList) *metav1.ListMeta { return &oldObj.ListMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.ComponentStatusList.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.ComponentStatus, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.ComponentStatus, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ComponentStatus(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.ComponentStatusList) []v1.ComponentStatus { return oldObj.Items }), fldPath.Child("items"))...)
+
 	return errs
 }
 
 func Validate_ConfigMap(opCtx operation.Context, obj, oldObj *v1.ConfigMap, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ConfigMap.TypeMeta has no validation
-	// field v1.ConfigMap.ObjectMeta has no validation
-	// field v1.ConfigMap.Immutable has no validation
-	// field v1.ConfigMap.Data has no validation
-	// field v1.ConfigMap.BinaryData has no validation
+	// field v1.ConfigMap.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.ConfigMap) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.ConfigMap.Immutable
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Immutable, safe.Field(oldObj, func(oldObj *v1.ConfigMap) *bool { return oldObj.Immutable }), fldPath.Child("immutable"))...)
+
+	// field v1.ConfigMap.Data
+	errs = append(errs,
+		func(obj, oldObj map[string]string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Data, safe.Field(oldObj, func(oldObj *v1.ConfigMap) map[string]string { return oldObj.Data }), fldPath.Child("data"))...)
+
+	// field v1.ConfigMap.BinaryData
+	errs = append(errs,
+		func(obj, oldObj map[string][]byte, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.BinaryData, safe.Field(oldObj, func(oldObj *v1.ConfigMap) map[string][]byte { return oldObj.BinaryData }), fldPath.Child("binaryData"))...)
+
+	return errs
+}
+
+func Validate_ConfigMapEnvSource(opCtx operation.Context, obj, oldObj *v1.ConfigMapEnvSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ConfigMapEnvSource.Optional
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Optional, safe.Field(oldObj, func(oldObj *v1.ConfigMapEnvSource) *bool { return oldObj.Optional }), fldPath.Child("optional"))...)
+
+	return errs
+}
+
+func Validate_ConfigMapKeySelector(opCtx operation.Context, obj, oldObj *v1.ConfigMapKeySelector, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ConfigMapKeySelector.Key has no validation
+
+	// field v1.ConfigMapKeySelector.Optional
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Optional, safe.Field(oldObj, func(oldObj *v1.ConfigMapKeySelector) *bool { return oldObj.Optional }), fldPath.Child("optional"))...)
+
 	return errs
 }
 
 func Validate_ConfigMapList(opCtx operation.Context, obj, oldObj *v1.ConfigMapList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ConfigMapList.TypeMeta has no validation
-	// field v1.ConfigMapList.ListMeta has no validation
-	// field v1.ConfigMapList.Items has no validation
+	// field v1.ConfigMapList.ListMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ListMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ListMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ListMeta, safe.Field(oldObj, func(oldObj *v1.ConfigMapList) *metav1.ListMeta { return &oldObj.ListMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.ConfigMapList.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.ConfigMap, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.ConfigMap, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ConfigMap(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.ConfigMapList) []v1.ConfigMap { return oldObj.Items }), fldPath.Child("items"))...)
+
+	return errs
+}
+
+func Validate_ConfigMapNodeConfigSource(opCtx operation.Context, obj, oldObj *v1.ConfigMapNodeConfigSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ConfigMapNodeConfigSource.Namespace has no validation
+	// field v1.ConfigMapNodeConfigSource.Name has no validation
+
+	// field v1.ConfigMapNodeConfigSource.UID
+	errs = append(errs,
+		func(obj, oldObj *types.UID, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			// NOTE: Type types.UID is in a non-included package.
+			//       Any validations defined on this type are not available from here.
+			return
+		}(&obj.UID, safe.Field(oldObj, func(oldObj *v1.ConfigMapNodeConfigSource) *types.UID { return &oldObj.UID }), fldPath.Child("uid"))...)
+
+	// field v1.ConfigMapNodeConfigSource.ResourceVersion
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ResourceVersion, safe.Field(oldObj, func(oldObj *v1.ConfigMapNodeConfigSource) *string { return &oldObj.ResourceVersion }), fldPath.Child("resourceVersion"))...)
+
+	// field v1.ConfigMapNodeConfigSource.KubeletConfigKey has no validation
+	return errs
+}
+
+func Validate_ConfigMapProjection(opCtx operation.Context, obj, oldObj *v1.ConfigMapProjection, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ConfigMapProjection.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.KeyToPath, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.KeyToPath, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_KeyToPath(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.ConfigMapProjection) []v1.KeyToPath { return oldObj.Items }), fldPath.Child("items"))...)
+
+	// field v1.ConfigMapProjection.Optional
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Optional, safe.Field(oldObj, func(oldObj *v1.ConfigMapProjection) *bool { return oldObj.Optional }), fldPath.Child("optional"))...)
+
+	return errs
+}
+
+func Validate_ConfigMapVolumeSource(opCtx operation.Context, obj, oldObj *v1.ConfigMapVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ConfigMapVolumeSource.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.KeyToPath, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.KeyToPath, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_KeyToPath(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.ConfigMapVolumeSource) []v1.KeyToPath { return oldObj.Items }), fldPath.Child("items"))...)
+
+	// field v1.ConfigMapVolumeSource.DefaultMode
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.DefaultMode, safe.Field(oldObj, func(oldObj *v1.ConfigMapVolumeSource) *int32 { return oldObj.DefaultMode }), fldPath.Child("defaultMode"))...)
+
+	// field v1.ConfigMapVolumeSource.Optional
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Optional, safe.Field(oldObj, func(oldObj *v1.ConfigMapVolumeSource) *bool { return oldObj.Optional }), fldPath.Child("optional"))...)
+
 	return errs
 }
 
 func Validate_Container(opCtx operation.Context, obj, oldObj *v1.Container, fldPath *field.Path) (errs field.ErrorList) {
 	// field v1.Container.Name has no validation
-	// field v1.Container.Image has no validation
-	// field v1.Container.Command has no validation
-	// field v1.Container.Args has no validation
-	// field v1.Container.WorkingDir has no validation
-	// field v1.Container.Ports has no validation
-	// field v1.Container.EnvFrom has no validation
-	// field v1.Container.Env has no validation
-	// field v1.Container.Resources has no validation
-	// field v1.Container.ResizePolicy has no validation
-	// field v1.Container.RestartPolicy has no validation
-	// field v1.Container.VolumeMounts has no validation
-	// field v1.Container.VolumeDevices has no validation
-	// field v1.Container.LivenessProbe has no validation
-	// field v1.Container.ReadinessProbe has no validation
-	// field v1.Container.StartupProbe has no validation
-	// field v1.Container.Lifecycle has no validation
-	// field v1.Container.TerminationMessagePath has no validation
-	// field v1.Container.TerminationMessagePolicy has no validation
-	// field v1.Container.ImagePullPolicy has no validation
+
+	// field v1.Container.Image
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Image, safe.Field(oldObj, func(oldObj *v1.Container) *string { return &oldObj.Image }), fldPath.Child("image"))...)
+
+	// field v1.Container.Command
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Command, safe.Field(oldObj, func(oldObj *v1.Container) []string { return oldObj.Command }), fldPath.Child("command"))...)
+
+	// field v1.Container.Args
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Args, safe.Field(oldObj, func(oldObj *v1.Container) []string { return oldObj.Args }), fldPath.Child("args"))...)
+
+	// field v1.Container.WorkingDir
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.WorkingDir, safe.Field(oldObj, func(oldObj *v1.Container) *string { return &oldObj.WorkingDir }), fldPath.Child("workingDir"))...)
+
+	// field v1.Container.Ports
+	errs = append(errs,
+		func(obj, oldObj []v1.ContainerPort, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.ContainerPort) any { return [2]any{o.ContainerPort, o.Protocol} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.ContainerPort, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ContainerPort(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.Ports, safe.Field(oldObj, func(oldObj *v1.Container) []v1.ContainerPort { return oldObj.Ports }), fldPath.Child("ports"))...)
+
+	// field v1.Container.EnvFrom
+	errs = append(errs,
+		func(obj, oldObj []v1.EnvFromSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.EnvFromSource, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_EnvFromSource(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.EnvFrom, safe.Field(oldObj, func(oldObj *v1.Container) []v1.EnvFromSource { return oldObj.EnvFrom }), fldPath.Child("envFrom"))...)
+
+	// field v1.Container.Env
+	errs = append(errs,
+		func(obj, oldObj []v1.EnvVar, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.EnvVar) any { return [1]any{o.Name} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.EnvVar, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_EnvVar(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.Env, safe.Field(oldObj, func(oldObj *v1.Container) []v1.EnvVar { return oldObj.Env }), fldPath.Child("env"))...)
+
+	// field v1.Container.Resources
+	errs = append(errs,
+		func(obj, oldObj *v1.ResourceRequirements, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ResourceRequirements(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Resources, safe.Field(oldObj, func(oldObj *v1.Container) *v1.ResourceRequirements { return &oldObj.Resources }), fldPath.Child("resources"))...)
+
+	// field v1.Container.ResizePolicy
+	errs = append(errs,
+		func(obj, oldObj []v1.ContainerResizePolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.ResizePolicy, safe.Field(oldObj, func(oldObj *v1.Container) []v1.ContainerResizePolicy { return oldObj.ResizePolicy }), fldPath.Child("resizePolicy"))...)
+
+	// field v1.Container.RestartPolicy
+	errs = append(errs,
+		func(obj, oldObj *v1.ContainerRestartPolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.RestartPolicy, safe.Field(oldObj, func(oldObj *v1.Container) *v1.ContainerRestartPolicy { return oldObj.RestartPolicy }), fldPath.Child("restartPolicy"))...)
+
+	// field v1.Container.VolumeMounts
+	errs = append(errs,
+		func(obj, oldObj []v1.VolumeMount, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.VolumeMount) any { return [1]any{o.MountPath} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.VolumeMount, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_VolumeMount(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.VolumeMounts, safe.Field(oldObj, func(oldObj *v1.Container) []v1.VolumeMount { return oldObj.VolumeMounts }), fldPath.Child("volumeMounts"))...)
+
+	// field v1.Container.VolumeDevices
+	errs = append(errs,
+		func(obj, oldObj []v1.VolumeDevice, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.VolumeDevices, safe.Field(oldObj, func(oldObj *v1.Container) []v1.VolumeDevice { return oldObj.VolumeDevices }), fldPath.Child("volumeDevices"))...)
+
+	// field v1.Container.LivenessProbe
+	errs = append(errs,
+		func(obj, oldObj *v1.Probe, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_Probe(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.LivenessProbe, safe.Field(oldObj, func(oldObj *v1.Container) *v1.Probe { return oldObj.LivenessProbe }), fldPath.Child("livenessProbe"))...)
+
+	// field v1.Container.ReadinessProbe
+	errs = append(errs,
+		func(obj, oldObj *v1.Probe, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_Probe(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ReadinessProbe, safe.Field(oldObj, func(oldObj *v1.Container) *v1.Probe { return oldObj.ReadinessProbe }), fldPath.Child("readinessProbe"))...)
+
+	// field v1.Container.StartupProbe
+	errs = append(errs,
+		func(obj, oldObj *v1.Probe, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_Probe(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.StartupProbe, safe.Field(oldObj, func(oldObj *v1.Container) *v1.Probe { return oldObj.StartupProbe }), fldPath.Child("startupProbe"))...)
+
+	// field v1.Container.Lifecycle
+	errs = append(errs,
+		func(obj, oldObj *v1.Lifecycle, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_Lifecycle(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Lifecycle, safe.Field(oldObj, func(oldObj *v1.Container) *v1.Lifecycle { return oldObj.Lifecycle }), fldPath.Child("lifecycle"))...)
+
+	// field v1.Container.TerminationMessagePath
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.TerminationMessagePath, safe.Field(oldObj, func(oldObj *v1.Container) *string { return &oldObj.TerminationMessagePath }), fldPath.Child("terminationMessagePath"))...)
+
+	// field v1.Container.TerminationMessagePolicy
+	errs = append(errs,
+		func(obj, oldObj *v1.TerminationMessagePolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.TerminationMessagePolicy, safe.Field(oldObj, func(oldObj *v1.Container) *v1.TerminationMessagePolicy { return &oldObj.TerminationMessagePolicy }), fldPath.Child("terminationMessagePolicy"))...)
+
+	// field v1.Container.ImagePullPolicy
+	errs = append(errs,
+		func(obj, oldObj *v1.PullPolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ImagePullPolicy, safe.Field(oldObj, func(oldObj *v1.Container) *v1.PullPolicy { return &oldObj.ImagePullPolicy }), fldPath.Child("imagePullPolicy"))...)
 
 	// field v1.Container.SecurityContext
 	errs = append(errs,
 		func(obj, oldObj *v1.SecurityContext, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			errs = append(errs, Validate_SecurityContext(opCtx, obj, oldObj, fldPath)...)
 			return
 		}(obj.SecurityContext, safe.Field(oldObj, func(oldObj *v1.Container) *v1.SecurityContext { return oldObj.SecurityContext }), fldPath.Child("securityContext"))...)
 
-	// field v1.Container.Stdin has no validation
-	// field v1.Container.StdinOnce has no validation
-	// field v1.Container.TTY has no validation
+	// field v1.Container.Stdin
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Stdin, safe.Field(oldObj, func(oldObj *v1.Container) *bool { return &oldObj.Stdin }), fldPath.Child("stdin"))...)
+
+	// field v1.Container.StdinOnce
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.StdinOnce, safe.Field(oldObj, func(oldObj *v1.Container) *bool { return &oldObj.StdinOnce }), fldPath.Child("stdinOnce"))...)
+
+	// field v1.Container.TTY
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.TTY, safe.Field(oldObj, func(oldObj *v1.Container) *bool { return &oldObj.TTY }), fldPath.Child("tty"))...)
+
+	return errs
+}
+
+func Validate_ContainerImage(opCtx operation.Context, obj, oldObj *v1.ContainerImage, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ContainerImage.Names
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Names, safe.Field(oldObj, func(oldObj *v1.ContainerImage) []string { return oldObj.Names }), fldPath.Child("names"))...)
+
+	// field v1.ContainerImage.SizeBytes
+	errs = append(errs,
+		func(obj, oldObj *int64, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.SizeBytes, safe.Field(oldObj, func(oldObj *v1.ContainerImage) *int64 { return &oldObj.SizeBytes }), fldPath.Child("sizeBytes"))...)
+
+	return errs
+}
+
+func Validate_ContainerPort(opCtx operation.Context, obj, oldObj *v1.ContainerPort, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ContainerPort.Name
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Name, safe.Field(oldObj, func(oldObj *v1.ContainerPort) *string { return &oldObj.Name }), fldPath.Child("name"))...)
+
+	// field v1.ContainerPort.HostPort
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.HostPort, safe.Field(oldObj, func(oldObj *v1.ContainerPort) *int32 { return &oldObj.HostPort }), fldPath.Child("hostPort"))...)
+
+	// field v1.ContainerPort.ContainerPort has no validation
+
+	// field v1.ContainerPort.Protocol
+	errs = append(errs,
+		func(obj, oldObj *v1.Protocol, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Protocol, safe.Field(oldObj, func(oldObj *v1.ContainerPort) *v1.Protocol { return &oldObj.Protocol }), fldPath.Child("protocol"))...)
+
+	// field v1.ContainerPort.HostIP
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.HostIP, safe.Field(oldObj, func(oldObj *v1.ContainerPort) *string { return &oldObj.HostIP }), fldPath.Child("hostIP"))...)
+
+	return errs
+}
+
+func Validate_ContainerState(opCtx operation.Context, obj, oldObj *v1.ContainerState, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ContainerState.Waiting
+	errs = append(errs,
+		func(obj, oldObj *v1.ContainerStateWaiting, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ContainerStateWaiting(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Waiting, safe.Field(oldObj, func(oldObj *v1.ContainerState) *v1.ContainerStateWaiting { return oldObj.Waiting }), fldPath.Child("waiting"))...)
+
+	// field v1.ContainerState.Running
+	errs = append(errs,
+		func(obj, oldObj *v1.ContainerStateRunning, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ContainerStateRunning(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Running, safe.Field(oldObj, func(oldObj *v1.ContainerState) *v1.ContainerStateRunning { return oldObj.Running }), fldPath.Child("running"))...)
+
+	// field v1.ContainerState.Terminated
+	errs = append(errs,
+		func(obj, oldObj *v1.ContainerStateTerminated, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ContainerStateTerminated(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Terminated, safe.Field(oldObj, func(oldObj *v1.ContainerState) *v1.ContainerStateTerminated { return oldObj.Terminated }), fldPath.Child("terminated"))...)
+
+	return errs
+}
+
+func Validate_ContainerStateRunning(opCtx operation.Context, obj, oldObj *v1.ContainerStateRunning, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ContainerStateRunning.StartedAt
+	errs = append(errs,
+		func(obj, oldObj *metav1.Time, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.StartedAt, safe.Field(oldObj, func(oldObj *v1.ContainerStateRunning) *metav1.Time { return &oldObj.StartedAt }), fldPath.Child("startedAt"))...)
+
+	return errs
+}
+
+func Validate_ContainerStateTerminated(opCtx operation.Context, obj, oldObj *v1.ContainerStateTerminated, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ContainerStateTerminated.ExitCode has no validation
+
+	// field v1.ContainerStateTerminated.Signal
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Signal, safe.Field(oldObj, func(oldObj *v1.ContainerStateTerminated) *int32 { return &oldObj.Signal }), fldPath.Child("signal"))...)
+
+	// field v1.ContainerStateTerminated.Reason
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Reason, safe.Field(oldObj, func(oldObj *v1.ContainerStateTerminated) *string { return &oldObj.Reason }), fldPath.Child("reason"))...)
+
+	// field v1.ContainerStateTerminated.Message
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Message, safe.Field(oldObj, func(oldObj *v1.ContainerStateTerminated) *string { return &oldObj.Message }), fldPath.Child("message"))...)
+
+	// field v1.ContainerStateTerminated.StartedAt
+	errs = append(errs,
+		func(obj, oldObj *metav1.Time, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.StartedAt, safe.Field(oldObj, func(oldObj *v1.ContainerStateTerminated) *metav1.Time { return &oldObj.StartedAt }), fldPath.Child("startedAt"))...)
+
+	// field v1.ContainerStateTerminated.FinishedAt
+	errs = append(errs,
+		func(obj, oldObj *metav1.Time, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FinishedAt, safe.Field(oldObj, func(oldObj *v1.ContainerStateTerminated) *metav1.Time { return &oldObj.FinishedAt }), fldPath.Child("finishedAt"))...)
+
+	// field v1.ContainerStateTerminated.ContainerID
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ContainerID, safe.Field(oldObj, func(oldObj *v1.ContainerStateTerminated) *string { return &oldObj.ContainerID }), fldPath.Child("containerID"))...)
+
+	return errs
+}
+
+func Validate_ContainerStateWaiting(opCtx operation.Context, obj, oldObj *v1.ContainerStateWaiting, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ContainerStateWaiting.Reason
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Reason, safe.Field(oldObj, func(oldObj *v1.ContainerStateWaiting) *string { return &oldObj.Reason }), fldPath.Child("reason"))...)
+
+	// field v1.ContainerStateWaiting.Message
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Message, safe.Field(oldObj, func(oldObj *v1.ContainerStateWaiting) *string { return &oldObj.Message }), fldPath.Child("message"))...)
+
 	return errs
 }
 
 func Validate_ContainerStatus(opCtx operation.Context, obj, oldObj *v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
 	// field v1.ContainerStatus.Name has no validation
-	// field v1.ContainerStatus.State has no validation
-	// field v1.ContainerStatus.LastTerminationState has no validation
+
+	// field v1.ContainerStatus.State
+	errs = append(errs,
+		func(obj, oldObj *v1.ContainerState, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ContainerState(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.State, safe.Field(oldObj, func(oldObj *v1.ContainerStatus) *v1.ContainerState { return &oldObj.State }), fldPath.Child("state"))...)
+
+	// field v1.ContainerStatus.LastTerminationState
+	errs = append(errs,
+		func(obj, oldObj *v1.ContainerState, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ContainerState(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.LastTerminationState, safe.Field(oldObj, func(oldObj *v1.ContainerStatus) *v1.ContainerState { return &oldObj.LastTerminationState }), fldPath.Child("lastState"))...)
+
 	// field v1.ContainerStatus.Ready has no validation
 	// field v1.ContainerStatus.RestartCount has no validation
 	// field v1.ContainerStatus.Image has no validation
 	// field v1.ContainerStatus.ImageID has no validation
-	// field v1.ContainerStatus.ContainerID has no validation
-	// field v1.ContainerStatus.Started has no validation
-	// field v1.ContainerStatus.AllocatedResources has no validation
-	// field v1.ContainerStatus.Resources has no validation
-	// field v1.ContainerStatus.VolumeMounts has no validation
-	// field v1.ContainerStatus.User has no validation
+
+	// field v1.ContainerStatus.ContainerID
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ContainerID, safe.Field(oldObj, func(oldObj *v1.ContainerStatus) *string { return &oldObj.ContainerID }), fldPath.Child("containerID"))...)
+
+	// field v1.ContainerStatus.Started
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Started, safe.Field(oldObj, func(oldObj *v1.ContainerStatus) *bool { return oldObj.Started }), fldPath.Child("started"))...)
+
+	// field v1.ContainerStatus.AllocatedResources
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.AllocatedResources, safe.Field(oldObj, func(oldObj *v1.ContainerStatus) v1.ResourceList { return oldObj.AllocatedResources }), fldPath.Child("allocatedResources"))...)
+
+	// field v1.ContainerStatus.Resources
+	errs = append(errs,
+		func(obj, oldObj *v1.ResourceRequirements, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ResourceRequirements(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Resources, safe.Field(oldObj, func(oldObj *v1.ContainerStatus) *v1.ResourceRequirements { return oldObj.Resources }), fldPath.Child("resources"))...)
+
+	// field v1.ContainerStatus.VolumeMounts
+	errs = append(errs,
+		func(obj, oldObj []v1.VolumeMountStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.VolumeMountStatus) any { return [1]any{o.MountPath} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.VolumeMountStatus, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_VolumeMountStatus(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.VolumeMounts, safe.Field(oldObj, func(oldObj *v1.ContainerStatus) []v1.VolumeMountStatus { return oldObj.VolumeMounts }), fldPath.Child("volumeMounts"))...)
+
+	// field v1.ContainerStatus.User
+	errs = append(errs,
+		func(obj, oldObj *v1.ContainerUser, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ContainerUser(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.User, safe.Field(oldObj, func(oldObj *v1.ContainerStatus) *v1.ContainerUser { return oldObj.User }), fldPath.Child("user"))...)
 
 	// field v1.ContainerStatus.AllocatedResourcesStatus
 	errs = append(errs,
 		func(obj, oldObj []v1.ResourceStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			oldListMap := safe.NewListMap(oldObj, func(o *v1.ResourceStatus) any { return [1]any{o.Name} })
 			for i, val := range obj {
 				errs = append(errs,
@@ -448,84 +1745,1188 @@ func Validate_ContainerStatus(opCtx operation.Context, obj, oldObj *v1.Container
 	return errs
 }
 
+func Validate_ContainerUser(opCtx operation.Context, obj, oldObj *v1.ContainerUser, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ContainerUser.Linux
+	errs = append(errs,
+		func(obj, oldObj *v1.LinuxContainerUser, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_LinuxContainerUser(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Linux, safe.Field(oldObj, func(oldObj *v1.ContainerUser) *v1.LinuxContainerUser { return oldObj.Linux }), fldPath.Child("linux"))...)
+
+	return errs
+}
+
+func Validate_DownwardAPIProjection(opCtx operation.Context, obj, oldObj *v1.DownwardAPIProjection, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.DownwardAPIProjection.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.DownwardAPIVolumeFile, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.DownwardAPIVolumeFile, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_DownwardAPIVolumeFile(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.DownwardAPIProjection) []v1.DownwardAPIVolumeFile { return oldObj.Items }), fldPath.Child("items"))...)
+
+	return errs
+}
+
+func Validate_DownwardAPIVolumeFile(opCtx operation.Context, obj, oldObj *v1.DownwardAPIVolumeFile, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.DownwardAPIVolumeFile.Path has no validation
+
+	// field v1.DownwardAPIVolumeFile.FieldRef
+	errs = append(errs,
+		func(obj, oldObj *v1.ObjectFieldSelector, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ObjectFieldSelector(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.FieldRef, safe.Field(oldObj, func(oldObj *v1.DownwardAPIVolumeFile) *v1.ObjectFieldSelector { return oldObj.FieldRef }), fldPath.Child("fieldRef"))...)
+
+	// field v1.DownwardAPIVolumeFile.ResourceFieldRef
+	errs = append(errs,
+		func(obj, oldObj *v1.ResourceFieldSelector, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ResourceFieldSelector(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ResourceFieldRef, safe.Field(oldObj, func(oldObj *v1.DownwardAPIVolumeFile) *v1.ResourceFieldSelector { return oldObj.ResourceFieldRef }), fldPath.Child("resourceFieldRef"))...)
+
+	// field v1.DownwardAPIVolumeFile.Mode
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Mode, safe.Field(oldObj, func(oldObj *v1.DownwardAPIVolumeFile) *int32 { return oldObj.Mode }), fldPath.Child("mode"))...)
+
+	return errs
+}
+
+func Validate_DownwardAPIVolumeSource(opCtx operation.Context, obj, oldObj *v1.DownwardAPIVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.DownwardAPIVolumeSource.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.DownwardAPIVolumeFile, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.DownwardAPIVolumeFile, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_DownwardAPIVolumeFile(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.DownwardAPIVolumeSource) []v1.DownwardAPIVolumeFile { return oldObj.Items }), fldPath.Child("items"))...)
+
+	// field v1.DownwardAPIVolumeSource.DefaultMode
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.DefaultMode, safe.Field(oldObj, func(oldObj *v1.DownwardAPIVolumeSource) *int32 { return oldObj.DefaultMode }), fldPath.Child("defaultMode"))...)
+
+	return errs
+}
+
+func Validate_EmptyDirVolumeSource(opCtx operation.Context, obj, oldObj *v1.EmptyDirVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.EmptyDirVolumeSource.Medium
+	errs = append(errs,
+		func(obj, oldObj *v1.StorageMedium, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Medium, safe.Field(oldObj, func(oldObj *v1.EmptyDirVolumeSource) *v1.StorageMedium { return &oldObj.Medium }), fldPath.Child("medium"))...)
+
+	// field v1.EmptyDirVolumeSource.SizeLimit
+	errs = append(errs,
+		func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.SizeLimit, safe.Field(oldObj, func(oldObj *v1.EmptyDirVolumeSource) *resource.Quantity { return oldObj.SizeLimit }), fldPath.Child("sizeLimit"))...)
+
+	return errs
+}
+
+func Validate_EndpointAddress(opCtx operation.Context, obj, oldObj *v1.EndpointAddress, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.EndpointAddress.IP has no validation
+
+	// field v1.EndpointAddress.Hostname
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Hostname, safe.Field(oldObj, func(oldObj *v1.EndpointAddress) *string { return &oldObj.Hostname }), fldPath.Child("hostname"))...)
+
+	// field v1.EndpointAddress.NodeName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.NodeName, safe.Field(oldObj, func(oldObj *v1.EndpointAddress) *string { return oldObj.NodeName }), fldPath.Child("nodeName"))...)
+
+	// field v1.EndpointAddress.TargetRef
+	errs = append(errs,
+		func(obj, oldObj *v1.ObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ObjectReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.TargetRef, safe.Field(oldObj, func(oldObj *v1.EndpointAddress) *v1.ObjectReference { return oldObj.TargetRef }), fldPath.Child("targetRef"))...)
+
+	return errs
+}
+
+func Validate_EndpointPort(opCtx operation.Context, obj, oldObj *v1.EndpointPort, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.EndpointPort.Name
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Name, safe.Field(oldObj, func(oldObj *v1.EndpointPort) *string { return &oldObj.Name }), fldPath.Child("name"))...)
+
+	// field v1.EndpointPort.Port has no validation
+
+	// field v1.EndpointPort.Protocol
+	errs = append(errs,
+		func(obj, oldObj *v1.Protocol, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Protocol, safe.Field(oldObj, func(oldObj *v1.EndpointPort) *v1.Protocol { return &oldObj.Protocol }), fldPath.Child("protocol"))...)
+
+	// field v1.EndpointPort.AppProtocol
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.AppProtocol, safe.Field(oldObj, func(oldObj *v1.EndpointPort) *string { return oldObj.AppProtocol }), fldPath.Child("appProtocol"))...)
+
+	return errs
+}
+
+func Validate_EndpointSubset(opCtx operation.Context, obj, oldObj *v1.EndpointSubset, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.EndpointSubset.Addresses
+	errs = append(errs,
+		func(obj, oldObj []v1.EndpointAddress, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.EndpointAddress, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_EndpointAddress(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Addresses, safe.Field(oldObj, func(oldObj *v1.EndpointSubset) []v1.EndpointAddress { return oldObj.Addresses }), fldPath.Child("addresses"))...)
+
+	// field v1.EndpointSubset.NotReadyAddresses
+	errs = append(errs,
+		func(obj, oldObj []v1.EndpointAddress, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.EndpointAddress, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_EndpointAddress(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.NotReadyAddresses, safe.Field(oldObj, func(oldObj *v1.EndpointSubset) []v1.EndpointAddress { return oldObj.NotReadyAddresses }), fldPath.Child("notReadyAddresses"))...)
+
+	// field v1.EndpointSubset.Ports
+	errs = append(errs,
+		func(obj, oldObj []v1.EndpointPort, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.EndpointPort, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_EndpointPort(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Ports, safe.Field(oldObj, func(oldObj *v1.EndpointSubset) []v1.EndpointPort { return oldObj.Ports }), fldPath.Child("ports"))...)
+
+	return errs
+}
+
 func Validate_Endpoints(opCtx operation.Context, obj, oldObj *v1.Endpoints, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.Endpoints.TypeMeta has no validation
-	// field v1.Endpoints.ObjectMeta has no validation
-	// field v1.Endpoints.Subsets has no validation
+	// field v1.Endpoints.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.Endpoints) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.Endpoints.Subsets
+	errs = append(errs,
+		func(obj, oldObj []v1.EndpointSubset, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.EndpointSubset, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_EndpointSubset(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Subsets, safe.Field(oldObj, func(oldObj *v1.Endpoints) []v1.EndpointSubset { return oldObj.Subsets }), fldPath.Child("subsets"))...)
+
 	return errs
 }
 
 func Validate_EndpointsList(opCtx operation.Context, obj, oldObj *v1.EndpointsList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.EndpointsList.TypeMeta has no validation
-	// field v1.EndpointsList.ListMeta has no validation
-	// field v1.EndpointsList.Items has no validation
+	// field v1.EndpointsList.ListMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ListMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ListMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ListMeta, safe.Field(oldObj, func(oldObj *v1.EndpointsList) *metav1.ListMeta { return &oldObj.ListMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.EndpointsList.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.Endpoints, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.Endpoints, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Endpoints(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.EndpointsList) []v1.Endpoints { return oldObj.Items }), fldPath.Child("items"))...)
+
+	return errs
+}
+
+func Validate_EnvFromSource(opCtx operation.Context, obj, oldObj *v1.EnvFromSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.EnvFromSource.Prefix
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Prefix, safe.Field(oldObj, func(oldObj *v1.EnvFromSource) *string { return &oldObj.Prefix }), fldPath.Child("prefix"))...)
+
+	// field v1.EnvFromSource.ConfigMapRef
+	errs = append(errs,
+		func(obj, oldObj *v1.ConfigMapEnvSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ConfigMapEnvSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ConfigMapRef, safe.Field(oldObj, func(oldObj *v1.EnvFromSource) *v1.ConfigMapEnvSource { return oldObj.ConfigMapRef }), fldPath.Child("configMapRef"))...)
+
+	// field v1.EnvFromSource.SecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.SecretEnvSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_SecretEnvSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SecretRef, safe.Field(oldObj, func(oldObj *v1.EnvFromSource) *v1.SecretEnvSource { return oldObj.SecretRef }), fldPath.Child("secretRef"))...)
+
+	return errs
+}
+
+func Validate_EnvVar(opCtx operation.Context, obj, oldObj *v1.EnvVar, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.EnvVar.Name has no validation
+
+	// field v1.EnvVar.Value
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Value, safe.Field(oldObj, func(oldObj *v1.EnvVar) *string { return &oldObj.Value }), fldPath.Child("value"))...)
+
+	// field v1.EnvVar.ValueFrom
+	errs = append(errs,
+		func(obj, oldObj *v1.EnvVarSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_EnvVarSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ValueFrom, safe.Field(oldObj, func(oldObj *v1.EnvVar) *v1.EnvVarSource { return oldObj.ValueFrom }), fldPath.Child("valueFrom"))...)
+
+	return errs
+}
+
+func Validate_EnvVarSource(opCtx operation.Context, obj, oldObj *v1.EnvVarSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.EnvVarSource.FieldRef
+	errs = append(errs,
+		func(obj, oldObj *v1.ObjectFieldSelector, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ObjectFieldSelector(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.FieldRef, safe.Field(oldObj, func(oldObj *v1.EnvVarSource) *v1.ObjectFieldSelector { return oldObj.FieldRef }), fldPath.Child("fieldRef"))...)
+
+	// field v1.EnvVarSource.ResourceFieldRef
+	errs = append(errs,
+		func(obj, oldObj *v1.ResourceFieldSelector, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ResourceFieldSelector(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ResourceFieldRef, safe.Field(oldObj, func(oldObj *v1.EnvVarSource) *v1.ResourceFieldSelector { return oldObj.ResourceFieldRef }), fldPath.Child("resourceFieldRef"))...)
+
+	// field v1.EnvVarSource.ConfigMapKeyRef
+	errs = append(errs,
+		func(obj, oldObj *v1.ConfigMapKeySelector, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ConfigMapKeySelector(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ConfigMapKeyRef, safe.Field(oldObj, func(oldObj *v1.EnvVarSource) *v1.ConfigMapKeySelector { return oldObj.ConfigMapKeyRef }), fldPath.Child("configMapKeyRef"))...)
+
+	// field v1.EnvVarSource.SecretKeyRef
+	errs = append(errs,
+		func(obj, oldObj *v1.SecretKeySelector, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_SecretKeySelector(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SecretKeyRef, safe.Field(oldObj, func(oldObj *v1.EnvVarSource) *v1.SecretKeySelector { return oldObj.SecretKeyRef }), fldPath.Child("secretKeyRef"))...)
+
 	return errs
 }
 
 func Validate_EphemeralContainer(opCtx operation.Context, obj, oldObj *v1.EphemeralContainer, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.EphemeralContainer.TargetContainerName has no validation
+	// field v1.EphemeralContainer.TargetContainerName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.TargetContainerName, safe.Field(oldObj, func(oldObj *v1.EphemeralContainer) *string { return &oldObj.TargetContainerName }), fldPath.Child("targetContainerName"))...)
+
 	return errs
 }
 
 func Validate_EphemeralContainerCommon(opCtx operation.Context, obj, oldObj *v1.EphemeralContainerCommon, fldPath *field.Path) (errs field.ErrorList) {
 	// field v1.EphemeralContainerCommon.Name has no validation
 	// field v1.EphemeralContainerCommon.Image has no validation
-	// field v1.EphemeralContainerCommon.Command has no validation
-	// field v1.EphemeralContainerCommon.Args has no validation
-	// field v1.EphemeralContainerCommon.WorkingDir has no validation
-	// field v1.EphemeralContainerCommon.Ports has no validation
-	// field v1.EphemeralContainerCommon.EnvFrom has no validation
-	// field v1.EphemeralContainerCommon.Env has no validation
-	// field v1.EphemeralContainerCommon.Resources has no validation
-	// field v1.EphemeralContainerCommon.ResizePolicy has no validation
-	// field v1.EphemeralContainerCommon.RestartPolicy has no validation
-	// field v1.EphemeralContainerCommon.VolumeMounts has no validation
-	// field v1.EphemeralContainerCommon.VolumeDevices has no validation
-	// field v1.EphemeralContainerCommon.LivenessProbe has no validation
-	// field v1.EphemeralContainerCommon.ReadinessProbe has no validation
-	// field v1.EphemeralContainerCommon.StartupProbe has no validation
-	// field v1.EphemeralContainerCommon.Lifecycle has no validation
-	// field v1.EphemeralContainerCommon.TerminationMessagePath has no validation
-	// field v1.EphemeralContainerCommon.TerminationMessagePolicy has no validation
-	// field v1.EphemeralContainerCommon.ImagePullPolicy has no validation
+
+	// field v1.EphemeralContainerCommon.Command
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Command, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) []string { return oldObj.Command }), fldPath.Child("command"))...)
+
+	// field v1.EphemeralContainerCommon.Args
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Args, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) []string { return oldObj.Args }), fldPath.Child("args"))...)
+
+	// field v1.EphemeralContainerCommon.WorkingDir
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.WorkingDir, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) *string { return &oldObj.WorkingDir }), fldPath.Child("workingDir"))...)
+
+	// field v1.EphemeralContainerCommon.Ports
+	errs = append(errs,
+		func(obj, oldObj []v1.ContainerPort, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.ContainerPort) any { return [2]any{o.ContainerPort, o.Protocol} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.ContainerPort, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ContainerPort(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.Ports, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) []v1.ContainerPort { return oldObj.Ports }), fldPath.Child("ports"))...)
+
+	// field v1.EphemeralContainerCommon.EnvFrom
+	errs = append(errs,
+		func(obj, oldObj []v1.EnvFromSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.EnvFromSource, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_EnvFromSource(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.EnvFrom, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) []v1.EnvFromSource { return oldObj.EnvFrom }), fldPath.Child("envFrom"))...)
+
+	// field v1.EphemeralContainerCommon.Env
+	errs = append(errs,
+		func(obj, oldObj []v1.EnvVar, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.EnvVar) any { return [1]any{o.Name} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.EnvVar, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_EnvVar(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.Env, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) []v1.EnvVar { return oldObj.Env }), fldPath.Child("env"))...)
+
+	// field v1.EphemeralContainerCommon.Resources
+	errs = append(errs,
+		func(obj, oldObj *v1.ResourceRequirements, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ResourceRequirements(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Resources, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) *v1.ResourceRequirements { return &oldObj.Resources }), fldPath.Child("resources"))...)
+
+	// field v1.EphemeralContainerCommon.ResizePolicy
+	errs = append(errs,
+		func(obj, oldObj []v1.ContainerResizePolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.ResizePolicy, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) []v1.ContainerResizePolicy { return oldObj.ResizePolicy }), fldPath.Child("resizePolicy"))...)
+
+	// field v1.EphemeralContainerCommon.RestartPolicy
+	errs = append(errs,
+		func(obj, oldObj *v1.ContainerRestartPolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.RestartPolicy, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) *v1.ContainerRestartPolicy { return oldObj.RestartPolicy }), fldPath.Child("restartPolicy"))...)
+
+	// field v1.EphemeralContainerCommon.VolumeMounts
+	errs = append(errs,
+		func(obj, oldObj []v1.VolumeMount, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.VolumeMount) any { return [1]any{o.MountPath} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.VolumeMount, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_VolumeMount(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.VolumeMounts, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) []v1.VolumeMount { return oldObj.VolumeMounts }), fldPath.Child("volumeMounts"))...)
+
+	// field v1.EphemeralContainerCommon.VolumeDevices
+	errs = append(errs,
+		func(obj, oldObj []v1.VolumeDevice, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.VolumeDevices, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) []v1.VolumeDevice { return oldObj.VolumeDevices }), fldPath.Child("volumeDevices"))...)
+
+	// field v1.EphemeralContainerCommon.LivenessProbe
+	errs = append(errs,
+		func(obj, oldObj *v1.Probe, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_Probe(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.LivenessProbe, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) *v1.Probe { return oldObj.LivenessProbe }), fldPath.Child("livenessProbe"))...)
+
+	// field v1.EphemeralContainerCommon.ReadinessProbe
+	errs = append(errs,
+		func(obj, oldObj *v1.Probe, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_Probe(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ReadinessProbe, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) *v1.Probe { return oldObj.ReadinessProbe }), fldPath.Child("readinessProbe"))...)
+
+	// field v1.EphemeralContainerCommon.StartupProbe
+	errs = append(errs,
+		func(obj, oldObj *v1.Probe, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_Probe(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.StartupProbe, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) *v1.Probe { return oldObj.StartupProbe }), fldPath.Child("startupProbe"))...)
+
+	// field v1.EphemeralContainerCommon.Lifecycle
+	errs = append(errs,
+		func(obj, oldObj *v1.Lifecycle, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_Lifecycle(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Lifecycle, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) *v1.Lifecycle { return oldObj.Lifecycle }), fldPath.Child("lifecycle"))...)
+
+	// field v1.EphemeralContainerCommon.TerminationMessagePath
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.TerminationMessagePath, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) *string { return &oldObj.TerminationMessagePath }), fldPath.Child("terminationMessagePath"))...)
+
+	// field v1.EphemeralContainerCommon.TerminationMessagePolicy
+	errs = append(errs,
+		func(obj, oldObj *v1.TerminationMessagePolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.TerminationMessagePolicy, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) *v1.TerminationMessagePolicy {
+			return &oldObj.TerminationMessagePolicy
+		}), fldPath.Child("terminationMessagePolicy"))...)
+
+	// field v1.EphemeralContainerCommon.ImagePullPolicy
+	errs = append(errs,
+		func(obj, oldObj *v1.PullPolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ImagePullPolicy, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) *v1.PullPolicy { return &oldObj.ImagePullPolicy }), fldPath.Child("imagePullPolicy"))...)
 
 	// field v1.EphemeralContainerCommon.SecurityContext
 	errs = append(errs,
 		func(obj, oldObj *v1.SecurityContext, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			errs = append(errs, Validate_SecurityContext(opCtx, obj, oldObj, fldPath)...)
 			return
 		}(obj.SecurityContext, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) *v1.SecurityContext { return oldObj.SecurityContext }), fldPath.Child("securityContext"))...)
 
-	// field v1.EphemeralContainerCommon.Stdin has no validation
-	// field v1.EphemeralContainerCommon.StdinOnce has no validation
-	// field v1.EphemeralContainerCommon.TTY has no validation
+	// field v1.EphemeralContainerCommon.Stdin
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Stdin, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) *bool { return &oldObj.Stdin }), fldPath.Child("stdin"))...)
+
+	// field v1.EphemeralContainerCommon.StdinOnce
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.StdinOnce, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) *bool { return &oldObj.StdinOnce }), fldPath.Child("stdinOnce"))...)
+
+	// field v1.EphemeralContainerCommon.TTY
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.TTY, safe.Field(oldObj, func(oldObj *v1.EphemeralContainerCommon) *bool { return &oldObj.TTY }), fldPath.Child("tty"))...)
+
+	return errs
+}
+
+func Validate_EphemeralVolumeSource(opCtx operation.Context, obj, oldObj *v1.EphemeralVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.EphemeralVolumeSource.VolumeClaimTemplate
+	errs = append(errs,
+		func(obj, oldObj *v1.PersistentVolumeClaimTemplate, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_PersistentVolumeClaimTemplate(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.VolumeClaimTemplate, safe.Field(oldObj, func(oldObj *v1.EphemeralVolumeSource) *v1.PersistentVolumeClaimTemplate {
+			return oldObj.VolumeClaimTemplate
+		}), fldPath.Child("volumeClaimTemplate"))...)
+
 	return errs
 }
 
 func Validate_Event(opCtx operation.Context, obj, oldObj *v1.Event, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.Event.TypeMeta has no validation
-	// field v1.Event.ObjectMeta has no validation
-	// field v1.Event.InvolvedObject has no validation
-	// field v1.Event.Reason has no validation
-	// field v1.Event.Message has no validation
-	// field v1.Event.Source has no validation
-	// field v1.Event.FirstTimestamp has no validation
-	// field v1.Event.LastTimestamp has no validation
-	// field v1.Event.Count has no validation
-	// field v1.Event.Type has no validation
-	// field v1.Event.EventTime has no validation
-	// field v1.Event.Series has no validation
-	// field v1.Event.Action has no validation
-	// field v1.Event.Related has no validation
-	// field v1.Event.ReportingController has no validation
-	// field v1.Event.ReportingInstance has no validation
+	// field v1.Event.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.Event) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.Event.InvolvedObject
+	errs = append(errs,
+		func(obj, oldObj *v1.ObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_ObjectReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.InvolvedObject, safe.Field(oldObj, func(oldObj *v1.Event) *v1.ObjectReference { return &oldObj.InvolvedObject }), fldPath.Child("involvedObject"))...)
+
+	// field v1.Event.Reason
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Reason, safe.Field(oldObj, func(oldObj *v1.Event) *string { return &oldObj.Reason }), fldPath.Child("reason"))...)
+
+	// field v1.Event.Message
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Message, safe.Field(oldObj, func(oldObj *v1.Event) *string { return &oldObj.Message }), fldPath.Child("message"))...)
+
+	// field v1.Event.Source
+	errs = append(errs,
+		func(obj, oldObj *v1.EventSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_EventSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Source, safe.Field(oldObj, func(oldObj *v1.Event) *v1.EventSource { return &oldObj.Source }), fldPath.Child("source"))...)
+
+	// field v1.Event.FirstTimestamp
+	errs = append(errs,
+		func(obj, oldObj *metav1.Time, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FirstTimestamp, safe.Field(oldObj, func(oldObj *v1.Event) *metav1.Time { return &oldObj.FirstTimestamp }), fldPath.Child("firstTimestamp"))...)
+
+	// field v1.Event.LastTimestamp
+	errs = append(errs,
+		func(obj, oldObj *metav1.Time, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.LastTimestamp, safe.Field(oldObj, func(oldObj *v1.Event) *metav1.Time { return &oldObj.LastTimestamp }), fldPath.Child("lastTimestamp"))...)
+
+	// field v1.Event.Count
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Count, safe.Field(oldObj, func(oldObj *v1.Event) *int32 { return &oldObj.Count }), fldPath.Child("count"))...)
+
+	// field v1.Event.Type
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Type, safe.Field(oldObj, func(oldObj *v1.Event) *string { return &oldObj.Type }), fldPath.Child("type"))...)
+
+	// field v1.Event.EventTime
+	errs = append(errs,
+		func(obj, oldObj *metav1.MicroTime, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.EventTime, safe.Field(oldObj, func(oldObj *v1.Event) *metav1.MicroTime { return &oldObj.EventTime }), fldPath.Child("eventTime"))...)
+
+	// field v1.Event.Series
+	errs = append(errs,
+		func(obj, oldObj *v1.EventSeries, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Series, safe.Field(oldObj, func(oldObj *v1.Event) *v1.EventSeries { return oldObj.Series }), fldPath.Child("series"))...)
+
+	// field v1.Event.Action
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Action, safe.Field(oldObj, func(oldObj *v1.Event) *string { return &oldObj.Action }), fldPath.Child("action"))...)
+
+	// field v1.Event.Related
+	errs = append(errs,
+		func(obj, oldObj *v1.ObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ObjectReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Related, safe.Field(oldObj, func(oldObj *v1.Event) *v1.ObjectReference { return oldObj.Related }), fldPath.Child("related"))...)
+
+	// field v1.Event.ReportingController
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReportingController, safe.Field(oldObj, func(oldObj *v1.Event) *string { return &oldObj.ReportingController }), fldPath.Child("reportingComponent"))...)
+
+	// field v1.Event.ReportingInstance
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReportingInstance, safe.Field(oldObj, func(oldObj *v1.Event) *string { return &oldObj.ReportingInstance }), fldPath.Child("reportingInstance"))...)
+
 	return errs
 }
 
 func Validate_EventList(opCtx operation.Context, obj, oldObj *v1.EventList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.EventList.TypeMeta has no validation
-	// field v1.EventList.ListMeta has no validation
-	// field v1.EventList.Items has no validation
+	// field v1.EventList.ListMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ListMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ListMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ListMeta, safe.Field(oldObj, func(oldObj *v1.EventList) *metav1.ListMeta { return &oldObj.ListMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.EventList.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.Event, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.Event, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Event(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.EventList) []v1.Event { return oldObj.Items }), fldPath.Child("items"))...)
+
+	return errs
+}
+
+func Validate_EventSource(opCtx operation.Context, obj, oldObj *v1.EventSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.EventSource.Component
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Component, safe.Field(oldObj, func(oldObj *v1.EventSource) *string { return &oldObj.Component }), fldPath.Child("component"))...)
+
+	// field v1.EventSource.Host
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Host, safe.Field(oldObj, func(oldObj *v1.EventSource) *string { return &oldObj.Host }), fldPath.Child("host"))...)
+
+	return errs
+}
+
+func Validate_ExecAction(opCtx operation.Context, obj, oldObj *v1.ExecAction, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ExecAction.Command
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Command, safe.Field(oldObj, func(oldObj *v1.ExecAction) []string { return oldObj.Command }), fldPath.Child("command"))...)
+
+	return errs
+}
+
+func Validate_FCVolumeSource(opCtx operation.Context, obj, oldObj *v1.FCVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.FCVolumeSource.TargetWWNs
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.TargetWWNs, safe.Field(oldObj, func(oldObj *v1.FCVolumeSource) []string { return oldObj.TargetWWNs }), fldPath.Child("targetWWNs"))...)
+
+	// field v1.FCVolumeSource.Lun
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Lun, safe.Field(oldObj, func(oldObj *v1.FCVolumeSource) *int32 { return oldObj.Lun }), fldPath.Child("lun"))...)
+
+	// field v1.FCVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FSType, safe.Field(oldObj, func(oldObj *v1.FCVolumeSource) *string { return &oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.FCVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.FCVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	// field v1.FCVolumeSource.WWIDs
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.WWIDs, safe.Field(oldObj, func(oldObj *v1.FCVolumeSource) []string { return oldObj.WWIDs }), fldPath.Child("wwids"))...)
+
+	return errs
+}
+
+func Validate_FlexPersistentVolumeSource(opCtx operation.Context, obj, oldObj *v1.FlexPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.FlexPersistentVolumeSource.Driver has no validation
+
+	// field v1.FlexPersistentVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FSType, safe.Field(oldObj, func(oldObj *v1.FlexPersistentVolumeSource) *string { return &oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.FlexPersistentVolumeSource.SecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.SecretReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_SecretReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SecretRef, safe.Field(oldObj, func(oldObj *v1.FlexPersistentVolumeSource) *v1.SecretReference { return oldObj.SecretRef }), fldPath.Child("secretRef"))...)
+
+	// field v1.FlexPersistentVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.FlexPersistentVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	// field v1.FlexPersistentVolumeSource.Options
+	errs = append(errs,
+		func(obj, oldObj map[string]string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Options, safe.Field(oldObj, func(oldObj *v1.FlexPersistentVolumeSource) map[string]string { return oldObj.Options }), fldPath.Child("options"))...)
+
+	return errs
+}
+
+func Validate_FlexVolumeSource(opCtx operation.Context, obj, oldObj *v1.FlexVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.FlexVolumeSource.Driver has no validation
+
+	// field v1.FlexVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FSType, safe.Field(oldObj, func(oldObj *v1.FlexVolumeSource) *string { return &oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.FlexVolumeSource.SecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.LocalObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_LocalObjectReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SecretRef, safe.Field(oldObj, func(oldObj *v1.FlexVolumeSource) *v1.LocalObjectReference { return oldObj.SecretRef }), fldPath.Child("secretRef"))...)
+
+	// field v1.FlexVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.FlexVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	// field v1.FlexVolumeSource.Options
+	errs = append(errs,
+		func(obj, oldObj map[string]string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Options, safe.Field(oldObj, func(oldObj *v1.FlexVolumeSource) map[string]string { return oldObj.Options }), fldPath.Child("options"))...)
+
+	return errs
+}
+
+func Validate_FlockerVolumeSource(opCtx operation.Context, obj, oldObj *v1.FlockerVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.FlockerVolumeSource.DatasetName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.DatasetName, safe.Field(oldObj, func(oldObj *v1.FlockerVolumeSource) *string { return &oldObj.DatasetName }), fldPath.Child("datasetName"))...)
+
+	// field v1.FlockerVolumeSource.DatasetUUID
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.DatasetUUID, safe.Field(oldObj, func(oldObj *v1.FlockerVolumeSource) *string { return &oldObj.DatasetUUID }), fldPath.Child("datasetUUID"))...)
+
+	return errs
+}
+
+func Validate_GCEPersistentDiskVolumeSource(opCtx operation.Context, obj, oldObj *v1.GCEPersistentDiskVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.GCEPersistentDiskVolumeSource.PDName has no validation
+
+	// field v1.GCEPersistentDiskVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FSType, safe.Field(oldObj, func(oldObj *v1.GCEPersistentDiskVolumeSource) *string { return &oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.GCEPersistentDiskVolumeSource.Partition
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Partition, safe.Field(oldObj, func(oldObj *v1.GCEPersistentDiskVolumeSource) *int32 { return &oldObj.Partition }), fldPath.Child("partition"))...)
+
+	// field v1.GCEPersistentDiskVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.GCEPersistentDiskVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	return errs
+}
+
+func Validate_GRPCAction(opCtx operation.Context, obj, oldObj *v1.GRPCAction, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.GRPCAction.Port has no validation
+
+	// field v1.GRPCAction.Service
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Service, safe.Field(oldObj, func(oldObj *v1.GRPCAction) *string { return oldObj.Service }), fldPath.Child("service"))...)
+
+	return errs
+}
+
+func Validate_GitRepoVolumeSource(opCtx operation.Context, obj, oldObj *v1.GitRepoVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.GitRepoVolumeSource.Repository has no validation
+
+	// field v1.GitRepoVolumeSource.Revision
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Revision, safe.Field(oldObj, func(oldObj *v1.GitRepoVolumeSource) *string { return &oldObj.Revision }), fldPath.Child("revision"))...)
+
+	// field v1.GitRepoVolumeSource.Directory
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Directory, safe.Field(oldObj, func(oldObj *v1.GitRepoVolumeSource) *string { return &oldObj.Directory }), fldPath.Child("directory"))...)
+
+	return errs
+}
+
+func Validate_GlusterfsPersistentVolumeSource(opCtx operation.Context, obj, oldObj *v1.GlusterfsPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.GlusterfsPersistentVolumeSource.EndpointsName has no validation
+	// field v1.GlusterfsPersistentVolumeSource.Path has no validation
+
+	// field v1.GlusterfsPersistentVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.GlusterfsPersistentVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	// field v1.GlusterfsPersistentVolumeSource.EndpointsNamespace
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.EndpointsNamespace, safe.Field(oldObj, func(oldObj *v1.GlusterfsPersistentVolumeSource) *string { return oldObj.EndpointsNamespace }), fldPath.Child("endpointsNamespace"))...)
+
+	return errs
+}
+
+func Validate_GlusterfsVolumeSource(opCtx operation.Context, obj, oldObj *v1.GlusterfsVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.GlusterfsVolumeSource.EndpointsName has no validation
+	// field v1.GlusterfsVolumeSource.Path has no validation
+
+	// field v1.GlusterfsVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.GlusterfsVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	return errs
+}
+
+func Validate_HTTPGetAction(opCtx operation.Context, obj, oldObj *v1.HTTPGetAction, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.HTTPGetAction.Path
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Path, safe.Field(oldObj, func(oldObj *v1.HTTPGetAction) *string { return &oldObj.Path }), fldPath.Child("path"))...)
+
+	// field v1.HTTPGetAction.Port
+	errs = append(errs,
+		func(obj, oldObj *intstr.IntOrString, fldPath *field.Path) (errs field.ErrorList) {
+			// NOTE: Type intstr.IntOrString is in a non-included package.
+			//       Any validations defined on this type are not available from here.
+			return
+		}(&obj.Port, safe.Field(oldObj, func(oldObj *v1.HTTPGetAction) *intstr.IntOrString { return &oldObj.Port }), fldPath.Child("port"))...)
+
+	// field v1.HTTPGetAction.Host
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Host, safe.Field(oldObj, func(oldObj *v1.HTTPGetAction) *string { return &oldObj.Host }), fldPath.Child("host"))...)
+
+	// field v1.HTTPGetAction.Scheme
+	errs = append(errs,
+		func(obj, oldObj *v1.URIScheme, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Scheme, safe.Field(oldObj, func(oldObj *v1.HTTPGetAction) *v1.URIScheme { return &oldObj.Scheme }), fldPath.Child("scheme"))...)
+
+	// field v1.HTTPGetAction.HTTPHeaders
+	errs = append(errs,
+		func(obj, oldObj []v1.HTTPHeader, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.HTTPHeaders, safe.Field(oldObj, func(oldObj *v1.HTTPGetAction) []v1.HTTPHeader { return oldObj.HTTPHeaders }), fldPath.Child("httpHeaders"))...)
+
 	return errs
 }
 
@@ -535,7 +2936,7 @@ func Validate_HostAlias(opCtx operation.Context, obj, oldObj *v1.HostAlias, fldP
 		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.Required(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			return
 		}(&obj.IP, safe.Field(oldObj, func(oldObj *v1.HostAlias) *string { return &oldObj.IP }), fldPath.Child("ip"))...)
@@ -550,7 +2951,7 @@ func Validate_HostIP(opCtx operation.Context, obj, oldObj *v1.HostIP, fldPath *f
 		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.Required(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			return
 		}(&obj.IP, safe.Field(oldObj, func(oldObj *v1.HostIP) *string { return &oldObj.IP }), fldPath.Child("ip"))...)
@@ -558,100 +2959,2177 @@ func Validate_HostIP(opCtx operation.Context, obj, oldObj *v1.HostIP, fldPath *f
 	return errs
 }
 
+func Validate_HostPathVolumeSource(opCtx operation.Context, obj, oldObj *v1.HostPathVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.HostPathVolumeSource.Path has no validation
+
+	// field v1.HostPathVolumeSource.Type
+	errs = append(errs,
+		func(obj, oldObj *v1.HostPathType, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Type, safe.Field(oldObj, func(oldObj *v1.HostPathVolumeSource) *v1.HostPathType { return oldObj.Type }), fldPath.Child("type"))...)
+
+	return errs
+}
+
+func Validate_ISCSIPersistentVolumeSource(opCtx operation.Context, obj, oldObj *v1.ISCSIPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ISCSIPersistentVolumeSource.TargetPortal has no validation
+	// field v1.ISCSIPersistentVolumeSource.IQN has no validation
+	// field v1.ISCSIPersistentVolumeSource.Lun has no validation
+
+	// field v1.ISCSIPersistentVolumeSource.ISCSIInterface
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ISCSIInterface, safe.Field(oldObj, func(oldObj *v1.ISCSIPersistentVolumeSource) *string { return &oldObj.ISCSIInterface }), fldPath.Child("iscsiInterface"))...)
+
+	// field v1.ISCSIPersistentVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FSType, safe.Field(oldObj, func(oldObj *v1.ISCSIPersistentVolumeSource) *string { return &oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.ISCSIPersistentVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.ISCSIPersistentVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	// field v1.ISCSIPersistentVolumeSource.Portals
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Portals, safe.Field(oldObj, func(oldObj *v1.ISCSIPersistentVolumeSource) []string { return oldObj.Portals }), fldPath.Child("portals"))...)
+
+	// field v1.ISCSIPersistentVolumeSource.DiscoveryCHAPAuth
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.DiscoveryCHAPAuth, safe.Field(oldObj, func(oldObj *v1.ISCSIPersistentVolumeSource) *bool { return &oldObj.DiscoveryCHAPAuth }), fldPath.Child("chapAuthDiscovery"))...)
+
+	// field v1.ISCSIPersistentVolumeSource.SessionCHAPAuth
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.SessionCHAPAuth, safe.Field(oldObj, func(oldObj *v1.ISCSIPersistentVolumeSource) *bool { return &oldObj.SessionCHAPAuth }), fldPath.Child("chapAuthSession"))...)
+
+	// field v1.ISCSIPersistentVolumeSource.SecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.SecretReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_SecretReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SecretRef, safe.Field(oldObj, func(oldObj *v1.ISCSIPersistentVolumeSource) *v1.SecretReference { return oldObj.SecretRef }), fldPath.Child("secretRef"))...)
+
+	// field v1.ISCSIPersistentVolumeSource.InitiatorName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.InitiatorName, safe.Field(oldObj, func(oldObj *v1.ISCSIPersistentVolumeSource) *string { return oldObj.InitiatorName }), fldPath.Child("initiatorName"))...)
+
+	return errs
+}
+
+func Validate_ISCSIVolumeSource(opCtx operation.Context, obj, oldObj *v1.ISCSIVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ISCSIVolumeSource.TargetPortal has no validation
+	// field v1.ISCSIVolumeSource.IQN has no validation
+	// field v1.ISCSIVolumeSource.Lun has no validation
+
+	// field v1.ISCSIVolumeSource.ISCSIInterface
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ISCSIInterface, safe.Field(oldObj, func(oldObj *v1.ISCSIVolumeSource) *string { return &oldObj.ISCSIInterface }), fldPath.Child("iscsiInterface"))...)
+
+	// field v1.ISCSIVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FSType, safe.Field(oldObj, func(oldObj *v1.ISCSIVolumeSource) *string { return &oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.ISCSIVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.ISCSIVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	// field v1.ISCSIVolumeSource.Portals
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Portals, safe.Field(oldObj, func(oldObj *v1.ISCSIVolumeSource) []string { return oldObj.Portals }), fldPath.Child("portals"))...)
+
+	// field v1.ISCSIVolumeSource.DiscoveryCHAPAuth
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.DiscoveryCHAPAuth, safe.Field(oldObj, func(oldObj *v1.ISCSIVolumeSource) *bool { return &oldObj.DiscoveryCHAPAuth }), fldPath.Child("chapAuthDiscovery"))...)
+
+	// field v1.ISCSIVolumeSource.SessionCHAPAuth
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.SessionCHAPAuth, safe.Field(oldObj, func(oldObj *v1.ISCSIVolumeSource) *bool { return &oldObj.SessionCHAPAuth }), fldPath.Child("chapAuthSession"))...)
+
+	// field v1.ISCSIVolumeSource.SecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.LocalObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_LocalObjectReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SecretRef, safe.Field(oldObj, func(oldObj *v1.ISCSIVolumeSource) *v1.LocalObjectReference { return oldObj.SecretRef }), fldPath.Child("secretRef"))...)
+
+	// field v1.ISCSIVolumeSource.InitiatorName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.InitiatorName, safe.Field(oldObj, func(oldObj *v1.ISCSIVolumeSource) *string { return oldObj.InitiatorName }), fldPath.Child("initiatorName"))...)
+
+	return errs
+}
+
+func Validate_ImageVolumeSource(opCtx operation.Context, obj, oldObj *v1.ImageVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ImageVolumeSource.Reference
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Reference, safe.Field(oldObj, func(oldObj *v1.ImageVolumeSource) *string { return &oldObj.Reference }), fldPath.Child("reference"))...)
+
+	// field v1.ImageVolumeSource.PullPolicy
+	errs = append(errs,
+		func(obj, oldObj *v1.PullPolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.PullPolicy, safe.Field(oldObj, func(oldObj *v1.ImageVolumeSource) *v1.PullPolicy { return &oldObj.PullPolicy }), fldPath.Child("pullPolicy"))...)
+
+	return errs
+}
+
+func Validate_KeyToPath(opCtx operation.Context, obj, oldObj *v1.KeyToPath, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.KeyToPath.Key has no validation
+	// field v1.KeyToPath.Path has no validation
+
+	// field v1.KeyToPath.Mode
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Mode, safe.Field(oldObj, func(oldObj *v1.KeyToPath) *int32 { return oldObj.Mode }), fldPath.Child("mode"))...)
+
+	return errs
+}
+
+func Validate_Lifecycle(opCtx operation.Context, obj, oldObj *v1.Lifecycle, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.Lifecycle.PostStart
+	errs = append(errs,
+		func(obj, oldObj *v1.LifecycleHandler, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_LifecycleHandler(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.PostStart, safe.Field(oldObj, func(oldObj *v1.Lifecycle) *v1.LifecycleHandler { return oldObj.PostStart }), fldPath.Child("postStart"))...)
+
+	// field v1.Lifecycle.PreStop
+	errs = append(errs,
+		func(obj, oldObj *v1.LifecycleHandler, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_LifecycleHandler(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.PreStop, safe.Field(oldObj, func(oldObj *v1.Lifecycle) *v1.LifecycleHandler { return oldObj.PreStop }), fldPath.Child("preStop"))...)
+
+	return errs
+}
+
+func Validate_LifecycleHandler(opCtx operation.Context, obj, oldObj *v1.LifecycleHandler, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.LifecycleHandler.Exec
+	errs = append(errs,
+		func(obj, oldObj *v1.ExecAction, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ExecAction(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Exec, safe.Field(oldObj, func(oldObj *v1.LifecycleHandler) *v1.ExecAction { return oldObj.Exec }), fldPath.Child("exec"))...)
+
+	// field v1.LifecycleHandler.HTTPGet
+	errs = append(errs,
+		func(obj, oldObj *v1.HTTPGetAction, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_HTTPGetAction(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.HTTPGet, safe.Field(oldObj, func(oldObj *v1.LifecycleHandler) *v1.HTTPGetAction { return oldObj.HTTPGet }), fldPath.Child("httpGet"))...)
+
+	// field v1.LifecycleHandler.TCPSocket
+	errs = append(errs,
+		func(obj, oldObj *v1.TCPSocketAction, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_TCPSocketAction(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.TCPSocket, safe.Field(oldObj, func(oldObj *v1.LifecycleHandler) *v1.TCPSocketAction { return oldObj.TCPSocket }), fldPath.Child("tcpSocket"))...)
+
+	// field v1.LifecycleHandler.Sleep
+	errs = append(errs,
+		func(obj, oldObj *v1.SleepAction, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Sleep, safe.Field(oldObj, func(oldObj *v1.LifecycleHandler) *v1.SleepAction { return oldObj.Sleep }), fldPath.Child("sleep"))...)
+
+	return errs
+}
+
 func Validate_LimitRange(opCtx operation.Context, obj, oldObj *v1.LimitRange, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.LimitRange.TypeMeta has no validation
-	// field v1.LimitRange.ObjectMeta has no validation
-	// field v1.LimitRange.Spec has no validation
+	// field v1.LimitRange.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.LimitRange) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.LimitRange.Spec
+	errs = append(errs,
+		func(obj, oldObj *v1.LimitRangeSpec, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_LimitRangeSpec(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Spec, safe.Field(oldObj, func(oldObj *v1.LimitRange) *v1.LimitRangeSpec { return &oldObj.Spec }), fldPath.Child("spec"))...)
+
+	return errs
+}
+
+func Validate_LimitRangeItem(opCtx operation.Context, obj, oldObj *v1.LimitRangeItem, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.LimitRangeItem.Type has no validation
+
+	// field v1.LimitRangeItem.Max
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.Max, safe.Field(oldObj, func(oldObj *v1.LimitRangeItem) v1.ResourceList { return oldObj.Max }), fldPath.Child("max"))...)
+
+	// field v1.LimitRangeItem.Min
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.Min, safe.Field(oldObj, func(oldObj *v1.LimitRangeItem) v1.ResourceList { return oldObj.Min }), fldPath.Child("min"))...)
+
+	// field v1.LimitRangeItem.Default
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.Default, safe.Field(oldObj, func(oldObj *v1.LimitRangeItem) v1.ResourceList { return oldObj.Default }), fldPath.Child("default"))...)
+
+	// field v1.LimitRangeItem.DefaultRequest
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.DefaultRequest, safe.Field(oldObj, func(oldObj *v1.LimitRangeItem) v1.ResourceList { return oldObj.DefaultRequest }), fldPath.Child("defaultRequest"))...)
+
+	// field v1.LimitRangeItem.MaxLimitRequestRatio
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.MaxLimitRequestRatio, safe.Field(oldObj, func(oldObj *v1.LimitRangeItem) v1.ResourceList { return oldObj.MaxLimitRequestRatio }), fldPath.Child("maxLimitRequestRatio"))...)
+
 	return errs
 }
 
 func Validate_LimitRangeList(opCtx operation.Context, obj, oldObj *v1.LimitRangeList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.LimitRangeList.TypeMeta has no validation
-	// field v1.LimitRangeList.ListMeta has no validation
-	// field v1.LimitRangeList.Items has no validation
+	// field v1.LimitRangeList.ListMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ListMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ListMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ListMeta, safe.Field(oldObj, func(oldObj *v1.LimitRangeList) *metav1.ListMeta { return &oldObj.ListMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.LimitRangeList.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.LimitRange, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.LimitRange, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_LimitRange(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.LimitRangeList) []v1.LimitRange { return oldObj.Items }), fldPath.Child("items"))...)
+
+	return errs
+}
+
+func Validate_LimitRangeSpec(opCtx operation.Context, obj, oldObj *v1.LimitRangeSpec, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.LimitRangeSpec.Limits
+	errs = append(errs,
+		func(obj, oldObj []v1.LimitRangeItem, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.LimitRangeItem, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_LimitRangeItem(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Limits, safe.Field(oldObj, func(oldObj *v1.LimitRangeSpec) []v1.LimitRangeItem { return oldObj.Limits }), fldPath.Child("limits"))...)
+
+	return errs
+}
+
+func Validate_LinuxContainerUser(opCtx operation.Context, obj, oldObj *v1.LinuxContainerUser, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.LinuxContainerUser.UID has no validation
+	// field v1.LinuxContainerUser.GID has no validation
+
+	// field v1.LinuxContainerUser.SupplementalGroups
+	errs = append(errs,
+		func(obj, oldObj []int64, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.SupplementalGroups, safe.Field(oldObj, func(oldObj *v1.LinuxContainerUser) []int64 { return oldObj.SupplementalGroups }), fldPath.Child("supplementalGroups"))...)
+
 	return errs
 }
 
 func Validate_List(opCtx operation.Context, obj, oldObj *v1.List, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.List.TypeMeta has no validation
-	// field v1.List.ListMeta has no validation
-	// field v1.List.Items has no validation
+	// field v1.List.ListMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ListMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ListMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ListMeta, safe.Field(oldObj, func(oldObj *v1.List) *metav1.ListMeta { return &oldObj.ListMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.List.Items
+	errs = append(errs,
+		func(obj, oldObj []runtime.RawExtension, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *runtime.RawExtension, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type runtime.RawExtension is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.List) []runtime.RawExtension { return oldObj.Items }), fldPath.Child("items"))...)
+
+	return errs
+}
+
+func Validate_LoadBalancerIngress(opCtx operation.Context, obj, oldObj *v1.LoadBalancerIngress, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.LoadBalancerIngress.IP
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.IP, safe.Field(oldObj, func(oldObj *v1.LoadBalancerIngress) *string { return &oldObj.IP }), fldPath.Child("ip"))...)
+
+	// field v1.LoadBalancerIngress.Hostname
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Hostname, safe.Field(oldObj, func(oldObj *v1.LoadBalancerIngress) *string { return &oldObj.Hostname }), fldPath.Child("hostname"))...)
+
+	// field v1.LoadBalancerIngress.IPMode
+	errs = append(errs,
+		func(obj, oldObj *v1.LoadBalancerIPMode, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.IPMode, safe.Field(oldObj, func(oldObj *v1.LoadBalancerIngress) *v1.LoadBalancerIPMode { return oldObj.IPMode }), fldPath.Child("ipMode"))...)
+
+	// field v1.LoadBalancerIngress.Ports
+	errs = append(errs,
+		func(obj, oldObj []v1.PortStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.PortStatus, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_PortStatus(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Ports, safe.Field(oldObj, func(oldObj *v1.LoadBalancerIngress) []v1.PortStatus { return oldObj.Ports }), fldPath.Child("ports"))...)
+
+	return errs
+}
+
+func Validate_LoadBalancerStatus(opCtx operation.Context, obj, oldObj *v1.LoadBalancerStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.LoadBalancerStatus.Ingress
+	errs = append(errs,
+		func(obj, oldObj []v1.LoadBalancerIngress, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.LoadBalancerIngress, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_LoadBalancerIngress(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Ingress, safe.Field(oldObj, func(oldObj *v1.LoadBalancerStatus) []v1.LoadBalancerIngress { return oldObj.Ingress }), fldPath.Child("ingress"))...)
+
+	return errs
+}
+
+func Validate_LocalObjectReference(opCtx operation.Context, obj, oldObj *v1.LocalObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.LocalObjectReference.Name
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Name, safe.Field(oldObj, func(oldObj *v1.LocalObjectReference) *string { return &oldObj.Name }), fldPath.Child("name"))...)
+
+	return errs
+}
+
+func Validate_LocalVolumeSource(opCtx operation.Context, obj, oldObj *v1.LocalVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.LocalVolumeSource.Path has no validation
+
+	// field v1.LocalVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.FSType, safe.Field(oldObj, func(oldObj *v1.LocalVolumeSource) *string { return oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	return errs
+}
+
+func Validate_NFSVolumeSource(opCtx operation.Context, obj, oldObj *v1.NFSVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NFSVolumeSource.Server has no validation
+	// field v1.NFSVolumeSource.Path has no validation
+
+	// field v1.NFSVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.NFSVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
 	return errs
 }
 
 func Validate_Namespace(opCtx operation.Context, obj, oldObj *v1.Namespace, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.Namespace.TypeMeta has no validation
-	// field v1.Namespace.ObjectMeta has no validation
-	// field v1.Namespace.Spec has no validation
-	// field v1.Namespace.Status has no validation
+	// field v1.Namespace.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.Namespace) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.Namespace.Spec
+	errs = append(errs,
+		func(obj, oldObj *v1.NamespaceSpec, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_NamespaceSpec(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Spec, safe.Field(oldObj, func(oldObj *v1.Namespace) *v1.NamespaceSpec { return &oldObj.Spec }), fldPath.Child("spec"))...)
+
+	// field v1.Namespace.Status
+	errs = append(errs,
+		func(obj, oldObj *v1.NamespaceStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_NamespaceStatus(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Status, safe.Field(oldObj, func(oldObj *v1.Namespace) *v1.NamespaceStatus { return &oldObj.Status }), fldPath.Child("status"))...)
+
+	return errs
+}
+
+func Validate_NamespaceCondition(opCtx operation.Context, obj, oldObj *v1.NamespaceCondition, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NamespaceCondition.Type has no validation
+	// field v1.NamespaceCondition.Status has no validation
+
+	// field v1.NamespaceCondition.LastTransitionTime
+	errs = append(errs,
+		func(obj, oldObj *metav1.Time, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.LastTransitionTime, safe.Field(oldObj, func(oldObj *v1.NamespaceCondition) *metav1.Time { return &oldObj.LastTransitionTime }), fldPath.Child("lastTransitionTime"))...)
+
+	// field v1.NamespaceCondition.Reason
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Reason, safe.Field(oldObj, func(oldObj *v1.NamespaceCondition) *string { return &oldObj.Reason }), fldPath.Child("reason"))...)
+
+	// field v1.NamespaceCondition.Message
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Message, safe.Field(oldObj, func(oldObj *v1.NamespaceCondition) *string { return &oldObj.Message }), fldPath.Child("message"))...)
+
 	return errs
 }
 
 func Validate_NamespaceList(opCtx operation.Context, obj, oldObj *v1.NamespaceList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.NamespaceList.TypeMeta has no validation
-	// field v1.NamespaceList.ListMeta has no validation
-	// field v1.NamespaceList.Items has no validation
+	// field v1.NamespaceList.ListMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ListMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ListMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ListMeta, safe.Field(oldObj, func(oldObj *v1.NamespaceList) *metav1.ListMeta { return &oldObj.ListMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.NamespaceList.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.Namespace, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.Namespace, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Namespace(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.NamespaceList) []v1.Namespace { return oldObj.Items }), fldPath.Child("items"))...)
+
+	return errs
+}
+
+func Validate_NamespaceSpec(opCtx operation.Context, obj, oldObj *v1.NamespaceSpec, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NamespaceSpec.Finalizers
+	errs = append(errs,
+		func(obj, oldObj []v1.FinalizerName, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Finalizers, safe.Field(oldObj, func(oldObj *v1.NamespaceSpec) []v1.FinalizerName { return oldObj.Finalizers }), fldPath.Child("finalizers"))...)
+
+	return errs
+}
+
+func Validate_NamespaceStatus(opCtx operation.Context, obj, oldObj *v1.NamespaceStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NamespaceStatus.Phase
+	errs = append(errs,
+		func(obj, oldObj *v1.NamespacePhase, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Phase, safe.Field(oldObj, func(oldObj *v1.NamespaceStatus) *v1.NamespacePhase { return &oldObj.Phase }), fldPath.Child("phase"))...)
+
+	// field v1.NamespaceStatus.Conditions
+	errs = append(errs,
+		func(obj, oldObj []v1.NamespaceCondition, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.NamespaceCondition) any { return [1]any{o.Type} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.NamespaceCondition, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_NamespaceCondition(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.Conditions, safe.Field(oldObj, func(oldObj *v1.NamespaceStatus) []v1.NamespaceCondition { return oldObj.Conditions }), fldPath.Child("conditions"))...)
+
 	return errs
 }
 
 func Validate_Node(opCtx operation.Context, obj, oldObj *v1.Node, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.Node.TypeMeta has no validation
-	// field v1.Node.ObjectMeta has no validation
-	// field v1.Node.Spec has no validation
-	// field v1.Node.Status has no validation
+	// field v1.Node.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.Node) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.Node.Spec
+	errs = append(errs,
+		func(obj, oldObj *v1.NodeSpec, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_NodeSpec(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Spec, safe.Field(oldObj, func(oldObj *v1.Node) *v1.NodeSpec { return &oldObj.Spec }), fldPath.Child("spec"))...)
+
+	// field v1.Node.Status
+	errs = append(errs,
+		func(obj, oldObj *v1.NodeStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_NodeStatus(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Status, safe.Field(oldObj, func(oldObj *v1.Node) *v1.NodeStatus { return &oldObj.Status }), fldPath.Child("status"))...)
+
+	return errs
+}
+
+func Validate_NodeAffinity(opCtx operation.Context, obj, oldObj *v1.NodeAffinity, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution
+	errs = append(errs,
+		func(obj, oldObj *v1.NodeSelector, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_NodeSelector(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.RequiredDuringSchedulingIgnoredDuringExecution, safe.Field(oldObj, func(oldObj *v1.NodeAffinity) *v1.NodeSelector {
+			return oldObj.RequiredDuringSchedulingIgnoredDuringExecution
+		}), fldPath.Child("requiredDuringSchedulingIgnoredDuringExecution"))...)
+
+	// field v1.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution
+	errs = append(errs,
+		func(obj, oldObj []v1.PreferredSchedulingTerm, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.PreferredSchedulingTerm, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_PreferredSchedulingTerm(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.PreferredDuringSchedulingIgnoredDuringExecution, safe.Field(oldObj, func(oldObj *v1.NodeAffinity) []v1.PreferredSchedulingTerm {
+			return oldObj.PreferredDuringSchedulingIgnoredDuringExecution
+		}), fldPath.Child("preferredDuringSchedulingIgnoredDuringExecution"))...)
+
+	return errs
+}
+
+func Validate_NodeCondition(opCtx operation.Context, obj, oldObj *v1.NodeCondition, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NodeCondition.Type has no validation
+	// field v1.NodeCondition.Status has no validation
+
+	// field v1.NodeCondition.LastHeartbeatTime
+	errs = append(errs,
+		func(obj, oldObj *metav1.Time, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.LastHeartbeatTime, safe.Field(oldObj, func(oldObj *v1.NodeCondition) *metav1.Time { return &oldObj.LastHeartbeatTime }), fldPath.Child("lastHeartbeatTime"))...)
+
+	// field v1.NodeCondition.LastTransitionTime
+	errs = append(errs,
+		func(obj, oldObj *metav1.Time, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.LastTransitionTime, safe.Field(oldObj, func(oldObj *v1.NodeCondition) *metav1.Time { return &oldObj.LastTransitionTime }), fldPath.Child("lastTransitionTime"))...)
+
+	// field v1.NodeCondition.Reason
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Reason, safe.Field(oldObj, func(oldObj *v1.NodeCondition) *string { return &oldObj.Reason }), fldPath.Child("reason"))...)
+
+	// field v1.NodeCondition.Message
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Message, safe.Field(oldObj, func(oldObj *v1.NodeCondition) *string { return &oldObj.Message }), fldPath.Child("message"))...)
+
+	return errs
+}
+
+func Validate_NodeConfigSource(opCtx operation.Context, obj, oldObj *v1.NodeConfigSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NodeConfigSource.ConfigMap
+	errs = append(errs,
+		func(obj, oldObj *v1.ConfigMapNodeConfigSource, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_ConfigMapNodeConfigSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ConfigMap, safe.Field(oldObj, func(oldObj *v1.NodeConfigSource) *v1.ConfigMapNodeConfigSource { return oldObj.ConfigMap }), fldPath.Child("configMap"))...)
+
+	return errs
+}
+
+func Validate_NodeConfigStatus(opCtx operation.Context, obj, oldObj *v1.NodeConfigStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NodeConfigStatus.Assigned
+	errs = append(errs,
+		func(obj, oldObj *v1.NodeConfigSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_NodeConfigSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Assigned, safe.Field(oldObj, func(oldObj *v1.NodeConfigStatus) *v1.NodeConfigSource { return oldObj.Assigned }), fldPath.Child("assigned"))...)
+
+	// field v1.NodeConfigStatus.Active
+	errs = append(errs,
+		func(obj, oldObj *v1.NodeConfigSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_NodeConfigSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Active, safe.Field(oldObj, func(oldObj *v1.NodeConfigStatus) *v1.NodeConfigSource { return oldObj.Active }), fldPath.Child("active"))...)
+
+	// field v1.NodeConfigStatus.LastKnownGood
+	errs = append(errs,
+		func(obj, oldObj *v1.NodeConfigSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_NodeConfigSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.LastKnownGood, safe.Field(oldObj, func(oldObj *v1.NodeConfigStatus) *v1.NodeConfigSource { return oldObj.LastKnownGood }), fldPath.Child("lastKnownGood"))...)
+
+	// field v1.NodeConfigStatus.Error
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Error, safe.Field(oldObj, func(oldObj *v1.NodeConfigStatus) *string { return &oldObj.Error }), fldPath.Child("error"))...)
+
+	return errs
+}
+
+func Validate_NodeDaemonEndpoints(opCtx operation.Context, obj, oldObj *v1.NodeDaemonEndpoints, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NodeDaemonEndpoints.KubeletEndpoint
+	errs = append(errs,
+		func(obj, oldObj *v1.DaemonEndpoint, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.KubeletEndpoint, safe.Field(oldObj, func(oldObj *v1.NodeDaemonEndpoints) *v1.DaemonEndpoint { return &oldObj.KubeletEndpoint }), fldPath.Child("kubeletEndpoint"))...)
+
+	return errs
+}
+
+func Validate_NodeFeatures(opCtx operation.Context, obj, oldObj *v1.NodeFeatures, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NodeFeatures.SupplementalGroupsPolicy
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.SupplementalGroupsPolicy, safe.Field(oldObj, func(oldObj *v1.NodeFeatures) *bool { return oldObj.SupplementalGroupsPolicy }), fldPath.Child("supplementalGroupsPolicy"))...)
+
 	return errs
 }
 
 func Validate_NodeList(opCtx operation.Context, obj, oldObj *v1.NodeList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.NodeList.TypeMeta has no validation
-	// field v1.NodeList.ListMeta has no validation
-	// field v1.NodeList.Items has no validation
+	// field v1.NodeList.ListMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ListMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ListMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ListMeta, safe.Field(oldObj, func(oldObj *v1.NodeList) *metav1.ListMeta { return &oldObj.ListMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.NodeList.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.Node, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.Node, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Node(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.NodeList) []v1.Node { return oldObj.Items }), fldPath.Child("items"))...)
+
 	return errs
 }
 
 func Validate_NodeProxyOptions(opCtx operation.Context, obj, oldObj *v1.NodeProxyOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.NodeProxyOptions.TypeMeta has no validation
-	// field v1.NodeProxyOptions.Path has no validation
+	// field v1.NodeProxyOptions.Path
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Path, safe.Field(oldObj, func(oldObj *v1.NodeProxyOptions) *string { return &oldObj.Path }), fldPath.Child("path"))...)
+
+	return errs
+}
+
+func Validate_NodeRuntimeHandler(opCtx operation.Context, obj, oldObj *v1.NodeRuntimeHandler, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NodeRuntimeHandler.Name
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Name, safe.Field(oldObj, func(oldObj *v1.NodeRuntimeHandler) *string { return &oldObj.Name }), fldPath.Child("name"))...)
+
+	// field v1.NodeRuntimeHandler.Features
+	errs = append(errs,
+		func(obj, oldObj *v1.NodeRuntimeHandlerFeatures, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_NodeRuntimeHandlerFeatures(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Features, safe.Field(oldObj, func(oldObj *v1.NodeRuntimeHandler) *v1.NodeRuntimeHandlerFeatures { return oldObj.Features }), fldPath.Child("features"))...)
+
+	return errs
+}
+
+func Validate_NodeRuntimeHandlerFeatures(opCtx operation.Context, obj, oldObj *v1.NodeRuntimeHandlerFeatures, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NodeRuntimeHandlerFeatures.RecursiveReadOnlyMounts
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.RecursiveReadOnlyMounts, safe.Field(oldObj, func(oldObj *v1.NodeRuntimeHandlerFeatures) *bool { return oldObj.RecursiveReadOnlyMounts }), fldPath.Child("recursiveReadOnlyMounts"))...)
+
+	// field v1.NodeRuntimeHandlerFeatures.UserNamespaces
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.UserNamespaces, safe.Field(oldObj, func(oldObj *v1.NodeRuntimeHandlerFeatures) *bool { return oldObj.UserNamespaces }), fldPath.Child("userNamespaces"))...)
+
+	return errs
+}
+
+func Validate_NodeSelector(opCtx operation.Context, obj, oldObj *v1.NodeSelector, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NodeSelector.NodeSelectorTerms
+	errs = append(errs,
+		func(obj, oldObj []v1.NodeSelectorTerm, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.NodeSelectorTerm, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_NodeSelectorTerm(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.NodeSelectorTerms, safe.Field(oldObj, func(oldObj *v1.NodeSelector) []v1.NodeSelectorTerm { return oldObj.NodeSelectorTerms }), fldPath.Child("nodeSelectorTerms"))...)
+
+	return errs
+}
+
+func Validate_NodeSelectorRequirement(opCtx operation.Context, obj, oldObj *v1.NodeSelectorRequirement, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NodeSelectorRequirement.Key has no validation
+	// field v1.NodeSelectorRequirement.Operator has no validation
+
+	// field v1.NodeSelectorRequirement.Values
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Values, safe.Field(oldObj, func(oldObj *v1.NodeSelectorRequirement) []string { return oldObj.Values }), fldPath.Child("values"))...)
+
+	return errs
+}
+
+func Validate_NodeSelectorTerm(opCtx operation.Context, obj, oldObj *v1.NodeSelectorTerm, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NodeSelectorTerm.MatchExpressions
+	errs = append(errs,
+		func(obj, oldObj []v1.NodeSelectorRequirement, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.NodeSelectorRequirement, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_NodeSelectorRequirement(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.MatchExpressions, safe.Field(oldObj, func(oldObj *v1.NodeSelectorTerm) []v1.NodeSelectorRequirement { return oldObj.MatchExpressions }), fldPath.Child("matchExpressions"))...)
+
+	// field v1.NodeSelectorTerm.MatchFields
+	errs = append(errs,
+		func(obj, oldObj []v1.NodeSelectorRequirement, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.NodeSelectorRequirement, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_NodeSelectorRequirement(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.MatchFields, safe.Field(oldObj, func(oldObj *v1.NodeSelectorTerm) []v1.NodeSelectorRequirement { return oldObj.MatchFields }), fldPath.Child("matchFields"))...)
+
+	return errs
+}
+
+func Validate_NodeSpec(opCtx operation.Context, obj, oldObj *v1.NodeSpec, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NodeSpec.PodCIDR
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.PodCIDR, safe.Field(oldObj, func(oldObj *v1.NodeSpec) *string { return &oldObj.PodCIDR }), fldPath.Child("podCIDR"))...)
+
+	// field v1.NodeSpec.PodCIDRs
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.PodCIDRs, safe.Field(oldObj, func(oldObj *v1.NodeSpec) []string { return oldObj.PodCIDRs }), fldPath.Child("podCIDRs"))...)
+
+	// field v1.NodeSpec.ProviderID
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ProviderID, safe.Field(oldObj, func(oldObj *v1.NodeSpec) *string { return &oldObj.ProviderID }), fldPath.Child("providerID"))...)
+
+	// field v1.NodeSpec.Unschedulable
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Unschedulable, safe.Field(oldObj, func(oldObj *v1.NodeSpec) *bool { return &oldObj.Unschedulable }), fldPath.Child("unschedulable"))...)
+
+	// field v1.NodeSpec.Taints
+	errs = append(errs,
+		func(obj, oldObj []v1.Taint, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.Taint, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Taint(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Taints, safe.Field(oldObj, func(oldObj *v1.NodeSpec) []v1.Taint { return oldObj.Taints }), fldPath.Child("taints"))...)
+
+	// field v1.NodeSpec.ConfigSource
+	errs = append(errs,
+		func(obj, oldObj *v1.NodeConfigSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_NodeConfigSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ConfigSource, safe.Field(oldObj, func(oldObj *v1.NodeSpec) *v1.NodeConfigSource { return oldObj.ConfigSource }), fldPath.Child("configSource"))...)
+
+	// field v1.NodeSpec.DoNotUseExternalID
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.DoNotUseExternalID, safe.Field(oldObj, func(oldObj *v1.NodeSpec) *string { return &oldObj.DoNotUseExternalID }), fldPath.Child("externalID"))...)
+
+	return errs
+}
+
+func Validate_NodeStatus(opCtx operation.Context, obj, oldObj *v1.NodeStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NodeStatus.Capacity
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.Capacity, safe.Field(oldObj, func(oldObj *v1.NodeStatus) v1.ResourceList { return oldObj.Capacity }), fldPath.Child("capacity"))...)
+
+	// field v1.NodeStatus.Allocatable
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.Allocatable, safe.Field(oldObj, func(oldObj *v1.NodeStatus) v1.ResourceList { return oldObj.Allocatable }), fldPath.Child("allocatable"))...)
+
+	// field v1.NodeStatus.Phase
+	errs = append(errs,
+		func(obj, oldObj *v1.NodePhase, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Phase, safe.Field(oldObj, func(oldObj *v1.NodeStatus) *v1.NodePhase { return &oldObj.Phase }), fldPath.Child("phase"))...)
+
+	// field v1.NodeStatus.Conditions
+	errs = append(errs,
+		func(obj, oldObj []v1.NodeCondition, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.NodeCondition) any { return [1]any{o.Type} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.NodeCondition, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_NodeCondition(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.Conditions, safe.Field(oldObj, func(oldObj *v1.NodeStatus) []v1.NodeCondition { return oldObj.Conditions }), fldPath.Child("conditions"))...)
+
+	// field v1.NodeStatus.Addresses
+	errs = append(errs,
+		func(obj, oldObj []v1.NodeAddress, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Addresses, safe.Field(oldObj, func(oldObj *v1.NodeStatus) []v1.NodeAddress { return oldObj.Addresses }), fldPath.Child("addresses"))...)
+
+	// field v1.NodeStatus.DaemonEndpoints
+	errs = append(errs,
+		func(obj, oldObj *v1.NodeDaemonEndpoints, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_NodeDaemonEndpoints(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.DaemonEndpoints, safe.Field(oldObj, func(oldObj *v1.NodeStatus) *v1.NodeDaemonEndpoints { return &oldObj.DaemonEndpoints }), fldPath.Child("daemonEndpoints"))...)
+
+	// field v1.NodeStatus.NodeInfo
+	errs = append(errs,
+		func(obj, oldObj *v1.NodeSystemInfo, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.NodeInfo, safe.Field(oldObj, func(oldObj *v1.NodeStatus) *v1.NodeSystemInfo { return &oldObj.NodeInfo }), fldPath.Child("nodeInfo"))...)
+
+	// field v1.NodeStatus.Images
+	errs = append(errs,
+		func(obj, oldObj []v1.ContainerImage, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.ContainerImage, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ContainerImage(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Images, safe.Field(oldObj, func(oldObj *v1.NodeStatus) []v1.ContainerImage { return oldObj.Images }), fldPath.Child("images"))...)
+
+	// field v1.NodeStatus.VolumesInUse
+	errs = append(errs,
+		func(obj, oldObj []v1.UniqueVolumeName, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.VolumesInUse, safe.Field(oldObj, func(oldObj *v1.NodeStatus) []v1.UniqueVolumeName { return oldObj.VolumesInUse }), fldPath.Child("volumesInUse"))...)
+
+	// field v1.NodeStatus.VolumesAttached
+	errs = append(errs,
+		func(obj, oldObj []v1.AttachedVolume, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.VolumesAttached, safe.Field(oldObj, func(oldObj *v1.NodeStatus) []v1.AttachedVolume { return oldObj.VolumesAttached }), fldPath.Child("volumesAttached"))...)
+
+	// field v1.NodeStatus.Config
+	errs = append(errs,
+		func(obj, oldObj *v1.NodeConfigStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_NodeConfigStatus(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Config, safe.Field(oldObj, func(oldObj *v1.NodeStatus) *v1.NodeConfigStatus { return oldObj.Config }), fldPath.Child("config"))...)
+
+	// field v1.NodeStatus.RuntimeHandlers
+	errs = append(errs,
+		func(obj, oldObj []v1.NodeRuntimeHandler, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.NodeRuntimeHandler, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_NodeRuntimeHandler(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.RuntimeHandlers, safe.Field(oldObj, func(oldObj *v1.NodeStatus) []v1.NodeRuntimeHandler { return oldObj.RuntimeHandlers }), fldPath.Child("runtimeHandlers"))...)
+
+	// field v1.NodeStatus.Features
+	errs = append(errs,
+		func(obj, oldObj *v1.NodeFeatures, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_NodeFeatures(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Features, safe.Field(oldObj, func(oldObj *v1.NodeStatus) *v1.NodeFeatures { return oldObj.Features }), fldPath.Child("features"))...)
+
+	return errs
+}
+
+func Validate_ObjectFieldSelector(opCtx operation.Context, obj, oldObj *v1.ObjectFieldSelector, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ObjectFieldSelector.APIVersion
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.APIVersion, safe.Field(oldObj, func(oldObj *v1.ObjectFieldSelector) *string { return &oldObj.APIVersion }), fldPath.Child("apiVersion"))...)
+
+	// field v1.ObjectFieldSelector.FieldPath has no validation
+	return errs
+}
+
+func Validate_ObjectReference(opCtx operation.Context, obj, oldObj *v1.ObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ObjectReference.Kind
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Kind, safe.Field(oldObj, func(oldObj *v1.ObjectReference) *string { return &oldObj.Kind }), fldPath.Child("kind"))...)
+
+	// field v1.ObjectReference.Namespace
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Namespace, safe.Field(oldObj, func(oldObj *v1.ObjectReference) *string { return &oldObj.Namespace }), fldPath.Child("namespace"))...)
+
+	// field v1.ObjectReference.Name
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Name, safe.Field(oldObj, func(oldObj *v1.ObjectReference) *string { return &oldObj.Name }), fldPath.Child("name"))...)
+
+	// field v1.ObjectReference.UID
+	errs = append(errs,
+		func(obj, oldObj *types.UID, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			// NOTE: Type types.UID is in a non-included package.
+			//       Any validations defined on this type are not available from here.
+			return
+		}(&obj.UID, safe.Field(oldObj, func(oldObj *v1.ObjectReference) *types.UID { return &oldObj.UID }), fldPath.Child("uid"))...)
+
+	// field v1.ObjectReference.APIVersion
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.APIVersion, safe.Field(oldObj, func(oldObj *v1.ObjectReference) *string { return &oldObj.APIVersion }), fldPath.Child("apiVersion"))...)
+
+	// field v1.ObjectReference.ResourceVersion
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ResourceVersion, safe.Field(oldObj, func(oldObj *v1.ObjectReference) *string { return &oldObj.ResourceVersion }), fldPath.Child("resourceVersion"))...)
+
+	// field v1.ObjectReference.FieldPath
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FieldPath, safe.Field(oldObj, func(oldObj *v1.ObjectReference) *string { return &oldObj.FieldPath }), fldPath.Child("fieldPath"))...)
+
 	return errs
 }
 
 func Validate_PersistentVolume(opCtx operation.Context, obj, oldObj *v1.PersistentVolume, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PersistentVolume.TypeMeta has no validation
-	// field v1.PersistentVolume.ObjectMeta has no validation
-	// field v1.PersistentVolume.Spec has no validation
-	// field v1.PersistentVolume.Status has no validation
+	// field v1.PersistentVolume.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.PersistentVolume) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.PersistentVolume.Spec
+	errs = append(errs,
+		func(obj, oldObj *v1.PersistentVolumeSpec, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_PersistentVolumeSpec(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Spec, safe.Field(oldObj, func(oldObj *v1.PersistentVolume) *v1.PersistentVolumeSpec { return &oldObj.Spec }), fldPath.Child("spec"))...)
+
+	// field v1.PersistentVolume.Status
+	errs = append(errs,
+		func(obj, oldObj *v1.PersistentVolumeStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_PersistentVolumeStatus(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Status, safe.Field(oldObj, func(oldObj *v1.PersistentVolume) *v1.PersistentVolumeStatus { return &oldObj.Status }), fldPath.Child("status"))...)
+
 	return errs
 }
 
 func Validate_PersistentVolumeClaim(opCtx operation.Context, obj, oldObj *v1.PersistentVolumeClaim, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PersistentVolumeClaim.TypeMeta has no validation
-	// field v1.PersistentVolumeClaim.ObjectMeta has no validation
-	// field v1.PersistentVolumeClaim.Spec has no validation
-	// field v1.PersistentVolumeClaim.Status has no validation
+	// field v1.PersistentVolumeClaim.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaim) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.PersistentVolumeClaim.Spec
+	errs = append(errs,
+		func(obj, oldObj *v1.PersistentVolumeClaimSpec, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_PersistentVolumeClaimSpec(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Spec, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaim) *v1.PersistentVolumeClaimSpec { return &oldObj.Spec }), fldPath.Child("spec"))...)
+
+	// field v1.PersistentVolumeClaim.Status
+	errs = append(errs,
+		func(obj, oldObj *v1.PersistentVolumeClaimStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_PersistentVolumeClaimStatus(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Status, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaim) *v1.PersistentVolumeClaimStatus { return &oldObj.Status }), fldPath.Child("status"))...)
+
+	return errs
+}
+
+func Validate_PersistentVolumeClaimCondition(opCtx operation.Context, obj, oldObj *v1.PersistentVolumeClaimCondition, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PersistentVolumeClaimCondition.Type has no validation
+	// field v1.PersistentVolumeClaimCondition.Status has no validation
+
+	// field v1.PersistentVolumeClaimCondition.LastProbeTime
+	errs = append(errs,
+		func(obj, oldObj *metav1.Time, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.LastProbeTime, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimCondition) *metav1.Time { return &oldObj.LastProbeTime }), fldPath.Child("lastProbeTime"))...)
+
+	// field v1.PersistentVolumeClaimCondition.LastTransitionTime
+	errs = append(errs,
+		func(obj, oldObj *metav1.Time, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.LastTransitionTime, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimCondition) *metav1.Time { return &oldObj.LastTransitionTime }), fldPath.Child("lastTransitionTime"))...)
+
+	// field v1.PersistentVolumeClaimCondition.Reason
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Reason, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimCondition) *string { return &oldObj.Reason }), fldPath.Child("reason"))...)
+
+	// field v1.PersistentVolumeClaimCondition.Message
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Message, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimCondition) *string { return &oldObj.Message }), fldPath.Child("message"))...)
+
 	return errs
 }
 
 func Validate_PersistentVolumeClaimList(opCtx operation.Context, obj, oldObj *v1.PersistentVolumeClaimList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PersistentVolumeClaimList.TypeMeta has no validation
-	// field v1.PersistentVolumeClaimList.ListMeta has no validation
-	// field v1.PersistentVolumeClaimList.Items has no validation
+	// field v1.PersistentVolumeClaimList.ListMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ListMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ListMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ListMeta, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimList) *metav1.ListMeta { return &oldObj.ListMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.PersistentVolumeClaimList.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.PersistentVolumeClaim, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.PersistentVolumeClaim, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_PersistentVolumeClaim(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimList) []v1.PersistentVolumeClaim { return oldObj.Items }), fldPath.Child("items"))...)
+
+	return errs
+}
+
+func Validate_PersistentVolumeClaimSpec(opCtx operation.Context, obj, oldObj *v1.PersistentVolumeClaimSpec, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PersistentVolumeClaimSpec.AccessModes
+	errs = append(errs,
+		func(obj, oldObj []v1.PersistentVolumeAccessMode, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.AccessModes, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimSpec) []v1.PersistentVolumeAccessMode { return oldObj.AccessModes }), fldPath.Child("accessModes"))...)
+
+	// field v1.PersistentVolumeClaimSpec.Selector
+	errs = append(errs,
+		func(obj, oldObj *metav1.LabelSelector, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_LabelSelector(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Selector, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimSpec) *metav1.LabelSelector { return oldObj.Selector }), fldPath.Child("selector"))...)
+
+	// field v1.PersistentVolumeClaimSpec.Resources
+	errs = append(errs,
+		func(obj, oldObj *v1.VolumeResourceRequirements, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_VolumeResourceRequirements(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Resources, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimSpec) *v1.VolumeResourceRequirements { return &oldObj.Resources }), fldPath.Child("resources"))...)
+
+	// field v1.PersistentVolumeClaimSpec.VolumeName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.VolumeName, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimSpec) *string { return &oldObj.VolumeName }), fldPath.Child("volumeName"))...)
+
+	// field v1.PersistentVolumeClaimSpec.StorageClassName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.StorageClassName, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimSpec) *string { return oldObj.StorageClassName }), fldPath.Child("storageClassName"))...)
+
+	// field v1.PersistentVolumeClaimSpec.VolumeMode
+	errs = append(errs,
+		func(obj, oldObj *v1.PersistentVolumeMode, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.VolumeMode, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimSpec) *v1.PersistentVolumeMode { return oldObj.VolumeMode }), fldPath.Child("volumeMode"))...)
+
+	// field v1.PersistentVolumeClaimSpec.DataSource
+	errs = append(errs,
+		func(obj, oldObj *v1.TypedLocalObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_TypedLocalObjectReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.DataSource, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimSpec) *v1.TypedLocalObjectReference { return oldObj.DataSource }), fldPath.Child("dataSource"))...)
+
+	// field v1.PersistentVolumeClaimSpec.DataSourceRef
+	errs = append(errs,
+		func(obj, oldObj *v1.TypedObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_TypedObjectReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.DataSourceRef, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimSpec) *v1.TypedObjectReference { return oldObj.DataSourceRef }), fldPath.Child("dataSourceRef"))...)
+
+	// field v1.PersistentVolumeClaimSpec.VolumeAttributesClassName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.VolumeAttributesClassName, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimSpec) *string { return oldObj.VolumeAttributesClassName }), fldPath.Child("volumeAttributesClassName"))...)
+
+	return errs
+}
+
+func Validate_PersistentVolumeClaimStatus(opCtx operation.Context, obj, oldObj *v1.PersistentVolumeClaimStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PersistentVolumeClaimStatus.Phase
+	errs = append(errs,
+		func(obj, oldObj *v1.PersistentVolumeClaimPhase, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Phase, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimStatus) *v1.PersistentVolumeClaimPhase { return &oldObj.Phase }), fldPath.Child("phase"))...)
+
+	// field v1.PersistentVolumeClaimStatus.AccessModes
+	errs = append(errs,
+		func(obj, oldObj []v1.PersistentVolumeAccessMode, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.AccessModes, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimStatus) []v1.PersistentVolumeAccessMode {
+			return oldObj.AccessModes
+		}), fldPath.Child("accessModes"))...)
+
+	// field v1.PersistentVolumeClaimStatus.Capacity
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.Capacity, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimStatus) v1.ResourceList { return oldObj.Capacity }), fldPath.Child("capacity"))...)
+
+	// field v1.PersistentVolumeClaimStatus.Conditions
+	errs = append(errs,
+		func(obj, oldObj []v1.PersistentVolumeClaimCondition, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.PersistentVolumeClaimCondition) any { return [1]any{o.Type} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.PersistentVolumeClaimCondition, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_PersistentVolumeClaimCondition(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.Conditions, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimStatus) []v1.PersistentVolumeClaimCondition {
+			return oldObj.Conditions
+		}), fldPath.Child("conditions"))...)
+
+	// field v1.PersistentVolumeClaimStatus.AllocatedResources
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.AllocatedResources, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimStatus) v1.ResourceList { return oldObj.AllocatedResources }), fldPath.Child("allocatedResources"))...)
+
+	// field v1.PersistentVolumeClaimStatus.AllocatedResourceStatuses
+	errs = append(errs,
+		func(obj, oldObj map[v1.ResourceName]v1.ClaimResourceStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.AllocatedResourceStatuses, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimStatus) map[v1.ResourceName]v1.ClaimResourceStatus {
+			return oldObj.AllocatedResourceStatuses
+		}), fldPath.Child("allocatedResourceStatuses"))...)
+
+	// field v1.PersistentVolumeClaimStatus.CurrentVolumeAttributesClassName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.CurrentVolumeAttributesClassName, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimStatus) *string { return oldObj.CurrentVolumeAttributesClassName }), fldPath.Child("currentVolumeAttributesClassName"))...)
+
+	// field v1.PersistentVolumeClaimStatus.ModifyVolumeStatus
+	errs = append(errs,
+		func(obj, oldObj *v1.ModifyVolumeStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.ModifyVolumeStatus, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimStatus) *v1.ModifyVolumeStatus { return oldObj.ModifyVolumeStatus }), fldPath.Child("modifyVolumeStatus"))...)
+
+	return errs
+}
+
+func Validate_PersistentVolumeClaimTemplate(opCtx operation.Context, obj, oldObj *v1.PersistentVolumeClaimTemplate, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PersistentVolumeClaimTemplate.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimTemplate) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.PersistentVolumeClaimTemplate.Spec
+	errs = append(errs,
+		func(obj, oldObj *v1.PersistentVolumeClaimSpec, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_PersistentVolumeClaimSpec(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Spec, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimTemplate) *v1.PersistentVolumeClaimSpec { return &oldObj.Spec }), fldPath.Child("spec"))...)
+
+	return errs
+}
+
+func Validate_PersistentVolumeClaimVolumeSource(opCtx operation.Context, obj, oldObj *v1.PersistentVolumeClaimVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PersistentVolumeClaimVolumeSource.ClaimName has no validation
+
+	// field v1.PersistentVolumeClaimVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeClaimVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
 	return errs
 }
 
 func Validate_PersistentVolumeList(opCtx operation.Context, obj, oldObj *v1.PersistentVolumeList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PersistentVolumeList.TypeMeta has no validation
-	// field v1.PersistentVolumeList.ListMeta has no validation
-	// field v1.PersistentVolumeList.Items has no validation
+	// field v1.PersistentVolumeList.ListMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ListMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ListMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ListMeta, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeList) *metav1.ListMeta { return &oldObj.ListMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.PersistentVolumeList.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.PersistentVolume, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.PersistentVolume, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_PersistentVolume(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeList) []v1.PersistentVolume { return oldObj.Items }), fldPath.Child("items"))...)
+
+	return errs
+}
+
+func Validate_PersistentVolumeSource(opCtx operation.Context, obj, oldObj *v1.PersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PersistentVolumeSource.GCEPersistentDisk
+	errs = append(errs,
+		func(obj, oldObj *v1.GCEPersistentDiskVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_GCEPersistentDiskVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.GCEPersistentDisk, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.GCEPersistentDiskVolumeSource {
+			return oldObj.GCEPersistentDisk
+		}), fldPath.Child("gcePersistentDisk"))...)
+
+	// field v1.PersistentVolumeSource.AWSElasticBlockStore
+	errs = append(errs,
+		func(obj, oldObj *v1.AWSElasticBlockStoreVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_AWSElasticBlockStoreVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.AWSElasticBlockStore, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.AWSElasticBlockStoreVolumeSource {
+			return oldObj.AWSElasticBlockStore
+		}), fldPath.Child("awsElasticBlockStore"))...)
+
+	// field v1.PersistentVolumeSource.HostPath
+	errs = append(errs,
+		func(obj, oldObj *v1.HostPathVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_HostPathVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.HostPath, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.HostPathVolumeSource { return oldObj.HostPath }), fldPath.Child("hostPath"))...)
+
+	// field v1.PersistentVolumeSource.Glusterfs
+	errs = append(errs,
+		func(obj, oldObj *v1.GlusterfsPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_GlusterfsPersistentVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Glusterfs, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.GlusterfsPersistentVolumeSource { return oldObj.Glusterfs }), fldPath.Child("glusterfs"))...)
+
+	// field v1.PersistentVolumeSource.NFS
+	errs = append(errs,
+		func(obj, oldObj *v1.NFSVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_NFSVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.NFS, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.NFSVolumeSource { return oldObj.NFS }), fldPath.Child("nfs"))...)
+
+	// field v1.PersistentVolumeSource.RBD
+	errs = append(errs,
+		func(obj, oldObj *v1.RBDPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_RBDPersistentVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.RBD, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.RBDPersistentVolumeSource { return oldObj.RBD }), fldPath.Child("rbd"))...)
+
+	// field v1.PersistentVolumeSource.ISCSI
+	errs = append(errs,
+		func(obj, oldObj *v1.ISCSIPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ISCSIPersistentVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ISCSI, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.ISCSIPersistentVolumeSource { return oldObj.ISCSI }), fldPath.Child("iscsi"))...)
+
+	// field v1.PersistentVolumeSource.Cinder
+	errs = append(errs,
+		func(obj, oldObj *v1.CinderPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_CinderPersistentVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Cinder, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.CinderPersistentVolumeSource { return oldObj.Cinder }), fldPath.Child("cinder"))...)
+
+	// field v1.PersistentVolumeSource.CephFS
+	errs = append(errs,
+		func(obj, oldObj *v1.CephFSPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_CephFSPersistentVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.CephFS, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.CephFSPersistentVolumeSource { return oldObj.CephFS }), fldPath.Child("cephfs"))...)
+
+	// field v1.PersistentVolumeSource.FC
+	errs = append(errs,
+		func(obj, oldObj *v1.FCVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_FCVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.FC, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.FCVolumeSource { return oldObj.FC }), fldPath.Child("fc"))...)
+
+	// field v1.PersistentVolumeSource.Flocker
+	errs = append(errs,
+		func(obj, oldObj *v1.FlockerVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_FlockerVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Flocker, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.FlockerVolumeSource { return oldObj.Flocker }), fldPath.Child("flocker"))...)
+
+	// field v1.PersistentVolumeSource.FlexVolume
+	errs = append(errs,
+		func(obj, oldObj *v1.FlexPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_FlexPersistentVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.FlexVolume, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.FlexPersistentVolumeSource { return oldObj.FlexVolume }), fldPath.Child("flexVolume"))...)
+
+	// field v1.PersistentVolumeSource.AzureFile
+	errs = append(errs,
+		func(obj, oldObj *v1.AzureFilePersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_AzureFilePersistentVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.AzureFile, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.AzureFilePersistentVolumeSource { return oldObj.AzureFile }), fldPath.Child("azureFile"))...)
+
+	// field v1.PersistentVolumeSource.VsphereVolume
+	errs = append(errs,
+		func(obj, oldObj *v1.VsphereVirtualDiskVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_VsphereVirtualDiskVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.VsphereVolume, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.VsphereVirtualDiskVolumeSource {
+			return oldObj.VsphereVolume
+		}), fldPath.Child("vsphereVolume"))...)
+
+	// field v1.PersistentVolumeSource.Quobyte
+	errs = append(errs,
+		func(obj, oldObj *v1.QuobyteVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_QuobyteVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Quobyte, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.QuobyteVolumeSource { return oldObj.Quobyte }), fldPath.Child("quobyte"))...)
+
+	// field v1.PersistentVolumeSource.AzureDisk
+	errs = append(errs,
+		func(obj, oldObj *v1.AzureDiskVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_AzureDiskVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.AzureDisk, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.AzureDiskVolumeSource { return oldObj.AzureDisk }), fldPath.Child("azureDisk"))...)
+
+	// field v1.PersistentVolumeSource.PhotonPersistentDisk has no validation
+
+	// field v1.PersistentVolumeSource.PortworxVolume
+	errs = append(errs,
+		func(obj, oldObj *v1.PortworxVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_PortworxVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.PortworxVolume, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.PortworxVolumeSource { return oldObj.PortworxVolume }), fldPath.Child("portworxVolume"))...)
+
+	// field v1.PersistentVolumeSource.ScaleIO
+	errs = append(errs,
+		func(obj, oldObj *v1.ScaleIOPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ScaleIOPersistentVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ScaleIO, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.ScaleIOPersistentVolumeSource { return oldObj.ScaleIO }), fldPath.Child("scaleIO"))...)
+
+	// field v1.PersistentVolumeSource.Local
+	errs = append(errs,
+		func(obj, oldObj *v1.LocalVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_LocalVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Local, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.LocalVolumeSource { return oldObj.Local }), fldPath.Child("local"))...)
+
+	// field v1.PersistentVolumeSource.StorageOS
+	errs = append(errs,
+		func(obj, oldObj *v1.StorageOSPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_StorageOSPersistentVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.StorageOS, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.StorageOSPersistentVolumeSource { return oldObj.StorageOS }), fldPath.Child("storageos"))...)
+
+	// field v1.PersistentVolumeSource.CSI
+	errs = append(errs,
+		func(obj, oldObj *v1.CSIPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_CSIPersistentVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.CSI, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSource) *v1.CSIPersistentVolumeSource { return oldObj.CSI }), fldPath.Child("csi"))...)
+
+	return errs
+}
+
+func Validate_PersistentVolumeSpec(opCtx operation.Context, obj, oldObj *v1.PersistentVolumeSpec, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PersistentVolumeSpec.Capacity
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.Capacity, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSpec) v1.ResourceList { return oldObj.Capacity }), fldPath.Child("capacity"))...)
+
+	// field v1.PersistentVolumeSpec.AccessModes
+	errs = append(errs,
+		func(obj, oldObj []v1.PersistentVolumeAccessMode, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.AccessModes, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSpec) []v1.PersistentVolumeAccessMode { return oldObj.AccessModes }), fldPath.Child("accessModes"))...)
+
+	// field v1.PersistentVolumeSpec.ClaimRef
+	errs = append(errs,
+		func(obj, oldObj *v1.ObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ObjectReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ClaimRef, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSpec) *v1.ObjectReference { return oldObj.ClaimRef }), fldPath.Child("claimRef"))...)
+
+	// field v1.PersistentVolumeSpec.PersistentVolumeReclaimPolicy
+	errs = append(errs,
+		func(obj, oldObj *v1.PersistentVolumeReclaimPolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.PersistentVolumeReclaimPolicy, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSpec) *v1.PersistentVolumeReclaimPolicy {
+			return &oldObj.PersistentVolumeReclaimPolicy
+		}), fldPath.Child("persistentVolumeReclaimPolicy"))...)
+
+	// field v1.PersistentVolumeSpec.StorageClassName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.StorageClassName, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSpec) *string { return &oldObj.StorageClassName }), fldPath.Child("storageClassName"))...)
+
+	// field v1.PersistentVolumeSpec.MountOptions
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.MountOptions, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSpec) []string { return oldObj.MountOptions }), fldPath.Child("mountOptions"))...)
+
+	// field v1.PersistentVolumeSpec.VolumeMode
+	errs = append(errs,
+		func(obj, oldObj *v1.PersistentVolumeMode, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.VolumeMode, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSpec) *v1.PersistentVolumeMode { return oldObj.VolumeMode }), fldPath.Child("volumeMode"))...)
+
+	// field v1.PersistentVolumeSpec.NodeAffinity
+	errs = append(errs,
+		func(obj, oldObj *v1.VolumeNodeAffinity, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_VolumeNodeAffinity(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.NodeAffinity, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSpec) *v1.VolumeNodeAffinity { return oldObj.NodeAffinity }), fldPath.Child("nodeAffinity"))...)
+
+	// field v1.PersistentVolumeSpec.VolumeAttributesClassName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.VolumeAttributesClassName, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeSpec) *string { return oldObj.VolumeAttributesClassName }), fldPath.Child("volumeAttributesClassName"))...)
+
+	return errs
+}
+
+func Validate_PersistentVolumeStatus(opCtx operation.Context, obj, oldObj *v1.PersistentVolumeStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PersistentVolumeStatus.Phase
+	errs = append(errs,
+		func(obj, oldObj *v1.PersistentVolumePhase, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Phase, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeStatus) *v1.PersistentVolumePhase { return &oldObj.Phase }), fldPath.Child("phase"))...)
+
+	// field v1.PersistentVolumeStatus.Message
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Message, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeStatus) *string { return &oldObj.Message }), fldPath.Child("message"))...)
+
+	// field v1.PersistentVolumeStatus.Reason
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Reason, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeStatus) *string { return &oldObj.Reason }), fldPath.Child("reason"))...)
+
+	// field v1.PersistentVolumeStatus.LastPhaseTransitionTime
+	errs = append(errs,
+		func(obj, oldObj *metav1.Time, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.LastPhaseTransitionTime, safe.Field(oldObj, func(oldObj *v1.PersistentVolumeStatus) *metav1.Time { return oldObj.LastPhaseTransitionTime }), fldPath.Child("lastPhaseTransitionTime"))...)
+
 	return errs
 }
 
 func Validate_Pod(opCtx operation.Context, obj, oldObj *v1.Pod, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.Pod.TypeMeta has no validation
-	// field v1.Pod.ObjectMeta has no validation
+	// field v1.Pod.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.Pod) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
 
 	// field v1.Pod.Spec
 	errs = append(errs,
 		func(obj, oldObj *v1.PodSpec, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			errs = append(errs, Validate_PodSpec(opCtx, obj, oldObj, fldPath)...)
 			return
 		}(&obj.Spec, safe.Field(oldObj, func(oldObj *v1.Pod) *v1.PodSpec { return &oldObj.Spec }), fldPath.Child("spec"))...)
@@ -659,6 +5137,9 @@ func Validate_Pod(opCtx operation.Context, obj, oldObj *v1.Pod, fldPath *field.P
 	// field v1.Pod.Status
 	errs = append(errs,
 		func(obj, oldObj *v1.PodStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			errs = append(errs, Validate_PodStatus(opCtx, obj, oldObj, fldPath)...)
 			return
 		}(&obj.Status, safe.Field(oldObj, func(oldObj *v1.Pod) *v1.PodStatus { return &oldObj.Status }), fldPath.Child("status"))...)
@@ -666,23 +5147,330 @@ func Validate_Pod(opCtx operation.Context, obj, oldObj *v1.Pod, fldPath *field.P
 	return errs
 }
 
+func Validate_PodAffinity(opCtx operation.Context, obj, oldObj *v1.PodAffinity, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodAffinity.RequiredDuringSchedulingIgnoredDuringExecution
+	errs = append(errs,
+		func(obj, oldObj []v1.PodAffinityTerm, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.PodAffinityTerm, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_PodAffinityTerm(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.RequiredDuringSchedulingIgnoredDuringExecution, safe.Field(oldObj, func(oldObj *v1.PodAffinity) []v1.PodAffinityTerm {
+			return oldObj.RequiredDuringSchedulingIgnoredDuringExecution
+		}), fldPath.Child("requiredDuringSchedulingIgnoredDuringExecution"))...)
+
+	// field v1.PodAffinity.PreferredDuringSchedulingIgnoredDuringExecution
+	errs = append(errs,
+		func(obj, oldObj []v1.WeightedPodAffinityTerm, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.WeightedPodAffinityTerm, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_WeightedPodAffinityTerm(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.PreferredDuringSchedulingIgnoredDuringExecution, safe.Field(oldObj, func(oldObj *v1.PodAffinity) []v1.WeightedPodAffinityTerm {
+			return oldObj.PreferredDuringSchedulingIgnoredDuringExecution
+		}), fldPath.Child("preferredDuringSchedulingIgnoredDuringExecution"))...)
+
+	return errs
+}
+
+func Validate_PodAffinityTerm(opCtx operation.Context, obj, oldObj *v1.PodAffinityTerm, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodAffinityTerm.LabelSelector
+	errs = append(errs,
+		func(obj, oldObj *metav1.LabelSelector, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_LabelSelector(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.LabelSelector, safe.Field(oldObj, func(oldObj *v1.PodAffinityTerm) *metav1.LabelSelector { return oldObj.LabelSelector }), fldPath.Child("labelSelector"))...)
+
+	// field v1.PodAffinityTerm.Namespaces
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Namespaces, safe.Field(oldObj, func(oldObj *v1.PodAffinityTerm) []string { return oldObj.Namespaces }), fldPath.Child("namespaces"))...)
+
+	// field v1.PodAffinityTerm.TopologyKey has no validation
+
+	// field v1.PodAffinityTerm.NamespaceSelector
+	errs = append(errs,
+		func(obj, oldObj *metav1.LabelSelector, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_LabelSelector(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.NamespaceSelector, safe.Field(oldObj, func(oldObj *v1.PodAffinityTerm) *metav1.LabelSelector { return oldObj.NamespaceSelector }), fldPath.Child("namespaceSelector"))...)
+
+	// field v1.PodAffinityTerm.MatchLabelKeys
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.MatchLabelKeys, safe.Field(oldObj, func(oldObj *v1.PodAffinityTerm) []string { return oldObj.MatchLabelKeys }), fldPath.Child("matchLabelKeys"))...)
+
+	// field v1.PodAffinityTerm.MismatchLabelKeys
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.MismatchLabelKeys, safe.Field(oldObj, func(oldObj *v1.PodAffinityTerm) []string { return oldObj.MismatchLabelKeys }), fldPath.Child("mismatchLabelKeys"))...)
+
+	return errs
+}
+
+func Validate_PodAntiAffinity(opCtx operation.Context, obj, oldObj *v1.PodAntiAffinity, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodAntiAffinity.RequiredDuringSchedulingIgnoredDuringExecution
+	errs = append(errs,
+		func(obj, oldObj []v1.PodAffinityTerm, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.PodAffinityTerm, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_PodAffinityTerm(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.RequiredDuringSchedulingIgnoredDuringExecution, safe.Field(oldObj, func(oldObj *v1.PodAntiAffinity) []v1.PodAffinityTerm {
+			return oldObj.RequiredDuringSchedulingIgnoredDuringExecution
+		}), fldPath.Child("requiredDuringSchedulingIgnoredDuringExecution"))...)
+
+	// field v1.PodAntiAffinity.PreferredDuringSchedulingIgnoredDuringExecution
+	errs = append(errs,
+		func(obj, oldObj []v1.WeightedPodAffinityTerm, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.WeightedPodAffinityTerm, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_WeightedPodAffinityTerm(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.PreferredDuringSchedulingIgnoredDuringExecution, safe.Field(oldObj, func(oldObj *v1.PodAntiAffinity) []v1.WeightedPodAffinityTerm {
+			return oldObj.PreferredDuringSchedulingIgnoredDuringExecution
+		}), fldPath.Child("preferredDuringSchedulingIgnoredDuringExecution"))...)
+
+	return errs
+}
+
 func Validate_PodAttachOptions(opCtx operation.Context, obj, oldObj *v1.PodAttachOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodAttachOptions.TypeMeta has no validation
-	// field v1.PodAttachOptions.Stdin has no validation
-	// field v1.PodAttachOptions.Stdout has no validation
-	// field v1.PodAttachOptions.Stderr has no validation
-	// field v1.PodAttachOptions.TTY has no validation
-	// field v1.PodAttachOptions.Container has no validation
+	// field v1.PodAttachOptions.Stdin
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Stdin, safe.Field(oldObj, func(oldObj *v1.PodAttachOptions) *bool { return &oldObj.Stdin }), fldPath.Child("stdin"))...)
+
+	// field v1.PodAttachOptions.Stdout
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Stdout, safe.Field(oldObj, func(oldObj *v1.PodAttachOptions) *bool { return &oldObj.Stdout }), fldPath.Child("stdout"))...)
+
+	// field v1.PodAttachOptions.Stderr
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Stderr, safe.Field(oldObj, func(oldObj *v1.PodAttachOptions) *bool { return &oldObj.Stderr }), fldPath.Child("stderr"))...)
+
+	// field v1.PodAttachOptions.TTY
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.TTY, safe.Field(oldObj, func(oldObj *v1.PodAttachOptions) *bool { return &oldObj.TTY }), fldPath.Child("tty"))...)
+
+	// field v1.PodAttachOptions.Container
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Container, safe.Field(oldObj, func(oldObj *v1.PodAttachOptions) *string { return &oldObj.Container }), fldPath.Child("container"))...)
+
+	return errs
+}
+
+func Validate_PodCondition(opCtx operation.Context, obj, oldObj *v1.PodCondition, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodCondition.Type has no validation
+	// field v1.PodCondition.Status has no validation
+
+	// field v1.PodCondition.LastProbeTime
+	errs = append(errs,
+		func(obj, oldObj *metav1.Time, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.LastProbeTime, safe.Field(oldObj, func(oldObj *v1.PodCondition) *metav1.Time { return &oldObj.LastProbeTime }), fldPath.Child("lastProbeTime"))...)
+
+	// field v1.PodCondition.LastTransitionTime
+	errs = append(errs,
+		func(obj, oldObj *metav1.Time, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.LastTransitionTime, safe.Field(oldObj, func(oldObj *v1.PodCondition) *metav1.Time { return &oldObj.LastTransitionTime }), fldPath.Child("lastTransitionTime"))...)
+
+	// field v1.PodCondition.Reason
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Reason, safe.Field(oldObj, func(oldObj *v1.PodCondition) *string { return &oldObj.Reason }), fldPath.Child("reason"))...)
+
+	// field v1.PodCondition.Message
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Message, safe.Field(oldObj, func(oldObj *v1.PodCondition) *string { return &oldObj.Message }), fldPath.Child("message"))...)
+
+	return errs
+}
+
+func Validate_PodDNSConfig(opCtx operation.Context, obj, oldObj *v1.PodDNSConfig, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodDNSConfig.Nameservers
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Nameservers, safe.Field(oldObj, func(oldObj *v1.PodDNSConfig) []string { return oldObj.Nameservers }), fldPath.Child("nameservers"))...)
+
+	// field v1.PodDNSConfig.Searches
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Searches, safe.Field(oldObj, func(oldObj *v1.PodDNSConfig) []string { return oldObj.Searches }), fldPath.Child("searches"))...)
+
+	// field v1.PodDNSConfig.Options
+	errs = append(errs,
+		func(obj, oldObj []v1.PodDNSConfigOption, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.PodDNSConfigOption, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_PodDNSConfigOption(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Options, safe.Field(oldObj, func(oldObj *v1.PodDNSConfig) []v1.PodDNSConfigOption { return oldObj.Options }), fldPath.Child("options"))...)
+
+	return errs
+}
+
+func Validate_PodDNSConfigOption(opCtx operation.Context, obj, oldObj *v1.PodDNSConfigOption, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodDNSConfigOption.Name has no validation
+
+	// field v1.PodDNSConfigOption.Value
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Value, safe.Field(oldObj, func(oldObj *v1.PodDNSConfigOption) *string { return oldObj.Value }), fldPath.Child("value"))...)
+
 	return errs
 }
 
 func Validate_PodExecOptions(opCtx operation.Context, obj, oldObj *v1.PodExecOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodExecOptions.TypeMeta has no validation
-	// field v1.PodExecOptions.Stdin has no validation
-	// field v1.PodExecOptions.Stdout has no validation
-	// field v1.PodExecOptions.Stderr has no validation
-	// field v1.PodExecOptions.TTY has no validation
-	// field v1.PodExecOptions.Container has no validation
+	// field v1.PodExecOptions.Stdin
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Stdin, safe.Field(oldObj, func(oldObj *v1.PodExecOptions) *bool { return &oldObj.Stdin }), fldPath.Child("stdin"))...)
+
+	// field v1.PodExecOptions.Stdout
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Stdout, safe.Field(oldObj, func(oldObj *v1.PodExecOptions) *bool { return &oldObj.Stdout }), fldPath.Child("stdout"))...)
+
+	// field v1.PodExecOptions.Stderr
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Stderr, safe.Field(oldObj, func(oldObj *v1.PodExecOptions) *bool { return &oldObj.Stderr }), fldPath.Child("stderr"))...)
+
+	// field v1.PodExecOptions.TTY
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.TTY, safe.Field(oldObj, func(oldObj *v1.PodExecOptions) *bool { return &oldObj.TTY }), fldPath.Child("tty"))...)
+
+	// field v1.PodExecOptions.Container
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Container, safe.Field(oldObj, func(oldObj *v1.PodExecOptions) *string { return &oldObj.Container }), fldPath.Child("container"))...)
+
 	// field v1.PodExecOptions.Command has no validation
 	return errs
 }
@@ -693,7 +5481,7 @@ func Validate_PodIP(opCtx operation.Context, obj, oldObj *v1.PodIP, fldPath *fie
 		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.Required(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			return
 		}(&obj.IP, safe.Field(oldObj, func(oldObj *v1.PodIP) *string { return &oldObj.IP }), fldPath.Child("ip"))...)
@@ -702,8 +5490,15 @@ func Validate_PodIP(opCtx operation.Context, obj, oldObj *v1.PodIP, fldPath *fie
 }
 
 func Validate_PodList(opCtx operation.Context, obj, oldObj *v1.PodList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodList.TypeMeta has no validation
-	// field v1.PodList.ListMeta has no validation
+	// field v1.PodList.ListMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ListMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ListMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ListMeta, safe.Field(oldObj, func(oldObj *v1.PodList) *metav1.ListMeta { return &oldObj.ListMeta }), fldPath.Child("metadata"))...)
 
 	// field v1.PodList.Items
 	errs = append(errs,
@@ -722,46 +5517,232 @@ func Validate_PodList(opCtx operation.Context, obj, oldObj *v1.PodList, fldPath 
 }
 
 func Validate_PodLogOptions(opCtx operation.Context, obj, oldObj *v1.PodLogOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodLogOptions.TypeMeta has no validation
-	// field v1.PodLogOptions.Container has no validation
-	// field v1.PodLogOptions.Follow has no validation
-	// field v1.PodLogOptions.Previous has no validation
-	// field v1.PodLogOptions.SinceSeconds has no validation
-	// field v1.PodLogOptions.SinceTime has no validation
-	// field v1.PodLogOptions.Timestamps has no validation
-	// field v1.PodLogOptions.TailLines has no validation
-	// field v1.PodLogOptions.LimitBytes has no validation
-	// field v1.PodLogOptions.InsecureSkipTLSVerifyBackend has no validation
+	// field v1.PodLogOptions.Container
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Container, safe.Field(oldObj, func(oldObj *v1.PodLogOptions) *string { return &oldObj.Container }), fldPath.Child("container"))...)
+
+	// field v1.PodLogOptions.Follow
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Follow, safe.Field(oldObj, func(oldObj *v1.PodLogOptions) *bool { return &oldObj.Follow }), fldPath.Child("follow"))...)
+
+	// field v1.PodLogOptions.Previous
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Previous, safe.Field(oldObj, func(oldObj *v1.PodLogOptions) *bool { return &oldObj.Previous }), fldPath.Child("previous"))...)
+
+	// field v1.PodLogOptions.SinceSeconds
+	errs = append(errs,
+		func(obj, oldObj *int64, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.SinceSeconds, safe.Field(oldObj, func(oldObj *v1.PodLogOptions) *int64 { return oldObj.SinceSeconds }), fldPath.Child("sinceSeconds"))...)
+
+	// field v1.PodLogOptions.SinceTime
+	errs = append(errs,
+		func(obj, oldObj *metav1.Time, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.SinceTime, safe.Field(oldObj, func(oldObj *v1.PodLogOptions) *metav1.Time { return oldObj.SinceTime }), fldPath.Child("sinceTime"))...)
+
+	// field v1.PodLogOptions.Timestamps
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Timestamps, safe.Field(oldObj, func(oldObj *v1.PodLogOptions) *bool { return &oldObj.Timestamps }), fldPath.Child("timestamps"))...)
+
+	// field v1.PodLogOptions.TailLines
+	errs = append(errs,
+		func(obj, oldObj *int64, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.TailLines, safe.Field(oldObj, func(oldObj *v1.PodLogOptions) *int64 { return oldObj.TailLines }), fldPath.Child("tailLines"))...)
+
+	// field v1.PodLogOptions.LimitBytes
+	errs = append(errs,
+		func(obj, oldObj *int64, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.LimitBytes, safe.Field(oldObj, func(oldObj *v1.PodLogOptions) *int64 { return oldObj.LimitBytes }), fldPath.Child("limitBytes"))...)
+
+	// field v1.PodLogOptions.InsecureSkipTLSVerifyBackend
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.InsecureSkipTLSVerifyBackend, safe.Field(oldObj, func(oldObj *v1.PodLogOptions) *bool { return &oldObj.InsecureSkipTLSVerifyBackend }), fldPath.Child("insecureSkipTLSVerifyBackend"))...)
+
 	return errs
 }
 
 func Validate_PodPortForwardOptions(opCtx operation.Context, obj, oldObj *v1.PodPortForwardOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodPortForwardOptions.TypeMeta has no validation
-	// field v1.PodPortForwardOptions.Ports has no validation
+	// field v1.PodPortForwardOptions.Ports
+	errs = append(errs,
+		func(obj, oldObj []int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Ports, safe.Field(oldObj, func(oldObj *v1.PodPortForwardOptions) []int32 { return oldObj.Ports }), fldPath.Child("ports"))...)
+
 	return errs
 }
 
 func Validate_PodProxyOptions(opCtx operation.Context, obj, oldObj *v1.PodProxyOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodProxyOptions.TypeMeta has no validation
-	// field v1.PodProxyOptions.Path has no validation
+	// field v1.PodProxyOptions.Path
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Path, safe.Field(oldObj, func(oldObj *v1.PodProxyOptions) *string { return &oldObj.Path }), fldPath.Child("path"))...)
+
+	return errs
+}
+
+func Validate_PodResourceClaimStatus(opCtx operation.Context, obj, oldObj *v1.PodResourceClaimStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodResourceClaimStatus.Name has no validation
+
+	// field v1.PodResourceClaimStatus.ResourceClaimName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.ResourceClaimName, safe.Field(oldObj, func(oldObj *v1.PodResourceClaimStatus) *string { return oldObj.ResourceClaimName }), fldPath.Child("resourceClaimName"))...)
+
 	return errs
 }
 
 func Validate_PodSecurityContext(opCtx operation.Context, obj, oldObj *v1.PodSecurityContext, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodSecurityContext.SELinuxOptions has no validation
-	// field v1.PodSecurityContext.WindowsOptions has no validation
-	// field v1.PodSecurityContext.RunAsUser has no validation
-	// field v1.PodSecurityContext.RunAsGroup has no validation
-	// field v1.PodSecurityContext.RunAsNonRoot has no validation
-	// field v1.PodSecurityContext.SupplementalGroups has no validation
-	// field v1.PodSecurityContext.SupplementalGroupsPolicy has no validation
-	// field v1.PodSecurityContext.FSGroup has no validation
-	// field v1.PodSecurityContext.Sysctls has no validation
-	// field v1.PodSecurityContext.FSGroupChangePolicy has no validation
+	// field v1.PodSecurityContext.SELinuxOptions
+	errs = append(errs,
+		func(obj, oldObj *v1.SELinuxOptions, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_SELinuxOptions(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SELinuxOptions, safe.Field(oldObj, func(oldObj *v1.PodSecurityContext) *v1.SELinuxOptions { return oldObj.SELinuxOptions }), fldPath.Child("seLinuxOptions"))...)
+
+	// field v1.PodSecurityContext.WindowsOptions
+	errs = append(errs,
+		func(obj, oldObj *v1.WindowsSecurityContextOptions, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_WindowsSecurityContextOptions(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.WindowsOptions, safe.Field(oldObj, func(oldObj *v1.PodSecurityContext) *v1.WindowsSecurityContextOptions { return oldObj.WindowsOptions }), fldPath.Child("windowsOptions"))...)
+
+	// field v1.PodSecurityContext.RunAsUser
+	errs = append(errs,
+		func(obj, oldObj *int64, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.RunAsUser, safe.Field(oldObj, func(oldObj *v1.PodSecurityContext) *int64 { return oldObj.RunAsUser }), fldPath.Child("runAsUser"))...)
+
+	// field v1.PodSecurityContext.RunAsGroup
+	errs = append(errs,
+		func(obj, oldObj *int64, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.RunAsGroup, safe.Field(oldObj, func(oldObj *v1.PodSecurityContext) *int64 { return oldObj.RunAsGroup }), fldPath.Child("runAsGroup"))...)
+
+	// field v1.PodSecurityContext.RunAsNonRoot
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.RunAsNonRoot, safe.Field(oldObj, func(oldObj *v1.PodSecurityContext) *bool { return oldObj.RunAsNonRoot }), fldPath.Child("runAsNonRoot"))...)
+
+	// field v1.PodSecurityContext.SupplementalGroups
+	errs = append(errs,
+		func(obj, oldObj []int64, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.SupplementalGroups, safe.Field(oldObj, func(oldObj *v1.PodSecurityContext) []int64 { return oldObj.SupplementalGroups }), fldPath.Child("supplementalGroups"))...)
+
+	// field v1.PodSecurityContext.SupplementalGroupsPolicy
+	errs = append(errs,
+		func(obj, oldObj *v1.SupplementalGroupsPolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.SupplementalGroupsPolicy, safe.Field(oldObj, func(oldObj *v1.PodSecurityContext) *v1.SupplementalGroupsPolicy {
+			return oldObj.SupplementalGroupsPolicy
+		}), fldPath.Child("supplementalGroupsPolicy"))...)
+
+	// field v1.PodSecurityContext.FSGroup
+	errs = append(errs,
+		func(obj, oldObj *int64, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.FSGroup, safe.Field(oldObj, func(oldObj *v1.PodSecurityContext) *int64 { return oldObj.FSGroup }), fldPath.Child("fsGroup"))...)
+
+	// field v1.PodSecurityContext.Sysctls
+	errs = append(errs,
+		func(obj, oldObj []v1.Sysctl, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Sysctls, safe.Field(oldObj, func(oldObj *v1.PodSecurityContext) []v1.Sysctl { return oldObj.Sysctls }), fldPath.Child("sysctls"))...)
+
+	// field v1.PodSecurityContext.FSGroupChangePolicy
+	errs = append(errs,
+		func(obj, oldObj *v1.PodFSGroupChangePolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.FSGroupChangePolicy, safe.Field(oldObj, func(oldObj *v1.PodSecurityContext) *v1.PodFSGroupChangePolicy { return oldObj.FSGroupChangePolicy }), fldPath.Child("fsGroupChangePolicy"))...)
 
 	// field v1.PodSecurityContext.SeccompProfile
 	errs = append(errs,
 		func(obj, oldObj *v1.SeccompProfile, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			errs = append(errs, Validate_SeccompProfile(opCtx, obj, oldObj, fldPath)...)
 			return
 		}(obj.SeccompProfile, safe.Field(oldObj, func(oldObj *v1.PodSecurityContext) *v1.SeccompProfile { return oldObj.SeccompProfile }), fldPath.Child("seccompProfile"))...)
@@ -769,6 +5750,9 @@ func Validate_PodSecurityContext(opCtx operation.Context, obj, oldObj *v1.PodSec
 	// field v1.PodSecurityContext.AppArmorProfile
 	errs = append(errs,
 		func(obj, oldObj *v1.AppArmorProfile, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			errs = append(errs, Validate_AppArmorProfile(opCtx, obj, oldObj, fldPath)...)
 			return
 		}(obj.AppArmorProfile, safe.Field(oldObj, func(oldObj *v1.PodSecurityContext) *v1.AppArmorProfile { return oldObj.AppArmorProfile }), fldPath.Child("appArmorProfile"))...)
@@ -780,6 +5764,9 @@ func Validate_PodSpec(opCtx operation.Context, obj, oldObj *v1.PodSpec, fldPath 
 	// field v1.PodSpec.Volumes
 	errs = append(errs,
 		func(obj, oldObj []v1.Volume, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			oldListMap := safe.NewListMap(oldObj, func(o *v1.Volume) any { return [1]any{o.Name} })
 			for i, val := range obj {
 				errs = append(errs,
@@ -822,47 +5809,223 @@ func Validate_PodSpec(opCtx operation.Context, obj, oldObj *v1.PodSpec, fldPath 
 	// field v1.PodSpec.EphemeralContainers
 	errs = append(errs,
 		func(obj, oldObj []v1.EphemeralContainer, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.EphemeralContainer) any { return [1]any{o.Name} })
 			for i, val := range obj {
 				errs = append(errs,
 					func(obj, oldObj *v1.EphemeralContainer, fldPath *field.Path) (errs field.ErrorList) {
 						errs = append(errs, Validate_EphemeralContainer(opCtx, obj, oldObj, fldPath)...)
 						return
-					}(&val, nil, fldPath.Index(i))...)
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
 			}
 			return
 		}(obj.EphemeralContainers, safe.Field(oldObj, func(oldObj *v1.PodSpec) []v1.EphemeralContainer { return oldObj.EphemeralContainers }), fldPath.Child("ephemeralContainers"))...)
 
-	// field v1.PodSpec.RestartPolicy has no validation
-	// field v1.PodSpec.TerminationGracePeriodSeconds has no validation
-	// field v1.PodSpec.ActiveDeadlineSeconds has no validation
-	// field v1.PodSpec.DNSPolicy has no validation
-	// field v1.PodSpec.NodeSelector has no validation
-	// field v1.PodSpec.ServiceAccountName has no validation
-	// field v1.PodSpec.DeprecatedServiceAccount has no validation
-	// field v1.PodSpec.AutomountServiceAccountToken has no validation
-	// field v1.PodSpec.NodeName has no validation
-	// field v1.PodSpec.HostNetwork has no validation
-	// field v1.PodSpec.HostPID has no validation
-	// field v1.PodSpec.HostIPC has no validation
-	// field v1.PodSpec.ShareProcessNamespace has no validation
+	// field v1.PodSpec.RestartPolicy
+	errs = append(errs,
+		func(obj, oldObj *v1.RestartPolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.RestartPolicy, safe.Field(oldObj, func(oldObj *v1.PodSpec) *v1.RestartPolicy { return &oldObj.RestartPolicy }), fldPath.Child("restartPolicy"))...)
+
+	// field v1.PodSpec.TerminationGracePeriodSeconds
+	errs = append(errs,
+		func(obj, oldObj *int64, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.TerminationGracePeriodSeconds, safe.Field(oldObj, func(oldObj *v1.PodSpec) *int64 { return oldObj.TerminationGracePeriodSeconds }), fldPath.Child("terminationGracePeriodSeconds"))...)
+
+	// field v1.PodSpec.ActiveDeadlineSeconds
+	errs = append(errs,
+		func(obj, oldObj *int64, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.ActiveDeadlineSeconds, safe.Field(oldObj, func(oldObj *v1.PodSpec) *int64 { return oldObj.ActiveDeadlineSeconds }), fldPath.Child("activeDeadlineSeconds"))...)
+
+	// field v1.PodSpec.DNSPolicy
+	errs = append(errs,
+		func(obj, oldObj *v1.DNSPolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.DNSPolicy, safe.Field(oldObj, func(oldObj *v1.PodSpec) *v1.DNSPolicy { return &oldObj.DNSPolicy }), fldPath.Child("dnsPolicy"))...)
+
+	// field v1.PodSpec.NodeSelector
+	errs = append(errs,
+		func(obj, oldObj map[string]string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.NodeSelector, safe.Field(oldObj, func(oldObj *v1.PodSpec) map[string]string { return oldObj.NodeSelector }), fldPath.Child("nodeSelector"))...)
+
+	// field v1.PodSpec.ServiceAccountName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ServiceAccountName, safe.Field(oldObj, func(oldObj *v1.PodSpec) *string { return &oldObj.ServiceAccountName }), fldPath.Child("serviceAccountName"))...)
+
+	// field v1.PodSpec.DeprecatedServiceAccount
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.DeprecatedServiceAccount, safe.Field(oldObj, func(oldObj *v1.PodSpec) *string { return &oldObj.DeprecatedServiceAccount }), fldPath.Child("serviceAccount"))...)
+
+	// field v1.PodSpec.AutomountServiceAccountToken
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.AutomountServiceAccountToken, safe.Field(oldObj, func(oldObj *v1.PodSpec) *bool { return oldObj.AutomountServiceAccountToken }), fldPath.Child("automountServiceAccountToken"))...)
+
+	// field v1.PodSpec.NodeName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.NodeName, safe.Field(oldObj, func(oldObj *v1.PodSpec) *string { return &oldObj.NodeName }), fldPath.Child("nodeName"))...)
+
+	// field v1.PodSpec.HostNetwork
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.HostNetwork, safe.Field(oldObj, func(oldObj *v1.PodSpec) *bool { return &oldObj.HostNetwork }), fldPath.Child("hostNetwork"))...)
+
+	// field v1.PodSpec.HostPID
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.HostPID, safe.Field(oldObj, func(oldObj *v1.PodSpec) *bool { return &oldObj.HostPID }), fldPath.Child("hostPID"))...)
+
+	// field v1.PodSpec.HostIPC
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.HostIPC, safe.Field(oldObj, func(oldObj *v1.PodSpec) *bool { return &oldObj.HostIPC }), fldPath.Child("hostIPC"))...)
+
+	// field v1.PodSpec.ShareProcessNamespace
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.ShareProcessNamespace, safe.Field(oldObj, func(oldObj *v1.PodSpec) *bool { return oldObj.ShareProcessNamespace }), fldPath.Child("shareProcessNamespace"))...)
 
 	// field v1.PodSpec.SecurityContext
 	errs = append(errs,
 		func(obj, oldObj *v1.PodSecurityContext, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			errs = append(errs, Validate_PodSecurityContext(opCtx, obj, oldObj, fldPath)...)
 			return
 		}(obj.SecurityContext, safe.Field(oldObj, func(oldObj *v1.PodSpec) *v1.PodSecurityContext { return oldObj.SecurityContext }), fldPath.Child("securityContext"))...)
 
-	// field v1.PodSpec.ImagePullSecrets has no validation
-	// field v1.PodSpec.Hostname has no validation
-	// field v1.PodSpec.Subdomain has no validation
-	// field v1.PodSpec.Affinity has no validation
-	// field v1.PodSpec.SchedulerName has no validation
-	// field v1.PodSpec.Tolerations has no validation
+	// field v1.PodSpec.ImagePullSecrets
+	errs = append(errs,
+		func(obj, oldObj []v1.LocalObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.LocalObjectReference) any { return [1]any{o.Name} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.LocalObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_LocalObjectReference(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.ImagePullSecrets, safe.Field(oldObj, func(oldObj *v1.PodSpec) []v1.LocalObjectReference { return oldObj.ImagePullSecrets }), fldPath.Child("imagePullSecrets"))...)
+
+	// field v1.PodSpec.Hostname
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Hostname, safe.Field(oldObj, func(oldObj *v1.PodSpec) *string { return &oldObj.Hostname }), fldPath.Child("hostname"))...)
+
+	// field v1.PodSpec.Subdomain
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Subdomain, safe.Field(oldObj, func(oldObj *v1.PodSpec) *string { return &oldObj.Subdomain }), fldPath.Child("subdomain"))...)
+
+	// field v1.PodSpec.Affinity
+	errs = append(errs,
+		func(obj, oldObj *v1.Affinity, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_Affinity(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Affinity, safe.Field(oldObj, func(oldObj *v1.PodSpec) *v1.Affinity { return oldObj.Affinity }), fldPath.Child("affinity"))...)
+
+	// field v1.PodSpec.SchedulerName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.SchedulerName, safe.Field(oldObj, func(oldObj *v1.PodSpec) *string { return &oldObj.SchedulerName }), fldPath.Child("schedulerName"))...)
+
+	// field v1.PodSpec.Tolerations
+	errs = append(errs,
+		func(obj, oldObj []v1.Toleration, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.Toleration, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Toleration(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Tolerations, safe.Field(oldObj, func(oldObj *v1.PodSpec) []v1.Toleration { return oldObj.Tolerations }), fldPath.Child("tolerations"))...)
 
 	// field v1.PodSpec.HostAliases
 	errs = append(errs,
 		func(obj, oldObj []v1.HostAlias, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			oldListMap := safe.NewListMap(oldObj, func(o *v1.HostAlias) any { return [1]any{o.IP} })
 			for i, val := range obj {
 				errs = append(errs,
@@ -874,34 +6037,221 @@ func Validate_PodSpec(opCtx operation.Context, obj, oldObj *v1.PodSpec, fldPath 
 			return
 		}(obj.HostAliases, safe.Field(oldObj, func(oldObj *v1.PodSpec) []v1.HostAlias { return oldObj.HostAliases }), fldPath.Child("hostAliases"))...)
 
-	// field v1.PodSpec.PriorityClassName has no validation
-	// field v1.PodSpec.Priority has no validation
-	// field v1.PodSpec.DNSConfig has no validation
-	// field v1.PodSpec.ReadinessGates has no validation
-	// field v1.PodSpec.RuntimeClassName has no validation
-	// field v1.PodSpec.EnableServiceLinks has no validation
-	// field v1.PodSpec.PreemptionPolicy has no validation
-	// field v1.PodSpec.Overhead has no validation
-	// field v1.PodSpec.TopologySpreadConstraints has no validation
-	// field v1.PodSpec.SetHostnameAsFQDN has no validation
-	// field v1.PodSpec.OS has no validation
-	// field v1.PodSpec.HostUsers has no validation
-	// field v1.PodSpec.SchedulingGates has no validation
-	// field v1.PodSpec.ResourceClaims has no validation
+	// field v1.PodSpec.PriorityClassName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.PriorityClassName, safe.Field(oldObj, func(oldObj *v1.PodSpec) *string { return &oldObj.PriorityClassName }), fldPath.Child("priorityClassName"))...)
+
+	// field v1.PodSpec.Priority
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Priority, safe.Field(oldObj, func(oldObj *v1.PodSpec) *int32 { return oldObj.Priority }), fldPath.Child("priority"))...)
+
+	// field v1.PodSpec.DNSConfig
+	errs = append(errs,
+		func(obj, oldObj *v1.PodDNSConfig, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_PodDNSConfig(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.DNSConfig, safe.Field(oldObj, func(oldObj *v1.PodSpec) *v1.PodDNSConfig { return oldObj.DNSConfig }), fldPath.Child("dnsConfig"))...)
+
+	// field v1.PodSpec.ReadinessGates
+	errs = append(errs,
+		func(obj, oldObj []v1.PodReadinessGate, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.ReadinessGates, safe.Field(oldObj, func(oldObj *v1.PodSpec) []v1.PodReadinessGate { return oldObj.ReadinessGates }), fldPath.Child("readinessGates"))...)
+
+	// field v1.PodSpec.RuntimeClassName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.RuntimeClassName, safe.Field(oldObj, func(oldObj *v1.PodSpec) *string { return oldObj.RuntimeClassName }), fldPath.Child("runtimeClassName"))...)
+
+	// field v1.PodSpec.EnableServiceLinks
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.EnableServiceLinks, safe.Field(oldObj, func(oldObj *v1.PodSpec) *bool { return oldObj.EnableServiceLinks }), fldPath.Child("enableServiceLinks"))...)
+
+	// field v1.PodSpec.PreemptionPolicy
+	errs = append(errs,
+		func(obj, oldObj *v1.PreemptionPolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.PreemptionPolicy, safe.Field(oldObj, func(oldObj *v1.PodSpec) *v1.PreemptionPolicy { return oldObj.PreemptionPolicy }), fldPath.Child("preemptionPolicy"))...)
+
+	// field v1.PodSpec.Overhead
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.Overhead, safe.Field(oldObj, func(oldObj *v1.PodSpec) v1.ResourceList { return oldObj.Overhead }), fldPath.Child("overhead"))...)
+
+	// field v1.PodSpec.TopologySpreadConstraints
+	errs = append(errs,
+		func(obj, oldObj []v1.TopologySpreadConstraint, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.TopologySpreadConstraint) any { return [2]any{o.TopologyKey, o.WhenUnsatisfiable} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.TopologySpreadConstraint, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_TopologySpreadConstraint(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.TopologySpreadConstraints, safe.Field(oldObj, func(oldObj *v1.PodSpec) []v1.TopologySpreadConstraint { return oldObj.TopologySpreadConstraints }), fldPath.Child("topologySpreadConstraints"))...)
+
+	// field v1.PodSpec.SetHostnameAsFQDN
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.SetHostnameAsFQDN, safe.Field(oldObj, func(oldObj *v1.PodSpec) *bool { return oldObj.SetHostnameAsFQDN }), fldPath.Child("setHostnameAsFQDN"))...)
+
+	// field v1.PodSpec.OS
+	errs = append(errs,
+		func(obj, oldObj *v1.PodOS, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.OS, safe.Field(oldObj, func(oldObj *v1.PodSpec) *v1.PodOS { return oldObj.OS }), fldPath.Child("os"))...)
+
+	// field v1.PodSpec.HostUsers
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.HostUsers, safe.Field(oldObj, func(oldObj *v1.PodSpec) *bool { return oldObj.HostUsers }), fldPath.Child("hostUsers"))...)
+
+	// field v1.PodSpec.SchedulingGates
+	errs = append(errs,
+		func(obj, oldObj []v1.PodSchedulingGate, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.SchedulingGates, safe.Field(oldObj, func(oldObj *v1.PodSpec) []v1.PodSchedulingGate { return oldObj.SchedulingGates }), fldPath.Child("schedulingGates"))...)
+
+	// field v1.PodSpec.ResourceClaims
+	errs = append(errs,
+		func(obj, oldObj []v1.PodResourceClaim, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.ResourceClaims, safe.Field(oldObj, func(oldObj *v1.PodSpec) []v1.PodResourceClaim { return oldObj.ResourceClaims }), fldPath.Child("resourceClaims"))...)
+
 	return errs
 }
 
 func Validate_PodStatus(opCtx operation.Context, obj, oldObj *v1.PodStatus, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodStatus.Phase has no validation
-	// field v1.PodStatus.Conditions has no validation
-	// field v1.PodStatus.Message has no validation
-	// field v1.PodStatus.Reason has no validation
-	// field v1.PodStatus.NominatedNodeName has no validation
-	// field v1.PodStatus.HostIP has no validation
+	// field v1.PodStatus.Phase
+	errs = append(errs,
+		func(obj, oldObj *v1.PodPhase, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Phase, safe.Field(oldObj, func(oldObj *v1.PodStatus) *v1.PodPhase { return &oldObj.Phase }), fldPath.Child("phase"))...)
+
+	// field v1.PodStatus.Conditions
+	errs = append(errs,
+		func(obj, oldObj []v1.PodCondition, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.PodCondition) any { return [1]any{o.Type} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.PodCondition, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_PodCondition(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.Conditions, safe.Field(oldObj, func(oldObj *v1.PodStatus) []v1.PodCondition { return oldObj.Conditions }), fldPath.Child("conditions"))...)
+
+	// field v1.PodStatus.Message
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Message, safe.Field(oldObj, func(oldObj *v1.PodStatus) *string { return &oldObj.Message }), fldPath.Child("message"))...)
+
+	// field v1.PodStatus.Reason
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Reason, safe.Field(oldObj, func(oldObj *v1.PodStatus) *string { return &oldObj.Reason }), fldPath.Child("reason"))...)
+
+	// field v1.PodStatus.NominatedNodeName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.NominatedNodeName, safe.Field(oldObj, func(oldObj *v1.PodStatus) *string { return &oldObj.NominatedNodeName }), fldPath.Child("nominatedNodeName"))...)
+
+	// field v1.PodStatus.HostIP
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.HostIP, safe.Field(oldObj, func(oldObj *v1.PodStatus) *string { return &oldObj.HostIP }), fldPath.Child("hostIP"))...)
 
 	// field v1.PodStatus.HostIPs
 	errs = append(errs,
 		func(obj, oldObj []v1.HostIP, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			for i, val := range obj {
 				errs = append(errs,
 					func(obj, oldObj *v1.HostIP, fldPath *field.Path) (errs field.ErrorList) {
@@ -912,11 +6262,21 @@ func Validate_PodStatus(opCtx operation.Context, obj, oldObj *v1.PodStatus, fldP
 			return
 		}(obj.HostIPs, safe.Field(oldObj, func(oldObj *v1.PodStatus) []v1.HostIP { return oldObj.HostIPs }), fldPath.Child("hostIPs"))...)
 
-	// field v1.PodStatus.PodIP has no validation
+	// field v1.PodStatus.PodIP
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.PodIP, safe.Field(oldObj, func(oldObj *v1.PodStatus) *string { return &oldObj.PodIP }), fldPath.Child("podIP"))...)
 
 	// field v1.PodStatus.PodIPs
 	errs = append(errs,
 		func(obj, oldObj []v1.PodIP, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			oldListMap := safe.NewListMap(oldObj, func(o *v1.PodIP) any { return [1]any{o.IP} })
 			for i, val := range obj {
 				errs = append(errs,
@@ -928,7 +6288,14 @@ func Validate_PodStatus(opCtx operation.Context, obj, oldObj *v1.PodStatus, fldP
 			return
 		}(obj.PodIPs, safe.Field(oldObj, func(oldObj *v1.PodStatus) []v1.PodIP { return oldObj.PodIPs }), fldPath.Child("podIPs"))...)
 
-	// field v1.PodStatus.StartTime has no validation
+	// field v1.PodStatus.StartTime
+	errs = append(errs,
+		func(obj, oldObj *metav1.Time, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.StartTime, safe.Field(oldObj, func(oldObj *v1.PodStatus) *metav1.Time { return oldObj.StartTime }), fldPath.Child("startTime"))...)
 
 	// field v1.PodStatus.InitContainerStatuses
 	errs = append(errs,
@@ -946,6 +6313,9 @@ func Validate_PodStatus(opCtx operation.Context, obj, oldObj *v1.PodStatus, fldP
 	// field v1.PodStatus.ContainerStatuses
 	errs = append(errs,
 		func(obj, oldObj []v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			for i, val := range obj {
 				errs = append(errs,
 					func(obj, oldObj *v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
@@ -956,11 +6326,21 @@ func Validate_PodStatus(opCtx operation.Context, obj, oldObj *v1.PodStatus, fldP
 			return
 		}(obj.ContainerStatuses, safe.Field(oldObj, func(oldObj *v1.PodStatus) []v1.ContainerStatus { return oldObj.ContainerStatuses }), fldPath.Child("containerStatuses"))...)
 
-	// field v1.PodStatus.QOSClass has no validation
+	// field v1.PodStatus.QOSClass
+	errs = append(errs,
+		func(obj, oldObj *v1.PodQOSClass, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.QOSClass, safe.Field(oldObj, func(oldObj *v1.PodStatus) *v1.PodQOSClass { return &oldObj.QOSClass }), fldPath.Child("qosClass"))...)
 
 	// field v1.PodStatus.EphemeralContainerStatuses
 	errs = append(errs,
 		func(obj, oldObj []v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			for i, val := range obj {
 				errs = append(errs,
 					func(obj, oldObj *v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
@@ -971,18 +6351,52 @@ func Validate_PodStatus(opCtx operation.Context, obj, oldObj *v1.PodStatus, fldP
 			return
 		}(obj.EphemeralContainerStatuses, safe.Field(oldObj, func(oldObj *v1.PodStatus) []v1.ContainerStatus { return oldObj.EphemeralContainerStatuses }), fldPath.Child("ephemeralContainerStatuses"))...)
 
-	// field v1.PodStatus.Resize has no validation
-	// field v1.PodStatus.ResourceClaimStatuses has no validation
+	// field v1.PodStatus.Resize
+	errs = append(errs,
+		func(obj, oldObj *v1.PodResizeStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Resize, safe.Field(oldObj, func(oldObj *v1.PodStatus) *v1.PodResizeStatus { return &oldObj.Resize }), fldPath.Child("resize"))...)
+
+	// field v1.PodStatus.ResourceClaimStatuses
+	errs = append(errs,
+		func(obj, oldObj []v1.PodResourceClaimStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.PodResourceClaimStatus) any { return [1]any{o.Name} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.PodResourceClaimStatus, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_PodResourceClaimStatus(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.ResourceClaimStatuses, safe.Field(oldObj, func(oldObj *v1.PodStatus) []v1.PodResourceClaimStatus { return oldObj.ResourceClaimStatuses }), fldPath.Child("resourceClaimStatuses"))...)
+
 	return errs
 }
 
 func Validate_PodStatusResult(opCtx operation.Context, obj, oldObj *v1.PodStatusResult, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodStatusResult.TypeMeta has no validation
-	// field v1.PodStatusResult.ObjectMeta has no validation
+	// field v1.PodStatusResult.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.PodStatusResult) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
 
 	// field v1.PodStatusResult.Status
 	errs = append(errs,
 		func(obj, oldObj *v1.PodStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			errs = append(errs, Validate_PodStatus(opCtx, obj, oldObj, fldPath)...)
 			return
 		}(&obj.Status, safe.Field(oldObj, func(oldObj *v1.PodStatusResult) *v1.PodStatus { return &oldObj.Status }), fldPath.Child("status"))...)
@@ -991,12 +6405,22 @@ func Validate_PodStatusResult(opCtx operation.Context, obj, oldObj *v1.PodStatus
 }
 
 func Validate_PodTemplate(opCtx operation.Context, obj, oldObj *v1.PodTemplate, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodTemplate.TypeMeta has no validation
-	// field v1.PodTemplate.ObjectMeta has no validation
+	// field v1.PodTemplate.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.PodTemplate) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
 
 	// field v1.PodTemplate.Template
 	errs = append(errs,
 		func(obj, oldObj *v1.PodTemplateSpec, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			errs = append(errs, Validate_PodTemplateSpec(opCtx, obj, oldObj, fldPath)...)
 			return
 		}(&obj.Template, safe.Field(oldObj, func(oldObj *v1.PodTemplate) *v1.PodTemplateSpec { return &oldObj.Template }), fldPath.Child("template"))...)
@@ -1005,8 +6429,15 @@ func Validate_PodTemplate(opCtx operation.Context, obj, oldObj *v1.PodTemplate, 
 }
 
 func Validate_PodTemplateList(opCtx operation.Context, obj, oldObj *v1.PodTemplateList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodTemplateList.TypeMeta has no validation
-	// field v1.PodTemplateList.ListMeta has no validation
+	// field v1.PodTemplateList.ListMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ListMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ListMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ListMeta, safe.Field(oldObj, func(oldObj *v1.PodTemplateList) *metav1.ListMeta { return &oldObj.ListMeta }), fldPath.Child("metadata"))...)
 
 	// field v1.PodTemplateList.Items
 	errs = append(errs,
@@ -1025,11 +6456,22 @@ func Validate_PodTemplateList(opCtx operation.Context, obj, oldObj *v1.PodTempla
 }
 
 func Validate_PodTemplateSpec(opCtx operation.Context, obj, oldObj *v1.PodTemplateSpec, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodTemplateSpec.ObjectMeta has no validation
+	// field v1.PodTemplateSpec.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.PodTemplateSpec) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
 
 	// field v1.PodTemplateSpec.Spec
 	errs = append(errs,
 		func(obj, oldObj *v1.PodSpec, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			errs = append(errs, Validate_PodSpec(opCtx, obj, oldObj, fldPath)...)
 			return
 		}(&obj.Spec, safe.Field(oldObj, func(oldObj *v1.PodTemplateSpec) *v1.PodSpec { return &oldObj.Spec }), fldPath.Child("spec"))...)
@@ -1037,32 +6479,443 @@ func Validate_PodTemplateSpec(opCtx operation.Context, obj, oldObj *v1.PodTempla
 	return errs
 }
 
+func Validate_PortStatus(opCtx operation.Context, obj, oldObj *v1.PortStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PortStatus.Port has no validation
+	// field v1.PortStatus.Protocol has no validation
+
+	// field v1.PortStatus.Error
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Error, safe.Field(oldObj, func(oldObj *v1.PortStatus) *string { return oldObj.Error }), fldPath.Child("error"))...)
+
+	return errs
+}
+
+func Validate_PortworxVolumeSource(opCtx operation.Context, obj, oldObj *v1.PortworxVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PortworxVolumeSource.VolumeID has no validation
+	// field v1.PortworxVolumeSource.FSType has no validation
+
+	// field v1.PortworxVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.PortworxVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	return errs
+}
+
+func Validate_PreferredSchedulingTerm(opCtx operation.Context, obj, oldObj *v1.PreferredSchedulingTerm, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PreferredSchedulingTerm.Weight has no validation
+
+	// field v1.PreferredSchedulingTerm.Preference
+	errs = append(errs,
+		func(obj, oldObj *v1.NodeSelectorTerm, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_NodeSelectorTerm(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Preference, safe.Field(oldObj, func(oldObj *v1.PreferredSchedulingTerm) *v1.NodeSelectorTerm { return &oldObj.Preference }), fldPath.Child("preference"))...)
+
+	return errs
+}
+
+func Validate_Probe(opCtx operation.Context, obj, oldObj *v1.Probe, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.Probe.InitialDelaySeconds
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.InitialDelaySeconds, safe.Field(oldObj, func(oldObj *v1.Probe) *int32 { return &oldObj.InitialDelaySeconds }), fldPath.Child("initialDelaySeconds"))...)
+
+	// field v1.Probe.TimeoutSeconds
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.TimeoutSeconds, safe.Field(oldObj, func(oldObj *v1.Probe) *int32 { return &oldObj.TimeoutSeconds }), fldPath.Child("timeoutSeconds"))...)
+
+	// field v1.Probe.PeriodSeconds
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.PeriodSeconds, safe.Field(oldObj, func(oldObj *v1.Probe) *int32 { return &oldObj.PeriodSeconds }), fldPath.Child("periodSeconds"))...)
+
+	// field v1.Probe.SuccessThreshold
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.SuccessThreshold, safe.Field(oldObj, func(oldObj *v1.Probe) *int32 { return &oldObj.SuccessThreshold }), fldPath.Child("successThreshold"))...)
+
+	// field v1.Probe.FailureThreshold
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FailureThreshold, safe.Field(oldObj, func(oldObj *v1.Probe) *int32 { return &oldObj.FailureThreshold }), fldPath.Child("failureThreshold"))...)
+
+	// field v1.Probe.TerminationGracePeriodSeconds
+	errs = append(errs,
+		func(obj, oldObj *int64, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.TerminationGracePeriodSeconds, safe.Field(oldObj, func(oldObj *v1.Probe) *int64 { return oldObj.TerminationGracePeriodSeconds }), fldPath.Child("terminationGracePeriodSeconds"))...)
+
+	return errs
+}
+
+func Validate_ProbeHandler(opCtx operation.Context, obj, oldObj *v1.ProbeHandler, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ProbeHandler.Exec
+	errs = append(errs,
+		func(obj, oldObj *v1.ExecAction, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ExecAction(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Exec, safe.Field(oldObj, func(oldObj *v1.ProbeHandler) *v1.ExecAction { return oldObj.Exec }), fldPath.Child("exec"))...)
+
+	// field v1.ProbeHandler.HTTPGet
+	errs = append(errs,
+		func(obj, oldObj *v1.HTTPGetAction, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_HTTPGetAction(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.HTTPGet, safe.Field(oldObj, func(oldObj *v1.ProbeHandler) *v1.HTTPGetAction { return oldObj.HTTPGet }), fldPath.Child("httpGet"))...)
+
+	// field v1.ProbeHandler.TCPSocket
+	errs = append(errs,
+		func(obj, oldObj *v1.TCPSocketAction, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_TCPSocketAction(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.TCPSocket, safe.Field(oldObj, func(oldObj *v1.ProbeHandler) *v1.TCPSocketAction { return oldObj.TCPSocket }), fldPath.Child("tcpSocket"))...)
+
+	// field v1.ProbeHandler.GRPC
+	errs = append(errs,
+		func(obj, oldObj *v1.GRPCAction, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_GRPCAction(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.GRPC, safe.Field(oldObj, func(oldObj *v1.ProbeHandler) *v1.GRPCAction { return oldObj.GRPC }), fldPath.Child("grpc"))...)
+
+	return errs
+}
+
+func Validate_ProjectedVolumeSource(opCtx operation.Context, obj, oldObj *v1.ProjectedVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ProjectedVolumeSource.Sources
+	errs = append(errs,
+		func(obj, oldObj []v1.VolumeProjection, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.VolumeProjection, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_VolumeProjection(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Sources, safe.Field(oldObj, func(oldObj *v1.ProjectedVolumeSource) []v1.VolumeProjection { return oldObj.Sources }), fldPath.Child("sources"))...)
+
+	// field v1.ProjectedVolumeSource.DefaultMode
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.DefaultMode, safe.Field(oldObj, func(oldObj *v1.ProjectedVolumeSource) *int32 { return oldObj.DefaultMode }), fldPath.Child("defaultMode"))...)
+
+	return errs
+}
+
+func Validate_QuobyteVolumeSource(opCtx operation.Context, obj, oldObj *v1.QuobyteVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.QuobyteVolumeSource.Registry has no validation
+	// field v1.QuobyteVolumeSource.Volume has no validation
+
+	// field v1.QuobyteVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.QuobyteVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	// field v1.QuobyteVolumeSource.User
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.User, safe.Field(oldObj, func(oldObj *v1.QuobyteVolumeSource) *string { return &oldObj.User }), fldPath.Child("user"))...)
+
+	// field v1.QuobyteVolumeSource.Group
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Group, safe.Field(oldObj, func(oldObj *v1.QuobyteVolumeSource) *string { return &oldObj.Group }), fldPath.Child("group"))...)
+
+	// field v1.QuobyteVolumeSource.Tenant
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Tenant, safe.Field(oldObj, func(oldObj *v1.QuobyteVolumeSource) *string { return &oldObj.Tenant }), fldPath.Child("tenant"))...)
+
+	return errs
+}
+
+func Validate_RBDPersistentVolumeSource(opCtx operation.Context, obj, oldObj *v1.RBDPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.RBDPersistentVolumeSource.CephMonitors has no validation
+	// field v1.RBDPersistentVolumeSource.RBDImage has no validation
+
+	// field v1.RBDPersistentVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FSType, safe.Field(oldObj, func(oldObj *v1.RBDPersistentVolumeSource) *string { return &oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.RBDPersistentVolumeSource.RBDPool
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.RBDPool, safe.Field(oldObj, func(oldObj *v1.RBDPersistentVolumeSource) *string { return &oldObj.RBDPool }), fldPath.Child("pool"))...)
+
+	// field v1.RBDPersistentVolumeSource.RadosUser
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.RadosUser, safe.Field(oldObj, func(oldObj *v1.RBDPersistentVolumeSource) *string { return &oldObj.RadosUser }), fldPath.Child("user"))...)
+
+	// field v1.RBDPersistentVolumeSource.Keyring
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Keyring, safe.Field(oldObj, func(oldObj *v1.RBDPersistentVolumeSource) *string { return &oldObj.Keyring }), fldPath.Child("keyring"))...)
+
+	// field v1.RBDPersistentVolumeSource.SecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.SecretReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_SecretReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SecretRef, safe.Field(oldObj, func(oldObj *v1.RBDPersistentVolumeSource) *v1.SecretReference { return oldObj.SecretRef }), fldPath.Child("secretRef"))...)
+
+	// field v1.RBDPersistentVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.RBDPersistentVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	return errs
+}
+
+func Validate_RBDVolumeSource(opCtx operation.Context, obj, oldObj *v1.RBDVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.RBDVolumeSource.CephMonitors has no validation
+	// field v1.RBDVolumeSource.RBDImage has no validation
+
+	// field v1.RBDVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FSType, safe.Field(oldObj, func(oldObj *v1.RBDVolumeSource) *string { return &oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.RBDVolumeSource.RBDPool
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.RBDPool, safe.Field(oldObj, func(oldObj *v1.RBDVolumeSource) *string { return &oldObj.RBDPool }), fldPath.Child("pool"))...)
+
+	// field v1.RBDVolumeSource.RadosUser
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.RadosUser, safe.Field(oldObj, func(oldObj *v1.RBDVolumeSource) *string { return &oldObj.RadosUser }), fldPath.Child("user"))...)
+
+	// field v1.RBDVolumeSource.Keyring
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Keyring, safe.Field(oldObj, func(oldObj *v1.RBDVolumeSource) *string { return &oldObj.Keyring }), fldPath.Child("keyring"))...)
+
+	// field v1.RBDVolumeSource.SecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.LocalObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_LocalObjectReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SecretRef, safe.Field(oldObj, func(oldObj *v1.RBDVolumeSource) *v1.LocalObjectReference { return oldObj.SecretRef }), fldPath.Child("secretRef"))...)
+
+	// field v1.RBDVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.RBDVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	return errs
+}
+
 func Validate_RangeAllocation(opCtx operation.Context, obj, oldObj *v1.RangeAllocation, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.RangeAllocation.TypeMeta has no validation
-	// field v1.RangeAllocation.ObjectMeta has no validation
+	// field v1.RangeAllocation.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.RangeAllocation) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
+
 	// field v1.RangeAllocation.Range has no validation
 	// field v1.RangeAllocation.Data has no validation
 	return errs
 }
 
 func Validate_ReplicationController(opCtx operation.Context, obj, oldObj *v1.ReplicationController, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ReplicationController.TypeMeta has no validation
-	// field v1.ReplicationController.ObjectMeta has no validation
+	// field v1.ReplicationController.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.ReplicationController) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
 
 	// field v1.ReplicationController.Spec
 	errs = append(errs,
 		func(obj, oldObj *v1.ReplicationControllerSpec, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			errs = append(errs, Validate_ReplicationControllerSpec(opCtx, obj, oldObj, fldPath)...)
 			return
 		}(&obj.Spec, safe.Field(oldObj, func(oldObj *v1.ReplicationController) *v1.ReplicationControllerSpec { return &oldObj.Spec }), fldPath.Child("spec"))...)
 
-	// field v1.ReplicationController.Status has no validation
+	// field v1.ReplicationController.Status
+	errs = append(errs,
+		func(obj, oldObj *v1.ReplicationControllerStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ReplicationControllerStatus(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Status, safe.Field(oldObj, func(oldObj *v1.ReplicationController) *v1.ReplicationControllerStatus { return &oldObj.Status }), fldPath.Child("status"))...)
+
+	return errs
+}
+
+func Validate_ReplicationControllerCondition(opCtx operation.Context, obj, oldObj *v1.ReplicationControllerCondition, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ReplicationControllerCondition.Type has no validation
+	// field v1.ReplicationControllerCondition.Status has no validation
+
+	// field v1.ReplicationControllerCondition.LastTransitionTime
+	errs = append(errs,
+		func(obj, oldObj *metav1.Time, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.LastTransitionTime, safe.Field(oldObj, func(oldObj *v1.ReplicationControllerCondition) *metav1.Time { return &oldObj.LastTransitionTime }), fldPath.Child("lastTransitionTime"))...)
+
+	// field v1.ReplicationControllerCondition.Reason
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Reason, safe.Field(oldObj, func(oldObj *v1.ReplicationControllerCondition) *string { return &oldObj.Reason }), fldPath.Child("reason"))...)
+
+	// field v1.ReplicationControllerCondition.Message
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Message, safe.Field(oldObj, func(oldObj *v1.ReplicationControllerCondition) *string { return &oldObj.Message }), fldPath.Child("message"))...)
+
 	return errs
 }
 
 func Validate_ReplicationControllerList(opCtx operation.Context, obj, oldObj *v1.ReplicationControllerList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ReplicationControllerList.TypeMeta has no validation
-	// field v1.ReplicationControllerList.ListMeta has no validation
+	// field v1.ReplicationControllerList.ListMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ListMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ListMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ListMeta, safe.Field(oldObj, func(oldObj *v1.ReplicationControllerList) *metav1.ListMeta { return &oldObj.ListMeta }), fldPath.Child("metadata"))...)
 
 	// field v1.ReplicationControllerList.Items
 	errs = append(errs,
@@ -1081,13 +6934,39 @@ func Validate_ReplicationControllerList(opCtx operation.Context, obj, oldObj *v1
 }
 
 func Validate_ReplicationControllerSpec(opCtx operation.Context, obj, oldObj *v1.ReplicationControllerSpec, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ReplicationControllerSpec.Replicas has no validation
-	// field v1.ReplicationControllerSpec.MinReadySeconds has no validation
-	// field v1.ReplicationControllerSpec.Selector has no validation
+	// field v1.ReplicationControllerSpec.Replicas
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Replicas, safe.Field(oldObj, func(oldObj *v1.ReplicationControllerSpec) *int32 { return oldObj.Replicas }), fldPath.Child("replicas"))...)
+
+	// field v1.ReplicationControllerSpec.MinReadySeconds
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.MinReadySeconds, safe.Field(oldObj, func(oldObj *v1.ReplicationControllerSpec) *int32 { return &oldObj.MinReadySeconds }), fldPath.Child("minReadySeconds"))...)
+
+	// field v1.ReplicationControllerSpec.Selector
+	errs = append(errs,
+		func(obj, oldObj map[string]string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Selector, safe.Field(oldObj, func(oldObj *v1.ReplicationControllerSpec) map[string]string { return oldObj.Selector }), fldPath.Child("selector"))...)
 
 	// field v1.ReplicationControllerSpec.Template
 	errs = append(errs,
 		func(obj, oldObj *v1.PodTemplateSpec, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			errs = append(errs, Validate_PodTemplateSpec(opCtx, obj, oldObj, fldPath)...)
 			return
 		}(obj.Template, safe.Field(oldObj, func(oldObj *v1.ReplicationControllerSpec) *v1.PodTemplateSpec { return oldObj.Template }), fldPath.Child("template"))...)
@@ -1095,18 +6974,299 @@ func Validate_ReplicationControllerSpec(opCtx operation.Context, obj, oldObj *v1
 	return errs
 }
 
+func Validate_ReplicationControllerStatus(opCtx operation.Context, obj, oldObj *v1.ReplicationControllerStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ReplicationControllerStatus.Replicas has no validation
+
+	// field v1.ReplicationControllerStatus.FullyLabeledReplicas
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FullyLabeledReplicas, safe.Field(oldObj, func(oldObj *v1.ReplicationControllerStatus) *int32 { return &oldObj.FullyLabeledReplicas }), fldPath.Child("fullyLabeledReplicas"))...)
+
+	// field v1.ReplicationControllerStatus.ReadyReplicas
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadyReplicas, safe.Field(oldObj, func(oldObj *v1.ReplicationControllerStatus) *int32 { return &oldObj.ReadyReplicas }), fldPath.Child("readyReplicas"))...)
+
+	// field v1.ReplicationControllerStatus.AvailableReplicas
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.AvailableReplicas, safe.Field(oldObj, func(oldObj *v1.ReplicationControllerStatus) *int32 { return &oldObj.AvailableReplicas }), fldPath.Child("availableReplicas"))...)
+
+	// field v1.ReplicationControllerStatus.ObservedGeneration
+	errs = append(errs,
+		func(obj, oldObj *int64, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ObservedGeneration, safe.Field(oldObj, func(oldObj *v1.ReplicationControllerStatus) *int64 { return &oldObj.ObservedGeneration }), fldPath.Child("observedGeneration"))...)
+
+	// field v1.ReplicationControllerStatus.Conditions
+	errs = append(errs,
+		func(obj, oldObj []v1.ReplicationControllerCondition, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.ReplicationControllerCondition) any { return [1]any{o.Type} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.ReplicationControllerCondition, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ReplicationControllerCondition(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.Conditions, safe.Field(oldObj, func(oldObj *v1.ReplicationControllerStatus) []v1.ReplicationControllerCondition {
+			return oldObj.Conditions
+		}), fldPath.Child("conditions"))...)
+
+	return errs
+}
+
+func Validate_ResourceClaim(opCtx operation.Context, obj, oldObj *v1.ResourceClaim, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ResourceClaim.Name has no validation
+
+	// field v1.ResourceClaim.Request
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Request, safe.Field(oldObj, func(oldObj *v1.ResourceClaim) *string { return &oldObj.Request }), fldPath.Child("request"))...)
+
+	return errs
+}
+
+func Validate_ResourceFieldSelector(opCtx operation.Context, obj, oldObj *v1.ResourceFieldSelector, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ResourceFieldSelector.ContainerName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ContainerName, safe.Field(oldObj, func(oldObj *v1.ResourceFieldSelector) *string { return &oldObj.ContainerName }), fldPath.Child("containerName"))...)
+
+	// field v1.ResourceFieldSelector.Resource has no validation
+
+	// field v1.ResourceFieldSelector.Divisor
+	errs = append(errs,
+		func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			// NOTE: Type resource.Quantity is in a non-included package.
+			//       Any validations defined on this type are not available from here.
+			return
+		}(&obj.Divisor, safe.Field(oldObj, func(oldObj *v1.ResourceFieldSelector) *resource.Quantity { return &oldObj.Divisor }), fldPath.Child("divisor"))...)
+
+	return errs
+}
+
 func Validate_ResourceQuota(opCtx operation.Context, obj, oldObj *v1.ResourceQuota, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ResourceQuota.TypeMeta has no validation
-	// field v1.ResourceQuota.ObjectMeta has no validation
-	// field v1.ResourceQuota.Spec has no validation
-	// field v1.ResourceQuota.Status has no validation
+	// field v1.ResourceQuota.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.ResourceQuota) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.ResourceQuota.Spec
+	errs = append(errs,
+		func(obj, oldObj *v1.ResourceQuotaSpec, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ResourceQuotaSpec(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Spec, safe.Field(oldObj, func(oldObj *v1.ResourceQuota) *v1.ResourceQuotaSpec { return &oldObj.Spec }), fldPath.Child("spec"))...)
+
+	// field v1.ResourceQuota.Status
+	errs = append(errs,
+		func(obj, oldObj *v1.ResourceQuotaStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ResourceQuotaStatus(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Status, safe.Field(oldObj, func(oldObj *v1.ResourceQuota) *v1.ResourceQuotaStatus { return &oldObj.Status }), fldPath.Child("status"))...)
+
 	return errs
 }
 
 func Validate_ResourceQuotaList(opCtx operation.Context, obj, oldObj *v1.ResourceQuotaList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ResourceQuotaList.TypeMeta has no validation
-	// field v1.ResourceQuotaList.ListMeta has no validation
-	// field v1.ResourceQuotaList.Items has no validation
+	// field v1.ResourceQuotaList.ListMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ListMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ListMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ListMeta, safe.Field(oldObj, func(oldObj *v1.ResourceQuotaList) *metav1.ListMeta { return &oldObj.ListMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.ResourceQuotaList.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.ResourceQuota, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.ResourceQuota, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ResourceQuota(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.ResourceQuotaList) []v1.ResourceQuota { return oldObj.Items }), fldPath.Child("items"))...)
+
+	return errs
+}
+
+func Validate_ResourceQuotaSpec(opCtx operation.Context, obj, oldObj *v1.ResourceQuotaSpec, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ResourceQuotaSpec.Hard
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.Hard, safe.Field(oldObj, func(oldObj *v1.ResourceQuotaSpec) v1.ResourceList { return oldObj.Hard }), fldPath.Child("hard"))...)
+
+	// field v1.ResourceQuotaSpec.Scopes
+	errs = append(errs,
+		func(obj, oldObj []v1.ResourceQuotaScope, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Scopes, safe.Field(oldObj, func(oldObj *v1.ResourceQuotaSpec) []v1.ResourceQuotaScope { return oldObj.Scopes }), fldPath.Child("scopes"))...)
+
+	// field v1.ResourceQuotaSpec.ScopeSelector
+	errs = append(errs,
+		func(obj, oldObj *v1.ScopeSelector, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ScopeSelector(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ScopeSelector, safe.Field(oldObj, func(oldObj *v1.ResourceQuotaSpec) *v1.ScopeSelector { return oldObj.ScopeSelector }), fldPath.Child("scopeSelector"))...)
+
+	return errs
+}
+
+func Validate_ResourceQuotaStatus(opCtx operation.Context, obj, oldObj *v1.ResourceQuotaStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ResourceQuotaStatus.Hard
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.Hard, safe.Field(oldObj, func(oldObj *v1.ResourceQuotaStatus) v1.ResourceList { return oldObj.Hard }), fldPath.Child("hard"))...)
+
+	// field v1.ResourceQuotaStatus.Used
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.Used, safe.Field(oldObj, func(oldObj *v1.ResourceQuotaStatus) v1.ResourceList { return oldObj.Used }), fldPath.Child("used"))...)
+
+	return errs
+}
+
+func Validate_ResourceRequirements(opCtx operation.Context, obj, oldObj *v1.ResourceRequirements, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ResourceRequirements.Limits
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.Limits, safe.Field(oldObj, func(oldObj *v1.ResourceRequirements) v1.ResourceList { return oldObj.Limits }), fldPath.Child("limits"))...)
+
+	// field v1.ResourceRequirements.Requests
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.Requests, safe.Field(oldObj, func(oldObj *v1.ResourceRequirements) v1.ResourceList { return oldObj.Requests }), fldPath.Child("requests"))...)
+
+	// field v1.ResourceRequirements.Claims
+	errs = append(errs,
+		func(obj, oldObj []v1.ResourceClaim, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.ResourceClaim) any { return [1]any{o.Name} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.ResourceClaim, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ResourceClaim(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.Claims, safe.Field(oldObj, func(oldObj *v1.ResourceRequirements) []v1.ResourceClaim { return oldObj.Claims }), fldPath.Child("claims"))...)
+
 	return errs
 }
 
@@ -1116,12 +7276,228 @@ func Validate_ResourceStatus(opCtx operation.Context, obj, oldObj *v1.ResourceSt
 		func(obj, oldObj *v1.ResourceName, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.Required(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			return
 		}(&obj.Name, safe.Field(oldObj, func(oldObj *v1.ResourceStatus) *v1.ResourceName { return &oldObj.Name }), fldPath.Child("name"))...)
 
 	// field v1.ResourceStatus.Resources has no validation
+	return errs
+}
+
+func Validate_SELinuxOptions(opCtx operation.Context, obj, oldObj *v1.SELinuxOptions, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.SELinuxOptions.User
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.User, safe.Field(oldObj, func(oldObj *v1.SELinuxOptions) *string { return &oldObj.User }), fldPath.Child("user"))...)
+
+	// field v1.SELinuxOptions.Role
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Role, safe.Field(oldObj, func(oldObj *v1.SELinuxOptions) *string { return &oldObj.Role }), fldPath.Child("role"))...)
+
+	// field v1.SELinuxOptions.Type
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Type, safe.Field(oldObj, func(oldObj *v1.SELinuxOptions) *string { return &oldObj.Type }), fldPath.Child("type"))...)
+
+	// field v1.SELinuxOptions.Level
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Level, safe.Field(oldObj, func(oldObj *v1.SELinuxOptions) *string { return &oldObj.Level }), fldPath.Child("level"))...)
+
+	return errs
+}
+
+func Validate_ScaleIOPersistentVolumeSource(opCtx operation.Context, obj, oldObj *v1.ScaleIOPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ScaleIOPersistentVolumeSource.Gateway has no validation
+	// field v1.ScaleIOPersistentVolumeSource.System has no validation
+
+	// field v1.ScaleIOPersistentVolumeSource.SecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.SecretReference, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_SecretReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SecretRef, safe.Field(oldObj, func(oldObj *v1.ScaleIOPersistentVolumeSource) *v1.SecretReference { return oldObj.SecretRef }), fldPath.Child("secretRef"))...)
+
+	// field v1.ScaleIOPersistentVolumeSource.SSLEnabled
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.SSLEnabled, safe.Field(oldObj, func(oldObj *v1.ScaleIOPersistentVolumeSource) *bool { return &oldObj.SSLEnabled }), fldPath.Child("sslEnabled"))...)
+
+	// field v1.ScaleIOPersistentVolumeSource.ProtectionDomain
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ProtectionDomain, safe.Field(oldObj, func(oldObj *v1.ScaleIOPersistentVolumeSource) *string { return &oldObj.ProtectionDomain }), fldPath.Child("protectionDomain"))...)
+
+	// field v1.ScaleIOPersistentVolumeSource.StoragePool
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.StoragePool, safe.Field(oldObj, func(oldObj *v1.ScaleIOPersistentVolumeSource) *string { return &oldObj.StoragePool }), fldPath.Child("storagePool"))...)
+
+	// field v1.ScaleIOPersistentVolumeSource.StorageMode
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.StorageMode, safe.Field(oldObj, func(oldObj *v1.ScaleIOPersistentVolumeSource) *string { return &oldObj.StorageMode }), fldPath.Child("storageMode"))...)
+
+	// field v1.ScaleIOPersistentVolumeSource.VolumeName has no validation
+
+	// field v1.ScaleIOPersistentVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FSType, safe.Field(oldObj, func(oldObj *v1.ScaleIOPersistentVolumeSource) *string { return &oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.ScaleIOPersistentVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.ScaleIOPersistentVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	return errs
+}
+
+func Validate_ScaleIOVolumeSource(opCtx operation.Context, obj, oldObj *v1.ScaleIOVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ScaleIOVolumeSource.Gateway has no validation
+	// field v1.ScaleIOVolumeSource.System has no validation
+
+	// field v1.ScaleIOVolumeSource.SecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.LocalObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_LocalObjectReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SecretRef, safe.Field(oldObj, func(oldObj *v1.ScaleIOVolumeSource) *v1.LocalObjectReference { return oldObj.SecretRef }), fldPath.Child("secretRef"))...)
+
+	// field v1.ScaleIOVolumeSource.SSLEnabled
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.SSLEnabled, safe.Field(oldObj, func(oldObj *v1.ScaleIOVolumeSource) *bool { return &oldObj.SSLEnabled }), fldPath.Child("sslEnabled"))...)
+
+	// field v1.ScaleIOVolumeSource.ProtectionDomain
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ProtectionDomain, safe.Field(oldObj, func(oldObj *v1.ScaleIOVolumeSource) *string { return &oldObj.ProtectionDomain }), fldPath.Child("protectionDomain"))...)
+
+	// field v1.ScaleIOVolumeSource.StoragePool
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.StoragePool, safe.Field(oldObj, func(oldObj *v1.ScaleIOVolumeSource) *string { return &oldObj.StoragePool }), fldPath.Child("storagePool"))...)
+
+	// field v1.ScaleIOVolumeSource.StorageMode
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.StorageMode, safe.Field(oldObj, func(oldObj *v1.ScaleIOVolumeSource) *string { return &oldObj.StorageMode }), fldPath.Child("storageMode"))...)
+
+	// field v1.ScaleIOVolumeSource.VolumeName has no validation
+
+	// field v1.ScaleIOVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FSType, safe.Field(oldObj, func(oldObj *v1.ScaleIOVolumeSource) *string { return &oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.ScaleIOVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.ScaleIOVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	return errs
+}
+
+func Validate_ScopeSelector(opCtx operation.Context, obj, oldObj *v1.ScopeSelector, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ScopeSelector.MatchExpressions
+	errs = append(errs,
+		func(obj, oldObj []v1.ScopedResourceSelectorRequirement, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.ScopedResourceSelectorRequirement, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ScopedResourceSelectorRequirement(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.MatchExpressions, safe.Field(oldObj, func(oldObj *v1.ScopeSelector) []v1.ScopedResourceSelectorRequirement { return oldObj.MatchExpressions }), fldPath.Child("matchExpressions"))...)
+
+	return errs
+}
+
+func Validate_ScopedResourceSelectorRequirement(opCtx operation.Context, obj, oldObj *v1.ScopedResourceSelectorRequirement, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ScopedResourceSelectorRequirement.ScopeName has no validation
+	// field v1.ScopedResourceSelectorRequirement.Operator has no validation
+
+	// field v1.ScopedResourceSelectorRequirement.Values
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Values, safe.Field(oldObj, func(oldObj *v1.ScopedResourceSelectorRequirement) []string { return oldObj.Values }), fldPath.Child("values"))...)
+
 	return errs
 }
 
@@ -1132,42 +7508,322 @@ func Validate_SeccompProfile(opCtx operation.Context, obj, oldObj *v1.SeccompPro
 	errs = append(errs, validate.DiscriminatedUnion(opCtx, fldPath, obj, oldObj, unionMembershipForSeccompProfile, obj.Type)...)
 
 	// field v1.SeccompProfile.Type has no validation
-	// field v1.SeccompProfile.LocalhostProfile has no validation
+
+	// field v1.SeccompProfile.LocalhostProfile
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.LocalhostProfile, safe.Field(oldObj, func(oldObj *v1.SeccompProfile) *string { return oldObj.LocalhostProfile }), fldPath.Child("localhostProfile"))...)
+
 	return errs
 }
 
 func Validate_Secret(opCtx operation.Context, obj, oldObj *v1.Secret, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.Secret.TypeMeta has no validation
-	// field v1.Secret.ObjectMeta has no validation
-	// field v1.Secret.Immutable has no validation
-	// field v1.Secret.Data has no validation
-	// field v1.Secret.StringData has no validation
-	// field v1.Secret.Type has no validation
+	// field v1.Secret.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.Secret) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.Secret.Immutable
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Immutable, safe.Field(oldObj, func(oldObj *v1.Secret) *bool { return oldObj.Immutable }), fldPath.Child("immutable"))...)
+
+	// field v1.Secret.Data
+	errs = append(errs,
+		func(obj, oldObj map[string][]byte, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Data, safe.Field(oldObj, func(oldObj *v1.Secret) map[string][]byte { return oldObj.Data }), fldPath.Child("data"))...)
+
+	// field v1.Secret.StringData
+	errs = append(errs,
+		func(obj, oldObj map[string]string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.StringData, safe.Field(oldObj, func(oldObj *v1.Secret) map[string]string { return oldObj.StringData }), fldPath.Child("stringData"))...)
+
+	// field v1.Secret.Type
+	errs = append(errs,
+		func(obj, oldObj *v1.SecretType, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Type, safe.Field(oldObj, func(oldObj *v1.Secret) *v1.SecretType { return &oldObj.Type }), fldPath.Child("type"))...)
+
+	return errs
+}
+
+func Validate_SecretEnvSource(opCtx operation.Context, obj, oldObj *v1.SecretEnvSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.SecretEnvSource.Optional
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Optional, safe.Field(oldObj, func(oldObj *v1.SecretEnvSource) *bool { return oldObj.Optional }), fldPath.Child("optional"))...)
+
+	return errs
+}
+
+func Validate_SecretKeySelector(opCtx operation.Context, obj, oldObj *v1.SecretKeySelector, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.SecretKeySelector.Key has no validation
+
+	// field v1.SecretKeySelector.Optional
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Optional, safe.Field(oldObj, func(oldObj *v1.SecretKeySelector) *bool { return oldObj.Optional }), fldPath.Child("optional"))...)
+
 	return errs
 }
 
 func Validate_SecretList(opCtx operation.Context, obj, oldObj *v1.SecretList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.SecretList.TypeMeta has no validation
-	// field v1.SecretList.ListMeta has no validation
-	// field v1.SecretList.Items has no validation
+	// field v1.SecretList.ListMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ListMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ListMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ListMeta, safe.Field(oldObj, func(oldObj *v1.SecretList) *metav1.ListMeta { return &oldObj.ListMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.SecretList.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.Secret, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.Secret, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Secret(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.SecretList) []v1.Secret { return oldObj.Items }), fldPath.Child("items"))...)
+
+	return errs
+}
+
+func Validate_SecretProjection(opCtx operation.Context, obj, oldObj *v1.SecretProjection, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.SecretProjection.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.KeyToPath, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.KeyToPath, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_KeyToPath(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.SecretProjection) []v1.KeyToPath { return oldObj.Items }), fldPath.Child("items"))...)
+
+	// field v1.SecretProjection.Optional
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Optional, safe.Field(oldObj, func(oldObj *v1.SecretProjection) *bool { return oldObj.Optional }), fldPath.Child("optional"))...)
+
+	return errs
+}
+
+func Validate_SecretReference(opCtx operation.Context, obj, oldObj *v1.SecretReference, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.SecretReference.Name
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Name, safe.Field(oldObj, func(oldObj *v1.SecretReference) *string { return &oldObj.Name }), fldPath.Child("name"))...)
+
+	// field v1.SecretReference.Namespace
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Namespace, safe.Field(oldObj, func(oldObj *v1.SecretReference) *string { return &oldObj.Namespace }), fldPath.Child("namespace"))...)
+
+	return errs
+}
+
+func Validate_SecretVolumeSource(opCtx operation.Context, obj, oldObj *v1.SecretVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.SecretVolumeSource.SecretName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.SecretName, safe.Field(oldObj, func(oldObj *v1.SecretVolumeSource) *string { return &oldObj.SecretName }), fldPath.Child("secretName"))...)
+
+	// field v1.SecretVolumeSource.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.KeyToPath, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.KeyToPath, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_KeyToPath(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.SecretVolumeSource) []v1.KeyToPath { return oldObj.Items }), fldPath.Child("items"))...)
+
+	// field v1.SecretVolumeSource.DefaultMode
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.DefaultMode, safe.Field(oldObj, func(oldObj *v1.SecretVolumeSource) *int32 { return oldObj.DefaultMode }), fldPath.Child("defaultMode"))...)
+
+	// field v1.SecretVolumeSource.Optional
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Optional, safe.Field(oldObj, func(oldObj *v1.SecretVolumeSource) *bool { return oldObj.Optional }), fldPath.Child("optional"))...)
+
 	return errs
 }
 
 func Validate_SecurityContext(opCtx operation.Context, obj, oldObj *v1.SecurityContext, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.SecurityContext.Capabilities has no validation
-	// field v1.SecurityContext.Privileged has no validation
-	// field v1.SecurityContext.SELinuxOptions has no validation
-	// field v1.SecurityContext.WindowsOptions has no validation
-	// field v1.SecurityContext.RunAsUser has no validation
-	// field v1.SecurityContext.RunAsGroup has no validation
-	// field v1.SecurityContext.RunAsNonRoot has no validation
-	// field v1.SecurityContext.ReadOnlyRootFilesystem has no validation
-	// field v1.SecurityContext.AllowPrivilegeEscalation has no validation
-	// field v1.SecurityContext.ProcMount has no validation
+	// field v1.SecurityContext.Capabilities
+	errs = append(errs,
+		func(obj, oldObj *v1.Capabilities, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_Capabilities(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Capabilities, safe.Field(oldObj, func(oldObj *v1.SecurityContext) *v1.Capabilities { return oldObj.Capabilities }), fldPath.Child("capabilities"))...)
+
+	// field v1.SecurityContext.Privileged
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Privileged, safe.Field(oldObj, func(oldObj *v1.SecurityContext) *bool { return oldObj.Privileged }), fldPath.Child("privileged"))...)
+
+	// field v1.SecurityContext.SELinuxOptions
+	errs = append(errs,
+		func(obj, oldObj *v1.SELinuxOptions, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_SELinuxOptions(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SELinuxOptions, safe.Field(oldObj, func(oldObj *v1.SecurityContext) *v1.SELinuxOptions { return oldObj.SELinuxOptions }), fldPath.Child("seLinuxOptions"))...)
+
+	// field v1.SecurityContext.WindowsOptions
+	errs = append(errs,
+		func(obj, oldObj *v1.WindowsSecurityContextOptions, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_WindowsSecurityContextOptions(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.WindowsOptions, safe.Field(oldObj, func(oldObj *v1.SecurityContext) *v1.WindowsSecurityContextOptions { return oldObj.WindowsOptions }), fldPath.Child("windowsOptions"))...)
+
+	// field v1.SecurityContext.RunAsUser
+	errs = append(errs,
+		func(obj, oldObj *int64, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.RunAsUser, safe.Field(oldObj, func(oldObj *v1.SecurityContext) *int64 { return oldObj.RunAsUser }), fldPath.Child("runAsUser"))...)
+
+	// field v1.SecurityContext.RunAsGroup
+	errs = append(errs,
+		func(obj, oldObj *int64, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.RunAsGroup, safe.Field(oldObj, func(oldObj *v1.SecurityContext) *int64 { return oldObj.RunAsGroup }), fldPath.Child("runAsGroup"))...)
+
+	// field v1.SecurityContext.RunAsNonRoot
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.RunAsNonRoot, safe.Field(oldObj, func(oldObj *v1.SecurityContext) *bool { return oldObj.RunAsNonRoot }), fldPath.Child("runAsNonRoot"))...)
+
+	// field v1.SecurityContext.ReadOnlyRootFilesystem
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.ReadOnlyRootFilesystem, safe.Field(oldObj, func(oldObj *v1.SecurityContext) *bool { return oldObj.ReadOnlyRootFilesystem }), fldPath.Child("readOnlyRootFilesystem"))...)
+
+	// field v1.SecurityContext.AllowPrivilegeEscalation
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.AllowPrivilegeEscalation, safe.Field(oldObj, func(oldObj *v1.SecurityContext) *bool { return oldObj.AllowPrivilegeEscalation }), fldPath.Child("allowPrivilegeEscalation"))...)
+
+	// field v1.SecurityContext.ProcMount
+	errs = append(errs,
+		func(obj, oldObj *v1.ProcMountType, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.ProcMount, safe.Field(oldObj, func(oldObj *v1.SecurityContext) *v1.ProcMountType { return oldObj.ProcMount }), fldPath.Child("procMount"))...)
 
 	// field v1.SecurityContext.SeccompProfile
 	errs = append(errs,
 		func(obj, oldObj *v1.SeccompProfile, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			errs = append(errs, Validate_SeccompProfile(opCtx, obj, oldObj, fldPath)...)
 			return
 		}(obj.SeccompProfile, safe.Field(oldObj, func(oldObj *v1.SecurityContext) *v1.SeccompProfile { return oldObj.SeccompProfile }), fldPath.Child("seccompProfile"))...)
@@ -1175,6 +7831,9 @@ func Validate_SecurityContext(opCtx operation.Context, obj, oldObj *v1.SecurityC
 	// field v1.SecurityContext.AppArmorProfile
 	errs = append(errs,
 		func(obj, oldObj *v1.AppArmorProfile, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			errs = append(errs, Validate_AppArmorProfile(opCtx, obj, oldObj, fldPath)...)
 			return
 		}(obj.AppArmorProfile, safe.Field(oldObj, func(oldObj *v1.SecurityContext) *v1.AppArmorProfile { return oldObj.AppArmorProfile }), fldPath.Child("appArmorProfile"))...)
@@ -1183,45 +7842,761 @@ func Validate_SecurityContext(opCtx operation.Context, obj, oldObj *v1.SecurityC
 }
 
 func Validate_SerializedReference(opCtx operation.Context, obj, oldObj *v1.SerializedReference, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.SerializedReference.TypeMeta has no validation
-	// field v1.SerializedReference.Reference has no validation
+	// field v1.SerializedReference.Reference
+	errs = append(errs,
+		func(obj, oldObj *v1.ObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ObjectReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Reference, safe.Field(oldObj, func(oldObj *v1.SerializedReference) *v1.ObjectReference { return &oldObj.Reference }), fldPath.Child("reference"))...)
+
 	return errs
 }
 
 func Validate_Service(opCtx operation.Context, obj, oldObj *v1.Service, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.Service.TypeMeta has no validation
-	// field v1.Service.ObjectMeta has no validation
-	// field v1.Service.Spec has no validation
-	// field v1.Service.Status has no validation
+	// field v1.Service.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.Service) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.Service.Spec
+	errs = append(errs,
+		func(obj, oldObj *v1.ServiceSpec, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ServiceSpec(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Spec, safe.Field(oldObj, func(oldObj *v1.Service) *v1.ServiceSpec { return &oldObj.Spec }), fldPath.Child("spec"))...)
+
+	// field v1.Service.Status
+	errs = append(errs,
+		func(obj, oldObj *v1.ServiceStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ServiceStatus(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.Status, safe.Field(oldObj, func(oldObj *v1.Service) *v1.ServiceStatus { return &oldObj.Status }), fldPath.Child("status"))...)
+
 	return errs
 }
 
 func Validate_ServiceAccount(opCtx operation.Context, obj, oldObj *v1.ServiceAccount, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ServiceAccount.TypeMeta has no validation
-	// field v1.ServiceAccount.ObjectMeta has no validation
-	// field v1.ServiceAccount.Secrets has no validation
-	// field v1.ServiceAccount.ImagePullSecrets has no validation
-	// field v1.ServiceAccount.AutomountServiceAccountToken has no validation
+	// field v1.ServiceAccount.ObjectMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ObjectMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ObjectMeta, safe.Field(oldObj, func(oldObj *v1.ServiceAccount) *metav1.ObjectMeta { return &oldObj.ObjectMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.ServiceAccount.Secrets
+	errs = append(errs,
+		func(obj, oldObj []v1.ObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.ObjectReference) any { return [1]any{o.Name} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.ObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ObjectReference(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.Secrets, safe.Field(oldObj, func(oldObj *v1.ServiceAccount) []v1.ObjectReference { return oldObj.Secrets }), fldPath.Child("secrets"))...)
+
+	// field v1.ServiceAccount.ImagePullSecrets
+	errs = append(errs,
+		func(obj, oldObj []v1.LocalObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.LocalObjectReference) any { return [1]any{o.Name} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.LocalObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_LocalObjectReference(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.ImagePullSecrets, safe.Field(oldObj, func(oldObj *v1.ServiceAccount) []v1.LocalObjectReference { return oldObj.ImagePullSecrets }), fldPath.Child("imagePullSecrets"))...)
+
+	// field v1.ServiceAccount.AutomountServiceAccountToken
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.AutomountServiceAccountToken, safe.Field(oldObj, func(oldObj *v1.ServiceAccount) *bool { return oldObj.AutomountServiceAccountToken }), fldPath.Child("automountServiceAccountToken"))...)
+
 	return errs
 }
 
 func Validate_ServiceAccountList(opCtx operation.Context, obj, oldObj *v1.ServiceAccountList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ServiceAccountList.TypeMeta has no validation
-	// field v1.ServiceAccountList.ListMeta has no validation
-	// field v1.ServiceAccountList.Items has no validation
+	// field v1.ServiceAccountList.ListMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ListMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ListMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ListMeta, safe.Field(oldObj, func(oldObj *v1.ServiceAccountList) *metav1.ListMeta { return &oldObj.ListMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.ServiceAccountList.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.ServiceAccount, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.ServiceAccount, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ServiceAccount(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.ServiceAccountList) []v1.ServiceAccount { return oldObj.Items }), fldPath.Child("items"))...)
+
+	return errs
+}
+
+func Validate_ServiceAccountTokenProjection(opCtx operation.Context, obj, oldObj *v1.ServiceAccountTokenProjection, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ServiceAccountTokenProjection.Audience
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Audience, safe.Field(oldObj, func(oldObj *v1.ServiceAccountTokenProjection) *string { return &oldObj.Audience }), fldPath.Child("audience"))...)
+
+	// field v1.ServiceAccountTokenProjection.ExpirationSeconds
+	errs = append(errs,
+		func(obj, oldObj *int64, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.ExpirationSeconds, safe.Field(oldObj, func(oldObj *v1.ServiceAccountTokenProjection) *int64 { return oldObj.ExpirationSeconds }), fldPath.Child("expirationSeconds"))...)
+
+	// field v1.ServiceAccountTokenProjection.Path has no validation
 	return errs
 }
 
 func Validate_ServiceList(opCtx operation.Context, obj, oldObj *v1.ServiceList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ServiceList.TypeMeta has no validation
-	// field v1.ServiceList.ListMeta has no validation
-	// field v1.ServiceList.Items has no validation
+	// field v1.ServiceList.ListMeta
+	errs = append(errs,
+		func(obj, oldObj *metav1.ListMeta, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_ListMeta(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.ListMeta, safe.Field(oldObj, func(oldObj *v1.ServiceList) *metav1.ListMeta { return &oldObj.ListMeta }), fldPath.Child("metadata"))...)
+
+	// field v1.ServiceList.Items
+	errs = append(errs,
+		func(obj, oldObj []v1.Service, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.Service, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Service(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, nil, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, safe.Field(oldObj, func(oldObj *v1.ServiceList) []v1.Service { return oldObj.Items }), fldPath.Child("items"))...)
+
+	return errs
+}
+
+func Validate_ServicePort(opCtx operation.Context, obj, oldObj *v1.ServicePort, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ServicePort.Name
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Name, safe.Field(oldObj, func(oldObj *v1.ServicePort) *string { return &oldObj.Name }), fldPath.Child("name"))...)
+
+	// field v1.ServicePort.Protocol
+	errs = append(errs,
+		func(obj, oldObj *v1.Protocol, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Protocol, safe.Field(oldObj, func(oldObj *v1.ServicePort) *v1.Protocol { return &oldObj.Protocol }), fldPath.Child("protocol"))...)
+
+	// field v1.ServicePort.AppProtocol
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.AppProtocol, safe.Field(oldObj, func(oldObj *v1.ServicePort) *string { return oldObj.AppProtocol }), fldPath.Child("appProtocol"))...)
+
+	// field v1.ServicePort.Port has no validation
+
+	// field v1.ServicePort.TargetPort
+	errs = append(errs,
+		func(obj, oldObj *intstr.IntOrString, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			// NOTE: Type intstr.IntOrString is in a non-included package.
+			//       Any validations defined on this type are not available from here.
+			return
+		}(&obj.TargetPort, safe.Field(oldObj, func(oldObj *v1.ServicePort) *intstr.IntOrString { return &oldObj.TargetPort }), fldPath.Child("targetPort"))...)
+
+	// field v1.ServicePort.NodePort
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.NodePort, safe.Field(oldObj, func(oldObj *v1.ServicePort) *int32 { return &oldObj.NodePort }), fldPath.Child("nodePort"))...)
+
 	return errs
 }
 
 func Validate_ServiceProxyOptions(opCtx operation.Context, obj, oldObj *v1.ServiceProxyOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ServiceProxyOptions.TypeMeta has no validation
-	// field v1.ServiceProxyOptions.Path has no validation
+	// field v1.ServiceProxyOptions.Path
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Path, safe.Field(oldObj, func(oldObj *v1.ServiceProxyOptions) *string { return &oldObj.Path }), fldPath.Child("path"))...)
+
+	return errs
+}
+
+func Validate_ServiceSpec(opCtx operation.Context, obj, oldObj *v1.ServiceSpec, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ServiceSpec.Ports
+	errs = append(errs,
+		func(obj, oldObj []v1.ServicePort, fldPath *field.Path) (errs field.ErrorList) {
+			oldListMap := safe.NewListMap(oldObj, func(o *v1.ServicePort) any { return [2]any{o.Port, o.Protocol} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *v1.ServicePort, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ServicePort(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.Ports, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) []v1.ServicePort { return oldObj.Ports }), fldPath.Child("ports"))...)
+
+	// field v1.ServiceSpec.Selector
+	errs = append(errs,
+		func(obj, oldObj map[string]string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Selector, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) map[string]string { return oldObj.Selector }), fldPath.Child("selector"))...)
+
+	// field v1.ServiceSpec.ClusterIP
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ClusterIP, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) *string { return &oldObj.ClusterIP }), fldPath.Child("clusterIP"))...)
+
+	// field v1.ServiceSpec.ClusterIPs
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.ClusterIPs, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) []string { return oldObj.ClusterIPs }), fldPath.Child("clusterIPs"))...)
+
+	// field v1.ServiceSpec.Type
+	errs = append(errs,
+		func(obj, oldObj *v1.ServiceType, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Type, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) *v1.ServiceType { return &oldObj.Type }), fldPath.Child("type"))...)
+
+	// field v1.ServiceSpec.ExternalIPs
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.ExternalIPs, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) []string { return oldObj.ExternalIPs }), fldPath.Child("externalIPs"))...)
+
+	// field v1.ServiceSpec.SessionAffinity
+	errs = append(errs,
+		func(obj, oldObj *v1.ServiceAffinity, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.SessionAffinity, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) *v1.ServiceAffinity { return &oldObj.SessionAffinity }), fldPath.Child("sessionAffinity"))...)
+
+	// field v1.ServiceSpec.LoadBalancerIP
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.LoadBalancerIP, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) *string { return &oldObj.LoadBalancerIP }), fldPath.Child("loadBalancerIP"))...)
+
+	// field v1.ServiceSpec.LoadBalancerSourceRanges
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.LoadBalancerSourceRanges, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) []string { return oldObj.LoadBalancerSourceRanges }), fldPath.Child("loadBalancerSourceRanges"))...)
+
+	// field v1.ServiceSpec.ExternalName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ExternalName, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) *string { return &oldObj.ExternalName }), fldPath.Child("externalName"))...)
+
+	// field v1.ServiceSpec.ExternalTrafficPolicy
+	errs = append(errs,
+		func(obj, oldObj *v1.ServiceExternalTrafficPolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ExternalTrafficPolicy, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) *v1.ServiceExternalTrafficPolicy { return &oldObj.ExternalTrafficPolicy }), fldPath.Child("externalTrafficPolicy"))...)
+
+	// field v1.ServiceSpec.HealthCheckNodePort
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.HealthCheckNodePort, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) *int32 { return &oldObj.HealthCheckNodePort }), fldPath.Child("healthCheckNodePort"))...)
+
+	// field v1.ServiceSpec.PublishNotReadyAddresses
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.PublishNotReadyAddresses, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) *bool { return &oldObj.PublishNotReadyAddresses }), fldPath.Child("publishNotReadyAddresses"))...)
+
+	// field v1.ServiceSpec.SessionAffinityConfig
+	errs = append(errs,
+		func(obj, oldObj *v1.SessionAffinityConfig, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_SessionAffinityConfig(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SessionAffinityConfig, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) *v1.SessionAffinityConfig { return oldObj.SessionAffinityConfig }), fldPath.Child("sessionAffinityConfig"))...)
+
+	// field v1.ServiceSpec.IPFamilies
+	errs = append(errs,
+		func(obj, oldObj []v1.IPFamily, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.IPFamilies, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) []v1.IPFamily { return oldObj.IPFamilies }), fldPath.Child("ipFamilies"))...)
+
+	// field v1.ServiceSpec.IPFamilyPolicy
+	errs = append(errs,
+		func(obj, oldObj *v1.IPFamilyPolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.IPFamilyPolicy, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) *v1.IPFamilyPolicy { return oldObj.IPFamilyPolicy }), fldPath.Child("ipFamilyPolicy"))...)
+
+	// field v1.ServiceSpec.AllocateLoadBalancerNodePorts
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.AllocateLoadBalancerNodePorts, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) *bool { return oldObj.AllocateLoadBalancerNodePorts }), fldPath.Child("allocateLoadBalancerNodePorts"))...)
+
+	// field v1.ServiceSpec.LoadBalancerClass
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.LoadBalancerClass, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) *string { return oldObj.LoadBalancerClass }), fldPath.Child("loadBalancerClass"))...)
+
+	// field v1.ServiceSpec.InternalTrafficPolicy
+	errs = append(errs,
+		func(obj, oldObj *v1.ServiceInternalTrafficPolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.InternalTrafficPolicy, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) *v1.ServiceInternalTrafficPolicy { return oldObj.InternalTrafficPolicy }), fldPath.Child("internalTrafficPolicy"))...)
+
+	// field v1.ServiceSpec.TrafficDistribution
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.TrafficDistribution, safe.Field(oldObj, func(oldObj *v1.ServiceSpec) *string { return oldObj.TrafficDistribution }), fldPath.Child("trafficDistribution"))...)
+
+	return errs
+}
+
+func Validate_ServiceStatus(opCtx operation.Context, obj, oldObj *v1.ServiceStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ServiceStatus.LoadBalancer
+	errs = append(errs,
+		func(obj, oldObj *v1.LoadBalancerStatus, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_LoadBalancerStatus(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.LoadBalancer, safe.Field(oldObj, func(oldObj *v1.ServiceStatus) *v1.LoadBalancerStatus { return &oldObj.LoadBalancer }), fldPath.Child("loadBalancer"))...)
+
+	// field v1.ServiceStatus.Conditions
+	errs = append(errs,
+		func(obj, oldObj []metav1.Condition, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			oldListMap := safe.NewListMap(oldObj, func(o *metav1.Condition) any { return [1]any{o.Type} })
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *metav1.Condition, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, metav1.Validate_Condition(opCtx, obj, oldObj, fldPath)...)
+						return
+					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+			}
+			return
+		}(obj.Conditions, safe.Field(oldObj, func(oldObj *v1.ServiceStatus) []metav1.Condition { return oldObj.Conditions }), fldPath.Child("conditions"))...)
+
+	return errs
+}
+
+func Validate_SessionAffinityConfig(opCtx operation.Context, obj, oldObj *v1.SessionAffinityConfig, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.SessionAffinityConfig.ClientIP
+	errs = append(errs,
+		func(obj, oldObj *v1.ClientIPConfig, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ClientIPConfig(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ClientIP, safe.Field(oldObj, func(oldObj *v1.SessionAffinityConfig) *v1.ClientIPConfig { return oldObj.ClientIP }), fldPath.Child("clientIP"))...)
+
+	return errs
+}
+
+func Validate_StorageOSPersistentVolumeSource(opCtx operation.Context, obj, oldObj *v1.StorageOSPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.StorageOSPersistentVolumeSource.VolumeName has no validation
+
+	// field v1.StorageOSPersistentVolumeSource.VolumeNamespace
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.VolumeNamespace, safe.Field(oldObj, func(oldObj *v1.StorageOSPersistentVolumeSource) *string { return &oldObj.VolumeNamespace }), fldPath.Child("volumeNamespace"))...)
+
+	// field v1.StorageOSPersistentVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FSType, safe.Field(oldObj, func(oldObj *v1.StorageOSPersistentVolumeSource) *string { return &oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.StorageOSPersistentVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.StorageOSPersistentVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	// field v1.StorageOSPersistentVolumeSource.SecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.ObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ObjectReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SecretRef, safe.Field(oldObj, func(oldObj *v1.StorageOSPersistentVolumeSource) *v1.ObjectReference { return oldObj.SecretRef }), fldPath.Child("secretRef"))...)
+
+	return errs
+}
+
+func Validate_StorageOSVolumeSource(opCtx operation.Context, obj, oldObj *v1.StorageOSVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.StorageOSVolumeSource.VolumeName has no validation
+
+	// field v1.StorageOSVolumeSource.VolumeNamespace
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.VolumeNamespace, safe.Field(oldObj, func(oldObj *v1.StorageOSVolumeSource) *string { return &oldObj.VolumeNamespace }), fldPath.Child("volumeNamespace"))...)
+
+	// field v1.StorageOSVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FSType, safe.Field(oldObj, func(oldObj *v1.StorageOSVolumeSource) *string { return &oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.StorageOSVolumeSource.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.StorageOSVolumeSource) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	// field v1.StorageOSVolumeSource.SecretRef
+	errs = append(errs,
+		func(obj, oldObj *v1.LocalObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_LocalObjectReference(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.SecretRef, safe.Field(oldObj, func(oldObj *v1.StorageOSVolumeSource) *v1.LocalObjectReference { return oldObj.SecretRef }), fldPath.Child("secretRef"))...)
+
+	return errs
+}
+
+func Validate_TCPSocketAction(opCtx operation.Context, obj, oldObj *v1.TCPSocketAction, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.TCPSocketAction.Port
+	errs = append(errs,
+		func(obj, oldObj *intstr.IntOrString, fldPath *field.Path) (errs field.ErrorList) {
+			// NOTE: Type intstr.IntOrString is in a non-included package.
+			//       Any validations defined on this type are not available from here.
+			return
+		}(&obj.Port, safe.Field(oldObj, func(oldObj *v1.TCPSocketAction) *intstr.IntOrString { return &oldObj.Port }), fldPath.Child("port"))...)
+
+	// field v1.TCPSocketAction.Host
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Host, safe.Field(oldObj, func(oldObj *v1.TCPSocketAction) *string { return &oldObj.Host }), fldPath.Child("host"))...)
+
+	return errs
+}
+
+func Validate_Taint(opCtx operation.Context, obj, oldObj *v1.Taint, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.Taint.Key has no validation
+
+	// field v1.Taint.Value
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Value, safe.Field(oldObj, func(oldObj *v1.Taint) *string { return &oldObj.Value }), fldPath.Child("value"))...)
+
+	// field v1.Taint.Effect has no validation
+
+	// field v1.Taint.TimeAdded
+	errs = append(errs,
+		func(obj, oldObj *metav1.Time, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.TimeAdded, safe.Field(oldObj, func(oldObj *v1.Taint) *metav1.Time { return oldObj.TimeAdded }), fldPath.Child("timeAdded"))...)
+
+	return errs
+}
+
+func Validate_Toleration(opCtx operation.Context, obj, oldObj *v1.Toleration, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.Toleration.Key
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Key, safe.Field(oldObj, func(oldObj *v1.Toleration) *string { return &oldObj.Key }), fldPath.Child("key"))...)
+
+	// field v1.Toleration.Operator
+	errs = append(errs,
+		func(obj, oldObj *v1.TolerationOperator, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Operator, safe.Field(oldObj, func(oldObj *v1.Toleration) *v1.TolerationOperator { return &oldObj.Operator }), fldPath.Child("operator"))...)
+
+	// field v1.Toleration.Value
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Value, safe.Field(oldObj, func(oldObj *v1.Toleration) *string { return &oldObj.Value }), fldPath.Child("value"))...)
+
+	// field v1.Toleration.Effect
+	errs = append(errs,
+		func(obj, oldObj *v1.TaintEffect, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.Effect, safe.Field(oldObj, func(oldObj *v1.Toleration) *v1.TaintEffect { return &oldObj.Effect }), fldPath.Child("effect"))...)
+
+	// field v1.Toleration.TolerationSeconds
+	errs = append(errs,
+		func(obj, oldObj *int64, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.TolerationSeconds, safe.Field(oldObj, func(oldObj *v1.Toleration) *int64 { return oldObj.TolerationSeconds }), fldPath.Child("tolerationSeconds"))...)
+
+	return errs
+}
+
+func Validate_TopologySpreadConstraint(opCtx operation.Context, obj, oldObj *v1.TopologySpreadConstraint, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.TopologySpreadConstraint.MaxSkew has no validation
+	// field v1.TopologySpreadConstraint.TopologyKey has no validation
+	// field v1.TopologySpreadConstraint.WhenUnsatisfiable has no validation
+
+	// field v1.TopologySpreadConstraint.LabelSelector
+	errs = append(errs,
+		func(obj, oldObj *metav1.LabelSelector, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, metav1.Validate_LabelSelector(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.LabelSelector, safe.Field(oldObj, func(oldObj *v1.TopologySpreadConstraint) *metav1.LabelSelector { return oldObj.LabelSelector }), fldPath.Child("labelSelector"))...)
+
+	// field v1.TopologySpreadConstraint.MinDomains
+	errs = append(errs,
+		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.MinDomains, safe.Field(oldObj, func(oldObj *v1.TopologySpreadConstraint) *int32 { return oldObj.MinDomains }), fldPath.Child("minDomains"))...)
+
+	// field v1.TopologySpreadConstraint.NodeAffinityPolicy
+	errs = append(errs,
+		func(obj, oldObj *v1.NodeInclusionPolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.NodeAffinityPolicy, safe.Field(oldObj, func(oldObj *v1.TopologySpreadConstraint) *v1.NodeInclusionPolicy { return oldObj.NodeAffinityPolicy }), fldPath.Child("nodeAffinityPolicy"))...)
+
+	// field v1.TopologySpreadConstraint.NodeTaintsPolicy
+	errs = append(errs,
+		func(obj, oldObj *v1.NodeInclusionPolicy, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.NodeTaintsPolicy, safe.Field(oldObj, func(oldObj *v1.TopologySpreadConstraint) *v1.NodeInclusionPolicy { return oldObj.NodeTaintsPolicy }), fldPath.Child("nodeTaintsPolicy"))...)
+
+	// field v1.TopologySpreadConstraint.MatchLabelKeys
+	errs = append(errs,
+		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.MatchLabelKeys, safe.Field(oldObj, func(oldObj *v1.TopologySpreadConstraint) []string { return oldObj.MatchLabelKeys }), fldPath.Child("matchLabelKeys"))...)
+
+	return errs
+}
+
+func Validate_TypedLocalObjectReference(opCtx operation.Context, obj, oldObj *v1.TypedLocalObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.TypedLocalObjectReference.APIGroup
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.APIGroup, safe.Field(oldObj, func(oldObj *v1.TypedLocalObjectReference) *string { return oldObj.APIGroup }), fldPath.Child("apiGroup"))...)
+
+	// field v1.TypedLocalObjectReference.Kind has no validation
+	// field v1.TypedLocalObjectReference.Name has no validation
+	return errs
+}
+
+func Validate_TypedObjectReference(opCtx operation.Context, obj, oldObj *v1.TypedObjectReference, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.TypedObjectReference.APIGroup
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.APIGroup, safe.Field(oldObj, func(oldObj *v1.TypedObjectReference) *string { return oldObj.APIGroup }), fldPath.Child("apiGroup"))...)
+
+	// field v1.TypedObjectReference.Kind has no validation
+	// field v1.TypedObjectReference.Name has no validation
+
+	// field v1.TypedObjectReference.Namespace
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.Namespace, safe.Field(oldObj, func(oldObj *v1.TypedObjectReference) *string { return oldObj.Namespace }), fldPath.Child("namespace"))...)
+
 	return errs
 }
 
@@ -1231,12 +8606,573 @@ func Validate_Volume(opCtx operation.Context, obj, oldObj *v1.Volume, fldPath *f
 		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.Required(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			errs = append(errs, validate.DNSLabel(opCtx, fldPath, obj, oldObj)...)
 			return
 		}(&obj.Name, safe.Field(oldObj, func(oldObj *v1.Volume) *string { return &oldObj.Name }), fldPath.Child("name"))...)
 
-	// field v1.Volume.VolumeSource has no validation
+	return errs
+}
+
+func Validate_VolumeMount(opCtx operation.Context, obj, oldObj *v1.VolumeMount, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.VolumeMount.Name has no validation
+
+	// field v1.VolumeMount.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.VolumeMount) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	// field v1.VolumeMount.RecursiveReadOnly
+	errs = append(errs,
+		func(obj, oldObj *v1.RecursiveReadOnlyMode, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.RecursiveReadOnly, safe.Field(oldObj, func(oldObj *v1.VolumeMount) *v1.RecursiveReadOnlyMode { return oldObj.RecursiveReadOnly }), fldPath.Child("recursiveReadOnly"))...)
+
+	// field v1.VolumeMount.MountPath has no validation
+
+	// field v1.VolumeMount.SubPath
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.SubPath, safe.Field(oldObj, func(oldObj *v1.VolumeMount) *string { return &oldObj.SubPath }), fldPath.Child("subPath"))...)
+
+	// field v1.VolumeMount.MountPropagation
+	errs = append(errs,
+		func(obj, oldObj *v1.MountPropagationMode, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.MountPropagation, safe.Field(oldObj, func(oldObj *v1.VolumeMount) *v1.MountPropagationMode { return oldObj.MountPropagation }), fldPath.Child("mountPropagation"))...)
+
+	// field v1.VolumeMount.SubPathExpr
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.SubPathExpr, safe.Field(oldObj, func(oldObj *v1.VolumeMount) *string { return &oldObj.SubPathExpr }), fldPath.Child("subPathExpr"))...)
+
+	return errs
+}
+
+func Validate_VolumeMountStatus(opCtx operation.Context, obj, oldObj *v1.VolumeMountStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.VolumeMountStatus.Name has no validation
+	// field v1.VolumeMountStatus.MountPath has no validation
+
+	// field v1.VolumeMountStatus.ReadOnly
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.ReadOnly, safe.Field(oldObj, func(oldObj *v1.VolumeMountStatus) *bool { return &oldObj.ReadOnly }), fldPath.Child("readOnly"))...)
+
+	// field v1.VolumeMountStatus.RecursiveReadOnly
+	errs = append(errs,
+		func(obj, oldObj *v1.RecursiveReadOnlyMode, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.RecursiveReadOnly, safe.Field(oldObj, func(oldObj *v1.VolumeMountStatus) *v1.RecursiveReadOnlyMode { return oldObj.RecursiveReadOnly }), fldPath.Child("recursiveReadOnly"))...)
+
+	return errs
+}
+
+func Validate_VolumeNodeAffinity(opCtx operation.Context, obj, oldObj *v1.VolumeNodeAffinity, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.VolumeNodeAffinity.Required
+	errs = append(errs,
+		func(obj, oldObj *v1.NodeSelector, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_NodeSelector(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Required, safe.Field(oldObj, func(oldObj *v1.VolumeNodeAffinity) *v1.NodeSelector { return oldObj.Required }), fldPath.Child("required"))...)
+
+	return errs
+}
+
+func Validate_VolumeProjection(opCtx operation.Context, obj, oldObj *v1.VolumeProjection, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.VolumeProjection.Secret
+	errs = append(errs,
+		func(obj, oldObj *v1.SecretProjection, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_SecretProjection(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Secret, safe.Field(oldObj, func(oldObj *v1.VolumeProjection) *v1.SecretProjection { return oldObj.Secret }), fldPath.Child("secret"))...)
+
+	// field v1.VolumeProjection.DownwardAPI
+	errs = append(errs,
+		func(obj, oldObj *v1.DownwardAPIProjection, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_DownwardAPIProjection(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.DownwardAPI, safe.Field(oldObj, func(oldObj *v1.VolumeProjection) *v1.DownwardAPIProjection { return oldObj.DownwardAPI }), fldPath.Child("downwardAPI"))...)
+
+	// field v1.VolumeProjection.ConfigMap
+	errs = append(errs,
+		func(obj, oldObj *v1.ConfigMapProjection, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ConfigMapProjection(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ConfigMap, safe.Field(oldObj, func(oldObj *v1.VolumeProjection) *v1.ConfigMapProjection { return oldObj.ConfigMap }), fldPath.Child("configMap"))...)
+
+	// field v1.VolumeProjection.ServiceAccountToken
+	errs = append(errs,
+		func(obj, oldObj *v1.ServiceAccountTokenProjection, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ServiceAccountTokenProjection(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ServiceAccountToken, safe.Field(oldObj, func(oldObj *v1.VolumeProjection) *v1.ServiceAccountTokenProjection { return oldObj.ServiceAccountToken }), fldPath.Child("serviceAccountToken"))...)
+
+	// field v1.VolumeProjection.ClusterTrustBundle
+	errs = append(errs,
+		func(obj, oldObj *v1.ClusterTrustBundleProjection, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ClusterTrustBundleProjection(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ClusterTrustBundle, safe.Field(oldObj, func(oldObj *v1.VolumeProjection) *v1.ClusterTrustBundleProjection { return oldObj.ClusterTrustBundle }), fldPath.Child("clusterTrustBundle"))...)
+
+	return errs
+}
+
+func Validate_VolumeResourceRequirements(opCtx operation.Context, obj, oldObj *v1.VolumeResourceRequirements, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.VolumeResourceRequirements.Limits
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.Limits, safe.Field(oldObj, func(oldObj *v1.VolumeResourceRequirements) v1.ResourceList { return oldObj.Limits }), fldPath.Child("limits"))...)
+
+	// field v1.VolumeResourceRequirements.Requests
+	errs = append(errs,
+		func(obj, oldObj v1.ResourceList, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj, oldObj *resource.Quantity, fldPath *field.Path) (errs field.ErrorList) {
+						// NOTE: Type resource.Quantity is in a non-included package.
+						//       Any validations defined on this type are not available from here.
+						return
+					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}
+			return
+		}(obj.Requests, safe.Field(oldObj, func(oldObj *v1.VolumeResourceRequirements) v1.ResourceList { return oldObj.Requests }), fldPath.Child("requests"))...)
+
+	return errs
+}
+
+func Validate_VolumeSource(opCtx operation.Context, obj, oldObj *v1.VolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.VolumeSource.HostPath
+	errs = append(errs,
+		func(obj, oldObj *v1.HostPathVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_HostPathVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.HostPath, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.HostPathVolumeSource { return oldObj.HostPath }), fldPath.Child("hostPath"))...)
+
+	// field v1.VolumeSource.EmptyDir
+	errs = append(errs,
+		func(obj, oldObj *v1.EmptyDirVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_EmptyDirVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.EmptyDir, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.EmptyDirVolumeSource { return oldObj.EmptyDir }), fldPath.Child("emptyDir"))...)
+
+	// field v1.VolumeSource.GCEPersistentDisk
+	errs = append(errs,
+		func(obj, oldObj *v1.GCEPersistentDiskVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_GCEPersistentDiskVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.GCEPersistentDisk, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.GCEPersistentDiskVolumeSource { return oldObj.GCEPersistentDisk }), fldPath.Child("gcePersistentDisk"))...)
+
+	// field v1.VolumeSource.AWSElasticBlockStore
+	errs = append(errs,
+		func(obj, oldObj *v1.AWSElasticBlockStoreVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_AWSElasticBlockStoreVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.AWSElasticBlockStore, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.AWSElasticBlockStoreVolumeSource { return oldObj.AWSElasticBlockStore }), fldPath.Child("awsElasticBlockStore"))...)
+
+	// field v1.VolumeSource.GitRepo
+	errs = append(errs,
+		func(obj, oldObj *v1.GitRepoVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_GitRepoVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.GitRepo, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.GitRepoVolumeSource { return oldObj.GitRepo }), fldPath.Child("gitRepo"))...)
+
+	// field v1.VolumeSource.Secret
+	errs = append(errs,
+		func(obj, oldObj *v1.SecretVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_SecretVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Secret, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.SecretVolumeSource { return oldObj.Secret }), fldPath.Child("secret"))...)
+
+	// field v1.VolumeSource.NFS
+	errs = append(errs,
+		func(obj, oldObj *v1.NFSVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_NFSVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.NFS, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.NFSVolumeSource { return oldObj.NFS }), fldPath.Child("nfs"))...)
+
+	// field v1.VolumeSource.ISCSI
+	errs = append(errs,
+		func(obj, oldObj *v1.ISCSIVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ISCSIVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ISCSI, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.ISCSIVolumeSource { return oldObj.ISCSI }), fldPath.Child("iscsi"))...)
+
+	// field v1.VolumeSource.Glusterfs
+	errs = append(errs,
+		func(obj, oldObj *v1.GlusterfsVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_GlusterfsVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Glusterfs, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.GlusterfsVolumeSource { return oldObj.Glusterfs }), fldPath.Child("glusterfs"))...)
+
+	// field v1.VolumeSource.PersistentVolumeClaim
+	errs = append(errs,
+		func(obj, oldObj *v1.PersistentVolumeClaimVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_PersistentVolumeClaimVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.PersistentVolumeClaim, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.PersistentVolumeClaimVolumeSource {
+			return oldObj.PersistentVolumeClaim
+		}), fldPath.Child("persistentVolumeClaim"))...)
+
+	// field v1.VolumeSource.RBD
+	errs = append(errs,
+		func(obj, oldObj *v1.RBDVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_RBDVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.RBD, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.RBDVolumeSource { return oldObj.RBD }), fldPath.Child("rbd"))...)
+
+	// field v1.VolumeSource.FlexVolume
+	errs = append(errs,
+		func(obj, oldObj *v1.FlexVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_FlexVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.FlexVolume, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.FlexVolumeSource { return oldObj.FlexVolume }), fldPath.Child("flexVolume"))...)
+
+	// field v1.VolumeSource.Cinder
+	errs = append(errs,
+		func(obj, oldObj *v1.CinderVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_CinderVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Cinder, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.CinderVolumeSource { return oldObj.Cinder }), fldPath.Child("cinder"))...)
+
+	// field v1.VolumeSource.CephFS
+	errs = append(errs,
+		func(obj, oldObj *v1.CephFSVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_CephFSVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.CephFS, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.CephFSVolumeSource { return oldObj.CephFS }), fldPath.Child("cephfs"))...)
+
+	// field v1.VolumeSource.Flocker
+	errs = append(errs,
+		func(obj, oldObj *v1.FlockerVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_FlockerVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Flocker, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.FlockerVolumeSource { return oldObj.Flocker }), fldPath.Child("flocker"))...)
+
+	// field v1.VolumeSource.DownwardAPI
+	errs = append(errs,
+		func(obj, oldObj *v1.DownwardAPIVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_DownwardAPIVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.DownwardAPI, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.DownwardAPIVolumeSource { return oldObj.DownwardAPI }), fldPath.Child("downwardAPI"))...)
+
+	// field v1.VolumeSource.FC
+	errs = append(errs,
+		func(obj, oldObj *v1.FCVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_FCVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.FC, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.FCVolumeSource { return oldObj.FC }), fldPath.Child("fc"))...)
+
+	// field v1.VolumeSource.AzureFile
+	errs = append(errs,
+		func(obj, oldObj *v1.AzureFileVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_AzureFileVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.AzureFile, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.AzureFileVolumeSource { return oldObj.AzureFile }), fldPath.Child("azureFile"))...)
+
+	// field v1.VolumeSource.ConfigMap
+	errs = append(errs,
+		func(obj, oldObj *v1.ConfigMapVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ConfigMapVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ConfigMap, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.ConfigMapVolumeSource { return oldObj.ConfigMap }), fldPath.Child("configMap"))...)
+
+	// field v1.VolumeSource.VsphereVolume
+	errs = append(errs,
+		func(obj, oldObj *v1.VsphereVirtualDiskVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_VsphereVirtualDiskVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.VsphereVolume, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.VsphereVirtualDiskVolumeSource { return oldObj.VsphereVolume }), fldPath.Child("vsphereVolume"))...)
+
+	// field v1.VolumeSource.Quobyte
+	errs = append(errs,
+		func(obj, oldObj *v1.QuobyteVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_QuobyteVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Quobyte, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.QuobyteVolumeSource { return oldObj.Quobyte }), fldPath.Child("quobyte"))...)
+
+	// field v1.VolumeSource.AzureDisk
+	errs = append(errs,
+		func(obj, oldObj *v1.AzureDiskVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_AzureDiskVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.AzureDisk, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.AzureDiskVolumeSource { return oldObj.AzureDisk }), fldPath.Child("azureDisk"))...)
+
+	// field v1.VolumeSource.PhotonPersistentDisk has no validation
+
+	// field v1.VolumeSource.Projected
+	errs = append(errs,
+		func(obj, oldObj *v1.ProjectedVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_ProjectedVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Projected, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.ProjectedVolumeSource { return oldObj.Projected }), fldPath.Child("projected"))...)
+
+	// field v1.VolumeSource.PortworxVolume
+	errs = append(errs,
+		func(obj, oldObj *v1.PortworxVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_PortworxVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.PortworxVolume, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.PortworxVolumeSource { return oldObj.PortworxVolume }), fldPath.Child("portworxVolume"))...)
+
+	// field v1.VolumeSource.ScaleIO
+	errs = append(errs,
+		func(obj, oldObj *v1.ScaleIOVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ScaleIOVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.ScaleIO, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.ScaleIOVolumeSource { return oldObj.ScaleIO }), fldPath.Child("scaleIO"))...)
+
+	// field v1.VolumeSource.StorageOS
+	errs = append(errs,
+		func(obj, oldObj *v1.StorageOSVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_StorageOSVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.StorageOS, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.StorageOSVolumeSource { return oldObj.StorageOS }), fldPath.Child("storageos"))...)
+
+	// field v1.VolumeSource.CSI
+	errs = append(errs,
+		func(obj, oldObj *v1.CSIVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_CSIVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.CSI, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.CSIVolumeSource { return oldObj.CSI }), fldPath.Child("csi"))...)
+
+	// field v1.VolumeSource.Ephemeral
+	errs = append(errs,
+		func(obj, oldObj *v1.EphemeralVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_EphemeralVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Ephemeral, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.EphemeralVolumeSource { return oldObj.Ephemeral }), fldPath.Child("ephemeral"))...)
+
+	// field v1.VolumeSource.Image
+	errs = append(errs,
+		func(obj, oldObj *v1.ImageVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, Validate_ImageVolumeSource(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(obj.Image, safe.Field(oldObj, func(oldObj *v1.VolumeSource) *v1.ImageVolumeSource { return oldObj.Image }), fldPath.Child("image"))...)
+
+	return errs
+}
+
+func Validate_VsphereVirtualDiskVolumeSource(opCtx operation.Context, obj, oldObj *v1.VsphereVirtualDiskVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.VsphereVirtualDiskVolumeSource.VolumePath has no validation
+
+	// field v1.VsphereVirtualDiskVolumeSource.FSType
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.FSType, safe.Field(oldObj, func(oldObj *v1.VsphereVirtualDiskVolumeSource) *string { return &oldObj.FSType }), fldPath.Child("fsType"))...)
+
+	// field v1.VsphereVirtualDiskVolumeSource.StoragePolicyName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.StoragePolicyName, safe.Field(oldObj, func(oldObj *v1.VsphereVirtualDiskVolumeSource) *string { return &oldObj.StoragePolicyName }), fldPath.Child("storagePolicyName"))...)
+
+	// field v1.VsphereVirtualDiskVolumeSource.StoragePolicyID
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(&obj.StoragePolicyID, safe.Field(oldObj, func(oldObj *v1.VsphereVirtualDiskVolumeSource) *string { return &oldObj.StoragePolicyID }), fldPath.Child("storagePolicyID"))...)
+
+	return errs
+}
+
+func Validate_WeightedPodAffinityTerm(opCtx operation.Context, obj, oldObj *v1.WeightedPodAffinityTerm, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.WeightedPodAffinityTerm.Weight has no validation
+
+	// field v1.WeightedPodAffinityTerm.PodAffinityTerm
+	errs = append(errs,
+		func(obj, oldObj *v1.PodAffinityTerm, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_PodAffinityTerm(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.PodAffinityTerm, safe.Field(oldObj, func(oldObj *v1.WeightedPodAffinityTerm) *v1.PodAffinityTerm { return &oldObj.PodAffinityTerm }), fldPath.Child("podAffinityTerm"))...)
+
+	return errs
+}
+
+func Validate_WindowsSecurityContextOptions(opCtx operation.Context, obj, oldObj *v1.WindowsSecurityContextOptions, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.WindowsSecurityContextOptions.GMSACredentialSpecName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.GMSACredentialSpecName, safe.Field(oldObj, func(oldObj *v1.WindowsSecurityContextOptions) *string { return oldObj.GMSACredentialSpecName }), fldPath.Child("gmsaCredentialSpecName"))...)
+
+	// field v1.WindowsSecurityContextOptions.GMSACredentialSpec
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.GMSACredentialSpec, safe.Field(oldObj, func(oldObj *v1.WindowsSecurityContextOptions) *string { return oldObj.GMSACredentialSpec }), fldPath.Child("gmsaCredentialSpec"))...)
+
+	// field v1.WindowsSecurityContextOptions.RunAsUserName
+	errs = append(errs,
+		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.RunAsUserName, safe.Field(oldObj, func(oldObj *v1.WindowsSecurityContextOptions) *string { return oldObj.RunAsUserName }), fldPath.Child("runAsUserName"))...)
+
+	// field v1.WindowsSecurityContextOptions.HostProcess
+	errs = append(errs,
+		func(obj, oldObj *bool, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(obj.HostProcess, safe.Field(oldObj, func(oldObj *v1.WindowsSecurityContextOptions) *bool { return oldObj.HostProcess }), fldPath.Child("hostProcess"))...)
+
 	return errs
 }
