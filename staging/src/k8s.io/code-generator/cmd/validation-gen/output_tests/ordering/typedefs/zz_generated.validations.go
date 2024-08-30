@@ -84,7 +84,7 @@ func Validate_E02(opCtx operation.Context, obj, oldObj *E02, fldPath *field.Path
 	// type E02
 	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "E02, IsFatal"); len(e) != 0 {
 		errs = append(errs, e...)
-		return // fatal
+		return // do not proceed
 	}
 
 	return errs
@@ -94,7 +94,7 @@ func Validate_E03(opCtx operation.Context, obj, oldObj *E03, fldPath *field.Path
 	// type E03
 	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "E03, IsFatal"); len(e) != 0 {
 		errs = append(errs, e...)
-		return // fatal
+		return // do not proceed
 	}
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "E03, no flags")...)
 
@@ -105,11 +105,11 @@ func Validate_EMultiple(opCtx operation.Context, obj, oldObj *EMultiple, fldPath
 	// type EMultiple
 	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "EMultiple, IsFatal 1"); len(e) != 0 {
 		errs = append(errs, e...)
-		return // fatal
+		return // do not proceed
 	}
 	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "EMultiple, IsFatal 2"); len(e) != 0 {
 		errs = append(errs, e...)
-		return // fatal
+		return // do not proceed
 	}
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "EMultiple, no flags 1")...)
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "E0, string payload")...)

@@ -76,7 +76,6 @@
 - How to deal with fields which are +optional and +default - they need a
   required-check, but only on server-side, never client-side.
 - Think of a better name and home for operation.Context
-- Handle +optional as a short-circuit but not an error
 - If a field is not +required and not +optional, do we pass nil values to
   validators?  Do they all need to nil-check?
 - Linear or bin-search ListMap rather thsan build a map?

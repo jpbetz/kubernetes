@@ -24,6 +24,7 @@ import (
 
 func init() {
 	AddToRegistry(InitRequiredDeclarativeValidator)
+	AddToRegistry(InitOptionalDeclarativeValidator)
 }
 
 func InitRequiredDeclarativeValidator(c *generator.Context) DeclarativeValidator {
@@ -52,6 +53,36 @@ func (requiredDeclarativeValidator) Docs() []TagDoc {
 	return []TagDoc{{
 		Tag:         requiredTagName,
 		Description: "Indicates that a field is required to be specified.",
+		Contexts:    []TagContext{TagContextType, TagContextField},
+	}}
+}
+
+func InitOptionalDeclarativeValidator(c *generator.Context) DeclarativeValidator {
+	return &optionalDeclarativeValidator{}
+}
+
+type optionalDeclarativeValidator struct{}
+
+const (
+	optionalTagName = "optional" // TODO: also support k8s:optional
+)
+
+var (
+	optionalValidator = types.Name{Package: libValidationPkg, Name: "Optional"}
+)
+
+func (optionalDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
+	_, optional := gengo.ExtractCommentTags("+", comments)[optionalTagName]
+	if !optional {
+		return Validations{}, nil
+	}
+	return Validations{Functions: []FunctionGen{Function(optionalTagName, IsFatal|NonError, optionalValidator)}}, nil
+}
+
+func (optionalDeclarativeValidator) Docs() []TagDoc {
+	return []TagDoc{{
+		Tag:         optionalTagName,
+		Description: "Indicates that a field is optional.",
 		Contexts:    []TagContext{TagContextType, TagContextField},
 	}}
 }

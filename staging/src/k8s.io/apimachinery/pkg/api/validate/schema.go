@@ -24,7 +24,7 @@ import (
 
 // MaxLength verifies that the specified value is not longer than max
 // characters.
-func MaxLength(opCtx operation.Context, fldPath *field.Path, value, _ *string, max int) field.ErrorList {
+func MaxLength(_ operation.Context, fldPath *field.Path, value, _ *string, max int) field.ErrorList {
 	if value == nil {
 		return nil
 	}
@@ -36,7 +36,7 @@ func MaxLength(opCtx operation.Context, fldPath *field.Path, value, _ *string, m
 
 // Required verifies that the specified value is not the zero-value for its
 // type.
-func Required[T comparable](opCtx operation.Context, fldPath *field.Path, value, _ *T) field.ErrorList {
+func Required[T comparable](_ operation.Context, fldPath *field.Path, value, _ *T) field.ErrorList {
 	if value != nil {
 		var zero T
 		if *value != zero {
@@ -44,4 +44,17 @@ func Required[T comparable](opCtx operation.Context, fldPath *field.Path, value,
 		}
 	}
 	return field.ErrorList{field.Required(fldPath, "")}
+}
+
+// Optional verifies that the specified value is not the zero-value for its
+// type. This is identical to Required, but the caller should treat an error
+// here as an indication that the optional value was not specified.
+func Optional[T comparable](_ operation.Context, fldPath *field.Path, value, _ *T) field.ErrorList {
+	if value != nil {
+		var zero T
+		if *value != zero {
+			return nil
+		}
+	}
+	return field.ErrorList{field.Required(fldPath, "optional value was not specified")}
 }

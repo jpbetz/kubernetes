@@ -94,7 +94,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 					func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 						if e := validate.Required(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 							errs = append(errs, e...)
-							return // fatal
+							return // do not proceed
 						}
 						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.LS[*]")...)
 						return

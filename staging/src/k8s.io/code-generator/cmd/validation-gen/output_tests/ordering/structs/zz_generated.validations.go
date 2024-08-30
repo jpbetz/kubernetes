@@ -134,7 +134,7 @@ func Validate_T02(opCtx operation.Context, obj, oldObj *T02, fldPath *field.Path
 	// type T02
 	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T02, IsFatal"); len(e) != 0 {
 		errs = append(errs, e...)
-		return // fatal
+		return // do not proceed
 	}
 
 	// field T02.TypeMeta has no validation
@@ -144,7 +144,7 @@ func Validate_T02(opCtx operation.Context, obj, oldObj *T02, fldPath *field.Path
 		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T02.S, IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			return
 		}(&obj.S, safe.Field(oldObj, func(oldObj *T02) *string { return &oldObj.S }), fldPath.Child("s"))...)
@@ -154,7 +154,7 @@ func Validate_T02(opCtx operation.Context, obj, oldObj *T02, fldPath *field.Path
 		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T02.PS, IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			return
 		}(obj.PS, safe.Field(oldObj, func(oldObj *T02) *string { return oldObj.PS }), fldPath.Child("ps"))...)
@@ -164,7 +164,7 @@ func Validate_T02(opCtx operation.Context, obj, oldObj *T02, fldPath *field.Path
 		func(obj, oldObj *Tother, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T02.T, IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			errs = append(errs, Validate_Tother(opCtx, obj, oldObj, fldPath)...)
 			return
@@ -175,7 +175,7 @@ func Validate_T02(opCtx operation.Context, obj, oldObj *T02, fldPath *field.Path
 		func(obj, oldObj *Tother, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T02.PT, IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			errs = append(errs, Validate_Tother(opCtx, obj, oldObj, fldPath)...)
 			return
@@ -188,7 +188,7 @@ func Validate_T03(opCtx operation.Context, obj, oldObj *T03, fldPath *field.Path
 	// type T03
 	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T03, IsFatal"); len(e) != 0 {
 		errs = append(errs, e...)
-		return // fatal
+		return // do not proceed
 	}
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T03, no flags")...)
 
@@ -199,7 +199,7 @@ func Validate_T03(opCtx operation.Context, obj, oldObj *T03, fldPath *field.Path
 		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T03.S, IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T03.S, no flags")...)
 			return
@@ -210,7 +210,7 @@ func Validate_T03(opCtx operation.Context, obj, oldObj *T03, fldPath *field.Path
 		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T03.PS, IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T03.PS, no flags")...)
 			return
@@ -221,7 +221,7 @@ func Validate_T03(opCtx operation.Context, obj, oldObj *T03, fldPath *field.Path
 		func(obj, oldObj *Tother, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T03.T, IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T03.T, no flags")...)
 			errs = append(errs, Validate_Tother(opCtx, obj, oldObj, fldPath)...)
@@ -233,7 +233,7 @@ func Validate_T03(opCtx operation.Context, obj, oldObj *T03, fldPath *field.Path
 		func(obj, oldObj *Tother, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T03.PT, IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T03.PT, no flags")...)
 			errs = append(errs, Validate_Tother(opCtx, obj, oldObj, fldPath)...)
@@ -247,11 +247,11 @@ func Validate_TMultiple(opCtx operation.Context, obj, oldObj *TMultiple, fldPath
 	// type TMultiple
 	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "TMultiple, IsFatal 1"); len(e) != 0 {
 		errs = append(errs, e...)
-		return // fatal
+		return // do not proceed
 	}
 	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "TMultiple, IsFatal 2"); len(e) != 0 {
 		errs = append(errs, e...)
-		return // fatal
+		return // do not proceed
 	}
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "TMultiple, no flags 1")...)
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T0, string payload")...)
@@ -264,11 +264,11 @@ func Validate_TMultiple(opCtx operation.Context, obj, oldObj *TMultiple, fldPath
 		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "TMultiple.S, IsFatal 1"); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "TMultiple.S, IsFatal 2"); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "TMultiple.S, no flags 1")...)
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T0, string payload")...)
@@ -281,11 +281,11 @@ func Validate_TMultiple(opCtx operation.Context, obj, oldObj *TMultiple, fldPath
 		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "TMultiple.PS, IsFatal 1"); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "TMultiple.PS, IsFatal 2"); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "TMultiple.PS, no flags 1")...)
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T0, string payload")...)
@@ -298,11 +298,11 @@ func Validate_TMultiple(opCtx operation.Context, obj, oldObj *TMultiple, fldPath
 		func(obj, oldObj *Tother, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "TMultiple.T, IsFatal 1"); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "TMultiple.T, IsFatal 2"); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "TMultiple.T, no flags 1")...)
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T0, string payload")...)
@@ -316,11 +316,11 @@ func Validate_TMultiple(opCtx operation.Context, obj, oldObj *TMultiple, fldPath
 		func(obj, oldObj *Tother, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "TMultiple.PT, IsFatal 1"); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "TMultiple.PT, IsFatal 2"); len(e) != 0 {
 				errs = append(errs, e...)
-				return // fatal
+				return // do not proceed
 			}
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "TMultiple.PT, no flags 1")...)
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T0, string payload")...)
