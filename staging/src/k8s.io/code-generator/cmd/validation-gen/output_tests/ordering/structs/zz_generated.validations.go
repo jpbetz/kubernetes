@@ -38,31 +38,31 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*T00)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_T00(opCtx, obj.(*T00), safe.Cast[T00](oldObj), nil)
+			return Validate_T00(opCtx, obj.(*T00), safe.Cast[*T00](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*T01)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_T01(opCtx, obj.(*T01), safe.Cast[T01](oldObj), nil)
+			return Validate_T01(opCtx, obj.(*T01), safe.Cast[*T01](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*T02)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_T02(opCtx, obj.(*T02), safe.Cast[T02](oldObj), nil)
+			return Validate_T02(opCtx, obj.(*T02), safe.Cast[*T02](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*T03)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_T03(opCtx, obj.(*T03), safe.Cast[T03](oldObj), nil)
+			return Validate_T03(opCtx, obj.(*T03), safe.Cast[*T03](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*TMultiple)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_TMultiple(opCtx, obj.(*TMultiple), safe.Cast[TMultiple](oldObj), nil)
+			return Validate_TMultiple(opCtx, obj.(*TMultiple), safe.Cast[*TMultiple](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})

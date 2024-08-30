@@ -39,79 +39,79 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 func RegisterValidations(scheme *runtime.Scheme) error {
 	scheme.AddValidationFunc((*v1.Binding)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Binding(opCtx, obj.(*v1.Binding), safe.Cast[v1.Binding](oldObj), nil)
+			return Validate_Binding(opCtx, obj.(*v1.Binding), safe.Cast[*v1.Binding](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.ComponentStatus)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ComponentStatus(opCtx, obj.(*v1.ComponentStatus), safe.Cast[v1.ComponentStatus](oldObj), nil)
+			return Validate_ComponentStatus(opCtx, obj.(*v1.ComponentStatus), safe.Cast[*v1.ComponentStatus](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.ComponentStatusList)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ComponentStatusList(opCtx, obj.(*v1.ComponentStatusList), safe.Cast[v1.ComponentStatusList](oldObj), nil)
+			return Validate_ComponentStatusList(opCtx, obj.(*v1.ComponentStatusList), safe.Cast[*v1.ComponentStatusList](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.ConfigMap)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ConfigMap(opCtx, obj.(*v1.ConfigMap), safe.Cast[v1.ConfigMap](oldObj), nil)
+			return Validate_ConfigMap(opCtx, obj.(*v1.ConfigMap), safe.Cast[*v1.ConfigMap](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.ConfigMapList)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ConfigMapList(opCtx, obj.(*v1.ConfigMapList), safe.Cast[v1.ConfigMapList](oldObj), nil)
+			return Validate_ConfigMapList(opCtx, obj.(*v1.ConfigMapList), safe.Cast[*v1.ConfigMapList](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.Endpoints)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Endpoints(opCtx, obj.(*v1.Endpoints), safe.Cast[v1.Endpoints](oldObj), nil)
+			return Validate_Endpoints(opCtx, obj.(*v1.Endpoints), safe.Cast[*v1.Endpoints](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.EndpointsList)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_EndpointsList(opCtx, obj.(*v1.EndpointsList), safe.Cast[v1.EndpointsList](oldObj), nil)
+			return Validate_EndpointsList(opCtx, obj.(*v1.EndpointsList), safe.Cast[*v1.EndpointsList](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.Event)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Event(opCtx, obj.(*v1.Event), safe.Cast[v1.Event](oldObj), nil)
+			return Validate_Event(opCtx, obj.(*v1.Event), safe.Cast[*v1.Event](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.EventList)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_EventList(opCtx, obj.(*v1.EventList), safe.Cast[v1.EventList](oldObj), nil)
+			return Validate_EventList(opCtx, obj.(*v1.EventList), safe.Cast[*v1.EventList](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.LimitRange)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_LimitRange(opCtx, obj.(*v1.LimitRange), safe.Cast[v1.LimitRange](oldObj), nil)
+			return Validate_LimitRange(opCtx, obj.(*v1.LimitRange), safe.Cast[*v1.LimitRange](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.LimitRangeList)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_LimitRangeList(opCtx, obj.(*v1.LimitRangeList), safe.Cast[v1.LimitRangeList](oldObj), nil)
+			return Validate_LimitRangeList(opCtx, obj.(*v1.LimitRangeList), safe.Cast[*v1.LimitRangeList](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.List)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_List(opCtx, obj.(*v1.List), safe.Cast[v1.List](oldObj), nil)
+			return Validate_List(opCtx, obj.(*v1.List), safe.Cast[*v1.List](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.Namespace)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Namespace(opCtx, obj.(*v1.Namespace), safe.Cast[v1.Namespace](oldObj), nil)
+			return Validate_Namespace(opCtx, obj.(*v1.Namespace), safe.Cast[*v1.Namespace](oldObj), nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
 			return nil // v1.NamespaceStatus has no validation
@@ -120,13 +120,13 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	})
 	scheme.AddValidationFunc((*v1.NamespaceList)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_NamespaceList(opCtx, obj.(*v1.NamespaceList), safe.Cast[v1.NamespaceList](oldObj), nil)
+			return Validate_NamespaceList(opCtx, obj.(*v1.NamespaceList), safe.Cast[*v1.NamespaceList](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.Node)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Node(opCtx, obj.(*v1.Node), safe.Cast[v1.Node](oldObj), nil)
+			return Validate_Node(opCtx, obj.(*v1.Node), safe.Cast[*v1.Node](oldObj), nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
 			return nil // v1.NodeStatus has no validation
@@ -135,19 +135,19 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	})
 	scheme.AddValidationFunc((*v1.NodeList)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_NodeList(opCtx, obj.(*v1.NodeList), safe.Cast[v1.NodeList](oldObj), nil)
+			return Validate_NodeList(opCtx, obj.(*v1.NodeList), safe.Cast[*v1.NodeList](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.NodeProxyOptions)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_NodeProxyOptions(opCtx, obj.(*v1.NodeProxyOptions), safe.Cast[v1.NodeProxyOptions](oldObj), nil)
+			return Validate_NodeProxyOptions(opCtx, obj.(*v1.NodeProxyOptions), safe.Cast[*v1.NodeProxyOptions](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.PersistentVolume)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PersistentVolume(opCtx, obj.(*v1.PersistentVolume), safe.Cast[v1.PersistentVolume](oldObj), nil)
+			return Validate_PersistentVolume(opCtx, obj.(*v1.PersistentVolume), safe.Cast[*v1.PersistentVolume](oldObj), nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
 			return nil // v1.PersistentVolumeStatus has no validation
@@ -156,7 +156,7 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	})
 	scheme.AddValidationFunc((*v1.PersistentVolumeClaim)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PersistentVolumeClaim(opCtx, obj.(*v1.PersistentVolumeClaim), safe.Cast[v1.PersistentVolumeClaim](oldObj), nil)
+			return Validate_PersistentVolumeClaim(opCtx, obj.(*v1.PersistentVolumeClaim), safe.Cast[*v1.PersistentVolumeClaim](oldObj), nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
 			return nil // v1.PersistentVolumeClaimStatus has no validation
@@ -165,93 +165,93 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	})
 	scheme.AddValidationFunc((*v1.PersistentVolumeClaimList)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PersistentVolumeClaimList(opCtx, obj.(*v1.PersistentVolumeClaimList), safe.Cast[v1.PersistentVolumeClaimList](oldObj), nil)
+			return Validate_PersistentVolumeClaimList(opCtx, obj.(*v1.PersistentVolumeClaimList), safe.Cast[*v1.PersistentVolumeClaimList](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.PersistentVolumeList)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PersistentVolumeList(opCtx, obj.(*v1.PersistentVolumeList), safe.Cast[v1.PersistentVolumeList](oldObj), nil)
+			return Validate_PersistentVolumeList(opCtx, obj.(*v1.PersistentVolumeList), safe.Cast[*v1.PersistentVolumeList](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.Pod)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Pod(opCtx, obj.(*v1.Pod), safe.Cast[v1.Pod](oldObj), nil)
+			return Validate_Pod(opCtx, obj.(*v1.Pod), safe.Cast[*v1.Pod](oldObj), nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
 			root := obj.(*v1.Pod)
-			return Validate_PodStatus(opCtx, &root.Status, safe.Field(safe.Cast[v1.Pod](oldObj), func(oldObj v1.Pod) v1.PodStatus { return oldObj.Status }), nil)
+			return Validate_PodStatus(opCtx, &root.Status, safe.Field(safe.Cast[*v1.Pod](oldObj), func(oldObj *v1.Pod) v1.PodStatus { return oldObj.Status }), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.PodAttachOptions)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PodAttachOptions(opCtx, obj.(*v1.PodAttachOptions), safe.Cast[v1.PodAttachOptions](oldObj), nil)
+			return Validate_PodAttachOptions(opCtx, obj.(*v1.PodAttachOptions), safe.Cast[*v1.PodAttachOptions](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.PodExecOptions)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PodExecOptions(opCtx, obj.(*v1.PodExecOptions), safe.Cast[v1.PodExecOptions](oldObj), nil)
+			return Validate_PodExecOptions(opCtx, obj.(*v1.PodExecOptions), safe.Cast[*v1.PodExecOptions](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.PodList)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PodList(opCtx, obj.(*v1.PodList), safe.Cast[v1.PodList](oldObj), nil)
+			return Validate_PodList(opCtx, obj.(*v1.PodList), safe.Cast[*v1.PodList](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.PodLogOptions)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PodLogOptions(opCtx, obj.(*v1.PodLogOptions), safe.Cast[v1.PodLogOptions](oldObj), nil)
+			return Validate_PodLogOptions(opCtx, obj.(*v1.PodLogOptions), safe.Cast[*v1.PodLogOptions](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.PodPortForwardOptions)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PodPortForwardOptions(opCtx, obj.(*v1.PodPortForwardOptions), safe.Cast[v1.PodPortForwardOptions](oldObj), nil)
+			return Validate_PodPortForwardOptions(opCtx, obj.(*v1.PodPortForwardOptions), safe.Cast[*v1.PodPortForwardOptions](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.PodProxyOptions)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PodProxyOptions(opCtx, obj.(*v1.PodProxyOptions), safe.Cast[v1.PodProxyOptions](oldObj), nil)
+			return Validate_PodProxyOptions(opCtx, obj.(*v1.PodProxyOptions), safe.Cast[*v1.PodProxyOptions](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.PodStatusResult)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PodStatusResult(opCtx, obj.(*v1.PodStatusResult), safe.Cast[v1.PodStatusResult](oldObj), nil)
+			return Validate_PodStatusResult(opCtx, obj.(*v1.PodStatusResult), safe.Cast[*v1.PodStatusResult](oldObj), nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
 			root := obj.(*v1.PodStatusResult)
-			return Validate_PodStatus(opCtx, &root.Status, safe.Field(safe.Cast[v1.PodStatusResult](oldObj), func(oldObj v1.PodStatusResult) v1.PodStatus { return oldObj.Status }), nil)
+			return Validate_PodStatus(opCtx, &root.Status, safe.Field(safe.Cast[*v1.PodStatusResult](oldObj), func(oldObj *v1.PodStatusResult) v1.PodStatus { return oldObj.Status }), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.PodTemplate)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PodTemplate(opCtx, obj.(*v1.PodTemplate), safe.Cast[v1.PodTemplate](oldObj), nil)
+			return Validate_PodTemplate(opCtx, obj.(*v1.PodTemplate), safe.Cast[*v1.PodTemplate](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.PodTemplateList)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PodTemplateList(opCtx, obj.(*v1.PodTemplateList), safe.Cast[v1.PodTemplateList](oldObj), nil)
+			return Validate_PodTemplateList(opCtx, obj.(*v1.PodTemplateList), safe.Cast[*v1.PodTemplateList](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.RangeAllocation)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_RangeAllocation(opCtx, obj.(*v1.RangeAllocation), safe.Cast[v1.RangeAllocation](oldObj), nil)
+			return Validate_RangeAllocation(opCtx, obj.(*v1.RangeAllocation), safe.Cast[*v1.RangeAllocation](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.ReplicationController)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ReplicationController(opCtx, obj.(*v1.ReplicationController), safe.Cast[v1.ReplicationController](oldObj), nil)
+			return Validate_ReplicationController(opCtx, obj.(*v1.ReplicationController), safe.Cast[*v1.ReplicationController](oldObj), nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
 			return nil // v1.ReplicationControllerStatus has no validation
@@ -260,13 +260,13 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	})
 	scheme.AddValidationFunc((*v1.ReplicationControllerList)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ReplicationControllerList(opCtx, obj.(*v1.ReplicationControllerList), safe.Cast[v1.ReplicationControllerList](oldObj), nil)
+			return Validate_ReplicationControllerList(opCtx, obj.(*v1.ReplicationControllerList), safe.Cast[*v1.ReplicationControllerList](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.ResourceQuota)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ResourceQuota(opCtx, obj.(*v1.ResourceQuota), safe.Cast[v1.ResourceQuota](oldObj), nil)
+			return Validate_ResourceQuota(opCtx, obj.(*v1.ResourceQuota), safe.Cast[*v1.ResourceQuota](oldObj), nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
 			return nil // v1.ResourceQuotaStatus has no validation
@@ -275,31 +275,31 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	})
 	scheme.AddValidationFunc((*v1.ResourceQuotaList)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ResourceQuotaList(opCtx, obj.(*v1.ResourceQuotaList), safe.Cast[v1.ResourceQuotaList](oldObj), nil)
+			return Validate_ResourceQuotaList(opCtx, obj.(*v1.ResourceQuotaList), safe.Cast[*v1.ResourceQuotaList](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.Secret)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Secret(opCtx, obj.(*v1.Secret), safe.Cast[v1.Secret](oldObj), nil)
+			return Validate_Secret(opCtx, obj.(*v1.Secret), safe.Cast[*v1.Secret](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.SecretList)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_SecretList(opCtx, obj.(*v1.SecretList), safe.Cast[v1.SecretList](oldObj), nil)
+			return Validate_SecretList(opCtx, obj.(*v1.SecretList), safe.Cast[*v1.SecretList](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.SerializedReference)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_SerializedReference(opCtx, obj.(*v1.SerializedReference), safe.Cast[v1.SerializedReference](oldObj), nil)
+			return Validate_SerializedReference(opCtx, obj.(*v1.SerializedReference), safe.Cast[*v1.SerializedReference](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.Service)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Service(opCtx, obj.(*v1.Service), safe.Cast[v1.Service](oldObj), nil)
+			return Validate_Service(opCtx, obj.(*v1.Service), safe.Cast[*v1.Service](oldObj), nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
 			return nil // v1.ServiceStatus has no validation
@@ -308,25 +308,25 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	})
 	scheme.AddValidationFunc((*v1.ServiceAccount)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ServiceAccount(opCtx, obj.(*v1.ServiceAccount), safe.Cast[v1.ServiceAccount](oldObj), nil)
+			return Validate_ServiceAccount(opCtx, obj.(*v1.ServiceAccount), safe.Cast[*v1.ServiceAccount](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.ServiceAccountList)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ServiceAccountList(opCtx, obj.(*v1.ServiceAccountList), safe.Cast[v1.ServiceAccountList](oldObj), nil)
+			return Validate_ServiceAccountList(opCtx, obj.(*v1.ServiceAccountList), safe.Cast[*v1.ServiceAccountList](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.ServiceList)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ServiceList(opCtx, obj.(*v1.ServiceList), safe.Cast[v1.ServiceList](oldObj), nil)
+			return Validate_ServiceList(opCtx, obj.(*v1.ServiceList), safe.Cast[*v1.ServiceList](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*v1.ServiceProxyOptions)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ServiceProxyOptions(opCtx, obj.(*v1.ServiceProxyOptions), safe.Cast[v1.ServiceProxyOptions](oldObj), nil)
+			return Validate_ServiceProxyOptions(opCtx, obj.(*v1.ServiceProxyOptions), safe.Cast[*v1.ServiceProxyOptions](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})

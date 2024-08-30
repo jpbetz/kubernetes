@@ -38,14 +38,14 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*T1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_T1(opCtx, obj.(*T1), safe.Cast[T1](oldObj), nil)
+			return Validate_T1(opCtx, obj.(*T1), safe.Cast[*T1](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_ALS(opCtx operation.Context, obj, oldObj *ALS, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_ALS(opCtx operation.Context, obj, oldObj ALS, fldPath *field.Path) (errs field.ErrorList) {
 	// type ALS
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "type ALS")...)
 
@@ -67,7 +67,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 
 	// field T1.ALS
 	errs = append(errs,
-		func(obj, oldObj *ALS, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj, oldObj ALS, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.ALS")...)
 			for i, val := range obj {
 				errs = append(errs,
@@ -78,7 +78,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 			}
 			errs = append(errs, Validate_ALS(opCtx, obj, oldObj, fldPath)...)
 			return
-		}(&obj.ALS, safe.Field(oldObj, func(oldObj *T1) *ALS { return &oldObj.ALS }), fldPath.Child("als"))...)
+		}(obj.ALS, safe.Field(oldObj, func(oldObj *T1) ALS { return oldObj.ALS }), fldPath.Child("als"))...)
 
 	// field T1.LALS
 	errs = append(errs,
@@ -86,11 +86,11 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.LALS")...)
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj, oldObj *ALS, fldPath *field.Path) (errs field.ErrorList) {
+					func(obj, oldObj ALS, fldPath *field.Path) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T1.LALS[vals]")...)
 						errs = append(errs, Validate_ALS(opCtx, obj, oldObj, fldPath)...)
 						return
-					}(&val, nil, fldPath.Index(i))...)
+					}(val, nil, fldPath.Index(i))...)
 			}
 			return
 		}(obj.LALS, safe.Field(oldObj, func(oldObj *T1) []ALS { return oldObj.LALS }), fldPath.Child("lals"))...)

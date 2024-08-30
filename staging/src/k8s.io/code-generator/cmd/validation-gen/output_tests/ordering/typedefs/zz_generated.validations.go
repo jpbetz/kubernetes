@@ -38,31 +38,31 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*E00)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E00(opCtx, obj.(*E00), safe.Cast[E00](oldObj), nil)
+			return Validate_E00(opCtx, obj.(*E00), safe.Cast[*E00](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*E01)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E01(opCtx, obj.(*E01), safe.Cast[E01](oldObj), nil)
+			return Validate_E01(opCtx, obj.(*E01), safe.Cast[*E01](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*E02)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E02(opCtx, obj.(*E02), safe.Cast[E02](oldObj), nil)
+			return Validate_E02(opCtx, obj.(*E02), safe.Cast[*E02](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*E03)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E03(opCtx, obj.(*E03), safe.Cast[E03](oldObj), nil)
+			return Validate_E03(opCtx, obj.(*E03), safe.Cast[*E03](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*EMultiple)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_EMultiple(opCtx, obj.(*EMultiple), safe.Cast[EMultiple](oldObj), nil)
+			return Validate_EMultiple(opCtx, obj.(*EMultiple), safe.Cast[*EMultiple](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})

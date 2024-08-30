@@ -38,14 +38,14 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*T1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_T1(opCtx, obj.(*T1), safe.Cast[T1](oldObj), nil)
+			return Validate_T1(opCtx, obj.(*T1), safe.Cast[*T1](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_AMSS(opCtx operation.Context, obj, oldObj *AMSS, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_AMSS(opCtx operation.Context, obj, oldObj AMSS, fldPath *field.Path) (errs field.ErrorList) {
 	// type AMSS
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "type AMSS")...)
 
@@ -72,7 +72,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 
 	// field T1.AMSS
 	errs = append(errs,
-		func(obj, oldObj *AMSS, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj, oldObj AMSS, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.AMSS")...)
 			for key, val := range obj {
 				errs = append(errs,
@@ -88,7 +88,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 			}
 			errs = append(errs, Validate_AMSS(opCtx, obj, oldObj, fldPath)...)
 			return
-		}(&obj.AMSS, safe.Field(oldObj, func(oldObj *T1) *AMSS { return &oldObj.AMSS }), fldPath.Child("amss"))...)
+		}(obj.AMSS, safe.Field(oldObj, func(oldObj *T1) AMSS { return oldObj.AMSS }), fldPath.Child("amss"))...)
 
 	return errs
 }
