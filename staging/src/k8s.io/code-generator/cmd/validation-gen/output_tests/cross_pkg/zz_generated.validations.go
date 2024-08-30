@@ -63,14 +63,5 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 		}(&obj.PrimitivesT2, safe.Field(oldObj, func(oldObj *T1) *primitives.T2 { return &oldObj.PrimitivesT2 }), fldPath.Child("primitivest2"))...)
 
 	// field T1.PrimitivesT3 has no validation
-
-	// field T1.PrimitivesT4
-	errs = append(errs,
-		func(obj, oldObj *primitives.T4, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, primitives.Validate_T4(opCtx, obj, oldObj, fldPath)...)
-			return
-		}(&obj.PrimitivesT4, safe.Field(oldObj, func(oldObj *T1) *primitives.T4 { return &oldObj.PrimitivesT4 }), fldPath.Child("primitivest4"))...)
-
-	// field T1.PrimitivesT5 has no validation
 	return errs
 }

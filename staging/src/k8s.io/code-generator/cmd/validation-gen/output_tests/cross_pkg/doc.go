@@ -32,6 +32,6 @@ type T1 struct {
 	PrimitivesT1 primitives.T1 `json:"primitivest1"`
 	PrimitivesT2 primitives.T2 `json:"primitivest2"`
 	PrimitivesT3 primitives.T3 `json:"primitivest3"`
-	PrimitivesT4 primitives.T4 `json:"primitivest4"`
-	PrimitivesT5 primitives.T5 `json:"primitivest5"`
+	// T4 and T5 are not root types in that pkg and are not linked into any
+	// root type's transitive graph, so they have no functions.
 }
