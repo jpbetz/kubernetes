@@ -710,26 +710,40 @@ func (g *genValidations) emitRegisterFunction(c *generator.Context, schemeRegist
 
 		// This uses a typed nil pointer, rather than a real instance because
 		// we need the type information, but not an instance of the type.
-		sw.Do("scheme.AddValidationFunc(($.typePfx$$.rootType|raw$)(nil), func(opCtx $.operation.Context|raw$, obj, oldObj interface{}, subresources ...string) $.field.ErrorList|raw$ {\n", targs)
+		sw.Do("scheme.AddValidationFunc(", targs)
+		sw.Do("    ($.typePfx$$.rootType|raw$)(nil), ", targs)
+		sw.Do("    func(opCtx $.operation.Context|raw$, obj, oldObj interface{}, ", targs)
+		sw.Do("    subresources ...string) $.field.ErrorList|raw$ {\n", targs)
 		sw.Do("  if len(subresources) == 0 {\n", targs)
-		sw.Do("    return $.rootType|objectvalidationfn$(opCtx, obj.($.typePfx$$.rootType|raw$), $.safe.Cast|raw$[$.typePfx$$.rootType|raw$](oldObj), nil)\n", targs)
+		sw.Do("    return $.rootType|objectvalidationfn$(", targs)
+		sw.Do("               opCtx, ", targs)
+		sw.Do("               obj.($.typePfx$$.rootType|raw$), ", targs)
+		sw.Do("               $.safe.Cast|raw$[$.typePfx$$.rootType|raw$](oldObj), ", targs)
+		sw.Do("               nil)\n", targs)
 		sw.Do("  }\n", targs)
 
 		if statusType != nil {
 			sw.Do("  if len(subresources) == 1 && subresources[0] == \"status\" {\n", targs)
 			if g.hasValidations(g.discovered.typeNodes[statusType]) {
 				sw.Do("    root := obj.($.typePfx$$.rootType|raw$)\n", targs)
-				sw.Do("    return $.statusType|objectvalidationfn$(opCtx, &root.$.statusField$, $.safe.Field|raw$($.safe.Cast|raw$[$.typePfx$$.rootType|raw$](oldObj), func(oldObj $.typePfx$$.rootType|raw$) $.statusType|raw$ { return oldObj.$.statusField$ }), nil)\n", targs)
+				sw.Do("    return $.statusType|objectvalidationfn$(", targs)
+				sw.Do("               opCtx, ", targs)
+				sw.Do("               &root.$.statusField$, ", targs)
+				sw.Do("               $.safe.Field|raw$(", targs)
+				sw.Do("                   $.safe.Cast|raw$[$.typePfx$$.rootType|raw$](oldObj), ", targs)
+				sw.Do("                   func(oldObj $.typePfx$$.rootType|raw$) $.statusType|raw$ { return oldObj.$.statusField$ }), ", targs)
+				sw.Do("                   nil)\n", targs)
 			} else {
 				sw.Do("    return nil // $.statusType|raw$ has no validation\n", targs)
 			}
 			sw.Do("  }\n", targs)
 		}
-		sw.Do("  return $.field.ErrorList|raw${$.field.InternalError|raw$(nil, $.fmt.Errorf|raw$(\"no validation found for %T, subresources: %v\", obj, subresources))}\n", targs)
+		sw.Do("  return $.field.ErrorList|raw${", targs)
+		sw.Do("      $.field.InternalError|raw$(", targs)
+		sw.Do("          nil, ", targs)
+		sw.Do("          $.fmt.Errorf|raw$(\"no validation found for %T, subresources: %v\", obj, subresources))", targs)
+		sw.Do("  }\n", targs)
 		sw.Do("})\n", targs)
-
-		// TODO: Support update validations
-		//       This will require correlating old object.
 	}
 	sw.Do("return nil\n", nil)
 	sw.Do("}\n\n", nil)
@@ -751,7 +765,10 @@ func (g *genValidations) emitValidationFunction(c *generator.Context, t *types.T
 	if node == nil {
 		panic(fmt.Sprintf("found nil node for root-type %v", t))
 	}
-	sw.Do("func $.inType|objectvalidationfn$(opCtx $.operation.Context|raw$, obj, oldObj $.objTypePfx$$.inType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
+	sw.Do("func $.inType|objectvalidationfn$(", targs)
+	sw.Do("    opCtx $.operation.Context|raw$, ", targs)
+	sw.Do("    obj, oldObj $.objTypePfx$$.inType|raw$, ", targs)
+	sw.Do("    fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
 	fakeChild := &childNode{
 		node:      node,
 		childType: t,
@@ -1252,7 +1269,7 @@ func isNilableType(t *types.Type) bool {
 		t = t.Underlying
 	}
 	switch t.Kind {
-	case types.Pointer, types.Map, types.Slice, types.Interface: // Note: Arrays are not nillable
+	case types.Pointer, types.Map, types.Slice, types.Interface: // Note: Arrays are not nilable
 		return true
 	}
 	return false
