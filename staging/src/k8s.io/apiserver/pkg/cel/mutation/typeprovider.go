@@ -85,6 +85,13 @@ func (p *TypeProvider) NewValue(structType string, fields map[string]ref.Val) re
 	return p.underlyingTypeProvider.NewValue(structType, fields)
 }
 
+// EnvOption creates the TypeProvider with a given TypeResolver,
+// and also returns the CEL EnvOption to apply it to the env.
+func EnvOption(resolver common.TypeResolver) cel.EnvOption {
+	_, envOpt := NewTypeProviderAndEnvOption(resolver)
+	return envOpt
+}
+
 // NewTypeProviderAndEnvOption creates the TypeProvider with a given TypeResolver,
 // and also returns the CEL EnvOption to apply it to the env.
 func NewTypeProviderAndEnvOption(resolver common.TypeResolver) (*TypeProvider, cel.EnvOption) {

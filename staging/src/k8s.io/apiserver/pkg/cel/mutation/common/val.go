@@ -17,8 +17,10 @@ limitations under the License.
 package common
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
@@ -97,6 +99,43 @@ func (v *ObjectVal) Value() any {
 		return types.WrapErr(err)
 	}
 	return result
+}
+
+// CheckTypeNamesMatchFieldPathNames transitively checks the CEL object type names of this ObjectVal. Returns all
+// found type name mismatch errors.
+// This ObjectVal must have type name of "Object". Children ObjectVal types under <field> or this ObjectVal
+// must have type names of the form "ObjectVal.<field>", children of that type must have type names of the
+// form "ObjectVal.<field>.<field>" and so on.
+// Intermediate maps and lists are ignored for type naming purposes.
+func (v *ObjectVal) CheckTypeNamesMatchFieldPathNames() error {
+	return errors.Join(typeCheck(v, []string{"Object"})...)
+
+}
+
+func typeCheck(v ref.Val, typeNamePath []string) []error {
+	var errs []error
+	if ov, ok := v.(*ObjectVal); ok {
+		tn := ov.typeRef.TypeName()
+		if strings.Join(typeNamePath, ".") != tn {
+			errs = append(errs, fmt.Errorf("unexpected type name %q, expected %q, which matches field name path from root Object type", tn, strings.Join(typeNamePath, ".")))
+		}
+		for k, f := range ov.fields {
+			errs = append(errs, typeCheck(f, append(typeNamePath, k))...)
+		}
+	}
+	value := v.Value()
+	if listOfVal, ok := value.([]ref.Val); ok {
+		for _, v := range listOfVal {
+			errs = append(errs, typeCheck(v, typeNamePath)...)
+		}
+	}
+
+	if mapOfVal, ok := value.(map[ref.Val]ref.Val); ok {
+		for _, v := range mapOfVal {
+			errs = append(errs, typeCheck(v, typeNamePath)...)
+		}
+	}
+	return errs
 }
 
 // IsZeroValue indicates whether the object is the zero value for the type.
