@@ -111,7 +111,10 @@ func TestDefaultAdmissionPolicy(t *testing.T) {
 					MatchConstraints: &v1alpha1.MatchResources{},
 					Mutations: []v1alpha1.Mutation{
 						{
-							Expression: "fake string",
+							PatchType: v1alpha1.PatchTypeApplyConfiguration,
+							ApplyConfiguration: &v1alpha1.ApplyConfiguration{
+								Expression: "fake string",
+							},
 						},
 					},
 				},
@@ -126,8 +129,11 @@ func TestDefaultAdmissionPolicy(t *testing.T) {
 					FailurePolicy: &fail,
 					Mutations: []v1alpha1.Mutation{
 						{
-							Expression:         "fake string",
-							ReinvocationPolicy: &never,
+							PatchType: v1alpha1.PatchTypeApplyConfiguration,
+							ApplyConfiguration: &v1alpha1.ApplyConfiguration{
+								Expression: "fake string",
+							},
+							ReinvocationPolicy: never,
 						},
 					},
 				},

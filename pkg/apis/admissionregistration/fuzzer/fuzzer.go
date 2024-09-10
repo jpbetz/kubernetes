@@ -116,10 +116,31 @@ var Funcs = func(codecs runtimeserializer.CodecFactory) []interface{} {
 		},
 		func(obj *admissionregistration.Mutation, c fuzz.Continue) {
 			c.FuzzNoCustom(obj) // fuzz self without calling this function again
-			if obj.ReinvocationPolicy == nil {
-				r := admissionregistration.NeverReinvocationPolicy
-				obj.ReinvocationPolicy = &r
+			obj.ReinvocationPolicy = admissionregistration.NeverReinvocationPolicy
+			patchTypes := []admissionregistration.PatchType{admissionregistration.PatchTypeJSONPatch, admissionregistration.PatchTypeApplyConfiguration}
+			obj.PatchType = patchTypes[c.Rand.Intn(len(patchTypes))]
+			if obj.PatchType == admissionregistration.PatchTypeJSONPatch {
+				obj.JSONPatch = admissionregistration.JSONPatch{}
+				c.Fuzz(&obj.JSONPatch)
+				obj.ApplyConfiguration = nil
 			}
+			if obj.PatchType == admissionregistration.PatchTypeApplyConfiguration {
+				obj.ApplyConfiguration = &admissionregistration.ApplyConfiguration{}
+				c.Fuzz(obj.ApplyConfiguration)
+				obj.JSONPatch = nil
+			}
+		},
+		func(obj *admissionregistration.JSONPatchOperation, c fuzz.Continue) {
+			c.FuzzNoCustom(obj) // fuzz self without calling this function again
+			opType := []admissionregistration.JSONPatchOperationType{
+				admissionregistration.Add,
+				admissionregistration.Remove,
+				admissionregistration.Replace,
+				admissionregistration.Copy,
+				admissionregistration.Move,
+				admissionregistration.Test,
+			}
+			obj.Op = opType[c.Rand.Intn(len(opType))]
 		},
 	}
 }
