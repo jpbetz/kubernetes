@@ -133,7 +133,8 @@ func validMutatingAdmissionPolicy() *admissionregistration.MutatingAdmissionPoli
 			},
 			Mutations: []admissionregistration.Mutation{
 				{
-					PatchType: admissionregistration.PatchTypeApplyConfiguration,
+					PatchType:          admissionregistration.PatchTypeApplyConfiguration,
+					ReinvocationPolicy: admissionregistration.IfNeededReinvocationPolicy,
 					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
 						Expression: `Object{
 							spec: Object.spec{
@@ -185,7 +186,8 @@ func newMutatingAdmissionPolicy(name string) *admissionregistration.MutatingAdmi
 			},
 			Mutations: []admissionregistration.Mutation{
 				{
-					PatchType: admissionregistration.PatchTypeApplyConfiguration,
+					PatchType:          admissionregistration.PatchTypeApplyConfiguration,
+					ReinvocationPolicy: admissionregistration.IfNeededReinvocationPolicy,
 					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
 						Expression: `Object{
 							spec: Object.spec{

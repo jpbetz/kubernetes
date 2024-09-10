@@ -61,7 +61,7 @@ func TestCompilation(t *testing.T) {
 				v1alpha1.JSONPatch{
 					{
 						Op:              v1alpha1.Test,
-						PathExpression:  "/spec/replicas",
+						PathExpression:  `"/spec/replicas"`,
 						ValueExpression: "100",
 					},
 					{

@@ -182,7 +182,7 @@ func (e jsonPatcher) evaluatePathExpression(pathEvaluator plugincel.Evaluator, r
 		return "", -1, err
 	}
 	if eval.Error != nil {
-		return "", -1, err
+		return "", -1, eval.Error
 	}
 	s, ok := eval.EvalResult.Value().(string)
 	if !ok {
