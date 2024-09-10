@@ -27,27 +27,37 @@ import (
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/cel"
 	"k8s.io/apiserver/pkg/cel/library"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
+	"k8s.io/kube-openapi/pkg/validation/spec"
 )
 
 // newActivation creates an activation for CEL admission plugins from the given request, admission chain and
 // variable binding information.
-func newActivation(ctx context.Context, versionedAttr *admission.VersionedAttributes, request *admissionv1.AdmissionRequest, inputs OptionalVariableBindings, namespace *v1.Namespace) (*evaluationActivation, error) {
+func newActivation(ctx context.Context, versionedAttr *admission.VersionedAttributes, request *admissionv1.AdmissionRequest, inputs OptionalVariableBindings, namespace *v1.Namespace, resolver resolver.SchemaResolver) (*evaluationActivation, error) {
 	// if this activation supports composition, we will need the compositionCtx. It may be nil.
 	compositionCtx, _ := ctx.(CompositionContext)
 
 	var err error
 
-	oldObjectVal, err := objectToResolveVal(versionedAttr.VersionedOldObject)
+	var objSchema *spec.Schema
+	if resolver != nil {
+		objSchema, err = resolver.ResolveSchema(versionedAttr.VersionedKind)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	oldObjectVal, err := objectToResolveVal(versionedAttr.VersionedOldObject, objSchema)
 	if err != nil {
 		return nil, err
 	}
-	objectVal, err := objectToResolveVal(versionedAttr.VersionedObject)
+	objectVal, err := objectToResolveVal(versionedAttr.VersionedObject, objSchema)
 	if err != nil {
 		return nil, err
 	}
 	var paramsVal, authorizerVal, requestResourceAuthorizerVal any
 	if inputs.VersionedParams != nil {
-		paramsVal, err = objectToResolveVal(inputs.VersionedParams)
+		paramsVal, err = objectToResolveVal(inputs.VersionedParams, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -62,7 +72,7 @@ func newActivation(ctx context.Context, versionedAttr *admission.VersionedAttrib
 	if err != nil {
 		return nil, err
 	}
-	namespaceVal, err := objectToResolveVal(namespace)
+	namespaceVal, err := objectToResolveVal(namespace, nil)
 	if err != nil {
 		return nil, err
 	}

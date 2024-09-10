@@ -150,7 +150,7 @@ func (e jsonPatcher) evaluateValueExpression(op JSONPatchOp, remainingBudget int
 	valueEvaluator := *op.ValueEvaluator
 	var err error
 	var eval plugincel.EvaluationResult
-	eval, remainingBudget, err = valueEvaluator.ForInput(ctx, r.VersionedAttributes, admissionRequest, r.OptionalVariables, r.Namespace, remainingBudget)
+	eval, remainingBudget, err = valueEvaluator.ForInput(ctx, nil, r.VersionedAttributes, admissionRequest, r.OptionalVariables, r.Namespace, remainingBudget)
 	if err != nil {
 		return nil, -1, err
 	}
@@ -181,7 +181,7 @@ func (e jsonPatcher) evaluateValueExpression(op JSONPatchOp, remainingBudget int
 func (e jsonPatcher) evaluatePathExpression(pathEvaluator plugincel.Evaluator, remainingBudget int64, ctx context.Context, r Request, admissionRequest *admissionv1.AdmissionRequest) (jsonpointer.Pointer, int64, error) {
 	var err error
 	var eval plugincel.EvaluationResult
-	eval, remainingBudget, err = pathEvaluator.ForInput(ctx, r.VersionedAttributes, admissionRequest, r.OptionalVariables, r.Namespace, remainingBudget)
+	eval, remainingBudget, err = pathEvaluator.ForInput(ctx, nil, r.VersionedAttributes, admissionRequest, r.OptionalVariables, r.Namespace, remainingBudget)
 	if err != nil {
 		return jsonpointer.Pointer{}, -1, err
 	}

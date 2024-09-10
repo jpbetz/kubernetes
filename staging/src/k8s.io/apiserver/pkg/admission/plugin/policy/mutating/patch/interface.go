@@ -25,6 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/managedfields"
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/admission/plugin/cel"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 )
 
 // Patcher provides a patch function to perform a mutation to an object in the admission chain.
@@ -40,4 +41,5 @@ type Request struct {
 	OptionalVariables   cel.OptionalVariableBindings
 	Namespace           *v1.Namespace
 	TypeConverter       managedfields.TypeConverter
+	SchemaResolver      resolver.SchemaResolver
 }

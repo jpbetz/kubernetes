@@ -29,6 +29,7 @@ import (
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
 	"k8s.io/apiserver/pkg/cel/environment"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 )
 
 type ExpressionAccessor interface {
@@ -113,7 +114,7 @@ type Evaluator interface {
 	// ForInput converts compiled CEL-typed values into a CEL-typed value to be patched.
 	// runtimeCELCostBudget was added for testing purpose only. Callers should always use const RuntimeCELCostBudget from k8s.io/apiserver/pkg/apis/cel/config.go as input.
 	// If cost budget is calculated, the filter should return the remaining budget.
-	ForInput(ctx context.Context, versionedAttr *admission.VersionedAttributes, request *v1.AdmissionRequest, optionalVars OptionalVariableBindings, namespace *corev1.Namespace, runtimeCELCostBudget int64) (EvaluationResult, int64, error)
+	ForInput(ctx context.Context, resolver resolver.SchemaResolver, versionedAttr *admission.VersionedAttributes, request *v1.AdmissionRequest, optionalVars OptionalVariableBindings, namespace *corev1.Namespace, runtimeCELCostBudget int64) (EvaluationResult, int64, error)
 
 	// CompilationErrors returns a list of errors from the compilation of the evaluator
 	CompilationErrors() []error

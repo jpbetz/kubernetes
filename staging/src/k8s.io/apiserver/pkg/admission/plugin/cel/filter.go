@@ -29,6 +29,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/cel/environment"
+	"k8s.io/apiserver/pkg/cel/openapi"
+	"k8s.io/kube-openapi/pkg/validation/spec"
 )
 
 // filterCompiler implement the interface FilterCompiler.
@@ -109,13 +111,17 @@ func convertObjectToUnstructured(obj interface{}) (*unstructured.Unstructured, e
 	return &unstructured.Unstructured{Object: ret}, nil
 }
 
-func objectToResolveVal(r runtime.Object) (interface{}, error) {
+func objectToResolveVal(r runtime.Object, s *spec.Schema) (interface{}, error) {
 	if r == nil || reflect.ValueOf(r).IsNil() {
 		return nil, nil
 	}
 	v, err := convertObjectToUnstructured(r)
 	if err != nil {
 		return nil, err
+	}
+
+	if s != nil {
+		return openapi.UnstructuredToVal(v.Object, s), nil
 	}
 	return v.Object, nil
 }
@@ -128,7 +134,7 @@ func (f *filter) ForInput(ctx context.Context, versionedAttr *admission.Versione
 	evaluations := make([]EvaluationResult, len(f.compilationResults))
 	var err error
 
-	activation, err := newActivation(ctx, versionedAttr, request, inputs, namespace)
+	activation, err := newActivation(ctx, versionedAttr, request, inputs, namespace, nil)
 	if err != nil {
 		return nil, -1, err
 	}

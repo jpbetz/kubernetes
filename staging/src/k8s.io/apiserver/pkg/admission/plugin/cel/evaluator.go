@@ -23,6 +23,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/cel/environment"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 )
 
 // evaluatorCompiler implement the interface PatchCompiler.
@@ -53,8 +54,8 @@ func NewEvaluator(compilationResult CompilationResult) Evaluator {
 // ForInput evaluates the compiled CEL expression converting it to an Evaluation
 // errors per evaluation are returned on the Evaluation object
 // runtimeCELCostBudget was added for testing purpose only. Callers should always use const RuntimeCELCostBudget from k8s.io/apiserver/pkg/apis/cel/config.go as input.
-func (p *evaluator) ForInput(ctx context.Context, versionedAttr *admission.VersionedAttributes, request *admissionv1.AdmissionRequest, inputs OptionalVariableBindings, namespace *v1.Namespace, runtimeCELCostBudget int64) (EvaluationResult, int64, error) {
-	activation, err := newActivation(ctx, versionedAttr, request, inputs, namespace)
+func (p *evaluator) ForInput(ctx context.Context, resolver resolver.SchemaResolver, versionedAttr *admission.VersionedAttributes, request *admissionv1.AdmissionRequest, inputs OptionalVariableBindings, namespace *v1.Namespace, runtimeCELCostBudget int64) (EvaluationResult, int64, error) {
+	activation, err := newActivation(ctx, versionedAttr, request, inputs, namespace, resolver)
 	if err != nil {
 		return EvaluationResult{}, -1, err
 	}

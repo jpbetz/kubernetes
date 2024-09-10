@@ -36,7 +36,10 @@ import (
 	"k8s.io/apiserver/pkg/admission/plugin/policy/mutating/patch"
 	celconfig "k8s.io/apiserver/pkg/apis/cel"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
+	k8sscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/openapi/openapitest"
+	"k8s.io/kubernetes/pkg/generated/openapi"
 	"k8s.io/utils/ptr"
 )
 
@@ -731,6 +734,8 @@ func TestCompilation(t *testing.T) {
 	tcManager := patch.NewTypeConverterManager(nil, openapitest.NewEmbeddedFileClient())
 	go tcManager.Run(ctx)
 
+	schemaResolver := resolver.NewDefinitionsSchemaResolver(openapi.GetOpenAPIDefinitions, k8sscheme.Scheme)
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			var gvk schema.GroupVersionKind
@@ -780,6 +785,7 @@ func TestCompilation(t *testing.T) {
 					OptionalVariables:   cel.OptionalVariableBindings{VersionedParams: tc.params, Authorizer: fakeAuthorizer{}},
 					Namespace:           nil,
 					TypeConverter:       typeConverter,
+					SchemaResolver:      schemaResolver,
 				}
 				obj, err = patcher.Patch(ctx, r, celconfig.RuntimeCELCostBudget)
 				if len(tc.expectedErr) > 0 {
