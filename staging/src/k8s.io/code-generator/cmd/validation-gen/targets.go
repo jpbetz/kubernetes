@@ -23,6 +23,7 @@ import (
 	"slices"
 	"strings"
 
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/code-generator/cmd/validation-gen/validators"
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
@@ -38,6 +39,7 @@ const (
 	enabledTagName        = "k8s:validation-gen-enabled-tags"
 	disabledTagName       = "k8s:validation-gen-disabled-tags"
 	schemeRegistryTagName = "k8s:validation-gen-scheme-registry" // defaults to k8s.io/apimachinery/pkg.runtime.Scheme
+	testFixtureTagName    = "k8s:validation-gen-test-fixture"    // if set, generate go test files for test fixtures.  Supported values: "validateFalse".
 )
 
 var (
@@ -78,6 +80,20 @@ func schemeRegistryTag(pkg *types.Package) types.Name {
 	default:
 		panic(fmt.Sprintf("Package %q contains more than usage of %q", pkg.Path, schemeRegistryTagName))
 	}
+}
+
+var testFixtureTagValues = sets.New("validateFalse")
+
+func testFixtureTag(pkg *types.Package) sets.Set[string] {
+	result := sets.New[string]()
+	values := gengo.ExtractCommentTags("+", pkg.Comments)[testFixtureTagName]
+	for _, value := range values {
+		if !testFixtureTagValues.Has(value) {
+			panic(fmt.Sprintf("Package %q: %s must be one of '%s', but got: %s", pkg.Path, testFixtureTagName, testFixtureTagValues.UnsortedList(), values[0]))
+		}
+		result.Insert(value)
+	}
+	return result
 }
 
 // NameSystems returns the name system used by the generators in this package.
@@ -263,9 +279,18 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 				},
 
 				GeneratorsFunc: func(c *generator.Context) (generators []generator.Generator) {
-					return []generator.Generator{
+					generators = []generator.Generator{
 						NewGenValidations(args.OutputFile, pkg.Path, rootTypes, td, inputToPkg, declarativeValidator, schemaRegistry),
 					}
+					testFixtureTags := testFixtureTag(pkg)
+					if testFixtureTags.Len() > 0 {
+						if !strings.HasSuffix(args.OutputFile, ".go") {
+							panic(fmt.Sprintf("%s requires that output file have .go suffix", testFixtureTagName))
+						}
+						filename := args.OutputFile[0:len(args.OutputFile)-3] + "_test.go"
+						generators = append(generators, FixtureTests(filename, testFixtureTags))
+					}
+					return generators
 				},
 			})
 	}

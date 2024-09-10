@@ -27,6 +27,7 @@ import (
 	"strings"
 	"unicode"
 
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/code-generator/cmd/validation-gen/validators"
 	"k8s.io/gengo/v2"
@@ -1441,4 +1442,33 @@ func getLeafTypeAndPrefixes(inType *types.Type) (*types.Type, string, string) {
 	}
 
 	return leafType, typePfx, exprPfx
+}
+
+// FixtureTests generates a test file that checks all validateFalse validations.
+func FixtureTests(outputFilename string, testFixtureTags sets.Set[string]) generator.Generator {
+	return &fixtureTestGen{
+		GoGenerator: generator.GoGenerator{
+			OutputFilename: outputFilename,
+		},
+		testFixtureTags: testFixtureTags,
+	}
+}
+
+type fixtureTestGen struct {
+	generator.GoGenerator
+	testFixtureTags sets.Set[string]
+}
+
+func (g *fixtureTestGen) Imports(_ *generator.Context) (imports []string) {
+	return []string{`"testing"`}
+}
+
+func (g *fixtureTestGen) Init(c *generator.Context, w io.Writer) error {
+	if g.testFixtureTags.Has("validateFalse") {
+		sw := generator.NewSnippetWriter(w, c, "$", "$")
+		sw.Do("func Test(t *testing.T) {\n", nil)
+		sw.Do("  localSchemeBuilder.Test(t).ValidateFixtures()\n", nil)
+		sw.Do("}\n", nil)
+	}
+	return nil
 }
