@@ -24,30 +24,34 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +validateTrue="type T1"
+// +validateFalse="type T1"
 type T1 struct {
-	// +validateTrue="field T1.PT1"
+	// +validateFalse="field T1.PT1"
+	// +optional
 	PT1 *T1 `json:"pt1"`
 
-	// +validateTrue="field T1.T2"
+	// +validateFalse="field T1.T2"
 	T2 T2 `json:"t2"`
-	// +validateTrue="field T1.PT2"
+	// +validateFalse="field T1.PT2"
+	// +optional
 	PT2 *T2 `json:"pt2"`
 }
 
-// +validateTrue="type T2"
+// +validateFalse="type T2"
 type T2 struct {
-	// +validateTrue="field T2.PT1"
+	// +validateFalse="field T2.PT1"
+	// +optional
 	PT1 *T1 `json:"pt1"`
 
-	// +validateTrue="field T2.PT2"
+	// +validateFalse="field T2.PT2"
+	// +optional
 	PT2 *T2 `json:"pt2"`
 }
 
-// +validateTrue="type E1"
-// +eachVal=+validateTrue="type E1 values"
+// +validateFalse="type E1"
+// +eachVal=+validateFalse="type E1 values"
 type E1 []E1
 
-// +validateTrue="type E2"
-// +eachVal=+validateTrue="type E2 values"
+// +validateFalse="type E2"
+// +eachVal=+validateFalse="type E2 values"
 type E2 []*E2

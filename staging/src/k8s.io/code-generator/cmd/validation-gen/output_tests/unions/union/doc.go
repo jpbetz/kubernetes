@@ -29,20 +29,18 @@ type U struct {
 	TypeMeta int
 
 	// +unionMember
+	// +optional
 	M1 *M1 `json:"m1"`
 
 	// +unionMember
+	// +optional
 	M2 *M2 `json:"m2"`
 }
 
-// +validateTrue="type M1"
 type M1 struct {
-	// +validateTrue="field M1.S"
 	S string `json:"s"`
 }
 
-// +validateTrue="type M2"
 type M2 struct {
-	// +validateTrue="field M2.S"
 	S string `json:"s"`
 }

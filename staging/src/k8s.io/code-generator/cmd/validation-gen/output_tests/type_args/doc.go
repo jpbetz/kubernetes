@@ -16,6 +16,7 @@ limitations under the License.
 
 // +k8s:validation-gen=TypeMeta
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
+// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package type_args
@@ -33,21 +34,21 @@ var localSchemeBuilder = testscheme.New()
 type T1 struct {
 	TypeMeta int
 
-	// +validateTrue={"typeArg":"k8s.io/code-generator/cmd/validation-gen/output_tests/primitives.T1", "msg":"T1.S1"}
+	// +validateFalse={"typeArg":"k8s.io/code-generator/cmd/validation-gen/output_tests/primitives.T1", "msg":"T1.S1"}
 	S1 *primitives.T1 `json:"s1"`
-	// +validateTrue={"typeArg":"k8s.io/code-generator/cmd/validation-gen/output_tests/primitives.T1", "msg":"PT1.PS1"}
+	// +validateFalse={"typeArg":"k8s.io/code-generator/cmd/validation-gen/output_tests/primitives.T1", "msg":"PT1.PS1"}
 	PS1 *primitives.T1 `json:"ps1"`
 
-	// +validateTrue={"typeArg":"k8s.io/code-generator/cmd/validation-gen/output_tests/type_args.E1", "msg":"T1.E1"}
+	// +validateFalse={"typeArg":"k8s.io/code-generator/cmd/validation-gen/output_tests/type_args.E1", "msg":"T1.E1"}
 	E1 E1 `json:"e1"`
 	// +validateTrue={"typeArg":"k8s.io/code-generator/cmd/validation-gen/output_tests/type_args.E1", "msg":"T1.PE1"}
 	PE1 *E1 `json:"pe1"`
 
-	// +validateTrue={"typeArg":"int", "msg":"T1.I1"}
+	// +validateFalse={"typeArg":"int", "msg":"T1.I1"}
 	I1 int `json:"i1"`
 	// +validateTrue={"typeArg":"int", "msg":"T1.PI1"}
 	PI1 *int `json:"pi1"`
 }
 
-// +validateTrue={"msg": "type E1"}
+// +validateFalse={"msg": "type E1"}
 type E1 string

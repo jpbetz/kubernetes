@@ -16,6 +16,7 @@ limitations under the License.
 
 // +k8s:validation-gen=TypeMeta
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
+// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package primitives
@@ -27,16 +28,16 @@ var localSchemeBuilder = testscheme.New()
 type T1 struct {
 	TypeMeta int
 
-	// +validateTrue="field T1.S"
+	// +validateFalse="field T1.S"
 	S string `json:"s"`
-	// +validateTrue="field T1.I"
+	// +validateFalse="field T1.I"
 	I int `json:"i"`
-	// +validateTrue="field T1.B"
+	// +validateFalse="field T1.B"
 	B bool `json:"b"`
-	// +validateTrue="field T1.F"
+	// +validateFalse="field T1.F"
 	F float64 `json:"f"`
 
-	// +validateTrue="field T1.T2"
+	// +validateFalse="field T1.T2"
 	T2 T2 `json:"t2"`
 
 	// No internal validations.
@@ -52,13 +53,13 @@ type T1 struct {
 
 // Note: This has validations and is linked into the type-graph of T1.
 type T2 struct {
-	// +validateTrue="field T2.S"
+	// +validateFalse="field T2.S"
 	S string `json:"s"`
-	// +validateTrue="field T2.I"
+	// +validateFalse="field T2.I"
 	I int `json:"i"`
-	// +validateTrue="field T2.B"
+	// +validateFalse="field T2.B"
 	B bool `json:"b"`
-	// +validateTrue="field T2.F"
+	// +validateFalse="field T2.F"
 	F float64 `json:"f"`
 }
 
@@ -72,13 +73,13 @@ type T3 struct {
 
 // Note: This has validations and is not linked into the type-graph of T1.
 type T4 struct {
-	// +validateTrue="field T4.S"
+	// +validateFalse="field T4.S"
 	S string `json:"s"`
-	// +validateTrue="field T4.I"
+	// +validateFalse="field T4.I"
 	I int `json:"i"`
-	// +validateTrue="field T4.B"
+	// +validateFalse="field T4.B"
 	B bool `json:"b"`
-	// +validateTrue="field T4.F"
+	// +validateFalse="field T4.F"
 	F float64 `json:"f"`
 }
 

@@ -17,6 +17,7 @@ limitations under the License.
 // Note: no types match this.
 // +k8s:validation-gen=TypeMeta
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
+// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package notypesmatch
@@ -26,13 +27,13 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 var localSchemeBuilder = testscheme.New()
 
 type T1 struct {
-	// +validateTrue="from field T1.S"
+	// +validateFalse="from field T1.S"
 	S string
-	// +validateTrue="from field T1.T2"
+	// +validateFalse="from field T1.T2"
 	T2 T2
 }
 
 type T2 struct {
-	// +validateTrue="from field T2.S"
+	// +validateFalse="from field T2.S"
 	S string
 }

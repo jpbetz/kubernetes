@@ -16,6 +16,7 @@ limitations under the License.
 
 // +k8s:validation-gen=*
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
+// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package publicprivate
@@ -25,17 +26,17 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 var localSchemeBuilder = testscheme.New()
 
 type T1 struct {
-	// +validateTrue="field T1.Public"
+	// +validateFalse="field T1.Public"
 	Public string `json:"public"`
 
-	// +validateTrue="field T1.private"
+	// +validateFalse="field T1.private"
 	private string `json:"private"`
 }
 
 type private struct {
-	// +validateTrue="field private.Public"
+	// +validateFalse="field private.Public"
 	Public string `json:"public"`
 
-	// +validateTrue="field private.private"
+	// +validateFalse="field private.private"
 	private string `json:"private"`
 }

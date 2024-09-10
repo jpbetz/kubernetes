@@ -16,6 +16,7 @@ limitations under the License.
 
 // +k8s:validation-gen=TypeMeta
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
+// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package primitivepointer
@@ -24,13 +25,13 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +validateTrue="type T1"
+// +validateFalse="type T1"
 type T1 struct {
 	TypeMeta int
 
-	// +validateTrue="field T1.MSPS"
-	// +eachKey=+validateTrue="T1.MSPS[keys]"
-	// +eachVal=+validateTrue="T1.MSPS[vals]"
+	// +validateFalse="field T1.MSPS"
+	// +eachKey=+validateFalse="T1.MSPS[keys]"
+	// +eachVal=+validateFalse="T1.MSPS[vals]"
 	MSPS map[string]*string `json:"msps"`
 
 	// Duplicate with no validation.

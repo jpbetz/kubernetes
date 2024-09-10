@@ -16,6 +16,7 @@ limitations under the License.
 
 // +k8s:validation-gen=TypeMeta
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
+// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package multiplevalidations
@@ -24,16 +25,16 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +validateTrue="type T1"
+// +validateFalse="type T1"
 type T1 struct {
 	TypeMeta int
 
-	// +validateTrue="field T1.MSS #1"
-	// +validateTrue="field T1.MSS #2"
-	// +eachKey=+validateTrue="T1.MSS[keys] #1"
-	// +eachKey=+validateTrue="T1.MSS[keys] #2"
-	// +eachVal=+validateTrue="T1.MSS[vals] #1"
-	// +eachVal=+validateTrue="T1.MSS[vals] #2"
+	// +validateFalse="field T1.MSS #1"
+	// +validateFalse="field T1.MSS #2"
+	// +eachKey=+validateFalse="T1.MSS[keys] #1"
+	// +eachKey=+validateFalse="T1.MSS[keys] #2"
+	// +eachVal=+validateFalse="T1.MSS[vals] #1"
+	// +eachVal=+validateFalse="T1.MSS[vals] #2"
 	MSS map[string]string `json:"mss"`
 
 	// Duplicate with no validation.

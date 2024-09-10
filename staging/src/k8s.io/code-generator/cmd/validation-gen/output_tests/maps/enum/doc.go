@@ -16,6 +16,7 @@ limitations under the License.
 
 // +k8s:validation-gen=TypeMeta
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
+// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package enum
@@ -24,24 +25,24 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +validateTrue="type E1"
+// +validateFalse="type E1"
 type E1 string
 
 type T1 struct {
 	TypeMeta int
 
-	// +validateTrue="field T1.MSE1"
-	// +eachKey=+validateTrue="T1.MSE1[keys]"
-	// +eachVal=+validateTrue="T1.MSE1[vals]"
+	// +validateFalse="field T1.MSE1"
+	// +eachKey=+validateFalse="T1.MSE1[keys]"
+	// +eachVal=+validateFalse="T1.MSE1[vals]"
 	MSE1 map[string]E1 `json:"mse1"`
 
-	// +validateTrue="field T1.MSPE1"
-	// +eachKey=+validateTrue="T1.MSPE1[keys]"
-	// +eachVal=+validateTrue="T1.MSPE1[vals]"
+	// +validateFalse="field T1.MSPE1"
+	// +eachKey=+validateFalse="T1.MSPE1[keys]"
+	// +eachVal=+validateFalse="T1.MSPE1[vals]"
 	MSPE1 map[string]*E1 `json:"mspe1"`
 
-	// +validateTrue="field T1.ME1S"
-	// +eachKey=+validateTrue="T1.ME1S[keys]"
-	// +eachVal=+validateTrue="T1.ME1S[vals]"
+	// +validateFalse="field T1.ME1S"
+	// +eachKey=+validateFalse="T1.ME1S[keys]"
+	// +eachVal=+validateFalse="T1.ME1S[vals]"
 	ME1S map[E1]string `json:"me1s"`
 }

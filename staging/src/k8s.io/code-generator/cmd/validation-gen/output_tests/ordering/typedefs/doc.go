@@ -16,6 +16,7 @@ limitations under the License.
 
 // +k8s:validation-gen=*
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
+// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package typedefs
@@ -31,20 +32,20 @@ var localSchemeBuilder = testscheme.New()
 // Note: No validations.
 type E00 string
 
-// +validateTrue={"flags":[], "msg":"E01, no flags"}
+// +validateFalse={"flags":[], "msg":"E01, no flags"}
 type E01 string
 
-// +validateTrue={"flags":["ShortCircuit"], "msg":"E02, ShortCircuit"}
+// +validateFalse={"flags":["ShortCircuit"], "msg":"E02, ShortCircuit"}
 type E02 string
 
-// +validateTrue={"flags":[], "msg":"E03, no flags"}
-// +validateTrue={"flags":["ShortCircuit"], "msg":"E03, ShortCircuit"}
+// +validateFalse={"flags":[], "msg":"E03, no flags"}
+// +validateFalse={"flags":["ShortCircuit"], "msg":"E03, ShortCircuit"}
 type E03 string
 
 // Note: these are intentionally in the wrong final order.
-// +validateTrue={"flags":[], "msg":"EMultiple, no flags 1"}
-// +validateTrue={"flags":["ShortCircuit"], "msg":"EMultiple, ShortCircuit 1"}
-// +validateTrue="E0, string payload"
-// +validateTrue={"flags":[], "msg":"EMultiple, no flags 2"}
-// +validateTrue={"flags":["ShortCircuit"], "msg":"EMultiple, ShortCircuit 2"}
+// +validateFalse={"flags":[], "msg":"EMultiple, no flags 1"}
+// +validateFalse={"flags":["ShortCircuit"], "msg":"EMultiple, ShortCircuit 1"}
+// +validateFalse="E0, string payload"
+// +validateFalse={"flags":[], "msg":"EMultiple, no flags 2"}
+// +validateFalse={"flags":["ShortCircuit"], "msg":"EMultiple, ShortCircuit 2"}
 type EMultiple string

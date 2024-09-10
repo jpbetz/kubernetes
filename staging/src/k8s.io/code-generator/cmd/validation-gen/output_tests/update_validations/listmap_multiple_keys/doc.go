@@ -16,6 +16,7 @@ limitations under the License.
 
 // +k8s:validation-gen=*
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
+// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package listmap_multiple_keys
@@ -48,13 +49,13 @@ type T1 struct {
 }
 
 type M1 struct {
-	// +validateTrue="M1.K1"
+	// +validateFalse="M1.K1"
 	K1 string `json:"k1"`
 
-	// +validateTrue="M1.K2"
+	// +validateFalse="M1.K2"
 	K2 string `json:"k2"`
 
-	// +validateTrue="M1.S"
+	// +validateFalse="M1.S"
 	S string `json:"s"`
 }
 

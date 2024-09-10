@@ -16,6 +16,7 @@ limitations under the License.
 
 // +k8s:validation-gen=TypeMeta
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
+// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package pointers
@@ -27,16 +28,16 @@ var localSchemeBuilder = testscheme.New()
 type T1 struct {
 	TypeMeta int
 
-	// +validateTrue="field T1.PS"
+	// +validateFalse="field T1.PS"
 	PS *string `json:"ps"`
-	// +validateTrue="field T1.PI"
+	// +validateFalse="field T1.PI"
 	PI *int `json:"pi"`
-	// +validateTrue="field T1.PB"
+	// +validateFalse="field T1.PB"
 	PB *bool `json:"pb"`
-	// +validateTrue="field T1.PF"
+	// +validateFalse="field T1.PF"
 	PF *float64 `json:"pf"`
 
-	// +validateTrue="field T1.PT2"
+	// +validateFalse="field T1.PT2"
 	PT2 *T2 `json:"pt2"`
 
 	// Duplicate types with no validation.
@@ -48,12 +49,12 @@ type T1 struct {
 
 // Note: This has validations and is linked into the type-graph of T1.
 type T2 struct {
-	// +validateTrue="field T2.PS"
+	// +validateFalse="field T2.PS"
 	PS *string `json:"ps"`
-	// +validateTrue="field T2.PI"
+	// +validateFalse="field T2.PI"
 	PI *int `json:"pi"`
-	// +validateTrue="field T2.PB"
+	// +validateFalse="field T2.PB"
 	PB *bool `json:"pb"`
-	// +validateTrue="field T2.PF"
+	// +validateFalse="field T2.PF"
 	PF *float64 `json:"pf"`
 }

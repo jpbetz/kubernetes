@@ -32,9 +32,11 @@ type DU struct {
 	D D `json:"d"`
 
 	// +unionMember={"memberName": "CustomM1"}
+	// +optional
 	M1 *M1 `json:"m1"`
 
 	// +unionMember={"memberName": "CustomM2"}
+	// +optional
 	M2 *M2 `json:"m2"`
 }
 
@@ -45,14 +47,10 @@ const (
 	DM2 D = "CustomM2"
 )
 
-// +validateTrue="type M1"
 type M1 struct {
-	// +validateTrue="field M1.S"
 	S string `json:"s"`
 }
 
-// +validateTrue="type M2"
 type M2 struct {
-	// +validateTrue="field M2.S"
 	S string `json:"s"`
 }

@@ -16,6 +16,7 @@ limitations under the License.
 
 // +k8s:validation-gen=TypeMeta
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
+// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package typedefs
@@ -24,50 +25,50 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +validateTrue="type E1"
+// +validateFalse="type E1"
 type E1 string
 
-// +validateTrue="type E2"
+// +validateFalse="type E2"
 type E2 int
 
-// +validateTrue="type E3"
+// +validateFalse="type E3"
 type E3 E1
 
-// +validateTrue="type E4"
+// +validateFalse="type E4"
 type E4 T2
 
-// +validateTrue="type T1"
+// +validateFalse="type T1"
 type T1 struct {
 	TypeMeta int
 
-	// +validateTrue="field T1.E1"
+	// +validateFalse="field T1.E1"
 	E1 E1 `json:"e1"`
-	// +validateTrue="field T1.PE1"
+	// +validateFalse="field T1.PE1"
 	PE1 *E1 `json:"pe1"`
 
-	// +validateTrue="field T1.E2"
+	// +validateFalse="field T1.E2"
 	E2 E2 `json:"e2"`
-	// +validateTrue="field T1.PE2"
+	// +validateFalse="field T1.PE2"
 	PE2 *E2 `json:"pe2"`
 
-	// +validateTrue="field T1.E3"
+	// +validateFalse="field T1.E3"
 	E3 E3 `json:"e3"`
-	// +validateTrue="field T1.PE3"
+	// +validateFalse="field T1.PE3"
 	PE3 *E3 `json:"pe3"`
 
-	// +validateTrue="field T1.E4"
+	// +validateFalse="field T1.E4"
 	E4 E4 `json:"e4"`
-	// +validateTrue="field T1.PE4"
+	// +validateFalse="field T1.PE4"
 	PE4 *E4 `json:"pe4"`
 
-	// +validateTrue="field T1.T2"
+	// +validateFalse="field T1.T2"
 	T2 T2 `json:"t2"`
-	// +validateTrue="field T1.PT2"
+	// +validateFalse="field T1.PT2"
 	PT2 *T2 `json:"pt2"`
 }
 
-// +validateTrue="type T2"
+// +validateFalse="type T2"
 type T2 struct {
-	// +validateTrue="field T2.S"
+	// +validateFalse="field T2.S"
 	S string `json:"s"`
 }

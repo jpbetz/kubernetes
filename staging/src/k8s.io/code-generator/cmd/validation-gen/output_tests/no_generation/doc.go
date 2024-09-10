@@ -24,18 +24,18 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 var localSchemeBuilder = testscheme.New()
 
 type T1 struct {
-	// +validateTrue="from field T1.S"
+	// +validateFalse="from field T1.S"
 	S string
-	// +validateTrue="from field T1.T2"
+	// +validateFalse="from field T1.T2"
 	T2 T2
 }
 
 type T2 struct {
-	// +validateTrue="from field T2.S"
+	// +validateFalse="from field T2.S"
 	S string
 }
 
 type private struct {
-	// +validateTrue="from field private.S"
+	// +validateFalse="from field private.S"
 	S string
 }

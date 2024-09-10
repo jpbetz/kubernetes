@@ -17,6 +17,7 @@ limitations under the License.
 // Note: this selects all types in the package.
 // +k8s:validation-gen=*
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
+// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package withfieldvalidations
@@ -26,17 +27,17 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 var localSchemeBuilder = testscheme.New()
 
 type T1 struct {
-	// +validateTrue="field T1.S"
+	// +validateFalse="field T1.S"
 	S string `json:"s"`
-	// +validateTrue="field T1.T2"
+	// +validateFalse="field T1.T2"
 	T2 T2 `json:"t2"`
-	// +validateTrue="field T1.T3"
+	// +validateFalse="field T1.T3"
 	T3 T3 `json:"t3"`
 }
 
 // Note: this has validations and is linked into T1.
 type T2 struct {
-	// +validateTrue="field T2.S"
+	// +validateFalse="field T2.S"
 	S string `json:"s"`
 }
 
@@ -47,7 +48,7 @@ type T3 struct {
 
 // Note: this has validations and is not linked into T1.
 type T4 struct {
-	// +validateTrue="field T4.S"
+	// +validateFalse="field T4.S"
 	S string `json:"s"`
 }
 

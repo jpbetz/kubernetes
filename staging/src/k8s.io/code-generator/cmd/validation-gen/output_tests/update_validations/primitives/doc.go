@@ -16,6 +16,7 @@ limitations under the License.
 
 // +k8s:validation-gen=*
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
+// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package primitives
@@ -25,12 +26,12 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 var localSchemeBuilder = testscheme.New()
 
 type T1 struct {
-	// +validateTrue={"flags":[], "msg":"T1.S"}
+	// +validateFalse={"flags":[], "msg":"T1.S"}
 	S string `json:"s"`
-	// +validateTrue={"flags":[], "msg":"T1.I"}
+	// +validateFalse={"flags":[], "msg":"T1.I"}
 	I int `json:"i"`
-	// +validateTrue={"flags":[], "msg":"T1.B"}
+	// +validateFalse={"flags":[], "msg":"T1.B"}
 	B bool `json:"b"`
-	// +validateTrue={"flags":[], "msg":"T1.F"}
+	// +validateFalse={"flags":[], "msg":"T1.F"}
 	F float64 `json:"f"`
 }

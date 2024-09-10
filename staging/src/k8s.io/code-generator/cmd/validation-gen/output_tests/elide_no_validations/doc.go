@@ -16,6 +16,7 @@ limitations under the License.
 
 // +k8s:validation-gen=TypeMeta
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
+// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package elidenovalidations
@@ -33,11 +34,11 @@ type T1 struct {
 
 	HasNoVal HasNoVal `json:"hasNoVal"`
 
-	// +validateTrue="field T1.HasNoValFieldVal"
+	// +validateFalse="field T1.HasNoValFieldVal"
 	HasNoValFieldVal HasNoVal `json:"hasNoValFieldVal"`
 }
 
-// +validateTrue="type HasTypeVal"
+// +validateFalse="type HasTypeVal"
 type HasTypeVal struct {
 	// Note: no field validation.
 	S string `json:"s"`
@@ -45,7 +46,7 @@ type HasTypeVal struct {
 
 // Note: no type validation.
 type HasFieldVal struct {
-	// +validateTrue="field HasFieldVal.S"
+	// +validateFalse="field HasFieldVal.S"
 	S string `json:"s"`
 }
 
@@ -55,7 +56,7 @@ type HasNoVal struct {
 	S string `json:"s"`
 }
 
-// +validateTrue="type HasTypeValNotLinked"
+// +validateFalse="type HasTypeValNotLinked"
 type HasTypeValNotLinked struct {
 	// Note: no field validation.
 	S string `json:"s"`
@@ -63,7 +64,7 @@ type HasTypeValNotLinked struct {
 
 // Note: no type validation.
 type HasFieldValNotLinked struct {
-	// +validateTrue="field HasFieldValNotLinked.S"
+	// +validateFalse="field HasFieldValNotLinked.S"
 	S string `json:"s"`
 }
 

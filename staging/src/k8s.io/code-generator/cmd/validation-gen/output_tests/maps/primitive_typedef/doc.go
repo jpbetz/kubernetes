@@ -16,6 +16,7 @@ limitations under the License.
 
 // +k8s:validation-gen=TypeMeta
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
+// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package typedef
@@ -24,13 +25,13 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +validateTrue="type T1"
+// +validateFalse="type T1"
 type T1 struct {
 	TypeMeta int
 
-	// +validateTrue="field T1.MSAMSS"
-	// +eachKey=+validateTrue="T1.MSAMSS[keys]"
-	// +eachVal=+validateTrue="T1.MSAMSS[vals]"
+	// +validateFalse="field T1.MSAMSS"
+	// +eachKey=+validateFalse="T1.MSAMSS[keys]"
+	// +eachVal=+validateFalse="T1.MSAMSS[vals]"
 	MSAMSS map[string]AMSS `json:"msamss"`
 
 	// +validateTrue="field T1.MSPAMSS"
@@ -39,7 +40,7 @@ type T1 struct {
 	MSPAMSS map[string]*AMSS `json:"mspamss"`
 }
 
-// +validateTrue="type AMSS"
-// +eachKey=+validateTrue="AMSS[keys]"
-// +eachVal=+validateTrue="AMSS[vals]"
+// +validateFalse="type AMSS"
+// +eachKey=+validateFalse="AMSS[keys]"
+// +eachVal=+validateFalse="AMSS[vals]"
 type AMSS map[string]string

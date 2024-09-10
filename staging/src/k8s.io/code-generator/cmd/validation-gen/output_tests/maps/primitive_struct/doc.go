@@ -16,6 +16,7 @@ limitations under the License.
 
 // +k8s:validation-gen=TypeMeta
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
+// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package primitivestruct
@@ -24,23 +25,23 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +validateTrue="type T1"
+// +validateFalse="type T1"
 type T1 struct {
 	TypeMeta int
 
-	// +validateTrue="field T1.MST2"
-	// +eachKey=+validateTrue="T1.MST2[keys]"
-	// +eachVal=+validateTrue="T1.MST2[vals]"
+	// +validateFalse="field T1.MST2"
+	// +eachKey=+validateFalse="T1.MST2[keys]"
+	// +eachVal=+validateFalse="T1.MST2[vals]"
 	MST2 map[string]T2 `json:"mst2"`
 
-	// +validateTrue="field T1.MSPT2"
-	// +eachKey=+validateTrue="T1.MSPT2[keys]"
-	// +eachVal=+validateTrue="T1.MSPT2[vals]"
+	// +validateFalse="field T1.MSPT2"
+	// +eachKey=+validateFalse="T1.MSPT2[keys]"
+	// +eachVal=+validateFalse="T1.MSPT2[vals]"
 	MSPT2 map[string]*T2 `json:"mspt2"`
 }
 
-// +validateTrue="type T2"
+// +validateFalse="type T2"
 type T2 struct {
-	// +validateTrue="field T2.S"
+	// +validateFalse="field T2.S"
 	S string `json:"s"`
 }

@@ -16,6 +16,7 @@ limitations under the License.
 
 // +k8s:validation-gen=TypeMeta
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
+// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package primitive
@@ -24,12 +25,12 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +validateTrue="type T1"
+// +validateFalse="type T1"
 type T1 struct {
 	TypeMeta int
 
-	// +validateTrue="field T1.LS"
-	// +eachVal=+validateTrue="T1.LS[vals]"
+	// +validateFalse="field T1.LS"
+	// +eachVal=+validateFalse="T1.LS[vals]"
 	LS []string `json:"ls"`
 
 	// Duplicate with no validation.

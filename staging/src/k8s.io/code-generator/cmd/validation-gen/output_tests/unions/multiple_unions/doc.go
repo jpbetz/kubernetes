@@ -29,26 +29,26 @@ type U struct {
 	TypeMeta int
 
 	// +unionMember={"union": "union1"}
+	// +optional
 	U1M1 *M1 `json:"u1m1"`
 
 	// +unionMember={"union": "union1"}
+	// +optional
 	U1M2 *M2 `json:"u1m2"`
 
 	// +unionMember={"union": "union2"}
+	// +optional
 	U2M1 *M1 `json:"u2m1"`
 
 	// +unionMember={"union": "union2"}
+	// +optional
 	U2M2 *M2 `json:"u2m2"`
 }
 
-// +validateTrue="type M1"
 type M1 struct {
-	// +validateTrue="field M1.S"
 	S string `json:"s"`
 }
 
-// +validateTrue="type M2"
 type M2 struct {
-	// +validateTrue="field M2.S"
 	S string `json:"s"`
 }
