@@ -48,7 +48,7 @@ func Union(opCtx operation.Context, fldPath *field.Path, _, _ any, union *UnionM
 			if specifiedMember != nil && *specifiedMember != m.memberName {
 				return field.ErrorList{
 					field.Invalid(fldPath, fmt.Sprintf("{%s}", strings.Join(union.specifiedFields(fieldValues), ", ")),
-						fmt.Sprintf("must specify exactly one of %s", strings.Join(union.allFields(), ", "))),
+						fmt.Sprintf("must specify exactly one of: %s", strings.Join(union.allFields(), ", "))),
 				}
 			}
 			name := m.memberName
@@ -89,7 +89,7 @@ func DiscriminatedUnion[T ~string](opCtx operation.Context, fldPath *field.Path,
 				fmt.Sprintf("may only be specified when `%s` is %q", union.discriminatorName, discriminatorValue)))
 		} else if !isSpecified && isDiscriminatedMember {
 			errs = append(errs, field.Invalid(fldPath.Child(member.fieldName), "",
-				fmt.Sprintf("may only be specified when `%s` is %q", union.discriminatorName, discriminatorValue)))
+				fmt.Sprintf("must be specified when `%s` is %q", union.discriminatorName, discriminatorValue)))
 		}
 	}
 	return errs
