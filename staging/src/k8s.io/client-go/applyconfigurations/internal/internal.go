@@ -512,6 +512,12 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: url
       type:
         scalar: string
+- name: io.k8s.api.admissionregistration.v1alpha1.ApplyConfiguration
+  map:
+    fields:
+    - name: expression
+      type:
+        scalar: string
 - name: io.k8s.api.admissionregistration.v1alpha1.AuditAnnotation
   map:
     fields:
@@ -534,6 +540,23 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+- name: io.k8s.api.admissionregistration.v1alpha1.JSONPatchOperation
+  map:
+    fields:
+    - name: fromExpression
+      type:
+        scalar: string
+    - name: op
+      type:
+        scalar: string
+      default: ""
+    - name: pathExpression
+      type:
+        scalar: string
+      default: ""
+    - name: valueExpression
+      type:
+        scalar: string
 - name: io.k8s.api.admissionregistration.v1alpha1.MatchCondition
   map:
     fields:
@@ -642,25 +665,28 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: paramKind
       type:
         namedType: io.k8s.api.admissionregistration.v1alpha1.ParamKind
+    - name: variables
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.api.admissionregistration.v1alpha1.Variable
+          elementRelationship: atomic
 - name: io.k8s.api.admissionregistration.v1alpha1.Mutation
   map:
     fields:
-    - name: expression
+    - name: applyConfiguration
       type:
-        scalar: string
-      default: ""
-    - name: message
+        namedType: io.k8s.api.admissionregistration.v1alpha1.ApplyConfiguration
+    - name: jsonPatch
       type:
-        scalar: string
-    - name: messageExpression
-      type:
-        scalar: string
+        list:
+          elementType:
+            namedType: io.k8s.api.admissionregistration.v1alpha1.JSONPatchOperation
+          elementRelationship: atomic
     - name: patchType
       type:
         scalar: string
-    - name: reason
-      type:
-        scalar: string
+      default: ""
     - name: reinvocationPolicy
       type:
         scalar: string

@@ -61,8 +61,10 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"k8s.io/api/admissionregistration/v1.Validation":                                                        schema_k8sio_api_admissionregistration_v1_Validation(ref),
 		"k8s.io/api/admissionregistration/v1.Variable":                                                          schema_k8sio_api_admissionregistration_v1_Variable(ref),
 		"k8s.io/api/admissionregistration/v1.WebhookClientConfig":                                               schema_k8sio_api_admissionregistration_v1_WebhookClientConfig(ref),
+		"k8s.io/api/admissionregistration/v1alpha1.ApplyConfiguration":                                          schema_k8sio_api_admissionregistration_v1alpha1_ApplyConfiguration(ref),
 		"k8s.io/api/admissionregistration/v1alpha1.AuditAnnotation":                                             schema_k8sio_api_admissionregistration_v1alpha1_AuditAnnotation(ref),
 		"k8s.io/api/admissionregistration/v1alpha1.ExpressionWarning":                                           schema_k8sio_api_admissionregistration_v1alpha1_ExpressionWarning(ref),
+		"k8s.io/api/admissionregistration/v1alpha1.JSONPatchOperation":                                          schema_k8sio_api_admissionregistration_v1alpha1_JSONPatchOperation(ref),
 		"k8s.io/api/admissionregistration/v1alpha1.MatchCondition":                                              schema_k8sio_api_admissionregistration_v1alpha1_MatchCondition(ref),
 		"k8s.io/api/admissionregistration/v1alpha1.MatchResources":                                              schema_k8sio_api_admissionregistration_v1alpha1_MatchResources(ref),
 		"k8s.io/api/admissionregistration/v1alpha1.MutatingAdmissionPolicy":                                     schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicy(ref),
@@ -2914,6 +2916,26 @@ func schema_k8sio_api_admissionregistration_v1_WebhookClientConfig(ref common.Re
 	}
 }
 
+func schema_k8sio_api_admissionregistration_v1alpha1_ApplyConfiguration(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ApplyConfiguration defines the desired configuration values of an object.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"expression": {
+						SchemaProps: spec.SchemaProps{
+							Description: "expression will be evaluated by CEL to create an apply configuration. ref: https://github.com/google/cel-spec\n\nApply configurations are declared in CEL using object initialization.  For example, this CEL expression returns an apply configuration to set a single field:\n\n\tObject{\n\t  spec: Object.spec{\n\t    serviceAccountName: \"example\"\n\t  }\n\t}\n\nCEL expressions have access to the object types needed to create apply configurations: - 'Object' - CEL type of the object. - 'Object.<fieldName>' - CEL type of the object's spec (such as 'Object.spec') - 'Object.<fieldName1>.<fieldName2>...<fieldNameN>` - CEL type of a nested field (such as 'Object.spec.container')\n\nCEL expressions have access to the contents of the API request/response, organized into CEL variables as well as some other useful variables:\n\n- 'object' - The object from the incoming request. The value is null for DELETE requests. - 'oldObject' - The existing object. The value is null for CREATE requests. - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go#AdmissionRequest)). - 'params' - Parameter resource referred to by the policy binding being evaluated. Only populated if the policy has a ParamKind. - 'namespaceObject' - The namespace object that the incoming object belongs to. The value is null for cluster-scoped resources. - 'variables' - Map of composited variables, from its name to its lazily evaluated value.\n  For example, a variable named 'foo' can be accessed as 'variables.foo'.\n\nThe `apiVersion`, `kind`, `metadata.name` and `metadata.generateName` are always accessible from the root of the object. No other metadata properties are accessible.\n\nOnly property names of the form `[a-zA-Z_.-/][a-zA-Z0-9_.-/]*` are accessible. Required.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_k8sio_api_admissionregistration_v1alpha1_AuditAnnotation(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -2969,6 +2991,51 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ExpressionWarning(ref commo
 					},
 				},
 				Required: []string{"fieldRef", "warning"},
+			},
+		},
+	}
+}
+
+func schema_k8sio_api_admissionregistration_v1alpha1_JSONPatchOperation(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "JSONPatchOperation defines a JSON Patch operation.\n\nJSONPatchOperation contains multiple fields which are declared as CEL expressions. ref: https://github.com/google/cel-spe CEL expressions have access to the contents of the API request/response, organized into CEL variables as well as some other useful variables:\n\n  - 'object' - The object from the incoming request. The value is null for DELETE requests.\n  - 'oldObject' - The existing object. The value is null for CREATE requests.\n  - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go#AdmissionRequest)).\n  - 'params' - Parameter resource referred to by the policy binding being evaluated. Only populated if the policy has a ParamKind.\n  - 'namespaceObject' - The namespace object that the incoming object belongs to. The value is null for cluster-scoped resources.\n  - 'variables' - Map of composited variables, from its name to its lazily evaluated value.\n    For example, a variable named 'foo' can be accessed as 'variables.foo'.\n\nThe `apiVersion`, `kind`, `metadata.name` and `metadata.generateName` are always accessible from the root of the object. No other metadata properties are accessible.\n\nOnly property names of the form `[a-zA-Z_.-/][a-zA-Z0-9_.-/]*` are accessible. Required if the op is \"add\", \"replace\" or \"test\"; must not be set for other op types.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"op": {
+						SchemaProps: spec.SchemaProps{
+							Description: "op specifies the operation this patch performs. Required.\n\nPossible enum values:\n - `\"add\"` add a value to an object or insert it into an array.\n - `\"copy\"` copy a value from one location to another in the object.\n - `\"move\"` move a value from one location to another in the object.\n - `\"remove\"` remove a value from an object or array.\n - `\"replace\"` replace a value of an object or array.\n - `\"test\"` test that the specified value is set in the object. If the test fails, the patch as a whole is not applied.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+							Enum:        []interface{}{"add", "copy", "move", "remove", "replace", "test"},
+						},
+					},
+					"pathExpression": {
+						SchemaProps: spec.SchemaProps{
+							Description: "pathExpression will be evaluated by CEL to create a path to the target value. path must evaluate to a '/' delimited field path conforming to the [JSON Path spec](https://jsonpatch.com/). Required.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"fromExpression": {
+						SchemaProps: spec.SchemaProps{
+							Description: "fromExpression will be evaluated by CEL to create a path to a value. from must evaluate to a '/' delimited field path conforming to the [JSON Path spec](https://jsonpatch.com/). Required if the op is \"move\" or \"copy\"; must be not be set for other op types.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"valueExpression": {
+						SchemaProps: spec.SchemaProps{
+							Description: "valueExpression will be evaluated by CEL to create a value. CEL scalars, maps and lists can be returned, and represent JSON values, maps and arrays when applied by jsonPatch.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"op", "pathExpression"},
 			},
 		},
 	}
@@ -3240,7 +3307,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicyBind
 					},
 					"matchResources": {
 						SchemaProps: spec.SchemaProps{
-							Description: "MatchResources declares what resources match this binding and will be validated by it. Note that this is intersected with the policy's matchConstraints, so only requests that are matched by the policy can be selected by this. If this is unset, all resources matched by the policy are validated by this binding When resourceRules is unset, it does not constrain resource matching. If a resource is matched by the other fields of this object, it will be validated. Note that this is differs from MutatingAdmissionPolicy matchConstraints, where resourceRules are required.",
+							Description: "MatchResources declares what resources match this binding and will be validated by it. Note that this is intersected with the policy's matchConstraints, so only requests that are matched by the policy can be selected by this. If this is unset, all resources matched by the policy are validated by this binding When resourceRules is unset, it does not constrain resource matching. If a resource is matched by the other fields of this object, it will be validated. Note that this is differs from MutatingAdmissionPolicy matchConstraints, where resourceRules are required. Only the CREATE and UPDATE operations are allowed.  DELETE and CONNECT operations may not be matched. '*' matches only CREATE and UPDATE.",
 							Ref:         ref("k8s.io/api/admissionregistration/v1alpha1.MatchResources"),
 						},
 					},
@@ -3307,19 +3374,38 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicySpec
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "MutatingAdmissionPolicySpec is the specification of the desired behavior of the AdmissionPolicy.",
+				Description: "MutatingAdmissionPolicySpec is the specification of the desired behavior of the admission policy.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"paramKind": {
 						SchemaProps: spec.SchemaProps{
-							Description: "ParamKind specifies the kind of resources used to parameterize this policy. If absent, there are no parameters for this policy and the param CEL variable will not be provided to validation expressions. If ParamKind refers to a non-existent kind, this policy definition is mis-configured and the FailurePolicy is applied. If paramKind is specified but paramRef is unset in MutatingAdmissionPolicyBinding, the params variable will be null.",
+							Description: "paramKind specifies the kind of resources used to parameterize this policy. If absent, there are no parameters for this policy and the param CEL variable will not be provided to validation expressions. If paramKind refers to a non-existent kind, this policy definition is mis-configured and the FailurePolicy is applied. If paramKind is specified but paramRef is unset in MutatingAdmissionPolicyBinding, the params variable will be null.",
 							Ref:         ref("k8s.io/api/admissionregistration/v1alpha1.ParamKind"),
 						},
 					},
 					"matchConstraints": {
 						SchemaProps: spec.SchemaProps{
-							Description: "MatchConstraints specifies what resources this policy is designed to validate. The AdmissionPolicy cares about a request if it matches _all_ Constraints. However, in order to prevent clusters from being put into an unstable state that cannot be recovered from via the API MutatingAdmissionPolicy cannot match MutatingAdmissionPolicy and MutatingAdmissionPolicyBinding. Required.",
+							Description: "matchConstraints specifies what resources this policy is designed to validate. The AdmissionPolicy cares about a request if it matches _all_ Constraints. However, in order to prevent clusters from being put into an unstable state that cannot be recovered from via the API MutatingAdmissionPolicy cannot match MutatingAdmissionPolicy and MutatingAdmissionPolicyBinding. Only the CREATE and UPDATE operations are allowed.  DELETE and CONNECT operations may not be matched. '*' matches only CREATE and UPDATE. Required.",
 							Ref:         ref("k8s.io/api/admissionregistration/v1alpha1.MatchResources"),
+						},
+					},
+					"variables": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "variables contain definitions of variables that can be used in composition of other expressions. Each variable is defined as a named CEL expression. The variables defined here will be available under `variables` in other expressions of the policy except matchConditions because matchConditions are evaluated before the rest of the policy.\n\nThe expression of a variable can refer to other variables defined earlier in the list but not those after. Thus, variables must be sorted by the order of first appearance and acyclic.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/api/admissionregistration/v1alpha1.Variable"),
+									},
+								},
+							},
 						},
 					},
 					"mutations": {
@@ -3329,7 +3415,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicySpec
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Mutations contain CEL expressions which are used to apply the mutation. Mutations may not be empty; a minimum of one mutation is required.",
+							Description: "mutations contain operations which are used to perform mutations. mutations may not be empty; a minimum of one mutation is required. Each mutation represents independent change, is not guaranteed to observe mutations made by preceding mutations, and may be invoked based on the mutation's reinvocationPolicy.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -3361,7 +3447,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicySpec
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "MatchConditions is a list of conditions that must be met for a request to be validated. Match conditions filter requests that have already been matched by the rules, namespaceSelector, and objectSelector. An empty list of matchConditions matches all requests. There are a maximum of 64 match conditions allowed.\n\nIf a parameter object is provided, it can be accessed via the `params` handle in the same manner as validation expressions.\n\nThe exact matching logic is (in order):\n  1. If ANY matchCondition evaluates to FALSE, the policy is skipped.\n  2. If ALL matchConditions evaluate to TRUE, the policy is evaluated.\n  3. If any matchCondition evaluates to an error (but none are FALSE):\n     - If failurePolicy=Fail, reject the request\n     - If failurePolicy=Ignore, the policy is skipped",
+							Description: "matchConditions is a list of conditions that must be met for a request to be validated. Match conditions filter requests that have already been matched by the rules, namespaceSelector, and objectSelector. An empty list of matchConditions matches all requests. There are a maximum of 64 match conditions allowed.\n\nIf a parameter object is provided, it can be accessed via the `params` handle in the same manner as validation expressions.\n\nThe exact matching logic is (in order):\n  1. If ANY matchCondition evaluates to FALSE, the policy is skipped.\n  2. If ALL matchConditions evaluate to TRUE, the policy is evaluated.\n  3. If any matchCondition evaluates to an error (but none are FALSE):\n     - If failurePolicy=Fail, reject the request\n     - If failurePolicy=Ignore, the policy is skipped",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
@@ -3377,7 +3463,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicySpec
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/api/admissionregistration/v1alpha1.MatchCondition", "k8s.io/api/admissionregistration/v1alpha1.MatchResources", "k8s.io/api/admissionregistration/v1alpha1.Mutation", "k8s.io/api/admissionregistration/v1alpha1.ParamKind"},
+			"k8s.io/api/admissionregistration/v1alpha1.MatchCondition", "k8s.io/api/admissionregistration/v1alpha1.MatchResources", "k8s.io/api/admissionregistration/v1alpha1.Mutation", "k8s.io/api/admissionregistration/v1alpha1.ParamKind", "k8s.io/api/admissionregistration/v1alpha1.Variable"},
 	}
 }
 
@@ -3388,38 +3474,9 @@ func schema_k8sio_api_admissionregistration_v1alpha1_Mutation(ref common.Referen
 				Description: "Mutation specifies the CEL expression which is used to apply the Mutation.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"expression": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Expression represents the expression which will be evaluated by CEL. ref: https://github.com/google/cel-spec CEL expressions have access to the contents of the API request/response, organized into CEL variables as well as some other useful variables:\n\n- 'object' - The object from the incoming request. The value is null for DELETE requests. - 'oldObject' - The existing object. The value is null for CREATE requests. - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go#AdmissionRequest)). - 'params' - Parameter resource referred to by the policy binding being evaluated. Only populated if the policy has a ParamKind. - 'namespaceObject' - The namespace object that the incoming object belongs to. The value is null for cluster-scoped resources. - 'variables' - Map of composited variables, from its name to its lazily evaluated value.\n  For example, a variable named 'foo' can be accessed as 'variables.foo'.\n\nThe `apiVersion`, `kind`, `metadata.name` and `metadata.generateName` are always accessible from the root of the object. No other metadata properties are accessible.\n\nOnly property names of the form `[a-zA-Z_.-/][a-zA-Z0-9_.-/]*` are accessible. Required.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"message": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Message represents the message displayed when validation fails. The message is required if the Expression contains line breaks. The message must not contain line breaks. If unset, the message is \"failed rule: {Rule}\". e.g. \"must be a URL with the host matching spec.host\" If the Expression contains line breaks. Message is required. The message must not contain line breaks. If unset, the message is \"failed Expression: {Expression}\".",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"reason": {
-						SchemaProps: spec.SchemaProps{
-							Description: "reason represents a machine-readable description of why this validation failed. If this is the first validation in the list to fail, this reason, as well as the corresponding HTTP response code, are used in the HTTP response to the client. The currently supported reasons are: \"Unauthorized\", \"Forbidden\", \"Invalid\", \"RequestEntityTooLarge\". If not set, StatusReasonInvalid is used in the response to the client.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"messageExpression": {
-						SchemaProps: spec.SchemaProps{
-							Description: "messageExpression declares a CEL expression that evaluates to the validation failure message that is returned when this rule fails. Since messageExpression is used as a failure message, it must evaluate to a string. If both message and messageExpression are present on a validation, then messageExpression will be used if validation fails. If messageExpression results in a runtime error, the runtime error is logged, and the validation failure message is produced as if the messageExpression field were unset. If messageExpression evaluates to an empty string, a string with only spaces, or a string that contains line breaks, then the validation failure message will also be produced as if the messageExpression field were unset, and the fact that messageExpression produced an empty string/string with only spaces/string with line breaks will be logged. messageExpression has access to all the same variables as the `expression` except for 'authorizer' and 'authorizer.requestResource'. Example: \"object.x must be less than max (\"+string(params.max)+\")\"",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
 					"reinvocationPolicy": {
 						SchemaProps: spec.SchemaProps{
-							Description: "reinvocationPolicy indicates whether this mutation should be called multiple times as part of a single admission evaluation. Allowed values are \"Never\" and \"IfNeeded\".\n\nNever: the mutation will not be called more than once in a single admission evaluation.\n\nIfNeeded: the mutation will be called at least one additional time as part of the admission evaluation if the object being admitted is modified by other admission plugins after the initial mutation call. mutations that specify this option *must* be idempotent, able to process objects they previously admitted. Note: * the number of additional invocations is not guaranteed to be exactly one. * if additional invocations result in further modifications to the object, webhooks are not guaranteed to be invoked again. * mutations that use this option may be reordered to minimize the number of additional invocations. * to validate an object after all mutations are guaranteed complete, use a validating admission policy instead.\n\nDefaults to \"Never\".\n\nPossible enum values:\n - `\"IfNeeded\"` indicates that the mutation may be called at least one additional time as part of the admission evaluation if the object being admitted is modified by other admission plugins after the initial mutation call.\n - `\"Never\"` indicates that the mutation must not be called more than once in a single admission evaluation.",
+							Description: "reinvocationPolicy indicates whether this mutation may be called multiple times as part of a single admission evaluation. Allowed values are \"Never\" and \"IfNeeded\".\n\nNever: the mutation will not be called more than once in a single admission evaluation.\n\nIfNeeded: This mutation may be invoked more than once for a single admission request and there is no guarantee of order with respect to other admission  plugins, admission webhooks, and admission policies.  A mutation is only reinvoked when mutation changes the object after this mutation is invoked. Required.\n\nPossible enum values:\n - `\"IfNeeded\"` indicates that the mutation may be called at least one additional time as part of the admission evaluation if the object being admitted is modified by other admission plugins after the initial mutation call.\n - `\"Never\"` indicates that the mutation must not be called more than once in a single admission evaluation.",
 							Type:        []string{"string"},
 							Format:      "",
 							Enum:        []interface{}{"IfNeeded", "Never"},
@@ -3427,16 +3484,39 @@ func schema_k8sio_api_admissionregistration_v1alpha1_Mutation(ref common.Referen
 					},
 					"patchType": {
 						SchemaProps: spec.SchemaProps{
-							Description: "patchType indicates the patch strategy used. Allowed values are \"ApplyConfiguration\" and \"JSONPatch\". \"ApplyConfiguration\" is to use structured merge algorithm stated [here](https://github.com/kubernetes-sigs/structured-merge-diff) to mutate the incoming object. \"JSONPatch\" is to use [JSON patch](https://jsonpatch.com/) to perform the mutation of the object.\n\nPossible enum values:\n - `\"PatchTypeApplyConfiguration\"` indicates that the mutation is using apply configuration to mutate the object.\n - `\"PatchTypeJSONPatch\"` indicates that the object is mutated through JSONPatch.",
+							Description: "patchType indicates the patch strategy used. Allowed values are \"ApplyConfiguration\" and \"JSONPatch\". Required.\n\n\nPossible enum values:\n - `\"ApplyConfiguration\"` ApplyConfiguration indicates that the mutation is using apply configuration to mutate the object.\n - `\"JSONPatch\"` JSONPatch indicates that the object is mutated through JSON Patch.",
+							Default:     "",
 							Type:        []string{"string"},
 							Format:      "",
-							Enum:        []interface{}{"PatchTypeApplyConfiguration", "PatchTypeJSONPatch"},
+							Enum:        []interface{}{"ApplyConfiguration", "JSONPatch"},
+						},
+					},
+					"applyConfiguration": {
+						SchemaProps: spec.SchemaProps{
+							Description: "applyConfiguration defines the desired configuration values of an object. The configuration is applied to the admission object using [structured merge diff](https://github.com/kubernetes-sigs/structured-merge-diff). A CEL expression is used to create apply configuration.",
+							Ref:         ref("k8s.io/api/admissionregistration/v1alpha1.ApplyConfiguration"),
+						},
+					},
+					"jsonPatch": {
+						SchemaProps: spec.SchemaProps{
+							Description: "jsonPatch defines a [JSON patch](https://jsonpatch.com/) operation to perform a mutation to the object. jsonPatch may not be empty; a minimum of one mutation is required. A CEL expression is used to define the patch value.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/api/admissionregistration/v1alpha1.JSONPatchOperation"),
+									},
+								},
+							},
 						},
 					},
 				},
-				Required: []string{"expression", "patchType"},
+				Required: []string{"patchType"},
 			},
 		},
+		Dependencies: []string{
+			"k8s.io/api/admissionregistration/v1alpha1.ApplyConfiguration", "k8s.io/api/admissionregistration/v1alpha1.JSONPatchOperation"},
 	}
 }
 

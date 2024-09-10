@@ -27,6 +27,7 @@ import (
 type MutatingAdmissionPolicySpecApplyConfiguration struct {
 	ParamKind        *ParamKindApplyConfiguration                     `json:"paramKind,omitempty"`
 	MatchConstraints *MatchResourcesApplyConfiguration                `json:"matchConstraints,omitempty"`
+	Variables        []VariableApplyConfiguration                     `json:"variables,omitempty"`
 	Mutations        []MutationApplyConfiguration                     `json:"mutations,omitempty"`
 	FailurePolicy    *admissionregistrationv1alpha1.FailurePolicyType `json:"failurePolicy,omitempty"`
 	MatchConditions  []MatchConditionApplyConfiguration               `json:"matchConditions,omitempty"`
@@ -51,6 +52,19 @@ func (b *MutatingAdmissionPolicySpecApplyConfiguration) WithParamKind(value *Par
 // If called multiple times, the MatchConstraints field is set to the value of the last call.
 func (b *MutatingAdmissionPolicySpecApplyConfiguration) WithMatchConstraints(value *MatchResourcesApplyConfiguration) *MutatingAdmissionPolicySpecApplyConfiguration {
 	b.MatchConstraints = value
+	return b
+}
+
+// WithVariables adds the given value to the Variables field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, values provided by each call will be appended to the Variables field.
+func (b *MutatingAdmissionPolicySpecApplyConfiguration) WithVariables(values ...*VariableApplyConfiguration) *MutatingAdmissionPolicySpecApplyConfiguration {
+	for i := range values {
+		if values[i] == nil {
+			panic("nil value passed to WithVariables")
+		}
+		b.Variables = append(b.Variables, *values[i])
+	}
 	return b
 }
 

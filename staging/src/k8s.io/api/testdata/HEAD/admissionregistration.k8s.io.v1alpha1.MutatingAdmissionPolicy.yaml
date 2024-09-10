@@ -80,12 +80,18 @@ spec:
       - resourcesValue
       scope: scopeValue
   mutations:
-  - expression: expressionValue
-    message: messageValue
-    messageExpression: messageExpressionValue
+  - applyConfiguration:
+      expression: expressionValue
+    jsonPatch:
+    - fromExpression: fromExpressionValue
+      op: opValue
+      pathExpression: pathExpressionValue
+      valueExpression: valueExpressionValue
     patchType: patchTypeValue
-    reason: reasonValue
     reinvocationPolicy: reinvocationPolicyValue
   paramKind:
     apiVersion: apiVersionValue
     kind: kindValue
+  variables:
+  - expression: expressionValue
+    name: nameValue
