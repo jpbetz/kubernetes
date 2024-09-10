@@ -267,6 +267,7 @@ type ValidatingAdmissionPolicySpec struct {
 	//
 	// The expression of a variable can refer to other variables defined earlier in the list but not those after.
 	// Thus, Variables must be sorted by the order of first appearance and acyclic.
+	// +listType=atomic
 	// +optional
 	Variables []Variable
 }
@@ -1169,7 +1170,7 @@ type MatchCondition struct {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +k8s:prerelease-lifecycle-gen:introduced=1.32
 
-// MutatingAdmissionPolicy describes the definition of an admission mutation policy that mutates the object coming into admission chain.
+// MutatingAdmissionPolicy describes an admission policy that may mutate an object.
 type MutatingAdmissionPolicy struct {
 	metav1.TypeMeta
 	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
@@ -1193,24 +1194,40 @@ type MutatingAdmissionPolicyList struct {
 	Items []MutatingAdmissionPolicy
 }
 
-// MutatingAdmissionPolicySpec is the specification of the desired behavior of the AdmissionPolicy.
+// MutatingAdmissionPolicySpec is the specification of the desired behavior of the admission policy.
 type MutatingAdmissionPolicySpec struct {
-	// ParamKind specifies the kind of resources used to parameterize this policy.
+	// paramKind specifies the kind of resources used to parameterize this policy.
 	// If absent, there are no parameters for this policy and the param CEL variable will not be provided to validation expressions.
-	// If ParamKind refers to a non-existent kind, this policy definition is mis-configured and the FailurePolicy is applied.
+	// If paramKind refers to a non-existent kind, this policy definition is mis-configured and the FailurePolicy is applied.
 	// If paramKind is specified but paramRef is unset in MutatingAdmissionPolicyBinding, the params variable will be null.
 	// +optional
 	ParamKind *ParamKind
 
-	// MatchConstraints specifies what resources this policy is designed to validate.
+	// matchConstraints specifies what resources this policy is designed to validate.
 	// The AdmissionPolicy cares about a request if it matches _all_ Constraints.
 	// However, in order to prevent clusters from being put into an unstable state that cannot be recovered from via the API
 	// MutatingAdmissionPolicy cannot match MutatingAdmissionPolicy and MutatingAdmissionPolicyBinding.
+	// Only the CREATE and UPDATE operations are allowed.  DELETE and CONNECT operations may not be matched.
+	// '*' matches only CREATE and UPDATE.
 	// Required.
 	MatchConstraints *MatchResources
 
-	// Mutations contain CEL expressions which are used to apply the mutation.
-	// Mutations may not be empty; a minimum of one mutation is required.
+	// variables contain definitions of variables that can be used in composition of other expressions.
+	// Each variable is defined as a named CEL expression.
+	// The variables defined here will be available under `variables` in other expressions of the policy
+	// except matchConditions because matchConditions are evaluated before the rest of the policy.
+	//
+	// The expression of a variable can refer to other variables defined earlier in the list but not those after.
+	// Thus, variables must be sorted by the order of first appearance and acyclic.
+	// +listType=atomic
+	// +optional
+	Variables []Variable
+
+	// mutations contain operations which are used to perform mutations.
+	// mutations may not be empty; a minimum of one mutation is required.
+	// Each mutation represents independent change, is not guaranteed to
+	// observe mutations made by preceding mutations, and may be invoked based
+	// on the mutation's reinvocationPolicy.
 	// +listType=atomic
 	// +optional
 	Mutations []Mutation
@@ -1228,7 +1245,7 @@ type MutatingAdmissionPolicySpec struct {
 	// +optional
 	FailurePolicy *FailurePolicyType
 
-	// MatchConditions is a list of conditions that must be met for a request to be validated.
+	// matchConditions is a list of conditions that must be met for a request to be validated.
 	// Match conditions filter requests that have already been matched by the rules,
 	// namespaceSelector, and objectSelector. An empty list of matchConditions matches all requests.
 	// There are a maximum of 64 match conditions allowed.
@@ -1251,10 +1268,67 @@ type MutatingAdmissionPolicySpec struct {
 	MatchConditions []MatchCondition
 }
 
-// Mutation specifies the CEL expression which is used to apply the Mutation.
+// Mutation specifies the operation that performs a Mutation.
 type Mutation struct {
-	// Expression represents the expression which will be evaluated by CEL.
+	// reinvocationPolicy indicates whether this mutation may be called multiple times as part of a single admission evaluation.
+	// Allowed values are "Never" and "IfNeeded".
+	//
+	// Never: the mutation will not be called more than once in a single admission evaluation.
+	//
+	// IfNeeded: This mutation may be invoked more than once for a single admission request and there is no guarantee of
+	// order with respect to other admission  plugins, admission webhooks, and admission policies.  A mutation is only
+	// reinvoked when mutation changes the object after this mutation is invoked.
+	// Required.
+	ReinvocationPolicy ReinvocationPolicyType
+	// patchType indicates the patch strategy used.
+	// Allowed values are "ApplyConfiguration" and "JSONPatch".
+	// Required.
+	//
+	// +unionDiscriminator
+	PatchType PatchType
+
+	// applyConfiguration defines the desired configuration values of an object.
+	// The configuration is applied to the admission object using
+	// [structured merge diff](https://github.com/kubernetes-sigs/structured-merge-diff).
+	// A CEL expression is used to create apply configuration.
+	ApplyConfiguration *ApplyConfiguration
+
+	// jsonPatch defines a [JSON patch](https://jsonpatch.com/) operation to perform a mutation to the object.
+	// jsonPatch may not be empty; a minimum of one mutation is required.
+	// A CEL expression is used to define the patch value.
+	JSONPatch JSONPatch
+}
+
+// PatchType specifies the type of patch operation for a mutation.
+// +enum
+type PatchType string
+
+const (
+	// ApplyConfiguration indicates that the mutation is using apply configuration to mutate the object.
+	PatchTypeApplyConfiguration PatchType = "ApplyConfiguration"
+	// JSONPatch indicates that the object is mutated through JSON Patch.
+	PatchTypeJSONPatch PatchType = "JSONPatch"
+)
+
+// ApplyConfiguration defines the desired configuration values of an object.
+type ApplyConfiguration struct {
+	// expression will be evaluated by CEL to create an apply configuration.
 	// ref: https://github.com/google/cel-spec
+	//
+	// Apply configurations are declared in CEL using object initialization.  For example, this CEL expression
+	// returns an apply configuration to set a single field:
+	//
+	//	Object{
+	//	  spec: Object.spec{
+	//	    serviceAccountName: "example"
+	//	  }
+	//	}
+	//
+	// CEL expressions have access to the object types needed to create apply configurations:
+	// - 'Object' - CEL type of the object.
+	// - 'Object.<fieldName>' - CEL type of the object's spec (such as 'Object.spec')
+	// - 'Object.<fieldName1>.<fieldName2>...<fieldNameN>` - CEL type of a nested field (such as 'Object.spec.container')
+	//
 	// CEL expressions have access to the contents of the API request/response, organized into CEL variables as well as some other useful variables:
 	//
 	// - 'object' - The object from the incoming request. The value is null for DELETE requests.
@@ -1271,70 +1345,70 @@ type Mutation struct {
 	// Only property names of the form `[a-zA-Z_.-/][a-zA-Z0-9_.-/]*` are accessible.
 	// Required.
 	Expression string
-	// Message represents the message displayed when validation fails. The message is required if the Expression contains
-	// line breaks. The message must not contain line breaks.
-	// If unset, the message is "failed rule: {Rule}".
-	// e.g. "must be a URL with the host matching spec.host"
-	// If the Expression contains line breaks. Message is required.
-	// The message must not contain line breaks.
-	// If unset, the message is "failed Expression: {Expression}".
-	// +optional
-	Message string
-	// reason represents a machine-readable description of why this validation failed.
-	// If this is the first validation in the list to fail, this reason, as well as the
-	// corresponding HTTP response code, are used in the
-	// HTTP response to the client.
-	// The currently supported reasons are: "Unauthorized", "Forbidden", "Invalid", "RequestEntityTooLarge".
-	// If not set, StatusReasonInvalid is used in the response to the client.
-	// +optional
-	Reason *metav1.StatusReason
-	// messageExpression declares a CEL expression that evaluates to the validation failure message that is returned when this rule fails.
-	// Since messageExpression is used as a failure message, it must evaluate to a string.
-	// If both message and messageExpression are present on a validation, then messageExpression will be used if validation fails.
-	// If messageExpression results in a runtime error, the runtime error is logged, and the validation failure message is produced
-	// as if the messageExpression field were unset. If messageExpression evaluates to an empty string, a string with only spaces, or a string
-	// that contains line breaks, then the validation failure message will also be produced as if the messageExpression field were unset, and
-	// the fact that messageExpression produced an empty string/string with only spaces/string with line breaks will be logged.
-	// messageExpression has access to all the same variables as the `expression` except for 'authorizer' and 'authorizer.requestResource'.
-	// Example:
-	// "object.x must be less than max ("+string(params.max)+")"
-	// +optional
-	MessageExpression string
-	// reinvocationPolicy indicates whether this mutation should be called multiple times as part of a single admission evaluation.
-	// Allowed values are "Never" and "IfNeeded".
-	//
-	// Never: the mutation will not be called more than once in a single admission evaluation.
-	//
-	// IfNeeded: the mutation will be called at least one additional time as part of the admission evaluation
-	// if the object being admitted is modified by other admission plugins after the initial mutation call.
-	// mutations that specify this option *must* be idempotent, able to process objects they previously admitted.
-	// Note:
-	// * the number of additional invocations is not guaranteed to be exactly one.
-	// * if additional invocations result in further modifications to the object, webhooks are not guaranteed to be invoked again.
-	// * mutations that use this option may be reordered to minimize the number of additional invocations.
-	// * to validate an object after all mutations are guaranteed complete, use a validating admission policy instead.
-	//
-	// Defaults to "Never".
-	// +optional
-	ReinvocationPolicy *ReinvocationPolicyType
-	// patchType indicates the patch strategy used.
-	// Allowed values are "ApplyConfiguration" and "JSONPatch".
-	// "ApplyConfiguration" is to use structured merge algorithm stated [here](https://github.com/kubernetes-sigs/structured-merge-diff)
-	// to mutate the incoming object.
-	// "JSONPatch" is to use [JSON patch](https://jsonpatch.com/) to perform the mutation of the object.
-	// +required
-	PatchType PatchType
 }
 
-// PatchType specifies what type of strategy the admission mutation uses.
+// JSONPatch defines a JSON Patch.
+type JSONPatch []JSONPatchOperation
+
+// JSONPatchOperation defines a JSON Patch operation.
+//
+// JSONPatchOperation contains multiple fields which are declared as CEL expressions.
+// ref: https://github.com/google/cel-spe
+// CEL expressions have access to the contents of the API request/response, organized into CEL variables as well as some other useful variables:
+//
+//   - 'object' - The object from the incoming request. The value is null for DELETE requests.
+//   - 'oldObject' - The existing object. The value is null for CREATE requests.
+//   - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go#AdmissionRequest)).
+//   - 'params' - Parameter resource referred to by the policy binding being evaluated. Only populated if the policy has a ParamKind.
+//   - 'namespaceObject' - The namespace object that the incoming object belongs to. The value is null for cluster-scoped resources.
+//   - 'variables' - Map of composited variables, from its name to its lazily evaluated value.
+//     For example, a variable named 'foo' can be accessed as 'variables.foo'.
+//
+// The `apiVersion`, `kind`, `metadata.name` and `metadata.generateName` are always accessible from the root of the
+// object. No other metadata properties are accessible.
+//
+// Only property names of the form `[a-zA-Z_.-/][a-zA-Z0-9_.-/]*` are accessible.
+// Required if the op is "add", "replace" or "test"; must not be
+// set for other op types.
+type JSONPatchOperation struct {
+	// op specifies the operation this patch performs.
+	// Required.
+	Op JSONPatchOperationType
+
+	// pathExpression will be evaluated by CEL to create a path to the target value.
+	// path must evaluate to a '/' delimited field path conforming to the [JSON Path spec](https://jsonpatch.com/).
+	// Required.
+	PathExpression string
+
+	// from specifies the path to a value.
+	// from must be a '/' delimited field path conforming to the [JSON Path spec](https://jsonpatch.com/).
+	// Required if the op is "move" or "copy"; must be not be
+	// set for other op types.
+	FromExpression string
+
+	// valueExpression will be evaluated by CEL to create a value.
+	// CEL scalars, maps and lists can be returned, and represent JSON values, maps and arrays when applied by jsonPatch.
+	ValueExpression string
+}
+
+// JSONPatchOperationType specifies a JSON Patch operation.
 // +enum
-type PatchType string
+type JSONPatchOperationType string
 
 const (
-	// PatchTypeApplyConfiguration indicates that the mutation is using apply configuration to mutate the object.
-	PatchTypeApplyConfiguration PatchType = "PatchTypeApplyConfiguration"
-	// PatchTypeJSONPatch indicates that the object is mutated through JSONPatch.
-	PatchTypeJSONPatch PatchType = "PatchTypeJSONPatch"
+	// add a value to an object or insert it into an array.
+	Add JSONPatchOperationType = "add"
+	// remove a value from an object or array.
+	Remove JSONPatchOperationType = "remove"
+	// replace a value of an object or array.
+	Replace JSONPatchOperationType = "replace"
+	// copy a value from one location to another in the object.
+	Copy JSONPatchOperationType = "copy"
+	// move a value from one location to another in the object.
+	Move JSONPatchOperationType = "move"
+	// test that the specified value is set in the object. If the test
+	// fails, the patch as a whole is not applied.
+	Test JSONPatchOperationType = "test"
 )
 
 // +genclient
@@ -1394,6 +1468,8 @@ type MutatingAdmissionPolicyBindingSpec struct {
 	// If this is unset, all resources matched by the policy are validated by this binding
 	// When resourceRules is unset, it does not constrain resource matching. If a resource is matched by the other fields of this object, it will be validated.
 	// Note that this is differs from MutatingAdmissionPolicy matchConstraints, where resourceRules are required.
+	// Only the CREATE and UPDATE operations are allowed.  DELETE and CONNECT operations may not be matched.
+	// '*' matches only CREATE and UPDATE.
 	// +optional
 	MatchResources *MatchResources
 }
