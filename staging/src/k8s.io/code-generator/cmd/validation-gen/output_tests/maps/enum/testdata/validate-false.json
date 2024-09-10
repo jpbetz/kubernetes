@@ -1,0 +1,28 @@
+{
+    "*enum.T1": {
+      "me1s": [
+        "T1.ME1S[keys]",
+        "field T1.ME1S",
+        "type E1"
+      ],
+      "me1s[]": [
+        "T1.ME1S[vals]"
+      ],
+      "mse1": [
+        "T1.MSE1[keys]",
+        "field T1.MSE1"
+      ],
+      "mse1[岯Ȉ\u0026\u003c沲3]": [
+        "T1.MSE1[vals]",
+        "type E1"
+      ],
+      "mspe1": [
+        "T1.MSPE1[keys]",
+        "field T1.MSPE1"
+      ],
+      "mspe1[x飖Ǒp!ǪŰ]": [
+        "T1.MSPE1[vals]",
+        "type E1"
+      ]
+    }
+  }

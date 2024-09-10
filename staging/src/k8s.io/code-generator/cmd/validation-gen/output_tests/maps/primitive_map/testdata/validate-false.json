@@ -1,0 +1,14 @@
+{
+    "*primitivemap.T1": {
+      "": [
+        "type T1"
+      ],
+      "msmss": [
+        "T1.MSMSS[keys]",
+        "field T1.MSMSS"
+      ],
+      "msmss[岯Ȉ\u0026\u003c沲3]": [
+        "T1.MSMSS[vals]"
+      ]
+    }
+  }

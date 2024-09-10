@@ -47,23 +47,23 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 
 func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// type T1
-	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "type T1")...)
+	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type T1")...)
 
 	// field T1.TypeMeta has no validation
 
 	// field T1.MSMSS
 	errs = append(errs,
 		func(obj, oldObj map[string]map[string]string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.MSMSS")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.MSMSS")...)
 			for key, val := range obj {
 				errs = append(errs,
 					func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T1.MSMSS[keys]")...)
+						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.MSMSS[keys]")...)
 						return
 					}(&key, nil, fldPath)...)
 				errs = append(errs,
 					func(obj, oldObj map[string]string, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T1.MSMSS[vals]")...)
+						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.MSMSS[vals]")...)
 						return
 					}(val, safe.Lookup(oldObj, key, safe.Ident), fldPath.Key(string(key)))...)
 			}

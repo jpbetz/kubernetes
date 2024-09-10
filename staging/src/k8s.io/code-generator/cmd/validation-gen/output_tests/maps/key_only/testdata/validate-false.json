@@ -1,0 +1,11 @@
+{
+    "*keyonly.T1": {
+      "": [
+        "type T1"
+      ],
+      "mss": [
+        "T1.MSS[keys]",
+        "field T1.MSS"
+      ]
+    }
+  }

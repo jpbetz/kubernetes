@@ -1,0 +1,29 @@
+{
+    "*primitivestruct.T1": {
+      "": [
+        "type T1"
+      ],
+      "mspt2": [
+        "T1.MSPT2[keys]",
+        "field T1.MSPT2"
+      ],
+      "mspt2[x飖Ǒp!ǪŰ]": [
+        "T1.MSPT2[vals]",
+        "type T2"
+      ],
+      "mspt2[x飖Ǒp!ǪŰ].s": [
+        "field T2.S"
+      ],
+      "mst2": [
+        "T1.MST2[keys]",
+        "field T1.MST2"
+      ],
+      "mst2[岯Ȉ\u0026\u003c沲3]": [
+        "T1.MST2[vals]",
+        "type T2"
+      ],
+      "mst2[岯Ȉ\u0026\u003c沲3].s": [
+        "field T2.S"
+      ]
+    }
+  }

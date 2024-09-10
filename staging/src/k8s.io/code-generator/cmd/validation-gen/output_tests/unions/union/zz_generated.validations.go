@@ -45,34 +45,6 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 	return nil
 }
 
-func Validate_M1(opCtx operation.Context, obj, oldObj *M1, fldPath *field.Path) (errs field.ErrorList) {
-	// type M1
-	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "type M1")...)
-
-	// field M1.S
-	errs = append(errs,
-		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field M1.S")...)
-			return
-		}(&obj.S, safe.Field(oldObj, func(oldObj *M1) *string { return &oldObj.S }), fldPath.Child("s"))...)
-
-	return errs
-}
-
-func Validate_M2(opCtx operation.Context, obj, oldObj *M2, fldPath *field.Path) (errs field.ErrorList) {
-	// type M2
-	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "type M2")...)
-
-	// field M2.S
-	errs = append(errs,
-		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field M2.S")...)
-			return
-		}(&obj.S, safe.Field(oldObj, func(oldObj *M2) *string { return &oldObj.S }), fldPath.Child("s"))...)
-
-	return errs
-}
-
 var unionMembershipForU = validate.NewUnionMembership([2]string{"m1", "M1"}, [2]string{"m2", "M2"})
 
 func Validate_U(opCtx operation.Context, obj, oldObj *U, fldPath *field.Path) (errs field.ErrorList) {
@@ -84,14 +56,18 @@ func Validate_U(opCtx operation.Context, obj, oldObj *U, fldPath *field.Path) (e
 	// field U.M1
 	errs = append(errs,
 		func(obj, oldObj *M1, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_M1(opCtx, obj, oldObj, fldPath)...)
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			return
 		}(obj.M1, safe.Field(oldObj, func(oldObj *U) *M1 { return oldObj.M1 }), fldPath.Child("m1"))...)
 
 	// field U.M2
 	errs = append(errs,
 		func(obj, oldObj *M2, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_M2(opCtx, obj, oldObj, fldPath)...)
+			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			return
 		}(obj.M2, safe.Field(oldObj, func(oldObj *U) *M2 { return oldObj.M2 }), fldPath.Child("m2"))...)
 

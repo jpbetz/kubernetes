@@ -1,0 +1,25 @@
+{
+    "*typedef.T1": {
+      "": [
+        "type T1"
+      ],
+      "als": [
+        "field T1.ALS",
+        "type ALS"
+      ],
+      "als[0]": [
+        "ALS[vals]",
+        "ALS[vals]"
+      ],
+      "lals": [
+        "field T1.LALS"
+      ],
+      "lals[0]": [
+        "T1.LALS[vals]",
+        "type ALS"
+      ],
+      "lals[0][0]": [
+        "ALS[vals]"
+      ]
+    }
+  }

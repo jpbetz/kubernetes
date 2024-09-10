@@ -1,0 +1,26 @@
+{
+    "*typedef.T1": {
+      "": [
+        "type T1"
+      ],
+      "msamss": [
+        "T1.MSAMSS[keys]",
+        "field T1.MSAMSS"
+      ],
+      "msamss[岯Ȉ\u0026\u003c沲3]": [
+        "AMSS[keys]",
+        "T1.MSAMSS[vals]",
+        "type AMSS"
+      ],
+      "msamss[岯Ȉ\u0026\u003c沲3][Ō仲牚輠ɟɛ3鎑鎢屃]": [
+        "AMSS[vals]"
+      ],
+      "mspamss[綷罨袢捺悲ȅ-@烱ęssĂZ稈V]": [
+        "AMSS[keys]",
+        "type AMSS"
+      ],
+      "mspamss[綷罨袢捺悲ȅ-@烱ęssĂZ稈V][ŁPyÌ祆tkƺ]": [
+        "AMSS[vals]"
+      ]
+    }
+  }

@@ -47,26 +47,26 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 
 func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// type T1
-	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "type T1")...)
+	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type T1")...)
 
 	// field T1.TypeMeta has no validation
 
 	// field T1.MSS
 	errs = append(errs,
 		func(obj, oldObj map[string]string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.MSS #1")...)
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.MSS #2")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.MSS #1")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.MSS #2")...)
 			for key, val := range obj {
 				errs = append(errs,
 					func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T1.MSS[keys] #1")...)
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T1.MSS[keys] #2")...)
+						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.MSS[keys] #1")...)
+						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.MSS[keys] #2")...)
 						return
 					}(&key, nil, fldPath)...)
 				errs = append(errs,
 					func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T1.MSS[vals] #1")...)
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T1.MSS[vals] #2")...)
+						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.MSS[vals] #1")...)
+						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.MSS[vals] #2")...)
 						return
 					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
 			}

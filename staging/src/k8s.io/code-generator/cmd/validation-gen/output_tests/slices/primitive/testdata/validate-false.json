@@ -1,0 +1,13 @@
+{
+    "*primitive.T1": {
+      "": [
+        "type T1"
+      ],
+      "ls": [
+        "field T1.LS"
+      ],
+      "ls[0]": [
+        "T1.LS[vals]"
+      ]
+    }
+  }

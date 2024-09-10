@@ -1,0 +1,16 @@
+{
+    "*primitive_pointers.T1": {
+      "bp": [
+        "T1.BP"
+      ],
+      "fp": [
+        "T1.FP"
+      ],
+      "ip": [
+        "T1.IP"
+      ],
+      "sp": [
+        "T1.SP"
+      ]
+    }
+  }

@@ -49,7 +49,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	// field T1.Public
 	errs = append(errs,
 		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.Public")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.Public")...)
 			return
 		}(&obj.Public, safe.Field(oldObj, func(oldObj *T1) *string { return &oldObj.Public }), fldPath.Child("public"))...)
 

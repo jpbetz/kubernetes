@@ -1,0 +1,10 @@
+{
+    "*optional.T1": {
+      "ps": [
+        "field T1.PS"
+      ],
+      "s": [
+        "field T1.S"
+      ]
+    }
+  }

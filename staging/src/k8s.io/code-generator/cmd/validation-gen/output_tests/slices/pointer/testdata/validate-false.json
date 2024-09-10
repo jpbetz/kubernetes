@@ -1,0 +1,13 @@
+{
+    "*pointer.T1": {
+      "": [
+        "type T1"
+      ],
+      "lps": [
+        "field T1.LPS"
+      ],
+      "lps[0]": [
+        "T1.LPS[vals]"
+      ]
+    }
+  }

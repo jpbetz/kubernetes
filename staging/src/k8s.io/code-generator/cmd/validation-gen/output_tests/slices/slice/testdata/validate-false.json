@@ -1,0 +1,13 @@
+{
+    "*slice.T1": {
+      "": [
+        "type T1"
+      ],
+      "lls": [
+        "field T1.LLS"
+      ],
+      "lls[0]": [
+        "T1.LLS[vals]"
+      ]
+    }
+  }

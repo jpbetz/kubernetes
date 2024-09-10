@@ -47,7 +47,7 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 
 func Validate_E1(opCtx operation.Context, obj, oldObj *E1, fldPath *field.Path) (errs field.ErrorList) {
 	// type E1
-	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "type E1")...)
+	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type E1")...)
 
 	return errs
 }
@@ -58,11 +58,11 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	// field T1.LE1
 	errs = append(errs,
 		func(obj, oldObj []E1, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.LE1")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.LE1")...)
 			for i, val := range obj {
 				errs = append(errs,
 					func(obj, oldObj *E1, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T1.LE1[vals]")...)
+						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.LE1[vals]")...)
 						errs = append(errs, Validate_E1(opCtx, obj, oldObj, fldPath)...)
 						return
 					}(&val, nil, fldPath.Index(i))...)
@@ -73,11 +73,11 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	// field T1.LPE1
 	errs = append(errs,
 		func(obj, oldObj []*E1, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.LPE1")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.LPE1")...)
 			for i, val := range obj {
 				errs = append(errs,
 					func(obj, oldObj *E1, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T1.LPE1[vals]")...)
+						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.LPE1[vals]")...)
 						errs = append(errs, Validate_E1(opCtx, obj, oldObj, fldPath)...)
 						return
 					}(val, nil, fldPath.Index(i))...)
