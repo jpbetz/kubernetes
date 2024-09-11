@@ -61,20 +61,22 @@ func compilePolicy(policy *Policy) PolicyEvaluator {
 	for _, m := range policy.Spec.Mutations {
 		switch m.PatchType {
 		case v1alpha1.PatchTypeJSONPatch:
+			jsonPatchOpts := opts
+			jsonPatchOpts.HasObjectTypes = true // Provide Object types to apply configurations
 			if len(m.JSONPatch) > 0 {
 				var ops []patch.JSONPatchOp
 				for _, p := range m.JSONPatch {
 					var valueEvaluator, pathEvaluator, fromEvaluator *plugincel.Evaluator
 					if len(p.ValueExpression) > 0 {
-						ce := compiler.CompileEvaluator(&JSONPatchCondition{Expression: p.ValueExpression}, opts, environment.StoredExpressions)
+						ce := compiler.CompileEvaluator(&JSONPatchCondition{Expression: p.ValueExpression}, jsonPatchOpts, environment.StoredExpressions)
 						valueEvaluator = &ce
 					}
 					if len(p.PathExpression) > 0 {
-						ce := compiler.CompileEvaluator(&JSONPatchPathCondition{Expression: p.PathExpression}, opts, environment.StoredExpressions)
+						ce := compiler.CompileEvaluator(&JSONPatchPathCondition{Expression: p.PathExpression}, jsonPatchOpts, environment.StoredExpressions)
 						pathEvaluator = &ce
 					}
 					if len(p.FromExpression) > 0 {
-						ce := compiler.CompileEvaluator(&JSONPatchPathCondition{Expression: p.FromExpression}, opts, environment.StoredExpressions)
+						ce := compiler.CompileEvaluator(&JSONPatchPathCondition{Expression: p.FromExpression}, jsonPatchOpts, environment.StoredExpressions)
 						fromEvaluator = &ce
 					}
 					ops = append(ops, patch.JSONPatchOp{Patch: p, ValueEvaluator: valueEvaluator, PathEvaluator: pathEvaluator, FromEvaluator: fromEvaluator})

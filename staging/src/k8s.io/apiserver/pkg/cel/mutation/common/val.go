@@ -19,6 +19,7 @@ package common
 import (
 	"errors"
 	"fmt"
+	"google.golang.org/protobuf/types/known/structpb"
 	"reflect"
 	"strings"
 
@@ -52,9 +53,6 @@ var _ traits.Zeroer = (*ObjectVal)(nil)
 // or any recursive conversion fails.
 func (v *ObjectVal) ConvertToNative(typeDesc reflect.Type) (any, error) {
 	var result map[string]any
-	if typeDesc != reflect.TypeOf(result) {
-		return nil, fmt.Errorf("unable to convert to %v", typeDesc)
-	}
 	result = make(map[string]any, len(v.fields))
 	for k, v := range v.fields {
 		converted, err := convertField(v)
@@ -63,7 +61,13 @@ func (v *ObjectVal) ConvertToNative(typeDesc reflect.Type) (any, error) {
 		}
 		result[k] = converted
 	}
-	return result, nil
+	if typeDesc == reflect.TypeOf(result) {
+		return result, nil
+	}
+	if typeDesc == reflect.TypeOf(&structpb.Value{}) {
+		return structpb.NewStruct(result)
+	}
+	return nil, fmt.Errorf("unable to convert to %v", typeDesc)
 }
 
 // ConvertToType supports type conversions between CEL value types supported by the expression language.
@@ -72,7 +76,7 @@ func (v *ObjectVal) ConvertToType(typeValue ref.Type) ref.Val {
 	case v.typeRef:
 		return v
 	case types.TypeType:
-		return v.typeRef.CELType()
+		return v.typeRef.TypeType()
 	}
 	return types.NewErr("unsupported conversion into %v", typeValue)
 }
@@ -87,7 +91,7 @@ func (v *ObjectVal) Equal(other ref.Val) ref.Val {
 
 // Type returns the TypeValue of the value.
 func (v *ObjectVal) Type() ref.Type {
-	return v.typeRef.CELType()
+	return v.typeRef.Type()
 }
 
 // Value returns its value as a map[string]any.
@@ -103,12 +107,12 @@ func (v *ObjectVal) Value() any {
 
 // CheckTypeNamesMatchFieldPathNames transitively checks the CEL object type names of this ObjectVal. Returns all
 // found type name mismatch errors.
-// This ObjectVal must have type name of "Object". Children ObjectVal types under <field> or this ObjectVal
-// must have type names of the form "ObjectVal.<field>", children of that type must have type names of the
-// form "ObjectVal.<field>.<field>" and so on.
-// Intermediate maps and lists are ignored for type naming purposes.
+// Children ObjectVal types under <field> or this ObjectVal
+// must have type names of the form "<ObjectVal.TypeName>.<field>", children of that type must have type names of the
+// form "<ObjectVal.TypeName>.<field>.<field>" and so on.
+// Intermediate maps and lists are unnamed and ignored.
 func (v *ObjectVal) CheckTypeNamesMatchFieldPathNames() error {
-	return errors.Join(typeCheck(v, []string{"Object"})...)
+	return errors.Join(typeCheck(v, []string{v.Type().TypeName()})...)
 
 }
 

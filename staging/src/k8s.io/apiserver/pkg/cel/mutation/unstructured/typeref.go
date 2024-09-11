@@ -44,8 +44,11 @@ func (r *TypeRef) Val(fields map[string]ref.Val) ref.Val {
 	return common.NewObjectVal(r, fields)
 }
 
-// CELType returns the type. The returned type is of TypeType type.
-func (r *TypeRef) CELType() *types.Type {
+func (r *TypeRef) Type() *types.Type {
+	return r.celObjectType
+}
+
+func (r *TypeRef) TypeType() *types.Type {
 	return r.celTypeType
 }
 

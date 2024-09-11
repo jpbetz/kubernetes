@@ -55,7 +55,7 @@ func (p *TypeProvider) FindIdent(identName string) (ref.Val, bool) {
 func (p *TypeProvider) FindStructType(structType string) (*types.Type, bool) {
 	t, ok := p.typeResolver.Resolve(structType)
 	if ok {
-		return t.CELType(), true
+		return t.TypeType(), true
 	}
 	return p.underlyingTypeProvider.FindStructType(structType)
 }

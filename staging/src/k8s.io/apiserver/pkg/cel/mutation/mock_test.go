@@ -53,7 +53,11 @@ func (m *mockTypeRef) TypeName() string {
 	return m.objectType.TypeName()
 }
 
-func (m *mockTypeRef) CELType() *types.Type {
+func (m *mockTypeRef) Type() *types.Type {
+	return m.objectType
+}
+
+func (m *mockTypeRef) TypeType() *types.Type {
 	return types.NewTypeTypeWithParam(m.objectType)
 }
 

@@ -78,26 +78,28 @@ func (e jsonPatcher) Patch(ctx context.Context, r Request, runtimeCELCostBudget 
 		for _, op := range e {
 			var err error
 			resultOp := jsonpatch.Operation{}
+			var path, from jsonpointer.Pointer
 			resultOp["op"] = pointer.To(json2.RawMessage(strconv.Quote(string(op.Patch.Op))))
 			if op.PathEvaluator != nil {
-				var path string
 				path, remainingBudget, err = e.evaluatePathExpression(*op.PathEvaluator, remainingBudget, ctx, r, admissionRequest)
 				if err != nil {
 					return nil, err
 				}
-				resultOp["path"] = pointer.To(json2.RawMessage(strconv.Quote(path)))
+				resultOp["path"] = pointer.To(json2.RawMessage(strconv.Quote(path.String())))
+			} else {
+				// path is required for all operations
+				return nil, fmt.Errorf("internal error in patch operation: missing compiled pathExpression")
 			}
 			if op.FromEvaluator != nil {
-				var from string
 				from, remainingBudget, err = e.evaluatePathExpression(*op.FromEvaluator, remainingBudget, ctx, r, admissionRequest)
 				if err != nil {
 					return nil, err
 				}
-				resultOp["from"] = pointer.To(json2.RawMessage(strconv.Quote(from)))
+				resultOp["from"] = pointer.To(json2.RawMessage(strconv.Quote(from.String())))
 			}
 			if op.ValueEvaluator != nil {
 				var patchBytes []byte
-				patchBytes, remainingBudget, err = e.evaluateValueExpression(op, remainingBudget, ctx, r, admissionRequest)
+				patchBytes, remainingBudget, err = e.evaluateValueExpression(op, remainingBudget, ctx, r, admissionRequest, path)
 				if err != nil {
 					return nil, err
 				}
@@ -144,7 +146,7 @@ func (e jsonPatcher) Patch(ctx context.Context, r Request, runtimeCELCostBudget 
 	return newVersionedObject, nil
 }
 
-func (e jsonPatcher) evaluateValueExpression(op JSONPatchOp, remainingBudget int64, ctx context.Context, r Request, admissionRequest *admissionv1.AdmissionRequest) ([]byte, int64, error) {
+func (e jsonPatcher) evaluateValueExpression(op JSONPatchOp, remainingBudget int64, ctx context.Context, r Request, admissionRequest *admissionv1.AdmissionRequest, path jsonpointer.Pointer) ([]byte, int64, error) {
 	valueEvaluator := *op.ValueEvaluator
 	var err error
 	var eval plugincel.EvaluationResult
@@ -155,15 +157,17 @@ func (e jsonPatcher) evaluateValueExpression(op JSONPatchOp, remainingBudget int
 	if eval.Error != nil {
 		return nil, -1, eval.Error
 	}
-	var v any
 	refVal := eval.EvalResult
-	if ov, ok := refVal.(*common.ObjectVal); ok { // Matches CEL objects created using initializers
-		return nil, -1, fmt.Errorf("%v: object types are not supported for JSON Patch", ov.Type())
-	} else {
-		// CEL data literals representing arbitrary JSON values can be serialized to JSON for use in
-		// JSON Patch if first converted to pb.Value.
-		v, err = refVal.ConvertToNative(reflect.TypeOf(&structpb.Value{}))
+	if objVal, ok := refVal.(*common.ObjectVal); ok {
+		err := objVal.CheckTypeNamesMatchFieldPathNames()
+		if err != nil {
+			return nil, -1, fmt.Errorf("type mismatch: %w", err)
+		}
 	}
+
+	// CEL data literals representing arbitrary JSON values can be serialized to JSON for use in
+	// JSON Patch if first converted to pb.Value.
+	v, err := refVal.ConvertToNative(reflect.TypeOf(&structpb.Value{}))
 	if err != nil {
 		return nil, -1, fmt.Errorf("JSONPath valueExpression evaluated to a type that could not marshal to JSON: %w", err)
 	}
@@ -174,24 +178,24 @@ func (e jsonPatcher) evaluateValueExpression(op JSONPatchOp, remainingBudget int
 	return b, remainingBudget, nil
 }
 
-func (e jsonPatcher) evaluatePathExpression(pathEvaluator plugincel.Evaluator, remainingBudget int64, ctx context.Context, r Request, admissionRequest *admissionv1.AdmissionRequest) (string, int64, error) {
+func (e jsonPatcher) evaluatePathExpression(pathEvaluator plugincel.Evaluator, remainingBudget int64, ctx context.Context, r Request, admissionRequest *admissionv1.AdmissionRequest) (jsonpointer.Pointer, int64, error) {
 	var err error
 	var eval plugincel.EvaluationResult
 	eval, remainingBudget, err = pathEvaluator.ForInput(ctx, r.VersionedAttributes, admissionRequest, r.OptionalVariables, r.Namespace, remainingBudget)
 	if err != nil {
-		return "", -1, err
+		return jsonpointer.Pointer{}, -1, err
 	}
 	if eval.Error != nil {
-		return "", -1, eval.Error
+		return jsonpointer.Pointer{}, -1, eval.Error
 	}
 	s, ok := eval.EvalResult.Value().(string)
 	if !ok {
 		// Should not happen since result type is checked by type checker as string
-		return "", -1, fmt.Errorf("evaluated to %T but expected string", eval.EvalResult.Value())
+		return jsonpointer.Pointer{}, -1, fmt.Errorf("evaluated to %T but expected string", eval.EvalResult.Value())
 	}
-	_, err = jsonpointer.New(s)
+	jsonPointer, err := jsonpointer.New(s)
 	if err != nil {
-		return "", -1, fmt.Errorf("failed to parse as JSON Pointer: %w", err)
+		return jsonpointer.Pointer{}, -1, fmt.Errorf("failed to parse as JSON Pointer: %w", err)
 	}
-	return s, remainingBudget, nil
+	return jsonPointer, remainingBudget, nil
 }

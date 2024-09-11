@@ -352,19 +352,76 @@ func TestCompilation(t *testing.T) {
 			expectedResult: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](11)}},
 		},
 		{
-			name: "jsonPatch may not use CEL initializers",
+			name: "jsonPatch with CEL initializer",
 			policy: jsonPatches(policy("d1"), v1alpha1.JSONPatch{
 				{
-					Op:              v1alpha1.Add,
-					PathExpression:  `"/spec/template/spec/containers/-"`,
-					ValueExpression: `Object.spec.template.spec.container{name: "x"}`,
+					Op:             v1alpha1.Add,
+					PathExpression: `"/spec/template/spec/containers/-"`,
+					ValueExpression: `
+						Object.spec.template.spec.containers{
+							name: "x",
+							ports: [Object.spec.template.spec.containers.ports{containerPort: 8080}],
+						}`,
 				},
 			}),
 			gvr: deploymentGVR,
 			object: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Template: corev1.PodTemplateSpec{Spec: corev1.PodSpec{
 				Containers: []corev1.Container{{Name: "a"}},
 			}}}},
-			expectedErr: "undeclared reference to 'Object.spec.template.spec.container'",
+			expectedResult: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Template: corev1.PodTemplateSpec{Spec: corev1.PodSpec{
+				Containers: []corev1.Container{{Name: "a"}, {Name: "x", Ports: []corev1.ContainerPort{{ContainerPort: 8080}}}},
+			}}}},
+		},
+		{
+			name: "jsonPatch invalid CEL initializer field",
+			policy: jsonPatches(policy("d1"), v1alpha1.JSONPatch{
+				{
+					Op:             v1alpha1.Add,
+					PathExpression: `"/spec/template/spec/containers/-"`,
+					ValueExpression: `
+						Object.spec.template.spec.containers{
+							name: "x",
+							ports: [Object.spec.template.spec.containers.ports{containerPortZ: 8080}],
+						}`,
+				},
+			}),
+			gvr: deploymentGVR,
+			object: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Template: corev1.PodTemplateSpec{Spec: corev1.PodSpec{
+				Containers: []corev1.Container{{Name: "a"}},
+			}}}},
+			expectedErr: "strict decoding error: unknown field \"spec.template.spec.containers[1].ports[0].containerPortZ\"",
+		},
+		{
+			name: "jsonPatch invalid CEL initializer type",
+			policy: jsonPatches(policy("d1"), v1alpha1.JSONPatch{
+				{
+					Op:             v1alpha1.Add,
+					PathExpression: `"/spec/template/spec/containers/-"`,
+					ValueExpression: `
+						Object.spec.template.spec.containers{
+							name: "x",
+							ports: [Object.spec.template.spec.container.portsZ{containerPort: 8080}],
+						}`,
+				},
+			}),
+			gvr: deploymentGVR,
+			object: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Template: corev1.PodTemplateSpec{Spec: corev1.PodSpec{
+				Containers: []corev1.Container{{Name: "a"}},
+			}}}},
+			expectedErr: "unexpected type name \"Object.spec.template.spec.container.portsZ\", expected \"Object.spec.template.spec.containers.ports\", which matches field name path from root Object type",
+		},
+		{
+			name: "jsonPatch add map entry by key and value",
+			policy: jsonPatches(policy("d1"), v1alpha1.JSONPatch{
+				{
+					Op:              v1alpha1.Add,
+					PathExpression:  `"/spec"`,
+					ValueExpression: `Object.spec{selector: Object.spec.selector{}, replicas: 10}`,
+				},
+			}),
+			gvr:            deploymentGVR,
+			object:         &appsv1.Deployment{Spec: appsv1.DeploymentSpec{}},
+			expectedResult: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Selector: &metav1.LabelSelector{}, Replicas: ptr.To[int32](10)}},
 		},
 		{
 			name: "applyConfiguration then jsonPatch",
@@ -599,6 +656,14 @@ func TestCompilation(t *testing.T) {
 			gvr:         deploymentGVR,
 			object:      &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](1)}},
 			expectedErr: "must evaluate to Object but got string",
+		},
+		{
+			name: "apply configuration with invalid initializer return type",
+			policy: applyConfigurations(policy("d1"),
+				`Object.spec.metadata{}`),
+			gvr:         deploymentGVR,
+			object:      &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](1)}},
+			expectedErr: "must evaluate to Object but got Object.spec.metadata",
 		},
 		{
 			name: "jsonPatch with excessive cost",
