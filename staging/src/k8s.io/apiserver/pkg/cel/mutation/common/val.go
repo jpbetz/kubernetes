@@ -31,6 +31,16 @@ import (
 // ObjectVal is the CEL Val for an object that is constructed via the object
 // construction syntax.
 type ObjectVal struct {
+	// TODO(jpbetz): To fix runtime types fully. We'd need to somehow attach schema information to these values
+	//               before (or during) evaluation.
+	//               The time is matters most is during TypeRef.Val field assignment.  The ideal outcome would be a runtime
+	//               pass on the AST that type checks all data literals and then converts them to valid UnstructuredToTypedVal
+	//               data. If we achieved this we've have comprehensive runtime checking from that point on.
+	//               We could macro in something to help us achieve this if we really needed too.
+	//               Another option might be to do a manual AST pass?  That's sorta-kinda what we get with a macro.
+	//               Say every Object{} data literal is macro'd with a schemaAdd(Object{}, objectSchema).
+	//               If schemaAdd() returned a Object{} backed by UnstructuredToTypedVal we'd be done.
+
 	typeRef TypeRef
 	fields  map[string]ref.Val
 }
