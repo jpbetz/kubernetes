@@ -19,6 +19,7 @@ package unstructured
 import (
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
+	"strings"
 
 	"k8s.io/apiserver/pkg/cel/mutation/common"
 )
@@ -41,6 +42,14 @@ func (r *TypeRef) TypeName() string {
 
 // Val returns an instance given the fields.
 func (r *TypeRef) Val(fields map[string]ref.Val) ref.Val {
+	for fieldName, fieldValue := range fields {
+		// Check if the ref.Val can possibly be a valid type assignee.
+		// We know that if the object type mismatches there is an error.
+		// Note that is possible for the object types to match and still be an error.
+		if strings.HasPrefix(fieldValue.Type().TypeName(), "Object") && fieldValue.Type().TypeName() != r.TypeName()+"."+fieldName {
+			return types.NewErr("cannot use %s as field %s of type %s", fieldValue.Type().TypeName(), fieldName, r.TypeName())
+		}
+	}
 	return common.NewObjectVal(r, fields)
 }
 
@@ -61,7 +70,7 @@ func (r *TypeRef) Field(name string) (*types.FieldType, bool) {
 
 // NewTypeRef creates a TypeRef by the given field name.
 func NewTypeRef(name string) *TypeRef {
-	objectType := types.NewObjectType(name, common.ObjectTraits)
+	objectType := types.NewObjectType(name)
 	return &TypeRef{
 		celObjectType: objectType,
 		celTypeType:   types.NewTypeTypeWithParam(objectType),

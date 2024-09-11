@@ -721,6 +721,16 @@ func TestCompilation(t *testing.T) {
 			object:      &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](1)}},
 			expectedErr: "error applying patch: invalid ApplyConfiguration: may not mutate atomic arrays, maps or structs: .spec.selector",
 		},
+		{
+			name: "apply configuration with change to atomic",
+			policy: applyConfigurations(policy("d1"),
+				`Object{
+					metadata: object.spec
+				}`),
+			gvr:            deploymentGVR,
+			object:         &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](1), Selector: &metav1.LabelSelector{}}},
+			expectedResult: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](1), Selector: &metav1.LabelSelector{}}},
+		},
 	}
 
 	scheme := runtime.NewScheme()

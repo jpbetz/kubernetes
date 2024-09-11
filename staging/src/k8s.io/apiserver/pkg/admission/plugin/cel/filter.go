@@ -28,6 +28,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/admission"
+	"k8s.io/apiserver/pkg/cel/common"
 	"k8s.io/apiserver/pkg/cel/environment"
 	"k8s.io/apiserver/pkg/cel/openapi"
 	"k8s.io/kube-openapi/pkg/validation/spec"
@@ -111,7 +112,7 @@ func convertObjectToUnstructured(obj interface{}) (*unstructured.Unstructured, e
 	return &unstructured.Unstructured{Object: ret}, nil
 }
 
-func objectToResolveVal(r runtime.Object, s *spec.Schema) (interface{}, error) {
+func objectToResolveVal(r runtime.Object, s *spec.Schema, objectType common.ObjectType) (interface{}, error) {
 	if r == nil || reflect.ValueOf(r).IsNil() {
 		return nil, nil
 	}
@@ -121,7 +122,7 @@ func objectToResolveVal(r runtime.Object, s *spec.Schema) (interface{}, error) {
 	}
 
 	if s != nil {
-		return openapi.UnstructuredToVal(v.Object, s), nil
+		return openapi.UnstructuredToTypedVal(v.Object, s, objectType), nil
 	}
 	return v.Object, nil
 }

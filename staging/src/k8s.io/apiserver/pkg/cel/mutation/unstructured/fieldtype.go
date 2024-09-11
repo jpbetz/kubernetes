@@ -30,8 +30,8 @@ func NewFieldType(name string) *types.FieldType {
 		// use DynType for all fields.
 		Type: types.DynType,
 		IsSet: func(target any) bool {
-			// for an unstructured object, we allow any field to be considered set.
-			return true
+			_, ok := target.(map[string]any)
+			return ok
 		},
 		GetFrom: func(target any) (any, error) {
 			if m, ok := target.(map[string]any); ok {

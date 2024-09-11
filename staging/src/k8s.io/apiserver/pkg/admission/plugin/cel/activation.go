@@ -26,6 +26,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/cel"
+	"k8s.io/apiserver/pkg/cel/common"
 	"k8s.io/apiserver/pkg/cel/library"
 	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 	"k8s.io/kube-openapi/pkg/validation/spec"
@@ -40,24 +41,27 @@ func newActivation(ctx context.Context, versionedAttr *admission.VersionedAttrib
 	var err error
 
 	var objSchema *spec.Schema
+
+	var objectType common.ObjectType
 	if resolver != nil {
 		objSchema, err = resolver.ResolveSchema(versionedAttr.VersionedKind)
 		if err != nil {
 			return nil, err
 		}
+		objectType = common.NewObjectType()
 	}
 
-	oldObjectVal, err := objectToResolveVal(versionedAttr.VersionedOldObject, objSchema)
+	oldObjectVal, err := objectToResolveVal(versionedAttr.VersionedOldObject, objSchema, objectType)
 	if err != nil {
 		return nil, err
 	}
-	objectVal, err := objectToResolveVal(versionedAttr.VersionedObject, objSchema)
+	objectVal, err := objectToResolveVal(versionedAttr.VersionedObject, objSchema, objectType)
 	if err != nil {
 		return nil, err
 	}
 	var paramsVal, authorizerVal, requestResourceAuthorizerVal any
 	if inputs.VersionedParams != nil {
-		paramsVal, err = objectToResolveVal(inputs.VersionedParams, nil)
+		paramsVal, err = objectToResolveVal(inputs.VersionedParams, nil, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -72,7 +76,7 @@ func newActivation(ctx context.Context, versionedAttr *admission.VersionedAttrib
 	if err != nil {
 		return nil, err
 	}
-	namespaceVal, err := objectToResolveVal(namespace, nil)
+	namespaceVal, err := objectToResolveVal(namespace, nil, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -220,6 +220,10 @@ func UnstructuredToVal(unstructured any, schema *spec.Schema) ref.Val {
 	return common.UnstructuredToVal(unstructured, &Schema{schema})
 }
 
+func UnstructuredToTypedVal(unstructured any, schema *spec.Schema, objectType common.ObjectType) ref.Val {
+	return common.UnstructuredToTypedVal(unstructured, &Schema{schema}, objectType)
+}
+
 func SchemaDeclType(s *spec.Schema, isResourceRoot bool) *apiservercel.DeclType {
 	return common.SchemaDeclType(&Schema{Schema: s}, isResourceRoot)
 }

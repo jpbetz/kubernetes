@@ -19,6 +19,7 @@ package common
 import (
 	"fmt"
 	"reflect"
+	"strings"
 	"sync"
 	"time"
 
@@ -36,6 +37,10 @@ import (
 // The root schema of custom resource schema is expected contain type meta and object meta schemas.
 // If Embedded resources do not contain type meta and object meta schemas, they will be added automatically.
 func UnstructuredToVal(unstructured interface{}, schema Schema) ref.Val {
+	return UnstructuredToTypedVal(unstructured, schema, nil)
+}
+
+func UnstructuredToTypedVal(unstructured interface{}, schema Schema, objectType ObjectType) ref.Val {
 	if unstructured == nil {
 		if schema.Nullable() {
 			return types.NullValue
@@ -73,6 +78,7 @@ func UnstructuredToVal(unstructured interface{}, schema Schema) ref.Val {
 					}
 					return nil, false
 				},
+				objectType: objectType,
 			}
 		}
 		if schema.AdditionalProperties() != nil && schema.AdditionalProperties().Schema() != nil {
@@ -82,6 +88,7 @@ func UnstructuredToVal(unstructured interface{}, schema Schema) ref.Val {
 				propSchema: func(key string) (Schema, bool) {
 					return schema.AdditionalProperties().Schema(), true
 				},
+				objectType: objectType,
 			}
 		}
 
@@ -99,6 +106,7 @@ func UnstructuredToVal(unstructured interface{}, schema Schema) ref.Val {
 			propSchema: func(key string) (Schema, bool) {
 				return nil, false
 			},
+			objectType: objectType,
 		}
 	}
 
@@ -116,7 +124,7 @@ func UnstructuredToVal(unstructured interface{}, schema Schema) ref.Val {
 			switch listType {
 			case "map":
 				mapKeys := schema.XListMapKeys()
-				return &unstructuredMapList{unstructuredList: typedList, escapedKeyProps: escapeKeyProps(mapKeys)}
+				return &unstructuredMapList{unstructuredList: typedList, escapedKeyProps: escapeKeyProps(mapKeys), objectType: objectType}
 			case "set":
 				return &unstructuredSetList{unstructuredList: typedList}
 			case "atomic":
@@ -244,6 +252,8 @@ type unstructuredMapList struct {
 
 	sync.Once // for for lazy load of mapOfList since it is only needed if Equals is called
 	mapOfList map[interface{}]interface{}
+
+	objectType ObjectType
 }
 
 func (t *unstructuredMapList) getMap() map[interface{}]interface{} {
@@ -570,6 +580,8 @@ type unstructuredMap struct {
 	schema Schema
 	// propSchema finds the schema to use for a particular map key.
 	propSchema func(key string) (Schema, bool)
+
+	objectType ObjectType
 }
 
 var _ = traits.Mapper(&unstructuredMap{})
@@ -587,7 +599,14 @@ func (t *unstructuredMap) ConvertToType(typeValue ref.Type) ref.Val {
 	case types.MapType:
 		return t
 	case types.TypeType:
+		if t.objectType != nil {
+			return t.objectType.Type()
+		}
 		return types.MapType
+	default:
+		if t.objectType != nil && typeValue.TypeName() == t.objectType.Type().TypeName() {
+			return t.objectType.Type()
+		}
 	}
 	return types.NewErr("type conversion error from '%s' to '%s'", t.Type(), typeValue.TypeName())
 }
@@ -630,6 +649,9 @@ func (t *unstructuredMap) Equal(other ref.Val) ref.Val {
 }
 
 func (t *unstructuredMap) Type() ref.Type {
+	if t.objectType != nil {
+		return t.objectType.Type()
+	}
 	return types.MapType
 }
 
@@ -713,9 +735,26 @@ func (t *unstructuredMap) Find(key ref.Val) (ref.Val, bool) {
 			return nil, false
 		}
 		if propSchema, ok := t.propSchema(k); ok {
+			if t.objectType != nil {
+				return UnstructuredToTypedVal(v, propSchema, t.objectType.Field(k)), true
+			}
 			return UnstructuredToVal(v, propSchema), true
 		}
 	}
 
 	return nil, false
+}
+
+type ObjectType []string
+
+func NewObjectType() ObjectType {
+	return []string{"Object"}
+}
+
+func (t ObjectType) Field(name string) ObjectType {
+	return append(t, name)
+}
+
+func (t ObjectType) Type() *types.Type {
+	return types.NewObjectType(strings.Join(t, "."))
 }
