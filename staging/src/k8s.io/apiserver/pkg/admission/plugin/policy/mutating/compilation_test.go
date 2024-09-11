@@ -414,6 +414,22 @@ func TestCompilation(t *testing.T) {
 			expectedErr: "unexpected type name \"Object.spec.template.spec.container.portsZ\", expected \"Object.spec.template.spec.containers.ports\", which matches field name path from root Object type",
 		},
 		{
+			name: "jsonPatch type mismatch between path and value",
+			policy: jsonPatches(policy("d1"), v1alpha1.JSONPatch{
+				{
+					Op:             v1alpha1.Add,
+					PathExpression: `"/spec/selector"`,
+					ValueExpression: `
+						Object.spec.template.xyz{}`,
+				},
+			}),
+			gvr: deploymentGVR,
+			object: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Template: corev1.PodTemplateSpec{Spec: corev1.PodSpec{
+				Containers: []corev1.Container{{Name: "a"}},
+			}}}},
+			expectedErr: "type mismatch: path /spec/selector points to type Object.spec.selector but valueExpression evaluates to type Object.spec.template.xyz",
+		},
+		{
 			name: "jsonPatch add map entry by key and value",
 			policy: jsonPatches(policy("d1"), v1alpha1.JSONPatch{
 				{
@@ -638,7 +654,7 @@ func TestCompilation(t *testing.T) {
 				}`),
 			gvr:         deploymentGVR,
 			object:      &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](1)}},
-			expectedErr: "type mismatch: unexpected type name \"Object.specx\", expected \"Object.spec\", which matches field name path from root Object type",
+			expectedErr: "cannot use Object.specx as field spec of type Object",
 		},
 		{
 			name: "apply configuration with invalid field name",
@@ -722,14 +738,14 @@ func TestCompilation(t *testing.T) {
 			expectedErr: "error applying patch: invalid ApplyConfiguration: may not mutate atomic arrays, maps or structs: .spec.selector",
 		},
 		{
-			name: "apply configuration with change to atomic",
+			name: "apply configuration with type mismatch between initializer and variable",
 			policy: applyConfigurations(policy("d1"),
 				`Object{
 					metadata: object.spec
 				}`),
-			gvr:            deploymentGVR,
-			object:         &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](1), Selector: &metav1.LabelSelector{}}},
-			expectedResult: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](1), Selector: &metav1.LabelSelector{}}},
+			gvr:         deploymentGVR,
+			object:      &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](1), Selector: &metav1.LabelSelector{}}},
+			expectedErr: "cannot use Object.spec as field metadata of type Object",
 		},
 	}
 

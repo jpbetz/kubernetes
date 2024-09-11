@@ -26,6 +26,7 @@ import (
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/admission/plugin/cel"
 	"k8s.io/apiserver/pkg/cel/openapi/resolver"
+	"k8s.io/kube-openapi/pkg/validation/spec"
 )
 
 // Patcher provides a patch function to perform a mutation to an object in the admission chain.
@@ -42,4 +43,14 @@ type Request struct {
 	Namespace           *v1.Namespace
 	TypeConverter       managedfields.TypeConverter
 	SchemaResolver      resolver.SchemaResolver
+}
+
+// ObjectSchema attempts to find the schema for the request object. Return nil if there is no
+// SchemaResolver for this Request, otherwise returns a Schema or an error from the schema resolver.
+func (r Request) ObjectSchema() (*spec.Schema, error) {
+	// Sanity check the use of Object initializers
+	if r.SchemaResolver != nil {
+		return r.SchemaResolver.ResolveSchema(r.VersionedAttributes.VersionedKind)
+	}
+	return nil, nil
 }

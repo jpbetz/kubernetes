@@ -26,6 +26,7 @@ import (
 	jsonpatch "gopkg.in/evanphx/json-patch.v4"
 	"reflect"
 	"strconv"
+	"strings"
 
 	admissionv1 "k8s.io/api/admission/v1"
 	"k8s.io/api/admissionregistration/v1alpha1"
@@ -36,6 +37,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 	plugincel "k8s.io/apiserver/pkg/admission/plugin/cel"
 	"k8s.io/apiserver/pkg/cel/mutation/common"
+	"k8s.io/kube-openapi/pkg/validation/spec"
 	pointer "k8s.io/utils/ptr"
 )
 
@@ -159,7 +161,18 @@ func (e jsonPatcher) evaluateValueExpression(op JSONPatchOp, remainingBudget int
 	}
 	refVal := eval.EvalResult
 	if objVal, ok := refVal.(*common.ObjectVal); ok {
-		err := objVal.CheckTypeNamesMatchFieldPathNames()
+		schema, err := r.ObjectSchema()
+		if err != nil {
+			return nil, -1, err
+		}
+		if schema != nil {
+			if objectTypeName := objectTypeNameAtPath(path, schema); len(objectTypeName) > 0 {
+				if objVal.Type().TypeName() != objectTypeName {
+					return nil, -1, fmt.Errorf("type mismatch: path %s points to type %s but valueExpression evaluates to type %s", path.String(), objectTypeName, objVal.Type().TypeName())
+				}
+			}
+		}
+		err = objVal.CheckTypeNamesMatchFieldPathNames()
 		if err != nil {
 			return nil, -1, fmt.Errorf("type mismatch: %w", err)
 		}
@@ -198,4 +211,31 @@ func (e jsonPatcher) evaluatePathExpression(pathEvaluator plugincel.Evaluator, r
 		return jsonpointer.Pointer{}, -1, fmt.Errorf("failed to parse as JSON Pointer: %w", err)
 	}
 	return jsonPointer, remainingBudget, nil
+}
+
+func objectTypeNameAtPath(path jsonpointer.Pointer, schema *spec.Schema) string {
+	sb := strings.Builder{}
+	sb.WriteString("Object")
+	for _, token := range path.DecodedTokens() {
+		if len(schema.Properties) > 0 {
+			if child, ok := schema.Properties[token]; ok {
+				schema = &child
+				sb.WriteString(".")
+				sb.WriteString(token)
+			} else {
+				// TODO
+			}
+		} else if schema.AdditionalProperties != nil && schema.AdditionalProperties.Schema != nil {
+			// Ignore the token. It's a map key, but we don't need to know more than that.
+			schema = schema.AdditionalProperties.Schema
+
+		} else if schema.Items != nil && schema.Items.Schema != nil {
+			// Ignore the token. It's a map index (or a JSON pointer '-'), but we don't need to know more than that.
+			schema = schema.Items.Schema
+		} else {
+			// Schemas are allowed to have none of these things.
+			return ""
+		}
+	}
+	return sb.String()
 }
