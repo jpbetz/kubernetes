@@ -2373,7 +2373,7 @@ func TestValidateValidatingAdmissionPolicy(t *testing.T) {
 		},
 		expectedError: `Unsupported value: ""`,
 	}, {
-		name: "operation must be either create/update/delete/connect",
+		name: "operation must be either create/update",
 		config: &admissionregistration.ValidatingAdmissionPolicy{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "config",
@@ -3214,7 +3214,7 @@ func TestValidateValidatingAdmissionPolicyUpdate(t *testing.T) {
 				MatchConstraints: &admissionregistration.MatchResources{
 					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
 						RuleWithOperations: admissionregistration.RuleWithOperations{
-							Operations: []admissionregistration.OperationType{"*"},
+							Operations: []admissionregistration.OperationType{"CREATE", "UPDATE"},
 							Rule: admissionregistration.Rule{
 								APIGroups:   []string{"a"},
 								APIVersions: []string{"a"},
@@ -3584,7 +3584,7 @@ func TestValidateValidatingAdmissionPolicyBinding(t *testing.T) {
 				},
 			},
 		},
-		expectedError: `spec.matchResouces.matchPolicy: Unsupported value: "other": supported values: "Equivalent", "Exact"`,
+		expectedError: `spec.matchResources.matchPolicy: Unsupported value: "other": supported values: "Equivalent", "Exact"`,
 	}, {
 		name: "Operations must not be empty or nil",
 		config: &admissionregistration.ValidatingAdmissionPolicyBinding{
@@ -3639,7 +3639,7 @@ func TestValidateValidatingAdmissionPolicyBinding(t *testing.T) {
 				},
 			},
 		},
-		expectedError: `spec.matchResouces.resourceRules[0].operations: Required value, spec.matchResouces.resourceRules[1].operations: Required value, spec.matchResouces.excludeResourceRules[0].operations: Required value, spec.matchResouces.excludeResourceRules[1].operations: Required value`,
+		expectedError: `spec.matchResources.resourceRules[0].operations: Required value, spec.matchResources.resourceRules[1].operations: Required value, spec.matchResources.excludeResourceRules[0].operations: Required value, spec.matchResources.excludeResourceRules[1].operations: Required value`,
 	}, {
 		name: "\"\" is NOT a valid operation",
 		config: &admissionregistration.ValidatingAdmissionPolicyBinding{
@@ -3812,7 +3812,7 @@ func TestValidateValidatingAdmissionPolicyBinding(t *testing.T) {
 				},
 			},
 		},
-		expectedError: `spec.matchResouces.resourceRules[0].resources[1]: Invalid value: "a/x": if 'a/*' is present, must not specify a/x`,
+		expectedError: `spec.matchResources.resourceRules[0].resources[1]: Invalid value: "a/x": if 'a/*' is present, must not specify a/x`,
 	}, {
 		name: "resource a/* can mix with a",
 		config: &admissionregistration.ValidatingAdmissionPolicyBinding{
@@ -3877,7 +3877,7 @@ func TestValidateValidatingAdmissionPolicyBinding(t *testing.T) {
 				},
 			},
 		},
-		expectedError: `spec.matchResouces.resourceRules[0].resources[1]: Invalid value: "x/a": if '*/a' is present, must not specify x/a`,
+		expectedError: `spec.matchResources.resourceRules[0].resources[1]: Invalid value: "x/a": if '*/a' is present, must not specify x/a`,
 	}, {
 		name: "resource */* cannot mix with other resources",
 		config: &admissionregistration.ValidatingAdmissionPolicyBinding{
@@ -3905,7 +3905,7 @@ func TestValidateValidatingAdmissionPolicyBinding(t *testing.T) {
 				},
 			},
 		},
-		expectedError: `spec.matchResouces.resourceRules[0].resources: Invalid value: []string{"*/*", "a"}: if '*/*' is present, must not specify other resources`,
+		expectedError: `spec.matchResources.resourceRules[0].resources: Invalid value: []string{"*/*", "a"}: if '*/*' is present, must not specify other resources`,
 	}, {
 		name: "validationActions must be unique",
 		config: &admissionregistration.ValidatingAdmissionPolicyBinding{
@@ -4267,12 +4267,15 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 					r := admissionregistration.FailurePolicyType("other")
 					return &r
 				}(),
+				ReinvocationPolicy: admissionregistration.IfNeededReinvocationPolicy,
 				Mutations: []admissionregistration.Mutation{{
-					Expression: `Object{
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: `Object{
 							spec: Object.spec{
 								replicas: object.spec.replicas % 2 == 0?object.spec.replicas + 1:object.spec.replicas
 							}
 						}`,
+					},
 					PatchType: applyConfigurationPatchType,
 				}},
 			},
@@ -4285,15 +4288,18 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 				Name: "config",
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
+				ReinvocationPolicy: admissionregistration.IfNeededReinvocationPolicy,
 				Mutations: []admissionregistration.Mutation{
 					{
-						Expression: "1 < 2",
-						PatchType:  applyConfigurationPatchType,
+						ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+							Expression: "1 < 2",
+						},
+						PatchType: applyConfigurationPatchType,
 					},
 				},
 			},
 		},
-		expectedError: `spec.mutations[0].expression: Invalid value: "1 < 2": must evaluate to struct type`,
+		expectedError: `spec.mutations[0].applyConfiguration.expression: Invalid value: "1 < 2": must evaluate to Object`,
 	}, {
 		name: "patchType validation",
 		config: &admissionregistration.MutatingAdmissionPolicy{
@@ -4301,40 +4307,155 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 				Name: "config",
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
+				ReinvocationPolicy: admissionregistration.IfNeededReinvocationPolicy,
 				Mutations: []admissionregistration.Mutation{
 					{
-						Expression: `Object{
-							spec: Object.spec{
-								replicas: object.spec.replicas % 2 == 0?object.spec.replicas + 1:object.spec.replicas
-							}
-						}`,
+						ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+							Expression: `Object{
+								spec: Object.spec{
+									replicas: object.spec.replicas % 2 == 0?object.spec.replicas + 1:object.spec.replicas
+								}
+							}`,
+						},
 						PatchType: "other",
 					},
 				},
 			},
 		},
-		expectedError: `spec.mutations[0].patchType: Unsupported value: "other": supported values: "PatchTypeApplyConfiguration", "PatchTypeJSONPatch"`,
+		expectedError: `spec.mutations[0].patchType: Unsupported value: "other": supported values: "ApplyConfiguration", "JSONPatch"`,
 	}, {
-		// TODO: remove the test after JSONPatch support is added
-		name: "patchType validation - not yet supported type",
+		name: "PatchType is JSONPatch but union member is ApplyConfiguration",
 		config: &admissionregistration.MutatingAdmissionPolicy{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "config",
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
+				ReinvocationPolicy: admissionregistration.IfNeededReinvocationPolicy,
 				Mutations: []admissionregistration.Mutation{
 					{
-						Expression: `Object{
-							spec: Object.spec{
-								replicas: object.spec.replicas % 2 == 0?object.spec.replicas + 1:object.spec.replicas
-							}
-						}`,
-						PatchType: "PatchTypeJSONPatch",
+						ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+							Expression: `Object{
+								spec: Object.spec{
+									replicas: object.spec.replicas % 2 == 0?object.spec.replicas + 1:object.spec.replicas
+								}
+							}`,
+						},
+						PatchType: "JSONPatch",
 					},
 				},
 			},
 		},
-		expectedError: `spec.mutations[0].patchType: Invalid value: "PatchTypeJSONPatch": the JSONPatch support has not yet implemented.`,
+		expectedError: `spec.mutations[0].applyConfiguration: Invalid value: "{applyConfiguration}": must not be specified when patchType is JSONPatch`,
+	}, {
+		name: "PatchType is ApplyConfiguration but union member is JSONPatch",
+		config: &admissionregistration.MutatingAdmissionPolicy{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "config",
+			},
+			Spec: admissionregistration.MutatingAdmissionPolicySpec{
+				ReinvocationPolicy: admissionregistration.IfNeededReinvocationPolicy,
+				Mutations: []admissionregistration.Mutation{
+					{
+						JSONPatch: &admissionregistration.JSONPatch{
+							Expression: `[
+								JSONPatch{op: "replace", path: "/spec/repliacs", value: 1}
+							]`,
+						},
+						PatchType: "ApplyConfiguration",
+					},
+				},
+			},
+		},
+		expectedError: `spec.mutations[0].jsonPatch: Invalid value: "{jsonPatch}": must not be specified when patchType is ApplyConfiguration`,
+	}, {
+		name: "JSONPatch is empty",
+		config: &admissionregistration.MutatingAdmissionPolicy{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "config",
+			},
+			Spec: admissionregistration.MutatingAdmissionPolicySpec{
+				ReinvocationPolicy: admissionregistration.IfNeededReinvocationPolicy,
+				Mutations: []admissionregistration.Mutation{
+					{
+						PatchType: "JSONPatch",
+					},
+				},
+			},
+		},
+		expectedError: `spec.mutations[0].jsonPatch: Required value: must be specified when patchType is JSONPatch`,
+	}, {
+		name: "JSONPatch has an empty value expression",
+		config: &admissionregistration.MutatingAdmissionPolicy{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "config",
+			},
+			Spec: admissionregistration.MutatingAdmissionPolicySpec{
+				ReinvocationPolicy: admissionregistration.IfNeededReinvocationPolicy,
+				Mutations: []admissionregistration.Mutation{
+					{
+						JSONPatch: &admissionregistration.JSONPatch{
+							Expression: `   `,
+						},
+						PatchType: "JSONPatch",
+					},
+				},
+			},
+		},
+		expectedError: `spec.mutations[0].jsonPatch.expression: Required value`,
+	}, {
+		name: "invalid variable",
+		config: &admissionregistration.MutatingAdmissionPolicy{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "config",
+			},
+			Spec: admissionregistration.MutatingAdmissionPolicySpec{
+				Variables: []admissionregistration.Variable{
+					{
+						Name:       "x",
+						Expression: "///",
+					},
+				},
+				ReinvocationPolicy: admissionregistration.IfNeededReinvocationPolicy,
+				Mutations: []admissionregistration.Mutation{
+					{
+						JSONPatch: &admissionregistration.JSONPatch{
+							Expression: `[
+								JSONPatch{op: "add", path: "/spec/repliacs", value: variables.x}
+							]`,
+						},
+						PatchType: "JSONPatch",
+					},
+				},
+			},
+		},
+		expectedError: `spec.variables[0].expression: Invalid value: "///": compilation failed`,
+	}, {
+		name: "Reference to missing variable",
+		config: &admissionregistration.MutatingAdmissionPolicy{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "config",
+			},
+			Spec: admissionregistration.MutatingAdmissionPolicySpec{
+				Variables: []admissionregistration.Variable{
+					{
+						Name:       "x",
+						Expression: "10 + 10",
+					},
+				},
+				ReinvocationPolicy: admissionregistration.IfNeededReinvocationPolicy,
+				Mutations: []admissionregistration.Mutation{
+					{
+						JSONPatch: &admissionregistration.JSONPatch{
+							Expression: `[
+								JSONPatch{op: "add", path: "/spec/repliacs", value: variables.x + variables.y}
+							]`,
+						},
+						PatchType: "JSONPatch",
+					},
+				},
+			},
+		},
+		expectedError: `undefined field 'y'`,
 	}, {
 		name: "API version is required in ParamKind",
 		config: &admissionregistration.MutatingAdmissionPolicy{
@@ -4343,8 +4464,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 				ParamKind: &admissionregistration.ParamKind{
 					Kind:       "Example",
@@ -4361,8 +4484,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 				ParamKind: &admissionregistration.ParamKind{
 					APIVersion: "test.example.com/v1",
@@ -4378,8 +4503,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 				ParamKind: &admissionregistration.ParamKind{
 					Kind:       "Example",
@@ -4396,8 +4523,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 				ParamKind: &admissionregistration.ParamKind{
 					APIVersion: "!!!/v1",
@@ -4417,24 +4546,6 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 
 		expectedError: `spec.failurePolicy: Required value, spec.matchConstraints: Required value, spec.mutations: Required value: mutations must contain at least one item`,
 	}, {
-		name: "Invalid Validations Reason",
-		config: &admissionregistration.MutatingAdmissionPolicy{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: "config",
-			},
-			Spec: admissionregistration.MutatingAdmissionPolicySpec{
-				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
-					Reason: func() *metav1.StatusReason {
-						r := metav1.StatusReason("other")
-						return &r
-					}(),
-				}},
-			},
-		},
-		expectedError: `spec.mutations[0].reason: Unsupported value: "other"`,
-	}, {
 		name: "MatchConstraints is required",
 		config: &admissionregistration.MutatingAdmissionPolicy{
 			ObjectMeta: metav1.ObjectMeta{
@@ -4442,8 +4553,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 			},
 		},
@@ -4456,8 +4569,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 				MatchConstraints: &admissionregistration.MatchResources{},
 			},
@@ -4471,8 +4586,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 				MatchConstraints: &admissionregistration.MatchResources{
 					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
@@ -4492,11 +4609,16 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 				Name: "config",
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
-				Mutations: []admissionregistration.Mutation{{}},
+				Mutations: []admissionregistration.Mutation{
+					{
+						PatchType:          admissionregistration.PatchTypeApplyConfiguration,
+						ApplyConfiguration: &admissionregistration.ApplyConfiguration{},
+					},
+				},
 			},
 		},
 
-		expectedError: `spec.mutations[0].expression: Required value: expression is not specified`,
+		expectedError: `spec.mutations[0].applyConfiguration.expression: Required value`,
 	}, {
 		name: "matchResources resourceNames check",
 		config: &admissionregistration.MutatingAdmissionPolicy{
@@ -4505,8 +4627,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 				MatchConstraints: &admissionregistration.MatchResources{
 					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
@@ -4524,8 +4648,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 				MatchConstraints: &admissionregistration.MatchResources{
 					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
@@ -4543,8 +4669,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 				MatchConstraints: &admissionregistration.MatchResources{
 					MatchPolicy: func() *admissionregistration.MatchPolicyType {
@@ -4563,8 +4691,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 				FailurePolicy: func() *admissionregistration.FailurePolicyType {
 					r := admissionregistration.FailurePolicyType("Fail")
@@ -4631,8 +4761,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 				MatchConstraints: &admissionregistration.MatchResources{
 					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
@@ -4650,15 +4782,17 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 		},
 		expectedError: `Unsupported value: ""`,
 	}, {
-		name: "operation must be either create/update/delete/connect",
+		name: "operation must be either create/update",
 		config: &admissionregistration.MutatingAdmissionPolicy{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "config",
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 				MatchConstraints: &admissionregistration.MatchResources{
 					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
@@ -4676,6 +4810,62 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 		},
 		expectedError: `Unsupported value: "PATCH"`,
 	}, {
+		name: "operation must not be delete",
+		config: &admissionregistration.MutatingAdmissionPolicy{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "config",
+			},
+			Spec: admissionregistration.MutatingAdmissionPolicySpec{
+				Mutations: []admissionregistration.Mutation{{
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
+				}},
+				MatchConstraints: &admissionregistration.MatchResources{
+					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
+						RuleWithOperations: admissionregistration.RuleWithOperations{
+							Operations: []admissionregistration.OperationType{"DELETE"},
+							Rule: admissionregistration.Rule{
+								APIGroups:   []string{"a"},
+								APIVersions: []string{"a"},
+								Resources:   []string{"a"},
+							},
+						},
+					}},
+				},
+			},
+		},
+		expectedError: `Unsupported value: "DELETE"`,
+	}, {
+		name: "operation must not be connect",
+		config: &admissionregistration.MutatingAdmissionPolicy{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "config",
+			},
+			Spec: admissionregistration.MutatingAdmissionPolicySpec{
+				Mutations: []admissionregistration.Mutation{{
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
+				}},
+				MatchConstraints: &admissionregistration.MatchResources{
+					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
+						RuleWithOperations: admissionregistration.RuleWithOperations{
+							Operations: []admissionregistration.OperationType{"CONNECT"},
+							Rule: admissionregistration.Rule{
+								APIGroups:   []string{"a"},
+								APIVersions: []string{"a"},
+								Resources:   []string{"a"},
+							},
+						},
+					}},
+				},
+			},
+		},
+		expectedError: `Unsupported value: "CONNECT"`,
+	}, {
 		name: "wildcard operation cannot be mixed with other strings",
 		config: &admissionregistration.MutatingAdmissionPolicy{
 			ObjectMeta: metav1.ObjectMeta{
@@ -4683,8 +4873,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 				MatchConstraints: &admissionregistration.MatchResources{
 					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
@@ -4712,12 +4904,11 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 					r := admissionregistration.FailurePolicyType("Fail")
 					return &r
 				}(),
+				ReinvocationPolicy: admissionregistration.IfNeededReinvocationPolicy,
 				Mutations: []admissionregistration.Mutation{{
-					Expression: `Object{
-							spec: Object.spec{
-								replicas: oldObject.spec.replicas % 2 == 0?oldObject.spec.replicas + 1:oldObject.spec.replicas
-							}
-						}`,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
 					PatchType: applyConfigurationPatchType,
 				}},
 				MatchConstraints: &admissionregistration.MatchResources{
@@ -4752,8 +4943,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 				MatchConstraints: &admissionregistration.MatchResources{
 					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
@@ -4778,8 +4971,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 				MatchConstraints: &admissionregistration.MatchResources{
 					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
@@ -4807,12 +5002,11 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 					r := admissionregistration.FailurePolicyType("Fail")
 					return &r
 				}(),
+				ReinvocationPolicy: admissionregistration.IfNeededReinvocationPolicy,
 				Mutations: []admissionregistration.Mutation{{
-					Expression: `Object{
-							spec: Object.spec{
-								replicas: oldObject.spec.replicas % 2 == 0?oldObject.spec.replicas + 1:oldObject.spec.replicas
-							}
-						}`,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
 					PatchType: applyConfigurationPatchType,
 				}},
 				MatchConstraints: &admissionregistration.MatchResources{
@@ -4847,8 +5041,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 				MatchConstraints: &admissionregistration.MatchResources{
 					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
@@ -4873,8 +5069,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 				MatchConstraints: &admissionregistration.MatchResources{
 					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
@@ -4892,60 +5090,6 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 		},
 		expectedError: `spec.matchConstraints.resourceRules[0].resources: Invalid value: []string{"*/*", "a"}: if '*/*' is present, must not specify other resources`,
 	}, {
-		name: "invalid messageExpression",
-		config: &admissionregistration.MutatingAdmissionPolicy{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: "config",
-			},
-			Spec: admissionregistration.MutatingAdmissionPolicySpec{
-				Mutations: []admissionregistration.Mutation{{
-					Expression:        "true",
-					MessageExpression: "object.x in [1, 2, ",
-					PatchType:         applyConfigurationPatchType,
-				}},
-				MatchConstraints: &admissionregistration.MatchResources{
-					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
-						RuleWithOperations: admissionregistration.RuleWithOperations{
-							Operations: []admissionregistration.OperationType{"CREATE"},
-							Rule: admissionregistration.Rule{
-								APIGroups:   []string{"a"},
-								APIVersions: []string{"a"},
-								Resources:   []string{"*/*"},
-							},
-						},
-					}},
-				},
-			},
-		},
-		expectedError: `spec.mutations[0].messageExpression: Invalid value: "object.x in [1, 2, ": compilation failed: ERROR: <input>:1:20: Syntax error: missing ']' at '<EOF>`,
-	}, {
-		name: "messageExpression of wrong type",
-		config: &admissionregistration.MutatingAdmissionPolicy{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: "config",
-			},
-			Spec: admissionregistration.MutatingAdmissionPolicySpec{
-				Mutations: []admissionregistration.Mutation{{
-					Expression:        "true",
-					MessageExpression: "0 == 0",
-					PatchType:         applyConfigurationPatchType,
-				}},
-				MatchConstraints: &admissionregistration.MatchResources{
-					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
-						RuleWithOperations: admissionregistration.RuleWithOperations{
-							Operations: []admissionregistration.OperationType{"CREATE"},
-							Rule: admissionregistration.Rule{
-								APIGroups:   []string{"a"},
-								APIVersions: []string{"a"},
-								Resources:   []string{"*/*"},
-							},
-						},
-					}},
-				},
-			},
-		},
-		expectedError: `spec.mutations[0].messageExpression: Invalid value: "0 == 0": must evaluate to string`,
-	}, {
 		name: "patchType required",
 		config: &admissionregistration.MutatingAdmissionPolicy{
 			ObjectMeta: metav1.ObjectMeta{
@@ -4953,7 +5097,9 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "true",
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
 				}},
 				MatchConstraints: &admissionregistration.MatchResources{
 					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
@@ -4969,7 +5115,7 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 				},
 			},
 		},
-		expectedError: `spec.mutations[0].patchType: Required value: patchType must be specified`,
+		expectedError: `spec.mutations[0].patchType: Required value`,
 	}, {
 		name: "single match condition must have a name",
 		config: &admissionregistration.MutatingAdmissionPolicy{
@@ -4981,8 +5127,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 					Expression: "true",
 				}},
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "true",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 			},
 		},
@@ -5001,7 +5149,7 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 				MatchConstraints: &admissionregistration.MatchResources{
 					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
 						RuleWithOperations: admissionregistration.RuleWithOperations{
-							Operations: []admissionregistration.OperationType{"*"},
+							Operations: []admissionregistration.OperationType{"CREATE", "UPDATE"},
 							Rule: admissionregistration.Rule{
 								APIGroups:   []string{"a"},
 								APIVersions: []string{"a"},
@@ -5028,12 +5176,11 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 					Name:       "hasParams",
 					Expression: `params.foo == "okay"`,
 				}},
+				ReinvocationPolicy: admissionregistration.IfNeededReinvocationPolicy,
 				Mutations: []admissionregistration.Mutation{{
-					Expression: `Object{
-							spec: Object.spec{
-								replicas: oldObject.spec.replicas % 2 == 0?oldObject.spec.replicas + 1:oldObject.spec.replicas
-							}
-						}`,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
 					PatchType: applyConfigurationPatchType,
 				}},
 			},
@@ -5077,8 +5224,10 @@ func TestValidateMutatingAdmissionPolicy(t *testing.T) {
 					Expression: `params.foo == "okay"`,
 				}},
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 			},
 		},
@@ -5120,12 +5269,11 @@ func TestValidateMutatingAdmissionPolicyUpdate(t *testing.T) {
 					r := admissionregistration.FailurePolicyType("Fail")
 					return &r
 				}(),
+				ReinvocationPolicy: admissionregistration.IfNeededReinvocationPolicy,
 				Mutations: []admissionregistration.Mutation{{
-					Expression: `Object{
-							spec: Object.spec{
-								replicas: oldObject.spec.replicas % 2 == 0?oldObject.spec.replicas + 1:oldObject.spec.replicas
-							}
-						}`,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
 					PatchType: applyConfigurationPatchType,
 				}},
 				MatchConstraints: &admissionregistration.MatchResources{
@@ -5158,8 +5306,10 @@ func TestValidateMutatingAdmissionPolicyUpdate(t *testing.T) {
 			},
 			Spec: admissionregistration.MutatingAdmissionPolicySpec{
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 				MatchConstraints: &admissionregistration.MatchResources{
 					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
@@ -5186,12 +5336,11 @@ func TestValidateMutatingAdmissionPolicyUpdate(t *testing.T) {
 					r := admissionregistration.FailurePolicyType("Fail")
 					return &r
 				}(),
+				ReinvocationPolicy: admissionregistration.IfNeededReinvocationPolicy,
 				Mutations: []admissionregistration.Mutation{{
-					Expression: `Object{
-							spec: Object.spec{
-								replicas: oldObject.spec.replicas % 2 == 0?oldObject.spec.replicas + 1:oldObject.spec.replicas
-							}
-						}`,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
 					PatchType: applyConfigurationPatchType,
 				}},
 				MatchConstraints: &admissionregistration.MatchResources{
@@ -5266,8 +5415,10 @@ func TestValidateMutatingAdmissionPolicyUpdate(t *testing.T) {
 					Expression: `params.foo == "okay"`,
 				}},
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 			},
 		},
@@ -5307,8 +5458,10 @@ func TestValidateMutatingAdmissionPolicyUpdate(t *testing.T) {
 					Expression: `params.foo == "okay"`,
 				}},
 				Mutations: []admissionregistration.Mutation{{
-					Expression: "object.x < 100",
-					PatchType:  applyConfigurationPatchType,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
+					PatchType: applyConfigurationPatchType,
 				}},
 			},
 		},
@@ -5323,7 +5476,7 @@ func TestValidateMutatingAdmissionPolicyUpdate(t *testing.T) {
 				MatchConstraints: &admissionregistration.MatchResources{
 					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
 						RuleWithOperations: admissionregistration.RuleWithOperations{
-							Operations: []admissionregistration.OperationType{"*"},
+							Operations: []admissionregistration.OperationType{"CREATE", "UPDATE"},
 							Rule: admissionregistration.Rule{
 								APIGroups:   []string{"a"},
 								APIVersions: []string{"a"},
@@ -5350,12 +5503,11 @@ func TestValidateMutatingAdmissionPolicyUpdate(t *testing.T) {
 					Name:       "hasParams",
 					Expression: `params.foo == "okay"`,
 				}},
+				ReinvocationPolicy: admissionregistration.IfNeededReinvocationPolicy,
 				Mutations: []admissionregistration.Mutation{{
-					Expression: `Object{
-							spec: Object.spec{
-								replicas: oldObject.spec.replicas % 2 == 0?oldObject.spec.replicas + 1:oldObject.spec.replicas
-							}
-						}`,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
 					PatchType: applyConfigurationPatchType,
 				}},
 			},
@@ -5368,7 +5520,7 @@ func TestValidateMutatingAdmissionPolicyUpdate(t *testing.T) {
 				MatchConstraints: &admissionregistration.MatchResources{
 					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
 						RuleWithOperations: admissionregistration.RuleWithOperations{
-							Operations: []admissionregistration.OperationType{"*"},
+							Operations: []admissionregistration.OperationType{"CREATE", "UPDATE"},
 							Rule: admissionregistration.Rule{
 								APIGroups:   []string{"a"},
 								APIVersions: []string{"a"},
@@ -5395,12 +5547,11 @@ func TestValidateMutatingAdmissionPolicyUpdate(t *testing.T) {
 					Name:       "hasParams",
 					Expression: `params.foo == "okay"`,
 				}},
+				ReinvocationPolicy: admissionregistration.IfNeededReinvocationPolicy,
 				Mutations: []admissionregistration.Mutation{{
-					Expression: `Object{
-							spec: Object.spec{
-								replicas: oldObject.spec.replicas % 2 == 0?oldObject.spec.replicas + 1:oldObject.spec.replicas
-							}
-						}`,
+					ApplyConfiguration: &admissionregistration.ApplyConfiguration{
+						Expression: "Object{ spec: Object.spec{ replicas: 1 } }",
+					},
 					PatchType: applyConfigurationPatchType,
 				}},
 			},
@@ -5425,28 +5576,6 @@ func TestValidateMutatingAdmissionPolicyUpdate(t *testing.T) {
 					},
 				},
 				nil),
-			expectedError: `undeclared reference to 'test'`,
-		},
-		{
-			name: "validation messageExpressions that are changed must be compiled using the NewExpression environment",
-			oldconfig: mutatingAdmissionPolicyWithExpressions(
-				nil,
-				[]admissionregistration.Mutation{
-					{
-						Expression:        `true`,
-						MessageExpression: "'test'",
-						PatchType:         applyConfigurationPatchType,
-					},
-				}),
-			config: mutatingAdmissionPolicyWithExpressions(
-				nil,
-				[]admissionregistration.Mutation{
-					{
-						Expression:        `true`,
-						MessageExpression: "string(test())",
-						PatchType:         applyConfigurationPatchType,
-					},
-				}),
 			expectedError: `undeclared reference to 'test'`,
 		},
 	}
@@ -5510,7 +5639,7 @@ func TestValidateMutatingAdmissionPolicyBinding(t *testing.T) {
 				},
 			},
 		},
-		expectedError: `spec.matchResouces.matchPolicy: Unsupported value: "other": supported values: "Equivalent", "Exact"`,
+		expectedError: `spec.matchResources.matchPolicy: Unsupported value: "other": supported values: "Equivalent", "Exact"`,
 	}, {
 		name: "Operations must not be empty or nil",
 		config: &admissionregistration.MutatingAdmissionPolicyBinding{
@@ -5565,7 +5694,7 @@ func TestValidateMutatingAdmissionPolicyBinding(t *testing.T) {
 				},
 			},
 		},
-		expectedError: `spec.matchResouces.resourceRules[0].operations: Required value, spec.matchResouces.resourceRules[1].operations: Required value, spec.matchResouces.excludeResourceRules[0].operations: Required value, spec.matchResouces.excludeResourceRules[1].operations: Required value`,
+		expectedError: `spec.matchResources.resourceRules[0].operations: Required value, spec.matchResources.resourceRules[1].operations: Required value, spec.matchResources.excludeResourceRules[0].operations: Required value, spec.matchResources.excludeResourceRules[1].operations: Required value`,
 	}, {
 		name: "\"\" is NOT a valid operation",
 		config: &admissionregistration.MutatingAdmissionPolicyBinding{
@@ -5593,7 +5722,7 @@ func TestValidateMutatingAdmissionPolicyBinding(t *testing.T) {
 		},
 		expectedError: `Unsupported value: ""`,
 	}, {
-		name: "operation must be either create/update/delete/connect",
+		name: "operation must be either create/update",
 		config: &admissionregistration.MutatingAdmissionPolicyBinding{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "config",
@@ -5618,6 +5747,58 @@ func TestValidateMutatingAdmissionPolicyBinding(t *testing.T) {
 			},
 		},
 		expectedError: `Unsupported value: "PATCH"`,
+	}, {
+		name: "operation must not be DELETE",
+		config: &admissionregistration.MutatingAdmissionPolicyBinding{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "config",
+			},
+			Spec: admissionregistration.MutatingAdmissionPolicyBindingSpec{
+				PolicyName: "xyzlimit-scale.example.com",
+				ParamRef: &admissionregistration.ParamRef{
+					Name:                    "xyzlimit-scale-setting.example.com",
+					ParameterNotFoundAction: ptr(admissionregistration.DenyAction),
+				}, MatchResources: &admissionregistration.MatchResources{
+					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
+						RuleWithOperations: admissionregistration.RuleWithOperations{
+							Operations: []admissionregistration.OperationType{"DELETE"},
+							Rule: admissionregistration.Rule{
+								APIGroups:   []string{"a"},
+								APIVersions: []string{"a"},
+								Resources:   []string{"a"},
+							},
+						},
+					}},
+				},
+			},
+		},
+		expectedError: `Unsupported value: "DELETE"`,
+	}, {
+		name: "operation must not be CONNECT",
+		config: &admissionregistration.MutatingAdmissionPolicyBinding{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "config",
+			},
+			Spec: admissionregistration.MutatingAdmissionPolicyBindingSpec{
+				PolicyName: "xyzlimit-scale.example.com",
+				ParamRef: &admissionregistration.ParamRef{
+					Name:                    "xyzlimit-scale-setting.example.com",
+					ParameterNotFoundAction: ptr(admissionregistration.DenyAction),
+				}, MatchResources: &admissionregistration.MatchResources{
+					ResourceRules: []admissionregistration.NamedRuleWithOperations{{
+						RuleWithOperations: admissionregistration.RuleWithOperations{
+							Operations: []admissionregistration.OperationType{"CONNECT"},
+							Rule: admissionregistration.Rule{
+								APIGroups:   []string{"a"},
+								APIVersions: []string{"a"},
+								Resources:   []string{"a"},
+							},
+						},
+					}},
+				},
+			},
+		},
+		expectedError: `Unsupported value: "CONNECT"`,
 	}, {
 		name: "wildcard operation cannot be mixed with other strings",
 		config: &admissionregistration.MutatingAdmissionPolicyBinding{
@@ -5734,7 +5915,7 @@ func TestValidateMutatingAdmissionPolicyBinding(t *testing.T) {
 				},
 			},
 		},
-		expectedError: `spec.matchResouces.resourceRules[0].resources[1]: Invalid value: "a/x": if 'a/*' is present, must not specify a/x`,
+		expectedError: `spec.matchResources.resourceRules[0].resources[1]: Invalid value: "a/x": if 'a/*' is present, must not specify a/x`,
 	}, {
 		name: "resource a/* can mix with a",
 		config: &admissionregistration.MutatingAdmissionPolicyBinding{
@@ -5797,7 +5978,7 @@ func TestValidateMutatingAdmissionPolicyBinding(t *testing.T) {
 				},
 			},
 		},
-		expectedError: `spec.matchResouces.resourceRules[0].resources[1]: Invalid value: "x/a": if '*/a' is present, must not specify x/a`,
+		expectedError: `spec.matchResources.resourceRules[0].resources[1]: Invalid value: "x/a": if '*/a' is present, must not specify x/a`,
 	}, {
 		name: "resource */* cannot mix with other resources",
 		config: &admissionregistration.MutatingAdmissionPolicyBinding{
@@ -5824,7 +6005,7 @@ func TestValidateMutatingAdmissionPolicyBinding(t *testing.T) {
 				},
 			},
 		},
-		expectedError: `spec.matchResouces.resourceRules[0].resources: Invalid value: []string{"*/*", "a"}: if '*/*' is present, must not specify other resources`,
+		expectedError: `spec.matchResources.resourceRules[0].resources: Invalid value: []string{"*/*", "a"}: if '*/*' is present, must not specify other resources`,
 	}, {
 		name: "paramRef selector must not be set when name is set",
 		config: &admissionregistration.MutatingAdmissionPolicyBinding{
