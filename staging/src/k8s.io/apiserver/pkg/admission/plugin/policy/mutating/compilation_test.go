@@ -36,7 +36,10 @@ import (
 	"k8s.io/apiserver/pkg/admission/plugin/policy/mutating/patch"
 	celconfig "k8s.io/apiserver/pkg/apis/cel"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
+	k8sscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/openapi/openapitest"
+	"k8s.io/kubernetes/pkg/generated/openapi"
 	"k8s.io/utils/ptr"
 )
 
@@ -342,7 +345,7 @@ func TestCompilation(t *testing.T) {
 			object: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Template: corev1.PodTemplateSpec{Spec: corev1.PodSpec{
 				Containers: []corev1.Container{{Name: "a"}},
 			}}}},
-			expectedErr: "strict decoding error: unknown field \"spec.template.spec.containers[1].ports[0].containerPortZ\"",
+			expectedErr: "undefined field 'containerPortZ'",
 		},
 		{
 			name: "jsonPatch invalid CEL initializer type",
@@ -361,7 +364,7 @@ func TestCompilation(t *testing.T) {
 			object: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Template: corev1.PodTemplateSpec{Spec: corev1.PodSpec{
 				Containers: []corev1.Container{{Name: "a"}},
 			}}}},
-			expectedErr: " mismatch: unexpected type name \"Object.spec.template.spec.containers.portsZ\", expected \"Object.spec.template.spec.containers.ports\", which matches field name path from root Object type",
+			expectedErr: "expected type of field 'ports' is 'list(Object.spec.template.spec.containers.ports)' but provided type is 'list(Object.spec.template.spec.containers.portsZ)",
 		},
 		{
 			name: "jsonPatch add map entry by key and value",
@@ -645,7 +648,7 @@ func TestCompilation(t *testing.T) {
 										containerPort: 80
 									}],
 									resources: Object.spec.template.spec.containers.resources{
-										limits: {"cpu": "128M"},
+										limits: {"cpu": "1500m"},
 									}
 								}]
 							}
@@ -669,7 +672,7 @@ func TestCompilation(t *testing.T) {
 								{ContainerPort: 80},
 							},
 							Resources: corev1.ResourceRequirements{
-								Limits: corev1.ResourceList{corev1.ResourceName("cpu"): resource.MustParse("128M")},
+								Limits: corev1.ResourceList{corev1.ResourceName("cpu"): resource.MustParse("1500m")},
 							},
 						}},
 					},
@@ -686,7 +689,7 @@ func TestCompilation(t *testing.T) {
 				}`),
 			gvr:         deploymentGVR,
 			object:      &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](1)}},
-			expectedErr: "type mismatch: unexpected type name \"Object.specx\", expected \"Object.spec\", which matches field name path from root Object type",
+			expectedErr: "expected type of field 'spec' is 'Object.spec' but provided type is 'Object.specx'",
 		},
 		{
 			name: "apply configuration with invalid field name",
@@ -698,7 +701,7 @@ func TestCompilation(t *testing.T) {
 				}`),
 			gvr:         deploymentGVR,
 			object:      &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](1)}},
-			expectedErr: "error applying patch: failed to convert patch object to typed object: .spec.replicasx: field not declared in schema",
+			expectedErr: "undefined field 'replicasx'",
 		},
 		{
 			name: "apply configuration with invalid return type",
@@ -775,7 +778,7 @@ func TestCompilation(t *testing.T) {
 					JSONPatch{
 						op: "add", path: "/metadata/labels",
 						value: {
-							"value": Object{field: "fieldValue"}.field,
+							"value": Object.metadata{name: "fieldValue"}.name,
 						}
 					}
 				]`,
@@ -793,8 +796,8 @@ func TestCompilation(t *testing.T) {
 					JSONPatch{
 						op: "add", path: "/metadata/labels",
 						value: {
-							"field": string(has(Object{field: "fieldValue"}.field)),
-							"field-unset": string(has(Object{}.field)),
+							"field": string(has(Object.metadata{name: "fieldValue"}.name)),
+							"field-unset": string(has(Object.metadata{}.name)),
 						}
 					}
 				]`,
@@ -814,8 +817,8 @@ func TestCompilation(t *testing.T) {
 						op: "add", path: "/metadata/labels",
 						value: {
 							"empty": string(Object{} == Object{}),
-							"same": string(Object{field: "x"} == Object{field: "x"}),
-							"different": string(Object{field: "x"} == Object{field: "y"}),
+							"same": string(Object.metadata{name: "x"} == Object.metadata{name: "x"}),
+							"different": string(Object.metadata{name: "x"} == Object.metadata{name: "y"}),
 						}
 					}
 				]`,
@@ -824,6 +827,26 @@ func TestCompilation(t *testing.T) {
 			object: &appsv1.Deployment{ObjectMeta: metav1.ObjectMeta{Labels: map[string]string{}}},
 			expectedResult: &appsv1.Deployment{ObjectMeta: metav1.ObjectMeta{Labels: map[string]string{
 				"empty":     "true",
+				"same":      "true",
+				"different": "false",
+			}}},
+		},
+		{
+			name: "object type checking",
+			policy: jsonPatches(policy("d1"), v1alpha1.JSONPatch{
+				Expression: `[
+					JSONPatch{
+						op: "add", path: "/metadata/labels",
+						value: {
+							"same": string(type(Object.metadata{}) == type(object.metadata)),
+							"different": string(type(Object.spec{}) == type(object.metadata)),
+						}
+					}
+				]`,
+			}),
+			gvr:    deploymentGVR,
+			object: &appsv1.Deployment{ObjectMeta: metav1.ObjectMeta{Labels: map[string]string{}}},
+			expectedResult: &appsv1.Deployment{ObjectMeta: metav1.ObjectMeta{Labels: map[string]string{
 				"same":      "true",
 				"different": "false",
 			}}},
@@ -841,6 +864,7 @@ func TestCompilation(t *testing.T) {
 	tcManager := patch.NewTypeConverterManager(nil, openapitest.NewEmbeddedFileClient())
 	go tcManager.Run(ctx)
 
+	schemaResolver := resolver.NewDefinitionsSchemaResolver(openapi.GetOpenAPIDefinitions, k8sscheme.Scheme)
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			var gvk schema.GroupVersionKind
@@ -890,6 +914,7 @@ func TestCompilation(t *testing.T) {
 					OptionalVariables:   cel.OptionalVariableBindings{VersionedParams: tc.params, Authorizer: fakeAuthorizer{}},
 					Namespace:           nil,
 					TypeConverter:       typeConverter,
+					SchemaResolver:      schemaResolver,
 				}
 				obj, err = patcher.Patch(ctx, r, celconfig.RuntimeCELCostBudget)
 				if len(tc.expectedErr) > 0 {

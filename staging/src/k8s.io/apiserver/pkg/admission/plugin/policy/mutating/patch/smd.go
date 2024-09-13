@@ -31,16 +31,15 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/managedfields"
 	plugincel "k8s.io/apiserver/pkg/admission/plugin/cel"
-	"k8s.io/apiserver/pkg/cel/mutation/dynamic"
 )
 
 // NewApplyConfigurationPatcher creates a patcher that performs an applyConfiguration mutation.
-func NewApplyConfigurationPatcher(expressionEvaluator plugincel.Evaluator) Patcher {
+func NewApplyConfigurationPatcher(expressionEvaluator plugincel.Patch) Patcher {
 	return &applyConfigPatcher{expressionEvaluator: expressionEvaluator}
 }
 
 type applyConfigPatcher struct {
-	expressionEvaluator plugincel.Evaluator
+	expressionEvaluator plugincel.Patch
 }
 
 func (e *applyConfigPatcher) Patch(ctx context.Context, r Request, runtimeCELCostBudget int64) (runtime.Object, error) {
@@ -53,7 +52,7 @@ func (e *applyConfigPatcher) Patch(ctx context.Context, r Request, runtimeCELCos
 	if len(compileErrors) > 0 {
 		return nil, errors.Join(compileErrors...)
 	}
-	eval, _, err := e.expressionEvaluator.ForInput(ctx, r.VersionedAttributes, admissionRequest, r.OptionalVariables, r.Namespace, runtimeCELCostBudget)
+	eval, _, err := e.expressionEvaluator.ForInput(ctx, r.SchemaResolver, r.VersionedAttributes, admissionRequest, r.OptionalVariables, r.Namespace, runtimeCELCostBudget)
 	if err != nil {
 		return nil, err
 	}
@@ -61,31 +60,11 @@ func (e *applyConfigPatcher) Patch(ctx context.Context, r Request, runtimeCELCos
 		return nil, eval.Error
 	}
 	v := eval.EvalResult
-
-	// The compiler ensures that the return type is an ObjectVal with type name of "Object".
-	objVal, ok := v.(*dynamic.ObjectVal)
-	if !ok {
-		// Should not happen since the compiler type checks the return type.
-		return nil, fmt.Errorf("unsupported return type from ApplyConfiguration expression: %v", v.Type())
-	}
-	// TODO: Object initializers are insufficiently type checked.
-	// In the interim, we use this sanity check to detect type mismatches
-	// between field names and Object initializers. For example,
-	// "Object.spec{ selector: Object.spec.wrong{}}" is detected as a mismatch.
-	// Before beta, attaching full type information both to Object initializers and
-	// the "object" and "oldObject" variables is needed. This will allow CEL to
-	// perform comprehensive runtime type checking.
-	err = objVal.CheckTypeNamesMatchFieldPathNames()
-	if err != nil {
-		return nil, fmt.Errorf("type mismatch: %w", err)
-	}
-
-	value, ok := objVal.Value().(map[string]any)
+	u, ok := v.Value().(map[string]any)
 	if !ok {
 		return nil, fmt.Errorf("invalid return type: %T", v)
 	}
-
-	patchObject := unstructured.Unstructured{Object: value}
+	patchObject := unstructured.Unstructured{Object: u}
 	patchObject.SetGroupVersionKind(r.VersionedAttributes.VersionedObject.GetObjectKind().GroupVersionKind())
 	patched, err := ApplyStructuredMergeDiff(r.TypeConverter, r.VersionedAttributes.VersionedObject, &patchObject)
 	if err != nil {

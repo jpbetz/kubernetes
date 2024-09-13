@@ -17,14 +17,12 @@ limitations under the License.
 package dynamic
 
 import (
-	"errors"
 	"fmt"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/common/types/traits"
 	"google.golang.org/protobuf/types/known/structpb"
 	"reflect"
-	"strings"
 )
 
 // ObjectType is the implementation of the Object type for use when compiling
@@ -76,6 +74,7 @@ func (r *ObjectType) Field(name string) (*types.FieldType, bool) {
 	}, true
 }
 
+// FieldNames returns a nil list to indicate that all field names are allowed.
 func (r *ObjectType) FieldNames() ([]string, bool) {
 	return nil, true // Field names are not known for dynamic types. All field names are allowed.
 }
@@ -166,43 +165,6 @@ func (v *ObjectVal) Value() any {
 		return types.WrapErr(err)
 	}
 	return result
-}
-
-// CheckTypeNamesMatchFieldPathNames transitively checks the CEL object type names of this ObjectVal. Returns all
-// found type name mismatch errors.
-// Children ObjectVal types under <field> or this ObjectVal
-// must have type names of the form "<ObjectVal.TypeName>.<field>", children of that type must have type names of the
-// form "<ObjectVal.TypeName>.<field>.<field>" and so on.
-// Intermediate maps and lists are unnamed and ignored.
-func (v *ObjectVal) CheckTypeNamesMatchFieldPathNames() error {
-	return errors.Join(typeCheck(v, []string{v.Type().TypeName()})...)
-
-}
-
-func typeCheck(v ref.Val, typeNamePath []string) []error {
-	var errs []error
-	if ov, ok := v.(*ObjectVal); ok {
-		tn := ov.objectType.TypeName()
-		if strings.Join(typeNamePath, ".") != tn {
-			errs = append(errs, fmt.Errorf("unexpected type name %q, expected %q, which matches field name path from root Object type", tn, strings.Join(typeNamePath, ".")))
-		}
-		for k, f := range ov.fields {
-			errs = append(errs, typeCheck(f, append(typeNamePath, k))...)
-		}
-	}
-	value := v.Value()
-	if listOfVal, ok := value.([]ref.Val); ok {
-		for _, v := range listOfVal {
-			errs = append(errs, typeCheck(v, typeNamePath)...)
-		}
-	}
-
-	if mapOfVal, ok := value.(map[ref.Val]ref.Val); ok {
-		for _, v := range mapOfVal {
-			errs = append(errs, typeCheck(v, typeNamePath)...)
-		}
-	}
-	return errs
 }
 
 // IsZeroValue indicates whether the object is the zero value for the type.

@@ -32,6 +32,7 @@ import (
 	apiservercel "k8s.io/apiserver/pkg/cel"
 	"k8s.io/apiserver/pkg/cel/environment"
 	"k8s.io/apiserver/pkg/cel/lazy"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 )
 
 const VariablesTypeName = "kubernetes.variables"
@@ -39,7 +40,7 @@ const VariablesTypeName = "kubernetes.variables"
 type CompositedCompiler struct {
 	Compiler
 	FilterCompiler
-	EvaluatorCompiler
+	PatchCompiler
 
 	CompositionEnv *CompositionEnv
 }
@@ -50,8 +51,8 @@ type CompositedFilter struct {
 	compositionEnv *CompositionEnv
 }
 
-type CompositedEvaluator struct {
-	Evaluator
+type CompositedPatch struct {
+	Patch
 
 	compositionEnv *CompositionEnv
 }
@@ -72,12 +73,12 @@ func NewCompositedCompilerFromTemplate(context *CompositionEnv) *CompositedCompi
 	}
 	compiler := NewCompiler(context.EnvSet)
 	filterCompiler := &filterCompiler{compiler}
-	evaluatorCompiler := &evaluatorCompiler{compiler}
+	evaluatorCompiler := &evaluatorCompiler{compiler: compiler}
 	return &CompositedCompiler{
-		Compiler:          compiler,
-		FilterCompiler:    filterCompiler,
-		EvaluatorCompiler: evaluatorCompiler,
-		CompositionEnv:    context,
+		Compiler:       compiler,
+		FilterCompiler: filterCompiler,
+		PatchCompiler:  evaluatorCompiler,
+		CompositionEnv: context,
 	}
 }
 
@@ -102,10 +103,10 @@ func (c *CompositedCompiler) Compile(expressions []ExpressionAccessor, optionalD
 	}
 }
 
-func (c *CompositedCompiler) CompileEvaluator(expression ExpressionAccessor, optionalDecls OptionalVariableDeclarations, envType environment.Type) Evaluator {
-	evaluator := c.EvaluatorCompiler.CompileEvaluator(expression, optionalDecls, envType)
-	return &CompositedEvaluator{
-		Evaluator:      evaluator,
+func (c *CompositedCompiler) CompilePatch(expression ExpressionAccessor, optionalDecls OptionalVariableDeclarations, envType environment.Type) Patch {
+	evaluator := c.PatchCompiler.CompilePatch(expression, optionalDecls, envType)
+	return &CompositedPatch{
+		Patch:          evaluator,
 		compositionEnv: c.CompositionEnv,
 	}
 }
@@ -177,9 +178,9 @@ func (c *compositionContext) Variables(activation any) ref.Val {
 	return lazyMap
 }
 
-func (f *CompositedFilter) ForInput(ctx context.Context, versionedAttr *admission.VersionedAttributes, request *v1.AdmissionRequest, optionalVars OptionalVariableBindings, namespace *corev1.Namespace, runtimeCELCostBudget int64) ([]EvaluationResult, int64, error) {
+func (f *CompositedFilter) ForInput(ctx context.Context, schemaResolver resolver.SchemaResolver, versionedAttr *admission.VersionedAttributes, request *v1.AdmissionRequest, optionalVars OptionalVariableBindings, namespace *corev1.Namespace, runtimeCELCostBudget int64) ([]EvaluationResult, int64, error) {
 	ctx = f.compositionEnv.CreateContext(ctx)
-	return f.Filter.ForInput(ctx, versionedAttr, request, optionalVars, namespace, runtimeCELCostBudget)
+	return f.Filter.ForInput(ctx, schemaResolver, versionedAttr, request, optionalVars, namespace, runtimeCELCostBudget)
 }
 
 func (c *compositionContext) reportCost(cost int64) {

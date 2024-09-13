@@ -27,21 +27,34 @@ import (
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/cel"
 	"k8s.io/apiserver/pkg/cel/library"
+	"k8s.io/apiserver/pkg/cel/mutation/static"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
+	"k8s.io/kube-openapi/pkg/validation/spec"
 )
 
 // newActivation creates an activation for CEL admission plugins from the given request, admission chain and
 // variable binding information.
-func newActivation(ctx context.Context, versionedAttr *admission.VersionedAttributes, request *admissionv1.AdmissionRequest, inputs OptionalVariableBindings, namespace *v1.Namespace) (*evaluationActivation, error) {
+func newActivation(ctx context.Context, versionedAttr *admission.VersionedAttributes, request *admissionv1.AdmissionRequest, inputs OptionalVariableBindings, namespace *v1.Namespace, schemaResolver resolver.SchemaResolver) (*evaluationActivation, error) {
 	// if this activation supports composition, we will need the compositionCtx. It may be nil.
 	compositionCtx, _ := ctx.(CompositionContext)
 
 	var err error
 
-	oldObjectVal, err := objectToResolveVal(versionedAttr.VersionedOldObject)
+	var objSchema *spec.Schema
+	var objectType *static.ObjectType
+	if schemaResolver != nil {
+		objSchema, err = schemaResolver.ResolveSchema(versionedAttr.VersionedKind)
+		if err != nil {
+			return nil, err
+		}
+		objectType = static.NewObjectType("Object", objSchema)
+	}
+
+	oldObjectVal, err := objectWithTypeToResolveVal(versionedAttr.VersionedOldObject, objectType)
 	if err != nil {
 		return nil, err
 	}
-	objectVal, err := objectToResolveVal(versionedAttr.VersionedObject)
+	objectVal, err := objectWithTypeToResolveVal(versionedAttr.VersionedObject, objectType)
 	if err != nil {
 		return nil, err
 	}

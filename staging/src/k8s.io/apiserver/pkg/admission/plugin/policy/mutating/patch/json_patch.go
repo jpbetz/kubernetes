@@ -36,17 +36,16 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 	plugincel "k8s.io/apiserver/pkg/admission/plugin/cel"
 	"k8s.io/apiserver/pkg/cel/mutation"
-	"k8s.io/apiserver/pkg/cel/mutation/dynamic"
 	pointer "k8s.io/utils/ptr"
 )
 
 // NewJSONPatcher creates a patcher that performs a JSON Patch mutation.
-func NewJSONPatcher(patchEvaluator plugincel.Evaluator) Patcher {
+func NewJSONPatcher(patchEvaluator plugincel.Patch) Patcher {
 	return &jsonPatcher{patchEvaluator}
 }
 
 type jsonPatcher struct {
-	PatchEvaluator plugincel.Evaluator
+	PatchEvaluator plugincel.Patch
 }
 
 func (e *jsonPatcher) Patch(ctx context.Context, r Request, runtimeCELCostBudget int64) (runtime.Object, error) {
@@ -95,10 +94,10 @@ func (e *jsonPatcher) Patch(ctx context.Context, r Request, runtimeCELCostBudget
 	return newVersionedObject, nil
 }
 
-func (e *jsonPatcher) evaluatePatchExpression(patchEvaluator plugincel.Evaluator, remainingBudget int64, ctx context.Context, r Request, admissionRequest *admissionv1.AdmissionRequest) (jsonpatch.Patch, int64, error) {
+func (e *jsonPatcher) evaluatePatchExpression(patchEvaluator plugincel.Patch, remainingBudget int64, ctx context.Context, r Request, admissionRequest *admissionv1.AdmissionRequest) (jsonpatch.Patch, int64, error) {
 	var err error
 	var eval plugincel.EvaluationResult
-	eval, remainingBudget, err = patchEvaluator.ForInput(ctx, r.VersionedAttributes, admissionRequest, r.OptionalVariables, r.Namespace, remainingBudget)
+	eval, remainingBudget, err = patchEvaluator.ForInput(ctx, r.SchemaResolver, r.VersionedAttributes, admissionRequest, r.OptionalVariables, r.Namespace, remainingBudget)
 	if err != nil {
 		return nil, -1, err
 	}
@@ -139,19 +138,6 @@ func (e *jsonPatcher) evaluatePatchExpression(patchEvaluator plugincel.Evaluator
 			resultOp["from"] = pointer.To(json2.RawMessage(strconv.Quote(op.From)))
 		}
 		if op.Val != nil {
-			if objVal, ok := op.Val.(*dynamic.ObjectVal); ok {
-				// TODO: Object initializers are insufficiently type checked.
-				// In the interim, we use this sanity check to detect type mismatches
-				// between field names and Object initializers. For example,
-				// "Object.spec{ selector: Object.spec.wrong{}}" is detected as a mismatch.
-				// Before beta, attaching full type information both to Object initializers and
-				// the "object" and "oldObject" variables is needed. This will allow CEL to
-				// perform comprehensive runtime type checking.
-				err := objVal.CheckTypeNamesMatchFieldPathNames()
-				if err != nil {
-					return nil, -1, fmt.Errorf("type mismatch: %w", err)
-				}
-			}
 			// CEL data literals representing arbitrary JSON values can be serialized to JSON for use in
 			// JSON Patch if first converted to pb.Value.
 			v, err := op.Val.ConvertToNative(reflect.TypeOf(&structpb.Value{}))

@@ -228,7 +228,7 @@ func CalculateUsageStats(options quota.UsageStatsOptions,
 	return result, nil
 }
 
-// objectCountEvaluator provides an implementation for quota.Evaluator
+// objectCountEvaluator provides an implementation for quota.Patch
 // that associates usage of the specified resource based on the number of items
 // returned by the specified listing function.
 type objectCountEvaluator struct {

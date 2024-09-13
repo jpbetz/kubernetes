@@ -29,6 +29,7 @@ import (
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
 	"k8s.io/apiserver/pkg/cel/environment"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 )
 
 type ExpressionAccessor interface {
@@ -93,28 +94,31 @@ type Filter interface {
 	// ForInput converts compiled CEL-typed values into evaluated CEL-typed value.
 	// runtimeCELCostBudget was added for testing purpose only. Callers should always use const RuntimeCELCostBudget from k8s.io/apiserver/pkg/apis/cel/config.go as input.
 	// If cost budget is calculated, the filter should return the remaining budget.
-	ForInput(ctx context.Context, versionedAttr *admission.VersionedAttributes, request *v1.AdmissionRequest, optionalVars OptionalVariableBindings, namespace *corev1.Namespace, runtimeCELCostBudget int64) ([]EvaluationResult, int64, error)
+	ForInput(ctx context.Context, schemaResolver resolver.SchemaResolver, versionedAttr *admission.VersionedAttributes, request *v1.AdmissionRequest, optionalVars OptionalVariableBindings, namespace *corev1.Namespace, runtimeCELCostBudget int64) ([]EvaluationResult, int64, error)
 
-	// CompilationErrors returns a list of errors from the compilation of the evaluator
+	// CompilationErrors returns a list of errors from the compilation of the patch
 	CompilationErrors() []error
 }
 
-// EvaluatorCompiler contains a function to assist with converting types and values to/from CEL-typed values.
-type EvaluatorCompiler interface {
-	// CompileEvaluator is used for the cel expression compilation
-	CompileEvaluator(expression ExpressionAccessor, optionalDecls OptionalVariableDeclarations, envType environment.Type) Evaluator
+// PatchCompiler compiles an expression with incomplete type information, stores it, and then
+// recompiles it as needed with late bound type information provided by a SchemaResolver, at runtime.
+type PatchCompiler interface {
+	// CompilePatch compiles an expression using incomplete type information and returns
+	// and patch.
+	CompilePatch(expression ExpressionAccessor, optionalDecls OptionalVariableDeclarations, envType environment.Type) Patch
 }
 
-// Evaluator contains the result of compiling a CEL expression.
+// Patch contains the result of compiling a CEL expression with incomplete type information, and
+// provides late bound schema aware recompilation using the provided SchemaResolver before evaluation of the expression.
 // It expects the inbound object to already have been converted to the version expected
 // by the underlying CEL code (which is indicated by the match criteria of a policy definition).
 // versionedParams may be nil.
-type Evaluator interface {
+type Patch interface {
 	// ForInput converts compiled CEL-typed values into a CEL-typed value to be patched.
 	// runtimeCELCostBudget was added for testing purpose only. Callers should always use const RuntimeCELCostBudget from k8s.io/apiserver/pkg/apis/cel/config.go as input.
 	// If cost budget is calculated, the filter should return the remaining budget.
-	ForInput(ctx context.Context, versionedAttr *admission.VersionedAttributes, request *v1.AdmissionRequest, optionalVars OptionalVariableBindings, namespace *corev1.Namespace, runtimeCELCostBudget int64) (EvaluationResult, int64, error)
+	ForInput(ctx context.Context, schemaResolver resolver.SchemaResolver, versionedAttr *admission.VersionedAttributes, request *v1.AdmissionRequest, optionalVars OptionalVariableBindings, namespace *corev1.Namespace, runtimeCELCostBudget int64) (EvaluationResult, int64, error)
 
-	// CompilationErrors returns a list of errors from the compilation of the evaluator
+	// CompilationErrors returns a list of errors from the compilation of the patch
 	CompilationErrors() []error
 }
