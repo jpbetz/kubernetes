@@ -167,14 +167,39 @@ func (s *ValidationTestBuilder) ValidateFixtures() {
 			s.Fatal(err)
 		}
 		// Compare fixture with validation results
-		if !cmp.Equal(got, testdata) {
-			s.Errorf("validateFalse args, grouped by field path, differed from %s:\n"+
-				"%s\n"+
-				"If the test expectations have changed, run go test with the environment variable %s=true",
-				testdataFilename, cmp.Diff(got, testdata), fixtureEnvVar)
+		expectedKeys := sets.New[string]()
+		gotKeys := sets.New[string]()
+		for k := range got {
+			gotKeys.Insert(k)
+		}
+		hasErrors := false
+		for k, expectedForType := range testdata {
+			expectedKeys.Insert(k)
+			gotForType, ok := got[k]
+			s.T.Run(k, func(t *testing.T) {
+				if !ok {
+					t.Errorf("%q has expected validateFalse args in %s but got no validation errors.", k, testdataFilename)
+					hasErrors = true
+				} else {
+					if !cmp.Equal(gotForType, expectedForType) {
+						t.Errorf("validateFalse args, grouped by field path, differed from %s:\n%s\n",
+							testdataFilename, cmp.Diff(gotForType, expectedForType))
+						hasErrors = true
+					}
+				}
+			})
+		}
+		for unexpectedType := range gotKeys.Difference(expectedKeys) {
+			s.T.Run(unexpectedType, func(t *testing.T) {
+				t.Errorf("%q got unexpected validateFalse args, grouped by field path:\n%s\n",
+					unexpectedType, cmp.Diff(nil, got[unexpectedType]))
+				hasErrors = true
+			})
+		}
+		if hasErrors {
+			s.T.Logf("If the test expectations have changed, run go test with the environment variable %s=true", fixtureEnvVar)
 		}
 	}
-
 }
 
 func fuzzer() *fuzz.Fuzzer {
