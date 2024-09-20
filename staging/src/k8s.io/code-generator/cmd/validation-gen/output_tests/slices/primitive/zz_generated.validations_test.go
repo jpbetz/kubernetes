@@ -25,6 +25,6 @@ import (
 	"testing"
 )
 
-func Test(t *testing.T) {
+func TestValidation(t *testing.T) {
 	localSchemeBuilder.Test(t).ValidateFixtures()
 }
