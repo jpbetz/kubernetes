@@ -1466,7 +1466,7 @@ func (g *fixtureTestGen) Imports(_ *generator.Context) (imports []string) {
 func (g *fixtureTestGen) Init(c *generator.Context, w io.Writer) error {
 	if g.testFixtureTags.Has("validateFalse") {
 		sw := generator.NewSnippetWriter(w, c, "$", "$")
-		sw.Do("func Test(t *testing.T) {\n", nil)
+		sw.Do("func TestValidation(t *testing.T) {\n", nil)
 		sw.Do("  localSchemeBuilder.Test(t).ValidateFixtures()\n", nil)
 		sw.Do("}\n", nil)
 	}
