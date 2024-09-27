@@ -13,9 +13,6 @@
   - Define how update validators are authored (CEL transition rules have explored WHEN a update rule should trigger)
 - Warning support
   - Decide how to implement
-- Ratcheting support?
-  - Do we need to do anything with feature gate awareness?
-  - Some handwritten validations take options params that guide validation behavior. How to support?
 - Stop using "+k8s:validation-gen=TypeMeta" to find root types?
   - Do we need something more flexible?
 - Stop generating validation for list types

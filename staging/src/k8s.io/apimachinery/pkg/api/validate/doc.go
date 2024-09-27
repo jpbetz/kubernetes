@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// package validate holds API validation functions which are designed for use
+// Package validate holds API validation functions which are designed for use
 // with the k8s.io/code-generator/cmd/validation-gen tool.  Each validation
 // function has a similar fingerprint:
 //
@@ -31,6 +31,17 @@ limitations under the License.
 // operation, either value or oldValue may be nil, e.g. when adding or removing
 // a value in a list-map.  Validators which care about UPDATE operations should
 // look at the opCtx argument to know which operation is being executed.
+//
+// Tightened validation (also known as ratcheting validation) is supported by
+// defining a new validation function. For example:
+//
+//	func TightenedMaxLength(opCtx operation.Context, fldPath *field.Path, value, oldValue *string) field.ErrorList {
+//	  if oldValue != nil && len(MaxLength(opCtx, fldPath, oldValue, nil)) > 0 {
+//	    // old value is not valid, so this value skips the tightened validation
+//	    return nil
+//	  }
+//	  return MaxLength(opCtx, fldPath, value, nil)
+//	}
 //
 // In general, we cannot distinguish a non-specified slice or map from one that
 // is specified but empty.  Validators should not rely on nil values, but use
