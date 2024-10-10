@@ -46,6 +46,20 @@ func Required[T comparable](_ operation.Context, fldPath *field.Path, value, _ *
 	return field.ErrorList{field.Required(fldPath, "")}
 }
 
+// Forbidden verifies that the specified value is the zero-value for its
+// type.
+func Forbidden[T comparable](_ operation.Context, fldPath *field.Path, value, _ *T) field.ErrorList {
+	if value == nil {
+		return nil
+	}
+	var zero T
+	if *value == zero {
+		return nil
+	}
+
+	return field.ErrorList{field.Forbidden(fldPath, "")}
+}
+
 // Optional verifies that the specified value is not the zero-value for its
 // type. This is identical to Required, but the caller should treat an error
 // here as an indication that the optional value was not specified.

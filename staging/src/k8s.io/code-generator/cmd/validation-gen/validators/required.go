@@ -18,16 +18,16 @@ package validators
 
 import (
 	"k8s.io/gengo/v2"
-	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
 )
 
 func init() {
 	AddToRegistry(InitRequiredDeclarativeValidator)
+	AddToRegistry(InitForbiddenDeclarativeValidator)
 	AddToRegistry(InitOptionalDeclarativeValidator)
 }
 
-func InitRequiredDeclarativeValidator(c *generator.Context) DeclarativeValidator {
+func InitRequiredDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
 	return &requiredDeclarativeValidator{}
 }
 
@@ -57,7 +57,37 @@ func (requiredDeclarativeValidator) Docs() []TagDoc {
 	}}
 }
 
-func InitOptionalDeclarativeValidator(c *generator.Context) DeclarativeValidator {
+func InitForbiddenDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
+	return &forbiddenDeclarativeValidator{}
+}
+
+type forbiddenDeclarativeValidator struct{}
+
+const (
+	forbiddenTagName = "forbidden" // TODO: also support k8s:forbidden
+)
+
+var (
+	forbiddenValidator = types.Name{Package: libValidationPkg, Name: "Forbidden"}
+)
+
+func (forbiddenDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
+	_, forbidden := gengo.ExtractCommentTags("+", comments)[forbiddenTagName]
+	if !forbidden {
+		return Validations{}, nil
+	}
+	return Validations{Functions: []FunctionGen{Function(forbiddenTagName, ShortCircuit, forbiddenValidator)}}, nil
+}
+
+func (forbiddenDeclarativeValidator) Docs() []TagDoc {
+	return []TagDoc{{
+		Tag:         forbiddenTagName,
+		Description: "Indicates that a field is forbidden to be specified.",
+		Contexts:    []TagContext{TagContextType, TagContextField},
+	}}
+}
+
+func InitOptionalDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
 	return &optionalDeclarativeValidator{}
 }
 
