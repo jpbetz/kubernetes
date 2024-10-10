@@ -54,7 +54,7 @@ func (endpointsStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.
 // Validate validates a new endpoints.
 func (endpointsStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateEndpointsCreate(obj.(*api.Endpoints))
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -75,7 +75,7 @@ func (endpointsStrategy) AllowCreateOnUpdate() bool {
 // ValidateUpdate is the default update validation for an end user.
 func (endpointsStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateEndpointsUpdate(obj.(*api.Endpoints), old.(*api.Endpoints))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
 	return allErrs
 }
 

@@ -16,12 +16,16 @@ limitations under the License.
 
 package operation
 
+import "k8s.io/apimachinery/pkg/util/sets"
+
 // Context provides contextual information about a validation request and the API
 // operation being validated.
 // This type is intended for use with generate validation code and may be enhanced
 // in the future to include other information needed to validate requests.
 type Context struct {
 	Operation Operation
+	// Options tracks the options enabled for validation.
+	Options sets.Set[string]
 }
 
 // Operation is the request operation to be validated.

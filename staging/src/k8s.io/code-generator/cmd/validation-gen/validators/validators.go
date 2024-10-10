@@ -112,6 +112,24 @@ type FunctionGen interface {
 
 	// Flags returns the options for this validator function.
 	Flags() FunctionFlags
+
+	// Conditions returns the conditions that must true for a resource to be
+	// validated by this function.
+	Conditions() Conditions
+}
+
+// Conditions defines what conditions must be true for a resource to be validated.
+// If any of the conditions are not true, the resource is not validated.
+type Conditions struct {
+	// OptionEnabled specifies an option name that must be set to true for the condition to be true.
+	OptionEnabled string
+
+	// OptionDisabled specifies an option name that must be set to false for the condition to be true.
+	OptionDisabled string
+}
+
+func (c Conditions) Empty() bool {
+	return len(c.OptionEnabled) == 0 && len(c.OptionDisabled) == 0
 }
 
 // Identifier is a name that the generator will output as an identifier.
@@ -154,12 +172,21 @@ func GenericFunction(tagName string, flags FunctionFlags, function types.Name, t
 	return &functionGen{tagName: tagName, flags: flags, function: function, extraArgs: anyArgs, typeArgs: typeArgs}
 }
 
+func WithCondition(fn FunctionGen, conditions Conditions) FunctionGen {
+	name, args := fn.SignatureAndArgs()
+	return &functionGen{
+		tagName: fn.TagName(), flags: fn.Flags(), function: name, extraArgs: args, typeArgs: fn.TypeArgs(),
+		conditions: conditions,
+	}
+}
+
 type functionGen struct {
-	tagName   string
-	function  types.Name
-	extraArgs []any
-	typeArgs  []types.Name
-	flags     FunctionFlags
+	tagName    string
+	function   types.Name
+	extraArgs  []any
+	typeArgs   []types.Name
+	flags      FunctionFlags
+	conditions Conditions
 }
 
 func (v *functionGen) TagName() string {
@@ -175,6 +202,8 @@ func (v *functionGen) TypeArgs() []types.Name { return v.typeArgs }
 func (v *functionGen) Flags() FunctionFlags {
 	return v.flags
 }
+
+func (v *functionGen) Conditions() Conditions { return v.conditions }
 
 // Variable creates a VariableGen for a given function name and extraArgs.
 func Variable(variable PrivateVar, init FunctionGen) VariableGen {

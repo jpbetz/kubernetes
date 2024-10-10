@@ -17,7 +17,6 @@ limitations under the License.
 package validators
 
 import (
-	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
 	"k8s.io/kube-openapi/pkg/generators"
 )
@@ -26,7 +25,7 @@ func init() {
 	AddToRegistry(InitOpenAPIDeclarativeValidator)
 }
 
-func InitOpenAPIDeclarativeValidator(c *generator.Context) DeclarativeValidator {
+func InitOpenAPIDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
 	return &openAPIDeclarativeValidator{}
 }
 

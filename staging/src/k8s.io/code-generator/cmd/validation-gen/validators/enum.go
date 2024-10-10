@@ -37,8 +37,8 @@ func init() {
 	AddToRegistry(InitEnumDeclarativeValidator)
 }
 
-func InitEnumDeclarativeValidator(c *generator.Context) DeclarativeValidator {
-	return &enumDeclarativeValidator{enumContext: newEnumContext(c)}
+func InitEnumDeclarativeValidator(cfg *ValidatorConfig) DeclarativeValidator {
+	return &enumDeclarativeValidator{enumContext: newEnumContext(cfg.GeneratorContext)}
 }
 
 type enumDeclarativeValidator struct {
