@@ -57,18 +57,18 @@ func (s *Scheme) AddValidationFunc(srcType any, fn func(opCtx operation.Context,
 }
 
 // Validate validates an object using the registered validation function.
-func (s *Scheme) Validate(object any, subresources ...string) field.ErrorList {
+func (s *Scheme) Validate(opts sets.Set[string], object any, subresources ...string) field.ErrorList {
 	if len(s.registrationErrors) > 0 {
 		return s.registrationErrors // short circuit with registration errors if any are present
 	}
 	if fn, ok := s.validationFuncs[reflect.TypeOf(object)]; ok {
-		return fn(operation.Context{Operation: operation.Create}, object, nil, subresources...)
+		return fn(operation.Context{Operation: operation.Create, Options: opts}, object, nil, subresources...)
 	}
 	return nil
 }
 
 // ValidateUpdate validates an update to an object using the registered validation function.
-func (s *Scheme) ValidateUpdate(object, oldObject any, subresources ...string) field.ErrorList {
+func (s *Scheme) ValidateUpdate(opts sets.Set[string], object, oldObject any, subresources ...string) field.ErrorList {
 	if len(s.registrationErrors) > 0 {
 		return s.registrationErrors // short circuit with registration errors if any are present
 	}
@@ -225,6 +225,7 @@ type ValidationTester struct {
 	*ValidationTestBuilder
 	value    any
 	oldValue any
+	opts     sets.Set[string]
 }
 
 // OldValue sets the oldValue for this ValidationTester. When oldValue is set to
@@ -241,6 +242,12 @@ func (v *ValidationTester) OldValue(oldValue any) *ValidationTester {
 func (v *ValidationTester) OldValueFuzzed(oldValue any) *ValidationTester {
 	fuzzer().Fuzz(oldValue)
 	v.oldValue = oldValue
+	return v
+}
+
+// Opts sets the ValidationOpts to use.
+func (v *ValidationTester) Opts(opts sets.Set[string]) *ValidationTester {
+	v.opts = opts
 	return v
 }
 
@@ -361,9 +368,9 @@ func byFullError(err *field.Error) string {
 func (v *ValidationTester) validate() field.ErrorList {
 	var errs field.ErrorList
 	if v.oldValue == nil {
-		errs = v.s.Validate(v.value)
+		errs = v.s.Validate(v.opts, v.value)
 	} else {
-		errs = v.s.ValidateUpdate(v.value, v.oldValue)
+		errs = v.s.ValidateUpdate(v.opts, v.value, v.oldValue)
 	}
 	return errs
 }

@@ -22,7 +22,6 @@ import (
 	"slices"
 
 	"k8s.io/gengo/v2"
-	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/parser/tags"
 	"k8s.io/gengo/v2/types"
 )
@@ -37,9 +36,9 @@ func init() {
 	AddToRegistry(InitUnionDeclarativeValidator)
 }
 
-func InitUnionDeclarativeValidator(c *generator.Context) DeclarativeValidator {
+func InitUnionDeclarativeValidator(cfg *ValidatorConfig) DeclarativeValidator {
 	return &unionDeclarativeValidator{
-		universe: c.Universe,
+		universe: cfg.GeneratorContext.Universe,
 	}
 }
 

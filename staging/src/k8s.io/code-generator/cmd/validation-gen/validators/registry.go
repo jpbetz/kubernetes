@@ -24,7 +24,20 @@ import (
 
 var registry = &Registry{}
 
-type DeclarativeValidatorInit func(c *generator.Context) DeclarativeValidator
+// ValidatorConfig defines the configuration provided DeclarativeValidatorInit functions.
+type ValidatorConfig struct {
+	// GeneratorContext provides gogen's generator Context.
+	GeneratorContext *generator.Context
+	// EmbedValidator provides a way to compose validations.
+	// For example, it is possible to define a validation such as "+myValidator=+format=IP" by using
+	// the EmbedValidator to extract the validation for "+format=IP" and use the resulting Validations
+	// to create the Validations returned by the "+myValidator" DeclarativeValidator.
+	// EmbedValidator.ExtractValidations() SHOULD NOT be called during init, since other validators may not have yet
+	// initialized and may not yet be registered for use as an embedded validator.
+	EmbedValidator DeclarativeValidator
+}
+
+type DeclarativeValidatorInit func(cfg *ValidatorConfig) DeclarativeValidator
 
 // AddToRegistry adds a DeclarativeValidator to the registry by providing the
 // registry with an initializer it can use to construct a DeclarativeValidator for each
@@ -42,11 +55,18 @@ func (r *Registry) Add(validator DeclarativeValidatorInit) {
 }
 
 func NewValidator(c *generator.Context, enabledTags, disabledTags []string) DeclarativeValidator {
-	validators := make([]DeclarativeValidator, 0, len(registry.inits))
-	for _, init := range registry.inits {
-		validators = append(validators, init(c))
+	composite := &compositeValidator{
+		validators:   make([]DeclarativeValidator, 0, len(registry.inits)),
+		enabledTags:  sets.New(enabledTags...),
+		disabledTags: sets.New(disabledTags...)}
+	cfg := &ValidatorConfig{
+		GeneratorContext: c,
+		EmbedValidator:   composite,
 	}
-	return &compositeValidator{validators: validators, enabledTags: sets.New(enabledTags...), disabledTags: sets.New(disabledTags...)}
+	for _, init := range registry.inits {
+		composite.validators = append(composite.validators, init(cfg))
+	}
+	return composite
 }
 
 type compositeValidator struct {

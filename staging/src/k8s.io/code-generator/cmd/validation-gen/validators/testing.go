@@ -22,7 +22,6 @@ import (
 	"strings"
 
 	"k8s.io/gengo/v2"
-	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
 )
 
@@ -32,11 +31,11 @@ func init() {
 	AddToRegistry(InitValidateErrorDeclarativeValidator)
 }
 
-func InitValidateTrueDeclarativeValidator(c *generator.Context) DeclarativeValidator {
+func InitValidateTrueDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
 	return &fixedResultDeclarativeValidator{true}
 }
 
-func InitValidateFalseDeclarativeValidator(c *generator.Context) DeclarativeValidator {
+func InitValidateFalseDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
 	return &fixedResultDeclarativeValidator{false}
 }
 
@@ -44,7 +43,7 @@ type fixedResultDeclarativeValidator struct {
 	result bool
 }
 
-func InitValidateErrorDeclarativeValidator(c *generator.Context) DeclarativeValidator {
+func InitValidateErrorDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
 	return &errorDeclarativeValidator{}
 }
 
