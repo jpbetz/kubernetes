@@ -24,7 +24,15 @@ import "k8s.io/apimachinery/pkg/util/sets"
 // in the future to include other information needed to validate requests.
 type Context struct {
 	Operation Operation
-	// Options tracks the options enabled for validation.
+	// Options declare the options enabled for validation.
+	// Options should be set according to a resource validation strategy before validation
+	// is performed, and must be treated as read-only during validation.
+	// Options are identified by string names. Option string names may match the name of a feature
+	// gate, in which case the presence of the name in the set indicates that the feature is
+	// considered enabled for the resource being validated.  Note that a resource may have a
+	// feature enabled even when the feature gate is disabled. This can happen when feature is
+	// already in-use by a resource, often because the feature gate was enabled when the
+	// resource first began using the feature.
 	Options sets.Set[string]
 }
 
