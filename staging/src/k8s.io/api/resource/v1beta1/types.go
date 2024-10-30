@@ -36,7 +36,11 @@ const (
 // +genclient
 // +genclient:nonNamespaced
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// +k8s:prerelease-lifecycle-gen:introduced=1.32
+// +k8s:prerelease-lifecycle-gen:introduced=1.31
+//
+// This really only was introduced in 1.32, but we have to lie here because otherwise
+// https://github.com/kubernetes/kubernetes/blame/d001d5684e69b08e120dc328917925318c5f324c/staging/src/k8s.io/apiserver/pkg/server/storage/resource_encoding_config.go#L170-L179
+// prevents using v1beta1 as storage version (https://github.com/kubernetes/kubernetes/issues/128448).
 
 // ResourceSlice represents one or more resources in a pool of similar resources,
 // managed by a common driver. A pool may span more than one ResourceSlice, and exactly how many
@@ -297,7 +301,11 @@ type DeviceAttribute struct {
 const DeviceAttributeMaxValueLength = 64
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// +k8s:prerelease-lifecycle-gen:introduced=1.32
+// +k8s:prerelease-lifecycle-gen:introduced=1.31
+//
+// This really only was introduced in 1.32, but we have to lie here because otherwise
+// https://github.com/kubernetes/kubernetes/blame/d001d5684e69b08e120dc328917925318c5f324c/staging/src/k8s.io/apiserver/pkg/server/storage/resource_encoding_config.go#L170-L179
+// prevents using v1beta1 as storage version (https://github.com/kubernetes/kubernetes/issues/128448).
 
 // ResourceSliceList is a collection of ResourceSlices.
 type ResourceSliceList struct {
@@ -312,7 +320,11 @@ type ResourceSliceList struct {
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// +k8s:prerelease-lifecycle-gen:introduced=1.32
+// +k8s:prerelease-lifecycle-gen:introduced=1.31
+//
+// This really only was introduced in 1.32, but we have to lie here because otherwise
+// https://github.com/kubernetes/kubernetes/blame/d001d5684e69b08e120dc328917925318c5f324c/staging/src/k8s.io/apiserver/pkg/server/storage/resource_encoding_config.go#L170-L179
+// prevents using v1beta1 as storage version (https://github.com/kubernetes/kubernetes/issues/128448).
 
 // ResourceClaim describes a request for access to resources in the cluster,
 // for use by workloads. For example, if a workload needs an accelerator device
@@ -848,7 +860,11 @@ const (
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// +k8s:prerelease-lifecycle-gen:introduced=1.32
+// +k8s:prerelease-lifecycle-gen:introduced=1.31
+//
+// This really only was introduced in 1.32, but we have to lie here because otherwise
+// https://github.com/kubernetes/kubernetes/blame/d001d5684e69b08e120dc328917925318c5f324c/staging/src/k8s.io/apiserver/pkg/server/storage/resource_encoding_config.go#L170-L179
+// prevents using v1beta1 as storage version (https://github.com/kubernetes/kubernetes/issues/128448).
 
 // ResourceClaimList is a collection of claims.
 type ResourceClaimList struct {
@@ -864,7 +880,11 @@ type ResourceClaimList struct {
 // +genclient
 // +genclient:nonNamespaced
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// +k8s:prerelease-lifecycle-gen:introduced=1.32
+// +k8s:prerelease-lifecycle-gen:introduced=1.31
+//
+// This really only was introduced in 1.32, but we have to lie here because otherwise
+// https://github.com/kubernetes/kubernetes/blame/d001d5684e69b08e120dc328917925318c5f324c/staging/src/k8s.io/apiserver/pkg/server/storage/resource_encoding_config.go#L170-L179
+// prevents using v1beta1 as storage version (https://github.com/kubernetes/kubernetes/issues/128448).
 
 // DeviceClass is a vendor- or admin-provided resource that contains
 // device configuration and selectors. It can be referenced in
@@ -921,7 +941,11 @@ type DeviceClassConfiguration struct {
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// +k8s:prerelease-lifecycle-gen:introduced=1.32
+// +k8s:prerelease-lifecycle-gen:introduced=1.31
+//
+// This really only was introduced in 1.32, but we have to lie here because otherwise
+// https://github.com/kubernetes/kubernetes/blame/d001d5684e69b08e120dc328917925318c5f324c/staging/src/k8s.io/apiserver/pkg/server/storage/resource_encoding_config.go#L170-L179
+// prevents using v1beta1 as storage version (https://github.com/kubernetes/kubernetes/issues/128448).
 
 // DeviceClassList is a collection of classes.
 type DeviceClassList struct {
@@ -936,7 +960,11 @@ type DeviceClassList struct {
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// +k8s:prerelease-lifecycle-gen:introduced=1.32
+// +k8s:prerelease-lifecycle-gen:introduced=1.31
+//
+// This really only was introduced in 1.32, but we have to lie here because otherwise
+// https://github.com/kubernetes/kubernetes/blame/d001d5684e69b08e120dc328917925318c5f324c/staging/src/k8s.io/apiserver/pkg/server/storage/resource_encoding_config.go#L170-L179
+// prevents using v1beta1 as storage version (https://github.com/kubernetes/kubernetes/issues/128448).
 
 // ResourceClaimTemplate is used to produce ResourceClaim objects.
 //
@@ -971,7 +999,11 @@ type ResourceClaimTemplateSpec struct {
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// +k8s:prerelease-lifecycle-gen:introduced=1.32
+// +k8s:prerelease-lifecycle-gen:introduced=1.31
+//
+// This really only was introduced in 1.32, but we have to lie here because otherwise
+// https://github.com/kubernetes/kubernetes/blame/d001d5684e69b08e120dc328917925318c5f324c/staging/src/k8s.io/apiserver/pkg/server/storage/resource_encoding_config.go#L170-L179
+// prevents using v1beta1 as storage version (https://github.com/kubernetes/kubernetes/issues/128448).
 
 // ResourceClaimTemplateList is a collection of claim templates.
 type ResourceClaimTemplateList struct {
