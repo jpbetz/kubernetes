@@ -267,6 +267,8 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 			}
 		}
 
+		schemeBuilder := types.Name{Package: typesPkg.Path, Name: "SchemeBuilder"}
+
 		targets = append(targets,
 			&generator.SimpleTarget{
 				PkgName:       pkg.Name,
@@ -280,7 +282,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 
 				GeneratorsFunc: func(c *generator.Context) (generators []generator.Generator) {
 					generators = []generator.Generator{
-						NewGenValidations(args.OutputFile, pkg.Path, rootTypes, td, inputToPkg, declarativeValidator, schemaRegistry),
+						NewGenValidations(args.OutputFile, pkg.Path, rootTypes, td, inputToPkg, declarativeValidator, schemaRegistry, schemeBuilder),
 					}
 					testFixtureTags := testFixtureTag(pkg)
 					if testFixtureTags.Len() > 0 {

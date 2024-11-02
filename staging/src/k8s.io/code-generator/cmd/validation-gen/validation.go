@@ -67,10 +67,11 @@ type genValidations struct {
 	validator           validators.DeclarativeValidator
 	hasValidationsCache map[*typeNode]bool
 	schemaRegistry      types.Name
+	schemeBuilder       types.Name
 }
 
 // NewGenValidations cretes a new generator for the specified package.
-func NewGenValidations(outputFilename, outputPackage string, rootTypes []*types.Type, discovered *typeDiscoverer, inputToPkg map[string]string, validator validators.DeclarativeValidator, schemaRegistry types.Name) generator.Generator {
+func NewGenValidations(outputFilename, outputPackage string, rootTypes []*types.Type, discovered *typeDiscoverer, inputToPkg map[string]string, validator validators.DeclarativeValidator, schemaRegistry types.Name, schemeBuilder types.Name) generator.Generator {
 	return &genValidations{
 		GoGenerator: generator.GoGenerator{
 			OutputFilename: outputFilename,
@@ -83,6 +84,7 @@ func NewGenValidations(outputFilename, outputPackage string, rootTypes []*types.
 		validator:           validator,
 		hasValidationsCache: map[*typeNode]bool{},
 		schemaRegistry:      schemaRegistry,
+		schemeBuilder:       schemeBuilder,
 	}
 }
 
@@ -129,7 +131,7 @@ func (g *genValidations) isOtherPackage(pkg string) bool {
 func (g *genValidations) Init(c *generator.Context, w io.Writer) error {
 	klog.V(5).Infof("emitting registration code")
 	sw := generator.NewSnippetWriter(w, c, "$", "$")
-	g.emitRegisterFunction(c, g.schemaRegistry, sw)
+	g.emitRegisterFunction(c, g.schemaRegistry, g.schemeBuilder, sw)
 	if err := sw.Error(); err != nil {
 		return err
 	}
@@ -727,14 +729,14 @@ func mkSymbolArgs(c *generator.Context, names []types.Name) generator.Args {
 
 // emitRegisterFunction emits the type-registration logic for validation
 // functions.
-func (g *genValidations) emitRegisterFunction(c *generator.Context, schemeRegistry types.Name, sw *generator.SnippetWriter) {
+func (g *genValidations) emitRegisterFunction(c *generator.Context, schemeRegistry types.Name, schemeBuilder types.Name, sw *generator.SnippetWriter) {
 	scheme := c.Universe.Type(schemeRegistry)
 	schemePtr := &types.Type{
 		Kind: types.Pointer,
 		Elem: scheme,
 	}
 
-	sw.Do("func init() { localSchemeBuilder.Register(RegisterValidations)}\n\n", nil)
+	sw.Do("func init() { $.|raw$.Register(RegisterValidations)}\n\n", c.Universe.Type(schemeBuilder))
 
 	sw.Do("// RegisterValidations adds validation functions to the given scheme.\n", nil)
 	sw.Do("// Public to allow building arbitrary schemes.\n", nil)
