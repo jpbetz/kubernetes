@@ -14,6 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// +k8s:validation-gen=TypeMeta
+// +k8s:validation-gen-input=k8s.io/kubernetes/pkg/apis/core
+// +k8s:validation-gen-disabled-tags=enum
+
 // Package validation has functions for validating the correctness of api
 // objects and explaining what is wrong with them when they aren't valid.
 package validation // import "k8s.io/kubernetes/pkg/apis/core/validation"
