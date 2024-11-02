@@ -23,7 +23,7 @@ package maps
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
-var localSchemeBuilder = testscheme.New()
+var SchemeBuilder = testscheme.New()
 
 type T1 struct {
 	MSM1 map[string]M1 `json:"msm1"`

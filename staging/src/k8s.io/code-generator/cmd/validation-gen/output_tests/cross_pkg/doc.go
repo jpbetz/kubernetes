@@ -28,7 +28,7 @@ import (
 	"k8s.io/code-generator/cmd/validation-gen/testscheme"
 )
 
-var localSchemeBuilder = testscheme.New()
+var SchemeBuilder = testscheme.New()
 
 type T1 struct {
 	TypeMeta int

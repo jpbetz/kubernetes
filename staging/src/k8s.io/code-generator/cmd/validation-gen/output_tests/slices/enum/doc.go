@@ -23,7 +23,7 @@ package enum
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
-var localSchemeBuilder = testscheme.New()
+var SchemeBuilder = testscheme.New()
 
 // +validateFalse="type E1"
 type E1 string

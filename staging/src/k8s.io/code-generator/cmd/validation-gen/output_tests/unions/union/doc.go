@@ -22,7 +22,7 @@ package union
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
-var localSchemeBuilder = testscheme.New()
+var SchemeBuilder = testscheme.New()
 
 // Non-discriminated union
 type U struct {

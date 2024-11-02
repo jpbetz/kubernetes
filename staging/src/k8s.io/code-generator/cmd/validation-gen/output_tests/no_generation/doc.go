@@ -21,7 +21,7 @@ package nogeneration
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
-var localSchemeBuilder = testscheme.New()
+var SchemeBuilder = testscheme.New()
 
 type T1 struct {
 	// +validateFalse="from field T1.S"

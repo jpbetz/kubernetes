@@ -23,7 +23,7 @@ package multipletags
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
-var localSchemeBuilder = testscheme.New()
+var SchemeBuilder = testscheme.New()
 
 // +validateFalse="type T1 #1"
 // +validateFalse="type T1 #2"

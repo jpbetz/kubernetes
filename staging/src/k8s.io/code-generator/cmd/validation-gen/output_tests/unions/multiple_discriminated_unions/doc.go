@@ -22,7 +22,7 @@ package multiple_discriminated_unions
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
-var localSchemeBuilder = testscheme.New()
+var SchemeBuilder = testscheme.New()
 
 // Two discriminated unions in the same struct
 type DU struct {

@@ -23,7 +23,7 @@ package lists
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
-var localSchemeBuilder = testscheme.New()
+var SchemeBuilder = testscheme.New()
 
 type T1 struct {
 	LM1 []M1 `json:"lm1"`

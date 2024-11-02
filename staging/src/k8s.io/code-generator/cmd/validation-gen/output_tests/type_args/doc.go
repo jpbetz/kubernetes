@@ -26,7 +26,7 @@ import (
 	"k8s.io/code-generator/cmd/validation-gen/testscheme"
 )
 
-var localSchemeBuilder = testscheme.New()
+var SchemeBuilder = testscheme.New()
 
 // Explicitly set the type-arg to prove it renders properly.
 // NOTE: because of how validation code is generated, these must always be

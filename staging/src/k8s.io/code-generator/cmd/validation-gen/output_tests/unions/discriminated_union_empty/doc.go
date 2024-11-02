@@ -22,7 +22,7 @@ package discriminated_union_empty
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
-var localSchemeBuilder = testscheme.New()
+var SchemeBuilder = testscheme.New()
 
 // Empty discriminated union
 type DU1 struct {
