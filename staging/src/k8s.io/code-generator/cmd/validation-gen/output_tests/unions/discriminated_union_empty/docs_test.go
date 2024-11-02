@@ -21,7 +21,7 @@ import (
 )
 
 func Test(t *testing.T) {
-	st := localSchemeBuilder.Test(t)
+	st := SchemeBuilder.Test(t)
 
 	// Unions discriminators may be optional.
 	st.Value(&DU1{D: D("")}).ExpectValid()

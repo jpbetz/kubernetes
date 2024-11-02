@@ -26,5 +26,5 @@ import (
 )
 
 func TestValidation(t *testing.T) {
-	localSchemeBuilder.Test(t).ValidateFixtures()
+	SchemeBuilder.Test(t).ValidateFixtures()
 }

@@ -24,7 +24,7 @@ import (
 )
 
 func Test(t *testing.T) {
-	st := localSchemeBuilder.Test(t)
+	st := SchemeBuilder.Test(t)
 
 	st.Value(&T1{
 		E0:  "",                 // no valid value exists

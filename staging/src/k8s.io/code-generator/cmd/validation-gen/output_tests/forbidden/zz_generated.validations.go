@@ -31,7 +31,7 @@ import (
 	testscheme "k8s.io/code-generator/cmd/validation-gen/testscheme"
 )
 
-func init() { localSchemeBuilder.Register(RegisterValidations) }
+func init() { SchemeBuilder.Register(RegisterValidations) }
 
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
@@ -100,5 +100,6 @@ func Validate_T2(opCtx operation.Context, obj, oldObj *T2, fldPath *field.Path) 
 		return // do not proceed
 	}
 
+	// field T2.S has no validation
 	return errs
 }

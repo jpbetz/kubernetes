@@ -23,7 +23,7 @@ import (
 )
 
 func Test(t *testing.T) {
-	st := localSchemeBuilder.Test(t)
+	st := SchemeBuilder.Test(t)
 
 	st.Value(&T1{S1: ""}).
 		// All ifOptionDisabled validations should fail

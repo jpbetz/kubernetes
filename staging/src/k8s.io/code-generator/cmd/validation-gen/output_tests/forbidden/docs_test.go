@@ -24,7 +24,7 @@ import (
 )
 
 func Test(t *testing.T) {
-	st := localSchemeBuilder.Test(t)
+	st := SchemeBuilder.Test(t)
 
 	st.Value(&T1{S: "x", PS: pointer.To("x"), T2: T2{S: "x"}, PT2: &T2{S: "x"}}).
 		ExpectInvalid(

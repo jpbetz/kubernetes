@@ -23,7 +23,7 @@ import (
 )
 
 func Test(t *testing.T) {
-	st := localSchemeBuilder.Test(t)
+	st := SchemeBuilder.Test(t)
 
 	st.Value(&U{U1M1: &M1{S: "x"}, U2M1: &M1{S: "x"}}).ExpectValid()
 	st.Value(&U{U1M2: &M2{S: "x"}, U2M2: &M2{S: "x"}}).ExpectValid()

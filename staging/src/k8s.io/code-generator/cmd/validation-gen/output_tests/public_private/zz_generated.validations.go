@@ -31,7 +31,7 @@ import (
 	testscheme "k8s.io/code-generator/cmd/validation-gen/testscheme"
 )
 
-func init() { localSchemeBuilder.Register(RegisterValidations) }
+func init() { SchemeBuilder.Register(RegisterValidations) }
 
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
