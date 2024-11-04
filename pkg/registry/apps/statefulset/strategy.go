@@ -142,7 +142,7 @@ func (statefulSetStrategy) Validate(ctx context.Context, obj runtime.Object) fie
 	opts := pod.GetValidationOptionsFromPodTemplate(&statefulSet.Spec.Template, nil)
 
 	allErrs := validation.ValidateStatefulSet(statefulSet, opts)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, legacyscheme.Scheme.Validate(nil, obj, []string{}...)...)
 	return allErrs
 }
 
@@ -172,7 +172,7 @@ func (statefulSetStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.
 
 	opts := pod.GetValidationOptionsFromPodTemplate(&newStatefulSet.Spec.Template, &oldStatefulSet.Spec.Template)
 	allErrs := validation.ValidateStatefulSetUpdate(newStatefulSet, oldStatefulSet, opts)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	allErrs = append(allErrs, legacyscheme.Scheme.ValidateUpdate(nil, obj, old, []string{}...)...)
 	return allErrs
 }
 
@@ -225,7 +225,7 @@ func (statefulSetStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old 
 func (statefulSetStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	// TODO: Validate status updates.
 	allErrs := validation.ValidateStatefulSetStatusUpdate(obj.(*apps.StatefulSet), old.(*apps.StatefulSet))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old, "status")...)
+	allErrs = append(allErrs, legacyscheme.Scheme.ValidateUpdate(nil, obj, old, []string{"status"}...)...)
 	return allErrs
 }
 

@@ -27,7 +27,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/registry/generic"
-	"k8s.io/apiserver/pkg/registry/rest"
 	pkgstorage "k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
@@ -89,7 +88,7 @@ func (svcStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object
 func (svcStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	service := obj.(*api.Service)
 	allErrs := validation.ValidateServiceCreate(service)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, legacyscheme.Scheme.Validate(nil, obj, []string{}...)...)
 	return allErrs
 }
 
@@ -108,7 +107,7 @@ func (svcStrategy) AllowCreateOnUpdate() bool {
 
 func (strategy svcStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateServiceUpdate(obj.(*api.Service), old.(*api.Service))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	allErrs = append(allErrs, legacyscheme.Scheme.ValidateUpdate(nil, obj, old, []string{}...)...)
 	return allErrs
 }
 
@@ -167,7 +166,7 @@ func (serviceStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old runt
 // ValidateUpdate is the default update validation for an end user updating status
 func (serviceStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateServiceStatusUpdate(obj.(*api.Service), old.(*api.Service))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old, "status")...)
+	allErrs = append(allErrs, legacyscheme.Scheme.ValidateUpdate(nil, obj, old, []string{"status"}...)...)
 	return allErrs
 }
 

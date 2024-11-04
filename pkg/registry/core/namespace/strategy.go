@@ -28,7 +28,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/registry/generic"
-	"k8s.io/apiserver/pkg/registry/rest"
 	apistorage "k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
@@ -98,7 +97,7 @@ func (namespaceStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.
 func (namespaceStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	namespace := obj.(*api.Namespace)
 	allErrs := validation.ValidateNamespace(namespace)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, legacyscheme.Scheme.Validate(nil, obj, []string{}...)...)
 	return allErrs
 }
 
@@ -142,7 +141,7 @@ func (namespaceStrategy) AllowCreateOnUpdate() bool {
 func (namespaceStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	errorList := validation.ValidateNamespace(obj.(*api.Namespace))
 	allErrs := append(errorList, validation.ValidateNamespaceUpdate(obj.(*api.Namespace), old.(*api.Namespace))...)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	allErrs = append(allErrs, legacyscheme.Scheme.ValidateUpdate(nil, obj, old, []string{}...)...)
 	return allErrs
 }
 
@@ -179,7 +178,7 @@ func (namespaceStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old ru
 
 func (namespaceStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateNamespaceStatusUpdate(obj.(*api.Namespace), old.(*api.Namespace))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old, "status")...)
+	allErrs = append(allErrs, legacyscheme.Scheme.ValidateUpdate(nil, obj, old, []string{"status"}...)...)
 	return allErrs
 }
 

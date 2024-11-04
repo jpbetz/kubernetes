@@ -28,7 +28,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/registry/generic"
-	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
@@ -80,7 +79,7 @@ func (persistentvolumeStrategy) Validate(ctx context.Context, obj runtime.Object
 	opts := validation.ValidationOptionsForPersistentVolume(persistentvolume, nil)
 	errorList := validation.ValidatePersistentVolume(persistentvolume, opts)
 	errorList = append(errorList, volumevalidation.ValidatePersistentVolume(persistentvolume)...)
-	errorList = append(errorList, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	errorList = append(errorList, legacyscheme.Scheme.Validate(nil, obj, []string{}...)...)
 	return errorList
 }
 
@@ -112,7 +111,7 @@ func (persistentvolumeStrategy) ValidateUpdate(ctx context.Context, obj, old run
 	errorList := validation.ValidatePersistentVolume(newPv, opts)
 	errorList = append(errorList, volumevalidation.ValidatePersistentVolume(newPv)...)
 	errorList = append(errorList, validation.ValidatePersistentVolumeUpdate(newPv, oldPv, opts)...)
-	errorList = append(errorList, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	errorList = append(errorList, legacyscheme.Scheme.ValidateUpdate(nil, obj, old, []string{}...)...)
 	return errorList
 }
 
@@ -166,7 +165,7 @@ func (persistentvolumeStatusStrategy) PrepareForUpdate(ctx context.Context, obj,
 
 func (persistentvolumeStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidatePersistentVolumeStatusUpdate(obj.(*api.PersistentVolume), old.(*api.PersistentVolume))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old, "status")...)
+	allErrs = append(allErrs, legacyscheme.Scheme.ValidateUpdate(nil, obj, old, []string{"status"}...)...)
 	return allErrs
 }
 

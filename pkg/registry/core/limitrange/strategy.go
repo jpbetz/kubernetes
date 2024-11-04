@@ -22,7 +22,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/uuid"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/storage/names"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	api "k8s.io/kubernetes/pkg/apis/core"
@@ -55,7 +54,7 @@ func (limitrangeStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime
 func (limitrangeStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	limitRange := obj.(*api.LimitRange)
 	allErrs := validation.ValidateLimitRange(limitRange)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, legacyscheme.Scheme.Validate(nil, obj, []string{}...)...)
 	return allErrs
 }
 
@@ -75,7 +74,7 @@ func (limitrangeStrategy) AllowCreateOnUpdate() bool {
 func (limitrangeStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	limitRange := obj.(*api.LimitRange)
 	allErrs := validation.ValidateLimitRange(limitRange)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	allErrs = append(allErrs, legacyscheme.Scheme.ValidateUpdate(nil, obj, old, []string{}...)...)
 	return allErrs
 }
 

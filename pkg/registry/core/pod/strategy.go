@@ -40,7 +40,6 @@ import (
 	utilvalidation "k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/registry/generic"
-	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
@@ -121,7 +120,7 @@ func (podStrategy) Validate(ctx context.Context, obj runtime.Object) field.Error
 	opts := podutil.GetValidationOptionsFromPodSpecAndMeta(&pod.Spec, nil, &pod.ObjectMeta, nil)
 	opts.ResourceIsPod = true
 	allErrs := corevalidation.ValidatePodCreate(pod, opts)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, legacyscheme.Scheme.Validate(nil, obj, []string{}...)...)
 	return allErrs
 }
 
@@ -153,7 +152,7 @@ func (podStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) 
 	opts := podutil.GetValidationOptionsFromPodSpecAndMeta(&pod.Spec, &oldPod.Spec, &pod.ObjectMeta, &oldPod.ObjectMeta)
 	opts.ResourceIsPod = true
 	allErrs := corevalidation.ValidatePodUpdate(obj.(*api.Pod), old.(*api.Pod), opts)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	allErrs = append(allErrs, legacyscheme.Scheme.ValidateUpdate(nil, obj, old, []string{}...)...)
 	return allErrs
 }
 
@@ -241,7 +240,7 @@ func (podStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Ob
 	opts.ResourceIsPod = true
 
 	allErrs := corevalidation.ValidatePodStatusUpdate(obj.(*api.Pod), old.(*api.Pod), opts)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old, "status")...)
+	allErrs = append(allErrs, legacyscheme.Scheme.ValidateUpdate(nil, obj, old, []string{"status"}...)...)
 	return allErrs
 }
 

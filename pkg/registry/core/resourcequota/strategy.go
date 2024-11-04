@@ -23,7 +23,6 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/storage/names"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	api "k8s.io/kubernetes/pkg/apis/core"
@@ -74,7 +73,7 @@ func (resourcequotaStrategy) PrepareForUpdate(ctx context.Context, obj, old runt
 func (resourcequotaStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	resourcequota := obj.(*api.ResourceQuota)
 	allErrs := validation.ValidateResourceQuota(resourcequota)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, legacyscheme.Scheme.Validate(nil, obj, []string{}...)...)
 	return allErrs
 }
 
@@ -96,7 +95,7 @@ func (resourcequotaStrategy) AllowCreateOnUpdate() bool {
 func (resourcequotaStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	newObj, oldObj := obj.(*api.ResourceQuota), old.(*api.ResourceQuota)
 	allErrs := validation.ValidateResourceQuotaUpdate(newObj, oldObj)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	allErrs = append(allErrs, legacyscheme.Scheme.ValidateUpdate(nil, obj, old, []string{}...)...)
 	return allErrs
 }
 
@@ -136,7 +135,7 @@ func (resourcequotaStatusStrategy) PrepareForUpdate(ctx context.Context, obj, ol
 
 func (resourcequotaStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateResourceQuotaStatusUpdate(obj.(*api.ResourceQuota), old.(*api.ResourceQuota))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old, "status")...)
+	allErrs = append(allErrs, legacyscheme.Scheme.ValidateUpdate(nil, obj, old, []string{"status"}...)...)
 	return allErrs
 }
 
