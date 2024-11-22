@@ -19,6 +19,8 @@ package validation
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/google/go-cmp/cmp"
+	"iter"
 	"math"
 	"net"
 	"path"
@@ -30,7 +32,6 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/google/go-cmp/cmp"
 	netutils "k8s.io/utils/net"
 
 	v1 "k8s.io/api/core/v1"
@@ -4310,30 +4311,53 @@ func validatePodResources(spec *core.PodSpec, podClaimNames sets.Set[string], fl
 	return allErrs
 }
 
+type podSpecAccessor struct {
+	spec *core.PodSpec
+}
+
+func (p podSpecAccessor) Containers() iter.Seq2[string, resourcehelper.ContainerResources] {
+	return func(yield func(string, resourcehelper.ContainerResources) bool) {
+		for i := range p.spec.Containers {
+			yield(p.spec.Containers[i].Name, podContainerAccessor{&p.spec.Containers[i]})
+		}
+	}
+}
+
+func (p podSpecAccessor) InitContainers() iter.Seq2[string, resourcehelper.InitContainerResources] {
+	return func(yield func(string, resourcehelper.InitContainerResources) bool) {
+		for i := range p.spec.InitContainers {
+			yield(p.spec.InitContainers[i].Name, podContainerAccessor{&p.spec.InitContainers[i]})
+		}
+	}
+}
+
+type podContainerAccessor struct {
+	*core.Container
+}
+
+func (c podContainerAccessor) GetContainerName() string {
+	return c.Name
+}
+
+func (c podContainerAccessor) GetRequests() v1.ResourceList {
+	out := make(v1.ResourceList, len(c.Resources.Requests))
+	for resourceName, quantity := range c.Resources.Requests {
+		out[v1.ResourceName(resourceName)] = quantity
+	}
+	return out
+}
+
+func (c podContainerAccessor) IsContainerRestartPolicyAlways() bool {
+	return c.RestartPolicy != nil && *c.RestartPolicy == core.ContainerRestartPolicyAlways
+}
+
 // validatePodResourceConsistency checks if aggregate container-level requests are
 // less than or equal to pod-level requests, and individual container-level limits
 // are less than or equal to pod-level limits.
 func validatePodResourceConsistency(spec *core.PodSpec, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-
-	// Convert the *core.PodSpec to *v1.PodSpec to satisfy the call to
-	// resourcehelper.PodRequests method, in the subsequent lines,
-	// which requires a *v1.Pod object (containing a *v1.PodSpec).
-	v1PodSpec := &v1.PodSpec{}
-	// TODO(ndixita): Convert_core_PodSpec_To_v1_PodSpec is risky. Add a copy of
-	// AggregateContainerRequests against internal core.Pod type for beta release of
-	// PodLevelResources feature.
-	if err := corev1.Convert_core_PodSpec_To_v1_PodSpec(spec, v1PodSpec, nil); err != nil {
-		allErrs = append(allErrs, field.InternalError(fldPath, fmt.Errorf("invalid %q: %v", fldPath, err.Error())))
-	}
-
 	reqPath := fldPath.Child("requests")
-	// resourcehelper.AggregateContainerRequests method requires a Pod object to
-	// calculate the total requests requirements of a pod. Hence a Pod object using
-	// v1PodSpec i.e. (&v1.Pod{Spec: *v1PodSpec}, is created on the fly, and passed
-	// to the AggregateContainerRequests method to facilitate proper resource
-	// calculation without modifying AggregateContainerRequests method.
-	aggrContainerReqs := resourcehelper.AggregateContainerRequests(&v1.Pod{Spec: *v1PodSpec}, resourcehelper.PodResourcesOptions{})
+	aggrContainerReqs := resourcehelper.AggregatePodContainerRequests(podSpecAccessor{spec}, nil, resourcehelper.PodResourcesOptions{})
 
 	// Pod-level requests must be >= aggregate requests of all containers in a pod.
 	for resourceName, ctrReqs := range aggrContainerReqs {

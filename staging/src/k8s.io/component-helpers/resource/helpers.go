@@ -17,6 +17,8 @@ limitations under the License.
 package resource
 
 import (
+	"iter"
+
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
@@ -135,30 +137,61 @@ func PodRequests(pod *v1.Pod, opts PodResourcesOptions) v1.ResourceList {
 	return reqs
 }
 
-// AggregateContainerRequests computes the total resource requests of all the containers
-// in a pod. This computation folows the formula defined in the KEP for sidecar
+// PodSpecContainerResources provides access to the container resource requests in a pod spec.
+type PodSpecContainerResources interface {
+	// Containers iterates over the name and ContainerResources of the containers in the pod spec.
+	Containers() iter.Seq2[string, ContainerResources]
+	// InitContainers iterates over the name and ContainerResources of the init containers in the pod spec.
+	InitContainers() iter.Seq2[string, InitContainerResources]
+}
+
+// PodStatusContainerResources provides access to the container resource requests in a pod status.
+type PodStatusContainerResources interface {
+	// ContainerStatuses iterates over the name and ContainerResources of container statuses in the pod status.
+	ContainerStatuses() iter.Seq2[string, ContainerResources]
+	// IsPodResizeStatusInfeasible returns true if the pod resize status is infeasible.
+	IsPodResizeStatusInfeasible() bool
+}
+
+// ContainerResources provides access to the request resources of a container.
+type ContainerResources interface {
+	// GetRequests returns the container's resource requests.
+	GetRequests() v1.ResourceList
+}
+
+// InitContainerResources provides access to the request resources of an init container.
+type InitContainerResources interface {
+	ContainerResources
+	// IsContainerRestartPolicyAlways returns true if the init container has a restart policy of Always.
+	IsContainerRestartPolicyAlways() bool
+}
+
+// AggregatePodContainerRequests computes the total resource requests of all the containers
+// in a pod spec and status. This computation follows the formula defined in the KEP for sidecar
 // containers. See https://github.com/kubernetes/enhancements/tree/master/keps/sig-node/753-sidecar-containers#resources-calculation-for-scheduling-and-pod-admission
 // for more details.
-func AggregateContainerRequests(pod *v1.Pod, opts PodResourcesOptions) v1.ResourceList {
+// If opts.UseStatusResources is true, a status should be provided. If UseStatusResources is false, the status is ignored
+// and may be nil.
+func AggregatePodContainerRequests(spec PodSpecContainerResources, status PodStatusContainerResources, opts PodResourcesOptions) v1.ResourceList {
 	// attempt to reuse the maps if passed, or allocate otherwise
 	reqs := reuseOrClearResourceList(opts.Reuse)
-	var containerStatuses map[string]*v1.ContainerStatus
+	var containerStatuses map[string]v1.ResourceList
 	if opts.UseStatusResources {
-		containerStatuses = make(map[string]*v1.ContainerStatus, len(pod.Status.ContainerStatuses))
-		for i := range pod.Status.ContainerStatuses {
-			containerStatuses[pod.Status.ContainerStatuses[i].Name] = &pod.Status.ContainerStatuses[i]
+		containerStatuses = make(map[string]v1.ResourceList) // FIXME: Add a length function to PodSpecContainerResources and use it to allocate the map size
+		for name, request := range status.ContainerStatuses() {
+			containerStatuses[name] = request.GetRequests()
 		}
 	}
 
-	for _, container := range pod.Spec.Containers {
-		containerReqs := container.Resources.Requests
+	for name, containerResources := range spec.Containers() {
+		containerReqs := containerResources.GetRequests()
 		if opts.UseStatusResources {
-			cs, found := containerStatuses[container.Name]
-			if found && cs.Resources != nil {
-				if pod.Status.Resize == v1.PodResizeStatusInfeasible {
-					containerReqs = cs.Resources.Requests.DeepCopy()
+			cs, found := containerStatuses[name]
+			if found {
+				if status.IsPodResizeStatusInfeasible() {
+					containerReqs = cs.DeepCopy()
 				} else {
-					containerReqs = max(container.Resources.Requests, cs.Resources.Requests)
+					containerReqs = max(containerReqs, cs)
 				}
 			}
 		}
@@ -184,13 +217,13 @@ func AggregateContainerRequests(pod *v1.Pod, opts PodResourcesOptions) v1.Resour
 	// `InitContainerUse(i) = sum(Resources of restartable init containers with index < i) + Resources of i-th init container`.
 	//
 	// See https://github.com/kubernetes/enhancements/tree/master/keps/sig-node/753-sidecar-containers#exposing-pod-resource-requirements for the detail.
-	for _, container := range pod.Spec.InitContainers {
-		containerReqs := container.Resources.Requests
+	for _, container := range spec.InitContainers() {
+		containerReqs := container.GetRequests()
 		if len(opts.NonMissingContainerRequests) > 0 {
 			containerReqs = applyNonMissing(containerReqs, opts.NonMissingContainerRequests)
 		}
 
-		if container.RestartPolicy != nil && *container.RestartPolicy == v1.ContainerRestartPolicyAlways {
+		if container.IsContainerRestartPolicyAlways() {
 			// and add them to the resulting cumulative container requests
 			addResourceList(reqs, containerReqs)
 
@@ -212,6 +245,75 @@ func AggregateContainerRequests(pod *v1.Pod, opts PodResourcesOptions) v1.Resour
 
 	maxResourceList(reqs, initContainerReqs)
 	return reqs
+}
+
+// AggregateContainerRequests computes the total resource requests of all the containers
+// in a pod. This computation follows the formula defined in the KEP for sidecar
+// containers. See https://github.com/kubernetes/enhancements/tree/master/keps/sig-node/753-sidecar-containers#resources-calculation-for-scheduling-and-pod-admission
+// for more details.
+func AggregateContainerRequests(pod *v1.Pod, opts PodResourcesOptions) v1.ResourceList {
+	accessor := v1PodAccessor{pod} // implements both spec and status accessor interfaces
+	return AggregatePodContainerRequests(accessor, accessor, opts)
+}
+
+type v1PodAccessor struct {
+	*v1.Pod
+}
+
+func (p v1PodAccessor) Containers() iter.Seq2[string, ContainerResources] {
+	return func(yield func(string, ContainerResources) bool) {
+		for i := range p.Spec.Containers {
+			yield(p.Spec.Containers[i].Name, v1PodContainerAccessor{&p.Spec.Containers[i]})
+		}
+	}
+}
+
+func (p v1PodAccessor) InitContainers() iter.Seq2[string, InitContainerResources] {
+	return func(yield func(string, InitContainerResources) bool) {
+		for i := range p.Spec.InitContainers {
+			yield(p.Spec.InitContainers[i].Name, v1PodContainerAccessor{&p.Spec.InitContainers[i]})
+		}
+	}
+}
+
+func (p v1PodAccessor) ContainerStatuses() iter.Seq2[string, ContainerResources] {
+	return func(yield func(string, ContainerResources) bool) {
+		for i := range p.Status.ContainerStatuses {
+			yield(p.Status.ContainerStatuses[i].Name, v1PodStatusContainerAccessor{&p.Status.ContainerStatuses[i]})
+		}
+	}
+}
+
+func (p v1PodAccessor) IsPodResizeStatusInfeasible() bool {
+	return p.Status.Resize == v1.PodResizeStatusInfeasible
+}
+
+type v1PodContainerAccessor struct {
+	*v1.Container
+}
+
+func (c v1PodContainerAccessor) GetContainerName() string {
+	return c.Name
+}
+
+func (c v1PodContainerAccessor) GetRequests() v1.ResourceList {
+	return c.Resources.Requests
+}
+
+func (c v1PodContainerAccessor) IsContainerRestartPolicyAlways() bool {
+	return c.RestartPolicy != nil && *c.RestartPolicy == v1.ContainerRestartPolicyAlways
+}
+
+type v1PodStatusContainerAccessor struct {
+	*v1.ContainerStatus
+}
+
+func (c v1PodStatusContainerAccessor) GetContainerName() string {
+	return c.Name
+}
+
+func (c v1PodStatusContainerAccessor) GetRequests() v1.ResourceList {
+	return c.Resources.Requests
 }
 
 // applyNonMissing will return a copy of the given resource list with any missing values replaced by the nonMissing values
