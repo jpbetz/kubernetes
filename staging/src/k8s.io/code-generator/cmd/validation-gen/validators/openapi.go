@@ -35,10 +35,9 @@ func InitOpenAPIDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
 type openAPIDeclarativeValidator struct{}
 
 const (
-	markerPrefix     = "k8s:validation:"
-	formatTagName    = markerPrefix + "format"
-	maxLengthTagName = markerPrefix + "maxLength"
-	maxItemsTagName  = markerPrefix + "maxItems"
+	formatTagName    = "k8s:format"
+	maxLengthTagName = "k8s:maxLength"
+	maxItemsTagName  = "k8s:maxItems"
 )
 
 var (
@@ -50,7 +49,6 @@ var (
 
 func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
 	var result Validations
-	// Leverage the kube-openapi parser for 'k8s:validation:' validations.
 	commentTags := gengo.ExtractCommentTags("+", comments)
 
 	maxLength, ok, err := extractOptionalIntValue(commentTags, maxLengthTagName)
