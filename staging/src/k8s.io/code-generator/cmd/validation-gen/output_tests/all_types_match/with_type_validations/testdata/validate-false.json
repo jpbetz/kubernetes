@@ -4,7 +4,6 @@
         "type E1"
       ]
     },
-    "*withtypevalidations.E2": {},
     "*withtypevalidations.T1": {
       "": [
         "type T1"
@@ -12,6 +11,5 @@
       "s": [
         "field T1.S"
       ]
-    },
-    "*withtypevalidations.T2": {}
+    }
   }
