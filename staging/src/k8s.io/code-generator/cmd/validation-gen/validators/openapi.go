@@ -28,12 +28,14 @@ const (
 	formatTagName    = "k8s:format"
 	maxLengthTagName = "k8s:maxLength"
 	maxItemsTagName  = "k8s:maxItems"
+	minimumTagName   = "k8s:minimum"
 )
 
 func init() {
 	RegisterTagValidator(formatTagValidator{})
 	RegisterTagValidator(maxLengthTagValidator{})
 	RegisterTagValidator(maxItemsTagValidator{})
+	RegisterTagValidator(minimumTagValidator{})
 }
 
 type formatTagValidator struct{}
@@ -124,7 +126,7 @@ func (maxLengthTagValidator) GetValidations(context Context, _ []string, payload
 		t = t.Underlying
 	}
 	if t != types.String {
-		return result, fmt.Errorf("can only be used on string types")
+		return result, fmt.Errorf("can only be used on string types (%s)", rootTypeString(context.Type, t))
 	}
 
 	intVal, err := strconv.Atoi(payload)
@@ -181,7 +183,7 @@ func (maxItemsTagValidator) GetValidations(context Context, _ []string, payload 
 		t = t.Underlying
 	}
 	if t.Kind != types.Slice && t.Kind != types.Array {
-		return result, fmt.Errorf("can only be used on list types")
+		return result, fmt.Errorf("can only be used on list types (%s)", rootTypeString(context.Type, t))
 	}
 
 	intVal, err := strconv.Atoi(payload)
@@ -191,6 +193,7 @@ func (maxItemsTagValidator) GetValidations(context Context, _ []string, payload 
 	if intVal < 0 {
 		return result, fmt.Errorf("must be greater than or equal to zero")
 	}
+	// Note: maxItems short-circuits other validations.
 	result.AddFunction(Function(maxItemsTagName, ShortCircuit, maxItemsValidator, intVal))
 	return result, nil
 }
@@ -200,11 +203,56 @@ func (mitv maxItemsTagValidator) Docs() TagDoc {
 		Tag:         mitv.TagName(),
 		Scopes:      mitv.ValidScopes().UnsortedList(),
 		Description: "Indicates that a list field has a limit on its size.",
-		Payloads: []TagPayloadDoc{
-			{
-				Description: "<non-negative integer>",
-				Docs:        "This field must be no more than X items long.",
-			},
-		},
+		Payloads: []TagPayloadDoc{{
+			Description: "<non-negative integer>",
+			Docs:        "This field must be no more than X items long.",
+		}},
+	}
+}
+
+type minimumTagValidator struct{}
+
+func (minimumTagValidator) Init(_ Config) {}
+
+func (minimumTagValidator) TagName() string {
+	return minimumTagName
+}
+
+var minimumTagValidScopes = sets.New(
+	ScopeAny,
+)
+
+func (minimumTagValidator) ValidScopes() sets.Set[Scope] {
+	return minimumTagValidScopes
+}
+
+var (
+	minimumValidator = types.Name{Package: libValidationPkg, Name: "Minimum"}
+)
+
+func (minimumTagValidator) GetValidations(context Context, _ []string, payload string) (Validations, error) {
+	var result Validations
+
+	if t := realType(context.Type); !types.IsInteger(t) {
+		return result, fmt.Errorf("can only be used on integer types (%s)", rootTypeString(context.Type, t))
+	}
+
+	intVal, err := strconv.Atoi(payload)
+	if err != nil {
+		return result, fmt.Errorf("failed to parse tag payload as int: %v", err)
+	}
+	result.AddFunction(Function(minimumTagName, DefaultFlags, minimumValidator, intVal))
+	return result, nil
+}
+
+func (mtv minimumTagValidator) Docs() TagDoc {
+	return TagDoc{
+		Tag:         mtv.TagName(),
+		Scopes:      mtv.ValidScopes().UnsortedList(),
+		Description: "Indicates that a numeric field has a minimum value.",
+		Payloads: []TagPayloadDoc{{
+			Description: "<integer>",
+			Docs:        "This field must be greater than or equal to x.",
+		}},
 	}
 }
