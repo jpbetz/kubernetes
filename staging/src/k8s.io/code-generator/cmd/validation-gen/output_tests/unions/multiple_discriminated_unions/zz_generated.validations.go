@@ -59,7 +59,7 @@ func Validate_DU(opCtx operation.Context, obj, oldObj *DU, fldPath *field.Path) 
 	// field DU.U1M1
 	errs = append(errs,
 		func(obj, oldObj *M1, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+			if e := validate.OptionalPointer(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
 			return
@@ -68,7 +68,7 @@ func Validate_DU(opCtx operation.Context, obj, oldObj *DU, fldPath *field.Path) 
 	// field DU.U1M2
 	errs = append(errs,
 		func(obj, oldObj *M2, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+			if e := validate.OptionalPointer(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
 			return
@@ -79,7 +79,7 @@ func Validate_DU(opCtx operation.Context, obj, oldObj *DU, fldPath *field.Path) 
 	// field DU.U2M1
 	errs = append(errs,
 		func(obj, oldObj *M1, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+			if e := validate.OptionalPointer(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
 			return
@@ -88,7 +88,7 @@ func Validate_DU(opCtx operation.Context, obj, oldObj *DU, fldPath *field.Path) 
 	// field DU.U2M2
 	errs = append(errs,
 		func(obj, oldObj *M2, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.Optional(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+			if e := validate.OptionalPointer(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
 			return

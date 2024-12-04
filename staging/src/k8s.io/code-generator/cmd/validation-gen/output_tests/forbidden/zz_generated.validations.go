@@ -51,8 +51,11 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	// field T1.S
 	errs = append(errs,
 		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.Forbidden(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+			if e := validate.ForbiddenValue(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
+				return // do not proceed
+			}
+			if e := validate.OptionalValue(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
 			return
@@ -61,45 +64,30 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	// field T1.PS
 	errs = append(errs,
 		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.Forbidden(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+			if e := validate.ForbiddenPointer(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
+				return // do not proceed
+			}
+			if e := validate.OptionalPointer(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
 			return
 		}(obj.PS, safe.Field(oldObj, func(oldObj *T1) *string { return oldObj.PS }), fldPath.Child("ps"))...)
 
-	// field T1.T2
-	errs = append(errs,
-		func(obj, oldObj *T2, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.Forbidden(opCtx, fldPath, obj, oldObj); len(e) != 0 {
-				errs = append(errs, e...)
-				return // do not proceed
-			}
-			errs = append(errs, Validate_T2(opCtx, obj, oldObj, fldPath)...)
-			return
-		}(&obj.T2, safe.Field(oldObj, func(oldObj *T1) *T2 { return &oldObj.T2 }), fldPath.Child("t2"))...)
+	// field T1.T2 has no validation
 
 	// field T1.PT2
 	errs = append(errs,
 		func(obj, oldObj *T2, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.Forbidden(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+			if e := validate.ForbiddenPointer(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
 			}
-			errs = append(errs, Validate_T2(opCtx, obj, oldObj, fldPath)...)
+			if e := validate.OptionalPointer(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
 			return
 		}(obj.PT2, safe.Field(oldObj, func(oldObj *T1) *T2 { return oldObj.PT2 }), fldPath.Child("pt2"))...)
 
-	return errs
-}
-
-func Validate_T2(opCtx operation.Context, obj, oldObj *T2, fldPath *field.Path) (errs field.ErrorList) {
-	// type T2
-	if e := validate.Forbidden(opCtx, fldPath, obj, oldObj); len(e) != 0 {
-		errs = append(errs, e...)
-		return // do not proceed
-	}
-
-	// field T2.S has no validation
 	return errs
 }

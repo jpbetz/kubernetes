@@ -51,7 +51,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	// field T1.S
 	errs = append(errs,
 		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.Required(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+			if e := validate.RequiredValue(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
 			}
@@ -62,7 +62,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	// field T1.PS
 	errs = append(errs,
 		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.Required(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+			if e := validate.RequiredPointer(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
 			}
@@ -73,10 +73,6 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	// field T1.T2
 	errs = append(errs,
 		func(obj, oldObj *T2, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.Required(opCtx, fldPath, obj, oldObj); len(e) != 0 {
-				errs = append(errs, e...)
-				return // do not proceed
-			}
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.T2")...)
 			errs = append(errs, Validate_T2(opCtx, obj, oldObj, fldPath)...)
 			return
@@ -85,7 +81,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	// field T1.PT2
 	errs = append(errs,
 		func(obj, oldObj *T2, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.Required(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+			if e := validate.RequiredPointer(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
 			}

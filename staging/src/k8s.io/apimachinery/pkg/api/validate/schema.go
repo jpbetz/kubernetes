@@ -34,41 +34,111 @@ func MaxLength(_ operation.Context, fldPath *field.Path, value, _ *string, max i
 	return nil
 }
 
-// Required verifies that the specified value is not the zero-value for its
-// type.
-func Required[T comparable](_ operation.Context, fldPath *field.Path, value, _ *T) field.ErrorList {
-	if value != nil {
-		var zero T
-		if *value != zero {
-			return nil
-		}
+// RequiredValue verifies that the specified value is not the zero-value for
+// its type.
+func RequiredValue[T comparable](_ operation.Context, fldPath *field.Path, value, _ *T) field.ErrorList {
+	var zero T
+	if *value != zero {
+		return nil
 	}
 	return field.ErrorList{field.Required(fldPath, "")}
 }
 
-// Forbidden verifies that the specified value is the zero-value for its
-// type.
-func Forbidden[T comparable](_ operation.Context, fldPath *field.Path, value, _ *T) field.ErrorList {
-	if value == nil {
+// RequiredPointer verifies that the specified pointer is not nil.
+func RequiredPointer[T any](_ operation.Context, fldPath *field.Path, value, _ *T) field.ErrorList {
+	if value != nil {
 		return nil
 	}
+	return field.ErrorList{field.Required(fldPath, "")}
+}
+
+// RequiredSlice verifies that the specified slice is not empty.
+func RequiredSlice[T any](_ operation.Context, fldPath *field.Path, value, _ []T) field.ErrorList {
+	if len(value) > 0 {
+		return nil
+	}
+	return field.ErrorList{field.Required(fldPath, "")}
+}
+
+// RequiredMap verifies that the specified map is not empty.
+func RequiredMap[K comparable, T any](_ operation.Context, fldPath *field.Path, value, _ map[K]T) field.ErrorList {
+	if len(value) > 0 {
+		return nil
+	}
+	return field.ErrorList{field.Required(fldPath, "")}
+}
+
+// ForbiddenValue verifies that the specified value is the zero-value for its
+// type.
+func ForbiddenValue[T comparable](_ operation.Context, fldPath *field.Path, value, _ *T) field.ErrorList {
 	var zero T
 	if *value == zero {
 		return nil
 	}
-
 	return field.ErrorList{field.Forbidden(fldPath, "")}
 }
 
-// Optional verifies that the specified value is not the zero-value for its
-// type. This is identical to Required, but the caller should treat an error
-// here as an indication that the optional value was not specified.
-func Optional[T comparable](_ operation.Context, fldPath *field.Path, value, _ *T) field.ErrorList {
+// ForbiddenPointer verifies that the specified pointer is nil.
+func ForbiddenPointer[T any](_ operation.Context, fldPath *field.Path, value, _ *T) field.ErrorList {
+	if value == nil {
+		return nil
+	}
+	return field.ErrorList{field.Forbidden(fldPath, "")}
+}
+
+// ForbiddenSlice verifies that the specified slice is empty.
+func ForbiddenSlice[T any](_ operation.Context, fldPath *field.Path, value, _ []T) field.ErrorList {
+	if len(value) == 0 {
+		return nil
+	}
+	return field.ErrorList{field.Forbidden(fldPath, "")}
+}
+
+// RequiredMap verifies that the specified map is empty.
+func ForbiddenMap[K comparable, T any](_ operation.Context, fldPath *field.Path, value, _ map[K]T) field.ErrorList {
+	if len(value) == 0 {
+		return nil
+	}
+	return field.ErrorList{field.Forbidden(fldPath, "")}
+}
+
+// OptionalValue verifies that the specified value is not the zero-value for
+// its type. This is identical to RequiredValue, but the caller should treat an
+// error here as an indication that the optional value was not specified.
+func OptionalValue[T comparable](_ operation.Context, fldPath *field.Path, value, _ *T) field.ErrorList {
+	var zero T
+	if *value != zero {
+		return nil
+	}
+	return field.ErrorList{field.Required(fldPath, "optional value was not specified")}
+}
+
+// OptionalPointer verifies that the specified pointer is not nil. This is
+// identical to RequiredPointer, but the caller should treat an error here as an
+// indication that the optional value was not specified.
+func OptionalPointer[T any](_ operation.Context, fldPath *field.Path, value, _ *T) field.ErrorList {
 	if value != nil {
-		var zero T
-		if *value != zero {
-			return nil
-		}
+		return nil
+	}
+	return field.ErrorList{field.Required(fldPath, "optional value was not specified")}
+}
+
+// OptionalSlice verifies that the specified slice is not empty. This is
+// identical to RequiredSlice, but the caller should treat an error here as an
+// indication that the optional value was not specified.
+func OptionalSlice[T any](_ operation.Context, fldPath *field.Path, value, _ []T) field.ErrorList {
+	if len(value) > 0 {
+		return nil
+	}
+	return field.ErrorList{field.Required(fldPath, "optional value was not specified")}
+}
+
+// OptionalMap verifies that the specified map is not empty. This is identical
+// to RequiredMap, but the caller should treat an error here as an indication that
+// the optional value was not specified.
+func OptionalMap[K comparable, T any](_ operation.Context, fldPath *field.Path, value, _ map[K]T) field.ErrorList {
+	if len(value) > 0 {
+		return nil
 	}
 	return field.ErrorList{field.Required(fldPath, "optional value was not specified")}
 }

@@ -30,10 +30,10 @@ func Test(t *testing.T) {
 		ExpectInvalid(
 			field.Forbidden(field.NewPath("s"), ""),
 			field.Forbidden(field.NewPath("ps"), ""),
-			field.Forbidden(field.NewPath("t2"), ""),
+			// field.Forbidden(field.NewPath("t2"), ""),
 			field.Forbidden(field.NewPath("pt2"), ""),
 		)
 
-	st.Value(&T1{S: "", PS: pointer.To(""), T2: T2{S: ""}, PT2: &T2{S: ""}}).
+	st.Value(&T1{S: "", PS: nil, T2: T2{S: ""}, PT2: nil}).
 		ExpectValid()
 }

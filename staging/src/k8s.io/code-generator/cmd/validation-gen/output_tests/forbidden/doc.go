@@ -32,13 +32,11 @@ type T1 struct {
 	// +forbidden
 	PS *string `json:"ps"`
 
-	// +forbidden
 	T2 T2 `json:"t2"`
 	// +forbidden
 	PT2 *T2 `json:"pt2"`
 }
 
-// +forbidden="type T2"
 type T2 struct {
 	S string `json:"s"`
 }
