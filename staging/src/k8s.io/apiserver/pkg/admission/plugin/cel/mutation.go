@@ -23,6 +23,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/cel/environment"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 )
 
 // mutatingCompiler provides a MutatingCompiler implementation.
@@ -48,11 +49,11 @@ func NewMutatingEvaluator(compilationResult CompilationResult) MutatingEvaluator
 // ForInput evaluates the compiled CEL expression and returns an evaluation result
 // errors per evaluation are returned in the evaluation result
 // runtimeCELCostBudget was added for testing purpose only. Callers should always use const RuntimeCELCostBudget from k8s.io/apiserver/pkg/apis/cel/config.go as input.
-func (p *mutatingEvaluator) ForInput(ctx context.Context, versionedAttr *admission.VersionedAttributes, request *admissionv1.AdmissionRequest, inputs OptionalVariableBindings, namespace *v1.Namespace, runtimeCELCostBudget int64) (EvaluationResult, int64, error) {
+func (p *mutatingEvaluator) ForInput(ctx context.Context, schemaResolver resolver.SchemaResolver, versionedAttr *admission.VersionedAttributes, request *admissionv1.AdmissionRequest, inputs OptionalVariableBindings, namespace *v1.Namespace, runtimeCELCostBudget int64) (EvaluationResult, int64, error) {
 	// if this activation supports composition, we will need the compositionCtx. It may be nil.
 	compositionCtx, _ := ctx.(CompositionContext)
 
-	activation, err := newActivation(compositionCtx, versionedAttr, request, inputs, namespace)
+	activation, err := newActivation(compositionCtx, versionedAttr, request, inputs, namespace, schemaResolver)
 	if err != nil {
 		return EvaluationResult{}, -1, err
 	}

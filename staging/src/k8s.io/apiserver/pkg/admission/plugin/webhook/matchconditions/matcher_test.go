@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	api "k8s.io/api/core/v1"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 
 	v1 "k8s.io/api/admissionregistration/v1"
 
@@ -42,7 +43,7 @@ type fakeCelFilter struct {
 	throwError  bool
 }
 
-func (f *fakeCelFilter) ForInput(context.Context, *admission.VersionedAttributes, *admissionv1.AdmissionRequest, cel.OptionalVariableBindings, *api.Namespace, int64) ([]cel.EvaluationResult, int64, error) {
+func (f *fakeCelFilter) ForInput(context.Context, resolver.SchemaResolver, *admission.VersionedAttributes, *admissionv1.AdmissionRequest, cel.OptionalVariableBindings, *api.Namespace, int64) ([]cel.EvaluationResult, int64, error) {
 	if f.throwError {
 		return nil, 0, errors.New("test error")
 	}

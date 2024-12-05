@@ -41,7 +41,7 @@ func SchemaDeclType(s Schema, isResourceRoot bool) *apiservercel.DeclType {
 	if s == nil {
 		return nil
 	}
-	if s.IsXIntOrString() {
+	if isIntOrString(s) {
 		// schemas using XIntOrString are not required to have a type.
 
 		// intOrStringType represents the x-kubernetes-int-or-string union type in CEL expressions.
@@ -182,6 +182,27 @@ func SchemaDeclType(s Schema, isResourceRoot bool) *apiservercel.DeclType {
 	return nil
 }
 
+func isIntOrString(s Schema) bool {
+	// x-kubernetes-int-or-string
+	if s.IsXIntOrString() {
+		return true
+	}
+
+	// An int or string can also be denoted using OneOf
+	if len(s.OneOf()) != 2 {
+		return false
+	}
+	hasInt, hasString := false, false
+	for _, s := range s.OneOf() {
+		if s.Type() == "string" {
+			hasString = true
+		}
+		if s.Type() == "number" {
+			hasInt = true
+		}
+	}
+	return hasInt && hasString
+}
 func zeroIfNegative(v int64) int64 {
 	if v < 0 {
 		return 0

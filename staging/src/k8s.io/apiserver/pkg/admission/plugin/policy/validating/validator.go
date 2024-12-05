@@ -106,7 +106,7 @@ func (v *validator) Validate(ctx context.Context, matchedResource schema.GroupVe
 	admissionRequest := cel.CreateAdmissionRequest(versionedAttr.Attributes, metav1.GroupVersionResource(matchedResource), metav1.GroupVersionKind(versionedAttr.VersionedKind))
 	// Decide which fields are exposed
 	ns := cel.CreateNamespaceObject(namespace)
-	evalResults, remainingBudget, err := v.validationFilter.ForInput(ctx, versionedAttr, admissionRequest, optionalVars, ns, runtimeCELCostBudget)
+	evalResults, remainingBudget, err := v.validationFilter.ForInput(ctx, nil, versionedAttr, admissionRequest, optionalVars, ns, runtimeCELCostBudget)
 	if err != nil {
 		return ValidateResult{
 			Decisions: []PolicyDecision{
@@ -119,7 +119,7 @@ func (v *validator) Validate(ctx context.Context, matchedResource schema.GroupVe
 		}
 	}
 	decisions := make([]PolicyDecision, len(evalResults))
-	messageResults, _, err := v.messageFilter.ForInput(ctx, versionedAttr, admissionRequest, expressionOptionalVars, ns, remainingBudget)
+	messageResults, _, err := v.messageFilter.ForInput(ctx, nil, versionedAttr, admissionRequest, expressionOptionalVars, ns, remainingBudget)
 	for i, evalResult := range evalResults {
 		var decision = &decisions[i]
 		decision.Elapsed = evalResult.Elapsed
@@ -193,7 +193,7 @@ func (v *validator) Validate(ctx context.Context, matchedResource schema.GroupVe
 	}
 
 	options := cel.OptionalVariableBindings{VersionedParams: versionedParams}
-	auditAnnotationEvalResults, _, err := v.auditAnnotationFilter.ForInput(ctx, versionedAttr, admissionRequest, options, namespace, runtimeCELCostBudget)
+	auditAnnotationEvalResults, _, err := v.auditAnnotationFilter.ForInput(ctx, nil, versionedAttr, admissionRequest, options, namespace, runtimeCELCostBudget)
 	if err != nil {
 		return ValidateResult{
 			Decisions: []PolicyDecision{

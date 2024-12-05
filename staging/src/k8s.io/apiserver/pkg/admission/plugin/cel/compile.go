@@ -149,7 +149,15 @@ type CompilationResult struct {
 // Compiler provides a CEL expression compiler configured with the desired admission related CEL variables and
 // environment mode.
 type Compiler interface {
+	// CompileCELExpression returns a compiled CEL expression.
+	// perCallLimit was added for testing purpose only. Callers should always use const PerCallLimit from k8s.io/apiserver/pkg/apis/cel/config.go as input.
 	CompileCELExpression(expressionAccessor ExpressionAccessor, options OptionalVariableDeclarations, mode environment.Type) CompilationResult
+}
+
+type LateBoundCompiler interface {
+	// CompileWithLateBoundTypes is the same as CompileCELExpression but adds the provided TypeResolver to the environment
+	// just before compiling.
+	CompileWithLateBoundTypes(lateBoundTypesResolver common.TypeResolver, expressionAccessor ExpressionAccessor, options OptionalVariableDeclarations, envType environment.Type) CompilationResult
 }
 
 type compiler struct {
@@ -165,6 +173,16 @@ type variableDeclEnvs map[OptionalVariableDeclarations]*environment.EnvSet
 // CompileCELExpression returns a compiled CEL expression.
 // perCallLimit was added for testing purpose only. Callers should always use const PerCallLimit from k8s.io/apiserver/pkg/apis/cel/config.go as input.
 func (c compiler) CompileCELExpression(expressionAccessor ExpressionAccessor, options OptionalVariableDeclarations, envType environment.Type) CompilationResult {
+	return c.compile(expressionAccessor, options, envType, nil)
+}
+
+// CompileWithLateBoundTypes is the same as CompileCELExpression but adds the provided TypeResolver to the environment
+// just before compiling.
+func (c compiler) CompileWithLateBoundTypes(lateBoundTypeResolver common.TypeResolver, expressionAccessor ExpressionAccessor, options OptionalVariableDeclarations, envType environment.Type) CompilationResult {
+	return c.compile(expressionAccessor, options, envType, lateBoundTypeResolver)
+}
+
+func (c compiler) compile(expressionAccessor ExpressionAccessor, options OptionalVariableDeclarations, envType environment.Type, resolver common.TypeResolver) CompilationResult {
 	resultError := func(errorString string, errType apiservercel.ErrorType, cause error) CompilationResult {
 		return CompilationResult{
 			Error: &apiservercel.Error{
@@ -179,6 +197,12 @@ func (c compiler) CompileCELExpression(expressionAccessor ExpressionAccessor, op
 	env, err := c.varEnvs[options].Env(envType)
 	if err != nil {
 		return resultError(fmt.Sprintf("unexpected error loading CEL environment: %v", err), apiservercel.ErrorTypeInternal, nil)
+	}
+	if resolver != nil {
+		env, err = env.Extend(common.ResolverEnvOption(resolver))
+		if err != nil {
+			return resultError(fmt.Sprintf("unexpected error loading CEL environment: %v", err), apiservercel.ErrorTypeInternal, nil)
+		}
 	}
 
 	ast, issues := env.Compile(expressionAccessor.GetExpression())

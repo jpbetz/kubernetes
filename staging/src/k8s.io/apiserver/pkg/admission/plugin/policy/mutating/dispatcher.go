@@ -39,13 +39,15 @@ import (
 	webhookgeneric "k8s.io/apiserver/pkg/admission/plugin/webhook/generic"
 	celconfig "k8s.io/apiserver/pkg/apis/cel"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 )
 
-func NewDispatcher(a authorizer.Authorizer, m *matching.Matcher, tcm patch.TypeConverterManager) generic.Dispatcher[PolicyHook] {
+func NewDispatcher(a authorizer.Authorizer, m *matching.Matcher, tcm patch.TypeConverterManager, schemaResolver resolver.SchemaResolver) generic.Dispatcher[PolicyHook] {
 	res := &dispatcher{
 		matcher:              m,
 		authz:                a,
 		typeConverterManager: tcm,
+		schemaResolver:       schemaResolver,
 	}
 	res.Dispatcher = generic.NewPolicyDispatcher[*Policy, *PolicyBinding, PolicyEvaluator](
 		NewMutatingAdmissionPolicyAccessor,
@@ -60,6 +62,7 @@ type dispatcher struct {
 	matcher              *matching.Matcher
 	authz                authorizer.Authorizer
 	typeConverterManager patch.TypeConverterManager
+	schemaResolver       resolver.SchemaResolver
 	generic.Dispatcher[PolicyHook]
 }
 
@@ -243,6 +246,7 @@ func (d *dispatcher) dispatchOne(
 		OptionalVariables:   optionalVariables,
 		Namespace:           namespace,
 		TypeConverter:       typeConverter,
+		SchemaResolver:      d.schemaResolver,
 	}
 	newVersionedObject, err := patcher.Patch(ctx, patchRequest, celconfig.RuntimeCELCostBudget)
 	if err != nil {

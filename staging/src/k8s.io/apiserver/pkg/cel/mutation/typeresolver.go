@@ -21,6 +21,8 @@ import (
 
 	"k8s.io/apiserver/pkg/cel/common"
 	"k8s.io/apiserver/pkg/cel/mutation/dynamic"
+	"k8s.io/apiserver/pkg/cel/mutation/static"
+	"k8s.io/kube-openapi/pkg/validation/spec"
 )
 
 // ObjectTypeName is the name of Object types that are used to declare the types of
@@ -42,6 +44,25 @@ func (r *DynamicTypeResolver) Resolve(name string) (common.ResolvedType, bool) {
 	}
 	if name == ObjectTypeName || strings.HasPrefix(name, ObjectTypeName+".") {
 		return dynamic.NewObjectType(name), true
+	}
+	return nil, false
+}
+
+// SchemaTypeResolver resolves the Object and JSONPatch types when compiling
+// CEL expressions with schema information about the object.
+type SchemaTypeResolver struct {
+	ObjectSchema *spec.Schema
+}
+
+func (r *SchemaTypeResolver) Resolve(name string) (common.ResolvedType, bool) {
+	if name == JSONPatchTypeName {
+		return &JSONPatchType{}, true
+	}
+	if strings.HasPrefix(name, ObjectTypeName) {
+		path := static.NewObjectTypeNamer(name).Path()
+		if schema, ok := static.ResolveSchemaForObjectTypePath(path, r.ObjectSchema); ok {
+			return static.NewObjectType(name, schema), true
+		}
 	}
 	return nil, false
 }

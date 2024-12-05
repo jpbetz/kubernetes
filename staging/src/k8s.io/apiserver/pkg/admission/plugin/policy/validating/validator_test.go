@@ -40,6 +40,7 @@ import (
 	"k8s.io/apiserver/pkg/authorization/authorizer"
 	apiservercel "k8s.io/apiserver/pkg/cel"
 	"k8s.io/apiserver/pkg/cel/environment"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 )
 
 var _ cel.ConditionEvaluator = &fakeCelFilter{}
@@ -49,7 +50,7 @@ type fakeCelFilter struct {
 	throwError  bool
 }
 
-func (f *fakeCelFilter) ForInput(ctx context.Context, versionedAttr *admission.VersionedAttributes, request *admissionv1.AdmissionRequest, optionalVars cel.OptionalVariableBindings, namespace *corev1.Namespace, costBudget int64) ([]cel.EvaluationResult, int64, error) {
+func (f *fakeCelFilter) ForInput(ctx context.Context, schemaResolver resolver.SchemaResolver, versionedAttr *admission.VersionedAttributes, request *admissionv1.AdmissionRequest, optionalVars cel.OptionalVariableBindings, namespace *corev1.Namespace, costBudget int64) ([]cel.EvaluationResult, int64, error) {
 	if costBudget <= 0 { // this filter will cost 1, so cost = 0 means fail.
 		return nil, -1, &apiservercel.Error{
 			Type:   apiservercel.ErrorTypeInvalid,

@@ -301,74 +301,6 @@ func TestMutatingAdmissionPolicy(t *testing.T) {
 			},
 		},
 		{
-			name: "policy with variables",
-			policies: []*v1alpha1.MutatingAdmissionPolicy{
-				withMutatingVariables([]v1alpha1.Variable{
-					{Name: "foo1", Expression: `"foo1" + "Value"`},
-					{Name: "foo2", Expression: `variables.foo1.replace("1", "2")`},
-				},
-					mutatingPolicy("policy-with-multiple-mutations", v1alpha1.NeverReinvocationPolicy, matchEndpointResources, nil,
-						v1alpha1.Mutation{
-							PatchType: v1alpha1.PatchTypeApplyConfiguration,
-							ApplyConfiguration: &v1alpha1.ApplyConfiguration{
-								Expression: `
-							Object{
-								metadata: Object.metadata{
-									annotations: {
-										"foo1": variables.foo1
-									}
-								}
-							}`,
-							},
-						},
-						v1alpha1.Mutation{
-							PatchType: v1alpha1.PatchTypeJSONPatch,
-							JSONPatch: &v1alpha1.JSONPatch{
-								Expression: `[
-									JSONPatch{op: "test", path: "/metadata/annotations", value: {"foo1": variables.foo1}},
-									JSONPatch{op: "add", path: "/metadata/annotations/foo2", value: variables.foo2},
-								]`,
-							},
-						},
-						v1alpha1.Mutation{
-							PatchType: v1alpha1.PatchTypeApplyConfiguration,
-							ApplyConfiguration: &v1alpha1.ApplyConfiguration{
-								Expression: `
-							Object{
-								metadata: Object.metadata{
-									annotations: {
-										"foo3": "foo3Value"
-									}
-								}
-							}`,
-							},
-						},
-					)),
-			},
-			bindings: []*v1alpha1.MutatingAdmissionPolicyBinding{
-				mutatingBinding("policy-with-multiple-mutations", nil, nil),
-			},
-			requestOperation: admissionregistrationv1.Create,
-			requestResource:  corev1.SchemeGroupVersion.WithResource("endpoints"),
-			requestObject: &corev1.Endpoints{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "policy-with-multiple-mutations-object",
-					Namespace: "default",
-				},
-			},
-			expected: &corev1.Endpoints{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "policy-with-multiple-mutations-object",
-					Namespace: "default",
-					Annotations: map[string]string{
-						"foo1": "foo1Value",
-						"foo2": "foo2Value",
-						"foo3": "foo3Value",
-					},
-				},
-			},
-		},
-		{
 			name: "match condition matches",
 			policies: []*v1alpha1.MutatingAdmissionPolicy{
 				withMutatingMatchConditions([]v1alpha1.MatchCondition{{Name: "test-only", Expression: `object.metadata.?labels["environment"] == optional.of("test")`}},
@@ -599,6 +531,74 @@ func TestMutatingAdmissionPolicy_Slow(t *testing.T) {
 		requestObject    runtime.Object
 		expected         runtime.Object
 	}{
+		{
+			name: "policy with variables",
+			policies: []*v1alpha1.MutatingAdmissionPolicy{
+				withMutatingVariables([]v1alpha1.Variable{
+					{Name: "foo1", Expression: `"foo1" + "Value"`},
+					{Name: "foo2", Expression: `variables.foo1.replace("1", "2")`},
+				},
+					mutatingPolicy("policy-with-multiple-mutations", v1alpha1.NeverReinvocationPolicy, matchEndpointResources, nil,
+						v1alpha1.Mutation{
+							PatchType: v1alpha1.PatchTypeApplyConfiguration,
+							ApplyConfiguration: &v1alpha1.ApplyConfiguration{
+								Expression: `
+							Object{
+								metadata: Object.metadata{
+									annotations: {
+										"foo1": variables.foo1
+									}
+								}
+							}`,
+							},
+						},
+						v1alpha1.Mutation{
+							PatchType: v1alpha1.PatchTypeJSONPatch,
+							JSONPatch: &v1alpha1.JSONPatch{
+								Expression: `[
+									JSONPatch{op: "test", path: "/metadata/annotations", value: {"foo1": variables.foo1}},
+									JSONPatch{op: "add", path: "/metadata/annotations/foo2", value: variables.foo2},
+								]`,
+							},
+						},
+						v1alpha1.Mutation{
+							PatchType: v1alpha1.PatchTypeApplyConfiguration,
+							ApplyConfiguration: &v1alpha1.ApplyConfiguration{
+								Expression: `
+							Object{
+								metadata: Object.metadata{
+									annotations: {
+										"foo3": "foo3Value"
+									}
+								}
+							}`,
+							},
+						},
+					)),
+			},
+			bindings: []*v1alpha1.MutatingAdmissionPolicyBinding{
+				mutatingBinding("policy-with-multiple-mutations", nil, nil),
+			},
+			requestOperation: admissionregistrationv1.Create,
+			requestResource:  corev1.SchemeGroupVersion.WithResource("endpoints"),
+			requestObject: &corev1.Endpoints{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "policy-with-multiple-mutations-object",
+					Namespace: "default",
+				},
+			},
+			expected: &corev1.Endpoints{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "policy-with-multiple-mutations-object",
+					Namespace: "default",
+					Annotations: map[string]string{
+						"foo1": "foo1Value",
+						"foo2": "foo2Value",
+						"foo3": "foo3Value",
+					},
+				},
+			},
+		},
 		{
 			name: "unbound policy is no-op",
 			policies: []*v1alpha1.MutatingAdmissionPolicy{

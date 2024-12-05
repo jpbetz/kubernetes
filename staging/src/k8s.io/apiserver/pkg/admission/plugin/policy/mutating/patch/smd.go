@@ -74,7 +74,7 @@ func (e *applyConfigPatcher) Patch(ctx context.Context, r Request, runtimeCELCos
 	if len(compileErrors) > 0 {
 		return nil, errors.Join(compileErrors...)
 	}
-	eval, _, err := e.expressionEvaluator.ForInput(ctx, r.VersionedAttributes, admissionRequest, r.OptionalVariables, r.Namespace, runtimeCELCostBudget)
+	eval, _, err := e.expressionEvaluator.ForInput(ctx, r.SchemaResolver, r.VersionedAttributes, admissionRequest, r.OptionalVariables, r.Namespace, runtimeCELCostBudget)
 	if err != nil {
 		return nil, err
 	}

@@ -32,6 +32,7 @@ import (
 	apiservercel "k8s.io/apiserver/pkg/cel"
 	"k8s.io/apiserver/pkg/cel/environment"
 	"k8s.io/apiserver/pkg/cel/lazy"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 )
 
 const VariablesTypeName = "kubernetes.variables"
@@ -183,9 +184,9 @@ func (c *compositionContext) Variables(activation any) ref.Val {
 	return lazyMap
 }
 
-func (f *CompositedConditionEvaluator) ForInput(ctx context.Context, versionedAttr *admission.VersionedAttributes, request *v1.AdmissionRequest, optionalVars OptionalVariableBindings, namespace *corev1.Namespace, runtimeCELCostBudget int64) ([]EvaluationResult, int64, error) {
+func (f *CompositedConditionEvaluator) ForInput(ctx context.Context, schemaResolver resolver.SchemaResolver, versionedAttr *admission.VersionedAttributes, request *v1.AdmissionRequest, optionalVars OptionalVariableBindings, namespace *corev1.Namespace, runtimeCELCostBudget int64) ([]EvaluationResult, int64, error) {
 	ctx = f.compositionEnv.CreateContext(ctx)
-	return f.ConditionEvaluator.ForInput(ctx, versionedAttr, request, optionalVars, namespace, runtimeCELCostBudget)
+	return f.ConditionEvaluator.ForInput(ctx, schemaResolver, versionedAttr, request, optionalVars, namespace, runtimeCELCostBudget)
 }
 
 func (c *compositionContext) reportCost(cost int64) {

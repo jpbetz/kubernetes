@@ -77,6 +77,7 @@ func (o *ObjectType) Field(name string) (*types.FieldType, bool) {
 	}, true
 }
 
+// FieldNames returns a nil list to indicate that all field names are allowed.
 func (o *ObjectType) FieldNames() ([]string, bool) {
 	return nil, true // Field names are not known for dynamic types. All field names are allowed.
 }

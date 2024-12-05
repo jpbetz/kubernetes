@@ -18,6 +18,7 @@ package common
 
 import (
 	"fmt"
+	"google.golang.org/protobuf/types/known/structpb"
 	"reflect"
 	"sync"
 	"time"
@@ -32,17 +33,36 @@ import (
 	"k8s.io/apiserver/pkg/cel"
 )
 
+// FIXME: tests, particularly for Type names, conversions, equality
+
 // UnstructuredToVal converts a Kubernetes unstructured data element to a CEL Val.
 // The root schema of custom resource schema is expected contain type meta and object meta schemas.
 // If Embedded resources do not contain type meta and object meta schemas, they will be added automatically.
 func UnstructuredToVal(unstructured interface{}, schema Schema) ref.Val {
+	return UnstructuredToValWithTypeNames(unstructured, schema, nil)
+}
+
+// TypeNamer provides a CEL type names for objects.
+type TypeNamer interface {
+	// Type returns the type of the current object.
+	Type() *types.Type
+	// ForField takes a field name and returns a TypeNamer for the first object under that field name.
+	// Intermediate maps and lists are ignored for naming purposes.
+	ForField(name string) TypeNamer
+}
+
+// UnstructuredToValWithTypeNames is the same as UnstructuredToVal except that objects are assigned names by the
+// provided TypeNamer. If TypeName is nil, all objects are assigned the default type name used by CEL for structs of
+// "object".
+// When a TypeNamer is used, objects, and lists of maps of objects with different type names are unequal.
+func UnstructuredToValWithTypeNames(unstructured interface{}, schema Schema, typeName TypeNamer) ref.Val {
 	if unstructured == nil {
 		if schema.Nullable() {
 			return types.NullValue
 		}
 		return types.NewErr("invalid data, got null for schema with nullable=false")
 	}
-	if schema.IsXIntOrString() {
+	if isIntOrString(schema) {
 		switch v := unstructured.(type) {
 		case string:
 			return types.String(v)
@@ -73,6 +93,7 @@ func UnstructuredToVal(unstructured interface{}, schema Schema) ref.Val {
 					}
 					return nil, false
 				},
+				typeName: typeName,
 			}
 		}
 		if schema.AdditionalProperties() != nil && schema.AdditionalProperties().Schema() != nil {
@@ -82,6 +103,7 @@ func UnstructuredToVal(unstructured interface{}, schema Schema) ref.Val {
 				propSchema: func(key string) (Schema, bool) {
 					return schema.AdditionalProperties().Schema(), true
 				},
+				typeName: typeName,
 			}
 		}
 
@@ -99,6 +121,7 @@ func UnstructuredToVal(unstructured interface{}, schema Schema) ref.Val {
 			propSchema: func(key string) (Schema, bool) {
 				return nil, false
 			},
+			typeName: typeName,
 		}
 	}
 
@@ -110,13 +133,13 @@ func UnstructuredToVal(unstructured interface{}, schema Schema) ref.Val {
 		if schema.Items() == nil {
 			return types.NewErr("invalid array type, expected Items with a non-empty Schema")
 		}
-		typedList := unstructuredList{elements: l, itemsSchema: schema.Items()}
+		typedList := unstructuredList{elements: l, itemsSchema: schema.Items(), elementTypeName: typeName}
 		listType := schema.XListType()
 		if listType != "" {
 			switch listType {
 			case "map":
 				mapKeys := schema.XListMapKeys()
-				return &unstructuredMapList{unstructuredList: typedList, escapedKeyProps: escapeKeyProps(mapKeys)}
+				return &unstructuredMapList{unstructuredList: typedList, escapedKeyProps: escapeKeyProps(mapKeys), elementTypeName: typeName}
 			case "set":
 				return &unstructuredSetList{unstructuredList: typedList}
 			case "atomic":
@@ -242,8 +265,9 @@ type unstructuredMapList struct {
 	unstructuredList
 	escapedKeyProps []string
 
-	sync.Once // for for lazy load of mapOfList since it is only needed if Equals is called
-	mapOfList map[interface{}]interface{}
+	sync.Once       // for for lazy load of mapOfList since it is only needed if Equals is called
+	mapOfList       map[interface{}]interface{}
+	elementTypeName TypeNamer
 }
 
 func (t *unstructuredMapList) getMap() map[interface{}]interface{} {
@@ -290,6 +314,11 @@ func (t *unstructuredMapList) Equal(other ref.Val) ref.Val {
 	if !ok {
 		return types.MaybeNoSuchOverloadErr(other)
 	}
+	if t.elementTypeName != nil {
+		if types.NewListType(t.elementTypeName.Type()) != oMapList.Type() {
+			return types.False
+		}
+	}
 	sz := types.Int(len(t.elements))
 	if sz != oMapList.Size() {
 		return types.False
@@ -335,7 +364,7 @@ func (t *unstructuredMapList) Add(other ref.Val) ref.Val {
 		}
 	}
 	return &unstructuredMapList{
-		unstructuredList: unstructuredList{elements: elements, itemsSchema: t.itemsSchema},
+		unstructuredList: unstructuredList{elements: elements, itemsSchema: t.itemsSchema, elementTypeName: t.elementTypeName},
 		escapedKeyProps:  t.escapedKeyProps,
 	}
 }
@@ -421,8 +450,9 @@ func (t *unstructuredSetList) Add(other ref.Val) ref.Val {
 
 // unstructuredList represents an unstructured data instance of an OpenAPI array with x-kubernetes-list-type=atomic (the default).
 type unstructuredList struct {
-	elements    []interface{}
-	itemsSchema Schema
+	elements        []interface{}
+	itemsSchema     Schema
+	elementTypeName TypeNamer
 }
 
 var _ = traits.Lister(&unstructuredList{})
@@ -447,15 +477,24 @@ func (t *unstructuredList) ConvertToNative(typeDesc reflect.Type) (interface{}, 
 			return t.elements, nil
 		}
 	}
+	if typeDesc == reflect.TypeOf(&structpb.Value{}) {
+		return structpb.NewList(t.elements)
+	}
 	return nil, fmt.Errorf("type conversion error from '%s' to '%s'", t.Type(), typeDesc)
 }
 
 func (t *unstructuredList) ConvertToType(typeValue ref.Type) ref.Val {
 	switch typeValue {
 	case types.ListType:
-		return t
+		if t.elementTypeName == nil {
+			return t
+		}
 	case types.TypeType:
-		return types.ListType
+		return t.findType()
+	default:
+		if t.Type().TypeName() == typeValue.TypeName() {
+			return t
+		}
 	}
 	return types.NewErr("type conversion error from '%s' to '%s'", t.Type(), typeValue.TypeName())
 }
@@ -469,6 +508,9 @@ func (t *unstructuredList) Equal(other ref.Val) ref.Val {
 	if sz != oList.Size() {
 		return types.False
 	}
+	if t.elementTypeName != nil && t.Type().TypeName() != oList.Type().TypeName() {
+		return types.False
+	}
 	for i := types.Int(0); i < sz; i++ {
 		eq := t.Get(i).Equal(oList.Get(i))
 		if eq != types.True {
@@ -478,8 +520,15 @@ func (t *unstructuredList) Equal(other ref.Val) ref.Val {
 	return types.True
 }
 
-func (t *unstructuredList) Type() ref.Type {
+func (t *unstructuredList) findType() *types.Type {
+	if t.elementTypeName != nil {
+		return types.NewListType(SchemaToNamedType(t.elementTypeName, t.itemsSchema))
+	}
 	return types.ListType
+}
+
+func (t *unstructuredList) Type() ref.Type {
+	return t.findType()
 }
 
 func (t *unstructuredList) Value() interface{} {
@@ -491,13 +540,16 @@ func (t *unstructuredList) Add(other ref.Val) ref.Val {
 	if !ok {
 		return types.MaybeNoSuchOverloadErr(other)
 	}
+	if t.elementTypeName != nil && t.Type().TypeName() != oList.Type().TypeName() {
+		return types.MaybeNoSuchOverloadErr(other)
+	}
 	elements := t.elements
 	for it := oList.Iterator(); it.HasNext() == types.True; {
 		next := it.Next().Value()
 		elements = append(elements, next)
 	}
 
-	return &unstructuredList{elements: elements, itemsSchema: t.itemsSchema}
+	return &unstructuredList{elements: elements, itemsSchema: t.itemsSchema, elementTypeName: t.elementTypeName}
 }
 
 func (t *unstructuredList) Contains(val ref.Val) ref.Val {
@@ -507,7 +559,7 @@ func (t *unstructuredList) Contains(val ref.Val) ref.Val {
 	var err ref.Val
 	sz := len(t.elements)
 	for i := 0; i < sz; i++ {
-		elem := UnstructuredToVal(t.elements[i], t.itemsSchema)
+		elem := UnstructuredToValWithTypeNames(t.elements[i], t.itemsSchema, t.elementTypeName)
 		cmp := elem.Equal(val)
 		b, ok := cmp.(types.Bool)
 		if !ok && err == nil {
@@ -532,14 +584,14 @@ func (t *unstructuredList) Get(idx ref.Val) ref.Val {
 	if i < 0 || i >= len(t.elements) {
 		return types.NewErr("index out of bounds: %v", idx)
 	}
-	return UnstructuredToVal(t.elements[i], t.itemsSchema)
+	return UnstructuredToValWithTypeNames(t.elements[i], t.itemsSchema, t.elementTypeName)
 }
 
 func (t *unstructuredList) Iterator() traits.Iterator {
 	items := make([]ref.Val, len(t.elements))
 	for i, item := range t.elements {
 		itemCopy := item
-		items[i] = UnstructuredToVal(itemCopy, t.itemsSchema)
+		items[i] = UnstructuredToValWithTypeNames(itemCopy, t.itemsSchema, t.elementTypeName)
 	}
 	return &listIterator{unstructuredList: t, items: items}
 }
@@ -570,6 +622,12 @@ type unstructuredMap struct {
 	schema Schema
 	// propSchema finds the schema to use for a particular map key.
 	propSchema func(key string) (Schema, bool)
+
+	// typeName is set on objects (objects with properties) and names the object
+	typeName TypeNamer
+
+	// valueName is set on maps (objects with additionalProperties) and names the contained object type under the value
+	valueName TypeNamer
 }
 
 var _ = traits.Mapper(&unstructuredMap{})
@@ -579,15 +637,28 @@ func (t *unstructuredMap) ConvertToNative(typeDesc reflect.Type) (interface{}, e
 	case reflect.Map:
 		return t.value, nil
 	}
+	// CEL's builtin data literal values all support conversion to structpb.Value, which
+	// can then be serialized to JSON. This is convenient for CEL expressions that return
+	// an arbitrary JSON value, such as our MutatingAdmissionPolicy JSON Patch valueExpression
+	// field, so we support the conversion here, for Object data literals, as well.
+	if typeDesc == reflect.TypeOf(&structpb.Value{}) {
+		return structpb.NewStruct(t.value)
+	}
 	return nil, fmt.Errorf("type conversion error from '%s' to '%s'", t.Type(), typeDesc)
 }
 
 func (t *unstructuredMap) ConvertToType(typeValue ref.Type) ref.Val {
 	switch typeValue {
 	case types.MapType:
-		return t
+		if t.typeName == nil {
+			return t
+		}
 	case types.TypeType:
-		return types.MapType
+		return t.findType()
+	default:
+		if t.Type().TypeName() == t.typeName.Type().TypeName() {
+			return t
+		}
 	}
 	return types.NewErr("type conversion error from '%s' to '%s'", t.Type(), typeValue.TypeName())
 }
@@ -598,6 +669,9 @@ func (t *unstructuredMap) Equal(other ref.Val) ref.Val {
 		return types.MaybeNoSuchOverloadErr(other)
 	}
 	if t.Size() != oMap.Size() {
+		return types.False
+	}
+	if (t.typeName != nil || t.valueName != nil) && t.Type().TypeName() != other.Type().TypeName() {
 		return types.False
 	}
 	for key, value := range t.value {
@@ -629,8 +703,18 @@ func (t *unstructuredMap) Equal(other ref.Val) ref.Val {
 	return types.True
 }
 
-func (t *unstructuredMap) Type() ref.Type {
+func (t *unstructuredMap) findType() *types.Type {
+	if t.typeName != nil {
+		return t.typeName.Type()
+	}
+	if t.valueName != nil {
+		return types.NewMapType(types.StringType, SchemaToNamedType(t.valueName, t.schema.Items()))
+	}
 	return types.MapType
+}
+
+func (t *unstructuredMap) Type() ref.Type {
+	return t.findType()
 }
 
 func (t *unstructuredMap) Value() interface{} {
@@ -713,9 +797,36 @@ func (t *unstructuredMap) Find(key ref.Val) (ref.Val, bool) {
 			return nil, false
 		}
 		if propSchema, ok := t.propSchema(k); ok {
+			if t.typeName != nil {
+				// There might not be a more deeply nested Object type under this field. If there is not
+				// a normal UnstructuredToVal is sufficient.
+				if len(propSchema.Properties()) > 0 {
+					return UnstructuredToValWithTypeNames(v, propSchema, t.typeName.ForField(k)), true
+				}
+			}
 			return UnstructuredToVal(v, propSchema), true
 		}
 	}
 
 	return nil, false
+}
+
+// SchemaToNamedType creates a CEL Type to match the given Schema, but assigns names using the given namer.
+func SchemaToNamedType(namer TypeNamer, schema Schema) *types.Type {
+	decl := SchemaDeclType(schema, false)
+	return DeclToNamedType(namer, decl)
+}
+
+// DeclToNamedType creates a CEL Type to match the given DeclType, but assigns names using the given namer.
+func DeclToNamedType(namer TypeNamer, declType *cel.DeclType) *types.Type {
+	if declType.IsObject() {
+		return types.NewObjectType(namer.Type().TypeName())
+	}
+	if declType.IsList() {
+		return types.NewListType(DeclToNamedType(namer, declType.ElemType))
+	}
+	if declType.IsMap() {
+		return types.NewMapType(types.StringType, DeclToNamedType(namer, declType.ElemType))
+	}
+	return declType.CelType()
 }

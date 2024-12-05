@@ -118,7 +118,7 @@ func (e *jsonPatcher) Patch(ctx context.Context, r Request, runtimeCELCostBudget
 func (e *jsonPatcher) evaluatePatchExpression(ctx context.Context, patchEvaluator plugincel.MutatingEvaluator, remainingBudget int64, r Request, admissionRequest *admissionv1.AdmissionRequest) (jsonpatch.Patch, int64, error) {
 	var err error
 	var eval plugincel.EvaluationResult
-	eval, remainingBudget, err = patchEvaluator.ForInput(ctx, r.VersionedAttributes, admissionRequest, r.OptionalVariables, r.Namespace, remainingBudget)
+	eval, remainingBudget, err = patchEvaluator.ForInput(ctx, r.SchemaResolver, r.VersionedAttributes, admissionRequest, r.OptionalVariables, r.Namespace, remainingBudget)
 	if err != nil {
 		return nil, -1, err
 	}

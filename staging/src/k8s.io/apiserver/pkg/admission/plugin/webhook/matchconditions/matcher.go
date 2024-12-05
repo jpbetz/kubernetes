@@ -79,7 +79,7 @@ func NewMatcher(filter celplugin.ConditionEvaluator, failPolicy *v1.FailurePolic
 
 func (m *matcher) Match(ctx context.Context, versionedAttr *admission.VersionedAttributes, versionedParams runtime.Object, authz authorizer.Authorizer) MatchResult {
 	t := time.Now()
-	evalResults, _, err := m.filter.ForInput(ctx, versionedAttr, celplugin.CreateAdmissionRequest(versionedAttr.Attributes, metav1.GroupVersionResource(versionedAttr.GetResource()), metav1.GroupVersionKind(versionedAttr.VersionedKind)), celplugin.OptionalVariableBindings{
+	evalResults, _, err := m.filter.ForInput(ctx, nil, versionedAttr, celplugin.CreateAdmissionRequest(versionedAttr.Attributes, metav1.GroupVersionResource(versionedAttr.GetResource()), metav1.GroupVersionKind(versionedAttr.VersionedKind)), celplugin.OptionalVariableBindings{
 		VersionedParams: versionedParams,
 		Authorizer:      authz,
 	}, nil, celconfig.RuntimeCELCostBudgetMatchConditions)

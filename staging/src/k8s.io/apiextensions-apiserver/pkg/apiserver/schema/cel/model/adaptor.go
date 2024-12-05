@@ -228,33 +228,39 @@ func (s *Structural) XListMapKeys() []string {
 
 func (s *Structural) AllOf() []common.Schema {
 	var res []common.Schema
-	for _, subSchema := range s.Structural.ValueValidation.AllOf {
-		subSchema := subSchema
-		res = append(res, nestedValueValidationToStructural(&subSchema))
+	if s.Structural.ValueValidation != nil {
+		for _, subSchema := range s.Structural.ValueValidation.AllOf {
+			subSchema := subSchema
+			res = append(res, nestedValueValidationToStructural(&subSchema))
+		}
 	}
 	return res
 }
 
 func (s *Structural) AnyOf() []common.Schema {
 	var res []common.Schema
-	for _, subSchema := range s.Structural.ValueValidation.AnyOf {
-		subSchema := subSchema
-		res = append(res, nestedValueValidationToStructural(&subSchema))
+	if s.Structural.ValueValidation != nil {
+		for _, subSchema := range s.Structural.ValueValidation.AnyOf {
+			subSchema := subSchema
+			res = append(res, nestedValueValidationToStructural(&subSchema))
+		}
 	}
 	return res
 }
 
 func (s *Structural) OneOf() []common.Schema {
 	var res []common.Schema
-	for _, subSchema := range s.Structural.ValueValidation.OneOf {
-		subSchema := subSchema
-		res = append(res, nestedValueValidationToStructural(&subSchema))
+	if s.Structural.ValueValidation != nil {
+		for _, subSchema := range s.Structural.ValueValidation.OneOf {
+			subSchema := subSchema
+			res = append(res, nestedValueValidationToStructural(&subSchema))
+		}
 	}
 	return res
 }
 
 func (s *Structural) Not() common.Schema {
-	if s.Structural.ValueValidation.Not == nil {
+	if s.Structural.ValueValidation == nil || s.Structural.ValueValidation.Not == nil {
 		return nil
 	}
 	return nestedValueValidationToStructural(s.Structural.ValueValidation.Not)

@@ -28,6 +28,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -37,7 +38,10 @@ import (
 	"k8s.io/apiserver/pkg/admission/plugin/policy/mutating/patch"
 	celconfig "k8s.io/apiserver/pkg/apis/cel"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
+	k8sscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/openapi/openapitest"
+	"k8s.io/kubernetes/pkg/generated/openapi"
 	"k8s.io/utils/ptr"
 )
 
@@ -131,17 +135,93 @@ func TestCompilation(t *testing.T) {
 			expectedResult: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](11)}},
 		},
 		{
-			name: "apply configuration with params",
-			policy: paramKind(applyConfigurations(policy("d1"),
+			name: "complex apply configuration initialization",
+			policy: applyConfigurations(policy("d1"),
+				`Object{
+					spec: Object.spec{
+						replicas: 1,
+						template: Object.spec.template{
+							metadata: Object.spec.template.metadata{
+								labels: {"app": "nginx"}
+							},
+							spec: Object.spec.template.spec{
+								containers: [Object.spec.template.spec.containers{
+									name: "nginx",
+									image: "nginx:1.14.2",
+									ports: [Object.spec.template.spec.containers.ports{
+										containerPort: 80
+									}],
+									resources: Object.spec.template.spec.containers.resources{
+										limits: {"cpu": "128M"},
+									}
+								}]
+							}
+						}
+					}
+				}`),
+
+			gvr:    deploymentGVR,
+			object: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{}},
+			expectedResult: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{
+				Replicas: ptr.To[int32](1),
+				Template: corev1.PodTemplateSpec{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: map[string]string{"app": "nginx"},
+					},
+					Spec: corev1.PodSpec{
+						Containers: []corev1.Container{{
+							Name:  "nginx",
+							Image: "nginx:1.14.2",
+							Ports: []corev1.ContainerPort{
+								{ContainerPort: 80},
+							},
+							Resources: corev1.ResourceRequirements{
+								Limits: corev1.ResourceList{corev1.ResourceName("cpu"): resource.MustParse("128M")},
+							},
+						}},
+					},
+				},
+			}},
+		},
+		{
+			name: "apply configuration with invalid type name",
+			policy: applyConfigurations(policy("d1"),
+				`Object{
+					spec: Object.specx{
+						replicas: 1
+					}
+				}`),
+			gvr:         deploymentGVR,
+			object:      &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](1)}},
+			expectedErr: "type mismatch: unexpected type name \"Object.specx\", expected \"Object.spec\", which matches field name path from root Object type",
+		},
+		{
+			name: "apply configuration with invalid field name",
+			policy: applyConfigurations(policy("d1"),
 				`Object{
 					spec: Object.spec{
 						replicas: int(params.data['k1'])
 					}
-				}`), &v1alpha1.ParamKind{Kind: "ConfigMap", APIVersion: "v1"}),
-			params:         &corev1.ConfigMap{Data: map[string]string{"k1": "100"}},
-			gvr:            deploymentGVR,
-			object:         &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](1)}},
-			expectedResult: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](100)}},
+				}`),
+			gvr:         deploymentGVR,
+			object:      &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](1)}},
+			expectedErr: "error applying patch: failed to convert patch object to typed object: .spec.replicasx: field not declared in schema",
+		},
+		{
+			name: "apply configuration with invalid return type",
+			policy: applyConfigurations(policy("d1"),
+				`"I'm a teapot!"`),
+			gvr:         deploymentGVR,
+			object:      &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](1)}},
+			expectedErr: "must evaluate to Object but got string",
+		},
+		{
+			name: "apply configuration with invalid initializer return type",
+			policy: applyConfigurations(policy("d1"),
+				`Object.spec.metadata{}`),
+			gvr:         deploymentGVR,
+			object:      &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Replicas: ptr.To[int32](1)}},
+			expectedErr: "must evaluate to Object but got Object.spec.metadata",
 		},
 		{
 			name: "jsonPatch with excessive cost",
@@ -213,7 +293,7 @@ func TestCompilation(t *testing.T) {
 					JSONPatch{
 						op: "add", path: "/metadata/labels",
 						value: {
-							"value": Object{field: "fieldValue"}.field,
+							"value": Object.metadata{name: "fieldValue"}.name,
 						}
 					}
 				]`,
@@ -231,8 +311,8 @@ func TestCompilation(t *testing.T) {
 					JSONPatch{
 						op: "add", path: "/metadata/labels",
 						value: {
-							"field": string(has(Object{field: "fieldValue"}.field)),
-							"field-unset": string(has(Object{}.field)),
+							"field": string(has(Object.metadata{name: "fieldValue"}.name)),
+							"field-unset": string(has(Object.metadata{}.name)),
 						}
 					}
 				]`,
@@ -252,8 +332,8 @@ func TestCompilation(t *testing.T) {
 						op: "add", path: "/metadata/labels",
 						value: {
 							"empty": string(Object{} == Object{}),
-							"same": string(Object{field: "x"} == Object{field: "x"}),
-							"different": string(Object{field: "x"} == Object{field: "y"}),
+							"same": string(Object.metadata{name: "x"} == Object.metadata{name: "x"}),
+							"different": string(Object.metadata{name: "x"} == Object.metadata{name: "y"}),
 						}
 					}
 				]`,
@@ -291,6 +371,50 @@ func TestCompilation(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "object type checking",
+			policy: jsonPatches(policy("d1"), v1alpha1.JSONPatch{
+				Expression: `[
+					JSONPatch{
+						op: "add", path: "/metadata/labels",
+						value: {
+							"same": string(type(Object.metadata{}) == type(object.metadata)),
+							"different": string(type(Object.spec{}) == type(object.metadata)),
+							"same-list": string(type([Object.spec.template.spec.containers{}]) == type(object.spec.template.spec.containers)),
+							"different-list": string(type([Object.spec{}]) == type(object.spec.template.spec.containers)),
+						}
+					}
+				]`,
+			}),
+			gvr: deploymentGVR,
+			object: &appsv1.Deployment{ObjectMeta: metav1.ObjectMeta{Labels: map[string]string{}},
+				Spec: appsv1.DeploymentSpec{
+					Template: corev1.PodTemplateSpec{
+						Spec: corev1.PodSpec{
+							Containers: []corev1.Container{{
+								Name: "nginx",
+							}},
+						},
+					},
+				},
+			},
+			expectedResult: &appsv1.Deployment{ObjectMeta: metav1.ObjectMeta{Labels: map[string]string{
+				"same":           "true",
+				"different":      "false",
+				"same-list":      "true",
+				"different-list": "false",
+			}},
+				Spec: appsv1.DeploymentSpec{
+					Template: corev1.PodTemplateSpec{
+						Spec: corev1.PodSpec{
+							Containers: []corev1.Container{{
+								Name: "nginx",
+							}},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	scheme := runtime.NewScheme()
@@ -312,6 +436,7 @@ func TestCompilation(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	schemaResolver := resolver.NewDefinitionsSchemaResolver(openapi.GetOpenAPIDefinitions, k8sscheme.Scheme)
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			var gvk schema.GroupVersionKind
@@ -361,6 +486,7 @@ func TestCompilation(t *testing.T) {
 					OptionalVariables:   cel.OptionalVariableBindings{VersionedParams: tc.params, Authorizer: fakeAuthorizer{}},
 					Namespace:           tc.namespace,
 					TypeConverter:       typeConverter,
+					SchemaResolver:      schemaResolver,
 				}
 				obj, err = patcher.Patch(ctx, r, celconfig.RuntimeCELCostBudget)
 				if len(tc.expectedErr) > 0 {

@@ -27,7 +27,11 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/admission"
+	"k8s.io/apiserver/pkg/cel/common"
 	"k8s.io/apiserver/pkg/cel/environment"
+	"k8s.io/apiserver/pkg/cel/mutation/static"
+	"k8s.io/apiserver/pkg/cel/openapi"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 )
 
 // conditionCompiler implement the interface ConditionCompiler.
@@ -74,6 +78,10 @@ func convertObjectToUnstructured(obj interface{}) (*unstructured.Unstructured, e
 }
 
 func objectToResolveVal(r runtime.Object) (interface{}, error) {
+	return objectWithTypeToResolveVal(r, nil)
+}
+
+func objectWithTypeToResolveVal(r runtime.Object, objectType *static.ObjectType) (interface{}, error) {
 	if r == nil || reflect.ValueOf(r).IsNil() {
 		return nil, nil
 	}
@@ -81,13 +89,16 @@ func objectToResolveVal(r runtime.Object) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+	if objectType != nil {
+		return common.UnstructuredToValWithTypeNames(v.Object, &openapi.Schema{Schema: objectType.Schema}, objectType.Namer()), nil
+	}
 	return v.Object, nil
 }
 
 // ForInput evaluates the compiled CEL expressions converting them into CELEvaluations
 // errors per evaluation are returned on the Evaluation object
 // runtimeCELCostBudget was added for testing purpose only. Callers should always use const RuntimeCELCostBudget from k8s.io/apiserver/pkg/apis/cel/config.go as input.
-func (c *condition) ForInput(ctx context.Context, versionedAttr *admission.VersionedAttributes, request *admissionv1.AdmissionRequest, inputs OptionalVariableBindings, namespace *v1.Namespace, runtimeCELCostBudget int64) ([]EvaluationResult, int64, error) {
+func (c *condition) ForInput(ctx context.Context, schemaResolver resolver.SchemaResolver, versionedAttr *admission.VersionedAttributes, request *admissionv1.AdmissionRequest, inputs OptionalVariableBindings, namespace *v1.Namespace, runtimeCELCostBudget int64) ([]EvaluationResult, int64, error) {
 	// TODO: replace unstructured with ref.Val for CEL variables when native type support is available
 	evaluations := make([]EvaluationResult, len(c.compilationResults))
 	var err error
@@ -95,7 +106,7 @@ func (c *condition) ForInput(ctx context.Context, versionedAttr *admission.Versi
 	// if this activation supports composition, we will need the compositionCtx. It may be nil.
 	compositionCtx, _ := ctx.(CompositionContext)
 
-	activation, err := newActivation(compositionCtx, versionedAttr, request, inputs, namespace)
+	activation, err := newActivation(compositionCtx, versionedAttr, request, inputs, namespace, schemaResolver)
 	if err != nil {
 		return nil, -1, err
 	}
