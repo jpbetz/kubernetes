@@ -18,11 +18,9 @@
         "field T2.S"
       ]
     },
-    "*withfieldvalidations.T3": {},
     "*withfieldvalidations.T4": {
       "s": [
         "field T4.S"
       ]
-    },
-    "*withfieldvalidations.T5": {}
+    }
   }

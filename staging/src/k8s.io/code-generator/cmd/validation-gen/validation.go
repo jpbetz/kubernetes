@@ -243,7 +243,7 @@ type typeNode struct {
 	key         *childNode     // populated when this type is a map
 	elem        *childNode     // populated when this type is a map or slice
 	underlying  *childNode     // populated when this type is an alias
-	listMapKeys []types.Member // populated with +listMapKey values when this type is a +listType=map slice
+	listMapKeys []types.Member // populated with listMapKey values when this type is listType=map slice
 
 	typeValidations validators.Validations // validations on the type
 	keyValidations  validators.Validations // validations on each key of a map type
@@ -327,13 +327,13 @@ func (n *typeNode) dumpChildren(buf *bytes.Buffer, indent int, visited map[*type
 
 const (
 	// This tag defines a validation which is to be run on each key in a map.
-	eachKeyTag = "eachKey"
+	eachKeyTag = "k8s:eachKey"
 	// This tag defines a validation which is to be run on each value in a map
 	// or slice.
-	eachValTag = "eachVal"
+	eachValTag = "k8s:eachVal"
 	// This tag designates a child field as part of the list-map key for a list
 	// of structs.
-	listMapKeyTag = "listMapKey"
+	listMapKeyTag = "k8s:listMapKey"
 )
 
 // builtinTagDocs returns information about the hard-coded tags.
@@ -535,7 +535,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 				childType: childType,
 				node:      node,
 			}
-			// Extract +listMapKeys for correlating object and oldObject during
+			// Extract +k8s:listMapKeys for correlating object and oldObject during
 			// update validation.
 			if listMapKeyNames, ok := gengo.ExtractCommentTags("+", memb.CommentLines)[listMapKeyTag]; ok {
 				// List-maps can only be list types.
@@ -762,6 +762,10 @@ func (g *genValidations) emitRegisterFunction(c *generator.Context, schemeRegist
 	sw.Do("// Public to allow building arbitrary schemes.\n", nil)
 	sw.Do("func RegisterValidations(scheme $.|raw$) error {\n", schemePtr)
 	for _, rootType := range g.rootTypes {
+		if !g.hasValidations(g.discovered.typeNodes[rootType]) {
+			continue
+		}
+
 		node := g.discovered.typeNodes[rootType]
 		if node == nil {
 			panic(fmt.Sprintf("found nil node for root-type %v", rootType))
@@ -838,6 +842,10 @@ func (g *genValidations) emitRegisterFunction(c *generator.Context, schemeRegist
 
 // emitValidationFunction emits a validation function for the specified type.
 func (g *genValidations) emitValidationFunction(c *generator.Context, t *types.Type, sw *generator.SnippetWriter) {
+	if !g.hasValidations(g.discovered.typeNodes[t]) {
+		return
+	}
+
 	targs := generator.Args{
 		"inType":     t,
 		"field":      mkSymbolArgs(c, fieldPkgSymbols),
@@ -1024,8 +1032,8 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			oldVal := "nil" // updated below if needed
 
 			// Lookup corresponding old slice elem values for update validation using a traverse.ListMap.
-			// Only +listType=map slices have corresponding old values. Corresponding old values have matching
-			// +listMapKey values.
+			// Only +k8s:listType=map slices have corresponding old values. Corresponding old values have matching
+			// +k8s:listMapKey values.
 			if isCorrelatable {
 				// Note: this func returns 'any' but it's always an array (not
 				// slice) of 'any', and those should always be comparable, so
