@@ -8323,7 +8323,6 @@ func Validate_Volume(opCtx operation.Context, obj, oldObj *corev1.Volume, fldPat
 				errs = append(errs, e...)
 				return // do not proceed
 			}
-			errs = append(errs, validate.DNSLabel(opCtx, fldPath, obj, oldObj)...)
 			return
 		}(&obj.Name, safe.Field(oldObj, func(oldObj *corev1.Volume) *string { return &oldObj.Name }), fldPath.Child("name"))...)
 
