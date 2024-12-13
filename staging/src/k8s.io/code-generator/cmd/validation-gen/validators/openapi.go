@@ -70,8 +70,8 @@ func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []
 		format := formats[0]
 		if formatFunction, err := getFormatValidationFunction(format); err != nil {
 			return result, err
-		} else if formatFunction != nil {
-			return result, fmt.Errorf("internal error: nil validation function for format %q", format)
+		} else if formatFunction == nil {
+			return result, fmt.Errorf("internal error: no validation function found for format %q", format)
 		} else {
 			result.AddFunction(formatFunction)
 		}
