@@ -51,25 +51,21 @@ func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []
 	var result Validations
 	commentTags := gengo.ExtractCommentTags("+", comments)
 
-	maxLength, found, err := extractOptionalIntValue(commentTags, maxLengthTagName)
-	if err != nil {
+	if maxLength, found, err := extractOptionalIntValue(commentTags, maxLengthTagName); err != nil {
 		return result, err
-	}
-	if found {
+	} else if found {
 		result.AddFunction(Function(maxLengthTagName, DefaultFlags, maxLengthValidator, maxLength))
 	}
 
-	maxItems, found, err := extractOptionalIntValue(commentTags, maxItemsTagName)
-	if err != nil {
+	if maxItems, found, err := extractOptionalIntValue(commentTags, maxItemsTagName); err != nil {
 		return result, err
-	}
-	if found {
+	} else if found {
 		result.AddFunction(Function(maxItemsTagName, ShortCircuit, maxItemsValidator, maxItems))
 	}
 
 	if formats := commentTags[formatTagName]; len(formats) > 0 {
 		if len(formats) > 1 {
-			return result, fmt.Errorf("multiple %s tags found", formatTagName)
+			return result, fmt.Errorf("multiple values found for tag %q", formatTagName)
 		}
 		format := formats[0]
 		if formatFunction, err := getFormatValidationFunction(format); err != nil {
@@ -90,11 +86,11 @@ func extractOptionalIntValue(commentTags map[string][]string, tagName string) (i
 		return 0, false, nil
 	}
 	if len(values) > 1 {
-		return 0, false, fmt.Errorf("multiple %s tags found", tagName)
+		return 0, false, fmt.Errorf("multiple values found for tag %q", tagName)
 	}
 	intVal, err := strconv.Atoi(values[0])
 	if err != nil {
-		return 0, false, fmt.Errorf("failed to parse %s value: %v", tagName, err)
+		return 0, false, fmt.Errorf("failed to parse value for tag %q: %v", tagName, err)
 	}
 	return intVal, true, nil
 }
@@ -145,5 +141,5 @@ func getFormatValidationFunction(format string) (FunctionGen, error) {
 	}
 	// TODO: Flesh out the list of validation functions
 
-	return nil, fmt.Errorf("unsupported validation format: %q", format)
+	return nil, fmt.Errorf("unsupported validation format %q", format)
 }
