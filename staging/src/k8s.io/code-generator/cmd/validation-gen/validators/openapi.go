@@ -51,19 +51,19 @@ func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []
 	var result Validations
 	commentTags := gengo.ExtractCommentTags("+", comments)
 
-	maxLength, ok, err := extractOptionalIntValue(commentTags, maxLengthTagName)
+	maxLength, found, err := extractOptionalIntValue(commentTags, maxLengthTagName)
 	if err != nil {
 		return result, err
 	}
-	if ok {
+	if found {
 		result.AddFunction(Function(maxLengthTagName, DefaultFlags, maxLengthValidator, maxLength))
 	}
 
-	maxItems, ok, err := extractOptionalIntValue(commentTags, maxItemsTagName)
+	maxItems, found, err := extractOptionalIntValue(commentTags, maxItemsTagName)
 	if err != nil {
 		return result, err
 	}
-	if ok {
+	if found {
 		result.AddFunction(Function(maxItemsTagName, ShortCircuit, maxItemsValidator, maxItems))
 	}
 
@@ -85,8 +85,8 @@ func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []
 }
 
 func extractOptionalIntValue(commentTags map[string][]string, tagName string) (int, bool, error) {
-	values, ok := commentTags[tagName]
-	if !ok || len(values) == 0 {
+	values, found := commentTags[tagName]
+	if !found || len(values) == 0 {
 		return 0, false, nil
 	}
 	if len(values) > 1 {
