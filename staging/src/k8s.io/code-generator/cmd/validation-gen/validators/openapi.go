@@ -17,8 +17,11 @@ limitations under the License.
 package validators
 
 import (
+	"fmt"
+	"strconv"
+
+	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/types"
-	"k8s.io/kube-openapi/pkg/generators"
 )
 
 func init() {
@@ -33,9 +36,9 @@ type openAPIDeclarativeValidator struct{}
 
 const (
 	markerPrefix     = "k8s:validation:"
-	formatTagName    = markerPrefix + ":format"
-	maxLengthTagName = markerPrefix + ":maxLength"
-	maxItemsTagName  = markerPrefix + ":maxItems"
+	formatTagName    = markerPrefix + "format"
+	maxLengthTagName = markerPrefix + "maxLength"
+	maxItemsTagName  = markerPrefix + "maxItems"
 )
 
 var (
@@ -48,24 +51,51 @@ var (
 func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
 	var result Validations
 	// Leverage the kube-openapi parser for 'k8s:validation:' validations.
-	schema, err := generators.ParseCommentTags(t, comments, "+"+markerPrefix)
+	commentTags := gengo.ExtractCommentTags("+", comments)
+
+	maxLength, ok, err := extractOptionalIntValue(commentTags, maxLengthTagName)
 	if err != nil {
 		return result, err
 	}
-	if schema.MaxLength != nil {
-		result.AddFunction(Function(maxLengthTagName, DefaultFlags, maxLengthValidator, *schema.MaxLength))
+	if ok {
+		result.AddFunction(Function(maxLengthTagName, DefaultFlags, maxLengthValidator, maxLength))
 	}
-	if schema.MaxItems != nil {
-		result.AddFunction(Function(maxItemsTagName, ShortCircuit, maxItemsValidator, *schema.MaxItems))
+
+	maxItems, ok, err := extractOptionalIntValue(commentTags, maxItemsTagName)
+	if err != nil {
+		return result, err
 	}
-	if len(schema.Format) > 0 {
-		formatFunction := FormatValidationFunction(schema.Format)
+	if ok {
+		result.AddFunction(Function(maxItemsTagName, ShortCircuit, maxItemsValidator, maxItems))
+	}
+
+	if formats := commentTags[formatTagName]; len(formats) > 0 {
+		if len(formats) > 1 {
+			return result, fmt.Errorf("multiple %s tags found", formatTagName)
+		}
+		format := formats[0]
+		formatFunction := FormatValidationFunction(format)
 		if formatFunction != nil {
 			result.AddFunction(formatFunction)
 		}
 	}
 
 	return result, nil
+}
+
+func extractOptionalIntValue(commentTags map[string][]string, tagName string) (int, bool, error) {
+	values, ok := commentTags[tagName]
+	if !ok || len(values) == 0 {
+		return 0, false, nil
+	}
+	if len(values) > 1 {
+		return 0, false, fmt.Errorf("multiple %s tags found", tagName)
+	}
+	intVal, err := strconv.Atoi(values[0])
+	if err != nil {
+		return 0, false, fmt.Errorf("failed to parse %s value: %v", tagName, err)
+	}
+	return intVal, true, nil
 }
 
 func (openAPIDeclarativeValidator) Docs() []TagDoc {
