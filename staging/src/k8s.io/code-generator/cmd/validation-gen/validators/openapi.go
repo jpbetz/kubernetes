@@ -72,8 +72,11 @@ func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []
 			return result, fmt.Errorf("multiple %s tags found", formatTagName)
 		}
 		format := formats[0]
-		formatFunction := FormatValidationFunction(format)
-		if formatFunction != nil {
+		if formatFunction, err := getFormatValidationFunction(format); err != nil {
+			return result, err
+		} else if formatFunction != nil {
+			return result, fmt.Errorf("internal error: nil validation function for format %q", format)
+		} else {
 			result.AddFunction(formatFunction)
 		}
 	}
@@ -129,18 +132,18 @@ func (openAPIDeclarativeValidator) Docs() []TagDoc {
 	}}
 }
 
-func FormatValidationFunction(format string) FunctionGen {
+func getFormatValidationFunction(format string) (FunctionGen, error) {
 	// The naming convention for these formats follows the JSON schema style:
 	// all lower-case, dashes between words. See
 	// https://json-schema.org/draft/2020-12/json-schema-validation#name-defined-formats
 	// for more examples.
 	if format == "ip" {
-		return Function(formatTagName, DefaultFlags, ipValidator)
+		return Function(formatTagName, DefaultFlags, ipValidator), nil
 	}
 	if format == "dns-label" {
-		return Function(formatTagName, DefaultFlags, dnsLabelValidator)
+		return Function(formatTagName, DefaultFlags, dnsLabelValidator), nil
 	}
 	// TODO: Flesh out the list of validation functions
 
-	return nil // TODO: ignore unsupported formats?
+	return nil, fmt.Errorf("unsupported validation format: %q", format)
 }
