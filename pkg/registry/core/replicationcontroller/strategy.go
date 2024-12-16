@@ -37,11 +37,13 @@ import (
 	"k8s.io/apiserver/pkg/registry/rest"
 	apistorage "k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	"k8s.io/kubernetes/pkg/api/pod"
 	api "k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/apis/core/helper"
 	corevalidation "k8s.io/kubernetes/pkg/apis/core/validation"
+	"k8s.io/kubernetes/pkg/features"
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
@@ -123,7 +125,11 @@ func (rcStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object)
 func (rcStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	controller := obj.(*api.ReplicationController)
 	opts := pod.GetValidationOptionsFromPodTemplate(controller.Spec.Template, nil)
-	return corevalidation.ValidateReplicationController(controller, opts)
+	allErrs := corevalidation.ValidateReplicationController(controller, opts)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	}
+	return allErrs
 }
 
 // WarningsOnCreate returns warnings for the creation of the given object.
@@ -172,6 +178,10 @@ func (rcStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) f
 		default:
 			errs = append(errs, &field.Error{Type: field.ErrorTypeNotFound, BadValue: value, Field: brokenField, Detail: "unknown non-convertible field"})
 		}
+	}
+
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		errs = append(errs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
 	}
 
 	return errs
