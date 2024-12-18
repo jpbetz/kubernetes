@@ -270,71 +270,6 @@ func (n typeNode) lookupField(jsonName string) *childNode {
 	return nil
 }
 
-// dump returns a multi-line string which represents a typeNode and its
-// children.  This can be used to debug the type graph.
-func (n *typeNode) dump() string {
-	buf := bytes.Buffer{}
-	visited := map[*typeNode]bool{}
-	buf.WriteString(fmt.Sprintf("type %s {\n", n.valueType))
-	n.doDump(&buf, 1, visited)
-	buf.WriteString("}")
-	return buf.String()
-}
-
-func (n *typeNode) dumpIndent(buf *bytes.Buffer, indent int) {
-	for i := 0; i < indent; i++ {
-		buf.WriteString("    ")
-	}
-}
-
-func (n *typeNode) doDump(buf *bytes.Buffer, indent int, visited map[*typeNode]bool) {
-	if visited[n] {
-		n.dumpIndent(buf, indent)
-		buf.WriteString("(recursive)\n")
-		return
-	}
-	visited[n] = true
-
-	for _, val := range n.typeValidations.Functions {
-		n.dumpIndent(buf, indent)
-		fn, args := val.SignatureAndArgs()
-		buf.WriteString(fmt.Sprintf("type-validation: %v(%+v)\n", fn, args))
-	}
-	for _, val := range n.typeValidations.Variables {
-		n.dumpIndent(buf, indent)
-		fn, args := val.Init().SignatureAndArgs()
-		buf.WriteString(fmt.Sprintf("type-validation variable: %s := %v(%+v)\n", val.Var().Name, fn, args))
-	}
-	n.dumpChildren(buf, indent, visited)
-}
-
-func (n *typeNode) dumpChildren(buf *bytes.Buffer, indent int, visited map[*typeNode]bool) {
-	for _, fld := range n.fields {
-		n.dumpIndent(buf, indent)
-		buf.WriteString(fmt.Sprintf("field %s: %s {\n", fld.name, fld.childType))
-		for _, val := range fld.fieldValidations.Functions {
-			fn, args := val.SignatureAndArgs()
-			n.dumpIndent(buf, indent+1)
-			buf.WriteString(fmt.Sprintf("field-validation: %v(%+v)\n", fn, args))
-		}
-		for _, val := range fld.keyValidations.Functions {
-			fn, args := val.SignatureAndArgs()
-			n.dumpIndent(buf, indent+1)
-			buf.WriteString(fmt.Sprintf("key-validation: %v(%+v)\n", fn, args))
-		}
-		for _, val := range fld.elemValidations.Functions {
-			fn, args := val.SignatureAndArgs()
-			n.dumpIndent(buf, indent+1)
-			buf.WriteString(fmt.Sprintf("val-validation: %v(%+v)\n", fn, args))
-		}
-		if fld.node != nil {
-			fld.node.doDump(buf, indent+1, visited)
-		}
-		n.dumpIndent(buf, indent)
-		buf.WriteString("}\n")
-	}
-}
-
 const (
 	// This tag defines a validation which is to be run on each key in a map.
 	eachKeyTag = "k8s:eachKey"
@@ -399,8 +334,6 @@ func (td *typeDiscoverer) DiscoverType(t *types.Type) error {
 		return err
 	} else if node == nil {
 		panic(fmt.Sprintf("discovered a nil node for type %v", t))
-	} else {
-		fmt.Println(node.dump()) //FIXME: remove
 	}
 	return nil
 }
