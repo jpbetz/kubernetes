@@ -6275,10 +6275,10 @@ func ValidateReplicationControllerSpec(spec, oldSpec *core.ReplicationController
 	allErrs := field.ErrorList{}
 	allErrs = append(allErrs, ValidateNonnegativeField(int64(spec.MinReadySeconds), fldPath.Child("minReadySeconds"))...)
 	allErrs = append(allErrs, ValidateNonEmptySelector(spec.Selector, fldPath.Child("selector"))...)
-	if spec.Replicas == nil {
-		allErrs = append(allErrs, field.Required(fldPath.Child("replicas"), ""))
-	} else {
-		if !utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+	if !utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		if spec.Replicas == nil {
+			allErrs = append(allErrs, field.Required(fldPath.Child("replicas"), ""))
+		} else {
 			allErrs = append(allErrs, ValidateNonnegativeField(int64(*spec.Replicas), fldPath.Child("replicas"))...)
 		}
 	}
