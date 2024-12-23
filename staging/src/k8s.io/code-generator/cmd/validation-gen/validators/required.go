@@ -20,13 +20,27 @@ import (
 	"fmt"
 
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/types"
 )
 
 const (
-	requiredTagName  = "k8s:required"
+	// All of our tags are expressed from the perspective of a client of the
+	// API, but the code we generate is for the server. Optional is tricky.
+	//
+	// A field which is marked as optional and does not have a default is
+	// strictly optional. A client is allowed to not set it and the server will
+	// not give it a default value. Code which consumes it must handle that it
+	// might not have any value at all.
+	//
+	// A field which is marked as optional but has a default is optional to
+	// clients, but required to the server. A client is allowed to not set it
+	// but the server will give it a default value. Code which consumes it can
+	// assume that it always has a value.
 	optionalTagName  = "k8s:optional"
+	requiredTagName  = "k8s:required"
 	forbiddenTagName = "k8s:forbidden"
+	defaultTagName   = "default" // TODO: this should evenually be +k8s:default
 )
 
 func init() {
@@ -112,7 +126,15 @@ var (
 	optionalMapValidator     = types.Name{Package: libValidationPkg, Name: "OptionalMap"}
 )
 
-func (requirednessTagValidator) doOptional(context Context) (Validations, error) {
+func (rtv requirednessTagValidator) doOptional(context Context) (Validations, error) {
+	// Peek at the default tag to determine if this field is actually required.
+	// See comments on optionalTagName.
+	//
+	// This tag only applies to fields, so Member must be valid.
+	if _, hasDefault := gengo.ExtractCommentTags("+", context.Member.CommentLines)[defaultTagName]; hasDefault {
+		return rtv.doRequired(context)
+	}
+
 	// Most validators don't care whether the value they are validating was
 	// originally defined as a value-type or a pointer-type in the API.  This
 	// one does.  Since Go doesn't do partial specialization of templates, we
