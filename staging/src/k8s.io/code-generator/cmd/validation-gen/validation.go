@@ -207,7 +207,8 @@ func (g *genValidations) hasValidationsMiss(n *typeNode, seen map[*typeNode]bool
 
 // typeDiscoverer contains fields necessary to build graphs of types.
 type typeDiscoverer struct {
-	validator  validators.DeclarativeValidator
+	knownTags  *validators.TagRegistry
+	validator  validators.DeclarativeValidator // legacy
 	inputToPkg map[string]string
 
 	// typeNodes holds a map of gengo Type to typeNode for all of the types
@@ -216,8 +217,9 @@ type typeDiscoverer struct {
 }
 
 // NewTypeDiscoverer creates and initializes a NewTypeDiscoverer.
-func NewTypeDiscoverer(validator validators.DeclarativeValidator, inputToPkg map[string]string) *typeDiscoverer {
+func NewTypeDiscoverer(knownTags *validators.TagRegistry, validator validators.DeclarativeValidator, inputToPkg map[string]string) *typeDiscoverer {
 	return &typeDiscoverer{
+		knownTags:  knownTags,
 		validator:  validator,
 		inputToPkg: inputToPkg,
 		typeNodes:  map[*types.Type]*typeNode{},
@@ -381,6 +383,16 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 	td.typeNodes[t] = thisNode
 
 	// Extract any type-attached validation rules.
+	tc := validators.NewTypeContext(t)
+	if validations, err := td.knownTags.ExtractValidations(tc, t.CommentLines); err != nil {
+		return nil, fmt.Errorf("%v: %w", fldPath, err)
+	} else {
+		if !validations.Empty() {
+			klog.V(5).InfoS("found type-attached validations", "n", validations.Len())
+			thisNode.typeValidations = validations
+		}
+	}
+	// legacy
 	if validations, err := td.validator.ExtractValidations(t, t.CommentLines); err != nil {
 		return nil, fmt.Errorf("%v: %w", fldPath, err)
 	} else {
@@ -509,6 +521,19 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		}
 
 		// Extract any field-attached validation rules.
+		tc := validators.NewFieldContext(memb.Name, memb.Type, thisNode.valueType)
+		if validations, err := td.knownTags.ExtractValidations(tc, memb.CommentLines); err != nil {
+			return fmt.Errorf("field %s: %w", childPath.String(), err)
+		} else {
+			if !validations.Empty() {
+				klog.V(5).InfoS("found field-attached validations", "n", validations.Len())
+				child.fieldValidations.Add(validations)
+				if len(validations.Variables) > 0 {
+					return fmt.Errorf("%v: variable generation is not supported for field validations", childPath)
+				}
+			}
+		}
+		// legacy
 		if validations, err := td.validator.ExtractValidations(memb.Type, memb.CommentLines); err != nil {
 			return fmt.Errorf("field %s: %w", childPath.String(), err)
 		} else {

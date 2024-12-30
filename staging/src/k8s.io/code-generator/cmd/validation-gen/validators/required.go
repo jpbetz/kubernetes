@@ -19,14 +19,15 @@ package validators
 import (
 	"fmt"
 
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/gengo/v2"
+	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
 )
 
 func init() {
 	AddToRegistry(InitRequiredDeclarativeValidator)
 	AddToRegistry(InitForbiddenDeclarativeValidator)
-	AddToRegistry(InitOptionalDeclarativeValidator)
 }
 
 func InitRequiredDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
@@ -164,32 +165,38 @@ func (forbiddenDeclarativeValidator) Docs() []TagDoc {
 	}}
 }
 
-func InitOptionalDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
-	return &optionalDeclarativeValidator{}
+//
+// +k8s:optional
+//
+
+const optionalTagName = "k8s:optional"
+
+func init() {
+	RegisterTagDescriptor(optionalTag{})
 }
 
-type optionalDeclarativeValidator struct{}
+type optionalTag struct{}
 
-const (
-	optionalTagName = "k8s:optional"
-)
+var _ TagDescriptor = optionalTag{}
 
-var (
-	optionalValueValidator   = types.Name{Package: libValidationPkg, Name: "OptionalValue"}
-	optionalPointerValidator = types.Name{Package: libValidationPkg, Name: "OptionalPointer"}
-	optionalSliceValidator   = types.Name{Package: libValidationPkg, Name: "OptionalSlice"}
-	optionalMapValidator     = types.Name{Package: libValidationPkg, Name: "OptionalMap"}
-)
+func (optionalTag) Init(_ *generator.Context) {}
 
-func (optionalDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
-	_, optional := gengo.ExtractCommentTags("+", comments)[optionalTagName]
-	if !optional {
-		return Validations{}, nil
-	}
+func (optionalTag) TagName() string {
+	return optionalTagName
+}
+
+var optionalTagScopes = sets.New(TagScopeField)
+
+func (optionalTag) ValidScopes() sets.Set[TagScope] {
+	return optionalTagScopes
+}
+
+func (optionalTag) GetValidations(context TagContext2, _ []string, _ string) (Validations, error) {
 	// Most validators don't care whether the value they are validating was
 	// originally defined as a value-type or a pointer-type in the API.  This
 	// one does.  Since Go doesn't do partial specialization of templates, we
 	// do manual dispatch here.
+	t := context.Field.Type
 	for t.Kind == types.Alias {
 		t = t.Underlying
 	}
@@ -210,10 +217,17 @@ func (optionalDeclarativeValidator) ExtractValidations(t *types.Type, comments [
 	return Validations{Functions: []FunctionGen{Function(optionalTagName, ShortCircuit|NonError, optionalValueValidator)}}, nil
 }
 
-func (optionalDeclarativeValidator) Docs() []TagDoc {
+var (
+	optionalValueValidator   = types.Name{Package: libValidationPkg, Name: "OptionalValue"}
+	optionalPointerValidator = types.Name{Package: libValidationPkg, Name: "OptionalPointer"}
+	optionalSliceValidator   = types.Name{Package: libValidationPkg, Name: "OptionalSlice"}
+	optionalMapValidator     = types.Name{Package: libValidationPkg, Name: "OptionalMap"}
+)
+
+func (optionalTag) Docs() []TagDoc {
 	return []TagDoc{{
 		Tag:         optionalTagName,
-		Description: "Indicates that a field is optional.",
-		Contexts:    []TagContext{TagContextType, TagContextField},
+		Description: "Indicates that a field is optional to clients.",
+		Contexts:    []TagContext{TagContextField},
 	}}
 }

@@ -190,6 +190,8 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 	orderer := namer.Orderer{Namer: namer.NewPublicNamer(1)}
 	context.Order = orderer.OrderUniverse(context.Universe)
 
+	allTags := validators.GetTagRegistry(context)
+
 	// Build a cache of type->callNode for every type we need.
 	for _, input := range context.Inputs {
 		klog.V(2).InfoS("processing", "pkg", input)
@@ -252,7 +254,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 			return cmp.Compare(a.Name.String(), b.Name.String())
 		})
 
-		td := NewTypeDiscoverer(declarativeValidator, inputToPkg)
+		td := NewTypeDiscoverer(allTags, declarativeValidator, inputToPkg)
 		for _, t := range rootTypes {
 			klog.V(4).InfoS("pre-processing", "type", t)
 			if err := td.DiscoverType(t); err != nil {

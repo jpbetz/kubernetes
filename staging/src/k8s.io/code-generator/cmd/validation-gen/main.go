@@ -110,11 +110,14 @@ func printDocs() {
 		FileTypes: map[string]generator.FileType{},
 	}
 
+	allTags := validators.GetTagRegistry(c)
+
 	// This gets a composite validator which aggregates the many plugins.
 	validator := validators.NewValidator(c)
 
 	docs := builtinTagDocs()
 	docs = append(docs, validator.Docs()...)
+	docs = append(docs, allTags.Docs()...)
 	slices.SortFunc(docs, func(a, b validators.TagDoc) int {
 		return cmp.Compare(a.Tag, b.Tag)
 	})

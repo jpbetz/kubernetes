@@ -17,9 +17,103 @@ limitations under the License.
 package validators
 
 import (
+	"fmt"
+	"sort"
+	"sync"
+	"sync/atomic"
+
+	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
 )
+
+var allTags = &TagRegistry{
+	descriptors: map[string]TagDescriptor{},
+}
+
+type TagRegistry struct {
+	lock        sync.Mutex
+	descriptors map[string]TagDescriptor // keyed by tagname
+	index       []string                 // all tag names
+	initialized atomic.Bool              // init() was called
+}
+
+func (tr *TagRegistry) add(desc TagDescriptor) {
+	tr.lock.Lock()
+	defer tr.lock.Unlock()
+
+	if tr.initialized.Load() {
+		panic("TagRegistry was modified after init")
+	}
+
+	name := desc.TagName()
+	if _, exists := allTags.descriptors[name]; exists {
+		panic(fmt.Sprintf("tag %q was registered twice", name))
+	}
+	allTags.descriptors[name] = desc
+}
+
+func (tr *TagRegistry) init(c *generator.Context) {
+	tr.lock.Lock()
+	defer tr.lock.Unlock()
+
+	if tr.initialized.Load() {
+		panic("TagRegistry.init() was called twice")
+	}
+	tr.initialized.Store(true)
+
+	for _, desc := range allTags.descriptors {
+		tr.index = append(tr.index, desc.TagName())
+		desc.Init(c)
+	}
+	sort.Strings(tr.index)
+}
+
+func (tr *TagRegistry) ExtractValidations(context TagContext2, comments []string) (Validations, error) {
+	if !tr.initialized.Load() {
+		panic("TagRegistry.init() was not called")
+	}
+
+	// Extract all known tags so we can iterate them.
+	tags, err := gengo.ExtractFunctionStyleCommentTags("+", tr.index, comments)
+	if err != nil {
+		return Validations{}, err
+	}
+	validations := Validations{}
+	for tag, vals := range tags {
+		desc := tr.descriptors[tag]
+		if !desc.ValidScopes().Has(context.Scope) {
+			return Validations{}, fmt.Errorf("tag %q cannot be specified on %s", desc.TagName(), context.Scope)
+		}
+		for _, val := range vals { // tags may have multiple values
+			if theseValidations, err := desc.GetValidations(context, val.Args, val.Value); err != nil {
+				return Validations{}, err
+			} else {
+				validations.Add(theseValidations)
+			}
+		}
+	}
+	return validations, nil
+}
+
+func (tr *TagRegistry) Docs() []TagDoc {
+	var result []TagDoc
+	for _, v := range tr.descriptors {
+		result = append(result, v.Docs()...)
+	}
+	return result
+}
+
+func RegisterTagDescriptor(desc TagDescriptor) {
+	allTags.add(desc)
+}
+
+func GetTagRegistry(c *generator.Context) *TagRegistry {
+	allTags.init(c)
+	return allTags
+}
+
+/* ---------------- */
 
 var registry = &Registry{}
 

@@ -17,11 +17,14 @@ limitations under the License.
 package validators
 
 import (
+	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
 )
 
 // DeclarativeValidator is able to extract validation function generators from
 // types.go files.
+// legacy
 type DeclarativeValidator interface {
 	// ExtractValidations returns a Validations for the validation this DeclarativeValidator
 	// supports for the given go type, and it's corresponding comment strings.
@@ -30,6 +33,96 @@ type DeclarativeValidator interface {
 	// Docs returns user-friendly documentation for all of the tags that this
 	// validator supports.
 	Docs() []TagDoc
+}
+
+// TagDescriptor describes a single validation tag and how to use it.
+type TagDescriptor interface {
+	// Init initializes the tag implementation.  This will be called exactly
+	// once.
+	Init(c *generator.Context)
+
+	// TagName returns the full tag name (without the "marker" prefix) for this
+	// tag.
+	TagName() string
+
+	// ValidScopes returns the set of scopes where this tag may be used.
+	ValidScopes() sets.Set[TagScope]
+
+	// GetValidations returns any validations described by this tag.
+	GetValidations(context TagContext2, args []string, val string) (Validations, error)
+
+	// Docs returns user-facing documentation for this tag.
+	// FIXME: get rid of contexts and call ValidScopes()
+	Docs() []TagDoc
+}
+
+// TagScope describes where a tag is used.
+type TagScope string
+
+// Note: All of these values should be strings which can be used in an error
+// message such as "may not be used in %s".
+const (
+	// TagScopeType indicates a tag used in the comments immediately preceeding
+	// a type's definition.
+	//FIXME: if this were in a tags pkg, maybe "FieldScope"
+	TagScopeType TagScope = "type definitions"
+	// TagScopeField indicates a tag used in the comments immediately
+	// preceeding a struct field's definition.
+	TagScopeField TagScope = "struct fields"
+	//FIXME: add list values and map keys/values
+)
+
+// TagContext2 describes where a tag was used, so that the scope can be checked
+// and so validators can handle different cases if they need.  Each value of
+// the Scope field maps to exactly one "details" field.
+//
+// Callers should use the constructor functions in this package.
+// FIXME: rename when old form is gone
+type TagContext2 struct {
+	// Scope is where the tag was used.
+	Scope TagScope
+
+	//
+	// Exactly one of the following must be set.
+	//
+
+	// Type provides details about the type being defined when Scope is
+	// TagScopeType.
+	Type *types.Type
+
+	// Field provides details about the field being defined when Scope is
+	// TagScopeField.
+	Field *TagContextFieldInfo
+}
+
+// TagContextFieldInfo carries details about the definition of a field.
+type TagContextFieldInfo struct {
+	// Name is the field's name in the parent struct.
+	Name string
+	// Type is the type of the field.
+	Type *types.Type
+	// Struct is the type of the parent struct.
+	Struct *types.Type
+}
+
+// NewTypeContext allocates a valid TagContext2 for a type definition.
+func NewTypeContext(t *types.Type) TagContext2 {
+	return TagContext2{
+		Scope: TagScopeType,
+		Type:  t,
+	}
+}
+
+// NewFieldContext allocates a valid TagContext2 for a field definition.
+func NewFieldContext(name string, fieldType, structType *types.Type) TagContext2 {
+	return TagContext2{
+		Scope: TagScopeField,
+		Field: &TagContextFieldInfo{
+			Name:   name,
+			Type:   fieldType,
+			Struct: structType,
+		},
+	}
 }
 
 // Validations defines the function calls and variables to generate to perform validation.
