@@ -196,9 +196,9 @@ func (optionalTag) GetValidations(context TagContext2, _ []string, _ string) (Va
 	// originally defined as a value-type or a pointer-type in the API.  This
 	// one does.  Since Go doesn't do partial specialization of templates, we
 	// do manual dispatch here.
-	t := context.Field.Type
+	t := context.Type
 	for t.Kind == types.Alias {
-		t = t.Underlying
+		panic("alias type should already have been unwrapped")
 	}
 	switch t.Kind {
 	case types.Slice:

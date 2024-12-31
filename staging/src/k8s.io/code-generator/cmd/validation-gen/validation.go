@@ -383,7 +383,14 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 	td.typeNodes[t] = thisNode
 
 	// Extract any type-attached validation rules.
-	tc := validators.NewTypeContext(t)
+	tc := validators.TagContext2{
+		Scope: validators.TagScopeType,
+		Type:  t,
+	}
+	if t.Kind == types.Alias {
+		tc.Parent = t
+		tc.Type = t.Underlying
+	}
 	if validations, err := td.knownTags.ExtractValidations(tc, t.CommentLines); err != nil {
 		return nil, fmt.Errorf("%v: %w", fldPath, err)
 	} else {
@@ -521,7 +528,11 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		}
 
 		// Extract any field-attached validation rules.
-		tc := validators.NewFieldContext(memb.Name, memb.Type, thisNode.valueType)
+		tc := validators.TagContext2{
+			Scope:  validators.TagScopeField,
+			Type:   memb.Type,
+			Parent: thisNode.valueType,
+		}
 		if validations, err := td.knownTags.ExtractValidations(tc, memb.CommentLines); err != nil {
 			return fmt.Errorf("field %s: %w", childPath.String(), err)
 		} else {
@@ -550,7 +561,12 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		switch childType.Kind {
 		case types.Slice, types.Array:
 			// Extract any embedded list-validation rules.
-			if validations, err := td.extractEmbeddedValidations(eachValTag, memb.CommentLines, childType.Elem); err != nil {
+			valCtxt := validators.TagContext2{
+				Scope:  validators.TagScopeListVal,
+				Type:   childType.Elem,
+				Parent: memb.Type,
+			}
+			if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, memb.CommentLines, childType.Elem); err != nil {
 				return fmt.Errorf("%v: %w", childPath.Key("vals"), err)
 			} else {
 				if !validations.Empty() {
@@ -575,15 +591,20 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			doOneChildField := func(subfield types.Member, name, jsonName string) error {
 				klog.V(5).InfoS("field", "name", name, "jsonName", jsonName, "type", memb.Type)
 
+				tc := validators.TagContext2{
+					Scope:  validators.TagScopeField,
+					Type:   subfield.Type,
+					Parent: childType, // the struct being iterated
+				}
 				// Passing memb.CommentLines because subfield validations are
 				// declared on the *parent* type (memb) field and not the *subfield* type (subfield).
-				if validations, err := td.extractSubfieldValidations(&subfield, jsonName, memb.CommentLines); err != nil {
+				if validations, err := td.extractSubfieldValidations(tc, jsonName, memb.CommentLines); err != nil {
 					return fmt.Errorf("%v: %w", childPath.Child(name), err)
 				} else {
 					if validations.Empty() {
 						return nil
 					}
-					klog.V(5).InfoS("  found field-attached subfield-validations", "n", validations.Len())
+					klog.V(5).InfoS("found field-attached subfield-validations", "n", validations.Len())
 
 					subchild := &childNode{
 						name:             name,
@@ -600,7 +621,12 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			}
 		case types.Map:
 			// Extract any embedded key-validation rules.
-			if validations, err := td.extractEmbeddedValidations(eachKeyTag, memb.CommentLines, childType.Key); err != nil {
+			keyCtxt := validators.TagContext2{
+				Scope:  validators.TagScopeMapKey,
+				Type:   childType.Key,
+				Parent: memb.Type,
+			}
+			if validations, err := td.extractEmbeddedValidations(eachKeyTag, keyCtxt, memb.CommentLines, childType.Key); err != nil {
 				return fmt.Errorf("%v: %w", childPath.Key("keys"), err)
 			} else {
 				if !validations.Empty() {
@@ -612,7 +638,12 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 				}
 			}
 			// Extract any embedded val-validation rules.
-			if validations, err := td.extractEmbeddedValidations(eachValTag, memb.CommentLines, childType.Elem); err != nil {
+			valCtxt := validators.TagContext2{
+				Scope:  validators.TagScopeMapVal,
+				Type:   childType.Elem,
+				Parent: memb.Type,
+			}
+			if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, memb.CommentLines, childType.Elem); err != nil {
 				return fmt.Errorf("%v: %w", childPath.Key("vals"), err)
 			} else {
 				if !validations.Empty() {
@@ -671,7 +702,12 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 	switch underlying.Kind {
 	case types.Slice, types.Array:
 		// Extract any embedded list-validation rules.
-		if validations, err := td.extractEmbeddedValidations(eachValTag, thisNode.valueType.CommentLines, underlying); err != nil {
+		valCtxt := validators.TagContext2{
+			Scope:  validators.TagScopeListVal,
+			Type:   underlying.Elem,
+			Parent: underlying,
+		}
+		if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, thisNode.valueType.CommentLines, underlying); err != nil {
 			return fmt.Errorf("%v: %w", fldPath.Key("vals"), err)
 		} else {
 			if !validations.Empty() {
@@ -681,7 +717,12 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 		}
 	case types.Map:
 		// Extract any embedded key-validation rules.
-		if validations, err := td.extractEmbeddedValidations(eachKeyTag, thisNode.valueType.CommentLines, underlying); err != nil {
+		keyCtxt := validators.TagContext2{
+			Scope:  validators.TagScopeMapKey,
+			Type:   underlying.Key,
+			Parent: underlying,
+		}
+		if validations, err := td.extractEmbeddedValidations(eachKeyTag, keyCtxt, thisNode.valueType.CommentLines, underlying); err != nil {
 			return fmt.Errorf("%v: %w", fldPath.Key("keys"), err)
 		} else {
 			if !validations.Empty() {
@@ -690,7 +731,12 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 			}
 		}
 		// Extract any embedded val-validation rules.
-		if validations, err := td.extractEmbeddedValidations(eachValTag, thisNode.valueType.CommentLines, underlying); err != nil {
+		valCtxt := validators.TagContext2{
+			Scope:  validators.TagScopeMapVal,
+			Type:   underlying.Elem,
+			Parent: underlying,
+		}
+		if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, thisNode.valueType.CommentLines, underlying); err != nil {
 			return fmt.Errorf("%v: %w", fldPath.Key("vals"), err)
 		} else {
 			if !validations.Empty() {
@@ -703,11 +749,18 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 	return nil
 }
 
-func (td *typeDiscoverer) extractEmbeddedValidations(tag string, comments []string, t *types.Type) (validators.Validations, error) {
+// FIXME: drop the `t` arg when converted.
+func (td *typeDiscoverer) extractEmbeddedValidations(tag string, context validators.TagContext2, comments []string, t *types.Type) (validators.Validations, error) {
 	var result validators.Validations
 	if tagVals, found := gengo.ExtractCommentTags("+", comments)[tag]; found {
 		for _, tagVal := range tagVals {
 			fakeComments := []string{tagVal}
+			if validations, err := td.knownTags.ExtractValidations(context, fakeComments); err != nil {
+				return result, err
+			} else {
+				result.Add(validations)
+			}
+			// legacy
 			if validations, err := td.validator.ExtractValidations(t, fakeComments); err != nil {
 				return result, err
 			} else {
@@ -1583,7 +1636,8 @@ func (g *fixtureTestGen) Init(c *generator.Context, w io.Writer) error {
 // extractSubfieldValidations extracts all +k8s:subfield validations for the given
 // subfield that were defined on the parent struct.The syntax for the tag is
 // +k8s:subfield(subfield-json-name)=<validator-tag>=<args>
-func (td *typeDiscoverer) extractSubfieldValidations(subfield *types.Member, jsonName string, comments []string) (validators.Validations, error) {
+// TODO: this could be supported on type definitions.
+func (td *typeDiscoverer) extractSubfieldValidations(context validators.TagContext2, jsonName string, comments []string) (validators.Validations, error) {
 	var result validators.Validations
 
 	// Currently the format for +k8s:subfield tag is:
@@ -1593,11 +1647,18 @@ func (td *typeDiscoverer) extractSubfieldValidations(subfield *types.Member, jso
 		for _, tagVal := range tagVals {
 			// Extract any embedded validation rules.
 			fakeComments := []string{tagVal}
-			if subfieldValidations, err := td.validator.ExtractValidations(subfield.Type, fakeComments); err != nil {
+			if subfieldValidations, err := td.knownTags.ExtractValidations(context, fakeComments); err != nil {
 				return result, err
 			} else {
 				if !subfieldValidations.Empty() {
-					klog.V(5).InfoS("  found subfield-validations", "field", subfield.Name, "n", subfieldValidations.Len())
+					result.Add(subfieldValidations)
+				}
+			}
+			//legacy
+			if subfieldValidations, err := td.validator.ExtractValidations(context.Type, fakeComments); err != nil {
+				return result, err
+			} else {
+				if !subfieldValidations.Empty() {
 					result.Add(subfieldValidations)
 				}
 			}

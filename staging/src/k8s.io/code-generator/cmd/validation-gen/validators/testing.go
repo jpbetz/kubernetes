@@ -21,36 +21,13 @@ import (
 	"fmt"
 	"strings"
 
-	"k8s.io/gengo/v2"
+	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
 )
 
-func init() {
-	AddToRegistry(InitValidateTrueDeclarativeValidator)
-	AddToRegistry(InitValidateFalseDeclarativeValidator)
-	AddToRegistry(InitValidateErrorDeclarativeValidator)
-}
-
-func InitValidateTrueDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
-	return &fixedResultDeclarativeValidator{true}
-}
-
-func InitValidateFalseDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
-	return &fixedResultDeclarativeValidator{false}
-}
-
-type fixedResultDeclarativeValidator struct {
-	result bool
-}
-
-func InitValidateErrorDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
-	return &errorDeclarativeValidator{}
-}
-
-type errorDeclarativeValidator struct {
-}
-
 const (
+	// These tags return a fixed pass/fail state.
 	validateTrueTagName  = "k8s:validateTrue"
 	validateFalseTagName = "k8s:validateFalse"
 
@@ -58,38 +35,120 @@ const (
 	validateErrorTagName = "k8s:validateError"
 )
 
-var (
-	fixedResultValidator = types.Name{Package: libValidationPkg, Name: "FixedResult"}
-)
+func init() {
+	RegisterTagDescriptor(fixedResultTag{result: true})
+	RegisterTagDescriptor(fixedResultTag{result: false})
+	RegisterTagDescriptor(fixedResultTag{error: true})
+}
 
-func (v fixedResultDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
+type fixedResultTag struct {
+	result bool
+	error  bool
+}
+
+var _ TagDescriptor = fixedResultTag{}
+
+func (fixedResultTag) Init(_ *generator.Context) {}
+
+func (frt fixedResultTag) TagName() string {
+	if frt.error {
+		return validateErrorTagName
+	} else if frt.result {
+		return validateTrueTagName
+	}
+	return validateFalseTagName
+}
+
+var fixedResultTagScopes = sets.New(TagScopeAll)
+
+func (fixedResultTag) ValidScopes() sets.Set[TagScope] {
+	return fixedResultTagScopes
+}
+
+func (frt fixedResultTag) GetValidations(context TagContext2, _ []string, payload string) (Validations, error) {
 	var result Validations
 
-	if v.result {
-		vals := gengo.ExtractCommentTags("+", comments)[validateTrueTagName]
-		for _, val := range vals {
-			tag, err := v.parseTagVal(val)
-			if err != nil {
-				return result, fmt.Errorf("can't extract +%s tag: %w", validateTrueTagName, err)
-			}
-			result.AddFunction(GenericFunction(validateTrueTagName, tag.flags, fixedResultValidator, tag.typeArgs, true, tag.msg))
-		}
-	} else {
-		vals := gengo.ExtractCommentTags("+", comments)[validateFalseTagName]
-		for _, val := range vals {
-			tag, err := v.parseTagVal(val)
-			if err != nil {
-				return result, fmt.Errorf("can't extract +%s tag: %w", validateFalseTagName, err)
-			}
-			result.AddFunction(GenericFunction(validateFalseTagName, tag.flags, fixedResultValidator, tag.typeArgs, false, tag.msg))
-		}
+	if frt.error {
+		return result, fmt.Errorf("forced error: %q", payload)
 	}
+
+	tag, err := frt.parseTagPayload(payload)
+	if err != nil {
+		return result, fmt.Errorf("can't decode tag payload: %w", err)
+	}
+	result.AddFunction(GenericFunction(frt.TagName(), tag.flags, fixedResultValidator, tag.typeArgs, frt.result, tag.msg))
 
 	return result, nil
 }
 
-func (v fixedResultDeclarativeValidator) Docs() []TagDoc {
-	if v.result {
+var (
+	fixedResultValidator = types.Name{Package: libValidationPkg, Name: "FixedResult"}
+)
+
+type fixedResultPayload struct {
+	flags    FunctionFlags
+	msg      string
+	typeArgs []types.Name
+}
+
+func (fixedResultTag) parseTagPayload(in string) (fixedResultPayload, error) {
+	type payload struct {
+		Flags   []string `json:"flags"`
+		Msg     string   `json:"msg"`
+		TypeArg string   `json:"typeArg,omitempty"`
+	}
+	// We expect either a string (maybe empty) or a JSON object.
+	if len(in) == 0 {
+		return fixedResultPayload{}, nil
+	}
+	var pl payload
+	if err := json.Unmarshal([]byte(in), &pl); err != nil {
+		s := ""
+		if err := json.Unmarshal([]byte(in), &s); err != nil {
+			return fixedResultPayload{}, fmt.Errorf("error parsing JSON value: %v (%q)", err, in)
+		}
+		return fixedResultPayload{msg: s}, nil
+	}
+	// The msg field is required in JSON mode.
+	if pl.Msg == "" {
+		return fixedResultPayload{}, fmt.Errorf("JSON msg is required")
+	}
+	var flags FunctionFlags
+	for _, fl := range pl.Flags {
+		switch fl {
+		case "ShortCircuit":
+			flags |= ShortCircuit
+		case "NonError":
+			flags |= NonError
+		default:
+			return fixedResultPayload{}, fmt.Errorf("unknown flag: %q", fl)
+		}
+	}
+	var typeArgs []types.Name
+	if tn := pl.TypeArg; len(tn) > 0 {
+		if !strings.HasPrefix(tn, "*") {
+			tn = "*" + tn // We always need the pointer type.
+		}
+		typeArgs = []types.Name{{Package: "", Name: tn}}
+	}
+
+	return fixedResultPayload{flags, pl.Msg, typeArgs}, nil
+}
+
+func (frt fixedResultTag) Docs() []TagDoc {
+	if frt.error {
+		return []TagDoc{{
+			Tag:         validateErrorTagName,
+			Description: "Always fails code generation (useful for testing).",
+			Contexts:    []TagContext{TagContextType, TagContextField},
+			Payloads: []TagPayloadDoc{{
+				Description: "<string>",
+				Docs:        "This string will be included in the error message.",
+			}},
+		}}
+	}
+
+	if frt.result {
 		return []TagDoc{{
 			Tag:         validateTrueTagName,
 			Description: "Always passes validation (useful for testing).",
@@ -144,75 +203,4 @@ func (v fixedResultDeclarativeValidator) Docs() []TagDoc {
 			}},
 		}}
 	}
-}
-
-type tagVal struct {
-	flags    FunctionFlags
-	msg      string
-	typeArgs []types.Name
-}
-
-func (_ fixedResultDeclarativeValidator) parseTagVal(in string) (tagVal, error) {
-	type payload struct {
-		Flags   []string `json:"flags"`
-		Msg     string   `json:"msg"`
-		TypeArg string   `json:"typeArg,omitempty"`
-	}
-	// We expect either a string (maybe empty) or a JSON object.
-	if len(in) == 0 {
-		return tagVal{}, nil
-	}
-	var pl payload
-	if err := json.Unmarshal([]byte(in), &pl); err != nil {
-		s := ""
-		if err := json.Unmarshal([]byte(in), &s); err != nil {
-			return tagVal{}, fmt.Errorf("error parsing JSON value: %v (%q)", err, in)
-		}
-		return tagVal{msg: s}, nil
-	}
-	// The msg field is required in JSON mode.
-	if pl.Msg == "" {
-		return tagVal{}, fmt.Errorf("JSON msg is required")
-	}
-	var flags FunctionFlags
-	for _, fl := range pl.Flags {
-		switch fl {
-		case "ShortCircuit":
-			flags |= ShortCircuit
-		case "NonError":
-			flags |= NonError
-		default:
-			return tagVal{}, fmt.Errorf("unknown flag: %q", fl)
-		}
-	}
-	var typeArgs []types.Name
-	if tn := pl.TypeArg; len(tn) > 0 {
-		if !strings.HasPrefix(tn, "*") {
-			tn = "*" + tn // We always need the pointer type.
-		}
-		typeArgs = []types.Name{{Package: "", Name: tn}}
-	}
-
-	return tagVal{flags, pl.Msg, typeArgs}, nil
-}
-
-func (v errorDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
-	var result Validations
-	vals, found := gengo.ExtractCommentTags("+", comments)[validateErrorTagName]
-	if found {
-		return result, fmt.Errorf("forced error: %q", vals)
-	}
-	return result, nil
-}
-
-func (errorDeclarativeValidator) Docs() []TagDoc {
-	return []TagDoc{{
-		Tag:         validateErrorTagName,
-		Description: "Always fails code generation (useful for testing).",
-		Contexts:    []TagContext{TagContextType, TagContextField},
-		Payloads: []TagPayloadDoc{{
-			Description: "<string>",
-			Docs:        "This string will be included in the error message.",
-		}},
-	}}
 }

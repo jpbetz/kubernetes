@@ -84,11 +84,27 @@ func (o optionDeclarativeValidator) parseIfOptionsTag(t *types.Type, tag gengo.T
 	if len(tag.Args) != 1 {
 		return "", Validations{}, fmt.Errorf("tag %q requires 1 argument", tag.Name)
 	}
-	validations, err := o.cfg.EmbedValidator.ExtractValidations(t, []string{tag.Value})
-	if err != nil {
-		return "", Validations{}, err
+
+	result := Validations{}
+	fakeComments := []string{tag.Value}
+
+	//FIXME: Use the real context once converted
+	tc := TagContext2{
+		Scope: TagScopeType,
+		Type:  t,
 	}
-	return tag.Args[0], validations, nil
+	if validations, err := o.cfg.AllTags.ExtractValidations(tc, fakeComments); err != nil {
+		return "", Validations{}, err
+	} else {
+		result.Add(validations)
+	}
+	// legacy
+	if validations, err := o.cfg.EmbedValidator.ExtractValidations(t, fakeComments); err != nil {
+		return "", Validations{}, err
+	} else {
+		result.Add(validations)
+	}
+	return tag.Args[0], result, nil
 }
 
 func (optionDeclarativeValidator) Docs() []TagDoc {

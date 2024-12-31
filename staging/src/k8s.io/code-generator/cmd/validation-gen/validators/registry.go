@@ -82,7 +82,7 @@ func (tr *TagRegistry) ExtractValidations(context TagContext2, comments []string
 	validations := Validations{}
 	for tag, vals := range tags {
 		desc := tr.descriptors[tag]
-		if !desc.ValidScopes().Has(context.Scope) {
+		if scopes := desc.ValidScopes(); !scopes.Has(context.Scope) && !scopes.Has(TagScopeAll) {
 			return Validations{}, fmt.Errorf("tag %q cannot be specified on %s", desc.TagName(), context.Scope)
 		}
 		for _, val := range vals { // tags may have multiple values
@@ -128,6 +128,8 @@ type ValidatorConfig struct {
 	// EmbedValidator.ExtractValidations() SHOULD NOT be called during init, since other validators may not have yet
 	// initialized and may not yet be registered for use as an embedded validator.
 	EmbedValidator DeclarativeValidator
+	// This is temporary until conversion is done.
+	AllTags *TagRegistry
 }
 
 type DeclarativeValidatorInit func(cfg *ValidatorConfig) DeclarativeValidator
@@ -154,6 +156,7 @@ func NewValidator(c *generator.Context) DeclarativeValidator {
 	cfg := &ValidatorConfig{
 		GeneratorContext: c,
 		EmbedValidator:   composite,
+		AllTags:          allTags,
 	}
 	for _, init := range registry.inits {
 		composite.validators = append(composite.validators, init(cfg))
