@@ -191,7 +191,7 @@ func (optionalTag) ValidScopes() sets.Set[TagScope] {
 	return optionalTagScopes
 }
 
-func (optionalTag) GetValidations(context TagContext2, _ []string, _ string) (Validations, error) {
+func (optionalTag) GetValidations(context TagContext, _ []string, _ string) (Validations, error) {
 	// Most validators don't care whether the value they are validating was
 	// originally defined as a value-type or a pointer-type in the API.  This
 	// one does.  Since Go doesn't do partial specialization of templates, we

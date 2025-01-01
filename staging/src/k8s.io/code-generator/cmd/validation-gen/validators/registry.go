@@ -69,7 +69,7 @@ func (tr *TagRegistry) init(c *generator.Context) {
 	sort.Strings(tr.index)
 }
 
-func (tr *TagRegistry) ExtractValidations(context TagContext2, comments []string) (Validations, error) {
+func (tr *TagRegistry) ExtractValidations(context TagContext, comments []string) (Validations, error) {
 	if !tr.initialized.Load() {
 		panic("TagRegistry.init() was not called")
 	}
