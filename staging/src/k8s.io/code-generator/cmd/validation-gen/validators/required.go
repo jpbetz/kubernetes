@@ -224,10 +224,10 @@ var (
 	optionalMapValidator     = types.Name{Package: libValidationPkg, Name: "OptionalMap"}
 )
 
-func (optionalTag) Docs() []TagDoc {
-	return []TagDoc{{
-		Tag:         optionalTagName,
+func (ot optionalTag) Docs() TagDoc {
+	return TagDoc{
+		Tag:         ot.TagName(),
+		Contexts:    ot.ValidScopes().UnsortedList(),
 		Description: "Indicates that a field is optional to clients.",
-		Contexts:    []TagScope{TagScopeField},
-	}}
+	}
 }

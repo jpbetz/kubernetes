@@ -52,7 +52,7 @@ type TagDescriptor interface {
 	GetValidations(context TagContext2, args []string, payload string) (Validations, error)
 
 	// Docs returns user-facing documentation for this tag.
-	Docs() []TagDoc
+	Docs() TagDoc
 }
 
 // TagScope describes where a tag is used.

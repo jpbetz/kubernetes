@@ -99,7 +99,7 @@ func (tr *TagRegistry) ExtractValidations(context TagContext2, comments []string
 func (tr *TagRegistry) Docs() []TagDoc {
 	var result []TagDoc
 	for _, v := range tr.descriptors {
-		result = append(result, v.Docs()...)
+		result = append(result, v.Docs())
 	}
 	return result
 }

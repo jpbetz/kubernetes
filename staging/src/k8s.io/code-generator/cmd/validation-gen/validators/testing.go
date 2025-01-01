@@ -135,72 +135,46 @@ func (fixedResultTag) parseTagPayload(in string) (fixedResultPayload, error) {
 	return fixedResultPayload{flags, pl.Msg, typeArgs}, nil
 }
 
-func (frt fixedResultTag) Docs() []TagDoc {
-	if frt.error {
-		return []TagDoc{{
-			Tag:         validateErrorTagName,
-			Description: "Always fails code generation (useful for testing).",
-			Contexts:    []TagScope{TagScopeType, TagScopeField},
-			Payloads: []TagPayloadDoc{{
-				Description: "<string>",
-				Docs:        "This string will be included in the error message.",
-			}},
-		}}
+func (frt fixedResultTag) Docs() TagDoc {
+	doc := TagDoc{
+		Tag:      frt.TagName(),
+		Contexts: frt.ValidScopes().UnsortedList(),
 	}
-
-	if frt.result {
-		return []TagDoc{{
-			Tag:         validateTrueTagName,
-			Description: "Always passes validation (useful for testing).",
-			Contexts:    []TagScope{TagScopeType, TagScopeField},
-			Payloads: []TagPayloadDoc{{
-				Description: "<none>",
-				Docs:        "",
-			}, {
-				Description: "<quoted-string>",
-				Docs:        "The generated code will include this string.",
-			}, {
-				Description: "<json-object>",
-				Docs:        "",
-				Schema: []TagPayloadSchema{{
-					Key:   "flags",
-					Value: "<list-of-flag-string>",
-					Docs:  `values: ShortCircuit, NonError`,
-				}, {
-					Key:   "msg",
-					Value: "<string>",
-					Docs:  "The generated code will include this string.",
-				}, {
-					Key:   "typeArg",
-					Value: "<string>",
-					Docs:  "The type arg in generated code (must be the value-type, not pointer).",
-				}},
-			}},
+	if frt.error {
+		doc.Description = "Always fails code generation (useful for testing)."
+		doc.Payloads = []TagPayloadDoc{{
+			Description: "<string>",
+			Docs:        "This string will be included in the error message.",
 		}}
 	} else {
-		return []TagDoc{{
-			Tag:         validateFalseTagName,
-			Description: "Always fails validation (useful for testing).",
-			Contexts:    []TagScope{TagScopeType, TagScopeField},
-			Payloads: []TagPayloadDoc{{
-				Description: "<none>",
-				Docs:        "",
+		// True and false have the same payloads.
+		doc.Payloads = []TagPayloadDoc{{
+			Description: "<none>",
+		}, {
+			Description: "<quoted-string>",
+			Docs:        "The generated code will include this string.",
+		}, {
+			Description: "<json-object>",
+			Docs:        "",
+			Schema: []TagPayloadSchema{{
+				Key:   "flags",
+				Value: "<list-of-flag-string>",
+				Docs:  `values: ShortCircuit, NonError`,
 			}, {
-				Description: "<quoted-string>",
-				Docs:        "The generated code will include this string.",
+				Key:   "msg",
+				Value: "<string>",
+				Docs:  "The generated code will include this string.",
 			}, {
-				Description: "<json-object>",
-				Docs:        "",
-				Schema: []TagPayloadSchema{{
-					Key:   "flags",
-					Value: "<list-of-flag-string>",
-					Docs:  `values: ShortCircuit, NonError`,
-				}, {
-					Key:   "msg",
-					Value: "<string>",
-					Docs:  "The generated code will include this string.",
-				}},
+				Key:   "typeArg",
+				Value: "<string>",
+				Docs:  "The type arg in generated code (must be the value-type, not pointer).",
 			}},
 		}}
+		if frt.result {
+			doc.Description = "Always passes validation (useful for testing)."
+		} else {
+			doc.Description = "Always fails validation (useful for testing)."
+		}
 	}
+	return doc
 }
