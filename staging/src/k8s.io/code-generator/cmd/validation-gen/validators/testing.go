@@ -140,7 +140,7 @@ func (frt fixedResultTag) Docs() []TagDoc {
 		return []TagDoc{{
 			Tag:         validateErrorTagName,
 			Description: "Always fails code generation (useful for testing).",
-			Contexts:    []TagContext{TagContextType, TagContextField},
+			Contexts:    []TagScope{TagScopeType, TagScopeField},
 			Payloads: []TagPayloadDoc{{
 				Description: "<string>",
 				Docs:        "This string will be included in the error message.",
@@ -152,7 +152,7 @@ func (frt fixedResultTag) Docs() []TagDoc {
 		return []TagDoc{{
 			Tag:         validateTrueTagName,
 			Description: "Always passes validation (useful for testing).",
-			Contexts:    []TagContext{TagContextType, TagContextField},
+			Contexts:    []TagScope{TagScopeType, TagScopeField},
 			Payloads: []TagPayloadDoc{{
 				Description: "<none>",
 				Docs:        "",
@@ -181,7 +181,7 @@ func (frt fixedResultTag) Docs() []TagDoc {
 		return []TagDoc{{
 			Tag:         validateFalseTagName,
 			Description: "Always fails validation (useful for testing).",
-			Contexts:    []TagContext{TagContextType, TagContextField},
+			Contexts:    []TagScope{TagScopeType, TagScopeField},
 			Payloads: []TagPayloadDoc{{
 				Description: "<none>",
 				Docs:        "",

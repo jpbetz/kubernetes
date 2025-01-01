@@ -99,7 +99,7 @@ func (openAPIDeclarativeValidator) Docs() []TagDoc {
 	return []TagDoc{{
 		Tag:         formatTagName,
 		Description: "Indicates that a string field has a particular format.",
-		Contexts:    []TagContext{TagContextType, TagContextField},
+		Contexts:    []TagScope{TagScopeType, TagScopeField},
 		Payloads: []TagPayloadDoc{{
 			Description: "ip-sloppy",
 			Docs:        "This field holds an IPv4 or IPv6 address value. IPv4 octets may have leading zeros.",
@@ -110,7 +110,7 @@ func (openAPIDeclarativeValidator) Docs() []TagDoc {
 	}, {
 		Tag:         maxLengthTagName,
 		Description: "Indicates that a string field has a limit on its length.",
-		Contexts:    []TagContext{TagContextType, TagContextField},
+		Contexts:    []TagScope{TagScopeType, TagScopeField},
 		Payloads: []TagPayloadDoc{{
 			Description: "<non-negative integer>",
 			Docs:        "This field must be no more than X characters long.",
@@ -118,7 +118,7 @@ func (openAPIDeclarativeValidator) Docs() []TagDoc {
 	}, {
 		Tag:         maxItemsTagName,
 		Description: "Indidates that a slice field has a limit on its size.",
-		Contexts:    []TagContext{TagContextType, TagContextField},
+		Contexts:    []TagScope{TagScopeType, TagScopeField},
 		Payloads: []TagPayloadDoc{
 			{
 				Description: "<non-negative integer>",

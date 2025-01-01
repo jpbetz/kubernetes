@@ -68,7 +68,7 @@ func (enumDeclarativeValidator) Docs() []TagDoc {
 	return []TagDoc{{
 		Tag:         tagEnumType,
 		Description: "Indicates that a string type is an enum. All const values of this type are considered values in the enum.",
-		Contexts:    []TagContext{TagContextType},
+		Contexts:    []TagScope{TagScopeType},
 		Payloads:    nil,
 	}}
 }

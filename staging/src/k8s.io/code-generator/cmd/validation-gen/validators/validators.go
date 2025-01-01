@@ -52,7 +52,6 @@ type TagDescriptor interface {
 	GetValidations(context TagContext2, args []string, payload string) (Validations, error)
 
 	// Docs returns user-facing documentation for this tag.
-	// FIXME: get rid of contexts and call ValidScopes()
 	Docs() []TagDoc
 }
 
@@ -334,24 +333,12 @@ type TagDoc struct {
 	Description string
 	// Contexts lists the place or places this tag may be used.  Tags used in
 	// the wrong context may or may not cause errors.
-	Contexts []TagContext
+	Contexts []TagScope
 	// Payloads lists zero or more varieties of value for this tag. If this tag
 	// never has a payload, this list should be empty, but if the payload is
 	// optional, this list should include an entry for "<none>".
 	Payloads []TagPayloadDoc
 }
-
-// TagContext describes where a tag may be attached.
-type TagContext string
-
-const (
-	// TagContextType indicates that a tag may be attached to a type
-	// definition.
-	TagContextType TagContext = "Type definition"
-	// TagContextField indicates that a tag may be attached to a struct
-	// field, the keys of a map, or the values of a map or slice.
-	TagContextField TagContext = "Field definition, map key, map/slice value"
-)
 
 // TagPayloadDoc describes a value for a tag (e.g `+tagName=tagValue`).  Some
 // tags upport multiple payloads, including <none> (e.g. `+tagName`).

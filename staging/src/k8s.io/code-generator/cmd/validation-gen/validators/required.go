@@ -79,7 +79,7 @@ func (requiredDeclarativeValidator) Docs() []TagDoc {
 	return []TagDoc{{
 		Tag:         requiredTagName,
 		Description: "Indicates that a field is required to be specified.",
-		Contexts:    []TagContext{TagContextType, TagContextField},
+		Contexts:    []TagScope{TagScopeType, TagScopeField},
 	}}
 }
 
@@ -161,7 +161,7 @@ func (forbiddenDeclarativeValidator) Docs() []TagDoc {
 	return []TagDoc{{
 		Tag:         forbiddenTagName,
 		Description: "Indicates that a field is forbidden to be specified.",
-		Contexts:    []TagContext{TagContextType, TagContextField},
+		Contexts:    []TagScope{TagScopeType, TagScopeField},
 	}}
 }
 
@@ -228,6 +228,6 @@ func (optionalTag) Docs() []TagDoc {
 	return []TagDoc{{
 		Tag:         optionalTagName,
 		Description: "Indicates that a field is optional to clients.",
-		Contexts:    []TagContext{TagContextField},
+		Contexts:    []TagScope{TagScopeField},
 	}}
 }

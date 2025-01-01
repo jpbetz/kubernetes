@@ -198,7 +198,7 @@ func (unionDeclarativeValidator) Docs() []TagDoc {
 	return []TagDoc{{
 		Tag:         discriminatorTagName,
 		Description: "Indicates that this field is the discriminator for a union.",
-		Contexts:    []TagContext{TagContextField},
+		Contexts:    []TagScope{TagScopeField},
 		Payloads: []TagPayloadDoc{{
 			Description: "<json-object>",
 			Docs:        "",
@@ -211,7 +211,7 @@ func (unionDeclarativeValidator) Docs() []TagDoc {
 	}, {
 		Tag:         memberTagName,
 		Description: "Indicates that this field is a member of a union.",
-		Contexts:    []TagContext{TagContextField},
+		Contexts:    []TagScope{TagScopeField},
 		Payloads: []TagPayloadDoc{{
 			Description: "<json-object>",
 			Docs:        "",
