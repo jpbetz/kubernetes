@@ -20,25 +20,63 @@ import (
 	"fmt"
 
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
 )
 
+const (
+	requiredTagName  = "k8s:required"
+	optionalTagName  = "k8s:optional"
+	forbiddenTagName = "k8s:forbidden"
+)
+
 func init() {
-	AddToRegistry(InitRequiredDeclarativeValidator)
-	AddToRegistry(InitForbiddenDeclarativeValidator)
+	RegisterTagDescriptor(requirednessTag{requirednessRequired})
+	RegisterTagDescriptor(requirednessTag{requirednessOptional})
+	RegisterTagDescriptor(requirednessTag{requirednessForbidden})
 }
 
-func InitRequiredDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
-	return &requiredDeclarativeValidator{}
+// requirednessTag implements multiple modes of requiredness.
+type requirednessTag struct {
+	mode requirednessMode
 }
 
-type requiredDeclarativeValidator struct{}
+type requirednessMode string
 
 const (
-	requiredTagName = "k8s:required"
+	requirednessRequired  requirednessMode = requiredTagName
+	requirednessOptional  requirednessMode = optionalTagName
+	requirednessForbidden requirednessMode = forbiddenTagName
 )
+
+var _ TagDescriptor = requirednessTag{}
+
+func (requirednessTag) Init(_ *generator.Context) {}
+
+func (rt requirednessTag) TagName() string {
+	return string(rt.mode)
+}
+
+var requirednessTagScopes = sets.New(TagScopeField)
+
+func (requirednessTag) ValidScopes() sets.Set[TagScope] {
+	return requirednessTagScopes
+}
+
+func (rt requirednessTag) GetValidations(context TagContext, _ []string, _ string) (Validations, error) {
+	if context.Type.Kind == types.Alias {
+		panic("alias type should already have been unwrapped")
+	}
+	switch rt.mode {
+	case requirednessRequired:
+		return rt.doRequired(context)
+	case requirednessOptional:
+		return rt.doOptional(context)
+	case requirednessForbidden:
+		return rt.doForbidden(context)
+	}
+	panic(fmt.Sprintf("unknown requiredness mode: %q", rt.mode))
+}
 
 var (
 	requiredValueValidator   = types.Name{Package: libValidationPkg, Name: "RequiredValue"}
@@ -47,19 +85,14 @@ var (
 	requiredMapValidator     = types.Name{Package: libValidationPkg, Name: "RequiredMap"}
 )
 
-func (requiredDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
-	_, required := gengo.ExtractCommentTags("+", comments)[requiredTagName]
-	if !required {
-		return Validations{}, nil
-	}
+// TODO: It might be valuable to have a string payload for when requiredness is
+// conditional (e.g. required when <otherfield> is specified).
+func (requirednessTag) doRequired(context TagContext) (Validations, error) {
 	// Most validators don't care whether the value they are validating was
 	// originally defined as a value-type or a pointer-type in the API.  This
 	// one does.  Since Go doesn't do partial specialization of templates, we
 	// do manual dispatch here.
-	for t.Kind == types.Alias {
-		t = t.Underlying
-	}
-	switch t.Kind {
+	switch context.Type.Kind {
 	case types.Slice:
 		return Validations{Functions: []FunctionGen{Function(requiredTagName, ShortCircuit, requiredSliceValidator)}}, nil
 	case types.Map:
@@ -75,23 +108,34 @@ func (requiredDeclarativeValidator) ExtractValidations(t *types.Type, comments [
 	return Validations{Functions: []FunctionGen{Function(requiredTagName, ShortCircuit, requiredValueValidator)}}, nil
 }
 
-func (requiredDeclarativeValidator) Docs() []TagDoc {
-	return []TagDoc{{
-		Tag:         requiredTagName,
-		Description: "Indicates that a field is required to be specified.",
-		Contexts:    []TagScope{TagScopeType, TagScopeField},
-	}}
-}
-
-func InitForbiddenDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
-	return &forbiddenDeclarativeValidator{}
-}
-
-type forbiddenDeclarativeValidator struct{}
-
-const (
-	forbiddenTagName = "k8s:forbidden"
+var (
+	optionalValueValidator   = types.Name{Package: libValidationPkg, Name: "OptionalValue"}
+	optionalPointerValidator = types.Name{Package: libValidationPkg, Name: "OptionalPointer"}
+	optionalSliceValidator   = types.Name{Package: libValidationPkg, Name: "OptionalSlice"}
+	optionalMapValidator     = types.Name{Package: libValidationPkg, Name: "OptionalMap"}
 )
+
+func (requirednessTag) doOptional(context TagContext) (Validations, error) {
+	// Most validators don't care whether the value they are validating was
+	// originally defined as a value-type or a pointer-type in the API.  This
+	// one does.  Since Go doesn't do partial specialization of templates, we
+	// do manual dispatch here.
+	switch context.Type.Kind {
+	case types.Slice:
+		return Validations{Functions: []FunctionGen{Function(optionalTagName, ShortCircuit|NonError, optionalSliceValidator)}}, nil
+	case types.Map:
+		return Validations{Functions: []FunctionGen{Function(optionalTagName, ShortCircuit|NonError, optionalMapValidator)}}, nil
+	case types.Pointer:
+		return Validations{Functions: []FunctionGen{Function(optionalTagName, ShortCircuit|NonError, optionalPointerValidator)}}, nil
+	case types.Struct:
+		// Specifying that a non-pointer struct is optional doesn't actually
+		// make sense technically almost ever, and is better described as a
+		// union inside the struct. It does, however, make sense as
+		// documentation.
+		return Validations{Comments: []string{"optional non-pointer structs are purely documentation"}}, nil
+	}
+	return Validations{Functions: []FunctionGen{Function(optionalTagName, ShortCircuit|NonError, optionalValueValidator)}}, nil
+}
 
 var (
 	forbiddenValueValidator   = types.Name{Package: libValidationPkg, Name: "ForbiddenValue"}
@@ -100,18 +144,9 @@ var (
 	forbiddenMapValidator     = types.Name{Package: libValidationPkg, Name: "ForbiddenMap"}
 )
 
-func (forbiddenDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
-	_, forbidden := gengo.ExtractCommentTags("+", comments)[forbiddenTagName]
-	if !forbidden {
-		return Validations{}, nil
-	}
-	// Most validators don't care whether the value they are validating was
-	// originally defined as a value-type or a pointer-type in the API.  This
-	// one does.  Since Go doesn't do partial specialization of templates, we
-	// do manual dispatch here.
-	for t.Kind == types.Alias {
-		t = t.Underlying
-	}
+// TODO: It might be valuable to have a string payload for when forbidden is
+// conditional (e.g. forbidden when <option> is disabled).
+func (requirednessTag) doForbidden(context TagContext) (Validations, error) {
 	// Forbidden is weird.  Each of these emits two checks, which are polar
 	// opposites.  If the field fails the forbidden check, it will
 	// short-circuit and not run the optional check.  If it passes the
@@ -119,7 +154,7 @@ func (forbiddenDeclarativeValidator) ExtractValidations(t *types.Type, comments 
 	// optional check and short-circuit (but without error).  Why?  For
 	// example, this prevents any further validation from trying to run on a
 	// nil pointer.
-	switch t.Kind {
+	switch context.Type.Kind {
 	case types.Slice:
 		return Validations{
 			Functions: []FunctionGen{
@@ -157,77 +192,22 @@ func (forbiddenDeclarativeValidator) ExtractValidations(t *types.Type, comments 
 	}, nil
 }
 
-func (forbiddenDeclarativeValidator) Docs() []TagDoc {
-	return []TagDoc{{
-		Tag:         forbiddenTagName,
-		Description: "Indicates that a field is forbidden to be specified.",
-		Contexts:    []TagScope{TagScopeType, TagScopeField},
-	}}
-}
-
-//
-// +k8s:optional
-//
-
-const optionalTagName = "k8s:optional"
-
-func init() {
-	RegisterTagDescriptor(optionalTag{})
-}
-
-type optionalTag struct{}
-
-var _ TagDescriptor = optionalTag{}
-
-func (optionalTag) Init(_ *generator.Context) {}
-
-func (optionalTag) TagName() string {
-	return optionalTagName
-}
-
-var optionalTagScopes = sets.New(TagScopeField)
-
-func (optionalTag) ValidScopes() sets.Set[TagScope] {
-	return optionalTagScopes
-}
-
-func (optionalTag) GetValidations(context TagContext, _ []string, _ string) (Validations, error) {
-	// Most validators don't care whether the value they are validating was
-	// originally defined as a value-type or a pointer-type in the API.  This
-	// one does.  Since Go doesn't do partial specialization of templates, we
-	// do manual dispatch here.
-	t := context.Type
-	for t.Kind == types.Alias {
-		panic("alias type should already have been unwrapped")
+func (rt requirednessTag) Docs() TagDoc {
+	doc := TagDoc{
+		Tag:      rt.TagName(),
+		Contexts: rt.ValidScopes().UnsortedList(),
 	}
-	switch t.Kind {
-	case types.Slice:
-		return Validations{Functions: []FunctionGen{Function(optionalTagName, ShortCircuit|NonError, optionalSliceValidator)}}, nil
-	case types.Map:
-		return Validations{Functions: []FunctionGen{Function(optionalTagName, ShortCircuit|NonError, optionalMapValidator)}}, nil
-	case types.Pointer:
-		return Validations{Functions: []FunctionGen{Function(optionalTagName, ShortCircuit|NonError, optionalPointerValidator)}}, nil
-	case types.Struct:
-		// Specifying that a non-pointer struct is optional doesn't actually
-		// make sense technically almost ever, and is better described as a
-		// union inside the struct. It does, however, make sense as
-		// documentation.
-		return Validations{Comments: []string{"optional non-pointer structs are purely documentation"}}, nil
-	}
-	return Validations{Functions: []FunctionGen{Function(optionalTagName, ShortCircuit|NonError, optionalValueValidator)}}, nil
-}
 
-var (
-	optionalValueValidator   = types.Name{Package: libValidationPkg, Name: "OptionalValue"}
-	optionalPointerValidator = types.Name{Package: libValidationPkg, Name: "OptionalPointer"}
-	optionalSliceValidator   = types.Name{Package: libValidationPkg, Name: "OptionalSlice"}
-	optionalMapValidator     = types.Name{Package: libValidationPkg, Name: "OptionalMap"}
-)
-
-func (ot optionalTag) Docs() TagDoc {
-	return TagDoc{
-		Tag:         ot.TagName(),
-		Contexts:    ot.ValidScopes().UnsortedList(),
-		Description: "Indicates that a field is optional to clients.",
+	switch rt.mode {
+	case requirednessRequired:
+		doc.Description = "Indicates that a field is optional to clients."
+	case requirednessOptional:
+		doc.Description = "Indicates that a field must be specified by clients."
+	case requirednessForbidden:
+		doc.Description = "Indicates that a field may not be specified."
+	default:
+		panic(fmt.Sprintf("unknown requiredness mode: %q", rt.mode))
 	}
+
+	return doc
 }
