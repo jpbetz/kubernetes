@@ -110,7 +110,8 @@ func printDocs() {
 		FileTypes: map[string]generator.FileType{},
 	}
 
-	allTags := validators.GetTagRegistry(c)
+	// Initialize all registered tags.
+	allTags := validators.InitGlobalTagRegistry(c)
 
 	// This gets a composite validator which aggregates the many plugins.
 	validator := validators.NewValidator(c)

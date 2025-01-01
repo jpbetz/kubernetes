@@ -190,7 +190,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 	orderer := namer.Orderer{Namer: namer.NewPublicNamer(1)}
 	context.Order = orderer.OrderUniverse(context.Universe)
 
-	allTags := validators.GetTagRegistry(context)
+	allTags := validators.InitGlobalTagRegistry(context)
 
 	// Build a cache of type->callNode for every type we need.
 	for _, input := range context.Inputs {

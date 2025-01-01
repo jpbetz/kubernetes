@@ -27,10 +27,13 @@ import (
 	"k8s.io/gengo/v2/types"
 )
 
-var allTags = &TagRegistry{
+// This is the global registry of tag descriptors. For simplicity this is in
+// the same package as tag implementations, but it should not be used directly.
+var globalAllTags = &TagRegistry{
 	descriptors: map[string]TagDescriptor{},
 }
 
+// TagRegistry holds a list of registered tags.
 type TagRegistry struct {
 	lock        sync.Mutex
 	descriptors map[string]TagDescriptor // keyed by tagname
@@ -47,10 +50,10 @@ func (tr *TagRegistry) add(desc TagDescriptor) {
 	}
 
 	name := desc.TagName()
-	if _, exists := allTags.descriptors[name]; exists {
+	if _, exists := globalAllTags.descriptors[name]; exists {
 		panic(fmt.Sprintf("tag %q was registered twice", name))
 	}
-	allTags.descriptors[name] = desc
+	globalAllTags.descriptors[name] = desc
 }
 
 func (tr *TagRegistry) init(c *generator.Context) {
@@ -62,13 +65,17 @@ func (tr *TagRegistry) init(c *generator.Context) {
 	}
 	tr.initialized.Store(true)
 
-	for _, desc := range allTags.descriptors {
+	for _, desc := range globalAllTags.descriptors {
 		tr.index = append(tr.index, desc.TagName())
 		desc.Init(c)
 	}
 	sort.Strings(tr.index)
 }
 
+// ExtractValidations evaluates a block comments for a given context (e.g. a type
+// definition), looking for known tags.  If known tags are found, they are
+// executed for the context, producing zero or more validations, which can
+// later be rendered by the code-generation logic.
 func (tr *TagRegistry) ExtractValidations(context TagContext, comments []string) (Validations, error) {
 	if !tr.initialized.Load() {
 		panic("TagRegistry.init() was not called")
@@ -96,6 +103,7 @@ func (tr *TagRegistry) ExtractValidations(context TagContext, comments []string)
 	return validations, nil
 }
 
+// Docs returns documentation for each tag in this registry.
 func (tr *TagRegistry) Docs() []TagDoc {
 	var result []TagDoc
 	for _, v := range tr.descriptors {
@@ -104,13 +112,18 @@ func (tr *TagRegistry) Docs() []TagDoc {
 	return result
 }
 
+// RegisterTagDescriptor should be called by each tag implementation to
+// register its descriptor with the global tag registry.
 func RegisterTagDescriptor(desc TagDescriptor) {
-	allTags.add(desc)
+	globalAllTags.add(desc)
 }
 
-func GetTagRegistry(c *generator.Context) *TagRegistry {
-	allTags.init(c)
-	return allTags
+// InitGlobalTagRegistry should be called by the main application to initialize
+// and safely access the global tag registry.  Once this is called, no more
+// tags may be registered.
+func InitGlobalTagRegistry(c *generator.Context) *TagRegistry {
+	globalAllTags.init(c)
+	return globalAllTags
 }
 
 /* ---------------- */
@@ -156,7 +169,7 @@ func NewValidator(c *generator.Context) DeclarativeValidator {
 	cfg := &ValidatorConfig{
 		GeneratorContext: c,
 		EmbedValidator:   composite,
-		AllTags:          allTags,
+		AllTags:          globalAllTags,
 	}
 	for _, init := range registry.inits {
 		composite.validators = append(composite.validators, init(cfg))
