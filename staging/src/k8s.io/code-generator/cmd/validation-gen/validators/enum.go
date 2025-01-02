@@ -19,58 +19,69 @@ package validators
 import (
 	"cmp"
 	"fmt"
-	"regexp"
 	"slices"
 	"sort"
 	"strings"
 
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
 )
 
-var enumValidator = types.Name{Package: libValidationPkg, Name: "Enum"}
-
-var setsNew = types.Name{Package: "k8s.io/apimachinery/pkg/util/sets", Name: "New"}
+const enumTagName = "k8s:enum"
 
 func init() {
-	AddToRegistry(InitEnumDeclarativeValidator)
+	RegisterTagDescriptor(&enumTag{})
 }
 
-func InitEnumDeclarativeValidator(cfg *ValidatorConfig) DeclarativeValidator {
-	return &enumDeclarativeValidator{enumContext: newEnumContext(cfg.GeneratorContext)}
-}
-
-type enumDeclarativeValidator struct {
+type enumTag struct {
 	enumContext *enumContext
 }
 
-func (c *enumDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
+func (et *enumTag) Init(c *generator.Context) {
+	et.enumContext = newEnumContext(c)
+}
+
+func (enumTag) TagName() string {
+	return enumTagName
+}
+
+var enumTagScopes = sets.New(TagScopeType)
+
+func (enumTag) ValidScopes() sets.Set[TagScope] {
+	return enumTagScopes
+}
+
+var (
+	enumValidator = types.Name{Package: libValidationPkg, Name: "Enum"}
+)
+
+var setsNew = types.Name{Package: "k8s.io/apimachinery/pkg/util/sets", Name: "New"}
+
+func (et *enumTag) GetValidations(context TagContext, _ []string, payload string) (Validations, error) {
 	var result Validations
-	commentTags := gengo.ExtractCommentTags("+", comments)
-	if _, ok := commentTags[tagEnumType]; ok {
-		if enum, ok := c.enumContext.EnumType(t); ok {
-			// TODO: Avoid the "local" here. This was added to to avoid errors caused when the package is an empty string.
-			//       The correct package would be the output package but is not known here. This does not show up in generated code.
-			// TODO: Append a consistent hash suffix to avoid generated name conflicts?
-			supportVarName := PrivateVar{Name: "SymbolsFor" + t.Name.Name, Package: "local"}
-			supportVar := Variable(supportVarName, GenericFunction(tagEnumType, DefaultFlags, setsNew, []types.Name{enum.Name}, enum.ValueArgs()...))
-			result.AddVariable(supportVar)
-			fn := Function("enum", DefaultFlags, enumValidator, supportVarName)
-			result.AddFunction(fn)
-		}
-		return result, nil
+
+	if enum, ok := et.enumContext.EnumType(context.Parent); ok {
+		// TODO: Avoid the "local" here. This was added to to avoid errors caused when the package is an empty string.
+		//       The correct package would be the output package but is not known here. This does not show up in generated code.
+		// TODO: Append a consistent hash suffix to avoid generated name conflicts?
+		supportVarName := PrivateVar{Name: "SymbolsFor" + context.Parent.Name.Name, Package: "local"}
+		supportVar := Variable(supportVarName, GenericFunction(enumTagName, DefaultFlags, setsNew, []types.Name{enum.Name}, enum.ValueArgs()...))
+		result.AddVariable(supportVar)
+		fn := Function("enum", DefaultFlags, enumValidator, supportVarName)
+		result.AddFunction(fn)
 	}
+
 	return result, nil
 }
 
-func (enumDeclarativeValidator) Docs() []TagDoc {
-	return []TagDoc{{
-		Tag:         tagEnumType,
+func (et *enumTag) Docs() TagDoc {
+	return TagDoc{
+		Tag:         et.TagName(),
+		Contexts:    et.ValidScopes().UnsortedList(),
 		Description: "Indicates that a string type is an enum. All const values of this type are considered values in the enum.",
-		Contexts:    []TagScope{TagScopeType},
-		Payloads:    nil,
-	}}
+	}
 }
 
 func (et *enumType) ValueArgs() []any {
@@ -92,10 +103,7 @@ func (et *enumType) SymbolConstants() []Identifier {
 	return values
 }
 
-// TODO: Everything below this comment is an exact copy of kube-openapi's enum.go.
-
-const tagEnumType = "k8s:enum"
-const enumTypeDescriptionHeader = "Possible enum values:"
+// TODO: Everything below this comment is copied from kube-openapi's enum.go.
 
 type enumValue struct {
 	Name    types.Name
@@ -141,24 +149,6 @@ func (et *enumType) ValueStrings() []string {
 	}
 	sort.Strings(values)
 	return values
-}
-
-// DescriptionLines returns a description of the enum in this format:
-//
-// Possible enum values:
-//   - `"value1"` description 1
-//   - `"value2"` description 2
-func (et *enumType) DescriptionLines() []string {
-	if len(et.Values) == 0 {
-		return nil
-	}
-	var lines []string
-	for _, value := range et.Values {
-		lines = append(lines, value.Description())
-	}
-	sort.Strings(lines)
-	// Prepend an empty string to initiate a new paragraph.
-	return append([]string{"", enumTypeDescriptionHeader}, lines...)
 }
 
 func parseEnums(c *generator.Context) enumMap {
@@ -215,20 +205,6 @@ func (et *enumType) addIfNotPresent(value *enumValue) {
 	et.Values = append(et.Values, value)
 }
 
-// Description returns the description line for the enumValue
-// with the format:
-//   - `"FooValue"` is the Foo value
-func (ev *enumValue) Description() string {
-	comment := strings.TrimSpace(ev.Comment)
-	// The comment should starts with the type name, trim it first.
-	comment = strings.TrimPrefix(comment, ev.Name.Name)
-	// Trim the possible space after previous step.
-	comment = strings.TrimSpace(comment)
-	// The comment may be multiline, cascade all consecutive whitespaces.
-	comment = whitespaceRegex.ReplaceAllString(comment, " ")
-	return fmt.Sprintf(" - `%q` %s", ev.Value, comment)
-}
-
 // isEnumType checks if a given type is an enum by the definition
 // An enum type should be an alias of string and has tag '+enum' in its comment.
 // Additionally, pass the type of builtin 'string' to check against.
@@ -237,8 +213,5 @@ func isEnumType(stringType *types.Type, t *types.Type) bool {
 }
 
 func hasEnumTag(t *types.Type) bool {
-	return gengo.ExtractCommentTags("+", t.CommentLines)[tagEnumType] != nil
+	return gengo.ExtractCommentTags("+", t.CommentLines)[enumTagName] != nil
 }
-
-// whitespaceRegex is the regex for consecutive whitespaces.
-var whitespaceRegex = regexp.MustCompile(`\s+`)
