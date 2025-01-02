@@ -39,8 +39,6 @@ func init() {
 
 type formatTag struct{}
 
-var _ TagDescriptor = formatTag{}
-
 func (formatTag) Init(_ *generator.Context) {}
 
 func (formatTag) TagName() string {
@@ -103,8 +101,6 @@ func (ft formatTag) Docs() TagDoc {
 
 type maxLengthTag struct{}
 
-var _ TagDescriptor = maxLengthTag{}
-
 func (maxLengthTag) Init(_ *generator.Context) {}
 
 func (maxLengthTag) TagName() string {
@@ -156,8 +152,6 @@ func (mlt maxLengthTag) Docs() TagDoc {
 }
 
 type maxItemsTag struct{}
-
-var _ TagDescriptor = maxItemsTag{}
 
 func (maxItemsTag) Init(_ *generator.Context) {}
 

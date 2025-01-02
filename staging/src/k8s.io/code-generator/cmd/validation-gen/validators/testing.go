@@ -46,8 +46,6 @@ type fixedResultTag struct {
 	error  bool
 }
 
-var _ TagDescriptor = fixedResultTag{}
-
 func (fixedResultTag) Init(_ *generator.Context) {}
 
 func (frt fixedResultTag) TagName() string {

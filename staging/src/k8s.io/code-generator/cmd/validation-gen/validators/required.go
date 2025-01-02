@@ -49,8 +49,6 @@ const (
 	requirednessForbidden requirednessMode = forbiddenTagName
 )
 
-var _ TagDescriptor = requirednessTag{}
-
 func (requirednessTag) Init(_ *generator.Context) {}
 
 func (rt requirednessTag) TagName() string {
