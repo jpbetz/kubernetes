@@ -84,7 +84,7 @@ func (tr *TagRegistry) ExtractValidations(context TagContext, comments []string)
 	// Extract all known tags so we can iterate them.
 	tags, err := gengo.ExtractFunctionStyleCommentTags("+", tr.index, comments)
 	if err != nil {
-		return Validations{}, err
+		return Validations{}, fmt.Errorf("failed to parse tags: %w", err)
 	}
 	validations := Validations{}
 	for tag, vals := range tags {
@@ -94,7 +94,7 @@ func (tr *TagRegistry) ExtractValidations(context TagContext, comments []string)
 		}
 		for _, val := range vals { // tags may have multiple values
 			if theseValidations, err := desc.GetValidations(context, val.Args, val.Value); err != nil {
-				return Validations{}, err
+				return Validations{}, fmt.Errorf("taq %q: %w", desc.TagName(), err)
 			} else {
 				validations.Add(theseValidations)
 			}

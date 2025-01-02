@@ -20,19 +20,10 @@ import (
 	"fmt"
 	"strconv"
 
-	"k8s.io/gengo/v2"
+	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
 )
-
-func init() {
-	AddToRegistry(InitOpenAPIDeclarativeValidator)
-}
-
-func InitOpenAPIDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
-	return &openAPIDeclarativeValidator{}
-}
-
-type openAPIDeclarativeValidator struct{}
 
 const (
 	formatTagName    = "k8s:format"
@@ -40,92 +31,43 @@ const (
 	maxItemsTagName  = "k8s:maxItems"
 )
 
+func init() {
+	RegisterTagDescriptor(formatTag{})
+	RegisterTagDescriptor(maxLengthTag{})
+	RegisterTagDescriptor(maxItemsTag{})
+}
+
+type formatTag struct{}
+
+var _ TagDescriptor = formatTag{}
+
+func (formatTag) Init(_ *generator.Context) {}
+
+func (formatTag) TagName() string {
+	return formatTagName
+}
+
+var formatTagScopes = sets.New(TagScopeAll)
+
+func (formatTag) ValidScopes() sets.Set[TagScope] {
+	return formatTagScopes
+}
+
 var (
-	ipValidator        = types.Name{Package: libValidationPkg, Name: "IPSloppy"}
-	dnsLabelValidator  = types.Name{Package: libValidationPkg, Name: "DNSLabel"}
-	maxLengthValidator = types.Name{Package: libValidationPkg, Name: "MaxLength"}
-	maxItemsValidator  = types.Name{Package: libValidationPkg, Name: "MaxItems"}
+	ipSloppyValidator = types.Name{Package: libValidationPkg, Name: "IPSloppy"}
+	dnsLabelValidator = types.Name{Package: libValidationPkg, Name: "DNSLabel"}
 )
 
-func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
+func (formatTag) GetValidations(context TagContext, _ []string, payload string) (Validations, error) {
 	var result Validations
-	commentTags := gengo.ExtractCommentTags("+", comments)
-
-	if maxLength, found, err := extractOptionalIntValue(commentTags, maxLengthTagName); err != nil {
+	if formatFunction, err := getFormatValidationFunction(payload); err != nil {
 		return result, err
-	} else if found {
-		result.AddFunction(Function(maxLengthTagName, DefaultFlags, maxLengthValidator, maxLength))
+	} else if formatFunction == nil {
+		return result, fmt.Errorf("internal error: no validation function found for format %q", payload)
+	} else {
+		result.AddFunction(formatFunction)
 	}
-
-	if maxItems, found, err := extractOptionalIntValue(commentTags, maxItemsTagName); err != nil {
-		return result, err
-	} else if found {
-		result.AddFunction(Function(maxItemsTagName, ShortCircuit, maxItemsValidator, maxItems))
-	}
-
-	if formats := commentTags[formatTagName]; len(formats) > 0 {
-		if len(formats) > 1 {
-			return result, fmt.Errorf("multiple values found for tag %q", formatTagName)
-		}
-		format := formats[0]
-		if formatFunction, err := getFormatValidationFunction(format); err != nil {
-			return result, err
-		} else if formatFunction == nil {
-			return result, fmt.Errorf("internal error: no validation function found for format %q", format)
-		} else {
-			result.AddFunction(formatFunction)
-		}
-	}
-
 	return result, nil
-}
-
-func extractOptionalIntValue(commentTags map[string][]string, tagName string) (int, bool, error) {
-	values, found := commentTags[tagName]
-	if !found || len(values) == 0 {
-		return 0, false, nil
-	}
-	if len(values) > 1 {
-		return 0, false, fmt.Errorf("multiple values found for tag %q", tagName)
-	}
-	intVal, err := strconv.Atoi(values[0])
-	if err != nil {
-		return 0, false, fmt.Errorf("failed to parse value for tag %q: %v", tagName, err)
-	}
-	return intVal, true, nil
-}
-
-func (openAPIDeclarativeValidator) Docs() []TagDoc {
-	return []TagDoc{{
-		Tag:         formatTagName,
-		Description: "Indicates that a string field has a particular format.",
-		Contexts:    []TagScope{TagScopeType, TagScopeField},
-		Payloads: []TagPayloadDoc{{
-			Description: "ip-sloppy",
-			Docs:        "This field holds an IPv4 or IPv6 address value. IPv4 octets may have leading zeros.",
-		}, {
-			Description: "dns-label",
-			Docs:        "This field holds a DNS label value.",
-		}},
-	}, {
-		Tag:         maxLengthTagName,
-		Description: "Indicates that a string field has a limit on its length.",
-		Contexts:    []TagScope{TagScopeType, TagScopeField},
-		Payloads: []TagPayloadDoc{{
-			Description: "<non-negative integer>",
-			Docs:        "This field must be no more than X characters long.",
-		}},
-	}, {
-		Tag:         maxItemsTagName,
-		Description: "Indidates that a slice field has a limit on its size.",
-		Contexts:    []TagScope{TagScopeType, TagScopeField},
-		Payloads: []TagPayloadDoc{
-			{
-				Description: "<non-negative integer>",
-				Docs:        "This field must be no more than X items long.",
-			},
-		},
-	}}
 }
 
 func getFormatValidationFunction(format string) (FunctionGen, error) {
@@ -134,7 +76,7 @@ func getFormatValidationFunction(format string) (FunctionGen, error) {
 	// https://json-schema.org/draft/2020-12/json-schema-validation#name-defined-formats
 	// for more examples.
 	if format == "ip-sloppy" {
-		return Function(formatTagName, DefaultFlags, ipValidator), nil
+		return Function(formatTagName, DefaultFlags, ipSloppyValidator), nil
 	}
 	if format == "dns-label" {
 		return Function(formatTagName, DefaultFlags, dnsLabelValidator), nil
@@ -142,4 +84,134 @@ func getFormatValidationFunction(format string) (FunctionGen, error) {
 	// TODO: Flesh out the list of validation functions
 
 	return nil, fmt.Errorf("unsupported validation format %q", format)
+}
+
+func (ft formatTag) Docs() TagDoc {
+	return TagDoc{
+		Tag:         ft.TagName(),
+		Contexts:    ft.ValidScopes().UnsortedList(),
+		Description: "Indicates that a string field has a particular format.",
+		Payloads: []TagPayloadDoc{{
+			Description: "ip-sloppy",
+			Docs:        "This field holds an IPv4 or IPv6 address value. IPv4 octets may have leading zeros.",
+		}, {
+			Description: "dns-label",
+			Docs:        "This field holds a DNS label value.",
+		}},
+	}
+}
+
+type maxLengthTag struct{}
+
+var _ TagDescriptor = maxLengthTag{}
+
+func (maxLengthTag) Init(_ *generator.Context) {}
+
+func (maxLengthTag) TagName() string {
+	return maxLengthTagName
+}
+
+var maxLengthTagScopes = sets.New(TagScopeField)
+
+func (maxLengthTag) ValidScopes() sets.Set[TagScope] {
+	return maxLengthTagScopes
+}
+
+var (
+	maxLengthValidator = types.Name{Package: libValidationPkg, Name: "MaxLength"}
+)
+
+func (maxLengthTag) GetValidations(context TagContext, _ []string, payload string) (Validations, error) {
+	var result Validations
+
+	t := context.Type
+	if t.Kind == types.Alias {
+		t = t.Underlying
+	}
+	if t != types.String {
+		return result, fmt.Errorf("can only be used on string types")
+	}
+
+	intVal, err := strconv.Atoi(payload)
+	if err != nil {
+		return result, fmt.Errorf("failed to parse tag payload as int: %v", err)
+	}
+	if intVal < 0 {
+		return result, fmt.Errorf("must be greater than or equal to zero")
+	}
+	result.AddFunction(Function(maxLengthTagName, DefaultFlags, maxLengthValidator, intVal))
+	return result, nil
+}
+
+func (mlt maxLengthTag) Docs() TagDoc {
+	return TagDoc{
+		Tag:         mlt.TagName(),
+		Contexts:    mlt.ValidScopes().UnsortedList(),
+		Description: "Indicates that a string field has a limit on its length.",
+		Payloads: []TagPayloadDoc{{
+			Description: "<non-negative integer>",
+			Docs:        "This field must be no more than X characters long.",
+		}},
+	}
+}
+
+type maxItemsTag struct{}
+
+var _ TagDescriptor = maxItemsTag{}
+
+func (maxItemsTag) Init(_ *generator.Context) {}
+
+func (maxItemsTag) TagName() string {
+	return maxItemsTagName
+}
+
+var maxItemsTagScopes = sets.New(
+	TagScopeType,
+	TagScopeField,
+	TagScopeListVal,
+	TagScopeMapVal,
+)
+
+func (maxItemsTag) ValidScopes() sets.Set[TagScope] {
+	return maxItemsTagScopes
+}
+
+var (
+	maxItemsValidator = types.Name{Package: libValidationPkg, Name: "MaxItems"}
+)
+
+func (maxItemsTag) GetValidations(context TagContext, _ []string, payload string) (Validations, error) {
+	var result Validations
+
+	t := context.Type
+	if t.Kind == types.Alias {
+		t = t.Underlying
+	}
+	if t.Kind != types.Slice && t.Kind != types.Array {
+		return result, fmt.Errorf("can only be used on list types")
+	}
+
+	intVal, err := strconv.Atoi(payload)
+	if err != nil {
+		return result, fmt.Errorf("failed to parse tag payload as int: %v", err)
+	}
+	if intVal < 0 {
+		return result, fmt.Errorf("must be greater than or equal to zero")
+	}
+	result.AddFunction(Function(maxItemsTagName, ShortCircuit, maxItemsValidator, intVal))
+	return result, nil
+}
+
+func (mit maxItemsTag) Docs() TagDoc {
+	return TagDoc{
+		Tag:         mit.TagName(),
+		Contexts:    mit.ValidScopes().UnsortedList(),
+		Description: "Indicates that a list field has a limit on its size.",
+		Payloads: []TagPayloadDoc{
+			{
+				Description: "<non-negative integer>",
+				Docs:        "This field must be no more than X items long.",
+			},
+		},
+	}
 }
