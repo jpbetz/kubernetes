@@ -93,7 +93,7 @@ func (o optionDeclarativeValidator) parseIfOptionsTag(t *types.Type, tag gengo.T
 		Scope: TagScopeType,
 		Type:  t,
 	}
-	if validations, err := o.cfg.AllTags.ExtractValidations(tc, fakeComments); err != nil {
+	if validations, err := o.cfg.ValidatorRegistry.ExtractValidations(tc, fakeComments); err != nil {
 		return "", Validations{}, err
 	} else {
 		result.Add(validations)

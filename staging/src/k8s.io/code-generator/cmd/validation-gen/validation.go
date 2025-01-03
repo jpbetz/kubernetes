@@ -207,9 +207,9 @@ func (g *genValidations) hasValidationsMiss(n *typeNode, seen map[*typeNode]bool
 
 // typeDiscoverer contains fields necessary to build graphs of types.
 type typeDiscoverer struct {
-	knownTags  *validators.TagRegistry
-	validator  validators.DeclarativeValidator // legacy
-	inputToPkg map[string]string
+	validatorRegistry *validators.ValidatorRegistry
+	validator         validators.DeclarativeValidator // legacy
+	inputToPkg        map[string]string
 
 	// typeNodes holds a map of gengo Type to typeNode for all of the types
 	// encountered during discovery.
@@ -217,12 +217,12 @@ type typeDiscoverer struct {
 }
 
 // NewTypeDiscoverer creates and initializes a NewTypeDiscoverer.
-func NewTypeDiscoverer(knownTags *validators.TagRegistry, validator validators.DeclarativeValidator, inputToPkg map[string]string) *typeDiscoverer {
+func NewTypeDiscoverer(validatorRegistry *validators.ValidatorRegistry, validator validators.DeclarativeValidator, inputToPkg map[string]string) *typeDiscoverer {
 	return &typeDiscoverer{
-		knownTags:  knownTags,
-		validator:  validator,
-		inputToPkg: inputToPkg,
-		typeNodes:  map[*types.Type]*typeNode{},
+		validatorRegistry: validatorRegistry,
+		validator:         validator,
+		inputToPkg:        inputToPkg,
+		typeNodes:         map[*types.Type]*typeNode{},
 	}
 }
 
@@ -451,7 +451,7 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 		tc.Parent = t
 		tc.Type = t.Underlying
 	}
-	if validations, err := td.knownTags.ExtractValidations(tc, t.CommentLines); err != nil {
+	if validations, err := td.validatorRegistry.ExtractValidations(tc, t.CommentLines); err != nil {
 		return nil, fmt.Errorf("%v: %w", fldPath, err)
 	} else {
 		if !validations.Empty() {
@@ -539,7 +539,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			Parent: thisNode.valueType,
 			Member: &memb,
 		}
-		if validations, err := td.knownTags.ExtractValidations(tc, memb.CommentLines); err != nil {
+		if validations, err := td.validatorRegistry.ExtractValidations(tc, memb.CommentLines); err != nil {
 			return fmt.Errorf("field %s: %w", childPath.String(), err)
 		} else {
 			if !validations.Empty() {
@@ -762,7 +762,7 @@ func (td *typeDiscoverer) extractEmbeddedValidations(tag string, context validat
 	if tagVals, found := gengo.ExtractCommentTags("+", comments)[tag]; found {
 		for _, tagVal := range tagVals {
 			fakeComments := []string{tagVal}
-			if validations, err := td.knownTags.ExtractValidations(context, fakeComments); err != nil {
+			if validations, err := td.validatorRegistry.ExtractValidations(context, fakeComments); err != nil {
 				return result, err
 			} else {
 				result.Add(validations)
@@ -1654,7 +1654,7 @@ func (td *typeDiscoverer) extractSubfieldValidations(context validators.TagConte
 		for _, tagVal := range tagVals {
 			// Extract any embedded validation rules.
 			fakeComments := []string{tagVal}
-			if subfieldValidations, err := td.knownTags.ExtractValidations(context, fakeComments); err != nil {
+			if subfieldValidations, err := td.validatorRegistry.ExtractValidations(context, fakeComments); err != nil {
 				return result, err
 			} else {
 				if !subfieldValidations.Empty() {

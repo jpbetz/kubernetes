@@ -31,12 +31,12 @@ import (
 
 // This is the global registry of tag validators. For simplicity this is in
 // the same package as the implementations, but it should not be used directly.
-var globalValidatorRegistry = &TagRegistry{
+var globalValidatorRegistry = &ValidatorRegistry{
 	tagDescriptors: map[string]TagDescriptor{},
 }
 
-// TagRegistry holds a list of registered tags.
-type TagRegistry struct {
+// ValidatorRegistry holds a list of registered tags.
+type ValidatorRegistry struct {
 	lock        sync.Mutex
 	initialized atomic.Bool // init() was called
 
@@ -46,13 +46,13 @@ type TagRegistry struct {
 	index          []string                 // all tag names
 }
 
-func (tr *TagRegistry) add(desc TagDescriptor) {
-	if tr.initialized.Load() {
-		panic("TagRegistry was modified after init")
+func (reg *ValidatorRegistry) add(desc TagDescriptor) {
+	if reg.initialized.Load() {
+		panic("ValidatorRegistry was modified after init")
 	}
 
-	tr.lock.Lock()
-	defer tr.lock.Unlock()
+	reg.lock.Lock()
+	defer reg.lock.Unlock()
 
 	name := desc.TagName()
 	if _, exists := globalValidatorRegistry.tagDescriptors[name]; exists {
@@ -61,40 +61,39 @@ func (tr *TagRegistry) add(desc TagDescriptor) {
 	globalValidatorRegistry.tagDescriptors[name] = desc
 }
 
-func (tr *TagRegistry) addTypeValidator(tv TypeValidator) {
-	if tr.initialized.Load() {
-		panic("TagRegistry was modified after init")
+func (reg *ValidatorRegistry) addTypeValidator(tv TypeValidator) {
+	if reg.initialized.Load() {
+		panic("ValidatorRegistry was modified after init")
 	}
 
-	tr.lock.Lock()
-	defer tr.lock.Unlock()
+	reg.lock.Lock()
+	defer reg.lock.Unlock()
 
 	globalValidatorRegistry.typeValidators = append(globalValidatorRegistry.typeValidators, tv)
 }
 
-func (tr *TagRegistry) init(c *generator.Context) {
-	if tr.initialized.Load() {
-		panic("TagRegistry.init() was called twice")
+func (reg *ValidatorRegistry) init(c *generator.Context) {
+	if reg.initialized.Load() {
+		panic("ValidatorRegistry.init() was called twice")
 	}
 
-	tr.lock.Lock()
-	defer tr.lock.Unlock()
+	reg.lock.Lock()
+	defer reg.lock.Unlock()
 
-	for _, tv := range tr.typeValidators {
+	for _, tv := range reg.typeValidators {
 		tv.Init(c)
 	}
-	slices.SortFunc(tr.typeValidators, func(a, b TypeValidator) int {
+	slices.SortFunc(reg.typeValidators, func(a, b TypeValidator) int {
 		return cmp.Compare(a.Name(), b.Name())
 	})
 
 	for _, desc := range globalValidatorRegistry.tagDescriptors {
-		tr.index = append(tr.index, desc.TagName())
+		reg.index = append(reg.index, desc.TagName())
 		desc.Init(c)
 	}
-	sort.Strings(tr.index)
+	sort.Strings(reg.index)
 
-	tr.initialized.Store(true)
-
+	reg.initialized.Store(true)
 }
 
 // ExtractValidations considers the given context (e.g. a type definition) and
@@ -103,16 +102,16 @@ func (tr *TagRegistry) init(c *generator.Context) {
 // found in the associated comment block.  Any matching validators produce zero
 // or more validations, which will later be rendered by the code-generation
 // logic.
-func (tr *TagRegistry) ExtractValidations(context TagContext, comments []string) (Validations, error) {
-	if !tr.initialized.Load() {
-		panic("TagRegistry.init() was not called")
+func (reg *ValidatorRegistry) ExtractValidations(context TagContext, comments []string) (Validations, error) {
+	if !reg.initialized.Load() {
+		panic("ValidatorRegistry.init() was not called")
 	}
 
 	validations := Validations{}
 
 	if context.Scope == TagScopeType {
 		// Run all type-validators.
-		for _, tv := range tr.typeValidators {
+		for _, tv := range reg.typeValidators {
 			if theseValidations, err := tv.GetValidations(context.Type, context.Parent); err != nil {
 				return Validations{}, fmt.Errorf("type validator %q: %w", tv.Name(), err)
 			} else {
@@ -122,13 +121,13 @@ func (tr *TagRegistry) ExtractValidations(context TagContext, comments []string)
 	}
 
 	// Extract all known tags so we can iterate them.
-	tags, err := gengo.ExtractFunctionStyleCommentTags("+", tr.index, comments)
+	tags, err := gengo.ExtractFunctionStyleCommentTags("+", reg.index, comments)
 	if err != nil {
 		return Validations{}, fmt.Errorf("failed to parse tags: %w", err)
 	}
 	// Run matching tag-validators.
 	for tag, vals := range tags {
-		desc := tr.tagDescriptors[tag]
+		desc := reg.tagDescriptors[tag]
 		if scopes := desc.ValidScopes(); !scopes.Has(context.Scope) && !scopes.Has(TagScopeAll) {
 			return Validations{}, fmt.Errorf("tag %q cannot be specified on %s", desc.TagName(), context.Scope)
 		}
@@ -145,28 +144,30 @@ func (tr *TagRegistry) ExtractValidations(context TagContext, comments []string)
 }
 
 // Docs returns documentation for each tag in this registry.
-func (tr *TagRegistry) Docs() []TagDoc {
+func (reg *ValidatorRegistry) Docs() []TagDoc {
 	var result []TagDoc
-	for _, v := range tr.tagDescriptors {
+	for _, v := range reg.tagDescriptors {
 		result = append(result, v.Docs())
 	}
 	return result
 }
 
-// RegisterTagDescriptor should be called by each tag implementation to
-// register its descriptor with the global tag registry.
+// RegisterTagValidator must be called by any validator which wants to run when
+// a specific tag is found.
 func RegisterTagDescriptor(desc TagDescriptor) {
 	globalValidatorRegistry.add(desc)
 }
 
+// RegisterTypeValidator must be called by any validator which wants to run
+// against every type definition.
 func RegisterTypeValidator(tv TypeValidator) {
 	globalValidatorRegistry.addTypeValidator(tv)
 }
 
-// InitGlobalTagRegistry should be called by the main application to initialize
-// and safely access the global tag registry.  Once this is called, no more
-// tags may be registered.
-func InitGlobalTagRegistry(c *generator.Context) *TagRegistry {
+// InitGlobalValidatorRegistry must be called exactly once by the main
+// application to initialize and safely access the global tag registry.  Once
+// this is called, no more validators may be registered.
+func InitGlobalValidatorRegistry(c *generator.Context) *ValidatorRegistry {
 	globalValidatorRegistry.init(c)
 	return globalValidatorRegistry
 }
@@ -187,7 +188,7 @@ type ValidatorConfig struct {
 	// initialized and may not yet be registered for use as an embedded validator.
 	EmbedValidator DeclarativeValidator
 	// This is temporary until conversion is done.
-	AllTags *TagRegistry
+	ValidatorRegistry *ValidatorRegistry
 }
 
 type DeclarativeValidatorInit func(cfg *ValidatorConfig) DeclarativeValidator
@@ -212,9 +213,9 @@ func NewValidator(c *generator.Context) DeclarativeValidator {
 		validators: make([]DeclarativeValidator, 0, len(registry.inits)),
 	}
 	cfg := &ValidatorConfig{
-		GeneratorContext: c,
-		EmbedValidator:   composite,
-		AllTags:          globalValidatorRegistry,
+		GeneratorContext:  c,
+		EmbedValidator:    composite,
+		ValidatorRegistry: globalValidatorRegistry,
 	}
 	for _, init := range registry.inits {
 		composite.validators = append(composite.validators, init(cfg))
