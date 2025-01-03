@@ -32,9 +32,9 @@ const (
 )
 
 func init() {
-	RegisterTagDescriptor(formatTag{})
-	RegisterTagDescriptor(maxLengthTag{})
-	RegisterTagDescriptor(maxItemsTag{})
+	RegisterTagValidator(formatTag{})
+	RegisterTagValidator(maxLengthTag{})
+	RegisterTagValidator(maxItemsTag{})
 }
 
 type formatTag struct{}

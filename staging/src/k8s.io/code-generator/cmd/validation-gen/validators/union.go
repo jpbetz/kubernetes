@@ -39,8 +39,8 @@ func init() {
 	// actually pertains to the struct itself.
 	shared := map[*types.Type]unions{}
 	RegisterTypeValidator(unionTypeValidator{shared})
-	RegisterTagDescriptor(unionDiscriminatorTag{shared})
-	RegisterTagDescriptor(unionMemberTag{shared})
+	RegisterTagValidator(unionDiscriminatorTag{shared})
+	RegisterTagValidator(unionMemberTag{shared})
 }
 
 type unionTypeValidator struct {

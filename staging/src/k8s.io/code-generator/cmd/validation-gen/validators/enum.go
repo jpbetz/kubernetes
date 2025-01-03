@@ -32,7 +32,7 @@ import (
 const enumTagName = "k8s:enum"
 
 func init() {
-	RegisterTagDescriptor(&enumTag{})
+	RegisterTagValidator(&enumTag{})
 }
 
 type enumTag struct {

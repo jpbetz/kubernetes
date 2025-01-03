@@ -31,9 +31,9 @@ const (
 )
 
 func init() {
-	RegisterTagDescriptor(requirednessTag{requirednessRequired})
-	RegisterTagDescriptor(requirednessTag{requirednessOptional})
-	RegisterTagDescriptor(requirednessTag{requirednessForbidden})
+	RegisterTagValidator(requirednessTag{requirednessRequired})
+	RegisterTagValidator(requirednessTag{requirednessOptional})
+	RegisterTagValidator(requirednessTag{requirednessForbidden})
 }
 
 // requirednessTag implements multiple modes of requiredness.

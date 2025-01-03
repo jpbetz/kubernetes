@@ -22,8 +22,8 @@ import (
 	"k8s.io/gengo/v2/types"
 )
 
-// TagDescriptor describes a single validation tag and how to use it.
-type TagDescriptor interface {
+// TagValidator describes a single validation tag and how to use it.
+type TagValidator interface {
 	// Init initializes the tag implementation.  This will be called exactly
 	// once.
 	Init(c *generator.Context)

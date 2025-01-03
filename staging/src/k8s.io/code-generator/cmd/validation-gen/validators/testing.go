@@ -36,9 +36,9 @@ const (
 )
 
 func init() {
-	RegisterTagDescriptor(fixedResultTag{result: true})
-	RegisterTagDescriptor(fixedResultTag{result: false})
-	RegisterTagDescriptor(fixedResultTag{error: true})
+	RegisterTagValidator(fixedResultTag{result: true})
+	RegisterTagValidator(fixedResultTag{result: false})
+	RegisterTagValidator(fixedResultTag{error: true})
 }
 
 type fixedResultTag struct {

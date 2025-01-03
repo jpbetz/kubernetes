@@ -32,7 +32,7 @@ import (
 // This is the global registry of tag validators. For simplicity this is in
 // the same package as the implementations, but it should not be used directly.
 var globalValidatorRegistry = &ValidatorRegistry{
-	tagDescriptors: map[string]TagDescriptor{},
+	tagValidators: map[string]TagValidator{},
 }
 
 // ValidatorRegistry holds a list of registered tags.
@@ -42,11 +42,11 @@ type ValidatorRegistry struct {
 
 	typeValidators []TypeValidator
 
-	tagDescriptors map[string]TagDescriptor // keyed by tagname
-	index          []string                 // all tag names
+	tagValidators map[string]TagValidator // keyed by tagname
+	tagIndex      []string                // all tag names
 }
 
-func (reg *ValidatorRegistry) add(desc TagDescriptor) {
+func (reg *ValidatorRegistry) addTagValidator(tv TagValidator) {
 	if reg.initialized.Load() {
 		panic("ValidatorRegistry was modified after init")
 	}
@@ -54,11 +54,11 @@ func (reg *ValidatorRegistry) add(desc TagDescriptor) {
 	reg.lock.Lock()
 	defer reg.lock.Unlock()
 
-	name := desc.TagName()
-	if _, exists := globalValidatorRegistry.tagDescriptors[name]; exists {
+	name := tv.TagName()
+	if _, exists := globalValidatorRegistry.tagValidators[name]; exists {
 		panic(fmt.Sprintf("tag %q was registered twice", name))
 	}
-	globalValidatorRegistry.tagDescriptors[name] = desc
+	globalValidatorRegistry.tagValidators[name] = tv
 }
 
 func (reg *ValidatorRegistry) addTypeValidator(tv TypeValidator) {
@@ -87,11 +87,11 @@ func (reg *ValidatorRegistry) init(c *generator.Context) {
 		return cmp.Compare(a.Name(), b.Name())
 	})
 
-	for _, desc := range globalValidatorRegistry.tagDescriptors {
-		reg.index = append(reg.index, desc.TagName())
-		desc.Init(c)
+	for _, tv := range globalValidatorRegistry.tagValidators {
+		reg.tagIndex = append(reg.tagIndex, tv.TagName())
+		tv.Init(c)
 	}
-	sort.Strings(reg.index)
+	sort.Strings(reg.tagIndex)
 
 	reg.initialized.Store(true)
 }
@@ -121,19 +121,19 @@ func (reg *ValidatorRegistry) ExtractValidations(context TagContext, comments []
 	}
 
 	// Extract all known tags so we can iterate them.
-	tags, err := gengo.ExtractFunctionStyleCommentTags("+", reg.index, comments)
+	tags, err := gengo.ExtractFunctionStyleCommentTags("+", reg.tagIndex, comments)
 	if err != nil {
 		return Validations{}, fmt.Errorf("failed to parse tags: %w", err)
 	}
 	// Run matching tag-validators.
 	for tag, vals := range tags {
-		desc := reg.tagDescriptors[tag]
-		if scopes := desc.ValidScopes(); !scopes.Has(context.Scope) && !scopes.Has(TagScopeAll) {
-			return Validations{}, fmt.Errorf("tag %q cannot be specified on %s", desc.TagName(), context.Scope)
+		tv := reg.tagValidators[tag]
+		if scopes := tv.ValidScopes(); !scopes.Has(context.Scope) && !scopes.Has(TagScopeAll) {
+			return Validations{}, fmt.Errorf("tag %q cannot be specified on %s", tv.TagName(), context.Scope)
 		}
 		for _, val := range vals { // tags may have multiple values
-			if theseValidations, err := desc.GetValidations(context, val.Args, val.Value); err != nil {
-				return Validations{}, fmt.Errorf("taq %q: %w", desc.TagName(), err)
+			if theseValidations, err := tv.GetValidations(context, val.Args, val.Value); err != nil {
+				return Validations{}, fmt.Errorf("tag %q: %w", tv.TagName(), err)
 			} else {
 				validations.Add(theseValidations)
 			}
@@ -146,7 +146,7 @@ func (reg *ValidatorRegistry) ExtractValidations(context TagContext, comments []
 // Docs returns documentation for each tag in this registry.
 func (reg *ValidatorRegistry) Docs() []TagDoc {
 	var result []TagDoc
-	for _, v := range reg.tagDescriptors {
+	for _, v := range reg.tagValidators {
 		result = append(result, v.Docs())
 	}
 	return result
@@ -154,8 +154,8 @@ func (reg *ValidatorRegistry) Docs() []TagDoc {
 
 // RegisterTagValidator must be called by any validator which wants to run when
 // a specific tag is found.
-func RegisterTagDescriptor(desc TagDescriptor) {
-	globalValidatorRegistry.add(desc)
+func RegisterTagValidator(tv TagValidator) {
+	globalValidatorRegistry.addTagValidator(tv)
 }
 
 // RegisterTypeValidator must be called by any validator which wants to run
