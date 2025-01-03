@@ -114,10 +114,10 @@ func (unionDiscriminatorTag) TagName() string {
 }
 
 // Shared between unionDiscriminatorTag and unionMemberTag.
-var unionTagScopes = sets.New(TagScopeField)
+var unionTagValidScopes = sets.New(ScopeField)
 
-func (unionDiscriminatorTag) ValidScopes() sets.Set[TagScope] {
-	return unionTagScopes
+func (unionDiscriminatorTag) ValidScopes() sets.Set[Scope] {
+	return unionTagValidScopes
 }
 
 func (udt unionDiscriminatorTag) GetValidations(context Context, _ []string, payload string) (Validations, error) {
@@ -171,8 +171,8 @@ func (unionMemberTag) TagName() string {
 	return unionMemberTagName
 }
 
-func (unionMemberTag) ValidScopes() sets.Set[TagScope] {
-	return unionTagScopes
+func (unionMemberTag) ValidScopes() sets.Set[Scope] {
+	return unionTagValidScopes
 }
 
 func (umt unionMemberTag) GetValidations(context Context, _ []string, payload string) (Validations, error) {

@@ -57,10 +57,10 @@ func (frt fixedResultTag) TagName() string {
 	return validateFalseTagName
 }
 
-var fixedResultTagScopes = sets.New(TagScopeAll)
+var fixedResultTagValidScopes = sets.New(ScopeAny)
 
-func (fixedResultTag) ValidScopes() sets.Set[TagScope] {
-	return fixedResultTagScopes
+func (fixedResultTag) ValidScopes() sets.Set[Scope] {
+	return fixedResultTagValidScopes
 }
 
 func (frt fixedResultTag) GetValidations(context Context, _ []string, payload string) (Validations, error) {

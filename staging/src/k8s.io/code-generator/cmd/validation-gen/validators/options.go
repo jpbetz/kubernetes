@@ -90,7 +90,7 @@ func (o optionDeclarativeValidator) parseIfOptionsTag(t *types.Type, tag gengo.T
 
 	//FIXME: Use the real context once converted
 	context := Context{
-		Scope: TagScopeType,
+		Scope: ScopeType,
 		Type:  t,
 	}
 	if validations, err := o.cfg.ValidatorRegistry.ExtractValidations(context, fakeComments); err != nil {
@@ -111,7 +111,7 @@ func (optionDeclarativeValidator) Docs() []TagDoc {
 	return []TagDoc{{
 		Tag:         fmt.Sprintf("%s(<option-name>)", ifOptionEnabledTag),
 		Description: "Declares a validation that only applies when an option is enabled.",
-		Contexts:    []TagScope{TagScopeType, TagScopeField},
+		Contexts:    []Scope{ScopeType, ScopeField},
 		Payloads: []TagPayloadDoc{{
 			Description: "<validation-tag>",
 			Docs:        "This validation tag will be evaluated only if the validation option is enabled.",
@@ -119,7 +119,7 @@ func (optionDeclarativeValidator) Docs() []TagDoc {
 	}, {
 		Tag:         fmt.Sprintf("%s(<option-name>)", ifOptionDisabledTag),
 		Description: "Declares a validation that only applies when an option is disabled.",
-		Contexts:    []TagScope{TagScopeType, TagScopeField},
+		Contexts:    []Scope{ScopeType, ScopeField},
 		Payloads: []TagPayloadDoc{{
 			Description: "<validation-tag>",
 			Docs:        "This validation tag will be evaluated only if the validation option is disabled.",

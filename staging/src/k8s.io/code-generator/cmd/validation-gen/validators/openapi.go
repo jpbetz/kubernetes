@@ -45,10 +45,10 @@ func (formatTag) TagName() string {
 	return formatTagName
 }
 
-var formatTagScopes = sets.New(TagScopeAll)
+var formatTagValidScopes = sets.New(ScopeAny)
 
-func (formatTag) ValidScopes() sets.Set[TagScope] {
-	return formatTagScopes
+func (formatTag) ValidScopes() sets.Set[Scope] {
+	return formatTagValidScopes
 }
 
 var (
@@ -107,10 +107,10 @@ func (maxLengthTag) TagName() string {
 	return maxLengthTagName
 }
 
-var maxLengthTagScopes = sets.New(TagScopeAll)
+var maxLengthTagValidScopes = sets.New(ScopeAny)
 
-func (maxLengthTag) ValidScopes() sets.Set[TagScope] {
-	return maxLengthTagScopes
+func (maxLengthTag) ValidScopes() sets.Set[Scope] {
+	return maxLengthTagValidScopes
 }
 
 var (
@@ -159,15 +159,15 @@ func (maxItemsTag) TagName() string {
 	return maxItemsTagName
 }
 
-var maxItemsTagScopes = sets.New(
-	TagScopeType,
-	TagScopeField,
-	TagScopeListVal,
-	TagScopeMapVal,
+var maxItemsTagValidScopes = sets.New(
+	ScopeType,
+	ScopeField,
+	ScopeListVal,
+	ScopeMapVal,
 )
 
-func (maxItemsTag) ValidScopes() sets.Set[TagScope] {
-	return maxItemsTagScopes
+func (maxItemsTag) ValidScopes() sets.Set[Scope] {
+	return maxItemsTagValidScopes
 }
 
 var (

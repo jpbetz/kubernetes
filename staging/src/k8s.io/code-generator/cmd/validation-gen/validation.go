@@ -290,7 +290,7 @@ func builtinTagDocs() []validators.TagDoc {
 	return []validators.TagDoc{{
 		Tag:         eachKeyTag,
 		Description: "Declares a validation for map keys.",
-		Contexts:    []validators.TagScope{validators.TagScopeType, validators.TagScopeField},
+		Contexts:    []validators.Scope{validators.ScopeType, validators.ScopeField},
 		Payloads: []validators.TagPayloadDoc{{
 			Description: "<validation-tag>",
 			Docs:        "This tag will be evaluated for each key of a map.",
@@ -298,7 +298,7 @@ func builtinTagDocs() []validators.TagDoc {
 	}, {
 		Tag:         eachValTag,
 		Description: "Declares a validation for map and slice values.",
-		Contexts:    []validators.TagScope{validators.TagScopeType, validators.TagScopeField},
+		Contexts:    []validators.Scope{validators.ScopeType, validators.ScopeField},
 		Payloads: []validators.TagPayloadDoc{{
 			Description: "<validation-tag>",
 			Docs:        "This tag will be evaluated for each value of a map or slice.",
@@ -306,7 +306,7 @@ func builtinTagDocs() []validators.TagDoc {
 	}, {
 		Tag:         listMapKeyTag,
 		Description: "Declares a named field of a list's value type as part of the list-map key.",
-		Contexts:    []validators.TagScope{validators.TagScopeType, validators.TagScopeField},
+		Contexts:    []validators.Scope{validators.ScopeType, validators.ScopeField},
 		Payloads: []validators.TagPayloadDoc{{
 			Description: "<field-name>",
 			Docs:        "This values names a field of a list's value type.",
@@ -314,7 +314,7 @@ func builtinTagDocs() []validators.TagDoc {
 	}, {
 		Tag:         fmt.Sprintf("%s(<field-name>)", subfieldTag),
 		Description: "Declares a validation for a specified subfield of the struct. The subfield must be a direct field of the struct, or of an embedded struct",
-		Contexts:    []validators.TagScope{validators.TagScopeField},
+		Contexts:    []validators.Scope{validators.ScopeField},
 		Payloads: []validators.TagPayloadDoc{{
 			Description: "<validation-tag>",
 			Docs:        "This tag will be evaluated for the subfield of the struct.",
@@ -444,7 +444,7 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 	// validators.  This does not influence the order in which the validations
 	// are called in emitted code, just how we evaluate what to emit.
 	context := validators.Context{
-		Scope: validators.TagScopeType,
+		Scope: validators.ScopeType,
 		Type:  t,
 	}
 	if t.Kind == types.Alias {
@@ -534,7 +534,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 
 		// Extract any field-attached validation rules.
 		context := validators.Context{
-			Scope:  validators.TagScopeField,
+			Scope:  validators.ScopeField,
 			Type:   memb.Type,
 			Parent: thisNode.valueType,
 			Member: &memb,
@@ -568,7 +568,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		case types.Slice, types.Array:
 			// Extract any embedded list-validation rules.
 			valCtxt := validators.Context{
-				Scope:  validators.TagScopeListVal,
+				Scope:  validators.ScopeListVal,
 				Type:   childType.Elem,
 				Parent: memb.Type,
 			}
@@ -598,7 +598,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 				klog.V(5).InfoS("field", "name", name, "jsonName", jsonName, "type", memb.Type)
 
 				context := validators.Context{
-					Scope:  validators.TagScopeField,
+					Scope:  validators.ScopeField,
 					Type:   subfield.Type,
 					Parent: childType, // the struct being iterated
 					Member: &subfield,
@@ -629,7 +629,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		case types.Map:
 			// Extract any embedded key-validation rules.
 			keyCtxt := validators.Context{
-				Scope:  validators.TagScopeMapKey,
+				Scope:  validators.ScopeMapKey,
 				Type:   childType.Key,
 				Parent: memb.Type,
 			}
@@ -646,7 +646,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			}
 			// Extract any embedded val-validation rules.
 			valCtxt := validators.Context{
-				Scope:  validators.TagScopeMapVal,
+				Scope:  validators.ScopeMapVal,
 				Type:   childType.Elem,
 				Parent: memb.Type,
 			}
@@ -710,7 +710,7 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 	case types.Slice, types.Array:
 		// Extract any embedded list-validation rules.
 		valCtxt := validators.Context{
-			Scope:  validators.TagScopeListVal,
+			Scope:  validators.ScopeListVal,
 			Type:   underlying.Elem,
 			Parent: underlying,
 		}
@@ -725,7 +725,7 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 	case types.Map:
 		// Extract any embedded key-validation rules.
 		keyCtxt := validators.Context{
-			Scope:  validators.TagScopeMapKey,
+			Scope:  validators.ScopeMapKey,
 			Type:   underlying.Key,
 			Parent: underlying,
 		}
@@ -739,7 +739,7 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 		}
 		// Extract any embedded val-validation rules.
 		valCtxt := validators.Context{
-			Scope:  validators.TagScopeMapVal,
+			Scope:  validators.ScopeMapVal,
 			Type:   underlying.Elem,
 			Parent: underlying,
 		}

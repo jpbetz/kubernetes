@@ -55,10 +55,10 @@ func (rt requirednessTag) TagName() string {
 	return string(rt.mode)
 }
 
-var requirednessTagScopes = sets.New(TagScopeField)
+var requirednessTagValidScopes = sets.New(ScopeField)
 
-func (requirednessTag) ValidScopes() sets.Set[TagScope] {
-	return requirednessTagScopes
+func (requirednessTag) ValidScopes() sets.Set[Scope] {
+	return requirednessTagValidScopes
 }
 
 func (rt requirednessTag) GetValidations(context Context, _ []string, _ string) (Validations, error) {

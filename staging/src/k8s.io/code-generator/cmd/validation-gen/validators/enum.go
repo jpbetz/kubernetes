@@ -47,10 +47,10 @@ func (enumTag) TagName() string {
 	return enumTagName
 }
 
-var enumTagScopes = sets.New(TagScopeType)
+var enumTagValidScopes = sets.New(ScopeType)
 
-func (enumTag) ValidScopes() sets.Set[TagScope] {
-	return enumTagScopes
+func (enumTag) ValidScopes() sets.Set[Scope] {
+	return enumTagValidScopes
 }
 
 var (

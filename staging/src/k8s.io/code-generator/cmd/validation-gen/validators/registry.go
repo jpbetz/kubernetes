@@ -109,7 +109,7 @@ func (reg *ValidatorRegistry) ExtractValidations(context Context, comments []str
 
 	validations := Validations{}
 
-	if context.Scope == TagScopeType {
+	if context.Scope == ScopeType {
 		// Run all type-validators.
 		for _, tv := range reg.typeValidators {
 			if theseValidations, err := tv.GetValidations(context.Type, context.Parent); err != nil {
@@ -128,7 +128,7 @@ func (reg *ValidatorRegistry) ExtractValidations(context Context, comments []str
 	// Run matching tag-validators.
 	for tag, vals := range tags {
 		tv := reg.tagValidators[tag]
-		if scopes := tv.ValidScopes(); !scopes.Has(context.Scope) && !scopes.Has(TagScopeAll) {
+		if scopes := tv.ValidScopes(); !scopes.Has(context.Scope) && !scopes.Has(ScopeAny) {
 			return Validations{}, fmt.Errorf("tag %q cannot be specified on %s", tv.TagName(), context.Scope)
 		}
 		for _, val := range vals { // tags may have multiple values
