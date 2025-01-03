@@ -59,7 +59,7 @@ var (
 
 var setsNew = types.Name{Package: "k8s.io/apimachinery/pkg/util/sets", Name: "New"}
 
-func (et *enumTag) GetValidations(context TagContext, _ []string, payload string) (Validations, error) {
+func (et *enumTag) GetValidations(context Context, _ []string, payload string) (Validations, error) {
 	if context.Type != types.String {
 		return Validations{}, fmt.Errorf("can only be used on string types")
 	}

@@ -61,7 +61,7 @@ func (requirednessTag) ValidScopes() sets.Set[TagScope] {
 	return requirednessTagScopes
 }
 
-func (rt requirednessTag) GetValidations(context TagContext, _ []string, _ string) (Validations, error) {
+func (rt requirednessTag) GetValidations(context Context, _ []string, _ string) (Validations, error) {
 	if context.Type.Kind == types.Alias {
 		panic("alias type should already have been unwrapped")
 	}
@@ -85,7 +85,7 @@ var (
 
 // TODO: It might be valuable to have a string payload for when requiredness is
 // conditional (e.g. required when <otherfield> is specified).
-func (requirednessTag) doRequired(context TagContext) (Validations, error) {
+func (requirednessTag) doRequired(context Context) (Validations, error) {
 	// Most validators don't care whether the value they are validating was
 	// originally defined as a value-type or a pointer-type in the API.  This
 	// one does.  Since Go doesn't do partial specialization of templates, we
@@ -113,7 +113,7 @@ var (
 	optionalMapValidator     = types.Name{Package: libValidationPkg, Name: "OptionalMap"}
 )
 
-func (requirednessTag) doOptional(context TagContext) (Validations, error) {
+func (requirednessTag) doOptional(context Context) (Validations, error) {
 	// Most validators don't care whether the value they are validating was
 	// originally defined as a value-type or a pointer-type in the API.  This
 	// one does.  Since Go doesn't do partial specialization of templates, we
@@ -144,7 +144,7 @@ var (
 
 // TODO: It might be valuable to have a string payload for when forbidden is
 // conditional (e.g. forbidden when <option> is disabled).
-func (requirednessTag) doForbidden(context TagContext) (Validations, error) {
+func (requirednessTag) doForbidden(context Context) (Validations, error) {
 	// Forbidden is weird.  Each of these emits two checks, which are polar
 	// opposites.  If the field fails the forbidden check, it will
 	// short-circuit and not run the optional check.  If it passes the

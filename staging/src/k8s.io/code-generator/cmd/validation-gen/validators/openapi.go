@@ -56,7 +56,7 @@ var (
 	dnsLabelValidator = types.Name{Package: libValidationPkg, Name: "DNSLabel"}
 )
 
-func (formatTag) GetValidations(context TagContext, _ []string, payload string) (Validations, error) {
+func (formatTag) GetValidations(context Context, _ []string, payload string) (Validations, error) {
 	var result Validations
 	if formatFunction, err := getFormatValidationFunction(payload); err != nil {
 		return result, err
@@ -117,7 +117,7 @@ var (
 	maxLengthValidator = types.Name{Package: libValidationPkg, Name: "MaxLength"}
 )
 
-func (maxLengthTag) GetValidations(context TagContext, _ []string, payload string) (Validations, error) {
+func (maxLengthTag) GetValidations(context Context, _ []string, payload string) (Validations, error) {
 	var result Validations
 
 	t := context.Type
@@ -174,7 +174,7 @@ var (
 	maxItemsValidator = types.Name{Package: libValidationPkg, Name: "MaxItems"}
 )
 
-func (maxItemsTag) GetValidations(context TagContext, _ []string, payload string) (Validations, error) {
+func (maxItemsTag) GetValidations(context Context, _ []string, payload string) (Validations, error) {
 	var result Validations
 
 	t := context.Type

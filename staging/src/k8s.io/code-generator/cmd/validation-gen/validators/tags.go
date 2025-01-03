@@ -36,7 +36,7 @@ type TagValidator interface {
 	ValidScopes() sets.Set[TagScope]
 
 	// GetValidations returns any validations described by this tag.
-	GetValidations(context TagContext, args []string, payload string) (Validations, error)
+	GetValidations(context Context, args []string, payload string) (Validations, error)
 
 	// Docs returns user-facing documentation for this tag.
 	Docs() TagDoc
@@ -69,7 +69,7 @@ type TagScope string
 // message such as "may not be used in %s".
 const (
 	// TagScopeAll indicates that a tag may be use in any context.  This value
-	// should never appear in a TagContext struct, since that indicates a
+	// should never appear in a Context struct, since that indicates a
 	// specific use.
 	TagScopeAll TagScope = "anywhere"
 
@@ -101,9 +101,9 @@ const (
 	// for now.
 )
 
-// TagContext describes where a tag was used, so that the scope can be checked
+// Context describes where a tag was used, so that the scope can be checked
 // and so validators can handle different cases if they need.
-type TagContext struct {
+type Context struct {
 	// Scope is where the tag was used.
 	Scope TagScope
 

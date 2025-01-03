@@ -102,7 +102,7 @@ func (reg *ValidatorRegistry) init(c *generator.Context) {
 // found in the associated comment block.  Any matching validators produce zero
 // or more validations, which will later be rendered by the code-generation
 // logic.
-func (reg *ValidatorRegistry) ExtractValidations(context TagContext, comments []string) (Validations, error) {
+func (reg *ValidatorRegistry) ExtractValidations(context Context, comments []string) (Validations, error) {
 	if !reg.initialized.Load() {
 		panic("ValidatorRegistry.init() was not called")
 	}

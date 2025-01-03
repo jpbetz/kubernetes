@@ -443,15 +443,15 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 	// For example, all struct field validators get called before the type
 	// validators.  This does not influence the order in which the validations
 	// are called in emitted code, just how we evaluate what to emit.
-	tc := validators.TagContext{
+	context := validators.Context{
 		Scope: validators.TagScopeType,
 		Type:  t,
 	}
 	if t.Kind == types.Alias {
-		tc.Parent = t
-		tc.Type = t.Underlying
+		context.Parent = t
+		context.Type = t.Underlying
 	}
-	if validations, err := td.validatorRegistry.ExtractValidations(tc, t.CommentLines); err != nil {
+	if validations, err := td.validatorRegistry.ExtractValidations(context, t.CommentLines); err != nil {
 		return nil, fmt.Errorf("%v: %w", fldPath, err)
 	} else {
 		if !validations.Empty() {
@@ -533,13 +533,13 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		}
 
 		// Extract any field-attached validation rules.
-		tc := validators.TagContext{
+		context := validators.Context{
 			Scope:  validators.TagScopeField,
 			Type:   memb.Type,
 			Parent: thisNode.valueType,
 			Member: &memb,
 		}
-		if validations, err := td.validatorRegistry.ExtractValidations(tc, memb.CommentLines); err != nil {
+		if validations, err := td.validatorRegistry.ExtractValidations(context, memb.CommentLines); err != nil {
 			return fmt.Errorf("field %s: %w", childPath.String(), err)
 		} else {
 			if !validations.Empty() {
@@ -567,7 +567,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		switch childType.Kind {
 		case types.Slice, types.Array:
 			// Extract any embedded list-validation rules.
-			valCtxt := validators.TagContext{
+			valCtxt := validators.Context{
 				Scope:  validators.TagScopeListVal,
 				Type:   childType.Elem,
 				Parent: memb.Type,
@@ -597,7 +597,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			doOneChildField := func(subfield types.Member, name, jsonName string) error {
 				klog.V(5).InfoS("field", "name", name, "jsonName", jsonName, "type", memb.Type)
 
-				tc := validators.TagContext{
+				context := validators.Context{
 					Scope:  validators.TagScopeField,
 					Type:   subfield.Type,
 					Parent: childType, // the struct being iterated
@@ -605,7 +605,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 				}
 				// Passing memb.CommentLines because subfield validations are
 				// declared on the *parent* type (memb) field and not the *subfield* type (subfield).
-				if validations, err := td.extractSubfieldValidations(tc, jsonName, memb.CommentLines); err != nil {
+				if validations, err := td.extractSubfieldValidations(context, jsonName, memb.CommentLines); err != nil {
 					return fmt.Errorf("%v: %w", childPath.Child(name), err)
 				} else {
 					if validations.Empty() {
@@ -628,7 +628,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			}
 		case types.Map:
 			// Extract any embedded key-validation rules.
-			keyCtxt := validators.TagContext{
+			keyCtxt := validators.Context{
 				Scope:  validators.TagScopeMapKey,
 				Type:   childType.Key,
 				Parent: memb.Type,
@@ -645,7 +645,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 				}
 			}
 			// Extract any embedded val-validation rules.
-			valCtxt := validators.TagContext{
+			valCtxt := validators.Context{
 				Scope:  validators.TagScopeMapVal,
 				Type:   childType.Elem,
 				Parent: memb.Type,
@@ -709,7 +709,7 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 	switch underlying.Kind {
 	case types.Slice, types.Array:
 		// Extract any embedded list-validation rules.
-		valCtxt := validators.TagContext{
+		valCtxt := validators.Context{
 			Scope:  validators.TagScopeListVal,
 			Type:   underlying.Elem,
 			Parent: underlying,
@@ -724,7 +724,7 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 		}
 	case types.Map:
 		// Extract any embedded key-validation rules.
-		keyCtxt := validators.TagContext{
+		keyCtxt := validators.Context{
 			Scope:  validators.TagScopeMapKey,
 			Type:   underlying.Key,
 			Parent: underlying,
@@ -738,7 +738,7 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 			}
 		}
 		// Extract any embedded val-validation rules.
-		valCtxt := validators.TagContext{
+		valCtxt := validators.Context{
 			Scope:  validators.TagScopeMapVal,
 			Type:   underlying.Elem,
 			Parent: underlying,
@@ -757,7 +757,7 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 }
 
 // FIXME: drop the `t` arg when converted.
-func (td *typeDiscoverer) extractEmbeddedValidations(tag string, context validators.TagContext, comments []string, t *types.Type) (validators.Validations, error) {
+func (td *typeDiscoverer) extractEmbeddedValidations(tag string, context validators.Context, comments []string, t *types.Type) (validators.Validations, error) {
 	var result validators.Validations
 	if tagVals, found := gengo.ExtractCommentTags("+", comments)[tag]; found {
 		for _, tagVal := range tagVals {
@@ -1644,7 +1644,7 @@ func (g *fixtureTestGen) Init(c *generator.Context, w io.Writer) error {
 // subfield that were defined on the parent struct.The syntax for the tag is
 // +k8s:subfield(subfield-json-name)=<validator-tag>=<args>
 // TODO: this could be supported on type definitions.
-func (td *typeDiscoverer) extractSubfieldValidations(context validators.TagContext, jsonName string, comments []string) (validators.Validations, error) {
+func (td *typeDiscoverer) extractSubfieldValidations(context validators.Context, jsonName string, comments []string) (validators.Validations, error) {
 	var result validators.Validations
 
 	// Currently the format for +k8s:subfield tag is:

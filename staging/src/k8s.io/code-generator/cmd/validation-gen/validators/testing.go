@@ -63,7 +63,7 @@ func (fixedResultTag) ValidScopes() sets.Set[TagScope] {
 	return fixedResultTagScopes
 }
 
-func (frt fixedResultTag) GetValidations(context TagContext, _ []string, payload string) (Validations, error) {
+func (frt fixedResultTag) GetValidations(context Context, _ []string, payload string) (Validations, error) {
 	var result Validations
 
 	if frt.error {

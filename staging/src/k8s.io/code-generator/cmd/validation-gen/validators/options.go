@@ -89,11 +89,11 @@ func (o optionDeclarativeValidator) parseIfOptionsTag(t *types.Type, tag gengo.T
 	fakeComments := []string{tag.Value}
 
 	//FIXME: Use the real context once converted
-	tc := TagContext{
+	context := Context{
 		Scope: TagScopeType,
 		Type:  t,
 	}
-	if validations, err := o.cfg.ValidatorRegistry.ExtractValidations(tc, fakeComments); err != nil {
+	if validations, err := o.cfg.ValidatorRegistry.ExtractValidations(context, fakeComments); err != nil {
 		return "", Validations{}, err
 	} else {
 		result.Add(validations)

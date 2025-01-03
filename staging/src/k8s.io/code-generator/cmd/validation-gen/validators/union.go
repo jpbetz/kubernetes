@@ -120,7 +120,7 @@ func (unionDiscriminatorTag) ValidScopes() sets.Set[TagScope] {
 	return unionTagScopes
 }
 
-func (udt unionDiscriminatorTag) GetValidations(context TagContext, _ []string, payload string) (Validations, error) {
+func (udt unionDiscriminatorTag) GetValidations(context Context, _ []string, payload string) (Validations, error) {
 	p := &discriminatorParams{}
 	if len(payload) > 0 {
 		if err := json.Unmarshal([]byte(payload), &p); err != nil {
@@ -175,7 +175,7 @@ func (unionMemberTag) ValidScopes() sets.Set[TagScope] {
 	return unionTagScopes
 }
 
-func (umt unionMemberTag) GetValidations(context TagContext, _ []string, payload string) (Validations, error) {
+func (umt unionMemberTag) GetValidations(context Context, _ []string, payload string) (Validations, error) {
 	var fieldName string
 	jsonTag, ok := tags.LookupJSON(*context.Member)
 	if !ok {
