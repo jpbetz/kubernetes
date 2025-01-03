@@ -31,13 +31,13 @@ const (
 )
 
 func init() {
-	RegisterTagValidator(requirednessTag{requirednessRequired})
-	RegisterTagValidator(requirednessTag{requirednessOptional})
-	RegisterTagValidator(requirednessTag{requirednessForbidden})
+	RegisterTagValidator(requirednessTagValidator{requirednessRequired})
+	RegisterTagValidator(requirednessTagValidator{requirednessOptional})
+	RegisterTagValidator(requirednessTagValidator{requirednessForbidden})
 }
 
-// requirednessTag implements multiple modes of requiredness.
-type requirednessTag struct {
+// requirednessTagValidator implements multiple modes of requiredness.
+type requirednessTagValidator struct {
 	mode requirednessMode
 }
 
@@ -49,31 +49,31 @@ const (
 	requirednessForbidden requirednessMode = forbiddenTagName
 )
 
-func (requirednessTag) Init(_ *generator.Context) {}
+func (requirednessTagValidator) Init(_ *generator.Context) {}
 
-func (rt requirednessTag) TagName() string {
-	return string(rt.mode)
+func (rtv requirednessTagValidator) TagName() string {
+	return string(rtv.mode)
 }
 
 var requirednessTagValidScopes = sets.New(ScopeField)
 
-func (requirednessTag) ValidScopes() sets.Set[Scope] {
+func (requirednessTagValidator) ValidScopes() sets.Set[Scope] {
 	return requirednessTagValidScopes
 }
 
-func (rt requirednessTag) GetValidations(context Context, _ []string, _ string) (Validations, error) {
+func (rtv requirednessTagValidator) GetValidations(context Context, _ []string, _ string) (Validations, error) {
 	if context.Type.Kind == types.Alias {
 		panic("alias type should already have been unwrapped")
 	}
-	switch rt.mode {
+	switch rtv.mode {
 	case requirednessRequired:
-		return rt.doRequired(context)
+		return rtv.doRequired(context)
 	case requirednessOptional:
-		return rt.doOptional(context)
+		return rtv.doOptional(context)
 	case requirednessForbidden:
-		return rt.doForbidden(context)
+		return rtv.doForbidden(context)
 	}
-	panic(fmt.Sprintf("unknown requiredness mode: %q", rt.mode))
+	panic(fmt.Sprintf("unknown requiredness mode: %q", rtv.mode))
 }
 
 var (
@@ -85,7 +85,7 @@ var (
 
 // TODO: It might be valuable to have a string payload for when requiredness is
 // conditional (e.g. required when <otherfield> is specified).
-func (requirednessTag) doRequired(context Context) (Validations, error) {
+func (requirednessTagValidator) doRequired(context Context) (Validations, error) {
 	// Most validators don't care whether the value they are validating was
 	// originally defined as a value-type or a pointer-type in the API.  This
 	// one does.  Since Go doesn't do partial specialization of templates, we
@@ -113,7 +113,7 @@ var (
 	optionalMapValidator     = types.Name{Package: libValidationPkg, Name: "OptionalMap"}
 )
 
-func (requirednessTag) doOptional(context Context) (Validations, error) {
+func (requirednessTagValidator) doOptional(context Context) (Validations, error) {
 	// Most validators don't care whether the value they are validating was
 	// originally defined as a value-type or a pointer-type in the API.  This
 	// one does.  Since Go doesn't do partial specialization of templates, we
@@ -144,7 +144,7 @@ var (
 
 // TODO: It might be valuable to have a string payload for when forbidden is
 // conditional (e.g. forbidden when <option> is disabled).
-func (requirednessTag) doForbidden(context Context) (Validations, error) {
+func (requirednessTagValidator) doForbidden(context Context) (Validations, error) {
 	// Forbidden is weird.  Each of these emits two checks, which are polar
 	// opposites.  If the field fails the forbidden check, it will
 	// short-circuit and not run the optional check.  If it passes the
@@ -190,13 +190,13 @@ func (requirednessTag) doForbidden(context Context) (Validations, error) {
 	}, nil
 }
 
-func (rt requirednessTag) Docs() TagDoc {
+func (rtv requirednessTagValidator) Docs() TagDoc {
 	doc := TagDoc{
-		Tag:    rt.TagName(),
-		Scopes: rt.ValidScopes().UnsortedList(),
+		Tag:    rtv.TagName(),
+		Scopes: rtv.ValidScopes().UnsortedList(),
 	}
 
-	switch rt.mode {
+	switch rtv.mode {
 	case requirednessRequired:
 		doc.Description = "Indicates that a field is optional to clients."
 	case requirednessOptional:
@@ -204,7 +204,7 @@ func (rt requirednessTag) Docs() TagDoc {
 	case requirednessForbidden:
 		doc.Description = "Indicates that a field may not be specified."
 	default:
-		panic(fmt.Sprintf("unknown requiredness mode: %q", rt.mode))
+		panic(fmt.Sprintf("unknown requiredness mode: %q", rtv.mode))
 	}
 
 	return doc

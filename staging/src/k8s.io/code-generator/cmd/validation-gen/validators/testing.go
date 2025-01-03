@@ -36,22 +36,22 @@ const (
 )
 
 func init() {
-	RegisterTagValidator(fixedResultTag{result: true})
-	RegisterTagValidator(fixedResultTag{result: false})
-	RegisterTagValidator(fixedResultTag{error: true})
+	RegisterTagValidator(fixedResultTagValidator{result: true})
+	RegisterTagValidator(fixedResultTagValidator{result: false})
+	RegisterTagValidator(fixedResultTagValidator{error: true})
 }
 
-type fixedResultTag struct {
+type fixedResultTagValidator struct {
 	result bool
 	error  bool
 }
 
-func (fixedResultTag) Init(_ *generator.Context) {}
+func (fixedResultTagValidator) Init(_ *generator.Context) {}
 
-func (frt fixedResultTag) TagName() string {
-	if frt.error {
+func (frtv fixedResultTagValidator) TagName() string {
+	if frtv.error {
 		return validateErrorTagName
-	} else if frt.result {
+	} else if frtv.result {
 		return validateTrueTagName
 	}
 	return validateFalseTagName
@@ -59,22 +59,22 @@ func (frt fixedResultTag) TagName() string {
 
 var fixedResultTagValidScopes = sets.New(ScopeAny)
 
-func (fixedResultTag) ValidScopes() sets.Set[Scope] {
+func (fixedResultTagValidator) ValidScopes() sets.Set[Scope] {
 	return fixedResultTagValidScopes
 }
 
-func (frt fixedResultTag) GetValidations(context Context, _ []string, payload string) (Validations, error) {
+func (frtv fixedResultTagValidator) GetValidations(context Context, _ []string, payload string) (Validations, error) {
 	var result Validations
 
-	if frt.error {
+	if frtv.error {
 		return result, fmt.Errorf("forced error: %q", payload)
 	}
 
-	tag, err := frt.parseTagPayload(payload)
+	tag, err := frtv.parseTagPayload(payload)
 	if err != nil {
 		return result, fmt.Errorf("can't decode tag payload: %w", err)
 	}
-	result.AddFunction(GenericFunction(frt.TagName(), tag.flags, fixedResultValidator, tag.typeArgs, frt.result, tag.msg))
+	result.AddFunction(GenericFunction(frtv.TagName(), tag.flags, fixedResultValidator, tag.typeArgs, frtv.result, tag.msg))
 
 	return result, nil
 }
@@ -89,7 +89,7 @@ type fixedResultPayload struct {
 	typeArgs []types.Name
 }
 
-func (fixedResultTag) parseTagPayload(in string) (fixedResultPayload, error) {
+func (fixedResultTagValidator) parseTagPayload(in string) (fixedResultPayload, error) {
 	type payload struct {
 		Flags   []string `json:"flags"`
 		Msg     string   `json:"msg"`
@@ -133,12 +133,12 @@ func (fixedResultTag) parseTagPayload(in string) (fixedResultPayload, error) {
 	return fixedResultPayload{flags, pl.Msg, typeArgs}, nil
 }
 
-func (frt fixedResultTag) Docs() TagDoc {
+func (frtv fixedResultTagValidator) Docs() TagDoc {
 	doc := TagDoc{
-		Tag:    frt.TagName(),
-		Scopes: frt.ValidScopes().UnsortedList(),
+		Tag:    frtv.TagName(),
+		Scopes: frtv.ValidScopes().UnsortedList(),
 	}
-	if frt.error {
+	if frtv.error {
 		doc.Description = "Always fails code generation (useful for testing)."
 		doc.Payloads = []TagPayloadDoc{{
 			Description: "<string>",
@@ -168,7 +168,7 @@ func (frt fixedResultTag) Docs() TagDoc {
 				Docs:  "The type arg in generated code (must be the value-type, not pointer).",
 			}},
 		}}
-		if frt.result {
+		if frtv.result {
 			doc.Description = "Always passes validation (useful for testing)."
 		} else {
 			doc.Description = "Always fails validation (useful for testing)."

@@ -32,22 +32,22 @@ const (
 )
 
 func init() {
-	RegisterTagValidator(formatTag{})
-	RegisterTagValidator(maxLengthTag{})
-	RegisterTagValidator(maxItemsTag{})
+	RegisterTagValidator(formatTagValidator{})
+	RegisterTagValidator(maxLengthTagValidator{})
+	RegisterTagValidator(maxItemsTagValidator{})
 }
 
-type formatTag struct{}
+type formatTagValidator struct{}
 
-func (formatTag) Init(_ *generator.Context) {}
+func (formatTagValidator) Init(_ *generator.Context) {}
 
-func (formatTag) TagName() string {
+func (formatTagValidator) TagName() string {
 	return formatTagName
 }
 
 var formatTagValidScopes = sets.New(ScopeAny)
 
-func (formatTag) ValidScopes() sets.Set[Scope] {
+func (formatTagValidator) ValidScopes() sets.Set[Scope] {
 	return formatTagValidScopes
 }
 
@@ -56,7 +56,7 @@ var (
 	dnsLabelValidator = types.Name{Package: libValidationPkg, Name: "DNSLabel"}
 )
 
-func (formatTag) GetValidations(context Context, _ []string, payload string) (Validations, error) {
+func (formatTagValidator) GetValidations(context Context, _ []string, payload string) (Validations, error) {
 	var result Validations
 	if formatFunction, err := getFormatValidationFunction(payload); err != nil {
 		return result, err
@@ -84,10 +84,10 @@ func getFormatValidationFunction(format string) (FunctionGen, error) {
 	return nil, fmt.Errorf("unsupported validation format %q", format)
 }
 
-func (ft formatTag) Docs() TagDoc {
+func (ftv formatTagValidator) Docs() TagDoc {
 	return TagDoc{
-		Tag:         ft.TagName(),
-		Scopes:      ft.ValidScopes().UnsortedList(),
+		Tag:         ftv.TagName(),
+		Scopes:      ftv.ValidScopes().UnsortedList(),
 		Description: "Indicates that a string field has a particular format.",
 		Payloads: []TagPayloadDoc{{
 			Description: "ip-sloppy",
@@ -99,17 +99,17 @@ func (ft formatTag) Docs() TagDoc {
 	}
 }
 
-type maxLengthTag struct{}
+type maxLengthTagValidator struct{}
 
-func (maxLengthTag) Init(_ *generator.Context) {}
+func (maxLengthTagValidator) Init(_ *generator.Context) {}
 
-func (maxLengthTag) TagName() string {
+func (maxLengthTagValidator) TagName() string {
 	return maxLengthTagName
 }
 
 var maxLengthTagValidScopes = sets.New(ScopeAny)
 
-func (maxLengthTag) ValidScopes() sets.Set[Scope] {
+func (maxLengthTagValidator) ValidScopes() sets.Set[Scope] {
 	return maxLengthTagValidScopes
 }
 
@@ -117,7 +117,7 @@ var (
 	maxLengthValidator = types.Name{Package: libValidationPkg, Name: "MaxLength"}
 )
 
-func (maxLengthTag) GetValidations(context Context, _ []string, payload string) (Validations, error) {
+func (maxLengthTagValidator) GetValidations(context Context, _ []string, payload string) (Validations, error) {
 	var result Validations
 
 	t := context.Type
@@ -139,10 +139,10 @@ func (maxLengthTag) GetValidations(context Context, _ []string, payload string) 
 	return result, nil
 }
 
-func (mlt maxLengthTag) Docs() TagDoc {
+func (mltv maxLengthTagValidator) Docs() TagDoc {
 	return TagDoc{
-		Tag:         mlt.TagName(),
-		Scopes:      mlt.ValidScopes().UnsortedList(),
+		Tag:         mltv.TagName(),
+		Scopes:      mltv.ValidScopes().UnsortedList(),
 		Description: "Indicates that a string field has a limit on its length.",
 		Payloads: []TagPayloadDoc{{
 			Description: "<non-negative integer>",
@@ -151,11 +151,11 @@ func (mlt maxLengthTag) Docs() TagDoc {
 	}
 }
 
-type maxItemsTag struct{}
+type maxItemsTagValidator struct{}
 
-func (maxItemsTag) Init(_ *generator.Context) {}
+func (maxItemsTagValidator) Init(_ *generator.Context) {}
 
-func (maxItemsTag) TagName() string {
+func (maxItemsTagValidator) TagName() string {
 	return maxItemsTagName
 }
 
@@ -166,7 +166,7 @@ var maxItemsTagValidScopes = sets.New(
 	ScopeMapVal,
 )
 
-func (maxItemsTag) ValidScopes() sets.Set[Scope] {
+func (maxItemsTagValidator) ValidScopes() sets.Set[Scope] {
 	return maxItemsTagValidScopes
 }
 
@@ -174,7 +174,7 @@ var (
 	maxItemsValidator = types.Name{Package: libValidationPkg, Name: "MaxItems"}
 )
 
-func (maxItemsTag) GetValidations(context Context, _ []string, payload string) (Validations, error) {
+func (maxItemsTagValidator) GetValidations(context Context, _ []string, payload string) (Validations, error) {
 	var result Validations
 
 	t := context.Type
@@ -196,10 +196,10 @@ func (maxItemsTag) GetValidations(context Context, _ []string, payload string) (
 	return result, nil
 }
 
-func (mit maxItemsTag) Docs() TagDoc {
+func (mitv maxItemsTagValidator) Docs() TagDoc {
 	return TagDoc{
-		Tag:         mit.TagName(),
-		Scopes:      mit.ValidScopes().UnsortedList(),
+		Tag:         mitv.TagName(),
+		Scopes:      mitv.ValidScopes().UnsortedList(),
 		Description: "Indicates that a list field has a limit on its size.",
 		Payloads: []TagPayloadDoc{
 			{

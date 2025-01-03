@@ -32,24 +32,24 @@ import (
 const enumTagName = "k8s:enum"
 
 func init() {
-	RegisterTagValidator(&enumTag{})
+	RegisterTagValidator(&enumTagValidator{})
 }
 
-type enumTag struct {
+type enumTagValidator struct {
 	enumContext *enumContext
 }
 
-func (et *enumTag) Init(c *generator.Context) {
-	et.enumContext = newEnumContext(c)
+func (etv *enumTagValidator) Init(c *generator.Context) {
+	etv.enumContext = newEnumContext(c)
 }
 
-func (enumTag) TagName() string {
+func (enumTagValidator) TagName() string {
 	return enumTagName
 }
 
 var enumTagValidScopes = sets.New(ScopeType)
 
-func (enumTag) ValidScopes() sets.Set[Scope] {
+func (enumTagValidator) ValidScopes() sets.Set[Scope] {
 	return enumTagValidScopes
 }
 
@@ -59,14 +59,14 @@ var (
 
 var setsNew = types.Name{Package: "k8s.io/apimachinery/pkg/util/sets", Name: "New"}
 
-func (et *enumTag) GetValidations(context Context, _ []string, payload string) (Validations, error) {
+func (etv *enumTagValidator) GetValidations(context Context, _ []string, payload string) (Validations, error) {
 	if context.Type != types.String {
 		return Validations{}, fmt.Errorf("can only be used on string types")
 	}
 
 	var result Validations
 
-	if enum, ok := et.enumContext.EnumType(context.Parent); ok {
+	if enum, ok := etv.enumContext.EnumType(context.Parent); ok {
 		// TODO: Avoid the "local" here. This was added to to avoid errors caused when the package is an empty string.
 		//       The correct package would be the output package but is not known here. This does not show up in generated code.
 		// TODO: Append a consistent hash suffix to avoid generated name conflicts?
@@ -80,10 +80,10 @@ func (et *enumTag) GetValidations(context Context, _ []string, payload string) (
 	return result, nil
 }
 
-func (et *enumTag) Docs() TagDoc {
+func (etv *enumTagValidator) Docs() TagDoc {
 	return TagDoc{
-		Tag:         et.TagName(),
-		Scopes:      et.ValidScopes().UnsortedList(),
+		Tag:         etv.TagName(),
+		Scopes:      etv.ValidScopes().UnsortedList(),
 		Description: "Indicates that a string type is an enum. All const values of this type are considered values in the enum.",
 	}
 }

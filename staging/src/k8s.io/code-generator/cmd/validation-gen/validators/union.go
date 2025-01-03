@@ -39,8 +39,8 @@ func init() {
 	// actually pertains to the struct itself.
 	shared := map[*types.Type]unions{}
 	RegisterTypeValidator(unionTypeValidator{shared})
-	RegisterTagValidator(unionDiscriminatorTag{shared})
-	RegisterTagValidator(unionMemberTag{shared})
+	RegisterTagValidator(unionDiscriminatorTagValidator{shared})
+	RegisterTagValidator(unionMemberTagValidator{shared})
 }
 
 type unionTypeValidator struct {
@@ -103,34 +103,34 @@ const (
 	unionMemberTagName        = "k8s:unionMember"
 )
 
-type unionDiscriminatorTag struct {
+type unionDiscriminatorTagValidator struct {
 	shared map[*types.Type]unions
 }
 
-func (unionDiscriminatorTag) Init(_ *generator.Context) {}
+func (unionDiscriminatorTagValidator) Init(_ *generator.Context) {}
 
-func (unionDiscriminatorTag) TagName() string {
+func (unionDiscriminatorTagValidator) TagName() string {
 	return unionDiscriminatorTagName
 }
 
-// Shared between unionDiscriminatorTag and unionMemberTag.
+// Shared between unionDiscriminatorTagValidator and unionMemberTagValidator.
 var unionTagValidScopes = sets.New(ScopeField)
 
-func (unionDiscriminatorTag) ValidScopes() sets.Set[Scope] {
+func (unionDiscriminatorTagValidator) ValidScopes() sets.Set[Scope] {
 	return unionTagValidScopes
 }
 
-func (udt unionDiscriminatorTag) GetValidations(context Context, _ []string, payload string) (Validations, error) {
+func (udtv unionDiscriminatorTagValidator) GetValidations(context Context, _ []string, payload string) (Validations, error) {
 	p := &discriminatorParams{}
 	if len(payload) > 0 {
 		if err := json.Unmarshal([]byte(payload), &p); err != nil {
 			return Validations{}, fmt.Errorf("error parsing JSON value: %v (%q)", err, payload)
 		}
 	}
-	if udt.shared[context.Parent] == nil {
-		udt.shared[context.Parent] = unions{}
+	if udtv.shared[context.Parent] == nil {
+		udtv.shared[context.Parent] = unions{}
 	}
-	u := udt.shared[context.Parent].getOrCreate(p.Union)
+	u := udtv.shared[context.Parent].getOrCreate(p.Union)
 
 	var discriminatorFieldName string
 	if jsonAnnotation, ok := tags.LookupJSON(*context.Member); ok {
@@ -144,10 +144,10 @@ func (udt unionDiscriminatorTag) GetValidations(context Context, _ []string, pay
 	return Validations{}, nil
 }
 
-func (udt unionDiscriminatorTag) Docs() TagDoc {
+func (udtv unionDiscriminatorTagValidator) Docs() TagDoc {
 	return TagDoc{
-		Tag:         udt.TagName(),
-		Scopes:      udt.ValidScopes().UnsortedList(),
+		Tag:         udtv.TagName(),
+		Scopes:      udtv.ValidScopes().UnsortedList(),
 		Description: "Indicates that this field is the discriminator for a union.",
 		Payloads: []TagPayloadDoc{{
 			Description: "<json-object>",
@@ -161,21 +161,21 @@ func (udt unionDiscriminatorTag) Docs() TagDoc {
 	}
 }
 
-type unionMemberTag struct {
+type unionMemberTagValidator struct {
 	shared map[*types.Type]unions
 }
 
-func (unionMemberTag) Init(_ *generator.Context) {}
+func (unionMemberTagValidator) Init(_ *generator.Context) {}
 
-func (unionMemberTag) TagName() string {
+func (unionMemberTagValidator) TagName() string {
 	return unionMemberTagName
 }
 
-func (unionMemberTag) ValidScopes() sets.Set[Scope] {
+func (unionMemberTagValidator) ValidScopes() sets.Set[Scope] {
 	return unionTagValidScopes
 }
 
-func (umt unionMemberTag) GetValidations(context Context, _ []string, payload string) (Validations, error) {
+func (umtv unionMemberTagValidator) GetValidations(context Context, _ []string, payload string) (Validations, error) {
 	var fieldName string
 	jsonTag, ok := tags.LookupJSON(*context.Member)
 	if !ok {
@@ -193,10 +193,10 @@ func (umt unionMemberTag) GetValidations(context Context, _ []string, payload st
 			return Validations{}, fmt.Errorf("error parsing JSON value: %v (%q)", err, payload)
 		}
 	}
-	if umt.shared[context.Parent] == nil {
-		umt.shared[context.Parent] = unions{}
+	if umtv.shared[context.Parent] == nil {
+		umtv.shared[context.Parent] = unions{}
 	}
-	u := umt.shared[context.Parent].getOrCreate(p.Union)
+	u := umtv.shared[context.Parent].getOrCreate(p.Union)
 	u.fields = append(u.fields, [2]string{fieldName, p.MemberName})
 	u.fieldMembers = append(u.fieldMembers, *context.Member)
 
@@ -205,10 +205,10 @@ func (umt unionMemberTag) GetValidations(context Context, _ []string, payload st
 	return Validations{}, nil
 }
 
-func (umt unionMemberTag) Docs() TagDoc {
+func (umtv unionMemberTagValidator) Docs() TagDoc {
 	return TagDoc{
-		Tag:         umt.TagName(),
-		Scopes:      umt.ValidScopes().UnsortedList(),
+		Tag:         umtv.TagName(),
+		Scopes:      umtv.ValidScopes().UnsortedList(),
 		Description: "Indicates that this field is a member of a union.",
 		Payloads: []TagPayloadDoc{{
 			Description: "<json-object>",
