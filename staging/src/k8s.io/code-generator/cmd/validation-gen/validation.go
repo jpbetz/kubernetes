@@ -290,7 +290,7 @@ func builtinTagDocs() []validators.TagDoc {
 	return []validators.TagDoc{{
 		Tag:         eachKeyTag,
 		Description: "Declares a validation for map keys.",
-		Contexts:    []validators.Scope{validators.ScopeType, validators.ScopeField},
+		Scopes:      []validators.Scope{validators.ScopeType, validators.ScopeField},
 		Payloads: []validators.TagPayloadDoc{{
 			Description: "<validation-tag>",
 			Docs:        "This tag will be evaluated for each key of a map.",
@@ -298,7 +298,7 @@ func builtinTagDocs() []validators.TagDoc {
 	}, {
 		Tag:         eachValTag,
 		Description: "Declares a validation for map and slice values.",
-		Contexts:    []validators.Scope{validators.ScopeType, validators.ScopeField},
+		Scopes:      []validators.Scope{validators.ScopeType, validators.ScopeField},
 		Payloads: []validators.TagPayloadDoc{{
 			Description: "<validation-tag>",
 			Docs:        "This tag will be evaluated for each value of a map or slice.",
@@ -306,7 +306,7 @@ func builtinTagDocs() []validators.TagDoc {
 	}, {
 		Tag:         listMapKeyTag,
 		Description: "Declares a named field of a list's value type as part of the list-map key.",
-		Contexts:    []validators.Scope{validators.ScopeType, validators.ScopeField},
+		Scopes:      []validators.Scope{validators.ScopeType, validators.ScopeField},
 		Payloads: []validators.TagPayloadDoc{{
 			Description: "<field-name>",
 			Docs:        "This values names a field of a list's value type.",
@@ -314,7 +314,7 @@ func builtinTagDocs() []validators.TagDoc {
 	}, {
 		Tag:         fmt.Sprintf("%s(<field-name>)", subfieldTag),
 		Description: "Declares a validation for a specified subfield of the struct. The subfield must be a direct field of the struct, or of an embedded struct",
-		Contexts:    []validators.Scope{validators.ScopeField},
+		Scopes:      []validators.Scope{validators.ScopeField},
 		Payloads: []validators.TagPayloadDoc{{
 			Description: "<validation-tag>",
 			Docs:        "This tag will be evaluated for the subfield of the struct.",

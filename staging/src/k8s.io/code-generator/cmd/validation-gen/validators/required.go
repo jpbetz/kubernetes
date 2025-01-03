@@ -192,8 +192,8 @@ func (requirednessTag) doForbidden(context Context) (Validations, error) {
 
 func (rt requirednessTag) Docs() TagDoc {
 	doc := TagDoc{
-		Tag:      rt.TagName(),
-		Contexts: rt.ValidScopes().UnsortedList(),
+		Tag:    rt.TagName(),
+		Scopes: rt.ValidScopes().UnsortedList(),
 	}
 
 	switch rt.mode {

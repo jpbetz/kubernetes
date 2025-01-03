@@ -136,9 +136,8 @@ type TagDoc struct {
 	Tag string
 	// Description is a short description of this tag's purpose.
 	Description string
-	// Contexts lists the place or places this tag may be used.  Tags used in
-	// the wrong context may or may not cause errors.
-	Contexts []Scope
+	// Scopes lists the place or places this tag may be used.
+	Scopes []Scope
 	// Payloads lists zero or more varieties of value for this tag. If this tag
 	// never has a payload, this list should be empty, but if the payload is
 	// optional, this list should include an entry for "<none>".

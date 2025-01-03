@@ -147,7 +147,7 @@ func (udt unionDiscriminatorTag) GetValidations(context Context, _ []string, pay
 func (udt unionDiscriminatorTag) Docs() TagDoc {
 	return TagDoc{
 		Tag:         udt.TagName(),
-		Contexts:    udt.ValidScopes().UnsortedList(),
+		Scopes:      udt.ValidScopes().UnsortedList(),
 		Description: "Indicates that this field is the discriminator for a union.",
 		Payloads: []TagPayloadDoc{{
 			Description: "<json-object>",
@@ -208,7 +208,7 @@ func (umt unionMemberTag) GetValidations(context Context, _ []string, payload st
 func (umt unionMemberTag) Docs() TagDoc {
 	return TagDoc{
 		Tag:         umt.TagName(),
-		Contexts:    umt.ValidScopes().UnsortedList(),
+		Scopes:      umt.ValidScopes().UnsortedList(),
 		Description: "Indicates that this field is a member of a union.",
 		Payloads: []TagPayloadDoc{{
 			Description: "<json-object>",

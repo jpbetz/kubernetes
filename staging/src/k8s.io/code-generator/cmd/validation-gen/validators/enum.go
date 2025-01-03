@@ -83,7 +83,7 @@ func (et *enumTag) GetValidations(context Context, _ []string, payload string) (
 func (et *enumTag) Docs() TagDoc {
 	return TagDoc{
 		Tag:         et.TagName(),
-		Contexts:    et.ValidScopes().UnsortedList(),
+		Scopes:      et.ValidScopes().UnsortedList(),
 		Description: "Indicates that a string type is an enum. All const values of this type are considered values in the enum.",
 	}
 }

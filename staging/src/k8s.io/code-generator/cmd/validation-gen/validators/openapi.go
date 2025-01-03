@@ -87,7 +87,7 @@ func getFormatValidationFunction(format string) (FunctionGen, error) {
 func (ft formatTag) Docs() TagDoc {
 	return TagDoc{
 		Tag:         ft.TagName(),
-		Contexts:    ft.ValidScopes().UnsortedList(),
+		Scopes:      ft.ValidScopes().UnsortedList(),
 		Description: "Indicates that a string field has a particular format.",
 		Payloads: []TagPayloadDoc{{
 			Description: "ip-sloppy",
@@ -142,7 +142,7 @@ func (maxLengthTag) GetValidations(context Context, _ []string, payload string) 
 func (mlt maxLengthTag) Docs() TagDoc {
 	return TagDoc{
 		Tag:         mlt.TagName(),
-		Contexts:    mlt.ValidScopes().UnsortedList(),
+		Scopes:      mlt.ValidScopes().UnsortedList(),
 		Description: "Indicates that a string field has a limit on its length.",
 		Payloads: []TagPayloadDoc{{
 			Description: "<non-negative integer>",
@@ -199,7 +199,7 @@ func (maxItemsTag) GetValidations(context Context, _ []string, payload string) (
 func (mit maxItemsTag) Docs() TagDoc {
 	return TagDoc{
 		Tag:         mit.TagName(),
-		Contexts:    mit.ValidScopes().UnsortedList(),
+		Scopes:      mit.ValidScopes().UnsortedList(),
 		Description: "Indicates that a list field has a limit on its size.",
 		Payloads: []TagPayloadDoc{
 			{

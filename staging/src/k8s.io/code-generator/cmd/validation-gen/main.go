@@ -121,7 +121,7 @@ func printDocs() {
 	docs = append(docs, validatorRegistry.Docs()...)
 	for i := range docs {
 		d := &docs[i]
-		slices.Sort(d.Contexts)
+		slices.Sort(d.Scopes)
 	}
 	slices.SortFunc(docs, func(a, b validators.TagDoc) int {
 		return cmp.Compare(a.Tag, b.Tag)

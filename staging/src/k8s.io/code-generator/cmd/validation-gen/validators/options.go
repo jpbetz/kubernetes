@@ -111,7 +111,7 @@ func (optionDeclarativeValidator) Docs() []TagDoc {
 	return []TagDoc{{
 		Tag:         fmt.Sprintf("%s(<option-name>)", ifOptionEnabledTag),
 		Description: "Declares a validation that only applies when an option is enabled.",
-		Contexts:    []Scope{ScopeType, ScopeField},
+		Scopes:      []Scope{ScopeType, ScopeField},
 		Payloads: []TagPayloadDoc{{
 			Description: "<validation-tag>",
 			Docs:        "This validation tag will be evaluated only if the validation option is enabled.",
@@ -119,7 +119,7 @@ func (optionDeclarativeValidator) Docs() []TagDoc {
 	}, {
 		Tag:         fmt.Sprintf("%s(<option-name>)", ifOptionDisabledTag),
 		Description: "Declares a validation that only applies when an option is disabled.",
-		Contexts:    []Scope{ScopeType, ScopeField},
+		Scopes:      []Scope{ScopeType, ScopeField},
 		Payloads: []TagPayloadDoc{{
 			Description: "<validation-tag>",
 			Docs:        "This validation tag will be evaluated only if the validation option is disabled.",

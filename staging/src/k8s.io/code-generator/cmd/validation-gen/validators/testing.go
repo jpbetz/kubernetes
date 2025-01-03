@@ -135,8 +135,8 @@ func (fixedResultTag) parseTagPayload(in string) (fixedResultPayload, error) {
 
 func (frt fixedResultTag) Docs() TagDoc {
 	doc := TagDoc{
-		Tag:      frt.TagName(),
-		Contexts: frt.ValidScopes().UnsortedList(),
+		Tag:    frt.TagName(),
+		Scopes: frt.ValidScopes().UnsortedList(),
 	}
 	if frt.error {
 		doc.Description = "Always fails code generation (useful for testing)."
