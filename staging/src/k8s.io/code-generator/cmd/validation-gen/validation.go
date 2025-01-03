@@ -577,7 +577,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			} else {
 				if !validations.Empty() {
 					klog.V(5).InfoS("found list-validations", "n", validations.Len())
-					child.elemValidations = validations
+					child.elemValidations.Add(validations)
 					if len(validations.Variables) > 0 {
 						return fmt.Errorf("%v: variable generation is not supported for list value validations", childPath)
 					}
@@ -638,7 +638,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			} else {
 				if !validations.Empty() {
 					klog.V(5).InfoS("found key-validations", "n", validations.Len())
-					child.keyValidations = validations
+					child.keyValidations.Add(validations)
 					if len(validations.Variables) > 0 {
 						return fmt.Errorf("%v: variable generation is not supported for map key validations", childPath)
 					}
@@ -655,7 +655,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			} else {
 				if !validations.Empty() {
 					klog.V(5).InfoS("found list-validations", "n", validations.Len())
-					child.elemValidations = validations
+					child.elemValidations.Add(validations)
 					if len(validations.Variables) > 0 {
 						return fmt.Errorf("%v: variable generation not supported for map value validations", childPath)
 					}
@@ -719,7 +719,7 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 		} else {
 			if !validations.Empty() {
 				klog.V(5).InfoS("found list-validations", "n", validations.Len())
-				child.elemValidations = validations
+				child.elemValidations.Add(validations)
 			}
 		}
 	case types.Map:
@@ -734,7 +734,7 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 		} else {
 			if !validations.Empty() {
 				klog.V(5).InfoS("found key-validations", "n", validations.Len())
-				child.keyValidations = validations
+				child.keyValidations.Add(validations)
 			}
 		}
 		// Extract any embedded val-validation rules.
@@ -748,7 +748,7 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 		} else {
 			if !validations.Empty() {
 				klog.V(5).InfoS("found val-validations", "n", validations.Len())
-				child.elemValidations = validations
+				child.elemValidations.Add(validations)
 			}
 		}
 	}
