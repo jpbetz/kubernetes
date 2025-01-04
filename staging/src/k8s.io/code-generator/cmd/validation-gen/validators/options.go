@@ -81,7 +81,10 @@ func (iotv ifOptionTagValidator) GetValidations(context Context, args []string, 
 
 func (iotv ifOptionTagValidator) Docs() TagDoc {
 	doc := TagDoc{
-		Tag:    iotv.TagName(),
+		Tag: iotv.TagName(),
+		Args: []TagArgDoc{{
+			Description: "<option>",
+		}},
 		Scopes: iotv.ValidScopes().UnsortedList(),
 	}
 

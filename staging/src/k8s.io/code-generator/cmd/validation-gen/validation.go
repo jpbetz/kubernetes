@@ -286,35 +286,39 @@ const (
 func builtinTagDocs() []validators.TagDoc {
 	return []validators.TagDoc{{
 		Tag:         eachKeyTag,
-		Description: "Declares a validation for map keys.",
+		Description: "Declares a validation for each key in a map.",
 		Scopes:      []validators.Scope{validators.ScopeType, validators.ScopeField},
 		Payloads: []validators.TagPayloadDoc{{
 			Description: "<validation-tag>",
-			Docs:        "This tag will be evaluated for each key of a map.",
+			Docs:        "The tag to evaluate for each key.",
 		}},
 	}, {
 		Tag:         eachValTag,
-		Description: "Declares a validation for map and slice values.",
+		Description: "Declares a validation for each value in a map or slice.",
 		Scopes:      []validators.Scope{validators.ScopeType, validators.ScopeField},
 		Payloads: []validators.TagPayloadDoc{{
 			Description: "<validation-tag>",
-			Docs:        "This tag will be evaluated for each value of a map or slice.",
+			Docs:        "The tag to evaluate for each value.",
 		}},
 	}, {
 		Tag:         listMapKeyTag,
-		Description: "Declares a named field of a list's value type as part of the list-map key.",
+		Description: "Declares a named field of a list's value-type to be part of the list-map key.",
 		Scopes:      []validators.Scope{validators.ScopeType, validators.ScopeField},
 		Payloads: []validators.TagPayloadDoc{{
 			Description: "<field-name>",
-			Docs:        "This values names a field of a list's value type.",
+			Docs:        "The name of the field.",
 		}},
 	}, {
-		Tag:         fmt.Sprintf("%s(<field-name>)", subfieldTag),
-		Description: "Declares a validation for a specified subfield of the struct. The subfield must be a direct field of the struct, or of an embedded struct",
+		Tag: subfieldTag,
+		Args: []validators.TagArgDoc{{
+			Description: "<field-name>",
+		}},
+		Description: "Declares a validation for a subfield of a struct.",
+		Docs:        "The named subfield must be a direct field of the struct, or of an embedded struct.",
 		Scopes:      []validators.Scope{validators.ScopeField},
 		Payloads: []validators.TagPayloadDoc{{
 			Description: "<validation-tag>",
-			Docs:        "This tag will be evaluated for the subfield of the struct.",
+			Docs:        "The tag to evaluate for the subfield.",
 		}},
 	}}
 }

@@ -151,8 +151,14 @@ type Context struct {
 type TagDoc struct {
 	// Tag is the tag name, without the leading '+'.
 	Tag string
+	// Args lists any arguments this tag might take.
+	Args []TagArgDoc
+	// Usage is how the tag is used, including arguments.
+	Usage string
 	// Description is a short description of this tag's purpose.
 	Description string
+	// Docs is a human-oriented string explaining this tag.
+	Docs string
 	// Scopes lists the place or places this tag may be used.
 	Scopes []Scope
 	// Payloads lists zero or more varieties of value for this tag. If this tag
@@ -161,20 +167,29 @@ type TagDoc struct {
 	Payloads []TagPayloadDoc
 }
 
-// TagPayloadDoc describes a value for a tag (e.g `+tagName=tagValue`).  Some
+// TagArgDoc describes an argument for a tag (e.g. `+tagName(tagArg)`.
+type TagArgDoc struct {
+	// Description is a short description of this arg (e.g. `<name>`).
+	Description string
+}
+
+// TagPayloadDoc describes a value for a tag (e.g. `+tagName=tagValue`).  Some
 // tags upport multiple payloads, including <none> (e.g. `+tagName`).
 type TagPayloadDoc struct {
+	// Description is a short description of this payload (e.g. `<number>`).
 	Description string
-	Docs        string             `json:",omitempty"`
-	Schema      []TagPayloadSchema `json:",omitempty"`
+	// Docs is a human-orientd string explaining this payload.
+	Docs string
+	// Schema details a JSON payload's contents.
+	Schema []TagPayloadSchema
 }
 
 // TagPayloadSchema describes a JSON tag payload.
 type TagPayloadSchema struct {
-	Key     string // required
-	Value   string // required
-	Docs    string `json:",omitempty"`
-	Default string `json:",omitempty"`
+	Key     string
+	Value   string
+	Docs    string
+	Default string
 }
 
 // Validations defines the function calls and variables to generate to perform validation.

@@ -118,6 +118,29 @@ func printDocs() {
 	for i := range docs {
 		d := &docs[i]
 		slices.Sort(d.Scopes)
+		if d.Usage == "" {
+			// Try to generate a usage string if none was provided.
+			usage := d.Tag
+			if len(d.Args) > 0 {
+				usage += "("
+				for i := range d.Args {
+					if i > 0 {
+						usage += ", "
+					}
+					usage += d.Args[i].Description
+				}
+				usage += ")"
+			}
+			if len(d.Payloads) > 0 {
+				usage += "="
+				if len(d.Payloads) == 1 {
+					usage += d.Payloads[0].Description
+				} else {
+					usage += "<payload>"
+				}
+			}
+			d.Usage = usage
+		}
 	}
 	slices.SortFunc(docs, func(a, b validators.TagDoc) int {
 		return cmp.Compare(a.Tag, b.Tag)
