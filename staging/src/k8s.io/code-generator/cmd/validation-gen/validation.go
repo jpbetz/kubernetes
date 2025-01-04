@@ -70,7 +70,7 @@ type genValidations struct {
 }
 
 // NewGenValidations cretes a new generator for the specified package.
-func NewGenValidations(outputFilename, outputPackage string, rootTypes []*types.Type, discovered *typeDiscoverer, inputToPkg map[string]string, validator validators.DeclarativeValidator, schemeRegistry types.Name) generator.Generator {
+func NewGenValidations(outputFilename, outputPackage string, rootTypes []*types.Type, discovered *typeDiscoverer, inputToPkg map[string]string, schemeRegistry types.Name) generator.Generator {
 	return &genValidations{
 		GoGenerator: generator.GoGenerator{
 			OutputFilename: outputFilename,
@@ -80,7 +80,6 @@ func NewGenValidations(outputFilename, outputPackage string, rootTypes []*types.
 		rootTypes:           rootTypes,
 		discovered:          discovered,
 		imports:             generator.NewImportTrackerForPackage(outputPackage),
-		validator:           validator,
 		hasValidationsCache: map[*typeNode]bool{},
 		schemeRegistry:      schemeRegistry,
 	}
