@@ -199,7 +199,6 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 
 		pkg := context.Universe[input]
 
-		declarativeValidator := validators.NewValidator(context)
 		schemeRegistry := schemeRegistryTag(pkg)
 
 		typesWith, found := extractTag(pkg.Comments)
@@ -255,7 +254,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 			return cmp.Compare(a.Name.String(), b.Name.String())
 		})
 
-		td := NewTypeDiscoverer(validatorRegistry, declarativeValidator, inputToPkg)
+		td := NewTypeDiscoverer(validatorRegistry, inputToPkg)
 		for _, t := range rootTypes {
 			klog.V(4).InfoS("pre-processing", "type", t)
 			if err := td.DiscoverType(t); err != nil {

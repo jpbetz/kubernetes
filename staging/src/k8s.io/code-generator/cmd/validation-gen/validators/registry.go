@@ -26,7 +26,6 @@ import (
 
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
-	"k8s.io/gengo/v2/types"
 )
 
 // This is the global registry of tag validators. For simplicity this is in
@@ -207,87 +206,4 @@ func RegisterTypeValidator(tv TypeValidator) {
 func InitGlobalValidatorRegistry(c *generator.Context) *ValidatorRegistry {
 	globalValidatorRegistry.init(c)
 	return globalValidatorRegistry
-}
-
-/* ---------------- */
-
-var registry = &Registry{}
-
-// ValidatorConfig defines the configuration provided DeclarativeValidatorInit functions.
-type ValidatorConfig struct {
-	// GeneratorContext provides gogen's generator Context.
-	GeneratorContext *generator.Context
-	// EmbedValidator provides a way to compose validations.
-	// For example, it is possible to define a validation such as "+myValidator=+format=IP" by using
-	// the EmbedValidator to extract the validation for "+format=IP" and use the resulting Validations
-	// to create the Validations returned by the "+myValidator" DeclarativeValidator.
-	// EmbedValidator.ExtractValidations() SHOULD NOT be called during init, since other validators may not have yet
-	// initialized and may not yet be registered for use as an embedded validator.
-	EmbedValidator DeclarativeValidator
-	// This is temporary until conversion is done.
-	ValidatorRegistry *ValidatorRegistry
-}
-
-type DeclarativeValidatorInit func(cfg *ValidatorConfig) DeclarativeValidator
-
-// AddToRegistry adds a DeclarativeValidator to the registry by providing the
-// registry with an initializer it can use to construct a DeclarativeValidator for each
-// generator context.
-func AddToRegistry(validator DeclarativeValidatorInit) {
-	registry.Add(validator)
-}
-
-type Registry struct {
-	inits []DeclarativeValidatorInit
-}
-
-func (r *Registry) Add(validator DeclarativeValidatorInit) {
-	r.inits = append(r.inits, validator)
-}
-
-func NewValidator(c *generator.Context) DeclarativeValidator {
-	composite := &compositeValidator{
-		validators: make([]DeclarativeValidator, 0, len(registry.inits)),
-	}
-	cfg := &ValidatorConfig{
-		GeneratorContext:  c,
-		EmbedValidator:    composite,
-		ValidatorRegistry: globalValidatorRegistry,
-	}
-	for _, init := range registry.inits {
-		composite.validators = append(composite.validators, init(cfg))
-	}
-	return composite
-}
-
-type compositeValidator struct {
-	validators []DeclarativeValidator
-}
-
-func (c *compositeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
-	var result Validations
-	for _, v := range c.validators {
-		validationGen, err := v.ExtractValidations(t, comments)
-		if err != nil {
-			return result, err
-		}
-		for _, f := range validationGen.Functions {
-			result.Functions = append(result.Functions, f)
-		}
-		for _, v := range validationGen.Variables {
-			result.Variables = append(result.Variables, v)
-		}
-		for _, v := range validationGen.Comments {
-			result.Comments = append(result.Comments, v)
-		}
-	}
-	return result, nil
-}
-
-func (c *compositeValidator) Docs() []TagDoc {
-	var result []TagDoc
-	for _, v := range c.validators {
-		result = append(result, v.Docs()...)
-	}
-	return result
 }

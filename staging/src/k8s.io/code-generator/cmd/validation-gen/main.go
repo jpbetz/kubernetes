@@ -113,11 +113,7 @@ func printDocs() {
 	// Initialize all registered validators.
 	validatorRegistry := validators.InitGlobalValidatorRegistry(c)
 
-	// This gets a composite validator which aggregates the many plugins.
-	validator := validators.NewValidator(c)
-
 	docs := builtinTagDocs()
-	docs = append(docs, validator.Docs()...)
 	docs = append(docs, validatorRegistry.Docs()...)
 	for i := range docs {
 		d := &docs[i]

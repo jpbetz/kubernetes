@@ -64,7 +64,6 @@ type genValidations struct {
 	rootTypes           []*types.Type
 	discovered          *typeDiscoverer
 	imports             namer.ImportTracker
-	validator           validators.DeclarativeValidator
 	hasValidationsCache map[*typeNode]bool
 	schemeRegistry      types.Name
 }
@@ -208,7 +207,6 @@ func (g *genValidations) hasValidationsMiss(n *typeNode, seen map[*typeNode]bool
 // typeDiscoverer contains fields necessary to build graphs of types.
 type typeDiscoverer struct {
 	validatorRegistry *validators.ValidatorRegistry
-	validator         validators.DeclarativeValidator // legacy
 	inputToPkg        map[string]string
 
 	// typeNodes holds a map of gengo Type to typeNode for all of the types
@@ -217,10 +215,9 @@ type typeDiscoverer struct {
 }
 
 // NewTypeDiscoverer creates and initializes a NewTypeDiscoverer.
-func NewTypeDiscoverer(validatorRegistry *validators.ValidatorRegistry, validator validators.DeclarativeValidator, inputToPkg map[string]string) *typeDiscoverer {
+func NewTypeDiscoverer(validatorRegistry *validators.ValidatorRegistry, inputToPkg map[string]string) *typeDiscoverer {
 	return &typeDiscoverer{
 		validatorRegistry: validatorRegistry,
-		validator:         validator,
 		inputToPkg:        inputToPkg,
 		typeNodes:         map[*types.Type]*typeNode{},
 	}
@@ -459,15 +456,6 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 			thisNode.typeValidations.Add(validations)
 		}
 	}
-	// legacy
-	if validations, err := td.validator.ExtractValidations(t, t.CommentLines); err != nil {
-		return nil, fmt.Errorf("%v: %w", fldPath, err)
-	} else {
-		if !validations.Empty() {
-			klog.V(5).InfoS("found type-attached validations", "n", validations.Len())
-			thisNode.typeValidations.Add(validations)
-		}
-	}
 
 	return thisNode, nil
 }
@@ -550,18 +538,6 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 				}
 			}
 		}
-		// legacy
-		if validations, err := td.validator.ExtractValidations(memb.Type, memb.CommentLines); err != nil {
-			return fmt.Errorf("field %s: %w", childPath.String(), err)
-		} else {
-			if !validations.Empty() {
-				klog.V(5).InfoS("found field-attached validations", "n", validations.Len())
-				child.fieldValidations.Add(validations)
-				if len(validations.Variables) > 0 {
-					return fmt.Errorf("%v: variable generation is not supported for field validations", childPath)
-				}
-			}
-		}
 
 		// Add any other field-attached "special" validators.
 		switch childType.Kind {
@@ -572,7 +548,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 				Type:   childType.Elem,
 				Parent: memb.Type,
 			}
-			if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, memb.CommentLines, childType.Elem); err != nil {
+			if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, memb.CommentLines); err != nil {
 				return fmt.Errorf("%v: %w", childPath.Key("vals"), err)
 			} else {
 				if !validations.Empty() {
@@ -633,7 +609,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 				Type:   childType.Key,
 				Parent: memb.Type,
 			}
-			if validations, err := td.extractEmbeddedValidations(eachKeyTag, keyCtxt, memb.CommentLines, childType.Key); err != nil {
+			if validations, err := td.extractEmbeddedValidations(eachKeyTag, keyCtxt, memb.CommentLines); err != nil {
 				return fmt.Errorf("%v: %w", childPath.Key("keys"), err)
 			} else {
 				if !validations.Empty() {
@@ -650,7 +626,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 				Type:   childType.Elem,
 				Parent: memb.Type,
 			}
-			if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, memb.CommentLines, childType.Elem); err != nil {
+			if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, memb.CommentLines); err != nil {
 				return fmt.Errorf("%v: %w", childPath.Key("vals"), err)
 			} else {
 				if !validations.Empty() {
@@ -714,7 +690,7 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 			Type:   underlying.Elem,
 			Parent: underlying,
 		}
-		if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, thisNode.valueType.CommentLines, underlying); err != nil {
+		if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, thisNode.valueType.CommentLines); err != nil {
 			return fmt.Errorf("%v: %w", fldPath.Key("vals"), err)
 		} else {
 			if !validations.Empty() {
@@ -729,7 +705,7 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 			Type:   underlying.Key,
 			Parent: underlying,
 		}
-		if validations, err := td.extractEmbeddedValidations(eachKeyTag, keyCtxt, thisNode.valueType.CommentLines, underlying); err != nil {
+		if validations, err := td.extractEmbeddedValidations(eachKeyTag, keyCtxt, thisNode.valueType.CommentLines); err != nil {
 			return fmt.Errorf("%v: %w", fldPath.Key("keys"), err)
 		} else {
 			if !validations.Empty() {
@@ -743,7 +719,7 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 			Type:   underlying.Elem,
 			Parent: underlying,
 		}
-		if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, thisNode.valueType.CommentLines, underlying); err != nil {
+		if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, thisNode.valueType.CommentLines); err != nil {
 			return fmt.Errorf("%v: %w", fldPath.Key("vals"), err)
 		} else {
 			if !validations.Empty() {
@@ -756,19 +732,12 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 	return nil
 }
 
-// FIXME: drop the `t` arg when converted.
-func (td *typeDiscoverer) extractEmbeddedValidations(tag string, context validators.Context, comments []string, t *types.Type) (validators.Validations, error) {
+func (td *typeDiscoverer) extractEmbeddedValidations(tag string, context validators.Context, comments []string) (validators.Validations, error) {
 	var result validators.Validations
 	if tagVals, found := gengo.ExtractCommentTags("+", comments)[tag]; found {
 		for _, tagVal := range tagVals {
 			fakeComments := []string{tagVal}
 			if validations, err := td.validatorRegistry.ExtractValidations(context, fakeComments); err != nil {
-				return result, err
-			} else {
-				result.Add(validations)
-			}
-			// legacy
-			if validations, err := td.validator.ExtractValidations(t, fakeComments); err != nil {
 				return result, err
 			} else {
 				result.Add(validations)
@@ -1655,14 +1624,6 @@ func (td *typeDiscoverer) extractSubfieldValidations(context validators.Context,
 			// Extract any embedded validation rules.
 			fakeComments := []string{tagVal}
 			if subfieldValidations, err := td.validatorRegistry.ExtractValidations(context, fakeComments); err != nil {
-				return result, err
-			} else {
-				if !subfieldValidations.Empty() {
-					result.Add(subfieldValidations)
-				}
-			}
-			//legacy
-			if subfieldValidations, err := td.validator.ExtractValidations(context.Type, fakeComments); err != nil {
 				return result, err
 			} else {
 				if !subfieldValidations.Empty() {

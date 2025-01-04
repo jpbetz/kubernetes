@@ -177,19 +177,6 @@ type TagPayloadSchema struct {
 	Default string `json:",omitempty"`
 }
 
-// DeclarativeValidator is able to extract validation function generators from
-// types.go files.
-// legacy
-type DeclarativeValidator interface {
-	// ExtractValidations returns a Validations for the validation this DeclarativeValidator
-	// supports for the given go type, and it's corresponding comment strings.
-	ExtractValidations(t *types.Type, comments []string) (Validations, error)
-
-	// Docs returns user-friendly documentation for all of the tags that this
-	// validator supports.
-	Docs() []TagDoc
-}
-
 // Validations defines the function calls and variables to generate to perform validation.
 type Validations struct {
 	Functions []FunctionGen
