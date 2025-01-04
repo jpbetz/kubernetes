@@ -19,110 +19,84 @@ package validators
 import (
 	"fmt"
 
-	"k8s.io/gengo/v2"
-	"k8s.io/gengo/v2/types"
+	"k8s.io/apimachinery/pkg/util/sets"
 )
-
-func init() {
-	AddToRegistry(InitOptionDeclarativeValidator)
-}
-
-func InitOptionDeclarativeValidator(cfg *ValidatorConfig) DeclarativeValidator {
-	return &optionDeclarativeValidator{cfg: cfg}
-}
-
-type optionDeclarativeValidator struct {
-	cfg *ValidatorConfig
-}
 
 const (
 	ifOptionEnabledTag  = "k8s:ifOptionEnabled"
 	ifOptionDisabledTag = "k8s:ifOptionDisabled"
 )
 
-func (o optionDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
-	tags, err := gengo.ExtractFunctionStyleCommentTags("+", []string{ifOptionEnabledTag, ifOptionDisabledTag}, comments)
-	if err != nil {
-		return Validations{}, err
-	}
-
-	enabledTags, hasEnabledTags := tags[ifOptionEnabledTag]
-	disabledTags, hasDisabledTags := tags[ifOptionDisabledTag]
-	if !hasEnabledTags && !hasDisabledTags {
-		return Validations{}, nil
-	}
-
-	var functions []FunctionGen
-	var variables []VariableGen
-	for _, v := range enabledTags {
-		optionName, validations, err := o.parseIfOptionsTag(t, v)
-		if err != nil {
-			return Validations{}, err
-		}
-		for _, fn := range validations.Functions {
-			functions = append(functions, WithCondition(fn, Conditions{OptionEnabled: optionName}))
-		}
-		variables = append(variables, validations.Variables...)
-	}
-	for _, v := range disabledTags {
-		optionName, validations, err := o.parseIfOptionsTag(t, v)
-		if err != nil {
-			return Validations{}, err
-		}
-		for _, fn := range validations.Functions {
-			functions = append(functions, WithCondition(fn, Conditions{OptionDisabled: optionName}))
-		}
-		variables = append(variables, validations.Variables...)
-	}
-	return Validations{
-		Functions: functions,
-		Variables: variables,
-	}, nil
+func init() {
+	RegisterTagValidator(&ifOptionTagValidator{true, nil})
+	RegisterTagValidator(&ifOptionTagValidator{false, nil})
 }
 
-func (o optionDeclarativeValidator) parseIfOptionsTag(t *types.Type, tag gengo.Tag) (string, Validations, error) {
-	if len(tag.Args) != 1 {
-		return "", Validations{}, fmt.Errorf("tag %q requires 1 argument", tag.Name)
+type ifOptionTagValidator struct {
+	enabled           bool
+	validatorRegistry *ValidatorRegistry
+}
+
+func (iotv *ifOptionTagValidator) Init(cfg Config) {
+	iotv.validatorRegistry = cfg.ValidatorRegistry
+}
+
+func (iotv ifOptionTagValidator) TagName() string {
+	if iotv.enabled {
+		return ifOptionEnabledTag
 	}
+	return ifOptionDisabledTag
+}
+
+var ifOptionTagValidScopes = sets.New(ScopeAny)
+
+func (ifOptionTagValidator) ValidScopes() sets.Set[Scope] {
+	return ifOptionTagValidScopes
+}
+
+func (iotv ifOptionTagValidator) GetValidations(context Context, args []string, payload string) (Validations, error) {
+	if len(args) != 1 {
+		return Validations{}, fmt.Errorf("takes exactly 1 argument")
+	}
+	optionName := args[0]
 
 	result := Validations{}
-	fakeComments := []string{tag.Value}
 
-	//FIXME: Use the real context once converted
-	context := Context{
-		Scope: ScopeType,
-		Type:  t,
-	}
-	if validations, err := o.cfg.ValidatorRegistry.ExtractValidations(context, fakeComments); err != nil {
-		return "", Validations{}, err
+	fakeComments := []string{payload}
+	if validations, err := iotv.validatorRegistry.ExtractValidations(context, fakeComments); err != nil {
+		return Validations{}, err
 	} else {
-		result.Add(validations)
+		for _, fn := range validations.Functions {
+			if iotv.enabled {
+				result.Functions = append(result.Functions, WithCondition(fn, Conditions{OptionEnabled: optionName}))
+			} else {
+				result.Functions = append(result.Functions, WithCondition(fn, Conditions{OptionDisabled: optionName}))
+			}
+			result.Variables = append(result.Variables, validations.Variables...)
+		}
+		return result, nil
 	}
-	// legacy
-	if validations, err := o.cfg.EmbedValidator.ExtractValidations(t, fakeComments); err != nil {
-		return "", Validations{}, err
-	} else {
-		result.Add(validations)
-	}
-	return tag.Args[0], result, nil
+
 }
 
-func (optionDeclarativeValidator) Docs() []TagDoc {
-	return []TagDoc{{
-		Tag:         fmt.Sprintf("%s(<option-name>)", ifOptionEnabledTag),
-		Description: "Declares a validation that only applies when an option is enabled.",
-		Scopes:      []Scope{ScopeType, ScopeField},
-		Payloads: []TagPayloadDoc{{
+func (iotv ifOptionTagValidator) Docs() TagDoc {
+	doc := TagDoc{
+		Tag:    iotv.TagName(),
+		Scopes: iotv.ValidScopes().UnsortedList(),
+	}
+
+	if iotv.enabled {
+		doc.Description = "Declares a validation that only applies when an option is enabled."
+		doc.Payloads = []TagPayloadDoc{{
 			Description: "<validation-tag>",
 			Docs:        "This validation tag will be evaluated only if the validation option is enabled.",
-		}},
-	}, {
-		Tag:         fmt.Sprintf("%s(<option-name>)", ifOptionDisabledTag),
-		Description: "Declares a validation that only applies when an option is disabled.",
-		Scopes:      []Scope{ScopeType, ScopeField},
-		Payloads: []TagPayloadDoc{{
+		}}
+	} else {
+		doc.Description = "Declares a validation that only applies when an option is disabled."
+		doc.Payloads = []TagPayloadDoc{{
 			Description: "<validation-tag>",
 			Docs:        "This validation tag will be evaluated only if the validation option is disabled.",
-		}},
-	}}
+		}}
+	}
+	return doc
 }
