@@ -191,7 +191,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 	context.Order = orderer.OrderUniverse(context.Universe)
 
 	// Initialize all validator plugins exactly once.
-	validatorRegistry := validators.InitGlobalValidatorRegistry(context)
+	validator := validators.InitGlobalRegistry(context)
 
 	// Build a cache of type->callNode for every type we need.
 	for _, input := range context.Inputs {
@@ -254,7 +254,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 			return cmp.Compare(a.Name.String(), b.Name.String())
 		})
 
-		td := NewTypeDiscoverer(validatorRegistry, inputToPkg)
+		td := NewTypeDiscoverer(validator, inputToPkg)
 		for _, t := range rootTypes {
 			klog.V(4).InfoS("pre-processing", "type", t)
 			if err := td.DiscoverType(t); err != nil {

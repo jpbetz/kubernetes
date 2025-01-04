@@ -33,12 +33,12 @@ func init() {
 }
 
 type ifOptionTagValidator struct {
-	enabled           bool
-	validatorRegistry *ValidatorRegistry
+	enabled   bool
+	validator *Registry
 }
 
 func (iotv *ifOptionTagValidator) Init(cfg Config) {
-	iotv.validatorRegistry = cfg.ValidatorRegistry
+	iotv.validator = cfg.Registry
 }
 
 func (iotv ifOptionTagValidator) TagName() string {
@@ -63,7 +63,7 @@ func (iotv ifOptionTagValidator) GetValidations(context Context, args []string, 
 	result := Validations{}
 
 	fakeComments := []string{payload}
-	if validations, err := iotv.validatorRegistry.ExtractValidations(context, fakeComments); err != nil {
+	if validations, err := iotv.validator.ExtractValidations(context, fakeComments); err != nil {
 		return Validations{}, err
 	} else {
 		for _, fn := range validations.Functions {

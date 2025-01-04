@@ -30,12 +30,12 @@ import (
 
 // This is the global registry of tag validators. For simplicity this is in
 // the same package as the implementations, but it should not be used directly.
-var globalValidatorRegistry = &ValidatorRegistry{
+var globalRegistry = &Registry{
 	tagValidators: map[string]TagValidator{},
 }
 
-// ValidatorRegistry holds a list of registered tags.
-type ValidatorRegistry struct {
+// Registry holds a list of registered tags.
+type Registry struct {
 	lock        sync.Mutex
 	initialized atomic.Bool // init() was called
 
@@ -45,43 +45,43 @@ type ValidatorRegistry struct {
 	tagIndex      []string                // all tag names
 }
 
-func (reg *ValidatorRegistry) addTagValidator(tv TagValidator) {
+func (reg *Registry) addTagValidator(tv TagValidator) {
 	if reg.initialized.Load() {
-		panic("ValidatorRegistry was modified after init")
+		panic("Registry was modified after init")
 	}
 
 	reg.lock.Lock()
 	defer reg.lock.Unlock()
 
 	name := tv.TagName()
-	if _, exists := globalValidatorRegistry.tagValidators[name]; exists {
+	if _, exists := globalRegistry.tagValidators[name]; exists {
 		panic(fmt.Sprintf("tag %q was registered twice", name))
 	}
-	globalValidatorRegistry.tagValidators[name] = tv
+	globalRegistry.tagValidators[name] = tv
 }
 
-func (reg *ValidatorRegistry) addTypeValidator(tv TypeValidator) {
+func (reg *Registry) addTypeValidator(tv TypeValidator) {
 	if reg.initialized.Load() {
-		panic("ValidatorRegistry was modified after init")
+		panic("Registry was modified after init")
 	}
 
 	reg.lock.Lock()
 	defer reg.lock.Unlock()
 
-	globalValidatorRegistry.typeValidators = append(globalValidatorRegistry.typeValidators, tv)
+	globalRegistry.typeValidators = append(globalRegistry.typeValidators, tv)
 }
 
-func (reg *ValidatorRegistry) init(c *generator.Context) {
+func (reg *Registry) init(c *generator.Context) {
 	if reg.initialized.Load() {
-		panic("ValidatorRegistry.init() was called twice")
+		panic("Registry.init() was called twice")
 	}
 
 	reg.lock.Lock()
 	defer reg.lock.Unlock()
 
 	cfg := Config{
-		GengoContext:      c,
-		ValidatorRegistry: reg,
+		GengoContext: c,
+		Registry:     reg,
 	}
 
 	for _, tv := range reg.typeValidators {
@@ -91,7 +91,7 @@ func (reg *ValidatorRegistry) init(c *generator.Context) {
 		return cmp.Compare(a.Name(), b.Name())
 	})
 
-	for _, tv := range globalValidatorRegistry.tagValidators {
+	for _, tv := range globalRegistry.tagValidators {
 		reg.tagIndex = append(reg.tagIndex, tv.TagName())
 		tv.Init(cfg)
 	}
@@ -106,9 +106,9 @@ func (reg *ValidatorRegistry) init(c *generator.Context) {
 // found in the associated comment block.  Any matching validators produce zero
 // or more validations, which will later be rendered by the code-generation
 // logic.
-func (reg *ValidatorRegistry) ExtractValidations(context Context, comments []string) (Validations, error) {
+func (reg *Registry) ExtractValidations(context Context, comments []string) (Validations, error) {
 	if !reg.initialized.Load() {
-		panic("ValidatorRegistry.init() was not called")
+		panic("Registry.init() was not called")
 	}
 
 	validations := Validations{}
@@ -179,7 +179,7 @@ func (reg *ValidatorRegistry) ExtractValidations(context Context, comments []str
 }
 
 // Docs returns documentation for each tag in this registry.
-func (reg *ValidatorRegistry) Docs() []TagDoc {
+func (reg *Registry) Docs() []TagDoc {
 	var result []TagDoc
 	for _, k := range reg.tagIndex {
 		v := reg.tagValidators[k]
@@ -191,19 +191,19 @@ func (reg *ValidatorRegistry) Docs() []TagDoc {
 // RegisterTagValidator must be called by any validator which wants to run when
 // a specific tag is found.
 func RegisterTagValidator(tv TagValidator) {
-	globalValidatorRegistry.addTagValidator(tv)
+	globalRegistry.addTagValidator(tv)
 }
 
 // RegisterTypeValidator must be called by any validator which wants to run
 // against every type definition.
 func RegisterTypeValidator(tv TypeValidator) {
-	globalValidatorRegistry.addTypeValidator(tv)
+	globalRegistry.addTypeValidator(tv)
 }
 
-// InitGlobalValidatorRegistry must be called exactly once by the main
+// InitGlobalRegistry must be called exactly once by the main
 // application to initialize and safely access the global tag registry.  Once
 // this is called, no more validators may be registered.
-func InitGlobalValidatorRegistry(c *generator.Context) *ValidatorRegistry {
-	globalValidatorRegistry.init(c)
-	return globalValidatorRegistry
+func InitGlobalRegistry(c *generator.Context) *Registry {
+	globalRegistry.init(c)
+	return globalRegistry
 }
