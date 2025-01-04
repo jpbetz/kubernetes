@@ -191,7 +191,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 	context.Order = orderer.OrderUniverse(context.Universe)
 
 	// Initialize all validator plugins exactly once.
-	validator := validators.InitGlobalRegistry(context)
+	validator := validators.InitGlobalValidator(context)
 
 	// Build a cache of type->callNode for every type we need.
 	for _, input := range context.Inputs {

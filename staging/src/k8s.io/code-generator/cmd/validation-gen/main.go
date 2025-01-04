@@ -111,7 +111,7 @@ func printDocs() {
 	}
 
 	// Initialize all registered validators.
-	validator := validators.InitGlobalRegistry(c)
+	validator := validators.InitGlobalValidator(c)
 
 	docs := builtinTagDocs()
 	docs = append(docs, validator.Docs()...)

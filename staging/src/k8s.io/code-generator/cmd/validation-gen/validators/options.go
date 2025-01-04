@@ -34,11 +34,11 @@ func init() {
 
 type ifOptionTagValidator struct {
 	enabled   bool
-	validator *Registry
+	validator Validator
 }
 
 func (iotv *ifOptionTagValidator) Init(cfg Config) {
-	iotv.validator = cfg.Registry
+	iotv.validator = cfg.Validator
 }
 
 func (iotv ifOptionTagValidator) TagName() string {

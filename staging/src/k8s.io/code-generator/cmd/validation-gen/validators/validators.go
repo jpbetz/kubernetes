@@ -67,7 +67,7 @@ type Config struct {
 	// to look up all sorts of other information.
 	GengoContext *generator.Context
 
-	// Registry provides a way to compose validations.
+	// Validator provides a way to compose validations.
 	//
 	// For example, it is possible to define a validation such as
 	// "+myValidator=+format=IP" by using the registry to extract the
@@ -76,7 +76,7 @@ type Config struct {
 	//
 	// This field MUST NOT be used during init, since other validators may not
 	// be initialized yet.
-	Registry *Registry
+	Validator Validator
 }
 
 // Scope describes where a validation (or potential validation) is located.

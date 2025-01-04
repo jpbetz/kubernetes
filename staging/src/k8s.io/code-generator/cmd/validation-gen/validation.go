@@ -206,7 +206,7 @@ func (g *genValidations) hasValidationsMiss(n *typeNode, seen map[*typeNode]bool
 
 // typeDiscoverer contains fields necessary to build graphs of types.
 type typeDiscoverer struct {
-	validator  *validators.Registry
+	validator  validators.Validator
 	inputToPkg map[string]string
 
 	// typeNodes holds a map of gengo Type to typeNode for all of the types
@@ -215,7 +215,7 @@ type typeDiscoverer struct {
 }
 
 // NewTypeDiscoverer creates and initializes a NewTypeDiscoverer.
-func NewTypeDiscoverer(validator *validators.Registry, inputToPkg map[string]string) *typeDiscoverer {
+func NewTypeDiscoverer(validator validators.Validator, inputToPkg map[string]string) *typeDiscoverer {
 	return &typeDiscoverer{
 		validator:  validator,
 		inputToPkg: inputToPkg,

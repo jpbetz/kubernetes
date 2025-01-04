@@ -30,12 +30,12 @@ import (
 
 // This is the global registry of tag validators. For simplicity this is in
 // the same package as the implementations, but it should not be used directly.
-var globalRegistry = &Registry{
+var globalRegistry = &registry{
 	tagValidators: map[string]TagValidator{},
 }
 
-// Registry holds a list of registered tags.
-type Registry struct {
+// registry holds a list of registered tags.
+type registry struct {
 	lock        sync.Mutex
 	initialized atomic.Bool // init() was called
 
@@ -45,9 +45,9 @@ type Registry struct {
 	tagIndex      []string                // all tag names
 }
 
-func (reg *Registry) addTagValidator(tv TagValidator) {
+func (reg *registry) addTagValidator(tv TagValidator) {
 	if reg.initialized.Load() {
-		panic("Registry was modified after init")
+		panic("registry was modified after init")
 	}
 
 	reg.lock.Lock()
@@ -60,9 +60,9 @@ func (reg *Registry) addTagValidator(tv TagValidator) {
 	globalRegistry.tagValidators[name] = tv
 }
 
-func (reg *Registry) addTypeValidator(tv TypeValidator) {
+func (reg *registry) addTypeValidator(tv TypeValidator) {
 	if reg.initialized.Load() {
-		panic("Registry was modified after init")
+		panic("registry was modified after init")
 	}
 
 	reg.lock.Lock()
@@ -71,9 +71,9 @@ func (reg *Registry) addTypeValidator(tv TypeValidator) {
 	globalRegistry.typeValidators = append(globalRegistry.typeValidators, tv)
 }
 
-func (reg *Registry) init(c *generator.Context) {
+func (reg *registry) init(c *generator.Context) {
 	if reg.initialized.Load() {
-		panic("Registry.init() was called twice")
+		panic("registry.init() was called twice")
 	}
 
 	reg.lock.Lock()
@@ -81,7 +81,7 @@ func (reg *Registry) init(c *generator.Context) {
 
 	cfg := Config{
 		GengoContext: c,
-		Registry:     reg,
+		Validator:    reg,
 	}
 
 	for _, tv := range reg.typeValidators {
@@ -106,9 +106,9 @@ func (reg *Registry) init(c *generator.Context) {
 // found in the associated comment block.  Any matching validators produce zero
 // or more validations, which will later be rendered by the code-generation
 // logic.
-func (reg *Registry) ExtractValidations(context Context, comments []string) (Validations, error) {
+func (reg *registry) ExtractValidations(context Context, comments []string) (Validations, error) {
 	if !reg.initialized.Load() {
-		panic("Registry.init() was not called")
+		panic("registry.init() was not called")
 	}
 
 	validations := Validations{}
@@ -179,7 +179,7 @@ func (reg *Registry) ExtractValidations(context Context, comments []string) (Val
 }
 
 // Docs returns documentation for each tag in this registry.
-func (reg *Registry) Docs() []TagDoc {
+func (reg *registry) Docs() []TagDoc {
 	var result []TagDoc
 	for _, k := range reg.tagIndex {
 		v := reg.tagValidators[k]
@@ -200,10 +200,24 @@ func RegisterTypeValidator(tv TypeValidator) {
 	globalRegistry.addTypeValidator(tv)
 }
 
-// InitGlobalRegistry must be called exactly once by the main
-// application to initialize and safely access the global tag registry.  Once
-// this is called, no more validators may be registered.
-func InitGlobalRegistry(c *generator.Context) *Registry {
+// Validator represents an aggregation of validator plugins.
+type Validator interface {
+	// ExtractValidations considers the given context (e.g. a type definition) and
+	// evaluates registered validators.  This includes type validators (which run
+	// against all types) and tag validators which run only if a specific tag is
+	// found in the associated comment block.  Any matching validators produce zero
+	// or more validations, which will later be rendered by the code-generation
+	// logic.
+	ExtractValidations(context Context, comments []string) (Validations, error)
+
+	// Docs returns documentation for each known tag.
+	Docs() []TagDoc
+}
+
+// InitGlobalValidator must be called exactly once by the main application to
+// initialize and safely access the global tag registry.  Once this is called,
+// no more validators may be registered.
+func InitGlobalValidator(c *generator.Context) Validator {
 	globalRegistry.init(c)
 	return globalRegistry
 }
