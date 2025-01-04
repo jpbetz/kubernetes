@@ -24,9 +24,8 @@ import (
 
 // TagValidator describes a single validation tag and how to use it.
 type TagValidator interface {
-	// Init initializes the tag implementation.  This will be called exactly
-	// once.
-	Init(c *generator.Context)
+	// Init initializes the implementation.  This will be called exactly once.
+	Init(cfg Config)
 
 	// TagName returns the full tag name (without the "marker" prefix) for this
 	// tag.
@@ -44,7 +43,7 @@ type TagValidator interface {
 
 type TypeValidator interface {
 	// Init initializes the implementation.  This will be called exactly once.
-	Init(c *generator.Context)
+	Init(cfg Config)
 
 	// Name returns a unique name for this validator.  This is used for sorting
 	// and logging.
@@ -60,6 +59,24 @@ type TypeValidator interface {
 	// realType will be the underlying type and the parentType will be the
 	// newly defined type (the Kind field will be `types.Alias`).
 	GetValidations(realType, parentType *types.Type) (Validations, error)
+}
+
+// Config carries optional configuration information for use by validators.
+type Config struct {
+	// GengoContext provides gengo's generator Context.  This allows validators
+	// to look up all sorts of other information.
+	GengoContext *generator.Context
+
+	// ValidatorRegistry provides a way to compose validations.
+	//
+	// For example, it is possible to define a validation such as
+	// "+myValidator=+format=IP" by using the registry to extract the
+	// validation for the embedded "+format=IP" and use those to
+	// create the final Validations returned by the "+myValidator" tag.
+	//
+	// This field MUST NOT be used during init, since other validators may not
+	// be initialized yet.
+	ValidatorRegistry *ValidatorRegistry
 }
 
 // Scope describes where a validation (or potential validation) is located.

@@ -80,8 +80,13 @@ func (reg *ValidatorRegistry) init(c *generator.Context) {
 	reg.lock.Lock()
 	defer reg.lock.Unlock()
 
+	cfg := Config{
+		GengoContext:      c,
+		ValidatorRegistry: reg,
+	}
+
 	for _, tv := range reg.typeValidators {
-		tv.Init(c)
+		tv.Init(cfg)
 	}
 	slices.SortFunc(reg.typeValidators, func(a, b TypeValidator) int {
 		return cmp.Compare(a.Name(), b.Name())
@@ -89,7 +94,7 @@ func (reg *ValidatorRegistry) init(c *generator.Context) {
 
 	for _, tv := range globalValidatorRegistry.tagValidators {
 		reg.tagIndex = append(reg.tagIndex, tv.TagName())
-		tv.Init(c)
+		tv.Init(cfg)
 	}
 	sort.Strings(reg.tagIndex)
 

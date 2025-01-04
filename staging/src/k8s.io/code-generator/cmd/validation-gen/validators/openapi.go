@@ -21,7 +21,6 @@ import (
 	"strconv"
 
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
 )
 
@@ -39,7 +38,7 @@ func init() {
 
 type formatTagValidator struct{}
 
-func (formatTagValidator) Init(_ *generator.Context) {}
+func (formatTagValidator) Init(_ Config) {}
 
 func (formatTagValidator) TagName() string {
 	return formatTagName
@@ -101,7 +100,7 @@ func (ftv formatTagValidator) Docs() TagDoc {
 
 type maxLengthTagValidator struct{}
 
-func (maxLengthTagValidator) Init(_ *generator.Context) {}
+func (maxLengthTagValidator) Init(_ Config) {}
 
 func (maxLengthTagValidator) TagName() string {
 	return maxLengthTagName
@@ -153,7 +152,7 @@ func (mltv maxLengthTagValidator) Docs() TagDoc {
 
 type maxItemsTagValidator struct{}
 
-func (maxItemsTagValidator) Init(_ *generator.Context) {}
+func (maxItemsTagValidator) Init(_ Config) {}
 
 func (maxItemsTagValidator) TagName() string {
 	return maxItemsTagName

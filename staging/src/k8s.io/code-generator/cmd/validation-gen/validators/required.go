@@ -20,7 +20,6 @@ import (
 	"fmt"
 
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
 )
 
@@ -49,7 +48,7 @@ const (
 	requirednessForbidden requirednessMode = forbiddenTagName
 )
 
-func (requirednessTagValidator) Init(_ *generator.Context) {}
+func (requirednessTagValidator) Init(_ Config) {}
 
 func (rtv requirednessTagValidator) TagName() string {
 	return string(rtv.mode)

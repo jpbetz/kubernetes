@@ -39,8 +39,8 @@ type enumTagValidator struct {
 	enumContext *enumContext
 }
 
-func (etv *enumTagValidator) Init(c *generator.Context) {
-	etv.enumContext = newEnumContext(c)
+func (etv *enumTagValidator) Init(cfg Config) {
+	etv.enumContext = newEnumContext(cfg.GengoContext)
 }
 
 func (enumTagValidator) TagName() string {

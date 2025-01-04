@@ -22,7 +22,6 @@ import (
 	"slices"
 
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/parser/tags"
 	"k8s.io/gengo/v2/types"
 )
@@ -47,7 +46,7 @@ type unionTypeValidator struct {
 	shared map[*types.Type]unions
 }
 
-func (unionTypeValidator) Init(_ *generator.Context) {}
+func (unionTypeValidator) Init(_ Config) {}
 
 func (unionTypeValidator) Name() string {
 	return "unionTypeValidator"
@@ -107,7 +106,7 @@ type unionDiscriminatorTagValidator struct {
 	shared map[*types.Type]unions
 }
 
-func (unionDiscriminatorTagValidator) Init(_ *generator.Context) {}
+func (unionDiscriminatorTagValidator) Init(_ Config) {}
 
 func (unionDiscriminatorTagValidator) TagName() string {
 	return unionDiscriminatorTagName
@@ -165,7 +164,7 @@ type unionMemberTagValidator struct {
 	shared map[*types.Type]unions
 }
 
-func (unionMemberTagValidator) Init(_ *generator.Context) {}
+func (unionMemberTagValidator) Init(_ Config) {}
 
 func (unionMemberTagValidator) TagName() string {
 	return unionMemberTagName

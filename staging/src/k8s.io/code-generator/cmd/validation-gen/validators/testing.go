@@ -22,7 +22,6 @@ import (
 	"strings"
 
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
 )
 
@@ -46,7 +45,7 @@ type fixedResultTagValidator struct {
 	error  bool
 }
 
-func (fixedResultTagValidator) Init(_ *generator.Context) {}
+func (fixedResultTagValidator) Init(_ Config) {}
 
 func (frtv fixedResultTagValidator) TagName() string {
 	if frtv.error {
