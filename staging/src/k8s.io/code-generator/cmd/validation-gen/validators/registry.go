@@ -130,8 +130,39 @@ func (reg *ValidatorRegistry) ExtractValidations(context Context, comments []str
 	if err != nil {
 		return Validations{}, fmt.Errorf("failed to parse tags: %w", err)
 	}
+
+	// Sort tags before collecting validations.
+	//
+	// It makes more sense to sort here, rather than when emitting because:
+	//
+	// Consider a type or field with the following comments:
+	//
+	//    // +k8s:validateFalse="111"
+	//    // +k8s:validateFalse="222"
+	//    // +k8s:ifOptionEnabled(Foo)=+k8s:validateFalse="333"
+	//
+	// Tag extraction will retain the relative order between 111 and 222, but
+	// 333 is extracted as tag "k8s:ifOptionEnabled".  Those are all in a map,
+	// which we iterate (in a random order).  When it reaches the emit stage,
+	// the "ifOptionEnabled" part is gone, and we will have 3 functionGen
+	// objects, all with tag "k8s:validateFalse", in a non-deterministic order
+	// because of the map iteration.  If we sort them at that point, we won't
+	// have enough information to do something smart, unless we look at the
+	// args, which are opaque to us.
+	//
+	// Sorting it earlier means we can sort "k8s:ifOptionEnabled" against
+	// "k8s:validateFalse".  All of the records within each of those is
+	// relatively ordered, so the result here would be to put "ifOptionEnabled"
+	// before "validateFalse" (lexicographical is better than random).
+	idx := []string{}
+	for tag := range tags {
+		idx = append(idx, tag)
+	}
+	sort.Strings(idx)
+
 	// Run matching tag-validators.
-	for tag, vals := range tags {
+	for _, tag := range idx {
+		vals := tags[tag]
 		tv := reg.tagValidators[tag]
 		if scopes := tv.ValidScopes(); !scopes.Has(context.Scope) && !scopes.Has(ScopeAny) {
 			return Validations{}, fmt.Errorf("tag %q cannot be specified on %s", tv.TagName(), context.Scope)
@@ -151,7 +182,8 @@ func (reg *ValidatorRegistry) ExtractValidations(context Context, comments []str
 // Docs returns documentation for each tag in this registry.
 func (reg *ValidatorRegistry) Docs() []TagDoc {
 	var result []TagDoc
-	for _, v := range reg.tagValidators {
+	for _, k := range reg.tagIndex {
+		v := reg.tagValidators[k]
 		result = append(result, v.Docs())
 	}
 	return result

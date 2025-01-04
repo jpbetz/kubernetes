@@ -104,15 +104,15 @@ func Validate_Struct(opCtx operation.Context, obj, oldObj *Struct, fldPath *fiel
 	errs = append(errs,
 		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, func() field.ErrorList {
-				if opCtx.Options.Has("FeatureX") {
-					return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.XYMixedField/X")
+				if !opCtx.Options.Has("FeatureY") {
+					return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.XYMixedField/Y")
 				} else {
 					return nil // skip validation
 				}
 			}()...)
 			errs = append(errs, func() field.ErrorList {
-				if !opCtx.Options.Has("FeatureY") {
-					return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.XYMixedField/Y")
+				if opCtx.Options.Has("FeatureX") {
+					return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.XYMixedField/X")
 				} else {
 					return nil // skip validation
 				}

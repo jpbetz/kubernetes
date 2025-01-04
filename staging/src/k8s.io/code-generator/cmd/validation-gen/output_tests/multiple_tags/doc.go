@@ -25,25 +25,33 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
+// validateTrue should sort after validateFalse, but all the validateFalse
+// should retain their order.
+
+// +k8s:validateTrue="type T1 #0"
 // +k8s:validateFalse="type T1 #1"
 // +k8s:validateFalse="type T1 #2"
 // +k8s:validateFalse="type T1 #3"
 type T1 struct {
 	TypeMeta int
-	// +k8s:validateFalse="field T1.S #1"
-	// +k8s:validateFalse="field T1.S #2"
-	// +k8s:validateFalse="field T1.S #3"
+	// +k8s:validateTrue="field T1.S true"
+	// +k8s:validateFalse="field T1.S false #1"
+	// +k8s:validateFalse="field T1.S false #2"
+	// +k8s:validateFalse="field T1.S false #3"
 	S string `json:"s"`
-	// +k8s:validateFalse="field T1.T2 #1"
-	// +k8s:validateFalse="field T1.T2 #2"
-	// +k8s:validateFalse="field T1.T2 #3"
+	// +k8s:validateTrue="field T1.T2 true"
+	// +k8s:validateFalse="field T1.T2 false #1"
+	// +k8s:validateFalse="field T1.T2 false #2"
+	// +k8s:validateFalse="field T1.T2 false #3"
 	T2 T2 `json:"t2"`
 }
 
-// +k8s:validateFalse="type T2 #1"
-// +k8s:validateFalse="type T2 #2"
+// +k8s:validateTrue="type T2 true"
+// +k8s:validateFalse="type T2 false #1"
+// +k8s:validateFalse="type T2 false #2"
 type T2 struct {
-	// +k8s:validateFalse="field T2.S #1"
-	// +k8s:validateFalse="field T2.S #2"
+	// +k8s:validateTrue="field T2.S true"
+	// +k8s:validateFalse="field T2.S false #1"
+	// +k8s:validateFalse="field T2.S false #2"
 	S string `json:"s"`
 }
