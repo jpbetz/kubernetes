@@ -42,6 +42,12 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
+	scheme.AddValidationFunc((*T3)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			return Validate_T3(opCtx, obj.(*T3), safe.Cast[*T3](oldObj), nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
+	})
 	return nil
 }
 
@@ -156,6 +162,7 @@ func Validate_T2(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T2) 
 	// field T2.MapField has no validation
 	// field T2.PointerField has no validation
 	// field T2.SliceField has no validation
+	// field T2.SliceField2 has no validation
 	// field T2.StringField has no validation
 
 	// field T2.StringFieldWithValidation
@@ -166,5 +173,33 @@ func Validate_T2(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T2) 
 		}(fldPath.Child("stringFieldWithValidation"), &obj.StringFieldWithValidation, safe.Field(oldObj, func(oldObj *T2) *string { return &oldObj.StringFieldWithValidation }))...)
 
 	// field T2.StructField has no validation
+	return errs
+}
+
+func Validate_T3(opCtx operation.Context, obj, oldObj *T3, fldPath *field.Path) (errs field.ErrorList) {
+	// field T3.TypeMeta has no validation
+
+	// field T3.T2
+	errs = append(errs,
+		func(obj, oldObj *T2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.Subfield(opCtx, fldPath, obj, oldObj, "stringField", func(o *T2) *string { return &o.StringField }, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "subfield T3.T2.StringField")
+			})...)
+			errs = append(errs, validate.Subfield(opCtx, fldPath, obj, oldObj, "structField", func(o *T2) *StructField { return &o.StructField }, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StructField) field.ErrorList {
+				return validate.Subfield(opCtx, fldPath, obj, oldObj, "stringField", func(o *StructField) *string { return &o.StringField }, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+					return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "subfield T3.T2.StructField.StringField")
+				})
+			})...)
+			errs = append(errs, validate.Subfield(opCtx, fldPath, obj, oldObj, "sliceField2", func(o *T2) []StructField { return o.SliceField2 }, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj []StructField) field.ErrorList {
+				return validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StructField) field.ErrorList {
+					return validate.Subfield(opCtx, fldPath, obj, oldObj, "stringField", func(o *StructField) *string { return &o.StringField }, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+						return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "subfield T3.T2.SliceField[*].StringField")
+					})
+				})
+			})...)
+			errs = append(errs, Validate_T2(opCtx, obj, oldObj, fldPath)...)
+			return
+		}(&obj.T2, safe.Field(oldObj, func(oldObj *T3) *T2 { return &oldObj.T2 }), fldPath.Child("t2"))...)
+
 	return errs
 }

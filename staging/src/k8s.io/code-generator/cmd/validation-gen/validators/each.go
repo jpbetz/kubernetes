@@ -320,18 +320,6 @@ func (evtv eachValTagValidator) getMapValidations(t *types.Type, validations Val
 	return result, nil
 }
 
-// isNilableType returns true if the argument type can be compared to nil.
-func isNilableType(t *types.Type) bool {
-	for t.Kind == types.Alias {
-		t = t.Underlying
-	}
-	switch t.Kind {
-	case types.Pointer, types.Map, types.Slice, types.Interface: // Note: Arrays are not nilable
-		return true
-	}
-	return false
-}
-
 func (evtv eachValTagValidator) Docs() TagDoc {
 	doc := TagDoc{
 		Tag:         evtv.TagName(),

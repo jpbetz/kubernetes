@@ -137,3 +137,28 @@ func equalStringSlices(a, b []string) bool {
 	}
 	return true
 }
+
+func TestNew(t *testing.T) {
+	st := localSchemeBuilder.Test(t)
+
+	st.Value(&T3{
+		T2: T2{
+			StringField:               "",
+			StringFieldWithValidation: "",
+			SliceField2:               []StructField{{}, {}},
+			//PointerField:              nil,
+			//MapField:                  map[string]string{},
+		},
+	}).
+		// All ifOptionDisabled validations should fail
+		ExpectValidateFalseByPath(map[string][]string{
+			"t2.stringFieldWithValidation":  []string{"field T2.StringFieldWithValidation"},
+			"t2.stringField":                []string{"subfield T3.T2.StringField"},
+			"t2.structField.stringField":    []string{"subfield T3.T2.StructField.StringField"},
+			"t2.sliceField2[0].stringField": []string{"subfield T3.T2.SliceField[*].StringField"},
+			"t2.sliceField2[1].stringField": []string{"subfield T3.T2.SliceField[*].StringField"},
+		})
+	////"subfield T3.T2.MapField",
+	////"subfield T3.T2.PointerField",
+
+}

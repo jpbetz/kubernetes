@@ -25,13 +25,16 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-type StructField struct{}
+type StructField struct {
+	StringField string `json:"stringField"`
+}
 
 // T2 has string, slice, pointer and map fields to test subfield field validations across types
 type T2 struct {
 	MapField     map[string]string `json:"mapField"`
 	PointerField *string           `json:"pointerField"`
 	SliceField   []string          `json:"sliceField"`
+	SliceField2  []StructField     `json:"sliceField2"`
 	StringField  string            `json:"stringField"`
 	// +k8s:validateFalse="field T2.StringFieldWithValidation"
 	StringFieldWithValidation string      `json:"stringFieldWithValidation"`
@@ -60,3 +63,16 @@ type T1 struct {
 	// +k8s:subfield(structField)=+k8s:validateFalse="subfield T1.PT2.StructField"
 	PT2 *T2 `json:"pt2"`
 }
+
+type T3 struct {
+	TypeMeta int `json:"typeMeta"`
+
+	// +k8s:subfield2(stringField)=+k8s:validateFalse="subfield T3.T2.StringField"
+	// +k8s:subfield2(structField)=+k8s:subfield2(stringField)=+k8s:validateFalse="subfield T3.T2.StructField.StringField"
+	// +k8s:subfield2(sliceField2)=+k8s:eachVal2=+k8s:subfield2(stringField)=+k8s:validateFalse="subfield T3.T2.SliceField[*].StringField"
+	T2 T2 `json:"t2"`
+}
+
+// +k8s:subfield2(mapField)=+k8s:validateFalse="subfield T1.T2.MapField"
+// +k8s:subfield(pointerField)=+k8s:validateFalse="subfield T1.T2.PointerField"
+// +k8s:subfield(stringFieldWithValidation)=+k8s:validateFalse="subfield T1.T2.StringFieldWithValidation"

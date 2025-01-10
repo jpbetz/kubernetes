@@ -24,10 +24,6 @@ import (
 // CompareFunc is a function that compares two values of the same type.
 type CompareFunc[T any] func(T, T) bool
 
-// ValidateFunc is a function that validates a value, possibly considering the
-// old value (if any).
-type ValidateFunc[T any] func(opCtx operation.Context, fldPath *field.Path, newValue, oldValue T) field.ErrorList
-
 // EachSliceVal validates each element of newSlice with the specified
 // validation function.  The comparison function is used to find the
 // corresponding value in oldSlice.  The value-type of the slices is assumed to
