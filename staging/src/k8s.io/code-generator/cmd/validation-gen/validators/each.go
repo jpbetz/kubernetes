@@ -40,6 +40,9 @@ func init() {
 	RegisterTagValidator(&eachValTagValidator{shared, nil})
 }
 
+// This applies to all tags in this file.
+var listTagsValidScopes = sets.New(ScopeAny)
+
 // listMap collects information about a single list with map semantics.
 type listMap struct {
 	declaredAsMap bool
@@ -189,8 +192,6 @@ func (evtv *eachValTagValidator) Init(cfg Config) {
 func (eachValTagValidator) TagName() string {
 	return eachValTag
 }
-
-var listTagsValidScopes = sets.New(ScopeAny)
 
 func (eachValTagValidator) ValidScopes() sets.Set[Scope] {
 	return listTagsValidScopes
@@ -342,4 +343,69 @@ func (evtv eachValTagValidator) Docs() TagDoc {
 	return doc
 }
 
-//FIXME: Do EachKey
+type eachKeyTagValidator struct {
+	validator Validator
+}
+
+func (ektv *eachKeyTagValidator) Init(cfg Config) {
+	ektv.validator = cfg.Validator
+}
+
+func (eachKeyTagValidator) TagName() string {
+	return eachValTag
+}
+
+func (eachKeyTagValidator) ValidScopes() sets.Set[Scope] {
+	return listTagsValidScopes
+}
+
+var (
+	validateEachMapKey = types.Name{Package: libValidationPkg, Name: "EachMapKey"}
+)
+
+func (ektv eachKeyTagValidator) GetValidations(context Context, _ []string, payload string) (Validations, error) {
+	t := context.Type
+	if t.Kind == types.Alias {
+		t = t.Underlying
+	}
+	if t.Kind != types.Map {
+		return Validations{}, fmt.Errorf("can only be used on map types")
+	}
+
+	result := Validations{}
+
+	fakeComments := []string{payload}
+	elemContext := Context{
+		Scope:  ScopeMapKey,
+		Type:   t.Elem,
+		Parent: t,
+		Path:   context.Path.Child("(keys)"),
+	}
+	if validations, err := ektv.validator.ExtractValidations(elemContext, fakeComments); err != nil {
+		return Validations{}, err
+	} else {
+		if len(validations.Variables) > 0 {
+			return Validations{}, fmt.Errorf("variable generation is not supported")
+		}
+
+		for _, vfn := range validations.Functions {
+			f := Function("eachVal2", vfn.Flags(), validateEachMapKey, WrapperFunction{vfn, t.Key})
+			result.Functions = append(result.Functions, f)
+		}
+	}
+
+	return result, nil
+}
+
+func (ektv eachKeyTagValidator) Docs() TagDoc {
+	doc := TagDoc{
+		Tag:         ektv.TagName(),
+		Scopes:      ektv.ValidScopes().UnsortedList(),
+		Description: "Declares a validation for each value in a map or list.",
+		Payloads: []TagPayloadDoc{{
+			Description: "<validation-tag>",
+			Docs:        "The tag to evaluate for each value.",
+		}},
+	}
+	return doc
+}

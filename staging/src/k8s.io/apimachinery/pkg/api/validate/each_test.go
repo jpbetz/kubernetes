@@ -288,3 +288,25 @@ func testEachMapValNilable[T any](t *testing.T, name string, input map[string]T)
 		}
 	})
 }
+
+type StringType string
+
+func TestEachMapKey(t *testing.T) {
+	testEachMapKey(t, "valid", map[string]int{"one": 11, "two": 12, "three": 13})
+	testEachMapKey(t, "valid", map[StringType]string{"A": "a", "B": "b", "C": "c"})
+}
+
+func testEachMapKey[K ~string, V any](t *testing.T, name string, input map[K]V) {
+	var zero K
+	t.Run(fmt.Sprintf("%s(%T)", name, zero), func(t *testing.T) {
+		calls := 0
+		vfn := func(opCtx operation.Context, fldPath *field.Path, newVal, oldVal K) field.ErrorList {
+			calls++
+			return nil
+		}
+		_ = EachMapKey(operation.Context{}, field.NewPath("test"), input, nil, vfn)
+		if calls != len(input) {
+			t.Errorf("expected %d calls, got %d", len(input), calls)
+		}
+	})
+}

@@ -79,11 +79,11 @@ func lookup[T any](list []T, target T, cmp func(T, T) bool) *T {
 // EachMapVal validates each element of newMap with the specified validation
 // function and, if the corresponding key is found in oldMap, the old value.
 // The value-type of the slices is assumed to not be nilable.
-func EachMapVal[K ~string, T any](opCtx operation.Context, fldPath *field.Path, newMap, oldMap map[K]T,
-	validator ValidateFunc[*T]) field.ErrorList {
+func EachMapVal[K ~string, V any](opCtx operation.Context, fldPath *field.Path, newMap, oldMap map[K]V,
+	validator ValidateFunc[*V]) field.ErrorList {
 	var errs field.ErrorList
 	for key, val := range newMap {
-		var old *T
+		var old *V
 		if o, found := oldMap[key]; found {
 			old = &o
 		}
@@ -95,15 +95,27 @@ func EachMapVal[K ~string, T any](opCtx operation.Context, fldPath *field.Path, 
 // EachMapValNilable validates each element of newMap with the specified
 // validation function and, if the corresponding key is found in oldMap, the
 // old value. The value-type of the slices is assumed to be nilable.
-func EachMapValNilable[K ~string, T any](opCtx operation.Context, fldPath *field.Path, newMap, oldMap map[K]T,
-	validator ValidateFunc[T]) field.ErrorList {
+func EachMapValNilable[K ~string, V any](opCtx operation.Context, fldPath *field.Path, newMap, oldMap map[K]V,
+	validator ValidateFunc[V]) field.ErrorList {
 	var errs field.ErrorList
 	for key, val := range newMap {
-		var old T
+		var old V
 		if o, found := oldMap[key]; found {
 			old = o
 		}
 		errs = append(errs, validator(opCtx, fldPath.Key(string(key)), val, old)...)
+	}
+	return errs
+}
+
+// EachMapKey validates each element of newMap with the specified
+// validation function.  The oldMap argument is not used.
+func EachMapKey[K ~string, V any](opCtx operation.Context, fldPath *field.Path, newMap, oldMap map[K]V,
+	validator ValidateFunc[K]) field.ErrorList {
+	var errs field.ErrorList
+	for key := range newMap {
+		var zero K
+		errs = append(errs, validator(opCtx, fldPath.Key(string(key)), key, zero)...)
 	}
 	return errs
 }
