@@ -129,14 +129,15 @@ func NewFieldContext(name string, fieldType, structType *types.Type) TagContext2
 type Validations struct {
 	Functions []FunctionGen
 	Variables []VariableGen
+	Comments  []string
 }
 
 func (v *Validations) Empty() bool {
-	return len(v.Functions) == 0 && len(v.Variables) == 0
+	return v.Len() == 0
 }
 
 func (v *Validations) Len() int {
-	return len(v.Functions) + len(v.Variables)
+	return len(v.Functions) + len(v.Variables) + len(v.Comments)
 }
 
 func (v *Validations) AddFunction(f FunctionGen) {
@@ -147,9 +148,14 @@ func (v *Validations) AddVariable(variable VariableGen) {
 	v.Variables = append(v.Variables, variable)
 }
 
+func (v *Validations) AddComment(comment string) {
+	v.Comments = append(v.Comments, comment)
+}
+
 func (v *Validations) Add(o Validations) {
 	v.Functions = append(v.Functions, o.Functions...)
 	v.Variables = append(v.Variables, o.Variables...)
+	v.Comments = append(v.Comments, o.Comments...)
 }
 
 // FunctionFlags define optional properties of a validator.  Most validators

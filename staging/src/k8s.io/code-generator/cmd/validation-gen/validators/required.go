@@ -70,7 +70,7 @@ func (requiredDeclarativeValidator) ExtractValidations(t *types.Type, comments [
 		// The +required tag on a non-pointer struct is only for documentation.
 		// We don't perform validation here and defer the validation to
 		// the struct's fields.
-		return Validations{}, nil
+		return Validations{Comments: []string{"required non-pointer structs are purely documentation"}}, nil
 	}
 	return Validations{Functions: []FunctionGen{Function(requiredTagName, ShortCircuit, requiredValueValidator)}}, nil
 }
@@ -212,7 +212,7 @@ func (optionalTag) GetValidations(context TagContext2, _ []string, _ string) (Va
 		// make sense technically almost ever, and is better described as a
 		// union inside the struct. It does, however, make sense as
 		// documentation.
-		return Validations{}, nil
+		return Validations{Comments: []string{"optional non-pointer structs are purely documentation"}}, nil
 	}
 	return Validations{Functions: []FunctionGen{Function(optionalTagName, ShortCircuit|NonError, optionalValueValidator)}}, nil
 }

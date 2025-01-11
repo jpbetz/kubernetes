@@ -903,6 +903,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 	if validations := thisNode.typeValidations; !validations.Empty() {
 		sw.Do("// type $.inType|raw$\n", targs)
 		emitCallsToValidators(c, validations.Functions, sw)
+		emitComments(validations.Comments, sw)
 		sw.Do("\n", nil)
 		didSome = true
 	}
@@ -927,6 +928,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			validations := fld.fieldValidations
 			if !validations.Empty() {
 				emitCallsToValidators(c, validations.Functions, bufsw)
+				emitComments(validations.Comments, bufsw)
 			}
 
 			// NOTE: while we don't know for sure that this field is a struct,
@@ -962,6 +964,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 				}
 
 				emitCallsToValidators(c, subchild.fieldValidations.Functions, bufsw)
+				emitComments(subchild.fieldValidations.Comments, bufsw)
 
 				bufsw.Do("    return\n", targs)
 				bufsw.Do("  }($.fieldExprPfx$obj.$.fieldName$, $.safe.Field|raw$(oldObj, func(oldObj *$.inType|raw$) $.fieldTypePfx$$.fieldType|raw$ { return $.fieldExprPfx$oldObj.$.fieldName$ }), fldPath.Child(\"$.fieldJSON$\"))...)\n", targs)
@@ -1036,6 +1039,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 		validations.Add(thisChild.elemValidations)
 		if !validations.Empty() {
 			emitCallsToValidators(c, validations.Functions, elemSW)
+			emitComments(validations.Comments, elemSW)
 		}
 
 		// If the node is nil, this must be a type in a package we are not
@@ -1101,6 +1105,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 		keyValidations.Add(thisChild.keyValidations)
 		if !keyValidations.Empty() {
 			emitCallsToValidators(c, keyValidations.Functions, keySW)
+			emitComments(keyValidations.Comments, keySW)
 		}
 
 		// If the node is nil, this must be a type in a package we are not
@@ -1130,6 +1135,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 		valValidations.Add(thisChild.elemValidations)
 		if !valValidations.Empty() {
 			emitCallsToValidators(c, valValidations.Functions, valSW)
+			emitComments(valValidations.Comments, valSW)
 		}
 
 		// If the node is nil, this must be a type in a package we are not
@@ -1346,6 +1352,14 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 				sw.Do("...)\n", nil)
 			}
 		}
+	}
+}
+
+func emitComments(comments []string, sw *generator.SnippetWriter) {
+	for _, comment := range comments {
+		sw.Do("// ", nil)
+		sw.Do(comment, nil)
+		sw.Do("\n", nil)
 	}
 }
 

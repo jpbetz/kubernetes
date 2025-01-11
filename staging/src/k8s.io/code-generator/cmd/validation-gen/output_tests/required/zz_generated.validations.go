@@ -74,6 +74,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 	errs = append(errs,
 		func(obj, oldObj *T2, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.T2")...)
+			// required non-pointer structs are purely documentation
 			errs = append(errs, Validate_T2(opCtx, obj, oldObj, fldPath)...)
 			return
 		}(&obj.T2, safe.Field(oldObj, func(oldObj *T1) *T2 { return &oldObj.T2 }), fldPath.Child("t2"))...)

@@ -178,6 +178,9 @@ func (c *compositeValidator) ExtractValidations(t *types.Type, comments []string
 		for _, v := range validationGen.Variables {
 			result.Variables = append(result.Variables, v)
 		}
+		for _, v := range validationGen.Comments {
+			result.Comments = append(result.Comments, v)
+		}
 	}
 	return result, nil
 }
