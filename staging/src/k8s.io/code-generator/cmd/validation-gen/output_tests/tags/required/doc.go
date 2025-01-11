@@ -18,26 +18,39 @@ limitations under the License.
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
 
 // This is a test package.
-package forbidden
+package required
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-type T1 struct {
+type Struct struct {
 	TypeMeta int
 
-	// +k8s:forbidden
-	S string `json:"s"`
-	// +k8s:forbidden
-	PS *string `json:"ps"`
+	// +k8s:required
+	// +k8s:validateFalse="field Struct.StringField"
+	StringField string `json:"stringField"`
 
-	// non-pointer struct fields cannot be forbiden
+	// +k8s:required
+	// +k8s:validateFalse="field Struct.StringPtrField"
+	StringPtrField *string `json:"stringPtrField"`
 
-	// +k8s:forbidden
-	PT2 *T2 `json:"pt2"`
+	// +k8s:required
+	// +k8s:validateFalse="field Struct.OtherStructField"
+	OtherStructField OtherStruct `json:"otherStructField"`
+
+	// +k8s:required
+	// +k8s:validateFalse="field Struct.OtherStructPtrField"
+	OtherStructPtrField *OtherStruct `json:"otherStructPtrField"`
+
+	// +k8s:required
+	// +k8s:validateFalse="field Struct.SliceField"
+	SliceField []string `json:"sliceField"`
+
+	// +k8s:required
+	// +k8s:validateFalse="field Struct.MapField"
+	MapField map[string]string `json:"mapField"`
 }
 
-type T2 struct {
-	S string `json:"s"`
-}
+// +k8s:validateFalse="type OtherStruct"
+type OtherStruct struct{}

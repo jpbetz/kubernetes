@@ -16,32 +16,41 @@ limitations under the License.
 
 // +k8s:validation-gen=TypeMeta
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
-// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
-package required
+package optional
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-type T1 struct {
+type Struct struct {
 	TypeMeta int
 
-	// +k8s:validateFalse="field T1.S"
-	// +k8s:required
-	S string `json:"s"`
-	// +k8s:validateFalse="field T1.PS"
-	// +k8s:required
-	PS *string `json:"ps"`
+	// +k8s:optional
+	// +k8s:validateFalse="field Struct.StringField"
+	StringField string `json:"stringField"`
 
-	// +k8s:validateFalse="field T1.T2"
-	// +k8s:required
-	T2 T2 `json:"t2"`
-	// +k8s:validateFalse="field T1.PT2"
-	// +k8s:required
-	PT2 *T2 `json:"pt2"`
+	// +k8s:optional
+	// +k8s:validateFalse="field Struct.StringPtrField"
+	StringPtrField *string `json:"stringPtrField"`
+
+	// +k8s:optional
+	// +k8s:validateFalse="field Struct.OtherStructField"
+	OtherStructField OtherStruct `json:"otherStructField"`
+
+	// +k8s:optional
+	// +k8s:validateFalse="field Struct.OtherStructPtrField"
+	OtherStructPtrField *OtherStruct `json:"otherStructPtrField"`
+
+	// +k8s:optional
+	// +k8s:validateFalse="field Struct.SliceField"
+	SliceField []string `json:"sliceField"`
+
+	// +k8s:optional
+	// +k8s:validateFalse="field Struct.MapField"
+	MapField map[string]string `json:"mapField"`
 }
 
-// +k8s:validateFalse="type T2"
-type T2 struct{}
+// +k8s:validateFalse="type OtherStruct"
+type OtherStruct struct{}

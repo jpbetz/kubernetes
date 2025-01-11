@@ -19,20 +19,27 @@ package forbidden
 import (
 	"testing"
 
-	"k8s.io/apimachinery/pkg/util/validation/field"
-	pointer "k8s.io/utils/ptr"
+	"k8s.io/utils/ptr"
 )
 
 func Test(t *testing.T) {
 	st := localSchemeBuilder.Test(t)
 
-	st.Value(&T1{S: "x", PS: pointer.To("x"), PT2: &T2{S: "x"}}).
-		ExpectInvalid(
-			field.Forbidden(field.NewPath("s"), ""),
-			field.Forbidden(field.NewPath("ps"), ""),
-			field.Forbidden(field.NewPath("pt2"), ""),
-		)
+	st.Value(&Struct{
+		// All zero-values.
+	}).ExpectValid()
 
-	st.Value(&T1{S: "", PS: nil, PT2: nil}).
-		ExpectValid()
+	st.Value(&Struct{
+		StringField:         "abc",
+		StringPtrField:      ptr.To("xyz"),
+		OtherStructPtrField: &OtherStruct{},
+		SliceField:          []string{"a", "b"},
+		MapField:            map[string]string{"a": "b", "c": "d"},
+	}).ExpectRegexpsByPath(map[string][]string{
+		"stringField":         []string{"Forbidden"},
+		"stringPtrField":      []string{"Forbidden"},
+		"otherStructPtrField": []string{"Forbidden"},
+		"sliceField":          []string{"Forbidden"},
+		"mapField":            []string{"Forbidden"},
+	})
 }
