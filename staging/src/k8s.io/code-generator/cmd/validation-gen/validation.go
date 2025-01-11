@@ -1045,7 +1045,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 				sw.Do("// field $.inType|raw$.$.fieldName$\n", targs)
 				sw.Do("errs = append(errs,\n", targs)
 				sw.Do("  func(obj, oldObj $.fieldTypePfx$$.fieldType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
-				sw.Append(buf)
+				sw.Merge(buf, bufsw)
 				sw.Do("    return\n", targs)
 				sw.Do("  }($.fieldExprPfx$obj.$.fieldName$, ", targs)
 				sw.Do("    $.safe.Field|raw$(oldObj, ", targs)
@@ -1123,7 +1123,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			sw.Do("for i, val := range obj {\n", targs)
 			sw.Do("  errs = append(errs,\n", targs)
 			sw.Do("    func(obj, oldObj $.elemTypePfx$$.elemType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
-			sw.Append(elemBuf)
+			sw.Merge(elemBuf, elemSW)
 			sw.Do("      return\n", targs)
 			sw.Do("    }($.elemExprPfx$val, $.oldVal$, fldPath.Index(i))...)\n", targs)
 			sw.Do("}\n", nil)
@@ -1216,14 +1216,14 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			if keyBuf.Len() > 0 {
 				sw.Do("  errs = append(errs,\n", targs)
 				sw.Do("    func(obj, oldObj *$.keyType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
-				sw.Append(keyBuf)
+				sw.Merge(keyBuf, keySW)
 				sw.Do("      return\n", targs)
 				sw.Do("    }(&key, nil, fldPath)...)\n", targs) // We don't match up map keys with a corresponding old value
 			}
 			if valBuf.Len() > 0 {
 				sw.Do("  errs = append(errs,\n", targs)
 				sw.Do("    func(obj, oldObj $.valTypePfx$$.valType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
-				sw.Append(valBuf)
+				sw.Merge(valBuf, valSW)
 				sw.Do("      return\n", targs)
 				sw.Do("    }($.valExprPfx$val, $.safe.Lookup|raw$(oldObj, key, $.xform|raw$), fldPath.Key(string(key)))...)\n", targs)
 			}
