@@ -26,8 +26,10 @@ import (
 
 // IPSloppy verifies that the specified value is a valid IP address, but allows
 // leading zeros on each octet value.  This should not be used for new APIs.
-func IPSloppy(opCtx operation.Context, fldPath *field.Path, value, _ *string) field.ErrorList {
-	_, errs := ipSloppy(opCtx, fldPath, value, nil)
+func IPSloppy[T ~string](opCtx operation.Context, fldPath *field.Path, value, _ *T) field.ErrorList {
+	vt := *value
+	vs := string(vt)
+	_, errs := ipSloppy(opCtx, fldPath, &vs, nil)
 	return errs
 }
 

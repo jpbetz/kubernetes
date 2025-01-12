@@ -24,7 +24,7 @@ import (
 
 // MaxLength verifies that the specified value is not longer than max
 // characters.
-func MaxLength(_ operation.Context, fldPath *field.Path, value, _ *string, max int) field.ErrorList {
+func MaxLength[T ~string](_ operation.Context, fldPath *field.Path, value, _ *T, max int) field.ErrorList {
 	if value == nil {
 		return nil
 	}

@@ -15,45 +15,34 @@ limitations under the License.
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
 
 // This is a test package.
-package typedef
+package sliceofstruct
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// Maxitems
-type M struct {
+type Struct struct {
 	TypeMeta int
 
-	// typedef-of-slice-of-primitive
-	// Validation on type only.
-	M0 IntSliceLimited `json:"m0"`
-	// Validation on field only.
-	// +k8s:maxItems=1
-	M1 IntSlice `json:"m1"`
-	// Validation on both type and field.
-	// +k8s:maxItems=1
-	M2 IntSliceLimited `json:"m2"`
+	// +k8s:maxItems=0
+	Max0Field []OtherStruct `json:"max0Field"`
 
-	// typedef-of-slice-of-pointer-to-primitive
-	// Validation on type only.
-	M3 IntPtrSliceLimited `json:"m3"`
-	// Validation on field only.
-	// +k8s:maxItems=1
-	M4 IntPtrSlice `json:"m4"`
-	// Validation on both type and field.
-	// +k8s:maxItems=1
-	M5 IntPtrSliceLimited `json:"m5"`
+	// +k8s:maxItems=10
+	Max10Field []OtherStruct `json:"max10Field"`
+
+	// +k8s:maxItems=0
+	Max0PtrField []*OtherStruct `json:"max0PtrField"`
+
+	// +k8s:maxItems=10
+	Max10PtrField []*OtherStruct `json:"max10PtrField"`
+
+	// +k8s:maxItems=0
+	Max0TypedefField []OtherTypedefStruct `json:"max0TypedefField"`
+
+	// +k8s:maxItems=10
+	Max10TypedefField []OtherTypedefStruct `json:"max10TypedefField"`
 }
 
-// Note: no limit here
-type IntSlice []int
+type OtherStruct struct{}
 
-// +k8s:maxItems=2
-type IntSliceLimited []int
-
-// Note: no limit here
-type IntPtrSlice []*int
-
-// +k8s:maxItems=2
-type IntPtrSliceLimited []*int
+type OtherTypedefStruct OtherStruct

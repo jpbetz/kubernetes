@@ -31,12 +31,12 @@ import (
 // All errors returned by this function will be "invalid" type errors. If the
 // caller wants better errors, it must take responsibility for checking things
 // like required/optional and max-length.
-func DNSLabel(opCtx operation.Context, fldPath *field.Path, value, _ *string) field.ErrorList {
+func DNSLabel[T ~string](opCtx operation.Context, fldPath *field.Path, value, _ *T) field.ErrorList {
 	if value == nil {
 		return nil
 	}
 	var allErrs field.ErrorList
-	for _, msg := range content.IsDNS1123Label(*value) {
+	for _, msg := range content.IsDNS1123Label((string)(*value)) {
 		allErrs = append(allErrs, field.Invalid(fldPath, *value, msg))
 	}
 	return allErrs

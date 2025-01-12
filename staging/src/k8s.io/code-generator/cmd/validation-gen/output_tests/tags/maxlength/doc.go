@@ -15,22 +15,39 @@ limitations under the License.
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
 
 // This is a test package.
-package sliceofprimitive
+package maxlength
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// Maxitems
-type M struct {
+type Struct struct {
 	TypeMeta int
 
-	// slice-of-primitive
-	// +k8s:maxItems=1
-	M0 []int `json:"m0"`
+	// +k8s:maxLength=0
+	Max0Field string `json:"max0Field"`
 
-	// slice-of-pointer-to-primitive
-	// Validation on field only.
-	// +k8s:maxItems=1
-	M1 []*int `json:"m1"`
+	// +k8s:maxLength=10
+	Max10Field string `json:"max10Field"`
+
+	// +k8s:maxLength=0
+	Max0UnvalidatedTypedefField UnvalidatedStringType `json:"max0UnvalidatedTypedefField"`
+
+	// +k8s:maxLength=10
+	Max10UnvalidatedTypedefField UnvalidatedStringType `json:"max10UnvalidatedTypedefField"`
+
+	// Note: no validation here
+	Max0ValidatedTypedefField Max0Type `json:"max0ValidatedTypedefField"`
+
+	// Note: no validation here
+	Max10ValidatedTypedefField Max10Type `json:"max10ValidatedTypedefField"`
 }
+
+// Note: no validation here
+type UnvalidatedStringType string
+
+// +k8s:maxLength=0
+type Max0Type string
+
+// +k8s:maxLength=10
+type Max10Type string

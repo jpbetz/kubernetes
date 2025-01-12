@@ -111,7 +111,7 @@ func (maxLengthTag) TagName() string {
 	return maxLengthTagName
 }
 
-var maxLengthTagScopes = sets.New(TagScopeField)
+var maxLengthTagScopes = sets.New(TagScopeAll)
 
 func (maxLengthTag) ValidScopes() sets.Set[TagScope] {
 	return maxLengthTagScopes

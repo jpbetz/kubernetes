@@ -21,12 +21,30 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-type T struct {
+type Struct struct {
 	TypeMeta int
 
 	// +k8s:format=ip-sloppy
 	IPField string `json:"ipField"`
 
+	// +k8s:format=ip-sloppy
+	IPPtrField *string `json:"ipPtrField"`
+
 	// +k8s:format=dns-label
 	DNSLabelField string `json:"dnsLabelField"`
+
+	// +k8s:format=dns-label
+	DNSLabelPtrField *string `json:"dnsLabelPtrField"`
+
+	// +k8s:format=dns-label
+	DNSLabelTypedefField UnvalidatedStringType `json:"dnsLabelTypedefField"`
+
+	// Note: no validation here
+	IPTypedefField IPStringType `json:"ipTypedefField"`
 }
+
+// Note: no validation here
+type UnvalidatedStringType string
+
+// +k8s:format=ip-sloppy
+type IPStringType string

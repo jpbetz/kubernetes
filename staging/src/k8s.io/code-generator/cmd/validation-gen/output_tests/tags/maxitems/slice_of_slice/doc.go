@@ -21,30 +21,26 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// Maxitems
-type M struct {
+type Struct struct {
 	TypeMeta int
 
-	// slice-of-slice-of-value
-	// +k8s:maxItems=1
-	M0 [][]int `json:"m0"`
+	// +k8s:maxItems=0
+	Max0Field [][]int `json:"max0Field"`
 
-	// slice-of-typedef-of-slice-of-value
-	// +k8s:maxItems=1
-	M1 []IntSlice `json:"m1"`
+	// +k8s:maxItems=10
+	Max10Field [][]int `json:"max10Field"`
 
-	// slice-of-slice-of-pointer
-	// +k8s:maxItems=1
-	M2 [][]*int `json:"m2"`
+	// +k8s:maxItems=0
+	Max0PtrField [][]*int `json:"max0PtrField"`
 
-	// slice-of-typedef-of-slice-of-pointer
-	// Validation on field only.
-	// +k8s:maxItems=1
-	M3 []IntPtrSlice `json:"m3"`
+	// +k8s:maxItems=10
+	Max10PtrField [][]*int `json:"max10PtrField"`
+
+	// +k8s:maxItems=0
+	Max0TypedefField []SliceType `json:"max0TypedefField"`
+
+	// +k8s:maxItems=10
+	Max10TypedefField []SliceType `json:"max10TypedefField"`
 }
 
-// Note: no limit here
-type IntSlice []int
-
-// Note: no limit here
-type IntPtrSlice []*int
+type SliceType []int
