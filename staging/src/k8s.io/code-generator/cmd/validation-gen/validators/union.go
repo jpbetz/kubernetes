@@ -21,7 +21,8 @@ import (
 	"fmt"
 	"slices"
 
-	"k8s.io/gengo/v2"
+	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/parser/tags"
 	"k8s.io/gengo/v2/types"
 )
@@ -33,26 +34,198 @@ var newDiscriminatedUnionMembership = types.Name{Package: libValidationPkg, Name
 var newUnionMembership = types.Name{Package: libValidationPkg, Name: "NewUnionMembership"}
 
 func init() {
-	AddToRegistry(InitUnionDeclarativeValidator)
+	// Unions are comprised of multiple tags, which need to share information
+	// between them.  The tags are on struct fields, but the validation
+	// actually pertains to the struct itself.
+	shared := map[*types.Type]unions{}
+	RegisterTypeValidator(unionTypeValidator{shared})
+	RegisterTagDescriptor(unionDiscriminatorTag{shared})
+	RegisterTagDescriptor(unionMemberTag{shared})
 }
 
-func InitUnionDeclarativeValidator(cfg *ValidatorConfig) DeclarativeValidator {
-	return &unionDeclarativeValidator{
-		universe: cfg.GeneratorContext.Universe,
+type unionTypeValidator struct {
+	shared map[*types.Type]unions
+}
+
+func (unionTypeValidator) Init(_ *generator.Context) {}
+
+func (unionTypeValidator) Name() string {
+	return "unionTypeValidator"
+}
+
+func (utv unionTypeValidator) GetValidations(realType, _ *types.Type) (Validations, error) {
+	result := Validations{}
+
+	if realType.Kind != types.Struct {
+		return result, nil
 	}
-}
 
-type unionDeclarativeValidator struct {
-	universe types.Universe
+	unions := utv.shared[realType]
+	if len(unions) == 0 {
+		return result, nil
+	}
+
+	// Sort the keys for stable output.
+	keys := make([]string, 0, len(unions))
+	for k := range unions {
+		keys = append(keys, k)
+	}
+	slices.Sort(keys)
+	for _, unionName := range keys {
+		u := unions[unionName]
+		if len(u.fieldMembers) > 0 || u.discriminator != nil {
+			// TODO: Avoid the "local" here. This was added to to avoid errors caused when the package is an empty string.
+			//       The correct package would be the output package but is not known here. This does not show up in generated code.
+			// TODO: Append a consistent hash suffix to avoid generated name conflicts?
+			supportVarName := PrivateVar{Name: "UnionMembershipFor" + realType.Name.Name + unionName, Package: "local"}
+			if u.discriminator != nil {
+				supportVar := Variable(supportVarName,
+					Function(unionMemberTagName, DefaultFlags, newDiscriminatedUnionMembership,
+						append([]any{*u.discriminator}, u.fields...)...))
+				result.Variables = append(result.Variables, supportVar)
+				fn := Function(unionMemberTagName, DefaultFlags, discriminatedUnionValidator,
+					append([]any{supportVarName, u.discriminatorMember}, u.fieldMembers...)...)
+				result.Functions = append(result.Functions, fn)
+			} else {
+				supportVar := Variable(supportVarName, Function(unionMemberTagName, DefaultFlags, newUnionMembership, u.fields...))
+				result.Variables = append(result.Variables, supportVar)
+				fn := Function(unionMemberTagName, DefaultFlags, unionValidator, append([]any{supportVarName}, u.fieldMembers...)...)
+				result.Functions = append(result.Functions, fn)
+			}
+		}
+	}
+
+	return result, nil
 }
 
 const (
-	// +k8s:union and +k8s:unionDiscriminator tag are used by openapi-gen to
-	// publish x-kubernetes-union and x-kubernetes-discriminator extensions
-	// into Kubernetes published OpenAPI.
-	discriminatorTagName = "k8s:unionDiscriminator"
-	memberTagName        = "k8s:unionMember"
+	unionDiscriminatorTagName = "k8s:unionDiscriminator"
+	unionMemberTagName        = "k8s:unionMember"
 )
+
+type unionDiscriminatorTag struct {
+	shared map[*types.Type]unions
+}
+
+func (unionDiscriminatorTag) Init(_ *generator.Context) {}
+
+func (unionDiscriminatorTag) TagName() string {
+	return unionDiscriminatorTagName
+}
+
+// Shared between unionDiscriminatorTag and unionMemberTag.
+var unionTagScopes = sets.New(TagScopeField)
+
+func (unionDiscriminatorTag) ValidScopes() sets.Set[TagScope] {
+	return unionTagScopes
+}
+
+func (udt unionDiscriminatorTag) GetValidations(context TagContext, _ []string, payload string) (Validations, error) {
+	p := &discriminatorParams{}
+	if len(payload) > 0 {
+		if err := json.Unmarshal([]byte(payload), &p); err != nil {
+			return Validations{}, fmt.Errorf("error parsing JSON value: %v (%q)", err, payload)
+		}
+	}
+	if udt.shared[context.Parent] == nil {
+		udt.shared[context.Parent] = unions{}
+	}
+	u := udt.shared[context.Parent].getOrCreate(p.Union)
+
+	var discriminatorFieldName string
+	if jsonAnnotation, ok := tags.LookupJSON(*context.Member); ok {
+		discriminatorFieldName = jsonAnnotation.Name
+		u.discriminator = &discriminatorFieldName
+		u.discriminatorMember = *context.Member
+	}
+
+	// This tag does not actually emit any validations, it just accumulates
+	// information. The validation is done by the unionTypeValidator.
+	return Validations{}, nil
+}
+
+func (udt unionDiscriminatorTag) Docs() TagDoc {
+	return TagDoc{
+		Tag:         udt.TagName(),
+		Contexts:    udt.ValidScopes().UnsortedList(),
+		Description: "Indicates that this field is the discriminator for a union.",
+		Payloads: []TagPayloadDoc{{
+			Description: "<json-object>",
+			Docs:        "",
+			Schema: []TagPayloadSchema{{
+				Key:   "union",
+				Value: "<string>",
+				Docs:  "the name of the union, if more than one exists",
+			}},
+		}},
+	}
+}
+
+type unionMemberTag struct {
+	shared map[*types.Type]unions
+}
+
+func (unionMemberTag) Init(_ *generator.Context) {}
+
+func (unionMemberTag) TagName() string {
+	return unionMemberTagName
+}
+
+func (unionMemberTag) ValidScopes() sets.Set[TagScope] {
+	return unionTagScopes
+}
+
+func (umt unionMemberTag) GetValidations(context TagContext, _ []string, payload string) (Validations, error) {
+	var fieldName string
+	jsonTag, ok := tags.LookupJSON(*context.Member)
+	if !ok {
+		return Validations{}, fmt.Errorf("field %q is a union member but has no JSON struct field tag", context.Member)
+	}
+	fieldName = jsonTag.Name
+	if len(fieldName) == 0 {
+		return Validations{}, fmt.Errorf("field %q is a union member but has no JSON name", context.Member)
+	}
+
+	p := &memberParams{MemberName: context.Member.Name}
+	if len(payload) > 0 {
+		// Name may optionally be overridden by tag's memberName field.
+		if err := json.Unmarshal([]byte(payload), &p); err != nil {
+			return Validations{}, fmt.Errorf("error parsing JSON value: %v (%q)", err, payload)
+		}
+	}
+	if umt.shared[context.Parent] == nil {
+		umt.shared[context.Parent] = unions{}
+	}
+	u := umt.shared[context.Parent].getOrCreate(p.Union)
+	u.fields = append(u.fields, [2]string{fieldName, p.MemberName})
+	u.fieldMembers = append(u.fieldMembers, *context.Member)
+
+	// This tag does not actually emit any validations, it just accumulates
+	// information. The validation is done by the unionTypeValidator.
+	return Validations{}, nil
+}
+
+func (umt unionMemberTag) Docs() TagDoc {
+	return TagDoc{
+		Tag:         umt.TagName(),
+		Contexts:    umt.ValidScopes().UnsortedList(),
+		Description: "Indicates that this field is a member of a union.",
+		Payloads: []TagPayloadDoc{{
+			Description: "<json-object>",
+			Docs:        "",
+			Schema: []TagPayloadSchema{{
+				Key:   "union",
+				Value: "<string>",
+				Docs:  "the name of the union, if more than one exists",
+			}, {
+				Key:     "memberName",
+				Value:   "<string>",
+				Docs:    "the discriminator value for this member",
+				Default: "the field's name",
+			}},
+		}},
+	}
+}
 
 // discriminatorParams defines JSON the parameter value for the
 // +k8s:unionDiscriminator tag.
@@ -107,124 +280,4 @@ func (us unions) getOrCreate(name string) *union {
 		us[name] = u
 	}
 	return u
-}
-
-func (c *unionDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
-	result := Validations{}
-	unions := unions{}
-	for _, member := range t.Members {
-		commentTags := gengo.ExtractCommentTags("+", member.CommentLines)
-		if commentTag, ok := commentTags[memberTagName]; ok {
-			if len(commentTag) != 1 {
-				return result, fmt.Errorf("must have one %q tag", memberTagName)
-			}
-			tag := commentTag[0]
-			var fieldName string
-			jsonTag, ok := tags.LookupJSON(member)
-			if !ok {
-				return result, fmt.Errorf("field %q is a union member but has no JSON struct field tag", member)
-			}
-			fieldName = jsonTag.Name
-			if len(fieldName) == 0 {
-				return result, fmt.Errorf("field %q is a union member but has no JSON name", member)
-			}
-
-			p := &memberParams{MemberName: member.Name}
-			if len(tag) > 0 {
-				// Name may optionally be overridden by tag's memberName field.
-				if err := json.Unmarshal([]byte(tag), &p); err != nil {
-					return result, fmt.Errorf("error parsing JSON value: %v (%q)", err, tag)
-				}
-			}
-			u := unions.getOrCreate(p.Union)
-			u.fields = append(u.fields, [2]string{fieldName, p.MemberName})
-			u.fieldMembers = append(u.fieldMembers, member)
-		}
-
-		if commentTag, ok := commentTags[discriminatorTagName]; ok {
-			if len(commentTag) != 1 {
-				return result, fmt.Errorf("must have one %q tag", memberTagName)
-			}
-			tag := commentTag[0]
-
-			p := &discriminatorParams{}
-			if len(tag) > 0 {
-				if err := json.Unmarshal([]byte(tag), &p); err != nil {
-					return result, fmt.Errorf("error parsing JSON value: %v (%q)", err, tag)
-				}
-			}
-			u := unions.getOrCreate(p.Union)
-
-			var discriminatorFieldName string
-			if jsonAnnotation, ok := tags.LookupJSON(member); ok {
-				discriminatorFieldName = jsonAnnotation.Name
-				u.discriminator = &discriminatorFieldName
-				u.discriminatorMember = member
-			}
-		}
-	}
-
-	// Sort the keys for stable output.
-	keys := make([]string, 0, len(unions))
-	for k := range unions {
-		keys = append(keys, k)
-	}
-	slices.Sort(keys)
-	for _, unionName := range keys {
-		u := unions[unionName]
-		if len(u.fieldMembers) > 0 || u.discriminator != nil {
-			// TODO: Avoid the "local" here. This was added to to avoid errors caused when the package is an empty string.
-			//       The correct package would be the output package but is not known here. This does not show up in generated code.
-			// TODO: Append a consistent hash suffix to avoid generated name conflicts?
-			supportVarName := PrivateVar{Name: "UnionMembershipFor" + t.Name.Name + unionName, Package: "local"}
-			if u.discriminator != nil {
-				supportVar := Variable(supportVarName, Function(memberTagName, DefaultFlags, newDiscriminatedUnionMembership, append([]any{*u.discriminator}, u.fields...)...))
-				result.Variables = append(result.Variables, supportVar)
-				fn := Function(memberTagName, DefaultFlags, discriminatedUnionValidator, append([]any{supportVarName, u.discriminatorMember}, u.fieldMembers...)...)
-				result.Functions = append(result.Functions, fn)
-			} else {
-				supportVar := Variable(supportVarName, Function(memberTagName, DefaultFlags, newUnionMembership, u.fields...))
-				result.Variables = append(result.Variables, supportVar)
-				fn := Function(memberTagName, DefaultFlags, unionValidator, append([]any{supportVarName}, u.fieldMembers...)...)
-				result.Functions = append(result.Functions, fn)
-			}
-		}
-	}
-
-	return result, nil
-}
-
-func (unionDeclarativeValidator) Docs() []TagDoc {
-	return []TagDoc{{
-		Tag:         discriminatorTagName,
-		Description: "Indicates that this field is the discriminator for a union.",
-		Contexts:    []TagScope{TagScopeField},
-		Payloads: []TagPayloadDoc{{
-			Description: "<json-object>",
-			Docs:        "",
-			Schema: []TagPayloadSchema{{
-				Key:   "union",
-				Value: "<string>",
-				Docs:  "the name of the union, if more than one exists",
-			}},
-		}},
-	}, {
-		Tag:         memberTagName,
-		Description: "Indicates that this field is a member of a union.",
-		Contexts:    []TagScope{TagScopeField},
-		Payloads: []TagPayloadDoc{{
-			Description: "<json-object>",
-			Docs:        "",
-			Schema: []TagPayloadSchema{{
-				Key:   "union",
-				Value: "<string>",
-				Docs:  "the name of the union, if more than one exists",
-			}, {
-				Key:     "memberName",
-				Value:   "<string>",
-				Docs:    "the discriminator value for this member",
-				Default: "the field's name",
-			}},
-		}},
-	}}
 }
