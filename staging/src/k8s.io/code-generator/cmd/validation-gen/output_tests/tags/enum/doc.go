@@ -24,33 +24,41 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-type T1 struct {
+type Struct struct {
 	TypeMeta int
 
-	E0  E0  `json:"e0"`
-	PE0 *E0 `json:"pe0"`
+	Enum0Field    Enum0  `json:"enum0Field"`
+	Enum0PtrField *Enum0 `json:"enum0PtrField"`
 
-	E1  E1  `json:"e1"`
-	PE1 *E1 `json:"pe1"`
+	Enum1Field    Enum1  `json:"enum1Field"`
+	Enum1PtrField *Enum1 `json:"enum1PtrField"`
 
-	E2  E2  `json:"e2"`
-	PE2 *E2 `json:"pe2"`
+	Enum2Field    Enum2  `json:"enum2Field"`
+	Enum2PtrField *Enum2 `json:"enum2PtrField"`
+
+	NotEnumField    NotEnum  `json:"notEnumField"`
+	NotEnumPtrField *NotEnum `json:"notEnumField"`
 }
 
 // +k8s:enum
-type E0 string // Note: this enum has no values
+type Enum0 string // Note: this enum has no values
 
 // +k8s:enum
-type E1 string // Note: this enum has 1 value
+type Enum1 string // Note: this enum has 1 value
 
 const (
-	E1V1 E1 = "e1v1"
+	E1V1 Enum1 = "e1v1"
 )
 
 // +k8s:enum
-type E2 string // Note: this enum has 2 values
+type Enum2 string // Note: this enum has 2 values
 
 const (
-	E2V1 E2 = "e2v1"
-	E2V2 E2 = "e2v2"
+	E2V1 Enum2 = "e2v1"
+	E2V2 Enum2 = "e2v2"
 )
+
+// Note: this is not an enum because the const values are of type Enum2, and
+// because go elides intermediate typedefs (this is modelled as "NotEnum" ->
+// "string" in the AST).
+type NotEnum Enum2

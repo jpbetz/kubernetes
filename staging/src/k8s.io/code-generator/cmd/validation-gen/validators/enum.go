@@ -60,6 +60,10 @@ var (
 var setsNew = types.Name{Package: "k8s.io/apimachinery/pkg/util/sets", Name: "New"}
 
 func (et *enumTag) GetValidations(context TagContext, _ []string, payload string) (Validations, error) {
+	if context.Type != types.String {
+		return Validations{}, fmt.Errorf("can only be used on string types")
+	}
+
 	var result Validations
 
 	if enum, ok := et.enumContext.EnumType(context.Parent); ok {
@@ -152,14 +156,11 @@ func (et *enumType) ValueStrings() []string {
 }
 
 func parseEnums(c *generator.Context) enumMap {
-	// First, find the builtin "string" type
-	stringType := c.Universe.Type(types.Name{Name: "string"})
-
 	// find all enum types.
 	enumTypes := make(enumMap)
 	for _, p := range c.Universe {
 		for _, t := range p.Types {
-			if isEnumType(stringType, t) {
+			if isEnumType(t) {
 				if _, ok := enumTypes[t.Name]; !ok {
 					enumTypes[t.Name] = &enumType{
 						Name: t.Name,
@@ -208,8 +209,8 @@ func (et *enumType) addIfNotPresent(value *enumValue) {
 // isEnumType checks if a given type is an enum by the definition
 // An enum type should be an alias of string and has tag '+enum' in its comment.
 // Additionally, pass the type of builtin 'string' to check against.
-func isEnumType(stringType *types.Type, t *types.Type) bool {
-	return t.Kind == types.Alias && t.Underlying == stringType && hasEnumTag(t)
+func isEnumType(t *types.Type) bool {
+	return t.Kind == types.Alias && t.Underlying == types.String && hasEnumTag(t)
 }
 
 func hasEnumTag(t *types.Type) bool {
