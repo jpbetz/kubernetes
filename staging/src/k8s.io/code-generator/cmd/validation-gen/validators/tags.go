@@ -42,6 +42,26 @@ type TagDescriptor interface {
 	Docs() TagDoc
 }
 
+type TypeValidator interface {
+	// Init initializes the implementation.  This will be called exactly once.
+	Init(c *generator.Context)
+
+	// Name returns a unique name for this validator.  This is used for sorting
+	// and logging.
+	Name() string
+
+	// GetValidations returns any validations imposed by this validator for the
+	// given types.
+	//
+	// The way gengo handles type definitions varies between structs and other
+	// types.  For struct definitions (e.g. `type Foo struct {}`), the realType
+	// is the struct itself (the Kind field will be `types.Struct`) and the
+	// parentType will be nil.  For other types (e.g. `type Bar string`), the
+	// realType will be the underlying type and the parentType will be the
+	// newly defined type (the Kind field will be `types.Alias`).
+	GetValidations(realType, parentType *types.Type) (Validations, error)
+}
+
 // TagScope describes where a tag is used.
 type TagScope string
 
@@ -105,6 +125,10 @@ type TagContext struct {
 	// Because of how gengo handles struct-type definitions, this field may be
 	// nil in those cases.
 	Parent *types.Type
+
+	// Member provides details about a field within a struct, when Scope is
+	// TagScopeField.  For all other values of Scope, this will be nil.
+	Member *types.Member
 }
 
 // TagDoc describes a comment-tag and its usage.

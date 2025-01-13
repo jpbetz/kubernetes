@@ -382,34 +382,7 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 	}
 	td.typeNodes[t] = thisNode
 
-	// Extract any type-attached validation rules.
-	tc := validators.TagContext{
-		Scope: validators.TagScopeType,
-		Type:  t,
-	}
-	if t.Kind == types.Alias {
-		tc.Parent = t
-		tc.Type = t.Underlying
-	}
-	if validations, err := td.knownTags.ExtractValidations(tc, t.CommentLines); err != nil {
-		return nil, fmt.Errorf("%v: %w", fldPath, err)
-	} else {
-		if !validations.Empty() {
-			klog.V(5).InfoS("found type-attached validations", "n", validations.Len())
-			thisNode.typeValidations = validations
-		}
-	}
-	// legacy
-	if validations, err := td.validator.ExtractValidations(t, t.CommentLines); err != nil {
-		return nil, fmt.Errorf("%v: %w", fldPath, err)
-	} else {
-		if !validations.Empty() {
-			klog.V(5).InfoS("found type-attached validations", "n", validations.Len())
-			thisNode.typeValidations = validations
-		}
-	}
-
-	// If this is an known, named type, we can call its validation function.
+	// If this is a known, named type, we can call its validation function.
 	switch t.Kind {
 	case types.Alias, types.Struct:
 		if fn, ok := td.getValidationFunctionName(t); ok {
@@ -417,6 +390,7 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 		}
 	}
 
+	// Discover into this type before extracting type validations.
 	switch t.Kind {
 	case types.Builtin:
 		// Nothing more to do.
@@ -462,6 +436,37 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 		}
 	default:
 		return nil, fmt.Errorf("field %s (%v, kind %v) is not supported", fldPath.String(), t, t.Kind)
+	}
+
+	// Extract any type-attached validation rules.  We do this AFTER descending
+	// into the type, so that these validators have access to the full type.
+	// For example, all struct field validators get called before the type
+	// validators.  This does not influence the order in which the validations
+	// are called in emitted code, just how we evaluate what to emit.
+	tc := validators.TagContext{
+		Scope: validators.TagScopeType,
+		Type:  t,
+	}
+	if t.Kind == types.Alias {
+		tc.Parent = t
+		tc.Type = t.Underlying
+	}
+	if validations, err := td.knownTags.ExtractValidations(tc, t.CommentLines); err != nil {
+		return nil, fmt.Errorf("%v: %w", fldPath, err)
+	} else {
+		if !validations.Empty() {
+			klog.V(5).InfoS("found type-attached validations", "n", validations.Len())
+			thisNode.typeValidations.Add(validations)
+		}
+	}
+	// legacy
+	if validations, err := td.validator.ExtractValidations(t, t.CommentLines); err != nil {
+		return nil, fmt.Errorf("%v: %w", fldPath, err)
+	} else {
+		if !validations.Empty() {
+			klog.V(5).InfoS("found type-attached validations", "n", validations.Len())
+			thisNode.typeValidations.Add(validations)
+		}
 	}
 
 	return thisNode, nil
@@ -532,6 +537,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			Scope:  validators.TagScopeField,
 			Type:   memb.Type,
 			Parent: thisNode.valueType,
+			Member: &memb,
 		}
 		if validations, err := td.knownTags.ExtractValidations(tc, memb.CommentLines); err != nil {
 			return fmt.Errorf("field %s: %w", childPath.String(), err)
@@ -595,6 +601,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 					Scope:  validators.TagScopeField,
 					Type:   subfield.Type,
 					Parent: childType, // the struct being iterated
+					Member: &subfield,
 				}
 				// Passing memb.CommentLines because subfield validations are
 				// declared on the *parent* type (memb) field and not the *subfield* type (subfield).
