@@ -24,16 +24,22 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-type T1 struct {
+type Struct struct {
 	TypeMeta int
 
-	// +k8s:ifOptionEnabled(FeatureX)=+k8s:validateFalse="field T1.S1"
-	S1 string `json:"s1"`
+	// +k8s:ifOptionEnabled(FeatureX)=+k8s:validateFalse="field Struct.XEnabledField"
+	XEnabledField string `json:"xEnabledField"`
 
-	// +k8s:ifOptionDisabled(FeatureX)=+k8s:validateFalse="field T1.S2"
-	S2 string `json:"s2"`
+	// +k8s:ifOptionDisabled(FeatureX)=+k8s:validateFalse="field Struct.XDisabledField"
+	XDisabledField string `json:"xDisabledField"`
 
-	// +k8s:ifOptionEnabled(FeatureX)=+k8s:validateFalse="field T1.S3.FeatureX"
-	// +k8s:ifOptionDisabled(FeatureY)=+k8s:validateFalse="field T1.S3.FeatureY"
-	S3 string `json:"s3"`
+	// +k8s:ifOptionEnabled(FeatureY)=+k8s:validateFalse="field Struct.YEnabledField"
+	YEnabledField string `json:"yEnabledField"`
+
+	// +k8s:ifOptionDisabled(FeatureY)=+k8s:validateFalse="field Struct.YDisabledField"
+	YDisabledField string `json:"yDisabledField"`
+
+	// +k8s:ifOptionEnabled(FeatureX)=+k8s:validateFalse="field Struct.XYMixedField/X"
+	// +k8s:ifOptionDisabled(FeatureY)=+k8s:validateFalse="field Struct.XYMixedField/Y"
+	XYMixedField string `json:"xyMixedField"`
 }
