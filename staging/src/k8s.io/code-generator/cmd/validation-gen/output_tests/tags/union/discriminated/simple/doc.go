@@ -18,24 +18,24 @@ limitations under the License.
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
 
 // This is a test package.
-package discriminated_union_custom_members
+package simple
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// Discriminated union with custom member names
-type DU struct {
+// Discriminated union
+type Struct struct {
 	TypeMeta int
 
 	// +k8s:unionDiscriminator
 	D D `json:"d"`
 
-	// +k8s:unionMember={"memberName": "CustomM1"}
+	// +k8s:unionMember
 	// +k8s:optional
 	M1 *M1 `json:"m1"`
 
-	// +k8s:unionMember={"memberName": "CustomM2"}
+	// +k8s:unionMember
 	// +k8s:optional
 	M2 *M2 `json:"m2"`
 }
@@ -43,14 +43,10 @@ type DU struct {
 type D string
 
 const (
-	DM1 D = "CustomM1"
-	DM2 D = "CustomM2"
+	DM1 D = "M1"
+	DM2 D = "M2"
 )
 
-type M1 struct {
-	S string `json:"s"`
-}
+type M1 struct{}
 
-type M2 struct {
-	S string `json:"s"`
-}
+type M2 struct{}

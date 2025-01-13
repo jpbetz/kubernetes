@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package union
+package custom_members
 
 import (
 	"testing"
@@ -25,13 +25,14 @@ import (
 func Test(t *testing.T) {
 	st := localSchemeBuilder.Test(t)
 
-	st.Value(&U{M1: &M1{S: "x"}}).ExpectValid()
-	st.Value(&U{M2: &M2{S: "x"}}).ExpectValid()
+	st.Value(&Struct{D: DM1, M1: &M1{}}).ExpectValid()
+	st.Value(&Struct{D: DM2, M2: &M2{}}).ExpectValid()
 
-	st.Value(&U{M1: &M1{S: "x"}, M2: &M2{S: "x"}}).ExpectInvalid(
-		field.Invalid(nil, "{m1, m2}", "must specify exactly one of: `m1`, `m2`"),
+	st.Value(&Struct{D: DM2, M1: &M1{}, M2: &M2{}}).ExpectInvalid(
+		field.Invalid(field.NewPath("m1"), "", "may only be specified when `d` is \"CustomM1\""),
 	)
-	st.Value(&U{}).ExpectInvalid(
-		field.Invalid(nil, "", "must specify exactly one of: `m1`, `m2`"),
+
+	st.Value(&Struct{D: DM1}).ExpectInvalid(
+		field.Invalid(field.NewPath("m1"), "", "must be specified when `d` is \"CustomM1\""),
 	)
 }

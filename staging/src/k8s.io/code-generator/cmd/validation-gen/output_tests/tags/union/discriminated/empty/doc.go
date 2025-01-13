@@ -14,25 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package discriminated_union
+// +k8s:validation-gen=TypeMeta
+// +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
 
-import (
-	"testing"
+// This is a test package.
+package empty
 
-	"k8s.io/apimachinery/pkg/util/validation/field"
-)
+import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
-func Test(t *testing.T) {
-	st := localSchemeBuilder.Test(t)
+var localSchemeBuilder = testscheme.New()
 
-	st.Value(&DU{D: DM1, M1: &M1{S: "x"}}).ExpectValid()
-	st.Value(&DU{D: DM2, M2: &M2{S: "x"}}).ExpectValid()
+// Empty discriminated union
+type Struct struct {
+	TypeMeta int
 
-	st.Value(&DU{D: DM2, M1: &M1{S: "x"}, M2: &M2{S: "x"}}).ExpectInvalid(
-		field.Invalid(field.NewPath("m1"), "", "may only be specified when `d` is \"M1\""),
-	)
-
-	st.Value(&DU{D: DM1}).ExpectInvalid(
-		field.Invalid(field.NewPath("m1"), "", "must be specified when `d` is \"M1\""),
-	)
+	// +k8s:unionDiscriminator
+	D D `json:"d"`
 }
+
+type D string

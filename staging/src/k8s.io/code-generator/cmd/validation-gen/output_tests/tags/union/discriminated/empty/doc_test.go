@@ -14,25 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package discriminated_union_custom_members
+package empty
 
 import (
 	"testing"
-
-	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 func Test(t *testing.T) {
 	st := localSchemeBuilder.Test(t)
 
-	st.Value(&DU{D: DM1, M1: &M1{S: "x"}}).ExpectValid()
-	st.Value(&DU{D: DM2, M2: &M2{S: "x"}}).ExpectValid()
+	// Unions discriminators may be optional.
+	st.Value(&Struct{D: D("")}).ExpectValid()
 
-	st.Value(&DU{D: DM2, M1: &M1{S: "x"}, M2: &M2{S: "x"}}).ExpectInvalid(
-		field.Invalid(field.NewPath("m1"), "", "may only be specified when `d` is \"CustomM1\""),
-	)
-
-	st.Value(&DU{D: DM1}).ExpectInvalid(
-		field.Invalid(field.NewPath("m1"), "", "must be specified when `d` is \"CustomM1\""),
-	)
+	// Unions discriminators Should be validated for valid values.
+	st.Value(&Struct{D: D("Unknown")}).ExpectValid()
 }

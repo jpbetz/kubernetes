@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package multiple_discriminated_unions
+package simple
 
 import (
 	"testing"
@@ -25,14 +25,16 @@ import (
 func Test(t *testing.T) {
 	st := localSchemeBuilder.Test(t)
 
-	st.Value(&DU{DU1: U1M1, U1M1: &M1{S: "x"}, DU2: U2M1, U2M1: &M1{S: "x"}}).ExpectValid()
-	st.Value(&DU{DU1: U1M2, U1M2: &M2{S: "x"}, DU2: U2M2, U2M2: &M2{S: "x"}}).ExpectValid()
+	st.Value(&Struct{ /* zero values */ }).ExpectValid()
 
-	st.Value(&DU{DU1: U1M2, U1M1: &M1{S: "x"}, U1M2: &M2{S: "x"}}).ExpectInvalid(
-		field.Invalid(field.NewPath("u1m1"), "", "may only be specified when `du1` is \"U1M1\""),
+	st.Value(&Struct{D: DM1, M1: &M1{}}).ExpectValid()
+	st.Value(&Struct{D: DM2, M2: &M2{}}).ExpectValid()
+
+	st.Value(&Struct{D: DM2, M1: &M1{}, M2: &M2{}}).ExpectInvalid(
+		field.Invalid(field.NewPath("m1"), "", "may only be specified when `d` is \"M1\""),
 	)
 
-	st.Value(&DU{DU1: U1M2}).ExpectInvalid(
-		field.Invalid(field.NewPath("u1m2"), "", "must be specified when `du1` is \"U1M2\""),
+	st.Value(&Struct{D: DM1}).ExpectInvalid(
+		field.Invalid(field.NewPath("m1"), "", "must be specified when `d` is \"M1\""),
 	)
 }

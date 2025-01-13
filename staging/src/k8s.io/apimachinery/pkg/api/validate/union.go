@@ -38,20 +38,24 @@ import (
 //	}
 func Union(opCtx operation.Context, fldPath *field.Path, _, _ any, union *UnionMembership, fieldValues ...any) field.ErrorList {
 	if len(union.members) != len(fieldValues) {
-		return field.ErrorList{field.InternalError(fldPath, fmt.Errorf("unexpected difference in length between fields defined in UnionMembership and fieldValues"))}
+		return field.ErrorList{
+			field.InternalError(fldPath,
+				fmt.Errorf("number of field values (%d) does not match number of union members (%d)",
+					len(fieldValues), len(union.members))),
+		}
 	}
 	var specifiedMember *string
 	for i, fieldValue := range fieldValues {
 		rv := reflect.ValueOf(fieldValue)
 		if rv.IsValid() && !rv.IsZero() {
 			m := union.members[i]
-			if specifiedMember != nil && *specifiedMember != m.memberName {
+			if specifiedMember != nil && *specifiedMember != m.discriminatorValue {
 				return field.ErrorList{
 					field.Invalid(fldPath, fmt.Sprintf("{%s}", strings.Join(union.specifiedFields(fieldValues), ", ")),
 						fmt.Sprintf("must specify exactly one of: %s", strings.Join(union.allFields(), ", "))),
 				}
 			}
-			name := m.memberName
+			name := m.discriminatorValue
 			specifiedMember = &name
 		}
 	}
@@ -74,19 +78,26 @@ func Union(opCtx operation.Context, fldPath *field.Path, _, _ any, union *UnionM
 //		errs = append(errs, DiscriminatedUnion(opCtx, fldPath, in, abcUnionMembership, in.Type, in.A, in.B, in.C)...)
 //		return errs
 //	}
+//
+// It is not an error for the discriminatorValue to be unknown.  That must be
+// validated on its own.
 func DiscriminatedUnion[T ~string](opCtx operation.Context, fldPath *field.Path, _, _ any, union *UnionMembership, discriminatorValue T, fieldValues ...any) (errs field.ErrorList) {
 	discriminatorStrValue := string(discriminatorValue)
 	if len(union.members) != len(fieldValues) {
-		return field.ErrorList{field.InternalError(fldPath, fmt.Errorf("unexpected difference in length between fields defined in UnionMembership and fieldValues"))}
+		return field.ErrorList{
+			field.InternalError(fldPath,
+				fmt.Errorf("number of field values (%d) does not match number of union members (%d)",
+					len(fieldValues), len(union.members))),
+		}
 	}
 	for i, fieldValue := range fieldValues {
 		member := union.members[i]
-		isDiscriminatedMember := discriminatorStrValue == member.memberName
+		isDiscriminatedMember := discriminatorStrValue == member.discriminatorValue
 		rv := reflect.ValueOf(fieldValue)
 		isSpecified := rv.IsValid() && !rv.IsZero()
 		if isSpecified && !isDiscriminatedMember {
 			errs = append(errs, field.Invalid(fldPath.Child(member.fieldName), "",
-				fmt.Sprintf("may only be specified when `%s` is %q", union.discriminatorName, member.memberName)))
+				fmt.Sprintf("may only be specified when `%s` is %q", union.discriminatorName, member.discriminatorValue)))
 		} else if !isSpecified && isDiscriminatedMember {
 			errs = append(errs, field.Invalid(fldPath.Child(member.fieldName), "",
 				fmt.Sprintf("must be specified when `%s` is %q", union.discriminatorName, discriminatorValue)))
@@ -96,7 +107,7 @@ func DiscriminatedUnion[T ~string](opCtx operation.Context, fldPath *field.Path,
 }
 
 type member struct {
-	fieldName, memberName string
+	fieldName, discriminatorValue string
 }
 
 // UnionMembership represents an ordered list of field union memberships.
@@ -107,7 +118,7 @@ type UnionMembership struct {
 
 // NewUnionMembership returns a new UnionMembership for the given list of members.
 //
-// Each member is a [2]string to provide a fieldName and memberName pair, where
+// Each member is a [2]string to provide a fieldName and discriminatorValue pair, where
 // [0] identifies the field name and [1] identifies the union member Name.
 //
 // Field names must be unique.
@@ -121,7 +132,7 @@ func NewDiscriminatedUnionMembership(discriminatorFieldName string, members ...[
 	u := &UnionMembership{}
 	u.discriminatorName = discriminatorFieldName
 	for _, fieldName := range members {
-		u.members = append(u.members, member{fieldName: fieldName[0], memberName: fieldName[1]})
+		u.members = append(u.members, member{fieldName: fieldName[0], discriminatorValue: fieldName[1]})
 	}
 	return u
 }

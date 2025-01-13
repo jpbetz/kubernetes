@@ -18,15 +18,17 @@ limitations under the License.
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
 
 // This is a test package.
-package multiple_unions
+package multiple
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
 // Two non-discriminated unions in the same struct
-type U struct {
+type Struct struct {
 	TypeMeta int
+
+	NonUnionField string `json:"nonUnionField"`
 
 	// +k8s:unionMember={"union": "union1"}
 	// +k8s:optional
@@ -45,10 +47,6 @@ type U struct {
 	U2M2 *M2 `json:"u2m2"`
 }
 
-type M1 struct {
-	S string `json:"s"`
-}
+type M1 struct{}
 
-type M2 struct {
-	S string `json:"s"`
-}
+type M2 struct{}

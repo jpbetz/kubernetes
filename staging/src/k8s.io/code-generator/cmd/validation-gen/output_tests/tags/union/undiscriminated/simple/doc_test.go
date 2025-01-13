@@ -14,15 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package discriminated_union_empty
+package simple
 
 import (
 	"testing"
+
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 func Test(t *testing.T) {
 	st := localSchemeBuilder.Test(t)
 
-	// Unions discriminators may be optional.
-	st.Value(&DU1{D: D("")}).ExpectValid()
+	st.Value(&Struct{}).ExpectInvalid(
+		field.Invalid(nil, "", "must specify exactly one of: `m1`, `m2`"),
+	)
+
+	st.Value(&Struct{M1: &M1{}}).ExpectValid()
+	st.Value(&Struct{M2: &M2{}}).ExpectValid()
+
+	st.Value(&Struct{M1: &M1{}, M2: &M2{}}).ExpectInvalid(
+		field.Invalid(nil, "{m1, m2}", "must specify exactly one of: `m1`, `m2`"),
+	)
 }

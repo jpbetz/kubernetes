@@ -18,18 +18,18 @@ limitations under the License.
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
 
 // This is a test package.
-package multiple_discriminated_unions
+package multiple
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
 // Two discriminated unions in the same struct
-type DU struct {
+type Struct struct {
 	TypeMeta int
 
 	// +k8s:unionDiscriminator={"union": "union1"}
-	DU1 D `json:"du1"`
+	D1 D `json:"d1"`
 
 	// +k8s:unionMember={"union": "union1"}
 	// +k8s:optional
@@ -40,7 +40,7 @@ type DU struct {
 	U1M2 *M2 `json:"u1m2"`
 
 	// +k8s:unionDiscriminator={"union": "union2"}
-	DU2 D `json:"du2"`
+	D2 D `json:"d2"`
 
 	// +k8s:unionMember={"union": "union2"}
 	// +k8s:optional
@@ -60,10 +60,6 @@ const (
 	U2M2 D = "U2M2"
 )
 
-type M1 struct {
-	S string `json:"s"`
-}
+type M1 struct{}
 
-type M2 struct {
-	S string `json:"s"`
-}
+type M2 struct{}

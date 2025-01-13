@@ -14,33 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// +k8s:validation-gen=TypeMeta
-// +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
+package custom_members
 
-// This is a test package.
-package union
+import (
+	"testing"
 
-import "k8s.io/code-generator/cmd/validation-gen/testscheme"
+	"k8s.io/apimachinery/pkg/util/validation/field"
+)
 
-var localSchemeBuilder = testscheme.New()
+func Test(t *testing.T) {
+	st := localSchemeBuilder.Test(t)
 
-// Non-discriminated union
-type U struct {
-	TypeMeta int
+	st.Value(&Struct{M1: &M1{}}).ExpectValid()
+	st.Value(&Struct{M2: &M2{}}).ExpectValid()
 
-	// +k8s:unionMember
-	// +k8s:optional
-	M1 *M1 `json:"m1"`
-
-	// +k8s:unionMember
-	// +k8s:optional
-	M2 *M2 `json:"m2"`
-}
-
-type M1 struct {
-	S string `json:"s"`
-}
-
-type M2 struct {
-	S string `json:"s"`
+	st.Value(&Struct{M1: &M1{}, M2: &M2{}}).ExpectInvalid(
+		field.Invalid(nil, "{m1, m2}", "must specify exactly one of: `m1`, `m2`"),
+	)
+	st.Value(&Struct{}).ExpectInvalid(
+		field.Invalid(nil, "", "must specify exactly one of: `m1`, `m2`"),
+	)
 }
