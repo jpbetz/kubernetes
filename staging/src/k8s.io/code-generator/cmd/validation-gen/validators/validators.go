@@ -18,6 +18,7 @@ package validators
 
 import (
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
 )
@@ -41,6 +42,14 @@ type TagValidator interface {
 	Docs() TagDoc
 }
 
+// LateTagValidator is an optional extension to TagValidator. Any TagValidator
+// which implements this interface will be evaluated after all TagValidators
+// which do not.
+type LateTagValidator interface {
+	LateTagValidator()
+}
+
+// TypeValidator describes a validator which runs on every type definition.
 type TypeValidator interface {
 	// Init initializes the implementation.  This will be called exactly once.
 	Init(cfg Config)
@@ -50,7 +59,7 @@ type TypeValidator interface {
 	Name() string
 
 	// GetValidations returns any validations imposed by this validator for the
-	// given types.
+	// given context.
 	//
 	// The way gengo handles type definitions varies between structs and other
 	// types.  For struct definitions (e.g. `type Foo struct {}`), the realType
@@ -58,7 +67,7 @@ type TypeValidator interface {
 	// parentType will be nil.  For other types (e.g. `type Bar string`), the
 	// realType will be the underlying type and the parentType will be the
 	// newly defined type (the Kind field will be `types.Alias`).
-	GetValidations(realType, parentType *types.Type) (Validations, error)
+	GetValidations(context Context) (Validations, error)
 }
 
 // Config carries optional configuration information for use by validators.
@@ -145,6 +154,11 @@ type Context struct {
 	// Member provides details about a field within a struct, when Scope is
 	// ScopeField.  For all other values of Scope, this will be nil.
 	Member *types.Member
+
+	// Path provides the field path to the type or field being validated. This
+	// is useful for identifying an exact context, e.g. to track information
+	// between related tags.
+	Path *field.Path
 }
 
 // TagDoc describes a comment-tag and its usage.
@@ -394,4 +408,32 @@ func (v variableGen) Var() PrivateVar {
 
 func (v variableGen) Init() FunctionGen {
 	return v.init
+}
+
+// WrapperFunction describes a function literal which has the fingerprint of a
+// regular validation function (opCtx, fldPath, obj, oldObj) and calls another
+// validation function with the same signature, plus extra args if needed.
+type WrapperFunction struct {
+	Function FunctionGen
+	ObjType  *types.Type
+}
+
+// Literal is a literal value that, when used as an argument to a validator,
+// will be emitted without any further interpretation.  Use this with caution,
+// it will not be subject to Namers.
+type Literal string
+
+// FunctionLiteral describes a function-literal expression that can be used as
+// an argument to a validator.  Unlike WrapperFunction, this does not
+// necessarily have the same signature as a regular validation function.
+type FunctionLiteral struct {
+	Parameters []ParamResult
+	Results    []ParamResult
+	Body       string
+}
+
+// ParamResult represents a parameter or a result of a function.
+type ParamResult struct {
+	Name string
+	Type *types.Type
 }

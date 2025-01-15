@@ -52,14 +52,14 @@ func (unionTypeValidator) Name() string {
 	return "unionTypeValidator"
 }
 
-func (utv unionTypeValidator) GetValidations(realType, _ *types.Type) (Validations, error) {
+func (utv unionTypeValidator) GetValidations(context Context) (Validations, error) {
 	result := Validations{}
 
-	if realType.Kind != types.Struct {
+	if context.Type.Kind != types.Struct {
 		return result, nil
 	}
 
-	unions := utv.shared[realType]
+	unions := utv.shared[context.Type]
 	if len(unions) == 0 {
 		return result, nil
 	}
@@ -76,7 +76,7 @@ func (utv unionTypeValidator) GetValidations(realType, _ *types.Type) (Validatio
 			// TODO: Avoid the "local" here. This was added to to avoid errors caused when the package is an empty string.
 			//       The correct package would be the output package but is not known here. This does not show up in generated code.
 			// TODO: Append a consistent hash suffix to avoid generated name conflicts?
-			supportVarName := PrivateVar{Name: "UnionMembershipFor" + realType.Name.Name + unionName, Package: "local"}
+			supportVarName := PrivateVar{Name: "UnionMembershipFor" + context.Type.Name.Name + unionName, Package: "local"}
 			if u.discriminator != nil {
 				supportVar := Variable(supportVarName,
 					Function(unionMemberTagName, DefaultFlags, newDiscriminatedUnionMembership,

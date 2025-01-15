@@ -447,6 +447,7 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 	context := validators.Context{
 		Scope: validators.ScopeType,
 		Type:  t,
+		Path:  fldPath,
 	}
 	if t.Kind == types.Alias {
 		context.Parent = t
@@ -530,6 +531,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			Type:   memb.Type,
 			Parent: thisNode.valueType,
 			Member: &memb,
+			Path:   childPath,
 		}
 		if validations, err := td.validator.ExtractValidations(context, memb.CommentLines); err != nil {
 			return fmt.Errorf("field %s: %w", childPath.String(), err)
@@ -551,6 +553,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 				Scope:  validators.ScopeListVal,
 				Type:   childType.Elem,
 				Parent: memb.Type,
+				Path:   childPath.Key("vals"),
 			}
 			if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, memb.CommentLines); err != nil {
 				return fmt.Errorf("%v: %w", childPath.Key("vals"), err)
@@ -582,6 +585,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 					Type:   subfield.Type,
 					Parent: childType, // the struct being iterated
 					Member: &subfield,
+					Path:   childPath,
 				}
 				// Passing memb.CommentLines because subfield validations are
 				// declared on the *parent* type (memb) field and not the *subfield* type (subfield).
@@ -612,6 +616,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 				Scope:  validators.ScopeMapKey,
 				Type:   childType.Key,
 				Parent: memb.Type,
+				Path:   childPath,
 			}
 			if validations, err := td.extractEmbeddedValidations(eachKeyTag, keyCtxt, memb.CommentLines); err != nil {
 				return fmt.Errorf("%v: %w", childPath.Key("keys"), err)
@@ -629,6 +634,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 				Scope:  validators.ScopeMapVal,
 				Type:   childType.Elem,
 				Parent: memb.Type,
+				Path:   childPath,
 			}
 			if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, memb.CommentLines); err != nil {
 				return fmt.Errorf("%v: %w", childPath.Key("vals"), err)
@@ -693,6 +699,7 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 			Scope:  validators.ScopeListVal,
 			Type:   underlying.Elem,
 			Parent: underlying,
+			Path:   fldPath,
 		}
 		if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, thisNode.valueType.CommentLines); err != nil {
 			return fmt.Errorf("%v: %w", fldPath.Key("vals"), err)
@@ -708,6 +715,7 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 			Scope:  validators.ScopeMapKey,
 			Type:   underlying.Key,
 			Parent: underlying,
+			Path:   fldPath.Key("keys"),
 		}
 		if validations, err := td.extractEmbeddedValidations(eachKeyTag, keyCtxt, thisNode.valueType.CommentLines); err != nil {
 			return fmt.Errorf("%v: %w", fldPath.Key("keys"), err)
@@ -722,6 +730,7 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 			Scope:  validators.ScopeMapVal,
 			Type:   underlying.Elem,
 			Parent: underlying,
+			Path:   fldPath.Key("vals"),
 		}
 		if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, thisNode.valueType.CommentLines); err != nil {
 			return fmt.Errorf("%v: %w", fldPath.Key("vals"), err)
@@ -1471,6 +1480,78 @@ func toGolangSourceDataLiteral(sw *generator.SnippetWriter, c *generator.Context
 		sw.Do("$.|private$", c.Universe.Type(types.Name(v)))
 	case *validators.PrivateVar:
 		sw.Do("$.|private$", c.Universe.Type(types.Name(*v)))
+	case validators.WrapperFunction:
+		fn, extraArgs := v.Function.SignatureAndArgs()
+		targs := generator.Args{
+			"funcName":   c.Universe.Type(fn),
+			"field":      mkSymbolArgs(c, fieldPkgSymbols),
+			"operation":  mkSymbolArgs(c, operationPkgSymbols),
+			"objType":    v.ObjType,
+			"objTypePfx": "*",
+		}
+		if isNilableType(v.ObjType) {
+			targs["objTypePfx"] = ""
+		}
+
+		emitCall := func() {
+			sw.Do("return $.funcName|raw$", targs)
+			typeArgs := v.Function.TypeArgs()
+			if len(typeArgs) > 0 {
+				sw.Do("[", nil)
+				for i, typeArg := range typeArgs {
+					sw.Do("$.|raw$", c.Universe.Type(typeArg))
+					if i < len(typeArgs)-1 {
+						sw.Do(",", nil)
+					}
+				}
+				sw.Do("]", nil)
+			}
+			sw.Do("(opCtx, fldPath, obj, oldObj", targs)
+			for _, arg := range extraArgs {
+				sw.Do(", ", nil)
+				toGolangSourceDataLiteral(sw, c, arg)
+			}
+			sw.Do(")", targs)
+		}
+		sw.Do("func(", targs)
+		sw.Do("    opCtx $.operation.Context|raw$, ", targs)
+		sw.Do("    fldPath *$.field.Path|raw$, ", targs)
+		sw.Do("    obj, oldObj $.objTypePfx$$.objType|raw$ ", targs)
+		sw.Do(")    $.field.ErrorList|raw$ {\n", targs)
+		emitCall()
+		sw.Do("\n}", targs)
+	case validators.Literal:
+		sw.Do("$.$", v)
+	case validators.FunctionLiteral:
+		sw.Do("func(", nil)
+		for i, param := range v.Parameters {
+			if i > 0 {
+				sw.Do(", ", nil)
+			}
+			targs := generator.Args{
+				"name": param.Name,
+				"type": param.Type,
+			}
+			sw.Do("$.name$ $.type|raw$", targs)
+		}
+		sw.Do(")", nil)
+		if len(v.Results) > 1 {
+			sw.Do(" (", nil)
+		}
+		for i, ret := range v.Results {
+			if i > 0 {
+				sw.Do(", ", nil)
+			}
+			targs := generator.Args{
+				"name": ret.Name,
+				"type": ret.Type,
+			}
+			sw.Do("$.name$ $.type|raw$", targs)
+		}
+		if len(v.Results) > 1 {
+			sw.Do(")", nil)
+		}
+		sw.Do(" { $.$ }", v.Body)
 	default:
 		rv := reflect.ValueOf(value)
 		switch rv.Kind() {

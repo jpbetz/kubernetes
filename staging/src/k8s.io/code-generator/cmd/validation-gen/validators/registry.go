@@ -39,10 +39,10 @@ type registry struct {
 	lock        sync.Mutex
 	initialized atomic.Bool // init() was called
 
-	typeValidators []TypeValidator
-
 	tagValidators map[string]TagValidator // keyed by tagname
 	tagIndex      []string                // all tag names
+
+	typeValidators []TypeValidator
 }
 
 func (reg *registry) addTagValidator(tv TagValidator) {
@@ -84,18 +84,18 @@ func (reg *registry) init(c *generator.Context) {
 		Validator:    reg,
 	}
 
+	for _, tv := range globalRegistry.tagValidators {
+		reg.tagIndex = append(reg.tagIndex, tv.TagName())
+		tv.Init(cfg)
+	}
+	sort.Strings(reg.tagIndex)
+
 	for _, tv := range reg.typeValidators {
 		tv.Init(cfg)
 	}
 	slices.SortFunc(reg.typeValidators, func(a, b TypeValidator) int {
 		return cmp.Compare(a.Name(), b.Name())
 	})
-
-	for _, tv := range globalRegistry.tagValidators {
-		reg.tagIndex = append(reg.tagIndex, tv.TagName())
-		tv.Init(cfg)
-	}
-	sort.Strings(reg.tagIndex)
 
 	reg.initialized.Store(true)
 }
@@ -113,10 +113,34 @@ func (reg *registry) ExtractValidations(context Context, comments []string) (Val
 
 	validations := Validations{}
 
+	// Extract tags and run matching tag-validators first.
+	tags, err := gengo.ExtractFunctionStyleCommentTags("+", reg.tagIndex, comments)
+	if err != nil {
+		return Validations{}, fmt.Errorf("failed to parse tags: %w", err)
+	}
+	phases := reg.sortTagsIntoPhases(tags)
+	for _, idx := range phases {
+		for _, tag := range idx {
+			vals := tags[tag]
+			tv := reg.tagValidators[tag]
+			if scopes := tv.ValidScopes(); !scopes.Has(context.Scope) && !scopes.Has(ScopeAny) {
+				return Validations{}, fmt.Errorf("tag %q cannot be specified on %s", tv.TagName(), context.Scope)
+			}
+			for _, val := range vals { // tags may have multiple values
+				if theseValidations, err := tv.GetValidations(context, val.Args, val.Value); err != nil {
+					return Validations{}, fmt.Errorf("tag %q: %w", tv.TagName(), err)
+				} else {
+					validations.Add(theseValidations)
+				}
+			}
+		}
+	}
+
+	// Run type-validators after tag validators are done.
 	if context.Scope == ScopeType {
 		// Run all type-validators.
 		for _, tv := range reg.typeValidators {
-			if theseValidations, err := tv.GetValidations(context.Type, context.Parent); err != nil {
+			if theseValidations, err := tv.GetValidations(context); err != nil {
 				return Validations{}, fmt.Errorf("type validator %q: %w", tv.Name(), err)
 			} else {
 				validations.Add(theseValidations)
@@ -124,13 +148,11 @@ func (reg *registry) ExtractValidations(context Context, comments []string) (Val
 		}
 	}
 
-	// Extract all known tags so we can iterate them.
-	tags, err := gengo.ExtractFunctionStyleCommentTags("+", reg.tagIndex, comments)
-	if err != nil {
-		return Validations{}, fmt.Errorf("failed to parse tags: %w", err)
-	}
+	return validations, nil
+}
 
-	// Sort tags before collecting validations.
+func (reg *registry) sortTagsIntoPhases(tags map[string][]gengo.Tag) [][]string {
+	// First sort all tags by their name, so the final output is deterministic.
 	//
 	// It makes more sense to sort here, rather than when emitting because:
 	//
@@ -153,29 +175,24 @@ func (reg *registry) ExtractValidations(context Context, comments []string) (Val
 	// "k8s:validateFalse".  All of the records within each of those is
 	// relatively ordered, so the result here would be to put "ifOptionEnabled"
 	// before "validateFalse" (lexicographical is better than random).
-	idx := []string{}
+	sortedTags := []string{}
 	for tag := range tags {
-		idx = append(idx, tag)
+		sortedTags = append(sortedTags, tag)
 	}
-	sort.Strings(idx)
+	sort.Strings(sortedTags)
 
-	// Run matching tag-validators.
-	for _, tag := range idx {
-		vals := tags[tag]
-		tv := reg.tagValidators[tag]
-		if scopes := tv.ValidScopes(); !scopes.Has(context.Scope) && !scopes.Has(ScopeAny) {
-			return Validations{}, fmt.Errorf("tag %q cannot be specified on %s", tv.TagName(), context.Scope)
-		}
-		for _, val := range vals { // tags may have multiple values
-			if theseValidations, err := tv.GetValidations(context, val.Args, val.Value); err != nil {
-				return Validations{}, fmt.Errorf("tag %q: %w", tv.TagName(), err)
-			} else {
-				validations.Add(theseValidations)
-			}
+	// Now split them into phases.
+	phase0 := []string{} // regular tags
+	phase1 := []string{} // "late" tags
+	for _, tn := range sortedTags {
+		tv := reg.tagValidators[tn]
+		if _, ok := tv.(LateTagValidator); ok {
+			phase1 = append(phase1, tn)
+		} else {
+			phase0 = append(phase0, tn)
 		}
 	}
-
-	return validations, nil
+	return [][]string{phase0, phase1}
 }
 
 // Docs returns documentation for each tag in this registry.
