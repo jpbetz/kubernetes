@@ -19,7 +19,7 @@ require (
 	k8s.io/component-base v0.0.0
 	k8s.io/kube-openapi v0.0.0-20241212222426-2c72e554b1e7
 	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738
-	sigs.k8s.io/structured-merge-diff/v4 v4.4.2
+	sigs.k8s.io/structured-merge-diff/v4 v4.5.1-0.20250117030100-b53bea6766e1
 )
 
 require (
@@ -118,4 +118,5 @@ replace (
 	k8s.io/code-generator => ../code-generator
 	k8s.io/component-base => ../component-base
 	k8s.io/kms => ../kms
+	sigs.k8s.io/structured-merge-diff/v4 => github.com/jpbetz/structured-merge-diff/v4 v4.5.1-0.20250117030100-b53bea6766e1
 )

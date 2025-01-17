@@ -33,6 +33,9 @@ type UpdaterBuilder struct {
 	Converter    Converter
 	IgnoreFilter map[fieldpath.APIVersion]fieldpath.Filter
 
+	// IgnoredFields provides a set of fields to ignore for each
+	IgnoredFields map[fieldpath.APIVersion]*fieldpath.Set
+
 	// Stop comparing the new object with old object after applying.
 	// This was initially used to avoid spurious etcd update, but
 	// since that's vastly inefficient, we've come-up with a better
@@ -46,6 +49,7 @@ func (u *UpdaterBuilder) BuildUpdater() *Updater {
 	return &Updater{
 		Converter:         u.Converter,
 		IgnoreFilter:      u.IgnoreFilter,
+		IgnoredFields:     u.IgnoredFields,
 		returnInputOnNoop: u.ReturnInputOnNoop,
 	}
 }
@@ -57,12 +61,17 @@ type Updater struct {
 	Converter Converter
 
 	// Deprecated: This will eventually become private.
+	IgnoredFields map[fieldpath.APIVersion]*fieldpath.Set
+
+	// Deprecated: This will eventually become private.
 	IgnoreFilter map[fieldpath.APIVersion]fieldpath.Filter
+
+	FilterUnsetMarkers bool
 
 	returnInputOnNoop bool
 }
 
-func (s *Updater) update(oldObject, newObject *typed.TypedValue, version fieldpath.APIVersion, managers fieldpath.ManagedFields, workflow string, force bool) (fieldpath.ManagedFields, *typed.Comparison, error) {
+func (s *Updater) update(oldObject, newObject *typed.TypedValue, version fieldpath.APIVersion, managers fieldpath.ManagedFields, workflow string, force bool, markedUnset *fieldpath.Set) (fieldpath.ManagedFields, *typed.Comparison, error) {
 	conflicts := fieldpath.ManagedFields{}
 	removed := fieldpath.ManagedFields{}
 	compare, err := oldObject.Compare(newObject)
@@ -70,8 +79,19 @@ func (s *Updater) update(oldObject, newObject *typed.TypedValue, version fieldpa
 		return nil, nil, fmt.Errorf("failed to compare objects: %v", err)
 	}
 
-	versions := map[fieldpath.APIVersion]*typed.Comparison{
-		version: compare.FilterFields(s.IgnoreFilter[version]),
+	var versions map[fieldpath.APIVersion]*typed.Comparison
+
+	if s.IgnoredFields != nil && s.IgnoreFilter != nil {
+		return nil, nil, fmt.Errorf("IgnoreFilter and IgnoreFilter may not both be set")
+	}
+	if s.IgnoredFields != nil {
+		versions = map[fieldpath.APIVersion]*typed.Comparison{
+			version: compare.ExcludeFields(s.IgnoredFields[version]),
+		}
+	} else {
+		versions = map[fieldpath.APIVersion]*typed.Comparison{
+			version: compare.FilterFields(s.IgnoreFilter[version]),
+		}
 	}
 
 	for manager, managerSet := range managers {
@@ -101,10 +121,22 @@ func (s *Updater) update(oldObject, newObject *typed.TypedValue, version fieldpa
 			if err != nil {
 				return nil, nil, fmt.Errorf("failed to compare objects: %v", err)
 			}
-			versions[managerSet.APIVersion()] = compare.FilterFields(s.IgnoreFilter[managerSet.APIVersion()])
+
+			if s.IgnoredFields != nil {
+				versions[managerSet.APIVersion()] = compare.ExcludeFields(s.IgnoredFields[managerSet.APIVersion()])
+			} else {
+				versions[managerSet.APIVersion()] = compare.FilterFields(s.IgnoreFilter[managerSet.APIVersion()])
+			}
 		}
 
+		// Modified and added fields that are owned by another manager are conflicts.
 		conflictSet := managerSet.Set().Intersection(compare.Modified.Union(compare.Added))
+
+		if markedUnset != nil {
+			// Removals of fields using "{__k8s_io_value__: unset}", that are owned by another manager, are conflicts.
+			conflictSet = conflictSet.Union(markedUnset.Intersection(compare.Removed))
+		}
+
 		if !conflictSet.Empty() {
 			conflicts[manager] = fieldpath.NewVersionedSet(conflictSet, managerSet.APIVersion(), false)
 		}
@@ -146,7 +178,7 @@ func (s *Updater) Update(liveObject, newObject *typed.TypedValue, version fieldp
 	if err != nil {
 		return nil, fieldpath.ManagedFields{}, err
 	}
-	managers, compare, err := s.update(liveObject, newObject, version, managers, manager, true)
+	managers, compare, err := s.update(liveObject, newObject, version, managers, manager, true, nil)
 	if err != nil {
 		return nil, fieldpath.ManagedFields{}, err
 	}
@@ -154,7 +186,16 @@ func (s *Updater) Update(liveObject, newObject *typed.TypedValue, version fieldp
 		managers[manager] = fieldpath.NewVersionedSet(fieldpath.NewSet(), version, false)
 	}
 	set := managers[manager].Set().Difference(compare.Removed).Union(compare.Modified).Union(compare.Added)
-	ignoreFilter := s.IgnoreFilter[version]
+
+	if s.IgnoredFields != nil && s.IgnoreFilter != nil {
+		return nil, nil, fmt.Errorf("IgnoreFilter and IgnoreFilter may not both be set")
+	}
+	var ignoreFilter fieldpath.Filter
+	if s.IgnoredFields != nil {
+		ignoreFilter = fieldpath.NewExcludeSetFilter(s.IgnoredFields[version])
+	} else {
+		ignoreFilter = s.IgnoreFilter[version]
+	}
 	if ignoreFilter != nil {
 		set = ignoreFilter.Filter(set)
 	}
@@ -170,35 +211,85 @@ func (s *Updater) Update(liveObject, newObject *typed.TypedValue, version fieldp
 	return newObject, managers, nil
 }
 
+type applyOptions struct {
+	allowUnsetMarkers bool
+}
+
+type ApplyOption = func(opts *applyOptions) *applyOptions
+
+// AllowUnsetMarkers allows the caller to specify "{__k8s_io_value__: unset}" in the config object to
+// indicate that the field should be unset.
+func AllowUnsetMarkers() ApplyOption {
+	return func(opts *applyOptions) *applyOptions {
+		opts.allowUnsetMarkers = true
+		return opts
+	}
+}
+
 // Apply should be called when Apply is run, given the current object as
 // well as the configuration that is applied. This will merge the object
 // and return it.
-func (s *Updater) Apply(liveObject, configObject *typed.TypedValue, version fieldpath.APIVersion, managers fieldpath.ManagedFields, manager string, force bool) (*typed.TypedValue, fieldpath.ManagedFields, error) {
+func (s *Updater) Apply(liveObject, configObject *typed.TypedValue, version fieldpath.APIVersion, managers fieldpath.ManagedFields, manager string, force bool, opts ...ApplyOption) (*typed.TypedValue, fieldpath.ManagedFields, error) {
+	applyOpts := &applyOptions{}
+	for _, opt := range opts {
+		opt(applyOpts)
+	}
+
 	var err error
 	managers, err = s.reconcileManagedFieldsWithSchemaChanges(liveObject, managers)
 	if err != nil {
 		return nil, fieldpath.ManagedFields{}, err
 	}
-	newObject, err := liveObject.Merge(configObject)
-	if err != nil {
-		return nil, fieldpath.ManagedFields{}, fmt.Errorf("failed to merge config: %v", err)
-	}
 	lastSet := managers[manager]
+
+	var markedAsUnset *fieldpath.Set
+	if applyOpts.allowUnsetMarkers {
+		// Remove any "{__k8s_io_value__: unset}" marker items from the configObject and
+		// get the set of items that should be unset according to the markers.
+		configObject, markedAsUnset, err = configObject.ExtractMarkers()
+		if err != nil {
+			return nil, fieldpath.ManagedFields{}, fmt.Errorf("failed to exract apply markers: %v", err)
+		}
+	}
 	set, err := configObject.ToFieldSet()
 	if err != nil {
 		return nil, fieldpath.ManagedFields{}, fmt.Errorf("failed to get field set: %v", err)
 	}
 
-	ignoreFilter := s.IgnoreFilter[version]
+	if markedAsUnset != nil && !markedAsUnset.Empty() {
+		// Items unset using markers are tracked as managed fields.
+		// That is, an item marked as unset indicates that the field manager "owns the opinion that the field is unset".
+		set = set.Union(markedAsUnset)
+	}
+
+	newObject, err := liveObject.Merge(configObject)
+	if err != nil {
+		return nil, fieldpath.ManagedFields{}, fmt.Errorf("failed to merge config: %v", err)
+	}
+
+	if markedAsUnset != nil && !markedAsUnset.Empty() {
+		newObject = newObject.RemoveItems(markedAsUnset)
+	}
+
+	if s.IgnoredFields != nil && s.IgnoreFilter != nil {
+		return nil, nil, fmt.Errorf("IgnoreFilter and IgnoreFilter may not both be set")
+	}
+	var ignoreFilter fieldpath.Filter
+	if s.IgnoredFields != nil {
+		ignoreFilter = fieldpath.NewExcludeSetFilter(s.IgnoredFields[version])
+	} else {
+		ignoreFilter = s.IgnoreFilter[version]
+	}
 	if ignoreFilter != nil {
 		set = ignoreFilter.Filter(set)
 	}
 	managers[manager] = fieldpath.NewVersionedSet(set, version, true)
+
 	newObject, err = s.prune(newObject, managers, manager, lastSet)
 	if err != nil {
 		return nil, fieldpath.ManagedFields{}, fmt.Errorf("failed to prune fields: %v", err)
 	}
-	managers, _, err = s.update(liveObject, newObject, version, managers, manager, force)
+	managers, _, err = s.update(liveObject, newObject, version, managers, manager, force, markedAsUnset)
 	if err != nil {
 		return nil, fieldpath.ManagedFields{}, err
 	}
@@ -213,6 +304,7 @@ func (s *Updater) Apply(liveObject, configObject *typed.TypedValue, version fiel
 // * applyingManager didn't apply it this time
 // * no other applier claims to manage it
 func (s *Updater) prune(merged *typed.TypedValue, managers fieldpath.ManagedFields, applyingManager string, lastSet fieldpath.VersionedSet) (*typed.TypedValue, error) {
+	// TODO: Generalize this function to take markers of any kind.
 	if lastSet == nil || lastSet.Set().Empty() {
 		return merged, nil
 	}

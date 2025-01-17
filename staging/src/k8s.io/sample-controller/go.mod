@@ -55,7 +55,7 @@ require (
 	k8s.io/kube-openapi v0.0.0-20241212222426-2c72e554b1e7 // indirect
 	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738 // indirect
 	sigs.k8s.io/json v0.0.0-20241010143419-9aa6b5e7a4b3 // indirect
-	sigs.k8s.io/structured-merge-diff/v4 v4.4.2 // indirect
+	sigs.k8s.io/structured-merge-diff/v4 v4.5.1-0.20250117030100-b53bea6766e1 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
 
@@ -64,4 +64,5 @@ replace (
 	k8s.io/apimachinery => ../apimachinery
 	k8s.io/client-go => ../client-go
 	k8s.io/code-generator => ../code-generator
+	sigs.k8s.io/structured-merge-diff/v4 => github.com/jpbetz/structured-merge-diff/v4 v4.5.1-0.20250117030100-b53bea6766e1
 )

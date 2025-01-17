@@ -82,11 +82,12 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/api v0.0.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20241212222426-2c72e554b1e7 // indirect
-	sigs.k8s.io/structured-merge-diff/v4 v4.4.2 // indirect
+	sigs.k8s.io/structured-merge-diff/v4 v4.5.1-0.20250117030100-b53bea6766e1 // indirect
 )
 
 replace (
 	k8s.io/api => ../api
 	k8s.io/apimachinery => ../apimachinery
 	k8s.io/client-go => ../client-go
+	sigs.k8s.io/structured-merge-diff/v4 => github.com/jpbetz/structured-merge-diff/v4 v4.5.1-0.20250117030100-b53bea6766e1
 )

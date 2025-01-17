@@ -52,7 +52,8 @@ type validatingObjectWalker struct {
 	typeRef schema.TypeRef
 	// If set to true, duplicates will be allowed in
 	// associativeLists/sets.
-	allowDuplicates bool
+	allowDuplicates   bool
+	allowUnsetMarkers bool
 
 	// Allocate only as many walkers as needed for the depth by storing them here.
 	spareWalkers *[]*validatingObjectWalker
@@ -117,6 +118,11 @@ func validateScalar(t *schema.Scalar, v value.Value, prefix string) (errs Valida
 }
 
 func (v *validatingObjectWalker) doScalar(t *schema.Scalar) ValidationErrors {
+	// TODO: Also limit to schema.Bool and schema.Numeric?
+	if v.allowUnsetMarkers && v.value.IsString() && v.value.AsString() == "$unset$" {
+		return nil
+	}
+
 	if errs := validateScalar(t, v.value, ""); len(errs) > 0 {
 		return errs
 	}
@@ -155,6 +161,11 @@ func (v *validatingObjectWalker) visitListItems(t *schema.List, list value.List)
 }
 
 func (v *validatingObjectWalker) doList(t *schema.List) (errs ValidationErrors) {
+	// TODO: Also limit to schema.Bool and schema.Numeric?
+	if v.allowUnsetMarkers && v.value.IsString() && v.value.AsString() == "$unset$" {
+		return nil
+	}
+
 	list, err := listValue(v.allocator, v.value)
 	if err != nil {
 		return errorf(err.Error())
@@ -191,6 +202,21 @@ func (v *validatingObjectWalker) visitMapItems(t *schema.Map, m value.Map) (errs
 }
 
 func (v *validatingObjectWalker) doMap(t *schema.Map) (errs ValidationErrors) {
+	// TODO: Also limit to schema.Bool and schema.Numeric?
+	if v.allowUnsetMarkers && v.value.IsString() && v.value.AsString() == "$unset$" {
+		return nil
+	}
+
+	// TODO: This is not the right way to handle unsets in listType=map.  Need to make this check fully correct.
+	if v.allowUnsetMarkers && v.value.IsMap() {
+		if maybeUnsetValue, ok := v.value.AsMap().Get("_"); ok {
+			if maybeUnsetValue.IsString() && maybeUnsetValue.AsString() == "$unset$" {
+				return nil
+			}
+		}
+		return nil
+	}
+
 	m, err := mapValue(v.allocator, v.value)
 	if err != nil {
 		return errorf(err.Error())

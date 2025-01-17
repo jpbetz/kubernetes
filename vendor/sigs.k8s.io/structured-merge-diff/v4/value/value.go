@@ -52,6 +52,8 @@ type Value interface {
 	// IsMap returns true if the Value is null, false otherwise.
 	IsNull() bool
 
+	// TODO: Add IsMarker and AsMarker and introduce an enum of marker types
+
 	// AsMap converts the Value into a Map (or panic if the type
 	// doesn't allow it).
 	AsMap() Map

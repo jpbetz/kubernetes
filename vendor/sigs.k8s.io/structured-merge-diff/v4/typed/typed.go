@@ -17,6 +17,7 @@ limitations under the License.
 package typed
 
 import (
+	"fmt"
 	"sync"
 
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
@@ -30,7 +31,25 @@ type ValidationOptions int
 const (
 	// AllowDuplicates means that sets and associative lists can have duplicate similar items.
 	AllowDuplicates ValidationOptions = iota
+
+	// TODO: Simplify this to allow markers of any kind
+	AllowUnsetMarkers ValidationOptions = iota
 )
+
+// extractItemsOptions is the options available when extracting items.
+type extractItemsOptions struct {
+	appendKeyFields bool
+}
+
+type ExtractItemsOption func(*extractItemsOptions)
+
+// WithAppendKeyFields configures ExtractItems to include key fields.
+// It is exported for use in configuring ExtractItems.
+func WithAppendKeyFields() ExtractItemsOption {
+	return func(opts *extractItemsOptions) {
+		opts.appendKeyFields = true
+	}
+}
 
 // AsTyped accepts a value and a type and returns a TypedValue. 'v' must have
 // type 'typeName' in the schema. An error is returned if the v doesn't conform
@@ -93,6 +112,8 @@ func (tv TypedValue) Validate(opts ...ValidationOptions) error {
 		switch opt {
 		case AllowDuplicates:
 			w.allowDuplicates = true
+		case AllowUnsetMarkers:
+			w.allowUnsetMarkers = true
 		}
 	}
 	defer w.finished()
@@ -111,6 +132,28 @@ func (tv TypedValue) ToFieldSet() (*fieldpath.Set, error) {
 		return nil, errs
 	}
 	return w.set, nil
+}
+
+// ExtractMarkers finds and all the "{__k8s_io_value__: unset}" marker values in TypedValue.
+// It returns a copy of the TypedValue with the marker values removed, and a set of field paths
+// that were marked as unset.
+func (tv TypedValue) ExtractMarkers() (value *TypedValue, unsetMarkers *fieldpath.Set, err error) {
+	unsetMarkers, fieldsToClear, err := func() (markedAsUnset *fieldpath.Set, toClear *fieldpath.Set, err error) {
+		w := tv.markerExtractorWalker()
+		defer w.finished()
+		if errs := w.extractMarkers(); len(errs) != 0 {
+			return nil, nil, errs
+		}
+		return w.unsetMarkers, w.fieldsToClear, nil
+	}()
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to extract markers: %v", err)
+	}
+
+	// Remove fields according to the unset markers and the managedFieldSet of fields that should be cleared.
+	value = tv.RemoveItems(unsetMarkers.Union(fieldsToClear))
+
+	return value, unsetMarkers, nil
 }
 
 // Merge returns the result of merging tv and pso ("partially specified
@@ -187,7 +230,37 @@ func (tv TypedValue) RemoveItems(items *fieldpath.Set) *TypedValue {
 }
 
 // ExtractItems returns a value with only the provided list or map items extracted from the value.
-func (tv TypedValue) ExtractItems(items *fieldpath.Set) *TypedValue {
+func (tv TypedValue) ExtractItems(items *fieldpath.Set, opts ...ExtractItemsOption) *TypedValue {
+	options := &extractItemsOptions{}
+	for _, opt := range opts {
+		opt(options)
+	}
+	if options.appendKeyFields {
+		tvPathSet, err := tv.ToFieldSet()
+		if err == nil {
+			keyFieldPathSet := fieldpath.NewSet()
+			items.Iterate(func(path fieldpath.Path) {
+				if !tvPathSet.Has(path) {
+					return
+				}
+				for i, pe := range path {
+					if pe.Key == nil {
+						continue
+					}
+					for _, keyField := range *pe.Key {
+						keyName := keyField.Name
+						// Create a new slice with the same elements as path[:i+1], but set its capacity to len(path[:i+1]).
+						// This ensures that appending to keyFieldPath creates a new underlying array, avoiding accidental
+						// modification of the original slice (path).
+						keyFieldPath := append(path[:i+1:i+1], fieldpath.PathElement{FieldName: &keyName})
+						keyFieldPathSet.Insert(keyFieldPath)
+					}
+				}
+			})
+			items = items.Union(keyFieldPathSet)
+		}
+	}
+
 	tv.value = removeItemsWithSchema(tv.value, items, tv.schema, tv.typeRef, true)
 	return &tv
 }
