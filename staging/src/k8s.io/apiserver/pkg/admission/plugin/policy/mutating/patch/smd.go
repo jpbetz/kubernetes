@@ -128,7 +128,7 @@ func ApplyStructuredMergeDiff(
 		return nil, fmt.Errorf("type converter must not be nil")
 	}
 
-	patchObjTyped, err := typeConverter.ObjectToTyped(patch)
+	patchObjTyped, err := typeConverter.ObjectToTyped(patch, typed.AllowUnsetMarkers)
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert patch object to typed object: %w", err)
 	}
@@ -143,9 +143,18 @@ func ApplyStructuredMergeDiff(
 		return nil, fmt.Errorf("failed to convert original object to typed object: %w", err)
 	}
 
+	patchObjTyped, markedAsUnset, err := patchObjTyped.ExtractMarkers()
+	if err != nil {
+		return nil, fmt.Errorf("failed to extract markers: %w", err)
+	}
+
 	newObjTyped, err := liveObjTyped.Merge(patchObjTyped)
 	if err != nil {
 		return nil, fmt.Errorf("failed to merge patch: %w", err)
+	}
+
+	if markedAsUnset != nil && !markedAsUnset.Empty() {
+		newObjTyped = newObjTyped.RemoveItems(markedAsUnset)
 	}
 
 	// Our mutating admission policy sets the fields but does not track ownership.
