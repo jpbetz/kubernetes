@@ -993,7 +993,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 				}
 				bufsw.Do("// field $.inType|raw$.$.fieldName$\n", targs)
 				bufsw.Do("errs = append(errs,\n", targs)
-				bufsw.Do("  func(obj, oldObj $.fieldTypePfx$$.fieldType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
+				bufsw.Do("  func(fldPath *$.field.Path|raw$, obj, oldObj $.fieldTypePfx$$.fieldType|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
 
 				if subchild.fieldValidations.Empty() {
 					panic(fmt.Sprintf("found non-empty field validations in node.subfield for node: %v", subchild))
@@ -1003,7 +1003,14 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 				emitComments(subchild.fieldValidations.Comments, bufsw)
 
 				bufsw.Do("    return\n", targs)
-				bufsw.Do("  }($.fieldExprPfx$obj.$.fieldName$, $.safe.Field|raw$(oldObj, func(oldObj *$.inType|raw$) $.fieldTypePfx$$.fieldType|raw$ { return $.fieldExprPfx$oldObj.$.fieldName$ }), fldPath.Child(\"$.fieldJSON$\"))...)\n", targs)
+				bufsw.Do("  }(fldPath.Child(\"$.fieldJSON$\"), ", targs)
+				bufsw.Do("    $.fieldExprPfx$obj.$.fieldName$, ", targs)
+				bufsw.Do("    $.safe.Field|raw$(", targs)
+				bufsw.Do("        oldObj, ", targs)
+				bufsw.Do("        func(oldObj *$.inType|raw$) $.fieldTypePfx$$.fieldType|raw$ { ", targs)
+				bufsw.Do("            return $.fieldExprPfx$oldObj.$.fieldName$ ", targs)
+				bufsw.Do("        })", targs)
+				bufsw.Do("   )...)\n", targs)
 				bufsw.Do("\n", nil)
 			}
 
@@ -1047,15 +1054,16 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 				}
 				sw.Do("// field $.inType|raw$.$.fieldName$\n", targs)
 				sw.Do("errs = append(errs,\n", targs)
-				sw.Do("  func(obj, oldObj $.fieldTypePfx$$.fieldType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
+				sw.Do("  func(fldPath *$.field.Path|raw$, obj, oldObj $.fieldTypePfx$$.fieldType|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
 				sw.Merge(buf, bufsw)
 				sw.Do("    return\n", targs)
-				sw.Do("  }($.fieldExprPfx$obj.$.fieldName$, ", targs)
+				sw.Do("  }(fldPath.Child(\"$.fieldJSON$\"), ", targs)
+				sw.Do("    $.fieldExprPfx$obj.$.fieldName$, ", targs)
 				sw.Do("    $.safe.Field|raw$(oldObj, ", targs)
 				sw.Do("        func(oldObj *$.inType|raw$) $.fieldTypePfx$$.fieldType|raw$ {", targs)
 				sw.Do("            return $.fieldExprPfx$oldObj.$.fieldName$", targs)
 				sw.Do("        }),", targs)
-				sw.Do("    fldPath.Child(\"$.fieldJSON$\"))...)\n", targs)
+				sw.Do("    )...)\n", targs)
 				sw.Do("\n", nil)
 			} else {
 				targs := targs.WithArgs(generator.Args{
@@ -1125,10 +1133,10 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 
 			sw.Do("for i, val := range obj {\n", targs)
 			sw.Do("  errs = append(errs,\n", targs)
-			sw.Do("    func(obj, oldObj $.elemTypePfx$$.elemType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
+			sw.Do("    func(fldPath *$.field.Path|raw$, obj, oldObj $.elemTypePfx$$.elemType|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
 			sw.Merge(elemBuf, elemSW)
 			sw.Do("      return\n", targs)
-			sw.Do("    }($.elemExprPfx$val, $.oldVal$, fldPath.Index(i))...)\n", targs)
+			sw.Do("    }(fldPath.Index(i), $.elemExprPfx$val, $.oldVal$)...)\n", targs)
 			sw.Do("}\n", nil)
 		}
 	case types.Map:
@@ -1218,17 +1226,20 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			sw.Do("for key, $.val$ := range obj {\n", targs.With("val", vName))
 			if keyBuf.Len() > 0 {
 				sw.Do("  errs = append(errs,\n", targs)
-				sw.Do("    func(obj, oldObj *$.keyType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
+				sw.Do("    func(fldPath *$.field.Path|raw$, obj, oldObj *$.keyType|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
 				sw.Merge(keyBuf, keySW)
 				sw.Do("      return\n", targs)
-				sw.Do("    }(&key, nil, fldPath)...)\n", targs) // We don't match up map keys with a corresponding old value
+				sw.Do("    }(fldPath, &key, nil)...)\n", targs) // We don't match up map keys with a corresponding old value
 			}
 			if valBuf.Len() > 0 {
 				sw.Do("  errs = append(errs,\n", targs)
-				sw.Do("    func(obj, oldObj $.valTypePfx$$.valType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
+				sw.Do("    func(fldPath *$.field.Path|raw$, obj, oldObj $.valTypePfx$$.valType|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
 				sw.Merge(valBuf, valSW)
 				sw.Do("      return\n", targs)
-				sw.Do("    }($.valExprPfx$val, $.safe.Lookup|raw$(oldObj, key, $.xform|raw$), fldPath.Key(string(key)))...)\n", targs)
+				sw.Do("    }(fldPath.Key(string(key)), ", targs)
+				sw.Do("      $.valExprPfx$val, ", targs)
+				sw.Do("      $.safe.Lookup|raw$(oldObj, key, $.xform|raw$)", targs)
+				sw.Do("     )...)\n", targs)
 			}
 
 			sw.Do("}\n", nil)

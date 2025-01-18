@@ -72,17 +72,17 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 func Validate_M1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *M1) (errs field.ErrorList) {
 	// field M1.K
 	errs = append(errs,
-		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "M1.K")...)
 			return
-		}(&obj.K, safe.Field(oldObj, func(oldObj *M1) *string { return &oldObj.K }), fldPath.Child("k"))...)
+		}(fldPath.Child("k"), &obj.K, safe.Field(oldObj, func(oldObj *M1) *string { return &oldObj.K }))...)
 
 	// field M1.S
 	errs = append(errs,
-		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "M1.S")...)
 			return
-		}(&obj.S, safe.Field(oldObj, func(oldObj *M1) *string { return &oldObj.S }), fldPath.Child("s"))...)
+		}(fldPath.Child("s"), &obj.S, safe.Field(oldObj, func(oldObj *M1) *string { return &oldObj.S }))...)
 
 	return errs
 }
@@ -90,10 +90,10 @@ func Validate_M1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *M1) 
 func Validate_M2(opCtx operation.Context, fldPath *field.Path, obj, oldObj *M2) (errs field.ErrorList) {
 	// field M2.M1
 	errs = append(errs,
-		func(obj, oldObj *M1, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *M1) (errs field.ErrorList) {
 			errs = append(errs, Validate_M1(opCtx, fldPath, obj, oldObj)...)
 			return
-		}(&obj.M1, safe.Field(oldObj, func(oldObj *M2) *M1 { return &oldObj.M1 }), fldPath.Child("M1"))...)
+		}(fldPath.Child("M1"), &obj.M1, safe.Field(oldObj, func(oldObj *M2) *M1 { return &oldObj.M1 }))...)
 
 	return errs
 }
@@ -105,10 +105,10 @@ func Validate_M3(opCtx operation.Context, fldPath *field.Path, obj, oldObj *M3) 
 func Validate_M4(opCtx operation.Context, fldPath *field.Path, obj, oldObj *M4) (errs field.ErrorList) {
 	// field M4.M2
 	errs = append(errs,
-		func(obj, oldObj *M2, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *M2) (errs field.ErrorList) {
 			errs = append(errs, Validate_M2(opCtx, fldPath, obj, oldObj)...)
 			return
-		}(&obj.M2, safe.Field(oldObj, func(oldObj *M4) *M2 { return &oldObj.M2 }), fldPath.Child("M2"))...)
+		}(fldPath.Child("M2"), &obj.M2, safe.Field(oldObj, func(oldObj *M4) *M2 { return &oldObj.M2 }))...)
 
 	return errs
 }
@@ -116,59 +116,59 @@ func Validate_M4(opCtx operation.Context, fldPath *field.Path, obj, oldObj *M4) 
 func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) (errs field.ErrorList) {
 	// field T1.LM1
 	errs = append(errs,
-		func(obj, oldObj []M1, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj []M1) (errs field.ErrorList) {
 			oldListMap := safe.NewListMap(oldObj, func(o *M1) any { return [1]any{o.K} })
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj, oldObj *M1, fldPath *field.Path) (errs field.ErrorList) {
+					func(fldPath *field.Path, obj, oldObj *M1) (errs field.ErrorList) {
 						errs = append(errs, Validate_M1(opCtx, fldPath, obj, oldObj)...)
 						return
-					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+					}(fldPath.Index(i), &val, oldListMap.WithMatchingKey(val))...)
 			}
 			return
-		}(obj.LM1, safe.Field(oldObj, func(oldObj *T1) []M1 { return oldObj.LM1 }), fldPath.Child("lm1"))...)
+		}(fldPath.Child("lm1"), obj.LM1, safe.Field(oldObj, func(oldObj *T1) []M1 { return oldObj.LM1 }))...)
 
 	// field T1.LM2
 	errs = append(errs,
-		func(obj, oldObj []M2, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj []M2) (errs field.ErrorList) {
 			oldListMap := safe.NewListMap(oldObj, func(o *M2) any { return [1]any{o.K} })
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj, oldObj *M2, fldPath *field.Path) (errs field.ErrorList) {
+					func(fldPath *field.Path, obj, oldObj *M2) (errs field.ErrorList) {
 						errs = append(errs, Validate_M2(opCtx, fldPath, obj, oldObj)...)
 						return
-					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+					}(fldPath.Index(i), &val, oldListMap.WithMatchingKey(val))...)
 			}
 			return
-		}(obj.LM2, safe.Field(oldObj, func(oldObj *T1) []M2 { return oldObj.LM2 }), fldPath.Child("lm2"))...)
+		}(fldPath.Child("lm2"), obj.LM2, safe.Field(oldObj, func(oldObj *T1) []M2 { return oldObj.LM2 }))...)
 
 	// field T1.LM3
 	errs = append(errs,
-		func(obj, oldObj []M3, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj []M3) (errs field.ErrorList) {
 			oldListMap := safe.NewListMap(oldObj, func(o *M3) any { return [1]any{o.K} })
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj, oldObj *M3, fldPath *field.Path) (errs field.ErrorList) {
+					func(fldPath *field.Path, obj, oldObj *M3) (errs field.ErrorList) {
 						errs = append(errs, Validate_M3(opCtx, fldPath, obj, oldObj)...)
 						return
-					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+					}(fldPath.Index(i), &val, oldListMap.WithMatchingKey(val))...)
 			}
 			return
-		}(obj.LM3, safe.Field(oldObj, func(oldObj *T1) []M3 { return oldObj.LM3 }), fldPath.Child("lm3"))...)
+		}(fldPath.Child("lm3"), obj.LM3, safe.Field(oldObj, func(oldObj *T1) []M3 { return oldObj.LM3 }))...)
 
 	// field T1.LM4
 	errs = append(errs,
-		func(obj, oldObj []M4, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj []M4) (errs field.ErrorList) {
 			oldListMap := safe.NewListMap(oldObj, func(o *M4) any { return [1]any{o.K} })
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj, oldObj *M4, fldPath *field.Path) (errs field.ErrorList) {
+					func(fldPath *field.Path, obj, oldObj *M4) (errs field.ErrorList) {
 						errs = append(errs, Validate_M4(opCtx, fldPath, obj, oldObj)...)
 						return
-					}(&val, oldListMap.WithMatchingKey(val), fldPath.Index(i))...)
+					}(fldPath.Index(i), &val, oldListMap.WithMatchingKey(val))...)
 			}
 			return
-		}(obj.LM4, safe.Field(oldObj, func(oldObj *T1) []M4 { return oldObj.LM4 }), fldPath.Child("lm4"))...)
+		}(fldPath.Child("lm4"), obj.LM4, safe.Field(oldObj, func(oldObj *T1) []M4 { return oldObj.LM4 }))...)
 
 	return errs
 }

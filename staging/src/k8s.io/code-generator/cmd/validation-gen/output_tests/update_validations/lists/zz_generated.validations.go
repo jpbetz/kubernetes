@@ -54,10 +54,10 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 func Validate_M1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *M1) (errs field.ErrorList) {
 	// field M1.S
 	errs = append(errs,
-		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "M1.S")...)
 			return
-		}(&obj.S, safe.Field(oldObj, func(oldObj *M1) *string { return &oldObj.S }), fldPath.Child("s"))...)
+		}(fldPath.Child("s"), &obj.S, safe.Field(oldObj, func(oldObj *M1) *string { return &oldObj.S }))...)
 
 	return errs
 }
@@ -65,16 +65,16 @@ func Validate_M1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *M1) 
 func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) (errs field.ErrorList) {
 	// field T1.LM1
 	errs = append(errs,
-		func(obj, oldObj []M1, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj []M1) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj, oldObj *M1, fldPath *field.Path) (errs field.ErrorList) {
+					func(fldPath *field.Path, obj, oldObj *M1) (errs field.ErrorList) {
 						errs = append(errs, Validate_M1(opCtx, fldPath, obj, oldObj)...)
 						return
-					}(&val, nil, fldPath.Index(i))...)
+					}(fldPath.Index(i), &val, nil)...)
 			}
 			return
-		}(obj.LM1, safe.Field(oldObj, func(oldObj *T1) []M1 { return oldObj.LM1 }), fldPath.Child("lm1"))...)
+		}(fldPath.Child("lm1"), obj.LM1, safe.Field(oldObj, func(oldObj *T1) []M1 { return oldObj.LM1 }))...)
 
 	return errs
 }

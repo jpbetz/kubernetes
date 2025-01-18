@@ -57,33 +57,33 @@ func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) 
 
 	// field T1.LE1
 	errs = append(errs,
-		func(obj, oldObj []E1, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj []E1) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.LE1")...)
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj, oldObj *E1, fldPath *field.Path) (errs field.ErrorList) {
+					func(fldPath *field.Path, obj, oldObj *E1) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.LE1[vals]")...)
 						errs = append(errs, Validate_E1(opCtx, fldPath, obj, oldObj)...)
 						return
-					}(&val, nil, fldPath.Index(i))...)
+					}(fldPath.Index(i), &val, nil)...)
 			}
 			return
-		}(obj.LE1, safe.Field(oldObj, func(oldObj *T1) []E1 { return oldObj.LE1 }), fldPath.Child("le1"))...)
+		}(fldPath.Child("le1"), obj.LE1, safe.Field(oldObj, func(oldObj *T1) []E1 { return oldObj.LE1 }))...)
 
 	// field T1.LPE1
 	errs = append(errs,
-		func(obj, oldObj []*E1, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj []*E1) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.LPE1")...)
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj, oldObj *E1, fldPath *field.Path) (errs field.ErrorList) {
+					func(fldPath *field.Path, obj, oldObj *E1) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.LPE1[vals]")...)
 						errs = append(errs, Validate_E1(opCtx, fldPath, obj, oldObj)...)
 						return
-					}(val, nil, fldPath.Index(i))...)
+					}(fldPath.Index(i), val, nil)...)
 			}
 			return
-		}(obj.LPE1, safe.Field(oldObj, func(oldObj *T1) []*E1 { return oldObj.LPE1 }), fldPath.Child("lpe1"))...)
+		}(fldPath.Child("lpe1"), obj.LPE1, safe.Field(oldObj, func(oldObj *T1) []*E1 { return oldObj.LPE1 }))...)
 
 	return errs
 }

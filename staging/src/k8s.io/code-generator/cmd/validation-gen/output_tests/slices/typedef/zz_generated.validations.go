@@ -51,10 +51,10 @@ func Validate_ALS(opCtx operation.Context, fldPath *field.Path, obj, oldObj ALS)
 
 	for i, val := range obj {
 		errs = append(errs,
-			func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 				errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "ALS[vals]")...)
 				return
-			}(&val, nil, fldPath.Index(i))...)
+			}(fldPath.Index(i), &val, nil)...)
 	}
 	return errs
 }
@@ -67,33 +67,33 @@ func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) 
 
 	// field T1.ALS
 	errs = append(errs,
-		func(obj, oldObj ALS, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj ALS) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.ALS")...)
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+					func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "ALS[vals]")...)
 						return
-					}(&val, nil, fldPath.Index(i))...)
+					}(fldPath.Index(i), &val, nil)...)
 			}
 			errs = append(errs, Validate_ALS(opCtx, fldPath, obj, oldObj)...)
 			return
-		}(obj.ALS, safe.Field(oldObj, func(oldObj *T1) ALS { return oldObj.ALS }), fldPath.Child("als"))...)
+		}(fldPath.Child("als"), obj.ALS, safe.Field(oldObj, func(oldObj *T1) ALS { return oldObj.ALS }))...)
 
 	// field T1.LALS
 	errs = append(errs,
-		func(obj, oldObj []ALS, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj []ALS) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.LALS")...)
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj, oldObj ALS, fldPath *field.Path) (errs field.ErrorList) {
+					func(fldPath *field.Path, obj, oldObj ALS) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.LALS[vals]")...)
 						errs = append(errs, Validate_ALS(opCtx, fldPath, obj, oldObj)...)
 						return
-					}(val, nil, fldPath.Index(i))...)
+					}(fldPath.Index(i), val, nil)...)
 			}
 			return
-		}(obj.LALS, safe.Field(oldObj, func(oldObj *T1) []ALS { return oldObj.LALS }), fldPath.Child("lals"))...)
+		}(fldPath.Child("lals"), obj.LALS, safe.Field(oldObj, func(oldObj *T1) []ALS { return oldObj.LALS }))...)
 
 	return errs
 }

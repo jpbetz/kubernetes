@@ -51,15 +51,15 @@ func Validate_AMSS(opCtx operation.Context, fldPath *field.Path, obj, oldObj AMS
 
 	for key, val := range obj {
 		errs = append(errs,
-			func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 				errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "AMSS[keys]")...)
 				return
-			}(&key, nil, fldPath)...)
+			}(fldPath, &key, nil)...)
 		errs = append(errs,
-			func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 				errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "AMSS[vals]")...)
 				return
-			}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}(fldPath.Key(string(key)), &val, safe.Lookup(oldObj, key, safe.PtrTo))...)
 	}
 	return errs
 }
@@ -72,23 +72,23 @@ func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) 
 
 	// field T1.AMSS
 	errs = append(errs,
-		func(obj, oldObj AMSS, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj AMSS) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.AMSS")...)
 			for key, val := range obj {
 				errs = append(errs,
-					func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+					func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "AMSS[keys]")...)
 						return
-					}(&key, nil, fldPath)...)
+					}(fldPath, &key, nil)...)
 				errs = append(errs,
-					func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+					func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "AMSS[vals]")...)
 						return
-					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+					}(fldPath.Key(string(key)), &val, safe.Lookup(oldObj, key, safe.PtrTo))...)
 			}
 			errs = append(errs, Validate_AMSS(opCtx, fldPath, obj, oldObj)...)
 			return
-		}(obj.AMSS, safe.Field(oldObj, func(oldObj *T1) AMSS { return oldObj.AMSS }), fldPath.Child("amss"))...)
+		}(fldPath.Child("amss"), obj.AMSS, safe.Field(oldObj, func(oldObj *T1) AMSS { return oldObj.AMSS }))...)
 
 	return errs
 }

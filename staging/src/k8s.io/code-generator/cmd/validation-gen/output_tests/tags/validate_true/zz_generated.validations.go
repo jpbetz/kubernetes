@@ -50,10 +50,10 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 
 	// field Struct.StringField
 	errs = append(errs,
-		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field Struct.StringField")...)
 			return
-		}(&obj.StringField, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.StringField }), fldPath.Child("stringField"))...)
+		}(fldPath.Child("stringField"), &obj.StringField, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.StringField }))...)
 
 	return errs
 }

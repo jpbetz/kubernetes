@@ -78,45 +78,45 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 
 	// field Struct.Enum0Field
 	errs = append(errs,
-		func(obj, oldObj *Enum0, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *Enum0) (errs field.ErrorList) {
 			errs = append(errs, Validate_Enum0(opCtx, fldPath, obj, oldObj)...)
 			return
-		}(&obj.Enum0Field, safe.Field(oldObj, func(oldObj *Struct) *Enum0 { return &oldObj.Enum0Field }), fldPath.Child("enum0Field"))...)
+		}(fldPath.Child("enum0Field"), &obj.Enum0Field, safe.Field(oldObj, func(oldObj *Struct) *Enum0 { return &oldObj.Enum0Field }))...)
 
 	// field Struct.Enum0PtrField
 	errs = append(errs,
-		func(obj, oldObj *Enum0, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *Enum0) (errs field.ErrorList) {
 			errs = append(errs, Validate_Enum0(opCtx, fldPath, obj, oldObj)...)
 			return
-		}(obj.Enum0PtrField, safe.Field(oldObj, func(oldObj *Struct) *Enum0 { return oldObj.Enum0PtrField }), fldPath.Child("enum0PtrField"))...)
+		}(fldPath.Child("enum0PtrField"), obj.Enum0PtrField, safe.Field(oldObj, func(oldObj *Struct) *Enum0 { return oldObj.Enum0PtrField }))...)
 
 	// field Struct.Enum1Field
 	errs = append(errs,
-		func(obj, oldObj *Enum1, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *Enum1) (errs field.ErrorList) {
 			errs = append(errs, Validate_Enum1(opCtx, fldPath, obj, oldObj)...)
 			return
-		}(&obj.Enum1Field, safe.Field(oldObj, func(oldObj *Struct) *Enum1 { return &oldObj.Enum1Field }), fldPath.Child("enum1Field"))...)
+		}(fldPath.Child("enum1Field"), &obj.Enum1Field, safe.Field(oldObj, func(oldObj *Struct) *Enum1 { return &oldObj.Enum1Field }))...)
 
 	// field Struct.Enum1PtrField
 	errs = append(errs,
-		func(obj, oldObj *Enum1, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *Enum1) (errs field.ErrorList) {
 			errs = append(errs, Validate_Enum1(opCtx, fldPath, obj, oldObj)...)
 			return
-		}(obj.Enum1PtrField, safe.Field(oldObj, func(oldObj *Struct) *Enum1 { return oldObj.Enum1PtrField }), fldPath.Child("enum1PtrField"))...)
+		}(fldPath.Child("enum1PtrField"), obj.Enum1PtrField, safe.Field(oldObj, func(oldObj *Struct) *Enum1 { return oldObj.Enum1PtrField }))...)
 
 	// field Struct.Enum2Field
 	errs = append(errs,
-		func(obj, oldObj *Enum2, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *Enum2) (errs field.ErrorList) {
 			errs = append(errs, Validate_Enum2(opCtx, fldPath, obj, oldObj)...)
 			return
-		}(&obj.Enum2Field, safe.Field(oldObj, func(oldObj *Struct) *Enum2 { return &oldObj.Enum2Field }), fldPath.Child("enum2Field"))...)
+		}(fldPath.Child("enum2Field"), &obj.Enum2Field, safe.Field(oldObj, func(oldObj *Struct) *Enum2 { return &oldObj.Enum2Field }))...)
 
 	// field Struct.Enum2PtrField
 	errs = append(errs,
-		func(obj, oldObj *Enum2, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *Enum2) (errs field.ErrorList) {
 			errs = append(errs, Validate_Enum2(opCtx, fldPath, obj, oldObj)...)
 			return
-		}(obj.Enum2PtrField, safe.Field(oldObj, func(oldObj *Struct) *Enum2 { return oldObj.Enum2PtrField }), fldPath.Child("enum2PtrField"))...)
+		}(fldPath.Child("enum2PtrField"), obj.Enum2PtrField, safe.Field(oldObj, func(oldObj *Struct) *Enum2 { return oldObj.Enum2PtrField }))...)
 
 	// field Struct.NotEnumField has no validation
 	// field Struct.NotEnumPtrField has no validation

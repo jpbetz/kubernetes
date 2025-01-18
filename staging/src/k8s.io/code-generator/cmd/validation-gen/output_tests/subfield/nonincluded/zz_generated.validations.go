@@ -49,18 +49,18 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) (errs field.ErrorList) {
 	// field T1.StructType
 	errs = append(errs,
-		func(obj, oldObj *other.StructType, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *other.StructType) (errs field.ErrorList) {
 			// field other.StructType.StringField
 			errs = append(errs,
-				func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+				func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 					errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "subfield T1.(other.StructType).StringField")...)
 					return
-				}(&obj.StringField, safe.Field(oldObj, func(oldObj *other.StructType) *string { return &oldObj.StringField }), fldPath.Child("stringField"))...)
+				}(fldPath.Child("stringField"), &obj.StringField, safe.Field(oldObj, func(oldObj *other.StructType) *string { return &oldObj.StringField }))...)
 
 			// NOTE: Type other.StructType is in a non-included package.
 			//       Any validations defined on this type are not available from here.
 			return
-		}(&obj.StructType, safe.Field(oldObj, func(oldObj *T1) *other.StructType { return &oldObj.StructType }), fldPath.Child("StructType"))...)
+		}(fldPath.Child("StructType"), &obj.StructType, safe.Field(oldObj, func(oldObj *T1) *other.StructType { return &oldObj.StructType }))...)
 
 	return errs
 }

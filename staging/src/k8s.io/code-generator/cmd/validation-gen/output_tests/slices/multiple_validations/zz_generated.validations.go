@@ -53,19 +53,19 @@ func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) 
 
 	// field T1.LS
 	errs = append(errs,
-		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj []string) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.LS #1")...)
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.LS #2")...)
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+					func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.LS[vals] #1")...)
 						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.LS[vals] #2")...)
 						return
-					}(&val, nil, fldPath.Index(i))...)
+					}(fldPath.Index(i), &val, nil)...)
 			}
 			return
-		}(obj.LS, safe.Field(oldObj, func(oldObj *T1) []string { return oldObj.LS }), fldPath.Child("ls"))...)
+		}(fldPath.Child("ls"), obj.LS, safe.Field(oldObj, func(oldObj *T1) []string { return oldObj.LS }))...)
 
 	// field T1.AnotherLS has no validation
 	return errs

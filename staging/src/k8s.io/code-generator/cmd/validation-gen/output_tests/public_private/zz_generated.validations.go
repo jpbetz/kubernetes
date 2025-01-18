@@ -48,10 +48,10 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) (errs field.ErrorList) {
 	// field T1.Public
 	errs = append(errs,
-		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.Public")...)
 			return
-		}(&obj.Public, safe.Field(oldObj, func(oldObj *T1) *string { return &oldObj.Public }), fldPath.Child("public"))...)
+		}(fldPath.Child("public"), &obj.Public, safe.Field(oldObj, func(oldObj *T1) *string { return &oldObj.Public }))...)
 
 	return errs
 }

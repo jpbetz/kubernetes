@@ -51,15 +51,15 @@ func Validate_AMSS(opCtx operation.Context, fldPath *field.Path, obj, oldObj AMS
 
 	for key, val := range obj {
 		errs = append(errs,
-			func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 				errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "AMSS[keys]")...)
 				return
-			}(&key, nil, fldPath)...)
+			}(fldPath, &key, nil)...)
 		errs = append(errs,
-			func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+			func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 				errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "AMSS[vals]")...)
 				return
-			}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
+			}(fldPath.Key(string(key)), &val, safe.Lookup(oldObj, key, safe.PtrTo))...)
 	}
 	return errs
 }
@@ -72,43 +72,43 @@ func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) 
 
 	// field T1.MSAMSS
 	errs = append(errs,
-		func(obj, oldObj map[string]AMSS, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj map[string]AMSS) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.MSAMSS")...)
 			for key, val := range obj {
 				errs = append(errs,
-					func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+					func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.MSAMSS[keys]")...)
 						return
-					}(&key, nil, fldPath)...)
+					}(fldPath, &key, nil)...)
 				errs = append(errs,
-					func(obj, oldObj AMSS, fldPath *field.Path) (errs field.ErrorList) {
+					func(fldPath *field.Path, obj, oldObj AMSS) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.MSAMSS[vals]")...)
 						errs = append(errs, Validate_AMSS(opCtx, fldPath, obj, oldObj)...)
 						return
-					}(val, safe.Lookup(oldObj, key, safe.Ident), fldPath.Key(string(key)))...)
+					}(fldPath.Key(string(key)), val, safe.Lookup(oldObj, key, safe.Ident))...)
 			}
 			return
-		}(obj.MSAMSS, safe.Field(oldObj, func(oldObj *T1) map[string]AMSS { return oldObj.MSAMSS }), fldPath.Child("msamss"))...)
+		}(fldPath.Child("msamss"), obj.MSAMSS, safe.Field(oldObj, func(oldObj *T1) map[string]AMSS { return oldObj.MSAMSS }))...)
 
 	// field T1.MSPAMSS
 	errs = append(errs,
-		func(obj, oldObj map[string]*AMSS, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj map[string]*AMSS) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.MSPAMSS")...)
 			for key, val := range obj {
 				errs = append(errs,
-					func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+					func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T1.MSPAMSS[keys]")...)
 						return
-					}(&key, nil, fldPath)...)
+					}(fldPath, &key, nil)...)
 				errs = append(errs,
-					func(obj, oldObj AMSS, fldPath *field.Path) (errs field.ErrorList) {
+					func(fldPath *field.Path, obj, oldObj AMSS) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T1.MSPAMSS[vals]")...)
 						errs = append(errs, Validate_AMSS(opCtx, fldPath, obj, oldObj)...)
 						return
-					}(*val, safe.Lookup(oldObj, key, safe.Deref), fldPath.Key(string(key)))...)
+					}(fldPath.Key(string(key)), *val, safe.Lookup(oldObj, key, safe.Deref))...)
 			}
 			return
-		}(obj.MSPAMSS, safe.Field(oldObj, func(oldObj *T1) map[string]*AMSS { return oldObj.MSPAMSS }), fldPath.Child("mspamss"))...)
+		}(fldPath.Child("mspamss"), obj.MSPAMSS, safe.Field(oldObj, func(oldObj *T1) map[string]*AMSS { return oldObj.MSPAMSS }))...)
 
 	return errs
 }

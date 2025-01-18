@@ -57,63 +57,63 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 
 	// field Struct.StringField
 	errs = append(errs,
-		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 			if e := validate.OptionalValue(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.StringField")...)
 			return
-		}(&obj.StringField, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.StringField }), fldPath.Child("stringField"))...)
+		}(fldPath.Child("stringField"), &obj.StringField, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.StringField }))...)
 
 	// field Struct.StringPtrField
 	errs = append(errs,
-		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 			if e := validate.OptionalPointer(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.StringPtrField")...)
 			return
-		}(obj.StringPtrField, safe.Field(oldObj, func(oldObj *Struct) *string { return oldObj.StringPtrField }), fldPath.Child("stringPtrField"))...)
+		}(fldPath.Child("stringPtrField"), obj.StringPtrField, safe.Field(oldObj, func(oldObj *Struct) *string { return oldObj.StringPtrField }))...)
 
 	// field Struct.OtherStructField
 	errs = append(errs,
-		func(obj, oldObj *OtherStruct, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *OtherStruct) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.OtherStructField")...)
 			// optional non-pointer structs are purely documentation
 			errs = append(errs, Validate_OtherStruct(opCtx, fldPath, obj, oldObj)...)
 			return
-		}(&obj.OtherStructField, safe.Field(oldObj, func(oldObj *Struct) *OtherStruct { return &oldObj.OtherStructField }), fldPath.Child("otherStructField"))...)
+		}(fldPath.Child("otherStructField"), &obj.OtherStructField, safe.Field(oldObj, func(oldObj *Struct) *OtherStruct { return &oldObj.OtherStructField }))...)
 
 	// field Struct.OtherStructPtrField
 	errs = append(errs,
-		func(obj, oldObj *OtherStruct, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *OtherStruct) (errs field.ErrorList) {
 			if e := validate.OptionalPointer(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.OtherStructPtrField")...)
 			errs = append(errs, Validate_OtherStruct(opCtx, fldPath, obj, oldObj)...)
 			return
-		}(obj.OtherStructPtrField, safe.Field(oldObj, func(oldObj *Struct) *OtherStruct { return oldObj.OtherStructPtrField }), fldPath.Child("otherStructPtrField"))...)
+		}(fldPath.Child("otherStructPtrField"), obj.OtherStructPtrField, safe.Field(oldObj, func(oldObj *Struct) *OtherStruct { return oldObj.OtherStructPtrField }))...)
 
 	// field Struct.SliceField
 	errs = append(errs,
-		func(obj, oldObj []string, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj []string) (errs field.ErrorList) {
 			if e := validate.OptionalSlice(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.SliceField")...)
 			return
-		}(obj.SliceField, safe.Field(oldObj, func(oldObj *Struct) []string { return oldObj.SliceField }), fldPath.Child("sliceField"))...)
+		}(fldPath.Child("sliceField"), obj.SliceField, safe.Field(oldObj, func(oldObj *Struct) []string { return oldObj.SliceField }))...)
 
 	// field Struct.MapField
 	errs = append(errs,
-		func(obj, oldObj map[string]string, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj map[string]string) (errs field.ErrorList) {
 			if e := validate.OptionalMap(opCtx, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField")...)
 			return
-		}(obj.MapField, safe.Field(oldObj, func(oldObj *Struct) map[string]string { return oldObj.MapField }), fldPath.Child("mapField"))...)
+		}(fldPath.Child("mapField"), obj.MapField, safe.Field(oldObj, func(oldObj *Struct) map[string]string { return oldObj.MapField }))...)
 
 	return errs
 }

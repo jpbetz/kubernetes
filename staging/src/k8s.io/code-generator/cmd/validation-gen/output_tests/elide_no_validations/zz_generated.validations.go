@@ -48,10 +48,10 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 func Validate_HasFieldVal(opCtx operation.Context, fldPath *field.Path, obj, oldObj *HasFieldVal) (errs field.ErrorList) {
 	// field HasFieldVal.S
 	errs = append(errs,
-		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field HasFieldVal.S")...)
 			return
-		}(&obj.S, safe.Field(oldObj, func(oldObj *HasFieldVal) *string { return &oldObj.S }), fldPath.Child("s"))...)
+		}(fldPath.Child("s"), &obj.S, safe.Field(oldObj, func(oldObj *HasFieldVal) *string { return &oldObj.S }))...)
 
 	return errs
 }
@@ -69,26 +69,26 @@ func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) 
 
 	// field T1.HasTypeVal
 	errs = append(errs,
-		func(obj, oldObj *HasTypeVal, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *HasTypeVal) (errs field.ErrorList) {
 			errs = append(errs, Validate_HasTypeVal(opCtx, fldPath, obj, oldObj)...)
 			return
-		}(&obj.HasTypeVal, safe.Field(oldObj, func(oldObj *T1) *HasTypeVal { return &oldObj.HasTypeVal }), fldPath.Child("hasTypeVal"))...)
+		}(fldPath.Child("hasTypeVal"), &obj.HasTypeVal, safe.Field(oldObj, func(oldObj *T1) *HasTypeVal { return &oldObj.HasTypeVal }))...)
 
 	// field T1.HasFieldVal
 	errs = append(errs,
-		func(obj, oldObj *HasFieldVal, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *HasFieldVal) (errs field.ErrorList) {
 			errs = append(errs, Validate_HasFieldVal(opCtx, fldPath, obj, oldObj)...)
 			return
-		}(&obj.HasFieldVal, safe.Field(oldObj, func(oldObj *T1) *HasFieldVal { return &oldObj.HasFieldVal }), fldPath.Child("hasFieldVal"))...)
+		}(fldPath.Child("hasFieldVal"), &obj.HasFieldVal, safe.Field(oldObj, func(oldObj *T1) *HasFieldVal { return &oldObj.HasFieldVal }))...)
 
 	// field T1.HasNoVal has no validation
 
 	// field T1.HasNoValFieldVal
 	errs = append(errs,
-		func(obj, oldObj *HasNoVal, fldPath *field.Path) (errs field.ErrorList) {
+		func(fldPath *field.Path, obj, oldObj *HasNoVal) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.HasNoValFieldVal")...)
 			return
-		}(&obj.HasNoValFieldVal, safe.Field(oldObj, func(oldObj *T1) *HasNoVal { return &oldObj.HasNoValFieldVal }), fldPath.Child("hasNoValFieldVal"))...)
+		}(fldPath.Child("hasNoValFieldVal"), &obj.HasNoValFieldVal, safe.Field(oldObj, func(oldObj *T1) *HasNoVal { return &oldObj.HasNoValFieldVal }))...)
 
 	return errs
 }
