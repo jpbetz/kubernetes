@@ -38,21 +38,21 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*Struct)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Struct(opCtx, obj.(*Struct), safe.Cast[*Struct](oldObj), nil)
+			return Validate_Struct(opCtx, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_IPStringType(opCtx operation.Context, obj, oldObj *IPStringType, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_IPStringType(opCtx operation.Context, fldPath *field.Path, obj, oldObj *IPStringType) (errs field.ErrorList) {
 	// type IPStringType
 	errs = append(errs, validate.IPSloppy(opCtx, fldPath, obj, oldObj)...)
 
 	return errs
 }
 
-func Validate_Struct(opCtx operation.Context, obj, oldObj *Struct, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
 	// field Struct.TypeMeta has no validation
 
 	// field Struct.IPField
@@ -93,7 +93,7 @@ func Validate_Struct(opCtx operation.Context, obj, oldObj *Struct, fldPath *fiel
 	// field Struct.IPTypedefField
 	errs = append(errs,
 		func(obj, oldObj *IPStringType, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_IPStringType(opCtx, obj, oldObj, fldPath)...)
+			errs = append(errs, Validate_IPStringType(opCtx, fldPath, obj, oldObj)...)
 			return
 		}(&obj.IPTypedefField, safe.Field(oldObj, func(oldObj *Struct) *IPStringType { return &oldObj.IPTypedefField }), fldPath.Child("ipTypedefField"))...)
 

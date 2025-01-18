@@ -830,9 +830,9 @@ func (g *genValidations) emitRegisterFunction(c *generator.Context, schemeRegist
 		sw.Do("  if len(subresources) == 0 {\n", targs)
 		sw.Do("    return $.rootType|objectvalidationfn$(", targs)
 		sw.Do("               opCtx, ", targs)
+		sw.Do("               nil /* fldPath */, ", targs)
 		sw.Do("               obj.($.typePfx$$.rootType|raw$), ", targs)
-		sw.Do("               $.safe.Cast|raw$[$.typePfx$$.rootType|raw$](oldObj), ", targs)
-		sw.Do("               nil)\n", targs)
+		sw.Do("               $.safe.Cast|raw$[$.typePfx$$.rootType|raw$](oldObj))\n", targs)
 		sw.Do("  }\n", targs)
 
 		if statusType != nil {
@@ -847,11 +847,13 @@ func (g *genValidations) emitRegisterFunction(c *generator.Context, schemeRegist
 				sw.Do("    root := obj.($.typePfx$$.rootType|raw$)\n", targs)
 				sw.Do("    return $.statusType|objectvalidationfn$(", targs)
 				sw.Do("               opCtx, ", targs)
+				sw.Do("               nil /* fldPath */, ", targs)
 				sw.Do("               &root.$.statusField$, ", targs)
 				sw.Do("               $.safe.Field|raw$(", targs)
 				sw.Do("                   $.safe.Cast|raw$[$.typePfx$$.rootType|raw$](oldObj), ", targs)
-				sw.Do("                   func(oldObj $.typePfx$$.rootType|raw$) $.statusTypePfx$$.statusType|raw$ { return $.statusTypePtrPfx$oldObj.$.statusField$ }), ", targs)
-				sw.Do("                   nil)\n", targs)
+				sw.Do("                   func(oldObj $.typePfx$$.rootType|raw$) $.statusTypePfx$$.statusType|raw$ { ", targs)
+				sw.Do("                       return $.statusTypePtrPfx$oldObj.$.statusField$ ", targs)
+				sw.Do("                   }))\n", targs)
 			} else {
 				sw.Do("    return nil // $.statusType|raw$ has no validation\n", targs)
 			}
@@ -890,8 +892,9 @@ func (g *genValidations) emitValidationFunction(c *generator.Context, t *types.T
 	}
 	sw.Do("func $.inType|objectvalidationfn$(", targs)
 	sw.Do("    opCtx $.operation.Context|raw$, ", targs)
-	sw.Do("    obj, oldObj $.objTypePfx$$.inType|raw$, ", targs)
-	sw.Do("    fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
+	sw.Do("    fldPath *$.field.Path|raw$, ", targs)
+	sw.Do("    obj, oldObj $.objTypePfx$$.inType|raw$) ", targs)
+	sw.Do("(errs $.field.ErrorList|raw$) {\n", targs)
 	fakeChild := &childNode{
 		node:      node,
 		childType: t,
@@ -1270,7 +1273,7 @@ func (g *genValidations) emitCallToOtherTypeFunc(c *generator.Context, node *typ
 	targs := generator.Args{
 		"funcName": c.Universe.Type(node.funcName),
 	}
-	sw.Do("errs = append(errs, $.funcName|raw$(opCtx, obj, oldObj, fldPath)...)\n", targs)
+	sw.Do("errs = append(errs, $.funcName|raw$(opCtx, fldPath, obj, oldObj)...)\n", targs)
 }
 
 // emitCallsToValidators emits calls to a list of validation functions for

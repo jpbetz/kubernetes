@@ -38,21 +38,21 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*Struct)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Struct(opCtx, obj.(*Struct), safe.Cast[*Struct](oldObj), nil)
+			return Validate_Struct(opCtx, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_OtherStruct(opCtx operation.Context, obj, oldObj *OtherStruct, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_OtherStruct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *OtherStruct) (errs field.ErrorList) {
 	// type OtherStruct
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type OtherStruct")...)
 
 	return errs
 }
 
-func Validate_Struct(opCtx operation.Context, obj, oldObj *Struct, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
 	// field Struct.TypeMeta has no validation
 
 	// field Struct.StringField
@@ -80,7 +80,7 @@ func Validate_Struct(opCtx operation.Context, obj, oldObj *Struct, fldPath *fiel
 		func(obj, oldObj *OtherStruct, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.OtherStructField")...)
 			// optional non-pointer structs are purely documentation
-			errs = append(errs, Validate_OtherStruct(opCtx, obj, oldObj, fldPath)...)
+			errs = append(errs, Validate_OtherStruct(opCtx, fldPath, obj, oldObj)...)
 			return
 		}(&obj.OtherStructField, safe.Field(oldObj, func(oldObj *Struct) *OtherStruct { return &oldObj.OtherStructField }), fldPath.Child("otherStructField"))...)
 
@@ -91,7 +91,7 @@ func Validate_Struct(opCtx operation.Context, obj, oldObj *Struct, fldPath *fiel
 				return // do not proceed
 			}
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.OtherStructPtrField")...)
-			errs = append(errs, Validate_OtherStruct(opCtx, obj, oldObj, fldPath)...)
+			errs = append(errs, Validate_OtherStruct(opCtx, fldPath, obj, oldObj)...)
 			return
 		}(obj.OtherStructPtrField, safe.Field(oldObj, func(oldObj *Struct) *OtherStruct { return oldObj.OtherStructPtrField }), fldPath.Child("otherStructPtrField"))...)
 

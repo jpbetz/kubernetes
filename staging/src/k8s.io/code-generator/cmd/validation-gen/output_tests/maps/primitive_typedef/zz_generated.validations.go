@@ -38,14 +38,14 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*T1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_T1(opCtx, obj.(*T1), safe.Cast[*T1](oldObj), nil)
+			return Validate_T1(opCtx, nil /* fldPath */, obj.(*T1), safe.Cast[*T1](oldObj))
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_AMSS(opCtx operation.Context, obj, oldObj AMSS, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_AMSS(opCtx operation.Context, fldPath *field.Path, obj, oldObj AMSS) (errs field.ErrorList) {
 	// type AMSS
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type AMSS")...)
 
@@ -64,7 +64,7 @@ func Validate_AMSS(opCtx operation.Context, obj, oldObj AMSS, fldPath *field.Pat
 	return errs
 }
 
-func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) (errs field.ErrorList) {
 	// type T1
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type T1")...)
 
@@ -83,7 +83,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 				errs = append(errs,
 					func(obj, oldObj AMSS, fldPath *field.Path) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.MSAMSS[vals]")...)
-						errs = append(errs, Validate_AMSS(opCtx, obj, oldObj, fldPath)...)
+						errs = append(errs, Validate_AMSS(opCtx, fldPath, obj, oldObj)...)
 						return
 					}(val, safe.Lookup(oldObj, key, safe.Ident), fldPath.Key(string(key)))...)
 			}
@@ -103,7 +103,7 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 				errs = append(errs,
 					func(obj, oldObj AMSS, fldPath *field.Path) (errs field.ErrorList) {
 						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "T1.MSPAMSS[vals]")...)
-						errs = append(errs, Validate_AMSS(opCtx, obj, oldObj, fldPath)...)
+						errs = append(errs, Validate_AMSS(opCtx, fldPath, obj, oldObj)...)
 						return
 					}(*val, safe.Lookup(oldObj, key, safe.Deref), fldPath.Key(string(key)))...)
 			}

@@ -38,39 +38,39 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*E01)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E01(opCtx, obj.(*E01), safe.Cast[*E01](oldObj), nil)
+			return Validate_E01(opCtx, nil /* fldPath */, obj.(*E01), safe.Cast[*E01](oldObj))
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*E02)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E02(opCtx, obj.(*E02), safe.Cast[*E02](oldObj), nil)
+			return Validate_E02(opCtx, nil /* fldPath */, obj.(*E02), safe.Cast[*E02](oldObj))
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*E03)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_E03(opCtx, obj.(*E03), safe.Cast[*E03](oldObj), nil)
+			return Validate_E03(opCtx, nil /* fldPath */, obj.(*E03), safe.Cast[*E03](oldObj))
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*EMultiple)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_EMultiple(opCtx, obj.(*EMultiple), safe.Cast[*EMultiple](oldObj), nil)
+			return Validate_EMultiple(opCtx, nil /* fldPath */, obj.(*EMultiple), safe.Cast[*EMultiple](oldObj))
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_E01(opCtx operation.Context, obj, oldObj *E01, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E01(opCtx operation.Context, fldPath *field.Path, obj, oldObj *E01) (errs field.ErrorList) {
 	// type E01
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "E01, no flags")...)
 
 	return errs
 }
 
-func Validate_E02(opCtx operation.Context, obj, oldObj *E02, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E02(opCtx operation.Context, fldPath *field.Path, obj, oldObj *E02) (errs field.ErrorList) {
 	// type E02
 	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "E02, ShortCircuit"); len(e) != 0 {
 		errs = append(errs, e...)
@@ -80,7 +80,7 @@ func Validate_E02(opCtx operation.Context, obj, oldObj *E02, fldPath *field.Path
 	return errs
 }
 
-func Validate_E03(opCtx operation.Context, obj, oldObj *E03, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_E03(opCtx operation.Context, fldPath *field.Path, obj, oldObj *E03) (errs field.ErrorList) {
 	// type E03
 	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "E03, ShortCircuit"); len(e) != 0 {
 		errs = append(errs, e...)
@@ -91,7 +91,7 @@ func Validate_E03(opCtx operation.Context, obj, oldObj *E03, fldPath *field.Path
 	return errs
 }
 
-func Validate_EMultiple(opCtx operation.Context, obj, oldObj *EMultiple, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_EMultiple(opCtx operation.Context, fldPath *field.Path, obj, oldObj *EMultiple) (errs field.ErrorList) {
 	// type EMultiple
 	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "EMultiple, ShortCircuit 1"); len(e) != 0 {
 		errs = append(errs, e...)

@@ -38,20 +38,20 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*M1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_M1(opCtx, obj.(*M1), safe.Cast[*M1](oldObj), nil)
+			return Validate_M1(opCtx, nil /* fldPath */, obj.(*M1), safe.Cast[*M1](oldObj))
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	scheme.AddValidationFunc((*T1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_T1(opCtx, obj.(*T1), safe.Cast[*T1](oldObj), nil)
+			return Validate_T1(opCtx, nil /* fldPath */, obj.(*T1), safe.Cast[*T1](oldObj))
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_M1(opCtx operation.Context, obj, oldObj *M1, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_M1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *M1) (errs field.ErrorList) {
 	// field M1.S
 	errs = append(errs,
 		func(obj, oldObj *string, fldPath *field.Path) (errs field.ErrorList) {
@@ -62,14 +62,14 @@ func Validate_M1(opCtx operation.Context, obj, oldObj *M1, fldPath *field.Path) 
 	return errs
 }
 
-func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) (errs field.ErrorList) {
 	// field T1.MSM1
 	errs = append(errs,
 		func(obj, oldObj map[string]M1, fldPath *field.Path) (errs field.ErrorList) {
 			for key, val := range obj {
 				errs = append(errs,
 					func(obj, oldObj *M1, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, Validate_M1(opCtx, obj, oldObj, fldPath)...)
+						errs = append(errs, Validate_M1(opCtx, fldPath, obj, oldObj)...)
 						return
 					}(&val, safe.Lookup(oldObj, key, safe.PtrTo), fldPath.Key(string(key)))...)
 			}

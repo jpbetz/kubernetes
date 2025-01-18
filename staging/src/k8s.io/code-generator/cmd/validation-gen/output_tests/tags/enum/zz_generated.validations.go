@@ -39,7 +39,7 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*Struct)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Struct(opCtx, obj.(*Struct), safe.Cast[*Struct](oldObj), nil)
+			return Validate_Struct(opCtx, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
@@ -48,7 +48,7 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 
 var symbolsForEnum0 = sets.New[Enum0]()
 
-func Validate_Enum0(opCtx operation.Context, obj, oldObj *Enum0, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_Enum0(opCtx operation.Context, fldPath *field.Path, obj, oldObj *Enum0) (errs field.ErrorList) {
 	// type Enum0
 	errs = append(errs, validate.Enum(opCtx, fldPath, obj, oldObj, symbolsForEnum0)...)
 
@@ -57,7 +57,7 @@ func Validate_Enum0(opCtx operation.Context, obj, oldObj *Enum0, fldPath *field.
 
 var symbolsForEnum1 = sets.New[Enum1](E1V1)
 
-func Validate_Enum1(opCtx operation.Context, obj, oldObj *Enum1, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_Enum1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *Enum1) (errs field.ErrorList) {
 	// type Enum1
 	errs = append(errs, validate.Enum(opCtx, fldPath, obj, oldObj, symbolsForEnum1)...)
 
@@ -66,55 +66,55 @@ func Validate_Enum1(opCtx operation.Context, obj, oldObj *Enum1, fldPath *field.
 
 var symbolsForEnum2 = sets.New[Enum2](E2V1, E2V2)
 
-func Validate_Enum2(opCtx operation.Context, obj, oldObj *Enum2, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_Enum2(opCtx operation.Context, fldPath *field.Path, obj, oldObj *Enum2) (errs field.ErrorList) {
 	// type Enum2
 	errs = append(errs, validate.Enum(opCtx, fldPath, obj, oldObj, symbolsForEnum2)...)
 
 	return errs
 }
 
-func Validate_Struct(opCtx operation.Context, obj, oldObj *Struct, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
 	// field Struct.TypeMeta has no validation
 
 	// field Struct.Enum0Field
 	errs = append(errs,
 		func(obj, oldObj *Enum0, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_Enum0(opCtx, obj, oldObj, fldPath)...)
+			errs = append(errs, Validate_Enum0(opCtx, fldPath, obj, oldObj)...)
 			return
 		}(&obj.Enum0Field, safe.Field(oldObj, func(oldObj *Struct) *Enum0 { return &oldObj.Enum0Field }), fldPath.Child("enum0Field"))...)
 
 	// field Struct.Enum0PtrField
 	errs = append(errs,
 		func(obj, oldObj *Enum0, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_Enum0(opCtx, obj, oldObj, fldPath)...)
+			errs = append(errs, Validate_Enum0(opCtx, fldPath, obj, oldObj)...)
 			return
 		}(obj.Enum0PtrField, safe.Field(oldObj, func(oldObj *Struct) *Enum0 { return oldObj.Enum0PtrField }), fldPath.Child("enum0PtrField"))...)
 
 	// field Struct.Enum1Field
 	errs = append(errs,
 		func(obj, oldObj *Enum1, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_Enum1(opCtx, obj, oldObj, fldPath)...)
+			errs = append(errs, Validate_Enum1(opCtx, fldPath, obj, oldObj)...)
 			return
 		}(&obj.Enum1Field, safe.Field(oldObj, func(oldObj *Struct) *Enum1 { return &oldObj.Enum1Field }), fldPath.Child("enum1Field"))...)
 
 	// field Struct.Enum1PtrField
 	errs = append(errs,
 		func(obj, oldObj *Enum1, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_Enum1(opCtx, obj, oldObj, fldPath)...)
+			errs = append(errs, Validate_Enum1(opCtx, fldPath, obj, oldObj)...)
 			return
 		}(obj.Enum1PtrField, safe.Field(oldObj, func(oldObj *Struct) *Enum1 { return oldObj.Enum1PtrField }), fldPath.Child("enum1PtrField"))...)
 
 	// field Struct.Enum2Field
 	errs = append(errs,
 		func(obj, oldObj *Enum2, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_Enum2(opCtx, obj, oldObj, fldPath)...)
+			errs = append(errs, Validate_Enum2(opCtx, fldPath, obj, oldObj)...)
 			return
 		}(&obj.Enum2Field, safe.Field(oldObj, func(oldObj *Struct) *Enum2 { return &oldObj.Enum2Field }), fldPath.Child("enum2Field"))...)
 
 	// field Struct.Enum2PtrField
 	errs = append(errs,
 		func(obj, oldObj *Enum2, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, Validate_Enum2(opCtx, obj, oldObj, fldPath)...)
+			errs = append(errs, Validate_Enum2(opCtx, fldPath, obj, oldObj)...)
 			return
 		}(obj.Enum2PtrField, safe.Field(oldObj, func(oldObj *Struct) *Enum2 { return oldObj.Enum2PtrField }), fldPath.Child("enum2PtrField"))...)
 

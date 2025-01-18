@@ -38,7 +38,7 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*Struct)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Struct(opCtx, obj.(*Struct), safe.Cast[*Struct](oldObj), nil)
+			return Validate_Struct(opCtx, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
@@ -48,7 +48,7 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 var unionMembershipForStructunion1 = validate.NewUnionMembership([2]string{"u1m1", "U1M1"}, [2]string{"u1m2", "U1M2"})
 var unionMembershipForStructunion2 = validate.NewUnionMembership([2]string{"u2m1", "U2M1"}, [2]string{"u2m2", "U2M2"})
 
-func Validate_Struct(opCtx operation.Context, obj, oldObj *Struct, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
 	// type Struct
 	errs = append(errs, validate.Union(opCtx, fldPath, obj, oldObj, unionMembershipForStructunion1, obj.U1M1, obj.U1M2)...)
 	errs = append(errs, validate.Union(opCtx, fldPath, obj, oldObj, unionMembershipForStructunion2, obj.U2M1, obj.U2M2)...)

@@ -102,7 +102,7 @@ func TestSubfieldValidationWithValidateFalseCountDupeErrors(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			opCtx := operation.Context{}
-			errs := Validate_T1(opCtx, tc.obj, tc.obj, nil)
+			errs := Validate_T1(opCtx, nil, tc.obj, tc.obj)
 			if tc.expectErrors && len(errs) == 0 {
 				t.Error("expected validation errors but got none")
 			}
