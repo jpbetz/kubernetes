@@ -30,22 +30,22 @@ type Struct struct {
 	TypeMeta int
 
 	// +k8s:validateFalse="field Struct.ListField"
-	// +k8s:eachVal2=+k8s:eachVal2=+k8s:validateFalse="field Struct.ListField[*][*]"
+	// +k8s:eachVal=+k8s:eachVal=+k8s:validateFalse="field Struct.ListField[*][*]"
 	ListField [][]string `json:"listField"`
 
 	// +k8s:validateFalse="field Struct.ListPtrField"
-	// +k8s:eachVal2=+k8s:eachVal2=+k8s:validateFalse="field Struct.ListPtrField[*][*]"
+	// +k8s:eachVal=+k8s:eachVal=+k8s:validateFalse="field Struct.ListPtrField[*][*]"
 	ListPtrField [][]*string `json:"listPtrField"`
 
 	// +k8s:validateFalse="field Struct.ListTypedefField"
-	// +k8s:eachVal2=+k8s:eachVal=+k8s:validateFalse="field Struct.ListTypedefField[*][*]"
+	// +k8s:eachVal=+k8s:eachVal=+k8s:validateFalse="field Struct.ListTypedefField[*][*]"
 	ListTypedefField []SliceType `json:"listTypedefField"`
 
 	UnvalidatedListField []SliceType `json:"UnvalidatedListField"`
 }
 
 // +k8s:validateFalse="type SliceType"
-// +k8s:eachVal2=+k8s:validateFalse="type SliceType[*]"
+// +k8s:eachVal=+k8s:validateFalse="type SliceType[*]"
 type SliceType []StringType
 
 // +k8s:validateFalse="type StringType"

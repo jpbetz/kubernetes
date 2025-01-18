@@ -53,8 +53,7 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 			errs = append(errs, validate.Subfield(opCtx, fldPath, obj, oldObj, "stringField", func(o *other.StructType) *string { return &o.StringField }, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
 				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "subfield Struct.(other.StructType).StringField")
 			})...)
-			// NOTE: Type other.StructType is in a non-included package.
-			//       Any validations defined on this type are not available from here.
+			// NOTE: Not validating this field's type: other.StructType is in a non-included package.
 			return
 		}(fldPath.Child("StructType"), &obj.StructType, safe.Field(oldObj, func(oldObj *Struct) *other.StructType { return &oldObj.StructType }))...)
 

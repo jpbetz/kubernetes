@@ -27,22 +27,22 @@ var localSchemeBuilder = testscheme.New()
 type Struct struct {
 	TypeMeta int
 
-	// +k8s:listType2=map
-	// +k8s:listMapKey2=key1Field
-	// +k8s:listMapKey2=key2Field
-	// +k8s:eachVal2=+k8s:immutable
+	// +k8s:listType=map
+	// +k8s:listMapKey=key1Field
+	// +k8s:listMapKey=key2Field
+	// +k8s:eachVal=+k8s:immutable
 	ListField []OtherStruct `json:"listField"`
 
-	// +k8s:listType2=map
-	// +k8s:listMapKey2=key1Field
-	// +k8s:listMapKey2=key2Field
-	// +k8s:eachVal2=+k8s:immutable
+	// +k8s:listType=map
+	// +k8s:listMapKey=key1Field
+	// +k8s:listMapKey=key2Field
+	// +k8s:eachVal=+k8s:immutable
 	ListPtrField []*OtherStruct `json:"listPtrField"`
 
-	// +k8s:listType2=map
-	// +k8s:listMapKey2=key1Field
-	// +k8s:listMapKey2=key2Field
-	// +k8s:eachVal2=+k8s:immutable
+	// +k8s:listType=map
+	// +k8s:listMapKey=key1Field
+	// +k8s:listMapKey=key2Field
+	// +k8s:eachVal=+k8s:immutable
 	ListTypedefField []OtherTypedefStruct `json:"listTypedefField"`
 }
 

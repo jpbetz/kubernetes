@@ -26,11 +26,17 @@ import (
 )
 
 const (
-	listTypeTag   = "k8s:listType2"
-	listMapKeyTag = "k8s:listMapKey2"
+	listTypeTag   = "k8s:listType"
+	listMapKeyTag = "k8s:listMapKey"
 	eachValTag    = "k8s:eachVal"
 	eachKeyTag    = "k8s:eachKey"
 )
+
+// We keep the eachVal and eachKey validators around because the main
+// code-generation logic calls them directly.  We could move them into the main
+// pkg, but it's easier and cleaner to leave them here.
+var globalEachVal *eachValTagValidator
+var globalEachKey *eachKeyTagValidator
 
 func init() {
 	// Lists with list-map semantics are comprised of multiple tags, which need
@@ -38,8 +44,12 @@ func init() {
 	shared := map[string]*listMap{} // keyed by the fieldpath
 	RegisterTagValidator(listTypeTagValidator{shared})
 	RegisterTagValidator(listMapKeyTagValidator{shared})
-	RegisterTagValidator(&eachValTagValidator{shared, nil})
-	RegisterTagValidator(&eachKeyTagValidator{nil})
+
+	globalEachVal = &eachValTagValidator{shared, nil}
+	RegisterTagValidator(globalEachVal)
+
+	globalEachKey = &eachKeyTagValidator{nil}
+	RegisterTagValidator(globalEachKey)
 }
 
 // This applies to all tags in this file.
@@ -239,16 +249,24 @@ func (evtv eachValTagValidator) GetValidations(context Context, _ []string, payl
 		if len(validations.Variables) > 0 {
 			return Validations{}, fmt.Errorf("variable generation is not supported")
 		}
-
-		switch t.Kind {
-		case types.Slice, types.Array:
-			return evtv.getListValidations(context.Path, t, validations)
-		case types.Map:
-			return evtv.getMapValidations(t, validations)
-		}
+		return evtv.getValidations(context.Path, t, validations)
 	}
+}
 
-	panic("unreachable")
+func (evtv eachValTagValidator) getValidations(fldPath *field.Path, t *types.Type, validations Validations) (Validations, error) {
+	switch t.Kind {
+	case types.Slice, types.Array:
+		return evtv.getListValidations(fldPath, t, validations)
+	case types.Map:
+		return evtv.getMapValidations(t, validations)
+	}
+	return Validations{}, fmt.Errorf("non-iterable type: %v", t)
+}
+
+// ForEachVal returns a validation that applies a function to each element of
+// a list or map.
+func ForEachVal(fldPath *field.Path, t *types.Type, fn FunctionGen) (Validations, error) {
+	return globalEachVal.getValidations(fldPath, t, Validations{Functions: []FunctionGen{fn}})
 }
 
 func (evtv eachValTagValidator) getListValidations(fldPath *field.Path, t *types.Type, validations Validations) (Validations, error) {
@@ -362,8 +380,6 @@ func (ektv eachKeyTagValidator) GetValidations(context Context, _ []string, payl
 		return Validations{}, fmt.Errorf("can only be used on map types")
 	}
 
-	result := Validations{}
-
 	fakeComments := []string{payload}
 	elemContext := Context{
 		Scope:  ScopeMapKey,
@@ -378,13 +394,23 @@ func (ektv eachKeyTagValidator) GetValidations(context Context, _ []string, payl
 			return Validations{}, fmt.Errorf("variable generation is not supported")
 		}
 
-		for _, vfn := range validations.Functions {
-			f := Function("eachKey", vfn.Flags(), validateEachMapKey, WrapperFunction{vfn, t.Key})
-			result.Functions = append(result.Functions, f)
-		}
+		return ektv.getValidations(t, validations)
 	}
+}
 
+func (ektv eachKeyTagValidator) getValidations(t *types.Type, validations Validations) (Validations, error) {
+	result := Validations{}
+	for _, vfn := range validations.Functions {
+		f := Function("eachKey", vfn.Flags(), validateEachMapKey, WrapperFunction{vfn, t.Key})
+		result.Functions = append(result.Functions, f)
+	}
 	return result, nil
+}
+
+// ForEachKey returns a validation that applies a function to each key of
+// a map.
+func ForEachKey(_ *field.Path, t *types.Type, fn FunctionGen) (Validations, error) {
+	return globalEachKey.getValidations(t, Validations{Functions: []FunctionGen{fn}})
 }
 
 func (ektv eachKeyTagValidator) Docs() TagDoc {

@@ -9,7 +9,9 @@
         "field Struct.MapField(keys)"
       ],
       "mapTypeField": [
-        "field Struct.MapTypeField"
+        "field Struct.MapTypeField",
+        "field Struct.MapTypeField(keys)",
+        "field Struct.MapTypeField(keys)"
       ],
       "mapTypedefField": [
         "field Struct.MapTypedefField",
@@ -26,6 +28,8 @@
       "validatedMapTypeField": [
         "ValidatedMapType",
         "field Struct.ValidatedMapTypeField",
+        "field Struct.ValidatedMapTypeField(keys)",
+        "field Struct.ValidatedMapTypeField(keys)",
         "type ValidatedMapType(keys)",
         "type ValidatedMapType(keys)"
       ]

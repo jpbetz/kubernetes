@@ -52,10 +52,6 @@ type T2 struct {
 // +k8s:eachVal=+k8s:validateFalse="type E1 values"
 type E1 []E1
 
-// +k8s:validateFalse="type E2"
-// +k8s:eachVal=+k8s:validateFalse="type E2 values"
-type E2 []*E2
-
 // NOTE: no validations.
 type T3 struct {
 	// NOTE: no validations.

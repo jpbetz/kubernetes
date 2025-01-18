@@ -30,20 +30,20 @@ type Struct struct {
 	TypeMeta int
 
 	// +k8s:validateFalse="field Struct.MapField"
-	// +k8s:eachVal2=+k8s:eachVal2=+k8s:validateFalse="field Struct.MapField[*][*]"
+	// +k8s:eachVal=+k8s:eachVal=+k8s:validateFalse="field Struct.MapField[*][*]"
 	MapField map[string][]string `json:"mapField"`
 
 	// +k8s:validateFalse="field Struct.MapPtrField"
-	// +k8s:eachVal2=+k8s:eachVal2=+k8s:validateFalse="field Struct.MapPtrField[*][*]"
+	// +k8s:eachVal=+k8s:eachVal=+k8s:validateFalse="field Struct.MapPtrField[*][*]"
 	MapPtrField map[string][]*string `json:"mapPtrField"`
 
 	// +k8s:validateFalse="field Struct.MapTypedefField"
-	// +k8s:eachVal2=+k8s:eachVal2=+k8s:validateFalse="field Struct.MapTypedefField[*][*]"
+	// +k8s:eachVal=+k8s:eachVal=+k8s:validateFalse="field Struct.MapTypedefField[*][*]"
 	MapTypedefField map[string]SliceType `json:"mapTypedefField"`
 }
 
 // +k8s:validateFalse="type SliceType"
-// +k8s:eachVal2=+k8s:validateFalse="type ListType[*]"
+// +k8s:eachVal=+k8s:validateFalse="type ListType[*]"
 type SliceType []StringType
 
 // +k8s:validateFalse="type StringType"

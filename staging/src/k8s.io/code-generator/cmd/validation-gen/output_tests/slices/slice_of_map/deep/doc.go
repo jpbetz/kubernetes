@@ -30,22 +30,22 @@ type Struct struct {
 	TypeMeta int
 
 	// +k8s:validateFalse="field Struct.ListField"
-	// +k8s:eachVal2=+k8s:eachVal2=+k8s:validateFalse="field Struct.ListField[*][*]"
+	// +k8s:eachVal=+k8s:eachVal=+k8s:validateFalse="field Struct.ListField[*][*]"
 	ListField []map[string]string `json:"listField"`
 
 	// +k8s:validateFalse="field Struct.ListPtrField"
-	// +k8s:eachVal2=+k8s:eachVal2=+k8s:validateFalse="field Struct.ListPtrField[*][*]"
+	// +k8s:eachVal=+k8s:eachVal=+k8s:validateFalse="field Struct.ListPtrField[*][*]"
 	ListPtrField []map[string]*string `json:"listPtrField"`
 
 	// +k8s:validateFalse="field Struct.ListTypedefField"
-	// +k8s:eachVal2=+k8s:eachVal2=+k8s:validateFalse="field Struct.ListTypedefField[*][*]"
+	// +k8s:eachVal=+k8s:eachVal=+k8s:validateFalse="field Struct.ListTypedefField[*][*]"
 	ListTypedefField []MapType `json:"listTypedefField"`
 
 	UnvalidatedListField []MapType `json:"UnvalidatedListField"`
 }
 
 // +k8s:validateFalse="type MapType"
-// +k8s:eachVal2=+k8s:validateFalse="type MapType[*]"
+// +k8s:eachVal=+k8s:validateFalse="type MapType[*]"
 type MapType map[string]StringType
 
 // +k8s:validateFalse="type StringType"

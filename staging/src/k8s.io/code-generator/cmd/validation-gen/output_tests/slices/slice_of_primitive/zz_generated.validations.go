@@ -85,13 +85,9 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 			errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
 				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListTypedefField[*]")
 			})...)
-			for i, val := range obj {
-				errs = append(errs,
-					func(fldPath *field.Path, obj, oldObj *StringType) (errs field.ErrorList) {
-						errs = append(errs, Validate_StringType(opCtx, fldPath, obj, oldObj)...)
-						return
-					}(fldPath.Index(i), &val, nil)...)
-			}
+			errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
+				return Validate_StringType(opCtx, fldPath, obj, oldObj)
+			})...)
 			return
 		}(fldPath.Child("listTypedefField"), obj.ListTypedefField, safe.Field(oldObj, func(oldObj *Struct) []StringType { return oldObj.ListTypedefField }))...)
 
@@ -102,13 +98,9 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 			errs = append(errs, validate.EachSliceValNilable(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
 				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListTypedefPtrField[*]")
 			})...)
-			for i, val := range obj {
-				errs = append(errs,
-					func(fldPath *field.Path, obj, oldObj *StringType) (errs field.ErrorList) {
-						errs = append(errs, Validate_StringType(opCtx, fldPath, obj, oldObj)...)
-						return
-					}(fldPath.Index(i), val, nil)...)
-			}
+			errs = append(errs, validate.EachSliceValNilable(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
+				return Validate_StringType(opCtx, fldPath, obj, oldObj)
+			})...)
 			return
 		}(fldPath.Child("listTypedefPtrField"), obj.ListTypedefPtrField, safe.Field(oldObj, func(oldObj *Struct) []*StringType { return oldObj.ListTypedefPtrField }))...)
 

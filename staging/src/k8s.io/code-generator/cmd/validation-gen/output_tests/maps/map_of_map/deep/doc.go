@@ -30,18 +30,18 @@ type Struct struct {
 	TypeMeta int
 
 	// +k8s:validateFalse="field Struct.MapField"
-	// +k8s:eachVal2=+k8s:eachVal2=+k8s:validateFalse="field Struct.MapField[*][*]"
+	// +k8s:eachVal=+k8s:eachVal=+k8s:validateFalse="field Struct.MapField[*][*]"
 	MapField map[string]map[string]string `json:"mapField"`
 
 	// +k8s:validateFalse="field Struct.MapPtrField"
-	// +k8s:eachVal2=+k8s:eachVal2=+k8s:validateFalse="field Struct.MapPtrField[*][*]"
+	// +k8s:eachVal=+k8s:eachVal=+k8s:validateFalse="field Struct.MapPtrField[*][*]"
 	MapPtrField map[string]map[string]*string `json:"mapPtrField"`
 
 	// +k8s:validateFalse="field Struct.MapTypedefField"
-	// +k8s:eachVal2=+k8s:eachVal2=+k8s:validateFalse="field Struct.MapTypedefField[*][*]"
+	// +k8s:eachVal=+k8s:eachVal=+k8s:validateFalse="field Struct.MapTypedefField[*][*]"
 	MapTypedefField map[string]MapType `json:"mapTypedefField"`
 }
 
 // +k8s:validateFalse="type MapType"
-// +k8s:eachVal2=+k8s:validateFalse="type MapType[*]"
+// +k8s:eachVal=+k8s:validateFalse="type MapType[*]"
 type MapType map[string]string

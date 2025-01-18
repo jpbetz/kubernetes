@@ -113,8 +113,7 @@ func printDocs() {
 	// Initialize all registered validators.
 	validator := validators.InitGlobalValidator(c)
 
-	docs := builtinTagDocs()
-	docs = append(docs, validator.Docs()...)
+	docs := validator.Docs()
 	for i := range docs {
 		d := &docs[i]
 		slices.Sort(d.Scopes)
