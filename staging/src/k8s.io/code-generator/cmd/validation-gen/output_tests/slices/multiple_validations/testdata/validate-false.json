@@ -10,6 +10,10 @@
       "ls[0]": [
         "T1.LS[vals] #1",
         "T1.LS[vals] #2"
+      ],
+      "ls[1]": [
+        "T1.LS[vals] #1",
+        "T1.LS[vals] #2"
       ]
     }
   }

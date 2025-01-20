@@ -7,10 +7,18 @@
         "T1.LE1[vals]",
         "type E1"
       ],
+      "le1[1]": [
+        "T1.LE1[vals]",
+        "type E1"
+      ],
       "lpe1": [
         "field T1.LPE1"
       ],
       "lpe1[0]": [
+        "T1.LPE1[vals]",
+        "type E1"
+      ],
+      "lpe1[1]": [
         "T1.LPE1[vals]",
         "type E1"
       ]

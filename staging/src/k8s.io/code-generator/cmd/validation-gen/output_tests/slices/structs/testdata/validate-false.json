@@ -13,6 +13,13 @@
       "lpt2[0].s": [
         "field T2.S"
       ],
+      "lpt2[1]": [
+        "T1.LPT2[vals]",
+        "type T2"
+      ],
+      "lpt2[1].s": [
+        "field T2.S"
+      ],
       "lt2": [
         "field T1.LT2"
       ],
@@ -21,6 +28,13 @@
         "type T2"
       ],
       "lt2[0].s": [
+        "field T2.S"
+      ],
+      "lt2[1]": [
+        "T1.LT2[vals]",
+        "type T2"
+      ],
+      "lt2[1].s": [
         "field T2.S"
       ]
     }

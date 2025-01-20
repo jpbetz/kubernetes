@@ -214,7 +214,8 @@ func (s *ValidationTestBuilder) ValidateFixtures() {
 }
 
 func fuzzer() *fuzz.Fuzzer {
-	return fuzz.New().NilChance(0.0).NumElements(1, 1).RandSource(rand.NewSource(0))
+	// Ensure that lists and maps are not empty and use a deterministic seed.
+	return fuzz.New().NilChance(0.0).NumElements(2, 2).RandSource(rand.NewSource(0))
 }
 
 // ValueFuzzed automatically populates the given value using a deterministic fuzzer.

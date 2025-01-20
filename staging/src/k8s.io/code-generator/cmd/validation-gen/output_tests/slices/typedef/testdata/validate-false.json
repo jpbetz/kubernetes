@@ -11,6 +11,10 @@
         "ALS[vals]",
         "ALS[vals]"
       ],
+      "als[1]": [
+        "ALS[vals]",
+        "ALS[vals]"
+      ],
       "lals": [
         "field T1.LALS"
       ],
@@ -19,6 +23,19 @@
         "type ALS"
       ],
       "lals[0][0]": [
+        "ALS[vals]"
+      ],
+      "lals[0][1]": [
+        "ALS[vals]"
+      ],
+      "lals[1]": [
+        "T1.LALS[vals]",
+        "type ALS"
+      ],
+      "lals[1][0]": [
+        "ALS[vals]"
+      ],
+      "lals[1][1]": [
         "ALS[vals]"
       ]
     }

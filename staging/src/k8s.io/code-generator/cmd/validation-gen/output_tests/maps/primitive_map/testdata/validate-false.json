@@ -5,9 +5,13 @@
       ],
       "msmss": [
         "T1.MSMSS[keys]",
+        "T1.MSMSS[keys]",
         "field T1.MSMSS"
       ],
       "msmss[岯Ȉ\u0026\u003c沲3]": [
+        "T1.MSMSS[vals]"
+      ],
+      "msmss[鶭ŁPyÌ祆tkƺƠav]": [
         "T1.MSMSS[vals]"
       ]
     }
