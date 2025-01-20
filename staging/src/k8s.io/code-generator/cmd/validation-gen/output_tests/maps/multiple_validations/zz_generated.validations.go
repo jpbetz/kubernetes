@@ -36,43 +36,43 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *testscheme.Scheme) error {
-	scheme.AddValidationFunc((*T1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*Struct)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_T1(opCtx, nil /* fldPath */, obj.(*T1), safe.Cast[*T1](oldObj))
+			return Validate_Struct(opCtx, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) (errs field.ErrorList) {
-	// type T1
-	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type T1")...)
+func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
+	// type Struct
+	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type Struct")...)
 
-	// field T1.TypeMeta has no validation
+	// field Struct.TypeMeta has no validation
 
-	// field T1.MSS
+	// field Struct.MapField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj map[string]string) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.MSS #1")...)
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field T1.MSS #2")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField #1")...)
+			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField #2")...)
 			for key, val := range obj {
 				errs = append(errs,
 					func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.MSS[keys] #1")...)
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.MSS[keys] #2")...)
+						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField(keys) #1")...)
+						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField(keys) #2")...)
 						return
 					}(fldPath, &key, nil)...)
 				errs = append(errs,
 					func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.MSS[vals] #1")...)
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.MSS[vals] #2")...)
+						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField[*] #1")...)
+						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField[*] #2")...)
 						return
 					}(fldPath.Key(string(key)), &val, safe.Lookup(oldObj, key, safe.PtrTo))...)
 			}
 			return
-		}(fldPath.Child("mss"), obj.MSS, safe.Field(oldObj, func(oldObj *T1) map[string]string { return oldObj.MSS }))...)
+		}(fldPath.Child("mapField"), obj.MapField, safe.Field(oldObj, func(oldObj *Struct) map[string]string { return oldObj.MapField }))...)
 
-	// field T1.AnotherMSS has no validation
+	// field Struct.UnvalidatedMapField has no validation
 	return errs
 }

@@ -1,23 +1,23 @@
 {
-    "*multiplevalidations.T1": {
+    "*multiplevalidations.Struct": {
       "": [
-        "type T1"
+        "type Struct"
       ],
-      "mss": [
-        "T1.MSS[keys] #1",
-        "T1.MSS[keys] #1",
-        "T1.MSS[keys] #2",
-        "T1.MSS[keys] #2",
-        "field T1.MSS #1",
-        "field T1.MSS #2"
+      "mapField": [
+        "field Struct.MapField #1",
+        "field Struct.MapField #2",
+        "field Struct.MapField(keys) #1",
+        "field Struct.MapField(keys) #1",
+        "field Struct.MapField(keys) #2",
+        "field Struct.MapField(keys) #2"
       ],
-      "mss[ÀYǎ3g成oɜH偩j0âȰ]": [
-        "T1.MSS[vals] #1",
-        "T1.MSS[vals] #2"
+      "mapField[ÀYǎ3g成oɜH偩j0âȰ]": [
+        "field Struct.MapField[*] #1",
+        "field Struct.MapField[*] #2"
       ],
-      "mss[岯Ȉ\u0026\u003c沲3]": [
-        "T1.MSS[vals] #1",
-        "T1.MSS[vals] #2"
+      "mapField[岯Ȉ\u0026\u003c沲3]": [
+        "field Struct.MapField[*] #1",
+        "field Struct.MapField[*] #2"
       ]
     }
   }

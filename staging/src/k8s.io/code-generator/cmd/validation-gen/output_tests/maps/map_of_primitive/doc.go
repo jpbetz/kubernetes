@@ -19,7 +19,7 @@ limitations under the License.
 // +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
-package multiplevalidations
+package mapofprimitive
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
@@ -29,13 +29,24 @@ var localSchemeBuilder = testscheme.New()
 type Struct struct {
 	TypeMeta int
 
-	// +k8s:validateFalse="field Struct.MapField #1"
-	// +k8s:validateFalse="field Struct.MapField #2"
-	// +k8s:eachKey=+k8s:validateFalse="field Struct.MapField(keys) #1"
-	// +k8s:eachKey=+k8s:validateFalse="field Struct.MapField(keys) #2"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.MapField[*] #1"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.MapField[*] #2"
+	// +k8s:validateFalse="field Struct.MapField"
+	// +k8s:eachVal=+k8s:validateFalse="field Struct.MapField[*]"
 	MapField map[string]string `json:"mapField"`
 
-	UnvalidatedMapField []string `json:"UnvalidatedMapField"`
+	// +k8s:validateFalse="field Struct.MapPtrField"
+	// +k8s:eachVal=+k8s:validateFalse="field Struct.MapPtrField[*]"
+	MapPtrField map[string]*string `json:"mapPtrField"`
+
+	// +k8s:validateFalse="field Struct.MapTypedefField"
+	// +k8s:eachVal=+k8s:validateFalse="field Struct.MapTypedefField[*]"
+	MapTypedefField map[string]StringType `json:"mapTypedefField"`
+
+	// +k8s:validateFalse="field Struct.MapTypedefPtrField"
+	// +k8s:eachVal=+k8s:validateFalse="field Struct.MapTypedefPtrField[*]"
+	MapTypedefPtrField map[string]*StringType `json:"mapTypedefPtrField"`
+
+	UnvalidatedMapField map[string]string `json:"UnvalidatedMapField"`
 }
+
+// +k8s:validateFalse="type StringType"
+type StringType string
