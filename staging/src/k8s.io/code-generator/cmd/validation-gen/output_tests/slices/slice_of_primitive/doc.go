@@ -19,22 +19,34 @@ limitations under the License.
 // +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
-package multiplevalidations
+package sliceofprimitive
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +k8s:validateFalse="type Struct #1"
-// +k8s:validateFalse="type Struct #2"
+// +k8s:validateFalse="type Struct"
 type Struct struct {
 	TypeMeta int
 
-	// +k8s:validateFalse="field Struct.ListField #1"
-	// +k8s:validateFalse="field Struct.ListField #2"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListField[*] #1"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListField[*] #2"
+	// +k8s:validateFalse="field Struct.ListField"
+	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListField[*]"
 	ListField []string `json:"listField"`
+
+	// +k8s:validateFalse="field Struct.ListPtrField"
+	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListPtrField[*]"
+	ListPtrField []*string `json:"listPtrField"`
+
+	// +k8s:validateFalse="field Struct.ListTypedefField"
+	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListTypedefField[*]"
+	ListTypedefField []StringType `json:"listTypedefField"`
+
+	// +k8s:validateFalse="field Struct.ListTypedefPtrField"
+	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListTypedefPtrField[*]"
+	ListTypedefPtrField []*StringType `json:"listTypedefPtrField"`
 
 	UnvalidatedListField []string `json:"UnvalidatedListField"`
 }
+
+// +k8s:validateFalse="type StringType"
+type StringType string

@@ -1,19 +1,20 @@
 {
-    "*multiplevalidations.T1": {
+    "*multiplevalidations.Struct": {
       "": [
-        "type T1"
+        "type Struct #1",
+        "type Struct #2"
       ],
-      "ls": [
-        "field T1.LS #1",
-        "field T1.LS #2"
+      "listField": [
+        "field Struct.ListField #1",
+        "field Struct.ListField #2"
       ],
-      "ls[0]": [
-        "T1.LS[vals] #1",
-        "T1.LS[vals] #2"
+      "listField[0]": [
+        "field Struct.ListField[*] #1",
+        "field Struct.ListField[*] #2"
       ],
-      "ls[1]": [
-        "T1.LS[vals] #1",
-        "T1.LS[vals] #2"
+      "listField[1]": [
+        "field Struct.ListField[*] #1",
+        "field Struct.ListField[*] #2"
       ]
     }
   }
