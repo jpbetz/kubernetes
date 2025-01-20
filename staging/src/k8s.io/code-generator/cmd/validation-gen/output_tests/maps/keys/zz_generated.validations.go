@@ -105,13 +105,6 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj ValidatedMapType) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ValidatedMapTypeField")...)
-			for key, _ := range obj {
-				errs = append(errs,
-					func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type ValidatedMapType(keys)")...)
-						return
-					}(fldPath, &key, nil)...)
-			}
 			errs = append(errs, Validate_ValidatedMapType(opCtx, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("validatedMapTypeField"), obj.ValidatedMapTypeField, safe.Field(oldObj, func(oldObj *Struct) ValidatedMapType { return oldObj.ValidatedMapTypeField }))...)

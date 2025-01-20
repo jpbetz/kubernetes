@@ -1021,13 +1021,8 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			} else {
 				// Get to the real type.
 				switch fld.node.valueType.Kind {
-				case types.Alias:
-					// Emit for the underlying type.
-					g.emitValidationForChild(c, fld.node.underlying, bufsw)
-					// Call the type's validation function.
-					g.emitCallToOtherTypeFunc(c, fld.node, bufsw)
-				case types.Struct:
-					// Call the type's validation function.
+				case types.Alias, types.Struct:
+					// If this field is another type, call its validation function.
 					g.emitCallToOtherTypeFunc(c, fld.node, bufsw)
 				default:
 					// Descend into this field.

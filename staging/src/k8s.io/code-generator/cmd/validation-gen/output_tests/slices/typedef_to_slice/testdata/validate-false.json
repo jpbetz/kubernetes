@@ -8,11 +8,9 @@
         "type ListType"
       ],
       "listField[0]": [
-        "type ListType[*]",
         "type ListType[*]"
       ],
       "listField[1]": [
-        "type ListType[*]",
         "type ListType[*]"
       ],
       "listPtrField": [
@@ -20,11 +18,9 @@
         "type ListPtrType"
       ],
       "listPtrField[0]": [
-        "type ListPtrType[*]",
         "type ListPtrType[*]"
       ],
       "listPtrField[1]": [
-        "type ListPtrType[*]",
         "type ListPtrType[*]"
       ],
       "listTypedefField": [
@@ -33,14 +29,10 @@
       ],
       "listTypedefField[0]": [
         "type ListTypedefType[*]",
-        "type ListTypedefType[*]",
-        "type StringType",
         "type StringType"
       ],
       "listTypedefField[1]": [
         "type ListTypedefType[*]",
-        "type ListTypedefType[*]",
-        "type StringType",
         "type StringType"
       ]
     }

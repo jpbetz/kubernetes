@@ -105,13 +105,6 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj MapType) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField")...)
-			for key, val := range obj {
-				errs = append(errs,
-					func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type MapType[*]")...)
-						return
-					}(fldPath.Key(string(key)), &val, safe.Lookup(oldObj, key, safe.PtrTo))...)
-			}
 			errs = append(errs, Validate_MapType(opCtx, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("mapField"), obj.MapField, safe.Field(oldObj, func(oldObj *Struct) MapType { return oldObj.MapField }))...)
@@ -120,13 +113,6 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj MapPtrType) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapPtrField")...)
-			for key, val := range obj {
-				errs = append(errs,
-					func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type MapPtrType[*]")...)
-						return
-					}(fldPath.Key(string(key)), val, safe.Lookup(oldObj, key, safe.Ident))...)
-			}
 			errs = append(errs, Validate_MapPtrType(opCtx, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("mapPtrField"), obj.MapPtrField, safe.Field(oldObj, func(oldObj *Struct) MapPtrType { return oldObj.MapPtrField }))...)
@@ -135,14 +121,6 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj MapTypedefType) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapTypedefField")...)
-			for key, val := range obj {
-				errs = append(errs,
-					func(fldPath *field.Path, obj, oldObj *StringType) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type MapTypedefType[*]")...)
-						errs = append(errs, Validate_StringType(opCtx, fldPath, obj, oldObj)...)
-						return
-					}(fldPath.Key(string(key)), &val, safe.Lookup(oldObj, key, safe.PtrTo))...)
-			}
 			errs = append(errs, Validate_MapTypedefType(opCtx, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("mapTypedefField"), obj.MapTypedefField, safe.Field(oldObj, func(oldObj *Struct) MapTypedefType { return oldObj.MapTypedefField }))...)

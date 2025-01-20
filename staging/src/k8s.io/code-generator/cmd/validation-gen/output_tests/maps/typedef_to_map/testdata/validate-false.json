@@ -8,11 +8,9 @@
         "type MapType"
       ],
       "mapField[ÀYǎ3g成oɜH偩j0âȰ]": [
-        "type MapType[*]",
         "type MapType[*]"
       ],
       "mapField[岯Ȉ\u0026\u003c沲3]": [
-        "type MapType[*]",
         "type MapType[*]"
       ],
       "mapPtrField": [
@@ -20,11 +18,9 @@
         "type MapPtrType"
       ],
       "mapPtrField[V噘¢\u003eóǲ岋笨Gń條ģ]": [
-        "type MapPtrType[*]",
         "type MapPtrType[*]"
       ],
       "mapPtrField[讻IeYF墄[C]": [
-        "type MapPtrType[*]",
         "type MapPtrType[*]"
       ],
       "mapTypedefField": [
@@ -33,14 +29,10 @@
       ],
       "mapTypedefField[\u003eƯ]ɹȽ東潇澍]": [
         "type MapTypedefType[*]",
-        "type MapTypedefType[*]",
-        "type StringType",
         "type StringType"
       ],
       "mapTypedefField[闌剾溏]": [
         "type MapTypedefType[*]",
-        "type MapTypedefType[*]",
-        "type StringType",
         "type StringType"
       ]
     }

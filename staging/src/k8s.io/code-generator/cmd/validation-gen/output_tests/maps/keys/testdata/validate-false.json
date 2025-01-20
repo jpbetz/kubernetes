@@ -27,8 +27,6 @@
         "ValidatedMapType",
         "field Struct.ValidatedMapTypeField",
         "type ValidatedMapType(keys)",
-        "type ValidatedMapType(keys)",
-        "type ValidatedMapType(keys)",
         "type ValidatedMapType(keys)"
       ]
     }
