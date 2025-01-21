@@ -16,7 +16,6 @@ limitations under the License.
 
 // +k8s:validation-gen=*
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
-// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package primitive_pointers
@@ -25,13 +24,13 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-type T1 struct {
-	// +k8s:validateFalse="T1.SP"
+type Struct struct {
+	// +k8s:immutable
 	SP *string `json:"sp"`
-	// +k8s:validateFalse="T1.IP"
+	// +k8s:immutable
 	IP *int `json:"ip"`
-	// +k8s:validateFalse="T1.BP"
+	// +k8s:immutable
 	BP *bool `json:"bp"`
-	// +k8s:validateFalse="T1.FP"
+	// +k8s:immutable
 	FP *float64 `json:"fp"`
 }

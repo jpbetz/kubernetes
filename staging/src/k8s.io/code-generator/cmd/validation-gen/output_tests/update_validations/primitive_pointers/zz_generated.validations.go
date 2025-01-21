@@ -36,43 +36,43 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *testscheme.Scheme) error {
-	scheme.AddValidationFunc((*T1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*Struct)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_T1(opCtx, nil /* fldPath */, obj.(*T1), safe.Cast[*T1](oldObj))
+			return Validate_Struct(opCtx, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) (errs field.ErrorList) {
-	// field T1.SP
+func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
+	// field Struct.SP
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.SP")...)
+			errs = append(errs, validate.Immutable(opCtx, fldPath, obj, oldObj)...)
 			return
-		}(fldPath.Child("sp"), obj.SP, safe.Field(oldObj, func(oldObj *T1) *string { return oldObj.SP }))...)
+		}(fldPath.Child("sp"), obj.SP, safe.Field(oldObj, func(oldObj *Struct) *string { return oldObj.SP }))...)
 
-	// field T1.IP
+	// field Struct.IP
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *int) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.IP")...)
+			errs = append(errs, validate.Immutable(opCtx, fldPath, obj, oldObj)...)
 			return
-		}(fldPath.Child("ip"), obj.IP, safe.Field(oldObj, func(oldObj *T1) *int { return oldObj.IP }))...)
+		}(fldPath.Child("ip"), obj.IP, safe.Field(oldObj, func(oldObj *Struct) *int { return oldObj.IP }))...)
 
-	// field T1.BP
+	// field Struct.BP
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *bool) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.BP")...)
+			errs = append(errs, validate.Immutable(opCtx, fldPath, obj, oldObj)...)
 			return
-		}(fldPath.Child("bp"), obj.BP, safe.Field(oldObj, func(oldObj *T1) *bool { return oldObj.BP }))...)
+		}(fldPath.Child("bp"), obj.BP, safe.Field(oldObj, func(oldObj *Struct) *bool { return oldObj.BP }))...)
 
-	// field T1.FP
+	// field Struct.FP
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *float64) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "T1.FP")...)
+			errs = append(errs, validate.Immutable(opCtx, fldPath, obj, oldObj)...)
 			return
-		}(fldPath.Child("fp"), obj.FP, safe.Field(oldObj, func(oldObj *T1) *float64 { return oldObj.FP }))...)
+		}(fldPath.Child("fp"), obj.FP, safe.Field(oldObj, func(oldObj *Struct) *float64 { return oldObj.FP }))...)
 
 	return errs
 }

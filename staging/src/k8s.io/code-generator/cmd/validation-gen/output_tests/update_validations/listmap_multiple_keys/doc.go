@@ -14,9 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// +k8s:validation-gen=*
+// +k8s:validation-gen=TypeMeta
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
-// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
 package listmap_multiple_keys
@@ -25,48 +24,26 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-type T1 struct {
-	// +k8s:listType=map
-	// +k8s:listMapKey=k1
-	// +k8s:listMapKey=k2
-	LM1 []M1 `json:"lm1"`
+type Struct struct {
+	TypeMeta int
 
 	// +k8s:listType=map
-	// +k8s:listMapKey=k1
-	// +k8s:listMapKey=k2
-	LM2 []M2 `json:"lm2"`
+	// +k8s:listMapKey=Key1Field
+	// +k8s:listMapKey=Key2Field
+	// +k8s:eachVal=+k8s:immutable
+	ListField []OtherStruct `json:"listField"`
 
 	// +k8s:listType=map
-	// +k8s:listMapKey=k1
-	// +k8s:listMapKey=k2
-	LM3 []M3 `json:"lm3"`
-
-	// +k8s:listType=map
-	// +k8s:listType=map
-	// +k8s:listMapKey=k1
-	// +k8s:listMapKey=k2
-	LM4 []M4 `json:"lm4"`
+	// +k8s:listMapKey=Key1Field
+	// +k8s:listMapKey=Key2Field
+	// +k8s:eachVal=+k8s:immutable
+	ListTypedefField []OtherTypedefStruct `json:"listTypedefField"`
 }
 
-type M1 struct {
-	// +k8s:validateFalse="M1.K1"
-	K1 string `json:"k1"`
-
-	// +k8s:validateFalse="M1.K2"
-	K2 string `json:"k2"`
-
-	// +k8s:validateFalse="M1.S"
-	S string `json:"s"`
+type OtherStruct struct {
+	Key1Field string
+	Key2Field int
+	DataField string
 }
 
-type M2 struct {
-	M1 // embedded, no JSON tag
-}
-
-type M3 struct {
-	M1 `json:",inline"` // embedded
-}
-
-type M4 struct {
-	M2
-}
+type OtherTypedefStruct OtherStruct
