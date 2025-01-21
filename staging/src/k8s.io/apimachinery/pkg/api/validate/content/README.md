@@ -12,3 +12,5 @@ but they should still use a slice return type.
 
 Good validation failure messages follow the Kubernetes API conventions, for
 example using "must" instead of "should".
+
+This package should have almost no external dependecies (except stdlib).

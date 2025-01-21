@@ -46,22 +46,22 @@ func mkMsgs(msgs ...string) []string {
 }
 
 // testVerify checks that the result matches the expected results.
-func testVerify[T any](t *testing.T, i int, input T, expect []string, result []string) {
+func testVerify[T any](t *testing.T, casenum int, input T, expect []string, result []string) {
 	t.Helper()
 
 	if len(result)+len(expect) == 0 {
 		return
 	}
 	if len(result) != 0 && len(expect) == 0 {
-		t.Errorf("case %d(%v): unexpected failure: %v", i, input, fmtMsgs(result))
+		t.Errorf("case %d(%v): unexpected failure: %v", casenum, input, fmtMsgs(result))
 		return
 	}
 	if len(result) == 0 && len(expect) != 0 {
-		t.Errorf("case %d(%v): unexpected success: expected %v", i, input, fmtMsgs(expect))
+		t.Errorf("case %d(%v): unexpected success: expected %v", casenum, input, fmtMsgs(expect))
 		return
 	}
 	if len(result) != len(expect) {
-		t.Errorf("case %d(%v): wrong errors\nexpected: %v\n     got: %v", i, input, fmtMsgs(expect), fmtMsgs(result))
+		t.Errorf("case %d(%v): wrong errors\nexpected: %v\n     got: %v", casenum, input, fmtMsgs(expect), fmtMsgs(result))
 		return
 	}
 	for i := range expect {
@@ -69,7 +69,7 @@ func testVerify[T any](t *testing.T, i int, input T, expect []string, result []s
 		got := result[i]
 
 		if re := regexp.MustCompile(want); !re.MatchString(got) {
-			t.Errorf("case %d(%v): wrong errors\nexpected: %v\n     got: %v", i, input, fmtMsgs(expect), fmtMsgs(result))
+			t.Errorf("case %d(%v): wrong errors\nexpected: %v\n     got: %v", casenum, input, fmtMsgs(expect), fmtMsgs(result))
 			return
 		}
 	}

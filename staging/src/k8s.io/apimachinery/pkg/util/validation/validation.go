@@ -192,29 +192,20 @@ const DNS1123LabelMaxLength int = content.DNS1123LabelMaxLength
 var IsDNS1123Label = content.IsDNS1123Label
 
 const dns1123SubdomainFmt string = dns1123LabelFmt + "(\\." + dns1123LabelFmt + ")*"
-const dns1123SubdomainErrorMsg string = "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character"
 
 const dns1123SubdomainFmtWithUnderscore string = dns1123LabelFmtWithUnderscore + "(\\." + dns1123LabelFmtWithUnderscore + ")*"
 const dns1123SubdomainErrorMsgFG string = "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '_', '-' or '.', and must start and end with an alphanumeric character"
 
 // DNS1123SubdomainMaxLength is a subdomain's max length in DNS (RFC 1123)
-const DNS1123SubdomainMaxLength int = 253
+// Deprecated: Use k8s.io/apimachinery/pkg/api/validate/content.DNS1123SubdomainMaxLength instead.
+const DNS1123SubdomainMaxLength = content.DNS1123SubdomainMaxLength
 
-var dns1123SubdomainRegexp = regexp.MustCompile("^" + dns1123SubdomainFmt + "$")
 var dns1123SubdomainRegexpWithUnderscore = regexp.MustCompile("^" + dns1123SubdomainFmtWithUnderscore + "$")
 
 // IsDNS1123Subdomain tests for a string that conforms to the definition of a
 // subdomain in DNS (RFC 1123).
-func IsDNS1123Subdomain(value string) []string {
-	var errs []string
-	if len(value) > DNS1123SubdomainMaxLength {
-		errs = append(errs, MaxLenError(DNS1123SubdomainMaxLength))
-	}
-	if !dns1123SubdomainRegexp.MatchString(value) {
-		errs = append(errs, RegexError(dns1123SubdomainErrorMsg, dns1123SubdomainFmt, "example.com"))
-	}
-	return errs
-}
+// Deprecated: Use k8s.io/apimachinery/pkg/api/validate/content.IsDNS1123Subdomain instead.
+var IsDNS1123Subdomain = content.IsDNS1123Subdomain
 
 // IsDNS1123SubdomainWithUnderscore tests for a string that conforms to the definition of a
 // subdomain in DNS (RFC 1123), but allows the use of an underscore in the string
