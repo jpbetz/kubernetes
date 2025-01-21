@@ -224,39 +224,6 @@ func TestIsQualifiedName(t *testing.T) {
 	}
 }
 
-func TestIsValidLabelValue(t *testing.T) {
-	successCases := []string{
-		"simple",
-		"now-with-dashes",
-		"1-starts-with-num",
-		"end-with-num-1",
-		"1234",                  // only num
-		strings.Repeat("a", 63), // to the limit
-		"",                      // empty value
-	}
-	for i := range successCases {
-		if errs := IsValidLabelValue(successCases[i]); len(errs) != 0 {
-			t.Errorf("case %s expected success: %v", successCases[i], errs)
-		}
-	}
-
-	errorCases := []string{
-		"nospecialchars%^=@",
-		"Tama-nui-te-rā.is.Māori.sun",
-		"\\backslashes\\are\\bad",
-		"-starts-with-dash",
-		"ends-with-dash-",
-		".starts.with.dot",
-		"ends.with.dot.",
-		strings.Repeat("a", 64), // over the limit
-	}
-	for i := range errorCases {
-		if errs := IsValidLabelValue(errorCases[i]); len(errs) == 0 {
-			t.Errorf("case[%d] expected failure", i)
-		}
-	}
-}
-
 func TestIsValidIP(t *testing.T) {
 	for _, tc := range []struct {
 		name   string

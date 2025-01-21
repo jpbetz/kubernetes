@@ -79,3 +79,45 @@ func TestIsQualifiedName(t *testing.T) {
 		testVerify(t, i, tc.input, tc.expect, result)
 	}
 }
+
+func TestIsLabelValue(t *testing.T) {
+	// errors expected
+	const minSizeError = "must contain at least 1 character"
+	const maxSizeError = "must be no more than 63 characters"
+	const startEndError = "must start and end with alphanumeric characters"
+	const interiorError = "must contain only alphanumeric characters, '-', '_', or '.'"
+
+	cases := []struct {
+		input  string
+		expect []string // regexes
+	}{
+		// Good values
+		{"", nil},
+		{"simple", nil},
+		{"now-with-dashes", nil},
+		{"now_with_underscores", nil},
+		{"now.with.dots", nil},
+		{"now-with-dashes_and_underscores.and.dots", nil},
+		{"1-starts-with-num", nil},
+		{"1234", nil},
+		{strings.Repeat("a", 63), nil},
+
+		// Bad values
+		{" ", mkMsgs(startEndError)},
+		{"simple/simple", mkMsgs(interiorError)},
+		{"-starts-with-dash", mkMsgs(startEndError)},
+		{"ends-with-dash-", mkMsgs(startEndError)},
+		{".starts.with.dot", mkMsgs(startEndError)},
+		{"ends.with.dot.", mkMsgs(startEndError)},
+		{"1234/5678", mkMsgs(interiorError)},
+		{"nospecialchars%^=@", mkMsgs(startEndError, interiorError)},
+		{"cantendwithadash-", mkMsgs(startEndError)},
+		{"-cantstartwithadash-", mkMsgs(startEndError)},
+		{strings.Repeat("a", 64), mkMsgs(maxSizeError)},
+	}
+
+	for i, tc := range cases {
+		result := IsLabelValue(tc.input)
+		testVerify(t, i, tc.input, tc.expect, result)
+	}
+}

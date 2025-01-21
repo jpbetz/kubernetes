@@ -55,17 +55,25 @@ func IsQualifiedName(value string) []string {
 		return append(errs, qualifiedNameErrMsg)
 	}
 
+	errs = append(errs, prefixEach(isQualifiedNameName(name), "name part: ")...)
+	return errs
+}
+
+// isQualifiedNameName verifies just the name part of a qualified name.
+func isQualifiedNameName(name string) []string {
+	var errs []string
+
 	if len(name) == 0 {
-		errs = append(errs, "name part: "+EmptyError())
+		errs = append(errs, EmptyError())
 	} else if len(name) > qualifiedNameMaxLength {
-		errs = append(errs, "name part: "+MaxLenError(qualifiedNameMaxLength))
+		errs = append(errs, MaxLenError(qualifiedNameMaxLength))
 	} else {
 		runes := []rune(name)
 		if !isAlNum(runes[0]) || !isAlNum(runes[len(runes)-1]) {
-			errs = append(errs, "name part: must start and end with alphanumeric characters")
+			errs = append(errs, "must start and end with alphanumeric characters")
 		}
 		if len(runes) > 2 && !qualifedNameRegexp.MatchString(string(runes[1:len(runes)-1])) {
-			errs = append(errs, "name part: must contain only alphanumeric characters, '-', '_', or '.'")
+			errs = append(errs, "must contain only alphanumeric characters, '-', '_', or '.'")
 		}
 	}
 	return errs
@@ -89,4 +97,18 @@ func isAlNum(r rune) bool {
 		return true
 	}
 	return false
+}
+
+// LabelValueMaxLength is a Kubernetes label value's max length.
+const LabelValueMaxLength int = qualifiedNameMaxLength
+
+// IsLabelValue tests whether the value passed is a valid label value.  If
+// the value is not valid, a list of error strings is returned.  Otherwise an
+// empty list (or nil) is returned.
+func IsLabelValue(value string) []string {
+	var errs []string
+	if len(value) > 0 {
+		errs = append(errs, isQualifiedNameName(value)...)
+	}
+	return errs
 }
