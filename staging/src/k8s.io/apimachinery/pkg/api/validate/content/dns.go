@@ -43,7 +43,7 @@ func IsDNS1123Label(value string) []string {
 	return isDNS1123LabelExceptMaxLength(value)
 }
 
-func isAlNum(r rune) bool {
+func isAlNumLower(r rune) bool {
 	if r > unicode.MaxASCII {
 		return false
 	}
@@ -61,13 +61,13 @@ func isAlNum(r rune) bool {
 func isDNS1123LabelExceptMaxLength(value string) []string {
 	if len(value) == 0 {
 		// No point in going further.
-		return []string{"must contain at least 1 character"}
+		return []string{EmptyError()}
 	}
 
 	var errs []string
 
 	runes := []rune(value)
-	if !isAlNum(runes[0]) || !isAlNum(runes[len(runes)-1]) {
+	if !isAlNumLower(runes[0]) || !isAlNumLower(runes[len(runes)-1]) {
 		errs = append(errs, "must start and end with lower-case alphanumeric characters")
 	}
 	if len(runes) > 2 && !dnsLabelRegexp.MatchString(string(runes[1:len(runes)-1])) {
@@ -91,7 +91,7 @@ func IsDNS1123Subdomain(value string) []string {
 	}
 	if len(value) == 0 {
 		// No point in going further.
-		return []string{"must contain at least 1 character"}
+		return []string{EmptyError()}
 	}
 
 	var errs []string

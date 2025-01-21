@@ -27,9 +27,10 @@ import (
 )
 
 const (
-	maxLengthErrMsg = "must be no more than"
-	namePartErrMsg  = "name part must consist of"
-	nameErrMsg      = "a qualified name must consist of"
+	maxLengthErrMsg        = "must be no more than"
+	namePartStartsErrMsg   = "name part: must start"
+	namePartContainsErrMsg = "name part: must contain"
+	nameConsistsErrMsg     = "must consist of"
 )
 
 // Ensure custom name functions are allowed
@@ -492,18 +493,25 @@ func TestValidateAnnotations(t *testing.T) {
 		annotations map[string]string
 		expect      string
 	}{
-		{map[string]string{"nospecialchars^=@": "bar"}, namePartErrMsg},
-		{map[string]string{"cantendwithadash-": "bar"}, namePartErrMsg},
-		{map[string]string{"only/one/slash": "bar"}, nameErrMsg},
+		{map[string]string{"nospecialchars^=@": "bar"}, namePartContainsErrMsg},
+		{map[string]string{"cantendwithadash-": "bar"}, namePartStartsErrMsg},
+		{map[string]string{"only/one/slash": "bar"}, nameConsistsErrMsg},
 		{map[string]string{strings.Repeat("a", 254): "bar"}, maxLengthErrMsg},
 	}
 	for i := range nameErrorCases {
 		errs := ValidateAnnotations(nameErrorCases[i].annotations, field.NewPath("field"))
-		if len(errs) != 1 {
+		if len(errs) == 0 {
 			t.Errorf("case[%d]: expected failure", i)
 		} else {
-			if !strings.Contains(errs[0].Detail, nameErrorCases[i].expect) {
-				t.Errorf("case[%d]: error details do not include %q: %q", i, nameErrorCases[i].expect, errs[0].Detail)
+			found := false
+			for _, err := range errs {
+				if strings.Contains(err.Detail, nameErrorCases[i].expect) {
+					found = true
+					break
+				}
+			}
+			if !found {
+				t.Errorf("case[%d]: error details do not include %q: %q", i, nameErrorCases[i].expect, errs)
 			}
 		}
 	}

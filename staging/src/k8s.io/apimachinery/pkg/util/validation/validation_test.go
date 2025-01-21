@@ -766,11 +766,11 @@ func TestIsFullyQualifiedName(t *testing.T) {
 	}, {
 		name:       "name should not include scheme",
 		targetName: "http://foo.k8s.io",
-		err:        "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters",
+		err:        "each part must contain only lower-case alphanumeric characters or '-'",
 	}, {
 		name:       "email should be invalid",
 		targetName: "example@foo.k8s.io",
-		err:        "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters",
+		err:        "each part must contain only lower-case alphanumeric characters or '-'",
 	}, {
 		name:       "name cannot be empty",
 		targetName: "",
@@ -778,7 +778,7 @@ func TestIsFullyQualifiedName(t *testing.T) {
 	}, {
 		name:       "name must conform to RFC 1123",
 		targetName: "A.B.C",
-		err:        "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters",
+		err:        "each part must start and end with lower-case alphanumeric characters",
 	}}
 	for _, tc := range messageTests {
 		err := IsFullyQualifiedName(field.NewPath(""), tc.targetName).ToAggregate()

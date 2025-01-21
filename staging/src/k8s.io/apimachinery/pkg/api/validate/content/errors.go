@@ -25,3 +25,8 @@ import (
 func MaxLenError(length int) string {
 	return fmt.Sprintf("must be no more than %d characters", length)
 }
+
+// EmptyError returns a string explanation of an "empty string" validation.
+func EmptyError() string {
+	return "must contain at least 1 character"
+}
