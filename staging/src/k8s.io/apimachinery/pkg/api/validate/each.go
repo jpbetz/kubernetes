@@ -110,12 +110,12 @@ func EachMapValNilable[K ~string, V any](opCtx operation.Context, fldPath *field
 
 // EachMapKey validates each element of newMap with the specified
 // validation function.  The oldMap argument is not used.
-func EachMapKey[K ~string, V any](opCtx operation.Context, fldPath *field.Path, newMap, oldMap map[K]V,
-	validator ValidateFunc[K]) field.ErrorList {
+func EachMapKey[K ~string, T any](opCtx operation.Context, fldPath *field.Path, newMap, oldMap map[K]T,
+	validator ValidateFunc[*K]) field.ErrorList {
 	var errs field.ErrorList
 	for key := range newMap {
-		var zero K
-		errs = append(errs, validator(opCtx, fldPath.Key(string(key)), key, zero)...)
+		// Note: the field path is the field, not the key.
+		errs = append(errs, validator(opCtx, fldPath, &key, nil)...)
 	}
 	return errs
 }

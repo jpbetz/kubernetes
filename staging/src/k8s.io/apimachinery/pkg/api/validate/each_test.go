@@ -300,7 +300,10 @@ func testEachMapKey[K ~string, V any](t *testing.T, name string, input map[K]V) 
 	var zero K
 	t.Run(fmt.Sprintf("%s(%T)", name, zero), func(t *testing.T) {
 		calls := 0
-		vfn := func(opCtx operation.Context, fldPath *field.Path, newVal, oldVal K) field.ErrorList {
+		vfn := func(opCtx operation.Context, fldPath *field.Path, newVal, oldVal *K) field.ErrorList {
+			if oldVal != nil {
+				t.Errorf("expected nil oldVal, got %v", *oldVal)
+			}
 			calls++
 			return nil
 		}

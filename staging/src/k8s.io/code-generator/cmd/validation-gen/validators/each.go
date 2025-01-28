@@ -29,6 +29,7 @@ const (
 	listTypeTag   = "k8s:listType2"
 	listMapKeyTag = "k8s:listMapKey2"
 	eachValTag    = "k8s:eachVal2"
+	eachKeyTag    = "k8s:eachKey2"
 )
 
 func init() {
@@ -38,6 +39,7 @@ func init() {
 	RegisterTagValidator(listTypeTagValidator{shared})
 	RegisterTagValidator(listMapKeyTagValidator{shared})
 	RegisterTagValidator(&eachValTagValidator{shared, nil})
+	RegisterTagValidator(&eachKeyTagValidator{nil})
 }
 
 // This applies to all tags in this file.
@@ -352,7 +354,7 @@ func (ektv *eachKeyTagValidator) Init(cfg Config) {
 }
 
 func (eachKeyTagValidator) TagName() string {
-	return eachValTag
+	return eachKeyTag
 }
 
 func (eachKeyTagValidator) ValidScopes() sets.Set[Scope] {
@@ -389,7 +391,7 @@ func (ektv eachKeyTagValidator) GetValidations(context Context, _ []string, payl
 		}
 
 		for _, vfn := range validations.Functions {
-			f := Function("eachVal2", vfn.Flags(), validateEachMapKey, WrapperFunction{vfn, t.Key})
+			f := Function("eachKey2", vfn.Flags(), validateEachMapKey, WrapperFunction{vfn, t.Key})
 			result.Functions = append(result.Functions, f)
 		}
 	}
