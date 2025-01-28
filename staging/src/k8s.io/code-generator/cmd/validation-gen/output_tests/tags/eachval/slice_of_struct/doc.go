@@ -16,37 +16,27 @@ limitations under the License.
 
 // +k8s:validation-gen=TypeMeta
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
-// +k8s:validation-gen-test-fixture=validateFalse
 
 // This is a test package.
-package shallow
+package sliceofstruct
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +k8s:validateFalse="type Struct"
 type Struct struct {
 	TypeMeta int
 
-	// +k8s:validateFalse="field Struct.ListField"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListField[*]"
-	ListField []map[string]string `json:"listField"`
+	// +k8s:eachVal2=+k8s:validateFalse="field Struct.ListField[*]"
+	ListField []OtherStruct `json:"listField"`
 
-	// +k8s:validateFalse="field Struct.ListPtrField"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListPtrField[*]"
-	ListPtrField []map[string]*string `json:"listPtrField"`
+	// +k8s:eachVal2=+k8s:validateFalse="field Struct.ListPtrField[*]"
+	ListPtrField []*OtherStruct `json:"listPtrField"`
 
-	// +k8s:validateFalse="field Struct.ListTypedefField"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListTypedefField[*]"
-	ListTypedefField []MapType `json:"listTypedefField"`
-
-	UnvalidatedListField []MapType `json:"UnvalidatedListField"`
+	// +k8s:eachVal2=+k8s:validateFalse="field Struct.ListTypedefField[*]"
+	ListTypedefField []OtherTypedefStruct `json:"listTypedefField"`
 }
 
-// +k8s:validateFalse="type MapType"
-// +k8s:eachVal=+k8s:validateFalse="type MapType[*]"
-type MapType map[string]StringType
+type OtherStruct struct{}
 
-// +k8s:validateFalse="type StringType"
-type StringType string
+type OtherTypedefStruct OtherStruct

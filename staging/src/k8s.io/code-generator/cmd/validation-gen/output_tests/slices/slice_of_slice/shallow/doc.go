@@ -41,10 +41,6 @@ type Struct struct {
 	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListTypedefField[*]"
 	ListTypedefField []SliceType `json:"listTypedefField"`
 
-	// +k8s:validateFalse="field Struct.ListTypedefPtrField"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListTypedefPtrField[*]"
-	ListTypedefPtrField []*SliceType `json:"listTypedefPtrField"`
-
 	UnvalidatedListField []SliceType `json:"UnvalidatedListField"`
 }
 
