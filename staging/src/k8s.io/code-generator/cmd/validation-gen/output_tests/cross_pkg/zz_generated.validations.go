@@ -152,11 +152,13 @@ func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) 
 	// field T1.MapOfOtherStringToOtherStruct
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj map[other.StringType]other.StructType) (errs field.ErrorList) {
+			errs = append(errs, validate.EachMapKey(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *other.StringType) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.MapOfOtherStringToOtherStruct keys")
+			})...)
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.MapOfOtherStringToOtherStruct")...)
 			for key, val := range obj {
 				errs = append(errs,
 					func(fldPath *field.Path, obj, oldObj *other.StringType) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.MapOfOtherStringToOtherStruct keys")...)
 						// NOTE: Type other.StringType is in a non-included package.
 						//       Any validations defined on this type are not available from here.
 						return
