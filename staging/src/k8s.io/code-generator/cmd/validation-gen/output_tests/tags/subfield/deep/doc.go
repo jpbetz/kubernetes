@@ -28,14 +28,14 @@ var localSchemeBuilder = testscheme.New()
 type Struct struct {
 	TypeMeta int `json:"typeMeta"`
 
-	// +k8s:subfield2(structField)=+k8s:subfield2(stringField)=+k8s:format=dns-label
-	// +k8s:subfield2(sliceField)=+k8s:eachVal=+k8s:subfield2(stringField)=+k8s:format=dns-label
-	// +k8s:subfield2(mapField)=+k8s:eachVal=+k8s:subfield2(stringField)=+k8s:format=dns-label
+	// +k8s:subfield(structField)=+k8s:subfield(stringField)=+k8s:format=dns-label
+	// +k8s:subfield(sliceField)=+k8s:eachVal=+k8s:subfield(stringField)=+k8s:format=dns-label
+	// +k8s:subfield(mapField)=+k8s:eachVal=+k8s:subfield(stringField)=+k8s:format=dns-label
 	StructField OtherStruct `json:"structField"`
 
-	// +k8s:subfield2(structField)=+k8s:subfield2(stringField)=+k8s:format=ip-sloppy
-	// +k8s:subfield2(sliceField)=+k8s:eachVal=+k8s:subfield2(stringField)=+k8s:format=ip-sloppy
-	// +k8s:subfield2(mapField)=+k8s:eachVal=+k8s:subfield2(stringField)=+k8s:format=ip-sloppy
+	// +k8s:subfield(structField)=+k8s:subfield(stringField)=+k8s:format=ip-sloppy
+	// +k8s:subfield(sliceField)=+k8s:eachVal=+k8s:subfield(stringField)=+k8s:format=ip-sloppy
+	// +k8s:subfield(mapField)=+k8s:eachVal=+k8s:subfield(stringField)=+k8s:format=ip-sloppy
 	StructPtrField *OtherStruct `json:"structPtrField"`
 }
 

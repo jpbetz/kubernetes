@@ -28,18 +28,18 @@ var localSchemeBuilder = testscheme.New()
 type Struct struct {
 	TypeMeta int `json:"typeMeta"`
 
-	// +k8s:subfield2(stringField)=+k8s:validateFalse="subfield Struct.StructField.StringField"
-	// +k8s:subfield2(pointerField)=+k8s:validateFalse="subfield Struct.StructField.PointerField"
-	// +k8s:subfield2(structField)=+k8s:validateFalse="subfield Struct.StructField.StructField"
-	// +k8s:subfield2(sliceField)=+k8s:validateFalse="subfield Struct.StructField.SliceField"
-	// +k8s:subfield2(mapField)=+k8s:validateFalse="subfield Struct.StructField.MapField"
+	// +k8s:subfield(stringField)=+k8s:validateFalse="subfield Struct.StructField.StringField"
+	// +k8s:subfield(pointerField)=+k8s:validateFalse="subfield Struct.StructField.PointerField"
+	// +k8s:subfield(structField)=+k8s:validateFalse="subfield Struct.StructField.StructField"
+	// +k8s:subfield(sliceField)=+k8s:validateFalse="subfield Struct.StructField.SliceField"
+	// +k8s:subfield(mapField)=+k8s:validateFalse="subfield Struct.StructField.MapField"
 	StructField OtherStruct `json:"structField"`
 
-	// +k8s:subfield2(stringField)=+k8s:validateFalse="subfield Struct.StructPtrField.StringField"
-	// +k8s:subfield2(pointerField)=+k8s:validateFalse="subfield Struct.StructPtrField.PointerField"
-	// +k8s:subfield2(structField)=+k8s:validateFalse="subfield Struct.StructPtrField.StructField"
-	// +k8s:subfield2(sliceField)=+k8s:validateFalse="subfield Struct.StructPtrField.SliceField"
-	// +k8s:subfield2(mapField)=+k8s:validateFalse="subfield Struct.StructPtrField.MapField"
+	// +k8s:subfield(stringField)=+k8s:validateFalse="subfield Struct.StructPtrField.StringField"
+	// +k8s:subfield(pointerField)=+k8s:validateFalse="subfield Struct.StructPtrField.PointerField"
+	// +k8s:subfield(structField)=+k8s:validateFalse="subfield Struct.StructPtrField.StructField"
+	// +k8s:subfield(sliceField)=+k8s:validateFalse="subfield Struct.StructPtrField.SliceField"
+	// +k8s:subfield(mapField)=+k8s:validateFalse="subfield Struct.StructPtrField.MapField"
 	StructPtrField *OtherStruct `json:"structPtrField"`
 }
 
