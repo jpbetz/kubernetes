@@ -1,7 +1,0 @@
-{
-    "*nonincluded.T1": {
-      "StructType.stringField": [
-        "subfield T1.(other.StructType).StringField"
-      ]
-    }
-  }

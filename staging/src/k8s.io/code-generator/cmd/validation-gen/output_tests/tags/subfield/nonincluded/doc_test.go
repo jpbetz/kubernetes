@@ -14,21 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// +k8s:validation-gen=*
-// +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
-// +k8s:validation-gen-test-fixture=validateFalse
-
-// Package nonincluded contains test types for testing subfield field validation tags.
 package nonincluded
 
 import (
-	"k8s.io/code-generator/cmd/validation-gen/output_tests/_codegenignore/other"
-	"k8s.io/code-generator/cmd/validation-gen/testscheme"
+	"testing"
 )
 
-var localSchemeBuilder = testscheme.New()
+func TestSubfieldObjectMetaValidationWithValidateFalse(t *testing.T) {
+	st := localSchemeBuilder.Test(t)
 
-type T1 struct {
-	// +k8s:subfield(stringField)=+k8s:validateFalse="subfield T1.(other.StructType).StringField"
-	other.StructType
+	st.Value(&Struct{}).
+		// check for subfield +k8s:validateFalse validation on Struct.(other.StructType).StringField
+		ExpectValidateFalse("subfield Struct.(other.StructType).StringField")
 }
