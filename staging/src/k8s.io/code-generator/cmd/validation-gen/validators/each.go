@@ -29,7 +29,7 @@ const (
 	listTypeTag   = "k8s:listType2"
 	listMapKeyTag = "k8s:listMapKey2"
 	eachValTag    = "k8s:eachVal2"
-	eachKeyTag    = "k8s:eachKey2"
+	eachKeyTag    = "k8s:eachKey"
 )
 
 func init() {
@@ -379,7 +379,7 @@ func (ektv eachKeyTagValidator) GetValidations(context Context, _ []string, payl
 		}
 
 		for _, vfn := range validations.Functions {
-			f := Function("eachKey2", vfn.Flags(), validateEachMapKey, WrapperFunction{vfn, t.Key})
+			f := Function("eachKey", vfn.Flags(), validateEachMapKey, WrapperFunction{vfn, t.Key})
 			result.Functions = append(result.Functions, f)
 		}
 	}

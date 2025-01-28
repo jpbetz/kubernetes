@@ -187,7 +187,7 @@ func (g *genValidations) hasValidationsMiss(n *typeNode, seen map[*typeNode]bool
 		allChildren = append(allChildren, n.elem)
 	}
 	for _, c := range allChildren {
-		if !c.fieldValidations.Empty() || !c.keyValidations.Empty() || !c.elemValidations.Empty() {
+		if !c.fieldValidations.Empty() || !c.elemValidations.Empty() {
 			return true
 		}
 		if g.hasValidationsImpl(c.node, seen) {
@@ -232,7 +232,6 @@ type childNode struct {
 	node      *typeNode   // the node of the child's value type, or nil if it is in a foreign package
 
 	fieldValidations validators.Validations // validations on the field
-	keyValidations   validators.Validations // validations on each key of a map field
 	elemValidations  validators.Validations // validations on each value of a list or map
 
 	// struct fields can have per-child-member validations.
@@ -254,7 +253,6 @@ type typeNode struct {
 	listMapKeys []types.Member // populated with listMapKey values when this type is listType=map slice
 
 	typeValidations validators.Validations // validations on the type
-	keyValidations  validators.Validations // validations on each key of a map type
 	elemValidations validators.Validations // validations on each value of a list or map
 }
 
@@ -269,8 +267,6 @@ func (n typeNode) lookupField(jsonName string) *childNode {
 }
 
 const (
-	// This tag defines a validation which is to be run on each key in a map.
-	eachKeyTag = "k8s:eachKey"
 	// This tag defines a validation which is to be run on each value in a map
 	// or slice.
 	eachValTag = "k8s:eachVal"
@@ -285,14 +281,6 @@ const (
 // builtinTagDocs returns information about the hard-coded tags.
 func builtinTagDocs() []validators.TagDoc {
 	return []validators.TagDoc{{
-		Tag:         eachKeyTag,
-		Description: "Declares a validation for each key in a map.",
-		Scopes:      []validators.Scope{validators.ScopeType, validators.ScopeField},
-		Payloads: []validators.TagPayloadDoc{{
-			Description: "<validation-tag>",
-			Docs:        "The tag to evaluate for each key.",
-		}},
-	}, {
 		Tag:         eachValTag,
 		Description: "Declares a validation for each value in a map or slice.",
 		Scopes:      []validators.Scope{validators.ScopeType, validators.ScopeField},
@@ -611,24 +599,6 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 				return err
 			}
 		case types.Map:
-			// Extract any embedded key-validation rules.
-			keyCtxt := validators.Context{
-				Scope:  validators.ScopeMapKey,
-				Type:   childType.Key,
-				Parent: memb.Type,
-				Path:   childPath,
-			}
-			if validations, err := td.extractEmbeddedValidations(eachKeyTag, keyCtxt, memb.CommentLines); err != nil {
-				return fmt.Errorf("%v: %w", childPath.Key("keys"), err)
-			} else {
-				if !validations.Empty() {
-					klog.V(5).InfoS("found key-validations", "n", validations.Len())
-					child.keyValidations.Add(validations)
-					if len(validations.Variables) > 0 {
-						return fmt.Errorf("%v: variable generation is not supported for map key validations", childPath)
-					}
-				}
-			}
 			// Extract any embedded val-validation rules.
 			valCtxt := validators.Context{
 				Scope:  validators.ScopeMapVal,
@@ -710,21 +680,6 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 			}
 		}
 	case types.Map:
-		// Extract any embedded key-validation rules.
-		keyCtxt := validators.Context{
-			Scope:  validators.ScopeMapKey,
-			Type:   underlying.Key,
-			Parent: underlying,
-			Path:   fldPath.Key("keys"),
-		}
-		if validations, err := td.extractEmbeddedValidations(eachKeyTag, keyCtxt, thisNode.valueType.CommentLines); err != nil {
-			return fmt.Errorf("%v: %w", fldPath.Key("keys"), err)
-		} else {
-			if !validations.Empty() {
-				klog.V(5).InfoS("found key-validations", "n", validations.Len())
-				child.keyValidations.Add(validations)
-			}
-		}
 		// Extract any embedded val-validation rules.
 		valCtxt := validators.Context{
 			Scope:  validators.ScopeMapVal,
@@ -1144,17 +1099,10 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			sw.Do("}\n", nil)
 		}
 	case types.Map:
+		// Validate each key.
 		// Accumulate into a buffer so we don't emit empty functions.
 		keyBuf := bytes.NewBuffer(nil)
 		keySW := sw.Dup(keyBuf)
-
-		// Validate each key.
-		keyValidations := thisNode.keyValidations
-		keyValidations.Add(thisChild.keyValidations)
-		if !keyValidations.Empty() {
-			emitCallsToValidators(c, keyValidations.Functions, keySW)
-			emitComments(keyValidations.Comments, keySW)
-		}
 
 		// If the node is nil, this must be a type in a package we are not
 		// handling - it's effectively opaque to us.
