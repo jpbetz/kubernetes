@@ -69,10 +69,12 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj map[string]OtherStruct) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField")...)
+			errs = append(errs, validate.EachMapVal(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *OtherStruct) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField[*]")
+			})...)
 			for key, val := range obj {
 				errs = append(errs,
 					func(fldPath *field.Path, obj, oldObj *OtherStruct) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField[*]")...)
 						errs = append(errs, Validate_OtherStruct(opCtx, fldPath, obj, oldObj)...)
 						return
 					}(fldPath.Key(string(key)), &val, safe.Lookup(oldObj, key, safe.PtrTo))...)
@@ -84,10 +86,12 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj map[string]*OtherStruct) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapPtrField")...)
+			errs = append(errs, validate.EachMapValNilable(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *OtherStruct) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapPtrField[*]")
+			})...)
 			for key, val := range obj {
 				errs = append(errs,
 					func(fldPath *field.Path, obj, oldObj *OtherStruct) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapPtrField[*]")...)
 						errs = append(errs, Validate_OtherStruct(opCtx, fldPath, obj, oldObj)...)
 						return
 					}(fldPath.Key(string(key)), val, safe.Lookup(oldObj, key, safe.Ident))...)
@@ -99,10 +103,12 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj map[string]OtherTypedefStruct) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapTypedefField")...)
+			errs = append(errs, validate.EachMapVal(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *OtherTypedefStruct) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapTypedefField[*]")
+			})...)
 			for key, val := range obj {
 				errs = append(errs,
 					func(fldPath *field.Path, obj, oldObj *OtherTypedefStruct) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapTypedefField[*]")...)
 						errs = append(errs, Validate_OtherTypedefStruct(opCtx, fldPath, obj, oldObj)...)
 						return
 					}(fldPath.Key(string(key)), &val, safe.Lookup(oldObj, key, safe.PtrTo))...)
@@ -114,10 +120,12 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj map[string]*OtherTypedefStruct) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapTypedefPtrField")...)
+			errs = append(errs, validate.EachMapValNilable(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *OtherTypedefStruct) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapTypedefPtrField[*]")
+			})...)
 			for key, val := range obj {
 				errs = append(errs,
 					func(fldPath *field.Path, obj, oldObj *OtherTypedefStruct) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapTypedefPtrField[*]")...)
 						errs = append(errs, Validate_OtherTypedefStruct(opCtx, fldPath, obj, oldObj)...)
 						return
 					}(fldPath.Key(string(key)), val, safe.Lookup(oldObj, key, safe.Ident))...)

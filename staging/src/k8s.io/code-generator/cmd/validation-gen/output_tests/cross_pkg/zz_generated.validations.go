@@ -137,10 +137,12 @@ func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) 
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj []other.StructType) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.SliceOfOtherStruct")...)
+			errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *other.StructType) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.SliceOfOtherStruct values")
+			})...)
 			for i, val := range obj {
 				errs = append(errs,
 					func(fldPath *field.Path, obj, oldObj *other.StructType) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.SliceOfOtherStruct values")...)
 						// NOTE: Type other.StructType is in a non-included package.
 						//       Any validations defined on this type are not available from here.
 						return
@@ -156,6 +158,9 @@ func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) 
 				return validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.MapOfOtherStringToOtherStruct keys")
 			})...)
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.MapOfOtherStringToOtherStruct")...)
+			errs = append(errs, validate.EachMapVal(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *other.StructType) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.MapOfOtherStringToOtherStruct values")
+			})...)
 			for key, val := range obj {
 				errs = append(errs,
 					func(fldPath *field.Path, obj, oldObj *other.StringType) (errs field.ErrorList) {
@@ -165,7 +170,6 @@ func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) 
 					}(fldPath, &key, nil)...)
 				errs = append(errs,
 					func(fldPath *field.Path, obj, oldObj *other.StructType) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "field T1.MapOfOtherStringToOtherStruct values")...)
 						// NOTE: Type other.StructType is in a non-included package.
 						//       Any validations defined on this type are not available from here.
 						return

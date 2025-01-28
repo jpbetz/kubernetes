@@ -48,39 +48,33 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 func Validate_ListPtrType(opCtx operation.Context, fldPath *field.Path, obj, oldObj ListPtrType) (errs field.ErrorList) {
 	// type ListPtrType
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type ListPtrType")...)
+	errs = append(errs, validate.EachSliceValNilable(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+		return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type ListPtrType[*]")
+	})...)
 
-	for i, val := range obj {
-		errs = append(errs,
-			func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-				errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type ListPtrType[*]")...)
-				return
-			}(fldPath.Index(i), val, nil)...)
-	}
 	return errs
 }
 
 func Validate_ListType(opCtx operation.Context, fldPath *field.Path, obj, oldObj ListType) (errs field.ErrorList) {
 	// type ListType
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type ListType")...)
+	errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+		return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type ListType[*]")
+	})...)
 
-	for i, val := range obj {
-		errs = append(errs,
-			func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-				errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type ListType[*]")...)
-				return
-			}(fldPath.Index(i), &val, nil)...)
-	}
 	return errs
 }
 
 func Validate_ListTypedefType(opCtx operation.Context, fldPath *field.Path, obj, oldObj ListTypedefType) (errs field.ErrorList) {
 	// type ListTypedefType
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type ListTypedefType")...)
+	errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
+		return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type ListTypedefType[*]")
+	})...)
 
 	for i, val := range obj {
 		errs = append(errs,
 			func(fldPath *field.Path, obj, oldObj *StringType) (errs field.ErrorList) {
-				errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type ListTypedefType[*]")...)
 				errs = append(errs, Validate_StringType(opCtx, fldPath, obj, oldObj)...)
 				return
 			}(fldPath.Index(i), &val, nil)...)
@@ -105,6 +99,9 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj ListType) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListField")...)
+			errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListField[*]")
+			})...)
 			errs = append(errs, Validate_ListType(opCtx, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("listField"), obj.ListField, safe.Field(oldObj, func(oldObj *Struct) ListType { return oldObj.ListField }))...)
@@ -113,6 +110,9 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj ListPtrType) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListPtrField")...)
+			errs = append(errs, validate.EachSliceValNilable(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListPtrField[*]")
+			})...)
 			errs = append(errs, Validate_ListPtrType(opCtx, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("listPtrField"), obj.ListPtrField, safe.Field(oldObj, func(oldObj *Struct) ListPtrType { return oldObj.ListPtrField }))...)
@@ -121,6 +121,9 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj ListTypedefType) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListTypedefField")...)
+			errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListTypedefField[*]")
+			})...)
 			errs = append(errs, Validate_ListTypedefType(opCtx, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("listTypedefField"), obj.ListTypedefField, safe.Field(oldObj, func(oldObj *Struct) ListTypedefType { return oldObj.ListTypedefField }))...)

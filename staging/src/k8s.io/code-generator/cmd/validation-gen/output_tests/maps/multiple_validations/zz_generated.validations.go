@@ -62,14 +62,12 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 			})...)
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField #1")...)
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField #2")...)
-			for key, val := range obj {
-				errs = append(errs,
-					func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField[*] #1")...)
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField[*] #2")...)
-						return
-					}(fldPath.Key(string(key)), &val, safe.Lookup(oldObj, key, safe.PtrTo))...)
-			}
+			errs = append(errs, validate.EachMapVal(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField[*] #1")
+			})...)
+			errs = append(errs, validate.EachMapVal(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField[*] #2")
+			})...)
 			return
 		}(fldPath.Child("mapField"), obj.MapField, safe.Field(oldObj, func(oldObj *Struct) map[string]string { return oldObj.MapField }))...)
 

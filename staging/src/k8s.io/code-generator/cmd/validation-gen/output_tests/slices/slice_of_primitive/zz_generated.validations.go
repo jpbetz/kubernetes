@@ -62,13 +62,9 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj []string) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListField")...)
-			for i, val := range obj {
-				errs = append(errs,
-					func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListField[*]")...)
-						return
-					}(fldPath.Index(i), &val, nil)...)
-			}
+			errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListField[*]")
+			})...)
 			return
 		}(fldPath.Child("listField"), obj.ListField, safe.Field(oldObj, func(oldObj *Struct) []string { return oldObj.ListField }))...)
 
@@ -76,13 +72,9 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj []*string) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListPtrField")...)
-			for i, val := range obj {
-				errs = append(errs,
-					func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListPtrField[*]")...)
-						return
-					}(fldPath.Index(i), val, nil)...)
-			}
+			errs = append(errs, validate.EachSliceValNilable(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListPtrField[*]")
+			})...)
 			return
 		}(fldPath.Child("listPtrField"), obj.ListPtrField, safe.Field(oldObj, func(oldObj *Struct) []*string { return oldObj.ListPtrField }))...)
 
@@ -90,10 +82,12 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj []StringType) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListTypedefField")...)
+			errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListTypedefField[*]")
+			})...)
 			for i, val := range obj {
 				errs = append(errs,
 					func(fldPath *field.Path, obj, oldObj *StringType) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListTypedefField[*]")...)
 						errs = append(errs, Validate_StringType(opCtx, fldPath, obj, oldObj)...)
 						return
 					}(fldPath.Index(i), &val, nil)...)
@@ -105,10 +99,12 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj []*StringType) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListTypedefPtrField")...)
+			errs = append(errs, validate.EachSliceValNilable(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListTypedefPtrField[*]")
+			})...)
 			for i, val := range obj {
 				errs = append(errs,
 					func(fldPath *field.Path, obj, oldObj *StringType) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListTypedefPtrField[*]")...)
 						errs = append(errs, Validate_StringType(opCtx, fldPath, obj, oldObj)...)
 						return
 					}(fldPath.Index(i), val, nil)...)

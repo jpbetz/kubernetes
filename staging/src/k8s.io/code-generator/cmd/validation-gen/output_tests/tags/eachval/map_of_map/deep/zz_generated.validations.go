@@ -22,12 +22,6 @@ limitations under the License.
 package deep
 
 import (
-	fmt "fmt"
-
-	operation "k8s.io/apimachinery/pkg/api/operation"
-	safe "k8s.io/apimachinery/pkg/api/safe"
-	validate "k8s.io/apimachinery/pkg/api/validate"
-	field "k8s.io/apimachinery/pkg/util/validation/field"
 	testscheme "k8s.io/code-generator/cmd/validation-gen/testscheme"
 )
 
@@ -36,50 +30,5 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *testscheme.Scheme) error {
-	scheme.AddValidationFunc((*Struct)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
-		if len(subresources) == 0 {
-			return Validate_Struct(opCtx, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
-		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
-	})
 	return nil
-}
-
-func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
-	// field Struct.TypeMeta has no validation
-
-	// field Struct.MapField
-	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj map[string]map[string]string) (errs field.ErrorList) {
-			errs = append(errs, validate.EachMapValNilable(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj map[string]string) field.ErrorList {
-				return validate.EachMapVal(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
-					return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField[*][*]")
-				})
-			})...)
-			return
-		}(fldPath.Child("mapField"), obj.MapField, safe.Field(oldObj, func(oldObj *Struct) map[string]map[string]string { return oldObj.MapField }))...)
-
-	// field Struct.MapPtrField
-	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj map[string]map[string]*string) (errs field.ErrorList) {
-			errs = append(errs, validate.EachMapValNilable(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj map[string]*string) field.ErrorList {
-				return validate.EachMapValNilable(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
-					return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapPtrField[*][*]")
-				})
-			})...)
-			return
-		}(fldPath.Child("mapPtrField"), obj.MapPtrField, safe.Field(oldObj, func(oldObj *Struct) map[string]map[string]*string { return oldObj.MapPtrField }))...)
-
-	// field Struct.MapTypedefField
-	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj map[string]MapType) (errs field.ErrorList) {
-			errs = append(errs, validate.EachMapValNilable(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj MapType) field.ErrorList {
-				return validate.EachMapVal(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
-					return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapTypedefField[*][*]")
-				})
-			})...)
-			return
-		}(fldPath.Child("mapTypedefField"), obj.MapTypedefField, safe.Field(oldObj, func(oldObj *Struct) map[string]MapType { return oldObj.MapTypedefField }))...)
-
-	return errs
 }

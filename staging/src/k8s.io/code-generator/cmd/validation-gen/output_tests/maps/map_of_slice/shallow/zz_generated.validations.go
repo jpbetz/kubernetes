@@ -48,14 +48,10 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 func Validate_SliceType(opCtx operation.Context, fldPath *field.Path, obj, oldObj SliceType) (errs field.ErrorList) {
 	// type SliceType
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type SliceType")...)
+	errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+		return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type SliceType[*]")
+	})...)
 
-	for i, val := range obj {
-		errs = append(errs,
-			func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-				errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type SliceType[*]")...)
-				return
-			}(fldPath.Index(i), &val, nil)...)
-	}
 	return errs
 }
 
@@ -69,13 +65,9 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj map[string][]string) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField")...)
-			for key, val := range obj {
-				errs = append(errs,
-					func(fldPath *field.Path, obj, oldObj []string) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField[*]")...)
-						return
-					}(fldPath.Key(string(key)), val, safe.Lookup(oldObj, key, safe.Ident))...)
-			}
+			errs = append(errs, validate.EachMapValNilable(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj []string) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapField[*]")
+			})...)
 			return
 		}(fldPath.Child("mapField"), obj.MapField, safe.Field(oldObj, func(oldObj *Struct) map[string][]string { return oldObj.MapField }))...)
 
@@ -83,13 +75,9 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj map[string][]*string) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapPtrField")...)
-			for key, val := range obj {
-				errs = append(errs,
-					func(fldPath *field.Path, obj, oldObj []*string) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapPtrField[*]")...)
-						return
-					}(fldPath.Key(string(key)), val, safe.Lookup(oldObj, key, safe.Ident))...)
-			}
+			errs = append(errs, validate.EachMapValNilable(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj []*string) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapPtrField[*]")
+			})...)
 			return
 		}(fldPath.Child("mapPtrField"), obj.MapPtrField, safe.Field(oldObj, func(oldObj *Struct) map[string][]*string { return oldObj.MapPtrField }))...)
 
@@ -97,10 +85,12 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj map[string]SliceType) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapTypedefField")...)
+			errs = append(errs, validate.EachMapValNilable(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj SliceType) field.ErrorList {
+				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapTypedefField[*]")
+			})...)
 			for key, val := range obj {
 				errs = append(errs,
 					func(fldPath *field.Path, obj, oldObj SliceType) (errs field.ErrorList) {
-						errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapTypedefField[*]")...)
 						errs = append(errs, Validate_SliceType(opCtx, fldPath, obj, oldObj)...)
 						return
 					}(fldPath.Key(string(key)), val, safe.Lookup(oldObj, key, safe.Ident))...)

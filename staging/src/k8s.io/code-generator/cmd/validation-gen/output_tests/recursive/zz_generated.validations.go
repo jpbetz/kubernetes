@@ -66,11 +66,13 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 func Validate_E1(opCtx operation.Context, fldPath *field.Path, obj, oldObj E1) (errs field.ErrorList) {
 	// type E1
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type E1")...)
+	errs = append(errs, validate.EachSliceValNilable(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj E1) field.ErrorList {
+		return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type E1 values")
+	})...)
 
 	for i, val := range obj {
 		errs = append(errs,
 			func(fldPath *field.Path, obj, oldObj E1) (errs field.ErrorList) {
-				errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type E1 values")...)
 				errs = append(errs, Validate_E1(opCtx, fldPath, obj, oldObj)...)
 				return
 			}(fldPath.Index(i), val, nil)...)
@@ -81,11 +83,13 @@ func Validate_E1(opCtx operation.Context, fldPath *field.Path, obj, oldObj E1) (
 func Validate_E2(opCtx operation.Context, fldPath *field.Path, obj, oldObj E2) (errs field.ErrorList) {
 	// type E2
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type E2")...)
+	errs = append(errs, validate.EachSliceValNilable(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *E2) field.ErrorList {
+		return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type E2 values")
+	})...)
 
 	for i, val := range obj {
 		errs = append(errs,
 			func(fldPath *field.Path, obj, oldObj E2) (errs field.ErrorList) {
-				errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type E2 values")...)
 				errs = append(errs, Validate_E2(opCtx, fldPath, obj, oldObj)...)
 				return
 			}(fldPath.Index(i), *val, nil)...)
