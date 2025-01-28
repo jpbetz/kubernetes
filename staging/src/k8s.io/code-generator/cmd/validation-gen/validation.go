@@ -535,7 +535,27 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 	var fields []*childNode
 
 	// Discover into each field of this struct.
-	doOneField := func(memb types.Member, name, jsonName string) error {
+	for _, memb := range thisNode.valueType.Members {
+		name := memb.Name
+		if len(name) == 0 { // embedded fields
+			if memb.Type.Kind == types.Pointer {
+				name = memb.Type.Elem.Name.Name
+			} else {
+				name = memb.Type.Name.Name
+			}
+		}
+		// Only do exported fields.
+		if unicode.IsLower([]rune(name)[0]) {
+			continue
+		}
+
+		// If we try to emit code for this field and find no JSON name, we
+		// will abort.
+		jsonName := ""
+		if commentTags, ok := tags.LookupJSON(memb); ok {
+			jsonName = commentTags.Name
+		}
+
 		klog.V(5).InfoS("field", "name", name, "jsonName", jsonName, "type", memb.Type)
 
 		// Discover the field type.
@@ -663,11 +683,6 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		}
 
 		fields = append(fields, child)
-		return nil
-	}
-
-	if err := forEachField(thisNode.valueType, doOneField); err != nil {
-		return err
 	}
 
 	thisNode.fields = fields
@@ -1363,37 +1378,6 @@ func (g *fixtureTestGen) Init(c *generator.Context, w io.Writer) error {
 		sw.Do("func TestValidation(t *testing.T) {\n", nil)
 		sw.Do("  localSchemeBuilder.Test(t).ValidateFixtures()\n", nil)
 		sw.Do("}\n", nil)
-	}
-	return nil
-}
-
-// forEachField iterates over each exported field of the given type,
-// and performs the given operation.
-func forEachField(t *types.Type, op func(member types.Member, name, jsonName string) error) error {
-	for _, memb := range t.Members {
-		name := memb.Name
-		if len(name) == 0 { // embedded fields
-			if memb.Type.Kind == types.Pointer {
-				name = memb.Type.Elem.Name.Name
-			} else {
-				name = memb.Type.Name.Name
-			}
-		}
-		// Only do exported fields.
-		if unicode.IsLower([]rune(name)[0]) {
-			continue
-		}
-
-		// If we try to emit code for this field and find no JSON name, we
-		// will abort.
-		jsonName := ""
-		if commentTags, ok := tags.LookupJSON(memb); ok {
-			jsonName = commentTags.Name
-		}
-
-		if err := op(memb, name, jsonName); err != nil {
-			return err
-		}
 	}
 	return nil
 }
