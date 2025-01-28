@@ -18,7 +18,7 @@ limitations under the License.
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
 
 // This is a test package.
-package listmap_multiple_keys
+package singlekey
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
@@ -27,23 +27,25 @@ var localSchemeBuilder = testscheme.New()
 type Struct struct {
 	TypeMeta int
 
-	// +k8s:listType=map
-	// +k8s:listMapKey=Key1Field
-	// +k8s:listMapKey=Key2Field
-	// +k8s:eachVal=+k8s:immutable
+	// +k8s:listType2=map
+	// +k8s:listMapKey2=keyField
+	// +k8s:eachVal2=+k8s:immutable
 	ListField []OtherStruct `json:"listField"`
 
-	// +k8s:listType=map
-	// +k8s:listMapKey=Key1Field
-	// +k8s:listMapKey=Key2Field
-	// +k8s:eachVal=+k8s:immutable
+	// +k8s:listType2=map
+	// +k8s:listMapKey2=keyField
+	// +k8s:eachVal2=+k8s:immutable
+	ListPtrField []*OtherStruct `json:"listPtrField"`
+
+	// +k8s:listType2=map
+	// +k8s:listMapKey2=keyField
+	// +k8s:eachVal2=+k8s:immutable
 	ListTypedefField []OtherTypedefStruct `json:"listTypedefField"`
 }
 
 type OtherStruct struct {
-	Key1Field string
-	Key2Field int
-	DataField string
+	KeyField  string `json:"keyField"`
+	DataField string `json:"dataField"`
 }
 
 type OtherTypedefStruct OtherStruct

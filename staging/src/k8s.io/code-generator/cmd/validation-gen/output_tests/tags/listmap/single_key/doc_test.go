@@ -13,7 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package listmap_multiple_keys
+
+package singlekey
 
 import (
 	"testing"
@@ -26,38 +27,51 @@ func Test(t *testing.T) {
 
 	structA1 := Struct{
 		ListField: []OtherStruct{
-			{"key1", 1, "one"},
-			{"key2", 2, "two"},
+			{"key1", "one"},
+			{"key2", "two"},
+		},
+		ListPtrField: []*OtherStruct{
+			&OtherStruct{"key1", "one"},
+			&OtherStruct{"key2", "two"},
 		},
 		ListTypedefField: []OtherTypedefStruct{
-			{"key1", 1, "one"},
-			{"key2", 2, "two"},
+			{"key1", "one"},
+			{"key2", "two"},
 		},
 	}
 
 	// Same data, different order.
 	structA2 := Struct{
 		ListField: []OtherStruct{
-			{"key2", 2, "two"},
-			{"key1", 1, "one"},
+			{"key2", "two"},
+			{"key1", "one"},
+		},
+		ListPtrField: []*OtherStruct{
+			&OtherStruct{"key2", "two"},
+			&OtherStruct{"key1", "one"},
 		},
 		ListTypedefField: []OtherTypedefStruct{
-			{"key2", 2, "two"},
-			{"key1", 1, "one"},
+			{"key2", "two"},
+			{"key1", "one"},
 		},
 	}
 
 	// Different data.
 	structB := Struct{
 		ListField: []OtherStruct{
-			{"key3", 3, "THREE"},
-			{"key1", 1, "ONE"},
-			{"key2", 2, "TWO"},
+			{"key3", "THREE"},
+			{"key1", "ONE"},
+			{"key2", "TWO"},
+		},
+		ListPtrField: []*OtherStruct{
+			&OtherStruct{"key3", "THREE"},
+			&OtherStruct{"key1", "ONE"},
+			&OtherStruct{"key2", "TWO"},
 		},
 		ListTypedefField: []OtherTypedefStruct{
-			{"key3", 3, "THREE"},
-			{"key1", 1, "ONE"},
-			{"key2", 2, "TWO"},
+			{"key3", "THREE"},
+			{"key1", "ONE"},
+			{"key2", "TWO"},
 		},
 	}
 
