@@ -71,9 +71,7 @@ func Validate_ListTypedefType(opCtx operation.Context, fldPath *field.Path, obj,
 	errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
 		return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type ListTypedefType[*]")
 	})...)
-	errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
-		return Validate_StringType(opCtx, fldPath, obj, oldObj)
-	})...)
+	errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, Validate_StringType)...)
 
 	return errs
 }

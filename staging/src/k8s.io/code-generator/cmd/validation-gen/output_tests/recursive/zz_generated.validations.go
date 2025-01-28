@@ -63,9 +63,7 @@ func Validate_E1(opCtx operation.Context, fldPath *field.Path, obj, oldObj E1) (
 	errs = append(errs, validate.EachSliceValNilable(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj E1) field.ErrorList {
 		return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type E1 values")
 	})...)
-	errs = append(errs, validate.EachSliceValNilable(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj E1) field.ErrorList {
-		return Validate_E1(opCtx, fldPath, obj, oldObj)
-	})...)
+	errs = append(errs, validate.EachSliceValNilable(opCtx, fldPath, obj, oldObj, nil, Validate_E1)...)
 
 	return errs
 }

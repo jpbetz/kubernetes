@@ -51,9 +51,7 @@ func Validate_MapType(opCtx operation.Context, fldPath *field.Path, obj, oldObj 
 	errs = append(errs, validate.EachMapVal(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
 		return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type MapType[*]")
 	})...)
-	errs = append(errs, validate.EachMapVal(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
-		return Validate_StringType(opCtx, fldPath, obj, oldObj)
-	})...)
+	errs = append(errs, validate.EachMapVal(opCtx, fldPath, obj, oldObj, Validate_StringType)...)
 
 	return errs
 }
@@ -98,18 +96,14 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 			errs = append(errs, validate.EachSliceValNilable(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj MapType) field.ErrorList {
 				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.ListTypedefField[*]")
 			})...)
-			errs = append(errs, validate.EachSliceValNilable(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj MapType) field.ErrorList {
-				return Validate_MapType(opCtx, fldPath, obj, oldObj)
-			})...)
+			errs = append(errs, validate.EachSliceValNilable(opCtx, fldPath, obj, oldObj, nil, Validate_MapType)...)
 			return
 		}(fldPath.Child("listTypedefField"), obj.ListTypedefField, safe.Field(oldObj, func(oldObj *Struct) []MapType { return oldObj.ListTypedefField }))...)
 
 	// field Struct.UnvalidatedListField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj []MapType) (errs field.ErrorList) {
-			errs = append(errs, validate.EachSliceValNilable(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj MapType) field.ErrorList {
-				return Validate_MapType(opCtx, fldPath, obj, oldObj)
-			})...)
+			errs = append(errs, validate.EachSliceValNilable(opCtx, fldPath, obj, oldObj, nil, Validate_MapType)...)
 			return
 		}(fldPath.Child("UnvalidatedListField"), obj.UnvalidatedListField, safe.Field(oldObj, func(oldObj *Struct) []MapType { return oldObj.UnvalidatedListField }))...)
 

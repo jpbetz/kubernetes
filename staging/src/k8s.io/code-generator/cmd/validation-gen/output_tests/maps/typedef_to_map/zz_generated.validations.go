@@ -71,9 +71,7 @@ func Validate_MapTypedefType(opCtx operation.Context, fldPath *field.Path, obj, 
 	errs = append(errs, validate.EachMapVal(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
 		return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type MapTypedefType[*]")
 	})...)
-	errs = append(errs, validate.EachMapVal(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
-		return Validate_StringType(opCtx, fldPath, obj, oldObj)
-	})...)
+	errs = append(errs, validate.EachMapVal(opCtx, fldPath, obj, oldObj, Validate_StringType)...)
 
 	return errs
 }

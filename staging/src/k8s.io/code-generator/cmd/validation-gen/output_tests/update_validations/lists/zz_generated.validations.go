@@ -66,9 +66,7 @@ func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) 
 	// field T1.LM1
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj []M1) (errs field.ErrorList) {
-			errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *M1) field.ErrorList {
-				return Validate_M1(opCtx, fldPath, obj, oldObj)
-			})...)
+			errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, Validate_M1)...)
 			return
 		}(fldPath.Child("lm1"), obj.LM1, safe.Field(oldObj, func(oldObj *T1) []M1 { return oldObj.LM1 }))...)
 

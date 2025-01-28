@@ -1176,44 +1176,55 @@ func toGolangSourceDataLiteral(sw *generator.SnippetWriter, c *generator.Context
 		sw.Do("$.|private$", c.Universe.Type(types.Name(*v)))
 	case validators.WrapperFunction:
 		fn, extraArgs := v.Function.SignatureAndArgs()
-		targs := generator.Args{
-			"funcName":   c.Universe.Type(fn),
-			"field":      mkSymbolArgs(c, fieldPkgSymbols),
-			"operation":  mkSymbolArgs(c, operationPkgSymbols),
-			"objType":    v.ObjType,
-			"objTypePfx": "*",
-		}
-		if isNilableType(v.ObjType) {
-			targs["objTypePfx"] = ""
-		}
+		if len(extraArgs) == 0 {
+			// If the function to be wrapped has no additional arguments, we can
+			// just use it directly.
+			targs := generator.Args{
+				"funcName": c.Universe.Type(fn),
+			}
+			sw.Do("$.funcName|raw$", targs)
+		} else {
+			// If the function to be wrapped has additional arguments, we need
+			// a "standard signature" validation function to wrap it.
+			targs := generator.Args{
+				"funcName":   c.Universe.Type(fn),
+				"field":      mkSymbolArgs(c, fieldPkgSymbols),
+				"operation":  mkSymbolArgs(c, operationPkgSymbols),
+				"objType":    v.ObjType,
+				"objTypePfx": "*",
+			}
+			if isNilableType(v.ObjType) {
+				targs["objTypePfx"] = ""
+			}
 
-		emitCall := func() {
-			sw.Do("return $.funcName|raw$", targs)
-			typeArgs := v.Function.TypeArgs()
-			if len(typeArgs) > 0 {
-				sw.Do("[", nil)
-				for i, typeArg := range typeArgs {
-					sw.Do("$.|raw$", c.Universe.Type(typeArg))
-					if i < len(typeArgs)-1 {
-						sw.Do(",", nil)
+			emitCall := func() {
+				sw.Do("return $.funcName|raw$", targs)
+				typeArgs := v.Function.TypeArgs()
+				if len(typeArgs) > 0 {
+					sw.Do("[", nil)
+					for i, typeArg := range typeArgs {
+						sw.Do("$.|raw$", c.Universe.Type(typeArg))
+						if i < len(typeArgs)-1 {
+							sw.Do(",", nil)
+						}
 					}
+					sw.Do("]", nil)
 				}
-				sw.Do("]", nil)
+				sw.Do("(opCtx, fldPath, obj, oldObj", targs)
+				for _, arg := range extraArgs {
+					sw.Do(", ", nil)
+					toGolangSourceDataLiteral(sw, c, arg)
+				}
+				sw.Do(")", targs)
 			}
-			sw.Do("(opCtx, fldPath, obj, oldObj", targs)
-			for _, arg := range extraArgs {
-				sw.Do(", ", nil)
-				toGolangSourceDataLiteral(sw, c, arg)
-			}
-			sw.Do(")", targs)
+			sw.Do("func(", targs)
+			sw.Do("    opCtx $.operation.Context|raw$, ", targs)
+			sw.Do("    fldPath *$.field.Path|raw$, ", targs)
+			sw.Do("    obj, oldObj $.objTypePfx$$.objType|raw$ ", targs)
+			sw.Do(")    $.field.ErrorList|raw$ {\n", targs)
+			emitCall()
+			sw.Do("\n}", targs)
 		}
-		sw.Do("func(", targs)
-		sw.Do("    opCtx $.operation.Context|raw$, ", targs)
-		sw.Do("    fldPath *$.field.Path|raw$, ", targs)
-		sw.Do("    obj, oldObj $.objTypePfx$$.objType|raw$ ", targs)
-		sw.Do(")    $.field.ErrorList|raw$ {\n", targs)
-		emitCall()
-		sw.Do("\n}", targs)
 	case validators.Literal:
 		sw.Do("$.$", v)
 	case validators.FunctionLiteral:

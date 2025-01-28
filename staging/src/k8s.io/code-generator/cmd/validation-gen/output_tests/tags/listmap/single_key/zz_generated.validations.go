@@ -51,27 +51,21 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 	// field Struct.ListField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj []OtherStruct) (errs field.ErrorList) {
-			errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, func(a OtherStruct, b OtherStruct) bool { return a.KeyField == b.KeyField }, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *OtherStruct) field.ErrorList {
-				return validate.Immutable(opCtx, fldPath, obj, oldObj)
-			})...)
+			errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, func(a OtherStruct, b OtherStruct) bool { return a.KeyField == b.KeyField }, validate.Immutable)...)
 			return
 		}(fldPath.Child("listField"), obj.ListField, safe.Field(oldObj, func(oldObj *Struct) []OtherStruct { return oldObj.ListField }))...)
 
 	// field Struct.ListPtrField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj []*OtherStruct) (errs field.ErrorList) {
-			errs = append(errs, validate.EachSliceValNilable(opCtx, fldPath, obj, oldObj, func(a *OtherStruct, b *OtherStruct) bool { return a.KeyField == b.KeyField }, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *OtherStruct) field.ErrorList {
-				return validate.Immutable(opCtx, fldPath, obj, oldObj)
-			})...)
+			errs = append(errs, validate.EachSliceValNilable(opCtx, fldPath, obj, oldObj, func(a *OtherStruct, b *OtherStruct) bool { return a.KeyField == b.KeyField }, validate.Immutable)...)
 			return
 		}(fldPath.Child("listPtrField"), obj.ListPtrField, safe.Field(oldObj, func(oldObj *Struct) []*OtherStruct { return oldObj.ListPtrField }))...)
 
 	// field Struct.ListTypedefField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj []OtherTypedefStruct) (errs field.ErrorList) {
-			errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, func(a OtherTypedefStruct, b OtherTypedefStruct) bool { return a.KeyField == b.KeyField }, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *OtherTypedefStruct) field.ErrorList {
-				return validate.Immutable(opCtx, fldPath, obj, oldObj)
-			})...)
+			errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, func(a OtherTypedefStruct, b OtherTypedefStruct) bool { return a.KeyField == b.KeyField }, validate.Immutable)...)
 			return
 		}(fldPath.Child("listTypedefField"), obj.ListTypedefField, safe.Field(oldObj, func(oldObj *Struct) []OtherTypedefStruct { return oldObj.ListTypedefField }))...)
 

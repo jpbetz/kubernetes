@@ -85,9 +85,7 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 			errs = append(errs, validate.EachMapVal(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
 				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapTypedefField[*]")
 			})...)
-			errs = append(errs, validate.EachMapVal(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
-				return Validate_StringType(opCtx, fldPath, obj, oldObj)
-			})...)
+			errs = append(errs, validate.EachMapVal(opCtx, fldPath, obj, oldObj, Validate_StringType)...)
 			return
 		}(fldPath.Child("mapTypedefField"), obj.MapTypedefField, safe.Field(oldObj, func(oldObj *Struct) map[string]StringType { return oldObj.MapTypedefField }))...)
 
@@ -98,9 +96,7 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 			errs = append(errs, validate.EachMapValNilable(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
 				return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapTypedefPtrField[*]")
 			})...)
-			errs = append(errs, validate.EachMapValNilable(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
-				return Validate_StringType(opCtx, fldPath, obj, oldObj)
-			})...)
+			errs = append(errs, validate.EachMapValNilable(opCtx, fldPath, obj, oldObj, Validate_StringType)...)
 			return
 		}(fldPath.Child("mapTypedefPtrField"), obj.MapTypedefPtrField, safe.Field(oldObj, func(oldObj *Struct) map[string]*StringType { return oldObj.MapTypedefPtrField }))...)
 

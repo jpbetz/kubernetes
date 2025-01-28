@@ -51,9 +51,7 @@ func Validate_SliceType(opCtx operation.Context, fldPath *field.Path, obj, oldOb
 	errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
 		return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type ListType[*]")
 	})...)
-	errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
-		return Validate_StringType(opCtx, fldPath, obj, oldObj)
-	})...)
+	errs = append(errs, validate.EachSliceVal(opCtx, fldPath, obj, oldObj, nil, Validate_StringType)...)
 
 	return errs
 }
@@ -104,9 +102,7 @@ func Validate_Struct(opCtx operation.Context, fldPath *field.Path, obj, oldObj *
 					return validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "field Struct.MapTypedefField[*][*]")
 				})
 			})...)
-			errs = append(errs, validate.EachMapValNilable(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj SliceType) field.ErrorList {
-				return Validate_SliceType(opCtx, fldPath, obj, oldObj)
-			})...)
+			errs = append(errs, validate.EachMapValNilable(opCtx, fldPath, obj, oldObj, Validate_SliceType)...)
 			return
 		}(fldPath.Child("mapTypedefField"), obj.MapTypedefField, safe.Field(oldObj, func(oldObj *Struct) map[string]SliceType { return oldObj.MapTypedefField }))...)
 

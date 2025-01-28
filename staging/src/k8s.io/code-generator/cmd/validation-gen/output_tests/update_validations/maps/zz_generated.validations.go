@@ -66,9 +66,7 @@ func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) 
 	// field T1.MSM1
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj map[string]M1) (errs field.ErrorList) {
-			errs = append(errs, validate.EachMapVal(opCtx, fldPath, obj, oldObj, func(opCtx operation.Context, fldPath *field.Path, obj, oldObj *M1) field.ErrorList {
-				return Validate_M1(opCtx, fldPath, obj, oldObj)
-			})...)
+			errs = append(errs, validate.EachMapVal(opCtx, fldPath, obj, oldObj, Validate_M1)...)
 			return
 		}(fldPath.Child("msm1"), obj.MSM1, safe.Field(oldObj, func(oldObj *T1) map[string]M1 { return oldObj.MSM1 }))...)
 
