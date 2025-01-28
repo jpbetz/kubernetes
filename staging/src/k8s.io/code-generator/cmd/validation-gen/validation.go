@@ -187,7 +187,7 @@ func (g *genValidations) hasValidationsMiss(n *typeNode, seen map[*typeNode]bool
 		allChildren = append(allChildren, n.elem)
 	}
 	for _, c := range allChildren {
-		if !c.fieldValidations.Empty() || !c.elemValidations.Empty() {
+		if !c.fieldValidations.Empty() {
 			return true
 		}
 		if g.hasValidationsImpl(c.node, seen) {
@@ -232,7 +232,6 @@ type childNode struct {
 	node      *typeNode   // the node of the child's value type, or nil if it is in a foreign package
 
 	fieldValidations validators.Validations // validations on the field
-	elemValidations  validators.Validations // validations on each value of a list or map
 
 	// struct fields can have per-child-member validations.
 	subfieldValidations []*childNode
@@ -253,7 +252,6 @@ type typeNode struct {
 	listMapKeys []types.Member // populated with listMapKey values when this type is listType=map slice
 
 	typeValidations validators.Validations // validations on the type
-	elemValidations validators.Validations // validations on each value of a list or map
 }
 
 // lookupField returns the childNode with the specified JSON name.
@@ -267,9 +265,6 @@ func (n typeNode) lookupField(jsonName string) *childNode {
 }
 
 const (
-	// This tag defines a validation which is to be run on each value in a map
-	// or slice.
-	eachValTag = "k8s:eachVal"
 	// This tag defines a validation which is to be run on a "subfield" of
 	// the struct tagged.
 	subfieldTag = "k8s:subfield"
@@ -281,14 +276,6 @@ const (
 // builtinTagDocs returns information about the hard-coded tags.
 func builtinTagDocs() []validators.TagDoc {
 	return []validators.TagDoc{{
-		Tag:         eachValTag,
-		Description: "Declares a validation for each value in a map or slice.",
-		Scopes:      []validators.Scope{validators.ScopeType, validators.ScopeField},
-		Payloads: []validators.TagPayloadDoc{{
-			Description: "<validation-tag>",
-			Docs:        "The tag to evaluate for each value.",
-		}},
-	}, {
 		Tag:         listMapKeyTag,
 		Description: "Declares a named field of a list's value-type to be part of the list-map key.",
 		Scopes:      []validators.Scope{validators.ScopeType, validators.ScopeField},
@@ -535,25 +522,6 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 
 		// Add any other field-attached "special" validators.
 		switch childType.Kind {
-		case types.Slice, types.Array:
-			// Extract any embedded list-validation rules.
-			valCtxt := validators.Context{
-				Scope:  validators.ScopeListVal,
-				Type:   childType.Elem,
-				Parent: memb.Type,
-				Path:   childPath.Key("vals"),
-			}
-			if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, memb.CommentLines); err != nil {
-				return fmt.Errorf("%v: %w", childPath.Key("vals"), err)
-			} else {
-				if !validations.Empty() {
-					klog.V(5).InfoS("found list-validations", "n", validations.Len())
-					child.elemValidations.Add(validations)
-					if len(validations.Variables) > 0 {
-						return fmt.Errorf("%v: variable generation is not supported for list value validations", childPath)
-					}
-				}
-			}
 		case types.Struct, types.Pointer:
 			if childType.Kind == types.Pointer {
 				if childType.Elem.Kind == types.Struct {
@@ -598,25 +566,6 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			if err := forEachField(childType, doOneChildField); err != nil {
 				return err
 			}
-		case types.Map:
-			// Extract any embedded val-validation rules.
-			valCtxt := validators.Context{
-				Scope:  validators.ScopeMapVal,
-				Type:   childType.Elem,
-				Parent: memb.Type,
-				Path:   childPath,
-			}
-			if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, memb.CommentLines); err != nil {
-				return fmt.Errorf("%v: %w", childPath.Key("vals"), err)
-			} else {
-				if !validations.Empty() {
-					klog.V(5).InfoS("found list-validations", "n", validations.Len())
-					child.elemValidations.Add(validations)
-					if len(validations.Variables) > 0 {
-						return fmt.Errorf("%v: variable generation not supported for map value validations", childPath)
-					}
-				}
-			}
 		}
 
 		fields = append(fields, child)
@@ -660,42 +609,6 @@ func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path)
 		}
 	}
 	thisNode.underlying = child
-
-	// Add any other type-attached "special" validators.
-	switch underlying.Kind {
-	case types.Slice, types.Array:
-		// Extract any embedded list-validation rules.
-		valCtxt := validators.Context{
-			Scope:  validators.ScopeListVal,
-			Type:   underlying.Elem,
-			Parent: underlying,
-			Path:   fldPath,
-		}
-		if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, thisNode.valueType.CommentLines); err != nil {
-			return fmt.Errorf("%v: %w", fldPath.Key("vals"), err)
-		} else {
-			if !validations.Empty() {
-				klog.V(5).InfoS("found list-validations", "n", validations.Len())
-				child.elemValidations.Add(validations)
-			}
-		}
-	case types.Map:
-		// Extract any embedded val-validation rules.
-		valCtxt := validators.Context{
-			Scope:  validators.ScopeMapVal,
-			Type:   underlying.Elem,
-			Parent: underlying,
-			Path:   fldPath.Key("vals"),
-		}
-		if validations, err := td.extractEmbeddedValidations(eachValTag, valCtxt, thisNode.valueType.CommentLines); err != nil {
-			return fmt.Errorf("%v: %w", fldPath.Key("vals"), err)
-		} else {
-			if !validations.Empty() {
-				klog.V(5).InfoS("found val-validations", "n", validations.Len())
-				child.elemValidations.Add(validations)
-			}
-		}
-	}
 
 	return nil
 }
@@ -1033,17 +946,10 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			didSome = true
 		}
 	case types.Slice, types.Array:
+		// Validate each value.
 		// Accumulate into a buffer so we don't emit empty functions.
 		elemBuf := bytes.NewBuffer(nil)
 		elemSW := sw.Dup(elemBuf)
-
-		// Validate each value.
-		validations := thisNode.elemValidations
-		validations.Add(thisChild.elemValidations)
-		if !validations.Empty() {
-			emitCallsToValidators(c, validations.Functions, elemSW)
-			emitComments(validations.Comments, elemSW)
-		}
 
 		// If the node is nil, this must be a type in a package we are not
 		// handling - it's effectively opaque to us.
@@ -1122,17 +1028,10 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			}
 		}
 
+		// Validate each value.
 		// Accumulate into a buffer so we don't emit empty functions.
 		valBuf := bytes.NewBuffer(nil)
 		valSW := sw.Dup(valBuf)
-
-		// Validate each value.
-		valValidations := thisNode.elemValidations
-		valValidations.Add(thisChild.elemValidations)
-		if !valValidations.Empty() {
-			emitCallsToValidators(c, valValidations.Functions, valSW)
-			emitComments(valValidations.Comments, valSW)
-		}
 
 		// If the node is nil, this must be a type in a package we are not
 		// handling - it's effectively opaque to us.

@@ -27,29 +27,29 @@ var localSchemeBuilder = testscheme.New()
 // Note: no validation here
 type UnvalidatedType []string
 
-// +k8s:eachVal2=+k8s:validateFalse="type ListType[*]"
+// +k8s:eachVal=+k8s:validateFalse="type ListType[*]"
 type ListType []string
 
 // Note: no validation here
 type UnvalidatedPtrType []*string
 
-// +k8s:eachVal2=+k8s:validateFalse="type ListPtrType[*]"
+// +k8s:eachVal=+k8s:validateFalse="type ListPtrType[*]"
 type ListPtrType []*string
 
 type StringType string
 
-// +k8s:eachVal2=+k8s:validateFalse="type ListTypedefType[*]"
+// +k8s:eachVal=+k8s:validateFalse="type ListTypedefType[*]"
 type ListTypedefType []StringType
 
 type Struct struct {
 	TypeMeta int
 
-	// +k8s:eachVal2=+k8s:validateFalse="field Struct.ListField[*]"
+	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListField[*]"
 	ListField ListType `json:"listField"`
 
-	// +k8s:eachVal2=+k8s:validateFalse="field Struct.ListPtrField[*]"
+	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListPtrField[*]"
 	ListPtrField ListPtrType `json:"listPtrField"`
 
-	// +k8s:eachVal2=+k8s:validateFalse="field Struct.ListTypedefField[*]"
+	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListTypedefField[*]"
 	ListTypedefField ListTypedefType `json:"listTypedefField"`
 }

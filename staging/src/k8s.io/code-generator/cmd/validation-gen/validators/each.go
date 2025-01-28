@@ -28,7 +28,7 @@ import (
 const (
 	listTypeTag   = "k8s:listType2"
 	listMapKeyTag = "k8s:listMapKey2"
-	eachValTag    = "k8s:eachVal2"
+	eachValTag    = "k8s:eachVal"
 	eachKeyTag    = "k8s:eachKey"
 )
 
@@ -292,7 +292,7 @@ func (evtv eachValTagValidator) getListValidations(fldPath *field.Path, t *types
 			cmpFn.Body = buf.String()
 			cmpArg = cmpFn
 		}
-		f := Function("eachVal2", vfn.Flags(), validateEach, cmpArg, WrapperFunction{vfn, t.Elem})
+		f := Function("eachVal", vfn.Flags(), validateEach, cmpArg, WrapperFunction{vfn, t.Elem})
 		result.Functions = append(result.Functions, f)
 	}
 
@@ -313,7 +313,7 @@ func (evtv eachValTagValidator) getMapValidations(t *types.Type, validations Val
 			validateEach = validateEachMapVal
 		}
 
-		f := Function("eachVal2", vfn.Flags(), validateEach, WrapperFunction{vfn, t.Elem})
+		f := Function("eachVal", vfn.Flags(), validateEach, WrapperFunction{vfn, t.Elem})
 		result.Functions = append(result.Functions, f)
 	}
 

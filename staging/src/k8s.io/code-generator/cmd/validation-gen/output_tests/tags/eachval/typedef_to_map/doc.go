@@ -27,31 +27,31 @@ var localSchemeBuilder = testscheme.New()
 // Note: no validation here
 type UnvalidatedType map[string]string
 
-// +k8s:eachVal2=+k8s:validateFalse="type MapType[*]"
+// +k8s:eachVal=+k8s:validateFalse="type MapType[*]"
 type MapType map[string]string
 
 // Note: no validation here
 type UnvalidatedPtrType map[string]*string
 
-// +k8s:eachVal2=+k8s:validateFalse="type MapPtrType[*]"
+// +k8s:eachVal=+k8s:validateFalse="type MapPtrType[*]"
 type MapPtrType map[string]*string
 
 // +k8s:validateFalse="type StringType"
 type StringType string
 
-// +k8s:eachVal2=+k8s:validateFalse="type MapTypedefType[*]"
+// +k8s:eachVal=+k8s:validateFalse="type MapTypedefType[*]"
 type MapTypedefType map[string]StringType
 
 // +k8s:validateFalse="type Struct"
 type Struct struct {
 	TypeMeta int
 
-	// +k8s:eachVal2=+k8s:validateFalse="field Struct.MapField[*]"
+	// +k8s:eachVal=+k8s:validateFalse="field Struct.MapField[*]"
 	MapField MapType `json:"mapField"`
 
-	// +k8s:eachVal2=+k8s:validateFalse="field Struct.MapPtrField[*]"
+	// +k8s:eachVal=+k8s:validateFalse="field Struct.MapPtrField[*]"
 	MapPtrField MapPtrType `json:"mapPtrField"`
 
-	// +k8s:eachVal2=+k8s:validateFalse="field Struct.MapTypedefField[*]"
+	// +k8s:eachVal=+k8s:validateFalse="field Struct.MapTypedefField[*]"
 	MapTypedefField MapTypedefType `json:"mapTypedefField"`
 }
