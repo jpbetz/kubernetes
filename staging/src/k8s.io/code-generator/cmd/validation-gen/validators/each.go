@@ -26,10 +26,10 @@ import (
 )
 
 const (
-	listTypeTag   = "k8s:listType"
-	listMapKeyTag = "k8s:listMapKey"
-	eachValTag    = "k8s:eachVal"
-	eachKeyTag    = "k8s:eachKey"
+	listTypeTagName   = "k8s:listType"
+	ListMapKeyTagName = "k8s:listMapKey"
+	eachValTagName    = "k8s:eachVal"
+	eachKeyTagName    = "k8s:eachKey"
 )
 
 // We keep the eachVal and eachKey validators around because the main
@@ -68,7 +68,7 @@ type listTypeTagValidator struct {
 func (listTypeTagValidator) Init(Config) {}
 
 func (listTypeTagValidator) TagName() string {
-	return listTypeTag
+	return listTypeTagName
 }
 
 func (listTypeTagValidator) ValidScopes() sets.Set[Scope] {
@@ -140,7 +140,7 @@ type listMapKeyTagValidator struct {
 func (listMapKeyTagValidator) Init(Config) {}
 
 func (listMapKeyTagValidator) TagName() string {
-	return listMapKeyTag
+	return ListMapKeyTagName
 }
 
 func (listMapKeyTagValidator) ValidScopes() sets.Set[Scope] {
@@ -202,7 +202,7 @@ func (evtv *eachValTagValidator) Init(cfg Config) {
 }
 
 func (eachValTagValidator) TagName() string {
-	return eachValTag
+	return eachValTagName
 }
 
 func (eachValTagValidator) ValidScopes() sets.Set[Scope] {
@@ -310,7 +310,7 @@ func (evtv eachValTagValidator) getListValidations(fldPath *field.Path, t *types
 			cmpFn.Body = buf.String()
 			cmpArg = cmpFn
 		}
-		f := Function("eachVal", vfn.Flags(), validateEach, cmpArg, WrapperFunction{vfn, t.Elem})
+		f := Function(eachValTagName, vfn.Flags(), validateEach, cmpArg, WrapperFunction{vfn, t.Elem})
 		result.Functions = append(result.Functions, f)
 	}
 
@@ -331,7 +331,7 @@ func (evtv eachValTagValidator) getMapValidations(t *types.Type, validations Val
 			validateEach = validateEachMapVal
 		}
 
-		f := Function("eachVal", vfn.Flags(), validateEach, WrapperFunction{vfn, t.Elem})
+		f := Function(eachValTagName, vfn.Flags(), validateEach, WrapperFunction{vfn, t.Elem})
 		result.Functions = append(result.Functions, f)
 	}
 
@@ -360,7 +360,7 @@ func (ektv *eachKeyTagValidator) Init(cfg Config) {
 }
 
 func (eachKeyTagValidator) TagName() string {
-	return eachKeyTag
+	return eachKeyTagName
 }
 
 func (eachKeyTagValidator) ValidScopes() sets.Set[Scope] {
@@ -401,7 +401,7 @@ func (ektv eachKeyTagValidator) GetValidations(context Context, _ []string, payl
 func (ektv eachKeyTagValidator) getValidations(t *types.Type, validations Validations) (Validations, error) {
 	result := Validations{}
 	for _, vfn := range validations.Functions {
-		f := Function("eachKey", vfn.Flags(), validateEachMapKey, WrapperFunction{vfn, t.Key})
+		f := Function(eachKeyTagName, vfn.Flags(), validateEachMapKey, WrapperFunction{vfn, t.Key})
 		result.Functions = append(result.Functions, f)
 	}
 	return result, nil

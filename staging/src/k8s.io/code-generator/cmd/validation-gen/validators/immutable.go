@@ -60,9 +60,9 @@ func (immutableTagValidator) GetValidations(context Context, _ []string, payload
 		}
 	}
 	if t.IsComparable() {
-		result.AddFunction(Function(maxLengthTagName, DefaultFlags, immutableValidator))
+		result.AddFunction(Function(immutableTagName, DefaultFlags, immutableValidator))
 	} else {
-		result.AddFunction(Function(maxLengthTagName, DefaultFlags, immutableNonComparableValidator))
+		result.AddFunction(Function(immutableTagName, DefaultFlags, immutableNonComparableValidator))
 	}
 
 	return result, nil

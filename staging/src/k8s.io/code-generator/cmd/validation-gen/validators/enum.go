@@ -73,7 +73,7 @@ func (etv *enumTagValidator) GetValidations(context Context, _ []string, payload
 		supportVarName := PrivateVar{Name: "SymbolsFor" + context.Parent.Name.Name, Package: "local"}
 		supportVar := Variable(supportVarName, GenericFunction(enumTagName, DefaultFlags, setsNew, []types.Name{enum.Name}, enum.ValueArgs()...))
 		result.AddVariable(supportVar)
-		fn := Function("enum", DefaultFlags, enumValidator, supportVarName)
+		fn := Function(enumTagName, DefaultFlags, enumValidator, supportVarName)
 		result.AddFunction(fn)
 	}
 

@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	subfieldTag = "k8s:subfield"
+	subfieldTagName = "k8s:subfield"
 )
 
 func init() {
@@ -40,7 +40,7 @@ func (stv *subfieldTagValidator) Init(cfg Config) {
 }
 
 func (subfieldTagValidator) TagName() string {
-	return subfieldTag
+	return subfieldTagName
 }
 
 var subfieldTagValidScopes = sets.New(ScopeAny)
@@ -100,7 +100,7 @@ func (stv subfieldTagValidator) GetValidations(context Context, args []string, p
 				Results:    []ParamResult{{"", nilableFieldType}},
 			}
 			getFn.Body = fmt.Sprintf("return %so.%s", fieldExprPrefix, submemb.Name)
-			f := Function("subfield", vfn.Flags(), validateSubfield, subname, getFn, WrapperFunction{vfn, submemb.Type})
+			f := Function(subfieldTagName, vfn.Flags(), validateSubfield, subname, getFn, WrapperFunction{vfn, submemb.Type})
 			result.Functions = append(result.Functions, f)
 			result.Variables = append(result.Variables, validations.Variables...)
 		}
