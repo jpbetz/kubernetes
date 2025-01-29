@@ -151,7 +151,7 @@ func ruleOptionalAndRequired(comments []string) (string, error) {
 	return conflictingTagsRule(comments, "+k8s:optional", "+k8s:required")
 }
 
-// ruleRequiredAndDefault checks for conflicting tags +k8s:required and +k8s:default in a slice of comments.
+// ruleRequiredAndDefault checks for conflicting tags +k8s:required and +default in a slice of comments.
 func ruleRequiredAndDefault(comments []string) (string, error) {
-	return conflictingTagsRule(comments, "+k8s:required", "+k8s:default")
+	return conflictingTagsRule(comments, "+k8s:required", "+default")
 }

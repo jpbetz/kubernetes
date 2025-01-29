@@ -177,18 +177,18 @@ func TestRuleRequiredAndDefault(t *testing.T) {
 		},
 		{
 			name:     "only default",
-			comments: []string{"+k8s:default=somevalue"},
+			comments: []string{"+default=somevalue"},
 			wantMsg:  "",
 		},
 		{
 			name:     "required and default",
-			comments: []string{"+k8s:required", "+k8s:default=somevalue"},
-			wantMsg:  "conflicting tags: {+k8s:required, +k8s:default}",
+			comments: []string{"+k8s:required", "+default=somevalue"},
+			wantMsg:  "conflicting tags: {+k8s:required, +default}",
 		},
 		{
 			name:     "required, empty, default",
-			comments: []string{"+k8s:required", "", "+k8s:default=somevalue"},
-			wantMsg:  "conflicting tags: {+k8s:required, +k8s:default}",
+			comments: []string{"+k8s:required", "", "+default=somevalue"},
+			wantMsg:  "conflicting tags: {+k8s:required, +default}",
 		},
 	}
 
