@@ -78,7 +78,7 @@ func (s *Scheme) ValidateUpdate(opts sets.Set[string], object, oldObject any, su
 		return s.registrationErrors // short circuit with registration errors if any are present
 	}
 	if fn, ok := s.validationFuncs[reflect.TypeOf(object)]; ok {
-		return fn(operation.Context{Operation: operation.Update}, oldObject, object, subresources...)
+		return fn(operation.Context{Operation: operation.Update}, object, oldObject, subresources...)
 	}
 	return nil
 }
