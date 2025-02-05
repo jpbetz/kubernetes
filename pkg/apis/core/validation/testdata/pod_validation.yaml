@@ -1,0 +1,514 @@
+# Base valid Pod object
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod
+  namespace: default
+spec:
+  containers:
+  - name: test-container
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+      protocol: TCP
+    terminationMessagePolicy: File
+    imagePullPolicy: IfNotPresent
+  terminationGracePeriodSeconds: 30
+  restartPolicy: Always
+  dnsPolicy: ClusterFirst
+  securityContext:
+    supplementalGroups: []
+    runAsUser: 1000
+    fsGroup: 1000
+---
+# Test case 1: Invalid container name
+name: "invalid container name"
+modifications:
+  "spec.containers[0].name": "Invalid_Container_Name!"
+expectedErrors:
+- field: "spec.containers[0].name"
+  type: "FieldValueInvalid"
+  detail: "a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character"
+---
+# Test case 2: Missing container image
+name: "missing container image"
+modifications:
+  "spec.containers[0].image": ""
+expectedErrors:
+- field: "spec.containers[0].image"
+  type: "FieldValueRequired"
+  detail: ""
+---
+# Test case 3: Invalid port number
+name: "invalid port number"
+modifications:
+  "spec.containers[0].ports[0].containerPort": 99999
+expectedErrors:
+- field: "spec.containers[0].ports[0].containerPort"
+  type: "FieldValueInvalid"
+  detail: "must be between 1 and 65535, inclusive"
+---
+# Test case 4: Invalid supplemental groups (too large)
+name: "invalid supplemental groups too large"
+modifications:
+  "spec.securityContext.supplementalGroups[0]": 2147483648
+expectedErrors:
+- field: "spec.securityContext.supplementalGroups[0]"
+  type: "FieldValueInvalid"
+  detail: "must be between 0 and 2147483647, inclusive"
+---
+# Test case 5: Invalid supplemental groups (negative)
+name: "invalid supplemental groups negative"
+modifications:
+  "spec.securityContext.supplementalGroups[0]": -1
+expectedErrors:
+- field: "spec.securityContext.supplementalGroups[0]"
+  type: "FieldValueInvalid"
+  detail: "must be between 0 and 2147483647, inclusive"
+---
+# Test case 6: Invalid runAsUser (too large)
+name: "invalid runAsUser too large"
+modifications:
+  "spec.securityContext.runAsUser": 2147483648
+expectedErrors:
+- field: "spec.securityContext.runAsUser"
+  type: "FieldValueInvalid"
+  detail: "must be between 0 and 2147483647, inclusive"
+---
+# Test case 7: Invalid runAsUser (negative)
+name: "invalid runAsUser negative"
+modifications:
+  "spec.securityContext.runAsUser": -1
+expectedErrors:
+- field: "spec.securityContext.runAsUser"
+  type: "FieldValueInvalid"
+  detail: "must be between 0 and 2147483647, inclusive"
+---
+# Test case 8: Invalid fsGroup (too large)
+name: "invalid fsGroup too large"
+modifications:
+  "spec.securityContext.fsGroup": 2147483648
+expectedErrors:
+- field: "spec.securityContext.fsGroup"
+  type: "FieldValueInvalid"
+  detail: "must be between 0 and 2147483647, inclusive"
+---
+# Test case 9: Invalid fsGroup (negative)
+name: "invalid fsGroup negative"
+modifications:
+  "spec.securityContext.fsGroup": -1
+expectedErrors:
+- field: "spec.securityContext.fsGroup"
+  type: "FieldValueInvalid"
+  detail: "must be between 0 and 2147483647, inclusive"
+---
+# Test case 10: Invalid DNS policy
+name: "invalid DNS policy"
+modifications:
+  "spec.dnsPolicy": "invalid"
+expectedErrors:
+- field: "spec.dnsPolicy"
+  type: "FieldValueInvalid"
+  detail: "supported values: \"ClusterFirstWithHostNet\", \"ClusterFirst\", \"Default\", \"None\""
+---
+# Test case 11: Invalid service account name
+name: "invalid service account name"
+modifications:
+  "spec.serviceAccountName": "Invalid_Name!"
+expectedErrors:
+- field: "spec.serviceAccountName"
+  type: "FieldValueInvalid"
+  detail: "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character"
+---
+# Test case 12: Invalid restart policy
+name: "invalid restart policy"
+modifications:
+  "spec.restartPolicy": "UnknownPolicy"
+expectedErrors:
+- field: "spec.restartPolicy"
+  type: "FieldValueInvalid"
+  detail: "supported values: \"Always\", \"OnFailure\", \"Never\""
+---
+# Test case 13: Invalid host network port mapping
+name: "invalid host network port mapping"
+modifications:
+  "spec.hostNetwork": true
+  "spec.containers[0].ports[0].hostPort": 8080
+  "spec.containers[0].ports[0].containerPort": 2600
+expectedErrors:
+- field: "spec.containers[0].ports[0].containerPort"
+  type: "FieldValueInvalid"
+  detail: "must match hostPort when hostNetwork is true"
+---
+# Test case 14: Invalid host aliases IP
+name: "invalid host aliases IP"
+modifications:
+  "spec.hostAliases[0].ip": "999.999.999.999"
+  "spec.hostAliases[0].hostnames[0]": "host1"
+expectedErrors:
+- field: "spec.hostAliases[0].ip"
+  type: "FieldValueInvalid"
+  detail: "must be a valid IP address"
+---
+# Test case 15: Invalid host aliases hostname
+name: "invalid host aliases hostname"
+modifications:
+  "spec.hostAliases[0].ip": "12.34.56.78"
+  "spec.hostAliases[0].hostnames[0]": "@#$^#@#$"
+expectedErrors:
+- field: "spec.hostAliases[0].hostnames[0]"
+  type: "FieldValueInvalid"
+  detail: "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character"
+---
+# Test case 16: Invalid active deadline seconds (zero)
+name: "invalid active deadline seconds zero"
+modifications:
+  "spec.activeDeadlineSeconds": 0
+expectedErrors:
+- field: "spec.activeDeadlineSeconds"
+  type: "FieldValueInvalid"
+  detail: "must be between 1 and 2147483647, inclusive"
+---
+# Test case 17: Invalid active deadline seconds (too large)
+name: "invalid active deadline seconds too large"
+modifications:
+  "spec.activeDeadlineSeconds": 2147483648
+expectedErrors:
+- field: "spec.activeDeadlineSeconds"
+  type: "FieldValueInvalid"
+  detail: "must be between 1 and 2147483647, inclusive"
+---
+# Test case 18: Invalid node name
+name: "invalid node name"
+modifications:
+  "spec.nodeName": "node name"
+expectedErrors:
+- field: "spec.nodeName"
+  type: "FieldValueInvalid"
+  detail: "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character"
+---
+# Test case 19: Invalid priority class name
+name: "invalid priority class name"
+modifications:
+  "spec.priorityClassName": "Invalid_Name!"
+expectedErrors:
+- field: "spec.priorityClassName"
+  type: "FieldValueInvalid"
+  detail: "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character"
+---
+# Test case 20: Invalid share process namespace with host PID
+name: "invalid share process namespace with host PID"
+modifications:
+  "spec.hostPID": true
+  "spec.shareProcessNamespace": true
+expectedErrors:
+- field: "spec.shareProcessNamespace"
+  type: "FieldValueInvalid"
+  detail: "cannot set both shareProcessNamespace and hostPID"
+---
+# Test case 21: Invalid runtime class name
+name: "invalid runtime class name"
+modifications:
+  "spec.runtimeClassName": "invalid/sandbox"
+expectedErrors:
+- field: "spec.runtimeClassName"
+  type: "FieldValueInvalid"
+  detail: "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character"
+---
+# Test case 22: Invalid fsGroup change policy
+name: "invalid fsGroup change policy"
+modifications:
+  "spec.securityContext.fsGroupChangePolicy": "invalid"
+expectedErrors:
+- field: "spec.securityContext.fsGroupChangePolicy"
+  type: "FieldValueInvalid"
+  detail: "supported values: \"Always\", \"OnRootMismatch\""
+---
+# Test case 23: Invalid node affinity operator
+name: "invalid node affinity operator"
+modifications:
+  "spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key": "key2"
+  "spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator": "InvalidOp"
+  "spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0]": "value1"
+expectedErrors:
+- field: "spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator"
+  type: "FieldValueInvalid"
+  detail: "not a valid node selector operator"
+---
+# Test case 24: Invalid pod affinity topology key
+name: "invalid pod affinity topology key"
+modifications:
+  "spec.affinity.podAffinity.requiredDuringSchedulingIgnoredDuringExecution[0].topologyKey": ""
+expectedErrors:
+- field: "spec.affinity.podAffinity.requiredDuringSchedulingIgnoredDuringExecution[0].topologyKey"
+  type: "FieldValueRequired"
+  detail: "can not be empty"
+---
+# Test case 25: Invalid pod anti-affinity label selector
+name: "invalid pod anti-affinity label selector"
+modifications:
+  "spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution[0].labelSelector.matchExpressions[0].key": "key2"
+  "spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution[0].labelSelector.matchExpressions[0].operator": "InvalidOp"
+  "spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution[0].topologyKey": "zone"
+expectedErrors:
+- field: "spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution[0].labelSelector.matchExpressions[0].operator"
+  type: "FieldValueInvalid"
+  detail: "not a valid label selector operator"
+---
+# Test case 26: Invalid toleration operator
+name: "invalid toleration operator"
+modifications:
+  "spec.tolerations[0].key": "foo"
+  "spec.tolerations[0].operator": "InvalidOp"
+  "spec.tolerations[0].value": "bar"
+  "spec.tolerations[0].effect": "NoSchedule"
+expectedErrors:
+- field: "spec.tolerations[0].operator"
+  type: "FieldValueInvalid"
+  detail: "not a valid toleration operator"
+---
+# Test case 27: Invalid toleration effect
+name: "invalid toleration effect"
+modifications:
+  "spec.tolerations[0].key": "foo"
+  "spec.tolerations[0].operator": "Equal"
+  "spec.tolerations[0].value": "bar"
+  "spec.tolerations[0].effect": "InvalidEffect"
+expectedErrors:
+- field: "spec.tolerations[0].effect"
+  type: "FieldValueInvalid"
+  detail: "not a valid taint effect"
+---
+# Test case 28: Invalid toleration value with Exists operator
+name: "invalid toleration value with exists operator"
+modifications:
+  "spec.tolerations[0].key": "foo"
+  "spec.tolerations[0].operator": "Exists"
+  "spec.tolerations[0].value": "bar"
+  "spec.tolerations[0].effect": "NoSchedule"
+expectedErrors:
+- field: "spec.tolerations[0].value"
+  type: "FieldValueInvalid"
+  detail: "value must be empty when operator is Exists"
+---
+# Test case 29: Missing toleration value with Equal operator
+name: "missing toleration value with equal operator"
+modifications:
+  "spec.tolerations[0].key": "foo"
+  "spec.tolerations[0].operator": "Equal"
+  "spec.tolerations[0].effect": "NoSchedule"
+expectedErrors:
+- field: "spec.tolerations[0].value"
+  type: "FieldValueRequired"
+  detail: "value must be specified when operator is Equal"
+---
+# Test case 30: Invalid container resource memory request
+name: "invalid container resource memory request"
+modifications:
+  "spec.containers[0].resources.requests.memory": "-1"
+expectedErrors:
+- field: "spec.containers[0].resources.requests.memory"
+  type: "FieldValueInvalid"
+  detail: "must be a valid resource quantity"
+---
+# Test case 31: Invalid container resource cpu limit
+name: "invalid container resource cpu limit"
+modifications:
+  "spec.containers[0].resources.limits.cpu": "invalid"
+expectedErrors:
+- field: "spec.containers[0].resources.limits.cpu"
+  type: "FieldValueInvalid"
+  detail: "must be a valid resource quantity"
+---
+# Test case 32: Container resource limit less than request
+name: "container resource limit less than request"
+modifications:
+  "spec.containers[0].resources.requests.memory": "2Gi"
+  "spec.containers[0].resources.limits.memory": "1Gi"
+expectedErrors:
+- field: "spec.containers[0].resources.limits.memory"
+  type: "FieldValueInvalid"
+  detail: "must be greater than or equal to request"
+---
+# Test case 33: Invalid container lifecycle handler
+name: "invalid container lifecycle handler"
+modifications:
+  "spec.containers[0].lifecycle.postStart.exec.command": []
+expectedErrors:
+- field: "spec.containers[0].lifecycle.postStart.exec.command"
+  type: "FieldValueRequired"
+  detail: "command cannot be empty"
+---
+# Test case 34: Invalid container probe handler
+name: "invalid container probe handler"
+modifications:
+  "spec.containers[0].livenessProbe.httpGet.port": -1
+expectedErrors:
+- field: "spec.containers[0].livenessProbe.httpGet.port"
+  type: "FieldValueInvalid"
+  detail: "must be between 1 and 65535, inclusive"
+---
+# Test case 35: Invalid container security context capabilities
+name: "invalid container security context capabilities"
+modifications:
+  "spec.containers[0].securityContext.capabilities.add[0]": "INVALID_CAP"
+expectedErrors:
+- field: "spec.containers[0].securityContext.capabilities.add[0]"
+  type: "FieldValueInvalid"
+  detail: "capability must be a valid POSIX capability"
+---
+# Test case 36: Invalid container security context privileged
+name: "invalid container security context privileged with non-root user"
+modifications:
+  "spec.containers[0].securityContext.privileged": true
+  "spec.containers[0].securityContext.runAsNonRoot": true
+expectedErrors:
+- field: "spec.containers[0].securityContext.privileged"
+  type: "FieldValueInvalid"
+  detail: "cannot set privileged and runAsNonRoot"
+---
+# Test case 37: Invalid container environment variable
+name: "invalid container environment variable"
+modifications:
+  "spec.containers[0].env[0].name": "INVALID=NAME"
+  "spec.containers[0].env[0].value": "value"
+expectedErrors:
+- field: "spec.containers[0].env[0].name"
+  type: "FieldValueInvalid"
+  detail: "a valid environment variable name must consist of alphabetic characters, digits, '_', '-', or '.'"
+---
+# Test case 38: Invalid container volume mount path
+name: "invalid container volume mount path"
+modifications:
+  "spec.containers[0].volumeMounts[0].name": "vol"
+  "spec.containers[0].volumeMounts[0].mountPath": ""
+expectedErrors:
+- field: "spec.containers[0].volumeMounts[0].mountPath"
+  type: "FieldValueRequired"
+  detail: "must be an absolute path"
+---
+# Test case 39: Duplicate container volume mount path
+name: "duplicate container volume mount path"
+modifications:
+  "spec.containers[0].volumeMounts[0].name": "vol1"
+  "spec.containers[0].volumeMounts[0].mountPath": "/path"
+  "spec.containers[0].volumeMounts[1].name": "vol2"
+  "spec.containers[0].volumeMounts[1].mountPath": "/path"
+expectedErrors:
+- field: "spec.containers[0].volumeMounts[1].mountPath"
+  type: "FieldValueInvalid"
+  detail: "must be unique"
+---
+# Test case 40: Invalid container image pull policy
+name: "invalid container image pull policy"
+modifications:
+  "spec.containers[0].imagePullPolicy": "InvalidPolicy"
+expectedErrors:
+- field: "spec.containers[0].imagePullPolicy"
+  type: "FieldValueInvalid"
+  detail: "not a valid image pull policy"
+---
+# Test case 41: Invalid container termination message policy
+name: "invalid container termination message policy"
+modifications:
+  "spec.containers[0].terminationMessagePolicy": "InvalidPolicy"
+expectedErrors:
+- field: "spec.containers[0].terminationMessagePolicy"
+  type: "FieldValueInvalid"
+  detail: "not a valid termination message policy"
+---
+# Test case 42: Invalid volume name
+name: "invalid volume name"
+modifications:
+  "spec.volumes[0].name": "INVALID_NAME!"
+  "spec.volumes[0].emptyDir": {}
+expectedErrors:
+- field: "spec.volumes[0].name"
+  type: "FieldValueInvalid"
+  detail: "a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character"
+---
+# Test case 43: Duplicate volume names
+name: "duplicate volume names"
+modifications:
+  "spec.volumes[0].name": "vol"
+  "spec.volumes[0].emptyDir": {}
+  "spec.volumes[1].name": "vol"
+  "spec.volumes[1].emptyDir": {}
+expectedErrors:
+- field: "spec.volumes[1].name"
+  type: "FieldValueDuplicate"
+  detail: "duplicate volume name"
+---
+# Test case 44: Invalid hostPath volume type
+name: "invalid hostPath volume type"
+modifications:
+  "spec.volumes[0].name": "vol"
+  "spec.volumes[0].hostPath.path": "/foo"
+  "spec.volumes[0].hostPath.type": "InvalidType"
+expectedErrors:
+- field: "spec.volumes[0].hostPath.type"
+  type: "FieldValueInvalid"
+  detail: "not a valid host path type"
+---
+# Test case 45: Invalid persistent volume claim name
+name: "invalid persistent volume claim name"
+modifications:
+  "spec.volumes[0].name": "vol"
+  "spec.volumes[0].persistentVolumeClaim.claimName": "INVALID_NAME!"
+expectedErrors:
+- field: "spec.volumes[0].persistentVolumeClaim.claimName"
+  type: "FieldValueInvalid"
+  detail: "a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character"
+---
+# Test case 46: Invalid projected volume sources
+name: "invalid projected volume sources"
+modifications:
+  "spec.volumes[0].name": "vol"
+  "spec.volumes[0].projected.sources": []
+expectedErrors:
+- field: "spec.volumes[0].projected.sources"
+  type: "FieldValueRequired"
+  detail: "must specify at least one volume source"
+---
+# Test case 47: Invalid scheduling gates
+name: "invalid scheduling gates"
+modifications:
+  "spec.schedulingGates[0].name": "INVALID_NAME!"
+expectedErrors:
+- field: "spec.schedulingGates[0].name"
+  type: "FieldValueInvalid"
+  detail: "a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character"
+---
+# Test case 48: Invalid topology spread constraint
+name: "invalid topology spread constraint"
+modifications:
+  "spec.topologySpreadConstraints[0].maxSkew": 0
+  "spec.topologySpreadConstraints[0].topologyKey": "zone"
+  "spec.topologySpreadConstraints[0].whenUnsatisfiable": "InvalidAction"
+expectedErrors:
+- field: "spec.topologySpreadConstraints[0].whenUnsatisfiable"
+  type: "FieldValueInvalid"
+  detail: "not a valid topology spread constraint action"
+---
+# Test case 49: Invalid node selector requirement operator
+name: "invalid node selector requirement operator"
+modifications:
+  "spec.nodeSelector": {"key": "value"}
+  "spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions": [{
+    "key": "key",
+    "operator": "InvalidOp",
+    "values": ["value"]
+  }]
+expectedErrors:
+- field: "spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator"
+  type: "FieldValueInvalid"
+  detail: "not a valid node selector operator"
+---
+# Test case 50: Invalid readiness gate condition type
+name: "invalid readiness gate condition type"
+modifications:
+  "spec.readinessGates": [{"conditionType": "INVALID_TYPE!"}]
+expectedErrors:
+- field: "spec.readinessGates[0].conditionType"
+  type: "FieldValueInvalid"
+  detail: "must be a valid condition type" 

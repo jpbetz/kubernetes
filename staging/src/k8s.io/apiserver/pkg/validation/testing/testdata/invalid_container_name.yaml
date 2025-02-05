@@ -9,8 +9,10 @@ spec:
     image: test-image
 ---
 name: invalid container name
-modifications:
-  spec.containers[0].name: "invalid.container.name"
+applyConfiguration:
+  spec:
+    containers:
+    - name: "invalid.container.name"
 expectedErrors:
 - field: spec.containers[0].name
   type: FieldValueInvalid

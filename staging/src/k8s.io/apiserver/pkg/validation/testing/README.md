@@ -21,12 +21,16 @@ spec:
 # Test Case 1
 name: invalid container name
 description: Container name must be a valid DNS label
-modifications:
-"spec.containers[0].name": "invalid.container.name"
+applyConfiguration:
+  apiVersion: v1
+  kind: Pod
+  spec:
+    containers:
+    - name: "invalid.container.name"
 expectedErrors:
-field: "spec.containers[0].name"
-type: "FieldValueInvalid"
-detail: "must be a valid DNS label"
+- field: spec.containers[0].name
+  type: FieldValueInvalid
+  detail: must be a valid DNS label
 ```
 
 2. Use the framework in your tests:
@@ -53,8 +57,31 @@ Each test case in the YAML file can include:
 - `name`: Name of the test case
 - `description`: Optional description
 - `skip`: Optional boolean to skip the test
-- `modifications`: Map of field paths to new values
+- `applyConfiguration`: Partial object to be applied as a patch using server-side apply semantics
 - `expectedErrors`: List of expected validation errors
+
+## Apply Configurations
+
+Apply configurations use server-side apply semantics to modify the base object. They should:
+
+1. Include the apiVersion and kind matching the base object
+2. Only include the fields that need to be modified
+3. Use the same structure as the original object
+
+Example apply configuration:
+```yaml
+applyConfiguration:
+  apiVersion: v1
+  kind: Pod
+  spec:
+    containers:
+    - name: "new-name"
+      resources:
+        limits:
+          memory: "256Mi"
+```
+
+This will modify only the container name and memory limit while preserving all other fields.
 
 ## Field Paths
 

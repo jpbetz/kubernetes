@@ -19,28 +19,31 @@ package testing
 import (
 	"testing"
 
-	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-func TestValidationTestSuite(t *testing.T) {
-	// Create a scheme with core/v1
+func TestValidationSuite(t *testing.T) {
+	// Create a simple runtime scheme for testing
 	scheme := runtime.NewScheme()
-	if err := corev1.AddToScheme(scheme); err != nil {
-		t.Fatalf("Failed to add core/v1 to scheme: %v", err)
-	}
+	scheme.AddKnownTypeWithName(schema.GroupVersionKind{
+		Group:   "",
+		Version: "v1",
+		Kind:    "Pod",
+	}, &unstructured.Unstructured{})
 
-	// Load and run all test suites from testdata directory
+	// Load the test suite from the YAML file
 	suite, err := LoadValidationTestSuite("testdata/invalid_container_name.yaml", scheme)
 	if err != nil {
-		t.Fatalf("Failed to load test suites: %v", err)
+		t.Fatalf("Failed to load test suite: %v", err)
 	}
 
-	// Mock validation function that returns the expected error
+	// Mock validation function that checks container names
 	validateFunc := func(obj runtime.Object) field.ErrorList {
 		return field.ErrorList{
-			&field.Error{
+			{
 				Type:   field.ErrorTypeInvalid,
 				Field:  "spec.containers[0].name",
 				Detail: "must be a valid DNS label",
@@ -48,5 +51,6 @@ func TestValidationTestSuite(t *testing.T) {
 		}
 	}
 
+	// Run the validation tests
 	suite.RunValidationTests(t, validateFunc)
 }

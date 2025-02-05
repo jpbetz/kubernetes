@@ -19,15 +19,23 @@ package testing
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"os"
 	"testing"
+	"time"
 
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/managedfields"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/util/yaml"
+	"k8s.io/apiserver/pkg/admission/plugin/policy/mutating/patch"
+	openapitest "k8s.io/client-go/openapi/openapitest"
 )
 
 // TestCase represents a single validation test case defined in YAML
@@ -35,8 +43,8 @@ type TestCase struct {
 	// Name of the test case
 	Name string `json:"name"`
 
-	// Modifications is a map of field paths to their new values
-	Modifications map[string]interface{} `json:"modifications"`
+	// ApplyConfiguration is the partial object to be applied as a patch
+	ApplyConfiguration map[string]interface{} `json:"applyConfiguration"`
 
 	// ExpectedErrors is a list of expected validation errors
 	ExpectedErrors []ExpectedError `json:"expectedErrors"`
@@ -61,6 +69,9 @@ type ValidationTestSuite struct {
 
 	// TestCases are the individual test cases
 	TestCases []TestCase
+
+	// TypeConverter is used for structured merge diff operations
+	TypeConverter managedfields.TypeConverter
 }
 
 // MockAPIResource is a minimal API resource type for testing
@@ -77,7 +88,6 @@ func (r *TestResource) DeepCopyObject() runtime.Object {
 }
 
 // LoadValidationTestSuite loads a test suite from a YAML file
-
 func LoadValidationTestSuite(path string, scheme *runtime.Scheme) (*ValidationTestSuite, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -98,6 +108,22 @@ func LoadValidationTestSuite(path string, scheme *runtime.Scheme) (*ValidationTe
 		return nil, fmt.Errorf("failed to parse base object: %v", err)
 	}
 
+	// Create type converter
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	tcManager := patch.NewTypeConverterManager(nil, openapitest.NewEmbeddedFileClient())
+	go tcManager.Run(ctx)
+
+	err = wait.PollUntilContextTimeout(ctx, 100*time.Millisecond, time.Second, true, func(context.Context) (done bool, err error) {
+		converter := tcManager.GetTypeConverter(baseObj.GetObjectKind().GroupVersionKind())
+		return converter != nil, nil
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to create type converter: %v", err)
+	}
+	typeConverter := tcManager.GetTypeConverter(baseObj.GetObjectKind().GroupVersionKind())
+
 	// Read remaining documents as test cases
 	var testCases []TestCase
 	for {
@@ -113,6 +139,7 @@ func LoadValidationTestSuite(path string, scheme *runtime.Scheme) (*ValidationTe
 		if err := yaml.Unmarshal(doc, &tc); err != nil {
 			return nil, fmt.Errorf("failed to parse test case: %v", err)
 		}
+
 		testCases = append(testCases, tc)
 	}
 
@@ -121,8 +148,9 @@ func LoadValidationTestSuite(path string, scheme *runtime.Scheme) (*ValidationTe
 	}
 
 	return &ValidationTestSuite{
-		BaseObject: baseObj,
-		TestCases:  testCases,
+		BaseObject:    baseObj,
+		TestCases:     testCases,
+		TypeConverter: typeConverter,
 	}, nil
 }
 
@@ -133,11 +161,24 @@ func (s *ValidationTestSuite) RunValidationTests(t *testing.T, validateFunc func
 			// Create a copy of the base object
 			testObj := s.BaseObject.DeepCopyObject()
 
-			// Apply modifications
-			for path, value := range tc.Modifications {
-				if err := setNestedField(testObj, path, value); err != nil {
-					t.Fatalf("Failed to modify object: %v", err)
+			if tc.ApplyConfiguration != nil {
+				applyConfig := &unstructured.Unstructured{Object: tc.ApplyConfiguration}
+				accessor, err := meta.TypeAccessor(applyConfig)
+				if err != nil {
+					t.Fatalf("Failed to get type accessor: %v", err)
 				}
+
+				// stamp the apply configuration with the base object's group version kind
+				accessor.SetAPIVersion(s.BaseObject.GetObjectKind().GroupVersionKind().GroupVersion().String())
+				accessor.SetKind(s.BaseObject.GetObjectKind().GroupVersionKind().Kind)
+
+				// Apply patch using structured merge diff
+				patchedObj, err := patch.ApplyStructuredMergeDiff(s.TypeConverter, testObj, applyConfig)
+				if err != nil {
+					t.Fatalf("Failed to apply patch: %v", err)
+				}
+
+				testObj = patchedObj
 			}
 
 			// Run validation
