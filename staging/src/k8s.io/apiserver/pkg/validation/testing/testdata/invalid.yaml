@@ -25,3 +25,11 @@ expectedErrors:
 - field: spec.containers[0].name
   type: FieldValueInvalid
   detail: must be a valid DNS label
+---
+name: invalid container name using replace
+replace:
+  "/spec/containers/0/name": "invalid.container.name.with.dots.replace"
+expectedErrors:
+- field: spec.containers[0].name
+  type: FieldValueInvalid
+  detail: must be a valid DNS label

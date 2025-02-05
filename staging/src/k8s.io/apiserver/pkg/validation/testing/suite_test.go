@@ -296,27 +296,3 @@ func TestValidationSuite(t *testing.T) {
 
 	validSuite.RunValidationTests(t, validValidateFunc)
 }
-
-// isDNSLabel returns true if the string is a valid DNS label
-func isDNSLabel(s string) bool {
-	if len(s) == 0 {
-		return false
-	}
-
-	for i, c := range s {
-		switch {
-		case 'a' <= c && c <= 'z':
-			continue
-		case '0' <= c && c <= '9':
-			continue
-		case c == '-':
-			if i == 0 || i == len(s)-1 {
-				return false
-			}
-			continue
-		default:
-			return false
-		}
-	}
-	return true
-}

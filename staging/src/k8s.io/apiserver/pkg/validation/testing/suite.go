@@ -204,12 +204,17 @@ type TestCase struct {
 	Name string `json:"name"`
 
 	// ApplyConfiguration is the partial object to be applied as a patch
-	// Only one of ApplyConfiguration or JSONPatch may be set
+	// Only one of ApplyConfiguration, JSONPatch, or Replace may be set
 	ApplyConfiguration map[string]interface{} `json:"applyConfiguration"`
 
 	// JSONPatch is a list of JSON patch operations to apply
-	// Only one of ApplyConfiguration or JSONPatch may be set
+	// Only one of ApplyConfiguration, JSONPatch, or Replace may be set
 	JSONPatch []map[string]interface{} `json:"jsonPatch"`
+
+	// Replace is a map of JSON paths to values for simple replace operations
+	// Only one of ApplyConfiguration, JSONPatch, or Replace may be set
+	// This is converted to JSONPatch replace operations internally
+	Replace map[string]interface{} `json:"replace"`
 
 	// ExpectedErrors is a list of expected validation errors
 	ExpectedErrors []ExpectedError `json:"expectedErrors"`
@@ -326,9 +331,19 @@ func (s *ValidationTestSuite) RunValidationTests(t *testing.T, validateFunc func
 			// Create a copy of the base object
 			testObj := s.BaseObject.DeepCopyObject()
 
-			// Validate that only one of ApplyConfiguration or JSONPatch is set
-			if tc.ApplyConfiguration != nil && tc.JSONPatch != nil {
-				t.Fatalf("Test case %s cannot have both ApplyConfiguration and JSONPatch set", tc.Name)
+			// Validate that only one of ApplyConfiguration, JSONPatch, or Replace is set
+			setFields := 0
+			if tc.ApplyConfiguration != nil {
+				setFields++
+			}
+			if tc.JSONPatch != nil {
+				setFields++
+			}
+			if tc.Replace != nil {
+				setFields++
+			}
+			if setFields > 1 {
+				t.Fatalf("Test case %s can only have one of ApplyConfiguration, JSONPatch, or Replace set", tc.Name)
 			}
 
 			if tc.ApplyConfiguration != nil {
@@ -351,17 +366,34 @@ func (s *ValidationTestSuite) RunValidationTests(t *testing.T, validateFunc func
 				testObj = patchedObj
 			}
 
-			if tc.JSONPatch != nil {
+			if tc.JSONPatch != nil || tc.Replace != nil {
 				// Convert test object to JSON
 				originalJSON, err := runtime.Encode(unstructured.UnstructuredJSONScheme, testObj)
 				if err != nil {
 					t.Fatalf("Failed to encode test object to JSON: %v", err)
 				}
 
-				// Convert JSONPatch to JSON
-				patchJSON, err := json.Marshal(tc.JSONPatch)
-				if err != nil {
-					t.Fatalf("Failed to marshal JSON patch: %v", err)
+				var patchJSON []byte
+				if tc.JSONPatch != nil {
+					// Convert JSONPatch to JSON
+					patchJSON, err = json.Marshal(tc.JSONPatch)
+					if err != nil {
+						t.Fatalf("Failed to marshal JSON patch: %v", err)
+					}
+				} else {
+					// Convert Replace map to JSONPatch operations
+					var patchOps []map[string]interface{}
+					for path, value := range tc.Replace {
+						patchOps = append(patchOps, map[string]interface{}{
+							"op":    "replace",
+							"path":  path,
+							"value": value,
+						})
+					}
+					patchJSON, err = json.Marshal(patchOps)
+					if err != nil {
+						t.Fatalf("Failed to marshal Replace operations to JSON patch: %v", err)
+					}
 				}
 
 				// Parse the patch

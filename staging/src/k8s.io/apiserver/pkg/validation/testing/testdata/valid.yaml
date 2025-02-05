@@ -16,4 +16,8 @@ applyConfiguration:
 ---
 name: valid container name using json patch
 jsonPatch:
-- { "op": "replace", "path": "/spec/containers/0/name", "value": "valid-container-name-2" } 
+- { "op": "replace", "path": "/spec/containers/0/name", "value": "valid-container-name-2" }
+---
+name: valid container name using replace
+replace:
+  "/spec/containers/0/name": "valid-container-name-3" 
