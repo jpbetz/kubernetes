@@ -324,7 +324,11 @@ func (s *ValidationTestSuite) RunValidationTests(t *testing.T, validateFunc func
 	for _, tc := range s.TestCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			// Create a copy of the base object
-			testObj := s.BaseObject.DeepCopyObject()
+			u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(s.BaseObject)
+			if err != nil {
+				t.Fatalf("Failed to convert base object to unstructured: %v", err)
+			}
+			var testObj runtime.Object = &unstructured.Unstructured{Object: u}
 
 			// Validate that only one of ApplyConfiguration, JSONPatch, or Replace is set
 			setFields := 0
@@ -419,4 +423,63 @@ func (s *ValidationTestSuite) RunValidationTests(t *testing.T, validateFunc func
 			validateErrors(t, tc.ExpectedErrors, actualErrors)
 		})
 	}
+}
+
+// NewValidationTestSuite creates a new test suite with the given base object
+func NewValidationTestSuite(baseObject runtime.Object) *ValidationTestSuite {
+	return &ValidationTestSuite{
+		BaseObject:    baseObject,
+		TestCases:     []TestCase{},
+		TypeConverter: nil, // Will be initialized on first use
+	}
+}
+
+// AddTestCase adds a new test case to the suite
+func (s *ValidationTestSuite) AddTestCase(name string) *TestCaseBuilder {
+	tc := TestCase{
+		Name: name,
+	}
+	s.TestCases = append(s.TestCases, tc)
+	return &TestCaseBuilder{
+		testCase: &s.TestCases[len(s.TestCases)-1],
+	}
+}
+
+// TestCaseBuilder provides a fluent interface for building test cases
+type TestCaseBuilder struct {
+	testCase *TestCase
+}
+
+// WithReplace adds field replacements to the test case
+func (b *TestCaseBuilder) WithReplace(replacements map[string]interface{}) *TestCaseBuilder {
+	b.testCase.Replace = replacements
+	return b
+}
+
+// WithJSONPatch adds JSON patch operations to the test case
+func (b *TestCaseBuilder) WithJSONPatch(patches []map[string]interface{}) *TestCaseBuilder {
+	b.testCase.JSONPatch = patches
+	return b
+}
+
+// WithApplyConfiguration adds an apply configuration to the test case
+func (b *TestCaseBuilder) WithApplyConfiguration(config map[string]interface{}) *TestCaseBuilder {
+	b.testCase.ApplyConfiguration = config
+	return b
+}
+
+// ExpectError adds an expected validation error
+func (b *TestCaseBuilder) ExpectError(field, errType, detail string) *TestCaseBuilder {
+	b.testCase.ExpectedErrors = append(b.testCase.ExpectedErrors, ExpectedError{
+		Field:  field,
+		Type:   errType,
+		Detail: detail,
+	})
+	return b
+}
+
+// ExpectNoErrors indicates that no validation errors are expected
+func (b *TestCaseBuilder) ExpectNoErrors() *TestCaseBuilder {
+	b.testCase.ExpectedErrors = []ExpectedError{}
+	return b
 }

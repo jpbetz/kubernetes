@@ -47,12 +47,11 @@ func NewStaticTypeConverterProvider(client openapi.Client) (TypeConverterProvide
 
 	// Process all paths and create type converters
 	for path, entry := range paths {
-		if !strings.HasPrefix(path, "/") {
-			path = "/" + path
-		}
-		if !strings.HasPrefix(path, "/apis/") && !strings.HasPrefix(path, "/api/") {
+		if !strings.HasPrefix(path, "apis/") && !strings.HasPrefix(path, "api/") {
 			continue
 		}
+		path = strings.TrimPrefix(path, "apis/")
+		path = strings.TrimPrefix(path, "api/")
 
 		gv, err := schema.ParseGroupVersion(path)
 		if err != nil {

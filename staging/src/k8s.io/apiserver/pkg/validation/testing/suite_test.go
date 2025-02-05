@@ -172,3 +172,39 @@ func TestValidationSuite(t *testing.T) {
 	}
 	validSuite.RunValidationTests(t, validValidateFunc)
 }
+
+func TestValidationSuiteWithDataLiterals(t *testing.T) {
+	// Create a base test object
+	baseObject := &TestObject{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "v1",
+			Kind:       "TestObject",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "test",
+		},
+		Spec: TestSpec{
+			StringField: "test",
+			IntField:    42,
+		},
+	}
+
+	// Create a new test suite
+	suite := NewValidationTestSuite(baseObject)
+
+	// Add test cases using the fluent builder interface
+	suite.AddTestCase("invalid string field").
+		WithReplace(map[string]interface{}{
+			"/spec/stringField": "invalid",
+		}).
+		ExpectError("spec.stringField", "FieldValueInvalid", "must not be 'invalid'")
+
+		// Test invalid cases
+	invalidValidateFunc := func(obj runtime.Object) field.ErrorList {
+		return field.ErrorList{
+			field.Invalid(field.NewPath("spec", "stringField"), obj, "must not be 'invalid'"),
+		}
+	}
+	suite.RunValidationTests(t, invalidValidateFunc)
+
+}

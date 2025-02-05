@@ -151,3 +151,69 @@ The framework performs exact matching of validation errors:
 2. Each error's field path must match exactly
 3. Error types must match exactly (except "Unsupported value" which matches any type)
 4. If a detail is specified, it must be contained within the actual error message or vice versa
+
+## Programmatic Test Case Construction
+
+In addition to YAML-based test cases, you can construct test cases programmatically using Go data literals. This approach provides better type safety and IDE support.
+
+### Example
+
+```go
+// Create a base test object
+baseObject := &TestObject{
+    TypeMeta: metav1.TypeMeta{
+        APIVersion: "v1",
+        Kind:       "TestObject",
+    },
+    ObjectMeta: metav1.ObjectMeta{
+        Name: "test",
+    },
+    Spec: TestSpec{
+        StringField: "test",
+        IntField:    42,
+    },
+}
+
+// Create a new test suite
+suite := NewValidationTestSuite(baseObject)
+
+// Add test cases using the fluent builder interface
+suite.AddTestCase("invalid string field").
+    WithReplace(map[string]interface{}{
+        "/spec/stringField": 123, // wrong type
+    }).
+    ExpectError("spec.stringField", "FieldValueInvalid", "must be a string")
+
+suite.AddTestCase("valid string field").
+    WithReplace(map[string]interface{}{
+        "/spec/stringField": "valid-value",
+    }).
+    ExpectNoErrors()
+
+// Run the tests with a validation function
+suite.RunValidationTests(t, validateFunc)
+```
+
+### Builder Methods
+
+The test case builder provides a fluent interface with the following methods:
+
+- `WithReplace(map[string]interface{})`: Add field replacements
+- `WithJSONPatch([]map[string]interface{})`: Add JSON patch operations
+- `WithApplyConfiguration(map[string]interface{})`: Add apply configuration
+- `ExpectError(field, errType, detail string)`: Add an expected validation error
+- `ExpectNoErrors()`: Indicate that no validation errors are expected
+
+Each method returns the builder, allowing method chaining for a concise and readable test definition.
+
+### Choosing Between YAML and Programmatic Approaches
+
+- Use YAML-based tests when:
+  - Test cases are primarily data-driven
+  - Tests need to be easily readable by non-developers
+  - Test data needs to be maintained separately from code
+
+- Use programmatic tests when:
+  - Test cases involve complex logic or transformations
+  - Type safety and IDE support are important
+  - Tests are tightly coupled with the code being tested
