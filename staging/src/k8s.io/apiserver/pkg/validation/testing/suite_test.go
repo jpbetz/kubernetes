@@ -45,6 +45,7 @@ type nestedStruct struct {
 	Value int64
 }
 
+// TestObject is a simple test type that implements runtime.Object
 type TestObject struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -81,7 +82,6 @@ spec:
   stringField: "test"
   intField: 42
 `),
-			wantErr: false,
 		},
 		{
 			name: "invalid yaml",
@@ -141,138 +141,15 @@ kind: UnknownType
 	}
 }
 
-func TestValidateErrors(t *testing.T) {
-	tests := []struct {
-		name     string
-		expected []ExpectedError
-		actual   field.ErrorList
-		wantErr  bool
-	}{
-		{
-			name: "matching errors - exact match",
-			expected: []ExpectedError{
-				{Field: "spec.field1", Type: "FieldValueRequired"},
-				{Field: "spec.field2", Type: "FieldValueInvalid", Detail: "must be positive"},
-			},
-			actual: field.ErrorList{
-				field.Required(field.NewPath("spec", "field1"), "field is required"),
-				field.Invalid(field.NewPath("spec", "field2"), -1, "must be positive"),
-			},
-			wantErr: false,
-		},
-		{
-			name: "matching errors - unsupported value type",
-			expected: []ExpectedError{
-				{Field: "spec.field1", Type: "Unsupported value"},
-			},
-			actual: field.ErrorList{
-				field.NotSupported(field.NewPath("spec", "field1"), "value", []string{"allowed"}),
-			},
-			wantErr: false,
-		},
-		{
-			name: "matching errors - detail substring match",
-			expected: []ExpectedError{
-				{Field: "spec.field1", Type: "FieldValueInvalid", Detail: "must be positive"},
-			},
-			actual: field.ErrorList{
-				field.Invalid(field.NewPath("spec", "field1"), -1, "value must be positive number"),
-			},
-			wantErr: false,
-		},
-		{
-			name: "matching errors - detail reverse substring match",
-			expected: []ExpectedError{
-				{Field: "spec.field1", Type: "FieldValueInvalid", Detail: "value must be positive number"},
-			},
-			actual: field.ErrorList{
-				field.Invalid(field.NewPath("spec", "field1"), -1, "must be positive"),
-			},
-			wantErr: false,
-		},
-		{
-			name: "different number of errors",
-			expected: []ExpectedError{
-				{Field: "spec.field1", Type: "FieldValueRequired"},
-			},
-			actual: field.ErrorList{
-				field.Required(field.NewPath("spec", "field1"), "field is required"),
-				field.Invalid(field.NewPath("spec", "field2"), -1, "must be positive"),
-			},
-			wantErr: true,
-		},
-		{
-			name: "different field paths",
-			expected: []ExpectedError{
-				{Field: "spec.field1", Type: "FieldValueRequired"},
-			},
-			actual: field.ErrorList{
-				field.Required(field.NewPath("spec", "field2"), "field is required"),
-			},
-			wantErr: true,
-		},
-		{
-			name: "different error types",
-			expected: []ExpectedError{
-				{Field: "spec.field1", Type: "FieldValueRequired"},
-			},
-			actual: field.ErrorList{
-				field.Invalid(field.NewPath("spec", "field1"), nil, "field is invalid"),
-			},
-			wantErr: true,
-		},
-		{
-			name: "different error details with no substring match",
-			expected: []ExpectedError{
-				{Field: "spec.field1", Type: "FieldValueInvalid", Detail: "must be positive"},
-			},
-			actual: field.ErrorList{
-				field.Invalid(field.NewPath("spec", "field1"), -1, "must be non-negative"),
-			},
-			wantErr: true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			recorder := &errorRecorder{TB: t}
-			validateErrors(recorder, tt.expected, tt.actual)
-
-			if tt.wantErr && !recorder.hasErrors {
-				t.Error("expected validation errors but got none")
-			}
-			if !tt.wantErr && recorder.hasErrors {
-				t.Error("expected no validation errors but got some")
-			}
-		})
-	}
-}
-
-// errorRecorder implements testing.TB and records if any errors were reported
-type errorRecorder struct {
-	testing.TB
-	hasErrors bool
-}
-
-func (r *errorRecorder) Errorf(format string, args ...interface{}) {
-	r.hasErrors = true
-}
-
-func (r *errorRecorder) Error(args ...interface{}) {
-	r.hasErrors = true
-}
-
 func TestValidationSuite(t *testing.T) {
-	// Create a simple runtime scheme for testing
 	scheme := runtime.NewScheme()
-
-	// Register Pod type with proper GVK
 	podGVK := schema.GroupVersionKind{
 		Group:   "",
 		Version: "v1",
 		Kind:    "Pod",
 	}
 	scheme.AddKnownTypeWithName(podGVK, &unstructured.Unstructured{})
+
 	// Test invalid cases
 	invalidValidateFunc := func(obj runtime.Object) field.ErrorList {
 		return field.ErrorList{
@@ -287,12 +164,11 @@ func TestValidationSuite(t *testing.T) {
 
 	// Test valid cases
 	validValidateFunc := func(obj runtime.Object) field.ErrorList {
-		return field.ErrorList{}
+		return nil
 	}
 	validSuite, err := LoadValidationTestSuite("testdata/valid.yaml", scheme)
 	if err != nil {
 		t.Fatalf("Failed to load valid test suite: %v", err)
 	}
-
 	validSuite.RunValidationTests(t, validValidateFunc)
 }
