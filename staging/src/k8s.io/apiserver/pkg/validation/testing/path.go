@@ -36,13 +36,18 @@ func FieldPathToJSONPointer(fieldPath string) (string, error) {
 	var result strings.Builder
 	for _, part := range parts {
 		// Handle array index notation [n]
-		if strings.Contains(part, "[") && strings.HasSuffix(part, "]") {
-			base := part[:strings.Index(part, "[")]
-			indexStr := strings.TrimSuffix(strings.TrimPrefix(part[strings.Index(part, "["):], "["), "]")
-			result.WriteString("/")
-			result.WriteString(base)
-			result.WriteString("/")
-			result.WriteString(indexStr)
+		if base, remaining, ok := strings.Cut(part, "["); ok {
+			if indexStr, trailing, ok := strings.Cut(remaining, "]"); ok {
+				if len(trailing) > 0 {
+					return "", fmt.Errorf("invalid array index in field path: %s", part)
+				}
+				result.WriteString("/")
+				result.WriteString(base)
+				result.WriteString("/")
+				result.WriteString(indexStr)
+			} else {
+				return "", fmt.Errorf("invalid array index in field path: %s", part)
+			}
 		} else {
 			result.WriteString("/")
 			result.WriteString(part)

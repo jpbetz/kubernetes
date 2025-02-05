@@ -18,44 +18,36 @@ spec:
     - name: test-container
       image: test-image
 ---
-# Test Case 1 - Field can be omitted when using single Replace
+# Test case 1
 name: invalid container name
 replace:
   "spec.containers[0].name": "invalid.container.name"
 expectedErrors:
 - type: FieldValueInvalid
-  detail: must be a valid DNS label  # detail is optional
----
-# Test Case 2 - Field can be explicitly specified
-name: invalid container name with explicit field
-replace:
-  "spec.containers[0].name": "invalid.container.name"
-expectedErrors:
-- field: spec.containers[0].name
-  type: FieldValueInvalid
   detail: must be a valid DNS label
 ---
-# Test Case 3
-name: valid container name
-replace:
-  "spec.containers[0].name": "valid-container-name"
-expectedErrors: []  # no errors expected
+# Test case 2
+# ...
 ```
 
 2. Use the framework in your tests:
 
 ```go
 func TestPodValidation(t testing.T) {
+	// Register any needed schemes
     scheme := runtime.NewScheme()
     corev1.AddToScheme(scheme)
-    suite, err := LoadValidationTestSuite("testdata/pod_validation_test.yaml", scheme)
+	// Load the test cases
+    suite, err := LoadValidationTestSuite("testdata/pod_validations.yaml", scheme)
     if err != nil {
         t.Fatalf("Failed to load test suite: %v", err)
     }
-    suite.RunValidationTests(t, func(obj runtime.Object) field.ErrorList {      
-        pod := obj.(corev1.Pod)
-        return validation.ValidatePod(pod)
-    })
+    // Run the tests against the appropriate validation implementation
+    suite.RunValidationTests(t, func(obj runtime.Object) field.ErrorList {
+      pod := obj.(*corev1.Pod)
+      opts := // ...
+      return corevalidation.ValidatePodCreate(pod, opts)
+  })
 }
 ```
 
@@ -73,10 +65,14 @@ Each test case in the YAML file can include:
 
 - `name`: Name of the test case (required)
 - One of the following modification methods (required):
-  - `replace`: Map of JSON paths to values for simple replacements
+  - `replace`: Map of field paths to values for simple replacements
   - `jsonPatch`: List of JSON patch operations to apply
   - `applyConfiguration`: Partial object to be applied as a patch using server-side apply semantics
-- `expectedErrors`: List of expected validation errors (required, use empty array for no errors)
+- `expectedErrors`: List of expected validation errors (omit if no errors are expected). If the test
+  case performs a replace of a single field value, the field in the expected error can be omitted,
+  and the framework will automatically use the field from the replace.
+- TODO: Add `expectedDeclarativeErrors` for declarative validation errors. If unset, the 
+  expectedErrors will be used for declarative validation.
 
 ### Expected Errors
 
@@ -84,27 +80,7 @@ Each expected error must specify:
 - `type`: Validation error type (required)
 - `field`: Dot-separated path to the field (optional when using a single Replace field)
 - `detail`: Optional error message detail to match
-
-When using a single `replace` field, the `field` in `expectedErrors` can be omitted. In this case, the framework will automatically use the field from the `replace` map for any zero-valued `field` in the expected errors. This helps reduce redundancy in test cases.
-
-Example with omitted field:
-```yaml
-replace:
-  "spec.containers[0].name": "invalid-name"
-expectedErrors:
-- type: FieldValueInvalid  # field is automatically set to "spec.containers[0].name"
-  detail: must be a valid DNS label
-```
-
-Example with explicit field:
-```yaml
-replace:
-  "spec.containers[0].name": "invalid-name"
-expectedErrors:
-- field: spec.containers[0].name  # explicitly specified
-  type: FieldValueInvalid
-  detail: must be a valid DNS label
-```
+- TODO: Add containers/prefix matching options for details?
 
 Valid error types:
 - `FieldValueRequired`: A required field is missing
@@ -116,7 +92,7 @@ Valid error types:
 
 ## Modifying the Base Object
 
-There are three ways to modify the base object in test cases. Only one method can be used per test case:
+There are three ways to modify the base object in test cases:
 
 ### 1. Replace
 
@@ -188,61 +164,34 @@ In addition to YAML-based test cases, you can construct test cases programmatica
 ### Example
 
 ```go
-// Create a base test object
-baseObject := &TestObject{
-    TypeMeta: metav1.TypeMeta{
-        APIVersion: "v1",
-        Kind:       "TestObject",
-    },
-    ObjectMeta: metav1.ObjectMeta{
-        Name: "test",
-    },
-    Spec: TestSpec{
-        StringField: "test",
-        IntField:    42,
-    },
-}
-
 // Create a new test suite
-suite := NewValidationTestSuite(baseObject)
+suite := NewValidationTestSuite(&corev1.Pod{...})
+suite.TestCases = []TestCase{
+{
+  Name: "invalid string field",
+  Replace: map[string]interface{}{
+    "spec.stringField": "invalid",
+  },
+  ExpectedErrors: []ExpectedError{
+    {Type: "FieldValueInvalid", Detail: "must not be 'invalid'"},
+  },
+},
 
-// Add test cases using the fluent builder interface
-suite.AddTestCase("invalid string field").
-    WithReplace(map[string]interface{}{
-        "/spec/stringField": 123, // wrong type
-    }).
-    ExpectError("spec.stringField", "FieldValueInvalid", "must be a string")
-
-suite.AddTestCase("valid string field").
-    WithReplace(map[string]interface{}{
-        "/spec/stringField": "valid-value",
-    }).
-    ExpectNoErrors()
-
-// Run the tests with a validation function
-suite.RunValidationTests(t, validateFunc)
+// Run the tests against the appropriate validation implementation
+suite.RunValidationTests(t, func(obj runtime.Object) field.ErrorList {
+  pod := obj.(*corev1.Pod)
+  opts := // ...
+  return corevalidation.ValidatePodCreate(pod, opts)
+})
 ```
 
-### Builder Methods
+### TODO
 
-The test case builder provides a fluent interface with the following methods:
-
-- `WithReplace(map[string]interface{})`: Add field replacements
-- `WithJSONPatch([]map[string]interface{})`: Add JSON patch operations
-- `WithApplyConfiguration(map[string]interface{})`: Add apply configuration
-- `ExpectError(field, errType, detail string)`: Add an expected validation error
-- `ExpectNoErrors()`: Indicate that no validation errors are expected
-
-Each method returns the builder, allowing method chaining for a concise and readable test definition.
-
-### Choosing Between YAML and Programmatic Approaches
-
-- Use YAML-based tests when:
-  - Test cases are primarily data-driven
-  - Tests need to be easily readable by non-developers
-  - Test data needs to be maintained separately from code
-
-- Use programmatic tests when:
-  - Test cases involve complex logic or transformations
-  - Type safety and IDE support are important
-  - Tests are tightly coupled with the code being tested
+- Add update validation support
+  - sometimes the baseObject is a reasonable oldObject
+  - sometimes we need to do 2 sets of modifications of the base object, one set to prepare the old object
+    and another to prepare the new object
+- Make opts configuration easy to do from test cases
+- Add support for validating declarative validation
+  - Allow declarative validation errors to be different from handwritten validation errors
+  - Make it easy to know if a test case is covered by declarative validation or not

@@ -17,6 +17,7 @@ limitations under the License.
 package testing
 
 import (
+	"strings"
 	"testing"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -25,41 +26,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
-
-type testStruct struct {
-	StringField    string
-	IntField       int64
-	BoolField      bool
-	FloatField     float64
-	SliceField     []string
-	MapField       map[string]string
-	NestedStruct   *nestedStruct
-	StringSlice    []string
-	IntSlice       []int64
-	StructSlice    []nestedStruct
-	PtrStructSlice []*nestedStruct
-}
-
-type nestedStruct struct {
-	Name  string
-	Value int64
-}
-
-// TestObject is a simple test type that implements runtime.Object
-type TestObject struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-	Spec              TestSpec `json:"spec,omitempty"`
-}
-
-type TestSpec struct {
-	StringField string `json:"stringField"`
-	IntField    int64  `json:"intField"`
-}
-
-func (t *TestObject) DeepCopyObject() runtime.Object {
-	return nil // not needed for testing
-}
 
 func TestParseObject(t *testing.T) {
 	scheme := runtime.NewScheme()
@@ -119,7 +85,7 @@ kind: UnknownType
 					t.Error("expected error but got none")
 					return
 				}
-				if tt.errContains != "" && !contains(err.Error(), tt.errContains) {
+				if tt.errContains != "" && !strings.Contains(err.Error(), tt.errContains) {
 					t.Errorf("expected error containing %q, got %v", tt.errContains, err)
 				}
 				return

@@ -17,6 +17,7 @@ limitations under the License.
 package testing
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -59,6 +60,18 @@ func TestFieldPathToJSONPointer(t *testing.T) {
 			wantErr:     true,
 			errContains: "field path cannot be empty",
 		},
+		{
+			name:        "invalid array index",
+			fieldPath:   "spec.containers[0",
+			wantErr:     true,
+			errContains: "invalid array index in field path",
+		},
+		{
+			name:        "invalid array index with trailing",
+			fieldPath:   "spec.containers[0]xyz",
+			wantErr:     true,
+			errContains: "invalid array index in field path",
+		},
 	}
 
 	for _, tt := range tests {
@@ -69,7 +82,7 @@ func TestFieldPathToJSONPointer(t *testing.T) {
 					t.Error("expected error but got none")
 					return
 				}
-				if tt.errContains != "" && !contains(err.Error(), tt.errContains) {
+				if tt.errContains != "" && !strings.Contains(err.Error(), tt.errContains) {
 					t.Errorf("expected error containing %q, got %v", tt.errContains, err)
 				}
 				return
