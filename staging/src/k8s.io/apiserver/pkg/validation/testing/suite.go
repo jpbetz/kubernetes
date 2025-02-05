@@ -382,10 +382,15 @@ func (s *ValidationTestSuite) RunValidationTests(t *testing.T, validateFunc func
 				} else {
 					// Convert Replace map to JSONPatch operations
 					var patchOps []map[string]interface{}
-					for path, value := range tc.Replace {
+					for field, value := range tc.Replace {
+						// Convert Kubernetes field path to JSON pointer
+						jsonPath, err := FieldPathToJSONPointer(field)
+						if err != nil {
+							t.Fatalf("Failed to convert field path %q to JSON pointer: %v", field, err)
+						}
 						patchOps = append(patchOps, map[string]interface{}{
 							"op":    "replace",
-							"path":  path,
+							"path":  jsonPath,
 							"value": value,
 						})
 					}
@@ -432,68 +437,4 @@ func NewValidationTestSuite(baseObject runtime.Object) *ValidationTestSuite {
 		TestCases:     []TestCase{},
 		TypeConverter: nil, // Will be initialized on first use
 	}
-}
-
-// AddTestCase adds a new test case to the suite
-func (s *ValidationTestSuite) AddTestCase(name string) *TestCaseBuilder {
-	tc := TestCase{
-		Name: name,
-	}
-	s.TestCases = append(s.TestCases, tc)
-	return &TestCaseBuilder{
-		testCase: &s.TestCases[len(s.TestCases)-1],
-	}
-}
-
-// TestCaseBuilder provides a fluent interface for building test cases
-type TestCaseBuilder struct {
-	testCase *TestCase
-}
-
-// WithReplace adds field replacements to the test case
-func (b *TestCaseBuilder) WithReplace(field string, value interface{}) *TestCaseBuilder {
-	if b.testCase.Replace == nil {
-		b.testCase.Replace = make(map[string]interface{})
-	}
-	b.testCase.Replace[field] = value
-	return b
-}
-
-// WithJSONPatch adds JSON patch operations to the test case
-func (b *TestCaseBuilder) WithJSONPatch(patches []map[string]interface{}) *TestCaseBuilder {
-	b.testCase.JSONPatch = patches
-	return b
-}
-
-// WithApplyConfiguration adds an apply configuration to the test case
-func (b *TestCaseBuilder) WithApplyConfiguration(config map[string]interface{}) *TestCaseBuilder {
-	b.testCase.ApplyConfiguration = config
-	return b
-}
-
-// ExpectError adds an expected validation error
-func (b *TestCaseBuilder) ExpectError(field, errType, detail string) *TestCaseBuilder {
-	b.testCase.ExpectedErrors = append(b.testCase.ExpectedErrors, ExpectedError{
-		Field:  field,
-		Type:   errType,
-		Detail: detail,
-	})
-	return b
-}
-
-// ExpectNoErrors indicates that no validation errors are expected
-func (b *TestCaseBuilder) ExpectNoErrors() *TestCaseBuilder {
-	b.testCase.ExpectedErrors = []ExpectedError{}
-	return b
-}
-
-// ReplaceExpectError is a convenience method that combines WithReplace and ExpectError.
-// It takes a field path in Kubernetes notation (e.g. spec.containers[0].name), a replacement value,
-// and the expected error type and detail for that path.
-func (b *TestCaseBuilder) ReplaceExpectError(fieldPath string, value interface{}, errType, errDetail string) *TestCaseBuilder {
-	jsonPath, err := FieldPathToJSONPointer(fieldPath)
-	if err != nil {
-		panic(fmt.Sprintf("invalid field path %q: %v", fieldPath, err))
-	}
-	return b.WithReplace(jsonPath, value).ExpectError(fieldPath, errType, errDetail)
 }

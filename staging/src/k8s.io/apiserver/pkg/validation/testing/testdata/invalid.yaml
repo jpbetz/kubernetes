@@ -28,7 +28,7 @@ expectedErrors:
 ---
 name: invalid container name using replace
 replace:
-  "/spec/containers/0/name": "invalid.container.name.with.dots.replace"
+  "spec.containers[0].name": "invalid.container.name.with.dots.replace"
 expectedErrors:
 - field: spec.containers[0].name
   type: FieldValueInvalid

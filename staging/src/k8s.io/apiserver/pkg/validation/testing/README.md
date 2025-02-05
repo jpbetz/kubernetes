@@ -91,12 +91,12 @@ There are three ways to modify the base object in test cases. Only one method ca
 
 ### 1. Replace
 
-Replace provides a simpler syntax for straightforward field replacements. It's internally converted to JSON patch operations:
+Replace provides a simpler syntax for straightforward field replacements. It uses Kubernetes field path notation (e.g. spec.containers[0].name):
 
 ```yaml
 replace:
-  "/spec/containers/0/name": "new-name"
-  "/spec/containers/0/resources/limits/memory": "256Mi"
+  "spec.containers[0].name": "new-name"
+  "spec.containers[0].resources.limits.memory": "256Mi"
 ```
 
 ### 2. JSON Patch
@@ -130,14 +130,14 @@ applyConfiguration:
 
 Field paths use different formats depending on the context:
 
-For `expectedErrors`:
+For `expectedErrors` and `replace`:
 - Use dot notation with array indices in square brackets
 - Examples:
   - `metadata.name`
   - `spec.containers[0].name`
   - `spec.containers[0].ports[0].containerPort`
 
-For `jsonPatch` and `replace`:
+For `jsonPatch`:
 - Use JSON pointer syntax with forward slashes
 - Examples:
   - `/metadata/name`

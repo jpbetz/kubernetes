@@ -20,4 +20,4 @@ jsonPatch:
 ---
 name: valid container name using replace
 replace:
-  "/spec/containers/0/name": "valid-container-name-3" 
+  "spec.containers[0].name": "valid-container-name-3" 
