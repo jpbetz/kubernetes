@@ -8,11 +8,16 @@ spec:
   - name: test-container
     image: test-image
 ---
-name: invalid container name
-applyConfiguration:
-  spec:
-    containers:
-    - name: "invalid.container.name"
+name: invalid container name using replace
+replace:
+  "spec.containers[0].name": "invalid.container.name.with.dots"
+expectedErrors:
+- type: FieldValueInvalid
+  detail: must be a valid DNS label
+---
+name: invalid container name using replace with explicit field
+replace:
+  "spec.containers[0].name": "invalid.container.name.with.dots"
 expectedErrors:
 - field: spec.containers[0].name
   type: FieldValueInvalid
@@ -26,16 +31,11 @@ expectedErrors:
   type: FieldValueInvalid
   detail: must be a valid DNS label
 ---
-name: invalid container name using replace
-replace:
-  "spec.containers[0].name": "invalid.container.name.with.dots.replace"
-expectedErrors:
-- type: FieldValueInvalid
-  detail: must be a valid DNS label
----
-name: invalid container name using replace with explicit field
-replace:
-  "spec.containers[0].name": "invalid.container.name.with.dots.replace"
+name: invalid container name
+applyConfiguration:
+  spec:
+    containers:
+    - name: "invalid.container.name.with.dots"
 expectedErrors:
 - field: spec.containers[0].name
   type: FieldValueInvalid
