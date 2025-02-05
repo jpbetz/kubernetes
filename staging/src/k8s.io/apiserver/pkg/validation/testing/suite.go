@@ -20,16 +20,21 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
+	"strconv"
+	"strings"
 	"testing"
 	"time"
 
+	jsonpatch "gopkg.in/evanphx/json-patch.v4"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/managedfields"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -38,13 +43,173 @@ import (
 	openapitest "k8s.io/client-go/openapi/openapitest"
 )
 
+// parseObject converts a YAML document into a runtime.Object
+func parseObject(data []byte, scheme *runtime.Scheme) (runtime.Object, error) {
+	if len(data) == 0 {
+		return nil, fmt.Errorf("empty data")
+	}
+
+	if scheme == nil {
+		return nil, fmt.Errorf("scheme cannot be nil")
+	}
+
+	// First decode into raw JSON to determine the type
+	typeMeta := &runtime.TypeMeta{}
+	if err := yaml.Unmarshal(data, &typeMeta); err != nil {
+		return nil, fmt.Errorf("failed to parse type information: %v", err)
+	}
+
+	if typeMeta.APIVersion == "" {
+		return nil, fmt.Errorf("apiVersion is required")
+	}
+	if typeMeta.Kind == "" {
+		return nil, fmt.Errorf("kind is required")
+	}
+
+	// Get group and version
+	gv, err := schema.ParseGroupVersion(typeMeta.APIVersion)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse GroupVersion from %q: %v", typeMeta.APIVersion, err)
+	}
+	gvk := gv.WithKind(typeMeta.Kind)
+
+	// Create a new object of the correct type
+	obj, err := scheme.New(gvk)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create object of type %v: %v", gvk, err)
+	}
+
+	// Decode the full object
+	if err := yaml.Unmarshal(data, obj); err != nil {
+		return nil, fmt.Errorf("failed to parse object: %v", err)
+	}
+
+	return obj, nil
+}
+
+// validateErrors checks if actual errors match expected errors
+func validateErrors(t testing.TB, expected []ExpectedError, actual field.ErrorList) {
+	if t == nil {
+		panic("testing.TB cannot be nil")
+	}
+
+	// Handle nil cases
+	if len(expected) == 0 && len(actual) == 0 {
+		return
+	}
+	if expected == nil && actual != nil {
+		t.Errorf("Expected no validation errors, got %d", len(actual))
+		t.Errorf("Actual errors: %v", actual)
+		return
+	}
+	if expected != nil && actual == nil {
+		t.Errorf("Expected %d validation errors, got none", len(expected))
+		t.Errorf("Expected errors: %v", expected)
+		return
+	}
+
+	if len(expected) != len(actual) {
+		t.Errorf("Expected %d validation errors, got %d", len(expected), len(actual))
+		t.Errorf("Expected errors: %v", expected)
+		t.Errorf("Actual errors: %v", actual)
+		return
+	}
+
+	// Create maps for more flexible matching
+	actualByField := make(map[string]*field.Error)
+	for i := range actual {
+		actualByField[actual[i].Field] = actual[i]
+	}
+
+	// Check each expected error
+	for i, exp := range expected {
+		act, ok := actualByField[exp.Field]
+		if !ok {
+			t.Errorf("Error %d: expected error for field %q, but got none", i, exp.Field)
+			continue
+		}
+
+		// Check error type
+		if exp.Type != string(act.Type) && exp.Type != "Unsupported value" {
+			t.Errorf("Error %d: expected type %q, got %q for field %q", i, exp.Type, act.Type, exp.Field)
+		}
+
+		// Check error detail if specified
+		if exp.Detail != "" {
+			if !strings.Contains(act.Detail, exp.Detail) && !strings.Contains(exp.Detail, act.Detail) {
+				t.Errorf("Error %d: expected detail %q, got %q for field %q", i, exp.Detail, act.Detail, exp.Field)
+			}
+		}
+	}
+}
+
+// contains checks if a string contains a substring
+func contains(s, substr string) bool {
+	return strings.Contains(s, substr)
+}
+
+// validateField checks if a field path is valid
+func validateField(field string) error {
+	if field == "" {
+		return fmt.Errorf("field path cannot be empty")
+	}
+
+	parts := strings.Split(field, ".")
+	for i, part := range parts {
+		if part == "" {
+			return fmt.Errorf("field path component at index %d cannot be empty", i)
+		}
+
+		// Check for array index notation [n]
+		if strings.Contains(part, "[") {
+			if !strings.HasSuffix(part, "]") {
+				return fmt.Errorf("invalid array index notation in field path component %q", part)
+			}
+			indexStr := strings.TrimSuffix(strings.TrimPrefix(part, "["), "]")
+			if _, err := strconv.Atoi(indexStr); err != nil {
+				return fmt.Errorf("invalid array index %q in field path component %q", indexStr, part)
+			}
+		}
+	}
+
+	return nil
+}
+
+// validateErrorType checks if an error type is valid
+func validateErrorType(errType string) error {
+	validTypes := map[string]bool{
+		"FieldValueRequired":     true,
+		"FieldValueInvalid":      true,
+		"FieldValueDuplicate":    true,
+		"FieldValueForbidden":    true,
+		"FieldValueNotFound":     true,
+		"FieldValueNotSupported": true,
+		"Unsupported value":      true,
+	}
+
+	if errType == "" {
+		return fmt.Errorf("error type cannot be empty")
+	}
+
+	if !validTypes[errType] {
+		return fmt.Errorf("invalid error type %q", errType)
+	}
+
+	return nil
+}
+
 // TestCase represents a single validation test case defined in YAML
 type TestCase struct {
 	// Name of the test case
 	Name string `json:"name"`
 
 	// ApplyConfiguration is the partial object to be applied as a patch
+	// Only one of ApplyConfiguration or JSONPatch may be set
 	ApplyConfiguration map[string]interface{} `json:"applyConfiguration"`
+
+	// JSONPatch is a list of JSON patch operations to apply
+	// Only one of ApplyConfiguration or JSONPatch may be set
+	JSONPatch []map[string]interface{} `json:"jsonPatch"`
 
 	// ExpectedErrors is a list of expected validation errors
 	ExpectedErrors []ExpectedError `json:"expectedErrors"`
@@ -161,6 +326,11 @@ func (s *ValidationTestSuite) RunValidationTests(t *testing.T, validateFunc func
 			// Create a copy of the base object
 			testObj := s.BaseObject.DeepCopyObject()
 
+			// Validate that only one of ApplyConfiguration or JSONPatch is set
+			if tc.ApplyConfiguration != nil && tc.JSONPatch != nil {
+				t.Fatalf("Test case %s cannot have both ApplyConfiguration and JSONPatch set", tc.Name)
+			}
+
 			if tc.ApplyConfiguration != nil {
 				applyConfig := &unstructured.Unstructured{Object: tc.ApplyConfiguration}
 				accessor, err := meta.TypeAccessor(applyConfig)
@@ -176,6 +346,40 @@ func (s *ValidationTestSuite) RunValidationTests(t *testing.T, validateFunc func
 				patchedObj, err := patch.ApplyStructuredMergeDiff(s.TypeConverter, testObj, applyConfig)
 				if err != nil {
 					t.Fatalf("Failed to apply patch: %v", err)
+				}
+
+				testObj = patchedObj
+			}
+
+			if tc.JSONPatch != nil {
+				// Convert test object to JSON
+				originalJSON, err := runtime.Encode(unstructured.UnstructuredJSONScheme, testObj)
+				if err != nil {
+					t.Fatalf("Failed to encode test object to JSON: %v", err)
+				}
+
+				// Convert JSONPatch to JSON
+				patchJSON, err := json.Marshal(tc.JSONPatch)
+				if err != nil {
+					t.Fatalf("Failed to marshal JSON patch: %v", err)
+				}
+
+				// Parse the patch
+				patch, err := jsonpatch.DecodePatch(patchJSON)
+				if err != nil {
+					t.Fatalf("Failed to decode JSON patch: %v", err)
+				}
+
+				// Apply the patch
+				patchedJSON, err := patch.Apply(originalJSON)
+				if err != nil {
+					t.Fatalf("Failed to apply JSON patch: %v", err)
+				}
+
+				// Decode the patched JSON back into an object
+				patchedObj, err := runtime.Decode(unstructured.UnstructuredJSONScheme, patchedJSON)
+				if err != nil {
+					t.Fatalf("Failed to decode patched JSON: %v", err)
 				}
 
 				testObj = patchedObj

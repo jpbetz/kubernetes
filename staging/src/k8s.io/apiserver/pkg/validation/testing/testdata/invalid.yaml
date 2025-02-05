@@ -17,3 +17,11 @@ expectedErrors:
 - field: spec.containers[0].name
   type: FieldValueInvalid
   detail: must be a valid DNS label
+---
+name: invalid container name using json patch
+jsonPatch:
+- { "op": "replace", "path": "/spec/containers/0/name", "value": "invalid.container.name.with.dots" }
+expectedErrors:
+- field: spec.containers[0].name
+  type: FieldValueInvalid
+  detail: must be a valid DNS label
