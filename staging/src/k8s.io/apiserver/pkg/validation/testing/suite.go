@@ -451,8 +451,11 @@ type TestCaseBuilder struct {
 }
 
 // WithReplace adds field replacements to the test case
-func (b *TestCaseBuilder) WithReplace(replacements map[string]interface{}) *TestCaseBuilder {
-	b.testCase.Replace = replacements
+func (b *TestCaseBuilder) WithReplace(field string, value interface{}) *TestCaseBuilder {
+	if b.testCase.Replace == nil {
+		b.testCase.Replace = make(map[string]interface{})
+	}
+	b.testCase.Replace[field] = value
 	return b
 }
 
@@ -482,4 +485,15 @@ func (b *TestCaseBuilder) ExpectError(field, errType, detail string) *TestCaseBu
 func (b *TestCaseBuilder) ExpectNoErrors() *TestCaseBuilder {
 	b.testCase.ExpectedErrors = []ExpectedError{}
 	return b
+}
+
+// ReplaceExpectError is a convenience method that combines WithReplace and ExpectError.
+// It takes a field path in Kubernetes notation (e.g. spec.containers[0].name), a replacement value,
+// and the expected error type and detail for that path.
+func (b *TestCaseBuilder) ReplaceExpectError(fieldPath string, value interface{}, errType, errDetail string) *TestCaseBuilder {
+	jsonPath, err := FieldPathToJSONPointer(fieldPath)
+	if err != nil {
+		panic(fmt.Sprintf("invalid field path %q: %v", fieldPath, err))
+	}
+	return b.WithReplace(jsonPath, value).ExpectError(fieldPath, errType, errDetail)
 }

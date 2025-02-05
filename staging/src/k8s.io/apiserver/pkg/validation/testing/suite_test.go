@@ -150,7 +150,7 @@ func TestValidationSuite(t *testing.T) {
 	}
 	scheme.AddKnownTypeWithName(podGVK, &unstructured.Unstructured{})
 
-	// Test invalid cases
+	// Mock the validation function
 	invalidValidateFunc := func(obj runtime.Object) field.ErrorList {
 		return field.ErrorList{
 			field.Invalid(field.NewPath("spec", "containers").Index(0).Child("name"), obj, "must be a valid DNS label"),
@@ -162,7 +162,7 @@ func TestValidationSuite(t *testing.T) {
 	}
 	invalidSuite.RunValidationTests(t, invalidValidateFunc)
 
-	// Test valid cases
+	// Mock the validation function
 	validValidateFunc := func(obj runtime.Object) field.ErrorList {
 		return nil
 	}
@@ -194,17 +194,50 @@ func TestValidationSuiteWithDataLiterals(t *testing.T) {
 
 	// Add test cases using the fluent builder interface
 	suite.AddTestCase("invalid string field").
-		WithReplace(map[string]interface{}{
-			"/spec/stringField": "invalid",
-		}).
+		WithReplace("/spec/stringField", "invalid").
 		ExpectError("spec.stringField", "FieldValueInvalid", "must not be 'invalid'")
 
-		// Test invalid cases
+	// Mock the validation function
 	invalidValidateFunc := func(obj runtime.Object) field.ErrorList {
 		return field.ErrorList{
 			field.Invalid(field.NewPath("spec", "stringField"), obj, "must not be 'invalid'"),
 		}
 	}
+
 	suite.RunValidationTests(t, invalidValidateFunc)
 
+}
+
+func TestReplaceExpectError(t *testing.T) {
+	// Create a base test object
+	baseObject := &TestObject{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "v1",
+			Kind:       "TestObject",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "test",
+		},
+		Spec: TestSpec{
+			StringField: "test",
+			IntField:    42,
+		},
+	}
+
+	// Create a new test suite
+	suite := NewValidationTestSuite(baseObject)
+
+	// Add test cases using ReplaceExpectError
+	suite.AddTestCase("test replace expect error").
+		ReplaceExpectError("spec.stringField", "invalid", "FieldValueInvalid", "must not be 'invalid'")
+
+	// Mock the validation function
+	validateFunc := func(obj runtime.Object) field.ErrorList {
+		return field.ErrorList{
+			field.Invalid(field.NewPath("spec", "stringField"), "invalid", "must not be 'invalid'"),
+		}
+	}
+
+	// Run the tests
+	suite.RunValidationTests(t, validateFunc)
 }
