@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod
+  namespace: default
+spec:
+  containers:
+  - name: test-container
+    image: test-image
+---
+apiVersion: testing.k8s.io/v1
+kind: TestCase
+name: invalid container name
+modifications:
+  spec.containers[0].name: "invalid.container.name"
+expectedErrors:
+- field: spec.containers[0].name
+  type: FieldValueInvalid
+  detail: must be a valid DNS label
