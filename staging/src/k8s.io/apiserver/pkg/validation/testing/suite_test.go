@@ -194,6 +194,16 @@ func TestValidationSuiteWithDataLiterals(t *testing.T) {
 				"spec.stringField": "invalid",
 			},
 			ExpectedErrors: []ExpectedError{
+				// The field is automatically set to "spec.stringField" because there is only one Replace field
+				{Type: "FieldValueInvalid", Detail: "must not be 'invalid'"},
+			},
+		},
+		{
+			Name: "invalid string field with explicit field",
+			Replace: map[string]interface{}{
+				"spec.stringField": "invalid",
+			},
+			ExpectedErrors: []ExpectedError{
 				{Field: "spec.stringField", Type: "FieldValueInvalid", Detail: "must not be 'invalid'"},
 			},
 		},

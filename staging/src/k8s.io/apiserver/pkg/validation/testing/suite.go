@@ -380,6 +380,21 @@ func (s *ValidationTestSuite) RunValidationTests(t *testing.T, validateFunc func
 						t.Fatalf("Failed to marshal JSON patch: %v", err)
 					}
 				} else {
+					// If there's only one Replace entry, use its field as the default for zero-valued ExpectedError.Field
+					var defaultField string
+					if len(tc.Replace) == 1 {
+						for field := range tc.Replace {
+							defaultField = field
+							// Update any zero-valued ExpectedError.Field
+							for i := range tc.ExpectedErrors {
+								if tc.ExpectedErrors[i].Field == "" {
+									tc.ExpectedErrors[i].Field = defaultField
+								}
+							}
+							break
+						}
+					}
+
 					// Convert Replace map to JSONPatch operations
 					var patchOps []map[string]interface{}
 					for field, value := range tc.Replace {

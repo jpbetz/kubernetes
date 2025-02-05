@@ -18,19 +18,27 @@ spec:
     - name: test-container
       image: test-image
 ---
-# Test Case 1
+# Test Case 1 - Field can be omitted when using single Replace
 name: invalid container name
 replace:
-  "/spec/containers/0/name": "invalid.container.name"
+  "spec.containers[0].name": "invalid.container.name"
+expectedErrors:
+- type: FieldValueInvalid
+  detail: must be a valid DNS label  # detail is optional
+---
+# Test Case 2 - Field can be explicitly specified
+name: invalid container name with explicit field
+replace:
+  "spec.containers[0].name": "invalid.container.name"
 expectedErrors:
 - field: spec.containers[0].name
   type: FieldValueInvalid
-  detail: must be a valid DNS label  # detail is optional
+  detail: must be a valid DNS label
 ---
-# Test Case 2
+# Test Case 3
 name: valid container name
 replace:
-  "/spec/containers/0/name": "valid-container-name"
+  "spec.containers[0].name": "valid-container-name"
 expectedErrors: []  # no errors expected
 ```
 
@@ -73,9 +81,30 @@ Each test case in the YAML file can include:
 ### Expected Errors
 
 Each expected error must specify:
-- `field`: Dot-separated path to the field (required)
 - `type`: Validation error type (required)
+- `field`: Dot-separated path to the field (optional when using a single Replace field)
 - `detail`: Optional error message detail to match
+
+When using a single `replace` field, the `field` in `expectedErrors` can be omitted. In this case, the framework will automatically use the field from the `replace` map for any zero-valued `field` in the expected errors. This helps reduce redundancy in test cases.
+
+Example with omitted field:
+```yaml
+replace:
+  "spec.containers[0].name": "invalid-name"
+expectedErrors:
+- type: FieldValueInvalid  # field is automatically set to "spec.containers[0].name"
+  detail: must be a valid DNS label
+```
+
+Example with explicit field:
+```yaml
+replace:
+  "spec.containers[0].name": "invalid-name"
+expectedErrors:
+- field: spec.containers[0].name  # explicitly specified
+  type: FieldValueInvalid
+  detail: must be a valid DNS label
+```
 
 Valid error types:
 - `FieldValueRequired`: A required field is missing
