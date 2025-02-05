@@ -26,47 +26,23 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-	"sigs.k8s.io/yaml"
+	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
 // parseObject converts a YAML document into a runtime.Object
 func parseObject(data []byte, scheme *runtime.Scheme) (runtime.Object, error) {
 	// First decode into raw JSON to determine the type
-	var typeMeta struct {
-		APIVersion string `json:"apiVersion"`
-		Kind       string `json:"kind"`
-	}
+	typeMeta := &runtime.TypeMeta{}
 	if err := yaml.Unmarshal(data, &typeMeta); err != nil {
 		return nil, fmt.Errorf("failed to parse type information: %v", err)
 	}
 
-	// Skip creating objects for test cases
-	if typeMeta.APIVersion == "testing.k8s.io/v1" && typeMeta.Kind == "TestCase" {
-		return nil, nil
-	}
-
 	// Get group and version
-	var group, version string
-	parts := strings.Split(typeMeta.APIVersion, "/")
-	if len(parts) == 2 {
-		group = parts[0]
-		version = parts[1]
-	} else {
-		version = parts[0]
+	gv, err := schema.ParseGroupVersion(typeMeta.APIVersion)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse GroupVersion from %q: %v", typeMeta.APIVersion, err)
 	}
-
-	// Get prioritized versions for the group
-	var gvk schema.GroupVersionKind
-	if versions := scheme.PrioritizedVersionsForGroup(group); len(versions) > 0 {
-		gvk = versions[0].WithKind(typeMeta.Kind)
-	} else {
-		// Fall back to direct GVK if group not found in scheme
-		gvk = schema.GroupVersionKind{
-			Group:   group,
-			Version: version,
-			Kind:    typeMeta.Kind,
-		}
-	}
+	gvk := gv.WithKind(typeMeta.Kind)
 
 	// Create a new object of the correct type
 	obj, err := scheme.New(gvk)

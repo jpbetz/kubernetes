@@ -8,8 +8,6 @@ spec:
   - name: test-container
     image: test-image
 ---
-apiVersion: testing.k8s.io/v1
-kind: TestCase
 name: invalid container name
 modifications:
   spec.containers[0].name: "invalid.container.name"

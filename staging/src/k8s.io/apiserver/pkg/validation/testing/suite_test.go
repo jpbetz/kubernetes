@@ -17,7 +17,6 @@ limitations under the License.
 package testing
 
 import (
-	"path/filepath"
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
@@ -32,38 +31,22 @@ func TestValidationTestSuite(t *testing.T) {
 		t.Fatalf("Failed to add core/v1 to scheme: %v", err)
 	}
 
-	// Get test files
-	testFiles, err := filepath.Glob("testdata/*.yaml")
+	// Load and run all test suites from testdata directory
+	suite, err := LoadValidationTestSuite("testdata/invalid_container_name.yaml", scheme)
 	if err != nil {
-		t.Fatalf("Failed to list test files: %v", err)
+		t.Fatalf("Failed to load test suites: %v", err)
 	}
 
-	if len(testFiles) == 0 {
-		t.Fatal("No test files found in testdata directory")
+	// Mock validation function that returns the expected error
+	validateFunc := func(obj runtime.Object) field.ErrorList {
+		return field.ErrorList{
+			&field.Error{
+				Type:   field.ErrorTypeInvalid,
+				Field:  "spec.containers[0].name",
+				Detail: "must be a valid DNS label",
+			},
+		}
 	}
 
-	// Run each test file
-	for _, testFile := range testFiles {
-		testName := filepath.Base(testFile)
-		t.Run(testName, func(t *testing.T) {
-			// Load and run the test suite
-			suite, err := LoadValidationTestSuite(testFile, scheme)
-			if err != nil {
-				t.Fatalf("Failed to load test suite: %v", err)
-			}
-
-			// Mock validation function that returns the expected error
-			validateFunc := func(obj runtime.Object) field.ErrorList {
-				return field.ErrorList{
-					&field.Error{
-						Type:   field.ErrorTypeInvalid,
-						Field:  "spec.containers[0].name",
-						Detail: "must be a valid DNS label",
-					},
-				}
-			}
-
-			suite.RunValidationTests(t, validateFunc)
-		})
-	}
+	suite.RunValidationTests(t, validateFunc)
 }

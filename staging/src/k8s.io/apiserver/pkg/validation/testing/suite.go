@@ -17,11 +17,14 @@ limitations under the License.
 package testing
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
+	"io"
 	"os"
-	"strings"
 	"testing"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apimachinery/pkg/util/yaml"
@@ -60,33 +63,61 @@ type ValidationTestSuite struct {
 	TestCases []TestCase
 }
 
+// MockAPIResource is a minimal API resource type for testing
+type TestResource struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+}
+
+func (r *TestResource) DeepCopyObject() runtime.Object {
+	return &TestResource{
+		TypeMeta:   r.TypeMeta,
+		ObjectMeta: r.ObjectMeta,
+	}
+}
+
 // LoadValidationTestSuite loads a test suite from a YAML file
+
 func LoadValidationTestSuite(path string, scheme *runtime.Scheme) (*ValidationTestSuite, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read test file: %v", err)
 	}
 
-	// Split the YAML documents
-	docs := strings.Split(string(data), "\n---\n")
-	if len(docs) < 2 {
-		return nil, fmt.Errorf("test file must contain at least 2 YAML documents (base object and test cases)")
+	// Use YAML reader to properly split documents
+	reader := yaml.NewYAMLReader(bufio.NewReader(bytes.NewReader(data)))
+
+	// Read first document (base object)
+	baseDoc, err := reader.Read()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read base object: %v", err)
 	}
 
-	// Parse the base object
-	baseObj, err := parseObject([]byte(docs[0]), scheme)
+	baseObj, err := parseObject(baseDoc, scheme)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse base object: %v", err)
 	}
 
-	// Parse the test cases
+	// Read remaining documents as test cases
 	var testCases []TestCase
-	for i, doc := range docs[1:] {
+	for {
+		doc, err := reader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, fmt.Errorf("failed to read test case: %v", err)
+		}
+
 		var tc TestCase
-		if err := yaml.Unmarshal([]byte(doc), &tc); err != nil {
-			return nil, fmt.Errorf("failed to parse test case %d: %v", i+1, err)
+		if err := yaml.Unmarshal(doc, &tc); err != nil {
+			return nil, fmt.Errorf("failed to parse test case: %v", err)
 		}
 		testCases = append(testCases, tc)
+	}
+
+	if len(testCases) == 0 {
+		return nil, fmt.Errorf("test file must contain at least one test case")
 	}
 
 	return &ValidationTestSuite{
