@@ -19,7 +19,6 @@ package testing
 import (
 	"bufio"
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -27,7 +26,6 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-	"time"
 
 	jsonpatch "gopkg.in/evanphx/json-patch.v4"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -37,9 +35,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/managedfields"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/util/yaml"
-	"k8s.io/apiserver/pkg/admission/plugin/policy/mutating/patch"
+	"k8s.io/apiserver/pkg/validation/testing/patch"
 	openapitest "k8s.io/client-go/openapi/openapitest"
 )
 
@@ -278,21 +275,19 @@ func LoadValidationTestSuite(path string, scheme *runtime.Scheme) (*ValidationTe
 		return nil, fmt.Errorf("failed to parse base object: %v", err)
 	}
 
-	// Create type converter
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	tcManager := patch.NewTypeConverterManager(nil, openapitest.NewEmbeddedFileClient())
-	go tcManager.Run(ctx)
-
-	err = wait.PollUntilContextTimeout(ctx, 100*time.Millisecond, time.Second, true, func(context.Context) (done bool, err error) {
-		converter := tcManager.GetTypeConverter(baseObj.GetObjectKind().GroupVersionKind())
-		return converter != nil, nil
-	})
-
+	// TODO: The tcProvider is only used once. This code is needlessly complex.
+	// We should just create the type converter once and reuse it, which would
+	// require having some type that LoadValidationTestSuite can be called multiple
+	// times from the same test suite.
+	tcProvider, err := patch.NewStaticTypeConverterProvider(openapitest.NewEmbeddedFileClient())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create type converter: %v", err)
 	}
-	typeConverter := tcManager.GetTypeConverter(baseObj.GetObjectKind().GroupVersionKind())
+
+	typeConverter, err := tcProvider(baseObj.GetObjectKind().GroupVersionKind())
+	if err != nil {
+		return nil, fmt.Errorf("failed to create type converter: %v", err)
+	}
 
 	// Read remaining documents as test cases
 	var testCases []TestCase

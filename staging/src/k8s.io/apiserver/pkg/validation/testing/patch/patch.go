@@ -17,152 +17,72 @@ limitations under the License.
 package patch
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
-	"sync"
-	"time"
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/managedfields"
-	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/openapi"
 	"k8s.io/kube-openapi/pkg/spec3"
 	"sigs.k8s.io/structured-merge-diff/v4/typed"
 )
 
-// TypeConverterManager manages type converters for different GroupVersionKinds
-type TypeConverterManager interface {
-	// GetTypeConverter returns a type converter for the given GVK
-	GetTypeConverter(gvk schema.GroupVersionKind) managedfields.TypeConverter
-	Run(ctx context.Context)
-}
+// TypeConverterProvider is a function that returns a type converter for a given GVK
+type TypeConverterProvider func(gvk schema.GroupVersionKind) (managedfields.TypeConverter, error)
 
-type typeConverterCacheEntry struct {
-	typeConverter managedfields.TypeConverter
-	entry         openapi.GroupVersion
-}
+// NewStaticTypeConverterProvider creates a type converter that maps GVKs to their corresponding type converters.
+// The client is expected to be backed by a static file that never changes.
+func NewStaticTypeConverterProvider(client openapi.Client) (TypeConverterProvider, error) {
+	// Initialize type converter map
+	typeConverterMap := make(map[schema.GroupVersion]managedfields.TypeConverter)
 
-type typeConverterManager struct {
-	lock                sync.RWMutex
-	staticTypeConverter managedfields.TypeConverter
-	typeConverterMap    map[schema.GroupVersion]typeConverterCacheEntry
-	lastFetchedPaths    map[schema.GroupVersion]openapi.GroupVersion
-	client              openapi.Client
-}
-
-// NewTypeConverterManager creates a new TypeConverterManager
-func NewTypeConverterManager(staticTypeConverter managedfields.TypeConverter, client openapi.Client) TypeConverterManager {
-	return &typeConverterManager{
-		staticTypeConverter: staticTypeConverter,
-		typeConverterMap:    make(map[schema.GroupVersion]typeConverterCacheEntry),
-		lastFetchedPaths:    make(map[schema.GroupVersion]openapi.GroupVersion),
-		client:              client,
+	// Get all paths once since the client is static
+	paths, err := client.Paths()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get paths: %w", err)
 	}
-}
 
-func (t *typeConverterManager) Run(ctx context.Context) {
-	wait.UntilWithContext(ctx, func(ctx context.Context) {
-		paths, err := t.client.Paths()
+	// Process all paths and create type converters
+	for path, entry := range paths {
+		if !strings.HasPrefix(path, "/") {
+			path = "/" + path
+		}
+		if !strings.HasPrefix(path, "/apis/") && !strings.HasPrefix(path, "/api/") {
+			continue
+		}
+
+		gv, err := schema.ParseGroupVersion(path)
 		if err != nil {
-			utilruntime.HandleError(fmt.Errorf("failed to get paths: %w", err))
-			return
+			return nil, fmt.Errorf("failed to parse group version %q: %w", path, err)
+		}
+		schBytes, err := entry.Schema(runtime.ContentTypeJSON)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get schema for %v: %w", gv, err)
 		}
 
-		parsedPaths := make(map[schema.GroupVersion]openapi.GroupVersion)
-		for path, entry := range paths {
-			if !strings.HasPrefix(path, "/apis/") && !strings.HasPrefix(path, "/api/") {
-				continue
-			}
-
-			gv, err := schema.ParseGroupVersion(path)
-			if err != nil {
-				utilruntime.HandleError(fmt.Errorf("failed to parse group version %q: %w", path, err))
-				return
-			}
-
-			parsedPaths[gv] = entry
+		var sch spec3.OpenAPI
+		if err := json.Unmarshal(schBytes, &sch); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal schema for %v: %w", gv, err)
 		}
 
-		t.lock.Lock()
-		defer t.lock.Unlock()
-		t.lastFetchedPaths = parsedPaths
-	}, 10*time.Second)
-}
-
-func (t *typeConverterManager) GetTypeConverter(gvk schema.GroupVersionKind) managedfields.TypeConverter {
-	// Check to see if the static type converter handles this GVK
-	if t.staticTypeConverter != nil {
-		stub := &unstructured.Unstructured{}
-		stub.SetGroupVersionKind(gvk)
-
-		if _, err := t.staticTypeConverter.ObjectToTyped(stub); err == nil {
-			return t.staticTypeConverter
-		}
-	}
-
-	gv := gvk.GroupVersion()
-
-	existing, entry, err := func() (managedfields.TypeConverter, openapi.GroupVersion, error) {
-		t.lock.RLock()
-		defer t.lock.RUnlock()
-
-		// If schema is not supported by static type converter, ask discovery
-		// for the schema
-		entry, ok := t.lastFetchedPaths[gv]
-		if !ok {
-			// If we can't get the schema, we can't do anything
-			return nil, nil, fmt.Errorf("no schema for %v", gvk)
+		tc, err := managedfields.NewTypeConverter(sch.Components.Schemas, false)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create type converter for %v: %w", gv, err)
 		}
 
-		// If the entry schema has not changed, used the same type converter
-		if existing, ok := t.typeConverterMap[gv]; ok && existing.entry.ServerRelativeURL() == entry.ServerRelativeURL() {
-			// If we have a type converter for this GVK, return it
-			return existing.typeConverter, existing.entry, nil
+		typeConverterMap[gv] = tc
+	}
+	// Return a function that maps GVKs to their type converters
+	return func(gvk schema.GroupVersionKind) (managedfields.TypeConverter, error) {
+		if tc := typeConverterMap[gvk.GroupVersion()]; tc != nil {
+			return tc, nil
 		}
 
-		return nil, entry, nil
-	}()
-	if err != nil {
-		utilruntime.HandleError(err)
-		return nil
-	} else if existing != nil {
-		return existing
-	}
-
-	schBytes, err := entry.Schema(runtime.ContentTypeJSON)
-	if err != nil {
-		utilruntime.HandleError(fmt.Errorf("failed to get schema for %v: %w", gvk, err))
-		return nil
-	}
-
-	var sch spec3.OpenAPI
-	if err := json.Unmarshal(schBytes, &sch); err != nil {
-		utilruntime.HandleError(fmt.Errorf("failed to unmarshal schema for %v: %w", gvk, err))
-		return nil
-	}
-
-	// The schema has changed, or there is no entry for it, generate
-	// a new type converter for this GV
-	tc, err := managedfields.NewTypeConverter(sch.Components.Schemas, false)
-	if err != nil {
-		utilruntime.HandleError(fmt.Errorf("failed to create type converter for %v: %w", gvk, err))
-		return nil
-	}
-
-	t.lock.Lock()
-	defer t.lock.Unlock()
-
-	t.typeConverterMap[gv] = typeConverterCacheEntry{
-		typeConverter: tc,
-		entry:         entry,
-	}
-
-	return tc
+		return nil, fmt.Errorf("no schema for %v", gvk)
+	}, nil
 }
 
 // ApplyStructuredMergeDiff applies a structured merge diff to an object and returns a copy of the object
