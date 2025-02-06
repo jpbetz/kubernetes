@@ -122,7 +122,7 @@ func TestValidationSuite(t *testing.T) {
 			field.Invalid(field.NewPath("spec", "containers").Index(0).Child("name"), obj, "must be a valid DNS label"),
 		}
 	}
-	invalidSuite, err := LoadValidationTestSuite("testdata/invalid.yaml", scheme)
+	invalidSuite, err := LoadValidationTestSuite("testdata/invalid.yaml", scheme, nil)
 	if err != nil {
 		t.Fatalf("Failed to load invalid test suite: %v", err)
 	}
@@ -132,7 +132,7 @@ func TestValidationSuite(t *testing.T) {
 	validValidateFunc := func(obj runtime.Object) field.ErrorList {
 		return nil
 	}
-	validSuite, err := LoadValidationTestSuite("testdata/valid.yaml", scheme)
+	validSuite, err := LoadValidationTestSuite("testdata/valid.yaml", scheme, nil)
 	if err != nil {
 		t.Fatalf("Failed to load valid test suite: %v", err)
 	}

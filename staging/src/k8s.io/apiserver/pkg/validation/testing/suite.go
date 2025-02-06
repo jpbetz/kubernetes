@@ -102,29 +102,47 @@ func validateErrors(t testing.TB, expected []ExpectedError, actual field.ErrorLi
 	}
 
 	// Create maps for more flexible matching
-	actualByField := make(map[string]*field.Error)
+	actualByField := make(map[string][]*field.Error)
 	for i := range actual {
-		actualByField[actual[i].Field] = actual[i]
+		actualByField[actual[i].Field] = append(actualByField[actual[i].Field], actual[i])
 	}
+
+	// Track matched errors to ensure we don't double count
+	matchedErrors := make(map[string]bool)
 
 	// Check each expected error
 	for i, exp := range expected {
-		// TODO: Fix this to handle multiple errors for the same field.
-		act, ok := actualByField[exp.Field]
+		errors, ok := actualByField[exp.Field]
 		if !ok {
 			t.Errorf("Error %d: expected error for field %q, but got none", i, exp.Field)
 			continue
 		}
 
-		// Check error type
-		if exp.Type != string(act.Type) {
-			t.Errorf("Error %d: expected type %q, got %q for field %q", i, exp.Type, act.Type, exp.Field)
+		// Try to find a matching error that hasn't been matched yet
+		found := false
+		for _, act := range errors {
+			errorKey := fmt.Sprintf("%s-%s-%s", act.Field, act.Type, act.Detail)
+			if !matchedErrors[errorKey] && exp.Type == string(act.Type) {
+				if exp.Detail == "" || strings.Contains(act.Detail, exp.Detail) || strings.Contains(exp.Detail, act.Detail) {
+					matchedErrors[errorKey] = true
+					found = true
+					break
+				}
+			}
 		}
 
-		// Check error detail if specified
-		if exp.Detail != "" {
-			if !strings.Contains(act.Detail, exp.Detail) && !strings.Contains(exp.Detail, act.Detail) {
-				t.Errorf("Error %d: expected detail %q, got %q for field %q", i, exp.Detail, act.Detail, exp.Field)
+		if !found {
+			t.Errorf("Error %d: no matching error found for field %q with type %q and detail %q", i, exp.Field, exp.Type, exp.Detail)
+			t.Errorf("Available errors for this field: %v", errors)
+		}
+	}
+
+	// Check for unexpected errors
+	for field, errors := range actualByField {
+		for _, act := range errors {
+			errorKey := fmt.Sprintf("%s-%s-%s", act.Field, act.Type, act.Detail)
+			if !matchedErrors[errorKey] {
+				t.Errorf("Unexpected error for field %q: %v", field, act)
 			}
 		}
 	}
@@ -157,8 +175,7 @@ type ExpectedError struct {
 	// Field is the dot-separated path to the field
 	Field string `json:"field"`
 
-	// Type is the validation error type (e.g. "FieldValueRequired", "FieldValueInvalid")
-	// TODO: We don't need the FieldValue prefix on these error types, remove it.
+	// Type is the validation error type (e.g. "Required", "Invalid", "Duplicate")
 	Type string `json:"type"`
 
 	// Detail is the expected error message detail (optional)
@@ -194,7 +211,7 @@ func (t *TestObject) DeepCopyObject() runtime.Object {
 }
 
 // LoadValidationTestSuite loads a test suite from a YAML file
-func LoadValidationTestSuite(path string, scheme *runtime.Scheme) (*ValidationTestSuite, error) {
+func LoadValidationTestSuite(path string, scheme *runtime.Scheme, typeConverter managedfields.TypeConverter) (*ValidationTestSuite, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read test file: %v", err)
@@ -214,18 +231,16 @@ func LoadValidationTestSuite(path string, scheme *runtime.Scheme) (*ValidationTe
 		return nil, fmt.Errorf("failed to parse base object: %v", err)
 	}
 
-	// TODO: The tcProvider is only used once. This code is needlessly complex.
-	// We should just create the type converter once and reuse it, which would
-	// require having some type that LoadValidationTestSuite can be called multiple
-	// times from the same test suite.
-	tcProvider, err := patch.NewStaticTypeConverterProvider(openapitest.NewEmbeddedFileClient())
-	if err != nil {
-		return nil, fmt.Errorf("failed to create type converter: %v", err)
-	}
-
-	typeConverter, err := tcProvider(baseObj.GetObjectKind().GroupVersionKind())
-	if err != nil {
-		return nil, fmt.Errorf("failed to create type converter: %v", err)
+	if typeConverter == nil {
+		// Create default type converter if none provided
+		defaultTCProvider, err := patch.NewStaticTypeConverterProvider(openapitest.NewEmbeddedFileClient())
+		if err != nil {
+			return nil, fmt.Errorf("failed to create default type converter provider: %v", err)
+		}
+		typeConverter, err = defaultTCProvider(baseObj.GetObjectKind().GroupVersionKind())
+		if err != nil {
+			return nil, fmt.Errorf("failed to create default type converter: %v", err)
+		}
 	}
 
 	// Read remaining documents as test cases
@@ -258,34 +273,91 @@ func LoadValidationTestSuite(path string, scheme *runtime.Scheme) (*ValidationTe
 	}, nil
 }
 
+// validateTestCaseConfiguration checks that the test case is properly configured
+func validateTestCaseConfiguration(tc TestCase) error {
+	// Count how many patch types are set
+	setFields := 0
+	if tc.ApplyConfiguration != nil {
+		setFields++
+	}
+	if tc.JSONPatch != nil {
+		setFields++
+	}
+	if tc.Replace != nil {
+		setFields++
+	}
+
+	if setFields == 0 {
+		return fmt.Errorf("test case %q must specify one of ApplyConfiguration, JSONPatch, or Replace", tc.Name)
+	}
+	if setFields > 1 {
+		return fmt.Errorf("test case %q can only have one of ApplyConfiguration, JSONPatch, or Replace set", tc.Name)
+	}
+
+	return nil
+}
+
+// convertReplaceToJSONPatch converts a Replace map to JSON patch operations
+func convertReplaceToJSONPatch(replaceMap map[string]interface{}) ([]byte, error) {
+	var patchOps []map[string]interface{}
+	for field, value := range replaceMap {
+		// Convert Kubernetes field path to JSON pointer
+		jsonPath, err := fieldPathToJSONPointer(field)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert field path %q to JSON pointer: %v", field, err)
+		}
+		patchOps = append(patchOps, map[string]interface{}{
+			"op":    "replace",
+			"path":  jsonPath,
+			"value": value,
+		})
+	}
+	return json.Marshal(patchOps)
+}
+
+// applyJSONPatchToObject applies a JSON patch to a runtime.Object
+func applyJSONPatchToObject(obj runtime.Object, patchJSON []byte) (runtime.Object, error) {
+	// Convert object to JSON
+	originalJSON, err := runtime.Encode(unstructured.UnstructuredJSONScheme, obj)
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode object to JSON: %v", err)
+	}
+
+	// Parse and apply the patch
+	patch, err := jsonpatch.DecodePatch(patchJSON)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode JSON patch: %v", err)
+	}
+
+	patchedJSON, err := patch.Apply(originalJSON)
+	if err != nil {
+		return nil, fmt.Errorf("failed to apply JSON patch: %v", err)
+	}
+
+	// Decode the patched JSON back into an object
+	patchedObj, err := runtime.Decode(unstructured.UnstructuredJSONScheme, patchedJSON)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode patched JSON: %v", err)
+	}
+
+	return patchedObj, nil
+}
+
 // RunValidationTests runs all test cases in the suite
 func (s *ValidationTestSuite) RunValidationTests(t *testing.T, validateFunc func(runtime.Object) field.ErrorList) {
 	for _, tc := range s.TestCases {
 		t.Run(tc.Name, func(t *testing.T) {
+			if err := validateTestCaseConfiguration(tc); err != nil {
+				t.Fatal(err)
+			}
+
 			u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(s.BaseObject)
 			if err != nil {
 				t.Fatalf("Failed to convert base object to unstructured: %v", err)
 			}
 			var testObj runtime.Object = &unstructured.Unstructured{Object: u}
 
-			// Validate that only one of ApplyConfiguration, JSONPatch, or Replace is set
-			// TODO: Move this validation into a separate function.
-			setFields := 0
 			if tc.ApplyConfiguration != nil {
-				setFields++
-			}
-			if tc.JSONPatch != nil {
-				setFields++
-			}
-			if tc.Replace != nil {
-				setFields++
-			}
-			if setFields > 1 {
-				t.Fatalf("Test case %s can only have one of ApplyConfiguration, JSONPatch, or Replace set", tc.Name)
-			}
-
-			if tc.ApplyConfiguration != nil {
-				// TODO: Split this out into a separate function.
 				applyConfig := &unstructured.Unstructured{Object: tc.ApplyConfiguration}
 				accessor, err := meta.TypeAccessor(applyConfig)
 				if err != nil {
@@ -303,79 +375,38 @@ func (s *ValidationTestSuite) RunValidationTests(t *testing.T, validateFunc func
 				}
 
 				testObj = patchedObj
-			}
-
-			if tc.JSONPatch != nil || tc.Replace != nil {
-				// TODO: Split this out into separate functions.
-				//       One function to build a JSON Patch from a Replace map.
-				//       One function to apply a JSON Patch to an object.
-				// Convert test object to JSON
-				originalJSON, err := runtime.Encode(unstructured.UnstructuredJSONScheme, testObj)
+			} else if tc.JSONPatch != nil {
+				patchJSON, err := json.Marshal(tc.JSONPatch)
 				if err != nil {
-					t.Fatalf("Failed to encode test object to JSON: %v", err)
+					t.Fatalf("Failed to marshal JSON patch: %v", err)
 				}
-
-				var patchJSON []byte
-				if tc.JSONPatch != nil {
-					// Convert JSONPatch to JSON
-					patchJSON, err = json.Marshal(tc.JSONPatch)
-					if err != nil {
-						t.Fatalf("Failed to marshal JSON patch: %v", err)
-					}
-				} else {
-					// If there's only one Replace entry, use its field as the default for zero-valued ExpectedError.Field
-					var defaultField string
-					if len(tc.Replace) == 1 {
-						for field := range tc.Replace {
-							defaultField = field
-							// Update any zero-valued ExpectedError.Field
-							for i := range tc.ExpectedErrors {
-								if tc.ExpectedErrors[i].Field == "" {
-									tc.ExpectedErrors[i].Field = defaultField
-								}
+				patchedObj, err := applyJSONPatchToObject(testObj, patchJSON)
+				if err != nil {
+					t.Fatalf("Failed to apply patch: %v", err)
+				}
+				testObj = patchedObj
+			} else if tc.Replace != nil {
+				// If there's only one Replace entry, use its field as the default for zero-valued ExpectedError.Field
+				if len(tc.Replace) == 1 {
+					for field := range tc.Replace {
+						// Update any zero-valued ExpectedError.Field
+						for i := range tc.ExpectedErrors {
+							if tc.ExpectedErrors[i].Field == "" {
+								tc.ExpectedErrors[i].Field = field
 							}
-							break
 						}
-					}
-
-					// Convert Replace map to JSONPatch operations
-					var patchOps []map[string]interface{}
-					for field, value := range tc.Replace {
-						// Convert Kubernetes field path to JSON pointer
-						jsonPath, err := fieldPathToJSONPointer(field)
-						if err != nil {
-							t.Fatalf("Failed to convert field path %q to JSON pointer: %v", field, err)
-						}
-						patchOps = append(patchOps, map[string]interface{}{
-							"op":    "replace",
-							"path":  jsonPath,
-							"value": value,
-						})
-					}
-					patchJSON, err = json.Marshal(patchOps)
-					if err != nil {
-						t.Fatalf("Failed to marshal Replace operations to JSON patch: %v", err)
+						break
 					}
 				}
 
-				// Parse the patch
-				patch, err := jsonpatch.DecodePatch(patchJSON)
+				patchJSON, err := convertReplaceToJSONPatch(tc.Replace)
 				if err != nil {
-					t.Fatalf("Failed to decode JSON patch: %v", err)
+					t.Fatalf("Failed to convert Replace to JSON patch: %v", err)
 				}
-
-				// Apply the patch
-				patchedJSON, err := patch.Apply(originalJSON)
+				patchedObj, err := applyJSONPatchToObject(testObj, patchJSON)
 				if err != nil {
-					t.Fatalf("Failed to apply JSON patch: %v", err)
+					t.Fatalf("Failed to apply patch: %v", err)
 				}
-
-				// Decode the patched JSON back into an object
-				patchedObj, err := runtime.Decode(unstructured.UnstructuredJSONScheme, patchedJSON)
-				if err != nil {
-					t.Fatalf("Failed to decode patched JSON: %v", err)
-				}
-
 				testObj = patchedObj
 			}
 
