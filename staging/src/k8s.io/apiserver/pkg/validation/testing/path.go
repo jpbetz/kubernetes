@@ -21,10 +21,10 @@ import (
 	"strings"
 )
 
-// FieldPathToJSONPointer converts a Kubernetes field path to a JSON pointer.
+// fieldPathToJSONPointer converts a Kubernetes field path to a JSON pointer.
 // Field paths use dot notation with array indices in square brackets (e.g. spec.containers[0].name)
 // JSON pointers use forward slashes with numeric indices (e.g. /spec/containers/0/name)
-func FieldPathToJSONPointer(fieldPath string) (string, error) {
+func fieldPathToJSONPointer(fieldPath string) (string, error) {
 	if fieldPath == "" {
 		return "", fmt.Errorf("field path cannot be empty")
 	}
@@ -37,14 +37,14 @@ func FieldPathToJSONPointer(fieldPath string) (string, error) {
 	for _, part := range parts {
 		// Handle array index notation [n]
 		if base, remaining, ok := strings.Cut(part, "["); ok {
-			if indexStr, trailing, ok := strings.Cut(remaining, "]"); ok {
+			if index, trailing, ok := strings.Cut(remaining, "]"); ok {
 				if len(trailing) > 0 {
 					return "", fmt.Errorf("invalid array index in field path: %s", part)
 				}
 				result.WriteString("/")
 				result.WriteString(base)
 				result.WriteString("/")
-				result.WriteString(indexStr)
+				result.WriteString(index)
 			} else {
 				return "", fmt.Errorf("invalid array index in field path: %s", part)
 			}

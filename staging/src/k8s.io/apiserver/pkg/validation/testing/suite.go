@@ -94,17 +94,6 @@ func validateErrors(t testing.TB, expected []ExpectedError, actual field.ErrorLi
 	if len(expected) == 0 && len(actual) == 0 {
 		return
 	}
-	if expected == nil && actual != nil {
-		t.Errorf("Expected no validation errors, got %d", len(actual))
-		t.Errorf("Actual errors: %v", actual)
-		return
-	}
-	if expected != nil && actual == nil {
-		t.Errorf("Expected %d validation errors, got none", len(expected))
-		t.Errorf("Expected errors: %v", expected)
-		return
-	}
-
 	if len(expected) != len(actual) {
 		t.Errorf("Expected %d validation errors, got %d", len(expected), len(actual))
 		t.Errorf("Expected errors: %v", expected)
@@ -120,6 +109,7 @@ func validateErrors(t testing.TB, expected []ExpectedError, actual field.ErrorLi
 
 	// Check each expected error
 	for i, exp := range expected {
+		// TODO: Fix this to handle multiple errors for the same field.
 		act, ok := actualByField[exp.Field]
 		if !ok {
 			t.Errorf("Error %d: expected error for field %q, but got none", i, exp.Field)
@@ -127,7 +117,7 @@ func validateErrors(t testing.TB, expected []ExpectedError, actual field.ErrorLi
 		}
 
 		// Check error type
-		if exp.Type != string(act.Type) && exp.Type != "Unsupported value" {
+		if exp.Type != string(act.Type) {
 			t.Errorf("Error %d: expected type %q, got %q for field %q", i, exp.Type, act.Type, exp.Field)
 		}
 
@@ -168,6 +158,7 @@ type ExpectedError struct {
 	Field string `json:"field"`
 
 	// Type is the validation error type (e.g. "FieldValueRequired", "FieldValueInvalid")
+	// TODO: We don't need the FieldValue prefix on these error types, remove it.
 	Type string `json:"type"`
 
 	// Detail is the expected error message detail (optional)
@@ -271,7 +262,6 @@ func LoadValidationTestSuite(path string, scheme *runtime.Scheme) (*ValidationTe
 func (s *ValidationTestSuite) RunValidationTests(t *testing.T, validateFunc func(runtime.Object) field.ErrorList) {
 	for _, tc := range s.TestCases {
 		t.Run(tc.Name, func(t *testing.T) {
-			// Create a copy of the base object
 			u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(s.BaseObject)
 			if err != nil {
 				t.Fatalf("Failed to convert base object to unstructured: %v", err)
@@ -279,6 +269,7 @@ func (s *ValidationTestSuite) RunValidationTests(t *testing.T, validateFunc func
 			var testObj runtime.Object = &unstructured.Unstructured{Object: u}
 
 			// Validate that only one of ApplyConfiguration, JSONPatch, or Replace is set
+			// TODO: Move this validation into a separate function.
 			setFields := 0
 			if tc.ApplyConfiguration != nil {
 				setFields++
@@ -294,6 +285,7 @@ func (s *ValidationTestSuite) RunValidationTests(t *testing.T, validateFunc func
 			}
 
 			if tc.ApplyConfiguration != nil {
+				// TODO: Split this out into a separate function.
 				applyConfig := &unstructured.Unstructured{Object: tc.ApplyConfiguration}
 				accessor, err := meta.TypeAccessor(applyConfig)
 				if err != nil {
@@ -314,6 +306,9 @@ func (s *ValidationTestSuite) RunValidationTests(t *testing.T, validateFunc func
 			}
 
 			if tc.JSONPatch != nil || tc.Replace != nil {
+				// TODO: Split this out into separate functions.
+				//       One function to build a JSON Patch from a Replace map.
+				//       One function to apply a JSON Patch to an object.
 				// Convert test object to JSON
 				originalJSON, err := runtime.Encode(unstructured.UnstructuredJSONScheme, testObj)
 				if err != nil {
@@ -347,7 +342,7 @@ func (s *ValidationTestSuite) RunValidationTests(t *testing.T, validateFunc func
 					var patchOps []map[string]interface{}
 					for field, value := range tc.Replace {
 						// Convert Kubernetes field path to JSON pointer
-						jsonPath, err := FieldPathToJSONPointer(field)
+						jsonPath, err := fieldPathToJSONPointer(field)
 						if err != nil {
 							t.Fatalf("Failed to convert field path %q to JSON pointer: %v", field, err)
 						}
