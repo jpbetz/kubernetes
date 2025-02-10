@@ -1,5 +1,5 @@
 P0 ("things we need to get done to get it merged upstream"):
-- How to deal with fields which are +k8s:optional and +k8s:default - they need a
+- How to deal with fields which are +k8s:optional and +default - they need a
   required-check, but only on server-side, never client-side. 
    - For optional fields w/ defaults how do we want to handle this
    - Are some items in strategies
@@ -15,11 +15,14 @@ P0 ("things we need to get done to get it merged upstream"):
   - test throught strategy.go, validation.go, or both?
   - ok to start process of moving up through strategy.go if it is cleaner?  Should be there already? Initial PR maybe don't do the move?
 - Squash and rebase the PR to prepare for upstream PR
-- Pick location for validator library
-  - k8s.io/apimachinery/pkg/util/validation introduces risk of drift if someone uses code-generator and a different rev of apimachinery
+  - drop unrelated changes, e.g. TODOs in pkg/apis/core/validation/validation_test.go
 - Add metrics gated by "DeclarativeValidationMismatchMetrics" to emit validation errors mismatch
+- Validation "origin" for tests
+
 
 P1:
+- Should defaults take +k8s:default?
+  - Adopted convention of prefix "+k8s:", do defaults also get "+k8s:"?
 - Validation logic for:
   - more format
   - more schema
@@ -28,6 +31,8 @@ P1:
   - if obj.X is value Y, then validate obj.Z
   - field found in listfield Y (e.g. volume mount name)
   - dependencies - field X is allowed IFF field Y
+- lists - whether add/remove are allowed on update
+- listType=set needs to validate all unique values
 - label/annotation validations based on Object type
 - IntOrString
 - Fix subresources
@@ -55,17 +60,28 @@ P1:
   - +eachVal=+subField(Foo)=+minimum=6
   - +subfield(Foo)=+eachField=+minimum=6
   - +subfield(Foo)=+subfield(Bar)=+eachVal=+subField(Qux)=+minimum=6
+- Correlate listType=set by exact value
+  - maybe allow a sloppy compare for IPs?
+- Allow some form of "key" like listMap, but for atomic lists
+  - uniqueness
+  - correlated updates
+- Investigate "chains" style output so CRDs can use the same primitives
+- Simplify the "always nilable" logic
+  - e.g. always pass non-pointer `value` and pointer `oldValue`; return
+    internal error if a pointer field is nil and not checked for
+    `required`/`optional`.
 
 P2: 
 - Deduplicate `jsontagutil.go`. It was copy-pasted in from applyconfig-gen
 - Deduplicate most of enum.go, it was copy-pasted in from kube-openapi
 - Use Go-standard-style names for generated functions
-- Clear out 3 remaining "Migrate to declarative validator" TODOs in `pkg/apis/core/validation/validation_test.go`
   for scalar testing that should be put in declarative validator test code
 - Linear or bin-search ListMap rather thsan build a map?
 - enums: pass the sorted list of value rather than a set, do a linear/binary search
 - Revisit whether eachKey/eachVal can be a single function call
 - Think of a better name and home for operation.Context
+- Add a way to store a comment with a FunctionGen, so we could emit things like
+  the which tag caused it
 
 
 Later:
@@ -85,6 +101,9 @@ Later:
                                                 look at obj.Name and obj.Decl.(TypeSpec).Name.NamePos
                                                 match that to another type?
   ```
+- Add file+line info to gengo Type and Member (for better errors)
+  - parser.fset.Position(Named.Obj().Pos())
+  - parser.fset.Position(Var.Pos())
 - Can we fix the gengo alias-to-ptr issue?  Causes problems in other generators.
   ```
   diff --git a/vendor/k8s.io/gengo/v2/parser/parse.go b/vendor/k8s.io/gengo/v2/parser/parse.go
@@ -102,3 +121,4 @@ Later:
                           if out.Kind != types.Unknown {
   ```
 - Exclude all fields that do not have a json struct tag with a name from validation.
+- Move logic from k8s.io/apimachinery/pkg/util/validation/ to k8s.io/apimachinery/pkg/api/
