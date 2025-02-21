@@ -345,9 +345,7 @@ func GenericFunction(tagName string, flags FunctionFlags, function types.Name, t
 	var anyArgs []any
 	if len(extraArgs) > 0 {
 		anyArgs = make([]any, len(extraArgs))
-		for i, arg := range extraArgs {
-			anyArgs[i] = arg
-		}
+		copy(anyArgs, extraArgs)
 	}
 	return &functionGen{tagName: tagName, flags: flags, function: function, extraArgs: anyArgs, typeArgs: typeArgs}
 }

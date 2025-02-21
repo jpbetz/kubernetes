@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-	http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,8 +31,8 @@ func Test(t *testing.T) {
 			{"key2", 2, "two"},
 		},
 		ListPtrField: []*OtherStruct{
-			&OtherStruct{"key1", 1, "one"},
-			&OtherStruct{"key2", 2, "two"},
+			{"key1", 1, "one"},
+			{"key2", 2, "two"},
 		},
 		ListTypedefField: []OtherTypedefStruct{
 			{"key1", 1, "one"},
@@ -47,8 +47,8 @@ func Test(t *testing.T) {
 			{"key1", 1, "one"},
 		},
 		ListPtrField: []*OtherStruct{
-			&OtherStruct{"key2", 2, "two"},
-			&OtherStruct{"key1", 1, "one"},
+			{"key2", 2, "two"},
+			{"key1", 1, "one"},
 		},
 		ListTypedefField: []OtherTypedefStruct{
 			{"key2", 2, "two"},
@@ -64,9 +64,9 @@ func Test(t *testing.T) {
 			{"key2", 2, "TWO"},
 		},
 		ListPtrField: []*OtherStruct{
-			&OtherStruct{"key3", 3, "THREE"},
-			&OtherStruct{"key1", 1, "ONE"},
-			&OtherStruct{"key2", 2, "TWO"},
+			{"key3", 3, "THREE"},
+			{"key1", 1, "ONE"},
+			{"key2", 2, "TWO"},
 		},
 		ListTypedefField: []OtherTypedefStruct{
 			{"key3", 3, "THREE"},

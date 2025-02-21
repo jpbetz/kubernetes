@@ -18,6 +18,8 @@ limitations under the License.
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
 // +k8s:validation-gen-test-fixture=validateFalse
 
+//nolint:unused
+
 // This is a test package.
 package crosspkg
 
@@ -60,10 +62,10 @@ type T1 struct {
 
 	// +k8s:validateTrue="field T1.SliceOfOtherStruct"
 	// +k8s:eachVal=+k8s:validateTrue="field T1.SliceOfOtherStruct values"
-	SliceOfOtherStruct []other.StructType `json:sliceOfOtherStruct"`
+	SliceOfOtherStruct []other.StructType `json:"sliceOfOtherStruct"`
 
 	// +k8s:validateTrue="field T1.MapOfOtherStringToOtherStruct"
 	// +k8s:eachKey=+k8s:validateTrue="field T1.MapOfOtherStringToOtherStruct keys"
 	// +k8s:eachVal=+k8s:validateTrue="field T1.MapOfOtherStringToOtherStruct values"
-	MapOfOtherStringToOtherStruct map[other.StringType]other.StructType `json:mapOfOtherStringToOtherStruct"`
+	MapOfOtherStringToOtherStruct map[other.StringType]other.StructType `json:"mapOfOtherStringToOtherStruct"`
 }

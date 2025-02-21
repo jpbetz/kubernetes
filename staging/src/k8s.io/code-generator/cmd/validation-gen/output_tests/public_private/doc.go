@@ -18,7 +18,9 @@ limitations under the License.
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
 // +k8s:validation-gen-test-fixture=validateFalse
 
-// This is a test package.
+// Package publicprivate is a test package.
+//
+//nolint:unused,govet // govet disables structtag check, which checks for use of tags on private fields
 package publicprivate
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"

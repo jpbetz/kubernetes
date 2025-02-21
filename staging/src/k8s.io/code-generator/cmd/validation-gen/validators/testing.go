@@ -102,7 +102,7 @@ func (fixedResultTagValidator) parseTagPayload(in string) (fixedResultPayload, e
 	if err := json.Unmarshal([]byte(in), &pl); err != nil {
 		s := ""
 		if err := json.Unmarshal([]byte(in), &s); err != nil {
-			return fixedResultPayload{}, fmt.Errorf("error parsing JSON value: %v (%q)", err, in)
+			return fixedResultPayload{}, fmt.Errorf("error parsing JSON value: %w (%q)", err, in)
 		}
 		return fixedResultPayload{msg: s}, nil
 	}

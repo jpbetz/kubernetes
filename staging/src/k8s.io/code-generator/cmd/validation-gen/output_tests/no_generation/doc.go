@@ -16,7 +16,9 @@ limitations under the License.
 
 // Note: validation generation is not enabled.
 
-// This is a test package.
+// Package nogeneration is a test package.
+//
+//nolint:unused
 package nogeneration
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"

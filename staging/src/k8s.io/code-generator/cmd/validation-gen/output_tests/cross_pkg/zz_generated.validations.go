@@ -139,7 +139,7 @@ func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) 
 			})...)
 			// NOTE: Not iterating this list's values: StructType is in a non-included package.
 			return
-		}(fldPath.Child("SliceOfOtherStruct"), obj.SliceOfOtherStruct, safe.Field(oldObj, func(oldObj *T1) []other.StructType { return oldObj.SliceOfOtherStruct }))...)
+		}(fldPath.Child("sliceOfOtherStruct"), obj.SliceOfOtherStruct, safe.Field(oldObj, func(oldObj *T1) []other.StructType { return oldObj.SliceOfOtherStruct }))...)
 
 	// field T1.MapOfOtherStringToOtherStruct
 	errs = append(errs,
@@ -154,7 +154,7 @@ func Validate_T1(opCtx operation.Context, fldPath *field.Path, obj, oldObj *T1) 
 			// NOTE: Not iterating this map's keys: StringType is in a non-included package.
 			// NOTE: Not iterating this map's values: StructType is in a non-included package.
 			return
-		}(fldPath.Child("MapOfOtherStringToOtherStruct"), obj.MapOfOtherStringToOtherStruct, safe.Field(oldObj, func(oldObj *T1) map[other.StringType]other.StructType { return oldObj.MapOfOtherStringToOtherStruct }))...)
+		}(fldPath.Child("mapOfOtherStringToOtherStruct"), obj.MapOfOtherStringToOtherStruct, safe.Field(oldObj, func(oldObj *T1) map[other.StringType]other.StructType { return oldObj.MapOfOtherStringToOtherStruct }))...)
 
 	return errs
 }

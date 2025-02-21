@@ -265,7 +265,9 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 		l := newLinter()
 		for _, t := range rootTypes {
 			klog.V(4).InfoS("linting root-type", "type", t)
-			l.lintType(t)
+			if err := l.lintType(t); err != nil {
+				klog.Fatalf("failed to lint type %q: %v", t.Name, err)
+			}
 			if len(l.lintErrors) > 0 {
 				lintErrs = append(lintErrs, l.lintErrors...)
 			}

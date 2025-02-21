@@ -26,12 +26,12 @@ func Test(t *testing.T) {
 	st.Value(&Struct{
 		// All zero-values.
 	}).ExpectValidateFalseByPath(map[string][]string{
-		"stringField": []string{"field Struct.StringField"},
+		"stringField": {"field Struct.StringField"},
 	})
 
 	st.Value(&Struct{
 		StringField: "abc",
 	}).ExpectValidateFalseByPath(map[string][]string{
-		"stringField": []string{"field Struct.StringField"},
+		"stringField": {"field Struct.StringField"},
 	})
 }

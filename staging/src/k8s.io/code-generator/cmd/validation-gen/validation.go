@@ -426,11 +426,9 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 	}
 	if validations, err := td.validator.ExtractValidations(context, t.CommentLines); err != nil {
 		return nil, fmt.Errorf("%v: %w", fldPath, err)
-	} else {
-		if !validations.Empty() {
-			klog.V(5).InfoS("found type-attached validations", "n", validations.Len())
-			thisNode.typeValidations.Add(validations)
-		}
+	} else if !validations.Empty() {
+		klog.V(5).InfoS("found type-attached validations", "n", validations.Len())
+		thisNode.typeValidations.Add(validations)
 	}
 
 	// Handle type definitions whose output depends on the rest of type
@@ -466,7 +464,7 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 						v, err := validators.ForEachVal(fldPath, underlying.childType,
 							validators.Function("iterateListValues", validators.DefaultFlags, funcName))
 						if err != nil {
-							return nil, fmt.Errorf("generating list iteration: %v", err)
+							return nil, fmt.Errorf("generating list iteration: %w", err)
 						} else {
 							thisNode.typeValidations.Add(v)
 						}
@@ -492,7 +490,7 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 						v, err := validators.ForEachKey(fldPath, underlying.childType,
 							validators.Function("iterateMapKeys", validators.DefaultFlags, funcName))
 						if err != nil {
-							return nil, fmt.Errorf("generating map key iteration: %v", err)
+							return nil, fmt.Errorf("generating map key iteration: %w", err)
 						} else {
 							thisNode.typeValidations.Add(v)
 						}
@@ -517,7 +515,7 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 						v, err := validators.ForEachVal(fldPath, underlying.childType,
 							validators.Function("iterateMapValues", validators.DefaultFlags, funcName))
 						if err != nil {
-							return nil, fmt.Errorf("generating map value iteration: %v", err)
+							return nil, fmt.Errorf("generating map value iteration: %w", err)
 						} else {
 							thisNode.typeValidations.Add(v)
 						}
@@ -584,15 +582,13 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		didSome := false
 		if validations, err := td.validator.ExtractValidations(context, memb.CommentLines); err != nil {
 			return fmt.Errorf("field %s: %w", childPath.String(), err)
-		} else {
-			if !validations.Empty() {
-				klog.V(5).InfoS("found field-attached validations", "n", validations.Len())
-				child.fieldValidations.Add(validations)
-				if len(validations.Variables) > 0 {
-					return fmt.Errorf("%v: variable generation is not supported for field validations", childPath)
-				}
-				didSome = true
+		} else if !validations.Empty() {
+			klog.V(5).InfoS("found field-attached validations", "n", validations.Len())
+			child.fieldValidations.Add(validations)
+			if len(validations.Variables) > 0 {
+				return fmt.Errorf("%v: variable generation is not supported for field validations", childPath)
 			}
+			didSome = true
 		}
 
 		// Add any other field-attached "special" validators. We need to do
@@ -622,7 +618,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 						v, err := validators.ForEachVal(childPath, childType,
 							validators.Function("iterateListValues", validators.DefaultFlags, funcName))
 						if err != nil {
-							return fmt.Errorf("generating list iteration: %v", err)
+							return fmt.Errorf("generating list iteration: %w", err)
 						} else {
 							child.fieldValidations.Add(v)
 						}
@@ -648,7 +644,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 						v, err := validators.ForEachKey(childPath, childType,
 							validators.Function("iterateMapKeys", validators.DefaultFlags, funcName))
 						if err != nil {
-							return fmt.Errorf("generating map key iteration: %v", err)
+							return fmt.Errorf("generating map key iteration: %w", err)
 						} else {
 							child.fieldValidations.Add(v)
 						}
@@ -673,7 +669,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 						v, err := validators.ForEachVal(childPath, childType,
 							validators.Function("iterateMapValues", validators.DefaultFlags, funcName))
 						if err != nil {
-							return fmt.Errorf("generating map value iteration: %v", err)
+							return fmt.Errorf("generating map value iteration: %w", err)
 						} else {
 							child.fieldValidations.Add(v)
 						}
@@ -943,7 +939,9 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 				sw.Do("// field $.inType|raw$.$.fieldName$\n", targs)
 				sw.Do("errs = append(errs,\n", targs)
 				sw.Do("  func(fldPath *$.field.Path|raw$, obj, oldObj $.fieldTypePfx$$.fieldType|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
-				sw.Merge(buf, bufsw)
+				if err := sw.Merge(buf, bufsw); err != nil {
+					panic(fmt.Sprintf("failed to merge buffer: %v", err))
+				}
 				sw.Do("    return\n", targs)
 				sw.Do("  }(fldPath.Child(\"$.fieldJSON$\"), ", targs)
 				sw.Do("    $.fieldExprPfx$obj.$.fieldName$, ", targs)
@@ -1293,6 +1291,7 @@ func toGolangSourceDataLiteral(sw *generator.SnippetWriter, c *generator.Context
 // The name is expected to be the "JSON name", rather than the Go name.  This
 // function will descend into embedded types which would appear in JSON to be
 // directly in the parent struct.  If t is not a struct this does nothing.
+// nolint:unused // FIXME: Remove once all validation-gen PRs are merged
 func findMemberByFieldName(t *types.Type, name string) (types.Member, bool) {
 	for _, m := range t.Members {
 		if jsonTag, found := tags.LookupJSON(m); found {

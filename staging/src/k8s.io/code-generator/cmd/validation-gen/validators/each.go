@@ -159,7 +159,7 @@ func (lmktv listMapKeyTagValidator) GetValidations(context Context, _ []string, 
 		return Validations{}, fmt.Errorf("only lists of structs can be list-maps")
 	}
 
-	fieldName := payload
+	var fieldName string
 	if memb := getMemberByJSON(realType(t.Elem), payload); memb == nil {
 		return Validations{}, fmt.Errorf("no field for JSON name %q", payload)
 	} else if k := realType(memb.Type).Kind; k != types.Builtin {

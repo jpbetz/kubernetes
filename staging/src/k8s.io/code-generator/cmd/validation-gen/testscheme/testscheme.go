@@ -32,8 +32,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/google/go-cmp/cmp"         // nolint:depguard // this package provides test utilities
+	"github.com/google/go-cmp/cmp/cmpopts" // nolint:depguard // this package provides test utilities
 	fuzz "github.com/google/gofuzz"
 
 	"k8s.io/apimachinery/pkg/api/operation"
@@ -165,9 +165,17 @@ func (s *ValidationTestBuilder) ValidateFixtures() {
 		} else if err != nil {
 			s.Fatal(err)
 		}
-		defer testdataFile.Close()
+		defer func() {
+			err := testdataFile.Close()
+			if err != nil {
+				s.Fatal(err)
+			}
+		}()
 
 		byteValue, err := io.ReadAll(testdataFile)
+		if err != nil {
+			s.Fatal(err)
+		}
 		testdata := map[string]map[string][]string{}
 		err = json.Unmarshal(byteValue, &testdata)
 		if err != nil {
@@ -189,12 +197,10 @@ func (s *ValidationTestBuilder) ValidateFixtures() {
 				if !ok {
 					t.Errorf("%q has expected validateFalse args in %s but got no validation errors.", k, testdataFilename)
 					hasErrors = true
-				} else {
-					if !cmp.Equal(gotForType, expectedForType) {
-						t.Errorf("validateFalse args, grouped by field path, differed from %s:\n%s\n",
-							testdataFilename, cmp.Diff(gotForType, expectedForType, cmpopts.SortMaps(stdcmp.Less[string])))
-						hasErrors = true
-					}
+				} else if !cmp.Equal(gotForType, expectedForType) {
+					t.Errorf("validateFalse args, grouped by field path, differed from %s:\n%s\n",
+						testdataFilename, cmp.Diff(gotForType, expectedForType, cmpopts.SortMaps(stdcmp.Less[string])))
+					hasErrors = true
 				}
 			})
 		}

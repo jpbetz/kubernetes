@@ -32,8 +32,8 @@ func Test(t *testing.T) {
 				StringField: "SS2",
 			}},
 			MapField: map[string]SmallStruct{
-				"a": SmallStruct{StringField: "SM1"},
-				"b": SmallStruct{StringField: "SM2"},
+				"a": {StringField: "SM1"},
+				"b": {StringField: "SM2"},
 			},
 		},
 		StructPtrField: &OtherStruct{
@@ -44,8 +44,8 @@ func Test(t *testing.T) {
 				StringField: "SPS2",
 			}},
 			MapField: map[string]SmallStruct{
-				"b": SmallStruct{StringField: "SPM1"},
-				"a": SmallStruct{StringField: "SPM2"},
+				"b": {StringField: "SPM1"},
+				"a": {StringField: "SPM2"},
 			},
 		},
 	}).ExpectValidateFalseByPath(map[string][]string{

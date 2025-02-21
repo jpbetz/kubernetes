@@ -104,7 +104,7 @@ func testEachSliceValUpdate[T any](t *testing.T, name string, input []T) {
 func TestEachSliceValNilablePointer(t *testing.T) {
 	testEachSliceValNilable(t, "valid", []*int{ptr.To(11), ptr.To(12), ptr.To(13)})
 	testEachSliceValNilable(t, "valid", []*string{ptr.To("a"), ptr.To("b"), ptr.To("c")})
-	testEachSliceValNilable(t, "valid", []*TestStruct{&TestStruct{11, "a"}, &TestStruct{12, "b"}, &TestStruct{13, "c"}})
+	testEachSliceValNilable(t, "valid", []*TestStruct{{11, "a"}, {12, "b"}, {13, "c"}})
 
 	testEachSliceValNilable(t, "empty", []*int{})
 	testEachSliceValNilable(t, "empty", []*string{})
@@ -116,7 +116,7 @@ func TestEachSliceValNilablePointer(t *testing.T) {
 
 	testEachSliceValNilableUpdate(t, "valid", []*int{ptr.To(11), ptr.To(12), ptr.To(13)})
 	testEachSliceValNilableUpdate(t, "valid", []*string{ptr.To("a"), ptr.To("b"), ptr.To("c")})
-	testEachSliceValNilableUpdate(t, "valid", []*TestStruct{&TestStruct{11, "a"}, &TestStruct{12, "b"}, &TestStruct{13, "c"}})
+	testEachSliceValNilableUpdate(t, "valid", []*TestStruct{{11, "a"}, {12, "b"}, {13, "c"}})
 
 	testEachSliceValNilableUpdate(t, "empty", []*int{})
 	testEachSliceValNilableUpdate(t, "empty", []*string{})
@@ -237,7 +237,7 @@ func testEachMapVal[T any](t *testing.T, name string, input map[string]T) {
 func TestEachMapValNilablePointer(t *testing.T) {
 	testEachMapValNilable(t, "valid", map[string]*int{"one": ptr.To(11), "two": ptr.To(12), "three": ptr.To(13)})
 	testEachMapValNilable(t, "valid", map[string]*string{"A": ptr.To("a"), "B": ptr.To("b"), "C": ptr.To("c")})
-	testEachMapValNilable(t, "valid", map[string]*TestStruct{"one": &TestStruct{11, "a"}, "two": &TestStruct{12, "b"}, "three": &TestStruct{13, "c"}})
+	testEachMapValNilable(t, "valid", map[string]*TestStruct{"one": {11, "a"}, "two": {12, "b"}, "three": {13, "c"}})
 
 	testEachMapValNilable(t, "empty", map[string]*int{})
 	testEachMapValNilable(t, "empty", map[string]*string{})
@@ -250,21 +250,21 @@ func TestEachMapValNilablePointer(t *testing.T) {
 
 func TestEachMapValNilableSlice(t *testing.T) {
 	testEachMapValNilable(t, "valid", map[string][]int{
-		"one":   []int{11, 12, 13},
-		"two":   []int{12, 13, 14},
-		"three": []int{13, 14, 15}})
+		"one":   {11, 12, 13},
+		"two":   {12, 13, 14},
+		"three": {13, 14, 15}})
 	testEachMapValNilable(t, "valid", map[string][]string{
-		"A": []string{"a", "b", "c"},
-		"B": []string{"b", "c", "d"},
-		"C": []string{"c", "d", "e"}})
+		"A": {"a", "b", "c"},
+		"B": {"b", "c", "d"},
+		"C": {"c", "d", "e"}})
 	testEachMapValNilable(t, "valid", map[string][]TestStruct{
-		"one":   []TestStruct{{11, "a"}, {12, "b"}, {13, "c"}},
-		"two":   []TestStruct{{12, "a"}, {13, "b"}, {14, "c"}},
-		"three": []TestStruct{{13, "a"}, {14, "b"}, {15, "c"}}})
+		"one":   {{11, "a"}, {12, "b"}, {13, "c"}},
+		"two":   {{12, "a"}, {13, "b"}, {14, "c"}},
+		"three": {{13, "a"}, {14, "b"}, {15, "c"}}})
 
-	testEachMapValNilable(t, "empty", map[string][]int{"a": []int{}, "b": []int{}, "c": []int{}})
-	testEachMapValNilable(t, "empty", map[string][]string{"a": []string{}, "b": []string{}, "c": []string{}})
-	testEachMapValNilable(t, "empty", map[string][]TestStruct{"a": []TestStruct{}, "b": []TestStruct{}, "c": []TestStruct{}})
+	testEachMapValNilable(t, "empty", map[string][]int{"a": {}, "b": {}, "c": {}})
+	testEachMapValNilable(t, "empty", map[string][]string{"a": {}, "b": {}, "c": {}})
+	testEachMapValNilable(t, "empty", map[string][]TestStruct{"a": {}, "b": {}, "c": {}})
 
 	testEachMapValNilable[int](t, "nil", nil)
 	testEachMapValNilable[string](t, "nil", nil)
