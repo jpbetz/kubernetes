@@ -68,9 +68,9 @@ func (iotv ifOptionTagValidator) GetValidations(context Context, args []string, 
 	} else {
 		for _, fn := range validations.Functions {
 			if iotv.enabled {
-				result.Functions = append(result.Functions, WithCondition(fn, Conditions{OptionEnabled: optionName}))
+				result.Functions = append(result.Functions, fn.WithConditions(Conditions{OptionEnabled: optionName}))
 			} else {
-				result.Functions = append(result.Functions, WithCondition(fn, Conditions{OptionDisabled: optionName}))
+				result.Functions = append(result.Functions, fn.WithConditions(Conditions{OptionDisabled: optionName}))
 			}
 			result.Variables = append(result.Variables, validations.Variables...)
 		}

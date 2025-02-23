@@ -71,7 +71,7 @@ func (etv *enumTagValidator) GetValidations(context Context, _ []string, payload
 		//       The correct package would be the output package but is not known here. This does not show up in generated code.
 		// TODO: Append a consistent hash suffix to avoid generated name conflicts?
 		supportVarName := PrivateVar{Name: "SymbolsFor" + context.Parent.Name.Name, Package: "local"}
-		supportVar := Variable(supportVarName, GenericFunction(enumTagName, DefaultFlags, setsNew, []types.Name{enum.Name}, enum.ValueArgs()...))
+		supportVar := Variable(supportVarName, Function(enumTagName, DefaultFlags, setsNew, enum.ValueArgs()...).WithTypeArgs(enum.Name))
 		result.AddVariable(supportVar)
 		fn := Function(enumTagName, DefaultFlags, enumValidator, supportVarName)
 		result.AddFunction(fn)
