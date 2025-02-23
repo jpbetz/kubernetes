@@ -89,6 +89,7 @@ func Validate_ReplicationControllerSpec(ctx context.Context, op operation.Operat
 	// field corev1.ReplicationControllerSpec.Replicas
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *int32) (errs field.ErrorList) {
+			// optional fields with default values are effectively required
 			if e := validate.RequiredPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
