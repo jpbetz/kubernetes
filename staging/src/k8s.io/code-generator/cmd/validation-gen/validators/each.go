@@ -252,8 +252,8 @@ func (evtv eachValTagValidator) getValidations(fldPath *field.Path, t *types.Typ
 
 // ForEachVal returns a validation that applies a function to each element of
 // a list or map.
-func ForEachVal(fldPath *field.Path, t *types.Type, fn FunctionGen) (Validations, error) {
-	return globalEachVal.getValidations(fldPath, t, Validations{Functions: []FunctionGen{fn}})
+func ForEachVal(fldPath *field.Path, t *types.Type, fn *FunctionGen) (Validations, error) {
+	return globalEachVal.getValidations(fldPath, t, Validations{Functions: []*FunctionGen{fn}})
 }
 
 func (evtv eachValTagValidator) getListValidations(fldPath *field.Path, t *types.Type, validations Validations) (Validations, error) {
@@ -298,7 +298,7 @@ func (evtv eachValTagValidator) getListValidations(fldPath *field.Path, t *types
 			cmpFn.Body = buf.String()
 			cmpArg = cmpFn
 		}
-		f := Function(eachValTagName, vfn.Flags(), validateEach, cmpArg, WrapperFunction{vfn, t.Elem})
+		f := Function(eachValTagName, vfn.Flags, validateEach, cmpArg, WrapperFunction{vfn, t.Elem})
 		result.Functions = append(result.Functions, f)
 	}
 
@@ -320,7 +320,7 @@ func (evtv eachValTagValidator) getMapValidations(t *types.Type, validations Val
 			validateEach = validateEachMapVal
 		}
 
-		f := Function(eachValTagName, vfn.Flags(), validateEach, WrapperFunction{vfn, t.Elem})
+		f := Function(eachValTagName, vfn.Flags, validateEach, WrapperFunction{vfn, t.Elem})
 		result.Functions = append(result.Functions, f)
 	}
 
@@ -391,7 +391,7 @@ func (ektv eachKeyTagValidator) getValidations(t *types.Type, validations Valida
 	result := Validations{}
 	result.OpaqueKeyType = validations.OpaqueType
 	for _, vfn := range validations.Functions {
-		f := Function(eachKeyTagName, vfn.Flags(), validateEachMapKey, WrapperFunction{vfn, t.Key})
+		f := Function(eachKeyTagName, vfn.Flags, validateEachMapKey, WrapperFunction{vfn, t.Key})
 		result.Functions = append(result.Functions, f)
 	}
 	return result, nil
@@ -399,8 +399,8 @@ func (ektv eachKeyTagValidator) getValidations(t *types.Type, validations Valida
 
 // ForEachKey returns a validation that applies a function to each key of
 // a map.
-func ForEachKey(_ *field.Path, t *types.Type, fn FunctionGen) (Validations, error) {
-	return globalEachKey.getValidations(t, Validations{Functions: []FunctionGen{fn}})
+func ForEachKey(_ *field.Path, t *types.Type, fn *FunctionGen) (Validations, error) {
+	return globalEachKey.getValidations(t, Validations{Functions: []*FunctionGen{fn}})
 }
 
 func (ektv eachKeyTagValidator) Docs() TagDoc {

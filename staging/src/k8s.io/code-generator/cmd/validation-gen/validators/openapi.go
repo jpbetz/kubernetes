@@ -69,7 +69,7 @@ func (formatTagValidator) GetValidations(context Context, _ []string, payload st
 	return result, nil
 }
 
-func getFormatValidationFunction(format string) (FunctionGen, error) {
+func getFormatValidationFunction(format string) (*FunctionGen, error) {
 	// The naming convention for these formats follows the JSON schema style:
 	// all lower-case, dashes between words. See
 	// https://json-schema.org/draft/2020-12/json-schema-validation#name-defined-formats
