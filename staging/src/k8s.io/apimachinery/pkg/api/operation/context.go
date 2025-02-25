@@ -24,7 +24,8 @@ import "k8s.io/apimachinery/pkg/util/sets"
 // in the future to include other information needed to validate requests.
 type Context struct {
 	Operation Operation
-	// Options declare the options enabled for validation.
+	// Options declare the options enabled/true for validation.
+	// Unset options are disabled/false.
 	// Options should be set according to a resource validation strategy before validation
 	// is performed, and must be treated as read-only during validation.
 	// Options are identified by string names. Option string names may match the name of a feature

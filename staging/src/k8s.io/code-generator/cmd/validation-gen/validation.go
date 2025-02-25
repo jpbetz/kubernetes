@@ -50,7 +50,7 @@ var (
 	fieldPkgSymbols     = mkPkgNames(fieldPkg, "ErrorList", "InternalError", "Path")
 	fmtPkgSymbols       = mkPkgNames("fmt", "Errorf")
 	safePkg             = "k8s.io/apimachinery/pkg/api/safe"
-	safePkgSymbols      = mkPkgNames(safePkg, "Field", "Lookup", "Cast", "PtrTo", "Deref", "Ident")
+	safePkgSymbols      = mkPkgNames(safePkg, "Field", "Cast")
 	operationPkg        = "k8s.io/apimachinery/pkg/api/operation"
 	operationPkgSymbols = mkPkgNames(operationPkg, "Context", "Update")
 )
