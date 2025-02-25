@@ -83,6 +83,8 @@ P2:
 - Revisit whether eachKey/eachVal can be a single function call
 - Add a way to store a comment with a FunctionGen, so we could emit things like
   the which tag caused it
+- When we do CRDs:
+  - accept or warn on kubebuilder comments?
 
 
 Later:
