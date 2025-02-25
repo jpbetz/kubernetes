@@ -197,9 +197,9 @@ func (rtv requirednessTagValidator) Docs() TagDoc {
 
 	switch rtv.mode {
 	case requirednessRequired:
-		doc.Description = "Indicates that a field is optional to clients."
-	case requirednessOptional:
 		doc.Description = "Indicates that a field must be specified by clients."
+	case requirednessOptional:
+		doc.Description = "Indicates that a field is optional to clients."
 	case requirednessForbidden:
 		doc.Description = "Indicates that a field may not be specified."
 	default:
