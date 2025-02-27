@@ -150,6 +150,21 @@ const (
 	// Enable usage of Provision of PVCs from snapshots in other namespaces
 	CrossNamespaceVolumeDataSource featuregate.Feature = "CrossNamespaceVolumeDataSource"
 
+	// owner: @thockin
+	// kep: http://kep.k8s.io/5073:
+	// beta: v1.33
+	//
+	// Enables declarative validation of APIs, where declared.
+	EnableDeclarativeValidation featuregate.Feature = "EnableDeclarativeValidation"
+
+	// owner: @thockin
+	// kep: http://kep.k8s.io/5073:
+	// beta: v1.33
+	//
+	// DisableImperativeDeclarativeOverlap disables imperative validation of APIs in cases
+	// where there is a declarated analagous declarative validation for that API.
+	DisableImperativeDeclarativeOverlap featuregate.Feature = "DisableImperativeDeclarativeOverlap"
+
 	// owner: @atiratree
 	// kep: http://kep.k8s.io/3973
 	//

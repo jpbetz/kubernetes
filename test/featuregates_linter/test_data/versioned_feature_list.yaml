@@ -364,6 +364,18 @@
     lockToDefault: true
     preRelease: GA
     version: "1.32"
+- name: EnableDeclarativeValidation
+  versionedSpecs:
+  - default: false
+    lockToDefault: false
+    preRelease: Beta
+    version: "1.33"
+- name: DisableImperativeDeclarativeOverlap
+  versionedSpecs:
+  - default: false
+    lockToDefault: false
+    preRelease: Beta
+    version: "1.33"
 - name: DeploymentPodReplacementPolicy
   versionedSpecs:
   - default: false
