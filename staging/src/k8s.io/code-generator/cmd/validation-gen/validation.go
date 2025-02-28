@@ -910,10 +910,16 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			// If the node is nil, this must be a type in a package we are not
 			// handling - it's effectively opaque to us.
 			if fld.node == nil {
-				targs := generator.Args{
-					"type": fld.childType,
+				if fld.fieldValidations.SkipUnimported {
+					targs := generator.Args{
+						"type": fld.childType,
+					}
+					bufsw.Do("// NOTE: Not validating this field's type: $.type|raw$ is in a non-included package.\n", targs)
+				} else {
+					panic(fmt.Sprintf(`Cannot generate validation for field '%v' of type: %v. It is in a
+ non-included package. To resolve, either add the package to validation-gen's --extra-pkg flag, or add
++k8s:skipUnimported to the field to skip validation.`, fld.name, fld.childType.String()))
 				}
-				bufsw.Do("// NOTE: Not validating this field's type: $.type|raw$ is in a non-included package.\n", targs)
 			} else {
 				// Get to the real type.
 				switch fld.node.valueType.Kind {

@@ -54,18 +54,23 @@ type T1 struct {
 	TypedefsE4 typedefs.E4 `json:"typedefse4"`
 
 	// +k8s:validateTrue="field T1.OtherString"
+	// +k8s:skipUnimported
 	OtherString other.StringType `json:"otherString"`
 	// +k8s:validateTrue="field T1.OtherInt"
+	// +k8s:skipUnimported
 	OtherInt other.IntType `json:"otherInt"`
 	// +k8s:validateTrue="field T1.OtherStruct"
+	// +k8s:skipUnimported
 	OtherStruct other.StructType `json:"otherStruct"`
 
 	// +k8s:validateTrue="field T1.SliceOfOtherStruct"
 	// +k8s:eachVal=+k8s:validateTrue="field T1.SliceOfOtherStruct values"
+	// +k8s:skipUnimported
 	SliceOfOtherStruct []other.StructType `json:"sliceOfOtherStruct"`
 
 	// +k8s:validateTrue="field T1.MapOfOtherStringToOtherStruct"
 	// +k8s:eachKey=+k8s:validateTrue="field T1.MapOfOtherStringToOtherStruct keys"
 	// +k8s:eachVal=+k8s:validateTrue="field T1.MapOfOtherStringToOtherStruct values"
+	// +k8s:skipUnimported
 	MapOfOtherStringToOtherStruct map[other.StringType]other.StructType `json:"mapOfOtherStringToOtherStruct"`
 }

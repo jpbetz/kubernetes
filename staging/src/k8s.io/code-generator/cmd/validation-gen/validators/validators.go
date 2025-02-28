@@ -208,9 +208,10 @@ type TagPayloadSchema struct {
 
 // Validations defines the function calls and variables to generate to perform validation.
 type Validations struct {
-	Functions []FunctionGen
-	Variables []VariableGen
-	Comments  []string
+	Functions      []FunctionGen
+	Variables      []VariableGen
+	Comments       []string
+	SkipUnimported bool
 }
 
 func (v *Validations) Empty() bool {
@@ -237,6 +238,7 @@ func (v *Validations) Add(o Validations) {
 	v.Functions = append(v.Functions, o.Functions...)
 	v.Variables = append(v.Variables, o.Variables...)
 	v.Comments = append(v.Comments, o.Comments...)
+	v.SkipUnimported = v.SkipUnimported || o.SkipUnimported
 }
 
 // FunctionFlags define optional properties of a validator.  Most validators
