@@ -167,7 +167,6 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *other.StringType) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.OtherString")...)
-			// NOTE: Not validating this field's type: other.StringType is in a non-included package.
 			return
 		}(fldPath.Child("otherString"), &obj.OtherString, safe.Field(oldObj, func(oldObj *T1) *other.StringType { return &oldObj.OtherString }))...)
 
@@ -175,7 +174,6 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *other.StringType) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.OtherStringPtr")...)
-			// NOTE: Not validating this field's type: *other.StringType is in a non-included package.
 			return
 		}(fldPath.Child("otherStringPtr"), obj.OtherStringPtr, safe.Field(oldObj, func(oldObj *T1) *other.StringType { return oldObj.OtherStringPtr }))...)
 
@@ -183,7 +181,6 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *other.IntType) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.OtherInt")...)
-			// NOTE: Not validating this field's type: other.IntType is in a non-included package.
 			return
 		}(fldPath.Child("otherInt"), &obj.OtherInt, safe.Field(oldObj, func(oldObj *T1) *other.IntType { return &oldObj.OtherInt }))...)
 
@@ -191,7 +188,6 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *other.IntType) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.OtherIntPtr")...)
-			// NOTE: Not validating this field's type: *other.IntType is in a non-included package.
 			return
 		}(fldPath.Child("otherIntPtr"), obj.OtherIntPtr, safe.Field(oldObj, func(oldObj *T1) *other.IntType { return oldObj.OtherIntPtr }))...)
 
@@ -199,7 +195,6 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *other.StructType) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.OtherStruct")...)
-			// NOTE: Not validating this field's type: other.StructType is in a non-included package.
 			return
 		}(fldPath.Child("otherStruct"), &obj.OtherStruct, safe.Field(oldObj, func(oldObj *T1) *other.StructType { return &oldObj.OtherStruct }))...)
 
@@ -207,7 +202,6 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *other.StructType) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.OtherStructPtr")...)
-			// NOTE: Not validating this field's type: *other.StructType is in a non-included package.
 			return
 		}(fldPath.Child("otherStructPtr"), obj.OtherStructPtr, safe.Field(oldObj, func(oldObj *T1) *other.StructType { return oldObj.OtherStructPtr }))...)
 
@@ -218,7 +212,6 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 			errs = append(errs, validate.EachSliceVal(ctx, op, fldPath, obj, oldObj, nil, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *other.StructType) field.ErrorList {
 				return validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.SliceOfOtherStruct values")
 			})...)
-			// NOTE: Not iterating this list's values: StructType is in a non-included package.
 			return
 		}(fldPath.Child("sliceOfOtherStruct"), obj.SliceOfOtherStruct, safe.Field(oldObj, func(oldObj *T1) []other.StructType { return oldObj.SliceOfOtherStruct }))...)
 
@@ -229,9 +222,28 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 			errs = append(errs, validate.EachSliceValNilable(ctx, op, fldPath, obj, oldObj, nil, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *other.StructType) field.ErrorList {
 				return validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.SliceOfOtherStructPtr values")
 			})...)
-			// NOTE: Not iterating this list's values: *k8s.io/code-generator/cmd/validation-gen/output_tests/_codegenignore/other.StructType is in a non-included package.
 			return
 		}(fldPath.Child("sliceOfOtherStructPtr"), obj.SliceOfOtherStructPtr, safe.Field(oldObj, func(oldObj *T1) []*other.StructType { return oldObj.SliceOfOtherStructPtr }))...)
+
+	// field T1.ListMapOfOtherStruct
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj []other.StructType) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.ListMapOfOtherStruct")...)
+			errs = append(errs, validate.EachSliceVal(ctx, op, fldPath, obj, oldObj, func(a other.StructType, b other.StructType) bool { return a.StringField == b.StringField }, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *other.StructType) field.ErrorList {
+				return validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.SliceOfOtherStruct values")
+			})...)
+			return
+		}(fldPath.Child("listMapOfOtherStruct"), obj.ListMapOfOtherStruct, safe.Field(oldObj, func(oldObj *T1) []other.StructType { return oldObj.ListMapOfOtherStruct }))...)
+
+	// field T1.ListMapOfOtherStructPtr
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj []*other.StructType) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.ListMapOfOtherStructPtr")...)
+			errs = append(errs, validate.EachSliceValNilable(ctx, op, fldPath, obj, oldObj, func(a *other.StructType, b *other.StructType) bool { return a.StringField == b.StringField }, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *other.StructType) field.ErrorList {
+				return validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.SliceOfOtherStructPtr values")
+			})...)
+			return
+		}(fldPath.Child("listMapOfOtherStructPtr"), obj.ListMapOfOtherStructPtr, safe.Field(oldObj, func(oldObj *T1) []*other.StructType { return oldObj.ListMapOfOtherStructPtr }))...)
 
 	// field T1.MapOfOtherStringToOtherStruct
 	errs = append(errs,
@@ -243,8 +255,6 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 			errs = append(errs, validate.EachMapVal(ctx, op, fldPath, obj, oldObj, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *other.StructType) field.ErrorList {
 				return validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.MapOfOtherStringToOtherStruct values")
 			})...)
-			// NOTE: Not iterating this map's keys: StringType is in a non-included package.
-			// NOTE: Not iterating this map's values: StructType is in a non-included package.
 			return
 		}(fldPath.Child("mapOfOtherStringToOtherStruct"), obj.MapOfOtherStringToOtherStruct, safe.Field(oldObj, func(oldObj *T1) map[other.StringType]other.StructType { return oldObj.MapOfOtherStringToOtherStruct }))...)
 
@@ -258,8 +268,6 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 			errs = append(errs, validate.EachMapValNilable(ctx, op, fldPath, obj, oldObj, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *other.StructType) field.ErrorList {
 				return validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.MapOfOtherStringToOtherStructPtr values")
 			})...)
-			// NOTE: Not iterating this map's keys: StringType is in a non-included package.
-			// NOTE: Not iterating this map's values: *k8s.io/code-generator/cmd/validation-gen/output_tests/_codegenignore/other.StructType is in a non-included package.
 			return
 		}(fldPath.Child("mapOfOtherStringToOtherStructPtr"), obj.MapOfOtherStringToOtherStructPtr, safe.Field(oldObj, func(oldObj *T1) map[other.StringType]*other.StructType {
 			return oldObj.MapOfOtherStringToOtherStructPtr

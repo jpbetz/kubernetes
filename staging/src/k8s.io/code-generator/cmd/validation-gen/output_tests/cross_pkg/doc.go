@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// +k8s:validation-gen=TypeMeta
+// +k8s:validation-gen=*
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
 // +k8s:validation-gen-test-fixture=validateFalse
 
@@ -68,31 +68,71 @@ type T1 struct {
 	TypedefsE4Ptr *typedefs.E4 `json:"typedefse4Ptr"`
 
 	// +k8s:validateTrue="field T1.OtherString"
+	// +k8s:skipUnimported
 	OtherString other.StringType `json:"otherString"`
 	// +k8s:validateTrue="field T1.OtherStringPtr"
+	// +k8s:skipUnimported
 	OtherStringPtr *other.StringType `json:"otherStringPtr"`
 	// +k8s:validateTrue="field T1.OtherInt"
+	// +k8s:skipUnimported
 	OtherInt other.IntType `json:"otherInt"`
 	// +k8s:validateTrue="field T1.OtherIntPtr"
+	// +k8s:skipUnimported
 	OtherIntPtr *other.IntType `json:"otherIntPtr"`
 	// +k8s:validateTrue="field T1.OtherStruct"
+	// +k8s:skipUnimported
 	OtherStruct other.StructType `json:"otherStruct"`
 	// +k8s:validateTrue="field T1.OtherStructPtr"
+	// +k8s:skipUnimported
 	OtherStructPtr *other.StructType `json:"otherStructPtr"`
 
 	// +k8s:validateTrue="field T1.SliceOfOtherStruct"
 	// +k8s:eachVal=+k8s:validateTrue="field T1.SliceOfOtherStruct values"
+	// +k8s:eachVal=+k8s:skipUnimported
 	SliceOfOtherStruct []other.StructType `json:"sliceOfOtherStruct"`
 	// +k8s:validateTrue="field T1.SliceOfOtherStructPtr"
 	// +k8s:eachVal=+k8s:validateTrue="field T1.SliceOfOtherStructPtr values"
+	// +k8s:eachVal=+k8s:skipUnimported
 	SliceOfOtherStructPtr []*other.StructType `json:"sliceOfOtherStructPtr"`
+
+	// +k8s:validateTrue="field T1.ListMapOfOtherStruct"
+	// +k8s:eachVal=+k8s:validateTrue="field T1.SliceOfOtherStruct values"
+	// +k8s:listType=map
+	// +k8s:listMapKey=stringField
+	// +k8s:eachVal=+k8s:skipUnimported
+	ListMapOfOtherStruct []other.StructType `json:"listMapOfOtherStruct"`
+	// +k8s:validateTrue="field T1.ListMapOfOtherStructPtr"
+	// +k8s:eachVal=+k8s:validateTrue="field T1.SliceOfOtherStructPtr values"
+	// +k8s:listType=map
+	// +k8s:listMapKey=stringField
+	// +k8s:eachVal=+k8s:skipUnimported
+	ListMapOfOtherStructPtr []*other.StructType `json:"listMapOfOtherStructPtr"`
 
 	// +k8s:validateTrue="field T1.MapOfOtherStringToOtherStruct"
 	// +k8s:eachKey=+k8s:validateTrue="field T1.MapOfOtherStringToOtherStruct keys"
 	// +k8s:eachVal=+k8s:validateTrue="field T1.MapOfOtherStringToOtherStruct values"
+	// +k8s:eachKey=+k8s:skipUnimported
+	// +k8s:eachVal=+k8s:skipUnimported
 	MapOfOtherStringToOtherStruct map[other.StringType]other.StructType `json:"mapOfOtherStringToOtherStruct"`
 	// +k8s:validateTrue="field T1.MapOfOtherStringToOtherStructPtr"
 	// +k8s:eachKey=+k8s:validateTrue="field T1.MapOfOtherStringToOtherStructPtr keys"
 	// +k8s:eachVal=+k8s:validateTrue="field T1.MapOfOtherStringToOtherStructPtr values"
+	// +k8s:eachKey=+k8s:skipUnimported
+	// +k8s:eachVal=+k8s:skipUnimported
 	MapOfOtherStringToOtherStructPtr map[other.StringType]*other.StructType `json:"mapOfOtherStringToOtherStructPtr"`
 }
+
+// TODO: the validateFalse test fixture doesn't handle map and slice types, and
+// fixing it requires fixing gofuzz.  That is a tomorrow problem.  For now, the
+// following types have been tested to fail without +k8s:skipUnimported.
+
+/*
+// +k8s:validateTrue="type TypedefSliceOther"
+// +k8s:eachVal=+k8s:skipUnimported
+type TypedefSliceOther []other.StructType
+
+// +k8s:validateTrue="type TypedefMapOther"
+// +k8s:eachKey=+k8s:skipUnimported
+// +k8s:eachVal=+k8s:skipUnimported
+type TypedefMapOther map[other.StringType]other.StructType
+*/
