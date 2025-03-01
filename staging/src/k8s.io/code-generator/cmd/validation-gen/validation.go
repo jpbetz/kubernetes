@@ -345,7 +345,7 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 
 	// Discover into this type before extracting type validations.
 	switch t.Kind {
-	case types.Builtin:
+	case types.Builtin, types.Interface:
 		// Nothing more to do.
 	case types.Alias:
 		// Discover the underlying type.
