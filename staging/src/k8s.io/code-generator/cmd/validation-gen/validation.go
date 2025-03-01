@@ -448,12 +448,15 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 		case types.Slice, types.Array:
 			// Validate each value.
 			if elemNode := underlying.node.elem.node; elemNode == nil {
-				if !thisNode.typeValidations.SkipUnimportedVal {
+				if !thisNode.typeValidations.OpaqueValType {
 					return nil, fmt.Errorf("%v: value type %v is in a non-included package; "+
 						"either add this package to validation-gen's --extra-pkg flag, "+
-						"or add +k8s:eachVal=+k8s:skipUnimported to the field to skip validation",
+						"or add +k8s:eachVal=+k8s:opaqueType to the field to skip validation",
 						fldPath, underlying.node.elem.childType)
 				}
+			} else if thisNode.typeValidations.OpaqueValType {
+				// If the type is marked as opaque, we can treat it as it is
+				// were in a non-included package.
 			} else {
 				// If the value type is a named type, call the validation
 				// function for each element.
@@ -476,12 +479,15 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 		case types.Map:
 			// Validate each key.
 			if keyNode := underlying.node.key.node; keyNode == nil {
-				if !thisNode.typeValidations.SkipUnimportedKey {
+				if !thisNode.typeValidations.OpaqueKeyType {
 					return nil, fmt.Errorf("%v: key type %v is in a non-included package; "+
 						"either add this package to validation-gen's --extra-pkg flag, "+
-						"or add +k8s:eachKey=+k8s:skipUnimported to the field to skip validation",
+						"or add +k8s:eachKey=+k8s:opaqueType to the field to skip validation",
 						fldPath, underlying.node.elem.childType)
 				}
+			} else if thisNode.typeValidations.OpaqueKeyType {
+				// If the type is marked as opaque, we can treat it as it is
+				// were in a non-included package.
 			} else {
 				// If the key type is a named type, call the validation
 				// function for each key.
@@ -503,12 +509,15 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 			}
 			// Validate each value.
 			if elemNode := underlying.node.elem.node; elemNode == nil {
-				if !thisNode.typeValidations.SkipUnimportedVal {
+				if !thisNode.typeValidations.OpaqueValType {
 					return nil, fmt.Errorf("%v: value type %v is in a non-included package; "+
 						"either add this package to validation-gen's --extra-pkg flag, "+
-						"or add +k8s:eachVal=+k8s:skipUnimported to the field to skip validation",
+						"or add +k8s:eachVal=+k8s:opaqueType to the field to skip validation",
 						fldPath, underlying.node.elem.childType)
 				}
+			} else if thisNode.typeValidations.OpaqueValType {
+				// If the type is marked as opaque, we can treat it as it is
+				// were in a non-included package.
 			} else {
 				// If the value type is a named type, call the validation
 				// function for each element.
@@ -598,13 +607,17 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		// Handle non-included types.
 		switch nonPtrType(childType).Kind {
 		case types.Struct, types.Alias:
-			if child.node == nil {
-				if !child.fieldValidations.SkipUnimported {
+			if child.node == nil { // a non-included type
+				if !child.fieldValidations.OpaqueType {
 					return fmt.Errorf("%v: type %v is in a non-included package; "+
 						"either add this package to validation-gen's --extra-pkg flag, "+
-						"or add +k8s:skipUnimported to the field to skip validation",
+						"or add +k8s:opaqueType to the field to skip validation",
 						childPath, childType.String())
 				}
+			} else if child.fieldValidations.OpaqueType {
+				// If the field is marked as opaque, we can treat it as it is
+				// were in a non-included package.
+				child.node = nil
 			}
 		}
 
@@ -619,12 +632,15 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		case types.Slice, types.Array:
 			// Validate each value of a list field.
 			if elemNode := child.node.elem.node; elemNode == nil {
-				if !child.fieldValidations.SkipUnimportedVal {
+				if !child.fieldValidations.OpaqueValType {
 					return fmt.Errorf("%v: value type %v is in a non-included package; "+
 						"either add this package to validation-gen's --extra-pkg flag, "+
-						"or add +k8s:eachVal=+k8s:skipUnimported to the field to skip validation",
+						"or add +k8s:eachVal=+k8s:opaqueType to the field to skip validation",
 						childPath, childType.Elem.String())
 				}
+			} else if child.fieldValidations.OpaqueValType {
+				// If the field is marked as opaque, we can treat it as it is
+				// were in a non-included package.
 			} else {
 				// If the list's value type is a named type, call the validation
 				// function for each element.
@@ -647,12 +663,15 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		case types.Map:
 			// Validate each key of a map field.
 			if keyNode := child.node.key.node; keyNode == nil {
-				if !child.fieldValidations.SkipUnimportedKey {
+				if !child.fieldValidations.OpaqueKeyType {
 					return fmt.Errorf("%v: key type %v is in a non-included package; "+
 						"either add this package to validation-gen's --extra-pkg flag, "+
-						"or add +k8s:eachKey=+k8s:skipUnimported to the field to skip validation",
+						"or add +k8s:eachKey=+k8s:opaqueType to the field to skip validation",
 						childPath, childType.Key.String())
 				}
+			} else if child.fieldValidations.OpaqueKeyType {
+				// If the field is marked as opaque, we can treat it as it is
+				// were in a non-included package.
 			} else {
 				// If the map's key type is a named type, call the validation
 				// function for each key.
@@ -674,12 +693,15 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			}
 			// Validate each value of a map field.
 			if elemNode := child.node.elem.node; elemNode == nil {
-				if !child.fieldValidations.SkipUnimportedVal {
+				if !child.fieldValidations.OpaqueValType {
 					return fmt.Errorf("%v: value type %v is in a non-included package; "+
 						"either add this package to validation-gen's --extra-pkg flag, "+
-						"or add +k8s:eachVal=+k8s:skipUnimported to the field to skip validation",
+						"or add +k8s:eachVal=+k8s:opaqueType to the field to skip validation",
 						childPath, childType.Elem.String())
 				}
+			} else if child.fieldValidations.OpaqueValType {
+				// If the field is marked as opaque, we can treat it as it is
+				// were in a non-included package.
 			} else {
 				// If the map's value type is a named type, call the validation
 				// function for each element.
