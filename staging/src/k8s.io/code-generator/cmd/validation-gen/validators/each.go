@@ -271,7 +271,7 @@ func ForEachVal(fldPath *field.Path, t *types.Type, fn FunctionGen) (Validations
 
 func (evtv eachValTagValidator) getListValidations(fldPath *field.Path, t *types.Type, validations Validations) (Validations, error) {
 	result := Validations{}
-	result.SkipUnimportedVal = validations.SkipUnimported
+	result.OpaqueValType = validations.OpaqueType
 
 	var listMap *listMap
 	if lm, found := evtv.byFieldPath[fldPath.String()]; found {
@@ -320,7 +320,7 @@ func (evtv eachValTagValidator) getListValidations(fldPath *field.Path, t *types
 
 func (evtv eachValTagValidator) getMapValidations(t *types.Type, validations Validations) (Validations, error) {
 	result := Validations{}
-	result.SkipUnimportedVal = validations.SkipUnimported
+	result.OpaqueValType = validations.OpaqueType
 
 	for _, vfn := range validations.Functions {
 		// Which function we call depends on whether the value-type is
@@ -402,7 +402,7 @@ func (ektv eachKeyTagValidator) GetValidations(context Context, _ []string, payl
 
 func (ektv eachKeyTagValidator) getValidations(t *types.Type, validations Validations) (Validations, error) {
 	result := Validations{}
-	result.SkipUnimportedKey = validations.SkipUnimported
+	result.OpaqueKeyType = validations.OpaqueType
 	for _, vfn := range validations.Functions {
 		f := Function(eachKeyTagName, vfn.Flags(), validateEachMapKey, WrapperFunction{vfn, t.Key})
 		result.Functions = append(result.Functions, f)

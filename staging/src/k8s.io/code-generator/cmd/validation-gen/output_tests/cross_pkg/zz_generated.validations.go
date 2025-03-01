@@ -213,7 +213,7 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 				return validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.SliceOfOtherStruct values")
 			})...)
 			return
-		}(fldPath.Child("SliceOfOtherStruct"), obj.SliceOfOtherStruct, safe.Field(oldObj, func(oldObj *T1) []other.StructType { return oldObj.SliceOfOtherStruct }))...)
+		}(fldPath.Child("sliceOfOtherStruct"), obj.SliceOfOtherStruct, safe.Field(oldObj, func(oldObj *T1) []other.StructType { return oldObj.SliceOfOtherStruct }))...)
 
 	// field T1.SliceOfOtherStructPtr
 	errs = append(errs,
@@ -256,7 +256,7 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 				return validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.MapOfOtherStringToOtherStruct values")
 			})...)
 			return
-		}(fldPath.Child("MapOfOtherStringToOtherStruct"), obj.MapOfOtherStringToOtherStruct, safe.Field(oldObj, func(oldObj *T1) map[other.StringType]other.StructType { return oldObj.MapOfOtherStringToOtherStruct }))...)
+		}(fldPath.Child("mapOfOtherStringToOtherStruct"), obj.MapOfOtherStringToOtherStruct, safe.Field(oldObj, func(oldObj *T1) map[other.StringType]other.StructType { return oldObj.MapOfOtherStringToOtherStruct }))...)
 
 	// field T1.MapOfOtherStringToOtherStructPtr
 	errs = append(errs,
