@@ -129,6 +129,7 @@ func (s *ValidationTestBuilder) ValidateFixtures() {
 	got := map[string]map[string][]string{}
 	for t := range s.s.validationFuncs {
 		var v any
+		// TODO: this should handle maps and slices
 		if t.Kind() == reflect.Ptr {
 			v = reflect.New(t.Elem()).Interface()
 		} else {
