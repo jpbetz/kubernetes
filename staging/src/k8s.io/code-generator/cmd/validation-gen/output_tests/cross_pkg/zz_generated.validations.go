@@ -60,6 +60,14 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 			return
 		}(fldPath.Child("primitivest1"), &obj.PrimitivesT1, safe.Field(oldObj, func(oldObj *T1) *primitives.T1 { return &oldObj.PrimitivesT1 }))...)
 
+	// field T1.PrimitivesT1Ptr
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *primitives.T1) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.PrimitivesT1Ptr")...)
+			errs = append(errs, primitives.Validate_T1(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("primitivest1Ptr"), obj.PrimitivesT1Ptr, safe.Field(oldObj, func(oldObj *T1) *primitives.T1 { return oldObj.PrimitivesT1Ptr }))...)
+
 	// field T1.PrimitivesT2
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *primitives.T2) (errs field.ErrorList) {
@@ -68,12 +76,28 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 			return
 		}(fldPath.Child("primitivest2"), &obj.PrimitivesT2, safe.Field(oldObj, func(oldObj *T1) *primitives.T2 { return &oldObj.PrimitivesT2 }))...)
 
+	// field T1.PrimitivesT2Ptr
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *primitives.T1) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.PrimitivesT2Ptr")...)
+			errs = append(errs, primitives.Validate_T1(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("primitivest2Ptr"), obj.PrimitivesT2Ptr, safe.Field(oldObj, func(oldObj *T1) *primitives.T1 { return oldObj.PrimitivesT2Ptr }))...)
+
 	// field T1.PrimitivesT3
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *primitives.T3) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.PrimitivesT3")...)
 			return
 		}(fldPath.Child("primitivest3"), &obj.PrimitivesT3, safe.Field(oldObj, func(oldObj *T1) *primitives.T3 { return &oldObj.PrimitivesT3 }))...)
+
+	// field T1.PrimitivesT3Ptr
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *primitives.T1) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.PrimitivesT3Ptr")...)
+			errs = append(errs, primitives.Validate_T1(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("primitivest3Ptr"), obj.PrimitivesT3Ptr, safe.Field(oldObj, func(oldObj *T1) *primitives.T1 { return oldObj.PrimitivesT3Ptr }))...)
 
 	// field T1.TypedefsE1
 	errs = append(errs,
@@ -83,6 +107,14 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 			return
 		}(fldPath.Child("typedefse1"), &obj.TypedefsE1, safe.Field(oldObj, func(oldObj *T1) *typedefs.E1 { return &oldObj.TypedefsE1 }))...)
 
+	// field T1.TypedefsE1Ptr
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *typedefs.E1) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.TypedefsE1Ptr")...)
+			errs = append(errs, typedefs.Validate_E1(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("typedefse1Ptr"), obj.TypedefsE1Ptr, safe.Field(oldObj, func(oldObj *T1) *typedefs.E1 { return oldObj.TypedefsE1Ptr }))...)
+
 	// field T1.TypedefsE2
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *typedefs.E2) (errs field.ErrorList) {
@@ -90,6 +122,14 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 			errs = append(errs, typedefs.Validate_E2(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("typedefse2"), &obj.TypedefsE2, safe.Field(oldObj, func(oldObj *T1) *typedefs.E2 { return &oldObj.TypedefsE2 }))...)
+
+	// field T1.TypedefsE2Ptr
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *typedefs.E2) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.TypedefsE2Ptr")...)
+			errs = append(errs, typedefs.Validate_E2(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("typedefse2Ptr"), obj.TypedefsE2Ptr, safe.Field(oldObj, func(oldObj *T1) *typedefs.E2 { return oldObj.TypedefsE2Ptr }))...)
 
 	// field T1.TypedefsE3
 	errs = append(errs,
@@ -99,6 +139,14 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 			return
 		}(fldPath.Child("typedefse3"), &obj.TypedefsE3, safe.Field(oldObj, func(oldObj *T1) *typedefs.E3 { return &oldObj.TypedefsE3 }))...)
 
+	// field T1.TypedefsE3Ptr
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *typedefs.E3) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.TypedefsE3Ptr")...)
+			errs = append(errs, typedefs.Validate_E3(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("typedefse3Ptr"), obj.TypedefsE3Ptr, safe.Field(oldObj, func(oldObj *T1) *typedefs.E3 { return oldObj.TypedefsE3Ptr }))...)
+
 	// field T1.TypedefsE4
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *typedefs.E4) (errs field.ErrorList) {
@@ -106,6 +154,14 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 			errs = append(errs, typedefs.Validate_E4(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("typedefse4"), &obj.TypedefsE4, safe.Field(oldObj, func(oldObj *T1) *typedefs.E4 { return &oldObj.TypedefsE4 }))...)
+
+	// field T1.TypedefsE4Ptr
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *typedefs.E4) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.TypedefsE4Ptr")...)
+			errs = append(errs, typedefs.Validate_E4(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("typedefse4Ptr"), obj.TypedefsE4Ptr, safe.Field(oldObj, func(oldObj *T1) *typedefs.E4 { return oldObj.TypedefsE4Ptr }))...)
 
 	// field T1.OtherString
 	errs = append(errs,
@@ -115,6 +171,14 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 			return
 		}(fldPath.Child("otherString"), &obj.OtherString, safe.Field(oldObj, func(oldObj *T1) *other.StringType { return &oldObj.OtherString }))...)
 
+	// field T1.OtherStringPtr
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *other.StringType) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.OtherStringPtr")...)
+			// NOTE: Not validating this field's type: *other.StringType is in a non-included package.
+			return
+		}(fldPath.Child("otherStringPtr"), obj.OtherStringPtr, safe.Field(oldObj, func(oldObj *T1) *other.StringType { return oldObj.OtherStringPtr }))...)
+
 	// field T1.OtherInt
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *other.IntType) (errs field.ErrorList) {
@@ -123,6 +187,14 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 			return
 		}(fldPath.Child("otherInt"), &obj.OtherInt, safe.Field(oldObj, func(oldObj *T1) *other.IntType { return &oldObj.OtherInt }))...)
 
+	// field T1.OtherIntPtr
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *other.IntType) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.OtherIntPtr")...)
+			// NOTE: Not validating this field's type: *other.IntType is in a non-included package.
+			return
+		}(fldPath.Child("otherIntPtr"), obj.OtherIntPtr, safe.Field(oldObj, func(oldObj *T1) *other.IntType { return oldObj.OtherIntPtr }))...)
+
 	// field T1.OtherStruct
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *other.StructType) (errs field.ErrorList) {
@@ -130,6 +202,14 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 			// NOTE: Not validating this field's type: other.StructType is in a non-included package.
 			return
 		}(fldPath.Child("otherStruct"), &obj.OtherStruct, safe.Field(oldObj, func(oldObj *T1) *other.StructType { return &oldObj.OtherStruct }))...)
+
+	// field T1.OtherStructPtr
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *other.StructType) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.OtherStructPtr")...)
+			// NOTE: Not validating this field's type: *other.StructType is in a non-included package.
+			return
+		}(fldPath.Child("otherStructPtr"), obj.OtherStructPtr, safe.Field(oldObj, func(oldObj *T1) *other.StructType { return oldObj.OtherStructPtr }))...)
 
 	// field T1.SliceOfOtherStruct
 	errs = append(errs,
@@ -141,6 +221,17 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 			// NOTE: Not iterating this list's values: StructType is in a non-included package.
 			return
 		}(fldPath.Child("sliceOfOtherStruct"), obj.SliceOfOtherStruct, safe.Field(oldObj, func(oldObj *T1) []other.StructType { return oldObj.SliceOfOtherStruct }))...)
+
+	// field T1.SliceOfOtherStructPtr
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj []*other.StructType) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.SliceOfOtherStructPtr")...)
+			errs = append(errs, validate.EachSliceValNilable(ctx, op, fldPath, obj, oldObj, nil, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *other.StructType) field.ErrorList {
+				return validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.SliceOfOtherStructPtr values")
+			})...)
+			// NOTE: Not iterating this list's values: *k8s.io/code-generator/cmd/validation-gen/output_tests/_codegenignore/other.StructType is in a non-included package.
+			return
+		}(fldPath.Child("sliceOfOtherStructPtr"), obj.SliceOfOtherStructPtr, safe.Field(oldObj, func(oldObj *T1) []*other.StructType { return oldObj.SliceOfOtherStructPtr }))...)
 
 	// field T1.MapOfOtherStringToOtherStruct
 	errs = append(errs,
@@ -156,6 +247,23 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 			// NOTE: Not iterating this map's values: StructType is in a non-included package.
 			return
 		}(fldPath.Child("mapOfOtherStringToOtherStruct"), obj.MapOfOtherStringToOtherStruct, safe.Field(oldObj, func(oldObj *T1) map[other.StringType]other.StructType { return oldObj.MapOfOtherStringToOtherStruct }))...)
+
+	// field T1.MapOfOtherStringToOtherStructPtr
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj map[other.StringType]*other.StructType) (errs field.ErrorList) {
+			errs = append(errs, validate.EachMapKey(ctx, op, fldPath, obj, oldObj, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *other.StringType) field.ErrorList {
+				return validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.MapOfOtherStringToOtherStructPtr keys")
+			})...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.MapOfOtherStringToOtherStructPtr")...)
+			errs = append(errs, validate.EachMapValNilable(ctx, op, fldPath, obj, oldObj, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *other.StructType) field.ErrorList {
+				return validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field T1.MapOfOtherStringToOtherStructPtr values")
+			})...)
+			// NOTE: Not iterating this map's keys: StringType is in a non-included package.
+			// NOTE: Not iterating this map's values: *k8s.io/code-generator/cmd/validation-gen/output_tests/_codegenignore/other.StructType is in a non-included package.
+			return
+		}(fldPath.Child("mapOfOtherStringToOtherStructPtr"), obj.MapOfOtherStringToOtherStructPtr, safe.Field(oldObj, func(oldObj *T1) map[other.StringType]*other.StructType {
+			return oldObj.MapOfOtherStringToOtherStructPtr
+		}))...)
 
 	return errs
 }
