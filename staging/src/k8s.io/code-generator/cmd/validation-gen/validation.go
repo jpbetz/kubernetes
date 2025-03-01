@@ -312,7 +312,7 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 
 	// Discovery applies to values, not pointers.
 	if t.Kind == types.Pointer {
-		t = t.Elem
+		return td.discover(t.Elem, fldPath)
 	}
 
 	// If we have done this type already, we can stop here and break any
