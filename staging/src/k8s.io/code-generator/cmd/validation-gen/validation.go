@@ -439,11 +439,9 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 	// discovery being complete. In particular, aliases to lists and maps need
 	// iteration, but we don't want to iterate them if the key or value types
 	// don't actually have validations. We also want to handle non-included
-	// types and emit "this page intentionally left blank" comments, but only
-	// if we are emitting other code, lest we end up generating a bunch of
-	// functions whose only purpose is to carry that comment. Lastly, we want
-	// to handle recursive types, but we need to finish discovering the type
-	// before we know if therea re other validations, again so we don't emit
+	// types and make users tell us what they intended. Lastly, we want to
+	// handle recursive types, but we need to finish discovering the type
+	// before we know if there are other validations, again so we don't emit
 	// empty functions.
 	if t.Kind == types.Alias {
 		underlying := thisNode.underlying
@@ -452,9 +450,11 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 		case types.Slice, types.Array:
 			// Validate each value.
 			if elemNode := underlying.node.elem.node; elemNode == nil {
-				if hasValidations(underlying.node) {
-					thisNode.typeValidations.AddComment(fmt.Sprintf(
-						"NOTE: Not iterating this list's values: %v is in a non-included package.", underlying.childType.Elem.Name.Name))
+				if !thisNode.typeValidations.SkipUnimportedVal {
+					return nil, fmt.Errorf("%v: value type %v is in a non-included package; "+
+						"either add this package to validation-gen's --extra-pkg flag, "+
+						"or add +k8s:eachVal=+k8s:skipUnimported to the field to skip validation",
+						fldPath, underlying.node.elem.childType)
 				}
 			} else {
 				// If the value type is a named type, call the validation
@@ -478,9 +478,11 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 		case types.Map:
 			// Validate each key.
 			if keyNode := underlying.node.key.node; keyNode == nil {
-				if hasValidations(underlying.node) {
-					thisNode.typeValidations.AddComment(fmt.Sprintf(
-						"NOTE: Not iterating this map's keys: %v is in a non-included package.", underlying.childType.Key.Name.Name))
+				if !thisNode.typeValidations.SkipUnimportedKey {
+					return nil, fmt.Errorf("%v: key type %v is in a non-included package; "+
+						"either add this package to validation-gen's --extra-pkg flag, "+
+						"or add +k8s:eachKey=+k8s:skipUnimported to the field to skip validation",
+						fldPath, underlying.node.elem.childType)
 				}
 			} else {
 				// If the key type is a named type, call the validation
@@ -503,9 +505,11 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 			}
 			// Validate each value.
 			if elemNode := underlying.node.elem.node; elemNode == nil {
-				if hasValidations(underlying.node) {
-					thisNode.typeValidations.AddComment(fmt.Sprintf(
-						"NOTE: Not iterating this map's values: %v is in a non-included package.", underlying.childType.Elem.Name.Name))
+				if !thisNode.typeValidations.SkipUnimportedVal {
+					return nil, fmt.Errorf("%v: value type %v is in a non-included package; "+
+						"either add this package to validation-gen's --extra-pkg flag, "+
+						"or add +k8s:eachVal=+k8s:skipUnimported to the field to skip validation",
+						fldPath, underlying.node.elem.childType)
 				}
 			} else {
 				// If the value type is a named type, call the validation
@@ -583,7 +587,6 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			Member: &memb,
 			Path:   childPath,
 		}
-		didSome := false
 		if validations, err := td.validator.ExtractValidations(context, memb.CommentLines); err != nil {
 			return fmt.Errorf("field %s: %w", childPath.String(), err)
 		} else {
@@ -593,7 +596,19 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 				if len(validations.Variables) > 0 {
 					return fmt.Errorf("%v: variable generation is not supported for field validations", childPath)
 				}
-				didSome = true
+			}
+		}
+
+		// Handle non-included types.
+		switch nonPtrType(childType).Kind {
+		case types.Struct, types.Alias:
+			if child.node == nil {
+				if !child.fieldValidations.SkipUnimported {
+					return fmt.Errorf("%v: type %v is in a non-included package; "+
+						"either add this package to validation-gen's --extra-pkg flag, "+
+						"or add +k8s:skipUnimported to the field to skip validation",
+						childPath, childType.String())
+				}
 			}
 		}
 
@@ -608,9 +623,11 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		case types.Slice, types.Array:
 			// Validate each value of a list field.
 			if elemNode := child.node.elem.node; elemNode == nil {
-				if didSome {
-					child.fieldValidations.AddComment(fmt.Sprintf(
-						"NOTE: Not iterating this list's values: %v is in a non-included package.", childType.Elem.Name.Name))
+				if !child.fieldValidations.SkipUnimportedVal {
+					return fmt.Errorf("%v: value type %v is in a non-included package; "+
+						"either add this package to validation-gen's --extra-pkg flag, "+
+						"or add +k8s:eachVal=+k8s:skipUnimported to the field to skip validation",
+						childPath, childType.Elem.String())
 				}
 			} else {
 				// If the list's value type is a named type, call the validation
@@ -634,9 +651,11 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		case types.Map:
 			// Validate each key of a map field.
 			if keyNode := child.node.key.node; keyNode == nil {
-				if didSome {
-					child.fieldValidations.AddComment(fmt.Sprintf(
-						"NOTE: Not iterating this map's keys: %v is in a non-included package.", childType.Key.Name.Name))
+				if !child.fieldValidations.SkipUnimportedKey {
+					return fmt.Errorf("%v: key type %v is in a non-included package; "+
+						"either add this package to validation-gen's --extra-pkg flag, "+
+						"or add +k8s:eachKey=+k8s:skipUnimported to the field to skip validation",
+						childPath, childType.Key.String())
 				}
 			} else {
 				// If the map's key type is a named type, call the validation
@@ -659,9 +678,11 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			}
 			// Validate each value of a map field.
 			if elemNode := child.node.elem.node; elemNode == nil {
-				if didSome {
-					child.fieldValidations.AddComment(fmt.Sprintf(
-						"NOTE: Not iterating this map's values: %v is in a non-included package.", childType.Elem.Name.Name))
+				if !child.fieldValidations.SkipUnimportedVal {
+					return fmt.Errorf("%v: value type %v is in a non-included package; "+
+						"either add this package to validation-gen's --extra-pkg flag, "+
+						"or add +k8s:eachVal=+k8s:skipUnimported to the field to skip validation",
+						childPath, childType.Elem.String())
 				}
 			} else {
 				// If the map's value type is a named type, call the validation
@@ -689,6 +710,14 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 
 	thisNode.fields = fields
 	return nil
+}
+
+// nonPtrType removes any pointerness from the type.
+func nonPtrType(t *types.Type) *types.Type {
+	for t.Kind == types.Pointer {
+		t = t.Elem
+	}
+	return t
 }
 
 // getValidationFunctionName looks up the name of the specified type's
@@ -913,12 +942,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 
 			// If the node is nil, this must be a type in a package we are not
 			// handling - it's effectively opaque to us.
-			if fld.node == nil {
-				targs := generator.Args{
-					"type": fld.childType,
-				}
-				bufsw.Do("// NOTE: Not validating this field's type: $.type|raw$ is in a non-included package.\n", targs)
-			} else {
+			if fld.node != nil {
 				// Get to the real type.
 				switch fld.node.valueType.Kind {
 				case types.Alias, types.Struct:
