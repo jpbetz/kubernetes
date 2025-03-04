@@ -61,15 +61,13 @@ func (formatTagValidator) GetValidations(context Context, _ []string, payload st
 	var result Validations
 	if formatFunction, err := getFormatValidationFunction(payload); err != nil {
 		return result, err
-	} else if formatFunction == nil {
-		return result, fmt.Errorf("internal error: no validation function found for format %q", payload)
 	} else {
 		result.AddFunction(formatFunction)
 	}
 	return result, nil
 }
 
-func getFormatValidationFunction(format string) (*FunctionGen, error) {
+func getFormatValidationFunction(format string) (FunctionGen, error) {
 	// The naming convention for these formats follows the JSON schema style:
 	// all lower-case, dashes between words. See
 	// https://json-schema.org/draft/2020-12/json-schema-validation#name-defined-formats
@@ -82,7 +80,7 @@ func getFormatValidationFunction(format string) (*FunctionGen, error) {
 	}
 	// TODO: Flesh out the list of validation functions
 
-	return nil, fmt.Errorf("unsupported validation format %q", format)
+	return FunctionGen{}, fmt.Errorf("unsupported validation format %q", format)
 }
 
 func (ftv formatTagValidator) Docs() TagDoc {
