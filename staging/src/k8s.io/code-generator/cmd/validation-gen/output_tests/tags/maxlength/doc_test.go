@@ -53,11 +53,11 @@ func Test(t *testing.T) {
 		Max0ValidatedTypedefField:    Max0Type(strings.Repeat("x", 1)),
 		Max10ValidatedTypedefField:   Max10Type(strings.Repeat("x", 11)),
 	}).ExpectRegexpsByPath(map[string][]string{
-		"max0Field":                    []string{`Invalid value:.*must be no more than 0 characters`},
-		"max10Field":                   []string{`Invalid value:.*must be no more than 10 characters`},
-		"max0UnvalidatedTypedefField":  []string{`Invalid value:.*must be no more than 0 characters`},
-		"max10UnvalidatedTypedefField": []string{`Invalid value:.*must be no more than 10 characters`},
-		"max0ValidatedTypedefField":    []string{`Invalid value:.*must be no more than 0 characters`},
-		"max10ValidatedTypedefField":   []string{`Invalid value:.*must be no more than 10 characters`},
+		"max0Field":                    []string{`Invalid value:.*must be no more than 0 bytes`},
+		"max10Field":                   []string{`Invalid value:.*must be no more than 10 bytes`},
+		"max0UnvalidatedTypedefField":  []string{`Invalid value:.*must be no more than 0 bytes`},
+		"max10UnvalidatedTypedefField": []string{`Invalid value:.*must be no more than 10 bytes`},
+		"max0ValidatedTypedefField":    []string{`Invalid value:.*must be no more than 0 bytes`},
+		"max10ValidatedTypedefField":   []string{`Invalid value:.*must be no more than 10 bytes`},
 	})
 }

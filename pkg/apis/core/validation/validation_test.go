@@ -12267,7 +12267,7 @@ func TestValidatePod(t *testing.T) {
 			),
 		},
 		"final PVC name for ephemeral volume must be valid": {
-			expectedError: "spec.volumes[1].name: Invalid value: \"" + longVolName + "\": PVC name \"" + longPodName + "-" + longVolName + "\": must be no more than 253 characters",
+			expectedError: "spec.volumes[1].name: Invalid value: \"" + longVolName + "\": PVC name \"" + longPodName + "-" + longVolName + "\": must be no more than 253 bytes",
 			spec: *podtest.MakePod(longPodName,
 				podtest.SetVolumes(
 					core.Volume{Name: "pvc", VolumeSource: core.VolumeSource{PersistentVolumeClaim: &core.PersistentVolumeClaimVolumeSource{ClaimName: "my-pvc"}}},
