@@ -17,6 +17,7 @@ limitations under the License.
 package testing
 
 import (
+	"context"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -70,7 +71,7 @@ func runValidation(t *testing.T, scheme *runtime.Scheme, options sets.Set[string
 					if err != nil {
 						t.Fatal(err)
 					}
-					fn(t, gv.String(), scheme.Validate(options, versioned, subresources...))
+					fn(t, gv.String(), scheme.Validate(context.Background(), options, versioned, subresources...))
 				}
 			})
 		}
@@ -110,7 +111,7 @@ func runUpdateValidation(t *testing.T, scheme *runtime.Scheme, options sets.Set[
 						}
 					}
 
-					fn(t, gv.String(), scheme.ValidateUpdate(options, versionedNew, versionedOld, subresources...))
+					fn(t, gv.String(), scheme.ValidateUpdate(context.Background(), options, versionedNew, versionedOld, subresources...))
 				}
 			})
 		}

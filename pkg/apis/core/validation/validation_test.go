@@ -35,6 +35,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
+	utilpointer "k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
+
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/apitesting/fuzzer"
 	"k8s.io/apimachinery/pkg/api/apitesting/roundtrip"
@@ -63,8 +66,6 @@ import (
 	v1util "k8s.io/kubernetes/pkg/apis/core/v1"
 	"k8s.io/kubernetes/pkg/capabilities"
 	"k8s.io/kubernetes/pkg/features"
-	utilpointer "k8s.io/utils/pointer"
-	"k8s.io/utils/ptr"
 )
 
 const (
@@ -12282,7 +12283,7 @@ func TestValidatePod(t *testing.T) {
 			),
 		},
 		"final PVC name for ephemeral volume must be valid": {
-			expectedError: "spec.volumes[1].name: Invalid value: \"" + longVolName + "\": PVC name \"" + longPodName + "-" + longVolName + "\": must be no more than 253 bytes",
+			expectedError: "spec.volumes[1].name: Invalid value: \"" + longVolName + "\": PVC name \"" + longPodName + "-" + longVolName + "\": must be no more than 253 characters",
 			spec: *podtest.MakePod(longPodName,
 				podtest.SetVolumes(
 					core.Volume{Name: "pvc", VolumeSource: core.VolumeSource{PersistentVolumeClaim: &core.PersistentVolumeClaimVolumeSource{ClaimName: "my-pvc"}}},
