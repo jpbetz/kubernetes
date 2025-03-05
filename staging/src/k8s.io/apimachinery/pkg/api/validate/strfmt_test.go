@@ -17,9 +17,102 @@ limitations under the License.
 package validate
 
 import (
+	"context"
+	"strings"
 	"testing"
+
+	"k8s.io/apimachinery/pkg/api/operation"
+	"k8s.io/apimachinery/pkg/util/validation/field"
+	fldTesting "k8s.io/apimachinery/pkg/util/validation/field/testing"
 )
 
 func TestDNS1123Label(t *testing.T) {
-	// DNSLabel is a trivial wrapper of content.DNS1123Label.
+	ctx := context.Background()
+	fldPath := field.NewPath("test")
+
+	testCases := []struct {
+		name     string
+		label    string
+		wantErrs field.ErrorList
+	}{
+		{
+			name:     "valid label",
+			label:    "valid-label",
+			wantErrs: nil,
+		},
+		{
+			name:     "valid single character label",
+			label:    "a",
+			wantErrs: nil,
+		},
+		{
+			name:     "valid label with numbers",
+			label:    "123-abc",
+			wantErrs: nil,
+		},
+		{
+			name:  "invalid: uppercase characters",
+			label: "Invalid-Label",
+			wantErrs: field.ErrorList{
+				field.Invalid(fldPath, nil, "").WithOrigin("format=dns-label"),
+			},
+		},
+		{
+			name:  "invalid: starts with dash",
+			label: "-invalid-label",
+			wantErrs: field.ErrorList{
+				field.Invalid(fldPath, nil, "").WithOrigin("format=dns-label"),
+			},
+		},
+		{
+			name:  "invalid: ends with dash",
+			label: "invalid-label-",
+			wantErrs: field.ErrorList{
+				field.Invalid(fldPath, nil, "").WithOrigin("format=dns-label"),
+			},
+		},
+		{
+			name:  "invalid: contains dots",
+			label: "invalid.label",
+			wantErrs: field.ErrorList{
+				field.Invalid(fldPath, nil, "").WithOrigin("format=dns-label"),
+			},
+		},
+		{
+			name:  "invalid: contains special characters",
+			label: "invalid@label",
+			wantErrs: field.ErrorList{
+				field.Invalid(fldPath, nil, "").WithOrigin("format=dns-label"),
+			},
+		},
+		{
+			name:  "invalid: too long",
+			label: "a" + strings.Repeat("b", 62) + "c", // 64 characters
+			wantErrs: field.ErrorList{
+				field.Invalid(fldPath, nil, "").WithOrigin("format=dns-label"),
+			},
+		},
+		{
+			name:     "valid: max length",
+			label:    "a" + strings.Repeat("b", 61) + "c", // 63 characters
+			wantErrs: nil,
+		},
+		{
+			name:  "invalid: empty string",
+			label: "",
+			wantErrs: field.ErrorList{
+				field.Invalid(fldPath, nil, "").WithOrigin("format=dns-label"),
+			},
+		},
+	}
+
+	matcher := fldTesting.Match().ByType().ByField().ByOrigin()
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			value := tc.label
+			gotErrs := DNSLabel(ctx, operation.Operation{}, fldPath, &value, nil)
+
+			fldTesting.MatchErrors(t, tc.wantErrs, gotErrs, matcher)
+		})
+	}
 }

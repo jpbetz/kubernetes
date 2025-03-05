@@ -23,53 +23,54 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	fldTesting "k8s.io/apimachinery/pkg/util/validation/field/testing"
 )
 
 func TestMaxLength(t *testing.T) {
 	cases := []struct {
-		value string
-		max   int
-		err   string // regex
+		name     string
+		value    string
+		max      int
+		wantErrs field.ErrorList // regex
 	}{{
-		value: "",
-		max:   0,
+		name:     "empty string",
+		value:    "",
+		max:      0,
+		wantErrs: nil,
 	}, {
+		name:  "zero length",
 		value: "0",
 		max:   0,
-		err:   "fldpath: Invalid value.*must be no more than",
+		wantErrs: field.ErrorList{
+			field.Invalid(field.NewPath("fldpath"), nil, "must be no more than").WithOrigin("maxLength"),
+		},
 	}, {
-		value: "0",
-		max:   1,
+		name:     "one character",
+		value:    "0",
+		max:      1,
+		wantErrs: nil,
 	}, {
+		name:  "two characters",
 		value: "01",
 		max:   1,
-		err:   "fldpath: Invalid value.*must be no more than",
+		wantErrs: field.ErrorList{
+			field.Invalid(field.NewPath("fldpath"), nil, "must be no more than").WithOrigin("maxLength"),
+		},
 	}, {
 		value: "",
 		max:   -1,
-		err:   "fldpath: Invalid value.*must be no more than",
+		wantErrs: field.ErrorList{
+			field.Invalid(field.NewPath("fldpath"), nil, "must be no more than").WithOrigin("maxLength"),
+		},
 	}}
 
-	for i, tc := range cases {
-		v := tc.value
-		result := MaxLength(context.Background(), operation.Operation{}, field.NewPath("fldpath"), &v, nil, tc.max)
-		if len(result) > 0 && tc.err == "" {
-			t.Errorf("case %d: unexpected failure: %v", i, fmtErrs(result))
-			continue
-		}
-		if len(result) == 0 && tc.err != "" {
-			t.Errorf("case %d: unexpected success: expected %q", i, tc.err)
-			continue
-		}
-		if len(result) > 0 {
-			if len(result) > 1 {
-				t.Errorf("case %d: unexepected multi-error: %v", i, fmtErrs(result))
-				continue
-			}
-			if re := regexp.MustCompile(tc.err); !re.MatchString(result[0].Error()) {
-				t.Errorf("case %d: wrong error\nexpected: %q\n     got: %v", i, tc.err, fmtErrs(result))
-			}
-		}
+	matcher := fldTesting.Match().ByOrigin().ByDetailSubstring().ByField().ByType()
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			v := tc.value
+			gotErrs := MaxLength(context.Background(), operation.Operation{}, field.NewPath("fldpath"), &v, nil, tc.max)
+			fldTesting.MatchErrors(t, tc.wantErrs, gotErrs, matcher)
+		})
 	}
 }
 
