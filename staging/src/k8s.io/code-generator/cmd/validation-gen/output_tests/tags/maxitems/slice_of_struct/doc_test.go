@@ -30,42 +30,33 @@ func Test(t *testing.T) {
 	st.Value(&Struct{
 		Max0Field:         make([]OtherStruct, 0),
 		Max10Field:        make([]OtherStruct, 0),
-		Max0PtrField:      make([]*OtherStruct, 0),
-		Max10PtrField:     make([]*OtherStruct, 0),
 		Max0TypedefField:  make([]OtherTypedefStruct, 0),
 		Max10TypedefField: make([]OtherTypedefStruct, 0),
 	}).ExpectValid()
 
 	st.Value(&Struct{
 		Max10Field:        make([]OtherStruct, 1),
-		Max10PtrField:     make([]*OtherStruct, 1),
 		Max10TypedefField: make([]OtherTypedefStruct, 1),
 	}).ExpectValid()
 
 	st.Value(&Struct{
 		Max10Field:        make([]OtherStruct, 9),
-		Max10PtrField:     make([]*OtherStruct, 9),
 		Max10TypedefField: make([]OtherTypedefStruct, 9),
 	}).ExpectValid()
 
 	st.Value(&Struct{
 		Max10Field:        make([]OtherStruct, 10),
-		Max10PtrField:     make([]*OtherStruct, 10),
 		Max10TypedefField: make([]OtherTypedefStruct, 10),
 	}).ExpectValid()
 
 	st.Value(&Struct{
 		Max0Field:         make([]OtherStruct, 1),
 		Max10Field:        make([]OtherStruct, 11),
-		Max0PtrField:      make([]*OtherStruct, 1),
-		Max10PtrField:     make([]*OtherStruct, 11),
 		Max0TypedefField:  make([]OtherTypedefStruct, 1),
 		Max10TypedefField: make([]OtherTypedefStruct, 11),
 	}).ExpectRegexpsByPath(map[string][]string{
 		"max0Field":         []string{`Too many:.*must have at most 0 items`},
 		"max10Field":        []string{`Too many:.*must have at most 10 items`},
-		"max0PtrField":      []string{`Too many:.*must have at most 0 items`},
-		"max10PtrField":     []string{`Too many:.*must have at most 10 items`},
 		"max0TypedefField":  []string{`Too many:.*must have at most 0 items`},
 		"max10TypedefField": []string{`Too many:.*must have at most 10 items`},
 	})

@@ -46,16 +46,6 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 	return nil
 }
 
-func Validate_Max0PtrType(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj Max0PtrType) (errs field.ErrorList) {
-	// type Max0PtrType
-	if e := validate.MaxItems(ctx, op, fldPath, obj, oldObj, 0); len(e) != 0 {
-		errs = append(errs, e...)
-		return // do not proceed
-	}
-
-	return errs
-}
-
 func Validate_Max0Type(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj Max0Type) (errs field.ErrorList) {
 	// type Max0Type
 	if e := validate.MaxItems(ctx, op, fldPath, obj, oldObj, 0); len(e) != 0 {
@@ -69,16 +59,6 @@ func Validate_Max0Type(ctx context.Context, op operation.Operation, fldPath *fie
 func Validate_Max0TypedefType(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj Max0TypedefType) (errs field.ErrorList) {
 	// type Max0TypedefType
 	if e := validate.MaxItems(ctx, op, fldPath, obj, oldObj, 0); len(e) != 0 {
-		errs = append(errs, e...)
-		return // do not proceed
-	}
-
-	return errs
-}
-
-func Validate_Max10PtrType(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj Max10PtrType) (errs field.ErrorList) {
-	// type Max10PtrType
-	if e := validate.MaxItems(ctx, op, fldPath, obj, oldObj, 10); len(e) != 0 {
 		errs = append(errs, e...)
 		return // do not proceed
 	}
@@ -123,22 +103,6 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 			errs = append(errs, Validate_Max10Type(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("max10Field"), obj.Max10Field, safe.Field(oldObj, func(oldObj *Struct) Max10Type { return oldObj.Max10Field }))...)
-
-	// field Struct.UnvalidatedPtrField has no validation
-
-	// field Struct.Max0PtrField
-	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj Max0PtrType) (errs field.ErrorList) {
-			errs = append(errs, Validate_Max0PtrType(ctx, op, fldPath, obj, oldObj)...)
-			return
-		}(fldPath.Child("max0PtrField"), obj.Max0PtrField, safe.Field(oldObj, func(oldObj *Struct) Max0PtrType { return oldObj.Max0PtrField }))...)
-
-	// field Struct.Max10PtrField
-	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj Max10PtrType) (errs field.ErrorList) {
-			errs = append(errs, Validate_Max10PtrType(ctx, op, fldPath, obj, oldObj)...)
-			return
-		}(fldPath.Child("max10PtrField"), obj.Max10PtrField, safe.Field(oldObj, func(oldObj *Struct) Max10PtrType { return oldObj.Max10PtrField }))...)
 
 	// field Struct.Max0TypedefField
 	errs = append(errs,

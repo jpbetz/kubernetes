@@ -33,12 +33,6 @@ type Max10Type []int
 // Note: no validation here
 type UnvalidatedPtrType []*int
 
-// +k8s:maxItems=0
-type Max0PtrType []*int
-
-// +k8s:maxItems=10
-type Max10PtrType []*int
-
 type SliceType []int
 
 // +k8s:maxItems=0
@@ -55,12 +49,6 @@ type Struct struct {
 	Max0Field Max0Type `json:"max0Field"`
 
 	Max10Field Max10Type `json:"max10Field"`
-
-	UnvalidatedPtrField UnvalidatedPtrType `json:"unvalidatedPtrField"`
-
-	Max0PtrField Max0PtrType `json:"max0PtrField"`
-
-	Max10PtrField Max10PtrType `json:"max10PtrField"`
 
 	Max0TypedefField Max0TypedefType `json:"max0TypedefField"`
 

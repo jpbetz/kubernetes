@@ -31,12 +31,6 @@ type Struct struct {
 	Max10Field []OtherStruct `json:"max10Field"`
 
 	// +k8s:maxItems=0
-	Max0PtrField []*OtherStruct `json:"max0PtrField"`
-
-	// +k8s:maxItems=10
-	Max10PtrField []*OtherStruct `json:"max10PtrField"`
-
-	// +k8s:maxItems=0
 	Max0TypedefField []OtherTypedefStruct `json:"max0TypedefField"`
 
 	// +k8s:maxItems=10

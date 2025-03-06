@@ -69,26 +69,6 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 			return
 		}(fldPath.Child("max10Field"), obj.Max10Field, safe.Field(oldObj, func(oldObj *Struct) []OtherStruct { return oldObj.Max10Field }))...)
 
-	// field Struct.Max0PtrField
-	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj []*OtherStruct) (errs field.ErrorList) {
-			if e := validate.MaxItems(ctx, op, fldPath, obj, oldObj, 0); len(e) != 0 {
-				errs = append(errs, e...)
-				return // do not proceed
-			}
-			return
-		}(fldPath.Child("max0PtrField"), obj.Max0PtrField, safe.Field(oldObj, func(oldObj *Struct) []*OtherStruct { return oldObj.Max0PtrField }))...)
-
-	// field Struct.Max10PtrField
-	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj []*OtherStruct) (errs field.ErrorList) {
-			if e := validate.MaxItems(ctx, op, fldPath, obj, oldObj, 10); len(e) != 0 {
-				errs = append(errs, e...)
-				return // do not proceed
-			}
-			return
-		}(fldPath.Child("max10PtrField"), obj.Max10PtrField, safe.Field(oldObj, func(oldObj *Struct) []*OtherStruct { return oldObj.Max10PtrField }))...)
-
 	// field Struct.Max0TypedefField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj []OtherTypedefStruct) (errs field.ErrorList) {
