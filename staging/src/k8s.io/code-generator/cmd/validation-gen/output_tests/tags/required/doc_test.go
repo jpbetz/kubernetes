@@ -28,11 +28,8 @@ func Test(t *testing.T) {
 	st.Value(&Struct{
 		// All zero-values.
 	}).ExpectRegexpsByPath(map[string][]string{
-		"stringField":    []string{"Required value"},
-		"stringPtrField": []string{"Required value"},
-		"otherStructField": []string{
-			"forced failure: type OtherStruct",
-			"forced failure: field Struct.OtherStructField"},
+		"stringField":         []string{"Required value"},
+		"stringPtrField":      []string{"Required value"},
 		"otherStructPtrField": []string{"Required value"},
 		"sliceField":          []string{"Required value"},
 		"mapField":            []string{"Required value"},
@@ -43,11 +40,8 @@ func Test(t *testing.T) {
 		SliceField:     []string{},          // does not satisfy required
 		MapField:       map[string]string{}, // does not satisfy required
 	}).ExpectRegexpsByPath(map[string][]string{
-		"stringField":    []string{"Required value"},
-		"stringPtrField": []string{"forced failure: field Struct.StringPtrField"},
-		"otherStructField": []string{
-			"forced failure: type OtherStruct",
-			"forced failure: field Struct.OtherStructField"},
+		"stringField":         []string{"Required value"},
+		"stringPtrField":      []string{"forced failure: field Struct.StringPtrField"},
 		"otherStructPtrField": []string{"Required value"},
 		"sliceField":          []string{"Required value"},
 		"mapField":            []string{"Required value"},
@@ -56,16 +50,12 @@ func Test(t *testing.T) {
 	st.Value(&Struct{
 		StringField:         "abc",
 		StringPtrField:      ptr.To("xyz"),
-		OtherStructField:    OtherStruct{},
 		OtherStructPtrField: &OtherStruct{},
 		SliceField:          []string{"a", "b"},
 		MapField:            map[string]string{"a": "b", "c": "d"},
 	}).ExpectRegexpsByPath(map[string][]string{
 		"stringField":    []string{"forced failure: field Struct.StringField"},
 		"stringPtrField": []string{"forced failure: field Struct.StringPtrField"},
-		"otherStructField": []string{
-			"forced failure: type OtherStruct",
-			"forced failure: field Struct.OtherStructField"},
 		"otherStructPtrField": []string{
 			"forced failure: type OtherStruct",
 			"forced failure: field Struct.OtherStructPtrField",
