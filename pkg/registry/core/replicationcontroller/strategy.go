@@ -47,6 +47,9 @@ import (
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
+// Add to package
+var ValidateDeclarativelyFunc = rest.ValidateDeclaratively
+
 // rcStrategy implements verification logic for Replication Controllers.
 type rcStrategy struct {
 	runtime.ObjectTyper
@@ -125,14 +128,31 @@ func (rcStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object)
 func (rcStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	controller := obj.(*api.ReplicationController)
 	opts := pod.GetValidationOptionsFromPodTemplate(controller.Spec.Template, nil)
+
+	// Run imperative validation
 	allErrs := corevalidation.ValidateReplicationController(controller, opts)
+
+	// If DeclarativeValidation feature gate is enabled, run both validations
 	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
-		declarativeErrs := rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)
+		// Run declarative validation
+		var declarativeErrs field.ErrorList
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					declarativeErrs = append(declarativeErrs, field.InternalError(nil, fmt.Errorf("panic during declarative validation: %v", r)))
+				}
+			}()
+			declarativeErrs = ValidateDeclarativelyFunc(ctx, nil, legacyscheme.Scheme, obj)
+		}()
+
+		// Compare imperative and declarative errors and log + emit metric if there's a mismatch
+		corevalidation.CompareDeclarativeErrorsAndEmitMismatches(allErrs, declarativeErrs)
+
 		if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidationTakeover) {
 			allErrs = append(allErrs.RemoveCoveredByDeclarative(), declarativeErrs...)
 		}
-		// TODO: emit mismatch_metric by comparing between allErrs.ExtractCoveredByDeclarative() and declarativeErrs
 	}
+
 	return allErrs
 }
 
@@ -184,14 +204,27 @@ func (rcStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) f
 		}
 	}
 
+	// If DeclarativeValidation feature gate is enabled, run both validations
 	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		// Run declarative validation for update
 		// Following above pattern, we need to validate both create and update.
-		declarativeErrs := rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)
-		declarativeErrs = append(declarativeErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+		var declarativeErrs field.ErrorList
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					declarativeErrs = append(declarativeErrs, field.InternalError(nil, fmt.Errorf("panic during declarative validation: %v", r)))
+				}
+			}()
+			declarativeErrs = rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)
+			declarativeErrs = append(declarativeErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+		}()
+
 		if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidationTakeover) {
 			errs = append(errs.RemoveCoveredByDeclarative(), declarativeErrs...)
 		}
-		// TODO: emit mismatch_metric by comparing between errs.ExtractCoveredByDeclarative() and declarativeErrs
+
+		// Compare imperative and declarative errors and emit metric if there's a mismatch
+		corevalidation.CompareDeclarativeErrorsAndEmitMismatches(errs, declarativeErrs)
 	}
 
 	return errs
