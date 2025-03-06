@@ -112,14 +112,15 @@ func parseSubresourcePath(subresourcePath string) ([]string, error) {
 
 // CompareDeclarativeErrorsAndEmitMismatches checks for mismatches between imperative and declarative validation
 // and logs + emits metrics when inconsistencies are found
-func CompareDeclarativeErrorsAndEmitMismatches(imperativeErrs, declarativeErrs field.ErrorList, takeover bool) {
+func CompareDeclarativeErrorsAndEmitMismatches(ctx context.Context, imperativeErrs, declarativeErrs field.ErrorList, takeover bool) {
+	logger := klog.FromContext(ctx)
 	mismatchDetails := gatherDeclarativeValidationMismatches(imperativeErrs, declarativeErrs, takeover)
 	for _, detail := range mismatchDetails {
-		// Log information about the mismatch
-		klog.Warning(detail)
+		// Log information about the mismatch using contextual logger
+		logger.Info(detail)
 
 		// Increment the metric for the mismatch
-		validationmetrics.Metrics.EmitDeclarativeValidationMismatchMetric()
+		validationmetrics.Metrics.IncDeclarativeValidationMismatchMetric()
 	}
 }
 
@@ -134,10 +135,10 @@ func gatherDeclarativeValidationMismatches(imperativeErrs, declarativeErrs field
 	// recommendation based on takeover status
 	recommendation := "This difference should not affect system operation since hand written validation is authoritative."
 	if takeover {
-		recommendation = "Consider disabling the DeclarativeValidationTakeover feature gate."
+		recommendation = "Consider disabling the DeclarativeValidationTakeover feature gate to keep data persisted in etcd consistent with prior versions of Kubernetes."
 	}
-	fuzzyMatcher := fldtest.ErrorMatcher{}.ByType().ByField().ByOrigin().RequireOriginWhenInvalid()
-	exactMatcher := fldtest.ErrorMatcher{}.Exactly()
+	fuzzyMatcher := field.ErrorMatcher{}.ByType().ByField().ByOrigin().RequireOriginWhenInvalid()
+	exactMatcher := field.ErrorMatcher{}.Exactly()
 
 	// Dedupe imperative errors of exact error matches as they are
 	// not intended and come from (buggy) duplicate validation calls
@@ -192,7 +193,7 @@ func gatherDeclarativeValidationMismatches(imperativeErrs, declarativeErrs field
 			mismatchDetails = append(mismatchDetails,
 				fmt.Sprintf(
 					"Unexpected difference between hand written validation and declarative validation error results, unmatched error(s) found %s. "+
-						"This may indicate an issue with declarative validation. %s",
+						"This indicates an issue with declarative validation. %s",
 					fuzzyMatcher.Render(iErr),
 					recommendation,
 				),
@@ -207,7 +208,7 @@ func gatherDeclarativeValidationMismatches(imperativeErrs, declarativeErrs field
 		mismatchDetails = append(mismatchDetails,
 			fmt.Sprintf(
 				"Unexpected difference between hand written validation and declarative validation error results, extra error(s) found %s. "+
-					"This may indicate an issue with declarative validation. %s",
+					"This indicates an issue with declarative validation. %s",
 				fuzzyMatcher.Render(dErr),
 				recommendation,
 			),
@@ -219,19 +220,20 @@ func gatherDeclarativeValidationMismatches(imperativeErrs, declarativeErrs field
 
 // createDeclarativeValidationPanicHandler returns a function with panic recovery logic
 // that will increment the panic metric and either log or append errors based on the takeover parameter.
-func createDeclarativeValidationPanicHandler(errs *field.ErrorList, takeover bool) func() {
+func createDeclarativeValidationPanicHandler(ctx context.Context, errs *field.ErrorList, takeover bool) func() {
+	logger := klog.FromContext(ctx)
 	return func() {
 		if r := recover(); r != nil {
 			// Increment the panic metric counter
-			validationmetrics.Metrics.EmitDeclarativeValidationPanicMetric()
+			validationmetrics.Metrics.IncDeclarativeValidationPanicMetric()
 
 			const errorFmt = "panic during declarative validation: %v"
 			if takeover {
-				// If takeover is enabled, output as a validation error as authorative validator panicked and validation should error
+				// If takeover is enabled, output as a validation error as authoritative validator panicked and validation should error
 				*errs = append(*errs, field.InternalError(nil, fmt.Errorf(errorFmt, r)))
 			} else {
-				// if takeover not enabled, log the panic as a warning
-				klog.Warningf(errorFmt, r)
+				// if takeover not enabled, log the panic as an info message
+				logger.Info(fmt.Sprintf(errorFmt, r))
 			}
 		}
 	}
@@ -248,7 +250,7 @@ func withRecover(
 	takeover bool,
 ) func(ctx context.Context, options sets.Set[string], scheme *runtime.Scheme, obj runtime.Object) field.ErrorList {
 	return func(ctx context.Context, options sets.Set[string], scheme *runtime.Scheme, obj runtime.Object) (errs field.ErrorList) {
-		defer createDeclarativeValidationPanicHandler(&errs, takeover)()
+		defer createDeclarativeValidationPanicHandler(ctx, &errs, takeover)()
 
 		return validateFunc(ctx, options, scheme, obj)
 	}
@@ -265,7 +267,7 @@ func withRecoverUpdate(
 	takeover bool,
 ) func(ctx context.Context, options sets.Set[string], scheme *runtime.Scheme, obj, oldObj runtime.Object) field.ErrorList {
 	return func(ctx context.Context, options sets.Set[string], scheme *runtime.Scheme, obj, oldObj runtime.Object) (errs field.ErrorList) {
-		defer createDeclarativeValidationPanicHandler(&errs, takeover)()
+		defer createDeclarativeValidationPanicHandler(ctx, &errs, takeover)()
 
 		return validateUpdateFunc(ctx, options, scheme, obj, oldObj)
 	}

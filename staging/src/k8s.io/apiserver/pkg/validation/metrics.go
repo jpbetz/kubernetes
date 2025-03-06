@@ -26,40 +26,34 @@ const (
 	subsystem = "validation"
 )
 
-// Separate counter options variable for reuse during reset.
-var declarativeValidationMismatchCounterOpts = &metrics.CounterOpts{
-	Namespace:      namespace,
-	Subsystem:      subsystem,
-	Name:           "declarative_validation_mismatch_total",
-	Help:           "Number of times declarative validation results differed from handwritten validation results for core types.",
-	StabilityLevel: metrics.BETA,
-}
-
-// Counter options for declarative validation panics
-var declarativeValidationPanicCounterOpts = &metrics.CounterOpts{
-	Namespace:      namespace,
-	Subsystem:      subsystem,
-	Name:           "declarative_validation_panic_total",
-	Help:           "Number of times declarative validation has panicked during validation.",
-	StabilityLevel: metrics.BETA,
-}
-
 // ValidationMetrics is the interface for validation metrics.
 type ValidationMetrics interface {
-	EmitDeclarativeValidationMismatchMetric()
-	EmitDeclarativeValidationPanicMetric()
+	IncDeclarativeValidationMismatchMetric()
+	IncDeclarativeValidationPanicMetric()
 	Reset()
 }
 
 var validationMetricsInstance = &validationMetrics{
-	DeclarativeValidationMismatchCounter: metrics.NewCounter(declarativeValidationMismatchCounterOpts),
-	DeclarativeValidationPanicCounter:    metrics.NewCounter(declarativeValidationPanicCounterOpts),
+	DeclarativeValidationMismatchCounter: metrics.NewCounter(
+		&metrics.CounterOpts{
+			Namespace:      namespace,
+			Subsystem:      subsystem,
+			Name:           "declarative_validation_mismatch_total",
+			Help:           "Number of times declarative validation results differed from handwritten validation results for core types.",
+			StabilityLevel: metrics.BETA,
+		},
+	),
+	DeclarativeValidationPanicCounter: metrics.NewCounter(
+		&metrics.CounterOpts{
+			Namespace:      namespace,
+			Subsystem:      subsystem,
+			Name:           "declarative_validation_panic_total",
+			Help:           "Number of times declarative validation has panicked during validation.",
+			StabilityLevel: metrics.BETA,
+		},
+	),
 }
 
-// Metrics provides access to validation metrics.
-var Metrics ValidationMetrics = validationMetricsInstance
-
-func init() {
 	legacyregistry.MustRegister(validationMetricsInstance.DeclarativeValidationMismatchCounter)
 	legacyregistry.MustRegister(validationMetricsInstance.DeclarativeValidationPanicCounter)
 }
@@ -71,17 +65,17 @@ type validationMetrics struct {
 
 // Reset resets the validation metrics.
 func (m *validationMetrics) Reset() {
-	m.DeclarativeValidationMismatchCounter = metrics.NewCounter(declarativeValidationMismatchCounterOpts)
-	m.DeclarativeValidationPanicCounter = metrics.NewCounter(declarativeValidationPanicCounterOpts)
+	m.DeclarativeValidationMismatchCounter.Reset()
+	m.DeclarativeValidationPanicCounter.Reset()
 }
 
-// EmitDeclarativeValidationMismatchMetric increments the counter for the declarative_validation_mismatch_total metric.
-func (m *validationMetrics) EmitDeclarativeValidationMismatchMetric() {
+// IncDeclarativeValidationMismatchMetric increments the counter for the declarative_validation_mismatch_total metric.
+func (m *validationMetrics) IncDeclarativeValidationMismatchMetric() {
 	m.DeclarativeValidationMismatchCounter.Inc()
 }
 
-// EmitDeclarativeValidationPanicMetric increments the counter for the declarative_validation_panic_total metric.
-func (m *validationMetrics) EmitDeclarativeValidationPanicMetric() {
+// IncDeclarativeValidationPanicMetric increments the counter for the declarative_validation_panic_total metric.
+func (m *validationMetrics) IncDeclarativeValidationPanicMetric() {
 	m.DeclarativeValidationPanicCounter.Inc()
 }
 

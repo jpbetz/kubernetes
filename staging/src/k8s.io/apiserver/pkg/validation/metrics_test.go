@@ -30,7 +30,7 @@ func TestDeclarativeValidationMismatchMetric(t *testing.T) {
 	defer ResetValidationMetricsInstance()
 
 	// Increment the metric once
-	Metrics.EmitDeclarativeValidationMismatchMetric()
+	Metrics.IncDeclarativeValidationMismatchMetric()
 
 	expected := `
 	# HELP apiserver_validation_declarative_validation_mismatch_total [BETA] Number of times declarative validation results differed from handwritten validation results for core types.
@@ -49,7 +49,7 @@ func TestDeclarativeValidationPanicMetric(t *testing.T) {
 	defer ResetValidationMetricsInstance()
 
 	// Increment the metric once
-	Metrics.EmitDeclarativeValidationPanicMetric()
+	Metrics.IncDeclarativeValidationPanicMetric()
 
 	expected := `
 	# HELP apiserver_validation_declarative_validation_panic_total [BETA] Number of times declarative validation has panicked during validation.
@@ -68,9 +68,9 @@ func TestDeclarativeValidationMismatchMetricMultiple(t *testing.T) {
 	defer ResetValidationMetricsInstance()
 
 	// Increment the metric three times
-	Metrics.EmitDeclarativeValidationMismatchMetric()
-	Metrics.EmitDeclarativeValidationMismatchMetric()
-	Metrics.EmitDeclarativeValidationMismatchMetric()
+	Metrics.IncDeclarativeValidationMismatchMetric()
+	Metrics.IncDeclarativeValidationMismatchMetric()
+	Metrics.IncDeclarativeValidationMismatchMetric()
 
 	expected := `
 	# HELP apiserver_validation_declarative_validation_mismatch_total [BETA] Number of times declarative validation results differed from handwritten validation results for core types.
@@ -89,9 +89,9 @@ func TestDeclarativeValidationPanicMetricMultiple(t *testing.T) {
 	defer ResetValidationMetricsInstance()
 
 	// Increment the metric three times
-	Metrics.EmitDeclarativeValidationPanicMetric()
-	Metrics.EmitDeclarativeValidationPanicMetric()
-	Metrics.EmitDeclarativeValidationPanicMetric()
+	Metrics.IncDeclarativeValidationPanicMetric()
+	Metrics.IncDeclarativeValidationPanicMetric()
+	Metrics.IncDeclarativeValidationPanicMetric()
 
 	expected := `
 	# HELP apiserver_validation_declarative_validation_panic_total [BETA] Number of times declarative validation has panicked during validation.
@@ -110,8 +110,8 @@ func TestDeclarativeValidationMetricsReset(t *testing.T) {
 	defer ResetValidationMetricsInstance()
 
 	// Increment both metrics
-	Metrics.EmitDeclarativeValidationMismatchMetric()
-	Metrics.EmitDeclarativeValidationPanicMetric()
+	Metrics.IncDeclarativeValidationMismatchMetric()
+	Metrics.IncDeclarativeValidationPanicMetric()
 
 	// Reset the metrics
 	Metrics.Reset()
@@ -131,8 +131,8 @@ func TestDeclarativeValidationMetricsReset(t *testing.T) {
 	}
 
 	// Increment the metrics again to ensure they're still functional
-	Metrics.EmitDeclarativeValidationMismatchMetric()
-	Metrics.EmitDeclarativeValidationPanicMetric()
+	Metrics.IncDeclarativeValidationMismatchMetric()
+	Metrics.IncDeclarativeValidationPanicMetric()
 
 	// Verify they've been incremented correctly
 	expected = `

@@ -189,7 +189,8 @@ func (p Pod) DeepCopyObject() runtime.Object {
 	}
 }
 
-// TestCheckDeclarativeValidationMismatches tests all scenarios for
+// TestGatherDeclarativeValidationMismatches tests all mismatch
+// scenarios across imperative and declarative errors for
 // the gatherDeclarativeValidationMismatches function
 func TestGatherDeclarativeValidationMismatches(t *testing.T) {
 	replicasPath := field.NewPath("spec").Child("replicas")
@@ -207,7 +208,7 @@ func TestGatherDeclarativeValidationMismatches(t *testing.T) {
 	errCWithDiffOrigin := field.Invalid(replicasPath, nil, "covered error C").WithOrigin("maximum")
 	errD := field.Invalid(selectorPath, nil, "regular error D")
 
-	tests := []struct {
+	testCases := []struct {
 		name                    string
 		imperativeErrors        field.ErrorList
 		declarativeErrors       field.ErrorList
@@ -257,7 +258,7 @@ func TestGatherDeclarativeValidationMismatches(t *testing.T) {
 				"unmatched error(s) found",
 				"extra error(s) found",
 				"replicas",
-				"Consider disabling the DeclarativeValidationTakeover feature gate",
+				"Consider disabling the DeclarativeValidationTakeover feature gate to keep data persisted in etcd consistent with prior versions of Kubernetes",
 			},
 		},
 		{
@@ -303,7 +304,7 @@ func TestGatherDeclarativeValidationMismatches(t *testing.T) {
 				"Unexpected difference between hand written validation and declarative validation error results",
 				"unmatched error(s) found",
 				"minReadySeconds",
-				"Consider disabling the DeclarativeValidationTakeover feature gate",
+				"Consider disabling the DeclarativeValidationTakeover feature gate to keep data persisted in etcd consistent with prior versions of Kubernetes",
 			},
 		},
 		{
@@ -347,24 +348,90 @@ func TestGatherDeclarativeValidationMismatches(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			details := gatherDeclarativeValidationMismatches(tt.imperativeErrors, tt.declarativeErrors, tt.takeover)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			details := gatherDeclarativeValidationMismatches(tc.imperativeErrors, tc.declarativeErrors, tc.takeover)
 			// Check if mismatches were found if expected
-			if tt.expectMismatches && len(details) == 0 {
+			if tc.expectMismatches && len(details) == 0 {
 				t.Errorf("Expected mismatches but got none")
 			}
 			// Check if details contain expected text
 			detailsStr := strings.Join(details, " ")
-			for _, expectedContent := range tt.expectDetailsContaining {
+			for _, expectedContent := range tc.expectDetailsContaining {
 				if !strings.Contains(detailsStr, expectedContent) {
 					t.Errorf("Expected details to contain: %q, but they didn't.\nDetails were:\n%s",
 						expectedContent, strings.Join(details, "\n"))
 				}
 			}
 			// If we don't expect any details, make sure none provided
-			if len(tt.expectDetailsContaining) == 0 && len(details) > 0 {
+			if len(tc.expectDetailsContaining) == 0 && len(details) > 0 {
 				t.Errorf("Expected no details, but got %d details: %v", len(details), details)
+			}
+		})
+	}
+}
+
+// TestCompareDeclarativeErrorsAndEmitMismatches tests expected
+// logging of mismatch information given match & mismatch error conditions.
+func TestCompareDeclarativeErrorsAndEmitMismatches(t *testing.T) {
+	replicasPath := field.NewPath("spec").Child("replicas")
+	minReadySecondsPath := field.NewPath("spec").Child("minReadySeconds")
+
+	errA := field.Invalid(replicasPath, nil, "regular error A")
+	errB := field.Invalid(minReadySecondsPath, -1, "covered error B").WithOrigin("minimum")
+	coveredErrB := field.Invalid(minReadySecondsPath, -1, "covered error B").WithOrigin("minimum")
+	coveredErrB.CoveredByDeclarative = true
+
+	testCases := []struct {
+		name            string
+		imperativeErrs  field.ErrorList
+		declarativeErrs field.ErrorList
+		takeover        bool
+		expectLogs      bool
+		expectedRegex   string
+	}{
+		{
+			name:            "mismatched errors, log info",
+			imperativeErrs:  field.ErrorList{coveredErrB},
+			declarativeErrs: field.ErrorList{errA},
+			takeover:        true,
+			expectLogs:      true,
+			// logs have a prefix of the form - I0309 21:05:33.865030 1926106 validate.go:199]
+			expectedRegex: "I.*Unexpected difference between hand written validation and declarative validation error results.*Consider disabling the DeclarativeValidationTakeover feature gate to keep data persisted in etcd consistent with prior versions of Kubernetes",
+		},
+		{
+			name:            "matching errors, don't log info",
+			imperativeErrs:  field.ErrorList{coveredErrB},
+			declarativeErrs: field.ErrorList{errB},
+			takeover:        true,
+			expectLogs:      false,
+			expectedRegex:   "",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			var buf bytes.Buffer
+			klog.SetOutput(&buf)
+			klog.LogToStderr(false)
+			defer klog.LogToStderr(true)
+			ctx := context.Background()
+
+			CompareDeclarativeErrorsAndEmitMismatches(ctx, tc.imperativeErrs, tc.declarativeErrs, tc.takeover)
+
+			klog.Flush()
+			logOutput := buf.String()
+
+			if tc.expectLogs {
+				matched, err := regexp.MatchString(tc.expectedRegex, logOutput)
+				if err != nil {
+					t.Fatalf("Bad regex: %v", err)
+				}
+				if !matched {
+					t.Errorf("Expected log output to match %q, but got:\n%s", tc.expectedRegex, logOutput)
+				}
+			} else if len(logOutput) > 0 {
+				t.Errorf("Expected no mismatch logs, but found: %s", logOutput)
 			}
 		})
 	}
@@ -376,7 +443,7 @@ func TestWithRecover(t *testing.T) {
 	options := sets.New[string]()
 	obj := &runtime.Unknown{}
 
-	tests := []struct {
+	testCases := []struct {
 		name            string
 		validateFn      func(context.Context, sets.Set[string], *runtime.Scheme, runtime.Object) field.ErrorList
 		takeoverEnabled bool
@@ -403,8 +470,8 @@ func TestWithRecover(t *testing.T) {
 			},
 			takeoverEnabled: false,
 			wantErrs:        nil,
-			// logs have a prefix of the form - W0309 21:05:33.865030 1926106 validate.go:199]
-			expectLogRegex: "W.*panic during declarative validation: test panic",
+			// logs have a prefix of the form - I0309 21:05:33.865030 1926106 validate.go:199]
+			expectLogRegex: "I.*panic during declarative validation: test panic",
 		},
 		{
 			name: "panic with takeover enabled",
@@ -420,7 +487,7 @@ func TestWithRecover(t *testing.T) {
 		{
 			name: "nil return, no panic",
 			validateFn: func(context.Context, sets.Set[string], *runtime.Scheme, runtime.Object) field.ErrorList {
-				return nil // no errors, no panic
+				return nil
 			},
 			takeoverEnabled: false,
 			wantErrs:        nil,
@@ -428,35 +495,33 @@ func TestWithRecover(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
 			var buf bytes.Buffer
-			flag.Set("v", "6")
-			flag.Parse()
 			klog.SetOutput(&buf)
 			klog.LogToStderr(false)
 			defer klog.LogToStderr(true)
 
 			// Pass the takeover flag to withRecover instead of relying on the feature gate
-			wrapped := withRecover(tt.validateFn, tt.takeoverEnabled)
+			wrapped := withRecover(tc.validateFn, tc.takeoverEnabled)
 			gotErrs := wrapped(ctx, options, scheme, obj)
 
 			klog.Flush()
 			logOutput := buf.String()
 
-			// Compare gotErrs vs. tt.wantErrs
-			if !equalErrorLists(gotErrs, tt.wantErrs) {
-				t.Errorf("withRecover() gotErrs = %#v, want %#v", gotErrs, tt.wantErrs)
+			// Compare gotErrs vs. tc.wantErrs
+			if !equalErrorLists(gotErrs, tc.wantErrs) {
+				t.Errorf("withRecover() gotErrs = %#v, want %#v", gotErrs, tc.wantErrs)
 			}
 
 			// Check logs if needed
-			if tt.expectLogRegex != "" {
-				matched, err := regexp.MatchString(tt.expectLogRegex, logOutput)
+			if tc.expectLogRegex != "" {
+				matched, err := regexp.MatchString(tc.expectLogRegex, logOutput)
 				if err != nil {
 					t.Fatalf("Bad regex: %v", err)
 				}
 				if !matched {
-					t.Errorf("Expected log output %q, but got:\n%s", tt.expectLogRegex, logOutput)
+					t.Errorf("Expected log output %q, but got:\n%s", tc.expectLogRegex, logOutput)
 				}
 			} else if strings.Contains(logOutput, "panic during declarative validation") {
 				t.Errorf("Unexpected panic log found: %s", logOutput)
@@ -472,7 +537,7 @@ func TestWithRecoverUpdate(t *testing.T) {
 	obj := &runtime.Unknown{}
 	oldObj := &runtime.Unknown{}
 
-	tests := []struct {
+	testCases := []struct {
 		name            string
 		validateFn      func(context.Context, sets.Set[string], *runtime.Scheme, runtime.Object, runtime.Object) field.ErrorList
 		takeoverEnabled bool
@@ -499,8 +564,8 @@ func TestWithRecoverUpdate(t *testing.T) {
 			},
 			takeoverEnabled: false,
 			wantErrs:        nil,
-			// logs have a prefix of the form - W0309 21:05:33.865030 1926106 validate.go:199]
-			expectLogRegex: "W.*panic during declarative validation: test update panic",
+			// logs have a prefix of the form - I0309 21:05:33.865030 1926106 validate.go:199]
+			expectLogRegex: "I.*panic during declarative validation: test update panic",
 		},
 		{
 			name: "panic with takeover enabled",
@@ -524,35 +589,33 @@ func TestWithRecoverUpdate(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
 			var buf bytes.Buffer
-			flag.Set("v", "6")
-			flag.Parse()
 			klog.SetOutput(&buf)
 			klog.LogToStderr(false)
 			defer klog.LogToStderr(true)
 
 			// Pass the takeover flag to withRecoverUpdate instead of relying on the feature gate
-			wrapped := withRecoverUpdate(tt.validateFn, tt.takeoverEnabled)
+			wrapped := withRecoverUpdate(tc.validateFn, tc.takeoverEnabled)
 			gotErrs := wrapped(ctx, options, scheme, obj, oldObj)
 
 			klog.Flush()
 			logOutput := buf.String()
 
 			// Compare gotErrs with wantErrs
-			if !equalErrorLists(gotErrs, tt.wantErrs) {
-				t.Errorf("withRecoverUpdate() gotErrs = %#v, want %#v", gotErrs, tt.wantErrs)
+			if !equalErrorLists(gotErrs, tc.wantErrs) {
+				t.Errorf("withRecoverUpdate() gotErrs = %#v, want %#v", gotErrs, tc.wantErrs)
 			}
 
 			// Verify log output
-			if tt.expectLogRegex != "" {
-				matched, err := regexp.MatchString(tt.expectLogRegex, logOutput)
+			if tc.expectLogRegex != "" {
+				matched, err := regexp.MatchString(tc.expectLogRegex, logOutput)
 				if err != nil {
 					t.Fatalf("Bad regex: %v", err)
 				}
 				if !matched {
-					t.Errorf("Expected log pattern %q, but got:\n%s", tt.expectLogRegex, logOutput)
+					t.Errorf("Expected log pattern %q, but got:\n%s", tc.expectLogRegex, logOutput)
 				}
 			} else if strings.Contains(logOutput, "panic during declarative validation") {
 				t.Errorf("Unexpected panic log found: %s", logOutput)
