@@ -86,14 +86,14 @@ func TestValidateDeclaratively(t *testing.T) {
 		},
 		{
 			name:        "update subresource",
-			subresource: "/status",
+			subresource: "status",
 			object:      valid,
 			oldObject:   valid,
 			expected:    field.ErrorList{invalidStatusErr},
 		},
 		{
 			name:        "invalid subresource",
-			subresource: "invalid/status",
+			subresource: "/invalid/status",
 			object:      valid,
 			oldObject:   valid,
 			expected:    field.ErrorList{invalidSubresourceErr},
