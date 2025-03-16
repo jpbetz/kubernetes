@@ -30,3 +30,6 @@ jobs:
         go test ./staging/src/k8s.io/apimachinery/pkg/util/...
         git diff --exit-code
 
+    - name: Run verify boilerplate
+      run: |
+        hack/verify-boilerplate.sh
