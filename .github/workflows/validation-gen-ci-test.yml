@@ -30,3 +30,6 @@ jobs:
         go test ./staging/src/k8s.io/apimachinery/pkg/util/...
         git diff --exit-code
 
+    - name: Run make verify
+      run: |
+        make verify
