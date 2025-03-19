@@ -1,0 +1,906 @@
+# Kubernetes API Validation Rules
+
+## Introduction
+
+Kubernetes API validation ensures that objects created or updated through the API server meet specific formatting requirements, constraints, and semantic rules before being stored in etcd. Validation occurs in multiple layers:
+
+1. **OpenAPI Schema Validation** - Validates basic structure and data types
+2. **AdmissionWebhooks** - Allow custom validation via webhooks
+3. **Built-in Validation** - The internal logic specific to each resource type 
+4. **CEL Validation Rules** - For CustomResourceDefinitions
+
+This document describes the built-in validation rules for Kubernetes API resources, organized by API groups.
+
+## Common Validation Patterns
+
+### Format Validations
+
+| Format Type | Pattern | Example Field | Description |
+|-------------|---------|---------------|-------------|
+| DNS Subdomain | `[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*` | `metadata.name` | Must consist of lowercase alphanumeric characters or '-', and must start/end with an alphanumeric character. May contain '.' |
+| DNS Label | `[a-z0-9]([-a-z0-9]*[a-z0-9])?` | Container port names | Must consist of lowercase alphanumeric characters or '-', and must start/end with an alphanumeric character |
+| Path Segment | `/[a-zA-Z0-9\/\-._~%!$&'()*+,;=:]+` | API paths | Must be a valid path segment |
+| Qualified Name | `([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]` | Annotation keys | Domain-prefixed names |
+| Port Number | `0-65535` | Service ports | Valid TCP/UDP port numbers |
+| IP Address | Various | Pod IPs | IPv4/IPv6 addresses |
+| CIDR | IPv4/IPv6 with subnet | Network policies | Network CIDR notations |
+
+### Cross-Field Validations
+
+Cross-field validations enforce relationships between multiple fields:
+
+1. **Consistency validation**: Fields must be consistent with each other
+   - Example: `hostPort` and `containerPort` must match when `hostNetwork: true`
+
+2. **Conditional requirements**: Fields required based on other field values
+   - Example: When using `volumes[*].persistentVolumeClaim`, `claimName` must be specified
+
+3. **Mutual exclusion**: Some fields cannot be used together
+   - Example: Cannot specify both `minAvailable` and `maxUnavailable` in a PodDisruptionBudget
+
+4. **Cardinality checks**: Ensuring proper count of related items
+   - Example: At least one container required in a Pod
+
+5. **Subset/containment validation**: Ensuring one set is contained in another
+   - Example: Pod selector must select pods with the template's labels
+
+### Immutability Rules
+
+Many fields in Kubernetes objects cannot be changed after creation:
+
+| Resource | Immutable Fields | Conditions/Notes |
+|----------|------------------|------------------|
+| Pod | Most fields other than `spec.containers[*].image`, `spec.initContainers[*].image`, `spec.activeDeadlineSeconds`, `spec.terminationGracePeriodSeconds` | Most Pod fields are immutable after creation |
+| Service | `spec.selector`, `spec.clusterIP`, `spec.type` | May not be changed after creation |
+| PersistentVolume | `spec.capacity`, `spec.accessModes`, `spec.persistentVolumeReclaimPolicy`, `spec.storageClassName` | Core volume attributes are immutable |
+| StatefulSet | `spec.volumeClaimTemplates`, `spec.serviceName` | Template changes only affect new pods |
+| Secret/ConfigMap | All data when `immutable: true` | Can opt into immutability |
+| Job | `spec.completions`, `spec.parallelism`, `spec.selector`, `spec.template`, `spec.completionMode` | Most fields are immutable after creation |
+| CRD | `spec.scope`, `spec.group`, `spec.names` | Structural schema elements are typically immutable |
+
+### Create vs Update Validation Differences
+
+Validation rules often differ between creation and updates:
+
+1. **Relaxed validations on updates**:
+   - Some resource versions allow maintaining previously-valid configuration even if validation rules changed
+   - Example: NetworkPolicies can maintain invalid selectors created in older versions
+
+2. **Stricter validations on updates**:
+   - Immutability checks only apply during updates
+   - Transition validations check if status changes follow allowed state transitions
+
+3. **Field defaulting**:
+   - More defaulting happens on create than update
+   - On updates, empty fields often retain their previous values
+
+4. **Status updates**:
+   - Status updates have separate validation from spec updates
+   - Status validation typically enforces state machine transitions
+
+## Core API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| Pod | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| Pod | metadata.name | Must be a valid DNS subdomain name | format | No |
+| Pod | spec.containers | At least one container required | cross field (cardinality) | No |
+| Pod | spec.containers[*].name | Must be unique within pod, valid DNS label | format, cross field (uniqueness) | No |
+| Pod | spec.containers[*].image | Must not be empty | format | No |
+| Pod | spec.containers[*].resources | Validates resource requirements (limits, requests) | cross field (consistency) | No |
+| Pod | spec.containers[*].ports | Must have valid port numbers (0-65535) | format | No |
+| Pod | spec.containers[*].env | Variable names must be valid C identifiers | format | No |
+| Pod | spec.volumes | Volume names must be unique | cross field (uniqueness) | No |
+| Pod | spec.volumes[*].hostPath | Must have path specified when using hostPath | cross field (conditional requirement) | No |
+| Pod | spec.volumes[*].persistentVolumeClaim | Must specify valid claim name | format | No |
+| Pod | spec.volumes[*].configMap | Must specify valid configMap name | format | No |
+| Pod | spec.volumes[*].secret | Must specify valid secret name | format | No |
+| Pod | spec.restartPolicy | Must be "Always", "OnFailure", or "Never" | enum | No |
+| Pod | spec.nodeName | Must be a valid DNS subdomain name if specified | format | No |
+| Pod | spec.serviceAccountName | Must be a valid DNS subdomain name if specified | format | No |
+| Pod | spec.hostNetwork | If true, containers requesting ports must match host ports | cross field (conditional constraint) | No |
+| Node | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| Node | metadata.name | Must be a valid DNS subdomain name | format | No |
+| Node | spec.taints | Key must be a valid qualified name, value cannot be empty | format | No |
+| Node | spec.podCIDR | Must be valid CIDR notation if specified | format | No |
+| Service | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| Service | metadata.name | Must be a valid DNS subdomain name | format | No |
+| Service | spec.ports | At least one port required for ClusterIP and NodePort types | cross field (conditional cardinality) | No |
+| Service | spec.ports[*].port | Valid port number (1-65535) | format | No |
+| Service | spec.ports[*].targetPort | Valid port name or number | format | No |
+| Service | spec.ports[*].protocol | Must be "TCP", "UDP", or "SCTP" | enum | No |
+| Service | spec.selector | Valid label selector | format | No |
+| Service | spec.type | Must be "ClusterIP", "NodePort", "LoadBalancer", or "ExternalName" | enum | No |
+| Service | spec.clusterIP | Must be "None" or valid IP address | format | No |
+| Service | spec.externalName | Must be valid DNS name for ExternalName type | format, cross field (conditional requirement) | No |
+| Namespace | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| Namespace | metadata.name | Must be valid DNS label, not "default", "kube-system", etc. | format, enum (exclusion) | No |
+| ConfigMap | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| ConfigMap | data/binaryData | Keys must be valid DNS subdomain names, combined data size limited | format, cross field (size limit) | No |
+| Secret | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| Secret | metadata.name | Must be a valid DNS subdomain name | format | No |
+| Secret | type | Must be valid secret type ("Opaque", "kubernetes.io/service-account-token", etc.) | enum | No |
+| Secret | data | Total size has limit (typically 1MB) | cross field (size limit) | No |
+| PersistentVolume | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| PersistentVolume | metadata.namespace | Must be empty (PVs are cluster-scoped) | format | No |
+| PersistentVolume | spec.accessModes | Must contain at least one valid access mode | enum, cross field (cardinality) | No |
+| PersistentVolume | spec.accessModes | ReadWriteOncePod cannot be specified with other access modes | cross field | No |
+| PersistentVolume | spec.capacity | Must specify storage capacity | format | No |
+| PersistentVolume | spec.nodeAffinity | Node affinity rules must be valid if specified | cross field | No |
+| PersistentVolume | spec.persistentVolumeSource | Must specify exactly one volume type | union | No |
+| PersistentVolume | spec.volumeAttributesClassName | Must be a valid name if specified | format | Yes, only when VolumeAttributesClass feature gate is enabled |
+| PersistentVolume | spec.volumeMode | Must be a valid PersistentVolumeMode ("Filesystem" or "Block") | enum | No |
+| PersistentVolumeClaim | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| PersistentVolumeClaim | spec.accessModes | Must contain at least one valid access mode | enum, cross field (cardinality) | No |
+| PersistentVolumeClaim | spec.dataSource | Must specify valid kind/name if specified | format | No |
+| PersistentVolumeClaim | spec.dataSourceRef | Must specify valid group/kind/name/namespace if specified | format | Yes, only when VolumeDataSourceRef feature gate is enabled |
+| PersistentVolumeClaim | spec.resources | Must specify storage request | cross field (requirement) | No |
+| PersistentVolumeClaim | spec.storageClassName | Must be valid storage class name if specified | format | No |
+| PersistentVolumeClaim | spec.volumeMode | Must be a valid PersistentVolumeMode ("Filesystem" or "Block") | enum | No |
+| Endpoints | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| Endpoints | subsets[*].addresses | Must have valid IP addresses | format | No |
+| Endpoints | subsets[*].ports | Must have valid port numbers | format | No |
+| Event | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| Event | reason | Must be 1-255 characters (with allowed chars) | format | No |
+| ResourceQuota | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| ResourceQuota | spec.hard | Must have valid resource names and quantities | format | No |
+| LimitRange | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| LimitRange | spec.limits | Must have valid resource types and values | format | No |
+
+## Apps API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| Deployment | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| Deployment | metadata.name | Must be a valid DNS subdomain name | format | No |
+| Deployment | spec.selector | Must not be empty, must be valid label selector | format | No |
+| Deployment | spec.template | Must be valid pod template, must match selector | cross field (consistency) | No |
+| Deployment | spec.strategy.type | Must be "Recreate" or "RollingUpdate" | enum | No |
+| Deployment | spec.strategy.rollingUpdate | Must have valid maxSurge and maxUnavailable (if specified) | cross field (conditional requirement) | Only when strategy.type is RollingUpdate |
+| Deployment | spec.strategy.rollingUpdate.maxSurge | Must be valid percentage or absolute value | format | Only when strategy.type is RollingUpdate |
+| Deployment | spec.strategy.rollingUpdate.maxUnavailable | Must be valid percentage or absolute value | format | Only when strategy.type is RollingUpdate |
+| Deployment | spec.replicas | Must be non-negative integer | format | No |
+| Deployment | spec.progressDeadlineSeconds | Must be positive integer if specified | format | No |
+| Deployment | spec.revisionHistoryLimit | Must be non-negative integer if specified | format | No |
+| Deployment | spec.minReadySeconds | Must be non-negative integer | format | No |
+| StatefulSet | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| StatefulSet | metadata.name | Must be a valid DNS subdomain name | format | No |
+| StatefulSet | spec.selector | Must not be empty, must be valid label selector | format | No |
+| StatefulSet | spec.template | Must be valid pod template, must match selector | cross field (consistency) | No |
+| StatefulSet | spec.serviceName | Must not be empty, must be valid DNS subdomain name | format | No |
+| StatefulSet | spec.replicas | Must be non-negative integer | format | No |
+| StatefulSet | spec.updateStrategy | Must be valid update strategy | enum | No |
+| StatefulSet | spec.volumeClaimTemplates | Must be valid PVC templates | cross field | No |
+| StatefulSet | spec.podManagementPolicy | Must be "OrderedReady" or "Parallel" | enum | No |
+| StatefulSet | spec.persistentVolumeClaimRetentionPolicy | Must have valid deletion and reclaim policies | enum | Yes, when StatefulSetAutoDeletePVC feature is enabled |
+| StatefulSet | spec.ordinals | Must have valid start and count values | format | Yes, when StatefulSetStartOrdinal feature is enabled |
+| DaemonSet | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| DaemonSet | metadata.name | Must be a valid DNS subdomain name | format | No |
+| DaemonSet | spec.selector | Must not be empty, must be valid label selector | format | No |
+| DaemonSet | spec.template | Must be valid pod template, must match selector | cross field (consistency) | No |
+| DaemonSet | spec.updateStrategy | Must be valid update strategy | enum | No |
+| DaemonSet | spec.minReadySeconds | Must be non-negative integer | format | No |
+| ReplicaSet | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| ReplicaSet | metadata.name | Must be a valid DNS subdomain name | format | No |
+| ReplicaSet | spec.selector | Must not be empty, must be valid label selector | format | No |
+| ReplicaSet | spec.template | Must be valid pod template, must match selector | cross field (consistency) | No |
+| ReplicaSet | spec.replicas | Must be non-negative integer | format | No |
+| ReplicaSet | spec.minReadySeconds | Must be non-negative integer | format | No |
+| ControllerRevision | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| ControllerRevision | metadata.name | Must be a valid DNS subdomain name | format | No |
+| ControllerRevision | data | Must be valid serialized data | format | No |
+| ControllerRevision | revision | Must be non-negative integer | format | No |
+
+## Networking API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| NetworkPolicy | metadata | Calls `ValidateObjectMeta()` | shared | No |
+| NetworkPolicy | metadata.name | Must be a valid DNS subdomain name | format | No |
+| NetworkPolicy | spec.podSelector | Must be valid label selector | format | No |
+| NetworkPolicy | spec.ingress | Ingress rules must specify valid ports | format | No |
+| NetworkPolicy | spec.ingress.from | From must specify valid peer selectors | format | No |
+| NetworkPolicy | spec.ingress.ports | Port must be between 1 and 65535 inclusive if numeric | range | No |
+| NetworkPolicy | spec.ingress[*].from[*].ipBlock.cidr | Must be valid CIDR notation | format | Only when ipBlock is used |
+| NetworkPolicy | spec.ingress[*].from[*].ipBlock.except | Must be valid CIDR notation, must be subset of cidr | format | Only when ipBlock is used |
+| NetworkPolicy | spec.ingress[*].from[*].ipBlock.except | Must be subset of CIDR | cross field | Only when ipBlock is used |
+| NetworkPolicy | spec.ingress[*].from[*].namespaceSelector | Must be valid label selector | format | Only when namespaceSelector is used |
+| NetworkPolicy | spec.ingress[*].from[*].podSelector | Must be valid label selector | format | Only when podSelector is used |
+| NetworkPolicy | spec.ingress[*].from[*].ports | Must have valid port numbers or names | format | No |
+| NetworkPolicy | spec.ingress[*].ports[*].protocol | Must be "TCP", "UDP", or "SCTP" | enum | No |
+| NetworkPolicy | spec.ingress[*].ports[*].port | Must be valid port number or name | format | No |
+| NetworkPolicy | spec.egress | Egress rules must specify valid ports | format | No |
+| NetworkPolicy | spec.egress.ports | Port must be between 1 and 65535 inclusive if numeric | range | No |
+| NetworkPolicy | spec.egress.to | To must specify valid peer selectors | format | No |
+| NetworkPolicy | spec.egress[*].to[*].ipBlock.cidr | Must be valid CIDR notation | format | Only when ipBlock is used |
+| NetworkPolicy | spec.egress[*].to[*].ipBlock.except | Must be valid CIDR notation, must be subset of cidr | format | Only when ipBlock is used |
+| NetworkPolicy | spec.egress[*].to[*].ipBlock.except | Must be subset of CIDR | cross field | Only when ipBlock is used |
+| NetworkPolicy | spec.egress[*].to[*].namespaceSelector | Must be valid label selector | format | Only when namespaceSelector is used |
+| NetworkPolicy | spec.egress[*].to[*].podSelector | Must be valid label selector | format | Only when podSelector is used |
+| NetworkPolicy | spec.egress[*].to[*].ports | Must have valid port numbers or names | format | No |
+| NetworkPolicy | spec.egress[*].ports[*].protocol | Must be "TCP", "UDP", or "SCTP" | enum | No |
+| NetworkPolicy | spec.egress[*].ports[*].port | Must be valid port number or name | format | No |
+| NetworkPolicy | spec.policyTypes | Must be "Ingress", "Egress", or both | enum | No |
+| Ingress | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| Ingress | metadata.name | Must be a valid DNS subdomain name | format | No |
+| Ingress | spec.rules[*].host | Must be valid DNS subdomain name if specified | format | No |
+| Ingress | spec.rules[*].http.paths[*].path | Must be valid URL path if specified | format | No |
+| Ingress | spec.rules[*].http.paths[*].pathType | Must be "Exact", "Prefix", or "ImplementationSpecific" | enum | No |
+| Ingress | spec.rules[*].http.paths[*].backend | Must specify valid service name and port | cross field | No |
+| Ingress | spec.tls[*].hosts | Must be valid DNS subdomain names | format | Only when TLS is specified |
+| Ingress | spec.tls[*].secretName | Must be valid secret name if specified | format | Only when TLS is specified |
+| Ingress | spec.ingressClassName | Must be a valid name if specified | format | No |
+| IngressClass | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| IngressClass | metadata.name | Must be a valid DNS subdomain name | format | No |
+| IngressClass | spec.controller | Must not be empty | format | No |
+| IngressClass | spec.parameters | Must specify valid resource if specified | cross field | No |
+
+## Batch API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| Job | metadata | Calls `ValidateObjectMeta()` | shared | No |
+| Job | metadata.name | Must be a valid DNS subdomain name | format | No |
+| Job | spec.selector | Must be valid label selector | format | No |
+| Job | spec.template | Must be valid pod template, must match selector | cross field | No |
+| Job | spec.template.spec.restartPolicy | Must be "Never" or "OnFailure" | enum | No |
+| Job | spec.parallelism | Must be non-negative integer | format | No |
+| Job | spec.completions | Must be non-negative integer | format | No |
+| Job | spec.backoffLimit | Must be non-negative integer | format | No |
+| Job | spec.activeDeadlineSeconds | Must be positive integer if specified | format | No |
+| Job | spec.ttlSecondsAfterFinished | Must be non-negative integer if specified | format | Only if TTLAfterFinished feature gate is enabled |
+| Job | spec.completionMode | Must be a valid CompletionMode ("NonIndexed" or "Indexed") | enum | No |
+| Job | spec.completionMode | On update, completionMode is immutable | immutable | Yes during update |
+| Job | spec.suspend | Boolean field controlling job suspension | format | No |
+| Job | spec.podFailurePolicy | Must have valid rules with valid actions and conditions | cross field | No |
+| Job | spec.podFailurePolicy | On update, podFailurePolicy is immutable | immutable | Yes during update |
+| Job | status.uncountedTerminatedPods | Must have valid pod UIDs, no duplicates between succeeded and failed | cross field | No |
+| CronJob | metadata | Calls `ValidateObjectMeta()` | shared | No |
+| CronJob | metadata.name | Must be a valid DNS subdomain name | format | No |
+| CronJob | metadata.name | Name must be no more than 52 characters | length | No |
+| CronJob | spec.schedule | Must be valid cron schedule string | format | No |
+| CronJob | spec.schedule | Schedule is required | required field | No |
+| CronJob | spec.jobTemplate | Must be valid job template | cross field | No |
+| CronJob | spec.startingDeadlineSeconds | Must be non-negative integer if specified | format | No |
+| CronJob | spec.concurrencyPolicy | Must be "Allow", "Forbid", or "Replace" | enum | No |
+| CronJob | spec.successfulJobsHistoryLimit | Must be non-negative integer if specified | format | No |
+| CronJob | spec.failedJobsHistoryLimit | Must be non-negative integer if specified | format | No |
+| CronJob | spec.timeZone | Must be a valid time zone name if specified | format | Yes when CronJobTimeZone feature is enabled |
+| CronJob | spec.suspend | Must be a valid boolean value | format | No |
+
+## RBAC API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| Role | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| Role | metadata.name | Must be a valid DNS subdomain name | format | No |
+| Role | rules[*].apiGroups | Must be valid API group names | format | No |
+| Role | rules[*].resources | Must be valid resource names | format | No |
+| Role | rules[*].verbs | Must be valid verbs (get, list, watch, create, update, patch, delete) | enum | No |
+| Role | rules[*].resourceNames | Must be valid resource names if specified | format | No |
+| RoleBinding | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| RoleBinding | metadata.name | Must be a valid DNS subdomain name | format | No |
+| RoleBinding | roleRef.apiGroup | Must be "rbac.authorization.k8s.io" | enum | No |
+| RoleBinding | roleRef.kind | Must be "Role" or "ClusterRole" | enum | No |
+| RoleBinding | roleRef.name | Must not be empty | format | No |
+| RoleBinding | subjects[*].kind | Must be "User", "Group", or "ServiceAccount" | enum | No |
+| RoleBinding | subjects[*].name | Must not be empty | format | No |
+| RoleBinding | subjects[*].namespace | Must be valid namespace name for ServiceAccount subjects | format, cross field (conditional requirement) | Only when subject is ServiceAccount |
+| ClusterRole | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| ClusterRole | metadata.name | Must be a valid DNS subdomain name | format | No |
+| ClusterRole | rules[*].apiGroups | Must be valid API group names | format | No |
+| ClusterRole | rules[*].resources | Must be valid resource names | format | No |
+| ClusterRole | rules[*].verbs | Must be valid verbs (get, list, watch, create, update, patch, delete) | enum | No |
+| ClusterRole | rules[*].resourceNames | Must be valid resource names if specified | format | No |
+| ClusterRole | aggregationRule.clusterRoleSelectors | Must be valid label selectors if specified | format | No |
+| ClusterRoleBinding | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| ClusterRoleBinding | metadata.name | Must be a valid DNS subdomain name | format | No |
+| ClusterRoleBinding | roleRef.apiGroup | Must be "rbac.authorization.k8s.io" | enum | No |
+| ClusterRoleBinding | roleRef.kind | Must be "ClusterRole" | enum | No |
+| ClusterRoleBinding | roleRef.name | Must not be empty | format | No |
+| ClusterRoleBinding | subjects[*].kind | Must be "User", "Group", or "ServiceAccount" | enum | No |
+| ClusterRoleBinding | subjects[*].name | Must not be empty | format | No |
+| ClusterRoleBinding | subjects[*].namespace | Must be valid namespace name for ServiceAccount subjects | format, cross field (conditional requirement) | Only when subject is ServiceAccount |
+
+## Storage API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| StorageClass | metadata | Calls `ValidateObjectMeta()` | shared | No |
+| StorageClass | metadata.name | Must be a valid DNS subdomain name | format | No |
+| StorageClass | provisioner | Must not be empty | format | No |
+| StorageClass | parameters | Validates based on provisioner-specific rules | cross field | No |
+| StorageClass | parameters | Parameter names and values must be less than 512 characters | length | No |
+| StorageClass | parameters | Total parameters size must be less than 256 KB | size | No |
+| StorageClass | reclaimPolicy | Must be "Delete" or "Retain" if specified | enum | No |
+| StorageClass | volumeBindingMode | Must be "Immediate" or "WaitForFirstConsumer" if specified | enum | No |
+| StorageClass | allowVolumeExpansion | Boolean value | format | No |
+| StorageClass | allowedTopologies | TopologySelectorTerms must be valid | format | No |
+| VolumeAttachment | metadata | Calls `ValidateObjectMeta()` | shared | No |
+| VolumeAttachment | metadata.name | Must be a valid DNS subdomain name | format | No |
+| VolumeAttachment | spec.attacher | Must not be empty | format | No |
+| VolumeAttachment | spec.source | Must specify valid PV or in-line volume source | union | No |
+| VolumeAttachment | spec.source | Either PersistentVolumeName or CSI is required | required field | No |
+| VolumeAttachment | spec.nodeName | Must not be empty | format | No |
+| VolumeAttachment | status.attachError | Error message must be less than 1024 characters | length | No |
+| VolumeAttachment | status.attachmentMetadata | Attachment metadata size must be less than 256 KB | size | No |
+| CSIDriver | metadata | Calls `ValidateObjectMeta()` | shared | No |
+| CSIDriver | metadata.name | Must be a valid DNS subdomain name | format | No |
+| CSIDriver | spec.attachRequired | Boolean value | format | No |
+| CSIDriver | spec.podInfoOnMount | Boolean value | format | No |
+| CSIDriver | spec.fsGroupPolicy | FSGroupPolicy must be ReadWriteOnceWithFSType, File, or None | enum | No |
+| CSIDriver | spec.volumeLifecycleModes | Must contain valid volume lifecycle modes | enum | No |
+| CSIDriver | spec.volumeLifecycleModes | Volume lifecycle modes must be Persistent or Ephemeral | enum | No |
+| CSINode | metadata | Calls `ValidateObjectMeta()` | shared | No |
+| CSINode | metadata.name | Must be a valid DNS subdomain name | format | No |
+| CSINode | spec.drivers | Driver names must be unique | uniqueness | No |
+| CSINode | spec.drivers[*].name | Must not be empty | format | No |
+| CSINode | spec.drivers[*].nodeID | Must not be empty | format | No |
+| CSINode | spec.drivers[*].nodeID | NodeID must be less than 192 or 256 characters depending on feature flag | length | No |
+| CSINode | spec.drivers[*].topologyKeys | Must be valid topology keys if specified | format | No |
+| VolumeAttributesClass | metadata | Calls `ValidateObjectMeta()` | shared | No |
+| VolumeAttributesClass | driverName | DriverName is required | required field | No |
+| VolumeAttributesClass | driverName | On update, driverName is immutable | immutable | Yes during update |
+| VolumeAttributesClass | parameters | Parameters must be valid | format | No |
+| VolumeAttributesClass | parameters | On update, parameters are immutable | immutable | Yes during update |
+
+## Authentication API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| TokenReview | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| TokenReview | spec.token | Optional, but must not be empty if specified | format | No |
+| TokenReview | spec.audiences | Must be valid audiences if specified | format | No |
+| SelfSubjectReview | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| TokenRequest | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| TokenRequest | spec.audiences | Must not be empty | format | No |
+| TokenRequest | spec.expirationSeconds | Must be positive integer if specified | format | No |
+| TokenRequest | spec.boundObjectRef | Must specify valid object reference if specified | cross field | No |
+
+## Authorization API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| SubjectAccessReview | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| SubjectAccessReview | spec.resourceAttributes | Must specify resource or non-resource, not both | union | No |
+| SubjectAccessReview | spec.resourceAttributes.resource | Must not be empty if specified | format | Only when resourceAttributes is used |
+| SubjectAccessReview | spec.resourceAttributes.verb | Must not be empty if specified | format | Only when resourceAttributes is used |
+| SubjectAccessReview | spec.nonResourceAttributes.path | Must not be empty if specified | format | Only when nonResourceAttributes is used |
+| SubjectAccessReview | spec.nonResourceAttributes.verb | Must not be empty if specified | format | Only when nonResourceAttributes is used |
+| SubjectAccessReview | spec.user | Optional | format | No |
+| SubjectAccessReview | spec.groups | Must be valid group names if specified | format | No |
+| LocalSubjectAccessReview | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| LocalSubjectAccessReview | metadata.namespace | Must not be empty | format | No |
+| LocalSubjectAccessReview | spec | Same validation as SubjectAccessReview | cross field | No |
+| SelfSubjectAccessReview | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| SelfSubjectAccessReview | spec | Same validation as SubjectAccessReview, but user/group fields not allowed | cross field (restrictions) | No |
+| SelfSubjectRulesReview | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+
+## Certificates API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| CertificateSigningRequest | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| CertificateSigningRequest | metadata.name | Must be a valid DNS subdomain name | format | No |
+| CertificateSigningRequest | spec.request | Must be valid PEM-encoded certificate request | format | No |
+| CertificateSigningRequest | spec.signerName | Must not be empty, must be valid signer name | format | No |
+| CertificateSigningRequest | spec.usages | Must contain valid key usages | enum | No |
+| CertificateSigningRequest | spec.expirationSeconds | Must be positive integer if specified | format | No |
+
+## Admissionregistration API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| ValidatingWebhookConfiguration | metadata | Calls `ValidateObjectMeta()` | shared | No |
+| ValidatingWebhookConfiguration | metadata.name | Must be a valid DNS subdomain name | format | No |
+| ValidatingWebhookConfiguration | webhooks[*].name | Must be a domain with at least three segments separated by dots | format | No |
+| ValidatingWebhookConfiguration | webhooks[*].clientConfig | Must specify valid URL or service reference | union | No |
+| ValidatingWebhookConfiguration | webhooks[*].rules | Must specify valid API groups, versions, resources, and operations | cross field | No |
+| ValidatingWebhookConfiguration | webhooks[*].failurePolicy | Must be "Fail" or "Ignore" if specified | enum | No |
+| ValidatingWebhookConfiguration | webhooks[*].matchPolicy | Must be "Exact" or "Equivalent" if specified | enum | No |
+| ValidatingWebhookConfiguration | webhooks[*].sideEffects | Must be "None", "NoneOnDryRun", "Some", or "Unknown" | enum | No |
+| ValidatingWebhookConfiguration | webhooks[*].timeoutSeconds | Must be a positive integer if specified | format | No |
+| ValidatingWebhookConfiguration | webhooks[*].admissionReviewVersions | Must be valid admission review versions | format | No |
+| MutatingWebhookConfiguration | metadata | Calls `ValidateObjectMeta()` | shared | No |
+| MutatingWebhookConfiguration | metadata.name | Must be a valid DNS subdomain name | format | No |
+| MutatingWebhookConfiguration | webhooks[*].name | Must be a domain with at least three segments separated by dots | format | No |
+| MutatingWebhookConfiguration | webhooks[*].clientConfig | Must specify valid URL or service reference | union | No |
+| MutatingWebhookConfiguration | webhooks[*].rules | Must specify valid API groups, versions, resources, and operations | cross field | No |
+| MutatingWebhookConfiguration | webhooks[*].failurePolicy | Must be "Fail" or "Ignore" if specified | enum | No |
+| MutatingWebhookConfiguration | webhooks[*].matchPolicy | Must be "Exact" or "Equivalent" if specified | enum | No |
+| MutatingWebhookConfiguration | webhooks[*].sideEffects | Must be "None", "NoneOnDryRun", "Some", or "Unknown" | enum | No |
+| MutatingWebhookConfiguration | webhooks[*].timeoutSeconds | Must be a positive integer if specified | format | No |
+| MutatingWebhookConfiguration | webhooks[*].admissionReviewVersions | Must be valid admission review versions | format | No |
+| MutatingWebhookConfiguration | webhooks[*].reinvocationPolicy | Must be "Never" or "IfNeeded" if specified | enum | No |
+| ValidatingAdmissionPolicy | metadata | Calls `ValidateObjectMeta()` | shared | No |
+| ValidatingAdmissionPolicy | metadata.name | Must be a valid DNS subdomain name | format | No |
+| ValidatingAdmissionPolicy | spec.matchConstraints | Must specify resource rules | cross field | No |
+| ValidatingAdmissionPolicy | spec.validations | Must specify at least one validation unless auditAnnotations is specified | cross field | No |
+| ValidatingAdmissionPolicy | spec.failurePolicy | Must be "Fail" or "Ignore" | enum | No |
+| ValidatingAdmissionPolicy | spec.paramKind | Must have valid API version and kind if specified | cross field | No |
+| ValidatingAdmissionPolicyBinding | metadata | Calls `ValidateObjectMeta()` | shared | No |
+| ValidatingAdmissionPolicyBinding | metadata.name | Must be a valid DNS subdomain name | format | No |
+| ValidatingAdmissionPolicyBinding | spec.policyName | Must be a valid name reference | format | No |
+| ValidatingAdmissionPolicyBinding | spec.paramRef | Must be a valid object reference if specified | cross field | No |
+
+## Coordination API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| Lease | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| Lease | metadata.name | Must be a valid DNS subdomain name | format | No |
+| Lease | spec.holderIdentity | Optional, validates string format | format | No |
+| Lease | spec.leaseDurationSeconds | Must be a positive integer if specified | format | No |
+| Lease | spec.leaseTransitions | Must be a non-negative integer if specified | format | No |
+| Lease | spec.acquireTime | Must be a valid time format | format | No |
+| Lease | spec.renewTime | Must be a valid time format | format | No |
+| Lease | spec.strategy | Must be a valid strategy ("OldestEmulationVersion" or qualified name) | enum | No |
+| Lease | spec.emulationVersion | Must be specified when strategy is "OldestEmulationVersion" | cross field | Yes |
+| Lease | spec.preferredHolder | Must not be specified unless `strategy` is defined | cross field | Yes |
+| LeaseCandidate | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| LeaseCandidate | metadata.name | Must be a valid DNS subdomain name and ConfigMapKey | format | No |
+| LeaseCandidate | spec.leaseName | Must not be empty, immutable after creation | format, immutable | No |
+| LeaseCandidate | spec.binaryVersion | Must not be empty, must be valid semver format | format | No |
+| LeaseCandidate | spec.emulationVersion | Must be valid semver format and >= binaryVersion | cross field | No |
+| LeaseCandidate | spec.strategy | Must not be empty, must be a valid strategy | enum | No |
+| LeaseCandidate | spec.pingTime | No additional validation for MicroTime | format | No |
+| LeaseCandidate | spec.renewTime | No additional validation for MicroTime | format | No |
+
+## Scheduling API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| PriorityClass | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| PriorityClass | metadata.name | Must be a valid DNS subdomain name | format | No |
+| PriorityClass | metadata.name | If name starts with "system-", must be one of the predefined system priority classes | reserved | No |
+| PriorityClass | value | For non-system priority classes, value must be <= HighestUserDefinablePriority | cross field | Yes |
+| PriorityClass | value | Value must be valid integer, immutable after creation | format, immutable | No |
+| PriorityClass | globalDefault | Must be boolean value | format | No |
+| PriorityClass | description | Optional text description | format | No |
+| PriorityClass | preemptionPolicy | Must be "Never" or "PreemptLowerPriority" if specified, immutable after creation | enum, immutable | No |
+
+## Node API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| RuntimeClass | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| RuntimeClass | metadata.name | Must be a valid DNS subdomain name | format | No |
+| RuntimeClass | handler | Must not be empty, must be valid DNS label, immutable after creation | format, immutable | No |
+| RuntimeClass | scheduling | Optional scheduling configuration | cross field | No |
+| RuntimeClass | scheduling.nodeSelector | Must be valid label selector if specified | format | No |
+| RuntimeClass | scheduling.tolerations | Must be valid tolerations, must not have duplicates | format, cross field (uniqueness) | No |
+| RuntimeClass | overhead | Must specify valid resource requirements if specified | cross field | No |
+| RuntimeClass | overhead.podFixed | Must be valid resource quantities | format | No |
+
+## Discovery API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| EndpointSlice | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| EndpointSlice | metadata.name | Must be a valid DNS subdomain name | format | No |
+| EndpointSlice | addressType | Must be "IPv4", "IPv6", or "FQDN", immutable after creation | enum, immutable | No |
+| EndpointSlice | endpoints | Must not exceed maximum of 1000 endpoints | cross field (cardinality) | No |
+| EndpointSlice | endpoints[*].addresses | Must have at least one address, must not exceed 100 addresses | cross field (cardinality) | No |
+| EndpointSlice | endpoints[*].addresses | Must be valid IPs or FQDNs according to addressType | format | Yes |
+| EndpointSlice | endpoints[*].conditions | Must have valid readiness booleans | format | No |
+| EndpointSlice | endpoints[*].hostname | Must be valid DNS label if specified | format | No |
+| EndpointSlice | endpoints[*].nodeName | Must be valid node name if specified | format | No |
+| EndpointSlice | endpoints[*].targetRef | Must be valid object reference if specified | cross field | No |
+| EndpointSlice | endpoints[*].deprecatedTopology | Must not exceed 16 labels, must be valid labels | format, cross field (cardinality) | No |
+| EndpointSlice | endpoints[*].hints | Must have valid zone hints if specified | cross field | No |
+| EndpointSlice | endpoints[*].hints.forZones | Must not exceed 8 zone hints, must have unique zone names | cross field (cardinality, uniqueness) | No |
+| EndpointSlice | ports | Must not exceed maximum of 20000 ports | cross field (cardinality) | No |
+| EndpointSlice | ports[*].name | Must be valid DNS label, must be unique within endpoint slice | format, cross field (uniqueness) | No |
+| EndpointSlice | ports[*].protocol | Must be specified, must be "TCP", "UDP", or "SCTP" | enum | No |
+| EndpointSlice | ports[*].port | Must be valid port number if specified | format | No |
+| EndpointSlice | ports[*].appProtocol | Must be valid qualified name if specified | format | No |
+
+## Autoscaling API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| HorizontalPodAutoscaler | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| HorizontalPodAutoscaler | metadata.name | Must be a valid DNS subdomain name | format | No |
+| HorizontalPodAutoscaler | spec.scaleTargetRef.kind | Must not be empty, must be a valid kind | format | No |
+| HorizontalPodAutoscaler | spec.scaleTargetRef.name | Must not be empty, must be a valid name | format | No |
+| HorizontalPodAutoscaler | spec.minReplicas | Must be ≥ 0 if HPAScaleToZero feature enabled, otherwise ≥ 1 | format | Yes |
+| HorizontalPodAutoscaler | spec.maxReplicas | Must be greater than 0 and ≥ minReplicas | cross field | No |
+| HorizontalPodAutoscaler | spec.metrics | Must have either Object or External metrics if minReplicas=0 | cross field | Yes |
+| HorizontalPodAutoscaler | spec.metrics[*].type | Must be one of Resource, Object, Pods, External, or ContainerResource | enum | No |
+| HorizontalPodAutoscaler | spec.metrics[*].resource.name | Must be a valid resource name | format | No |
+| HorizontalPodAutoscaler | spec.metrics[*].resource.target | Must specify either utilization or absolute value, not both | cross field | No |
+| HorizontalPodAutoscaler | spec.metrics[*].containerResource.name | Must be a valid resource name | format | No |
+| HorizontalPodAutoscaler | spec.metrics[*].containerResource.container | Must not be empty | format | No |
+| HorizontalPodAutoscaler | spec.metrics[*].containerResource.target | Must specify either utilization or absolute value, not both | cross field | No |
+| HorizontalPodAutoscaler | spec.metrics[*].object.target.type | Must be Value, Utilization, or AverageValue | enum | No |
+| HorizontalPodAutoscaler | spec.metrics[*].object.target.value | Must be valid resource quantity | format | No |
+| HorizontalPodAutoscaler | spec.metrics[*].pods.metric.name | Must not be empty | format | No |
+| HorizontalPodAutoscaler | spec.metrics[*].pods.target.type | Must be AverageValue | enum | No |
+| HorizontalPodAutoscaler | spec.metrics[*].external.metric.name | Must not be empty | format | No |
+| HorizontalPodAutoscaler | spec.metrics[*].external.target | Must be valid target with correct type | cross field | No |
+| HorizontalPodAutoscaler | spec.behavior.scaleDown | Validates the scale down rules | cross field | No |
+| HorizontalPodAutoscaler | spec.behavior.scaleUp | Validates the scale up rules | cross field | No |
+| HorizontalPodAutoscaler | spec.behavior.scaleDown.stabilizationWindowSeconds | Must be ≥ 0 and ≤ 3600 if specified | format | No |
+| HorizontalPodAutoscaler | spec.behavior.scaleUp.stabilizationWindowSeconds | Must be ≥ 0 and ≤ 3600 if specified | format | No |
+| HorizontalPodAutoscaler | spec.behavior.scaleDown.selectPolicy | Must be "Max", "Min", or "Disabled" if specified | enum | No |
+| HorizontalPodAutoscaler | spec.behavior.scaleUp.selectPolicy | Must be "Max", "Min", or "Disabled" if specified | enum | No |
+| HorizontalPodAutoscaler | spec.behavior.scaleDown.policies | Must specify at least one policy | cross field (cardinality) | No |
+| HorizontalPodAutoscaler | spec.behavior.scaleUp.policies | Must specify at least one policy | cross field (cardinality) | No |
+| HorizontalPodAutoscaler | spec.behavior.scaleDown.policies[*].type | Must be "Pods" or "Percent" | enum | No |
+| HorizontalPodAutoscaler | spec.behavior.scaleUp.policies[*].type | Must be "Pods" or "Percent" | enum | No |
+| HorizontalPodAutoscaler | spec.behavior.scaleDown.policies[*].value | Must be greater than 0 | format | No |
+| HorizontalPodAutoscaler | spec.behavior.scaleUp.policies[*].value | Must be greater than 0 | format | No |
+| HorizontalPodAutoscaler | spec.behavior.scaleDown.policies[*].periodSeconds | Must be > 0 and ≤ 1800 | format | No |
+| HorizontalPodAutoscaler | spec.behavior.scaleUp.policies[*].periodSeconds | Must be > 0 and ≤ 1800 | format | No |
+| Scale | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| Scale | metadata.name | Must be a valid DNS subdomain name | format | No |
+| Scale | spec.replicas | Must be greater than or equal to 0 | format | No |
+
+## Events API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| Event | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| Event | metadata.name | Must be a valid DNS subdomain name | format | No |
+| Event | regarding | Must be valid object reference | cross field | No |
+| Event | regarding.fieldPath | Must be valid field path if specified | format | No |
+| Event | action | Must be valid action string if specified | format | No |
+| Event | reason | Must be valid reason string (1-255 chars) | format | No |
+| Event | note | Must be valid note if specified | format | No |
+| Event | type | Must be valid event type if specified (Normal or Warning) | enum | No |
+| Event | reportingController | Must be valid controller name if specified | format | No |
+| Event | reportingInstance | Must be valid instance name if specified | format | No |
+| Event | eventTime | Must be valid time format | format | No |
+| Event | series | Must be valid EventSeries if specified | cross field | No |
+| Event | related | Must be valid object reference if specified | cross field | No |
+
+## Apiextensions API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| CustomResourceDefinition | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| CustomResourceDefinition | metadata.name | Must be a valid DNS subdomain name, must match spec.names.plural.group | format, cross field (consistency) | No |
+| CustomResourceDefinition | spec.group | Must be valid DNS subdomain name | format | No |
+| CustomResourceDefinition | spec.names.plural | Must be valid DNS subdomain name | format | No |
+| CustomResourceDefinition | spec.names.singular | Must be valid DNS subdomain name if specified | format | No |
+| CustomResourceDefinition | spec.names.kind | Must be valid kind name | format | No |
+| CustomResourceDefinition | spec.names.listKind | Must be valid kind name if specified | format | No |
+| CustomResourceDefinition | spec.names.categories | Must be valid DNS subdomain names if specified | format | No |
+| CustomResourceDefinition | spec.names.shortNames | Must be valid DNS label names if specified | format | No |
+| CustomResourceDefinition | spec.scope | Must be "Cluster" or "Namespaced" | enum | No |
+| CustomResourceDefinition | spec.versions | Must have at least one version | cross field (cardinality) | No |
+| CustomResourceDefinition | spec.versions[*].name | Must be valid DNS label name | format | No |
+| CustomResourceDefinition | spec.versions[*].served | Boolean value | format | No |
+| CustomResourceDefinition | spec.versions[*].storage | Boolean value, only one version can be storage version | format, cross field (uniqueness) | No |
+| CustomResourceDefinition | spec.versions[*].schema | Must be valid OpenAPI v3 schema if specified | format | No |
+| CustomResourceDefinition | spec.versions[*].subresources | Must be valid subresources configuration if specified | cross field | No |
+| CustomResourceDefinition | spec.versions[*].additionalPrinterColumns | Must be valid printer columns configuration if specified | cross field | No |
+| CustomResourceDefinition | spec.conversion | Must be valid conversion configuration if specified | cross field | No |
+| CustomResourceDefinition | spec.preserveUnknownFields | Boolean value | format | No |
+
+## Flowcontrol API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| FlowSchema | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| FlowSchema | metadata.name | Must be a valid DNS subdomain name | format | No |
+| FlowSchema | spec.priorityLevel.name | Must not be empty | format | No |
+| FlowSchema | spec.matchingPrecedence | Must be non-negative integer | format | No |
+| FlowSchema | spec.distinguisherMethod.type | Must be "ByUser" or "ByNamespace" if specified | enum | No |
+| FlowSchema | spec.rules | Must specify valid rules | cross field | No |
+| PriorityLevelConfiguration | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| PriorityLevelConfiguration | metadata.name | Must be a valid DNS subdomain name | format | No |
+| PriorityLevelConfiguration | spec.type | Must be "Limited" or "Exempt" | enum | No |
+| PriorityLevelConfiguration | spec.limited | Required when type is "Limited" | cross field (conditional requirement) | Yes |
+| PriorityLevelConfiguration | spec.limited.assuredConcurrencyShares | Must be positive integer | format | No |
+| PriorityLevelConfiguration | spec.limited.limitResponse.type | Must be "Queue" or "Reject" | enum | No |
+| PriorityLevelConfiguration | spec.limited.limitResponse.queuing | Required when limitResponse.type is "Queue" | cross field (conditional requirement) | Yes |
+| PriorityLevelConfiguration | spec.limited.limitResponse.queuing.queueLengthLimit | Must be positive integer | format | No |
+| PriorityLevelConfiguration | spec.limited.limitResponse.queuing.handSize | Must be positive integer | format | No |
+| PriorityLevelConfiguration | spec.limited.limitResponse.queuing.queues | Must be positive integer | format | No |
+
+## Apiregistration API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| APIService | metadata | Calls `ValidateObjectMeta()` | shared | No |
+| APIService | metadata.name | Must be a valid DNS subdomain name | format | No |
+| APIService | spec.group | Must be valid DNS subdomain name if specified | format | No |
+| APIService | spec.version | Must be valid DNS label name | format | No |
+| APIService | spec.groupPriorityMinimum | Must be positive integer | format | No |
+| APIService | spec.versionPriority | Must be positive integer | format | No |
+| APIService | spec.service | Must specify namespace and name if service is provided | cross field | No |
+| APIService | spec.caBundle | Must be valid PEM-encoded CA bundle if specified | format | No |
+
+## Resource API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| ResourceClaim | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| ResourceClaim | spec.resourceClassName | Must not be empty | format | No |
+| ResourceClaim | spec.parametersRef | Must be valid object reference if specified | cross field | No |
+| ResourceClass | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| ResourceClass | spec.driverName | Must not be empty | format | No |
+| ResourceClass | spec.parametersRef | Must be valid object reference if specified | cross field | No |
+| ResourceClaimTemplate | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| ResourceClaimTemplate | spec.spec | Validates embedded ResourceClaim spec | cross field | No |
+
+## Policy API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| PodDisruptionBudget | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| PodDisruptionBudget | spec.selector | Must be valid label selector | format | No |
+| PodDisruptionBudget | spec.minAvailable | Must be valid IntOrString (integer or percentage) | format | No |
+| PodDisruptionBudget | spec.maxUnavailable | Must be valid IntOrString (integer or percentage) | format | No |
+| PodDisruptionBudget | spec.minAvailable and spec.maxUnavailable | Cannot specify both fields | cross field (mutual exclusion) | No |
+| PodSecurityPolicy | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| PodSecurityPolicy | spec.privileged | Boolean value | format | No |
+| PodSecurityPolicy | spec.allowPrivilegeEscalation | Boolean value | format | No |
+| PodSecurityPolicy | spec.hostNetwork | Boolean value | format | No |
+| PodSecurityPolicy | spec.hostPID | Boolean value | format | No |
+| PodSecurityPolicy | spec.hostIPC | Boolean value | format | No |
+| PodSecurityPolicy | spec.seLinux | Must be valid SELinux options | cross field | No |
+| PodSecurityPolicy | spec.runAsUser | Must be valid RunAsUserStrategyOptions | cross field | No |
+| PodSecurityPolicy | spec.runAsGroup | Must be valid RunAsGroupStrategyOptions | cross field | No |
+| PodSecurityPolicy | spec.supplementalGroups | Must be valid SupplementalGroupsStrategyOptions | cross field | No |
+| PodSecurityPolicy | spec.fsGroup | Must be valid FSGroupStrategyOptions | cross field | No |
+| PodSecurityPolicy | spec.volumes | Must be valid volume types | enum | No |
+| PodSecurityPolicy | spec.allowedHostPaths | Must be valid host path configurations | cross field | No |
+| PodSecurityPolicy | spec.allowedFlexVolumes | Must be valid flex volume configurations | cross field | No |
+| PodSecurityPolicy | spec.allowedCSIDrivers | Must be valid CSI driver configurations | cross field | No |
+| PodSecurityPolicy | spec.allowedCapabilities | Must be valid capabilities | format | No |
+| PodSecurityPolicy | spec.requiredDropCapabilities | Must be valid capabilities | format | No |
+| PodSecurityPolicy | spec.defaultAddCapabilities | Must be valid capabilities | format | No |
+| PodSecurityPolicy | spec.sysctls | Must be valid sysctl configurations | cross field | No |
+
+## Metrics API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| NodeMetrics | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| NodeMetrics | timestamp | Must be valid time format | format | No |
+| NodeMetrics | window | Must be valid time duration | format | No |
+| NodeMetrics | usage | Must contain valid resource usage metrics | format | No |
+| PodMetrics | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| PodMetrics | timestamp | Must be valid time format | format | No |
+| PodMetrics | window | Must be valid time duration | format | No |
+| PodMetrics | containers | Must contain at least one container metric | cross field (cardinality) | No |
+| PodMetrics | containers[*].name | Must be valid container name | format | No |
+| PodMetrics | containers[*].usage | Must contain valid resource usage metrics | format | No |
+
+## Migration API Group Validation Rules
+
+| Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|------|-------|-----------------|----------------|------------------------|
+| StorageVersionMigration | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| StorageVersionMigration | spec.resource.group | Must be valid group name | format | No |
+| StorageVersionMigration | spec.resource.version | Must be valid version name | format | No |
+| StorageVersionMigration | spec.resource.resource | Must be valid resource name | format | No |
+| StorageState | metadata | Calls `ValidateObjectMeta()` | cross field | No |
+| StorageState | spec.resource.group | Must be valid group name | format | No |
+| StorageState | spec.resource.version | Must be valid version name | format | No |
+| StorageState | spec.resource.resource | Must be valid resource name | format | No |
+
+## Common Validation Functions
+
+| Function | Purpose | Validation Rules | Validation Type | Conditional Validation |
+|----------|---------|-----------------|----------------|------------------------|
+| ValidateObjectMeta | Validates common metadata | Namespace and name follow DNS rules, labels and annotations valid | cross field | No |
+| ValidateDNS1123Label | Validates DNS labels | Lowercase alphanumeric characters or '-', starting with letter, ending with alphanumeric | format | No |
+| ValidateDNS1123Subdomain | Validates DNS subdomains | DNS labels separated by dots ('.'), maximum 253 characters | format | No |
+| ValidateLabels | Validates label map | Keys: alphanumeric, dots, dashes, max 63 chars; Values: optional, max 63 chars | format | No |
+| ValidateAnnotations | Validates annotation map | Keys must be valid qualified names, values can be any string | format | No |
+| ValidateLabelSelector | Validates label selectors | Valid match labels or expressions | format | No |
+| ValidateResourceRequirements | Validates container resources | Validates resource limits and requests, checks for negative values | cross field (consistency) | No |
+| ValidatePorts | Validates port specifications | Port numbers between 1-65535, valid names | format | No |
+| ValidateEnvVars | Validates environment variables | Valid C identifier names, no duplicate names | format, cross field (uniqueness) | No |
+| ValidateVolumes | Validates volume definitions | Unique names, valid source specification | format, cross field (uniqueness) | No |
+| ValidatePodSecurityContext | Validates pod security | Valid user/group IDs, SELinux options, sysctls | cross field | No |
+| ValidateSecurityContext | Validates container security | Validates capabilities, privilege settings, user/group IDs | cross field | No |
+| ValidateProbe | Validates container probes | Valid handler settings, timing values positive | cross field | No |
+
+## Status Field Validation Rules
+
+| Group | Kind | Field | Validation Rule | Validation Type | Conditional Validation |
+|-------|------|-------|-----------------|----------------|------------------------|
+| Core | Pod | status.conditions | Must be valid conditions with unique types | cross field (uniqueness) | No |
+| Core | Pod | status.nominatedNodeName | Must be valid DNS subdomain name if specified | format | No |
+| Core | Pod | status.observedGeneration | Must be non-negative integer | format | No |
+| Core | Pod | status.qosClass | Must not be changed once set | immutable | No |
+| Core | Pod | status.containerStatuses | State transitions must follow container lifecycle rules | cross field (state transitions) | Yes, depends on restartPolicy |
+| Core | Pod | status.initContainerStatuses | State transitions must follow init container lifecycle rules | cross field (state transitions) | No |
+| Core | Pod | status.ephemeralContainerStatuses | State transitions must follow container lifecycle rules | cross field (state transitions) | Yes, implicit RestartPolicyNever |
+| Core | Pod | status.resourceClaimStatuses | Must reference valid resources defined in spec | cross field (reference) | No |
+| Core | Pod | status.hostIPs | Must be valid IP addresses, can't be modified once set | format, immutable | No |
+| Core | Pod | status.podIPs | Must be valid IP addresses, can't be modified once set | format, immutable | No |
+| Core | Pod | status.containerStatuses[*].allocatedResources | Resources must be properly specified and consistent with requests in pod spec | cross field (consistency) | No |
+| Core | Node | status.capacity | Must be valid resource quantities | format | No |
+| Core | Node | status.allocatable | Must be valid resource quantities | format | No |
+| Core | Node | status.conditions | Must be valid conditions with unique types | cross field (uniqueness) | No |
+| Core | Node | status.addresses | Must have valid address types and values | enum, format | No |
+| Core | Node | status.nodeInfo | Must have valid OS, architecture values | format | No |
+| Core | Node | status.config | Must have valid config source references | cross field (reference) | No |
+| Core | Service | status.loadBalancer | Must have valid ingress IP addresses and hostnames | format | No |
+| Core | PersistentVolume | status.phase | Must be valid phase enum | enum | No |
+| Core | PersistentVolume | status.message | Optional reason for current phase | format | No |
+| Core | PersistentVolumeClaim | status.phase | Must be valid phase enum | enum | No |
+| Core | PersistentVolumeClaim | status.capacity | Must have valid resource quantities | format | No |
+| Core | PersistentVolumeClaim | status.conditions | Must be valid conditions with unique types | cross field (uniqueness) | No |
+| Core | Namespace | status.phase | Must be valid phase enum | enum | No |
+| Core | ReplicationController | status.replicas | Must be non-negative integer | format | No |
+| Core | ReplicationController | status.availableReplicas | Must be non-negative integer and not greater than replicas | format, cross field (relationship) | No |
+| Core | ReplicationController | status.readyReplicas | Must be non-negative integer and not greater than replicas | format, cross field (relationship) | No |
+| Core | ReplicationController | status.observedGeneration | Must be non-negative integer | format | No |
+| Apps | Deployment | status.observedGeneration | Must be non-negative integer | format | No |
+| Apps | Deployment | status.replicas | Must be non-negative integer | format | No |
+| Apps | Deployment | status.updatedReplicas | Must be non-negative integer and not greater than replicas | format, cross field (relationship) | No |
+| Apps | Deployment | status.readyReplicas | Must be non-negative integer and not greater than replicas | format, cross field (relationship) | No |
+| Apps | Deployment | status.availableReplicas | Must be non-negative integer and not greater than replicas | format, cross field (relationship) | No |
+| Apps | Deployment | status.unavailableReplicas | Must be non-negative integer | format | No |
+| Apps | Deployment | status.collisionCount | Must be non-negative integer if specified | format | No |
+| Apps | DaemonSet | status.currentNumberScheduled | Must be non-negative integer | format | No |
+| Apps | DaemonSet | status.numberMisscheduled | Must be non-negative integer | format | No |
+| Apps | DaemonSet | status.desiredNumberScheduled | Must be non-negative integer | format | No |
+| Apps | DaemonSet | status.numberReady | Must be non-negative integer | format | No |
+| Apps | DaemonSet | status.observedGeneration | Must be non-negative integer | format | No |
+| Apps | DaemonSet | status.updatedNumberScheduled | Must be non-negative integer | format | No |
+| Apps | DaemonSet | status.numberAvailable | Must be non-negative integer | format | No |
+| Apps | DaemonSet | status.numberUnavailable | Must be non-negative integer | format | No |
+| Apps | DaemonSet | status.collisionCount | Must be non-negative integer if specified | format | No |
+| Apps | StatefulSet | status.observedGeneration | Must be non-negative integer | format | No |
+| Apps | StatefulSet | status.replicas | Must be non-negative integer | format | No |
+| Apps | StatefulSet | status.readyReplicas | Must be non-negative integer and not greater than replicas | format, cross field (relationship) | No |
+| Apps | StatefulSet | status.currentReplicas | Must be non-negative integer and not greater than replicas | format, cross field (relationship) | No |
+| Apps | StatefulSet | status.updatedReplicas | Must be non-negative integer and not greater than replicas | format, cross field (relationship) | No |
+| Apps | StatefulSet | status.availableReplicas | Must be non-negative integer and not greater than replicas | format, cross field (relationship) | No |
+| Apps | StatefulSet | status.collisionCount | Must be non-negative integer if specified | format | No |
+| Apps | StatefulSet | status.conditions | Must be valid conditions with unique types | cross field (uniqueness) | No |
+| Batch | Job | status.active | Must be non-negative integer | format | No |
+| Batch | Job | status.succeeded | Must be non-negative integer | format | No |
+| Batch | Job | status.failed | Must be non-negative integer | format | No |
+| Batch | Job | status.completionTime | If set, must not be modified | immutable | Yes, only after job is complete |
+| Batch | Job | status.conditions | Must have unique condition types, Complete and Failed cannot both be true | cross field (uniqueness, contradiction) | No |
+| Batch | Job | status.uncountedTerminatedPods | Must have unique pod UIDs across succeeded and failed lists | cross field (uniqueness) | No |
+| Batch | CronJob | status.active | Must reference valid jobs | cross field (reference) | No |
+| Batch | CronJob | status.lastScheduleTime | Must be valid timestamp if specified | format | No |
+| Batch | CronJob | status.lastSuccessfulTime | Must be valid timestamp if specified | format | No |
+| Networking | Ingress | status.loadBalancer | Must have valid ingress IP addresses and hostnames | format | No |
+| Networking | NetworkPolicy | status.conditions | Must be valid conditions with unique types | cross field (uniqueness) | No |
+| Storage | VolumeAttachment | status.attached | Boolean indicating attachment state | format | No |
+| Storage | VolumeAttachment | status.attachmentMetadata | Valid key-value pairs | format | No |
+| Storage | VolumeAttachment | status.detachError | Valid error message if specified | format | No |
+| Storage | CSINode | status.drivers | Must have unique driver names | cross field (uniqueness) | No |
+| Resource | ResourceClaim | status.allocation | Must have valid object references | cross field (reference) | No |
+| Resource | ResourceClaim | status.reservedFor | Must have valid object references | cross field (reference) | No |
+| Resource | ResourceClaim | status.driverName | Must be valid driver name | format | No |
+| Resource | ResourceClaim | status.deviceStatus | Must validate all allocated device status fields | cross field | No |
+
+## Subresource Validation Rules
+
+| Group | Kind | Subresource | Validation Rules | Implementation |
+|-------|------|-------------|------------------|---------------|
+| Core | Pod | status | `ValidatePodStatusUpdate()` validates conditions, container states, resource claims, QoS class immutability, observedGeneration, containerStatus users & resources | strategy.go implements PrepareForUpdate to prevent spec changes |
+| Core | Pod | ephemeralcontainers | `ValidatePodEphemeralContainersUpdate()` validates ephemeral containers updates | podEphemeralContainersStrategy in strategy.go manages updates |
+| Core | Pod | resize | `ValidatePodResize()` validates container resource requirements can be resized | podResizeStrategy in strategy.go manages resize operations |
+| Core | Service | status | `ValidateServiceStatusUpdate()` validates loadBalancer status | serviceStatusStrategy preserves spec during status updates |
+| Core | Namespace | status | `ValidateNamespaceStatusUpdate()` validates phase transitions | namespaceStatusStrategy preserves spec during status updates |
+| Core | ResourceQuota | status | `ValidateResourceQuotaStatusUpdate()` validates status fields | resourcequotaStatusStrategy preserves spec during status updates |
+| Core | PersistentVolume | status | `ValidatePersistentVolumeStatusUpdate()` validates phase transitions | pvStatusStrategy preserves spec during status updates |
+| Core | PersistentVolumeClaim | status | `ValidatePersistentVolumeClaimStatusUpdate()` validates status fields | pvcStatusStrategy preserves spec during status updates |
+| Core | Node | status | Strategy preserves spec during status updates | nodeStatusStrategy validates node status fields |
+| Apps | Deployment | status | `ValidateDeploymentStatusUpdate()` validates status fields like replicas, observedGeneration | deploymentStatusStrategy preserves spec during status updates |
+| Apps | StatefulSet | status | `ValidateStatefulSetStatusUpdate()` validates status fields like replicas, observedGeneration | statefulSetStatusStrategy preserves spec during status updates |
+| Apps | DaemonSet | status | `ValidateDaemonSetStatusUpdate()` validates status fields | daemonSetStatusStrategy preserves spec during status updates |
+| Apps | ReplicaSet | status | `ValidateReplicaSetStatusUpdate()` validates status fields | replicaSetStatusStrategy preserves spec during status updates |
+| Batch | Job | status | `ValidateJobStatusUpdate()` validates conditions, counters | jobStatusStrategy prevents decreasing counters and mutating terminal conditions |
+| Batch | CronJob | status | `ValidateCronJobStatusUpdate()` validates status fields | cronJobStatusStrategy preserves spec during status updates |
+| Networking | Ingress | status | `ValidateIngressStatusUpdate()` validates loadBalancer | ingressStatusStrategy preserves spec during status updates |
+| Storage | VolumeAttachment | status | `ValidateVolumeAttachmentStatusUpdate()` validates status fields | volumeAttachmentStatusStrategy preserves spec during status updates |
+| StorageMigration | StorageVersionMigration | status | `ValidateStorageVersionMigrationStatusUpdate()` validates resource version immutability, conditions | statusStrategy preserves spec during status updates |
+| FlowControl | PriorityLevelConfiguration | status | `ValidatePriorityLevelConfigurationStatusUpdate()` validates status metrics | priorityLevelConfigurationStatusStrategy preserves spec during status updates |
+| FlowControl | FlowSchema | status | `ValidateFlowSchemaStatusUpdate()` validates conditions | flowSchemaStatusStrategy preserves spec during status updates |
+| Resource | ResourceClaim | status | `ValidateResourceClaimStatusUpdate()` validates allocation and reservation fields | resourceclaimStatusStrategy preserves spec during status updates |
+| Certificates | CertificateSigningRequest | status | `ValidateCertificateSigningRequestStatusUpdate()` validates certificate and conditions | certificateSigningRequestStatusStrategy preserves spec during status updates |
+
+## Webhook Validation
+
+Kubernetes supports custom validation through ValidatingWebhooks:
+
+1. **Registration**: Webhooks are registered via ValidatingWebhookConfiguration
+2. **Filtering**: Select which resources to validate via rules
+3. **Timing**: Webhooks can run on create, update, delete operations 
+4. **Failure policies**: Configure webhook failure behavior (fail-open or fail-closed)
+5. **Side effects**: Webhooks should declare if they have side effects
+6. **Performance**: Timeouts are enforced (default: 10s, max: 30s)
+
+Webhook validation complements built-in validation and can be used for cross-resource validation that is not possible with built-in validation.
+
+## CustomResourceDefinition Validation
+
+### OpenAPI Schema Validation
+
+CRDs support OpenAPI v3 schema validation:
+
+1. **Structural schemas** are required for all operations
+2. **Property validation**: type, format, pattern, minimum/maximum, etc.
+3. **Array validation**: minItems, maxItems, uniqueItems
+4. **Object validation**: required properties, property dependencies
+
+### CEL Validation Rules
+
+CRDs support Common Expression Language (CEL) validation through the `x-kubernetes-validations` extension:
+
+```yaml
+x-kubernetes-validations:
+  - rule: "self.minReplicas <= self.maxReplicas"
+    message: "minReplicas cannot be larger than maxReplicas"
+```
+
+Features of CEL validation:
+
+1. **Contextual validation**: `self` refers to the validated value
+2. **Custom error messages**: Specify readable error messages
+3. **Transition rules**: Use `oldSelf` to validate state transitions
+4. **Field paths**: Precisely indicate which field failed validation
+5. **Performance limits**: Rules have cost calculation limits
+6. **Validation reasons**: Can specify specific validation error types
+
+### Validation Exemptions
+
+During server-side apply, certain validations are relaxed:
+
+1. **Partial objects**: Only fields in the applied object are validated
+2. **Strategic merge**: Fields outside the current apply set are not validated
+3. **Ownership**: Validation focuses on fields owned by the applier
+
+## Status Field Validation Rules
+
+Status fields have specific validation rules:
+
+1. **Status condition types** must be unique
+2. **Object references** in status must be valid
+3. **Counter fields** (like replicas) must be non-negative
+4. **Terminal states** generally cannot be changed
+5. **ObservedGeneration** must be non-negative integer
+
+## Common Validation Functions
+
+Kubernetes uses a set of common validation functions across resource types:
+
+1. `ValidateObjectMeta()` - Validates standard metadata
+2. `ValidateDNS1123Label()` - Ensures names follow DNS naming conventions
+3. `ValidateLabels()` - Ensures labels follow correct format 
+4. `ValidateAnnotations()` - Ensures annotations follow correct format
+5. `ValidatePorts()` - Validates port specifications
+
+## Troubleshooting Validation Failures
+
+Common validation errors and solutions:
+
+1. **Invalid names**: Ensure resource names follow DNS subdomain format
+2. **Immutable field changes**: Create new resources instead of updating immutable fields
+3. **Selector mismatches**: Ensure labels match selectors in related resources
+4. **Missing required fields**: Check documentation for required fields
+5. **Type mismatches**: Verify correct data types (string vs number vs boolean)
+
+## Accessing Schema Validation Rules
+
+You can examine the validation schemas:
+
+1. **OpenAPI specification**: `/openapi/v2` endpoint exposes all schemas
+2. **kubectl explain**: Provides schema documentation for resources
+3. **CRD schemas**: View the OpenAPIV3Schema field in your CRD
+
+## Version-Specific Validation Differences
+
+Different Kubernetes versions may have different validation rules:
+
+1. **Alpha, Beta, Stable features**: Validation often tightens as features mature
+2. **Field requirements**: Optional fields may become required in newer versions
+3. **Format restrictions**: Pattern validations may become more strict
+4. **New validations**: Additional validations may be added with new versions
+
+## Conclusion
+
+Kubernetes API validation ensures data consistency and correctness. Understanding validation rules helps create valid resources and troubleshoot API errors. The validation system is extensible through webhooks and CEL rules for custom validation logic. 

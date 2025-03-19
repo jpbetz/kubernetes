@@ -1,0 +1,547 @@
+API Group,Kind,Field,Validation Rule,Validation Type,Validation Sub-Type,Conditional Validation
+Core,Pod,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Core,Pod,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Core,Pod,spec.containers,At least one container required,cross field,cardinality,No
+Core,Pod,spec.containers[*].name,Must be unique within pod and valid DNS label,format,dns,No
+Core,Pod,spec.containers[*].image,Must not be empty when container is not using resource claims only,format,required,When not using resource claims only
+Core,Pod,spec.containers[*].resources,"Validates resource requirements (limits, requests)",cross field,consistency,No
+Core,Pod,spec.containers[*].ports,"Container port names must be unique and valid DNS labels",cross field,uniqueness,No
+Core,Pod,spec.volumes,Volume names must be unique,cross field,uniqueness,No
+Core,Pod,spec.volumes,Volume name must be a valid DNS label,format,dns,No
+Core,Pod,spec.volumes[*].hostPath,Must have path specified when using hostPath,cross field,conditional requirement,No
+Core,Pod,spec.volumes[*].persistentVolumeClaim,Must specify valid claim name,format,reference,No
+Core,Pod,spec.volumes[*].configMap,Must specify valid configMap name,format,reference,No
+Core,Pod,spec.volumes[*].secret,Must specify valid secret name,format,reference,No
+Core,Pod,spec.restartPolicy,Must be "Always" "OnFailure" or "Never",enum,policy,No
+Core,Pod,spec.nodeName,Must be a valid DNS subdomain name if specified,format,dns,No
+Core,Pod,spec.serviceAccountName,Must be a valid DNS subdomain name if specified,format,dns,No
+Core,Pod,spec.hostNetwork,If true containers requesting ports must match host ports,cross field,conditional constraint,No
+Core,Pod,spec.hostIPC,Must not set hostIPC and hostUsers=false,cross field,incompatible field,When hostUsers=false
+Core,Pod,spec.hostPID,Must not set hostPID and hostUsers=false,cross field,incompatible field,When hostUsers=false
+Core,Pod,spec.initContainers,Init container names must be unique and must not collide with regular container names,cross field,uniqueness,No
+Core,Pod,spec.nodeSelector,"Node selector must be valid label selectors",format,label selector,No
+Core,Pod,spec.activeDeadlineSeconds,Active deadline seconds must be a positive integer,format,positive integer,No
+Core,Pod,spec.priority,Priority must be less than or equal to 1 billion,range,integer,No
+Core,Pod,spec.dnsPolicy,DNS policy must be one of ClusterFirstWithHostNet, ClusterFirst, Default, or None,enum,string,No
+Core,Pod,spec.terminationGracePeriodSeconds,Termination grace period seconds must be non-negative integer,format,non-negative integer,No
+Core,Pod,spec.topologySpreadConstraints,Topology key is required and must be a valid label key,format,label key,No
+Core,Pod,spec.topologySpreadConstraints,Max skew must be greater than zero,format,positive integer,No
+Core,Pod,spec.topologySpreadConstraints,When unsatisfiable must be DoNotSchedule or ScheduleAnyway,enum,string,No
+Core,Pod,spec.affinity,Affinity must have valid pod, node, or anti-affinity configurations,format,affinity,No
+Core,Pod,spec.automountServiceAccountToken,Must be a valid boolean value,format,boolean,No
+Core,Pod,spec.dnsConfig,DNS config must be valid,format,dns config,No
+Core,Pod,spec.dnsConfig.nameservers,Nameservers must be valid IP addresses,format,IP address,No
+Core,Pod,spec.dnsConfig.searches,Search domains must be valid DNS subdomains,format,DNS subdomain,No
+Core,Pod,spec.enableServiceLinks,Must be a valid boolean value,format,boolean,No
+Core,Pod,spec.hostAliases,Host aliases must be valid,format,host alias,No
+Core,Pod,spec.hostname,Hostname must be a valid DNS label,format,DNS label,No
+Core,Pod,spec.hostUsers,Must be a valid boolean value,format,boolean,No
+Core,Pod,spec.imagePullSecrets,Image pull secret names must be valid DNS subdomain names,format,DNS subdomain,No
+Core,Pod,spec.os,OS field must be valid with name Linux or Windows,enum,string,No
+Core,Pod,spec.preemptionPolicy,PreemptionPolicy must be Never or PreemptLowerPriority,enum,string,No
+Core,Pod,spec.priorityClassName,PriorityClassName must be a valid DNS subdomain name,format,DNS subdomain,No
+Core,Pod,spec.readinessGates,ReadinessGate condition types must not be empty,required field,string,No
+Core,Pod,spec.runtimeClassName,RuntimeClassName must be a valid DNS subdomain name,format,DNS subdomain,No
+Core,Pod,spec.schedulerName,SchedulerName must be a valid DNS subdomain name,format,DNS subdomain,No
+Core,Pod,spec.schedulingGates,SchedulingGate names must not be empty,required field,string,No
+Core,Pod,spec.securityContext,SecurityContext must be valid,format,security context,No
+Core,Pod,spec.securityContext.fsGroup,FSGroup must be a non-negative integer,format,non-negative integer,No
+Core,Pod,spec.securityContext.runAsGroup,RunAsGroup must be a non-negative integer,format,non-negative integer,No
+Core,Pod,spec.securityContext.runAsUser,RunAsUser must be a non-negative integer,format,non-negative integer,No
+Core,Pod,spec.securityContext.seccompProfile,SeccompProfile must be valid,format,seccomp profile,No
+Core,Pod,spec.securityContext.supplementalGroups,SupplementalGroups must be non-negative integers,format,non-negative integer,No
+Core,Pod,spec.securityContext.sysctls,Sysctl names must be valid,format,sysctl,No
+Core,Pod,spec.setHostnameAsFQDN,Must be a valid boolean value,format,boolean,No
+Core,Pod,spec.shareProcessNamespace,Must be a valid boolean value,format,boolean,No
+Core,Pod,spec.subdomain,Subdomain must be a valid DNS subdomain,format,DNS subdomain,No
+Core,Pod,spec.tolerations,Tolerations must be valid,format,toleration,No
+Core,Pod,spec.tolerations.key,Key must be a valid label key,format,label key,No
+Core,Pod,spec.tolerations.operator,Operator must be Exists or Equal,enum,string,No
+Core,Pod,spec.tolerations.effect,Effect must be NoSchedule, PreferNoSchedule, or NoExecute,enum,string,No
+Core,Pod,spec.overhead,Overhead resources must be valid resource quantities,format,resource quantity,No
+Core,Pod,spec.resourceClaims,Resource claim names must be unique,uniqueness,name,No
+Core,Pod,spec.resourceClaims.name,Resource claim name must be a valid DNS label,format,DNS label,No
+Core,Pod,spec.resourceClaims,Must specify exactly one of resourceClaimName or resourceClaimTemplateName,cross field,mutual exclusivity,No
+Core,Node,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Core,Node,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Core,Node,spec.taints,Key must be a valid qualified name value cannot be empty,format,qualified name,No
+Core,Node,spec.podCIDR,Must be valid CIDR notation if specified,format,cidr,No
+Core,Service,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Core,Service,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Core,Service,spec.ports,At least one port required for ClusterIP and NodePort types,cross field,conditional cardinality,No
+Core,Service,spec.ports[*].port,Valid port number (1-65535),format,port,No
+Core,Service,spec.ports[*].targetPort,Valid port name or number,format,port,No
+Core,Service,spec.ports[*].protocol,Must be "TCP" "UDP" or "SCTP",enum,protocol,No
+Core,Service,spec.selector,Valid label selector,format,selector,No
+Core,Service,spec.type,Must be "ClusterIP" "NodePort" "LoadBalancer" or "ExternalName",enum,service type,No
+Core,Service,spec.clusterIP,Must be "None" or valid IP address,format,ip,No
+Core,Service,spec.externalName,Must be valid DNS name for ExternalName type,format,dns,Only when type is ExternalName
+Core,Service,spec.ports,Service ports must have valid names (DNS label),format,DNS label,No
+Core,Service,spec.ports,Service port names must be unique,uniqueness,name,No
+Core,Service,spec.ports.nodePort,NodePort must be between 1 and 65535 inclusive,range,port,No
+Core,Service,spec.loadBalancerSourceRanges,LoadBalancerSourceRanges must be a list of valid IP CIDR blocks,format,IP CIDR,No
+Core,Service,spec.sessionAffinity,SessionAffinity must be ClientIP or None,enum,string,No
+Core,Service,spec.externalTrafficPolicy,ExternalTrafficPolicy must be Local or Cluster,enum,string,No
+Core,Service,spec.internalTrafficPolicy,InternalTrafficPolicy must be Local or Cluster,enum,string,No
+Core,Service,spec.ipFamilies,IPFamilies must be IPv4 and/or IPv6,enum,string,No
+Core,Service,spec.ipFamilyPolicy,IPFamilyPolicy must be SingleStack, PreferDualStack, or RequireDualStack,enum,string,No
+Core,Service,spec.allocateLoadBalancerNodePorts,Must be a valid boolean value,format,boolean,No
+Core,Service,spec.clusterIPs,ClusterIPs must be valid IP addresses,format,IP address,No
+Core,Service,spec.externalIPs,External IPs must be valid IP addresses,format,IP address,No
+Core,Service,spec.healthCheckNodePort,HealthCheckNodePort must be a valid port number,range,port,No
+Core,Service,spec.loadBalancerClass,LoadBalancerClass must be a valid domain-prefixed path,format,domain path,No
+Core,Service,spec.loadBalancerIP,LoadBalancerIP must be a valid IP address,format,IP address,No
+Core,Service,spec.publishNotReadyAddresses,Must be a valid boolean value,format,boolean,No
+Core,Service,status.loadBalancer.ingress.hostname,Hostname must be a valid DNS subdomain,format,DNS subdomain,No
+Core,Service,status.loadBalancer.ingress.ip,IP must be a valid IP address,format,IP address,No
+Core,Namespace,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Core,Namespace,metadata.name,Must be valid DNS label not "default" "kube-system" etc.,format,dns,No
+Core,Namespace,metadata.name,Reserved system names not allowed,enum,exclusion,No
+Core,ConfigMap,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Core,ConfigMap,data/binaryData,"Keys must be valid DNS subdomain names, combined data size limited",format,dns,No
+Core,ConfigMap,data/binaryData,Combined data has size limit,limit,size,No
+Core,ConfigMap,immutable,Must be a valid boolean value,format,boolean,No
+Core,ConfigMap,data,Data keys must be valid DNS subdomain names,format,DNS subdomain,No
+Core,ConfigMap,binaryData,BinaryData keys must be valid DNS subdomain names,format,DNS subdomain,No
+Core,ConfigMap,data,Data and BinaryData can't have overlapping keys,cross field,uniqueness,No
+Core,Secret,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Core,Secret,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Core,Secret,type,"Must be valid secret type (""Opaque"", ""kubernetes.io/service-account-token"" etc.)",enum,secret type,No
+Core,Secret,data,Total size has limit (typically 1MB),limit,size,No
+Core,Secret,data,Data keys must be valid DNS subdomain names unless type is kubernetes.io/dockerconfigjson or kubernetes.io/dockercfg,format,DNS subdomain,Unless type is kubernetes.io/dockerconfigjson or kubernetes.io/dockercfg
+Core,Secret,data,Secret of type service-account-token must have a token,required field,key,When type is service-account-token
+Core,Secret,immutable,Must be a valid boolean value,format,boolean,No
+Core,Secret,stringData,StringData keys must be valid DNS subdomain names unless type is kubernetes.io/dockerconfigjson or kubernetes.io/dockercfg,format,DNS subdomain,Unless type is kubernetes.io/dockerconfigjson or kubernetes.io/dockercfg
+Core,PersistentVolume,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Core,PersistentVolume,metadata.namespace,Must be empty (PVs are cluster-scoped),format,empty,No
+Core,PersistentVolume,spec.accessModes,"Must contain at least one valid access mode",enum,cardinality,No
+Core,PersistentVolume,spec.accessModes,ReadWriteOncePod cannot be specified with other access modes,cross field,constraint,No
+Core,PersistentVolume,spec.capacity,Must specify storage capacity,format,required,No
+Core,PersistentVolume,spec.nodeAffinity,Node affinity rules must be valid if specified,cross field,affinity,No
+Core,PersistentVolume,spec.persistentVolumeSource,Must specify exactly one volume type,union,exclusivity,No
+Core,PersistentVolume,spec.volumeAttributesClassName,Must be a valid name if specified,format,dns,Yes if VolumeAttributesClass feature gate is enabled
+Core,PersistentVolume,spec.volumeMode,Must be a valid PersistentVolumeMode ("Filesystem" or "Block"),enum,volume mode,No
+Core,PersistentVolumeClaim,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Core,PersistentVolumeClaim,spec.accessModes,Must contain at least one valid access mode,enum,cardinality,No
+Core,PersistentVolumeClaim,spec.dataSource,Must specify valid kind/name if specified,format,reference,No
+Core,PersistentVolumeClaim,spec.dataSourceRef,Must specify valid group/kind/name/namespace if specified,format,reference,Yes if VolumeDataSourceRef feature gate is enabled
+Core,PersistentVolumeClaim,spec.resources,Must specify storage request,cross field,requirement,No
+Core,PersistentVolumeClaim,spec.storageClassName,Must be valid storage class name if specified,format,reference,No
+Core,PersistentVolumeClaim,spec.volumeMode,Must be a valid PersistentVolumeMode ("Filesystem" or "Block"),enum,volume mode,No
+Core,Endpoints,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Core,Endpoints,subsets[*].addresses,Must have valid IP addresses,format,ip,No
+Core,Endpoints,subsets[*].ports,Must have valid port numbers,format,port,No
+Core,Event,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Core,Event,reason,Must be 1-255 characters (with allowed chars),format,character limit,No
+Core,ResourceQuota,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Core,ResourceQuota,spec.hard,Must have valid resource names and quantities,format,resource,No
+Core,LimitRange,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Core,LimitRange,spec.limits,Must have valid resource types and values,format,resource,No
+Apps,Deployment,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Apps,Deployment,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Apps,Deployment,spec.selector,Must not be empty must be valid label selector,format,selector,No
+Apps,Deployment,spec.template,Must be valid pod template must match selector,cross field,consistency,No
+Apps,Deployment,spec.strategy.type,Must be "Recreate" or "RollingUpdate",enum,strategy,No
+Apps,Deployment,spec.strategy.rollingUpdate,Must have valid maxSurge and maxUnavailable (if specified),cross field,conditional requirement,Only when strategy.type is RollingUpdate
+Apps,Deployment,spec.strategy.rollingUpdate.maxSurge,Must be valid percentage or absolute value,format,percentage,Only when strategy.type is RollingUpdate
+Apps,Deployment,spec.strategy.rollingUpdate.maxUnavailable,Must be valid percentage or absolute value,format,percentage,Only when strategy.type is RollingUpdate
+Apps,Deployment,spec.replicas,Must be non-negative integer,format,integer,No
+Apps,Deployment,spec.progressDeadlineSeconds,Must be positive integer if specified,format,integer,No
+Apps,Deployment,spec.revisionHistoryLimit,Must be non-negative integer if specified,format,integer,No
+Apps,Deployment,spec.minReadySeconds,Must be non-negative integer,format,integer,No
+Apps,Deployment,spec.paused,Must be a valid boolean value,format,boolean,No
+Apps,Deployment,status.availableReplicas,AvailableReplicas cannot be negative,format,non-negative integer,No
+Apps,Deployment,status.collisionCount,CollisionCount cannot be negative,format,non-negative integer,No
+Apps,Deployment,status.observedGeneration,ObservedGeneration cannot be negative,format,non-negative integer,No
+Apps,Deployment,status.readyReplicas,ReadyReplicas cannot be negative,format,non-negative integer,No
+Apps,Deployment,status.replicas,Replicas cannot be negative,format,non-negative integer,No
+Apps,Deployment,status.unavailableReplicas,UnavailableReplicas cannot be negative,format,non-negative integer,No
+Apps,Deployment,status.updatedReplicas,UpdatedReplicas cannot be negative,format,non-negative integer,No
+Apps,StatefulSet,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Apps,StatefulSet,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Apps,StatefulSet,spec.selector,Must not be empty must be valid label selector,format,selector,No
+Apps,StatefulSet,spec.template,Must be valid pod template must match selector,cross field,consistency,No
+Apps,StatefulSet,spec.serviceName,Must not be empty must be valid DNS subdomain name,format,dns,No
+Apps,StatefulSet,spec.replicas,Must be non-negative integer,format,integer,No
+Apps,StatefulSet,spec.updateStrategy,Must be valid update strategy,enum,strategy,No
+Apps,StatefulSet,spec.volumeClaimTemplates,Must be valid PVC templates,cross field,template,No
+Apps,StatefulSet,spec.podManagementPolicy,Must be "OrderedReady" or "Parallel",enum,policy,No
+Apps,StatefulSet,spec.persistentVolumeClaimRetentionPolicy,Must have valid deletion and reclaim policies,enum,policy,Yes when StatefulSetAutoDeletePVC feature is enabled
+Apps,StatefulSet,spec.ordinals,Must have valid start and count values,format,integer,Yes when StatefulSetStartOrdinal feature is enabled
+Apps,StatefulSet,spec.updateStrategy.type,UpdateStrategy type must be OnDelete or RollingUpdate,enum,string,No
+Apps,StatefulSet,spec.updateStrategy.rollingUpdate.partition,Partition must be a non-negative integer,format,non-negative integer,When update strategy type is RollingUpdate
+Apps,StatefulSet,spec.volumeClaimTemplates,VolumeClaimTemplate names must be unique,uniqueness,name,No
+Apps,StatefulSet,spec.persistentVolumeClaimRetentionPolicy.whenDeleted,WhenDeleted must be Delete or Retain,enum,string,No
+Apps,StatefulSet,spec.persistentVolumeClaimRetentionPolicy.whenScaled,WhenScaled must be Delete or Retain,enum,string,No
+Apps,StatefulSet,spec.minReadySeconds,MinReadySeconds must be a non-negative integer,format,non-negative integer,No
+Apps,StatefulSet,status.collisionCount,CollisionCount cannot be negative,format,non-negative integer,No
+Apps,StatefulSet,status.currentReplicas,CurrentReplicas cannot be negative,format,non-negative integer,No
+Apps,StatefulSet,status.observedGeneration,ObservedGeneration cannot be negative,format,non-negative integer,No
+Apps,StatefulSet,status.readyReplicas,ReadyReplicas cannot be negative,format,non-negative integer,No
+Apps,StatefulSet,status.replicas,Replicas cannot be negative,format,non-negative integer,No
+Apps,StatefulSet,status.updatedReplicas,UpdatedReplicas cannot be negative,format,non-negative integer,No
+Apps,DaemonSet,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Apps,DaemonSet,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Apps,DaemonSet,spec.selector,Must not be empty must be valid label selector,format,selector,No
+Apps,DaemonSet,spec.template,Must be valid pod template must match selector,cross field,consistency,No
+Apps,DaemonSet,spec.updateStrategy,Must be valid update strategy,enum,strategy,No
+Apps,DaemonSet,spec.minReadySeconds,Must be non-negative integer,format,integer,No
+Apps,DaemonSet,spec.updateStrategy.type,UpdateStrategy type must be OnDelete or RollingUpdate,enum,string,No
+Apps,DaemonSet,spec.updateStrategy.rollingUpdate.maxUnavailable,MaxUnavailable must be a non-negative integer or percentage,format,int or percentage,When update strategy type is RollingUpdate
+Apps,DaemonSet,spec.updateStrategy.rollingUpdate.maxSurge,MaxSurge must be a non-negative integer or percentage,format,int or percentage,When update strategy type is RollingUpdate
+Apps,DaemonSet,spec.revisionHistoryLimit,RevisionHistoryLimit must be a non-negative integer,format,non-negative integer,No
+Apps,DaemonSet,status.currentNumberScheduled,CurrentNumberScheduled cannot be negative,format,non-negative integer,No
+Apps,DaemonSet,status.desiredNumberScheduled,DesiredNumberScheduled cannot be negative,format,non-negative integer,No
+Apps,DaemonSet,status.numberAvailable,NumberAvailable cannot be negative,format,non-negative integer,No
+Apps,DaemonSet,status.numberMisscheduled,NumberMisscheduled cannot be negative,format,non-negative integer,No
+Apps,DaemonSet,status.numberReady,NumberReady cannot be negative,format,non-negative integer,No
+Apps,DaemonSet,status.numberUnavailable,NumberUnavailable cannot be negative,format,non-negative integer,No
+Apps,DaemonSet,status.observedGeneration,ObservedGeneration cannot be negative,format,non-negative integer,No
+Apps,DaemonSet,status.updatedNumberScheduled,UpdatedNumberScheduled cannot be negative,format,non-negative integer,No
+Apps,ReplicaSet,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Apps,ReplicaSet,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Apps,ReplicaSet,spec.selector,Must not be empty must be valid label selector,format,selector,No
+Apps,ReplicaSet,spec.template,Must be valid pod template must match selector,cross field,consistency,No
+Apps,ReplicaSet,spec.replicas,Must be non-negative integer,format,integer,No
+Apps,ReplicaSet,spec.minReadySeconds,Must be non-negative integer,format,integer,No
+Apps,ControllerRevision,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Apps,ControllerRevision,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Apps,ControllerRevision,data,Must be valid serialized data,format,serialized,No
+Apps,ControllerRevision,revision,Must be non-negative integer,format,integer,No
+Batch,Job,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Batch,Job,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Batch,Job,metadata.name,Name must be a valid DNS label and must not exceed 63 characters when combined with job index suffix,format,DNS label,When using Indexed completion mode
+Batch,Job,spec.selector,Must be valid label selector,format,selector,No
+Batch,Job,spec.template,Must be valid pod template must match selector,cross field,consistency,No
+Batch,Job,spec.template.spec.restartPolicy,Must be "Never" or "OnFailure",enum,policy,No
+Batch,Job,spec.parallelism,Must be non-negative integer,format,integer,No
+Batch,Job,spec.parallelism,Parallelism must not exceed 100000 for indexed jobs,range,integer,When completion mode is Indexed
+Batch,Job,spec.completions,Must be non-negative integer,format,integer,No
+Batch,Job,spec.backoffLimit,Must be non-negative integer,format,integer,No
+Batch,Job,spec.activeDeadlineSeconds,Must be positive integer if specified,format,integer,No
+Batch,Job,spec.ttlSecondsAfterFinished,Must be non-negative integer if specified,format,integer,Only if TTLAfterFinished feature gate is enabled
+Batch,Job,spec.completionMode,Must be a valid CompletionMode ("NonIndexed" or "Indexed"),enum,mode,No
+Batch,Job,spec.suspend,Boolean field controlling job suspension,format,boolean,No
+Batch,Job,spec.podFailurePolicy,Must have valid rules with valid actions and conditions,cross field,policy rules,No
+Batch,Job,spec.manualSelector,Must be a valid boolean value,format,boolean,No
+Batch,Job,status.active,Active cannot be negative,format,non-negative integer,No
+Batch,Job,status.failed,Failed cannot be negative,format,non-negative integer,No
+Batch,Job,status.succeeded,Succeeded cannot be negative,format,non-negative integer,No
+Batch,Job,status.ready,Ready cannot be negative,format,non-negative integer,No
+Batch,Job,status.terminating,Terminating cannot be negative,format,non-negative integer,No
+Batch,Job,status.completionTime,CompletionTime cannot be set before startTime,cross field,time ordering,No
+Batch,Job,status.completedIndexes,CompletedIndexes must be valid for indexed jobs,format,indexes,When completion mode is Indexed
+Batch,Job,status.completedIndexes,CompletedIndexes must be empty for non-indexed jobs,cross field,empty field,When completion mode is not Indexed
+Batch,Job,status.uncountedTerminatedPods,Must have valid pod UIDs no duplicates between succeeded and failed,cross field,uniqueness,No
+Batch,CronJob,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Batch,CronJob,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Batch,CronJob,metadata.name,Name must be no more than 52 characters,length,string,No
+Batch,CronJob,spec.schedule,Must be valid cron schedule string,format,cron,No
+Batch,CronJob,spec.jobTemplate,Must be valid job template,cross field,template,No
+Batch,CronJob,spec.startingDeadlineSeconds,Must be non-negative integer if specified,format,integer,No
+Batch,CronJob,spec.concurrencyPolicy,Must be "Allow" "Forbid" or "Replace",enum,policy,No
+Batch,CronJob,spec.successfulJobsHistoryLimit,Must be non-negative integer if specified,format,integer,No
+Batch,CronJob,spec.failedJobsHistoryLimit,Must be non-negative integer if specified,format,integer,No
+Batch,CronJob,spec.timeZone,Must be a valid time zone name if specified,format,timezone,Yes when CronJobTimeZone feature is enabled
+Batch,CronJob,spec.schedule,Schedule is required,required field,string,No
+Batch,CronJob,spec.timeZone,TimeZone must be a valid time zone if specified,format,time zone,No
+Batch,CronJob,spec.suspend,Must be a valid boolean value,format,boolean,No
+Batch,CronJob,status.active,Active Jobs must be valid object references,format,object reference,No
+Batch,CronJob,status.lastScheduleTime,LastScheduleTime must be a valid time,format,time,No
+Batch,CronJob,status.lastSuccessfulTime,LastSuccessfulTime must be a valid time,format,time,No
+Networking,NetworkPolicy,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Networking,NetworkPolicy,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Networking,NetworkPolicy,spec.podSelector,Must be valid label selector,format,selector,No
+Networking,NetworkPolicy,spec.ingress[*].from[*].ipBlock.cidr,Must be valid CIDR notation,format,cidr,Only when ipBlock is used
+Networking,NetworkPolicy,spec.ingress[*].from[*].ipBlock.except,Must be valid CIDR notation must be subset of cidr,format,cidr,Only when ipBlock is used
+Networking,NetworkPolicy,spec.ingress[*].from[*].ipBlock.except,Must be subset of CIDR,cross field,subset,Only when ipBlock is used
+Networking,NetworkPolicy,spec.ingress[*].from[*].namespaceSelector,Must be valid label selector,format,selector,Only when namespaceSelector is used
+Networking,NetworkPolicy,spec.ingress[*].from[*].podSelector,Must be valid label selector,format,selector,Only when podSelector is used
+Networking,NetworkPolicy,spec.ingress[*].ports[*].protocol,Must be "TCP" "UDP" or "SCTP",enum,protocol,No
+Networking,NetworkPolicy,spec.ingress[*].ports[*].port,Must be valid port number or name,format,port,No
+Networking,NetworkPolicy,spec.egress[*].to[*].ipBlock.cidr,Must be valid CIDR notation,format,cidr,Only when ipBlock is used
+Networking,NetworkPolicy,spec.egress[*].to[*].ipBlock.except,Must be valid CIDR notation must be subset of cidr,format,cidr,Only when ipBlock is used
+Networking,NetworkPolicy,spec.egress[*].to[*].ipBlock.except,Must be subset of CIDR,cross field,subset,Only when ipBlock is used
+Networking,NetworkPolicy,spec.egress[*].to[*].namespaceSelector,Must be valid label selector,format,selector,Only when namespaceSelector is used
+Networking,NetworkPolicy,spec.egress[*].to[*].podSelector,Must be valid label selector,format,selector,Only when podSelector is used
+Networking,NetworkPolicy,spec.egress[*].ports[*].protocol,Must be "TCP" "UDP" or "SCTP",enum,protocol,No
+Networking,NetworkPolicy,spec.egress[*].ports[*].port,Must be valid port number or name,format,port,No
+Networking,NetworkPolicy,spec.policyTypes,Must be "Ingress" "Egress" or both,enum,policy type,No
+Networking,NetworkPolicy,spec.egress[*].to[*].ports,Must have valid port numbers or names,format,port,No
+Networking,NetworkPolicy,spec.ingress[*].from[*].ports,Must have valid port numbers or names,format,port,No
+Networking,NetworkPolicy,spec.ingress,Ingress rules must specify valid ports,format,port range,No
+Networking,NetworkPolicy,spec.ingress.from,From must specify valid peer selectors,format,label selector,No
+Networking,NetworkPolicy,spec.ingress.ports,Port must be between 1 and 65535 inclusive if numeric,range,port,No
+Networking,NetworkPolicy,spec.egress,Egress rules must specify valid ports,format,port range,No
+Networking,NetworkPolicy,spec.egress.to,To must specify valid peer selectors,format,label selector,No
+Networking,NetworkPolicy,spec.egress.ports,Port must be between 1 and 65535 inclusive if numeric,range,port,No
+Networking,Ingress,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Networking,Ingress,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Networking,Ingress,spec.rules[*].host,Must be valid DNS subdomain name if specified,format,dns,No
+Networking,Ingress,spec.rules[*].http.paths[*].path,Must be valid URL path if specified,format,url path,No
+Networking,Ingress,spec.rules[*].http.paths[*].pathType,Must be "Exact" "Prefix" or "ImplementationSpecific",enum,path type,No
+Networking,Ingress,spec.rules[*].http.paths[*].backend,Must specify valid service name and port,cross field,reference,No
+Networking,Ingress,spec.tls[*].hosts,Must be valid DNS subdomain names,format,dns,Only when TLS is specified
+Networking,Ingress,spec.tls[*].secretName,Must be valid secret name if specified,format,reference,Only when TLS is specified
+Networking,Ingress,spec.ingressClassName,Must be a valid name if specified,format,dns,No
+Networking,Ingress,spec.defaultBackend,DefaultBackend must be a valid backend,format,backend reference,No
+Networking,Ingress,spec.rules,Host must be a valid DNS subdomain,format,DNS subdomain,No
+Networking,Ingress,spec.rules,Path must be valid,format,path,No
+Networking,Ingress,spec.rules.http.paths,Paths must be unique for a host,uniqueness,path,No
+Networking,Ingress,spec.rules.http.paths.backend,Backend is required,required field,backend reference,No
+Networking,Ingress,spec.tls,TLS hosts must match Ingress rule hosts,cross field,host reference,No
+Networking,IngressClass,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Networking,IngressClass,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Networking,IngressClass,spec.controller,Must not be empty,format,required,No
+Networking,IngressClass,spec.parameters,Must specify valid resource if specified,cross field,reference,No
+Networking,IngressClass,spec.controller,Controller must be a valid domain name,format,domain,No
+Networking,IngressClass,spec.parameters,Parameters reference must be valid,format,object reference,No
+RBAC,Role,metadata,Calls ValidateObjectMeta(),shared,standard,No
+RBAC,Role,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+RBAC,Role,rules[*].apiGroups,Must be valid API group names,format,api group,No
+RBAC,Role,rules[*].resources,Must be valid resource names,format,resource,No
+RBAC,Role,rules[*].verbs,Must be valid verbs (get list watch create update patch delete),enum,verb,No
+RBAC,Role,rules[*].resourceNames,Must be valid resource names if specified,format,resource,No
+RBAC,Role,metadata.name,Name must be a valid path segment,format,path segment,No
+RBAC,Role,rules,Rules must be valid policy rules,format,policy rule,No
+RBAC,Role,rules.verbs,Verbs cannot be empty,required field,string array,No
+RBAC,Role,rules.apiGroups,APIGroups must be valid strings,format,string array,No
+RBAC,Role,rules.resources,Resources must be valid strings,format,string array,No
+RBAC,Role,rules.resourceNames,ResourceNames must be valid resource names,format,string array,No
+RBAC,RoleBinding,metadata,Calls ValidateObjectMeta(),shared,standard,No
+RBAC,RoleBinding,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+RBAC,RoleBinding,roleRef.apiGroup,Must be "rbac.authorization.k8s.io",enum,api group,No
+RBAC,RoleBinding,roleRef.kind,Must be "Role" or "ClusterRole",enum,kind,No
+RBAC,RoleBinding,roleRef.name,Must not be empty,format,required,No
+RBAC,RoleBinding,subjects[*].kind,Must be "User" "Group" or "ServiceAccount",enum,subject kind,No
+RBAC,RoleBinding,subjects[*].name,Must not be empty,format,required,No
+RBAC,RoleBinding,subjects[*].namespace,Must be valid namespace name for ServiceAccount subjects,format,dns,Only when subject is ServiceAccount
+RBAC,RoleBinding,subjects[*].namespace,Required for ServiceAccount subjects,cross field,conditional requirement,Only when subject is ServiceAccount
+RBAC,RoleBinding,metadata.name,Name must be a valid path segment,format,path segment,No
+RBAC,RoleBinding,roleRef,RoleRef must refer to a Role in the current namespace,reference,role reference,No
+RBAC,RoleBinding,subjects,Subjects must be valid,format,subject,No
+RBAC,ClusterRole,metadata,Calls ValidateObjectMeta(),shared,standard,No
+RBAC,ClusterRole,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+RBAC,ClusterRole,rules[*].apiGroups,Must be valid API group names,format,api group,No
+RBAC,ClusterRole,rules[*].resources,Must be valid resource names,format,resource,No
+RBAC,ClusterRole,rules[*].verbs,Must be valid verbs (get list watch create update patch delete),enum,verb,No
+RBAC,ClusterRole,rules[*].resourceNames,Must be valid resource names if specified,format,resource,No
+RBAC,ClusterRole,aggregationRule.clusterRoleSelectors,Must be valid label selectors if specified,format,selector,No
+RBAC,ClusterRole,metadata.name,Name must be a valid path segment,format,path segment,No
+RBAC,ClusterRole,rules,Rules must be valid policy rules,format,policy rule,No
+RBAC,ClusterRole,rules.verbs,Verbs cannot be empty,required field,string array,No
+RBAC,ClusterRole,rules.apiGroups,APIGroups must be valid strings,format,string array,No
+RBAC,ClusterRole,rules.resources,Resources must be valid strings,format,string array,No
+RBAC,ClusterRole,rules.resourceNames,ResourceNames must be valid resource names,format,string array,No
+RBAC,ClusterRole,aggregationRule,AggregationRule must be valid,format,aggregation rule,No
+RBAC,ClusterRoleBinding,metadata,Calls ValidateObjectMeta(),shared,standard,No
+RBAC,ClusterRoleBinding,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+RBAC,ClusterRoleBinding,roleRef.apiGroup,Must be "rbac.authorization.k8s.io",enum,api group,No
+RBAC,ClusterRoleBinding,roleRef.kind,Must be "ClusterRole",enum,kind,No
+RBAC,ClusterRoleBinding,roleRef.name,Must not be empty,format,required,No
+RBAC,ClusterRoleBinding,subjects[*].kind,Must be "User" "Group" or "ServiceAccount",enum,subject kind,No
+RBAC,ClusterRoleBinding,subjects[*].name,Must not be empty,format,required,No
+RBAC,ClusterRoleBinding,subjects[*].namespace,Must be valid namespace name for ServiceAccount subjects,format,dns,Only when subject is ServiceAccount
+RBAC,ClusterRoleBinding,subjects[*].namespace,Required for ServiceAccount subjects,cross field,conditional requirement,Only when subject is ServiceAccount
+RBAC,ClusterRoleBinding,metadata.name,Name must be a valid path segment,format,path segment,No
+RBAC,ClusterRoleBinding,roleRef,RoleRef must refer to a ClusterRole,reference,role reference,No
+RBAC,ClusterRoleBinding,subjects,Subjects must be valid,format,subject,No
+Storage,StorageClass,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Storage,StorageClass,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Storage,StorageClass,provisioner,Must not be empty,format,required,No
+Storage,StorageClass,parameters,Validates based on provisioner-specific rules,cross field,provisioner-specific,No
+Storage,StorageClass,reclaimPolicy,Must be "Delete" or "Retain" if specified,enum,policy,No
+Storage,StorageClass,volumeBindingMode,Must be "Immediate" or "WaitForFirstConsumer" if specified,enum,binding mode,No
+Storage,StorageClass,allowVolumeExpansion,Boolean value,format,boolean,No
+Storage,StorageClass,parameters,Parameter names and values must be less than 512 characters,length,string,No
+Storage,StorageClass,parameters,Total parameters size must be less than 256 KB,size,map,No
+Storage,StorageClass,allowedTopologies,TopologySelectorTerms must be valid,format,topology selector,No
+Storage,VolumeAttachment,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Storage,VolumeAttachment,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Storage,VolumeAttachment,spec.attacher,Must not be empty,format,required,No
+Storage,VolumeAttachment,spec.source,Must specify valid PV or in-line volume source,union,exclusivity,No
+Storage,VolumeAttachment,spec.nodeName,Must not be empty,format,required,No
+Storage,VolumeAttachment,spec.source,Either PersistentVolumeName or CSI is required,required field,volume source,No
+Storage,VolumeAttachment,status.attachmentMetadata,Attachment metadata size must be less than 256 KB,size,map,No
+Storage,VolumeAttachment,status.attachError,Error message must be less than 1024 characters,length,string,No
+Storage,CSIDriver,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Storage,CSIDriver,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Storage,CSIDriver,spec.attachRequired,Boolean value,format,boolean,No
+Storage,CSIDriver,spec.podInfoOnMount,Boolean value,format,boolean,No
+Storage,CSIDriver,spec.volumeLifecycleModes,Must contain valid volume lifecycle modes,enum,lifecycle mode,No
+Storage,CSIDriver,spec.volumeLifecycleModes,Volume lifecycle modes must be Persistent or Ephemeral,enum,string,No
+Storage,CSIDriver,spec.fsGroupPolicy,FSGroupPolicy must be ReadWriteOnceWithFSType, File, or None,enum,string,No
+Storage,CSINode,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Storage,CSINode,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Storage,CSINode,spec.drivers[*].name,Must not be empty,format,required,No
+Storage,CSINode,spec.drivers[*].nodeID,Must not be empty,format,required,No
+Storage,CSINode,spec.drivers[*].topologyKeys,Must be valid topology keys if specified,format,topology,No
+Storage,CSINode,spec.drivers,Driver names must be unique,uniqueness,name,No
+Storage,CSINode,spec.drivers.nodeID,NodeID must be less than 192 or 256 characters depending on feature flag,length,string,No
+Storage,VolumeAttributesClass,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Storage,VolumeAttributesClass,driverName,DriverName is required,required field,string,No
+Storage,VolumeAttributesClass,parameters,Parameters must be valid,format,map,No
+Authentication,TokenReview,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Authentication,TokenReview,spec.token,Optional but must not be empty if specified,format,required,No
+Authentication,TokenReview,spec.audiences,Must be valid audiences if specified,format,audience,No
+Authentication,SelfSubjectReview,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Authentication,TokenRequest,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Authentication,TokenRequest,spec.audiences,Must not be empty,format,required,No
+Authentication,TokenRequest,spec.expirationSeconds,Must be positive integer if specified,format,integer,No
+Authentication,TokenRequest,spec.boundObjectRef,Must specify valid object reference if specified,cross field,reference,No
+Authorization,SubjectAccessReview,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Authorization,SubjectAccessReview,spec.resourceAttributes,Must specify resource or non-resource not both,union,exclusivity,No
+Authorization,SubjectAccessReview,spec.resourceAttributes.resource,Must not be empty if specified,format,required,Only when resourceAttributes is used
+Authorization,SubjectAccessReview,spec.resourceAttributes.verb,Must not be empty if specified,format,required,Only when resourceAttributes is used
+Authorization,SubjectAccessReview,spec.nonResourceAttributes.path,Must not be empty if specified,format,required,Only when nonResourceAttributes is used
+Authorization,SubjectAccessReview,spec.nonResourceAttributes.verb,Must not be empty if specified,format,required,Only when nonResourceAttributes is used
+Authorization,SubjectAccessReview,spec.user,Optional,format,optional,No
+Authorization,SubjectAccessReview,spec.groups,Must be valid group names if specified,format,group name,No
+Authorization,LocalSubjectAccessReview,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Authorization,LocalSubjectAccessReview,metadata.namespace,Must not be empty,format,required,No
+Authorization,LocalSubjectAccessReview,spec,Same validation as SubjectAccessReview,cross field,inherited,No
+Authorization,SelfSubjectAccessReview,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Authorization,SelfSubjectAccessReview,spec,Same validation as SubjectAccessReview but user/group fields not allowed,cross field,restrictions,No
+Authorization,SelfSubjectRulesReview,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Certificates,CertificateSigningRequest,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Certificates,CertificateSigningRequest,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Certificates,CertificateSigningRequest,spec.request,Must be valid PEM-encoded certificate request,format,pem,No
+Certificates,CertificateSigningRequest,spec.signerName,Must not be empty must be valid signer name,format,qualified name,No
+Certificates,CertificateSigningRequest,spec.usages,Must contain valid key usages,enum,key usage,No
+Certificates,CertificateSigningRequest,spec.expirationSeconds,Must be positive integer if specified,format,integer,No
+Admissionregistration,ValidatingWebhookConfiguration,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Admissionregistration,ValidatingWebhookConfiguration,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Admissionregistration,ValidatingWebhookConfiguration,webhooks[*].name,Must be a domain with at least three segments separated by dots,format,domain,No
+Admissionregistration,ValidatingWebhookConfiguration,webhooks[*].clientConfig,Must specify valid URL or service reference,union,exclusivity,No
+Admissionregistration,ValidatingWebhookConfiguration,webhooks[*].rules,Must specify valid API groups versions resources and operations,cross field,rules,No
+Admissionregistration,ValidatingWebhookConfiguration,webhooks[*].failurePolicy,Must be "Fail" or "Ignore" if specified,enum,policy,No
+Admissionregistration,ValidatingWebhookConfiguration,webhooks[*].matchPolicy,Must be "Exact" or "Equivalent" if specified,enum,policy,No
+Admissionregistration,ValidatingWebhookConfiguration,webhooks[*].sideEffects,Must be "None" "NoneOnDryRun" "Some" or "Unknown",enum,side effects,No
+Admissionregistration,ValidatingWebhookConfiguration,webhooks[*].timeoutSeconds,Must be a positive integer if specified,format,integer,No
+Admissionregistration,ValidatingWebhookConfiguration,webhooks[*].admissionReviewVersions,Must be valid admission review versions,format,version,No
+Admissionregistration,MutatingWebhookConfiguration,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Admissionregistration,MutatingWebhookConfiguration,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Admissionregistration,MutatingWebhookConfiguration,webhooks[*].name,Must be a domain with at least three segments separated by dots,format,domain,No
+Admissionregistration,MutatingWebhookConfiguration,webhooks[*].clientConfig,Must specify valid URL or service reference,union,exclusivity,No
+Admissionregistration,MutatingWebhookConfiguration,webhooks[*].rules,Must specify valid API groups versions resources and operations,cross field,rules,No
+Admissionregistration,MutatingWebhookConfiguration,webhooks[*].failurePolicy,Must be "Fail" or "Ignore" if specified,enum,policy,No
+Admissionregistration,MutatingWebhookConfiguration,webhooks[*].matchPolicy,Must be "Exact" or "Equivalent" if specified,enum,policy,No
+Admissionregistration,MutatingWebhookConfiguration,webhooks[*].sideEffects,Must be "None" "NoneOnDryRun" "Some" or "Unknown",enum,side effects,No
+Admissionregistration,MutatingWebhookConfiguration,webhooks[*].timeoutSeconds,Must be a positive integer if specified,format,integer,No
+Admissionregistration,MutatingWebhookConfiguration,webhooks[*].admissionReviewVersions,Must be valid admission review versions,format,version,No
+Admissionregistration,MutatingWebhookConfiguration,webhooks[*].reinvocationPolicy,Must be "Never" or "IfNeeded" if specified,enum,policy,No
+Admissionregistration,ValidatingAdmissionPolicy,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Admissionregistration,ValidatingAdmissionPolicy,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Admissionregistration,ValidatingAdmissionPolicy,spec.matchConstraints,Must specify resource rules,cross field,rules,No
+Admissionregistration,ValidatingAdmissionPolicy,spec.validations,Must specify at least one validation unless auditAnnotations is specified,cross field,conditional requirement,No
+Admissionregistration,ValidatingAdmissionPolicy,spec.failurePolicy,Must be "Fail" or "Ignore",enum,policy,No
+Admissionregistration,ValidatingAdmissionPolicy,spec.paramKind,Must have valid API version and kind if specified,cross field,api resource,No
+Admissionregistration,ValidatingAdmissionPolicyBinding,metadata,Calls ValidateObjectMeta(),shared,standard,No
+Admissionregistration,ValidatingAdmissionPolicyBinding,metadata.name,Must be a valid DNS subdomain name,format,dns,No
+Admissionregistration,ValidatingAdmissionPolicyBinding,spec.policyName,Must be a valid name reference,format,reference,No
+Admissionregistration,ValidatingAdmissionPolicyBinding,spec.paramRef,Must be a valid object reference if specified,cross field,reference,No
+Status,Pod,status.conditions,Must be valid conditions with unique types,cross field,uniqueness,No
+Status,Pod,status.nominatedNodeName,Must be valid DNS subdomain name if specified,format,dns,No
+Status,Pod,status.observedGeneration,Must be non-negative integer,format,integer,No
+Status,Pod,status.qosClass,Must not be changed once set,immutable,field,No
+Status,Pod,status.containerStatuses,State transitions must follow container lifecycle rules,cross field,state transitions,Yes depends on restartPolicy
+Status,Pod,status.containerStatuses[*].allocatedResources,Resources must be properly specified and consistent with requests in pod spec,cross field,consistency,No
+Status,Node,status.capacity,Must be valid resource quantities,format,resource,No
+Status,Node,status.allocatable,Must be valid resource quantities,format,resource,No
+Status,Node,status.conditions,Must be valid conditions with unique types,cross field,uniqueness,No
+Status,Node,status.addresses,Must have valid address types and values,enum,address,No
+Status,Node,status.addresses,Must have valid address values,format,address,No
+Status,Deployment,status.observedGeneration,Must be non-negative integer,format,integer,No
+Status,Deployment,status.replicas,Must be non-negative integer,format,integer,No
+Status,Deployment,status.updatedReplicas,Must be non-negative integer and not greater than replicas,format,integer,No
+Status,Deployment,status.updatedReplicas,Must not be greater than replicas,cross field,relationship,No
+Status,Deployment,status.readyReplicas,Must be non-negative integer and not greater than replicas,format,integer,No
+Status,Deployment,status.readyReplicas,Must not be greater than replicas,cross field,relationship,No
+Status,Deployment,status.availableReplicas,Must be non-negative integer and not greater than replicas,format,integer,No
+Status,Deployment,status.availableReplicas,Must not be greater than replicas,cross field,relationship,No
+Status,Deployment,status.unavailableReplicas,Must be non-negative integer,format,integer,No
+Status,Job,status.active,Must be non-negative integer,format,integer,No
+Status,Job,status.succeeded,Must be non-negative integer,format,integer,No
+Status,Job,status.failed,Must be non-negative integer,format,integer,No
+Status,Job,status.completionTime,If set must not be modified,immutable,field,Yes only after job is complete
+Status,Job,status.conditions,Must have unique condition types Complete and Failed cannot both be true,cross field,uniqueness,No
+Status,Job,status.conditions,Complete and Failed cannot both be true,cross field,contradiction,No
+Core,Pod,spec.initContainers[*].ports,Container port names must be unique and valid DNS labels,format,dns,No
+Core,Pod,spec.initContainers[*].name,Must not collide with regular container names,cross field,uniqueness,No
+Core,Pod,spec.hostIPC,Must not set hostIPC and hostUsers=false,cross field,incompatible field,When hostUsers=false
+Core,Pod,spec.hostNetwork,Must not set hostNetwork and hostUsers=false,cross field,incompatible field,When hostUsers=false
+Core,Pod,spec.hostPID,Must not set hostPID and hostUsers=false,cross field,incompatible field,When hostUsers=false
+Core,Service,spec.ports,Port names must be unique within service,cross field,uniqueness,No
+Core,Service,spec.clusterIPs,On update, primary clusterIP is immutable unless switching to/from ExternalName type,immutable,field,Yes during update
+Core,Service,spec.ipFamilies,On update, primary ipFamily is immutable unless switching to/from ExternalName type,immutable,field,Yes during update
+Core,PersistentVolumeClaim,spec.accessModes,ReadWriteOncePod cannot be specified with other access modes,cross field,constraint,No
+Core,Secret,data,Keys must be valid DNS subdomain names,format,dns,No
+Batch,Job,spec.selector,Generated selector must match template labels,cross field,consistency,When manualSelector is not true
+Batch,Job,spec.completionMode,On update, completionMode is immutable,immutable,field,Yes during update
+Batch,Job,spec.podFailurePolicy,On update, podFailurePolicy is immutable,immutable,field,Yes during update
+Batch,Job,spec.backoffLimitPerIndex,On update, backoffLimitPerIndex is immutable,immutable,field,Yes during update
+Batch,Job,spec.managedBy,On update, managedBy is immutable,immutable,field,Yes during update
+Batch,Job,status.conditions,Complete and Failed conditions cannot both be true,cross field,contradiction,No
+Batch,CronJob,spec.timeZone,Must be a valid time zone name if specified,format,timezone,Yes when CronJobTimeZone feature is enabled
+Apps,Deployment,spec.selector,On update, selector is immutable,immutable,field,Yes during update
+Apps,Deployment,status.replicas,Must be non-negative integer,format,integer,No
+Apps,Deployment,status.updatedReplicas,Must not be greater than replicas,cross field,relationship,No
+Apps,Deployment,status.readyReplicas,Must not be greater than replicas,cross field,relationship,No
+Apps,Deployment,status.availableReplicas,Must not be greater than replicas,cross field,relationship,No
+Apps,Deployment,status.collisionCount,On update, collisionCount cannot be decremented,immutable,field,Yes during update
+Apps,StatefulSet,spec.updateStrategy,Must be valid update strategy,enum,strategy,No
+Apps,StatefulSet,spec.selector,On update, selector is immutable,immutable,field,Yes during update
+Apps,StatefulSet,spec.volumeClaimTemplates,On update, volumeClaimTemplates are immutable,immutable,field,Yes during update
+Apps,StatefulSet,spec.persistentVolumeClaimRetentionPolicy,On update, persistentVolumeClaimRetentionPolicy is immutable,immutable,field,Yes during update
+Apps,StatefulSet,spec.ordinals,On update, ordinals field is immutable,immutable,field,Yes during update
+Storage,CSIDriver,spec.volumeLifecycleModes,Must contain valid volume lifecycle modes,enum,lifecycle mode,No
+Storage,VolumeAttributesClass,driverName,On update, driverName is immutable,immutable,field,Yes during update
+Storage,VolumeAttributesClass,parameters,On update, parameters are immutable,immutable,field,Yes during update
+Networking,NetworkPolicy,spec.ingress[*].from[*].ipBlock.except,Must be subset of CIDR,cross field,subset,Only when ipBlock is used
+Networking,NetworkPolicy,spec.egress[*].to[*].ipBlock.except,Must be subset of CIDR,cross field,subset,Only when ipBlock is used
+Authentication,TokenRequest,spec.audiences,Must not be empty,format,required,No
+Authentication,TokenRequest,spec.expirationSeconds,Must be positive integer if specified,format,integer,No
+Certificates,CertificateSigningRequest,spec.request,Must be valid PEM-encoded certificate request,format,pem,No
+Admissionregistration,ValidatingAdmissionPolicy,spec.matchConstraints,Must specify resource rules,cross field,rules,No
+Admissionregistration,ValidatingAdmissionPolicy,spec.validations,Must specify at least one validation unless auditAnnotations is specified,cross field,conditional requirement,No
+Core,Node,spec.taints[*].key,Must be a valid qualified name,format,qualified name,No
+Core,Node,spec.taints[*].value,Must not be empty when effect is specified,format,required,When effect is specified
+Core,Node,spec.taints[*].effect,Must be one of NoSchedule, PreferNoSchedule, or NoExecute,enum,effect,No
+Core,Pod,spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms,Must have at least one term if specified,cardinality,minimum,When requiredDuringSchedulingIgnoredDuringExecution is specified
+Core,Pod,spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[*].matchExpressions,Must have at least one expression if no matchFields are specified,cross field,conditional cardinality,When no matchFields are specified
+Core,Pod,spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[*].matchFields,Must have at least one field if no matchExpressions are specified,cross field,conditional cardinality,When no matchExpressions are specified
+Core,Pod,spec.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[*].preference,Must follow node selector term validation rules,cross field,standard,No
+Core,Pod,spec.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution[*].weight,Must be in the range 1-100,range,integer,No
+Core,Pod,spec.affinity.podAffinity.requiredDuringSchedulingIgnoredDuringExecution[*].labelSelector,Must be a valid label selector,format,selector,No
+Core,Pod,spec.affinity.podAffinity.requiredDuringSchedulingIgnoredDuringExecution[*].namespaces,Must be valid namespace names,format,dns,No
+Core,Pod,spec.affinity.podAffinity.requiredDuringSchedulingIgnoredDuringExecution[*].topologyKey,Must not be empty,format,required,No
+Core,Pod,spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution[*].labelSelector,Must be a valid label selector,format,selector,No
+Core,Pod,spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution[*].namespaces,Must be valid namespace names,format,dns,No
+Core,Pod,spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution[*].topologyKey,Must not be empty,format,required,No
+*,*,metadata.name,Must be a valid DNS subdomain name or empty if generateName is specified,format,dns,No
+*,*,metadata.generateName,Must be a valid DNS subdomain prefix if specified,format,dns,No
+*,*,metadata.namespace,Must be a valid DNS label if specified,format,dns,Yes if resource requires namespace
+*,*,metadata.namespace,Must not be specified for cluster-scoped resources,format,empty,Yes for cluster-scoped resources
+*,*,metadata.labels,Label keys and values must be valid according to DNS_SUBDOMAIN format with optional /,format,label,No
+*,*,metadata.annotations,Annotation keys must be qualified names, values have no format restrictions,format,qualified name,No
+*,*,metadata.ownerReferences,UID must not be empty for each reference,format,required,No
+*,*,metadata.ownerReferences,Name must not be empty for each reference,format,required,No
+*,*,metadata.ownerReferences,Kind must not be empty for each reference,format,required,No
+*,*,metadata.ownerReferences,APIVersion must not be empty for each reference,format,required,No
+*,*,metadata.finalizers,Finalizer names must be qualified names,format,qualified name,No
+*,*,metadata.managedFields,Field manager must be valid,format,manager,No
+*,*,spec.selector,Label selectors must have valid syntax (if present),format,selector,No
+*,*,status.conditions,Condition types must be unique in arrays of conditions,cross field,uniqueness,No
+*,*,status.observedGeneration,Must be non-negative integer,format,integer,No
+*,*,metadata,On update, name cannot be changed,immutable,field,Yes during update
+*,*,metadata,On update, namespace cannot be changed,immutable,field,Yes during update
+*,*,metadata,On update, uid cannot be changed,immutable,field,Yes during update
+*,*,metadata,On update, creationTimestamp cannot be changed,immutable,field,Yes during update
+*,*,spec.selector,On update, selectors are typically immutable,immutable,field,Yes during update (for most resources)
+*,*,spec.selector.matchLabels,Label keys must be valid DNS subdomain prefixes,format,dns,No
+*,*,spec.selector.matchLabels,Label values must be valid DNS subdomain names or empty,format,dns,No
+*,*,spec.selector.matchExpressions[*].key,Must be a valid DNS subdomain prefix,format,dns,No
+*,*,spec.selector.matchExpressions[*].operator,Must be one of In, NotIn, Exists, or DoesNotExist,enum,operator,No
+*,*,spec.selector.matchExpressions[*].values,Must be valid DNS subdomain names if operator is In or NotIn,format,dns,When operator is In or NotIn
+*,*,spec.selector.matchExpressions[*].values,Must be empty if operator is Exists or DoesNotExist,format,empty,When operator is Exists or DoesNotExist
+*,*,metadata.annotations,Certain annotations control behavior and may have validation rules,format,varies,Yes when specific annotations are used
