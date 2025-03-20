@@ -1,0 +1,143 @@
+/*
+Copyright 2025 The Kubernetes Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+package storage
+
+import (
+	"testing"
+
+	errors2 "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/validation/field"
+	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
+	"k8s.io/apiserver/pkg/registry/rest"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	featuregatetesting "k8s.io/component-base/featuregate/testing"
+	apitesting "k8s.io/kubernetes/pkg/api/testing"
+	"k8s.io/kubernetes/pkg/apis/autoscaling"
+	"k8s.io/kubernetes/pkg/features"
+)
+
+func TestValidateScaleForDeclarative(t *testing.T) {
+	testCases := map[string]struct {
+		input        autoscaling.Scale
+		expectedErrs field.ErrorList
+	}{
+		// spec.replicas
+		"0 replicas": {
+			input: mkScale(setScaleSpecReplicas(0)),
+		},
+		"1 replicas": {
+			input: mkScale(setScaleSpecReplicas(1)),
+		},
+		"positive replicas": {
+			input: mkScale(setScaleSpecReplicas(100)),
+		},
+		"negative replicas": {
+			input: mkScale(setScaleSpecReplicas(-1)),
+			expectedErrs: field.ErrorList{
+				field.Invalid(field.NewPath("spec.replicas"), nil, "").WithOrigin("minimum"),
+			},
+		},
+	}
+
+	storage, server := newStorage(t)
+	defer server.Terminate(t)
+	defer storage.Controller.Store.DestroyFunc()
+	_, err := createController(storage.Controller, *validController, t)
+	if err != nil {
+		t.Fatalf("error setting new replication controller %v: %v", *validController, err)
+	}
+
+	ctx := genericapirequest.WithRequestInfo(
+		genericapirequest.WithNamespace(genericapirequest.NewContext(), namespace),
+		&genericapirequest.RequestInfo{
+			APIGroup: "", APIVersion: "v1", Resource: "replicationcontrollers", Subresource: "scale",
+		},
+	)
+
+	for k, tc := range testCases {
+		t.Run(k, func(t *testing.T) {
+			var declarativeTakeoverErrs field.ErrorList
+			var imperativeErrs field.ErrorList
+			for _, gateVal := range []bool{true, false} {
+				// We only need to test both gate enabled and disabled together, because
+				// 1) the DeclarativeValidationTakeover won't take effect if DeclarativeValidation is disabled.
+				// 2) the validation output, when only DeclarativeValidation is enabled, is the same as when both gates are disabled.
+				featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.DeclarativeValidation, gateVal)
+				featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.DeclarativeValidationTakeover, gateVal)
+
+				_, _, err := storage.Scale.Update(ctx, tc.input.Name, rest.DefaultUpdatedObjectInfo(&tc.input), rest.ValidateAllObjectFunc, rest.ValidateAllObjectUpdateFunc, false, &metav1.UpdateOptions{})
+				errs := errorListFromStatusError(t, err)
+				if gateVal {
+					declarativeTakeoverErrs = errs
+				} else {
+					imperativeErrs = errs
+				}
+				// The errOutputMatcher is used to verify the output matches the expected errors in test cases.
+				errOutputMatcher := field.ErrorMatcher{}.ByType().ByField() // TODO: origin unavailable here
+				if len(tc.expectedErrs) > 0 {
+					errOutputMatcher.Test(t, tc.expectedErrs, errs)
+				} else if len(errs) != 0 {
+					t.Errorf("expected no errors, but got: %v", errs)
+				}
+			}
+			// The equivalenceMatcher is used to verify the output errors from handwritten imperative validation
+			// are equivalent to the output errors when DeclarativeValidationTakeover is enabled.
+			equivalenceMatcher := field.ErrorMatcher{}.ByType().ByField() // TODO: origin unavailable here
+			equivalenceMatcher.Test(t, imperativeErrs, declarativeTakeoverErrs)
+
+			apitesting.VerifyVersionedValidationEquivalence(t, &tc.input, nil)
+		})
+	}
+}
+
+// mkValidReplicationController produces a ReplicationController which passes
+// validation with no tweaks.
+func mkScale(tweaks ...func(rc *autoscaling.Scale)) autoscaling.Scale {
+	rc := autoscaling.Scale{
+		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: namespace},
+		Spec: autoscaling.ScaleSpec{
+			Replicas: 1,
+		},
+	}
+	for _, tweak := range tweaks {
+		tweak(&rc)
+	}
+	return rc
+}
+func setScaleSpecReplicas(val int32) func(rc *autoscaling.Scale) {
+	return func(rc *autoscaling.Scale) {
+		rc.Spec.Replicas = val
+	}
+}
+
+func errorListFromStatusError(t *testing.T, err error) field.ErrorList {
+	if err != nil {
+		switch e := err.(type) {
+		case *errors2.StatusError:
+			// TODO: This conversion is unfortunate. Origin gets lost.
+			list := make(field.ErrorList, len(e.Status().Details.Causes))
+			for i, c := range e.Status().Details.Causes {
+				list[i] = &field.Error{Type: field.ErrorType(c.Type), Field: c.Field, Detail: c.Message}
+			}
+			return list
+		default:
+			t.Fatalf("unexpected error: %v", err)
+		}
+	}
+	return nil
+}
