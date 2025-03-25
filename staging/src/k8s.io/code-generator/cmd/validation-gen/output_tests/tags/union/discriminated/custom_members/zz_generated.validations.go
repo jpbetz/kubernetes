@@ -28,6 +28,7 @@ import (
 	operation "k8s.io/apimachinery/pkg/api/operation"
 	safe "k8s.io/apimachinery/pkg/api/safe"
 	validate "k8s.io/apimachinery/pkg/api/validate"
+	visit "k8s.io/apimachinery/pkg/api/validate/visit"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
 	testscheme "k8s.io/code-generator/cmd/validation-gen/testscheme"
 )
@@ -39,7 +40,7 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*Struct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Struct(ctx, op, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
+			return Validate_Struct(ctx, op, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj), visit.NewState())
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
@@ -48,7 +49,7 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 
 var unionMembershipForStruct = validate.NewDiscriminatedUnionMembership("d", [2]string{"m1", "CustomM1"}, [2]string{"m2", "CustomM2"})
 
-func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
+func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct, v *visit.State) (errs field.ErrorList) {
 	// type Struct
 	errs = append(errs, validate.DiscriminatedUnion(ctx, op, fldPath, obj, oldObj, unionMembershipForStruct, obj.D, obj.M1, obj.M2)...)
 
@@ -57,21 +58,21 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 
 	// field Struct.M1
 	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *M1) (errs field.ErrorList) {
+		visit.Leaf(op, v, func(fldPath *field.Path, obj, oldObj *M1) (errs field.ErrorList) {
 			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
 			return
-		}(fldPath.Child("m1"), obj.M1, safe.Field(oldObj, func(oldObj *Struct) *M1 { return oldObj.M1 }))...)
+		})(fldPath.Child("m1"), obj.M1, safe.Field(oldObj, func(oldObj *Struct) *M1 { return oldObj.M1 }))...)
 
 	// field Struct.M2
 	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *M2) (errs field.ErrorList) {
+		visit.Leaf(op, v, func(fldPath *field.Path, obj, oldObj *M2) (errs field.ErrorList) {
 			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
 			return
-		}(fldPath.Child("m2"), obj.M2, safe.Field(oldObj, func(oldObj *Struct) *M2 { return oldObj.M2 }))...)
+		})(fldPath.Child("m2"), obj.M2, safe.Field(oldObj, func(oldObj *Struct) *M2 { return oldObj.M2 }))...)
 
 	return errs
 }

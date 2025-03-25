@@ -28,6 +28,7 @@ import (
 	operation "k8s.io/apimachinery/pkg/api/operation"
 	safe "k8s.io/apimachinery/pkg/api/safe"
 	validate "k8s.io/apimachinery/pkg/api/validate"
+	visit "k8s.io/apimachinery/pkg/api/validate/visit"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
 	testscheme "k8s.io/code-generator/cmd/validation-gen/testscheme"
 )
@@ -39,19 +40,19 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*Struct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Struct(ctx, op, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
+			return Validate_Struct(ctx, op, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj), visit.NewState())
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
+func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct, v *visit.State) (errs field.ErrorList) {
 	// field Struct.TypeMeta has no validation
 
 	// field Struct.XEnabledField
 	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
+		visit.Leaf(op, v, func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 			errs = append(errs, func() field.ErrorList {
 				if op.Options.Has("FeatureX") {
 					return validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field Struct.XEnabledField")
@@ -60,11 +61,11 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 				}
 			}()...)
 			return
-		}(fldPath.Child("xEnabledField"), &obj.XEnabledField, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.XEnabledField }))...)
+		})(fldPath.Child("xEnabledField"), &obj.XEnabledField, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.XEnabledField }))...)
 
 	// field Struct.XDisabledField
 	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
+		visit.Leaf(op, v, func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 			errs = append(errs, func() field.ErrorList {
 				if !op.Options.Has("FeatureX") {
 					return validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field Struct.XDisabledField")
@@ -73,11 +74,11 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 				}
 			}()...)
 			return
-		}(fldPath.Child("xDisabledField"), &obj.XDisabledField, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.XDisabledField }))...)
+		})(fldPath.Child("xDisabledField"), &obj.XDisabledField, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.XDisabledField }))...)
 
 	// field Struct.YEnabledField
 	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
+		visit.Leaf(op, v, func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 			errs = append(errs, func() field.ErrorList {
 				if op.Options.Has("FeatureY") {
 					return validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field Struct.YEnabledField")
@@ -86,11 +87,11 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 				}
 			}()...)
 			return
-		}(fldPath.Child("yEnabledField"), &obj.YEnabledField, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.YEnabledField }))...)
+		})(fldPath.Child("yEnabledField"), &obj.YEnabledField, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.YEnabledField }))...)
 
 	// field Struct.YDisabledField
 	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
+		visit.Leaf(op, v, func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 			errs = append(errs, func() field.ErrorList {
 				if !op.Options.Has("FeatureY") {
 					return validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field Struct.YDisabledField")
@@ -99,11 +100,11 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 				}
 			}()...)
 			return
-		}(fldPath.Child("yDisabledField"), &obj.YDisabledField, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.YDisabledField }))...)
+		})(fldPath.Child("yDisabledField"), &obj.YDisabledField, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.YDisabledField }))...)
 
 	// field Struct.XYMixedField
 	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
+		visit.Leaf(op, v, func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 			errs = append(errs, func() field.ErrorList {
 				if !op.Options.Has("FeatureY") {
 					return validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field Struct.XYMixedField/Y")
@@ -119,7 +120,7 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 				}
 			}()...)
 			return
-		}(fldPath.Child("xyMixedField"), &obj.XYMixedField, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.XYMixedField }))...)
+		})(fldPath.Child("xyMixedField"), &obj.XYMixedField, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.XYMixedField }))...)
 
 	return errs
 }

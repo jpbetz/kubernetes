@@ -28,6 +28,7 @@ import (
 	operation "k8s.io/apimachinery/pkg/api/operation"
 	safe "k8s.io/apimachinery/pkg/api/safe"
 	validate "k8s.io/apimachinery/pkg/api/validate"
+	visit "k8s.io/apimachinery/pkg/api/validate/visit"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
 	testscheme "k8s.io/code-generator/cmd/validation-gen/testscheme"
 )
@@ -39,41 +40,41 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*Struct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Struct(ctx, op, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
+			return Validate_Struct(ctx, op, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj), visit.NewState())
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
+func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct, v *visit.State) (errs field.ErrorList) {
 	// field Struct.SP
 	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
+		visit.Leaf(op, v, func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
 			errs = append(errs, validate.Immutable(ctx, op, fldPath, obj, oldObj)...)
 			return
-		}(fldPath.Child("sp"), obj.SP, safe.Field(oldObj, func(oldObj *Struct) *string { return oldObj.SP }))...)
+		})(fldPath.Child("sp"), obj.SP, safe.Field(oldObj, func(oldObj *Struct) *string { return oldObj.SP }))...)
 
 	// field Struct.IP
 	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *int) (errs field.ErrorList) {
+		visit.Leaf(op, v, func(fldPath *field.Path, obj, oldObj *int) (errs field.ErrorList) {
 			errs = append(errs, validate.Immutable(ctx, op, fldPath, obj, oldObj)...)
 			return
-		}(fldPath.Child("ip"), obj.IP, safe.Field(oldObj, func(oldObj *Struct) *int { return oldObj.IP }))...)
+		})(fldPath.Child("ip"), obj.IP, safe.Field(oldObj, func(oldObj *Struct) *int { return oldObj.IP }))...)
 
 	// field Struct.BP
 	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *bool) (errs field.ErrorList) {
+		visit.Leaf(op, v, func(fldPath *field.Path, obj, oldObj *bool) (errs field.ErrorList) {
 			errs = append(errs, validate.Immutable(ctx, op, fldPath, obj, oldObj)...)
 			return
-		}(fldPath.Child("bp"), obj.BP, safe.Field(oldObj, func(oldObj *Struct) *bool { return oldObj.BP }))...)
+		})(fldPath.Child("bp"), obj.BP, safe.Field(oldObj, func(oldObj *Struct) *bool { return oldObj.BP }))...)
 
 	// field Struct.FP
 	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *float64) (errs field.ErrorList) {
+		visit.Leaf(op, v, func(fldPath *field.Path, obj, oldObj *float64) (errs field.ErrorList) {
 			errs = append(errs, validate.Immutable(ctx, op, fldPath, obj, oldObj)...)
 			return
-		}(fldPath.Child("fp"), obj.FP, safe.Field(oldObj, func(oldObj *Struct) *float64 { return oldObj.FP }))...)
+		})(fldPath.Child("fp"), obj.FP, safe.Field(oldObj, func(oldObj *Struct) *float64 { return oldObj.FP }))...)
 
 	return errs
 }

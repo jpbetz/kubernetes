@@ -28,6 +28,7 @@ import (
 	operation "k8s.io/apimachinery/pkg/api/operation"
 	safe "k8s.io/apimachinery/pkg/api/safe"
 	validate "k8s.io/apimachinery/pkg/api/validate"
+	visit "k8s.io/apimachinery/pkg/api/validate/visit"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
 	testscheme "k8s.io/code-generator/cmd/validation-gen/testscheme"
 )
@@ -39,7 +40,7 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*Struct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Struct(ctx, op, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
+			return Validate_Struct(ctx, op, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj), visit.NewState())
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
@@ -49,7 +50,7 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 var unionMembershipForStructunion1 = validate.NewUnionMembership([2]string{"u1m1", "U1M1"}, [2]string{"u1m2", "U1M2"})
 var unionMembershipForStructunion2 = validate.NewUnionMembership([2]string{"u2m1", "U2M1"}, [2]string{"u2m2", "U2M2"})
 
-func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
+func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct, v *visit.State) (errs field.ErrorList) {
 	// type Struct
 	errs = append(errs, validate.Union(ctx, op, fldPath, obj, oldObj, unionMembershipForStructunion1, obj.U1M1, obj.U1M2)...)
 	errs = append(errs, validate.Union(ctx, op, fldPath, obj, oldObj, unionMembershipForStructunion2, obj.U2M1, obj.U2M2)...)
@@ -59,39 +60,39 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 
 	// field Struct.U1M1
 	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *M1) (errs field.ErrorList) {
+		visit.Leaf(op, v, func(fldPath *field.Path, obj, oldObj *M1) (errs field.ErrorList) {
 			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
 			return
-		}(fldPath.Child("u1m1"), obj.U1M1, safe.Field(oldObj, func(oldObj *Struct) *M1 { return oldObj.U1M1 }))...)
+		})(fldPath.Child("u1m1"), obj.U1M1, safe.Field(oldObj, func(oldObj *Struct) *M1 { return oldObj.U1M1 }))...)
 
 	// field Struct.U1M2
 	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *M2) (errs field.ErrorList) {
+		visit.Leaf(op, v, func(fldPath *field.Path, obj, oldObj *M2) (errs field.ErrorList) {
 			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
 			return
-		}(fldPath.Child("u1m2"), obj.U1M2, safe.Field(oldObj, func(oldObj *Struct) *M2 { return oldObj.U1M2 }))...)
+		})(fldPath.Child("u1m2"), obj.U1M2, safe.Field(oldObj, func(oldObj *Struct) *M2 { return oldObj.U1M2 }))...)
 
 	// field Struct.U2M1
 	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *M1) (errs field.ErrorList) {
+		visit.Leaf(op, v, func(fldPath *field.Path, obj, oldObj *M1) (errs field.ErrorList) {
 			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
 			return
-		}(fldPath.Child("u2m1"), obj.U2M1, safe.Field(oldObj, func(oldObj *Struct) *M1 { return oldObj.U2M1 }))...)
+		})(fldPath.Child("u2m1"), obj.U2M1, safe.Field(oldObj, func(oldObj *Struct) *M1 { return oldObj.U2M1 }))...)
 
 	// field Struct.U2M2
 	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *M2) (errs field.ErrorList) {
+		visit.Leaf(op, v, func(fldPath *field.Path, obj, oldObj *M2) (errs field.ErrorList) {
 			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
 			return
-		}(fldPath.Child("u2m2"), obj.U2M2, safe.Field(oldObj, func(oldObj *Struct) *M2 { return oldObj.U2M2 }))...)
+		})(fldPath.Child("u2m2"), obj.U2M2, safe.Field(oldObj, func(oldObj *Struct) *M2 { return oldObj.U2M2 }))...)
 
 	return errs
 }
