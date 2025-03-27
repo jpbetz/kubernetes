@@ -36,7 +36,7 @@ import (
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 	"k8s.io/apimachinery/pkg/api/resource"
-	"k8s.io/apimachinery/pkg/runtime"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apiserver/pkg/cel/library"
 	"testing"
@@ -50,15 +50,28 @@ type Struct struct {
 	F float64 `json:"f"`
 }
 
+type StructOmitEmpty struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	S string  `json:"s,omitempty"`
+	I int     `json:"i,omitempty"`
+	B bool    `json:"b,omitempty"`
+	F float64 `json:"f,omitempty"`
+}
+
 type Nested struct {
 	Name string `json:"name"`
 	Info Struct `json:"info"`
 }
 
 type Complex struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
 	ID          string             `json:"id"`
 	Tags        []string           `json:"tags"`
-	Metadata    map[string]string  `json:"metadata"`
+	Labels      map[string]string  `json:"labels"`
 	NestedObj   Nested             `json:"nestedObj"`
 	Timeout     time.Duration      `json:"timeout"`
 	RawBytes    []byte             `json:"rawBytes"`
@@ -92,28 +105,11 @@ func typedToValActivation(vals map[string]interface{}) map[string]interface{} {
 	return activation
 }
 
-type RawWrapper struct {
-	Wrapped map[string]interface{} `json:"wrapped"`
-}
-
-// rawUnstructuredActivation drops unstructured data into the activation.
-// This is roughly equivalent to how admission policies load data into the activation.
-func rawUnstructuredActivation(vals map[string]interface{}) map[string]interface{} {
-	v := &RawWrapper{vals}
-	wrapped, err := runtime.DefaultUnstructuredConverter.ToUnstructured(v)
-	if err != nil {
-		panic(err)
-	}
-	activation := wrapped["wrapped"].(map[string]interface{})
-	return activation
-}
-
 type testCase struct {
-	name                       string
-	expression                 string
-	activation                 map[string]any
-	wantErr                    string
-	skipRawUnstructuredCompare bool // Tracks known incompatibilities between TypedToVal and conversion through unstructured
+	name       string
+	expression string
+	activation map[string]any
+	wantErr    string
 }
 
 func TestTypedToVal(t *testing.T) {
@@ -124,15 +120,19 @@ func TestTypedToVal(t *testing.T) {
 	zeroStruct := Struct{}
 	zeroStructPtr := &Struct{}
 
+	structOmitEmpty1 := StructOmitEmpty{}
+
 	now := time.Now().Truncate(0)
 	duration1 := 5 * time.Second
 
 	nested1 := Nested{Name: "nested1", Info: struct1}
 
 	complex1 := Complex{
+		TypeMeta:    metav1.TypeMeta{Kind: "Complex", APIVersion: "v1"},
+		ObjectMeta:  metav1.ObjectMeta{Name: "complex1"},
 		ID:          "c1",
 		Tags:        []string{"a", "b", "c"},
-		Metadata:    map[string]string{"key1": "val1", "key2": "val2"},
+		Labels:      map[string]string{"key1": "val1", "key2": "val2"},
 		NestedObj:   nested1,
 		Timeout:     duration1,
 		RawBytes:    []byte("bytes1"),
@@ -151,9 +151,11 @@ func TestTypedToVal(t *testing.T) {
 		Enum:        EnumTypeA,
 	}
 	complex2 := Complex{
+		TypeMeta:    metav1.TypeMeta{Kind: "Complex2", APIVersion: "v1"},
+		ObjectMeta:  metav1.ObjectMeta{Name: "complex2"},
 		ID:          "c2",
 		Tags:        []string{"x", "y"},
-		Metadata:    map[string]string{"key3": "val3"},
+		Labels:      map[string]string{"key3": "val3"},
 		NestedObj:   Nested{Name: "nested2", Info: struct2},
 		Timeout:     10 * time.Second,
 		RawBytes:    []byte("bytes2"),
@@ -234,6 +236,11 @@ func TestTypedToVal(t *testing.T) {
 			activation: map[string]interface{}{"obj": struct1Ptr},
 		},
 		{
+			name:       "struct: access omitempty field (has)",
+			expression: "!has(obj.s)",
+			activation: map[string]interface{}{"obj": structOmitEmpty1},
+		},
+		{
 			name:       "struct: access non-existent field (has)",
 			expression: "!has(obj.nonExistent)",
 			activation: map[string]interface{}{"obj": struct1},
@@ -244,24 +251,47 @@ func TestTypedToVal(t *testing.T) {
 			activation: map[string]interface{}{"obj": struct1},
 			wantErr:    "no such key: nonExistent",
 		},
-		// TODO: Match unstructured error for this case?
-		//{
-		//	name:       "struct: access with non-string key (get) (error)",
-		//	expression: "obj[1]",
-		//	activation: map[string]interface{}{"obj": struct1},
-		//	wantErr:    "invalid map key type: int",
-		//},
-		// TODO: Match unstructured behavior for this case?
-		//{
-		//	name:       "struct: check contains non-string key (error)",
-		//	expression: "1 in obj",
-		//	activation: map[string]interface{}{"obj": struct1},
-		//	wantErr:    "no such overload",
-		//},
+		{
+			name:       "struct: access with non-string key (get) (error)",
+			expression: "obj[1]",
+			activation: map[string]interface{}{"obj": struct1},
+			wantErr:    "invalid map key type: int",
+		},
+		{
+			name:       "struct: check contains non-string key (error)",
+			expression: "1 in obj",
+			activation: map[string]interface{}{"obj": struct1},
+			wantErr:    "no such overload",
+		},
 		{
 			name:       "struct: convert to its own type",
 			expression: "type(obj) == type(obj)",
 			activation: map[string]interface{}{"obj": struct1},
+		},
+		{
+			name:       "struct: embedded inline",
+			expression: "c.apiVersion == 'v1' && c.kind == 'Complex'",
+			activation: map[string]interface{}{"c": complex1},
+		},
+		{
+			name:       "struct: embedded inline: omitempty",
+			expression: "!has(c.apiVersion)",
+			activation: map[string]interface{}{"c": structOmitEmpty1},
+		},
+		{
+			name:       "struct: embedded field",
+			expression: "c.metadata.name == 'complex1'",
+			activation: map[string]interface{}{"c": complex1},
+		},
+		{
+			name:       "struct: embedded field: omitempty struct",
+			expression: "!has(c.metadata.labels)",
+			activation: map[string]interface{}{"c": complex1},
+		},
+		{
+			name:       "struct: embedded field: omitempty field",
+			expression: "!has(c.metadata)",
+			activation: map[string]interface{}{"c": structOmitEmpty1},
 		},
 
 		// Comparison Tests
@@ -295,12 +325,11 @@ func TestTypedToVal(t *testing.T) {
 			expression: "s1 != 10",
 			activation: map[string]interface{}{"s1": struct1},
 		},
-		// TODO: Match unstructured behavior for this case?
-		//{
-		//	name:       "compare: nil struct pointer and null",
-		//	expression: "nil_obj == null",
-		//	activation: map[string]interface{}{"nil_obj": (*Struct)(nil)},
-		//},
+		{
+			name:       "compare: nil struct pointer and null",
+			expression: "nil_obj == null",
+			activation: map[string]interface{}{"nil_obj": (*Struct)(nil)},
+		},
 		{
 			name:       "compare: identical complex structs",
 			expression: "c1 == c1_again",
@@ -387,16 +416,14 @@ func TestTypedToVal(t *testing.T) {
 			activation: map[string]interface{}{"b1": []byte("abc"), "b2": []byte("abd")},
 		},
 		{
-			name:                       "compare: empty slices (different underlying types)",
-			expression:                 "e1 == e2",
-			activation:                 map[string]interface{}{"e1": []int{}, "e2": []string(nil)},
-			skipRawUnstructuredCompare: true, // raw unstructured have type info
+			name:       "compare: empty slices (different underlying types)",
+			expression: "e1 == e2",
+			activation: map[string]interface{}{"e1": []int{}, "e2": []string(nil)},
 		},
 		{
-			name:                       "compare: empty maps (different underlying types)",
-			expression:                 "m1 == m2",
-			activation:                 map[string]interface{}{"m1": map[string]int{}, "m2": map[string]bool(nil)},
-			skipRawUnstructuredCompare: true, // raw unstructured have type info
+			name:       "compare: empty maps (different underlying types)",
+			expression: "m1 == m2",
+			activation: map[string]interface{}{"m1": map[string]int{}, "m2": map[string]bool(nil)},
 		},
 
 		// Nested Struct Tests
@@ -496,10 +523,9 @@ func TestTypedToVal(t *testing.T) {
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:                       "slice: nil slice size",
-			expression:                 "size(c.nilSlice) == 0",
-			activation:                 map[string]interface{}{"c": complex1},
-			skipRawUnstructuredCompare: true, // raw unstructured have type info
+			name:       "slice: nil slice size",
+			expression: "size(c.nilSlice) == 0",
+			activation: map[string]interface{}{"c": complex1},
 		},
 		{
 			name:       "slice: exists() on empty",
@@ -525,90 +551,88 @@ func TestTypedToVal(t *testing.T) {
 		// Map Tests
 		{
 			name:       "map: access element",
-			expression: "c.metadata['key1'] == 'val1'",
+			expression: "c.labels['key1'] == 'val1'",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
 			name:       "map: size",
-			expression: "size(c.metadata) == 2",
+			expression: "size(c.labels) == 2",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
 			name:       "map: contains key ('in')",
-			expression: "'key1' in c.metadata",
+			expression: "'key1' in c.labels",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
 			name:       "map: not contains key ('in')",
-			expression: "!('key3' in c.metadata)",
+			expression: "!('key3' in c.labels)",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
 			name:       "map: has() key",
-			expression: "has(c.metadata.key1)",
+			expression: "has(c.labels.key1)",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
 			name:       "map: has() non-existent key",
-			expression: "!has(c.metadata.key3)",
+			expression: "!has(c.labels.key3)",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
 			name:       "map: access non-existent key (error)",
-			expression: "c.metadata['key3']",
+			expression: "c.labels['key3']",
 			activation: map[string]interface{}{"c": complex1},
 			wantErr:    "no such key: key3",
 		},
 		{
 			name:       "map: all() on keys true",
-			expression: "c.metadata.all(k, k.startsWith('key'))",
+			expression: "c.labels.all(name, name.startsWith('key'))",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
 			name:       "map: all() on keys false",
-			expression: "!c.metadata.all(k, k == 'key1')",
+			expression: "!c.labels.all(name, name == 'key1')",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
 			name:       "map: exists() on keys true",
-			expression: "c.metadata.exists(k, k == 'key2')",
+			expression: "c.labels.exists(name, name == 'key2')",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
 			name:       "map: exists() on keys false",
-			expression: "!c.metadata.exists(k, k == 'key3')",
+			expression: "!c.labels.exists(name, name == 'key3')",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:                       "map: empty map size",
-			expression:                 "size(c.emptyMap) == 0",
-			activation:                 map[string]interface{}{"c": complex1},
-			skipRawUnstructuredCompare: true, // raw unstructured have type info
+			name:       "map: empty map size",
+			expression: "size(c.emptyMap) == 0",
+			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:                       "map: nil map size",
-			expression:                 "size(c.nilMap) == 0",
-			activation:                 map[string]interface{}{"c": complex1},
-			skipRawUnstructuredCompare: true, // raw unstructured have type info
+			name:       "map: nil map size",
+			expression: "size(c.nilMap) == 0",
+			activation: map[string]interface{}{"c": complex1},
 		},
 		{
 			name:       "map: exists() on empty",
-			expression: "!c.emptyMap.exists(k, true)",
+			expression: "!c.emptyMap.exists(name, true)",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
 			name:       "map: all() on empty",
-			expression: "c.emptyMap.all(k, false)",
+			expression: "c.emptyMap.all(name, false)",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
 			name:       "map: convert to map type",
-			expression: "type(c.metadata) == map",
+			expression: "type(c.labels) == map",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
 			name:       "map: convert map to type type",
-			expression: "type(c.metadata) == map",
+			expression: "type(c.labels) == map",
 			activation: map[string]interface{}{"c": complex1},
 		},
 
@@ -668,20 +692,18 @@ func TestTypedToVal(t *testing.T) {
 		},
 		{
 			name:       "type: map field",
-			expression: "type(c.metadata) == map",
+			expression: "type(c.labels) == map",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:                       "type: duration field",
-			expression:                 "type(c.timeout) == google.protobuf.Duration",
-			activation:                 map[string]interface{}{"c": complex1},
-			skipRawUnstructuredCompare: true, // raw unstructured doesn't have format info
+			name:       "type: duration field",
+			expression: "type(c.timeout) == google.protobuf.Duration",
+			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:                       "type: bytes field",
-			expression:                 "type(c.rawBytes) == bytes",
-			activation:                 map[string]interface{}{"c": complex1},
-			skipRawUnstructuredCompare: true, // raw unstructured doesn't have format info
+			name:       "type: bytes field",
+			expression: "type(c.rawBytes) == bytes",
+			activation: map[string]interface{}{"c": complex1},
 		},
 		{
 			name:       "type: nil pointer field",
@@ -711,16 +733,14 @@ func TestTypedToVal(t *testing.T) {
 
 		// Special K8s Types
 		{
-			name:                       "duration: comparison equals",
-			expression:                 "c.timeout == duration('5s')",
-			activation:                 map[string]interface{}{"c": complex1},
-			skipRawUnstructuredCompare: true, // raw unstructured doesn't have format info
+			name:       "duration: comparison equals",
+			expression: "c.timeout == duration('5s')",
+			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:                       "duration: comparison greater",
-			expression:                 "c.timeout > duration('1s')",
-			activation:                 map[string]interface{}{"c": complex1},
-			skipRawUnstructuredCompare: true, // raw unstructured doesn't have format info
+			name:       "duration: comparison greater",
+			expression: "c.timeout > duration('1s')",
+			activation: map[string]interface{}{"c": complex1},
 		},
 		{
 			name:       "intOrString: int comparison",
@@ -734,25 +754,23 @@ func TestTypedToVal(t *testing.T) {
 		},
 		{
 			name:       "quantity: comparison",
-			expression: "quantity(c.quantity).isGreaterThan(quantity('99m')) && quantity(c.quantity).isLessThan(quantity('101m'))",
+			expression: "c.quantity.isGreaterThan(quantity('99m')) && c.quantity.isLessThan(quantity('101m'))",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:       "quantity: equality (as string)",
-			expression: "c.quantity == '100m'",
+			name:       "quantity: equality",
+			expression: "c.quantity == quantity('100m')",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:                       "bytes: size",
-			expression:                 "size(c.rawBytes) == 6",
-			activation:                 map[string]interface{}{"c": complex1},
-			skipRawUnstructuredCompare: true, // raw unstructured doesn't have format info
+			name:       "bytes: size",
+			expression: "size(c.rawBytes) == 6",
+			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:                       "bytes: equality",
-			expression:                 "c.rawBytes == b'bytes1'",
-			activation:                 map[string]interface{}{"c": complex1},
-			skipRawUnstructuredCompare: true, // raw unstructured doesn't have format info
+			name:       "bytes: equality",
+			expression: "c.rawBytes == b'bytes1'",
+			activation: map[string]interface{}{"c": complex1},
 		},
 	}
 
@@ -770,37 +788,21 @@ func TestTypedToVal(t *testing.T) {
 			}
 
 			typedOut, typedErr := evalExpression(t, env, tt.expression, typedToValActivation(tt.activation))
-			checkError(t, typedErr, tt.wantErr, "typed")
+			if typedErr != nil && len(tt.wantErr) == 0 {
+				t.Fatalf("Unexpected err: %v", typedErr)
+			}
+			if len(tt.wantErr) > 0 {
+				if typedErr == nil {
+					t.Fatalf("Expected error '%s' during evaluation, but got none", tt.wantErr)
+				}
+				if typedErr.Error() != tt.wantErr {
+					t.Fatalf("Expected error '%s' during evaluation, but got: %v", tt.wantErr, typedErr)
+				}
+			}
 			if len(tt.wantErr) == 0 && typedOut != types.True {
 				t.Errorf("Expected true but got %v", typedOut)
 			}
-
-			// Test for differences between TypedToVal and conversion through unstructured.
-			// This is important because TypedToVal could only ever be used as a replacement in
-			// admission policies for conversion through unstructured if it's compatible.
-			if !tt.skipRawUnstructuredCompare {
-				rawOut, rawErr := evalExpression(t, env, tt.expression, rawUnstructuredActivation(tt.activation))
-				checkError(t, rawErr, tt.wantErr, "raw")
-
-				if len(tt.wantErr) == 0 && rawOut != types.True {
-					t.Errorf("Expected true for raw activation but got %v", rawOut)
-				}
-			}
 		})
-	}
-}
-
-func checkError(t *testing.T, err error, wantErr string, name string) {
-	if err != nil && len(wantErr) == 0 {
-		t.Fatalf("%s: Unexpected err: %v", name, err)
-	}
-	if len(wantErr) > 0 {
-		if err == nil {
-			t.Fatalf("%s: Expected error '%s' during evaluation, but got none", name, wantErr)
-		}
-		if err.Error() != wantErr {
-			t.Fatalf("%s: Expected error '%s' during evaluation, but got: %v", name, wantErr, err)
-		}
 	}
 }
 

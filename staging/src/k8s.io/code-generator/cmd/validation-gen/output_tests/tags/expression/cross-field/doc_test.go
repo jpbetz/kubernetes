@@ -35,6 +35,8 @@ func Test(t *testing.T) {
 }
 
 // 3019 ns/op (cost enabled), 556.0 ns/op (cost disabled)
+// Note that disabling cost disables CEL tracking and avoids per-invocation factory initialization:
+// https://github.com/kubernetes/kubernetes/blob/047e4c8e56b5c6a0466e4f1f1fdeca7e9a8de3d6/vendor/github.com/google/cel-go/cel/program.go#L225
 func BenchmarkExpression(b *testing.B) {
 	obj := Struct{S: "x", I: 10}
 

@@ -21,7 +21,9 @@ import (
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/apiserver/pkg/cel"
 	"reflect"
+	"sync"
 	"time"
 
 	"github.com/google/cel-go/common/types"
@@ -67,9 +69,9 @@ func TypedToVal(val interface{}) ref.Val {
 			return types.NullValue
 		}
 		return types.Bytes(typedVal)
-	case time.Time:
+	case time.Time: // FIXME: Not used in the Kubernetes API and time.Time breaks DeepEquals. Remove?
 		return types.Timestamp{Time: typedVal}
-	case time.Duration:
+	case time.Duration: // FIXME: Not used in the Kubernetes API and time.Time breaks DeepEquals. Remove?
 		return types.Duration{Duration: typedVal}
 	case intstr.IntOrString:
 		switch typedVal.Type {
@@ -79,9 +81,7 @@ func TypedToVal(val interface{}) ref.Val {
 			return types.String(typedVal.StrVal)
 		}
 	case resource.Quantity:
-		// TODO: Return a CEL Quantity type instead of a string.  For backward compatibility with VAP,
-		//       this would need to be opt-in.
-		return types.String(typedVal.String())
+		return cel.Quantity{Quantity: &typedVal}
 	default:
 		// continue on to next switch
 	}
@@ -111,6 +111,24 @@ func TypedToVal(val interface{}) ref.Val {
 // structVal wraps a struct as a CEL ref.Val and provides lazy access to fields via reflection.
 type structVal struct {
 	value reflect.Value // Kind is required to be: reflect.Struct
+
+	// FIXME: This temporary and not optimal.  There are a finite set of built-in types.
+	//       Most of the work performed here repeated for the same types over and over.
+	//       To improve this consider using something like fieldCache in staging/src/k8s.io/apimachinery/pkg/runtime/converter.go.
+	fieldsOnce sync.Once
+	fields     []fieldEntry
+}
+
+type fieldEntry struct {
+	name  string
+	value reflect.Value
+}
+
+func (s *structVal) getFields() []fieldEntry {
+	s.fieldsOnce.Do(func() {
+		s.fields = listJSONFields(s.value.Type(), s.value)
+	})
+	return s.fields
 }
 
 func (s *structVal) ConvertToNative(typeDesc reflect.Type) (interface{}, error) {
@@ -163,11 +181,9 @@ func (s *structVal) Find(key ref.Val) (ref.Val, bool) {
 		return types.NewErr("invalid map key type: %v", key.Type()), true
 	}
 	fieldName := keyStr.Value().(string)
-	t := s.value.Type()
-	// Search the fields for a field with a matching jsonTag name.
-	for i := 0; i < t.NumField(); i++ {
-		if json, ok := LookupJSON(t.Field(i)); ok && json.Name == fieldName && !(s.value.Field(i).IsZero() && json.Omitempty) {
-			return TypedToVal(s.value.Field(i).Interface()), true
+	for _, e := range s.getFields() {
+		if e.name == fieldName {
+			return TypedToVal(e.value.Interface()), true
 		}
 	}
 	return nil, false
@@ -191,24 +207,16 @@ func (s *structVal) Get(key ref.Val) ref.Val {
 
 // TODO: Remove?
 func (s *structVal) Size() ref.Val {
-	count := 0
-	t := s.value.Type()
-	for i := 0; i < t.NumField(); i++ {
-		if json, ok := LookupJSON(t.Field(i)); ok && !(s.value.Field(i).IsZero() && json.Omitempty) {
-			count++
-		}
-	}
-	return types.Int(count)
+	entries := s.getFields()
+	return types.Int(len(entries))
 }
 
 // TODO: Remove?
 func (s *structVal) Iterator() traits.Iterator {
 	t := s.value.Type()
 	fieldNames := make([]ref.Val, 0, t.NumField())
-	for i := 0; i < t.NumField(); i++ {
-		if json, ok := LookupJSON(t.Field(i)); ok && !(s.value.Field(i).IsZero() && json.Omitempty) {
-			fieldNames = append(fieldNames, types.String(json.Name))
-		}
+	for _, e := range s.getFields() {
+		fieldNames = append(fieldNames, types.String(e.name))
 	}
 	return &structIter{structVal: s, fieldNames: fieldNames}
 }

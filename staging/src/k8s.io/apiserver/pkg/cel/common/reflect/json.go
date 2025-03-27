@@ -14,15 +14,60 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// TODO: Copy pasted from gengo and modified so that LookupJSON accepts a reflect.StructField.
-//       This needs a better home.
-
 package reflect
 
 import (
 	"reflect"
 	"strings"
 )
+
+// listJSONFields recursively finds all fields considering embedded structs
+// marked with `json:",inline"` and returns their JSON names.
+func listJSONFields(t reflect.Type, v reflect.Value) []fieldEntry {
+	for t.Kind() == reflect.Pointer {
+		t = t.Elem()
+	}
+	if t.Kind() != reflect.Struct {
+		return nil
+	}
+
+	entries := make([]fieldEntry, 0, t.NumField())
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		fieldVal := v.Field(i)
+		jsonTag, ok := LookupJSON(field)
+		if !ok || jsonTag.Omit {
+			continue
+		}
+
+		if field.Anonymous { // embedded struct
+			fieldType := field.Type
+			for fieldType.Kind() == reflect.Pointer {
+				fieldType = fieldType.Elem()
+			}
+			if fieldType.Kind() == reflect.Struct && jsonTag.Inline {
+				// embedded inline
+				entries = append(entries, listJSONFields(fieldType, fieldVal)...)
+				continue
+			}
+			// embedded in Go but treated as normal field in JSON
+			if jsonTag.Name != "" && !(jsonTag.Omitempty && fieldVal.IsZero()) {
+				entries = append(entries, fieldEntry{name: jsonTag.Name, value: fieldVal})
+			}
+			continue
+		}
+
+		// normal field
+		if jsonTag.Name != "" && !(jsonTag.Omitempty && fieldVal.IsZero()) {
+			entries = append(entries, fieldEntry{name: jsonTag.Name, value: fieldVal})
+		}
+	}
+
+	return entries
+}
+
+// TODO: Below is copy pasted from gengo and modified so that LookupJSON accepts a reflect.StructField.
+//       This needs a better home.
 
 // JSON represents a go json field tag.
 type JSON struct {
@@ -48,6 +93,9 @@ func (t JSON) String() string {
 
 func LookupJSON(m reflect.StructField) (JSON, bool) {
 	tag := m.Tag.Get("json")
+	if tag == "" {
+		return JSON{}, false
+	}
 	if tag == "-" {
 		return JSON{Omit: true}, true
 	}
