@@ -44,8 +44,12 @@ func Compile(expression string) *CompiledExpression {
 		return result
 	}
 	ast, issues := env.Compile(expression)
+	if issues != nil {
+		result.issues = issues
+		return result
+	}
 	if ast.OutputType() != cel.BoolType {
-		result.err = fmt.Errorf("cel expression must evaluate to a bool. Got: %v: %v", ast.OutputType(), issues)
+		result.err = fmt.Errorf("cel expression must evaluate to a bool, but got: %v for %s", ast.OutputType(), expression)
 		return result
 	}
 
@@ -108,6 +112,14 @@ type CompiledExpression struct {
 	issues     *cel.Issues
 
 	usesOldSelf bool
+}
+
+func (ce CompiledExpression) Error() error {
+	return ce.err
+}
+
+func (ce CompiledExpression) Issues() *cel.Issues {
+	return ce.issues
 }
 
 const (
