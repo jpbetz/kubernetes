@@ -16,8 +16,6 @@ limitations under the License.
 
 package operation
 
-import "k8s.io/apimachinery/pkg/util/sets"
-
 // Operation provides contextual information about a validation request and the API
 // operation being validated.
 // This type is intended for use with generate validation code and may be enhanced
@@ -41,10 +39,20 @@ type Operation struct {
 	// resource first began using the feature.
 	//
 	// Unset options are disabled/false.
-	Options sets.Set[string]
+	Options []string
 
 	// Request provides information about the request being validated.
 	Request Request
+}
+
+// HasOption returns true if the given string is in the Options slice.
+func (o Operation) HasOption(option string) bool {
+	for _, opt := range o.Options {
+		if opt == option {
+			return true
+		}
+	}
+	return false
 }
 
 // Request provides information about the request being validated.

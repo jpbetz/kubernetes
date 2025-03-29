@@ -24,7 +24,6 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	validationmetrics "k8s.io/apiserver/pkg/validation"
@@ -37,7 +36,7 @@ type ValidationConfig func(*validationConfig)
 // WithOptions sets the validation options.
 // options should contain any validation options that the declarative validation
 // tags expect.
-func WithOptions(options sets.Set[string]) ValidationConfig {
+func WithOptions(options []string) ValidationConfig {
 	return func(config *validationConfig) {
 		config.options = options
 	}
@@ -75,7 +74,7 @@ func WithSubresourceMapper(subresourceMapper GroupVersionKindProvider) Validatio
 
 type validationConfig struct {
 	opType               operation.Type
-	options              sets.Set[string]
+	options              []string
 	takeover             bool
 	subresourceGVKMapper GroupVersionKindProvider
 }

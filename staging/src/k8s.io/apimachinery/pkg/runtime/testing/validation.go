@@ -21,7 +21,6 @@ import (
 	"testing"
 
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
@@ -38,21 +37,21 @@ type VersionValidationRunner func(t *testing.T, gv string, versionValidationErro
 //	      errs = append(errs, versionValidationErrors...) // generated declarative validation
 //		  // Validate that the errors are what was expected for this test case.
 //		})
-func RunValidationForEachVersion(t *testing.T, scheme *runtime.Scheme, options sets.Set[string], unversioned runtime.Object, fn VersionValidationRunner) {
+func RunValidationForEachVersion(t *testing.T, scheme *runtime.Scheme, options []string, unversioned runtime.Object, fn VersionValidationRunner) {
 	runValidation(t, scheme, options, unversioned, fn)
 }
 
 // RunUpdateValidationForEachVersion is like RunValidationForEachVersion but for update validation.
-func RunUpdateValidationForEachVersion(t *testing.T, scheme *runtime.Scheme, options sets.Set[string], unversioned, unversionedOld runtime.Object, fn VersionValidationRunner) {
+func RunUpdateValidationForEachVersion(t *testing.T, scheme *runtime.Scheme, options []string, unversioned, unversionedOld runtime.Object, fn VersionValidationRunner) {
 	runUpdateValidation(t, scheme, options, unversioned, unversionedOld, fn)
 }
 
 // RunStatusValidationForEachVersion is like RunUpdateValidationForEachVersion but for status validation.
-func RunStatusValidationForEachVersion(t *testing.T, scheme *runtime.Scheme, options sets.Set[string], unversioned, unversionedOld runtime.Object, fn VersionValidationRunner) {
+func RunStatusValidationForEachVersion(t *testing.T, scheme *runtime.Scheme, options []string, unversioned, unversionedOld runtime.Object, fn VersionValidationRunner) {
 	runUpdateValidation(t, scheme, options, unversioned, unversionedOld, fn, "status")
 }
 
-func runValidation(t *testing.T, scheme *runtime.Scheme, options sets.Set[string], unversioned runtime.Object, fn VersionValidationRunner, subresources ...string) {
+func runValidation(t *testing.T, scheme *runtime.Scheme, options []string, unversioned runtime.Object, fn VersionValidationRunner, subresources ...string) {
 	unversionedGVKs, _, err := scheme.ObjectKinds(unversioned)
 	if err != nil {
 		t.Fatal(err)
@@ -78,7 +77,7 @@ func runValidation(t *testing.T, scheme *runtime.Scheme, options sets.Set[string
 	}
 }
 
-func runUpdateValidation(t *testing.T, scheme *runtime.Scheme, options sets.Set[string], unversionedNew, unversionedOld runtime.Object, fn VersionValidationRunner, subresources ...string) {
+func runUpdateValidation(t *testing.T, scheme *runtime.Scheme, options []string, unversionedNew, unversionedOld runtime.Object, fn VersionValidationRunner, subresources ...string) {
 	unversionedGVKs, _, err := scheme.ObjectKinds(unversionedNew)
 	if err != nil {
 		t.Fatal(err)
