@@ -31,14 +31,29 @@ import (
 	"math"
 )
 
-func Compile(expression string) *CompiledExpression {
+func NewRule(expression, messageExpression, message, errorType string) *CompiledRule {
+	result := &CompiledRule{
+		expression: Compile(expression, cel.BoolType),
+		message:    message,
+		errorType:  field.ErrorType(errorType),
+	}
+	if len(messageExpression) > 0 {
+		result.messageExpression = Compile(messageExpression, cel.StringType)
+	}
+	return result
+}
+
+func Compile(expression string, outputType *types.Type) *CompiledExpression {
 	result := &CompiledExpression{}
 	env := baseEnv.StoredExpressionsEnv()
 	// Use DynType. No point slowing down compilation at runtime for CEL expressions that are baked into apiserver
 	// binaries.
 	env, err := env.Extend(
 		cel.Variable(ScopedVarName, cel.DynType),
-		cel.Variable(OldScopedVarName, cel.DynType))
+		cel.Variable(OldScopedVarName, cel.DynType),
+		cel.Variable(SubresourcesVarName, cel.ListType(cel.StringType)),
+		cel.Variable(OptionsVarName, cel.ListType(cel.StringType)),
+	)
 	if err != nil {
 		result.err = err
 		return result
@@ -48,8 +63,8 @@ func Compile(expression string) *CompiledExpression {
 		result.issues = issues
 		return result
 	}
-	if ast.OutputType() != cel.BoolType {
-		result.err = fmt.Errorf("cel expression must evaluate to a bool, but got: %v for %s", ast.OutputType(), expression)
+	if ast.OutputType() != outputType {
+		result.err = fmt.Errorf("must evaluate to %s, but got: %v for %s", outputType.String(), ast.OutputType(), expression)
 		return result
 	}
 
@@ -73,12 +88,10 @@ func Compile(expression string) *CompiledExpression {
 	return result
 }
 
-func Expression[T any](ctx context.Context, op operation.Operation, fldPath *field.Path, value, oldValue *T, ce *CompiledExpression) field.ErrorList {
-	if ce.err != nil {
-		return field.ErrorList{field.InternalError(fldPath, fmt.Errorf("error initializing CEL environment:  %w", ce.err))}
-	}
-	if ce.issues != nil {
-		return field.ErrorList{field.InternalError(fldPath, fmt.Errorf("compilation error: %s", ce.issues))}
+func Expression[T any](ctx context.Context, op operation.Operation, fldPath *field.Path, value, oldValue *T, rule *CompiledRule) field.ErrorList {
+	errs := rule.Check(fldPath)
+	if len(errs) > 0 {
+		return errs
 	}
 
 	self := valuereflect.TypedToVal(value)
@@ -86,18 +99,35 @@ func Expression[T any](ctx context.Context, op operation.Operation, fldPath *fie
 	if op.Type == operation.Update {
 		oldSelf = valuereflect.TypedToVal(oldValue)
 	}
-
-	evalResult, _, err := ce.prog.ContextEval(ctx, &activation{
+	a := &activation{
 		self:       self,
 		oldSelf:    oldSelf,
-		hasOldSelf: ce.usesOldSelf,
-	})
+		hasOldSelf: rule.expression.usesOldSelf,
+
+		// TODO: subresources
+		// TODO: options
+	}
+
+	evalResult, _, err := rule.expression.prog.ContextEval(ctx, a)
 	if err != nil {
 		return field.ErrorList{field.InternalError(fldPath, fmt.Errorf("error evaluating expression: %w", err))}
 	}
+
 	if evalResult != types.True {
-		// TODO: Add message and messageExpression support
-		return field.ErrorList{field.Invalid(fldPath, value, "expression returned false")}
+		message := rule.message
+		if rule.messageExpression != nil {
+			messageEvalResult, _, err := rule.messageExpression.prog.ContextEval(ctx, a)
+			if err != nil {
+				return field.ErrorList{field.InternalError(fldPath, fmt.Errorf("error evaluating messageExpression: %w", err))}
+			}
+			message = messageEvalResult.Value().(string)
+		}
+
+		errorType := rule.errorType
+		if len(errorType) == 0 {
+			errorType = field.ErrorTypeInvalid
+		}
+		return field.ErrorList{&field.Error{Type: errorType, Detail: message, BadValue: value, Field: fldPath.String()}}
 	}
 	return nil
 }
@@ -105,13 +135,35 @@ func Expression[T any](ctx context.Context, op operation.Operation, fldPath *fie
 // Declarative Validation has access to all CEL libraries and options.
 var baseEnv = environment.MustBaseEnvSet(version.MajorMinor(math.MaxInt, math.MaxInt), true)
 
+type CompiledRule struct {
+	expression        *CompiledExpression
+	messageExpression *CompiledExpression
+	message           string
+	errorType         field.ErrorType
+}
+
+func (cr *CompiledRule) Check(fldPath *field.Path) field.ErrorList {
+	return append(cr.expression.Check(fldPath), cr.messageExpression.Check(fldPath)...)
+}
+
 type CompiledExpression struct {
+	name       string
 	expression string
 	prog       cel.Program
 	err        error
 	issues     *cel.Issues
 
 	usesOldSelf bool
+}
+
+func (ce *CompiledExpression) Check(fldPath *field.Path) field.ErrorList {
+	if ce.err != nil {
+		return field.ErrorList{field.InternalError(fldPath.Child(ce.name), fmt.Errorf("error initializing CEL environment:  %w", ce.err))}
+	}
+	if ce.issues != nil {
+		return field.ErrorList{field.InternalError(fldPath.Child(ce.name), fmt.Errorf("compilation error: %s", ce.issues))}
+	}
+	return nil
 }
 
 func (ce CompiledExpression) Error() error {
@@ -130,11 +182,21 @@ const (
 	// OldScopedVarName is the variable name assigned to the existing value of the locally scoped data element of a
 	// CEL validation expression.
 	OldScopedVarName = "oldSelf"
+
+	SubresourcesVarName = "subresources"
+
+	OptionsVarName = "options"
 )
 
 type activation struct {
 	self, oldSelf any
 	hasOldSelf    bool
+
+	subresources    []string
+	hasSubresources bool
+
+	options    []string
+	hasOptions bool
 }
 
 func (a *activation) ResolveName(name string) (interface{}, bool) {
@@ -143,6 +205,10 @@ func (a *activation) ResolveName(name string) (interface{}, bool) {
 		return a.self, true
 	case OldScopedVarName:
 		return a.oldSelf, a.hasOldSelf
+	case SubresourcesVarName:
+		return a.subresources, a.hasSubresources
+	case OptionsVarName:
+		return a.options, a.hasOptions
 	default:
 		return nil, false
 	}

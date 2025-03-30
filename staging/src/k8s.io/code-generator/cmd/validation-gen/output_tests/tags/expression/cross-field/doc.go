@@ -30,7 +30,7 @@ type Root struct {
 	Struct Struct `json:"struct"`
 }
 
-// +k8s:expression="self.s.size() < self.i"
+// +k8s:rule={"expression":"self.s.size() < self.i", "reason":"Invalid", "messageExpression":"'the length of s (%d) must be less than i (%d)'.format([self.s.size(), self.i])"}
 type Struct struct {
 	S string  `json:"s"`
 	I int     `json:"i"`
