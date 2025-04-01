@@ -23,7 +23,6 @@ package cross_field
 
 import (
 	context "context"
-	fmt "fmt"
 
 	operation "k8s.io/apimachinery/pkg/api/operation"
 	safe "k8s.io/apimachinery/pkg/api/safe"
@@ -37,11 +36,8 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *testscheme.Scheme) error {
-	scheme.AddValidationFunc((*Root)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}, subresources ...string) field.ErrorList {
-		if len(subresources) == 0 {
-			return Validate_Root(ctx, op, nil /* fldPath */, obj.(*Root), safe.Cast[*Root](oldObj))
-		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
+	scheme.AddValidationFunc((*Root)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
+		return Validate_Root(ctx, op, nil /* fldPath */, obj.(*Root), safe.Cast[*Root](oldObj))
 	})
 	return nil
 }
@@ -59,7 +55,7 @@ func Validate_Root(ctx context.Context, op operation.Operation, fldPath *field.P
 	return errs
 }
 
-var programForStruct = validate.NewRule("self.s.size() < self.i", "'the length of s (%d) must be less than i (%d)'.format([self.s.size(), self.i])", "", "Invalid")
+var programForStruct = validate.NewRule("self.s.size() < self.i", "", "", "Invalid")
 
 func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
 	// type Struct
