@@ -70,7 +70,7 @@ func LookupJSON(m reflect.StructField) (JSON, bool) {
 
 type options string
 
-// parse splits a struct field's json tag into its Name and
+// parse splits a struct field's json tag into its name and
 // comma-separated options.
 func parse(tag string) (string, options) {
 	if idx := strings.Index(tag, ","); idx != -1 {

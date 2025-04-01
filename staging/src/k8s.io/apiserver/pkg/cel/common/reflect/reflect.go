@@ -20,11 +20,11 @@ import (
 	"fmt"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apiserver/pkg/cel"
 	"k8s.io/apiserver/pkg/cel/common/reflect/internal"
 	"reflect"
-	"time"
 
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
@@ -32,7 +32,6 @@ import (
 )
 
 // TypedToVal converts Go values to CEL ref.Val types using reflection.
-// It's registered with the CEL environment using cel.CustomTypeAdapter.
 func TypedToVal(val interface{}) ref.Val {
 	if val == nil {
 		return types.NullValue
@@ -69,10 +68,10 @@ func TypedToVal(val interface{}) ref.Val {
 			return types.NullValue
 		}
 		return types.Bytes(typedVal)
-	case time.Time: // FIXME: Not used in the Kubernetes API and time.Time breaks DeepEquals. Remove?
-		return types.Timestamp{Time: typedVal}
-	case time.Duration: // FIXME: Not used in the Kubernetes API and time.Time breaks DeepEquals. Remove?
-		return types.Duration{Duration: typedVal}
+	case metav1.Time:
+		return types.Timestamp{Time: typedVal.Time}
+	case metav1.Duration:
+		return types.Duration{Duration: typedVal.Duration}
 	case intstr.IntOrString:
 		switch typedVal.Type {
 		case intstr.Int:
@@ -93,7 +92,7 @@ func TypedToVal(val interface{}) ref.Val {
 		return &mapVal{value: v}
 	case reflect.Struct:
 		return &structVal{value: v}
-	// TODO: Handle RawExtension
+	// TODO: Handle RawExtension?
 	// Match type aliases to primitives by kind
 	case reflect.Bool:
 		return types.Bool(v.Bool())
@@ -108,19 +107,11 @@ func TypedToVal(val interface{}) ref.Val {
 	}
 }
 
-var fieldCache = internal.NewFieldsCache()
+var fieldCache = internal.NewFieldLookupCache()
 
 // structVal wraps a struct as a CEL ref.Val and provides lazy access to fields via reflection.
 type structVal struct {
 	value reflect.Value // Kind is required to be: reflect.Struct
-}
-
-func (s *structVal) listFields() []internal.Field {
-	return fieldCache.List(s.value.Type(), s.value)
-}
-
-func (s *structVal) getField(name string) (reflect.Value, bool) {
-	return fieldCache.Get(s.value.Type(), s.value, name)
 }
 
 func (s *structVal) ConvertToNative(typeDesc reflect.Type) (interface{}, error) {
@@ -154,7 +145,6 @@ func (s *structVal) Type() ref.Type {
 	return s.objType()
 }
 
-// TODO: Decide how to represent object names.  Note for ConvertToUnstructured that we fallback to camelCase of field name if no json tag is present
 func (s *structVal) objType() *types.Type {
 	typeName := s.value.Type().Name()
 	if pkgPath := s.value.Type().PkgPath(); pkgPath != "" {
@@ -167,20 +157,8 @@ func (s *structVal) Value() interface{} {
 	return s.value.Interface()
 }
 
-func (s *structVal) Find(key ref.Val) (ref.Val, bool) {
-	keyStr, ok := key.(types.String)
-	if !ok {
-		return types.NewErr("invalid map key type: %v", key.Type()), true
-	}
-	fieldName := keyStr.Value().(string)
-	if e, ok := s.getField(fieldName); ok {
-		return TypedToVal(e.Interface()), true
-	}
-	return nil, false
-}
-
-func (s *structVal) Contains(key ref.Val) ref.Val {
-	v, found := s.Find(key)
+func (s *structVal) IsSet(field ref.Val) ref.Val {
+	v, found := s.lookupField(field)
 	if v != nil && types.IsUnknownOrError(v) {
 		return v
 	}
@@ -188,43 +166,24 @@ func (s *structVal) Contains(key ref.Val) ref.Val {
 }
 
 func (s *structVal) Get(key ref.Val) ref.Val {
-	v, found := s.Find(key)
+	v, found := s.lookupField(key)
 	if !found {
 		return types.NewErr("no such key: %v", key)
 	}
 	return v
 }
 
-// TODO: Remove?
-func (s *structVal) Size() ref.Val {
-	entries := s.listFields()
-	return types.Int(len(entries))
-}
-
-// TODO: Remove?
-func (s *structVal) Iterator() traits.Iterator {
-	t := s.value.Type()
-	fieldNames := make([]ref.Val, 0, t.NumField())
-	for _, e := range s.listFields() {
-		fieldNames = append(fieldNames, types.String(e.Name))
+func (s *structVal) lookupField(key ref.Val) (ref.Val, bool) {
+	keyStr, ok := key.(types.String)
+	if !ok {
+		return types.MaybeNoSuchOverloadErr(key), true
 	}
-	return &structIter{structVal: s, fieldNames: fieldNames}
-}
+	fieldName := keyStr.Value().(string)
 
-type structIter struct {
-	*structVal
-	fieldNames []ref.Val
-	idx        int
-}
-
-func (it *structIter) HasNext() ref.Val {
-	return types.Bool(it.idx < len(it.fieldNames))
-}
-
-func (it *structIter) Next() ref.Val {
-	key := it.fieldNames[it.idx]
-	it.idx++
-	return key
+	if e, ok := fieldCache.Get(s.value.Type(), s.value, fieldName); ok {
+		return TypedToVal(e.Interface()), true
+	}
+	return nil, false
 }
 
 type sliceVal struct {

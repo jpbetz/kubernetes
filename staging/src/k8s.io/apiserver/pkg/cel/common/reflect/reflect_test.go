@@ -59,7 +59,7 @@ type Complex struct {
 	Tags        []string           `json:"tags"`
 	Labels      map[string]string  `json:"labels"`
 	NestedObj   Nested             `json:"nestedObj"`
-	Timeout     time.Duration      `json:"timeout"`
+	Timeout     metav1.Duration    `json:"timeout"`
 	RawBytes    []byte             `json:"rawBytes"`
 	NilBytes    []byte             `json:"nilBytes"` // Always nil
 	ChildPtr    *Struct            `json:"childPtr"`
@@ -108,8 +108,8 @@ func TestTypedToVal(t *testing.T) {
 
 	structOmitEmpty1 := StructOmitEmpty{}
 
-	now := time.Now().Truncate(0)
-	duration1 := 5 * time.Second
+	now := metav1.Time{Time: time.Now().Truncate(0)}
+	duration1 := metav1.Duration{Duration: 5 * time.Second}
 
 	nested1 := Nested{Name: "nested1", Info: struct1}
 
@@ -143,7 +143,7 @@ func TestTypedToVal(t *testing.T) {
 		Tags:        []string{"x", "y"},
 		Labels:      map[string]string{"key3": "val3"},
 		NestedObj:   Nested{Name: "nested2", Info: struct2},
-		Timeout:     10 * time.Second,
+		Timeout:     metav1.Duration{Duration: 10 * time.Second},
 		RawBytes:    []byte("bytes2"),
 		NilBytes:    []byte{}, // Non-nil but empty
 		ChildPtr:    &struct1,
@@ -241,7 +241,7 @@ func TestTypedToVal(t *testing.T) {
 			name:       "struct: access with non-string key (get) (error)",
 			expression: "obj[1]",
 			activation: map[string]interface{}{"obj": struct1},
-			wantErr:    "invalid map key type: int",
+			wantErr:    "no such overload",
 		},
 		{
 			name:       "struct: check contains non-string key (error)",
@@ -379,17 +379,17 @@ func TestTypedToVal(t *testing.T) {
 		{
 			name:       "compare: time instances (different)",
 			expression: "t1 != t2",
-			activation: map[string]interface{}{"t1": now, "t2": now.Add(time.Nanosecond)},
+			activation: map[string]interface{}{"t1": now, "t2": metav1.Time{Time: now.Add(time.Nanosecond)}},
 		},
 		{
 			name:       "compare: duration instances (equal)",
 			expression: "d1 == d2",
-			activation: map[string]interface{}{"d1": duration1, "d2": 5 * time.Second},
+			activation: map[string]interface{}{"d1": duration1, "d2": metav1.Duration{Duration: 5 * time.Second}},
 		},
 		{
 			name:       "compare: duration instances (different)",
 			expression: "d1 != d2",
-			activation: map[string]interface{}{"d1": duration1, "d2": 6 * time.Second},
+			activation: map[string]interface{}{"d1": duration1, "d2": metav1.Duration{Duration: 6 * time.Second}},
 		},
 		{
 			name:       "compare: bytes instances (equal)",
@@ -811,7 +811,7 @@ func evalExpression(t *testing.T, env *cel.Env, expression string, activation ma
 func BenchmarkListFields(b *testing.B) {
 	struct1 := Struct{S: "hello", I: 10, B: true, F: 1.5}
 	struct2 := Struct{S: "world", I: 20, B: false, F: 2.5}
-	duration1 := 5 * time.Second
+	duration1 := metav1.Duration{Duration: 5 * time.Second}
 
 	nested1 := Nested{Name: "nested1", Info: struct1}
 
