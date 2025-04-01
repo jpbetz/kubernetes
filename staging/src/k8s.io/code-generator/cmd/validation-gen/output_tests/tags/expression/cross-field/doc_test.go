@@ -32,6 +32,9 @@ func Test(t *testing.T) {
 	st.Value(&Root{Struct: Struct{S: "xyz", I: 2}}).ExpectInvalid(
 		field.Invalid(field.NewPath("struct"), Struct{S: "xyz", I: 2, B: false, F: 0}, "the length of s (3) must be less than i (2)"),
 	)
+	st.Value(&Root{Struct: Struct{S: "xyz", I: 2}}).Opts([]string{"OptionX"}).ExpectInvalid(
+		field.Invalid(field.NewPath("struct"), Struct{S: "xyz", I: 2, B: false, F: 0}, "the length of s (3) must be less than i (2)"),
+	)
 }
 
 // 3019 ns/op (cost enabled), 556.0 ns/op (cost disabled)
@@ -40,7 +43,7 @@ func Test(t *testing.T) {
 func BenchmarkExpression(b *testing.B) {
 	obj := Struct{S: "x", I: 10}
 
-	// force compile and then reset to ignore compilation cost
+	// force compile and.hasSubresources then reset to ignore compilation cost
 	Validate_Struct(context.Background(), operation.Operation{Type: operation.Create}, nil, &obj, nil)
 	b.ResetTimer()
 

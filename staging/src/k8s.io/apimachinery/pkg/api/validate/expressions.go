@@ -99,13 +99,13 @@ func Expression[T any](ctx context.Context, op operation.Operation, fldPath *fie
 	if op.Type == operation.Update {
 		oldSelf = valuereflect.TypedToVal(oldValue)
 	}
+	// TODO: Should we skip create validation for expressions that use oldSelf like we do for CRDs?
 	a := &activation{
-		self:       self,
-		oldSelf:    oldSelf,
-		hasOldSelf: rule.expression.usesOldSelf,
-
-		// TODO: subresources
-		// TODO: options
+		self:         self,
+		oldSelf:      oldSelf,
+		hasOldSelf:   rule.expression.usesOldSelf,
+		subresources: op.Request.Subresources,
+		options:      op.Options,
 	}
 
 	evalResult, _, err := rule.expression.prog.ContextEval(ctx, a)
@@ -153,7 +153,9 @@ type CompiledExpression struct {
 	err        error
 	issues     *cel.Issues
 
-	usesOldSelf bool
+	usesOldSelf      bool
+	usesSubresources bool
+	usesOptions      bool
 }
 
 func (ce *CompiledExpression) Check(fldPath *field.Path) field.ErrorList {
@@ -192,11 +194,8 @@ type activation struct {
 	self, oldSelf any
 	hasOldSelf    bool
 
-	subresources    []string
-	hasSubresources bool
-
-	options    []string
-	hasOptions bool
+	subresources []string
+	options      []string
 }
 
 func (a *activation) ResolveName(name string) (interface{}, bool) {
@@ -206,9 +205,9 @@ func (a *activation) ResolveName(name string) (interface{}, bool) {
 	case OldScopedVarName:
 		return a.oldSelf, a.hasOldSelf
 	case SubresourcesVarName:
-		return a.subresources, a.hasSubresources
+		return a.subresources, true
 	case OptionsVarName:
-		return a.options, a.hasOptions
+		return a.options, true
 	default:
 		return nil, false
 	}
