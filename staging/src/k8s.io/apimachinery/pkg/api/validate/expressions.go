@@ -142,8 +142,12 @@ type CompiledRule struct {
 	errorType         field.ErrorType
 }
 
-func (cr *CompiledRule) Check(fldPath *field.Path) field.ErrorList {
-	return append(cr.expression.Check(fldPath), cr.messageExpression.Check(fldPath)...)
+func (cr *CompiledRule) Check(fldPath *field.Path) (errs field.ErrorList) {
+	errs = cr.expression.Check(fldPath)
+	if cr.messageExpression != nil {
+		errs = append(errs, cr.messageExpression.Check(fldPath)...)
+	}
+	return errs
 }
 
 type CompiledExpression struct {
