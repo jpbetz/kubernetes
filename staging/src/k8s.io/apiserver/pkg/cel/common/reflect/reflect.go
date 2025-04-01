@@ -22,8 +22,8 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apiserver/pkg/cel"
+	"k8s.io/apiserver/pkg/cel/common/reflect/internal"
 	"reflect"
-	"sync"
 	"time"
 
 	"github.com/google/cel-go/common/types"
@@ -108,27 +108,19 @@ func TypedToVal(val interface{}) ref.Val {
 	}
 }
 
+var fieldCache = internal.NewFieldsCache()
+
 // structVal wraps a struct as a CEL ref.Val and provides lazy access to fields via reflection.
 type structVal struct {
 	value reflect.Value // Kind is required to be: reflect.Struct
-
-	// FIXME: This temporary and not optimal.  There are a finite set of built-in types.
-	//       Most of the work performed here repeated for the same types over and over.
-	//       To improve this consider using something like fieldCache in staging/src/k8s.io/apimachinery/pkg/runtime/converter.go.
-	fieldsOnce sync.Once
-	fields     []fieldEntry
 }
 
-type fieldEntry struct {
-	name  string
-	value reflect.Value
+func (s *structVal) listFields() []internal.Field {
+	return fieldCache.List(s.value.Type(), s.value)
 }
 
-func (s *structVal) getFields() []fieldEntry {
-	s.fieldsOnce.Do(func() {
-		s.fields = listJSONFields(s.value.Type(), s.value)
-	})
-	return s.fields
+func (s *structVal) getField(name string) (reflect.Value, bool) {
+	return fieldCache.Get(s.value.Type(), s.value, name)
 }
 
 func (s *structVal) ConvertToNative(typeDesc reflect.Type) (interface{}, error) {
@@ -162,7 +154,7 @@ func (s *structVal) Type() ref.Type {
 	return s.objType()
 }
 
-// TODO: Decide now to represent object names.  Note for UnstructuredToVal
+// TODO: Decide how to represent object names.  Note for ConvertToUnstructured that we fallback to camelCase of field name if no json tag is present
 func (s *structVal) objType() *types.Type {
 	typeName := s.value.Type().Name()
 	if pkgPath := s.value.Type().PkgPath(); pkgPath != "" {
@@ -181,10 +173,8 @@ func (s *structVal) Find(key ref.Val) (ref.Val, bool) {
 		return types.NewErr("invalid map key type: %v", key.Type()), true
 	}
 	fieldName := keyStr.Value().(string)
-	for _, e := range s.getFields() {
-		if e.name == fieldName {
-			return TypedToVal(e.value.Interface()), true
-		}
+	if e, ok := s.getField(fieldName); ok {
+		return TypedToVal(e.Interface()), true
 	}
 	return nil, false
 }
@@ -207,7 +197,7 @@ func (s *structVal) Get(key ref.Val) ref.Val {
 
 // TODO: Remove?
 func (s *structVal) Size() ref.Val {
-	entries := s.getFields()
+	entries := s.listFields()
 	return types.Int(len(entries))
 }
 
@@ -215,8 +205,8 @@ func (s *structVal) Size() ref.Val {
 func (s *structVal) Iterator() traits.Iterator {
 	t := s.value.Type()
 	fieldNames := make([]ref.Val, 0, t.NumField())
-	for _, e := range s.getFields() {
-		fieldNames = append(fieldNames, types.String(e.name))
+	for _, e := range s.listFields() {
+		fieldNames = append(fieldNames, types.String(e.Name))
 	}
 	return &structIter{structVal: s, fieldNames: fieldNames}
 }

@@ -13,21 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-/*
-Copyright 2021 The Kubernetes Authors.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 
 package reflect
 
@@ -35,6 +20,7 @@ import (
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
+	"github.com/google/cel-go/common/types/traits"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -226,27 +212,27 @@ func TestTypedToVal(t *testing.T) {
 			activation: map[string]interface{}{"obj": zeroStructPtr},
 		},
 		{
-			name:       "struct: populated struct field access",
+			name:       "struct: populated struct jsonTag access",
 			expression: "obj.s == 'hello' && obj.i == 10 && obj.b == true && obj.f == 1.5",
 			activation: map[string]interface{}{"obj": struct1},
 		},
 		{
-			name:       "struct: populated struct pointer field access",
+			name:       "struct: populated struct pointer jsonTag access",
 			expression: "obj.s == 'hello' && obj.i == 10 && obj.b == true && obj.f == 1.5",
 			activation: map[string]interface{}{"obj": struct1Ptr},
 		},
 		{
-			name:       "struct: access omitempty field (has)",
+			name:       "struct: access omitempty jsonTag (has)",
 			expression: "!has(obj.s)",
 			activation: map[string]interface{}{"obj": structOmitEmpty1},
 		},
 		{
-			name:       "struct: access non-existent field (has)",
+			name:       "struct: access non-existent jsonTag (has)",
 			expression: "!has(obj.nonExistent)",
 			activation: map[string]interface{}{"obj": struct1},
 		},
 		{
-			name:       "struct: access non-existent field direct (error)",
+			name:       "struct: access non-existent jsonTag direct (error)",
 			expression: "obj.nonExistent",
 			activation: map[string]interface{}{"obj": struct1},
 			wantErr:    "no such key: nonExistent",
@@ -279,17 +265,17 @@ func TestTypedToVal(t *testing.T) {
 			activation: map[string]interface{}{"c": structOmitEmpty1},
 		},
 		{
-			name:       "struct: embedded field",
+			name:       "struct: embedded jsonTag",
 			expression: "c.metadata.name == 'complex1'",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:       "struct: embedded field: omitempty struct",
+			name:       "struct: embedded jsonTag: omitempty struct",
 			expression: "!has(c.metadata.labels)",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:       "struct: embedded field: omitempty field",
+			name:       "struct: embedded jsonTag: omitempty jsonTag",
 			expression: "!has(c.metadata)",
 			activation: map[string]interface{}{"c": structOmitEmpty1},
 		},
@@ -428,7 +414,7 @@ func TestTypedToVal(t *testing.T) {
 
 		// Nested Struct Tests
 		{
-			name:       "nested: access field",
+			name:       "nested: access jsonTag",
 			expression: "c.nestedObj.info.s == 'hello'",
 			activation: map[string]interface{}{"c": complex1},
 		},
@@ -638,95 +624,95 @@ func TestTypedToVal(t *testing.T) {
 
 		// Pointer Tests
 		{
-			name:       "pointer: access through non-nil pointer field",
+			name:       "pointer: access through non-nil pointer jsonTag",
 			expression: "c.childPtr.s == 'world'",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:       "pointer: compare non-nil pointer field",
+			name:       "pointer: compare non-nil pointer jsonTag",
 			expression: "c.childPtr == s2",
 			activation: map[string]interface{}{"c": complex1, "s2": struct2},
 		},
 		{
-			name:       "pointer: access through nil pointer field (error)",
+			name:       "pointer: access through nil pointer jsonTag (error)",
 			expression: "c.nilPtr.s",
 			activation: map[string]interface{}{"c": complex1},
-			wantErr:    "no such key: s", // Accessing field 's' on a null object
+			wantErr:    "no such key: s", // Accessing jsonTag 's' on a null object
 		},
 		{
-			name:       "pointer: check if nil pointer field is null",
+			name:       "pointer: check if nil pointer jsonTag is null",
 			expression: "c.nilPtr == null",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:       "pointer: has() on nil pointer field subfield",
+			name:       "pointer: has() on nil pointer jsonTag subfield",
 			expression: "!has(c.nilPtr.s)",
 			activation: map[string]interface{}{"c": complex1},
 		},
 
 		// Type Tests
 		{
-			name:       "type: string field",
+			name:       "type: string jsonTag",
 			expression: "type(obj.s) == string",
 			activation: map[string]interface{}{"obj": struct1},
 		},
 		{
-			name:       "type: int field",
+			name:       "type: int jsonTag",
 			expression: "type(obj.i) == int",
 			activation: map[string]interface{}{"obj": struct1},
 		},
 		{
-			name:       "type: bool field",
+			name:       "type: bool jsonTag",
 			expression: "type(obj.b) == bool",
 			activation: map[string]interface{}{"obj": struct1},
 		},
 		{
-			name:       "type: float field",
+			name:       "type: float jsonTag",
 			expression: "type(obj.f) == double",
 			activation: map[string]interface{}{"obj": struct1},
 		},
 		{
-			name:       "type: slice field",
+			name:       "type: slice jsonTag",
 			expression: "type(c.tags) == list",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:       "type: map field",
+			name:       "type: map jsonTag",
 			expression: "type(c.labels) == map",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:       "type: duration field",
+			name:       "type: duration jsonTag",
 			expression: "type(c.timeout) == google.protobuf.Duration",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:       "type: bytes field",
+			name:       "type: bytes jsonTag",
 			expression: "type(c.rawBytes) == bytes",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:       "type: nil pointer field",
+			name:       "type: nil pointer jsonTag",
 			expression: "type(c.nilPtr) == null_type",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:       "type: int32 field",
+			name:       "type: int32 jsonTag",
 			expression: "type(c.i32) == int",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:       "type: int64 field",
+			name:       "type: int64 jsonTag",
 			expression: "type(c.i64) == int",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:       "type: float32 field",
+			name:       "type: float32 jsonTag",
 			expression: "type(c.f32) == double",
 			activation: map[string]interface{}{"c": complex1},
 		},
 		{
-			name:       "type: enum field",
+			name:       "type: enum jsonTag",
 			expression: "type(c.enum) == string",
 			activation: map[string]interface{}{"c": complex1},
 		},
@@ -819,4 +805,43 @@ func evalExpression(t *testing.T, env *cel.Env, expression string, activation ma
 
 	out, _, err := prg.Eval(activation)
 	return out, err
+}
+
+// 40.21 ns/op
+func BenchmarkListFields(b *testing.B) {
+	struct1 := Struct{S: "hello", I: 10, B: true, F: 1.5}
+	struct2 := Struct{S: "world", I: 20, B: false, F: 2.5}
+	duration1 := 5 * time.Second
+
+	nested1 := Nested{Name: "nested1", Info: struct1}
+
+	complex1 := Complex{
+		TypeMeta:    metav1.TypeMeta{Kind: "Complex", APIVersion: "v1"},
+		ObjectMeta:  metav1.ObjectMeta{Name: "complex1"},
+		ID:          "c1",
+		Tags:        []string{"a", "b", "c"},
+		Labels:      map[string]string{"key1": "val1", "key2": "val2"},
+		NestedObj:   nested1,
+		Timeout:     duration1,
+		RawBytes:    []byte("bytes1"),
+		NilBytes:    nil,
+		ChildPtr:    &struct2,
+		NilPtr:      nil,
+		EmptySlice:  []int{},
+		NilSlice:    nil,
+		EmptyMap:    map[string]int{},
+		NilMap:      nil,
+		IntOrString: intstr.FromInt32(5),
+		Quantity:    resource.MustParse("100m"),
+		I32:         int32(32),
+		I64:         int64(64),
+		F32:         float32(32.5),
+		Enum:        EnumTypeA,
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		v := TypedToVal(complex1)
+		v.(traits.Mapper).Find(types.String("labels"))
+	}
 }
