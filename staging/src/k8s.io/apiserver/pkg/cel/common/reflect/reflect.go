@@ -87,12 +87,13 @@ func TypedToVal(val interface{}) ref.Val {
 
 	switch v.Kind() {
 	case reflect.Slice:
+		// TODO: Fully support listType=map and listType=set
+		//       See unstructuredMapList and unstructuredSetList
 		return &sliceVal{value: v}
 	case reflect.Map:
 		return &mapVal{value: v}
 	case reflect.Struct:
 		return &structVal{value: v}
-	// TODO: Handle RawExtension?
 	// Match type aliases to primitives by kind
 	case reflect.Bool:
 		return types.Bool(v.Bool())

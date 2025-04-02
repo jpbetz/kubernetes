@@ -27,7 +27,7 @@ import (
 // including the handling of name, inline, omit and omitempty.
 //
 // This cache expects a cache hit heavy workload. It precomputes data for fast lookup
-// using reflection and JSON tag parsing. Then it loads the information into a
+// using reflection and JSON tag parsing. Then, it loads the information into a
 // copy-on-write map for fast read access.
 func NewFieldLookupCache() *FieldLookupCache {
 	cache := &FieldLookupCache{}

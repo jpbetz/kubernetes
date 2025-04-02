@@ -26,7 +26,7 @@ import (
 type SimpleStruct struct {
 	Name string `json:"name"`
 	Age  int    `json:"age,omitempty"`
-	City string `json:"-"` // Ignored field
+	City string `json:"-"`
 }
 
 type EmbeddedStruct struct {
@@ -59,15 +59,42 @@ func TestFieldsCacheMatchesJsonMarshal(t *testing.T) {
 		name  string
 		input interface{} // must be a struct
 	}{
-		{name: "Simple struct", input: SimpleStruct{Name: "Alice", Age: 30, City: "London"}},
-		{name: "Simple struct with omitempty zero", input: SimpleStruct{Name: "Bob", City: "Paris"}},
-		{name: "Complex struct - std lib behavior", input: ComplexStruct{SimpleStruct: SimpleStruct{Name: "Charlie", Age: 25}, Details: detailsInstance, ZipCode: "12345", Country: &country, Metadata: meta}},
-		{name: "Complex struct with omitempty zero", input: ComplexStruct{SimpleStruct: SimpleStruct{Name: "David"}, Details: EmbeddedStruct{Street: "Side St", Number: 456}, ZipCode: "67890"}},
-		{name: "Truly inline struct (no name)", input: TrulyInlineStruct{EmbeddedStruct: EmbeddedStruct{Street: "Inline St", Number: 789}, PostCode: "INL INE"}},
-		{name: "Pointer to Struct", input: &ComplexStruct{ZipCode: "PtrZip", Details: detailsInstance, Metadata: map[string]interface{}{"ptrKey": true}}},
-		{name: "Struct with nil pointer field", input: ComplexStruct{ZipCode: "NilPtrTest", Country: nil}},
-		{name: "Empty Struct", input: SimpleStruct{}},
-		{name: "Nil Pointer Input", input: (*SimpleStruct)(nil)}, // Test nil pointer itself
+		{
+			name:  "simple struct",
+			input: SimpleStruct{Name: "Alice", Age: 30, City: "London"},
+		},
+		{
+			name:  "simple struct with omitempty zero",
+			input: SimpleStruct{Name: "Bob", City: "Paris"},
+		},
+		{
+			name:  "complex struct",
+			input: ComplexStruct{SimpleStruct: SimpleStruct{Name: "Charlie", Age: 25}, Details: detailsInstance, ZipCode: "12345", Country: &country, Metadata: meta},
+		},
+		{
+			name:  "complex struct with omitempty zero",
+			input: ComplexStruct{SimpleStruct: SimpleStruct{Name: "David"}, Details: EmbeddedStruct{Street: "Side St", Number: 456}, ZipCode: "67890"},
+		},
+		{
+			name:  "inline struct",
+			input: TrulyInlineStruct{EmbeddedStruct: EmbeddedStruct{Street: "Inline St", Number: 789}, PostCode: "INL INE"},
+		},
+		{
+			name:  "pointer to struct",
+			input: &ComplexStruct{ZipCode: "PtrZip", Details: detailsInstance, Metadata: map[string]interface{}{"ptrKey": true}},
+		},
+		{
+			name:  "struct with nil pointer field",
+			input: ComplexStruct{ZipCode: "NilPtrTest", Country: nil},
+		},
+		{
+			name:  "empty struct",
+			input: SimpleStruct{},
+		},
+		{
+			name:  "nil pointer input",
+			input: (*SimpleStruct)(nil),
+		},
 	}
 
 	for _, tc := range testCases {
@@ -92,33 +119,33 @@ func TestFieldsCacheMatchesJsonMarshal(t *testing.T) {
 			for k := range cacheFields {
 				cacheNames[k] = struct{}{}
 			}
-			stdNames := make(map[string]struct{}, len(marshalFields))
+			marshalNames := make(map[string]struct{}, len(marshalFields))
 			for k := range marshalFields {
-				stdNames[k] = struct{}{}
+				marshalNames[k] = struct{}{}
 			}
 
-			if !maps.Equal(cacheNames, stdNames) {
+			if !maps.Equal(cacheNames, marshalNames) {
 				missingInCache := []string{}
-				for name := range stdNames {
+				for name := range marshalNames {
 					if _, ok := cacheNames[name]; !ok {
 						missingInCache = append(missingInCache, name)
 					}
 				}
 				missingInMarshal := []string{}
 				for name := range cacheNames {
-					if _, ok := stdNames[name]; !ok {
+					if _, ok := marshalNames[name]; !ok {
 						missingInMarshal = append(missingInMarshal, name)
 					}
 				}
 				t.Errorf("nameValue name mismatch:\n  cache: %v\n  marshal: %v", missingInCache, missingInMarshal)
 			}
 
-			for name, stdVal := range marshalFields {
+			for name, marshalVal := range marshalFields {
 				cacheVal, ok := cacheFields[name]
 				if !ok {
 					continue
 				}
-				compareValues(t, name, cacheVal, stdVal)
+				compareValues(t, name, cacheVal, marshalVal)
 			}
 		})
 	}
@@ -147,13 +174,11 @@ func getCacheFields(t *testing.T, cache *FieldLookupCache, input interface{}) ma
 	return cacheFieldsMap
 }
 
-// nameValue is a JSON field name/value pair.
 type nameValue struct {
 	name  string
 	value reflect.Value
 }
 
-// list returns the fields in the struct.
 func (fc *FieldLookupCache) list(structType reflect.Type, structVal reflect.Value) []nameValue {
 	entries := make([]nameValue, 0, structVal.NumField())
 	for _, f := range fc.lookup(structType) {
@@ -183,15 +208,15 @@ func getMarshalFields(t *testing.T, input interface{}) map[string]interface{} {
 		return nil
 	}
 
-	var stdJSONMap map[string]interface{}
-	err = json.Unmarshal(b, &stdJSONMap)
+	var result map[string]interface{}
+	err = json.Unmarshal(b, &result)
 	if err != nil {
 		t.Fatalf("json.Unmarshal into map failed: %v", err)
 	}
-	return stdJSONMap
+	return result
 }
 
-func compareValues(t *testing.T, name string, cacheVal reflect.Value, stdJSONVal interface{}) {
+func compareValues(t *testing.T, name string, cacheVal reflect.Value, marshalVal interface{}) {
 	t.Helper()
 
 	b, err := json.Marshal(cacheVal.Interface())
@@ -206,7 +231,7 @@ func compareValues(t *testing.T, name string, cacheVal reflect.Value, stdJSONVal
 		return
 	}
 
-	b, err = json.Marshal(stdJSONVal)
+	b, err = json.Marshal(marshalVal)
 	if err != nil {
 		t.Errorf("value comparison failed for field '%s': error marshalling JSON map value: %v", name, err)
 		return
@@ -229,7 +254,7 @@ func BenchmarkFieldsCache(b *testing.B) {
 	benchVal := reflect.ValueOf(ComplexStruct{
 		SimpleStruct: SimpleStruct{Name: "Benchmark", Age: 100},
 		Details:      EmbeddedStruct{Street: "Bench St", Number: 99},
-		ZipCode:      "B3NCH",
+		ZipCode:      "12345",
 	})
 	benchTyp := reflect.TypeOf(ComplexStruct{})
 	_ = benchCache.lookup(benchTyp) // warm cache
