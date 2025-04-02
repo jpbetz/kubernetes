@@ -842,6 +842,6 @@ func BenchmarkListFields(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		v := TypedToVal(complex1)
-		v.(traits.Mapper).Find(types.String("labels"))
+		v.(traits.Indexer).Get(types.String("labels"))
 	}
 }
