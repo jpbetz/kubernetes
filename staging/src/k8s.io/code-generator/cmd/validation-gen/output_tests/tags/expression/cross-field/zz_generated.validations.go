@@ -55,7 +55,7 @@ func Validate_Root(ctx context.Context, op operation.Operation, fldPath *field.P
 	return errs
 }
 
-var programForStruct = validate.NewRule("self.s.size() < self.i", "", "", "Invalid")
+var programForStruct = validate.NewRule("!options.OptionX || self.s.size() < self.i", "'the length of s (%d) must be less than i (%d)'.format([self.s.size(), self.i])", "", "Invalid")
 
 func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
 	// type Struct

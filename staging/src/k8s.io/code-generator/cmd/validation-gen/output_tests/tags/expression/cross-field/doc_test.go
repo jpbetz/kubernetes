@@ -29,9 +29,8 @@ func Test(t *testing.T) {
 
 	st.Value(&Root{Struct: Struct{S: "x", I: 10}}).ExpectValid()
 
-	st.Value(&Root{Struct: Struct{S: "xyz", I: 2}}).ExpectInvalid(
-		field.Invalid(field.NewPath("struct"), Struct{S: "xyz", I: 2, B: false, F: 0}, "the length of s (3) must be less than i (2)"),
-	)
+	st.Value(&Root{Struct: Struct{S: "xyz", I: 2}}).ExpectValid()
+
 	st.Value(&Root{Struct: Struct{S: "xyz", I: 2}}).Opts([]string{"OptionX"}).ExpectInvalid(
 		field.Invalid(field.NewPath("struct"), Struct{S: "xyz", I: 2, B: false, F: 0}, "the length of s (3) must be less than i (2)"),
 	)

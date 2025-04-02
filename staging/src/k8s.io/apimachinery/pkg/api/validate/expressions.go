@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
+	"github.com/google/cel-go/common/types/ref"
+	"github.com/google/cel-go/common/types/traits"
 	"github.com/google/cel-go/interpreter"
 	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -29,13 +31,14 @@ import (
 	valuereflect "k8s.io/apiserver/pkg/cel/common/reflect"
 	"k8s.io/apiserver/pkg/cel/environment"
 	"math"
+	"reflect"
 )
 
 func NewRule(expression, messageExpression, message, errorType string) *CompiledRule {
 	result := &CompiledRule{
 		expression: Compile(expression, cel.BoolType),
 		message:    message,
-		errorType:  field.ErrorType(errorType),
+		errorType:  errorType,
 	}
 	if len(messageExpression) > 0 {
 		result.messageExpression = Compile(messageExpression, cel.StringType)
@@ -52,7 +55,7 @@ func Compile(expression string, outputType *types.Type) *CompiledExpression {
 		cel.Variable(ScopedVarName, cel.DynType),
 		cel.Variable(OldScopedVarName, cel.DynType),
 		cel.Variable(SubresourcesVarName, cel.ListType(cel.StringType)),
-		cel.Variable(OptionsVarName, cel.ListType(cel.StringType)),
+		cel.Variable(OptionsVarName, cel.MapType(cel.StringType, cel.BoolType)),
 	)
 	if err != nil {
 		result.err = err
@@ -95,7 +98,7 @@ func Expression[T any](ctx context.Context, op operation.Operation, fldPath *fie
 	}
 
 	self := valuereflect.TypedToVal(value)
-	var oldSelf any
+	var oldSelf ref.Val
 	if op.Type == operation.Update {
 		oldSelf = valuereflect.TypedToVal(oldValue)
 	}
@@ -105,7 +108,7 @@ func Expression[T any](ctx context.Context, op operation.Operation, fldPath *fie
 		oldSelf:      oldSelf,
 		hasOldSelf:   rule.expression.usesOldSelf,
 		subresources: op.Request.Subresources,
-		options:      op.Options,
+		options:      OptionsVal(op.Options),
 	}
 
 	evalResult, _, err := rule.expression.prog.ContextEval(ctx, a)
@@ -123,11 +126,18 @@ func Expression[T any](ctx context.Context, op operation.Operation, fldPath *fie
 			message = messageEvalResult.Value().(string)
 		}
 
-		errorType := rule.errorType
-		if len(errorType) == 0 {
-			errorType = field.ErrorTypeInvalid
+		var fieldError field.ErrorType
+		if len(rule.errorType) > 0 {
+			fieldError, err = toErrorType(rule.errorType)
+		} else {
+			fieldError = field.ErrorTypeInvalid
 		}
-		return field.ErrorList{&field.Error{Type: errorType, Detail: message, BadValue: value, Field: fldPath.String()}}
+		return field.ErrorList{&field.Error{
+			Type:     fieldError,
+			Field:    fldPath.String(),
+			BadValue: value,
+			Detail:   message},
+		}
 	}
 	return nil
 }
@@ -139,7 +149,7 @@ type CompiledRule struct {
 	expression        *CompiledExpression
 	messageExpression *CompiledExpression
 	message           string
-	errorType         field.ErrorType
+	errorType         string
 }
 
 func (cr *CompiledRule) Check(fldPath *field.Path) (errs field.ErrorList) {
@@ -195,11 +205,11 @@ const (
 )
 
 type activation struct {
-	self, oldSelf any
+	self, oldSelf ref.Val
 	hasOldSelf    bool
 
 	subresources []string
-	options      []string
+	options      ref.Val
 }
 
 func (a *activation) ResolveName(name string) (interface{}, bool) {
@@ -219,4 +229,88 @@ func (a *activation) ResolveName(name string) (interface{}, bool) {
 
 func (a *activation) Parent() interpreter.Activation {
 	return nil
+}
+
+// TODO: Ideally we shouldn't need this.  But changing the enum values of field.ErrorType is breaking.
+//	     Maybe we should add this as a utility function.
+
+func toErrorType(reason string) (field.ErrorType, error) {
+	switch reason {
+	case "NotFound":
+		return field.ErrorTypeNotFound, nil
+	case "Required":
+		return field.ErrorTypeRequired, nil
+	case "Duplicate":
+		return field.ErrorTypeDuplicate, nil
+	case "Invalid":
+		return field.ErrorTypeInvalid, nil
+	case "NotSupported":
+		return field.ErrorTypeNotSupported, nil
+	case "Forbidden":
+		return field.ErrorTypeForbidden, nil
+	case "TooLong":
+		return field.ErrorTypeTooLong, nil
+	case "TooMany":
+		return field.ErrorTypeTooMany, nil
+	case "Internal":
+		return field.ErrorTypeInternal, nil
+	case "TypeInvalid":
+		return field.ErrorTypeTypeInvalid, nil
+	default:
+		return "", fmt.Errorf("unrecognized error reason: %s", reason)
+	}
+}
+
+// OptionsVal wraps an options slice as a CEL map of string->boolean.
+// The map values are true for options in the slice and false otherwise.
+func OptionsVal(slice []string) ref.Val {
+	return optionsVal(slice)
+}
+
+type optionsVal []string
+
+func (s optionsVal) ConvertToNative(typeDesc reflect.Type) (any, error) {
+	return s, nil
+}
+
+func (s optionsVal) ConvertToType(t ref.Type) ref.Val {
+	if t.TypeName() == "map" {
+		return s
+	}
+	return types.NewErr("type conversion error from map to '%s'", t.TypeName())
+}
+
+func (s optionsVal) Equal(other ref.Val) ref.Val {
+	// TODO: Does equality make sense for this map? Should we just return "not implemented"?
+	o, ok := other.(traits.Mapper)
+	if !ok {
+		return types.False
+	}
+	if o.Size() != types.Int(len(s)) {
+		return types.False
+	}
+	for _, k := range s {
+		v := o.Get(types.String(k))
+		if v != types.True {
+			return types.False
+		}
+	}
+	return types.True
+}
+
+func (s optionsVal) Type() ref.Type {
+	return types.NewMapType(types.StringType, types.BoolType)
+}
+
+func (s optionsVal) Value() any {
+	return s
+}
+
+func (s optionsVal) Get(key ref.Val) ref.Val {
+	for _, v := range s {
+		if v == key.Value() {
+			return types.True
+		}
+	}
+	return types.False
 }
