@@ -17,14 +17,27 @@ limitations under the License.
 package reflect
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/common/types/traits"
+	"github.com/stretchr/testify/assert"
+	v1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apiserver/pkg/cel/common"
 	"k8s.io/apiserver/pkg/cel/library"
+	"k8s.io/apiserver/pkg/cel/openapi"
+	"k8s.io/client-go/openapi/openapitest"
+	"k8s.io/kube-openapi/pkg/spec3"
+	"k8s.io/utils/ptr"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -807,7 +820,143 @@ func evalExpression(t *testing.T, env *cel.Env, expression string, activation ma
 	return out, err
 }
 
-// 40.21 ns/op
+func TestTypedVsUnstructured(t *testing.T) {
+	// TODO: This test strategy only works if we make TypedToVal work like UnstructuredToVal.
+	//       Today the big difference is that UnstructureddToVal uses the map type for structs.
+	// TODO: build out test grid (or use fuzzer)
+	complexOriginal := v1.Deployment{
+		Spec: v1.DeploymentSpec{
+			Replicas: ptr.To[int32](1),
+		},
+	}
+	gvk := schema.GroupVersionKind{Group: "apps", Version: "v1", Kind: "Deployment"}
+
+	client := openapitest.NewEmbeddedFileClient()
+	paths, err := client.Paths()
+	if err != nil {
+		t.Fatalf("Failed to get paths: %v", err)
+	}
+	schBytes, err := paths[resourcePathFromGV(gvk.GroupVersion())].Schema(runtime.ContentTypeJSON)
+	if err != nil {
+		utilruntime.HandleError(fmt.Errorf("failed to get schema for %v: %w", gvk, err))
+	}
+
+	var sch spec3.OpenAPI
+	if err := json.Unmarshal(schBytes, &sch); err != nil {
+		utilruntime.HandleError(fmt.Errorf("failed to unmarshal schema for %v: %w", gvk, err))
+	}
+	kindSchema, ok := sch.Components.Schemas[fmt.Sprintf("io.k8s.api.%s.%s.%s", gvk.Group, gvk.Version, gvk.Kind)]
+	if !ok {
+		t.Fatalf("Kind %s not found in schema", gvk.Kind)
+	}
+
+	unstructuredMap, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&complexOriginal)
+	if err != nil {
+		t.Fatalf("Failed to convert struct to unstructured: %v", err)
+	}
+
+	typedVal := TypedToVal(complexOriginal)
+	unstructuredCelVal := common.UnstructuredToVal(unstructuredMap, &openapi.Schema{Schema: kindSchema})
+
+	compareRefVals(t, "root", typedVal, unstructuredCelVal)
+
+}
+
+// compareRefVals compares two ref.Val instances recursively, using various methods.
+func compareRefVals(t *testing.T, path string, val1, val2 ref.Val) {
+	t.Helper()
+
+	err1, isErr1 := val1.(error)
+	err2, isErr2 := val2.(error)
+	if isErr1 || isErr2 {
+		assert.Equal(t, isErr1, isErr2, "Path: %s - Error presence mismatch", path)
+		if isErr1 && isErr2 {
+			assert.Equal(t, err1.Error(), err2.Error(), "Path: %s - Error message mismatch", path)
+		}
+		return
+	}
+
+	//assert.True(t, val1.Type() == val2.Type() || val1.Type().TypeName() == val2.Type().TypeName(),
+	//	"Path: %s - Type mismatch: %v (%s) != %v (%s)", path, val1.Type(), val1.Type().TypeName(), val2.Type(), val2.Type().TypeName())
+
+	//eqResult := val1.Equal(val2)
+	//assert.Equal(t, types.True, eqResult, "Path: %s - Equal() returned false or error: %v", path, eqResult)
+
+	//_, isNativeComparable := val1.(types.Bool) // Use one primitive type as check
+	//if isNativeComparable {
+	//	assert.True(t, apiequality.Semantic.DeepEqual(val1.Value(), val2.Value()),
+	//		"Path: %s - Value() mismatch for primitive: %v != %v", path, val1.Value(), val2.Value())
+	//}
+
+	switch tv1 := val1.(type) {
+	case traits.Lister:
+		tv2, ok := val2.(traits.Lister)
+		assert.True(t, ok, "Path: %s - Type mismatch: val1 is Lister, val2 is not", path)
+		if !ok {
+			return
+		}
+
+		// Compare Size()
+		assert.Equal(t, tv1.Size(), tv2.Size(), "Path: %s - Size() mismatch for list", path)
+		size := int(tv1.Size().(types.Int))
+
+		// Compare elements using Get(i)
+		for i := 0; i < size; i++ {
+			idx := types.Int(i)
+			elem1 := tv1.Get(idx)
+			elem2 := tv2.Get(idx)
+			compareRefVals(t, path+fmt.Sprintf("[%d]", i), elem1, elem2)
+		}
+
+	case traits.Mapper:
+		tv2, ok := val2.(traits.Mapper)
+		assert.True(t, ok, "Path: %s - Type mismatch: val1 is Mapper, val2 is not", path)
+		if !ok {
+			return
+		}
+
+		// Compare Size()
+		assert.Equal(t, tv1.Size(), tv2.Size(), "Path: %s - Size() mismatch for map/struct", path)
+
+		// Compare using Iterator() and Get(key)
+		it1 := tv1.Iterator()
+		keys1 := make(map[string]ref.Val)
+		for it1.HasNext() == types.True {
+			key := it1.Next()
+			keyStr, ok := key.(types.String)
+			assert.True(t, ok, "Path: %s - Map key is not a string: %v", path, key)
+			if !ok {
+				continue
+			}
+			keys1[string(keyStr)] = tv1.Get(key)
+		}
+
+		it2 := tv2.Iterator()
+		keys2 := make(map[string]ref.Val)
+		for it2.HasNext() == types.True {
+			key := it2.Next()
+			keyStr, ok := key.(types.String)
+			assert.True(t, ok, "Path: %s - Map key is not a string: %v", path, key)
+			if !ok {
+				continue
+			}
+			keys2[string(keyStr)] = tv2.Get(key)
+		}
+
+		// Check if key sets are equal
+		assert.Equal(t, reflect.ValueOf(keys1).MapKeys(), reflect.ValueOf(keys2).MapKeys(), "Path: %s - Key sets differ", path)
+
+		// Compare values for each key
+		for k, v1 := range keys1 {
+			v2, found := keys2[k]
+			assert.True(t, found, "Path: %s - Key '%s' found in val1 map/struct but not in val2", path, k)
+			if found {
+				compareRefVals(t, path+fmt.Sprintf(".%s", k), v1, v2)
+			}
+		}
+	}
+}
+
 func BenchmarkListFields(b *testing.B) {
 	struct1 := Struct{S: "hello", I: 10, B: true, F: 1.5}
 	struct2 := Struct{S: "world", I: 20, B: false, F: 2.5}
@@ -844,4 +993,14 @@ func BenchmarkListFields(b *testing.B) {
 		v := TypedToVal(complex1)
 		v.(traits.Indexer).Get(types.String("labels"))
 	}
+}
+
+func resourcePathFromGV(gv schema.GroupVersion) string {
+	var resourcePath string
+	if len(gv.Group) == 0 {
+		resourcePath = fmt.Sprintf("api/%s", gv.Version)
+	} else {
+		resourcePath = fmt.Sprintf("apis/%s/%s", gv.Group, gv.Version)
+	}
+	return resourcePath
 }
