@@ -16,6 +16,8 @@ limitations under the License.
 
 package operation
 
+import "slices"
+
 // Operation provides contextual information about a validation request and the API
 // operation being validated.
 // This type is intended for use with generate validation code and may be enhanced
@@ -47,12 +49,7 @@ type Operation struct {
 
 // HasOption returns true if the given string is in the Options slice.
 func (o Operation) HasOption(option string) bool {
-	for _, opt := range o.Options {
-		if opt == option {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(o.Options, option)
 }
 
 // Request provides information about the request being validated.
