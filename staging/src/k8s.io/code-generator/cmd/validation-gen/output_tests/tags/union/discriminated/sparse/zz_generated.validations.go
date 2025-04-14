@@ -23,6 +23,7 @@ package sparse
 
 import (
 	context "context"
+<<<<<<< HEAD
 
 	operation "k8s.io/apimachinery/pkg/api/operation"
 	safe "k8s.io/apimachinery/pkg/api/safe"
@@ -38,6 +39,28 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*Struct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
 		return Validate_Struct(ctx, op, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
+||||||| parent of d87b485aa7a (Add test for sparse discriminated unions)
+=======
+	fmt "fmt"
+
+	operation "k8s.io/apimachinery/pkg/api/operation"
+	safe "k8s.io/apimachinery/pkg/api/safe"
+	validate "k8s.io/apimachinery/pkg/api/validate"
+	field "k8s.io/apimachinery/pkg/util/validation/field"
+	testscheme "k8s.io/code-generator/cmd/validation-gen/testscheme"
+)
+
+func init() { localSchemeBuilder.Register(RegisterValidations) }
+
+// RegisterValidations adds validation functions to the given scheme.
+// Public to allow building arbitrary schemes.
+func RegisterValidations(scheme *testscheme.Scheme) error {
+	scheme.AddValidationFunc((*Struct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			return Validate_Struct(ctx, op, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
+>>>>>>> d87b485aa7a (Add test for sparse discriminated unions)
 	})
 	return nil
 }
