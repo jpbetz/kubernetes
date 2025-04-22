@@ -469,7 +469,7 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 		context.Parent = t
 		context.Type = t.Underlying
 	}
-	if validations, err := td.validator.ExtractValidations(context, t.CommentLines); err != nil {
+	if validations, err := td.validator.ExtractValidations(context, "+k8s:", t.CommentLines); err != nil {
 		return nil, fmt.Errorf("%v: %w", fldPath, err)
 	} else if !validations.Empty() {
 		klog.V(5).InfoS("found type-attached validations", "n", validations.Len())
@@ -637,7 +637,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			Member: &memb,
 			Path:   childPath,
 		}
-		if validations, err := td.validator.ExtractValidations(context, memb.CommentLines); err != nil {
+		if validations, err := td.validator.ExtractValidations(context, "+k8s:", memb.CommentLines); err != nil {
 			return fmt.Errorf("field %s: %w", childPath.String(), err)
 		} else if !validations.Empty() {
 			klog.V(5).InfoS("found field-attached validations", "n", validations.Len())
