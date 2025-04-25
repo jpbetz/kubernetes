@@ -601,6 +601,9 @@ func (t *unstructuredMap) Equal(other ref.Val) ref.Val {
 		return types.False
 	}
 	for key, value := range t.value {
+		if value == nil {
+			continue
+		}
 		if propSchema, ok := t.propSchema(key); ok {
 			ov, found := oMap.Find(types.String(key))
 			if !found {

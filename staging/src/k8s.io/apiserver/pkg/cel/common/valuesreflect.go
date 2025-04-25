@@ -23,7 +23,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"k8s.io/apiserver/pkg/cel"
 	"reflect"
 	"sigs.k8s.io/structured-merge-diff/v4/value"
 
@@ -84,7 +83,8 @@ func TypedToVal(val interface{}) ref.Val {
 			return types.String(typedVal.StrVal)
 		}
 	case resource.Quantity:
-		return cel.Quantity{Quantity: &typedVal}
+		// For compatibility with CRD Validation rules, represent quantity as a plain string.
+		return types.String(typedVal.String())
 	case json.Marshaler:
 		// All JSON marshaled types must be mapped to a CEL type in the above switch.
 		// This ensures that all types are purposefully mapped to CEL types.
