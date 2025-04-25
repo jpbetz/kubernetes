@@ -75,17 +75,63 @@ type OtherStruct2 struct {
 }
 
 type Element1 struct {
+	// +k8s:ratcheting=1
+	// +k8s:validateFalse="field TypeMeta"
 	TypeMeta int
+
 	// +k8s:ratcheting=1
 	// +k8s:optional
-	// +k8s:validateFalse="type Element1"
-	Value *Element1 `json:"value"`
+	// +k8s:validateFalse="field Element1.F1"
+	F1 *Element1 `json:"f1"`
+
+	// +k8s:ratcheting=1
+	// +k8s:optional
+	// +k8s:validateFalse="field Element1.F2"
+	F2 *Element1 `json:"f2"`
+
+	// +k8s:ratcheting=1
+	// +k8s:optional
+	// +k8s:validateFalse="field Element1.F3"
+	F3 *Element1 `json:"f3"`
+
+	// +k8s:ratcheting=1
+	// +k8s:optional
+	// +k8s:validateFalse="field Element1.F4"
+	F4 *Element1 `json:"f4"`
+
+	// +k8s:ratcheting=1
+	// +k8s:optional
+	// +k8s:validateFalse="field Element1.F5"
+	F5 *Element1 `json:"f5"`
 }
 
 type Element2 struct {
+	// +k8s:ratcheting=2
+	// +k8s:validateFalse="field TypeMeta"
 	TypeMeta int
+
 	// +k8s:ratcheting=2
 	// +k8s:optional
-	// +k8s:validateFalse="type Element2"
-	Value *Element2 `json:"value"`
+	// +k8s:validateFalse="field Element2.F1"
+	F1 *Element2 `json:"f1"`
+
+	// +k8s:ratcheting=2
+	// +k8s:optional
+	// +k8s:validateFalse="field Element2.F2"
+	F2 *Element2 `json:"f2"`
+
+	// +k8s:ratcheting=2
+	// +k8s:optional
+	// +k8s:validateFalse="field Element2.F3"
+	F3 *Element2 `json:"f3"`
+
+	// +k8s:ratcheting=2
+	// +k8s:optional
+	// +k8s:validateFalse="field Element2.F4"
+	F4 *Element2 `json:"f4"`
+
+	// +k8s:ratcheting=2
+	// +k8s:optional
+	// +k8s:validateFalse="field Element2.F5"
+	F5 *Element2 `json:"f5"`
 }

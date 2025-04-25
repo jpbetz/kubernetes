@@ -8,239 +8,185 @@ import (
 	operation "k8s.io/apimachinery/pkg/api/operation"
 )
 
-// createElement1 creates an Element1 with specified nesting depth
-func createElement1(depth int) *Element1 {
-	if depth <= 0 {
-		return &Element1{
-			TypeMeta: 1,
-			Value:    nil,
-		}
-	}
-
-	return &Element1{
-		TypeMeta: 1,
-		Value:    createElement1(depth - 1),
-	}
-}
-
-// createElement2 creates an Element2 with specified nesting depth
-func createElement2(depth int) *Element2 {
-	if depth <= 0 {
-		return &Element2{
-			TypeMeta: 1,
-			Value:    nil,
-		}
-	}
-
-	return &Element2{
-		TypeMeta: 1,
-		Value:    createElement2(depth - 1),
-	}
-}
-
-// createModifiedElement1 creates a modified version of an Element1
-// The modification occurs at the specified modifyAtDepth
-func createModifiedElement1(base *Element1, currentDepth, modifyAtDepth int) *Element1 {
-	if base == nil {
+func createElement1(degree, nodeCount int, modifyLeaf bool) *Element1 {
+	if nodeCount <= 0 {
 		return nil
 	}
 
+	v := 1
+	if nodeCount == 1 && modifyLeaf {
+		v = 2
+	}
 	result := &Element1{
-		TypeMeta: base.TypeMeta,
+		TypeMeta: v,
+	}
+	nodeCount--
+	if nodeCount == 0 {
+		return result
 	}
 
-	// If we're at the depth to modify
-	if currentDepth == modifyAtDepth {
-		// Modify the TypeMeta
-		result.TypeMeta = base.TypeMeta + 1
-	}
+	perChild := nodeCount / degree
+	remainder := nodeCount % degree
 
-	// Recursively handle the Value field
-	if base.Value != nil {
-		result.Value = createModifiedElement1(base.Value, currentDepth+1, modifyAtDepth)
+	for i := 0; i < degree; i++ {
+		childNodeCount := perChild
+		if i == 0 {
+			childNodeCount += remainder
+		}
+		if childNodeCount <= 0 {
+			continue
+		}
+		switch i {
+		case 0:
+			result.F1 = createElement1(degree, childNodeCount, modifyLeaf)
+		case 1:
+			result.F2 = createElement1(degree, childNodeCount, modifyLeaf)
+		case 2:
+			result.F3 = createElement1(degree, childNodeCount, modifyLeaf)
+		case 3:
+			result.F4 = createElement1(degree, childNodeCount, modifyLeaf)
+		case 4:
+			result.F5 = createElement1(degree, childNodeCount, modifyLeaf)
+		default:
+			panic("unexpected")
+		}
 	}
-
 	return result
 }
 
-// createModifiedElement2 creates a modified version of an Element2
-// The modification occurs at the specified modifyAtDepth
-func createModifiedElement2(base *Element2, currentDepth, modifyAtDepth int) *Element2 {
-	if base == nil {
+func createElement2(degree, nodeCount int, modifyLeaf bool) *Element2 {
+	if nodeCount <= 0 {
 		return nil
 	}
 
+	v := 1
+	if nodeCount == 1 && modifyLeaf {
+		v = 2
+	}
 	result := &Element2{
-		TypeMeta: base.TypeMeta,
+		TypeMeta: v,
+	}
+	nodeCount--
+	if nodeCount == 0 {
+		return result
 	}
 
-	// If we're at the depth to modify
-	if currentDepth == modifyAtDepth {
-		// Modify the TypeMeta
-		result.TypeMeta = base.TypeMeta + 1
-	}
+	perChild := nodeCount / degree
+	remainder := nodeCount % degree
 
-	// Recursively handle the Value field
-	if base.Value != nil {
-		result.Value = createModifiedElement2(base.Value, currentDepth+1, modifyAtDepth)
+	for i := 0; i < degree; i++ {
+		childNodeCount := perChild
+		if i == 0 {
+			childNodeCount += remainder
+		}
+		if childNodeCount == 0 {
+			continue
+		}
+		switch i {
+		case 0:
+			result.F1 = createElement2(degree, childNodeCount, modifyLeaf)
+		case 1:
+			result.F2 = createElement2(degree, childNodeCount, modifyLeaf)
+		case 2:
+			result.F3 = createElement2(degree, childNodeCount, modifyLeaf)
+		case 3:
+			result.F4 = createElement2(degree, childNodeCount, modifyLeaf)
+		case 4:
+			result.F5 = createElement2(degree, childNodeCount, modifyLeaf)
+		default:
+			panic("unexpected")
+		}
 	}
-
 	return result
 }
 
 // ---------- Direct Comparison Benchmarks ----------
-
-// BenchmarkElementsComparison_NoChange directly compares Element1 vs Element2 with no changes
-func BenchmarkElementsComparison_NoChange(b *testing.B) {
-	ctx := context.Background()
-	op := operation.Operation{Type: operation.Update}
-
-	// Test with a deep structure to emphasize differences
-	depth := 20
-
-	// Setup Element1
-	old1 := createElement1(depth)
-	obj1 := createElement1(depth) // same as old
-
-	// Setup Element2
-	old2 := createElement2(depth)
-	obj2 := createElement2(depth) // same as old
-
-	b.Run("Element1", func(b *testing.B) {
-		b.ResetTimer()
-		for i := 0; i < b.N; i++ {
-			Validate_Element1(ctx, op, nil, obj1, old1)
-		}
-	})
-
-	b.Run("Element2", func(b *testing.B) {
-		b.ResetTimer()
-		for i := 0; i < b.N; i++ {
-			Validate_Element2(ctx, op, nil, obj2, old2)
-		}
-	})
-}
-
-// ---------- Individual Test Cases Grouped By Scenario ----------
-
-// BenchmarkValidateUpdate_NoChange benchmarks validation of unchanged elements
-func BenchmarkValidateUpdate_NoChange(b *testing.B) {
-	ctx := context.Background()
-	op := operation.Operation{Type: operation.Update}
-
-	for _, depth := range []int{1, 5, 10} {
-		// Test Element1
-		b.Run(fmt.Sprintf("Element1_Depth%d", depth), func(b *testing.B) {
-			old := createElement1(depth)
-			obj := createElement1(depth) // Same as old
-
-			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
-				Validate_Element1(ctx, op, nil, obj, old)
-			}
-		})
-
-		// Test Element2
-		b.Run(fmt.Sprintf("Element2_Depth%d", depth), func(b *testing.B) {
-			old := createElement2(depth)
-			obj := createElement2(depth) // Same as old
-
-			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
-				Validate_Element2(ctx, op, nil, obj, old)
-			}
-		})
-	}
-}
-
-// BenchmarkValidateUpdate_ChangeAtRoot benchmarks validation when changing the root element
-func BenchmarkValidateUpdate_ChangeAtRoot(b *testing.B) {
-	ctx := context.Background()
-	op := operation.Operation{Type: operation.Update}
-
-	for _, depth := range []int{1, 5, 10} {
-		// Test Element1
-		b.Run(fmt.Sprintf("Element1_Depth%d", depth), func(b *testing.B) {
-			old := createElement1(depth)
-			obj := createModifiedElement1(old, 0, 0) // Modify at root
-
-			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
-				Validate_Element1(ctx, op, nil, obj, old)
-			}
-		})
-
-		// Test Element2
-		b.Run(fmt.Sprintf("Element2_Depth%d", depth), func(b *testing.B) {
-			old := createElement2(depth)
-			obj := createModifiedElement2(old, 0, 0) // Modify at root
-
-			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
-				Validate_Element2(ctx, op, nil, obj, old)
-			}
-		})
-	}
-}
 
 // BenchmarkValidateUpdate_ChangeAtLeaf benchmarks validation when changing the leaf element
 func BenchmarkValidateUpdate_ChangeAtLeaf(b *testing.B) {
 	ctx := context.Background()
 	op := operation.Operation{Type: operation.Update}
 
-	for _, depth := range []int{600} {
-		// Test Element1
-		b.Run(fmt.Sprintf("Element1_Depth%d", depth), func(b *testing.B) {
-			old := createElement1(depth)
-			obj := createModifiedElement1(old, 0, depth-1) // Modify at leaf
+	for _, degree := range []int{1, 2, 3, 4, 5} {
+		for _, fail := range []bool{false, true} {
+			fixedResult = fail
+			for _, nodeCount := range []int{100, 200, 300, 400, 500, 600} {
+				// Test Element1
+				b.Run(fmt.Sprintf("Option: 1 degree: %d fail: %t nodeCount: %d", degree, fail, nodeCount), func(b *testing.B) {
+					old := createElement1(degree, nodeCount, false)
+					obj := createElement1(degree, nodeCount, true) // Modify at leaf
 
-			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
-				Validate_Element1(ctx, op, nil, obj, old)
+					if old.Size() != nodeCount {
+						b.Fatalf("old.Size() != nodeCount: %d != %d", old.Size(), nodeCount)
+					}
+					if obj.Size() != nodeCount {
+						b.Fatalf("obj.Size() != nodeCount: %d != %d", old.Size(), nodeCount)
+					}
+
+					b.ResetTimer()
+					for i := 0; i < b.N; i++ {
+						Validate_Element1(ctx, op, nil, obj, old)
+					}
+				})
+
+				// Test Element2
+				b.Run(fmt.Sprintf("Option: 2 degree: %d fail: %t nodeCount: %d", degree, fail, nodeCount), func(b *testing.B) {
+					old := createElement2(degree, nodeCount, false)
+					obj := createElement2(degree, nodeCount, true) // Modify at leaf
+
+					if old.Size() != nodeCount {
+						b.Fatalf("old.Size() != nodeCount: %d != %d", old.Size(), nodeCount)
+					}
+					if obj.Size() != nodeCount {
+						b.Fatalf("obj.Size() != nodeCount: %d != %d", old.Size(), nodeCount)
+					}
+
+					b.ResetTimer()
+					for i := 0; i < b.N; i++ {
+						Validate_Element2(ctx, op, nil, obj, old)
+					}
+				})
 			}
-		})
-
-		// Test Element2
-		b.Run(fmt.Sprintf("Element2_Depth%d", depth), func(b *testing.B) {
-			old := createElement2(depth)
-			obj := createModifiedElement2(old, 0, depth-1) // Modify at leaf
-
-			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
-				Validate_Element2(ctx, op, nil, obj, old)
-			}
-		})
+		}
 	}
 }
 
-// BenchmarkValidateUpdate_ChangeAtMiddle benchmarks validation when changing the middle element
-func BenchmarkValidateUpdate_ChangeAtMiddle(b *testing.B) {
-	ctx := context.Background()
-	op := operation.Operation{Type: operation.Update}
-
-	for _, depth := range []int{3, 5, 10} {
-		// Test Element1
-		b.Run(fmt.Sprintf("Element1_Depth%d", depth), func(b *testing.B) {
-			old := createElement1(depth)
-			middleDepth := depth / 2
-			obj := createModifiedElement1(old, 0, middleDepth) // Modify at middle
-
-			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
-				Validate_Element1(ctx, op, nil, obj, old)
-			}
-		})
-
-		// Test Element2
-		b.Run(fmt.Sprintf("Element2_Depth%d", depth), func(b *testing.B) {
-			old := createElement2(depth)
-			middleDepth := depth / 2
-			obj := createModifiedElement2(old, 0, middleDepth) // Modify at middle
-
-			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
-				Validate_Element2(ctx, op, nil, obj, old)
-			}
-		})
+func (e Element1) Size() int {
+	size := 1
+	if e.F1 != nil {
+		size += e.F1.Size()
 	}
+	if e.F2 != nil {
+		size += e.F2.Size()
+	}
+	if e.F3 != nil {
+		size += e.F3.Size()
+	}
+	if e.F4 != nil {
+		size += e.F4.Size()
+	}
+	if e.F5 != nil {
+		size += e.F5.Size()
+	}
+	return size
+}
+
+func (e Element2) Size() int {
+	size := 1
+	if e.F1 != nil {
+		size += e.F1.Size()
+	}
+	if e.F2 != nil {
+		size += e.F2.Size()
+	}
+	if e.F3 != nil {
+		size += e.F3.Size()
+	}
+	if e.F4 != nil {
+		size += e.F4.Size()
+	}
+	if e.F5 != nil {
+		size += e.F5.Size()
+	}
+	return size
 }

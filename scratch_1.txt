@@ -1,0 +1,268 @@
+GOROOT=/home/jpbetz/sdk/go1.24.1 #gosetup
+GOPATH=/home/jpbetz/go #gosetup
+/home/jpbetz/sdk/go1.24.1/bin/go test -c -o /home/jpbetz/.cache/JetBrains/GoLand2025.1/tmp/GoLand/___BenchmarkValidateUpdate_ChangeAtLeaf_in_k8s_io_code_generator_cmd_validation_gen_output_tests_ratcheting.test k8s.io/code-generator/cmd/validation-gen/output_tests/ratcheting #gosetup
+/home/jpbetz/.cache/JetBrains/GoLand2025.1/tmp/GoLand/___BenchmarkValidateUpdate_ChangeAtLeaf_in_k8s_io_code_generator_cmd_validation_gen_output_tests_ratcheting.test -test.v -test.paniconexit0 -test.bench ^\QBenchmarkValidateUpdate_ChangeAtLeaf\E$ -test.run ^$ #gosetup
+goos: linux
+goarch: amd64
+pkg: k8s.io/code-generator/cmd/validation-gen/output_tests/ratcheting
+cpu: Intel(R) Core(TM) Ultra 7 165U
+BenchmarkValidateUpdate_ChangeAtLeaf
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_false_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_false_nodeCount:_100-14         	     501	   2211310 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_false_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_false_nodeCount:_100-14         	     717	   1764004 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_false_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_false_nodeCount:_200-14         	     142	   8435471 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_false_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_false_nodeCount:_200-14         	     186	   6168450 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_false_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_false_nodeCount:_300-14         	      79	  19453574 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_false_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_false_nodeCount:_300-14         	      74	  15010477 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_false_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_false_nodeCount:_400-14         	      31	  35145056 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_false_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_false_nodeCount:_400-14         	      44	  26835313 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_false_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_false_nodeCount:_500-14         	      19	  55858107 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_false_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_false_nodeCount:_500-14         	      28	  39775434 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_false_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_false_nodeCount:_600-14         	      15	  78872326 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_false_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_false_nodeCount:_600-14         	      20	  59854572 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_true_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_true_nodeCount:_100-14          	    2661	    523530 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_true_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_true_nodeCount:_100-14          	     885	   1388913 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_true_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_true_nodeCount:_200-14          	     751	   1616035 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_true_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_true_nodeCount:_200-14          	     219	   5551029 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_true_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_true_nodeCount:_300-14          	     352	   3609870 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_true_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_true_nodeCount:_300-14          	      96	  13881954 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_true_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_true_nodeCount:_400-14          	     195	   6235599 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_true_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_true_nodeCount:_400-14          	      58	  23581584 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_true_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_true_nodeCount:_500-14          	     127	   9186311 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_true_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_true_nodeCount:_500-14          	      36	  35073253 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_true_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_1_fail:_true_nodeCount:_600-14          	      92	  12984784 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_true_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_1_fail:_true_nodeCount:_600-14          	      20	  52634578 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_false_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_false_nodeCount:_100-14         	    4282	    282803 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_false_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_false_nodeCount:_100-14         	    6448	    170667 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_false_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_false_nodeCount:_200-14         	    2133	    571872 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_false_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_false_nodeCount:_200-14         	    3546	    364208 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_false_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_false_nodeCount:_300-14         	    1338	    929495 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_false_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_false_nodeCount:_300-14         	    2054	    615322 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_false_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_false_nodeCount:_400-14         	     928	   1287881 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_false_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_false_nodeCount:_400-14         	    1491	    788442 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_false_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_false_nodeCount:_500-14         	     753	   1622876 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_false_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_false_nodeCount:_500-14         	    1275	    965586 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_false_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_false_nodeCount:_600-14         	     579	   2151945 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_false_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_false_nodeCount:_600-14         	    1014	   1182184 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_true_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_true_nodeCount:_100-14          	    8053	    139331 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_true_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_true_nodeCount:_100-14          	    9843	    108538 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_true_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_true_nodeCount:_200-14          	    4006	    297498 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_true_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_true_nodeCount:_200-14          	    4938	    230954 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_true_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_true_nodeCount:_300-14          	    2566	    442105 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_true_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_true_nodeCount:_300-14          	    3493	    333987 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_true_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_true_nodeCount:_400-14          	    1909	    630599 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_true_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_true_nodeCount:_400-14          	    2692	    456966 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_true_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_true_nodeCount:_500-14          	    1414	    873936 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_true_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_true_nodeCount:_500-14          	    2133	    575558 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_true_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_2_fail:_true_nodeCount:_600-14          	    1080	   1189912 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_true_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_2_fail:_true_nodeCount:_600-14          	    1579	    761949 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_false_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_false_nodeCount:_100-14         	    4035	    296415 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_false_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_false_nodeCount:_100-14         	    6104	    173761 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_false_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_false_nodeCount:_200-14         	    2115	    595158 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_false_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_false_nodeCount:_200-14         	    3532	    352025 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_false_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_false_nodeCount:_300-14         	    1366	    903031 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_false_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_false_nodeCount:_300-14         	    2264	    550534 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_false_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_false_nodeCount:_400-14         	    1000	   1213817 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_false_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_false_nodeCount:_400-14         	    1478	    754256 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_false_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_false_nodeCount:_500-14         	     766	   1561530 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_false_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_false_nodeCount:_500-14         	    1285	    914656 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_false_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_false_nodeCount:_600-14         	     619	   1947387 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_false_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_false_nodeCount:_600-14         	    1060	   1126123 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_true_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_true_nodeCount:_100-14          	    8323	    159950 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_true_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_true_nodeCount:_100-14          	    9698	    108242 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_true_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_true_nodeCount:_200-14          	    3769	    324607 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_true_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_true_nodeCount:_200-14          	    5157	    215503 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_true_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_true_nodeCount:_300-14          	    2505	    535401 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_true_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_true_nodeCount:_300-14          	    3679	    326484 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_true_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_true_nodeCount:_400-14          	    1809	    683539 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_true_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_true_nodeCount:_400-14          	    2792	    408042 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_true_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_true_nodeCount:_500-14          	    1226	    934609 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_true_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_true_nodeCount:_500-14          	    2161	    514425 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_true_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_3_fail:_true_nodeCount:_600-14          	    1083	   1120189 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_true_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_3_fail:_true_nodeCount:_600-14          	    1743	    672754 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_false_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_false_nodeCount:_100-14         	    4220	    304523 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_false_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_false_nodeCount:_100-14         	    6895	    179520 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_false_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_false_nodeCount:_200-14         	    1831	    666108 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_false_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_false_nodeCount:_200-14         	    3346	    354035 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_false_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_false_nodeCount:_300-14         	    1122	   1075799 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_false_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_false_nodeCount:_300-14         	    2142	    578775 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_false_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_false_nodeCount:_400-14         	     889	   1567853 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_false_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_false_nodeCount:_400-14         	    1528	    806900 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_false_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_false_nodeCount:_500-14         	     583	   2104455 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_false_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_false_nodeCount:_500-14         	    1026	   1174868 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_false_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_false_nodeCount:_600-14         	     446	   2603571 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_false_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_false_nodeCount:_600-14         	     949	   1346114 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_true_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_true_nodeCount:_100-14          	    6150	    212309 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_true_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_true_nodeCount:_100-14          	    9628	    116572 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_true_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_true_nodeCount:_200-14          	    3003	    506668 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_true_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_true_nodeCount:_200-14          	    4368	    237464 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_true_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_true_nodeCount:_300-14          	    1800	    728502 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_true_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_true_nodeCount:_300-14          	    2965	    371115 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_true_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_true_nodeCount:_400-14          	    1309	    967295 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_true_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_true_nodeCount:_400-14          	    2272	    486283 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_true_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_true_nodeCount:_500-14          	    1010	   1260531 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_true_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_true_nodeCount:_500-14          	    1614	    693324 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_true_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_4_fail:_true_nodeCount:_600-14          	     862	   1558354 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_true_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_4_fail:_true_nodeCount:_600-14          	    1252	    955151 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_false_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_false_nodeCount:_100-14         	    2678	    413164 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_false_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_false_nodeCount:_100-14         	    4729	    225309 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_false_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_false_nodeCount:_200-14         	    1638	    801613 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_false_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_false_nodeCount:_200-14         	    2530	    446062 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_false_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_false_nodeCount:_300-14         	     990	   1246698 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_false_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_false_nodeCount:_300-14         	    1830	    658414 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_false_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_false_nodeCount:_400-14         	     700	   1859069 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_false_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_false_nodeCount:_400-14         	    1417	    878766 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_false_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_false_nodeCount:_500-14         	     478	   2324088 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_false_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_false_nodeCount:_500-14         	    1134	   1098837 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_false_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_false_nodeCount:_600-14         	     440	   2888205 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_false_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_false_nodeCount:_600-14         	     817	   1407690 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_true_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_true_nodeCount:_100-14          	    6651	    238408 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_true_nodeCount:_100
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_true_nodeCount:_100-14          	    8820	    120333 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_true_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_true_nodeCount:_200-14          	    2626	    481155 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_true_nodeCount:_200
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_true_nodeCount:_200-14          	    4756	    231267 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_true_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_true_nodeCount:_300-14          	    1874	    748743 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_true_nodeCount:_300
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_true_nodeCount:_300-14          	    3081	    354483 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_true_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_true_nodeCount:_400-14          	    1308	   1071658 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_true_nodeCount:_400
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_true_nodeCount:_400-14          	    2613	    452733 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_true_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_true_nodeCount:_500-14          	     824	   1317420 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_true_nodeCount:_500
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_true_nodeCount:_500-14          	    1845	    605190 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_true_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_5_fail:_true_nodeCount:_600-14          	     775	   1614229 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_true_nodeCount:_600
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_2_degree:_5_fail:_true_nodeCount:_600-14          	    1413	    841103 ns/op
+BenchmarkValidateUpdate_ChangeAtLeaf/Option:_1_degree:_6_fail:_false_nodeCount:_100
+panic: unexpected
+
+goroutine 347 [running]:
+k8s.io/code-generator/cmd/validation-gen/output_tests/ratcheting.createElement1(0x6, 0x13, 0x0)
+	/home/jpbetz/projects/kubernetes/staging/src/k8s.io/code-generator/cmd/validation-gen/output_tests/ratcheting/element_benchmark_test.go:51 +0x266
+k8s.io/code-generator/cmd/validation-gen/output_tests/ratcheting.createElement1(0x6, 0x64, 0x0)
+	/home/jpbetz/projects/kubernetes/staging/src/k8s.io/code-generator/cmd/validation-gen/output_tests/ratcheting/element_benchmark_test.go:41 +0xed
+k8s.io/code-generator/cmd/validation-gen/output_tests/ratcheting.BenchmarkValidateUpdate_ChangeAtLeaf.func1(0xc0001fa508)
+	/home/jpbetz/projects/kubernetes/staging/src/k8s.io/code-generator/cmd/validation-gen/output_tests/ratcheting/element_benchmark_test.go:116 +0x5b
+testing.(*B).runN(0xc0001fa508, 0x1)
+	/home/jpbetz/sdk/go1.24.1/src/testing/benchmark.go:202 +0x176
+testing.(*B).run1.func1()
+	/home/jpbetz/sdk/go1.24.1/src/testing/benchmark.go:224 +0x48
+created by testing.(*B).run1 in goroutine 22
+	/home/jpbetz/sdk/go1.24.1/src/testing/benchmark.go:217 +0x90
+
+Process finished with the exit code 2
+

@@ -52,31 +52,111 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 	return nil
 }
 
-func Validate_Element1(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Element1) (errs field.ErrorList) {
-	// field Element1.TypeMeta has no validation
+var fixedResult = false
 
-	// field Element1.Value
+func Validate_Element1(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Element1) (errs field.ErrorList) {
+	// field Element1.TypeMeta
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *int) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, fixedResult, "field TypeMeta")...)
+			// ratcheting is enabled for this field
+			if op.Type == operation.Update && len(errs) > 0 && equality.Semantic.DeepEqual(obj, oldObj) {
+				return nil // no changes
+			}
+			return
+		}(fldPath.Child("TypeMeta"), &obj.TypeMeta, safe.Field(oldObj, func(oldObj *Element1) *int { return &oldObj.TypeMeta }))...)
+
+	// field Element1.F1
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *Element1) (errs field.ErrorList) {
 			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "type Element1")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, fixedResult, "field Element1.F1")...)
 			// ratcheting is enabled for this field
 			if op.Type == operation.Update && len(errs) > 0 && equality.Semantic.DeepEqual(obj, oldObj) {
 				return nil // no changes
 			}
 			errs = append(errs, Validate_Element1(ctx, op, fldPath, obj, oldObj)...)
 			return
-		}(fldPath.Child("value"), obj.Value, safe.Field(oldObj, func(oldObj *Element1) *Element1 { return oldObj.Value }))...)
+		}(fldPath.Child("f1"), obj.F1, safe.Field(oldObj, func(oldObj *Element1) *Element1 { return oldObj.F1 }))...)
+
+	// field Element1.F2
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Element1) (errs field.ErrorList) {
+			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, fixedResult, "field Element1.F2")...)
+			// ratcheting is enabled for this field
+			if op.Type == operation.Update && len(errs) > 0 && equality.Semantic.DeepEqual(obj, oldObj) {
+				return nil // no changes
+			}
+			errs = append(errs, Validate_Element1(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("f2"), obj.F2, safe.Field(oldObj, func(oldObj *Element1) *Element1 { return oldObj.F2 }))...)
+
+	// field Element1.F3
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Element1) (errs field.ErrorList) {
+			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, fixedResult, "field Element1.F3")...)
+			// ratcheting is enabled for this field
+			if op.Type == operation.Update && len(errs) > 0 && equality.Semantic.DeepEqual(obj, oldObj) {
+				return nil // no changes
+			}
+			errs = append(errs, Validate_Element1(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("f3"), obj.F3, safe.Field(oldObj, func(oldObj *Element1) *Element1 { return oldObj.F3 }))...)
+
+	// field Element1.F4
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Element1) (errs field.ErrorList) {
+			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, fixedResult, "field Element1.F4")...)
+			// ratcheting is enabled for this field
+			if op.Type == operation.Update && len(errs) > 0 && equality.Semantic.DeepEqual(obj, oldObj) {
+				return nil // no changes
+			}
+			errs = append(errs, Validate_Element1(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("f4"), obj.F4, safe.Field(oldObj, func(oldObj *Element1) *Element1 { return oldObj.F4 }))...)
+
+	// field Element1.F5
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Element1) (errs field.ErrorList) {
+			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, fixedResult, "field Element1.F5")...)
+			// ratcheting is enabled for this field
+			if op.Type == operation.Update && len(errs) > 0 && equality.Semantic.DeepEqual(obj, oldObj) {
+				return nil // no changes
+			}
+			errs = append(errs, Validate_Element1(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("f5"), obj.F5, safe.Field(oldObj, func(oldObj *Element1) *Element1 { return oldObj.F5 }))...)
 
 	return errs
 }
 
 func Validate_Element2(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Element2) (errs field.ErrorList) {
-	// field Element2.TypeMeta has no validation
+	// field Element2.TypeMeta
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *int) (errs field.ErrorList) {
+			// ratcheting is enabled for this field
+			if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+				return nil // no changes
+			}
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, fixedResult, "field TypeMeta")...)
+			return
+		}(fldPath.Child("TypeMeta"), &obj.TypeMeta, safe.Field(oldObj, func(oldObj *Element2) *int { return &oldObj.TypeMeta }))...)
 
-	// field Element2.Value
+	// field Element2.F1
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *Element2) (errs field.ErrorList) {
 			// ratcheting is enabled for this field
@@ -86,10 +166,70 @@ func Validate_Element2(ctx context.Context, op operation.Operation, fldPath *fie
 			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
 				return // do not proceed
 			}
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "type Element2")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, fixedResult, "field Element2.F1")...)
 			errs = append(errs, Validate_Element2(ctx, op, fldPath, obj, oldObj)...)
 			return
-		}(fldPath.Child("value"), obj.Value, safe.Field(oldObj, func(oldObj *Element2) *Element2 { return oldObj.Value }))...)
+		}(fldPath.Child("f1"), obj.F1, safe.Field(oldObj, func(oldObj *Element2) *Element2 { return oldObj.F1 }))...)
+
+	// field Element2.F2
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Element2) (errs field.ErrorList) {
+			// ratcheting is enabled for this field
+			if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+				return nil // no changes
+			}
+			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, fixedResult, "field Element2.F2")...)
+			errs = append(errs, Validate_Element2(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("f2"), obj.F2, safe.Field(oldObj, func(oldObj *Element2) *Element2 { return oldObj.F2 }))...)
+
+	// field Element2.F3
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Element2) (errs field.ErrorList) {
+			// ratcheting is enabled for this field
+			if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+				return nil // no changes
+			}
+			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, fixedResult, "field Element2.F3")...)
+			errs = append(errs, Validate_Element2(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("f3"), obj.F3, safe.Field(oldObj, func(oldObj *Element2) *Element2 { return oldObj.F3 }))...)
+
+	// field Element2.F4
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Element2) (errs field.ErrorList) {
+			// ratcheting is enabled for this field
+			if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+				return nil // no changes
+			}
+			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, fixedResult, "field Element2.F4")...)
+			errs = append(errs, Validate_Element2(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("f4"), obj.F4, safe.Field(oldObj, func(oldObj *Element2) *Element2 { return oldObj.F4 }))...)
+
+	// field Element2.F5
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Element2) (errs field.ErrorList) {
+			// ratcheting is enabled for this field
+			if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+				return nil // no changes
+			}
+			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
+				return // do not proceed
+			}
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, fixedResult, "field Element2.F5")...)
+			errs = append(errs, Validate_Element2(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("f5"), obj.F5, safe.Field(oldObj, func(oldObj *Element2) *Element2 { return oldObj.F5 }))...)
 
 	return errs
 }
