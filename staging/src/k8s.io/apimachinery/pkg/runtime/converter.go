@@ -53,6 +53,7 @@ type fieldInfo struct {
 	name      string
 	nameValue reflect.Value
 	omitempty bool
+	omitzero  bool
 }
 
 type fieldsCacheMap map[structField]*fieldInfo
@@ -385,10 +386,12 @@ func fieldInfoFromField(structType reflect.Type, field int) *fieldInfo {
 	} else {
 		items := strings.Split(jsonTag, ",")
 		info.name = items[0]
-		for i := range items {
-			if items[i] == "omitempty" {
+		for _, item := range items[1:] {
+			switch item {
+			case "omitempty":
 				info.omitempty = true
-				break
+			case "omitzero":
+				info.omitzero = true
 			}
 		}
 	}
@@ -775,7 +778,7 @@ func pointerToUnstructured(sv, dv reflect.Value) error {
 	return toUnstructured(sv.Elem(), dv)
 }
 
-func isZero(v reflect.Value) bool {
+func isEmpty(v reflect.Value) bool {
 	switch v.Kind() {
 	case reflect.Array, reflect.String:
 		return v.Len() == 0
@@ -816,8 +819,12 @@ func structToUnstructured(sv, dv reflect.Value) error {
 			// This field should be skipped.
 			continue
 		}
-		if fieldInfo.omitempty && isZero(fv) {
+		if fieldInfo.omitempty && isEmpty(fv) {
 			// omitempty fields should be ignored.
+			continue
+		}
+		if fieldInfo.omitzero && fv.IsZero() {
+			// omitzero fields should be ignored.
 			continue
 		}
 		if len(fieldInfo.name) == 0 {

@@ -151,6 +151,27 @@ type InlinedCCC struct {
 	CCC int64 `json:"ccc"`
 }
 
+type OmitZero struct {
+	Int    int     `json:"int,omitzero"`
+	String string  `json:"string,omitzero"`
+	Bool   bool    `json:"bool,omitzero"`
+	Float  float64 `json:"float,omitzero"`
+
+	IntPtr    *int     `json:"intPtr,omitzero"`
+	StringPtr *string  `json:"stringPtr,omitzero"`
+	BoolPtr   *bool    `json:"boolPtr,omitzero"`
+	FloatPtr  *float64 `json:"floatPtr,omitzero"`
+
+	Struct    A  `json:"struct,omitzero"`
+	StructPtr *A `json:"structPtr,omitzero"`
+	A         `json:"structEmbed,omitzero"`
+	*B        `json:"structEmbedPtr,omitzero"`
+
+	Map map[string]string `json:"map,omitzero"`
+
+	Slice []string `json:"slice,omitzero"`
+}
+
 type CustomValue struct {
 	data []byte
 }
@@ -220,6 +241,13 @@ func doRoundTrip(t *testing.T, item interface{}) {
 
 func TestRoundTrip(t *testing.T) {
 	intVal := int64(42)
+
+	// Values for OmitZero test cases
+	intValue := 42
+	stringValue := "test"
+	boolValue := true
+	floatValue := 3.14
+
 	testCases := []struct {
 		obj interface{}
 	}{
@@ -329,6 +357,39 @@ func TestRoundTrip(t *testing.T) {
 			// Test slice of interface{} with different values.
 			obj: &D{
 				A: []interface{}{float64(3.5), int64(4), "3.0", nil},
+			},
+		},
+		{
+			// Test omitzero with zero values - these fields should be omitted
+			obj: &OmitZero{},
+		},
+		{
+			// Test omitzero with non-zero values - these fields should be included
+			obj: &OmitZero{
+				Int:       intValue,
+				String:    stringValue,
+				Bool:      boolValue,
+				Float:     floatValue,
+				IntPtr:    &intValue,
+				StringPtr: &stringValue,
+				BoolPtr:   &boolValue,
+				FloatPtr:  &floatValue,
+				Struct: A{
+					B: "test1",
+				},
+				StructPtr: &A{
+					B: "test2",
+				},
+				A: A{
+					B: "test3",
+				},
+				B: &B{
+					B: "test4",
+				},
+				Map: map[string]string{
+					"key": "value",
+				},
+				Slice: []string{"item1", "item2"},
 			},
 		},
 	}
