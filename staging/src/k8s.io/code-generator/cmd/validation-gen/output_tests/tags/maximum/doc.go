@@ -27,7 +27,7 @@ var localSchemeBuilder = testscheme.New()
 type Struct struct {
 	TypeMeta int
 
-	// +k8s:maximum=1
+	// +k8s:maximum(intLimit)
 	IntField int `json:"intField"`
 	// +k8s:maximum=1
 	IntPtrField *int `json:"intPtrField"`
@@ -57,6 +57,8 @@ type Struct struct {
 	TypedefField IntType `json:"typedefField"`
 	// +k8s:maximum=1
 	TypedefPtrField *IntType `json:"typedefPtrField"`
+
+	IntLimit int `json:"intLimit"`
 }
 
 // +k8s:maximum=1

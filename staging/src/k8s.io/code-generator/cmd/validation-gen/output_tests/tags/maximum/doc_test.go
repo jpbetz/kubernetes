@@ -40,6 +40,7 @@ func Test(t *testing.T) {
 		UintPtrField:    ptr.To(uint(2)),
 		TypedefField:    IntType(2),
 		TypedefPtrField: ptr.To(IntType(2)),
+		IntLimit:        1,
 	}).ExpectInvalid(
 		field.Invalid(field.NewPath("intField"), 2, content.MaxError(1)),
 		field.Invalid(field.NewPath("intPtrField"), 2, content.MaxError(1)),
@@ -68,5 +69,6 @@ func Test(t *testing.T) {
 		UintPtrField:    ptr.To(uint(1)),
 		TypedefField:    IntType(1),
 		TypedefPtrField: ptr.To(IntType(1)),
+		IntLimit:        2,
 	}).ExpectValid()
 }

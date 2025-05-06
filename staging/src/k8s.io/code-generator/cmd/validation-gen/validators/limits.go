@@ -21,24 +21,38 @@ import (
 	"strconv"
 
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/gengo/v2/parser/tags"
 	"k8s.io/gengo/v2/types"
+	pointer "k8s.io/utils/ptr"
 )
 
 const (
 	maxLengthTagName = "k8s:maxLength"
 	maxItemsTagName  = "k8s:maxItems"
 	minimumTagName   = "k8s:minimum"
-	minimumTagName = "k8s:minimum"
-	maximumTagName = "k8s:maximum"
+	maximumTagName   = "k8s:maximum"
 )
 
 func init() {
 	RegisterTagValidator(maxLengthTagValidator{})
 	RegisterTagValidator(maxItemsTagValidator{})
-	RegisterTagValidator(minimumTagValidator{})
-	RegisterTagValidator(maximumTagValidator{})
+
+	shared := map[*types.Type]refLimits{}
+	RegisterTagValidator(minimumTagValidator{shared})
+	RegisterTagValidator(maximumTagValidator{shared})
+	RegisterTypeValidator(maximumTypeValidator{shared})
 }
 
+type refLimit struct {
+	min, max *string // name of the field that is referenced and provides a min or max limit
+}
+
+// member name -> limits
+type refLimits map[*types.Member]refLimit
+
+type minimumTagValidator struct {
+	shared map[*types.Type]refLimits
+}
 type maxLengthTagValidator struct{}
 
 func (maxLengthTagValidator) Init(_ Config) {}
@@ -144,8 +158,6 @@ func (mitv maxItemsTagValidator) Docs() TagDoc {
 	}
 }
 
-type minimumTagValidator struct{}
-
 func (minimumTagValidator) Init(_ Config) {}
 
 func (minimumTagValidator) TagName() string {
@@ -164,13 +176,18 @@ var (
 	minimumValidator = types.Name{Package: libValidationPkg, Name: "Minimum"}
 )
 
-func (minimumTagValidator) GetValidations(context Context, _ []string, payload string) (Validations, error) {
+func (mtv minimumTagValidator) GetValidations(context Context, args []string, payload string) (Validations, error) {
 	var result Validations
 
 	// This tag can apply to value and pointer fields, as well as typedefs
 	// (which should never be pointers). We need to check the concrete type.
 	if t := nonPointer(nativeType(context.Type)); !types.IsInteger(t) {
 		return result, fmt.Errorf("can only be used on integer types (%s)", rootTypeString(context.Type, t))
+	}
+
+	if len(args) == 1 {
+		// TODO
+		panic("not implemented")
 	}
 
 	intVal, err := strconv.Atoi(payload)
@@ -193,7 +210,9 @@ func (mtv minimumTagValidator) Docs() TagDoc {
 	}
 }
 
-type maximumTagValidator struct{}
+type maximumTagValidator struct {
+	shared map[*types.Type]refLimits
+}
 
 func (maximumTagValidator) Init(_ Config) {}
 
@@ -213,8 +232,20 @@ var (
 	maximumValidator = types.Name{Package: libValidationPkg, Name: "Maximum"}
 )
 
-func (maximumTagValidator) GetValidations(context Context, _ []string, payload string) (Validations, error) {
+func (mtv maximumTagValidator) GetValidations(context Context, args []string, payload string) (Validations, error) {
 	var result Validations
+
+	if len(args) == 1 {
+		refFieldName := args[0]
+		limits, ok := mtv.shared[context.Parent]
+		if !ok {
+			limits = map[*types.Member]refLimit{}
+			mtv.shared[context.Parent] = limits
+		}
+		limits[context.Member] = refLimit{max: pointer.To(refFieldName)}
+		fmt.Printf("added limits: %v -> %+v\n", context.Type, limits)
+		return result, nil
+	}
 
 	if t := nonPointer(nativeType(context.Type)); !types.IsInteger(t) {
 		return result, fmt.Errorf("can only be used on integer types (%s)", rootTypeString(context.Type, t))
@@ -238,4 +269,67 @@ func (mtv maximumTagValidator) Docs() TagDoc {
 			Docs:        "This field must be less than or equal to x.",
 		}},
 	}
+}
+
+type maximumTypeValidator struct {
+	shared map[*types.Type]refLimits
+}
+
+func (maximumTypeValidator) Init(_ Config) {}
+
+func (maximumTypeValidator) Name() string {
+	return "limitTypeValidator"
+}
+
+func (mtv maximumTypeValidator) GetValidations(context Context) (Validations, error) {
+	result := Validations{}
+
+	t := nonPointer(nativeType(context.Type))
+	if t.Kind != types.Struct {
+		return Validations{}, nil
+	}
+
+	limits := mtv.shared[context.Type]
+	fmt.Printf("checking limits: %v -> %+v\n", context.Type, limits)
+	if len(limits) == 0 {
+		return result, nil
+	}
+
+	fmt.Printf("found limits: %+v\n", limits)
+	// TODO: sort before output
+	for submemb, limit := range limits {
+		jsonTag, ok := tags.LookupJSON(*submemb)
+		if !ok {
+			return Validations{}, fmt.Errorf("no json tag for %s", submemb.Name)
+		}
+		// TODO: l.min support
+		if limit.max != nil {
+			subname := jsonTag.Name
+			ref := getMemberByJSON(t, *limit.max)
+			if ref == nil {
+				return Validations{}, fmt.Errorf("no field for json name %q", *limit.max)
+			}
+			vfn := Function(maximumTagName, DefaultFlags, maximumValidator, *ref)
+
+			nilableStructType := context.Type
+			if !isNilableType(nilableStructType) {
+				nilableStructType = types.PointerTo(nilableStructType)
+			}
+			nilableFieldType := submemb.Type
+			fieldExprPrefix := ""
+			if !isNilableType(nilableFieldType) {
+				nilableFieldType = types.PointerTo(nilableFieldType)
+				fieldExprPrefix = "&"
+			}
+
+			getFn := FunctionLiteral{
+				Parameters: []ParamResult{{"o", nilableStructType}},
+				Results:    []ParamResult{{"", nilableFieldType}},
+			}
+			getFn.Body = fmt.Sprintf("return %so.%s", fieldExprPrefix, submemb.Name)
+			f := Function(subfieldTagName, vfn.Flags, validateSubfield, subname, getFn, WrapperFunction{vfn, submemb.Type})
+			result.Functions = append(result.Functions, f)
+		}
+	}
+	return result, nil
 }
