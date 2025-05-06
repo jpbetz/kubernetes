@@ -55,3 +55,14 @@ func Minimum[T constraints.Integer](_ context.Context, _ operation.Operation, fl
 	}
 	return nil
 }
+
+// Maximum verifies that the specified value is greater than or equal to min.
+func Maximum[T constraints.Integer](_ context.Context, _ operation.Operation, fldPath *field.Path, value, _ *T, max T) field.ErrorList {
+	if value == nil {
+		return nil
+	}
+	if *value > max {
+		return field.ErrorList{field.Invalid(fldPath, *value, content.MaxError(max)).WithOrigin("Maximum")}
+	}
+	return nil
+}

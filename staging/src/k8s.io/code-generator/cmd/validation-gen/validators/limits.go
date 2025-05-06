@@ -28,12 +28,15 @@ const (
 	maxLengthTagName = "k8s:maxLength"
 	maxItemsTagName  = "k8s:maxItems"
 	minimumTagName   = "k8s:minimum"
+	minimumTagName = "k8s:minimum"
+	maximumTagName = "k8s:maximum"
 )
 
 func init() {
 	RegisterTagValidator(maxLengthTagValidator{})
 	RegisterTagValidator(maxItemsTagValidator{})
 	RegisterTagValidator(minimumTagValidator{})
+	RegisterTagValidator(maximumTagValidator{})
 }
 
 type maxLengthTagValidator struct{}
@@ -186,6 +189,53 @@ func (mtv minimumTagValidator) Docs() TagDoc {
 		Payloads: []TagPayloadDoc{{
 			Description: "<integer>",
 			Docs:        "This field must be greater than or equal to x.",
+		}},
+	}
+}
+
+type maximumTagValidator struct{}
+
+func (maximumTagValidator) Init(_ Config) {}
+
+func (maximumTagValidator) TagName() string {
+	return maximumTagName
+}
+
+var maximumTagValidScopes = sets.New(
+	ScopeAny,
+)
+
+func (maximumTagValidator) ValidScopes() sets.Set[Scope] {
+	return maximumTagValidScopes
+}
+
+var (
+	maximumValidator = types.Name{Package: libValidationPkg, Name: "Maximum"}
+)
+
+func (maximumTagValidator) GetValidations(context Context, _ []string, payload string) (Validations, error) {
+	var result Validations
+
+	if t := nonPointer(nativeType(context.Type)); !types.IsInteger(t) {
+		return result, fmt.Errorf("can only be used on integer types (%s)", rootTypeString(context.Type, t))
+	}
+
+	intVal, err := strconv.Atoi(payload)
+	if err != nil {
+		return result, fmt.Errorf("failed to parse tag payload as int: %w", err)
+	}
+	result.AddFunction(Function(maximumTagName, DefaultFlags, maximumValidator, intVal))
+	return result, nil
+}
+
+func (mtv maximumTagValidator) Docs() TagDoc {
+	return TagDoc{
+		Tag:         mtv.TagName(),
+		Scopes:      mtv.ValidScopes().UnsortedList(),
+		Description: "Indicates that a numeric field has a maximum value.",
+		Payloads: []TagPayloadDoc{{
+			Description: "<integer>",
+			Docs:        "This field must be less than or equal to x.",
 		}},
 	}
 }

@@ -28,6 +28,12 @@ func MinError[T constraints.Integer](min T) string {
 	return fmt.Sprintf("must be greater than or equal to %d", min)
 }
 
+// MaxError returns a string explanation of a "must be less than or equal"
+// validation failure.
+func MaxError[T constraints.Integer](max T) string {
+	return fmt.Sprintf("must be less than or equal to %d", max)
+}
+
 // MaxLenError returns a string explanation of a "string too long" validation
 // failure.
 func MaxLenError(length int) string {
@@ -54,3 +60,4 @@ func RegexError(msg string, re string, examples ...string) string {
 	msg += "regex used for validation is '" + re + "')"
 	return msg
 }
+
