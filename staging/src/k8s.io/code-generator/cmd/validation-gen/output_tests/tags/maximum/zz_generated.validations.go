@@ -23,7 +23,6 @@ package maximum
 
 import (
 	context "context"
-	fmt "fmt"
 
 	operation "k8s.io/apimachinery/pkg/api/operation"
 	safe "k8s.io/apimachinery/pkg/api/safe"
@@ -37,11 +36,8 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *testscheme.Scheme) error {
-	scheme.AddValidationFunc((*Struct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}, subresources ...string) field.ErrorList {
-		if len(subresources) == 0 {
-			return Validate_Struct(ctx, op, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
-		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
+	scheme.AddValidationFunc((*Struct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
+		return Validate_Struct(ctx, op, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
 	})
 	return nil
 }
@@ -54,14 +50,14 @@ func Validate_IntType(ctx context.Context, op operation.Operation, fldPath *fiel
 }
 
 func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
-	// field Struct.TypeMeta has no validation
+	// type Struct
+	parent := obj // TODO: Added by hand
+	errs = append(errs, validate.Subfield(ctx, op, fldPath, obj, oldObj, "intField", func(o *Struct) *int { return &o.IntField }, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *int) field.ErrorList {
+		return validate.Maximum(ctx, op, fldPath, obj, oldObj, parent.IntLimit) // TODO: switched from obj.IntLimit to parent.IntLimit by hand
+	})...)
 
-	// field Struct.IntField
-	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *int) (errs field.ErrorList) {
-			errs = append(errs, validate.Maximum(ctx, op, fldPath, obj, oldObj, 1)...)
-			return
-		}(fldPath.Child("intField"), &obj.IntField, safe.Field(oldObj, func(oldObj *Struct) *int { return &oldObj.IntField }))...)
+	// field Struct.TypeMeta has no validation
+	// field Struct.IntField has no validation
 
 	// field Struct.IntPtrField
 	errs = append(errs,
@@ -142,5 +138,6 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 			return
 		}(fldPath.Child("typedefPtrField"), obj.TypedefPtrField, safe.Field(oldObj, func(oldObj *Struct) *IntType { return oldObj.TypedefPtrField }))...)
 
+	// field Struct.IntLimit has no validation
 	return errs
 }
