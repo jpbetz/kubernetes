@@ -1129,7 +1129,7 @@ func TestToOpenAPIDefinitionName(t *testing.T) {
 		{
 			name:        "built-registerObj type",
 			registerObj: &runtimetestingv1.ExternalSimple{},
-			gvk:         schema.GroupVersionKind{Group: "", Version: "v1", Kind: "Simple"},
+			gvk:         schema.GroupVersionKind{Group: "testing.runtime.pkg.apimachinery.k8s.io", Version: "v1", Kind: "ExternalSimple"},
 			out:         "io.k8s.apimachinery.pkg.runtime.testing.v1.ExternalSimple",
 		},
 		{
@@ -1181,6 +1181,15 @@ func TestToOpenAPIDefinitionName(t *testing.T) {
 			}
 			if out != test.out {
 				t.Errorf("expected %s, got %s", test.out, out)
+			}
+
+			// TODO: this skips wantErr cases, which is OK?
+			toGVK, err := scheme.FromOpenAPIDefinitionName(test.out)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if !reflect.DeepEqual(toGVK, test.gvk) {
+				t.Errorf("expected %v, got %v", test.gvk, toGVK)
 			}
 		})
 	}

@@ -21,8 +21,10 @@ import (
 	"reflect"
 	"regexp"
 	"sort"
+	"strings"
 
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	scheme "k8s.io/kubernetes/pkg/api/legacyscheme"
 )
 
 var intOrStringAnyOf = []NestedValueValidation{
@@ -56,6 +58,10 @@ type ValidationOptions struct {
 	// defined by additionalProperties. i.e. additionalProperties in main structural
 	// schema, but properties within an allOf.
 	AllowValidationPropertiesWithAdditionalProperties bool
+
+	// AllowRefs allows $ref to be used in schemas to refer to known types.
+	// TODO: Document "known types"
+	AllowRefs bool
 }
 
 // ValidateStructural checks that s is a structural schema with the invariants:
@@ -84,6 +90,7 @@ func ValidateStructural(fldPath *field.Path, s *Structural) field.ErrorList {
 		AllowNestedAdditionalProperties:                   false,
 		AllowNestedXValidations:                           false,
 		AllowValidationPropertiesWithAdditionalProperties: false,
+		AllowRefs: true, // TODO: feature gate
 	})
 }
 
@@ -109,6 +116,25 @@ func validateStructuralInvariants(s *Structural, lvl level, fldPath *field.Path,
 	}
 
 	allErrs := field.ErrorList{}
+	if s.Ref != nil {
+		if !opts.AllowRefs {
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("ref"), "must not be used"))
+		} else {
+			// check the ref
+			ref := *s.Ref
+			if !strings.HasPrefix(ref, "#/components/schemas/") {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("ref"), ref, "must be a local reference"))
+			}
+			ref = strings.TrimPrefix(ref, "#/components/schemas/")
+			if len(ref) == 0 {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("ref"), ref, "must be a local reference"))
+			}
+			// TODO: load the openapi... it's needed to validate oneOf, allOf, etc.
+			if _, err := scheme.Scheme.FromOpenAPIDefinitionName(ref); err != nil {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("ref"), ref, fmt.Sprintf("must be a valid reference: %v", err)))
+			}
+		}
+	}
 
 	if s.Type == "array" && s.Items == nil {
 		allErrs = append(allErrs, field.Required(fldPath.Child("items"), "must be specified"))

@@ -69,6 +69,7 @@ func NewStructural(s *apiextensions.JSONSchemaProps) (*Structural, error) {
 	}
 
 	ss := &Structural{
+		Ref:                  s.Ref,
 		Generic:              *g,
 		Extensions:           *x,
 		ValueValidation:      vv,
@@ -305,9 +306,10 @@ func validateUnsupportedFields(s *apiextensions.JSONSchemaProps) error {
 	if len(s.Schema) > 0 {
 		return fmt.Errorf("OpenAPIV3Schema 'schema' is not supported")
 	}
-	if s.Ref != nil && len(*s.Ref) > 0 {
-		return fmt.Errorf("OpenAPIV3Schema '$ref' is not supported")
-	}
+	// TODO: Feature gate this?
+	//if s.Ref != nil && len(*s.Ref) > 0 {
+	//	return fmt.Errorf("OpenAPIV3Schema '$ref' is not supported")
+	//}
 	if len(s.PatternProperties) > 0 {
 		return fmt.Errorf("OpenAPIV3Schema 'patternProperties' is not supported")
 	}

@@ -25,6 +25,7 @@ import (
 
 // Structural represents a structural schema.
 type Structural struct {
+	Ref                  *string
 	Items                *Structural
 	Properties           map[string]Structural
 	AdditionalProperties *StructuralOrBool

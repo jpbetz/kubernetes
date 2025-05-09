@@ -108,7 +108,19 @@ func NewSchemaValidator(customResourceValidation *apiextensions.JSONSchemaProps)
 			return nil, nil, err
 		}
 	}
+	// TODO: Any refs needs to be inlined here or a schema resolver needs to be passed into kube-openapi.
+	// The resolve is the "RIGHT WAY" probably... but I don't know if it's worth it.
+
 	return NewSchemaValidatorFromOpenAPI(openapiSchema), openapiSchema, nil
+}
+
+func resolveRefs(schema *spec.Schema) error {
+	ptr := schema.Ref.GetPointer()
+	if ptr != nil {
+		ptr.String()
+		// TODO: need a schema resolver here
+	}
+	return nil
 }
 
 func NewSchemaValidatorFromOpenAPI(openapiSchema *spec.Schema) SchemaValidator {

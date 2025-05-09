@@ -49,6 +49,7 @@ func WithTypeAndObjectMeta(s *schema.Structural) *schema.Structural {
 		return s
 	}
 	result := &schema.Structural{
+		Ref:                  s.Ref,
 		AdditionalProperties: s.AdditionalProperties,
 		Generic:              s.Generic,
 		Extensions:           s.Extensions,
