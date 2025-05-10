@@ -1471,9 +1471,9 @@ func (v *specStandardValidatorV3) validate(schema *apiextensions.JSONSchemaProps
 		allErrs = append(allErrs, field.Forbidden(fldPath.Child("dependencies"), "dependencies is not supported"))
 	}
 
-	if schema.Ref != nil {
-		allErrs = append(allErrs, field.Forbidden(fldPath.Child("$ref"), "$ref is not supported"))
-	}
+	//if schema.Ref != nil {
+	//	allErrs = append(allErrs, field.Forbidden(fldPath.Child("$ref"), "$ref is not supported"))
+	//}
 
 	if schema.Type == "null" {
 		allErrs = append(allErrs, field.Forbidden(fldPath.Child("type"), "type cannot be set to null, use nullable as an alternative"))

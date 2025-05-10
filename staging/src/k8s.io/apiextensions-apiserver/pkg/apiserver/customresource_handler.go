@@ -265,7 +265,7 @@ func (r *crdHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		utilruntime.HandleError(err)
 		responsewriters.ErrorNegotiated(
-			apierrors.NewInternalError(fmt.Errorf("error resolving resource")),
+			apierrors.NewInternalError(fmt.Errorf("error resolving resource: %w", err)),
 			Codecs, schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}, w, req,
 		)
 		return
@@ -308,7 +308,7 @@ func (r *crdHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		utilruntime.HandleError(err)
 		responsewriters.ErrorNegotiated(
-			apierrors.NewInternalError(fmt.Errorf("error resolving resource")),
+			apierrors.NewInternalError(fmt.Errorf("error resolving resource: %w", err)),
 			Codecs, schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}, w, req,
 		)
 		return
@@ -664,7 +664,24 @@ func (r *crdHandler) getOrCreateServingInfoFor(uid types.UID, name string) (*crd
 		if err := apiextensionsv1.Convert_v1_CustomResourceValidation_To_apiextensions_CustomResourceValidation(val, internalValidation, nil); err != nil {
 			return nil, fmt.Errorf("failed converting CRD validation to internal version: %v", err)
 		}
-		s, err := structuralschema.NewStructural(internalValidation.OpenAPIV3Schema)
+
+		// TODO: This converts to spec.Schema to call resolveRefs and then converts back. We should avoid this.
+		openapiSchema := &spec.Schema{}
+		if internalValidation.OpenAPIV3Schema != nil {
+			if err := apiservervalidation.ConvertJSONSchemaProps(internalValidation.OpenAPIV3Schema, openapiSchema); err != nil {
+				return nil, err
+			}
+		}
+
+		if replacement, err := resolveRefs(openapiSchema, r.schemaResolver); err != nil {
+			return nil, err
+		} else if replacement != nil {
+			openapiSchema = replacement
+		}
+
+		jsonSchemaProps := toJSONSchemaProps(openapiSchema)
+
+		s, err := structuralschema.NewStructural(jsonSchemaProps)
 		if !crd.Spec.PreserveUnknownFields && err != nil {
 			// This should never happen. If it does, it is a programming error.
 			utilruntime.HandleError(fmt.Errorf("failed to convert schema to structural: %v", err))
@@ -1457,4 +1474,273 @@ func buildOpenAPIModelsForApply(staticOpenAPISpec map[string]*spec.Schema, crd *
 		return nil, err
 	}
 	return mergedOpenAPI.Components.Schemas, nil
+}
+
+func resolveRefs(schema *spec.Schema, resolver resolver.SchemaResolver) (*spec.Schema, error) {
+	// TODO: The resolver already handles $refs, so we should leverage it more fully.
+	// TODO: This does not handle all fields of the schema.
+
+	ptr := schema.Ref.GetPointer()
+	if ptr != nil && !ptr.IsEmpty() {
+		ref := strings.TrimPrefix(ptr.String(), "/components/schemas/")
+		gvk, err := Scheme.FromOpenAPIDefinitionName(ref)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get definition name for ref %q: %v", ptr.String(), err)
+		}
+		// TODO: This would work for root CRDs built-ins, but doesn't work for non-root types. We need to retrieve those from static openapi.
+		resolveSchema, err := resolver.ResolveSchema(gvk)
+		if err != nil {
+			return nil, fmt.Errorf("failed to resolve gvk %q: %v", gvk, err)
+		}
+		return resolveSchema, nil
+	}
+	for k, p := range schema.Properties {
+		if replacement, err := resolveRefs(&p, resolver); err != nil {
+			return nil, err
+		} else if replacement != nil {
+			schema.Properties[k] = *replacement
+		}
+	}
+	if schema.AdditionalProperties != nil && schema.AdditionalProperties.Schema != nil {
+		if replacement, err := resolveRefs(schema.AdditionalProperties.Schema, resolver); err != nil {
+			return nil, err
+		} else if replacement != nil {
+			schema.AdditionalProperties.Schema = replacement
+		}
+	}
+	if schema.Items != nil && schema.Items.Schema != nil {
+		if replacement, err := resolveRefs(schema.Items.Schema, resolver); err != nil {
+			return nil, err
+		} else if replacement != nil {
+			schema.Items.Schema = replacement
+		}
+	}
+	return schema, nil
+}
+
+func toJSONSchemaProps(openapiSchema *spec.Schema) *apiextensionsinternal.JSONSchemaProps {
+	// TODO: This is AI generated and should not merge.
+	// TODO: If we do need this conversion, long term, we should find a good place for it.
+
+	if openapiSchema == nil {
+		return nil
+	}
+
+	result := &apiextensionsinternal.JSONSchemaProps{
+		ID:               openapiSchema.ID,
+		Schema:           apiextensionsinternal.JSONSchemaURL(openapiSchema.Schema),
+		Description:      openapiSchema.Description,
+		Format:           openapiSchema.Format,
+		Title:            openapiSchema.Title,
+		Maximum:          openapiSchema.Maximum,
+		ExclusiveMaximum: openapiSchema.ExclusiveMaximum,
+		Minimum:          openapiSchema.Minimum,
+		ExclusiveMinimum: openapiSchema.ExclusiveMinimum,
+		MaxLength:        openapiSchema.MaxLength,
+		MinLength:        openapiSchema.MinLength,
+		Pattern:          openapiSchema.Pattern,
+		MaxItems:         openapiSchema.MaxItems,
+		MinItems:         openapiSchema.MinItems,
+		UniqueItems:      openapiSchema.UniqueItems,
+		MultipleOf:       openapiSchema.MultipleOf,
+		MaxProperties:    openapiSchema.MaxProperties,
+		MinProperties:    openapiSchema.MinProperties,
+		Required:         openapiSchema.Required,
+		Nullable:         openapiSchema.Nullable,
+	}
+
+	// Convert Type from StringOrArray to string
+	if len(openapiSchema.Type) > 0 {
+		result.Type = openapiSchema.Type[0]
+	}
+
+	// need to convert ints to int32 or int64
+	//if openapiSchema.Default != nil {
+	//	defaultValue := new(apiextensionsinternal.JSON)
+	//	*defaultValue = openapiSchema.Default
+	//	result.Default = defaultValue
+	//}
+
+	if openapiSchema.Example != nil {
+		exampleValue := new(apiextensionsinternal.JSON)
+		*exampleValue = openapiSchema.Example
+		result.Example = exampleValue
+	}
+
+	if len(openapiSchema.Enum) > 0 {
+		result.Enum = make([]apiextensionsinternal.JSON, len(openapiSchema.Enum))
+		for k, v := range openapiSchema.Enum {
+			result.Enum[k] = v
+		}
+	}
+
+	// Handle extension: x-kubernetes-int-or-string
+	if val, ok := openapiSchema.Extensions["x-kubernetes-int-or-string"]; ok {
+		if boolVal, ok := val.(bool); ok && boolVal {
+			result.XIntOrString = true
+		}
+	}
+
+	// Handle extension: x-kubernetes-preserve-unknown-fields
+	if val, ok := openapiSchema.Extensions["x-kubernetes-preserve-unknown-fields"]; ok {
+		if boolVal, ok := val.(bool); ok && boolVal {
+			b := true
+			result.XPreserveUnknownFields = &b
+		}
+	}
+
+	// Handle extension: x-kubernetes-embedded-resource
+	if val, ok := openapiSchema.Extensions["x-kubernetes-embedded-resource"]; ok {
+		if boolVal, ok := val.(bool); ok && boolVal {
+			result.XEmbeddedResource = true
+		}
+	}
+
+	// Handle extension: x-kubernetes-list-map-keys
+	if val, ok := openapiSchema.Extensions["x-kubernetes-list-map-keys"]; ok {
+		if listVal, ok := val.([]interface{}); ok {
+			result.XListMapKeys = make([]string, len(listVal))
+			for i, v := range listVal {
+				result.XListMapKeys[i] = fmt.Sprintf("%v", v)
+			}
+		}
+	}
+
+	// Handle extension: x-kubernetes-list-type
+	if val, ok := openapiSchema.Extensions["x-kubernetes-list-type"]; ok {
+		if strVal, ok := val.(string); ok {
+			result.XListType = &strVal
+		}
+	}
+
+	// Handle extension: x-kubernetes-map-type
+	if val, ok := openapiSchema.Extensions["x-kubernetes-map-type"]; ok {
+		if strVal, ok := val.(string); ok {
+			result.XMapType = &strVal
+		}
+	}
+
+	// Handle Ref
+	if openapiSchema.Ref.String() != "" {
+		ref := openapiSchema.Ref.String()
+		result.Ref = &ref
+	}
+
+	// Handle AllOf, OneOf, AnyOf
+	if len(openapiSchema.AllOf) > 0 {
+		result.AllOf = make([]apiextensionsinternal.JSONSchemaProps, len(openapiSchema.AllOf))
+		for i, schema := range openapiSchema.AllOf {
+			result.AllOf[i] = *toJSONSchemaProps(&schema)
+		}
+	}
+
+	if len(openapiSchema.OneOf) > 0 {
+		result.OneOf = make([]apiextensionsinternal.JSONSchemaProps, len(openapiSchema.OneOf))
+		for i, schema := range openapiSchema.OneOf {
+			result.OneOf[i] = *toJSONSchemaProps(&schema)
+		}
+	}
+
+	if len(openapiSchema.AnyOf) > 0 {
+		result.AnyOf = make([]apiextensionsinternal.JSONSchemaProps, len(openapiSchema.AnyOf))
+		for i, schema := range openapiSchema.AnyOf {
+			result.AnyOf[i] = *toJSONSchemaProps(&schema)
+		}
+	}
+
+	// Handle Not
+	if openapiSchema.Not != nil {
+		notProps := toJSONSchemaProps(openapiSchema.Not)
+		result.Not = notProps
+	}
+
+	// Handle Properties
+	if len(openapiSchema.Properties) > 0 {
+		result.Properties = make(map[string]apiextensionsinternal.JSONSchemaProps)
+		for k, v := range openapiSchema.Properties {
+			result.Properties[k] = *toJSONSchemaProps(&v)
+		}
+	}
+
+	// Handle PatternProperties
+	if len(openapiSchema.PatternProperties) > 0 {
+		result.PatternProperties = make(map[string]apiextensionsinternal.JSONSchemaProps)
+		for k, v := range openapiSchema.PatternProperties {
+			result.PatternProperties[k] = *toJSONSchemaProps(&v)
+		}
+	}
+
+	// Handle AdditionalProperties
+	if openapiSchema.AdditionalProperties != nil {
+		result.AdditionalProperties = &apiextensionsinternal.JSONSchemaPropsOrBool{}
+		if openapiSchema.AdditionalProperties.Allows {
+			result.AdditionalProperties.Allows = openapiSchema.AdditionalProperties.Allows
+		}
+		if openapiSchema.AdditionalProperties.Schema != nil {
+			schema := toJSONSchemaProps(openapiSchema.AdditionalProperties.Schema)
+			result.AdditionalProperties.Schema = schema
+		}
+	}
+
+	// Handle AdditionalItems
+	if openapiSchema.AdditionalItems != nil {
+		result.AdditionalItems = &apiextensionsinternal.JSONSchemaPropsOrBool{}
+		if openapiSchema.AdditionalItems.Allows {
+			result.AdditionalItems.Allows = openapiSchema.AdditionalItems.Allows
+		}
+		if openapiSchema.AdditionalItems.Schema != nil {
+			schema := toJSONSchemaProps(openapiSchema.AdditionalItems.Schema)
+			result.AdditionalItems.Schema = schema
+		}
+	}
+
+	// Handle Items
+	if openapiSchema.Items != nil {
+		result.Items = &apiextensionsinternal.JSONSchemaPropsOrArray{}
+		if openapiSchema.Items.Schema != nil {
+			schema := toJSONSchemaProps(openapiSchema.Items.Schema)
+			result.Items.Schema = schema
+		}
+		if len(openapiSchema.Items.Schemas) > 0 {
+			result.Items.JSONSchemas = make([]apiextensionsinternal.JSONSchemaProps, len(openapiSchema.Items.Schemas))
+			for i, schema := range openapiSchema.Items.Schemas {
+				result.Items.JSONSchemas[i] = *toJSONSchemaProps(&schema)
+			}
+		}
+	}
+
+	// Handle Definitions
+	if len(openapiSchema.Definitions) > 0 {
+		result.Definitions = make(apiextensionsinternal.JSONSchemaDefinitions)
+		for k, v := range openapiSchema.Definitions {
+			result.Definitions[k] = *toJSONSchemaProps(&v)
+		}
+	}
+
+	// Handle Dependencies
+	if len(openapiSchema.Dependencies) > 0 {
+		result.Dependencies = make(apiextensionsinternal.JSONSchemaDependencies)
+		for k, v := range openapiSchema.Dependencies {
+			if v.Schema != nil {
+				result.Dependencies[k] = apiextensionsinternal.JSONSchemaPropsOrStringArray{
+					Schema: toJSONSchemaProps(v.Schema),
+				}
+			}
+			if len(v.Property) > 0 {
+				result.Dependencies[k] = apiextensionsinternal.JSONSchemaPropsOrStringArray{
+					Property: v.Property,
+				}
+			}
+		}
+	}
+
+	// Handle ExternalDocs
+	if openapiSchema.ExternalDocs != nil {
+		result.ExternalDocs = &apiextensionsinternal.ExternalDocumentation{
+			Description: openapiSchema.ExternalDocs.Description,
+			URL:         openapiSchema.ExternalDocs.URL,
+		}
+	}
+
+	return result
 }

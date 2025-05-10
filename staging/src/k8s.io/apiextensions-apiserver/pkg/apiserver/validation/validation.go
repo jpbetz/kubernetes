@@ -32,7 +32,6 @@ import (
 	"k8s.io/kube-openapi/pkg/validation/spec"
 	"k8s.io/kube-openapi/pkg/validation/strfmt"
 	"k8s.io/kube-openapi/pkg/validation/validate"
-	scheme "k8s.io/kubernetes/pkg/api/legacyscheme"
 )
 
 type SchemaValidator interface {
@@ -118,30 +117,8 @@ func NewSchemaValidator(customResourceValidation *apiextensions.JSONSchemaProps,
 			return nil, nil, err
 		}
 	}
-	// TODO: Any refs needs to be inlined here or a schema resolver needs to be passed into kube-openapi.
-	// The resolve is the "RIGHT WAY" probably... but I don't know if it's worth it.
-	if err := resolveRefs(openapiSchema, resolver); err != nil {
-		return nil, nil, err
-	}
 
 	return NewSchemaValidatorFromOpenAPI(openapiSchema), openapiSchema, nil
-}
-
-func resolveRefs(schema *spec.Schema, resolver resolver.SchemaResolver) error {
-	ptr := schema.Ref.GetPointer()
-	if ptr != nil {
-		gvk, err := scheme.Scheme.FromOpenAPIDefinitionName(ptr.String())
-		if err != nil {
-			return err
-		}
-		resolveSchema, err := resolver.ResolveSchema(gvk)
-		if err != nil {
-			return err
-		}
-		schema.Ref = spec.Ref{}
-		schema.Schema = resolveSchema.Schema
-	}
-	return nil
 }
 
 func NewSchemaValidatorFromOpenAPI(openapiSchema *spec.Schema) SchemaValidator {

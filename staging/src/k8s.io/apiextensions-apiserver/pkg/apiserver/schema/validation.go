@@ -179,7 +179,7 @@ func validateStructuralInvariants(s *Structural, lvl level, fldPath *field.Path,
 		} else {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("type"), s.Type, "must be object if x-kubernetes-embedded-resource is true"))
 		}
-	} else if len(s.Type) == 0 && !s.Extensions.XIntOrString && !s.Extensions.XPreserveUnknownFields {
+	} else if s.Ref == nil && len(s.Type) == 0 && !s.Extensions.XIntOrString && !s.Extensions.XPreserveUnknownFields {
 		switch lvl {
 		case rootLevel:
 			allErrs = append(allErrs, field.Required(fldPath.Child("type"), "must not be empty at the root"))
