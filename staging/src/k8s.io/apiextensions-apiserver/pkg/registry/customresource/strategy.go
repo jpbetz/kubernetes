@@ -44,6 +44,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	celconfig "k8s.io/apiserver/pkg/apis/cel"
 	"k8s.io/apiserver/pkg/cel/common"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 	"k8s.io/apiserver/pkg/registry/generic"
 	apiserverstorage "k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
@@ -57,6 +58,7 @@ type customResourceStrategy struct {
 	runtime.ObjectTyper
 	names.NameGenerator
 
+	schemaResolver     resolver.SchemaResolver
 	namespaceScoped    bool
 	validator          customResourceValidator
 	structuralSchema   *structuralschema.Structural
@@ -73,13 +75,14 @@ type selectableField struct {
 	err       error
 }
 
-func NewStrategy(typer runtime.ObjectTyper, namespaceScoped bool, kind schema.GroupVersionKind, schemaValidator, statusSchemaValidator validation.SchemaValidator, structuralSchema *structuralschema.Structural, status *apiextensions.CustomResourceSubresourceStatus, scale *apiextensions.CustomResourceSubresourceScale, selectableFields []v1.SelectableField) customResourceStrategy {
+func NewStrategy(typer runtime.ObjectTyper, schemaResolver resolver.SchemaResolver, namespaceScoped bool, kind schema.GroupVersionKind, schemaValidator, statusSchemaValidator validation.SchemaValidator, structuralSchema *structuralschema.Structural, status *apiextensions.CustomResourceSubresourceStatus, scale *apiextensions.CustomResourceSubresourceScale, selectableFields []v1.SelectableField) customResourceStrategy {
 	var celValidator *cel.Validator
 	celValidator = cel.NewValidator(structuralSchema, true, celconfig.PerCallLimit) // CEL programs are compiled and cached here
 
 	strategy := customResourceStrategy{
 		ObjectTyper:     typer,
 		NameGenerator:   names.SimpleNameGenerator,
+		schemaResolver:  schemaResolver,
 		namespaceScoped: namespaceScoped,
 		status:          status,
 		scale:           scale,
@@ -286,7 +289,7 @@ func (a customResourceStrategy) ValidateUpdate(ctx context.Context, obj, old run
 	var correlatedObject *common.CorrelatedObject
 	if utilfeature.DefaultFeatureGate.Enabled(apiextensionsfeatures.CRDValidationRatcheting) {
 		correlatedObject = common.NewCorrelatedObject(uNew.Object, uOld.Object, &model.Structural{Structural: a.structuralSchema})
-		options = append(options, validation.WithRatcheting(correlatedObject))
+		options = append(options, validation.WithRatcheting(correlatedObject), validation.WithResolver(a.schemaResolver))
 		celOptions = append(celOptions, cel.WithRatcheting(correlatedObject))
 	}
 

@@ -44,6 +44,7 @@ import (
 	"k8s.io/apiextensions-apiserver/pkg/crdserverscheme"
 	"k8s.io/apiextensions-apiserver/pkg/registry/customresource"
 	"k8s.io/apiextensions-apiserver/pkg/registry/customresource/tableconvertor"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -128,6 +129,8 @@ type crdHandler struct {
 	// The limit on the request size that would be accepted and decoded in a write request
 	// 0 means no limit.
 	maxRequestBodyBytes int64
+
+	schemaResolver resolver.SchemaResolver
 }
 
 // crdInfo stores enough information to serve the storage for the custom resource
@@ -179,7 +182,8 @@ func NewCustomResourceDefinitionHandler(
 	requestTimeout time.Duration,
 	minRequestTimeout time.Duration,
 	staticOpenAPISpec map[string]*spec.Schema,
-	maxRequestBodyBytes int64) (*crdHandler, error) {
+	maxRequestBodyBytes int64,
+	schemaResolver resolver.SchemaResolver) (*crdHandler, error) {
 	ret := &crdHandler{
 		versionDiscoveryHandler: versionDiscoveryHandler,
 		groupDiscoveryHandler:   groupDiscoveryHandler,
@@ -195,6 +199,7 @@ func NewCustomResourceDefinitionHandler(
 		minRequestTimeout:       minRequestTimeout,
 		staticOpenAPISpec:       staticOpenAPISpec,
 		maxRequestBodyBytes:     maxRequestBodyBytes,
+		schemaResolver:          schemaResolver,
 	}
 	crdInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    ret.createCustomResourceDefinition,
@@ -764,7 +769,7 @@ func (r *crdHandler) getOrCreateServingInfoFor(uid types.UID, name string) (*crd
 			}
 			internalSchemaProps = internalValidationSchema.OpenAPIV3Schema
 		}
-		validator, _, err := apiservervalidation.NewSchemaValidator(internalSchemaProps)
+		validator, _, err := apiservervalidation.NewSchemaValidator(internalSchemaProps, r.schemaResolver)
 		if err != nil {
 			return nil, err
 		}
@@ -785,7 +790,7 @@ func (r *crdHandler) getOrCreateServingInfoFor(uid types.UID, name string) (*crd
 			// for the status subresource, validate only against the status schema
 			if internalValidationSchema != nil && internalValidationSchema.OpenAPIV3Schema != nil && internalValidationSchema.OpenAPIV3Schema.Properties != nil {
 				if statusSchema, ok := internalValidationSchema.OpenAPIV3Schema.Properties["status"]; ok {
-					statusValidator, _, err = apiservervalidation.NewSchemaValidator(&statusSchema)
+					statusValidator, _, err = apiservervalidation.NewSchemaValidator(&statusSchema, r.schemaResolver)
 					if err != nil {
 						return nil, err
 					}
@@ -825,6 +830,7 @@ func (r *crdHandler) getOrCreateServingInfoFor(uid types.UID, name string) (*crd
 			listKind,
 			customresource.NewStrategy(
 				typer,
+				r.schemaResolver,
 				crd.Spec.Scope == apiextensionsv1.NamespaceScoped,
 				kind,
 				validator,

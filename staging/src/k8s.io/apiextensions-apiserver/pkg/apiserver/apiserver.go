@@ -41,6 +41,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 	"k8s.io/apiserver/pkg/endpoints/discovery"
 	"k8s.io/apiserver/pkg/endpoints/discovery/aggregated"
 	genericregistry "k8s.io/apiserver/pkg/registry/generic"
@@ -87,6 +88,8 @@ type ExtraConfig struct {
 	ServiceResolver webhook.ServiceResolver
 	// AuthResolverWrapper is used in CR webhook converters
 	AuthResolverWrapper webhook.AuthenticationInfoResolverWrapper
+
+	SchemaResolver resolver.SchemaResolver
 }
 
 type Config struct {
@@ -199,6 +202,7 @@ func (c completedConfig) New(delegationTarget genericapiserver.DelegationTarget)
 		time.Duration(c.GenericConfig.MinRequestTimeout)*time.Second,
 		apiGroupInfo.StaticOpenAPISpec,
 		c.GenericConfig.MaxRequestBodyBytes,
+		c.ExtraConfig.SchemaResolver,
 	)
 	if err != nil {
 		return nil, err

@@ -26,11 +26,13 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/cel/common"
 	"k8s.io/apiserver/pkg/cel/environment"
+	"k8s.io/apiserver/pkg/cel/openapi/resolver"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	openapierrors "k8s.io/kube-openapi/pkg/validation/errors"
 	"k8s.io/kube-openapi/pkg/validation/spec"
 	"k8s.io/kube-openapi/pkg/validation/strfmt"
 	"k8s.io/kube-openapi/pkg/validation/validate"
+	scheme "k8s.io/kubernetes/pkg/api/legacyscheme"
 )
 
 type SchemaValidator interface {
@@ -57,6 +59,8 @@ type ValidationOptions struct {
 	// Used for ratcheting, but left as a separate field since it may be used
 	// for other purposes in the future.
 	CorrelatedObject *common.CorrelatedObject
+
+	Resolver resolver.SchemaResolver
 }
 
 type ValidationOption func(*ValidationOptions)
@@ -73,6 +77,12 @@ func WithRatcheting(correlation *common.CorrelatedObject) ValidationOption {
 	return func(options *ValidationOptions) {
 		options.Ratcheting = true
 		options.CorrelatedObject = correlation
+	}
+}
+
+func WithResolver(resolver resolver.SchemaResolver) ValidationOption {
+	return func(options *ValidationOptions) {
+		options.Resolver = resolver
 	}
 }
 
@@ -98,7 +108,7 @@ func (s basicSchemaValidator) ValidateUpdate(new, old interface{}, options ...Va
 //
 // If feature `CRDValidationRatcheting` is enabled - the validator returned
 // will support ratcheting unchanged correlatable fields across an update.
-func NewSchemaValidator(customResourceValidation *apiextensions.JSONSchemaProps) (SchemaValidator, *spec.Schema, error) {
+func NewSchemaValidator(customResourceValidation *apiextensions.JSONSchemaProps, resolver resolver.SchemaResolver) (SchemaValidator, *spec.Schema, error) {
 	// Convert CRD schema to openapi schema
 	openapiSchema := &spec.Schema{}
 	if customResourceValidation != nil {
@@ -110,15 +120,26 @@ func NewSchemaValidator(customResourceValidation *apiextensions.JSONSchemaProps)
 	}
 	// TODO: Any refs needs to be inlined here or a schema resolver needs to be passed into kube-openapi.
 	// The resolve is the "RIGHT WAY" probably... but I don't know if it's worth it.
+	if err := resolveRefs(openapiSchema, resolver); err != nil {
+		return nil, nil, err
+	}
 
 	return NewSchemaValidatorFromOpenAPI(openapiSchema), openapiSchema, nil
 }
 
-func resolveRefs(schema *spec.Schema) error {
+func resolveRefs(schema *spec.Schema, resolver resolver.SchemaResolver) error {
 	ptr := schema.Ref.GetPointer()
 	if ptr != nil {
-		ptr.String()
-		// TODO: need a schema resolver here
+		gvk, err := scheme.Scheme.FromOpenAPIDefinitionName(ptr.String())
+		if err != nil {
+			return err
+		}
+		resolveSchema, err := resolver.ResolveSchema(gvk)
+		if err != nil {
+			return err
+		}
+		schema.Ref = spec.Ref{}
+		schema.Schema = resolveSchema.Schema
 	}
 	return nil
 }
@@ -128,7 +149,6 @@ func NewSchemaValidatorFromOpenAPI(openapiSchema *spec.Schema) SchemaValidator {
 		return NewRatchetingSchemaValidator(openapiSchema, nil, "", strfmt.Default)
 	}
 	return basicSchemaValidator{validate.NewSchemaValidator(openapiSchema, nil, "", strfmt.Default)}
-
 }
 
 // ValidateCustomResourceUpdate validates the transition of Custom Resource from
