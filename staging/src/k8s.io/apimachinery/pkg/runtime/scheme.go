@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"reflect"
-	"slices"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/api/operation"
@@ -774,45 +773,6 @@ func (s *Scheme) ToOpenAPIDefinitionName(groupVersionKind schema.GroupVersionKin
 	rtype := reflect.TypeOf(example).Elem()
 	name := toOpenAPIDefinitionName(rtype.PkgPath() + "." + rtype.Name())
 	return name, nil
-}
-
-func (s *Scheme) FromOpenAPIDefinitionName(name string) (schema.GroupVersionKind, error) {
-	nameParts := strings.Split(name, ".")
-
-	if len(nameParts) < 3 {
-		return schema.GroupVersionKind{}, fmt.Errorf("invalid OpenAPI definition name: %v", name)
-	}
-
-	slices.Reverse(nameParts[0 : len(nameParts)-2])
-	gvk := schema.GroupVersionKind{
-		Group:   strings.Join(nameParts[0:len(nameParts)-2], "."),
-		Version: nameParts[len(nameParts)-2],
-		Kind:    nameParts[len(nameParts)-1],
-	}
-
-	if gvk.Group == "core.api.k8s.io" { // TODO: map all core groups and test
-		gvk.Group = ""
-	}
-
-	// TODO: This sort of check only works for Kinds..  we need to be able to lookup nested types..
-	//example, err := s.New(gvk)
-	//if err != nil {
-	//	return schema.GroupVersionKind{}, err
-	//}
-	//
-	//// TODO: Needed?  This is just asserting things we expect in test.
-	//switch example.(type) {
-	//case Unstructured:
-	//	// nothing to assert
-	//default:
-	//	// assert type name matches
-	//	rtype := reflect.TypeOf(example).Elem()
-	//	matchedName := toOpenAPIDefinitionName(rtype.PkgPath() + "." + rtype.Name())
-	//	if matchedName != name {
-	//		return schema.GroupVersionKind{}, fmt.Errorf("found wrong OpenAPI definition name: %v, expected %v", name, matchedName)
-	//	}
-	//}
-	return gvk, nil
 }
 
 // toOpenAPIDefinitionName converts Golang package/type canonical name into REST friendly OpenAPI name.

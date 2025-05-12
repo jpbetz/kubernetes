@@ -666,20 +666,13 @@ func (r *crdHandler) getOrCreateServingInfoFor(uid types.UID, name string) (*crd
 		}
 
 		// TODO: This converts to spec.Schema to call resolveRefs and then converts back. We should avoid this.
-		openapiSchema := &spec.Schema{}
+		var jsonSchemaProps *apiextensionsinternal.JSONSchemaProps
 		if internalValidation.OpenAPIV3Schema != nil {
-			if err := apiservervalidation.ConvertJSONSchemaProps(internalValidation.OpenAPIV3Schema, openapiSchema); err != nil {
-				return nil, err
+			jsonSchemaProps, err = r.resolve(internalValidation.OpenAPIV3Schema)
+			if err != nil {
+				return nil, fmt.Errorf("failed resolving CRD schema: %v", err)
 			}
 		}
-
-		if replacement, err := resolveRefs(openapiSchema, r.schemaResolver); err != nil {
-			return nil, err
-		} else if replacement != nil {
-			openapiSchema = replacement
-		}
-
-		jsonSchemaProps := toJSONSchemaProps(openapiSchema)
 
 		s, err := structuralschema.NewStructural(jsonSchemaProps)
 		if !crd.Spec.PreserveUnknownFields && err != nil {
@@ -785,7 +778,13 @@ func (r *crdHandler) getOrCreateServingInfoFor(uid types.UID, name string) (*crd
 				return nil, fmt.Errorf("failed to convert CRD validation to internal version: %v", err)
 			}
 			internalSchemaProps = internalValidationSchema.OpenAPIV3Schema
+			// internalSchemaProps needs ref resolution
+			internalSchemaProps, err = r.resolve(internalSchemaProps)
+			if err != nil {
+				return nil, fmt.Errorf("failed resolving CRD schema: %v", err)
+			}
 		}
+
 		validator, _, err := apiservervalidation.NewSchemaValidator(internalSchemaProps, r.schemaResolver)
 		if err != nil {
 			return nil, err
@@ -1476,23 +1475,17 @@ func buildOpenAPIModelsForApply(staticOpenAPISpec map[string]*spec.Schema, crd *
 	return mergedOpenAPI.Components.Schemas, nil
 }
 
-func resolveRefs(schema *spec.Schema, resolver resolver.SchemaResolver) (*spec.Schema, error) {
+func resolveRefs(schema *spec.Schema, resolver resolver.RefResolver) (*spec.Schema, error) {
 	// TODO: The resolver already handles $refs, so we should leverage it more fully.
 	// TODO: This does not handle all fields of the schema.
 
 	ptr := schema.Ref.GetPointer()
 	if ptr != nil && !ptr.IsEmpty() {
-		ref := strings.TrimPrefix(ptr.String(), "/components/schemas/")
-		gvk, err := Scheme.FromOpenAPIDefinitionName(ref)
+		s, err := resolver.ResolveRef(schema.Ref.Ref)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get definition name for ref %q: %v", ptr.String(), err)
 		}
-		// TODO: This would work for root CRDs built-ins, but doesn't work for non-root types. We need to retrieve those from static openapi.
-		resolveSchema, err := resolver.ResolveSchema(gvk)
-		if err != nil {
-			return nil, fmt.Errorf("failed to resolve gvk %q: %v", gvk, err)
-		}
-		return resolveSchema, nil
+		return s, nil
 	}
 	for k, p := range schema.Properties {
 		if replacement, err := resolveRefs(&p, resolver); err != nil {
@@ -1743,4 +1736,25 @@ func toJSONSchemaProps(openapiSchema *spec.Schema) *apiextensionsinternal.JSONSc
 	}
 
 	return result
+}
+
+func (r *crdHandler) resolve(jsonSchemaProps *apiextensionsinternal.JSONSchemaProps) (*apiextensionsinternal.JSONSchemaProps, error) {
+	// TODO: This converts to spec.Schema to call resolveRefs and then converts back. We should avoid this.
+	openapiSchema := &spec.Schema{}
+	if err := apiservervalidation.ConvertJSONSchemaProps(jsonSchemaProps, openapiSchema); err != nil {
+		return nil, err
+	}
+
+	refResolver, ok := r.schemaResolver.(resolver.RefResolver)
+	if !ok {
+		return nil, fmt.Errorf("the server could not properly serve the CR schema")
+	}
+
+	if replacement, err := resolveRefs(openapiSchema, refResolver); err != nil {
+		return nil, err
+	} else if replacement != nil {
+		openapiSchema = replacement
+	}
+
+	return toJSONSchemaProps(openapiSchema), nil
 }

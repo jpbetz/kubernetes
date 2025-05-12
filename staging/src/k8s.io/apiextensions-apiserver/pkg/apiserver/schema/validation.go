@@ -21,10 +21,8 @@ import (
 	"reflect"
 	"regexp"
 	"sort"
-	"strings"
 
 	"k8s.io/apimachinery/pkg/util/validation/field"
-	scheme "k8s.io/kubernetes/pkg/api/legacyscheme"
 )
 
 var intOrStringAnyOf = []NestedValueValidation{
@@ -121,18 +119,19 @@ func validateStructuralInvariants(s *Structural, lvl level, fldPath *field.Path,
 			allErrs = append(allErrs, field.Forbidden(fldPath.Child("ref"), "must not be used"))
 		} else {
 			// check the ref
-			ref := *s.Ref
-			if !strings.HasPrefix(ref, "#/components/schemas/") {
-				allErrs = append(allErrs, field.Invalid(fldPath.Child("ref"), ref, "must be a local reference"))
-			}
-			ref = strings.TrimPrefix(ref, "#/components/schemas/")
-			if len(ref) == 0 {
-				allErrs = append(allErrs, field.Invalid(fldPath.Child("ref"), ref, "must be a local reference"))
-			}
+			//ref := *s.Ref
+			//if !strings.HasPrefix(ref, "#/components/schemas/") {
+			//	allErrs = append(allErrs, field.Invalid(fldPath.Child("ref"), ref, "must be a local reference"))
+			//}
+			//ref = strings.TrimPrefix(ref, "#/components/schemas/")
+			//if len(ref) == 0 {
+			//	allErrs = append(allErrs, field.Invalid(fldPath.Child("ref"), ref, "must be a local reference"))
+			//}
 			// TODO: load the openapi... it's needed to validate oneOf, allOf, etc.
-			if _, err := scheme.Scheme.FromOpenAPIDefinitionName(ref); err != nil {
-				allErrs = append(allErrs, field.Invalid(fldPath.Child("ref"), ref, fmt.Sprintf("must be a valid reference: %v", err)))
-			}
+			// TODO: Use a ref resolver here? Just validate a ref is structurally correct?
+			//if _, err := scheme.Scheme.FromOpenAPIDefinitionName(ref); err != nil {
+			//	allErrs = append(allErrs, field.Invalid(fldPath.Child("ref"), ref, fmt.Sprintf("must be a valid reference: %v", err)))
+			//}
 		}
 	}
 

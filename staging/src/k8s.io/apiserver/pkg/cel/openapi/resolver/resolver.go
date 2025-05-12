@@ -19,6 +19,8 @@ package resolver
 import (
 	"fmt"
 
+	"github.com/go-openapi/jsonreference"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/kube-openapi/pkg/validation/spec"
 )
@@ -37,3 +39,10 @@ type SchemaResolver interface {
 // ErrSchemaNotFound is wrapped and returned if the schema cannot be located
 // by the resolver.
 var ErrSchemaNotFound = fmt.Errorf("schema not found")
+
+type RefResolver interface {
+	SchemaResolver
+	ResolveRef(ref jsonreference.Ref) (*spec.Schema, error)
+}
+
+var ErrRefNotFound = fmt.Errorf("ref not found")

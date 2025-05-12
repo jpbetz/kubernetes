@@ -17,6 +17,8 @@ limitations under the License.
 package resolver
 
 import (
+	"github.com/go-openapi/jsonreference"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/kube-openapi/pkg/validation/spec"
 )
@@ -42,4 +44,12 @@ func (r *combinedSchemaResolver) ResolveSchema(gvk schema.GroupVersionKind) (*sp
 		return r.definitions.ResolveSchema(gvk)
 	}
 	return r.secondary.ResolveSchema(gvk)
+}
+
+func (r *combinedSchemaResolver) ResolveRef(ref jsonreference.Ref) (*spec.Schema, error) {
+	return r.definitions.ResolveRef(ref)
+	//if refResolver, ok := r.secondary.(RefResolver); ok {
+	//	return refResolver.ResolveRef(ref)
+	//}
+	//return nil, fmt.Errorf("error resolving ref: %w", ErrRefNotFound) // TODO: is this misleading?
 }

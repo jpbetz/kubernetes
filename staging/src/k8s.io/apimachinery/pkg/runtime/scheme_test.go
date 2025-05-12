@@ -1182,15 +1182,6 @@ func TestToOpenAPIDefinitionName(t *testing.T) {
 			if out != test.out {
 				t.Errorf("expected %s, got %s", test.out, out)
 			}
-
-			// TODO: this skips wantErr cases, which is OK?
-			toGVK, err := scheme.FromOpenAPIDefinitionName(test.out)
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
-			if !reflect.DeepEqual(toGVK, test.gvk) {
-				t.Errorf("expected %v, got %v", test.gvk, toGVK)
-			}
 		})
 	}
 }

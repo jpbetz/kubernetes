@@ -18,6 +18,10 @@ package resolver
 
 import (
 	"fmt"
+	"slices"
+	"strings"
+
+	"github.com/go-openapi/jsonreference"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -74,6 +78,54 @@ func (d *DefinitionsSchemaResolver) ResolveSchema(gvk schema.GroupVersionKind) (
 		return nil, err
 	}
 	return s, nil
+}
+
+// Examples of valid input:
+// "/openapi/v3/api/v1#/components/schemas/io.k8s.api.core.v1.PodSpec"
+// "/openapi/v3/apis/apps/v1#/components/schemas/io.k8s.api.apps.v1.DaemonSet"
+// "/openapi/v3/apis/certificates.k8s.io/v1#/components/schemas/io.k8s.api.certificates.v1.CertificateSigningRequest"
+
+func (d *DefinitionsSchemaResolver) ResolveRef(ref jsonreference.Ref) (*spec.Schema, error) {
+	// TODO: Dropping the URL part is not really safe. We should validate it.
+	r := ref.GetPointer().String()
+	if !strings.HasPrefix(r, "/components/schemas/") {
+		return nil, fmt.Errorf("cannot resolve %v: %w", r, ErrSchemaNotFound)
+	}
+	definitionName := strings.TrimPrefix(r, "/components/schemas/")
+	internalName, err := toInternalName(definitionName)
+	if err != nil {
+		return nil, fmt.Errorf("cannot resolve %v: %w", r, err)
+	}
+	s, err := PopulateRefs(func(ref string) (*spec.Schema, bool) {
+		// find the schema by the ref string, and return a deep copy
+		def, ok := d.defs[ref]
+		if !ok {
+			return nil, false
+		}
+		s := def.Schema
+		return &s, true
+	}, internalName)
+	if err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+func toInternalName(name string) (string, error) {
+	nameParts := strings.Split(name, ".")
+
+	if len(nameParts) < 6 {
+		return "", fmt.Errorf("invalid OpenAPI definition name: %v", name)
+	}
+	if !slices.Equal(nameParts[:3], []string{"io", "k8s", "api"}) {
+		return "", fmt.Errorf("invalid OpenAPI definition name: %v", name)
+	}
+
+	group := nameParts[3]
+	version := nameParts[4]
+	typ := nameParts[5]
+
+	return fmt.Sprintf("k8s.io/api/%s/%s.%s", group, version, typ), nil
 }
 
 func extensionsToGVKs(extensions spec.Extensions) []schema.GroupVersionKind {
