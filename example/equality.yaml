@@ -1,0 +1,11 @@
+apiVersion: stable.example.com/v1
+kind: CronTab
+metadata:
+  name: my-cron-object
+spec:
+  job:
+    containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+          - containerPort: 80
