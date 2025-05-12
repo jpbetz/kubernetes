@@ -66,12 +66,6 @@ func (r *ClientDiscoveryResolver) ResolveSchema(gvk schema.GroupVersionKind) (*s
 	}
 	return s, nil
 }
-
-// TODO Implement?
-//func (r *ClientDiscoveryResolver) ResolveRef(schema string) (*spec.Schema, error) {
-//	panic("not implemented")
-//}
-
 func resolveRef(resp *schemaResponse, gvk schema.GroupVersionKind) (string, error) {
 	for ref, s := range resp.Components.Schemas {
 		var gvks []schema.GroupVersionKind

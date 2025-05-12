@@ -19,8 +19,6 @@ package resolver
 import (
 	"fmt"
 
-	"github.com/go-openapi/jsonreference"
-
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/kube-openapi/pkg/validation/spec"
 )
@@ -42,7 +40,11 @@ var ErrSchemaNotFound = fmt.Errorf("schema not found")
 
 type RefResolver interface {
 	SchemaResolver
-	ResolveRef(ref jsonreference.Ref) (*spec.Schema, error)
-}
 
-var ErrRefNotFound = fmt.Errorf("ref not found")
+	// ResolveRefs takes a schema including references ($ref) and returns a schema where all
+	// references are replaced with the referenced schema.
+	// To resolve a single reference, provide a schema containing only a $ref.
+	// The returned error wraps ErrSchemaNotFound if the resolution is
+	//  attempted, but the corresponding schema cannot be found.
+	ResolveRefs(*spec.Schema) (*spec.Schema, error)
+}

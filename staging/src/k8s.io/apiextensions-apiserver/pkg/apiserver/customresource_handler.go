@@ -1475,40 +1475,25 @@ func buildOpenAPIModelsForApply(staticOpenAPISpec map[string]*spec.Schema, crd *
 	return mergedOpenAPI.Components.Schemas, nil
 }
 
-func resolveRefs(schema *spec.Schema, resolver resolver.RefResolver) (*spec.Schema, error) {
-	// TODO: The resolver already handles $refs, so we should leverage it more fully.
-	// TODO: This does not handle all fields of the schema.
+func (r *crdHandler) resolve(jsonSchemaProps *apiextensionsinternal.JSONSchemaProps) (*apiextensionsinternal.JSONSchemaProps, error) {
+	// TODO: This converts to spec.Schema to call resolveRefs and then converts back. We should avoid this.
+	openapiSchema := &spec.Schema{}
+	err := apiservervalidation.ConvertJSONSchemaProps(jsonSchemaProps, openapiSchema)
+	if err != nil {
+		return nil, err
+	}
 
-	ptr := schema.Ref.GetPointer()
-	if ptr != nil && !ptr.IsEmpty() {
-		s, err := resolver.ResolveRef(schema.Ref.Ref)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get definition name for ref %q: %v", ptr.String(), err)
-		}
-		return s, nil
+	refResolver, ok := r.schemaResolver.(resolver.RefResolver)
+	if !ok {
+		return nil, fmt.Errorf("the server could not properly serve the CR schema")
 	}
-	for k, p := range schema.Properties {
-		if replacement, err := resolveRefs(&p, resolver); err != nil {
-			return nil, err
-		} else if replacement != nil {
-			schema.Properties[k] = *replacement
-		}
+
+	openapiSchema, err = refResolver.ResolveRefs(openapiSchema)
+	if err != nil {
+		return nil, err
 	}
-	if schema.AdditionalProperties != nil && schema.AdditionalProperties.Schema != nil {
-		if replacement, err := resolveRefs(schema.AdditionalProperties.Schema, resolver); err != nil {
-			return nil, err
-		} else if replacement != nil {
-			schema.AdditionalProperties.Schema = replacement
-		}
-	}
-	if schema.Items != nil && schema.Items.Schema != nil {
-		if replacement, err := resolveRefs(schema.Items.Schema, resolver); err != nil {
-			return nil, err
-		} else if replacement != nil {
-			schema.Items.Schema = replacement
-		}
-	}
-	return schema, nil
+
+	return toJSONSchemaProps(openapiSchema), nil
 }
 
 func toJSONSchemaProps(openapiSchema *spec.Schema) *apiextensionsinternal.JSONSchemaProps {
@@ -1736,25 +1721,4 @@ func toJSONSchemaProps(openapiSchema *spec.Schema) *apiextensionsinternal.JSONSc
 	}
 
 	return result
-}
-
-func (r *crdHandler) resolve(jsonSchemaProps *apiextensionsinternal.JSONSchemaProps) (*apiextensionsinternal.JSONSchemaProps, error) {
-	// TODO: This converts to spec.Schema to call resolveRefs and then converts back. We should avoid this.
-	openapiSchema := &spec.Schema{}
-	if err := apiservervalidation.ConvertJSONSchemaProps(jsonSchemaProps, openapiSchema); err != nil {
-		return nil, err
-	}
-
-	refResolver, ok := r.schemaResolver.(resolver.RefResolver)
-	if !ok {
-		return nil, fmt.Errorf("the server could not properly serve the CR schema")
-	}
-
-	if replacement, err := resolveRefs(openapiSchema, refResolver); err != nil {
-		return nil, err
-	} else if replacement != nil {
-		openapiSchema = replacement
-	}
-
-	return toJSONSchemaProps(openapiSchema), nil
 }

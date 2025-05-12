@@ -27,6 +27,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/go-openapi/jsonreference"
 	celgo "github.com/google/cel-go/cel"
 
 	"k8s.io/apiextensions-apiserver/pkg/apihelpers"
@@ -44,6 +45,7 @@ import (
 	celconfig "k8s.io/apiserver/pkg/apis/cel"
 	apiservercel "k8s.io/apiserver/pkg/cel"
 	"k8s.io/apiserver/pkg/cel/environment"
+	"k8s.io/apiserver/pkg/util/openapi"
 	"k8s.io/apiserver/pkg/util/webhook"
 )
 
@@ -1471,9 +1473,16 @@ func (v *specStandardValidatorV3) validate(schema *apiextensions.JSONSchemaProps
 		allErrs = append(allErrs, field.Forbidden(fldPath.Child("dependencies"), "dependencies is not supported"))
 	}
 
-	//if schema.Ref != nil {
-	//	allErrs = append(allErrs, field.Forbidden(fldPath.Child("$ref"), "$ref is not supported"))
-	//}
+	if schema.Ref != nil {
+		r, err := jsonreference.New(*schema.Ref)
+		if err != nil {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("$ref"), *schema.Ref, fmt.Sprintf("invalid $ref: %v", err)))
+		}
+		_, _, err = openapi.ParseRef(r)
+		if err != nil {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("$ref"), *schema.Ref, fmt.Sprintf("invalid $ref: %v", err)))
+		}
+	}
 
 	if schema.Type == "null" {
 		allErrs = append(allErrs, field.Forbidden(fldPath.Child("type"), "type cannot be set to null, use nullable as an alternative"))

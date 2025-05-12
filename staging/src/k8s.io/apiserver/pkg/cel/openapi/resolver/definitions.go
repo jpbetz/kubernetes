@@ -18,7 +18,6 @@ package resolver
 
 import (
 	"fmt"
-	"slices"
 	"strings"
 
 	"github.com/go-openapi/jsonreference"
@@ -26,6 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/endpoints/openapi"
+	utilopenapi "k8s.io/apiserver/pkg/util/openapi"
 	"k8s.io/kube-openapi/pkg/common"
 	"k8s.io/kube-openapi/pkg/validation/spec"
 )
@@ -80,22 +80,107 @@ func (d *DefinitionsSchemaResolver) ResolveSchema(gvk schema.GroupVersionKind) (
 	return s, nil
 }
 
-// Examples of valid input:
-// "/openapi/v3/api/v1#/components/schemas/io.k8s.api.core.v1.PodSpec"
-// "/openapi/v3/apis/apps/v1#/components/schemas/io.k8s.api.apps.v1.DaemonSet"
-// "/openapi/v3/apis/certificates.k8s.io/v1#/components/schemas/io.k8s.api.certificates.v1.CertificateSigningRequest"
+func (d *DefinitionsSchemaResolver) ResolveRefs(schema *spec.Schema) (*spec.Schema, error) {
+	ptr := schema.Ref.GetPointer()
+	if ptr != nil && !ptr.IsEmpty() {
+		s, err := d.resolveRef(schema.Ref.Ref)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get definition name for ref %q: %v", ptr.String(), err)
+		}
+		return s, nil
+	}
+	if schema.Items != nil && schema.Items.Schema != nil {
+		if replacement, err := d.ResolveRefs(schema.Items.Schema); err != nil {
+			return nil, err
+		} else if replacement != nil {
+			schema.Items.Schema = replacement
+		}
+	}
+	if schema.AllOf != nil {
+		for i, s := range schema.AllOf {
+			if replacement, err := d.ResolveRefs(&s); err != nil {
+				return nil, err
+			} else if replacement != nil {
+				schema.AllOf[i] = *replacement
+			}
+		}
+	}
+	if schema.AnyOf != nil {
+		for i, s := range schema.AnyOf {
+			if replacement, err := d.ResolveRefs(&s); err != nil {
+				return nil, err
+			} else if replacement != nil {
+				schema.AnyOf[i] = *replacement
+			}
+		}
+	}
+	if schema.OneOf != nil {
+		for i, s := range schema.OneOf {
+			if replacement, err := d.ResolveRefs(&s); err != nil {
+				return nil, err
+			} else if replacement != nil {
+				schema.OneOf[i] = *replacement
+			}
+		}
+	}
+	if schema.Not != nil {
+		if replacement, err := d.ResolveRefs(schema.Not); err != nil {
+			return nil, err
+		} else if replacement != nil {
+			schema.Not = replacement
+		}
+	}
+	for k, p := range schema.Properties {
+		if replacement, err := d.ResolveRefs(&p); err != nil {
+			return nil, err
+		} else if replacement != nil {
+			schema.Properties[k] = *replacement
+		}
+	}
+	if schema.AdditionalProperties != nil && schema.AdditionalProperties.Schema != nil {
+		if replacement, err := d.ResolveRefs(schema.AdditionalProperties.Schema); err != nil {
+			return nil, err
+		} else if replacement != nil {
+			schema.AdditionalProperties.Schema = replacement
+		}
+	}
+	if schema.PatternProperties != nil {
+		for k, p := range schema.PatternProperties {
+			if replacement, err := d.ResolveRefs(&p); err != nil {
+				return nil, err
+			} else if replacement != nil {
+				schema.PatternProperties[k] = *replacement
+			}
+		}
+	}
+	if schema.Dependencies != nil {
+		// TODO
+	}
+	if schema.AdditionalItems != nil && schema.AdditionalItems.Schema != nil {
+		if replacement, err := d.ResolveRefs(schema.AdditionalItems.Schema); err != nil {
+			return nil, err
+		} else if replacement != nil {
+			schema.AdditionalItems.Schema = replacement
+		}
+	}
+	if schema.Definitions != nil {
+		for k, p := range schema.Definitions {
+			if replacement, err := d.ResolveRefs(&p); err != nil {
+				return nil, err
+			} else if replacement != nil {
+				schema.Definitions[k] = *replacement
+			}
+		}
+	}
+	return schema, nil
+}
 
-func (d *DefinitionsSchemaResolver) ResolveRef(ref jsonreference.Ref) (*spec.Schema, error) {
-	// TODO: Dropping the URL part is not really safe. We should validate it.
-	r := ref.GetPointer().String()
-	if !strings.HasPrefix(r, "/components/schemas/") {
-		return nil, fmt.Errorf("cannot resolve %v: %w", r, ErrSchemaNotFound)
-	}
-	definitionName := strings.TrimPrefix(r, "/components/schemas/")
-	internalName, err := toInternalName(definitionName)
+func (d *DefinitionsSchemaResolver) resolveRef(ref jsonreference.Ref) (*spec.Schema, error) {
+	internalName, err := toInternalName(ref)
 	if err != nil {
-		return nil, fmt.Errorf("cannot resolve %v: %w", r, err)
+		return nil, fmt.Errorf("cannot resolve %v due to %w: %w", ref, err, ErrSchemaNotFound)
 	}
+
 	s, err := PopulateRefs(func(ref string) (*spec.Schema, bool) {
 		// find the schema by the ref string, and return a deep copy
 		def, ok := d.defs[ref]
@@ -111,21 +196,18 @@ func (d *DefinitionsSchemaResolver) ResolveRef(ref jsonreference.Ref) (*spec.Sch
 	return s, nil
 }
 
-func toInternalName(name string) (string, error) {
-	nameParts := strings.Split(name, ".")
-
-	if len(nameParts) < 6 {
-		return "", fmt.Errorf("invalid OpenAPI definition name: %v", name)
+func toInternalName(ref jsonreference.Ref) (string, error) {
+	gv, typeName, err := utilopenapi.ParseRef(ref)
+	if err != nil {
+		return "", fmt.Errorf("error parsing $ref %v: %w", ref, err)
 	}
-	if !slices.Equal(nameParts[:3], []string{"io", "k8s", "api"}) {
-		return "", fmt.Errorf("invalid OpenAPI definition name: %v", name)
+	group := gv.Group
+	if gv.Group == "" {
+		group = "core"
+	} else {
+		group, _, _ = strings.Cut(gv.Group, ".")
 	}
-
-	group := nameParts[3]
-	version := nameParts[4]
-	typ := nameParts[5]
-
-	return fmt.Sprintf("k8s.io/api/%s/%s.%s", group, version, typ), nil
+	return fmt.Sprintf("k8s.io/api/%s/%s.%s", group, gv.Version, typeName), nil
 }
 
 func extensionsToGVKs(extensions spec.Extensions) []schema.GroupVersionKind {
