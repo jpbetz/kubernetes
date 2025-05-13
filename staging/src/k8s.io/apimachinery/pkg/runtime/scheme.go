@@ -91,6 +91,10 @@ type Scheme struct {
 	// schemeName is the name of this scheme.  If you don't specify a name, the stack of the NewScheme caller will be used.
 	// This is useful for error reporting to indicate the origin of the scheme.
 	schemeName string
+
+	// OpenAPIDefinition name overrides
+	groupOpenAPIDefinitions map[schema.GroupVersion]string
+	kindOpenAPIDefinitions  map[schema.GroupVersionKind]string
 }
 
 // FieldLabelConversionFunc converts a field selector to internal representation.
@@ -108,6 +112,8 @@ func NewScheme() *Scheme {
 		validationFuncs:           map[reflect.Type]func(ctx context.Context, op operation.Operation, object, oldObject interface{}) field.ErrorList{},
 		versionPriority:           map[string][]string{},
 		schemeName:                naming.GetNameFromCallsite(internalPackages...),
+		groupOpenAPIDefinitions:   map[schema.GroupVersion]string{},
+		kindOpenAPIDefinitions:    map[schema.GroupVersionKind]string{},
 	}
 	s.converter = conversion.NewConverter(nil)
 
@@ -202,6 +208,21 @@ func (s *Scheme) AddKnownTypeWithName(gvk schema.GroupVersionKind, obj Object) {
 			panic(err)
 		}
 	}
+}
+
+func (s *Scheme) RegisterOpenAPIPathForTypes(path string, gv schema.GroupVersion, types ...Object) {
+	for _, obj := range types {
+		t := reflect.TypeOf(obj)
+		if t.Kind() != reflect.Pointer {
+			panic("All types must be pointers to structs.")
+		}
+		t = t.Elem()
+		s.kindOpenAPIDefinitions[gv.WithKind(t.Name())] = path
+	}
+}
+
+func (s *Scheme) RegisterOpenAPIPath(gv schema.GroupVersion, path string) {
+	s.groupOpenAPIDefinitions[gv] = path
 }
 
 // KnownTypes returns the types known for the given version.
@@ -770,6 +791,19 @@ func (s *Scheme) ToOpenAPIDefinitionName(groupVersionKind schema.GroupVersionKin
 		}
 		return reverseParts(groupVersionKind.Group) + "." + groupVersionKind.Version + "." + groupVersionKind.Kind, nil
 	}
+
+	if path, ok := s.kindOpenAPIDefinitions[groupVersionKind]; ok {
+		return path + "." + groupVersionKind.Kind, nil
+	}
+	if path, ok := s.groupOpenAPIDefinitions[groupVersionKind.GroupVersion()]; ok {
+		return path + "." + groupVersionKind.Kind, nil
+	}
+	if strings.HasSuffix(groupVersionKind.Group, ".k8s.io") {
+		group := strings.TrimSuffix(groupVersionKind.Group, ".k8s.io")
+		return "io.k8s.api." + group + "." + groupVersionKind.Version + "." + groupVersionKind.Kind, nil
+	}
+
+	// Use package paths
 	rtype := reflect.TypeOf(example).Elem()
 	name := toOpenAPIDefinitionName(rtype.PkgPath() + "." + rtype.Name())
 	return name, nil
