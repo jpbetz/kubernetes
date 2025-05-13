@@ -92,9 +92,13 @@ type Scheme struct {
 	// This is useful for error reporting to indicate the origin of the scheme.
 	schemeName string
 
-	// OpenAPIDefinition name overrides
-	groupOpenAPIDefinitions map[schema.GroupVersion]string
-	kindOpenAPIDefinitions  map[schema.GroupVersionKind]string
+	// openAPIGroupPath provides OpenAPI definition name prefixes that apply to all kinds in group-versions.
+	// The kind name is appended to the override to create the OpenAPI definition name: "<override>.<kindName>".
+	// If unset, the name is picked using heuristics.
+	openAPIGroupPath map[schema.GroupVersion]string
+	// openAPIKindPath provides OpenAPI definition names for group-version-kinds.
+	// If unset, the name is picked using heuristics.
+	openAPIKindPath map[schema.GroupVersionKind]string
 }
 
 // FieldLabelConversionFunc converts a field selector to internal representation.
@@ -112,8 +116,8 @@ func NewScheme() *Scheme {
 		validationFuncs:           map[reflect.Type]func(ctx context.Context, op operation.Operation, object, oldObject interface{}) field.ErrorList{},
 		versionPriority:           map[string][]string{},
 		schemeName:                naming.GetNameFromCallsite(internalPackages...),
-		groupOpenAPIDefinitions:   map[schema.GroupVersion]string{},
-		kindOpenAPIDefinitions:    map[schema.GroupVersionKind]string{},
+		openAPIGroupPath:          map[schema.GroupVersion]string{},
+		openAPIKindPath:           map[schema.GroupVersionKind]string{},
 	}
 	s.converter = conversion.NewConverter(nil)
 
@@ -210,6 +214,10 @@ func (s *Scheme) AddKnownTypeWithName(gvk schema.GroupVersionKind, obj Object) {
 	}
 }
 
+// RegisterOpenAPIPathForTypes registers an OpenAPI definition name prefix
+// that applies to all kinds in a group-version. The kind name is
+// appended to the override to create the OpenAPI definition name:
+// "<override>.<kindName>".
 func (s *Scheme) RegisterOpenAPIPathForTypes(path string, gv schema.GroupVersion, types ...Object) {
 	for _, obj := range types {
 		t := reflect.TypeOf(obj)
@@ -217,12 +225,13 @@ func (s *Scheme) RegisterOpenAPIPathForTypes(path string, gv schema.GroupVersion
 			panic("All types must be pointers to structs.")
 		}
 		t = t.Elem()
-		s.kindOpenAPIDefinitions[gv.WithKind(t.Name())] = path
+		s.openAPIKindPath[gv.WithKind(t.Name())] = path + "." + t.Name()
 	}
 }
 
+// RegisterOpenAPIPath sets an OpenAPI definition name for a group-version-kind.
 func (s *Scheme) RegisterOpenAPIPath(gv schema.GroupVersion, path string) {
-	s.groupOpenAPIDefinitions[gv] = path
+	s.openAPIGroupPath[gv] = path
 }
 
 // KnownTypes returns the types known for the given version.
@@ -792,18 +801,20 @@ func (s *Scheme) ToOpenAPIDefinitionName(groupVersionKind schema.GroupVersionKin
 		return reverseParts(groupVersionKind.Group) + "." + groupVersionKind.Version + "." + groupVersionKind.Kind, nil
 	}
 
-	if path, ok := s.kindOpenAPIDefinitions[groupVersionKind]; ok {
+	if path, ok := s.openAPIKindPath[groupVersionKind]; ok {
 		return path + "." + groupVersionKind.Kind, nil
 	}
-	if path, ok := s.groupOpenAPIDefinitions[groupVersionKind.GroupVersion()]; ok {
-		return path + "." + groupVersionKind.Kind, nil
+	if path, ok := s.openAPIGroupPath[groupVersionKind.GroupVersion()]; ok {
+		return path, nil
 	}
+
+	// FIXME: Better to just register all these and eliminate the heuristic?
 	if strings.HasSuffix(groupVersionKind.Group, ".k8s.io") {
 		group := strings.TrimSuffix(groupVersionKind.Group, ".k8s.io")
 		return "io.k8s.api." + group + "." + groupVersionKind.Version + "." + groupVersionKind.Kind, nil
 	}
 
-	// Use package paths
+	// Use package paths to pick a name
 	rtype := reflect.TypeOf(example).Elem()
 	name := toOpenAPIDefinitionName(rtype.PkgPath() + "." + rtype.Name())
 	return name, nil

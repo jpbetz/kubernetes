@@ -65,12 +65,14 @@ var optionsTypes = []runtime.Object{
 // AddToGroupVersion registers common meta types into schemas.
 func AddToGroupVersion(scheme *runtime.Scheme, groupVersion schema.GroupVersion) {
 	scheme.AddKnownTypeWithName(groupVersion.WithKind(WatchEventKind), &WatchEvent{})
+	scheme.RegisterOpenAPIPathForTypes("io.k8s.apimachinery.pkg.apis.meta.v1", groupVersion, &WatchEvent{})
 	scheme.AddKnownTypeWithName(
 		schema.GroupVersion{Group: groupVersion.Group, Version: runtime.APIVersionInternal}.WithKind(WatchEventKind),
 		&InternalEvent{},
 	)
 	// Supports legacy code paths, most callers should use metav1.ParameterCodec for now
 	scheme.AddKnownTypes(groupVersion, optionsTypes...)
+	scheme.RegisterOpenAPIPathForTypes("io.k8s.apimachinery.pkg.apis.meta.v1", groupVersion, optionsTypes...)
 	// Register Unversioned types under their own special group
 	scheme.AddUnversionedTypes(Unversioned,
 		&Status{},
@@ -79,7 +81,13 @@ func AddToGroupVersion(scheme *runtime.Scheme, groupVersion schema.GroupVersion)
 		&APIGroup{},
 		&APIResourceList{},
 	)
-
+	scheme.RegisterOpenAPIPathForTypes("io.k8s.apimachinery.pkg.apis.meta.v1", Unversioned,
+		&Status{},
+		&APIVersions{},
+		&APIGroupList{},
+		&APIGroup{},
+		&APIResourceList{},
+	)
 	// register manually. This usually goes through the SchemeBuilder, which we cannot use here.
 	utilruntime.Must(RegisterConversions(scheme))
 	utilruntime.Must(RegisterDefaults(scheme))

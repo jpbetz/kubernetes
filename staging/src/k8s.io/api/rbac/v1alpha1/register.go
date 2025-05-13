@@ -53,6 +53,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&ClusterRoleBindingList{},
 		&ClusterRoleList{},
 	)
+	scheme.RegisterOpenAPIPath(SchemeGroupVersion, "io.k8s.api.rbac.v1alpha1")
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
 }

@@ -57,6 +57,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&NetworkPolicy{},
 		&NetworkPolicyList{},
 	)
+	scheme.RegisterOpenAPIPath(SchemeGroupVersion, "io.k8s.api.extensions.v1beta1")
 	// Add the watch version that applies
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

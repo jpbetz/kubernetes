@@ -49,6 +49,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&CronJob{},
 		&CronJobList{},
 	)
+	scheme.RegisterOpenAPIPath(SchemeGroupVersion, "io.k8s.api.batch.v1")
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
 }

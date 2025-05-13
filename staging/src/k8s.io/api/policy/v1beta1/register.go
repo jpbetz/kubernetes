@@ -48,6 +48,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&PodDisruptionBudgetList{},
 		&Eviction{},
 	)
+	scheme.RegisterOpenAPIPath(SchemeGroupVersion, "io.k8s.api.policy.v1beta1")
 	// Add the watch version that applies
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

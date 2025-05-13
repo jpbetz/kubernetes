@@ -47,6 +47,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&HorizontalPodAutoscaler{},
 		&HorizontalPodAutoscalerList{},
 	)
+	scheme.RegisterOpenAPIPath(SchemeGroupVersion, "io.k8s.api.autoscaling.v2beta1")
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
 }

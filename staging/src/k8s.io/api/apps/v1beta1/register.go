@@ -53,6 +53,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&ControllerRevision{},
 		&ControllerRevisionList{},
 	)
+	scheme.RegisterOpenAPIPath(SchemeGroupVersion, "io.k8s.api.apps.v1beta1")
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
 }

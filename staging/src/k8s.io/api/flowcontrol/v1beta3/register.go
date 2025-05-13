@@ -53,6 +53,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&PriorityLevelConfiguration{},
 		&PriorityLevelConfigurationList{},
 	)
+	scheme.RegisterOpenAPIPath(SchemeGroupVersion, "io.k8s.api.flowcontrol.v1beta3")
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
 }

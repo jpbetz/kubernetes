@@ -92,7 +92,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 
 	// Add common types
 	scheme.AddKnownTypes(SchemeGroupVersion, &metav1.Status{})
-
+	scheme.RegisterOpenAPIPath(SchemeGroupVersion, "io.k8s.api.core.v1")
 	// Add the watch version that applies
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
