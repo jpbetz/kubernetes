@@ -13,7 +13,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	golang.org/x/text v0.22.0
 	k8s.io/apimachinery v0.0.0
-	k8s.io/gengo/v2 v2.0.0-20250207200755-1244d31929d7
+	k8s.io/gengo/v2 v2.0.0-20250603061911-db65aa66bbe3
 	k8s.io/klog/v2 v2.130.1
 	k8s.io/kube-openapi v0.0.0-20250318190949-c8a335a9a2ff
 	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738
@@ -47,4 +47,7 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.6.0 // indirect
 )
 
-replace k8s.io/apimachinery => ../apimachinery
+replace (
+	k8s.io/apimachinery => ../apimachinery
+	k8s.io/gengo/v2 => github.com/jpbetz/gengo/v2 v2.0.0-20250603061911-db65aa66bbe3
+)

@@ -108,5 +108,6 @@ replace (
 	k8s.io/apiserver => ../apiserver
 	k8s.io/client-go => ../client-go
 	k8s.io/component-base => ../component-base
+	k8s.io/gengo/v2 => github.com/jpbetz/gengo/v2 v2.0.0-20250603061911-db65aa66bbe3
 	k8s.io/kms => ../kms
 )

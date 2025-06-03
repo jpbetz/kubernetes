@@ -57,4 +57,5 @@ replace (
 	k8s.io/api => ../api
 	k8s.io/apimachinery => ../apimachinery
 	k8s.io/client-go => ../client-go
+	k8s.io/gengo/v2 => github.com/jpbetz/gengo/v2 v2.0.0-20250603061911-db65aa66bbe3
 )
