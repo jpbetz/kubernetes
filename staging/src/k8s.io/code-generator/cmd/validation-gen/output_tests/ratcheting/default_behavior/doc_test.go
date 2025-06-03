@@ -114,10 +114,10 @@ func Test_StructStruct(t *testing.T) {
 		field.Invalid(field.NewPath("nonDirectComparableStructPtrField"), "", ""),
 		field.Invalid(field.NewPath("directComparableStructPtrField").Child("intField"), "", ""),
 		field.Invalid(field.NewPath("nonDirectComparableStructPtrField").Child("intPtrField"), "", ""),
-		field.Invalid(field.NewPath("DirectComparableStruct"), "", ""),
-		field.Invalid(field.NewPath("NonDirectComparableStruct"), "", ""),
-		field.Invalid(field.NewPath("DirectComparableStruct").Child("intField"), "", ""),
-		field.Invalid(field.NewPath("NonDirectComparableStruct").Child("intPtrField"), "", ""),
+		field.Invalid(field.NewPath("directComparableStruct"), "", ""),
+		field.Invalid(field.NewPath("nonDirectComparableStruct"), "", ""),
+		field.Invalid(field.NewPath("directComparableStruct").Child("intField"), "", ""),
+		field.Invalid(field.NewPath("nonDirectComparableStruct").Child("intPtrField"), "", ""),
 	})
 
 	st.Value(&StructStruct{

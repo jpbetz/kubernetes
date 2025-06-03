@@ -397,10 +397,10 @@ func Validate_StructStruct(ctx context.Context, op operation.Operation, fldPath 
 			if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
 				return nil // no changes
 			}
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field DirectComparableStruct")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field directComparableStruct")...)
 			errs = append(errs, Validate_DirectComparableStruct(ctx, op, fldPath, obj, oldObj)...)
 			return
-		}(fldPath.Child("DirectComparableStruct"), &obj.DirectComparableStruct, safe.Field(oldObj, func(oldObj *StructStruct) *DirectComparableStruct { return &oldObj.DirectComparableStruct }))...)
+		}(fldPath.Child("directComparableStruct"), &obj.DirectComparableStruct, safe.Field(oldObj, func(oldObj *StructStruct) *DirectComparableStruct { return &oldObj.DirectComparableStruct }))...)
 
 	// field StructStruct.NonDirectComparableStruct
 	errs = append(errs,
@@ -408,10 +408,10 @@ func Validate_StructStruct(ctx context.Context, op operation.Operation, fldPath 
 			if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
 				return nil // no changes
 			}
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field NonDirectComparableStruct")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field nonDirectComparableStruct")...)
 			errs = append(errs, Validate_NonDirectComparableStruct(ctx, op, fldPath, obj, oldObj)...)
 			return
-		}(fldPath.Child("NonDirectComparableStruct"), &obj.NonDirectComparableStruct, safe.Field(oldObj, func(oldObj *StructStruct) *NonDirectComparableStruct { return &oldObj.NonDirectComparableStruct }))...)
+		}(fldPath.Child("nonDirectComparableStruct"), &obj.NonDirectComparableStruct, safe.Field(oldObj, func(oldObj *StructStruct) *NonDirectComparableStruct { return &oldObj.NonDirectComparableStruct }))...)
 
 	return errs
 }

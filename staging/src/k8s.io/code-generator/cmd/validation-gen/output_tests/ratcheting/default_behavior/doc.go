@@ -76,11 +76,11 @@ type StructStruct struct {
 	// +k8s:validateFalse="field nonDirectComparableStructPtrField"
 	NonDirectComparableStructPtr *NonDirectComparableStruct `json:"nonDirectComparableStructPtrField"`
 
-	// +k8s:validateFalse="field DirectComparableStruct"
-	DirectComparableStruct
+	// +k8s:validateFalse="field directComparableStruct"
+	DirectComparableStruct `json:"directComparableStruct"`
 
-	// +k8s:validateFalse="field NonDirectComparableStruct"
-	NonDirectComparableStruct
+	// +k8s:validateFalse="field nonDirectComparableStruct"
+	NonDirectComparableStruct `json:"nonDirectComparableStruct"`
 }
 
 type StructEmbedded struct {
