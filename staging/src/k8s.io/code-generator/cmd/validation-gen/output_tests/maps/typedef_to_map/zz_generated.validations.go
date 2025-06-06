@@ -32,17 +32,20 @@ import (
 	testscheme "k8s.io/code-generator/cmd/validation-gen/testscheme"
 )
 
+var (
+	structSupportedResources = []operation.ResourcePattern{operation.MustParsePattern("*")}
+)
+
 func init() { localSchemeBuilder.Register(RegisterValidations) }
 
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*Struct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
-		switch op.Request.SubresourcePath() {
-		case "/":
+		if op.Request.In(structSupportedResources) {
 			return Validate_Struct(ctx, op, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
 		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresource: %v", obj, op.Request.SubresourcePath()))}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, resource: %v", obj, op.Request.ResourcePath()))}
 	})
 	return nil
 }

@@ -53,6 +53,8 @@ type Operation struct {
 
 // Request provides information about the request being validated.
 type Request struct {
+	Resource string
+
 	// Subresources identifies the subresource path components of the request. For
 	// example, Subresources for a request to `/api/v1/pods/my-pod/status` would be
 	// `["status"]`. For `/api/v1/widget/my-widget/x/y/z`, it would be `["x", "y",
@@ -84,6 +86,51 @@ func (r Request) SubresourcePath() string {
 		return "/"
 	}
 	return "/" + strings.Join(r.Subresources, "/")
+}
+
+// TODO: This is NOT a URL path. It's something else. What do we call it?
+// RBAC uses this same representation...
+
+// ResourcePath returns the path is a slash-separated list of subresource
+// names. For example, `pods/status`, `pods/resize`, or `x/y/z`.
+func (r Request) ResourcePath() string {
+	if len(r.Subresources) == 0 {
+		return r.Resource
+	}
+	return r.Resource + "/" + strings.Join(r.Subresources, "/")
+}
+
+// TODO: this is a terrible function name
+
+func (r Request) In(resourcePatterns []ResourcePattern) bool {
+	for _, pattern := range resourcePatterns {
+		if pattern.Matches(r) {
+			return true
+		}
+	}
+	return false
+}
+
+type ResourcePattern []string
+
+func MustParsePattern(pattern string) ResourcePattern {
+	return strings.Split(pattern, "/")
+}
+
+func (pattern ResourcePattern) Matches(r Request) bool {
+	if len(pattern) == 0 || len(pattern) != len(r.Subresources)+1 {
+		return false
+	}
+	// Check if the first element of the pattern matches the resource name or is a wildcard
+	if pattern[0] != "*" && pattern[0] != r.Resource {
+		return false
+	}
+	for i := 1; i < len(pattern); i++ {
+		if pattern[i] != "*" && pattern[i] != r.Subresources[i-1] {
+			return false
+		}
+	}
+	return true
 }
 
 // Code is the request operation to be validated.

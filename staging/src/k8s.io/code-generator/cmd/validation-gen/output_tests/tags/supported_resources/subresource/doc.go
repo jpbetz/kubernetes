@@ -27,9 +27,10 @@ var localSchemeBuilder = testscheme.New()
 
 // Root resource is supported by default
 
-// +k8s:supportsSubresource=/status
-// +k8s:supportsSubresource=/scale
-// +k8s:supportsSubresource=/x/y
+// +k8s:supportsResource=test
+// +k8s:supportsResource=test/status
+// +k8s:supportsResource=test/scale
+// +k8s:supportsResource=test/x/y
 
 // T1 is a test type
 type T1 struct {

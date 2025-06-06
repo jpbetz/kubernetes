@@ -33,24 +33,27 @@ import (
 	field "k8s.io/apimachinery/pkg/util/validation/field"
 )
 
+var (
+	replicationControllerSupportedResources     = []operation.ResourcePattern{operation.MustParsePattern("/scale")}
+	replicationControllerListSupportedResources = []operation.ResourcePattern{operation.MustParsePattern("*")}
+)
+
 func init() { localSchemeBuilder.Register(RegisterValidations) }
 
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
 	scheme.AddValidationFunc((*corev1.ReplicationController)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
-		switch op.Request.SubresourcePath() {
-		case "/", "/scale":
+		if op.Request.In(replicationControllerSupportedResources) {
 			return Validate_ReplicationController(ctx, op, nil /* fldPath */, obj.(*corev1.ReplicationController), safe.Cast[*corev1.ReplicationController](oldObj))
 		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresource: %v", obj, op.Request.SubresourcePath()))}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, resource: %v", obj, op.Request.ResourcePath()))}
 	})
 	scheme.AddValidationFunc((*corev1.ReplicationControllerList)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
-		switch op.Request.SubresourcePath() {
-		case "/":
+		if op.Request.In(replicationControllerListSupportedResources) {
 			return Validate_ReplicationControllerList(ctx, op, nil /* fldPath */, obj.(*corev1.ReplicationControllerList), safe.Cast[*corev1.ReplicationControllerList](oldObj))
 		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresource: %v", obj, op.Request.SubresourcePath()))}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, resource: %v", obj, op.Request.ResourcePath()))}
 	})
 	return nil
 }

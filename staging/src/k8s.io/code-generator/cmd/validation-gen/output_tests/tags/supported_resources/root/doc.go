@@ -25,7 +25,7 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// This tests that without any +k8s:supportsSubresource or +k8s:isSubresource tags,
+// This tests that without any +k8s:supportsSResource tag,
 // that the validation of both the root resource is allowed and validation of all
 // subresources fails with an error.
 

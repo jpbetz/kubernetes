@@ -33,17 +33,20 @@ import (
 	field "k8s.io/apimachinery/pkg/util/validation/field"
 )
 
+var (
+	scaleSupportedResources = []operation.ResourcePattern{operation.MustParsePattern("*/scale")}
+)
+
 func init() { localSchemeBuilder.Register(RegisterValidations) }
 
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
 	scheme.AddValidationFunc((*appsv1beta2.Scale)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
-		switch op.Request.SubresourcePath() {
-		case "/scale":
+		if op.Request.In(scaleSupportedResources) {
 			return Validate_Scale(ctx, op, nil /* fldPath */, obj.(*appsv1beta2.Scale), safe.Cast[*appsv1beta2.Scale](oldObj))
 		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresource: %v", obj, op.Request.SubresourcePath()))}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, resource: %v", obj, op.Request.ResourcePath()))}
 	})
 	return nil
 }

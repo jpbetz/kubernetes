@@ -32,17 +32,20 @@ import (
 	testscheme "k8s.io/code-generator/cmd/validation-gen/testscheme"
 )
 
+var (
+	t1SupportedResources = []operation.ResourcePattern{operation.MustParsePattern("*")}
+)
+
 func init() { localSchemeBuilder.Register(RegisterValidations) }
 
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*T1)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
-		switch op.Request.SubresourcePath() {
-		case "/":
+		if op.Request.In(t1SupportedResources) {
 			return Validate_T1(ctx, op, nil /* fldPath */, obj.(*T1), safe.Cast[*T1](oldObj))
 		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresource: %v", obj, op.Request.SubresourcePath()))}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, resource: %v", obj, op.Request.ResourcePath()))}
 	})
 	return nil
 }

@@ -32,45 +32,48 @@ import (
 	testscheme "k8s.io/code-generator/cmd/validation-gen/testscheme"
 )
 
+var (
+	t00SupportedResources       = []operation.ResourcePattern{operation.MustParsePattern("*")}
+	t01SupportedResources       = []operation.ResourcePattern{operation.MustParsePattern("*")}
+	t02SupportedResources       = []operation.ResourcePattern{operation.MustParsePattern("*")}
+	t03SupportedResources       = []operation.ResourcePattern{operation.MustParsePattern("*")}
+	tMultipleSupportedResources = []operation.ResourcePattern{operation.MustParsePattern("*")}
+)
+
 func init() { localSchemeBuilder.Register(RegisterValidations) }
 
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*T00)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
-		switch op.Request.SubresourcePath() {
-		case "/":
+		if op.Request.In(t00SupportedResources) {
 			return Validate_T00(ctx, op, nil /* fldPath */, obj.(*T00), safe.Cast[*T00](oldObj))
 		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresource: %v", obj, op.Request.SubresourcePath()))}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, resource: %v", obj, op.Request.ResourcePath()))}
 	})
 	scheme.AddValidationFunc((*T01)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
-		switch op.Request.SubresourcePath() {
-		case "/":
+		if op.Request.In(t01SupportedResources) {
 			return Validate_T01(ctx, op, nil /* fldPath */, obj.(*T01), safe.Cast[*T01](oldObj))
 		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresource: %v", obj, op.Request.SubresourcePath()))}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, resource: %v", obj, op.Request.ResourcePath()))}
 	})
 	scheme.AddValidationFunc((*T02)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
-		switch op.Request.SubresourcePath() {
-		case "/":
+		if op.Request.In(t02SupportedResources) {
 			return Validate_T02(ctx, op, nil /* fldPath */, obj.(*T02), safe.Cast[*T02](oldObj))
 		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresource: %v", obj, op.Request.SubresourcePath()))}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, resource: %v", obj, op.Request.ResourcePath()))}
 	})
 	scheme.AddValidationFunc((*T03)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
-		switch op.Request.SubresourcePath() {
-		case "/":
+		if op.Request.In(t03SupportedResources) {
 			return Validate_T03(ctx, op, nil /* fldPath */, obj.(*T03), safe.Cast[*T03](oldObj))
 		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresource: %v", obj, op.Request.SubresourcePath()))}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, resource: %v", obj, op.Request.ResourcePath()))}
 	})
 	scheme.AddValidationFunc((*TMultiple)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
-		switch op.Request.SubresourcePath() {
-		case "/":
+		if op.Request.In(tMultipleSupportedResources) {
 			return Validate_TMultiple(ctx, op, nil /* fldPath */, obj.(*TMultiple), safe.Cast[*TMultiple](oldObj))
 		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresource: %v", obj, op.Request.SubresourcePath()))}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, resource: %v", obj, op.Request.ResourcePath()))}
 	})
 	return nil
 }

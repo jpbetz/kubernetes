@@ -124,7 +124,7 @@ func ValidateUpdateDeclaratively(ctx context.Context, scheme *runtime.Scheme, ob
 
 func validateDeclaratively(ctx context.Context, scheme *runtime.Scheme, obj, oldObj runtime.Object, o *validationConfigOption) field.ErrorList {
 	// Find versionedGroupVersion, which identifies the API version to use for declarative validation.
-	versionedGroupVersion, subresources, err := requestInfo(ctx, o.subresourceGVKMapper)
+	versionedGroupVersion, resource, subresources, err := requestInfo(ctx, o.subresourceGVKMapper)
 	if err != nil {
 		return field.ErrorList{field.InternalError(nil, err)}
 	}
@@ -136,22 +136,22 @@ func validateDeclaratively(ctx context.Context, scheme *runtime.Scheme, obj, old
 
 	switch o.opType {
 	case operation.Create:
-		return scheme.Validate(ctx, o.options, versionedObj, subresources...)
+		return scheme.Validate(ctx, o.options, versionedObj, resource, subresources...)
 	case operation.Update:
 		versionedOldObj, err = scheme.ConvertToVersion(oldObj, versionedGroupVersion)
 		if err != nil {
 			return field.ErrorList{field.InternalError(nil, fmt.Errorf("unexpected error converting to versioned type: %w", err))}
 		}
-		return scheme.ValidateUpdate(ctx, o.options, versionedObj, versionedOldObj, subresources...)
+		return scheme.ValidateUpdate(ctx, o.options, versionedObj, versionedOldObj, resource, subresources...)
 	default:
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("unknown operation type: %v", o.opType))}
 	}
 }
 
-func requestInfo(ctx context.Context, subresourceMapper GroupVersionKindProvider) (schema.GroupVersion, []string, error) {
+func requestInfo(ctx context.Context, subresourceMapper GroupVersionKindProvider) (schema.GroupVersion, string, []string, error) {
 	requestInfo, found := genericapirequest.RequestInfoFrom(ctx)
 	if !found {
-		return schema.GroupVersion{}, nil, fmt.Errorf("could not find requestInfo in context")
+		return schema.GroupVersion{}, "", nil, fmt.Errorf("could not find requestInfo in context")
 	}
 	groupVersion := schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}
 	if subresourceMapper != nil {
@@ -159,9 +159,9 @@ func requestInfo(ctx context.Context, subresourceMapper GroupVersionKindProvider
 	}
 	subresources, err := parseSubresourcePath(requestInfo.Subresource)
 	if err != nil {
-		return schema.GroupVersion{}, nil, fmt.Errorf("unexpected error parsing subresource path: %w", err)
+		return schema.GroupVersion{}, "", nil, fmt.Errorf("unexpected error parsing subresource path: %w", err)
 	}
-	return groupVersion, subresources, nil
+	return groupVersion, requestInfo.Resource, subresources, nil
 
 }
 
