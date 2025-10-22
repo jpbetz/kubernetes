@@ -20,6 +20,7 @@ import (
 	"reflect"
 
 	"github.com/go-openapi/swag"
+
 	"k8s.io/kube-openapi/pkg/validation/errors"
 	"k8s.io/kube-openapi/pkg/validation/spec"
 	"k8s.io/kube-openapi/pkg/validation/strfmt"
@@ -262,10 +263,54 @@ func (s *SchemaValidator) objectValidator() ValueValidator {
 		MinProperties:        s.Schema.MinProperties,
 		Required:             s.Schema.Required,
 		Properties:           s.Schema.Properties,
+		XPropertyNames:       toPropertyNamesSchema(s.Schema.Extensions["x-kubernetes-property-names"]),
 		AdditionalProperties: s.Schema.AdditionalProperties,
 		PatternProperties:    s.Schema.PatternProperties,
 		Root:                 s.Root,
 		KnownFormats:         s.KnownFormats,
 		Options:              s.Options,
 	}
+}
+
+// toPropertyNamesSchema creates a schema out of the valid property names fields in the given value.
+// toPropertyNamesSchema expects the value to be validated and ignores all invalid data and invalid types,
+// returning nil if the value cannot be converted into a schema.
+func toPropertyNamesSchema(value any) *spec.Schema {
+	var result *spec.Schema
+	if m, ok := value.(map[string]interface{}); ok {
+		result = &spec.Schema{SchemaProps: spec.SchemaProps{Type: []string{stringType}}}
+		for k, v := range m {
+			switch k {
+			case "pattern":
+				if p, ok := v.(string); ok {
+					result.Pattern = p
+				}
+			case "format":
+				if f, ok := v.(string); ok {
+					result.Format = f
+				}
+			case "enum":
+				if e, ok := v.([]interface{}); ok {
+					result.Enum = make([]interface{}, len(e))
+					for i, v := range e {
+						if s, ok := v.(string); ok {
+							result.Enum[i] = s
+						}
+					}
+				}
+			case "minLength":
+				if f, ok := v.(float64); ok {
+					v := int64(f)
+					result.MinLength = &v
+				}
+			case "maxLength":
+				if f, ok := v.(float64); ok {
+					v := int64(f)
+					result.MaxLength = &v
+				}
+			}
+		}
+	}
+
+	return result
 }

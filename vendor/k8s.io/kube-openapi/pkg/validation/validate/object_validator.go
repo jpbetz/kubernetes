@@ -35,6 +35,7 @@ type objectValidator struct {
 	Root                 interface{}
 	KnownFormats         strfmt.Registry
 	Options              SchemaValidatorOptions
+	XPropertyNames       *spec.Schema
 }
 
 func (o *objectValidator) SetPath(path string) {
@@ -104,6 +105,11 @@ func (o *objectValidator) Validate(data interface{}) *Result {
 					// TODO: this is dead code since regularProperty=false here
 					res.AddErrors(errors.FailedAllPatternProperties(o.Path, o.In, key))
 				}
+			}
+
+			// TODO: Only allow when used with AdditionalProperties? It's silly to have this with fixed property names
+			if o.XPropertyNames != nil {
+				res.Merge(o.Options.NewValidatorForField(key, o.XPropertyNames, o.Root, o.Path+"."+key, o.KnownFormats, o.Options.Options()...).Validate(key))
 			}
 		}
 		// Valid cases: additionalProperties: true or undefined
