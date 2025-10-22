@@ -149,6 +149,10 @@ type JSONSchemaProps struct {
 	// +listType=map
 	// +listMapKey=rule
 	XValidations ValidationRules
+
+	// x-kubernetes-property-names provides validation for map keys.
+	// The type of this field must be string.
+	XPropertyNames *JSONSchemaProps
 }
 
 // ValidationRules describes a list of validation rules written in the CEL expression language.

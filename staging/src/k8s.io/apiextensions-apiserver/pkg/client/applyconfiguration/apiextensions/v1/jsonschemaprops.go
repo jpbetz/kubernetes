@@ -160,6 +160,9 @@ type JSONSchemaPropsApplyConfiguration struct {
 	XMapType *string `json:"x-kubernetes-map-type,omitempty"`
 	// x-kubernetes-validations describes a list of validation rules written in the CEL expression language.
 	XValidations *apiextensionsv1.ValidationRules `json:"x-kubernetes-validations,omitempty"`
+	// x-kubernetes-property-names provides validation for map keys.
+	// The type of this field must be string.
+	XPropertyNames *JSONSchemaPropsApplyConfiguration `json:"x-kubernetes-property-names,omitempty"`
 }
 
 // JSONSchemaPropsApplyConfiguration constructs a declarative configuration of the JSONSchemaProps type for use with
@@ -550,5 +553,13 @@ func (b *JSONSchemaPropsApplyConfiguration) WithXMapType(value string) *JSONSche
 // If called multiple times, the XValidations field is set to the value of the last call.
 func (b *JSONSchemaPropsApplyConfiguration) WithXValidations(value apiextensionsv1.ValidationRules) *JSONSchemaPropsApplyConfiguration {
 	b.XValidations = &value
+	return b
+}
+
+// WithXPropertyNames sets the XPropertyNames field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the XPropertyNames field is set to the value of the last call.
+func (b *JSONSchemaPropsApplyConfiguration) WithXPropertyNames(value *JSONSchemaPropsApplyConfiguration) *JSONSchemaPropsApplyConfiguration {
+	b.XPropertyNames = value
 	return b
 }

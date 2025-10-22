@@ -194,6 +194,11 @@ type JSONSchemaProps struct {
 	// +listType=map
 	// +listMapKey=rule
 	XValidations ValidationRules `json:"x-kubernetes-validations,omitempty" patchStrategy:"merge" patchMergeKey:"rule" protobuf:"bytes,44,rep,name=xKubernetesValidations"`
+
+	// x-kubernetes-property-names provides validation for map keys.
+	// The type of this field must be string.
+	// +optional
+	XPropertyNames *JSONSchemaProps `json:"x-kubernetes-property-names,omitempty" protobuf:"bytes,45,opt,name=xKubernetesPropertyNames"`
 }
 
 // ValidationRules describes a list of validation rules written in the CEL expression language.
