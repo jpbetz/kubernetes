@@ -578,6 +578,11 @@ message JSONSchemaProps {
   // +listType=map
   // +listMapKey=rule
   repeated ValidationRule xKubernetesValidations = 44;
+
+  // x-kubernetes-property-names provides validation for map keys.
+  // The type of this field must be string.
+  // +optional
+  optional JSONSchemaProps xKubernetesPropertyNames = 45;
 }
 
 // JSONSchemaPropsOrArray represents a value that can either be a JSONSchemaProps

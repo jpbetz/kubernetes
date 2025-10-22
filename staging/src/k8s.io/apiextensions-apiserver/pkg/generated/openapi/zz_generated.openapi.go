@@ -2319,6 +2319,12 @@ func schema_pkg_apis_apiextensions_v1_JSONSchemaProps(ref common.ReferenceCallba
 							},
 						},
 					},
+					"x-kubernetes-property-names": {
+						SchemaProps: spec.SchemaProps{
+							Description: "x-kubernetes-property-names provides validation for map keys. The type of this field must be string.",
+							Ref:         ref(apiextensionsv1.JSONSchemaProps{}.OpenAPIModelName()),
+						},
+					},
 				},
 			},
 		},

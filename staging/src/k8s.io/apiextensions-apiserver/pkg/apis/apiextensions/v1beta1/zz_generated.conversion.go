@@ -1150,6 +1150,7 @@ func autoConvert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(in *ap
 	out.XListType = (*string)(unsafe.Pointer(in.XListType))
 	out.XMapType = (*string)(unsafe.Pointer(in.XMapType))
 	out.XValidations = *(*ValidationRules)(unsafe.Pointer(&in.XValidations))
+	// WARNING: in.XPropertyNames requires manual conversion: does not exist in peer-type
 	return nil
 }
 
