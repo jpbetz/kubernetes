@@ -163,6 +163,16 @@ func (c *CELSchemaContext) ChildAdditionalPropertiesContext(propsSchema *apiexte
 	return c.childContext(propsSchema, additionalItemsTypeInfoAccessor{})
 }
 
+// ChildPropertyNamesContext returns nil, nil if this CELSchemaContext is nil, otherwise it constructs and returns
+// a CELSchemaContext for the x-kubernetes-property-names of an object if this CELSchemaContext is an object.
+// propNamesSchema must be non-nil.
+func (c *CELSchemaContext) ChildPropertyNamesContext(propNamesSchema *apiextensions.JSONSchemaProps) *CELSchemaContext {
+	if c == nil {
+		return nil
+	}
+	return c.childContext(propNamesSchema, propNamesTypeInfoAccessor{})
+}
+
 // ChildItemsContext returns nil, nil if this CELSchemaContext is nil, otherwise it constructs and returns a CELSchemaContext
 // for the items of an array if this CELSchemaContext is an array.
 func (c *CELSchemaContext) ChildItemsContext(itemsSchema *apiextensions.JSONSchemaProps) *CELSchemaContext {
@@ -253,6 +263,17 @@ func (c additionalItemsTypeInfoAccessor) accessTypeInfo(parentTypeInfo *CELTypeI
 		propsSchema := parentTypeInfo.Schema.AdditionalProperties.Structural
 		valuesDeclType := parentTypeInfo.DeclType.ElemType
 		return &CELTypeInfo{Schema: propsSchema, DeclType: valuesDeclType}
+	}
+	return nil
+}
+
+type propNamesTypeInfoAccessor struct{}
+
+func (c propNamesTypeInfoAccessor) accessTypeInfo(parentTypeInfo *CELTypeInfo) *CELTypeInfo {
+	if parentTypeInfo.Schema.ValidationExtensions.XPropertyNames != nil {
+		propNamesSchema := parentTypeInfo.Schema.ValidationExtensions.XPropertyNames
+		namesDeclType := parentTypeInfo.DeclType.KeyType
+		return &CELTypeInfo{Schema: propNamesSchema, DeclType: namesDeclType}
 	}
 	return nil
 }

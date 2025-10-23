@@ -41,6 +41,10 @@ type Schema interface {
 	// or nil if this field does not exist.
 	AdditionalProperties() SchemaOrBool
 
+	// XPropertyNames return the OpenAPI x-kubernetes-property-names field,
+	// or nil if the field does not exist.
+	XPropertyNames() Schema
+
 	// Default returns the OpenAPI default field, or nil if this field does not exist.
 	Default() any
 

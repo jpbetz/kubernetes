@@ -55,6 +55,7 @@ type Validator struct {
 	Properties           map[string]Validator
 	AllOfValidators      []*Validator
 	AdditionalProperties *Validator
+	XPropertyNames       *Validator
 
 	Schema *schema.Structural
 
@@ -97,11 +98,12 @@ func validator(validationSchema, nodeSchema *schema.Structural, isResourceRoot b
 	compilationSchema.XValidations = validationSchema.XValidations
 	compiledRules, err := Compile(&compilationSchema, declType, perCallLimit, environment.MustBaseEnvSet(environment.DefaultCompatibilityVersion(), true), StoredExpressionsEnvLoader())
 
-	var itemsValidator, additionalPropertiesValidator *Validator
+	var itemsValidator, additionalPropertiesValidator, propertyNamesValidator *Validator
 	var propertiesValidators map[string]Validator
 	var allOfValidators []*Validator
-	var elemType *cel.DeclType
+	var keyType, elemType *cel.DeclType
 	if declType != nil {
+		keyType = declType.KeyType
 		elemType = declType.ElemType
 	} else {
 		elemType = declType
@@ -150,6 +152,10 @@ func validator(validationSchema, nodeSchema *schema.Structural, isResourceRoot b
 		additionalPropertiesValidator = validator(validationSchema.AdditionalProperties.Structural, nodeSchema.AdditionalProperties.Structural, nodeSchema.AdditionalProperties.Structural.XEmbeddedResource, elemType, perCallLimit)
 	}
 
+	if validationSchema.XPropertyNames != nil && nodeSchema.XPropertyNames != nil && keyType != nil {
+		propertyNamesValidator = validator(validationSchema.XPropertyNames, nodeSchema.XPropertyNames, nodeSchema.XPropertyNames.XEmbeddedResource, keyType, perCallLimit)
+	}
+
 	if validationSchema.ValueValidation != nil && len(validationSchema.ValueValidation.AllOf) > 0 {
 		allOfValidators = make([]*Validator, 0, len(validationSchema.ValueValidation.AllOf))
 		for _, allOf := range validationSchema.ValueValidation.AllOf {
@@ -160,7 +166,7 @@ func validator(validationSchema, nodeSchema *schema.Structural, isResourceRoot b
 		}
 	}
 
-	if len(compiledRules) > 0 || err != nil || itemsValidator != nil || additionalPropertiesValidator != nil || len(propertiesValidators) > 0 || len(allOfValidators) > 0 {
+	if len(compiledRules) > 0 || err != nil || itemsValidator != nil || additionalPropertiesValidator != nil || propertyNamesValidator != nil || len(propertiesValidators) > 0 || len(allOfValidators) > 0 {
 		activationFactory := validationActivationWithoutOldSelf
 		for _, rule := range compiledRules {
 			if rule.UsesOldSelf {
@@ -176,6 +182,7 @@ func validator(validationSchema, nodeSchema *schema.Structural, isResourceRoot b
 			isResourceRoot:       isResourceRoot,
 			Items:                itemsValidator,
 			AdditionalProperties: additionalPropertiesValidator,
+			XPropertyNames:       propertyNamesValidator,
 			Properties:           propertiesValidators,
 			AllOfValidators:      allOfValidators,
 			celActivationFactory: activationFactory,
@@ -835,6 +842,17 @@ func (s *Validator) validateMap(ctx context.Context, fldPath *field.Path, obj, o
 
 			var err field.ErrorList
 			err, remainingBudget = s.AdditionalProperties.validate(ctx, fldPath.Key(k), v, oldV, correlation.key(k), remainingBudget)
+			errs = append(errs, err...)
+			if remainingBudget < 0 {
+				return errs, remainingBudget
+			}
+		}
+	}
+	if s.XPropertyNames != nil {
+		for k, _ := range obj {
+			var err field.ErrorList
+			// TODO: What SHOULD the field paths be for map key validations?
+			err, remainingBudget = s.XPropertyNames.validate(ctx, fldPath.Key(k), k, nil, ratchetingOptions{}, remainingBudget)
 			errs = append(errs, err...)
 			if remainingBudget < 0 {
 				return errs, remainingBudget

@@ -289,6 +289,27 @@ func TestEstimateMaxLengthJSON(t *testing.T) {
 			ExpectedMaxElements: 393215,
 		},
 		{
+			Name: "stringMapWithPropertyNames",
+			InputSchema: &spec.Schema{
+				VendorExtensible: spec.VendorExtensible{Extensions: map[string]any{
+					extPropertyNames: map[string]any{
+						"type":      "string",
+						"maxLength": 32,
+					},
+				}},
+				SchemaProps: spec.SchemaProps{
+					Type: []string{"object"},
+					AdditionalProperties: &spec.SchemaOrBool{
+						Schema: &spec.Schema{
+							SchemaProps: spec.SchemaProps{
+								Type:      []string{"string"},
+								MaxLength: ptr.To[int64](32),
+							}},
+					},
+				}},
+			ExpectedMaxElements: 393215,
+		},
+		{
 			Name: "objectOptionalPropertyArray",
 			InputSchema: &spec.Schema{
 				SchemaProps: spec.SchemaProps{

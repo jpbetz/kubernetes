@@ -152,6 +152,30 @@ func Funcs(codecs runtimeserializer.CodecFactory) []interface{} {
 			if obj.XIntOrString {
 				obj.Type = ""
 			}
+
+			// We have strict validation on XPropertyNames
+			if obj.XPropertyNames != nil {
+				// TODO: Do we need this?
+				replacement := apiextensions.JSONSchemaProps{}
+				// Only include fields values allowed by x-kubernetes-property-names
+				replacement.MaxLength = obj.XPropertyNames.MaxLength
+				replacement.MinLength = obj.XPropertyNames.MinLength
+				replacement.Pattern = obj.XPropertyNames.Pattern
+				replacement.Format = obj.XPropertyNames.Format
+				if obj.XPropertyNames.Enum != nil {
+					replacement.Enum = []apiextensions.JSON{}
+					allOK := true
+					for _, e := range obj.XPropertyNames.Enum {
+						if _, ok := e.(string); !ok {
+							allOK = false
+						}
+					}
+					if allOK {
+						replacement.Enum = obj.XPropertyNames.Enum
+					}
+				}
+				obj.XPropertyNames = &replacement
+			}
 		},
 		func(obj *apiextensions.JSONSchemaPropsOrBool, c randfill.Continue) {
 			if c.Bool() {

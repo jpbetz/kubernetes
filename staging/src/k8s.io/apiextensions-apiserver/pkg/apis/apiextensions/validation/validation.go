@@ -1230,7 +1230,7 @@ func ValidateCustomResourceDefinitionOpenAPISchema(schema *apiextensions.JSONSch
 	}
 
 	if schema.XPropertyNames != nil {
-		// property-names only makes sense for objects
+		// TODO: Only allow when AdditionalProperties is enabled?
 		if schema.Type != "object" {
 			if len(schema.Type) == 0 {
 				allErrs.SchemaErrors = append(allErrs.SchemaErrors, field.Required(fldPath.Child("type"), "must be object if x-kubernetes-property-names is specified"))
@@ -1238,8 +1238,7 @@ func ValidateCustomResourceDefinitionOpenAPISchema(schema *apiextensions.JSONSch
 				allErrs.SchemaErrors = append(allErrs.SchemaErrors, field.Invalid(fldPath.Child("type"), schema.Type, "must be object if x-kubernetes-property-names is specified"))
 			}
 		}
-
-		// property-names schema must be of type string
+		
 		if schema.XPropertyNames.Type != "string" {
 			if len(schema.XPropertyNames.Type) == 0 {
 				allErrs.SchemaErrors = append(allErrs.SchemaErrors, field.Required(fldPath.Child("x-kubernetes-property-names").Child("type"), `must be "string"`))
@@ -1247,9 +1246,8 @@ func ValidateCustomResourceDefinitionOpenAPISchema(schema *apiextensions.JSONSch
 				allErrs.SchemaErrors = append(allErrs.SchemaErrors, field.Invalid(fldPath.Child("x-kubernetes-property-names").Child("type"), schema.XPropertyNames.Type, `must be "string"`))
 			}
 		}
-
-		// do all other validations
-		allErrs.AppendErrors(ValidateCustomResourceDefinitionOpenAPISchema(schema.XPropertyNames, fldPath.Child("x-kubernetes-property-names"), ssv, false, opts, nil))
+		// TODO: Also validate that only minLength, maxLength, ... may be used
+		allErrs.AppendErrors(ValidateCustomResourceDefinitionOpenAPISchema(schema.XPropertyNames, fldPath.Child("x-kubernetes-property-names"), ssv, false, opts, celContext.ChildPropertyNamesContext(schema.XPropertyNames)))
 	}
 
 	if len(schema.XValidations) > 0 {

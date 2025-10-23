@@ -2090,6 +2090,39 @@ func TestCelEstimatedCostStability(t *testing.T) {
 				`quantity(self.val1).isInteger()`:                                                                                        314576,
 			},
 		},
+		{
+			name: "map with key and value maxLengths",
+			schema: &schema.Structural{
+				Generic: schema.Generic{
+					Type: "object",
+				},
+				ValidationExtensions: schema.ValidationExtensions{
+					XPropertyNames: &schema.Structural{
+						Generic: schema.Generic{
+							Type: "string",
+						},
+						ValueValidation: &schema.ValueValidation{
+							MaxLength: ptr.To[int64](5),
+						},
+					},
+				},
+				AdditionalProperties: &schema.StructuralOrBool{
+					Structural: &schema.Structural{
+						Generic: schema.Generic{
+							Type: "string",
+						},
+						ValueValidation: &schema.ValueValidation{
+							MaxLength: ptr.To[int64](5),
+						},
+					},
+					Bool: true,
+				},
+			},
+			expectCost: map[string]uint64{
+				"self.all(k, k.matches('[a-z]*'))":       3932152,
+				"self.all(k, self[k].matches('[a-z]*'))": 4718582,
+			},
+		},
 	}
 
 	for _, tt := range cases {

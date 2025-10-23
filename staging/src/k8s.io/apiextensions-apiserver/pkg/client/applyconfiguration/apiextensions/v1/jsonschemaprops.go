@@ -160,8 +160,9 @@ type JSONSchemaPropsApplyConfiguration struct {
 	XMapType *string `json:"x-kubernetes-map-type,omitempty"`
 	// x-kubernetes-validations describes a list of validation rules written in the CEL expression language.
 	XValidations *apiextensionsv1.ValidationRules `json:"x-kubernetes-validations,omitempty"`
-	// x-kubernetes-property-names provides validation for map keys.
-	// The type of this field must be string.
+	// x-kubernetes-property-names describes validations for map keys.
+	// The schema type must be of string.
+	// Only the minLength, maxLength, pattern, format, enum and x-kubernetes-validations schema properties are supported.
 	XPropertyNames *JSONSchemaPropsApplyConfiguration `json:"x-kubernetes-property-names,omitempty"`
 }
 

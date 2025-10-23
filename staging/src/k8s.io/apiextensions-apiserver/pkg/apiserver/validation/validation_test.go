@@ -602,6 +602,131 @@ func TestValidateCustomResource(t *testing.T) {
 				}},
 			},
 		},
+		{name: "propertyName maxLength",
+			schema: apiextensions.JSONSchemaProps{
+				Type: "object",
+				Properties: map[string]apiextensions.JSONSchemaProps{
+					"fieldX": {
+						Type: "object",
+						XPropertyNames: &apiextensions.JSONSchemaProps{
+							Type:      "string",
+							MaxLength: ptr.To[int64](2),
+						},
+						AdditionalProperties: &apiextensions.JSONSchemaPropsOrBool{
+							Allows: true,
+							Schema: &apiextensions.JSONSchemaProps{
+								Type: "string",
+							},
+						},
+					},
+				},
+			},
+			failingObjects: []failingObject{
+				{object: map[string]any{"fieldX": map[string]any{"aaa": "value"}}, expectErrs: []string{
+					`fieldX.aaa: Too long: may not be more than 2 bytes`,
+				}},
+			},
+		},
+		{name: "propertyName minLength",
+			schema: apiextensions.JSONSchemaProps{
+				Type: "object",
+				Properties: map[string]apiextensions.JSONSchemaProps{
+					"fieldX": {
+						Type: "object",
+						XPropertyNames: &apiextensions.JSONSchemaProps{
+							Type:      "string",
+							MinLength: ptr.To[int64](2),
+						},
+						AdditionalProperties: &apiextensions.JSONSchemaPropsOrBool{
+							Allows: true,
+							Schema: &apiextensions.JSONSchemaProps{
+								Type: "string",
+							},
+						},
+					},
+				},
+			},
+			failingObjects: []failingObject{
+				{object: map[string]any{"fieldX": map[string]any{"a": "value"}}, expectErrs: []string{
+					`fieldX.a: Invalid value: "a": fieldX.a in body should be at least 2 chars long`,
+				}},
+			},
+		},
+		{name: "propertyName pattern",
+			schema: apiextensions.JSONSchemaProps{
+				Type: "object",
+				Properties: map[string]apiextensions.JSONSchemaProps{
+					"fieldX": {
+						Type: "object",
+						XPropertyNames: &apiextensions.JSONSchemaProps{
+							Type:    "string",
+							Pattern: "^[a-z]+$",
+						},
+						AdditionalProperties: &apiextensions.JSONSchemaPropsOrBool{
+							Allows: true,
+							Schema: &apiextensions.JSONSchemaProps{
+								Type: "string",
+							},
+						},
+					},
+				},
+			},
+			failingObjects: []failingObject{
+				{object: map[string]any{"fieldX": map[string]any{"a1": "value"}}, expectErrs: []string{
+					`fieldX.a1: Invalid value: "a1": fieldX.a1 in body should match '^[a-z]+$'`,
+				}},
+			},
+		},
+		{name: "propertyName format",
+			schema: apiextensions.JSONSchemaProps{
+				Type: "object",
+				Properties: map[string]apiextensions.JSONSchemaProps{
+					"fieldX": {
+						Type: "object",
+						XPropertyNames: &apiextensions.JSONSchemaProps{
+							Type:   "string",
+							Format: "hostname",
+						},
+						AdditionalProperties: &apiextensions.JSONSchemaPropsOrBool{
+							Allows: true,
+							Schema: &apiextensions.JSONSchemaProps{
+								Type: "string",
+							},
+						},
+					},
+				},
+			},
+			failingObjects: []failingObject{
+				{object: map[string]any{"fieldX": map[string]any{"a_b": "value"}}, expectErrs: []string{
+					`fieldX.a_b: Invalid value: "a_b": fieldX.a_b in body must be of type hostname: "a_b"`,
+				}},
+			},
+		},
+		{name: "propertyName enum",
+			schema: apiextensions.JSONSchemaProps{
+				Type: "object",
+				Properties: map[string]apiextensions.JSONSchemaProps{
+					"fieldX": {
+						Type: "object",
+						XPropertyNames: &apiextensions.JSONSchemaProps{
+							Type: "string",
+							Enum: []apiextensions.JSON{"a", "b"},
+						},
+						AdditionalProperties: &apiextensions.JSONSchemaPropsOrBool{
+							Allows: true,
+							Schema: &apiextensions.JSONSchemaProps{
+								Type: "string",
+							},
+						},
+					},
+				},
+			},
+			failingObjects: []failingObject{
+				{object: map[string]any{"fieldX": map[string]any{"c": "value"}}, expectErrs: []string{
+					`fieldX.c: Unsupported value: "c": supported values: "a", "b"`,
+				}},
+			},
+		},
 		{name: "k8sLongName",
 			compatVersion: version.MajorMinor(1, 34),
 			schema: apiextensions.JSONSchemaProps{

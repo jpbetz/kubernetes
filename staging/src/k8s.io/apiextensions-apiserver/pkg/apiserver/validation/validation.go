@@ -401,6 +401,14 @@ func ConvertJSONSchemaPropsWithPostProcess(in *apiextensions.JSONSchemaProps, ou
 	if in.XMapType != nil {
 		out.VendorExtensible.AddExtension("x-kubernetes-map-type", *in.XMapType)
 	}
+	if in.XPropertyNames != nil {
+		// TODO: Should this instead do:  internal->v1->unstructured?
+		propertyNames, err := convertPropertyNamesSchemaToInterfaceMap(in.XPropertyNames)
+		if err != nil {
+			return err
+		}
+		out.VendorExtensible.AddExtension("x-kubernetes-property-names", propertyNames)
+	}
 	if len(in.XValidations) != 0 {
 		var serializationValidationRules apiextensionsv1.ValidationRules
 		if err := apiextensionsv1.Convert_apiextensions_ValidationRules_To_v1_ValidationRules(&in.XValidations, &serializationValidationRules, nil); err != nil {
@@ -409,6 +417,33 @@ func ConvertJSONSchemaPropsWithPostProcess(in *apiextensions.JSONSchemaProps, ou
 		out.VendorExtensible.AddExtension("x-kubernetes-validations", convertSliceToInterfaceSlice(serializationValidationRules))
 	}
 	return nil
+}
+
+func convertPropertyNamesSchemaToInterfaceMap(in *apiextensions.JSONSchemaProps) (map[string]any, error) {
+	result := map[string]any{}
+	if in.MaxLength != nil {
+		result["maxLength"] = float64(*in.MaxLength)
+	}
+	if in.MinLength != nil {
+		result["minLength"] = float64(*in.MinLength)
+	}
+	if len(in.Pattern) > 0 {
+		result["pattern"] = in.Pattern
+	}
+	if len(in.Format) > 0 {
+		result["format"] = in.Format
+	}
+	if len(in.Enum) > 0 {
+		result["enum"] = convertSliceToInterfaceSlice(in.Enum)
+	}
+	if in.XValidations != nil {
+		var serializationValidationRules apiextensionsv1.ValidationRules
+		if err := apiextensionsv1.Convert_apiextensions_ValidationRules_To_v1_ValidationRules(&in.XValidations, &serializationValidationRules, nil); err != nil {
+			return nil, err
+		}
+		result["x-kubernetes-validations"] = convertSliceToInterfaceSlice(serializationValidationRules)
+	}
+	return result, nil
 }
 
 func convertSliceToInterfaceSlice[T any](in []T) []interface{} {

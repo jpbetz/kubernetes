@@ -86,6 +86,14 @@ func (s *Schema) AdditionalProperties() common.SchemaOrBool {
 	return &SchemaOrBool{SchemaOrBool: s.Schema.AdditionalProperties}
 }
 
+func (s *Schema) XPropertyNames() common.Schema {
+	propNames := getXPropertyNames(s.Schema)
+	if propNames == nil {
+		return nil
+	}
+	return &Schema{Schema: propNames}
+}
+
 func (s *Schema) Default() any {
 	return s.Schema.Default
 }

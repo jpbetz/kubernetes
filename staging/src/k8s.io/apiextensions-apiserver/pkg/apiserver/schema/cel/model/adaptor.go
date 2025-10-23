@@ -87,6 +87,13 @@ func (s *Structural) AdditionalProperties() common.SchemaOrBool {
 	return &StructuralOrBool{StructuralOrBool: s.Structural.AdditionalProperties}
 }
 
+func (s *Structural) XPropertyNames() common.Schema {
+	if s.Structural.XPropertyNames == nil {
+		return nil
+	}
+	return &Structural{Structural: s.Structural.XPropertyNames}
+}
+
 func (s *Structural) Default() any {
 	return s.Structural.Default.Object
 }

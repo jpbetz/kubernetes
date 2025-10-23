@@ -182,6 +182,11 @@ func (in *ValidationExtensions) DeepCopyInto(out *ValidationExtensions) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
+	if in.XPropertyNames != nil {
+		in, out := &in.XPropertyNames, &out.XPropertyNames
+		*out = new(Structural)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 

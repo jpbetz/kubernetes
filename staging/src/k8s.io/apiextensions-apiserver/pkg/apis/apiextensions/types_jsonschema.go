@@ -150,8 +150,9 @@ type JSONSchemaProps struct {
 	// +listMapKey=rule
 	XValidations ValidationRules
 
-	// x-kubernetes-property-names provides validation for map keys.
-	// The type of this field must be string.
+	// x-kubernetes-property-names describes validations for map keys.
+	// The schema type must be of string.
+	// Only the minLength, maxLength, pattern, format, enum and x-kubernetes-validations schema properties are supported.
 	XPropertyNames *JSONSchemaProps
 }
 

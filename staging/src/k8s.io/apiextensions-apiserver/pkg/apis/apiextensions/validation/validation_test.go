@@ -11295,6 +11295,115 @@ func TestValidateCustomResourceDefinitionValidation(t *testing.T) {
 				invalid("spec.validation.openAPIV3Schema.properties[value].x-kubernetes-validations[0].optionalOldSelf"),
 			},
 		},
+		{
+			name: "allow setting x-kubernetes-property-names with all supported validations",
+			opts: validationOptions{requireStructuralSchema: true},
+			input: apiextensions.CustomResourceValidation{
+				OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+					Type: "object",
+					Properties: map[string]apiextensions.JSONSchemaProps{
+						"value": {
+							Type: "object",
+							XPropertyNames: &apiextensions.JSONSchemaProps{
+								Type:      "string",
+								MaxLength: ptr.To[int64](10),
+								MinLength: ptr.To[int64](1),
+								Format:    "hostname",
+								Pattern:   "^[a-z]+$",
+								Enum:      []apiextensions.JSON{"a", "b"},
+								XValidations: []apiextensions.ValidationRule{
+									{
+										Rule: "self.startsWith('a')",
+									},
+								},
+							},
+							AdditionalProperties: &apiextensions.JSONSchemaPropsOrBool{
+								Schema: &apiextensions.JSONSchemaProps{
+									Type: "string",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "forbid setting x-kubernetes-property-names with unsupported validations",
+			opts: validationOptions{requireStructuralSchema: true},
+			input: apiextensions.CustomResourceValidation{
+				OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+					Type: "object",
+					Properties: map[string]apiextensions.JSONSchemaProps{
+						"value": {
+							Type: "object",
+							XPropertyNames: &apiextensions.JSONSchemaProps{
+								Type:    "string",
+								Default: ptr.To(apiextensions.JSON("a")),
+							},
+							AdditionalProperties: &apiextensions.JSONSchemaPropsOrBool{
+								Schema: &apiextensions.JSONSchemaProps{
+									Type: "string",
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedErrors: []validationMatch{
+				forbidden("spec.validation.openAPIV3Schema.properties[value].x-kubernetes-property-names.default"),
+			},
+		},
+		{
+			name: "forbid setting x-kubernetes-property-names with unsupported validations",
+			opts: validationOptions{requireStructuralSchema: true},
+			input: apiextensions.CustomResourceValidation{
+				OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+					Type: "object",
+					Properties: map[string]apiextensions.JSONSchemaProps{
+						"value": {
+							Type: "object",
+							XPropertyNames: &apiextensions.JSONSchemaProps{
+								Type:    "string",
+								Default: ptr.To(apiextensions.JSON("a")),
+							},
+							AdditionalProperties: &apiextensions.JSONSchemaPropsOrBool{
+								Schema: &apiextensions.JSONSchemaProps{
+									Type: "string",
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedErrors: []validationMatch{
+				forbidden("spec.validation.openAPIV3Schema.properties[value].x-kubernetes-property-names.default"),
+			},
+		},
+		{
+			name: "forbid setting x-kubernetes-property-names type to a non-string type",
+			opts: validationOptions{requireStructuralSchema: true}, input: apiextensions.CustomResourceValidation{
+				OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+					Type: "object",
+					Properties: map[string]apiextensions.JSONSchemaProps{
+						"value": {
+							Type: "object",
+							XPropertyNames: &apiextensions.JSONSchemaProps{
+								Type:      "integer",
+								MaxLength: ptr.To[int64](10)},
+							AdditionalProperties: &apiextensions.JSONSchemaPropsOrBool{
+								Schema: &apiextensions.JSONSchemaProps{
+									Type: "string",
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedErrors: []validationMatch{
+				invalid("spec.validation.openAPIV3Schema.properties[value].x-kubernetes-property-names.type"),
+			},
+		},
+		// TODO: forbid setting x-kubernetes-property-names fields except maxLength, minLength, format, pattern, enum, x-kubernetes-validations
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -139,6 +139,8 @@ type ValidationExtensions struct {
 	// x-kubernetes-validations describes a list of validation rules for expression validation.
 	// Use the v1 struct since this gets serialized as an extension.
 	XValidations apiextensionsv1.ValidationRules
+	// x-kubernetes-property-names is a schema for validating map keys.
+	XPropertyNames *Structural
 }
 
 // +k8s:deepcopy-gen=true

@@ -103,7 +103,11 @@ func SchemaDeclType(s Schema, isResourceRoot bool) *apiservercel.DeclType {
 				} else {
 					maxProperties = estimateMaxAdditionalPropertiesFromMinSize(propsType.MinSerializedSize)
 				}
-				return apiservercel.NewMapType(apiservercel.StringType, propsType, maxProperties)
+				propNamesType := apiservercel.StringType
+				if s.XPropertyNames() != nil {
+					propNamesType = SchemaDeclType(s.XPropertyNames(), s.XPropertyNames().IsXEmbeddedResource())
+				}
+				return apiservercel.NewMapType(propNamesType, propsType, maxProperties)
 			}
 			return nil
 		}

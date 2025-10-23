@@ -2309,6 +2309,24 @@ func TestValidationExpressionsAtSchemaLevels(t *testing.T) {
 			}),
 			errors: []string{"found no matching overload for '_==_' applied to '(int, string)"},
 		},
+		{name: "invalid rule under x-kubernetes-property-names",
+			obj: map[string]interface{}{
+				"f": map[string]interface{}{"k": 1},
+			},
+			schema: objectTypePtr(map[string]schema.Structural{
+				"f": withMapKeyType(mapTypePtr(&integerType), cloneWithRule(&stringType, "self == 1")),
+			}),
+			errors: []string{"found no matching overload for '_==_' applied to '(string, int)"},
+		},
+		{name: "failed rule under x-kubernetes-property-names",
+			obj: map[string]interface{}{
+				"f": map[string]interface{}{"k": 1},
+			},
+			schema: objectTypePtr(map[string]schema.Structural{
+				"f": withMapKeyType(mapTypePtr(&integerType), cloneWithRule(&stringType, "self.startsWith('x')")),
+			}),
+			errors: []string{"Invalid value: \"k\": failed rule: self.startsWith('x')"},
+		},
 		{name: "invalid rule under unescaped field name",
 			obj: map[string]interface{}{
 				"f": map[string]interface{}{
@@ -5143,6 +5161,11 @@ func mapType(valSchema *schema.Structural) schema.Structural {
 		AdditionalProperties: &schema.StructuralOrBool{Bool: true, Structural: valSchema},
 	}
 	return result
+}
+
+func withMapKeyType(objectSchema, keySchema *schema.Structural) schema.Structural {
+	objectSchema.XPropertyNames = keySchema
+	return *objectSchema
 }
 
 func mapTypePtr(valSchema *schema.Structural) *schema.Structural {

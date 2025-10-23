@@ -98,6 +98,15 @@ func getXValidations(schema *spec.Schema) []common.ValidationRule {
 	return results
 }
 
+func getXPropertyNames(schema *spec.Schema) *spec.Schema {
+	var propNames *spec.Schema
+	err := schema.Extensions.GetObject(extPropertyNames, propNames)
+	if err != nil {
+		return nil
+	}
+	return propNames
+}
+
 const extIntOrString = "x-kubernetes-int-or-string"
 const extEmbeddedResource = "x-kubernetes-embedded-resource"
 const extPreserveUnknownFields = "x-kubernetes-preserve-unknown-fields"
@@ -105,3 +114,4 @@ const extListType = "x-kubernetes-list-type"
 const extMapType = "x-kubernetes-map-type"
 const extListMapKeys = "x-kubernetes-list-map-keys"
 const extValidations = "x-kubernetes-validations"
+const extPropertyNames = "x-kubernetes-property-names"

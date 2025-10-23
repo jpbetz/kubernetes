@@ -195,9 +195,9 @@ type JSONSchemaProps struct {
 	// +listMapKey=rule
 	XValidations ValidationRules `json:"x-kubernetes-validations,omitempty" patchStrategy:"merge" patchMergeKey:"rule" protobuf:"bytes,44,rep,name=xKubernetesValidations"`
 
-	// x-kubernetes-property-names provides validation for map keys.
-	// The type of this field must be string.
-	// +optional
+	// x-kubernetes-property-names describes validations for map keys.
+	// The schema type must be of string.
+	// Only the minLength, maxLength, pattern, format, enum and x-kubernetes-validations schema properties are supported.
 	XPropertyNames *JSONSchemaProps `json:"x-kubernetes-property-names,omitempty" protobuf:"bytes,45,opt,name=xKubernetesPropertyNames"`
 }
 
