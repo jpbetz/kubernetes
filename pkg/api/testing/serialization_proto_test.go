@@ -250,3 +250,26 @@ func BenchmarkDecodeIntoProtobuf(b *testing.B) {
 		}
 	}
 }
+
+func BenchmarkDecodeIntoPartialObjectMetadataProtobuf(b *testing.B) {
+	items := benchmarkItems(b)
+	width := len(items)
+	encoded := make([][]byte, width)
+	for i := range items {
+		data, err := (&items[i]).Marshal()
+		if err != nil {
+			b.Fatal(err)
+		}
+		encoded[i] = data
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		obj := &metav1.PartialObjectMetadata{}
+		// Protobuf unmarshaling usually resets the object
+		if err := obj.Unmarshal(encoded[i%width]); err != nil {
+			b.Fatal(err)
+		}
+	}
+	b.StopTimer()
+}

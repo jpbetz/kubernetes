@@ -623,3 +623,26 @@ func BenchmarkDecodeIntoYAML(b *testing.B) {
 	}
 	b.StopTimer()
 }
+
+func BenchmarkDecodeIntoPartialObjectMetadataJSON(b *testing.B) {
+	codec := legacyscheme.Codecs.LegacyCodec(v1.SchemeGroupVersion)
+	items := benchmarkItems(b)
+	width := len(items)
+	encoded := make([][]byte, width)
+	for i := range items {
+		data, err := runtime.Encode(codec, &items[i])
+		if err != nil {
+			b.Fatal(err)
+		}
+		encoded[i] = data
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		obj := metav1.PartialObjectMetadata{}
+		if err := gojson.Unmarshal(encoded[i%width], &obj); err != nil {
+			b.Fatal(err)
+		}
+	}
+	b.StopTimer()
+}
