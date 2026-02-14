@@ -18,6 +18,8 @@ package app
 
 import (
 	"context"
+	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 	"testing"
@@ -29,6 +31,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/version"
 	"k8s.io/apiserver/pkg/server/healthz"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	restclient "k8s.io/client-go/rest"
 	cpnames "k8s.io/cloud-provider/names"
 	"k8s.io/component-base/featuregate"
 	featuregatetesting "k8s.io/component-base/featuregate/testing"
@@ -329,4 +332,20 @@ func runControllers(
 	}
 	RunControllers(ctx, controllerCtx, controllers, 0, 0)
 	return nil
+}
+
+// mockGetter implements cache.Getter for testing.
+type mockGetter struct{}
+
+func (g *mockGetter) Get() *restclient.Request {
+	return restclient.NewRequestWithClient(&url.URL{Scheme: "https", Host: "localhost"}, "", restclient.ClientContentConfig{}, http.DefaultClient)
+}
+
+func TestExcludeManagedFieldsGetterAddsParam(t *testing.T) {
+	wrapper := &excludeManagedFieldsGetter{delegate: &mockGetter{}}
+	req := wrapper.Get()
+	u := req.URL()
+	if got := u.Query().Get("excludeManagedFields"); got != "true" {
+		t.Errorf("expected excludeManagedFields=true in URL query, got %q; full URL: %s", got, u.String())
+	}
 }

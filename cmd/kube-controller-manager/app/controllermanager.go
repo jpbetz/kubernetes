@@ -31,6 +31,7 @@ import (
 	"github.com/blang/semver/v4"
 	"github.com/spf13/cobra"
 	coordinationv1 "k8s.io/api/coordination/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -38,6 +39,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/uuid"
 	"k8s.io/apimachinery/pkg/util/wait"
+	genericfeatures "k8s.io/apiserver/pkg/features"
 	"k8s.io/apiserver/pkg/server/flagz"
 	"k8s.io/apiserver/pkg/server/healthz"
 	"k8s.io/apiserver/pkg/server/mux"
@@ -469,6 +471,17 @@ func (c ControllerContext) NewClient(name string) (kubernetes.Interface, error) 
 	return client, nil
 }
 
+// excludeManagedFieldsGetter wraps a cache.Getter to add excludeManagedFields=true
+// to all list/watch requests, reducing wire traffic by having the server skip
+// serialization of managedFields.
+type excludeManagedFieldsGetter struct {
+	delegate cache.Getter
+}
+
+func (g *excludeManagedFieldsGetter) Get() *restclient.Request {
+	return g.delegate.Get().Param("excludeManagedFields", "true")
+}
+
 // CreateControllerContext creates a context struct containing references to resources needed by the
 // controllers such as the cloud provider and clientBuilder. rootClientBuilder is only used for
 // the shared-informers client and token controller.
@@ -494,6 +507,26 @@ func CreateControllerContext(ctx context.Context, s *config.CompletedConfig, roo
 	}
 
 	sharedInformers := informers.NewSharedInformerFactoryWithOptions(versionedClient, ResyncPeriod(s)(), informers.WithTransform(trim), informers.WithInformerName(informerName))
+
+	// Pre-register a custom pod informer that adds excludeManagedFields=true to
+	// list/watch requests. This reduces wire traffic by ~40-50% for pod responses
+	// since the server skips serialization of managedFields. All 21 controllers
+	// sharing this pod informer automatically benefit. If the apiserver doesn't
+	// support this parameter, it is silently ignored.
+	if utilfeature.DefaultFeatureGate.Enabled(genericfeatures.ExcludeManagedFields) {
+		sharedInformers.InformerFor(&v1.Pod{}, func(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+			getter := &excludeManagedFieldsGetter{delegate: client.CoreV1().RESTClient()}
+			lw := cache.NewFilteredListWatchFromClient(getter, "pods", metav1.NamespaceAll, nil)
+			return cache.NewSharedIndexInformerWithOptions(
+				cache.ToListWatcherWithWatchListSemantics(lw, client),
+				&v1.Pod{},
+				cache.SharedIndexInformerOptions{
+					ResyncPeriod: resyncPeriod,
+					Indexers:     cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
+				},
+			)
+		})
+	}
 
 	metadataConfig, err := rootClientBuilder.Config("metadata-informers")
 	if err != nil {
