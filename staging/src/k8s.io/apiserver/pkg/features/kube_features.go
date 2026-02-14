@@ -278,6 +278,14 @@ const (
 	// Enables post-start-hook for storage readiness
 	WatchCacheInitializationPostStartHook featuregate.Feature = "WatchCacheInitializationPostStartHook"
 
+	// owner: @jpbetz
+	//
+	// Enables interning of managedFields in the watch cache to reduce memory usage.
+	// When enabled, consecutive versions of the same object share managedFields pointers
+	// if the fields haven't changed, and string fields within managedFields entries are
+	// deduplicated across all objects using unique.Make.
+	WatchCacheManagedFieldsInterning featuregate.Feature = "WatchCacheManagedFieldsInterning"
+
 	// owner: @p0lyn0mial
 	//
 	// Allow the API server to stream individual items instead of chunking
@@ -477,6 +485,10 @@ var defaultVersionedKubernetesFeatureGates = map[featuregate.Feature]featuregate
 
 	WatchCacheInitializationPostStartHook: {
 		{Version: version.MustParse("1.31"), Default: false, PreRelease: featuregate.Beta},
+		{Version: version.MustParse("1.36"), Default: true, PreRelease: featuregate.Beta},
+	},
+
+	WatchCacheManagedFieldsInterning: {
 		{Version: version.MustParse("1.36"), Default: true, PreRelease: featuregate.Beta},
 	},
 

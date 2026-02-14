@@ -19,10 +19,12 @@ package cacher
 import (
 	"context"
 	"fmt"
+	goruntime "runtime"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
+	"unsafe"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -1410,4 +1412,616 @@ func TestCacheSnapshots(t *testing.T) {
 	elements = lister.ListPrefix("", "")
 	assert.Len(t, elements, 1)
 	assert.Equal(t, makeTestPod("foo", 600), elements[0].(*store.Element).Object)
+}
+
+func testManagedFields() []metav1.ManagedFieldsEntry {
+	return []metav1.ManagedFieldsEntry{
+		{
+			Manager:    "kubectl",
+			Operation:  metav1.ManagedFieldsOperationApply,
+			APIVersion: "v1",
+			FieldsType: "FieldsV1",
+			FieldsV1:   &metav1.FieldsV1{Raw: []byte(`{"f:metadata":{"f:labels":{"f:app":{}}}}`)},
+		},
+		{
+			Manager:    "kube-controller-manager",
+			Operation:  metav1.ManagedFieldsOperationUpdate,
+			APIVersion: "v1",
+			FieldsType: "FieldsV1",
+			Subresource: "status",
+			FieldsV1:   &metav1.FieldsV1{Raw: []byte(`{"f:status":{"f:phase":{}}}`)},
+			Time:        &metav1.Time{Time: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)},
+		},
+	}
+}
+
+func TestManagedFieldsEqual(t *testing.T) {
+	tests := []struct {
+		name     string
+		a, b     []metav1.ManagedFieldsEntry
+		expected bool
+	}{
+		{
+			name:     "both nil",
+			a:        nil,
+			b:        nil,
+			expected: true,
+		},
+		{
+			name:     "both empty",
+			a:        []metav1.ManagedFieldsEntry{},
+			b:        []metav1.ManagedFieldsEntry{},
+			expected: true,
+		},
+		{
+			name:     "nil vs empty",
+			a:        nil,
+			b:        []metav1.ManagedFieldsEntry{},
+			expected: true,
+		},
+		{
+			name:     "equal managed fields",
+			a:        testManagedFields(),
+			b:        testManagedFields(),
+			expected: true,
+		},
+		{
+			name: "different length",
+			a:    testManagedFields(),
+			b:    testManagedFields()[:1],
+			expected: false,
+		},
+		{
+			name: "different manager",
+			a:    testManagedFields(),
+			b: func() []metav1.ManagedFieldsEntry {
+				mf := testManagedFields()
+				mf[0].Manager = "other"
+				return mf
+			}(),
+			expected: false,
+		},
+		{
+			name: "different fieldsV1 raw",
+			a:    testManagedFields(),
+			b: func() []metav1.ManagedFieldsEntry {
+				mf := testManagedFields()
+				mf[0].FieldsV1 = &metav1.FieldsV1{Raw: []byte(`{"f:metadata":{"f:annotations":{}}}`)}
+				return mf
+			}(),
+			expected: false,
+		},
+		{
+			name: "different time",
+			a:    testManagedFields(),
+			b: func() []metav1.ManagedFieldsEntry {
+				mf := testManagedFields()
+				mf[1].Time = &metav1.Time{Time: time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC)}
+				return mf
+			}(),
+			expected: false,
+		},
+		{
+			name: "nil vs non-nil time",
+			a:    testManagedFields(),
+			b: func() []metav1.ManagedFieldsEntry {
+				mf := testManagedFields()
+				mf[1].Time = nil
+				return mf
+			}(),
+			expected: false,
+		},
+		{
+			name: "nil vs non-nil fieldsV1",
+			a:    testManagedFields(),
+			b: func() []metav1.ManagedFieldsEntry {
+				mf := testManagedFields()
+				mf[0].FieldsV1 = nil
+				return mf
+			}(),
+			expected: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := managedFieldsEqual(tt.a, tt.b)
+			if result != tt.expected {
+				t.Errorf("managedFieldsEqual() = %v, want %v", result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestInternManagedFields(t *testing.T) {
+	t.Run("shares pointer when equal", func(t *testing.T) {
+		prev := makeTestPod("pod", 1)
+		prev.ManagedFields = testManagedFields()
+		cur := makeTestPod("pod", 2)
+		cur.ManagedFields = testManagedFields()
+
+		// Verify they are equal but distinct slices before interning.
+		if &prev.ManagedFields[0] == &cur.ManagedFields[0] {
+			t.Fatal("expected distinct slices before interning")
+		}
+
+		internManagedFields(prev, cur)
+
+		// After interning, the slices should share the same backing array.
+		if &prev.ManagedFields[0] != &cur.ManagedFields[0] {
+			t.Error("expected shared slice after interning equal managedFields")
+		}
+	})
+
+	t.Run("does not share pointer when different", func(t *testing.T) {
+		prev := makeTestPod("pod", 1)
+		prev.ManagedFields = testManagedFields()
+		cur := makeTestPod("pod", 2)
+		cur.ManagedFields = testManagedFields()
+		cur.ManagedFields[0].Manager = "different-manager"
+
+		internManagedFields(prev, cur)
+
+		// Slices should remain distinct.
+		if &prev.ManagedFields[0] == &cur.ManagedFields[0] {
+			t.Error("expected distinct slices after interning different managedFields")
+		}
+	})
+
+	t.Run("handles nil managedFields", func(t *testing.T) {
+		prev := makeTestPod("pod", 1)
+		cur := makeTestPod("pod", 2)
+		// Both have nil managedFields — should not panic.
+		internManagedFields(prev, cur)
+	})
+}
+
+func TestProcessEventInternsManagedFields(t *testing.T) {
+	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.WatchCacheManagedFieldsInterning, true)
+	s := newTestWatchCache(10, DefaultEventFreshDuration, &cache.Indexers{})
+	defer s.Stop()
+
+	mf := testManagedFields()
+
+	// Add initial pod with managedFields.
+	pod1 := makeTestPod("pod", 1)
+	pod1.ManagedFields = mf
+	require.NoError(t, s.Add(pod1))
+
+	// Update pod with same managedFields but different labels.
+	pod2 := makeTestPodDetails("pod", 2, "other-node", map[string]string{"k8s-app": "my-app", "new": "label"})
+	pod2.ManagedFields = testManagedFields()
+	require.NoError(t, s.Update(pod2))
+
+	// The object in the store should share managedFields with the original.
+	item, ok, err := s.store.GetByKey("/prefix/ns/pod")
+	require.NoError(t, err)
+	require.True(t, ok)
+	storedPod := item.(*store.Element).Object.(*v1.Pod)
+	if &storedPod.ManagedFields[0] != &pod1.ManagedFields[0] {
+		t.Error("expected store object to share managedFields pointer with previous version after interning")
+	}
+}
+
+func TestInternManagedFieldsStrings(t *testing.T) {
+	// Use []byte conversion to force distinct allocations.
+	mf1 := []metav1.ManagedFieldsEntry{
+		{
+			Manager:    string([]byte("kubectl")),
+			Operation:  metav1.ManagedFieldsOperationType(string([]byte("Apply"))),
+			APIVersion: string([]byte("v1")),
+			FieldsType: string([]byte("FieldsV1")),
+		},
+	}
+	mf2 := []metav1.ManagedFieldsEntry{
+		{
+			Manager:    string([]byte("kubectl")),
+			Operation:  metav1.ManagedFieldsOperationType(string([]byte("Apply"))),
+			APIVersion: string([]byte("v1")),
+			FieldsType: string([]byte("FieldsV1")),
+		},
+	}
+
+	// Verify strings are distinct allocations before interning.
+	if unsafe.StringData(mf1[0].Manager) == unsafe.StringData(mf2[0].Manager) {
+		t.Skip("compiler already interned these strings")
+	}
+
+	pod1 := makeTestPod("pod1", 1)
+	pod1.ManagedFields = mf1
+	pod2 := makeTestPod("pod2", 2)
+	pod2.ManagedFields = mf2
+
+	internManagedFieldsStrings(pod1)
+	internManagedFieldsStrings(pod2)
+
+	// After interning, identical strings should share backing memory.
+	if unsafe.StringData(pod1.ManagedFields[0].Manager) != unsafe.StringData(pod2.ManagedFields[0].Manager) {
+		t.Error("expected Manager strings to share memory after interning")
+	}
+	if unsafe.StringData(string(pod1.ManagedFields[0].Operation)) != unsafe.StringData(string(pod2.ManagedFields[0].Operation)) {
+		t.Error("expected Operation strings to share memory after interning")
+	}
+	if unsafe.StringData(pod1.ManagedFields[0].APIVersion) != unsafe.StringData(pod2.ManagedFields[0].APIVersion) {
+		t.Error("expected APIVersion strings to share memory after interning")
+	}
+	if unsafe.StringData(pod1.ManagedFields[0].FieldsType) != unsafe.StringData(pod2.ManagedFields[0].FieldsType) {
+		t.Error("expected FieldsType strings to share memory after interning")
+	}
+}
+
+func TestInternManagedFieldsStringsNilManagedFields(t *testing.T) {
+	pod := makeTestPod("pod", 1)
+	// Should not panic with nil managedFields.
+	internManagedFieldsStrings(pod)
+}
+
+func TestReplaceInternsManagedFieldsStrings(t *testing.T) {
+	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.WatchCacheManagedFieldsInterning, true)
+	s := newTestWatchCache(10, DefaultEventFreshDuration, &cache.Indexers{})
+	defer s.Stop()
+
+	pod1 := makeTestPod("pod1", 1)
+	pod1.ManagedFields = []metav1.ManagedFieldsEntry{
+		{
+			Manager:    string([]byte("kubectl")),
+			APIVersion: string([]byte("v1")),
+			FieldsType: string([]byte("FieldsV1")),
+			Operation:  metav1.ManagedFieldsOperationType(string([]byte("Apply"))),
+		},
+	}
+	pod2 := makeTestPod("pod2", 1)
+	pod2.ManagedFields = []metav1.ManagedFieldsEntry{
+		{
+			Manager:    string([]byte("kubectl")),
+			APIVersion: string([]byte("v1")),
+			FieldsType: string([]byte("FieldsV1")),
+			Operation:  metav1.ManagedFieldsOperationType(string([]byte("Apply"))),
+		},
+	}
+
+	// Verify strings are distinct before Replace.
+	if unsafe.StringData(pod1.ManagedFields[0].Manager) == unsafe.StringData(pod2.ManagedFields[0].Manager) {
+		t.Skip("compiler already interned these strings")
+	}
+
+	err := s.Replace([]interface{}{pod1, pod2}, "1")
+	require.NoError(t, err)
+
+	item1, ok, err := s.store.GetByKey("/prefix/ns/pod1")
+	require.NoError(t, err)
+	require.True(t, ok)
+	item2, ok, err := s.store.GetByKey("/prefix/ns/pod2")
+	require.NoError(t, err)
+	require.True(t, ok)
+
+	stored1 := item1.(*store.Element).Object.(*v1.Pod)
+	stored2 := item2.(*store.Element).Object.(*v1.Pod)
+
+	if unsafe.StringData(stored1.ManagedFields[0].Manager) != unsafe.StringData(stored2.ManagedFields[0].Manager) {
+		t.Error("expected Manager strings to share memory after Replace interning")
+	}
+}
+
+// realisticManagedFields returns managedFields representative of a typical
+// Pod created by a Deployment, with kubectl apply and controller-manager
+// status updates. The FieldsV1 sizes are realistic (~2-5KB each).
+func realisticManagedFields() []metav1.ManagedFieldsEntry {
+	// Simulate kubectl apply fieldsV1 (~3KB for a moderately complex Pod spec)
+	applyFields := make([]byte, 3000)
+	for i := range applyFields {
+		applyFields[i] = "abcdefghijklmnopqrstuvwxyz0123456789"[i%36]
+	}
+	// Simulate status update fieldsV1 (~2KB)
+	statusFields := make([]byte, 2000)
+	for i := range statusFields {
+		statusFields[i] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[i%36]
+	}
+	// Simulate a third manager (e.g. a mutating webhook)
+	webhookFields := make([]byte, 500)
+	for i := range webhookFields {
+		webhookFields[i] = "0123456789abcdef"[i%16]
+	}
+
+	t1 := metav1.Time{Time: time.Date(2024, 6, 15, 10, 30, 0, 0, time.UTC)}
+	t2 := metav1.Time{Time: time.Date(2024, 6, 15, 11, 0, 0, 0, time.UTC)}
+	t3 := metav1.Time{Time: time.Date(2024, 6, 15, 10, 45, 0, 0, time.UTC)}
+
+	return []metav1.ManagedFieldsEntry{
+		{
+			Manager:    "kubectl-client-side-apply",
+			Operation:  metav1.ManagedFieldsOperationApply,
+			APIVersion: "v1",
+			FieldsType: "FieldsV1",
+			FieldsV1:   &metav1.FieldsV1{Raw: applyFields},
+			Time:       &t1,
+		},
+		{
+			Manager:     "kube-controller-manager",
+			Operation:   metav1.ManagedFieldsOperationUpdate,
+			APIVersion:  "v1",
+			FieldsType:  "FieldsV1",
+			Subresource: "status",
+			FieldsV1:    &metav1.FieldsV1{Raw: statusFields},
+			Time:        &t2,
+		},
+		{
+			Manager:    "admission-webhook",
+			Operation:  metav1.ManagedFieldsOperationUpdate,
+			APIVersion: "v1",
+			FieldsType: "FieldsV1",
+			FieldsV1:   &metav1.FieldsV1{Raw: webhookFields},
+			Time:       &t3,
+		},
+	}
+}
+
+func BenchmarkManagedFieldsEqual(b *testing.B) {
+	b.Run("equal", func(b *testing.B) {
+		a := realisticManagedFields()
+		c := realisticManagedFields()
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			managedFieldsEqual(a, c)
+		}
+	})
+	b.Run("different_last_entry", func(b *testing.B) {
+		a := realisticManagedFields()
+		c := realisticManagedFields()
+		c[2].Manager = "different-webhook"
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			managedFieldsEqual(a, c)
+		}
+	})
+	b.Run("different_fieldsV1", func(b *testing.B) {
+		a := realisticManagedFields()
+		c := realisticManagedFields()
+		c[0].FieldsV1 = &metav1.FieldsV1{Raw: []byte("different")}
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			managedFieldsEqual(a, c)
+		}
+	})
+}
+
+func BenchmarkInternManagedFieldsStrings(b *testing.B) {
+	b.Run("with_managedFields", func(b *testing.B) {
+		pods := make([]*v1.Pod, b.N)
+		for i := range pods {
+			pods[i] = makeTestPod(fmt.Sprintf("pod-%d", i), uint64(i+1))
+			pods[i].ManagedFields = realisticManagedFields()
+		}
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			internManagedFieldsStrings(pods[i])
+		}
+	})
+	b.Run("nil_managedFields", func(b *testing.B) {
+		pods := make([]*v1.Pod, b.N)
+		for i := range pods {
+			pods[i] = makeTestPod(fmt.Sprintf("pod-%d", i), uint64(i+1))
+		}
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			internManagedFieldsStrings(pods[i])
+		}
+	})
+}
+
+func BenchmarkProcessEvent(b *testing.B) {
+	b.Run("updates_same_managedFields", func(b *testing.B) {
+		s := newTestWatchCache(defaultUpperBoundCapacity, DefaultEventFreshDuration, &cache.Indexers{})
+		defer s.Stop()
+
+		// Seed the store with an initial pod.
+		pod := makeTestPod("pod", 1)
+		pod.ManagedFields = realisticManagedFields()
+		if err := s.Add(pod); err != nil {
+			b.Fatal(err)
+		}
+
+		b.ResetTimer()
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			updated := makeTestPodDetails("pod", uint64(i+2), "some-node", map[string]string{"k8s-app": "my-app", "iteration": strconv.Itoa(i)})
+			updated.ManagedFields = realisticManagedFields()
+			if err := s.Update(updated); err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
+	b.Run("updates_different_managedFields", func(b *testing.B) {
+		s := newTestWatchCache(defaultUpperBoundCapacity, DefaultEventFreshDuration, &cache.Indexers{})
+		defer s.Stop()
+
+		pod := makeTestPod("pod", 1)
+		pod.ManagedFields = realisticManagedFields()
+		if err := s.Add(pod); err != nil {
+			b.Fatal(err)
+		}
+
+		b.ResetTimer()
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			updated := makeTestPodDetails("pod", uint64(i+2), "some-node", map[string]string{"k8s-app": "my-app", "iteration": strconv.Itoa(i)})
+			mf := realisticManagedFields()
+			mf[0].Manager = fmt.Sprintf("kubectl-%d", i) // Force different each time
+			updated.ManagedFields = mf
+			if err := s.Update(updated); err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
+	b.Run("updates_no_managedFields", func(b *testing.B) {
+		s := newTestWatchCache(defaultUpperBoundCapacity, DefaultEventFreshDuration, &cache.Indexers{})
+		defer s.Stop()
+
+		pod := makeTestPod("pod", 1)
+		if err := s.Add(pod); err != nil {
+			b.Fatal(err)
+		}
+
+		b.ResetTimer()
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			updated := makeTestPodDetails("pod", uint64(i+2), "some-node", map[string]string{"k8s-app": "my-app", "iteration": strconv.Itoa(i)})
+			if err := s.Update(updated); err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
+}
+
+func BenchmarkReplace(b *testing.B) {
+	b.Run("with_managedFields", func(b *testing.B) {
+		s := newTestWatchCache(defaultUpperBoundCapacity, DefaultEventFreshDuration, &cache.Indexers{})
+		defer s.Stop()
+
+		const numPods = 1000
+		objs := make([]interface{}, numPods)
+		for i := range objs {
+			pod := makeTestPod(fmt.Sprintf("pod-%d", i), 1)
+			pod.ManagedFields = realisticManagedFields()
+			objs[i] = pod
+		}
+
+		b.ResetTimer()
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			if err := s.Replace(objs, strconv.Itoa(i+1)); err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
+	b.Run("without_managedFields", func(b *testing.B) {
+		s := newTestWatchCache(defaultUpperBoundCapacity, DefaultEventFreshDuration, &cache.Indexers{})
+		defer s.Stop()
+
+		const numPods = 1000
+		objs := make([]interface{}, numPods)
+		for i := range objs {
+			objs[i] = makeTestPod(fmt.Sprintf("pod-%d", i), 1)
+		}
+
+		b.ResetTimer()
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			if err := s.Replace(objs, strconv.Itoa(i+1)); err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
+}
+
+// fillWatchCacheWithManagedFields populates a watch cache with numPods pods,
+// each updated numVersions times. Returns heap alloc delta and sharing stats.
+func fillWatchCacheWithManagedFields(t testing.TB, numPods, numVersions int) (heapDeltaMB float64, sharedCount, totalEvents int) {
+	t.Helper()
+
+	s := newTestWatchCache(numPods*numVersions, DefaultEventFreshDuration, &cache.Indexers{})
+	defer s.Stop()
+
+	goruntime.GC()
+	goruntime.GC()
+	var memBefore goruntime.MemStats
+	goruntime.ReadMemStats(&memBefore)
+
+	// Add initial pods.
+	for i := 0; i < numPods; i++ {
+		pod := makeTestPod(fmt.Sprintf("pod-%d", i), uint64(i+1))
+		pod.ManagedFields = realisticManagedFields()
+		if err := s.Add(pod); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// Simulate updates.
+	rv := uint64(numPods + 1)
+	for ver := 0; ver < numVersions-1; ver++ {
+		for i := 0; i < numPods; i++ {
+			pod := makeTestPodDetails(
+				fmt.Sprintf("pod-%d", i), rv,
+				fmt.Sprintf("node-%d", rv%10),
+				map[string]string{"k8s-app": "my-app", "version": strconv.Itoa(int(rv))},
+			)
+			pod.ManagedFields = realisticManagedFields()
+			if err := s.Update(pod); err != nil {
+				t.Fatal(err)
+			}
+			rv++
+		}
+	}
+
+	goruntime.GC()
+	goruntime.GC()
+	var memAfter goruntime.MemStats
+	goruntime.ReadMemStats(&memAfter)
+
+	heapDeltaMB = float64(memAfter.HeapAlloc-memBefore.HeapAlloc) / (1024 * 1024)
+
+	// Count shared managedFields pointers in ring buffer.
+	s.RLock()
+	totalEvents = int(s.endIndex - s.startIndex)
+	lastMFPtr := map[string]uintptr{}
+	for i := s.startIndex; i < s.endIndex; i++ {
+		evt := s.cache[i%s.capacity]
+		if evt.Object == nil {
+			continue
+		}
+		pod := evt.Object.(*v1.Pod)
+		if len(pod.ManagedFields) == 0 {
+			continue
+		}
+		ptr := uintptr(unsafe.Pointer(&pod.ManagedFields[0]))
+		if prev, ok := lastMFPtr[evt.Key]; ok && ptr == prev {
+			sharedCount++
+		}
+		lastMFPtr[evt.Key] = ptr
+	}
+	s.RUnlock()
+
+	return heapDeltaMB, sharedCount, totalEvents
+}
+
+// TestWatchCacheMemoryInterning measures the heap memory impact of
+// managedFields interning by toggling the WatchCacheManagedFieldsInterning
+// feature gate and comparing heap usage.
+func TestWatchCacheMemoryInterning(t *testing.T) {
+	const (
+		numPods     = 1000
+		numVersions = 10
+	)
+
+	// Scenario 1: feature gate enabled (interning active).
+	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.WatchCacheManagedFieldsInterning, true)
+	heapEnabled, sharedEnabled, totalEnabled := fillWatchCacheWithManagedFields(t, numPods, numVersions)
+	t.Logf("Gate enabled:  heap delta = %.2f MB, shared = %d/%d (%.0f%%)",
+		heapEnabled, sharedEnabled, totalEnabled,
+		float64(sharedEnabled)/float64(totalEnabled)*100)
+
+	// Scenario 2: feature gate disabled (no interning).
+	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.WatchCacheManagedFieldsInterning, false)
+	heapDisabled, sharedDisabled, totalDisabled := fillWatchCacheWithManagedFields(t, numPods, numVersions)
+	t.Logf("Gate disabled: heap delta = %.2f MB, shared = %d/%d (%.0f%%)",
+		heapDisabled, sharedDisabled, totalDisabled,
+		float64(sharedDisabled)/float64(totalDisabled)*100)
+
+	savings := heapDisabled - heapEnabled
+	pct := savings / heapDisabled * 100
+	t.Logf("Memory savings: %.2f MB (%.0f%% reduction)", savings, pct)
+
+	// Verify interning is effective when enabled.
+	expectedShared := numPods * (numVersions - 1)
+	if sharedEnabled < expectedShared*9/10 {
+		t.Errorf("expected at least %d shared managedFields pointers with gate enabled, got %d", expectedShared*9/10, sharedEnabled)
+	}
+
+	// Verify no interning when disabled.
+	if sharedDisabled > 0 {
+		t.Errorf("expected no shared managedFields pointers with gate disabled, got %d", sharedDisabled)
+	}
+
+	if savings <= 0 {
+		t.Errorf("expected positive memory savings, got %.2f MB", savings)
+	}
 }
