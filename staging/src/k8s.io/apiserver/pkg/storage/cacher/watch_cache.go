@@ -17,6 +17,7 @@ limitations under the License.
 package cacher
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"math"
@@ -24,6 +25,7 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+	"unique"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -303,6 +305,10 @@ func (w *watchCache) processEvent(event watch.Event, resourceVersion uint64, upd
 		RecordTime:      w.clock.Now(),
 	}
 
+	if utilfeature.DefaultFeatureGate.Enabled(features.WatchCacheManagedFieldsInterning) {
+		internManagedFieldsStrings(elem.Object)
+	}
+
 	// We can call w.store.Get() outside of a critical section,
 	// because the w.store itself is thread-safe and the only
 	// place where w.store is modified is below (via updateFunc)
@@ -317,6 +323,9 @@ func (w *watchCache) processEvent(event watch.Event, resourceVersion uint64, upd
 		wcEvent.PrevObject = previousElem.Object
 		wcEvent.PrevObjLabels = previousElem.Labels
 		wcEvent.PrevObjFields = previousElem.Fields
+		if utilfeature.DefaultFeatureGate.Enabled(features.WatchCacheManagedFieldsInterning) {
+			internManagedFields(previousElem.Object, elem.Object)
+		}
 	}
 
 	if err := func() error {
@@ -354,6 +363,87 @@ func (w *watchCache) processEvent(event watch.Event, resourceVersion uint64, upd
 	}
 	metrics.RecordResourceVersion(w.groupResource, resourceVersion)
 	return nil
+}
+
+// internManagedFields shares the managedFields slice between the previous and
+// current object if they are equal. This reduces memory in the watch cache
+// because consecutive versions of the same object in the ring buffer typically
+// have identical managedFields (e.g. status updates, label changes don't
+// modify managedFields).
+func internManagedFields(previous, current runtime.Object) {
+	prevAccessor, ok := previous.(metav1.ObjectMetaAccessor)
+	if !ok {
+		return
+	}
+	curAccessor, ok := current.(metav1.ObjectMetaAccessor)
+	if !ok {
+		return
+	}
+	prevMeta := prevAccessor.GetObjectMeta()
+	curMeta := curAccessor.GetObjectMeta()
+	if prevMeta == nil || curMeta == nil {
+		return
+	}
+	prevMF := prevMeta.GetManagedFields()
+	curMF := curMeta.GetManagedFields()
+	if managedFieldsEqual(prevMF, curMF) {
+		curMeta.SetManagedFields(prevMF)
+	}
+}
+
+// internManagedFieldsStrings uses unique.Make to intern the string fields
+// within managedFields entries. This deduplicates strings like Manager,
+// APIVersion, FieldsType across all objects in the cache, since these
+// values are highly repetitive (e.g., all Pods share Manager="kubectl").
+func internManagedFieldsStrings(obj runtime.Object) {
+	accessor, ok := obj.(metav1.ObjectMetaAccessor)
+	if !ok {
+		return
+	}
+	meta := accessor.GetObjectMeta()
+	if meta == nil {
+		return
+	}
+	mf := meta.GetManagedFields()
+	for i := range mf {
+		mf[i].Manager = unique.Make(mf[i].Manager).Value()
+		mf[i].APIVersion = unique.Make(mf[i].APIVersion).Value()
+		mf[i].FieldsType = unique.Make(mf[i].FieldsType).Value()
+		mf[i].Subresource = unique.Make(mf[i].Subresource).Value()
+		mf[i].Operation = metav1.ManagedFieldsOperationType(
+			unique.Make(string(mf[i].Operation)).Value(),
+		)
+	}
+}
+
+// managedFieldsEqual compares two managed fields slices for equality,
+// comparing fields directly to avoid reflection overhead.
+func managedFieldsEqual(a, b []metav1.ManagedFieldsEntry) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i].Manager != b[i].Manager ||
+			a[i].Operation != b[i].Operation ||
+			a[i].APIVersion != b[i].APIVersion ||
+			a[i].FieldsType != b[i].FieldsType ||
+			a[i].Subresource != b[i].Subresource {
+			return false
+		}
+		if (a[i].Time == nil) != (b[i].Time == nil) {
+			return false
+		}
+		if a[i].Time != nil && !a[i].Time.Time.Equal(b[i].Time.Time) {
+			return false
+		}
+		if (a[i].FieldsV1 == nil) != (b[i].FieldsV1 == nil) {
+			return false
+		}
+		if a[i].FieldsV1 != nil && !bytes.Equal(a[i].FieldsV1.Raw, b[i].FieldsV1.Raw) {
+			return false
+		}
+	}
+	return true
 }
 
 // Assumes that lock is already held for write.
@@ -744,6 +834,9 @@ func (w *watchCache) Replace(objs []interface{}, resourceVersion string) error {
 		object, ok := obj.(runtime.Object)
 		if !ok {
 			return fmt.Errorf("didn't get runtime.Object for replace: %#v", obj)
+		}
+		if utilfeature.DefaultFeatureGate.Enabled(features.WatchCacheManagedFieldsInterning) {
+			internManagedFieldsStrings(object)
 		}
 		key, err := w.keyFunc(object)
 		if err != nil {
