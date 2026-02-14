@@ -24,6 +24,8 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/fields"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/watch"
@@ -748,6 +750,220 @@ func TestWatchCacheUpdateReleasesOldStoreRef(t *testing.T) {
 			mfOld := s.managedFieldsStore.Get("/prefix/default/pod1", 100)
 			if mfOld == nil {
 				t.Fatal("expected old entry to still exist (ring buffer ref)")
+			}
+		})
+	}
+}
+
+// TestClearManagedFields tests the clearManagedFields helper.
+func TestClearManagedFields(t *testing.T) {
+	pod := podWithManagedFields("pod1", "100", "kubectl")
+	if len(pod.GetManagedFields()) == 0 {
+		t.Fatal("expected managedFields to be set")
+	}
+	clearManagedFields(pod)
+	if len(pod.GetManagedFields()) != 0 {
+		t.Fatal("expected managedFields to be nil after clear")
+	}
+}
+
+// TestClearManagedFieldsFromList tests the clearManagedFieldsFromList helper.
+func TestClearManagedFieldsFromList(t *testing.T) {
+	podList := &v1.PodList{
+		Items: []v1.Pod{
+			*podWithManagedFields("pod1", "100", "kubectl"),
+			*podWithManagedFields("pod2", "101", "controller"),
+		},
+	}
+	for i := range podList.Items {
+		if len(podList.Items[i].GetManagedFields()) == 0 {
+			t.Fatalf("expected managedFields on pod %d", i)
+		}
+	}
+	clearManagedFieldsFromList(podList)
+	for i := range podList.Items {
+		if len(podList.Items[i].GetManagedFields()) != 0 {
+			t.Fatalf("expected managedFields to be nil on pod %d after clear", i)
+		}
+	}
+}
+
+// TestConvertToWatchEventExcludeManagedFields tests that watch events with
+// excludeManagedFields set return plain objects without managedFields.
+func TestConvertToWatchEventExcludeManagedFields(t *testing.T) {
+	for _, sideStoreEnabled := range []bool{true, false} {
+		for _, excludeMF := range []bool{true, false} {
+			t.Run(fmt.Sprintf("sideStore=%v/excludeMF=%v", sideStoreEnabled, excludeMF), func(t *testing.T) {
+				var mfStore *managedFieldsStore
+				if sideStoreEnabled {
+					mfStore = newManagedFieldsStore()
+					mfStore.Add("key1", 100, makeManagedFields("kubectl", []byte(`{"f:metadata":{}}`)), 1)
+				}
+
+				cw := &cacheWatcher{
+					versioner:            storage.APIObjectVersioner{},
+					filter:               func(_ string, _ labels.Set, _ fields.Set) bool { return true },
+					excludeManagedFields: excludeMF,
+				}
+				if mfStore != nil {
+					cw.getManagedFields = mfStore.Get
+				}
+
+				pod := podWithManagedFields("pod1", "100", "kubectl")
+				// Simulate what processEvent does: strip MF when side store is active.
+				if sideStoreEnabled {
+					extractAndClearManagedFields(pod)
+				}
+				event := &watchCacheEvent{
+					Type:            watch.Added,
+					Object:          pod,
+					Key:             "key1",
+					ResourceVersion: 100,
+					ObjLabels:       labels.Set{},
+					ObjFields:       fields.Set{},
+				}
+				setCachingObjects(event, storage.APIObjectVersioner{}, mfStore)
+
+				watchEvent := cw.convertToWatchEvent(event)
+				if watchEvent == nil {
+					t.Fatal("expected watch event, got nil")
+				}
+
+				if excludeMF {
+					// With excludeMF, the result should be a plain object (not CacheableObject)
+					if _, ok := watchEvent.Object.(runtime.CacheableObject); ok {
+						t.Fatal("expected plain object, got CacheableObject")
+					}
+					accessor := watchEvent.Object.(metav1.ObjectMetaAccessor)
+					mf := accessor.GetObjectMeta().GetManagedFields()
+					if len(mf) != 0 {
+						t.Fatalf("expected no managedFields with excludeMF, got %v", mf)
+					}
+				} else {
+					if sideStoreEnabled {
+						// With side store, result is hydratingObject (CacheableObject)
+						if _, ok := watchEvent.Object.(runtime.CacheableObject); !ok {
+							t.Fatal("expected CacheableObject with side store")
+						}
+					}
+				}
+			})
+		}
+	}
+}
+
+// TestConvertToWatchEventExcludeManagedFieldsDelete tests that delete events with
+// excludeManagedFields preserve the correct resourceVersion.
+func TestConvertToWatchEventExcludeManagedFieldsDelete(t *testing.T) {
+	for _, sideStoreEnabled := range []bool{true, false} {
+		for _, excludeMF := range []bool{true, false} {
+			t.Run(fmt.Sprintf("sideStore=%v/excludeMF=%v", sideStoreEnabled, excludeMF), func(t *testing.T) {
+				var mfStore *managedFieldsStore
+				if sideStoreEnabled {
+					mfStore = newManagedFieldsStore()
+					mfStore.Add("key1", 101, makeManagedFields("kubectl", []byte(`{"f:metadata":{}}`)), 1)
+				}
+
+				versioner := storage.APIObjectVersioner{}
+				cw := &cacheWatcher{
+					versioner:            versioner,
+					filter:               func(_ string, _ labels.Set, _ fields.Set) bool { return true },
+					excludeManagedFields: excludeMF,
+				}
+				if mfStore != nil {
+					cw.getManagedFields = mfStore.Get
+				}
+
+				prevPod := podWithManagedFields("pod1", "100", "kubectl")
+				// Simulate what processEvent does: strip MF when side store is active.
+				if sideStoreEnabled {
+					extractAndClearManagedFields(prevPod)
+				}
+				event := &watchCacheEvent{
+					Type:            watch.Deleted,
+					Object:          prevPod,
+					PrevObject:      prevPod,
+					Key:             "key1",
+					ResourceVersion: 101,
+					PrevObjLabels:   labels.Set{},
+					PrevObjFields:   fields.Set{},
+				}
+				setCachingObjects(event, versioner, mfStore)
+
+				watchEvent := cw.convertToWatchEvent(event)
+				if watchEvent == nil {
+					t.Fatal("expected watch event, got nil")
+				}
+				if watchEvent.Type != watch.Deleted {
+					t.Fatalf("expected Deleted event, got %v", watchEvent.Type)
+				}
+
+				// Verify resourceVersion is updated to the event's RV.
+				rv, err := versioner.ObjectResourceVersion(watchEvent.Object)
+				if err != nil {
+					t.Fatalf("failed to get resourceVersion: %v", err)
+				}
+				if rv != 101 {
+					t.Fatalf("expected resourceVersion 101, got %d", rv)
+				}
+
+				if excludeMF {
+					if _, ok := watchEvent.Object.(runtime.CacheableObject); ok {
+						t.Fatal("expected plain object with excludeMF, got CacheableObject")
+					}
+					accessor := watchEvent.Object.(metav1.ObjectMetaAccessor)
+					mf := accessor.GetObjectMeta().GetManagedFields()
+					if len(mf) != 0 {
+						t.Fatalf("expected no managedFields with excludeMF, got %v", mf)
+					}
+				}
+			})
+		}
+	}
+}
+
+// TestCacheWatcherExcludeManagedFieldsInitialEvents tests that initial events
+// from the ring buffer also omit managedFields when excludeManagedFields is set.
+func TestCacheWatcherExcludeManagedFieldsInitialEvents(t *testing.T) {
+	for _, sideStoreEnabled := range []bool{true, false} {
+		t.Run(fmt.Sprintf("sideStore=%v", sideStoreEnabled), func(t *testing.T) {
+			var mfStore *managedFieldsStore
+			if sideStoreEnabled {
+				mfStore = newManagedFieldsStore()
+				mfStore.Add("key1", 100, makeManagedFields("kubectl", []byte(`{"f:metadata":{}}`)), 1)
+			}
+
+			cw := &cacheWatcher{
+				versioner:            storage.APIObjectVersioner{},
+				filter:               func(_ string, _ labels.Set, _ fields.Set) bool { return true },
+				excludeManagedFields: true,
+			}
+			if mfStore != nil {
+				cw.getManagedFields = mfStore.Get
+			}
+
+			// Simulate an initial event with a plain object (not wrapped in cachingObject).
+			pod := podWithManagedFields("pod1", "100", "kubectl")
+			event := &watchCacheEvent{
+				Type:            watch.Added,
+				Object:          pod,
+				Key:             "key1",
+				ResourceVersion: 100,
+				ObjLabels:       labels.Set{},
+				ObjFields:       fields.Set{},
+			}
+			// Don't call setCachingObjects to simulate initial events from ring buffer
+			// which may have plain objects.
+
+			watchEvent := cw.convertToWatchEvent(event)
+			if watchEvent == nil {
+				t.Fatal("expected watch event, got nil")
+			}
+
+			accessor := watchEvent.Object.(metav1.ObjectMetaAccessor)
+			mf := accessor.GetObjectMeta().GetManagedFields()
+			if len(mf) != 0 {
+				t.Fatalf("expected no managedFields for initial event with excludeMF, got %v", mf)
 			}
 		})
 	}

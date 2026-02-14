@@ -211,13 +211,55 @@ Key changes to `staging/src/k8s.io/apiserver/pkg/storage/cacher/`:
 
 The side store is internal to the cacher -- no API changes, no storage format changes, no migration.
 
-## Phase 2: Query Parameter
+## Phase 2: `excludeManagedFields` Query Parameter
 
-Add `excludeManagedFields` to `ListOptions` / watch request options. Plumb through:
-- `staging/src/k8s.io/apiserver/pkg/endpoints/handlers/` (GET, LIST, WATCH handlers)
-- `staging/src/k8s.io/apiserver/pkg/storage/cacher/cache_watcher.go` (`convertToWatchEvent` -- skip hydration when opted out)
+**Status: Implemented**
 
-This is purely additive API surface. Default `false` preserves GA compatibility.
+Adds an opt-in `excludeManagedFields=true` query parameter to GET, LIST, and WATCH requests. When set, managedFields are omitted from responses entirely — no hydration, no serialization cost, smaller wire payloads. Default is `false`, existing behavior unchanged.
+
+### Approach
+
+Rather than modifying `metav1.ListOptions` / `metav1.GetOptions` (which would require protobuf regeneration and API review), `excludeManagedFields` is parsed directly from the URL query string — similar to the deprecated `export` parameter. The flag is passed through context to the storage layer.
+
+### Feature Gate
+
+`ExcludeManagedFields` — Alpha, default false, 1.36. When disabled, the query parameter is silently ignored.
+
+### Files changed
+
+- `staging/src/k8s.io/apiserver/pkg/features/kube_features.go`
+  - Added `ExcludeManagedFields` feature constant and versioned spec (Alpha, default false, 1.36).
+- `staging/src/k8s.io/apiserver/pkg/endpoints/request/context.go`
+  - Added `excludeManagedFieldsKey` to the iota block.
+  - Added `WithExcludeManagedFields(ctx)` and `ExcludeManagedFieldsFrom(ctx)` helpers.
+- `staging/src/k8s.io/apiserver/pkg/endpoints/handlers/get.go`
+  - `getResourceHandler`: parses `excludeManagedFields=true` from URL, sets context flag, strips MF from GET result.
+  - `ListResource`: parses `excludeManagedFields=true` from URL, sets context flag, strips MF from LIST result. Watch path carries the flag via context.
+  - Added `clearManagedFields` and `clearManagedFieldsFromList` helper functions.
+- `staging/src/k8s.io/apiserver/pkg/storage/cacher/managed_fields_store.go`
+  - Added `clearManagedFields(obj)` and `clearManagedFieldsFromList(listObj)` helpers.
+- `staging/src/k8s.io/apiserver/pkg/storage/cacher/cacher.go`
+  - `Get`: skips `HydrateManagedFields` when `ExcludeManagedFieldsFrom(ctx)` is true.
+  - `GetList`: skips `HydrateManagedFields` for each item when `ExcludeManagedFieldsFrom(ctx)` is true.
+  - `Watch`: sets `excludeManagedFields` on `cacheWatcher` when context flag is set.
+- `staging/src/k8s.io/apiserver/pkg/storage/cacher/cache_watcher.go`
+  - Added `excludeManagedFields` field to `cacheWatcher`.
+  - Added `getMutableObjectExcludingManagedFields` — unwraps CacheableObject wrappers and returns plain objects without MF.
+  - Updated `convertToWatchEvent` to use the exclude path for Added/Modified/Deleted events.
+
+### Watch path design
+
+When `excludeManagedFields` is true, `convertToWatchEvent` returns plain `runtime.Object` instances (not `CacheableObject` wrappers) with managedFields stripped. This is necessary because `hydratingObject.CacheEncode` injects managedFields before serialization and the result is cached per `runtime.Identifier` — sharing it across excludeMF and non-excludeMF watchers would produce incorrect output. The trade-off is that excludeMF watchers lose CacheEncode caching (each serializes independently), but the bandwidth savings from omitting MF (~40-50% smaller events) far outweighs this.
+
+### Tests added
+
+- `TestClearManagedFields` / `TestClearManagedFieldsFromList` — unit tests for strip helpers (managed_fields_store_test.go).
+- `TestConvertToWatchEventExcludeManagedFields` — Added events with hydratingObject and cachingObject return plain objects without MF (managed_fields_store_test.go).
+- `TestConvertToWatchEventExcludeManagedFieldsDelete` — Delete events preserve correct resourceVersion (managed_fields_store_test.go).
+- `TestCacheWatcherExcludeManagedFieldsInitialEvents` — Initial events from ring buffer omit MF (managed_fields_store_test.go).
+- `TestClearManagedFieldsHelper` / `TestClearManagedFieldsFromListHelper` — handler-level strip helpers (get_test.go).
+- `TestExcludeManagedFieldsQueryParam` — parameter parsed from URL with feature gate enabled/disabled (get_test.go).
+- `TestExcludeManagedFieldsFeatureGateDisabled` — parameter ignored when gate disabled (get_test.go).
 
 ## Expected Impact
 

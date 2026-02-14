@@ -48,6 +48,23 @@ import (
 	"k8s.io/klog/v2"
 )
 
+// clearManagedFields sets managedFields to nil on an object.
+func clearManagedFields(obj runtime.Object) {
+	if accessor, ok := obj.(metav1.ObjectMetaAccessor); ok {
+		if m := accessor.GetObjectMeta(); m != nil {
+			m.SetManagedFields(nil)
+		}
+	}
+}
+
+// clearManagedFieldsFromList clears managedFields on each item in a list object.
+func clearManagedFieldsFromList(listObj runtime.Object) {
+	meta.EachListItem(listObj, func(obj runtime.Object) error {
+		clearManagedFields(obj)
+		return nil
+	})
+}
+
 // getterFunc performs a get request with the given context and object name. The request
 // may be used to deserialize an options object to pass to the getter.
 type getterFunc func(ctx context.Context, name string, req *http.Request) (runtime.Object, error)
@@ -60,6 +77,13 @@ func getResourceHandler(scope *RequestScope, getter getterFunc) http.HandlerFunc
 		ctx, span := tracing.Start(ctx, "Get", traceFields(req)...)
 		req = req.WithContext(ctx)
 		defer span.End(500 * time.Millisecond)
+
+		if utilfeature.DefaultFeatureGate.Enabled(features.ExcludeManagedFields) {
+			if values := req.URL.Query(); values.Get("excludeManagedFields") == "true" {
+				ctx = request.WithExcludeManagedFields(ctx)
+				req = req.WithContext(ctx)
+			}
+		}
 
 		namespace, name, err := scope.Namer.Name(req)
 		if err != nil {
@@ -78,6 +102,10 @@ func getResourceHandler(scope *RequestScope, getter getterFunc) http.HandlerFunc
 		if err != nil {
 			scope.err(err, w, req)
 			return
+		}
+
+		if request.ExcludeManagedFieldsFrom(ctx) {
+			clearManagedFields(result)
 		}
 
 		span.AddEvent("About to write a response")
@@ -174,6 +202,13 @@ func ListResource(r rest.Lister, rw rest.Watcher, scope *RequestScope, forceWatc
 		// For performance tracking purposes.
 		ctx, span := tracing.Start(ctx, "List", traceFields(req)...)
 		req = req.WithContext(ctx)
+
+		if utilfeature.DefaultFeatureGate.Enabled(features.ExcludeManagedFields) {
+			if values := req.URL.Query(); values.Get("excludeManagedFields") == "true" {
+				ctx = request.WithExcludeManagedFields(ctx)
+				req = req.WithContext(ctx)
+			}
+		}
 
 		namespace, err := scope.Namer.Namespace(req)
 		if err != nil {
@@ -306,6 +341,9 @@ func ListResource(r rest.Lister, rw rest.Watcher, scope *RequestScope, forceWatc
 			return
 		}
 		span.AddEvent("Listing from storage done")
+		if request.ExcludeManagedFieldsFrom(ctx) {
+			clearManagedFieldsFromList(result)
+		}
 		defer span.AddEvent("Writing http response done", attribute.Int("count", meta.LenList(result)))
 		transformResponseObject(ctx, scope, req, w, http.StatusOK, outputMediaType, result)
 	}

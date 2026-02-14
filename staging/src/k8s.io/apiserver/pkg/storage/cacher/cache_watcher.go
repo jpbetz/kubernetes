@@ -90,6 +90,11 @@ type cacheWatcher struct {
 	// getManagedFields is a callback to retrieve managedFields from the side store.
 	// It is set when the managedFields side store is enabled.
 	getManagedFields func(key string, rv uint64) []metav1.ManagedFieldsEntry
+
+	// excludeManagedFields indicates that this watcher should omit managedFields
+	// from all watch events. When true, objects are returned without managedFields
+	// and CacheableObject wrapping is bypassed.
+	excludeManagedFields bool
 }
 
 func newCacheWatcher(
@@ -348,6 +353,29 @@ func (c *cacheWatcher) isDoneChannelClosedLocked() bool {
 	return false
 }
 
+// getMutableObjectExcludingManagedFields returns a deep copy of the object
+// with managedFields stripped. It unwraps CacheableObject wrappers to avoid
+// shared serialization caches that would inject managedFields.
+func (c *cacheWatcher) getMutableObjectExcludingManagedFields(obj runtime.Object) runtime.Object {
+	switch o := obj.(type) {
+	case *hydratingObject:
+		// Side store active: GetObject() returns deep copy with MF from the
+		// hydratingObject, but since we're excluding MF, use the inner
+		// cachingObject's GetObject() which returns a copy without MF.
+		return o.cachingObject.GetObject()
+	case *cachingObject:
+		// Side store disabled: deep copy then strip MF
+		result := o.GetObject()
+		clearManagedFields(result)
+		return result
+	default:
+		// Plain object (initial events): deep copy then strip MF
+		result := obj.DeepCopyObject()
+		clearManagedFields(result)
+		return result
+	}
+}
+
 func getMutableObject(object runtime.Object) runtime.Object {
 	switch object.(type) {
 	case *cachingObject, *hydratingObject:
@@ -411,14 +439,25 @@ func (c *cacheWatcher) convertToWatchEvent(event *watchCacheEvent) *watch.Event 
 
 	switch {
 	case curObjPasses && !oldObjPasses:
+		if c.excludeManagedFields {
+			return &watch.Event{Type: watch.Added, Object: c.getMutableObjectExcludingManagedFields(event.Object)}
+		}
 		obj := getMutableObject(event.Object)
 		c.hydrateManagedFields(obj, event.Key, event.ResourceVersion)
 		return &watch.Event{Type: watch.Added, Object: obj}
 	case curObjPasses && oldObjPasses:
+		if c.excludeManagedFields {
+			return &watch.Event{Type: watch.Modified, Object: c.getMutableObjectExcludingManagedFields(event.Object)}
+		}
 		obj := getMutableObject(event.Object)
 		c.hydrateManagedFields(obj, event.Key, event.ResourceVersion)
 		return &watch.Event{Type: watch.Modified, Object: obj}
 	case !curObjPasses && oldObjPasses:
+		if c.excludeManagedFields {
+			oldObj := c.getMutableObjectExcludingManagedFields(event.PrevObject)
+			updateResourceVersion(oldObj, c.versioner, event.ResourceVersion)
+			return &watch.Event{Type: watch.Deleted, Object: oldObj}
+		}
 		// return a delete event with the previous object content, but with the event's resource version
 		oldObj := getMutableObject(event.PrevObject)
 		// We know that if oldObj is cachingObject (which can only be set via

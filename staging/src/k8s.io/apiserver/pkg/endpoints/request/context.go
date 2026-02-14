@@ -32,6 +32,9 @@ const (
 
 	// userKey is the context key for the request user.
 	userKey
+
+	// excludeManagedFieldsKey is the context key for the excludeManagedFields request parameter.
+	excludeManagedFieldsKey
 )
 
 // NewContext instantiates a base context object for request flows.
@@ -75,4 +78,15 @@ func WithUser(parent context.Context, user user.Info) context.Context {
 func UserFrom(ctx context.Context) (user.Info, bool) {
 	user, ok := ctx.Value(userKey).(user.Info)
 	return user, ok
+}
+
+// WithExcludeManagedFields returns a copy of parent in which the excludeManagedFields flag is set
+func WithExcludeManagedFields(parent context.Context) context.Context {
+	return WithValue(parent, excludeManagedFieldsKey, true)
+}
+
+// ExcludeManagedFieldsFrom returns true if the excludeManagedFields flag is set on the ctx
+func ExcludeManagedFieldsFrom(ctx context.Context) bool {
+	excludeManagedFields, _ := ctx.Value(excludeManagedFieldsKey).(bool)
+	return excludeManagedFields
 }

@@ -19,9 +19,12 @@ package cacher
 import (
 	"hash/fnv"
 	"io"
+	"reflect"
 	"sync"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metautils "k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/conversion"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -175,6 +178,37 @@ func extractAndClearManagedFields(obj runtime.Object) []metav1.ManagedFieldsEntr
 	}
 	meta.SetManagedFields(nil)
 	return mf
+}
+
+// clearManagedFields sets managedFields to nil on an object.
+func clearManagedFields(obj runtime.Object) {
+	accessor, ok := obj.(metav1.ObjectMetaAccessor)
+	if !ok {
+		return
+	}
+	meta := accessor.GetObjectMeta()
+	if meta == nil {
+		return
+	}
+	meta.SetManagedFields(nil)
+}
+
+// clearManagedFieldsFromList clears managedFields on each item in a list object.
+func clearManagedFieldsFromList(listObj runtime.Object) {
+	items, err := metautils.GetItemsPtr(listObj)
+	if err != nil {
+		return
+	}
+	list, err := conversion.EnforcePtr(items)
+	if err != nil || list.Kind() != reflect.Slice {
+		return
+	}
+	for i := 0; i < list.Len(); i++ {
+		item := list.Index(i).Addr().Interface()
+		if obj, ok := item.(runtime.Object); ok {
+			clearManagedFields(obj)
+		}
+	}
 }
 
 // hydratingObject wraps a cachingObject and injects managedFields during

@@ -609,6 +609,9 @@ func (c *Cacher) Watch(ctx context.Context, key string, opts storage.ListOptions
 	if c.watchCache.managedFieldsStore != nil {
 		watcher.getManagedFields = c.watchCache.managedFieldsStore.Get
 	}
+	if request.ExcludeManagedFieldsFrom(ctx) {
+		watcher.excludeManagedFields = true
+	}
 
 	// note that c.waitUntilWatchCacheFreshAndForceAllEvents must be called without
 	// the c.watchCache.RLock held otherwise we are at risk of a deadlock
@@ -705,7 +708,9 @@ func (c *Cacher) Get(ctx context.Context, key string, opts storage.GetOptions, o
 			return fmt.Errorf("non *store.Element returned from storage: %v", obj)
 		}
 		objVal.Set(reflect.ValueOf(elem.Object).Elem())
-		c.watchCache.HydrateManagedFields(key, objPtr)
+		if !request.ExcludeManagedFieldsFrom(ctx) {
+			c.watchCache.HydrateManagedFields(key, objPtr)
+		}
 	} else {
 		objVal.Set(reflect.Zero(objVal.Type()))
 		if !opts.IgnoreNotFound {
@@ -814,9 +819,12 @@ func (c *Cacher) GetList(ctx context.Context, key string, opts storage.ListOptio
 		// Resize the slice appropriately, since we already know that size of result set
 		listVal.Set(reflect.MakeSlice(listVal.Type(), len(selectedObjects), len(selectedObjects)))
 		span.AddEvent("Resized result")
+		excludeMF := request.ExcludeManagedFieldsFrom(ctx)
 		for i, o := range selectedObjects {
 			listVal.Index(i).Set(reflect.ValueOf(o.object).Elem())
-			c.watchCache.HydrateManagedFields(o.key, listVal.Index(i).Addr().Interface().(runtime.Object))
+			if !excludeMF {
+				c.watchCache.HydrateManagedFields(o.key, listVal.Index(i).Addr().Interface().(runtime.Object))
+			}
 		}
 	}
 	span.AddEvent("Filtered items", attribute.Int("count", listVal.Len()))
