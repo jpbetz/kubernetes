@@ -22,6 +22,7 @@ import (
 	"sync"
 	"time"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -85,6 +86,10 @@ type cacheWatcher struct {
 
 	// state holds a numeric value indicating the current state of the watcher
 	state int
+
+	// getManagedFields is a callback to retrieve managedFields from the side store.
+	// It is set when the managedFields side store is enabled.
+	getManagedFields func(key string, rv uint64) []metav1.ManagedFieldsEntry
 }
 
 func newCacheWatcher(
@@ -344,13 +349,36 @@ func (c *cacheWatcher) isDoneChannelClosedLocked() bool {
 }
 
 func getMutableObject(object runtime.Object) runtime.Object {
-	if _, ok := object.(*cachingObject); ok {
+	switch object.(type) {
+	case *cachingObject, *hydratingObject:
 		// It is safe to return without deep-copy, because the underlying
 		// object will lazily perform deep-copy on the first try to change
 		// any of its fields.
 		return object
 	}
 	return object.DeepCopyObject()
+}
+
+// hydrateManagedFields injects managedFields from the side store into a
+// deep-copied object. It skips cachingObject and hydratingObject since those
+// handle hydration through CacheEncode.
+func (c *cacheWatcher) hydrateManagedFields(obj runtime.Object, key string, rv uint64) {
+	if c.getManagedFields == nil {
+		return
+	}
+	// Skip objects that handle hydration through CacheEncode.
+	switch obj.(type) {
+	case *cachingObject, *hydratingObject:
+		return
+	}
+	mf := c.getManagedFields(key, rv)
+	if len(mf) > 0 {
+		if accessor, ok := obj.(metav1.ObjectMetaAccessor); ok {
+			if meta := accessor.GetObjectMeta(); meta != nil {
+				meta.SetManagedFields(mf)
+			}
+		}
+	}
 }
 
 func updateResourceVersion(object runtime.Object, versioner storage.Versioner, resourceVersion uint64) {
@@ -383,9 +411,13 @@ func (c *cacheWatcher) convertToWatchEvent(event *watchCacheEvent) *watch.Event 
 
 	switch {
 	case curObjPasses && !oldObjPasses:
-		return &watch.Event{Type: watch.Added, Object: getMutableObject(event.Object)}
+		obj := getMutableObject(event.Object)
+		c.hydrateManagedFields(obj, event.Key, event.ResourceVersion)
+		return &watch.Event{Type: watch.Added, Object: obj}
 	case curObjPasses && oldObjPasses:
-		return &watch.Event{Type: watch.Modified, Object: getMutableObject(event.Object)}
+		obj := getMutableObject(event.Object)
+		c.hydrateManagedFields(obj, event.Key, event.ResourceVersion)
+		return &watch.Event{Type: watch.Modified, Object: obj}
 	case !curObjPasses && oldObjPasses:
 		// return a delete event with the previous object content, but with the event's resource version
 		oldObj := getMutableObject(event.PrevObject)
@@ -394,6 +426,7 @@ func (c *cacheWatcher) convertToWatchEvent(event *watchCacheEvent) *watch.Event 
 		// we don't need to update it. However, since cachingObject efficiently
 		// handles noop updates, we avoid this microoptimization here.
 		updateResourceVersion(oldObj, c.versioner, event.ResourceVersion)
+		c.hydrateManagedFields(oldObj, event.Key, event.ResourceVersion)
 		return &watch.Event{Type: watch.Deleted, Object: oldObj}
 	}
 

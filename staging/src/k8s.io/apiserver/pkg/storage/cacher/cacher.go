@@ -606,6 +606,9 @@ func (c *Cacher) Watch(ctx context.Context, key string, opts storage.ListOptions
 		c.groupResource,
 		identifier,
 	)
+	if c.watchCache.managedFieldsStore != nil {
+		watcher.getManagedFields = c.watchCache.managedFieldsStore.Get
+	}
 
 	// note that c.waitUntilWatchCacheFreshAndForceAllEvents must be called without
 	// the c.watchCache.RLock held otherwise we are at risk of a deadlock
@@ -702,6 +705,7 @@ func (c *Cacher) Get(ctx context.Context, key string, opts storage.GetOptions, o
 			return fmt.Errorf("non *store.Element returned from storage: %v", obj)
 		}
 		objVal.Set(reflect.ValueOf(elem.Object).Elem())
+		c.watchCache.HydrateManagedFields(key, objPtr)
 	} else {
 		objVal.Set(reflect.Zero(objVal.Type()))
 		if !opts.IgnoreNotFound {
@@ -781,7 +785,11 @@ func (c *Cacher) GetList(ctx context.Context, key string, opts storage.ListOptio
 	// Why not directly put object in the items of listObj?
 	//   the elements in ListObject are Struct type, making slice will bring excessive memory consumption.
 	//   so we try to delay this action as much as possible
-	var selectedObjects []runtime.Object
+	type selectedObject struct {
+		object runtime.Object
+		key    string
+	}
+	var selectedObjects []selectedObject
 	var lastSelectedObjectKey string
 	var hasMoreListItems bool
 	limit := computeListLimit(opts)
@@ -791,7 +799,7 @@ func (c *Cacher) GetList(ctx context.Context, key string, opts storage.ListOptio
 			return fmt.Errorf("non *store.Element returned from storage: %v", obj)
 		}
 		if opts.Predicate.MatchesObjectAttributes(elem.Labels, elem.Fields) {
-			selectedObjects = append(selectedObjects, elem.Object)
+			selectedObjects = append(selectedObjects, selectedObject{object: elem.Object, key: elem.Key})
 			lastSelectedObjectKey = elem.Key
 		}
 		if limit > 0 && int64(len(selectedObjects)) >= limit {
@@ -807,7 +815,8 @@ func (c *Cacher) GetList(ctx context.Context, key string, opts storage.ListOptio
 		listVal.Set(reflect.MakeSlice(listVal.Type(), len(selectedObjects), len(selectedObjects)))
 		span.AddEvent("Resized result")
 		for i, o := range selectedObjects {
-			listVal.Index(i).Set(reflect.ValueOf(o).Elem())
+			listVal.Index(i).Set(reflect.ValueOf(o.object).Elem())
+			c.watchCache.HydrateManagedFields(o.key, listVal.Index(i).Addr().Interface().(runtime.Object))
 		}
 	}
 	span.AddEvent("Filtered items", attribute.Int("count", listVal.Len()))
@@ -827,6 +836,9 @@ func (c *Cacher) GetList(ctx context.Context, key string, opts storage.ListOptio
 
 // baseObjectThreadUnsafe omits locking for cachingObject.
 func baseObjectThreadUnsafe(object runtime.Object) runtime.Object {
+	if ho, ok := object.(*hydratingObject); ok {
+		return ho.cachingObject.object
+	}
 	if co, ok := object.(*cachingObject); ok {
 		return co.object
 	}
@@ -919,11 +931,16 @@ func (c *Cacher) dispatchEvents() {
 	}
 }
 
-func setCachingObjects(event *watchCacheEvent, versioner storage.Versioner) {
+func setCachingObjects(event *watchCacheEvent, versioner storage.Versioner, mfStore *managedFieldsStore) {
 	switch event.Type {
 	case watch.Added, watch.Modified:
 		if object, err := newCachingObject(event.Object); err == nil {
-			event.Object = object
+			if mfStore != nil {
+				mf := mfStore.Get(event.Key, event.ResourceVersion)
+				event.Object = &hydratingObject{cachingObject: object, managedFields: mf}
+			} else {
+				event.Object = object
+			}
 		} else {
 			klog.Errorf("couldn't create cachingObject from: %#v", event.Object)
 		}
@@ -943,7 +960,14 @@ func setCachingObjects(event *watchCacheEvent, versioner storage.Versioner) {
 			// for them, we set resourceVersion to <current> instead of
 			// the resourceVersion of the last modification of the object.
 			updateResourceVersion(object, versioner, event.ResourceVersion)
-			event.PrevObject = object
+			if mfStore != nil {
+				// For deletes, managedFields from the deleted object are stored
+				// under the event's ResourceVersion in processEvent.
+				mf := mfStore.Get(event.Key, event.ResourceVersion)
+				event.PrevObject = &hydratingObject{cachingObject: object, managedFields: mf}
+			} else {
+				event.PrevObject = object
+			}
 		} else {
 			klog.Errorf("couldn't create cachingObject from: %#v", event.Object)
 		}
@@ -977,7 +1001,7 @@ func (c *Cacher) dispatchEvent(event *watchCacheEvent) {
 		//
 		// Make a shallow copy to allow overwriting Object and PrevObject.
 		wcEvent := *event
-		setCachingObjects(&wcEvent, c.versioner)
+		setCachingObjects(&wcEvent, c.versioner, c.watchCache.managedFieldsStore)
 		event = &wcEvent
 
 		c.blockedWatchers = c.blockedWatchers[:0]

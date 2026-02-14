@@ -163,6 +163,14 @@ type watchCache struct {
 	snapshottingEnabled atomic.Bool
 
 	getCurrentRV func(context.Context) (uint64, error)
+
+	// managedFieldsStore is a content-addressed side store for managedFields.
+	// When enabled, managedFields are stripped from cached objects and stored
+	// here, then hydrated back when serving API responses.
+	managedFieldsStore *managedFieldsStore
+	// storeRVs tracks the current resource version per key in the store,
+	// used to release the old store reference when an object is updated.
+	storeRVs map[string]uint64
 }
 
 func newWatchCache(
@@ -200,6 +208,10 @@ func newWatchCache(
 	if utilfeature.DefaultFeatureGate.Enabled(features.ListFromCacheSnapshot) {
 		wc.snapshottingEnabled.Store(true)
 		wc.snapshots = store.NewSnapshotter()
+	}
+	if utilfeature.DefaultFeatureGate.Enabled(features.WatchCacheManagedFieldsSideStore) {
+		wc.managedFieldsStore = newManagedFieldsStore()
+		wc.storeRVs = make(map[string]uint64)
 	}
 	metrics.WatchCacheCapacity.WithLabelValues(groupResource.Group, groupResource.Resource).Set(float64(wc.capacity))
 	wc.cond = sync.NewCond(wc.RLocker())
@@ -328,6 +340,25 @@ func (w *watchCache) processEvent(event watch.Event, resourceVersion uint64, upd
 		}
 	}
 
+	if w.managedFieldsStore != nil {
+		mf := extractAndClearManagedFields(elem.Object)
+		if event.Type == watch.Deleted {
+			// For deletes: 1 ref for the ring buffer only (object leaves the store).
+			w.managedFieldsStore.Add(key, resourceVersion, mf, 1)
+			if oldRV, ok := w.storeRVs[key]; ok {
+				w.managedFieldsStore.Release(key, oldRV)
+			}
+			delete(w.storeRVs, key)
+		} else {
+			// For adds/updates: 2 refs (ring buffer + store).
+			w.managedFieldsStore.Add(key, resourceVersion, mf, 2)
+			if oldRV, ok := w.storeRVs[key]; ok {
+				w.managedFieldsStore.Release(key, oldRV)
+			}
+			w.storeRVs[key] = resourceVersion
+		}
+	}
+
 	if err := func() error {
 		w.Lock()
 		defer w.Unlock()
@@ -451,6 +482,10 @@ func (w *watchCache) updateCache(event *watchCacheEvent) {
 	w.resizeCacheLocked(event.RecordTime)
 	if w.isCacheFullLocked() {
 		// Cache is full - remove the oldest element.
+		if w.managedFieldsStore != nil {
+			evicted := w.cache[w.startIndex%w.capacity]
+			w.managedFieldsStore.Release(evicted.Key, evicted.ResourceVersion)
+		}
 		w.startIndex++
 		w.removedEventSinceRelist = true
 	}
@@ -489,6 +524,14 @@ func (w *watchCache) isCacheFullLocked() bool {
 func (w *watchCache) doCacheResizeLocked(capacity int) {
 	newCache := make([]*watchCacheEvent, capacity)
 	if capacity < w.capacity {
+		// Release side store refs for events being evicted during shrink.
+		if w.managedFieldsStore != nil {
+			newStartIndex := w.endIndex - capacity
+			for i := w.startIndex; i < newStartIndex; i++ {
+				evicted := w.cache[i%w.capacity]
+				w.managedFieldsStore.Release(evicted.Key, evicted.ResourceVersion)
+			}
+		}
 		// adjust startIndex if cache capacity shrink.
 		w.startIndex = w.endIndex - capacity
 	}
@@ -829,6 +872,11 @@ func (w *watchCache) Replace(objs []interface{}, resourceVersion string) error {
 		return err
 	}
 
+	if w.managedFieldsStore != nil {
+		w.managedFieldsStore.Clear()
+		w.storeRVs = make(map[string]uint64)
+	}
+
 	toReplace := make([]interface{}, 0, len(objs))
 	for _, obj := range objs {
 		object, ok := obj.(runtime.Object)
@@ -841,6 +889,14 @@ func (w *watchCache) Replace(objs []interface{}, resourceVersion string) error {
 		key, err := w.keyFunc(object)
 		if err != nil {
 			return fmt.Errorf("couldn't compute key: %v", err)
+		}
+		if w.managedFieldsStore != nil {
+			rv, err := w.versioner.ObjectResourceVersion(object)
+			if err == nil {
+				mf := extractAndClearManagedFields(object)
+				w.managedFieldsStore.Add(key, rv, mf, 1) // 1 ref: store only
+				w.storeRVs[key] = rv
+			}
 		}
 		objLabels, objFields, err := w.getAttrsFunc(object)
 		if err != nil {
@@ -1045,6 +1101,27 @@ func (w *watchCache) MarkConsistent(consistent bool) {
 		w.snapshottingEnabled.Store(consistent)
 		if !consistent && w.snapshots != nil {
 			w.snapshots.Reset()
+		}
+	}
+}
+
+// HydrateManagedFields injects managedFields from the side store back into
+// the given object. It extracts the resource version from the object's metadata
+// to look up the managedFields. This is a no-op if the side store is not enabled.
+func (w *watchCache) HydrateManagedFields(key string, obj runtime.Object) {
+	if w.managedFieldsStore == nil {
+		return
+	}
+	rv, err := w.versioner.ObjectResourceVersion(obj)
+	if err != nil {
+		return
+	}
+	mf := w.managedFieldsStore.Get(key, rv)
+	if len(mf) > 0 {
+		if accessor, ok := obj.(metav1.ObjectMetaAccessor); ok {
+			if meta := accessor.GetObjectMeta(); meta != nil {
+				meta.SetManagedFields(mf)
+			}
 		}
 	}
 }

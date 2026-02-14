@@ -286,6 +286,14 @@ const (
 	// deduplicated across all objects using unique.Make.
 	WatchCacheManagedFieldsInterning featuregate.Feature = "WatchCacheManagedFieldsInterning"
 
+	// owner: @jpbetz
+	//
+	// Enables a content-addressed side store for managedFields in the watch cache.
+	// When enabled, managedFields are stripped from cached objects and stored in a
+	// deduplicated side store, then hydrated back when serving API responses.
+	// This dramatically reduces memory usage when many objects share similar managedFields.
+	WatchCacheManagedFieldsSideStore featuregate.Feature = "WatchCacheManagedFieldsSideStore"
+
 	// owner: @p0lyn0mial
 	//
 	// Allow the API server to stream individual items instead of chunking
@@ -490,6 +498,10 @@ var defaultVersionedKubernetesFeatureGates = map[featuregate.Feature]featuregate
 
 	WatchCacheManagedFieldsInterning: {
 		{Version: version.MustParse("1.36"), Default: true, PreRelease: featuregate.Beta},
+	},
+
+	WatchCacheManagedFieldsSideStore: {
+		{Version: version.MustParse("1.36"), Default: false, PreRelease: featuregate.Alpha},
 	},
 
 	WatchList: {
