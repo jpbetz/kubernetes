@@ -899,10 +899,10 @@ function indent() {
 
 function codegen::subsets() {
     local subset_types="${KUBE_ROOT}/staging/src/k8s.io/subset-types"
-    local subset_client="${KUBE_ROOT}/staging/src/k8s.io/subset-client"
     local codegen="${KUBE_ROOT}/staging/src/k8s.io/code-generator"
+    local scheduler_views="${KUBE_ROOT}/pkg/scheduler/apis/views"
 
-    kube::log::status "Generating subset types and client"
+    kube::log::status "Generating subset types"
 
     # Step 1: Run subset-gen to produce types.go + doc.go per group/version.
     GOPROXY=off go run k8s.io/code-generator/cmd/subset-gen \
@@ -924,13 +924,31 @@ function codegen::subsets() {
         --boilerplate "${BOILERPLATE_FILENAME}" \
         "${subset_types}"
 
-    # Step 4: Generate client, listers, and informers.
+    # Generate scheduler view types.
+    kube::log::status "Generating scheduler view types"
+
+    GOPROXY=off go run k8s.io/code-generator/cmd/subset-gen \
+        --output-dir "${scheduler_views}" \
+        --output-pkg k8s.io/kubernetes/pkg/scheduler/apis/views \
+        --config "${scheduler_views}/apps/v1/config.yaml" \
+        --go-header-file "${BOILERPLATE_FILENAME}" \
+        k8s.io/api/apps/v1
+
+    kube::codegen::gen_helpers \
+        --boilerplate "${BOILERPLATE_FILENAME}" \
+        "${scheduler_views}"
+
+    kube::codegen::gen_register \
+        --boilerplate "${BOILERPLATE_FILENAME}" \
+        "${scheduler_views}"
+
+    # Generate client, listers, and informers for scheduler views.
     kube::codegen::gen_client \
         --with-watch \
-        --output-dir "${subset_client}" \
-        --output-pkg k8s.io/subset-client \
+        --output-dir "${scheduler_views}" \
+        --output-pkg k8s.io/kubernetes/pkg/scheduler/apis/views \
         --boilerplate "${BOILERPLATE_FILENAME}" \
-        "${subset_types}"
+        "${scheduler_views}"
 }
 
 function codegen::subprojects() {
