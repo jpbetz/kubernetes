@@ -112,6 +112,8 @@ require (
 	k8s.io/mount-utils v0.0.0
 	k8s.io/pod-security-admission v0.0.0
 	k8s.io/sample-apiserver v0.0.0
+	k8s.io/subset-client v0.0.0
+	k8s.io/subset-types v0.0.0
 	k8s.io/system-validators v1.12.1
 	k8s.io/utils v0.0.0-20260210185600-b8788abfbbc2
 	sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730
@@ -248,4 +250,6 @@ replace (
 	k8s.io/sample-apiserver => ./staging/src/k8s.io/sample-apiserver
 	k8s.io/sample-cli-plugin => ./staging/src/k8s.io/sample-cli-plugin
 	k8s.io/sample-controller => ./staging/src/k8s.io/sample-controller
+	k8s.io/subset-client => ./staging/src/k8s.io/subset-client
+	k8s.io/subset-types => ./staging/src/k8s.io/subset-types
 )

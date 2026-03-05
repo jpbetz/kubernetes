@@ -12,10 +12,13 @@ type Container struct {
 	Image string `json:"image,omitempty" protobuf:"bytes,2,opt,name=image"`
 }
 
+// +genclient
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // Deployment enables declarative updates for Pods and ReplicaSets.
 type Deployment struct {
-	ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
-	Spec       DeploymentSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
+	inputv1.TypeMeta `json:",inline"`
+	ObjectMeta       `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+	Spec             DeploymentSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
 }
 
 // DeploymentSpec is the specification of the desired behavior of the Deployment.
@@ -40,4 +43,12 @@ type PodSpec struct {
 // PodTemplateSpec describes the data a pod should have when created from a template.
 type PodTemplateSpec struct {
 	Spec PodSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// DeploymentList is a list of Deployment objects.
+type DeploymentList struct {
+	inputv1.TypeMeta `json:",inline"`
+	inputv1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+	Items            []Deployment `json:"items" protobuf:"bytes,2,rep,name=items"`
 }

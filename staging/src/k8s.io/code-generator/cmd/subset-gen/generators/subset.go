@@ -36,8 +36,9 @@ type subsetGenerator struct {
 	resolved   []*resolvedType
 	localPkg   string
 	imports    namer.ImportTracker
-	subsetBase string       // base output package for this subset definition
-	allSubsets typeSubsetMap // all types that have subsets in this run
+	subsetBase string         // base output package for this subset definition
+	allSubsets typeSubsetMap   // all types that have subsets in this run
+	listInfos  []*listTypeInfo // list types to generate in this package
 }
 
 var _ generator.Generator = &subsetGenerator{}
@@ -66,14 +67,27 @@ func (g *subsetGenerator) GenerateType(c *generator.Context, t *types.Type, w io
 	for _, rt := range g.resolved {
 		if t == rt.sourceType {
 			klog.V(5).Infof("generating subset for type %v", t)
-			return g.generateStruct(w, t, rt.fieldTree)
+			return g.generateStruct(w, t, rt)
 		}
 	}
 	return fmt.Errorf("type %v not found in resolved types", t)
 }
 
-func (g *subsetGenerator) generateStruct(w io.Writer, t *types.Type, tree *config.FieldTree) error {
-	// Write doc comments.
+func (g *subsetGenerator) generateStruct(w io.Writer, t *types.Type, rt *resolvedType) error {
+	tree := rt.fieldTree
+
+	// Write marker comments for top-level types and list types.
+	isListType := strings.HasSuffix(t.Name.Name, "List")
+	if rt.topLevel {
+		// Top-level resource types get +genclient and deepcopy-gen marker.
+		fmt.Fprint(w, "// +genclient\n")
+		fmt.Fprint(w, "// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object\n")
+	} else if isListType {
+		// List types only get deepcopy-gen marker.
+		fmt.Fprint(w, "// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object\n")
+	}
+
+	// Write doc comments (stripped of source markers).
 	comments := filterCommentMarkers(append(t.SecondClosestCommentLines, t.CommentLines...))
 	if len(comments) > 0 {
 		fmt.Fprint(w, comments)
@@ -121,8 +135,12 @@ func (g *subsetGenerator) shouldIncludeMember(t *types.Type, member *types.Membe
 
 	// For embedded types, check if any of the embedded type's fields are selected.
 	if member.Embedded {
-		// Inline embedded types: check if any field selected matches a field in this embedded type.
+		// Inline embedded types: check if any field selected matches a field in this embedded type,
+		// or if the tree explicitly includes this embedded type by name (e.g. auto-injected TypeMeta).
 		if isInline(member) {
+			if tree.HasField(member.Name) != nil {
+				return true
+			}
 			embeddedType := dereferenceType(member.Type)
 			if embeddedType.Kind == types.Struct {
 				for fieldName := range tree.Fields {
@@ -229,6 +247,57 @@ func (g *subsetGenerator) rawTypeName(t *types.Type) string {
 	return t.Name.Name
 }
 
+func (g *subsetGenerator) Finalize(c *generator.Context, w io.Writer) error {
+	// Generate list types after all regular types.
+	for _, li := range g.listInfos {
+		if err := g.generateListType(w, li); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (g *subsetGenerator) generateListType(w io.Writer, li *listTypeInfo) error {
+	// List types get deepcopy-gen marker.
+	fmt.Fprint(w, "// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object\n")
+	fmt.Fprintf(w, "// %s is a list of %s objects.\n", li.listName, li.itemType.Name.Name)
+	fmt.Fprintf(w, "type %s struct {\n", li.listName)
+
+	// Emit TypeMeta and ListMeta from the source list type.
+	if li.sourceListType != nil {
+		for i := range li.sourceListType.Members {
+			m := &li.sourceListType.Members[i]
+			memberType := dereferenceType(m.Type)
+			if memberType.Name.Name == "TypeMeta" || memberType.Name.Name == "ListMeta" {
+				fieldType := g.rawTypeName(m.Type)
+				if m.Embedded {
+					if m.Tags != "" {
+						fmt.Fprintf(w, "\t%s `%s`\n", fieldType, m.Tags)
+					} else {
+						fmt.Fprintf(w, "\t%s\n", fieldType)
+					}
+				}
+			}
+		}
+	}
+
+	// Emit Items field.
+	itemsTags := `json:"items" protobuf:"bytes,2,rep,name=items"`
+	if li.sourceListType != nil {
+		for i := range li.sourceListType.Members {
+			m := &li.sourceListType.Members[i]
+			if m.Name == "Items" {
+				itemsTags = m.Tags
+				break
+			}
+		}
+	}
+	fmt.Fprintf(w, "\tItems []%s `%s`\n", li.itemType.Name.Name, itemsTags)
+
+	fmt.Fprint(w, "}\n\n")
+	return nil
+}
+
 // filterCommentMarkers removes comment lines starting with '+' (codegen markers)
 // and ensures all comments have the proper // prefix.
 func filterCommentMarkers(comments []string) string {
@@ -241,4 +310,26 @@ func filterCommentMarkers(comments []string) string {
 		b.WriteString("// " + trimmed + "\n")
 	}
 	return b.String()
+}
+
+// docGenerator generates a doc.go file with package-level marker comments.
+type docGenerator struct {
+	generator.GoGenerator
+	groupName string
+}
+
+var _ generator.Generator = &docGenerator{}
+
+func (g *docGenerator) Filter(*generator.Context, *types.Type) bool {
+	return false
+}
+
+func (g *docGenerator) Imports(*generator.Context) []string {
+	return nil
+}
+
+func (g *docGenerator) Init(c *generator.Context, w io.Writer) error {
+	fmt.Fprint(w, "// +k8s:deepcopy-gen=package\n")
+	fmt.Fprintf(w, "// +groupName=%s\n", g.groupName)
+	return nil
 }

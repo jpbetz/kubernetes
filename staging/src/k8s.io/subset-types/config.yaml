@@ -1,0 +1,4 @@
+ReplicaSet:
+  - spec.selector
+Service:
+  - spec.selector

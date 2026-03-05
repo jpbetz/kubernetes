@@ -74,6 +74,8 @@ type resolvedType struct {
 	outputPkg string
 	// outputDir is the filesystem directory for the output.
 	outputDir string
+	// topLevel is true if this type was explicitly listed in the config (not discovered via nesting).
+	topLevel bool
 }
 
 // typeSubsetMap tracks which types need subset generation.
@@ -109,18 +111,43 @@ func buildTargets(context *generator.Context, cfg config.Config, outputDir, outp
 			return nil, fmt.Errorf("type %q: %w", typeName, err)
 		}
 
+		// Auto-inject TypeMeta and ObjectMeta for top-level types.
+		// These are always present in API types and needed for runtime.Object compliance.
+		injectMetaFields(sourceType, resolvedTree)
+
 		outPkg, outDir := outputLocation(outputPkg, outputDir, sourceType.Name.Package)
 		tsm[sourceType.Name] = &resolvedType{
 			sourceType: sourceType,
 			fieldTree:  resolvedTree,
 			outputPkg:  outPkg,
 			outputDir:  outDir,
+			topLevel:   true,
 		}
 
 		// Recursively discover nested types that also need subset generation.
 		if err := discoverNestedSubsets(context, sourceType, resolvedTree, outputPkg, outputDir, tsm); err != nil {
 			return nil, fmt.Errorf("type %q: discovering nested subsets: %w", typeName, err)
 		}
+	}
+
+	// Build list type info for each top-level type (used in Finalize).
+	listInfos := map[string][]*listTypeInfo{} // keyed by output package
+	for _, rt := range tsm {
+		if !rt.topLevel {
+			continue
+		}
+		listTypeName := rt.sourceType.Name.Name + "List"
+		sourcePkg := context.Universe.Package(rt.sourceType.Name.Package)
+		var sourceListType *types.Type
+		if sourcePkg != nil {
+			sourceListType = sourcePkg.Types[listTypeName]
+		}
+		info := &listTypeInfo{
+			listName:       listTypeName,
+			itemType:       rt.sourceType,
+			sourceListType: sourceListType,
+		}
+		listInfos[rt.outputPkg] = append(listInfos[rt.outputPkg], info)
 	}
 
 	// Group resolved types by output package.
@@ -138,9 +165,15 @@ func buildTargets(context *generator.Context, cfg config.Config, outputDir, outp
 		dir := rts[0].outputDir
 		pkgName := path.Base(pkg)
 
+		// Determine group name from source package's doc.go comments.
+		groupName := extractGroupName(context, rts)
+
 		// Capture for closure.
 		capturedPkg := pkg
 		capturedRts := rts
+		capturedGroupName := groupName
+
+		capturedListInfos := listInfos[pkg]
 
 		targets = append(targets, &generator.SimpleTarget{
 			PkgName:       pkgName,
@@ -157,6 +190,13 @@ func buildTargets(context *generator.Context, cfg config.Config, outputDir, outp
 						localPkg:   capturedPkg,
 						imports:    generator.NewImportTrackerForPackage(capturedPkg),
 						allSubsets: tsm,
+						listInfos: capturedListInfos,
+					},
+					&docGenerator{
+						GoGenerator: generator.GoGenerator{
+							OutputFilename: "doc.go",
+						},
+						groupName: capturedGroupName,
 					},
 				}
 			},
@@ -393,4 +433,62 @@ func mergeFieldTrees(dst, src *config.FieldTree) {
 			dst.Fields[name] = srcChild
 		}
 	}
+}
+
+// injectMetaFields adds TypeMeta and ObjectMeta to the field tree if the source type has them.
+// This ensures top-level types always embed these meta types.
+func injectMetaFields(sourceType *types.Type, tree *config.FieldTree) {
+	if tree.IncludeAll {
+		return
+	}
+	if tree.Fields == nil {
+		tree.Fields = map[string]*config.FieldTree{}
+	}
+	for i := range sourceType.Members {
+		m := &sourceType.Members[i]
+		if !m.Embedded {
+			continue
+		}
+		memberType := dereferenceType(m.Type)
+		typeName := memberType.Name.Name
+		if typeName == "TypeMeta" || typeName == "ObjectMeta" {
+			// Use the Go field name (which equals the type name for embedded fields).
+			if _, exists := tree.Fields[m.Name]; !exists {
+				tree.Fields[m.Name] = &config.FieldTree{IncludeAll: true}
+			}
+		}
+	}
+}
+
+// listTypeInfo holds the information needed to generate a List type.
+type listTypeInfo struct {
+	listName       string
+	itemType       *types.Type
+	sourceListType *types.Type // may be nil if source doesn't have a list type
+}
+
+// extractGroupName finds the +groupName comment from the source package's doc.go.
+// Falls back to inferring from the package path.
+func extractGroupName(context *generator.Context, rts []*resolvedType) string {
+	// Find any top-level type to get the source package.
+	for _, rt := range rts {
+		if !rt.topLevel {
+			continue
+		}
+		sourcePkg := context.Universe.Package(rt.sourceType.Name.Package)
+		if sourcePkg != nil {
+			for _, comment := range sourcePkg.Comments {
+				trimmed := strings.TrimSpace(comment)
+				if strings.HasPrefix(trimmed, "+groupName=") {
+					return strings.TrimPrefix(trimmed, "+groupName=")
+				}
+			}
+			// Infer from path: k8s.io/api/apps/v1 -> "apps"
+			parts := strings.Split(rt.sourceType.Name.Package, "/")
+			if len(parts) >= 2 {
+				return parts[len(parts)-2]
+			}
+		}
+	}
+	return ""
 }

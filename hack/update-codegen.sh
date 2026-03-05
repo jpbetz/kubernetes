@@ -897,6 +897,42 @@ function indent() {
     done
 }
 
+function codegen::subsets() {
+    local subset_types="${KUBE_ROOT}/staging/src/k8s.io/subset-types"
+    local subset_client="${KUBE_ROOT}/staging/src/k8s.io/subset-client"
+    local codegen="${KUBE_ROOT}/staging/src/k8s.io/code-generator"
+
+    kube::log::status "Generating subset types and client"
+
+    # Step 1: Run subset-gen to produce types.go + doc.go per group/version.
+    GOPROXY=off go run k8s.io/code-generator/cmd/subset-gen \
+        --output-dir "${subset_types}" \
+        --output-pkg k8s.io/subset-types \
+        --config "${subset_types}/config.yaml" \
+        --go-header-file "${BOILERPLATE_FILENAME}" \
+        k8s.io/api/apps/v1 k8s.io/api/core/v1
+
+    # Step 2: Generate deepcopy functions.
+    source "${codegen}/kube_codegen.sh"
+
+    kube::codegen::gen_helpers \
+        --boilerplate "${BOILERPLATE_FILENAME}" \
+        "${subset_types}"
+
+    # Step 3: Generate register functions.
+    kube::codegen::gen_register \
+        --boilerplate "${BOILERPLATE_FILENAME}" \
+        "${subset_types}"
+
+    # Step 4: Generate client, listers, and informers.
+    kube::codegen::gen_client \
+        --with-watch \
+        --output-dir "${subset_client}" \
+        --output-pkg k8s.io/subset-client \
+        --boilerplate "${BOILERPLATE_FILENAME}" \
+        "${subset_types}"
+}
+
 function codegen::subprojects() {
     # Call generation on sub-projects.
     local subs=(

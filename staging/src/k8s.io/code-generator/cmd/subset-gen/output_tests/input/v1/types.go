@@ -33,6 +33,10 @@ type ObjectMeta struct {
 	GenerateName string            `json:"generateName,omitempty" protobuf:"bytes,2,opt,name=generateName"`
 }
 
+// +genclient
+// +genclient:method=GetScale,verb=get,subresource=scale
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
 // Deployment enables declarative updates for Pods and ReplicaSets.
 type Deployment struct {
 	TypeMeta   `json:",inline"`
@@ -40,6 +44,22 @@ type Deployment struct {
 
 	Spec   DeploymentSpec   `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
 	Status DeploymentStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+// DeploymentList is a list of Deployments.
+type DeploymentList struct {
+	TypeMeta `json:",inline"`
+	ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+
+	Items []Deployment `json:"items" protobuf:"bytes,2,rep,name=items"`
+}
+
+// ListMeta describes metadata for a list.
+type ListMeta struct {
+	ResourceVersion string `json:"resourceVersion,omitempty" protobuf:"bytes,2,opt,name=resourceVersion"`
+	Continue        string `json:"continue,omitempty" protobuf:"bytes,3,opt,name=continue"`
 }
 
 // DeploymentSpec is the specification of the desired behavior of the Deployment.
