@@ -29,6 +29,9 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes/fake"
+	viewsappsv1 "k8s.io/kubernetes/pkg/scheduler/apis/views/apps/v1"
+	viewslisters "k8s.io/kubernetes/pkg/scheduler/apis/views/listers/apps/v1"
+	"k8s.io/client-go/tools/cache"
 	st "k8s.io/kubernetes/pkg/scheduler/testing"
 )
 
@@ -144,14 +147,17 @@ func TestDefaultSelector(t *testing.T) {
 		return fakeInformerFactory.Core().V1().Services().Informer().GetStore().Add(service)
 	}
 
-	// Create fake ReplicaSet
+	// Create a view ReplicaSet indexer and lister.
+	rsIndexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	rsLister := viewslisters.NewReplicaSetLister(rsIndexer)
+
 	addFakeReplicaSet := func() error {
-		replicaSet := &appsv1.ReplicaSet{
+		replicaSet := &viewsappsv1.ReplicaSet{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      replicaSetName,
 				Namespace: namespace,
 			},
-			Spec: appsv1.ReplicaSetSpec{
+			Spec: viewsappsv1.ReplicaSetSpec{
 				Selector: &metav1.LabelSelector{
 					MatchLabels: map[string]string{
 						replicaSetLabelKey: replicaSetLabelVal,
@@ -159,7 +165,7 @@ func TestDefaultSelector(t *testing.T) {
 				},
 			},
 		}
-		return fakeInformerFactory.Apps().V1().ReplicaSets().Informer().GetStore().Add(replicaSet)
+		return rsIndexer.Add(replicaSet)
 	}
 
 	// Create fake ReplicationController
@@ -258,7 +264,7 @@ func TestDefaultSelector(t *testing.T) {
 			get := DefaultSelector(test.pod,
 				fakeInformerFactory.Core().V1().Services().Lister(),
 				fakeInformerFactory.Core().V1().ReplicationControllers().Lister(),
-				fakeInformerFactory.Apps().V1().ReplicaSets().Lister(),
+				rsLister,
 				fakeInformerFactory.Apps().V1().StatefulSets().Lister())
 			diff := cmp.Diff(test.expect.String(), get.String())
 			if diff != "" {

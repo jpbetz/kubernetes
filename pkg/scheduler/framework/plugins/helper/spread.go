@@ -17,19 +17,20 @@ limitations under the License.
 package helper
 
 import (
-	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	appslisters "k8s.io/client-go/listers/apps/v1"
 	corelisters "k8s.io/client-go/listers/core/v1"
+	viewsappslisters "k8s.io/kubernetes/pkg/scheduler/apis/views/listers/apps/v1"
 )
 
 var (
-	rcKind = v1.SchemeGroupVersion.WithKind("ReplicationController")
-	rsKind = appsv1.SchemeGroupVersion.WithKind("ReplicaSet")
-	ssKind = appsv1.SchemeGroupVersion.WithKind("StatefulSet")
+	rcKind  = v1.SchemeGroupVersion.WithKind("ReplicationController")
+	appsGV  = schema.GroupVersion{Group: "apps", Version: "v1"}
+	rsKind  = appsGV.WithKind("ReplicaSet")
+	ssKind  = appsGV.WithKind("StatefulSet")
 )
 
 // DefaultSelector returns a selector deduced from the Services, Replication
@@ -38,7 +39,7 @@ func DefaultSelector(
 	pod *v1.Pod,
 	sl corelisters.ServiceLister,
 	cl corelisters.ReplicationControllerLister,
-	rsl appslisters.ReplicaSetLister,
+	rsl viewsappslisters.ReplicaSetLister,
 	ssl appslisters.StatefulSetLister,
 ) labels.Selector {
 	labelSet := make(labels.Set)
@@ -70,6 +71,9 @@ func DefaultSelector(
 			selector = labelSet.AsSelector()
 		}
 	case rsKind:
+		if rsl == nil {
+			break
+		}
 		if rs, err := rsl.ReplicaSets(pod.Namespace).Get(owner.Name); err == nil {
 			if other, err := metav1.LabelSelectorAsSelector(rs.Spec.Selector); err == nil {
 				if r, ok := other.Requirements(); ok {

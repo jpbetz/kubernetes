@@ -30,8 +30,11 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes/fake"
+	clientcache "k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2/ktesting"
 	fwk "k8s.io/kube-scheduler/framework"
+	viewsappsv1 "k8s.io/kubernetes/pkg/scheduler/apis/views/apps/v1"
+	viewsappslisters "k8s.io/kubernetes/pkg/scheduler/apis/views/listers/apps/v1"
 	"k8s.io/kubernetes/pkg/scheduler/apis/config"
 	"k8s.io/kubernetes/pkg/scheduler/backend/cache"
 	"k8s.io/kubernetes/pkg/scheduler/framework"
@@ -44,6 +47,30 @@ import (
 )
 
 var podTopologySpreadFunc = frameworkruntime.FactoryAdapter(feature.Features{}, New)
+
+// makeViewReplicaSetLister creates a view ReplicaSetLister from test objects.
+// It converts full appsv1.ReplicaSet objects to view types and returns a lister
+// backed by a local indexer.
+func makeViewReplicaSetLister(t *testing.T, objs []runtime.Object) viewsappslisters.ReplicaSetLister {
+	t.Helper()
+	indexer := clientcache.NewIndexer(clientcache.MetaNamespaceKeyFunc, clientcache.Indexers{clientcache.NamespaceIndex: clientcache.MetaNamespaceIndexFunc})
+	for _, obj := range objs {
+		rs, ok := obj.(*appsv1.ReplicaSet)
+		if !ok {
+			continue
+		}
+		viewRS := &viewsappsv1.ReplicaSet{
+			ObjectMeta: rs.ObjectMeta,
+			Spec: viewsappsv1.ReplicaSetSpec{
+				Selector: rs.Spec.Selector,
+			},
+		}
+		if err := indexer.Add(viewRS); err != nil {
+			t.Fatalf("Failed to add view ReplicaSet: %v", err)
+		}
+	}
+	return viewsappslisters.NewReplicaSetLister(indexer)
+}
 
 // TestPreScoreSkip tests the cases that TopologySpread#PreScore returns the Skip status.
 func TestPreScoreSkip(t *testing.T) {
@@ -105,6 +132,7 @@ func TestPreScoreSkip(t *testing.T) {
 			informerFactory.Start(ctx.Done())
 			informerFactory.WaitForCacheSync(ctx.Done())
 			p := pl.(*PodTopologySpread)
+			p.replicaSets = makeViewReplicaSetLister(t, tt.objs)
 			cs := framework.NewCycleState()
 			if s := p.PreScore(ctx, cs, tt.pod, tf.BuildNodeInfos(tt.nodes)); !s.IsSkip() {
 				t.Fatalf("Expected skip but got %v", s.AsError())
@@ -604,6 +632,7 @@ func TestPreScoreStateEmptyNodes(t *testing.T) {
 			informerFactory.Start(ctx.Done())
 			informerFactory.WaitForCacheSync(ctx.Done())
 			p := pl.(*PodTopologySpread)
+			p.replicaSets = makeViewReplicaSetLister(t, tt.objs)
 			cs := framework.NewCycleState()
 			if s := p.PreScore(ctx, cs, tt.pod, tf.BuildNodeInfos(tt.nodes)); !s.IsSuccess() {
 				t.Fatal(s.AsError())
@@ -1386,6 +1415,7 @@ func TestPodTopologySpreadScore(t *testing.T) {
 			state := framework.NewCycleState()
 			pl := plugintesting.SetupPluginWithInformers(ctx, t, podTopologySpreadFunc, &config.PodTopologySpreadArgs{DefaultingType: config.SystemDefaulting}, cache.NewSnapshot(tt.existingPods, allNodes), tt.objs)
 			p := pl.(*PodTopologySpread)
+			p.replicaSets = makeViewReplicaSetLister(t, tt.objs)
 			p.enableNodeInclusionPolicyInPodTopologySpread = tt.enableNodeInclusionPolicy
 			p.enableMatchLabelKeysInPodTopologySpread = tt.enableMatchLabelKeys
 

@@ -27,6 +27,9 @@ import (
 	"k8s.io/client-go/informers"
 	appslisters "k8s.io/client-go/listers/apps/v1"
 	corelisters "k8s.io/client-go/listers/core/v1"
+	viewsclientset "k8s.io/kubernetes/pkg/scheduler/apis/views/clientset/versioned"
+	viewsinformers "k8s.io/kubernetes/pkg/scheduler/apis/views/informers/externalversions"
+	viewsappslisters "k8s.io/kubernetes/pkg/scheduler/apis/views/listers/apps/v1"
 	"k8s.io/klog/v2"
 	fwk "k8s.io/kube-scheduler/framework"
 	"k8s.io/kubernetes/pkg/scheduler/apis/config"
@@ -64,7 +67,7 @@ type PodTopologySpread struct {
 	sharedLister                                 fwk.SharedLister
 	services                                     corelisters.ServiceLister
 	replicationCtrls                             corelisters.ReplicationControllerLister
-	replicaSets                                  appslisters.ReplicaSetLister
+	replicaSets                                  viewsappslisters.ReplicaSetLister
 	statefulSets                                 appslisters.StatefulSetLister
 	enableNodeInclusionPolicyInPodTopologySpread bool
 	enableMatchLabelKeysInPodTopologySpread      bool
@@ -103,7 +106,7 @@ func (pl *PodTopologySpread) SignPod(ctx context.Context, pod *v1.Pod) ([]fwk.Si
 }
 
 // New initializes a new plugin and returns it.
-func New(_ context.Context, plArgs runtime.Object, h fwk.Handle, fts feature.Features) (fwk.Plugin, error) {
+func New(ctx context.Context, plArgs runtime.Object, h fwk.Handle, fts feature.Features) (fwk.Plugin, error) {
 	if h.SnapshotSharedLister() == nil {
 		return nil, fmt.Errorf("SnapshotSharedlister is nil")
 	}
@@ -132,6 +135,19 @@ func New(_ context.Context, plArgs runtime.Object, h fwk.Handle, fts feature.Fea
 			return nil, fmt.Errorf("SharedInformerFactory is nil")
 		}
 		pl.setListers(h.SharedInformerFactory())
+
+		// Create a view informer factory for ReplicaSets. The view type
+		// contains only Spec.Selector, reducing informer cache memory.
+		if h.KubeConfig() != nil {
+			viewClient, err := viewsclientset.NewForConfig(h.KubeConfig())
+			if err != nil {
+				return nil, fmt.Errorf("creating view clientset: %w", err)
+			}
+			viewFactory := viewsinformers.NewSharedInformerFactory(viewClient, 0)
+			pl.replicaSets = viewFactory.Apps().V1().ReplicaSets().Lister()
+			viewFactory.Start(ctx.Done())
+			viewFactory.WaitForCacheSync(ctx.Done())
+		}
 	}
 	return pl, nil
 }
@@ -147,7 +163,6 @@ func getArgs(obj runtime.Object) (config.PodTopologySpreadArgs, error) {
 func (pl *PodTopologySpread) setListers(factory informers.SharedInformerFactory) {
 	pl.services = factory.Core().V1().Services().Lister()
 	pl.replicationCtrls = factory.Core().V1().ReplicationControllers().Lister()
-	pl.replicaSets = factory.Apps().V1().ReplicaSets().Lister()
 	pl.statefulSets = factory.Apps().V1().StatefulSets().Lister()
 }
 
