@@ -31,6 +31,7 @@ import (
 	fwk "k8s.io/kube-scheduler/framework"
 	"k8s.io/kubernetes/pkg/scheduler/apis/config"
 	"k8s.io/kubernetes/pkg/scheduler/apis/config/validation"
+	appstransforms "k8s.io/kubernetes/pkg/scheduler/transforms/apps/v1"
 	"k8s.io/kubernetes/pkg/scheduler/framework/plugins/feature"
 	"k8s.io/kubernetes/pkg/scheduler/framework/plugins/names"
 	"k8s.io/kubernetes/pkg/scheduler/util"
@@ -103,7 +104,7 @@ func (pl *PodTopologySpread) SignPod(ctx context.Context, pod *v1.Pod) ([]fwk.Si
 }
 
 // New initializes a new plugin and returns it.
-func New(_ context.Context, plArgs runtime.Object, h fwk.Handle, fts feature.Features) (fwk.Plugin, error) {
+func New(ctx context.Context, plArgs runtime.Object, h fwk.Handle, fts feature.Features) (fwk.Plugin, error) {
 	if h.SnapshotSharedLister() == nil {
 		return nil, fmt.Errorf("SnapshotSharedlister is nil")
 	}
@@ -147,7 +148,17 @@ func getArgs(obj runtime.Object) (config.PodTopologySpreadArgs, error) {
 func (pl *PodTopologySpread) setListers(factory informers.SharedInformerFactory) {
 	pl.services = factory.Core().V1().Services().Lister()
 	pl.replicationCtrls = factory.Core().V1().ReplicationControllers().Lister()
+
+	// Set transforms to reduce memory usage by zeroing fields the
+	// scheduler doesn't need. These must be set before the informers start.
+	if err := factory.Apps().V1().ReplicaSets().Informer().SetTransform(appstransforms.TransformReplicaSet); err != nil {
+		klog.Warningf("Failed to set transform on ReplicaSets informer: %v", err)
+	}
 	pl.replicaSets = factory.Apps().V1().ReplicaSets().Lister()
+
+	if err := factory.Apps().V1().StatefulSets().Informer().SetTransform(appstransforms.TransformStatefulSet); err != nil {
+		klog.Warningf("Failed to set transform on StatefulSets informer: %v", err)
+	}
 	pl.statefulSets = factory.Apps().V1().StatefulSets().Lister()
 }
 

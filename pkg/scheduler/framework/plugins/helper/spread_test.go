@@ -144,7 +144,6 @@ func TestDefaultSelector(t *testing.T) {
 		return fakeInformerFactory.Core().V1().Services().Informer().GetStore().Add(service)
 	}
 
-	// Create fake ReplicaSet
 	addFakeReplicaSet := func() error {
 		replicaSet := &appsv1.ReplicaSet{
 			ObjectMeta: metav1.ObjectMeta{

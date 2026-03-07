@@ -897,6 +897,19 @@ function indent() {
     done
 }
 
+function codegen::transforms() {
+    local scheduler_transforms="${KUBE_ROOT}/pkg/scheduler/transforms"
+
+    kube::log::status "Generating scheduler transforms"
+
+    GOPROXY=off go run k8s.io/code-generator/cmd/transform-gen \
+        --input-base k8s.io/api \
+        --output-dir "${scheduler_transforms}" \
+        --output-pkg k8s.io/kubernetes/pkg/scheduler/transforms \
+        --config "${scheduler_transforms}/config.yaml" \
+        --go-header-file "${BOILERPLATE_FILENAME}"
+}
+
 function codegen::subprojects() {
     # Call generation on sub-projects.
     local subs=(

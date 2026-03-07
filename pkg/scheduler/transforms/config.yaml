@@ -1,0 +1,10 @@
+# Transform configuration for the scheduler.
+
+# TypeMeta is always fully included. ObjectMeta is included with
+# ManagedFields automatically stripped.
+
+apps/v1:
+  ReplicaSet:
+    - spec.selector
+  StatefulSet:
+    - spec.selector

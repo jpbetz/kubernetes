@@ -30,6 +30,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes/fake"
+	appslisters "k8s.io/client-go/listers/apps/v1"
+	clientcache "k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2/ktesting"
 	fwk "k8s.io/kube-scheduler/framework"
 	"k8s.io/kubernetes/pkg/scheduler/apis/config"
@@ -44,6 +46,22 @@ import (
 )
 
 var podTopologySpreadFunc = frameworkruntime.FactoryAdapter(feature.Features{}, New)
+
+// makeReplicaSetLister creates a ReplicaSetLister from test objects.
+func makeReplicaSetLister(t *testing.T, objs []runtime.Object) appslisters.ReplicaSetLister {
+	t.Helper()
+	indexer := clientcache.NewIndexer(clientcache.MetaNamespaceKeyFunc, clientcache.Indexers{clientcache.NamespaceIndex: clientcache.MetaNamespaceIndexFunc})
+	for _, obj := range objs {
+		rs, ok := obj.(*appsv1.ReplicaSet)
+		if !ok {
+			continue
+		}
+		if err := indexer.Add(rs); err != nil {
+			t.Fatalf("Failed to add ReplicaSet: %v", err)
+		}
+	}
+	return appslisters.NewReplicaSetLister(indexer)
+}
 
 // TestPreScoreSkip tests the cases that TopologySpread#PreScore returns the Skip status.
 func TestPreScoreSkip(t *testing.T) {
@@ -105,6 +123,7 @@ func TestPreScoreSkip(t *testing.T) {
 			informerFactory.Start(ctx.Done())
 			informerFactory.WaitForCacheSync(ctx.Done())
 			p := pl.(*PodTopologySpread)
+			p.replicaSets = makeReplicaSetLister(t, tt.objs)
 			cs := framework.NewCycleState()
 			if s := p.PreScore(ctx, cs, tt.pod, tf.BuildNodeInfos(tt.nodes)); !s.IsSkip() {
 				t.Fatalf("Expected skip but got %v", s.AsError())
@@ -604,6 +623,7 @@ func TestPreScoreStateEmptyNodes(t *testing.T) {
 			informerFactory.Start(ctx.Done())
 			informerFactory.WaitForCacheSync(ctx.Done())
 			p := pl.(*PodTopologySpread)
+			p.replicaSets = makeReplicaSetLister(t, tt.objs)
 			cs := framework.NewCycleState()
 			if s := p.PreScore(ctx, cs, tt.pod, tf.BuildNodeInfos(tt.nodes)); !s.IsSuccess() {
 				t.Fatal(s.AsError())
@@ -1386,6 +1406,7 @@ func TestPodTopologySpreadScore(t *testing.T) {
 			state := framework.NewCycleState()
 			pl := plugintesting.SetupPluginWithInformers(ctx, t, podTopologySpreadFunc, &config.PodTopologySpreadArgs{DefaultingType: config.SystemDefaulting}, cache.NewSnapshot(tt.existingPods, allNodes), tt.objs)
 			p := pl.(*PodTopologySpread)
+			p.replicaSets = makeReplicaSetLister(t, tt.objs)
 			p.enableNodeInclusionPolicyInPodTopologySpread = tt.enableNodeInclusionPolicy
 			p.enableMatchLabelKeysInPodTopologySpread = tt.enableMatchLabelKeys
 

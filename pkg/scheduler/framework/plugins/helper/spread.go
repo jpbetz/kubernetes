@@ -17,7 +17,6 @@ limitations under the License.
 package helper
 
 import (
-	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -27,9 +26,10 @@ import (
 )
 
 var (
-	rcKind = v1.SchemeGroupVersion.WithKind("ReplicationController")
-	rsKind = appsv1.SchemeGroupVersion.WithKind("ReplicaSet")
-	ssKind = appsv1.SchemeGroupVersion.WithKind("StatefulSet")
+	rcKind  = v1.SchemeGroupVersion.WithKind("ReplicationController")
+	appsGV  = schema.GroupVersion{Group: "apps", Version: "v1"}
+	rsKind  = appsGV.WithKind("ReplicaSet")
+	ssKind  = appsGV.WithKind("StatefulSet")
 )
 
 // DefaultSelector returns a selector deduced from the Services, Replication
@@ -70,6 +70,9 @@ func DefaultSelector(
 			selector = labelSet.AsSelector()
 		}
 	case rsKind:
+		if rsl == nil {
+			break
+		}
 		if rs, err := rsl.ReplicaSets(pod.Namespace).Get(owner.Name); err == nil {
 			if other, err := metav1.LabelSelectorAsSelector(rs.Spec.Selector); err == nil {
 				if r, ok := other.Requirements(); ok {
@@ -78,6 +81,9 @@ func DefaultSelector(
 			}
 		}
 	case ssKind:
+		if ssl == nil {
+			break
+		}
 		if ss, err := ssl.StatefulSets(pod.Namespace).Get(owner.Name); err == nil {
 			if other, err := metav1.LabelSelectorAsSelector(ss.Spec.Selector); err == nil {
 				if r, ok := other.Requirements(); ok {
