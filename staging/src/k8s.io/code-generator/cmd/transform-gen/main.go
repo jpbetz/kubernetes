@@ -25,7 +25,9 @@ import (
 	"sort"
 
 	"github.com/spf13/pflag"
+	"k8s.io/code-generator/cmd/transform-gen/analysis"
 	"k8s.io/code-generator/cmd/transform-gen/args"
+	"k8s.io/code-generator/cmd/transform-gen/config"
 	"k8s.io/code-generator/cmd/transform-gen/generators"
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
@@ -46,8 +48,22 @@ func main() {
 		klog.Fatalf("Error: %v", err)
 	}
 
-	if err := a.LoadConfig(); err != nil {
-		klog.Fatalf("Error loading config: %v", err)
+	if len(a.ScanPackages) > 0 {
+		// Auto-discover field usage from source code.
+		usage, err := analysis.AnalyzeFieldUsage(a.ScanPackages, a.InputBase)
+		if err != nil {
+			klog.Fatalf("Error analyzing field usage: %v", err)
+		}
+		a.Config = config.Config(usage)
+	} else {
+		// Load from config file.
+		if err := a.LoadConfig(); err != nil {
+			klog.Fatalf("Error loading config: %v", err)
+		}
+	}
+
+	if err := a.Config.Validate(); err != nil {
+		klog.Fatalf("Error validating config: %v", err)
 	}
 
 	// Build input package paths by combining --input-base with config keys.

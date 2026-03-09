@@ -32,6 +32,7 @@ type Args struct {
 	OutputPkg string
 
 	// ConfigFilePath is the path to the YAML config file declaring field views.
+	// Optional when ScanPackages is provided (field usage is auto-discovered).
 	ConfigFilePath string
 
 	// GoHeaderFile is the path to a file containing boilerplate header text.
@@ -42,7 +43,13 @@ type Args struct {
 	// and config key "apps/v1", the input package is "k8s.io/api/apps/v1".
 	InputBase string
 
-	// Config is the loaded configuration, populated after calling LoadConfig.
+	// ScanPackages is a list of Go package patterns to scan for field accesses.
+	// When provided, field usage is automatically discovered from source code
+	// instead of reading a config file.
+	ScanPackages []string
+
+	// Config is the loaded configuration, populated after calling LoadConfig
+	// or AnalyzeFieldUsage.
 	Config config.Config
 }
 
@@ -58,11 +65,14 @@ func (a *Args) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&a.OutputPkg, "output-pkg", "",
 		"the Go import-path of the generated results")
 	fs.StringVar(&a.ConfigFilePath, "config", "",
-		"path to the YAML config file declaring field views per type")
+		"path to the YAML config file declaring field views per type (optional when --scan-packages is used)")
 	fs.StringVar(&a.GoHeaderFile, "go-header-file", "",
 		"the path to a file containing boilerplate header text; the string \"YEAR\" will be replaced with the current 4-digit year")
 	fs.StringVar(&a.InputBase, "input-base", "",
 		"the Go import-path prefix for input packages; config keys are appended to this (e.g. \"k8s.io/api\")")
+	fs.StringSliceVar(&a.ScanPackages, "scan-packages", nil,
+		"Go package patterns to scan for field accesses (e.g. \"k8s.io/kubernetes/pkg/scheduler/...\"); "+
+			"when provided, field usage is auto-discovered and --config is optional")
 }
 
 // Validate checks the given arguments.
@@ -73,8 +83,8 @@ func (a *Args) Validate() error {
 	if len(a.OutputPkg) == 0 {
 		return fmt.Errorf("--output-pkg must be specified")
 	}
-	if len(a.ConfigFilePath) == 0 {
-		return fmt.Errorf("--config must be specified")
+	if len(a.ConfigFilePath) == 0 && len(a.ScanPackages) == 0 {
+		return fmt.Errorf("either --config or --scan-packages must be specified")
 	}
 	if len(a.InputBase) == 0 {
 		return fmt.Errorf("--input-base must be specified")

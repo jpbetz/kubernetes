@@ -15,6 +15,7 @@
 # limitations under the License.
 
 # Generates scheduler transform functions from k8s.io/api using transform-gen.
+# Field usage is automatically discovered by scanning the scheduler plugin packages.
 
 set -o errexit
 set -o nounset
@@ -32,5 +33,5 @@ GOPROXY=off go run k8s.io/code-generator/cmd/transform-gen \
     --input-base k8s.io/api \
     --output-dir "${TRANSFORMS_DIR}" \
     --output-pkg "${TRANSFORMS_PKG}" \
-    --config "${TRANSFORMS_DIR}/config.yaml" \
+    --scan-packages k8s.io/kubernetes/pkg/scheduler/framework/plugins/... \
     --go-header-file "${BOILERPLATE}"
