@@ -45,6 +45,13 @@ type MyResourceSpec struct {
 	Replicas *int32         `json:"replicas,omitempty"`
 	Selector *LabelSelector `json:"selector,omitempty"`
 	Template string         `json:"template,omitempty"`
+	Items    []MyItem       `json:"items,omitempty"`
+}
+
+// MyItem is an item in a list.
+type MyItem struct {
+	Value string `json:"value,omitempty"`
+	Extra string `json:"extra,omitempty"`
 }
 
 // MyResourceStatus is the status of MyResource.

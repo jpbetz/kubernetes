@@ -44,8 +44,10 @@ func TestAnalyzeFieldUsage(t *testing.T) {
 	expected := FieldUsage{
 		"v1": {
 			"MyResource": []string{
-				"spec.selector",
-				"spec.selector.matchLabels",
+				"spec.items.value",          // RangeVariable: for _, item := range r.Spec.Items { item.Value }
+				"spec.replicas",             // IntermediateVariable: spec := r.Spec; spec.Replicas
+				"spec.selector",             // DirectAccess: r.Spec.Selector
+				"spec.selector.matchLabels", // MultiHop: spec := r.Spec; sel := spec.Selector; sel.MatchLabels
 			},
 		},
 	}
