@@ -121,9 +121,13 @@ func (g *transformGenerator) generateZeroFields(w io.Writer, t *types.Type, tree
 
 		subtree := tree.HasField(member.Name)
 		if subtree == nil {
-			// Field not needed — zero it out.
-			memberType := member.Type
-			fmt.Fprintf(w, "%s%s.%s = %s\n", indent, varExpr, member.Name, g.zeroValue(memberType))
+			// Field not needed — zero it out, but only if the type can
+			// actually free memory (contains pointers, slices, or maps).
+			// Scalar types (int, bool, etc.) and fixed-size strings are
+			// allocated inline in the struct and zeroing them saves nothing.
+			if freesMemory(member.Type) {
+				fmt.Fprintf(w, "%s%s.%s = %s\n", indent, varExpr, member.Name, g.zeroValue(member.Type))
+			}
 			continue
 		}
 
@@ -181,6 +185,44 @@ func builtinZeroValue(name string) string {
 		return "0"
 	default:
 		return `""`
+	}
+}
+
+// freesMemory returns true if zeroing a field of this type can actually free
+// memory. Pointer, slice, and map types can be set to nil to release their
+// underlying data. Struct types free memory if any of their fields
+// transitively contain pointers, slices, or maps. Scalar types (int, bool,
+// float) and fixed-size types are allocated inline and zeroing them saves nothing.
+func freesMemory(t *types.Type) bool {
+	return freesMemoryVisited(t, map[*types.Type]bool{})
+}
+
+func freesMemoryVisited(t *types.Type, visited map[*types.Type]bool) bool {
+	if visited[t] {
+		return false
+	}
+	visited[t] = true
+
+	switch t.Kind {
+	case types.Pointer, types.Slice, types.Map:
+		return true
+	case types.Alias:
+		if t.Underlying != nil {
+			return freesMemoryVisited(t.Underlying, visited)
+		}
+		return false
+	case types.Struct:
+		for _, m := range t.Members {
+			if freesMemoryVisited(m.Type, visited) {
+				return true
+			}
+		}
+		return false
+	default:
+		// Builtins (int, bool, string, etc.) and other types.
+		// Strings are a (pointer, len) pair but typically hold short values
+		// in API types, so the savings are negligible.
+		return false
 	}
 }
 

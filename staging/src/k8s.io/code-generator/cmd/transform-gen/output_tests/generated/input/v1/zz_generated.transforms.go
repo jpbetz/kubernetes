@@ -17,12 +17,6 @@ func TransformDeployment(obj interface{}) (interface{}, error) {
 		return obj, fmt.Errorf("unexpected type %T", obj)
 	}
 	o.ObjectMeta.Annotations = nil
-	o.ObjectMeta.GenerateName = ""
 	o.Spec.Template.Spec.InitContainers = nil
-	o.Spec.Template.Spec.NodeName = ""
-	o.Spec.Template.Spec.HostNetwork = false
-	o.Spec.Strategy = inputv1.DeploymentStrategy{}
-	o.Spec.Paused = false
-	o.Status = inputv1.DeploymentStatus{}
 	return o, nil
 }
