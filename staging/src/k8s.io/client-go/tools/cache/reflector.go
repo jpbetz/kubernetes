@@ -765,9 +765,12 @@ func (r *Reflector) watchList(ctx context.Context) (watch.Interface, error) {
 
 	var transformer TransformFunc
 	storeOpts := []StoreOption{}
+	isMemoryOptimizationEnabled := clientfeatures.FeatureGates().Enabled(clientfeatures.WatchListMemoryOptimization)
 	if tr, ok := r.store.(TransformingStore); ok && tr.Transformer() != nil {
 		transformer = tr.Transformer()
-		storeOpts = append(storeOpts, WithTransformer(transformer))
+		if !isMemoryOptimizationEnabled {
+			storeOpts = append(storeOpts, WithTransformer(transformer))
+		}
 	}
 
 	initTrace := trace.New("Reflector WatchList", trace.Field{Key: "name", Value: r.name})
@@ -782,10 +785,8 @@ func (r *Reflector) watchList(ctx context.Context) (watch.Interface, error) {
 		resourceVersion = ""
 		lastKnownRV := r.rewatchResourceVersion()
 		temporaryStore = NewStore(DeletionHandlingMetaNamespaceKeyFunc, storeOpts...)
-		// note when a transformer is configured, reusing cached objects may result in a double-transform.
-		// TODO: check ^
-		if clientfeatures.FeatureGates().Enabled(clientfeatures.WatchListMemoryOptimization) {
-			temporaryStore = newWatchListMemoryOptimizedStore(temporaryStore, r.clientStore, DeletionHandlingMetaNamespaceKeyFunc)
+		if isMemoryOptimizationEnabled {
+			temporaryStore = newWatchListMemoryOptimizedStore(temporaryStore, r.clientStore, DeletionHandlingMetaNamespaceKeyFunc, transformer)
 		}
 		// TODO(#115478): large "list", slow clients, slow network, p&f
 		//  might slow down streaming and eventually fail.
@@ -838,7 +839,14 @@ func (r *Reflector) watchList(ctx context.Context) (watch.Interface, error) {
 	// component as soon as it finishes replacing the content.
 	checkWatchListDataConsistencyIfRequested(ctx, r.name, resourceVersion, r.listerWatcher.ListWithContext, transformer, temporaryStore.List)
 
-	if err := r.store.Replace(temporaryStore.List(), resourceVersion); err != nil {
+		if replaceTransformed, ok := r.store.(interface {
+		ReplaceAlreadyTransformed(list []interface{}, rv string) error
+	}); ok && transformer != nil {
+		err = replaceTransformed.ReplaceAlreadyTransformed(temporaryStore.List(), resourceVersion)
+	} else {
+		err = r.store.Replace(temporaryStore.List(), resourceVersion)
+	}
+	if err != nil {
 		return nil, fmt.Errorf("unable to sync watch-list result: %w", err)
 	}
 	initTrace.Step("SyncWith done")

@@ -26,41 +26,68 @@ type watchListMemoryOptimizedStore struct {
 	Store       // embedded delegate
 	clientStore Store
 	keyFunc     KeyFunc
+	transformer TransformFunc
 }
 
-func newWatchListMemoryOptimizedStore(delegate Store, clientStore Store, keyFunc KeyFunc) Store {
+func newWatchListMemoryOptimizedStore(delegate Store, clientStore Store, keyFunc KeyFunc, transformer TransformFunc) Store {
 	// keyFunc should match the delegate store's keying function.
-	if clientStore == nil {
+	if clientStore == nil && transformer == nil {
 		return delegate
 	}
 	return &watchListMemoryOptimizedStore{
 		Store:       delegate,
 		clientStore: clientStore,
 		keyFunc:     keyFunc,
+		transformer: transformer,
 	}
 }
 
 func (s *watchListMemoryOptimizedStore) Add(obj interface{}) error {
-	return s.Store.Add(s.maybeReuseObject(obj))
+	reused, reusedObj := s.maybeReuseObject(obj)
+	if reused {
+		return s.Store.Add(reusedObj)
+	}
+	if s.transformer != nil {
+		var err error
+		obj, err = s.transformer(obj)
+		if err != nil {
+			return err
+		}
+	}
+	return s.Store.Add(obj)
 }
 
 func (s *watchListMemoryOptimizedStore) Update(obj interface{}) error {
-	return s.Store.Update(s.maybeReuseObject(obj))
+	reused, reusedObj := s.maybeReuseObject(obj)
+	if reused {
+		return s.Store.Update(reusedObj)
+	}
+	if s.transformer != nil {
+		var err error
+		obj, err = s.transformer(obj)
+		if err != nil {
+			return err
+		}
+	}
+	return s.Store.Update(obj)
 }
 
-func (s *watchListMemoryOptimizedStore) maybeReuseObject(obj interface{}) interface{} {
+func (s *watchListMemoryOptimizedStore) maybeReuseObject(obj interface{}) (bool, interface{}) {
+	if s.clientStore == nil {
+		return false, obj
+	}
 	key, err := s.keyFunc(obj)
 	if err != nil {
-		return obj
+		return false, obj
 	}
 	cached, exists, err := s.clientStore.GetByKey(key)
 	if err != nil || !exists {
-		return obj
+		return false, obj
 	}
 	if sameResourceVersion(cached, obj) {
-		return cached
+		return true, cached
 	}
-	return obj
+	return false, obj
 }
 
 func sameResourceVersion(a, b interface{}) bool {

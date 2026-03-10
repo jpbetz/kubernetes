@@ -1,0 +1,66 @@
+diff --git a/staging/src/k8s.io/client-go/tools/cache/delta_fifo.go b/staging/src/k8s.io/client-go/tools/cache/delta_fifo.go
+index ce74dfb6f10..e7c85c292cd 100644
+--- a/staging/src/k8s.io/client-go/tools/cache/delta_fifo.go
++++ b/staging/src/k8s.io/client-go/tools/cache/delta_fifo.go
+@@ -639,6 +639,11 @@ func (f *DeltaFIFO) hasSynced_locked() bool {
+ // existing objects to Replace.
+ // Replace will log an error if it encounters an object that cannot be
+ // extracted with the KeyFunc.
++//
++// See ReplaceAlreadyTransformed for a variant that bypasses the transformer.
+ func (f *DeltaFIFO) Replace(list []interface{}, _ string) error {
++	return f.replace(list, false)
++}
++
++// ReplaceAlreadyTransformed behaves like Replace but bypasses the transformer
++// for the objects in the list. This is useful when the objects have already
++// been transformed (e.g., during a watchList).
++func (f *DeltaFIFO) ReplaceAlreadyTransformed(list []interface{}, _ string) error {
++	return f.replace(list, true)
++}
++
++func (f *DeltaFIFO) replace(list []interface{}, alreadyTransformed bool) error {
+ 	f.lock.Lock()
+ 	defer f.lock.Unlock()
+ 	keys := make(sets.Set[string], len(list))
+@@ -651,7 +656,11 @@ func (f *DeltaFIFO) Replace(list []interface{}, _ string) error {
+ 			return KeyError{item, err}
+ 		}
+ 		keys.Insert(key)
+-		if err := f.queueActionInternalLocked(action, Replaced, item); err != nil {
++		internalAction := Replaced
++		if alreadyTransformed {
++			internalAction = Sync // Sync skips the transformer
++		}
++		if err := f.queueActionInternalLocked(action, internalAction, item); err != nil {
+ 			return fmt.Errorf("couldn't enqueue object: %v", err)
+ 		}
+ 	}
+diff --git a/staging/src/k8s.io/client-go/tools/cache/reflector.go b/staging/src/k8s.io/client-go/tools/cache/reflector.go
+index 449153092a8..cfb61d31edc 100644
+--- a/staging/src/k8s.io/client-go/tools/cache/reflector.go
++++ b/staging/src/k8s.io/client-go/tools/cache/reflector.go
+@@ -782,8 +782,6 @@ func (r *Reflector) watchList(ctx context.Context) (watch.Interface, error) {
+ 		resourceVersion = ""
+ 		lastKnownRV := r.rewatchResourceVersion()
+ 		temporaryStore = NewStore(DeletionHandlingMetaNamespaceKeyFunc, storeOpts...)
+-		// note when a transformer is configured, reusing cached objects may result in a double-transform.
+-		// TODO: check ^
+ 		if clientfeatures.FeatureGates().Enabled(clientfeatures.WatchListMemoryOptimization) {
+ 			temporaryStore = newWatchListMemoryOptimizedStore(temporaryStore, r.clientStore, DeletionHandlingMetaNamespaceKeyFunc)
+ 		}
+@@ -910,7 +908,13 @@ func (r *Reflector) watchList(ctx context.Context) (watch.Interface, error) {
+ 		r.setLastSyncResourceVersion(resourceVersion)
+ 		r.setIsLastSyncResourceVersionUnavailable(false)
+ 		// after watch-list is completed, replace the store with temporaryStore
+-		err = r.store.Replace(temporaryStore.List(), lastKnownRV)
++		if replaceTransformed, ok := r.store.(interface {
++			ReplaceAlreadyTransformed(list []interface{}, rv string) error
++		}); ok && transformer != nil {
++			err = replaceTransformed.ReplaceAlreadyTransformed(temporaryStore.List(), lastKnownRV)
++		} else {
++			err = r.store.Replace(temporaryStore.List(), lastKnownRV)
++		}
+ 		if err != nil {
+ 			return nil, fmt.Errorf("unable to replace store: %w", err)
+ 		}

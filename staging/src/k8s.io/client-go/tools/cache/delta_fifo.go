@@ -562,7 +562,15 @@ func (f *DeltaFIFO) Pop(process PopProcessFunc) (interface{}, error) {
 // `f.items` and `f.knownObjects` (if not nil). The last known object for key K is
 // the one present in the last delta in `f.items`. If there is no delta for K
 // in `f.items`, it is the object in `f.knownObjects`
-func (f *DeltaFIFO) Replace(list []interface{}, _ string) error {
+func (f *DeltaFIFO) Replace(list []interface{}, rv string) error {
+	return f.replace(list, rv, false)
+}
+
+func (f *DeltaFIFO) ReplaceAlreadyTransformed(list []interface{}, rv string) error {
+	return f.replace(list, rv, true)
+}
+
+func (f *DeltaFIFO) replace(list []interface{}, _ string, alreadyTransformed bool) error {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 	keys := make(sets.Set[string], len(list))
@@ -580,7 +588,11 @@ func (f *DeltaFIFO) Replace(list []interface{}, _ string) error {
 			return KeyError{item, err}
 		}
 		keys.Insert(key)
-		if err := f.queueActionInternalLocked(action, Replaced, item); err != nil {
+		internalAction := Replaced
+		if alreadyTransformed {
+			internalAction = Sync
+		}
+		if err := f.queueActionInternalLocked(action, internalAction, item); err != nil {
 			return fmt.Errorf("couldn't enqueue object: %v", err)
 		}
 	}

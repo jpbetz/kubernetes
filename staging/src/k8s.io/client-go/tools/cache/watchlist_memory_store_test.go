@@ -82,7 +82,7 @@ func TestWatchListMemoryOptimizedStore(t *testing.T) {
 				require.NoError(t, clientStore.Add(scenario.existingObject))
 			}
 
-			store := newWatchListMemoryOptimizedStore(temporaryStore, clientStore, keyFunc)
+			store := newWatchListMemoryOptimizedStore(temporaryStore, clientStore, keyFunc, nil)
 			switch scenario.op {
 			case "add":
 				require.NoError(t, store.Add(scenario.incomingObject))
@@ -112,6 +112,56 @@ func TestWatchListMemoryOptimizedStoreNilClientStore(t *testing.T) {
 	keyFunc := DeletionHandlingMetaNamespaceKeyFunc
 	temporaryStore := NewStore(keyFunc)
 
-	store := newWatchListMemoryOptimizedStore(temporaryStore, nil, keyFunc)
+	store := newWatchListMemoryOptimizedStore(temporaryStore, nil, keyFunc, nil)
 	require.Same(t, temporaryStore, store)
+}
+
+func TestWatchListMemoryOptimizedStoreDoubleTransform(t *testing.T) {
+	keyFunc := DeletionHandlingMetaNamespaceKeyFunc
+	
+	// Create a clientStore that holds "already transformed" objects
+	clientStore := NewStore(keyFunc)
+	existingObject := &v1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            "p1",
+			Namespace:       "ns",
+			ResourceVersion: "10",
+			Annotations:     map[string]string{"transformed": "once"},
+		},
+	}
+	require.NoError(t, clientStore.Add(existingObject))
+
+	// Create a temporaryStore WITHOUT a transformer (as reflector.go now does)
+	transformer := func(obj interface{}) (interface{}, error) {
+		pod := obj.(*v1.Pod).DeepCopy()
+		if pod.Annotations == nil {
+			pod.Annotations = make(map[string]string)
+		}
+		pod.Annotations["transformed"] = pod.Annotations["transformed"] + "+again"
+		return pod, nil
+	}
+	temporaryStore := NewStore(keyFunc)
+
+	// Wrap temporaryStore with watchListMemoryOptimizedStore and pass the transformer
+	store := newWatchListMemoryOptimizedStore(temporaryStore, clientStore, keyFunc, transformer)
+
+	// Add an incoming object that matches the existing object
+	incomingObject := &v1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            "p1",
+			Namespace:       "ns",
+			ResourceVersion: "10",
+		},
+	}
+	require.NoError(t, store.Add(incomingObject))
+
+	// Get the object from temporaryStore and check its annotations
+	key, _ := keyFunc(incomingObject)
+	got, exists, _ := temporaryStore.GetByKey(key)
+	require.True(t, exists)
+
+	pod := got.(*v1.Pod)
+	if pod.Annotations["transformed"] != "once" {
+		t.Errorf("expected transformed annotation to be 'once', got '%s'", pod.Annotations["transformed"])
+	}
 }

@@ -2190,8 +2190,8 @@ func TestReflectorRespectStoreTransformer(t *testing.T) {
 			}
 
 			// Transformer should have been invoked twice for the initial sync in the informer on the temporary store,
-			// then twice on replace, then once on the following update.
-			if want, got := 5, int(transformerInvoked.Load()); want != got {
+			// then once on the following update. (Replacement skips transform since they are already transformed).
+			if want, got := 3, int(transformerInvoked.Load()); want != got {
 				t.Errorf("expected transformer to be invoked %d times, but got: %d", want, got)
 			}
 

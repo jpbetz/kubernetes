@@ -214,10 +214,10 @@ func (f *RealFIFO) addToItems_locked(deltaActionType DeltaType, skipTransform bo
 }
 
 // addReplaceToItemsLocked appends to the delta list.
-func (f *RealFIFO) addReplaceToItemsLocked(objs []interface{}, resourceVersion string) error {
+func (f *RealFIFO) addReplaceToItemsLocked(objs []interface{}, resourceVersion string, alreadyTransformed bool) error {
 	// Replaced items must be transformed before being added to the queue. These objects must
 	// all be objects that have not been transformed yet.
-	if f.transformer != nil {
+	if !alreadyTransformed && f.transformer != nil {
 		transformedObjs := make([]interface{}, len(objs))
 		for i, obj := range objs {
 			transformedObj, err := f.transformer(obj)
@@ -482,19 +482,27 @@ func (f *RealFIFO) PopBatch(processBatch ProcessBatchFunc, processSingle PopProc
 // 2. finds items in knownObjects that are not in newItems and creates synthetic deletes for them
 // 3. adds the newItems to the queue
 func (f *RealFIFO) Replace(newItems []interface{}, resourceVersion string) error {
+	return f.replace(newItems, resourceVersion, false)
+}
+
+func (f *RealFIFO) ReplaceAlreadyTransformed(newItems []interface{}, resourceVersion string) error {
+	return f.replace(newItems, resourceVersion, true)
+}
+
+func (f *RealFIFO) replace(newItems []interface{}, resourceVersion string, alreadyTransformed bool) error {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
 	var err error
 	if f.emitAtomicEvents {
-		err = f.addReplaceToItemsLocked(newItems, resourceVersion)
+		err = f.addReplaceToItemsLocked(newItems, resourceVersion, alreadyTransformed)
 	} else {
 		err = reconcileReplacement(f.items, f.knownObjects, newItems, f.keyOf,
 			func(obj DeletedFinalStateUnknown) error {
 				return f.addToItems_locked(Deleted, true, obj)
 			},
 			func(obj interface{}) error {
-				return f.addToItems_locked(Replaced, false, obj)
+				return f.addToItems_locked(Replaced, alreadyTransformed, obj)
 			})
 	}
 	if err != nil {
