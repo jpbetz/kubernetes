@@ -182,6 +182,18 @@ func (reg *registry) ExtractValidations(context Context, tags ...codetags.Tag) (
 		}
 	}
 
+	// Apply DefaultConditions to all functions that don't already have
+	// conditions. This resolves meta-tag conditioning (e.g. +k8s:featureGate)
+	// so that the emitter only sees fully-resolved per-function Conditions.
+	if validations.DefaultConditions != nil {
+		for i := range validations.Functions {
+			if validations.Functions[i].Conditions.Empty() {
+				validations.Functions[i].Conditions = *validations.DefaultConditions
+			}
+		}
+		validations.DefaultConditions = nil
+	}
+
 	return validations, nil
 }
 

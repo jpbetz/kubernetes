@@ -105,30 +105,40 @@ func Validate_MultiGateStruct(ctx context.Context, op operation.Operation, fldPa
 			if oldValueCorrelated && op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
 				return nil
 			}
-			if op.HasOption("GateA") && op.HasOption("GateB") {
-				// call field-attached validations
-				earlyReturn := false
-				// optional fields with default values are effectively required
-				if e := validate.RequiredPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
-					errs = append(errs, e...)
-					earlyReturn = true
+			// call field-attached validations
+			earlyReturn := false
+			// optional fields with default values are effectively required
+			if e := func() field.ErrorList {
+				if op.HasOption("GateA") && op.HasOption("GateB") {
+					return validate.RequiredPointer(ctx, op, fldPath, obj, oldObj)
+				} else {
+					return nil // skip validation
 				}
-				if earlyReturn {
-					return // do not proceed
+			}(); len(e) != 0 {
+				errs = append(errs, e...)
+				earlyReturn = true
+			}
+			if e := func() field.ErrorList {
+				if !(op.HasOption("GateA") && op.HasOption("GateB")) {
+					return validate.ForbiddenPointer(ctx, op, fldPath, obj, oldObj)
+				} else {
+					return nil // skip validation
 				}
-			} else {
-				// field is forbidden when GateA, GateB are disabled
-				earlyReturn := false
-				if e := validate.ForbiddenPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
-					errs = append(errs, e...)
-					earlyReturn = true
+			}(); len(e) != 0 {
+				errs = append(errs, e...)
+				earlyReturn = true
+			}
+			if e := func() field.ErrorList {
+				if !(op.HasOption("GateA") && op.HasOption("GateB")) {
+					return validate.OptionalPointer(ctx, op, fldPath, obj, oldObj)
+				} else {
+					return nil // skip validation
 				}
-				if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
-					earlyReturn = true
-				}
-				if earlyReturn {
-					return // do not proceed
-				}
+			}(); len(e) != 0 {
+				earlyReturn = true
+			}
+			if earlyReturn {
+				return // do not proceed
 			}
 			return
 		}(fldPath.Child("multiGatedField"), obj.MultiGatedField, safe.Field(oldObj, func(oldObj *MultiGateStruct) *string { return oldObj.MultiGatedField }), oldObj != nil)...)
@@ -148,30 +158,40 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 			if oldValueCorrelated && op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
 				return nil
 			}
-			if op.HasOption("MyGate") {
-				// call field-attached validations
-				earlyReturn := false
-				// optional fields with default values are effectively required
-				if e := validate.RequiredPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
-					errs = append(errs, e...)
-					earlyReturn = true
+			// call field-attached validations
+			earlyReturn := false
+			// optional fields with default values are effectively required
+			if e := func() field.ErrorList {
+				if op.HasOption("MyGate") {
+					return validate.RequiredPointer(ctx, op, fldPath, obj, oldObj)
+				} else {
+					return nil // skip validation
 				}
-				if earlyReturn {
-					return // do not proceed
+			}(); len(e) != 0 {
+				errs = append(errs, e...)
+				earlyReturn = true
+			}
+			if e := func() field.ErrorList {
+				if !(op.HasOption("MyGate")) {
+					return validate.ForbiddenPointer(ctx, op, fldPath, obj, oldObj)
+				} else {
+					return nil // skip validation
 				}
-			} else {
-				// field is forbidden when MyGate is disabled
-				earlyReturn := false
-				if e := validate.ForbiddenPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
-					errs = append(errs, e...)
-					earlyReturn = true
+			}(); len(e) != 0 {
+				errs = append(errs, e...)
+				earlyReturn = true
+			}
+			if e := func() field.ErrorList {
+				if !(op.HasOption("MyGate")) {
+					return validate.OptionalPointer(ctx, op, fldPath, obj, oldObj)
+				} else {
+					return nil // skip validation
 				}
-				if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
-					earlyReturn = true
-				}
-				if earlyReturn {
-					return // do not proceed
-				}
+			}(); len(e) != 0 {
+				earlyReturn = true
+			}
+			if earlyReturn {
+				return // do not proceed
 			}
 			return
 		}(fldPath.Child("stringPtrField"), obj.StringPtrField, safe.Field(oldObj, func(oldObj *Struct) *string { return oldObj.StringPtrField }), oldObj != nil)...)
@@ -191,28 +211,38 @@ func Validate_TypesStruct(ctx context.Context, op operation.Operation, fldPath *
 			if oldValueCorrelated && op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
 				return nil
 			}
-			if op.HasOption("SliceGate") {
-				// call field-attached validations
-				earlyReturn := false
-				if e := validate.OptionalSlice(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
-					earlyReturn = true
+			// call field-attached validations
+			earlyReturn := false
+			if e := func() field.ErrorList {
+				if op.HasOption("SliceGate") {
+					return validate.OptionalSlice(ctx, op, fldPath, obj, oldObj)
+				} else {
+					return nil // skip validation
 				}
-				if earlyReturn {
-					return // do not proceed
+			}(); len(e) != 0 {
+				earlyReturn = true
+			}
+			if e := func() field.ErrorList {
+				if !(op.HasOption("SliceGate")) {
+					return validate.ForbiddenSlice(ctx, op, fldPath, obj, oldObj)
+				} else {
+					return nil // skip validation
 				}
-			} else {
-				// field is forbidden when SliceGate is disabled
-				earlyReturn := false
-				if e := validate.ForbiddenSlice(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
-					errs = append(errs, e...)
-					earlyReturn = true
+			}(); len(e) != 0 {
+				errs = append(errs, e...)
+				earlyReturn = true
+			}
+			if e := func() field.ErrorList {
+				if !(op.HasOption("SliceGate")) {
+					return validate.OptionalSlice(ctx, op, fldPath, obj, oldObj)
+				} else {
+					return nil // skip validation
 				}
-				if e := validate.OptionalSlice(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
-					earlyReturn = true
-				}
-				if earlyReturn {
-					return // do not proceed
-				}
+			}(); len(e) != 0 {
+				earlyReturn = true
+			}
+			if earlyReturn {
+				return // do not proceed
 			}
 			return
 		}(fldPath.Child("sliceField"), obj.SliceField, safe.Field(oldObj, func(oldObj *TypesStruct) []string { return oldObj.SliceField }), oldObj != nil)...)
@@ -224,28 +254,38 @@ func Validate_TypesStruct(ctx context.Context, op operation.Operation, fldPath *
 			if oldValueCorrelated && op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
 				return nil
 			}
-			if op.HasOption("MapGate") {
-				// call field-attached validations
-				earlyReturn := false
-				if e := validate.OptionalMap(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
-					earlyReturn = true
+			// call field-attached validations
+			earlyReturn := false
+			if e := func() field.ErrorList {
+				if op.HasOption("MapGate") {
+					return validate.OptionalMap(ctx, op, fldPath, obj, oldObj)
+				} else {
+					return nil // skip validation
 				}
-				if earlyReturn {
-					return // do not proceed
+			}(); len(e) != 0 {
+				earlyReturn = true
+			}
+			if e := func() field.ErrorList {
+				if !(op.HasOption("MapGate")) {
+					return validate.ForbiddenMap(ctx, op, fldPath, obj, oldObj)
+				} else {
+					return nil // skip validation
 				}
-			} else {
-				// field is forbidden when MapGate is disabled
-				earlyReturn := false
-				if e := validate.ForbiddenMap(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
-					errs = append(errs, e...)
-					earlyReturn = true
+			}(); len(e) != 0 {
+				errs = append(errs, e...)
+				earlyReturn = true
+			}
+			if e := func() field.ErrorList {
+				if !(op.HasOption("MapGate")) {
+					return validate.OptionalMap(ctx, op, fldPath, obj, oldObj)
+				} else {
+					return nil // skip validation
 				}
-				if e := validate.OptionalMap(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
-					earlyReturn = true
-				}
-				if earlyReturn {
-					return // do not proceed
-				}
+			}(); len(e) != 0 {
+				earlyReturn = true
+			}
+			if earlyReturn {
+				return // do not proceed
 			}
 			return
 		}(fldPath.Child("mapField"), obj.MapField, safe.Field(oldObj, func(oldObj *TypesStruct) map[string]string { return oldObj.MapField }), oldObj != nil)...)
@@ -257,28 +297,38 @@ func Validate_TypesStruct(ctx context.Context, op operation.Operation, fldPath *
 			if oldValueCorrelated && op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
 				return nil
 			}
-			if op.HasOption("ValueGate") {
-				// call field-attached validations
-				earlyReturn := false
-				if e := validate.OptionalValue(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
-					earlyReturn = true
+			// call field-attached validations
+			earlyReturn := false
+			if e := func() field.ErrorList {
+				if op.HasOption("ValueGate") {
+					return validate.OptionalValue(ctx, op, fldPath, obj, oldObj)
+				} else {
+					return nil // skip validation
 				}
-				if earlyReturn {
-					return // do not proceed
+			}(); len(e) != 0 {
+				earlyReturn = true
+			}
+			if e := func() field.ErrorList {
+				if !(op.HasOption("ValueGate")) {
+					return validate.ForbiddenValue(ctx, op, fldPath, obj, oldObj)
+				} else {
+					return nil // skip validation
 				}
-			} else {
-				// field is forbidden when ValueGate is disabled
-				earlyReturn := false
-				if e := validate.ForbiddenValue(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
-					errs = append(errs, e...)
-					earlyReturn = true
+			}(); len(e) != 0 {
+				errs = append(errs, e...)
+				earlyReturn = true
+			}
+			if e := func() field.ErrorList {
+				if !(op.HasOption("ValueGate")) {
+					return validate.OptionalValue(ctx, op, fldPath, obj, oldObj)
+				} else {
+					return nil // skip validation
 				}
-				if e := validate.OptionalValue(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
-					earlyReturn = true
-				}
-				if earlyReturn {
-					return // do not proceed
-				}
+			}(); len(e) != 0 {
+				earlyReturn = true
+			}
+			if earlyReturn {
+				return // do not proceed
 			}
 			return
 		}(fldPath.Child("valueField"), &obj.ValueField, safe.Field(oldObj, func(oldObj *TypesStruct) *string { return &oldObj.ValueField }), oldObj != nil)...)
@@ -290,31 +340,41 @@ func Validate_TypesStruct(ctx context.Context, op operation.Operation, fldPath *
 			if oldValueCorrelated && op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
 				return nil
 			}
-			if op.HasOption("StructPtrGate") {
-				// call field-attached validations
-				earlyReturn := false
-				if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
-					earlyReturn = true
+			// call field-attached validations
+			earlyReturn := false
+			if e := func() field.ErrorList {
+				if op.HasOption("StructPtrGate") {
+					return validate.OptionalPointer(ctx, op, fldPath, obj, oldObj)
+				} else {
+					return nil // skip validation
 				}
-				if earlyReturn {
-					return // do not proceed
-				}
-				// call the type's validation function
-				errs = append(errs, Validate_InnerStruct(ctx, op, fldPath, obj, oldObj)...)
-			} else {
-				// field is forbidden when StructPtrGate is disabled
-				earlyReturn := false
-				if e := validate.ForbiddenPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
-					errs = append(errs, e...)
-					earlyReturn = true
-				}
-				if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
-					earlyReturn = true
-				}
-				if earlyReturn {
-					return // do not proceed
-				}
+			}(); len(e) != 0 {
+				earlyReturn = true
 			}
+			if e := func() field.ErrorList {
+				if !(op.HasOption("StructPtrGate")) {
+					return validate.ForbiddenPointer(ctx, op, fldPath, obj, oldObj)
+				} else {
+					return nil // skip validation
+				}
+			}(); len(e) != 0 {
+				errs = append(errs, e...)
+				earlyReturn = true
+			}
+			if e := func() field.ErrorList {
+				if !(op.HasOption("StructPtrGate")) {
+					return validate.OptionalPointer(ctx, op, fldPath, obj, oldObj)
+				} else {
+					return nil // skip validation
+				}
+			}(); len(e) != 0 {
+				earlyReturn = true
+			}
+			if earlyReturn {
+				return // do not proceed
+			}
+			// call the type's validation function
+			errs = append(errs, Validate_InnerStruct(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("structPtrField"), obj.StructPtrField, safe.Field(oldObj, func(oldObj *TypesStruct) *InnerStruct { return oldObj.StructPtrField }), oldObj != nil)...)
 

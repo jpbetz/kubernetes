@@ -1104,21 +1104,6 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			validations := fld.fieldValidations
 			fldRatchetingChecked := false
 
-			// If the field has gate checks, wrap the entire validation block
-			// in a gate-enabled check with a forbidden fallback.
-			hasGateCheck := len(validations.GateChecks) > 0
-			if hasGateCheck {
-				// Emit ratcheting before the gate check so it applies to
-				// both branches and is not duplicated.
-				emitRatchetingCheck(c, fld.childType, bufsw)
-				fldRatchetingChecked = true
-				var conds []string
-				for _, gc := range validations.GateChecks {
-					conds = append(conds, fmt.Sprintf("op.HasOption(%q)", gc.GateName))
-				}
-				bufsw.Do(fmt.Sprintf("if %s {\n", strings.Join(conds, " && ")), nil)
-			}
-
 			if !validations.Empty() {
 				emitComments(validations.Comments, bufsw)
 				if len(validations.Functions) > 0 {
@@ -1194,22 +1179,6 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 					// Descend into this field.
 					g.emitValidationForChild(c, fld, bufsw)
 				}
-			}
-
-			// Close the gate check block and emit the forbidden fallback.
-			if hasGateCheck {
-				var gateNames []string
-				for _, gc := range validations.GateChecks {
-					gateNames = append(gateNames, gc.GateName)
-				}
-				bufsw.Do("} else {\n", nil)
-				verb := "is"
-				if len(gateNames) > 1 {
-					verb = "are"
-				}
-				bufsw.Do(fmt.Sprintf("// field is forbidden when %s %s disabled\n", strings.Join(gateNames, ", "), verb), nil)
-				emitCallsToValidators(c, validations.GateChecks[0].ForbiddenFunctions, bufsw)
-				bufsw.Do("}\n", nil)
 			}
 
 			if buf.Len() > 0 {
@@ -1395,17 +1364,7 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 				emitCall = func() {
 					sw.Do("func() $.field.ErrorList|raw$ {\n", targs)
 					sw.Do("  if ", nil)
-					firstCondition := true
-					if len(v.Conditions.OptionEnabled) > 0 {
-						sw.Do("op.HasOption($.$)", strconv.Quote(v.Conditions.OptionEnabled))
-						firstCondition = false
-					}
-					if len(v.Conditions.OptionDisabled) > 0 {
-						if !firstCondition {
-							sw.Do(" && ", nil)
-						}
-						sw.Do("!op.HasOption($.$)", strconv.Quote(v.Conditions.OptionDisabled))
-					}
+					emitCondition(sw, v.Conditions)
 					sw.Do(" {\n", nil)
 					sw.Do("    return ", nil)
 					emitBaseFunction()
@@ -1504,6 +1463,23 @@ func sortIntoCohorts(in []validators.FunctionGen) [][]validators.FunctionGen {
 		result = append(result, sorted)
 	}
 	return result
+}
+
+// emitCondition writes a Go condition expression from a Conditions struct.
+func emitCondition(sw *generator.SnippetWriter, cond validators.Conditions) {
+	// Build the inner condition parts.
+	var parts []string
+	for _, opt := range cond.OptionsEnabled {
+		parts = append(parts, fmt.Sprintf("op.HasOption(%s)", strconv.Quote(opt)))
+	}
+	for _, opt := range cond.OptionsDisabled {
+		parts = append(parts, fmt.Sprintf("!op.HasOption(%s)", strconv.Quote(opt)))
+	}
+	expr := strings.Join(parts, " && ")
+	if cond.Inverted {
+		expr = "!(" + expr + ")"
+	}
+	sw.Do(expr, nil)
 }
 
 func emitComments(comments []string, sw *generator.SnippetWriter) {

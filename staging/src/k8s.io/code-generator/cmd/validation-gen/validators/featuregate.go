@@ -30,14 +30,20 @@ const (
 )
 
 func init() {
-	RegisterTagValidator(&featureGateTagValidator{})
+	// Shared state between the tag validator and field validator.
+	// The tag validator records gate names per field path; the field
+	// validator uses them to produce forbidden functions.
+	byPath := map[string][]string{}
+	RegisterTagValidator(&featureGateTagValidator{byPath: byPath})
+	RegisterFieldValidator(&featureGateFieldValidator{byPath: byPath})
 }
 
 // featureGateTagValidator handles +k8s:featureGate=GateName.
-// It returns a GateCheck which tells the emitter to wrap the field's
-// validations in a gate-enabled check and emit a forbidden fallback
-// when the gate is disabled.
-type featureGateTagValidator struct{}
+// It records the gate name and returns DefaultConditions so that all
+// other validations on this field are conditioned on the gate being enabled.
+type featureGateTagValidator struct {
+	byPath map[string][]string // field path -> gate names
+}
 
 func (*featureGateTagValidator) Init(_ Config) {}
 
@@ -56,22 +62,67 @@ func (fgtv *featureGateTagValidator) GetValidations(context Context, tag codetag
 		return Validations{}, fmt.Errorf("missing required feature gate name")
 	}
 
-	forbiddenFns, err := forbiddenFunctionsForType(context.Type)
+	// Validate the type is suitable for feature gating.
+	if util.NativeType(context.Type).Kind == types.Struct {
+		return Validations{}, fmt.Errorf("non-pointer structs cannot use the %q tag", featureGateTagName)
+	}
+
+	// Record the gate name for this field path.
+	fgtv.byPath[context.Path.String()] = append(fgtv.byPath[context.Path.String()], tag.Value)
+
+	// Return DefaultConditions to gate all other validations on this field.
+	return Validations{
+		DefaultConditions: &Conditions{OptionsEnabled: []string{tag.Value}},
+	}, nil
+}
+
+func (fgtv *featureGateTagValidator) Docs() TagDoc {
+	return TagDoc{
+		Tag:            fgtv.TagName(),
+		StabilityLevel: TagStabilityLevelAlpha,
+		Scopes:         sets.List(fgtv.ValidScopes()),
+		Description:    "Declares that a field is gated behind a feature gate. When the gate is disabled, the field is forbidden. When enabled, normal validation applies.",
+		Payloads: []TagPayloadDoc{{
+			Description: "<gate-name>",
+			Docs:        "The name of the feature gate. Use multiple +k8s:featureGate tags for multiple gates; all must be enabled for the field to be allowed.",
+		}},
+		PayloadsType:     codetags.ValueTypeString,
+		PayloadsRequired: true,
+	}
+}
+
+// featureGateFieldValidator runs after all tag validators and produces
+// the forbidden + optional short-circuit functions for gated fields.
+type featureGateFieldValidator struct {
+	byPath map[string][]string // field path -> gate names (shared with tag validator)
+}
+
+func (*featureGateFieldValidator) Init(_ Config) {}
+
+func (*featureGateFieldValidator) Name() string {
+	return "featureGate"
+}
+
+func (fv *featureGateFieldValidator) GetValidations(context Context) (Validations, error) {
+	gates := fv.byPath[context.Path.String()]
+	if len(gates) == 0 {
+		return Validations{}, nil
+	}
+
+	fns, err := forbiddenFunctionsForType(context.Type, gates)
 	if err != nil {
-		return Validations{}, fmt.Errorf("tag %q: %w", featureGateTagName, err)
+		return Validations{}, fmt.Errorf("field validator %q: %w", fv.Name(), err)
 	}
 
 	return Validations{
-		GateChecks: []GateCheck{{
-			GateName:           tag.Value,
-			ForbiddenFunctions: forbiddenFns,
-		}},
+		Functions: fns,
 	}, nil
 }
 
 // forbiddenFunctionsForType returns the forbidden + optional short-circuit
-// function pair for the given type, mirroring requirednessTagValidator.doForbidden().
-func forbiddenFunctionsForType(t *types.Type) ([]FunctionGen, error) {
+// function pair for the given type, with conditions set to the inverted gate
+// check (i.e., they fire when any gate is disabled).
+func forbiddenFunctionsForType(t *types.Type, gates []string) ([]FunctionGen, error) {
 	var forbidden, optional types.Name
 	switch util.NativeType(t).Kind {
 	case types.Slice:
@@ -90,23 +141,9 @@ func forbiddenFunctionsForType(t *types.Type) ([]FunctionGen, error) {
 		optional = optionalValueValidator
 	}
 
+	cond := Conditions{OptionsEnabled: gates, Inverted: true}
 	return []FunctionGen{
-		Function(featureGateTagName, ShortCircuit, forbidden),
-		Function(featureGateTagName, ShortCircuit|NonError, optional),
+		Function(featureGateTagName, ShortCircuit, forbidden).WithConditions(cond),
+		Function(featureGateTagName, ShortCircuit|NonError, optional).WithConditions(cond),
 	}, nil
-}
-
-func (fgtv *featureGateTagValidator) Docs() TagDoc {
-	return TagDoc{
-		Tag:            fgtv.TagName(),
-		StabilityLevel: TagStabilityLevelAlpha,
-		Scopes:         sets.List(fgtv.ValidScopes()),
-		Description:    "Declares that a field is gated behind a feature gate. When the gate is disabled, the field is forbidden. When enabled, normal validation applies.",
-		Payloads: []TagPayloadDoc{{
-			Description: "<gate-name>",
-			Docs:        "The name of the feature gate. Use multiple +k8s:featureGate tags for multiple gates; all must be enabled for the field to be allowed.",
-		}},
-		PayloadsType:     codetags.ValueTypeString,
-		PayloadsRequired: true,
-	}
 }
