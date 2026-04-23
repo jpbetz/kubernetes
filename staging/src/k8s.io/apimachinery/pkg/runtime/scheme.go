@@ -358,6 +358,14 @@ func (s *Scheme) Default(src Object) {
 	}
 }
 
+// HasDefaultingFunc reports whether a defaulting function has been registered
+// for the provided Object. This is primarily useful for tests that audit
+// code-generator registration across every type in a scheme.
+func (s *Scheme) HasDefaultingFunc(src Object) bool {
+	_, ok := s.defaulterFuncs[reflect.TypeOf(src)]
+	return ok
+}
+
 // AddValidationFunc registered a function that can validate the object, and
 // oldObject. These functions will be invoked when Validate() or ValidateUpdate()
 // is called. The function will never be called unless the validated object
@@ -365,6 +373,14 @@ func (s *Scheme) Default(src Object) {
 // fn passed to the later call will be used instead.
 func (s *Scheme) AddValidationFunc(srcType Object, fn func(ctx context.Context, op operation.Operation, object, oldObject interface{}) field.ErrorList) {
 	s.validationFuncs[reflect.TypeOf(srcType)] = fn
+}
+
+// HasValidationFunc reports whether a validation function has been registered
+// for the provided Object. This is primarily useful for tests that audit
+// code-generator registration across every type in a scheme.
+func (s *Scheme) HasValidationFunc(src Object) bool {
+	_, ok := s.validationFuncs[reflect.TypeOf(src)]
+	return ok
 }
 
 // Validate validates the provided Object according to the generated declarative validation code.
