@@ -31,6 +31,7 @@ import (
 	validate "k8s.io/apimachinery/pkg/api/validate"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
+	extensionsv1beta1 "k8s.io/kubernetes/pkg/apis/extensions/v1beta1"
 )
 
 func init() { localSchemeBuilder.Register(RegisterValidations) }
@@ -97,7 +98,7 @@ func Validate_NetworkPolicy(ctx context.Context, op operation.Operation, fldPath
 				return nil
 			}
 			// call the type's validation function
-			errs = append(errs, Validate_NetworkPolicySpec(ctx, op, fldPath, obj, oldObj)...)
+			errs = append(errs, extensionsv1beta1.Validate_NetworkPolicySpec(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("spec"), &obj.Spec, safe.Field(oldObj, func(oldObj *NetworkPolicy) *NetworkPolicySpec { return &oldObj.Spec }), oldObj != nil)...)
 
@@ -125,7 +126,7 @@ func Validate_NetworkPolicyEgressRule(ctx context.Context, op operation.Operatio
 				return // do not proceed
 			}
 			// iterate the list and call the type's validation function
-			errs = append(errs, validate.EachSliceVal(ctx, op, fldPath, obj, oldObj, nil, nil, Validate_NetworkPolicyPeer)...)
+			errs = append(errs, validate.EachSliceVal(ctx, op, fldPath, obj, oldObj, nil, nil, extensionsv1beta1.Validate_NetworkPolicyPeer)...)
 			return
 		}(fldPath.Child("to"), obj.To, safe.Field(oldObj, func(oldObj *NetworkPolicyEgressRule) []NetworkPolicyPeer { return oldObj.To }), oldObj != nil)...)
 
@@ -153,7 +154,7 @@ func Validate_NetworkPolicyIngressRule(ctx context.Context, op operation.Operati
 				return // do not proceed
 			}
 			// iterate the list and call the type's validation function
-			errs = append(errs, validate.EachSliceVal(ctx, op, fldPath, obj, oldObj, nil, nil, Validate_NetworkPolicyPeer)...)
+			errs = append(errs, validate.EachSliceVal(ctx, op, fldPath, obj, oldObj, nil, nil, extensionsv1beta1.Validate_NetworkPolicyPeer)...)
 			return
 		}(fldPath.Child("from"), obj.From, safe.Field(oldObj, func(oldObj *NetworkPolicyIngressRule) []NetworkPolicyPeer { return oldObj.From }), oldObj != nil)...)
 
@@ -182,7 +183,7 @@ func Validate_NetworkPolicyPeer(ctx context.Context, op operation.Operation, fld
 				return // do not proceed
 			}
 			// call the type's validation function
-			errs = append(errs, Validate_IPBlock(ctx, op, fldPath, obj, oldObj)...)
+			errs = append(errs, extensionsv1beta1.Validate_IPBlock(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("ipBlock"), obj.IPBlock, safe.Field(oldObj, func(oldObj *NetworkPolicyPeer) *IPBlock { return oldObj.IPBlock }), oldObj != nil)...)
 
@@ -210,7 +211,7 @@ func Validate_NetworkPolicySpec(ctx context.Context, op operation.Operation, fld
 				return // do not proceed
 			}
 			// iterate the list and call the type's validation function
-			errs = append(errs, validate.EachSliceVal(ctx, op, fldPath, obj, oldObj, nil, nil, Validate_NetworkPolicyIngressRule)...)
+			errs = append(errs, validate.EachSliceVal(ctx, op, fldPath, obj, oldObj, nil, nil, extensionsv1beta1.Validate_NetworkPolicyIngressRule)...)
 			return
 		}(fldPath.Child("ingress"), obj.Ingress, safe.Field(oldObj, func(oldObj *NetworkPolicySpec) []NetworkPolicyIngressRule { return oldObj.Ingress }), oldObj != nil)...)
 
@@ -230,7 +231,7 @@ func Validate_NetworkPolicySpec(ctx context.Context, op operation.Operation, fld
 				return // do not proceed
 			}
 			// iterate the list and call the type's validation function
-			errs = append(errs, validate.EachSliceVal(ctx, op, fldPath, obj, oldObj, nil, nil, Validate_NetworkPolicyEgressRule)...)
+			errs = append(errs, validate.EachSliceVal(ctx, op, fldPath, obj, oldObj, nil, nil, extensionsv1beta1.Validate_NetworkPolicyEgressRule)...)
 			return
 		}(fldPath.Child("egress"), obj.Egress, safe.Field(oldObj, func(oldObj *NetworkPolicySpec) []NetworkPolicyEgressRule { return oldObj.Egress }), oldObj != nil)...)
 
@@ -252,7 +253,7 @@ func Validate_Scale(ctx context.Context, op operation.Operation, fldPath *field.
 				return nil
 			}
 			// call the type's validation function
-			errs = append(errs, Validate_ScaleSpec(ctx, op, fldPath, obj, oldObj)...)
+			errs = append(errs, extensionsv1beta1.Validate_ScaleSpec(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("spec"), &obj.Spec, safe.Field(oldObj, func(oldObj *Scale) *ScaleSpec { return &oldObj.Spec }), oldObj != nil)...)
 
