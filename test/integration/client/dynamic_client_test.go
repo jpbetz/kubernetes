@@ -622,6 +622,43 @@ func TestDynamicClientCBOREnablement(t *testing.T) {
 	}
 }
 
+func TestDynamicClientCreateUnstructuredFromJSONWithCBOR(t *testing.T) {
+
+	server := kubeapiservertesting.StartTestServerOrDie(t, nil, framework.DefaultTestServerFlags(), framework.SharedEtcd())
+	t.Cleanup(server.TearDownFn)
+
+	config := rest.CopyConfig(server.ClientConfig)
+	//config.Wrap(framework.AssertRequestResponseAsCBOR(t))
+	dynamicClient, err := dynamic.NewForConfig(config)
+	if err != nil {
+		t.Fatalf("unexpected error creating dynamic client: %v", err)
+	}
+
+	// Mirrors how test/integration/etcd and the dynamic client's typical user code build payloads:
+	// JSON -> map[string]interface{}. Numeric fields end up as float64.
+	stub := `{"metadata":{"name":"test-cbor-int","namespace":"default"},"spec":{"terminationGracePeriodSeconds":30,"containers":[{"name":"c","image":"i"}]}}`
+	obj := &unstructured.Unstructured{Object: map[string]interface{}{}}
+	if err := json.Unmarshal([]byte(stub), &obj.Object); err != nil {
+		t.Fatalf("invalid stub: %v", err)
+	}
+	if got, want := obj.Object["spec"].(map[string]interface{})["terminationGracePeriodSeconds"], float64(30); got != want {
+		t.Fatalf("precondition: terminationGracePeriodSeconds should be float64(30) after JSON unmarshal, got %v (%T)", got, got)
+	}
+
+	created, err := dynamicClient.Resource(corev1.SchemeGroupVersion.WithResource("pods")).Namespace("default").Create(
+		context.TODO(),
+		obj,
+		metav1.CreateOptions{DryRun: []string{metav1.DryRunAll}},
+	)
+	if err != nil {
+		t.Fatalf("Create failed: %v", err)
+	}
+
+	if got, found, err := unstructured.NestedInt64(created.Object, "spec", "terminationGracePeriodSeconds"); err != nil || !found || got != 30 {
+		t.Fatalf("expected terminationGracePeriodSeconds=30 to round-trip, got value=%d found=%v err=%v", got, found, err)
+	}
+}
+
 func TestUnsupportedMediaTypeCircuitBreakerDynamicClient(t *testing.T) {
 	clientfeaturestesting.SetFeatureDuringTest(t, clientfeatures.ClientsAllowCBOR, true)
 	clientfeaturestesting.SetFeatureDuringTest(t, clientfeatures.ClientsPreferCBOR, true)
