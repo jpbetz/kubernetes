@@ -98,6 +98,12 @@ func (v *validatingAdmissionPolicyStrategy) Validate(ctx context.Context, obj ru
 	return errs
 }
 
+func (*validatingAdmissionPolicyStrategy) DeclarativeValidationConfig(ctx context.Context, obj, oldObj runtime.Object) rest.DeclarativeValidationConfig {
+	return rest.DeclarativeValidationConfig{
+		DeclarativeEnforcement: true,
+	}
+}
+
 // WarningsOnCreate returns warnings for the creation of the given object.
 func (v *validatingAdmissionPolicyStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
 	ic := obj.(*admissionregistration.ValidatingAdmissionPolicy)
