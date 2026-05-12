@@ -216,6 +216,7 @@ type ValidatingAdmissionPolicySpec struct {
 	// If ParamKind refers to a non-existent kind, this policy definition is mis-configured and the FailurePolicy is applied.
 	// If paramKind is specified but paramRef is unset in ValidatingAdmissionPolicyBinding, the params variable will be null.
 	// +optional
+	// +k8s:optional
 	ParamKind *ParamKind `json:"paramKind,omitempty" protobuf:"bytes,1,rep,name=paramKind"`
 
 	// matchConstraints specifies what resources this policy is designed to validate.
@@ -303,6 +304,8 @@ type ParamKind struct {
 
 	// kind is the API kind the resources belong to.
 	// Required.
+	// +k8s:alpha(since: "1.37")=+k8s:required
+	// +k8s:alpha(since: "1.37")=+k8s:maxLength=4
 	Kind string `json:"kind,omitempty" protobuf:"bytes,2,rep,name=kind"`
 }
 
@@ -1140,6 +1143,7 @@ type MutatingAdmissionPolicySpec struct {
 	// If paramKind refers to a non-existent kind, this policy definition is mis-configured and the FailurePolicy is applied.
 	// If paramKind is specified but paramRef is unset in MutatingAdmissionPolicyBinding, the params variable will be null.
 	// +optional
+	// +k8s:optional
 	ParamKind *ParamKind `json:"paramKind,omitempty" protobuf:"bytes,1,rep,name=paramKind"`
 
 	// matchConstraints specifies what resources this policy is designed to validate.
