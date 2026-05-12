@@ -852,7 +852,7 @@ func validateParamKind(gvk admissionregistration.ParamKind, fldPath *field.Path)
 		}
 	}
 	if len(gvk.Kind) == 0 {
-		allErrors = append(allErrors, field.Required(fldPath.Child("kind"), ""))
+		allErrors = append(allErrors, field.Required(fldPath.Child("kind"), "").MarkCoveredByDeclarative())
 	} else if errs := utilvalidation.IsDNS1035Label(strings.ToLower(gvk.Kind)); len(errs) > 0 {
 		allErrors = append(allErrors, field.Invalid(fldPath.Child("kind"), gvk.Kind, "may have mixed case, but should otherwise match: "+strings.Join(errs, ",")))
 	}
