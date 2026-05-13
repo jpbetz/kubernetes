@@ -194,7 +194,7 @@ func Validate_ParamKind(
 			if earlyReturn {
 				return // do not proceed
 			}
-			if e := validate.MaxLength(ctx, op, fldPath, obj, oldObj, 4).MarkAlpha(); len(e) != 0 {
+			if e := validate.MaxLength(ctx, op, fldPath, obj, oldObj, 4); len(e) != 0 {
 				errs = append(errs, e...)
 			}
 			return

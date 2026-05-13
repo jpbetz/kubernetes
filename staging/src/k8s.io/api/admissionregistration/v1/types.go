@@ -305,7 +305,7 @@ type ParamKind struct {
 	// kind is the API kind the resources belong to.
 	// Required.
 	// +k8s:alpha(since: "1.37")=+k8s:required
-	// +k8s:alpha(since: "1.37")=+k8s:maxLength=4
+	// +k8s:maxLength=4
 	Kind string `json:"kind,omitempty" protobuf:"bytes,2,rep,name=kind"`
 }
 

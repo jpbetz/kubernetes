@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package validatingadmissionpolicy
+package mutatingadmissionpolicy
 
 import (
 	"testing"
@@ -25,8 +25,8 @@ import (
 	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	apitesting "k8s.io/kubernetes/pkg/api/testing"
 	"k8s.io/kubernetes/pkg/apis/admissionregistration"
+	registry "k8s.io/kubernetes/pkg/registry/admissionregistration/mutatingadmissionpolicy"
 	"k8s.io/kubernetes/pkg/registry/admissionregistration/resolver"
-	registry "k8s.io/kubernetes/pkg/registry/admissionregistration/validatingadmissionpolicy"
 )
 
 var resourceResolver resolver.ResourceResolverFunc = func(gvk schema.GroupVersionKind) (schema.GroupVersionResource, error) {
@@ -49,7 +49,7 @@ func testDeclarativeValidate(t *testing.T, apiVersion string) {
 	ctx := genericapirequest.WithRequestInfo(genericapirequest.NewDefaultContext(), &genericapirequest.RequestInfo{
 		APIGroup:          "admissionregistration.k8s.io",
 		APIVersion:        apiVersion,
-		Resource:          "validatingadmissionpolicies",
+		Resource:          "mutatingadmissionpolicies",
 		IsResourceRequest: true,
 		Verb:              "create",
 	})
@@ -57,7 +57,7 @@ func testDeclarativeValidate(t *testing.T, apiVersion string) {
 	strategy := registry.NewStrategy(nil, resourceResolver)
 
 	testCases := map[string]struct {
-		input        admissionregistration.ValidatingAdmissionPolicy
+		input        admissionregistration.MutatingAdmissionPolicy
 		expectedErrs field.ErrorList
 	}{
 		"valid": {
@@ -96,7 +96,7 @@ func testDeclarativeValidateUpdate(t *testing.T, apiVersion string) {
 		APIPrefix:         "apis",
 		APIGroup:          "admissionregistration.k8s.io",
 		APIVersion:        apiVersion,
-		Resource:          "validatingadmissionpolicies",
+		Resource:          "mutatingadmissionpolicies",
 		Name:              "valid-policy",
 		IsResourceRequest: true,
 		Verb:              "update",
@@ -105,8 +105,8 @@ func testDeclarativeValidateUpdate(t *testing.T, apiVersion string) {
 	strategy := registry.NewStrategy(nil, resourceResolver)
 
 	testCases := map[string]struct {
-		oldObj       admissionregistration.ValidatingAdmissionPolicy
-		updateObj    admissionregistration.ValidatingAdmissionPolicy
+		oldObj       admissionregistration.MutatingAdmissionPolicy
+		updateObj    admissionregistration.MutatingAdmissionPolicy
 		expectedErrs field.ErrorList
 	}{
 		"valid update": {
@@ -128,19 +128,23 @@ func testDeclarativeValidateUpdate(t *testing.T, apiVersion string) {
 	}
 }
 
-func mkValidPolicy(tweaks ...func(obj *admissionregistration.ValidatingAdmissionPolicy)) admissionregistration.ValidatingAdmissionPolicy {
+func mkValidPolicy(tweaks ...func(obj *admissionregistration.MutatingAdmissionPolicy)) admissionregistration.MutatingAdmissionPolicy {
 	ignore := admissionregistration.Ignore
-	obj := admissionregistration.ValidatingAdmissionPolicy{
+	obj := admissionregistration.MutatingAdmissionPolicy{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "valid-policy",
 		},
-		Spec: admissionregistration.ValidatingAdmissionPolicySpec{
+		Spec: admissionregistration.MutatingAdmissionPolicySpec{
 			ParamKind: &admissionregistration.ParamKind{
 				Kind:       "abcd",
 				APIVersion: "rules.example.com/v1",
 			},
-			Validations: []admissionregistration.Validation{
-				{Expression: "object.spec.replicas <= params.maxReplicas"},
+			Mutations: []admissionregistration.Mutation{
+				{
+					JSONPatch: &admissionregistration.JSONPatch{
+						Expression: "object.spec.replicas <= params.maxReplicas",
+					},
+				},
 			},
 			MatchConstraints: &admissionregistration.MatchResources{
 				MatchPolicy: func() *admissionregistration.MatchPolicyType {
@@ -176,8 +180,8 @@ func mkValidPolicy(tweaks ...func(obj *admissionregistration.ValidatingAdmission
 	return obj
 }
 
-func tweakParamKindKind(kind string) func(obj *admissionregistration.ValidatingAdmissionPolicy) {
-	return func(obj *admissionregistration.ValidatingAdmissionPolicy) {
+func tweakParamKindKind(kind string) func(obj *admissionregistration.MutatingAdmissionPolicy) {
+	return func(obj *admissionregistration.MutatingAdmissionPolicy) {
 		obj.Spec.ParamKind.Kind = kind
 	}
 }
