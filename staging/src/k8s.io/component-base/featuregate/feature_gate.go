@@ -104,6 +104,37 @@ type FeatureSpec struct {
 	//  - With --min-compatibility-version=1.34 (default), FeatureA is Beta and disabled by default.
 	//  - With --min-compatibility-version=1.35, FeatureA becomes enabled by default.
 	MinCompatibilityVersion *version.Version
+
+	// Visibility of the feature. Defaults to External.
+	Visibility VisibilityType
+}
+
+// VisibilityType enumerates the visibility types of a feature.
+type VisibilityType int
+
+const (
+	// External identifies features to externally visible APIs and behaviors.
+	External VisibilityType = iota
+
+	// Internal identifies features that represent changes to the internals of a
+	// the system in ways that are not directly visible through the external
+	// APIs and behaviors of the system. This includes changes that are
+	// operatonally significant to the resource utilization and performce of the
+	// system, and communication with backend systems. Internal gates are often
+	// provided as a failsafe that can be disabled temprorarily if the change
+	// breaks in a particular environment.
+	Internal
+)
+
+func (t VisibilityType) String() string {
+	switch t {
+	case External:
+		return "External"
+	case Internal:
+		return "Internal"
+	default:
+		return fmt.Sprintf("Unknown GateType(%d)", int(t))
+	}
 }
 
 func (spec *FeatureSpec) HelpString(featureName Feature, includeCompatVer bool) string {
