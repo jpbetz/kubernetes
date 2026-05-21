@@ -202,7 +202,7 @@ func schema_pkg_apis_meta_v1_APIGroup(ref common.ReferenceCallback) common.OpenA
 					"preferredVersion": {
 						SchemaProps: spec.SchemaProps{
 							Description: "preferredVersion is the version preferred by the API server, which probably is the storage version.",
-							Default:     map[string]interface{}{},
+							Default:     map[string]interface{}{"groupVersion": "", "version": ""},
 							Ref:         ref(v1.GroupVersionForDiscovery{}.OpenAPIModelName()),
 						},
 					},
@@ -2809,7 +2809,7 @@ func schema_pkg_apis_apiregistration_v1_APIService(ref common.ReferenceCallback)
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Spec contains information for locating and communicating with a server",
-							Default:     map[string]interface{}{},
+							Default:     map[string]interface{}{"groupPriorityMinimum": 0, "versionPriority": 0},
 							Ref:         ref(apiregistrationv1.APIServiceSpec{}.OpenAPIModelName()),
 						},
 					},
@@ -3104,7 +3104,7 @@ func schema_pkg_apis_apiregistration_v1beta1_APIService(ref common.ReferenceCall
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Spec contains information for locating and communicating with a server",
-							Default:     map[string]interface{}{},
+							Default:     map[string]interface{}{"groupPriorityMinimum": 0, "versionPriority": 0},
 							Ref:         ref(v1beta1.APIServiceSpec{}.OpenAPIModelName()),
 						},
 					},

@@ -182,7 +182,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.kube-aggregator.pkg.apis.apiregistration.v1.APIServiceSpec
-      default: {}
+      default:
+        groupPriorityMinimum: 0
+        versionPriority: 0
     - name: status
       type:
         namedType: io.k8s.kube-aggregator.pkg.apis.apiregistration.v1.APIServiceStatus
@@ -272,7 +274,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.kube-aggregator.pkg.apis.apiregistration.v1beta1.APIServiceSpec
-      default: {}
+      default:
+        groupPriorityMinimum: 0
+        versionPriority: 0
     - name: status
       type:
         namedType: io.k8s.kube-aggregator.pkg.apis.apiregistration.v1beta1.APIServiceStatus

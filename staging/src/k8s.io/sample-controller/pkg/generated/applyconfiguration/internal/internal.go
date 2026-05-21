@@ -182,11 +182,13 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.sample-controller.pkg.apis.samplecontroller.v1alpha1.FooSpec
-      default: {}
+      default:
+        deploymentName: ""
     - name: status
       type:
         namedType: io.k8s.sample-controller.pkg.apis.samplecontroller.v1alpha1.FooStatus
-      default: {}
+      default:
+        availableReplicas: 0
 - name: io.k8s.sample-controller.pkg.apis.samplecontroller.v1alpha1.FooSpec
   map:
     fields:

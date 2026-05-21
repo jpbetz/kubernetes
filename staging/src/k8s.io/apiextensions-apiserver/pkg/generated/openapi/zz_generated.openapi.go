@@ -414,14 +414,14 @@ func schema_k8sio_api_autoscaling_v1_HorizontalPodAutoscaler(ref common.Referenc
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Description: "spec defines the behaviour of autoscaler. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status.",
-							Default:     map[string]interface{}{},
+							Default:     map[string]interface{}{"maxReplicas": 0, "scaleTargetRef": map[string]interface{}{"kind": "", "name": ""}},
 							Ref:         ref(v1.HorizontalPodAutoscalerSpec{}.OpenAPIModelName()),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Description: "status is the current information about the autoscaler.",
-							Default:     map[string]interface{}{},
+							Default:     map[string]interface{}{"currentReplicas": 0, "desiredReplicas": 0},
 							Ref:         ref(v1.HorizontalPodAutoscalerStatus{}.OpenAPIModelName()),
 						},
 					},
@@ -546,7 +546,7 @@ func schema_k8sio_api_autoscaling_v1_HorizontalPodAutoscalerSpec(ref common.Refe
 					"scaleTargetRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "scaleTargetRef is the reference to scaled resource; horizontal pod autoscaler will learn the current resource consumption and will set the desired number of pods by using its Scale subresource.",
-							Default:     map[string]interface{}{},
+							Default:     map[string]interface{}{"kind": "", "name": ""},
 							Ref:         ref(v1.CrossVersionObjectReference{}.OpenAPIModelName()),
 						},
 					},
@@ -753,7 +753,7 @@ func schema_k8sio_api_autoscaling_v1_ObjectMetricSource(ref common.ReferenceCall
 					"target": {
 						SchemaProps: spec.SchemaProps{
 							Description: "target is the described Kubernetes object.",
-							Default:     map[string]interface{}{},
+							Default:     map[string]interface{}{"kind": "", "name": ""},
 							Ref:         ref(v1.CrossVersionObjectReference{}.OpenAPIModelName()),
 						},
 					},
@@ -802,7 +802,7 @@ func schema_k8sio_api_autoscaling_v1_ObjectMetricStatus(ref common.ReferenceCall
 					"target": {
 						SchemaProps: spec.SchemaProps{
 							Description: "target is the described Kubernetes object.",
-							Default:     map[string]interface{}{},
+							Default:     map[string]interface{}{"kind": "", "name": ""},
 							Ref:         ref(v1.CrossVersionObjectReference{}.OpenAPIModelName()),
 						},
 					},
@@ -1025,7 +1025,7 @@ func schema_k8sio_api_autoscaling_v1_Scale(ref common.ReferenceCallback) common.
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Description: "status is the current status of the scale. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status. Read-only.",
-							Default:     map[string]interface{}{},
+							Default:     map[string]interface{}{"replicas": 0},
 							Ref:         ref(v1.ScaleStatus{}.OpenAPIModelName()),
 						},
 					},
@@ -1347,7 +1347,7 @@ func schema_pkg_apis_apiextensions_v1_CustomResourceDefinition(ref common.Refere
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Description: "spec describes how the user wants the resources to appear",
-							Default:     map[string]interface{}{},
+							Default:     map[string]interface{}{"group": "", "names": map[string]interface{}{"kind": "", "plural": ""}, "scope": ""},
 							Ref:         ref(apiextensionsv1.CustomResourceDefinitionSpec{}.OpenAPIModelName()),
 						},
 					},
@@ -1576,7 +1576,7 @@ func schema_pkg_apis_apiextensions_v1_CustomResourceDefinitionSpec(ref common.Re
 					"names": {
 						SchemaProps: spec.SchemaProps{
 							Description: "names specify the resource and kind names for the custom resource.",
-							Default:     map[string]interface{}{},
+							Default:     map[string]interface{}{"kind": "", "plural": ""},
 							Ref:         ref(apiextensionsv1.CustomResourceDefinitionNames{}.OpenAPIModelName()),
 						},
 					},
@@ -1659,7 +1659,7 @@ func schema_pkg_apis_apiextensions_v1_CustomResourceDefinitionStatus(ref common.
 					"acceptedNames": {
 						SchemaProps: spec.SchemaProps{
 							Description: "acceptedNames are the names that are actually being used to serve discovery. They may be different than the names in spec.",
-							Default:     map[string]interface{}{},
+							Default:     map[string]interface{}{"kind": "", "plural": ""},
 							Ref:         ref(apiextensionsv1.CustomResourceDefinitionNames{}.OpenAPIModelName()),
 						},
 					},
@@ -2840,7 +2840,7 @@ func schema_pkg_apis_apiextensions_v1beta1_CustomResourceDefinition(ref common.R
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Description: "spec describes how the user wants the resources to appear",
-							Default:     map[string]interface{}{},
+							Default:     map[string]interface{}{"group": "", "names": map[string]interface{}{"kind": "", "plural": ""}, "scope": ""},
 							Ref:         ref(v1beta1.CustomResourceDefinitionSpec{}.OpenAPIModelName()),
 						},
 					},
@@ -3076,7 +3076,7 @@ func schema_pkg_apis_apiextensions_v1beta1_CustomResourceDefinitionSpec(ref comm
 					"names": {
 						SchemaProps: spec.SchemaProps{
 							Description: "names specify the resource and kind names for the custom resource.",
-							Default:     map[string]interface{}{},
+							Default:     map[string]interface{}{"kind": "", "plural": ""},
 							Ref:         ref(v1beta1.CustomResourceDefinitionNames{}.OpenAPIModelName()),
 						},
 					},
@@ -3207,7 +3207,7 @@ func schema_pkg_apis_apiextensions_v1beta1_CustomResourceDefinitionStatus(ref co
 					"acceptedNames": {
 						SchemaProps: spec.SchemaProps{
 							Description: "acceptedNames are the names that are actually being used to serve discovery. They may be different than the names in spec.",
-							Default:     map[string]interface{}{},
+							Default:     map[string]interface{}{"kind": "", "plural": ""},
 							Ref:         ref(v1beta1.CustomResourceDefinitionNames{}.OpenAPIModelName()),
 						},
 					},
@@ -4166,7 +4166,7 @@ func schema_pkg_apis_meta_v1_APIGroup(ref common.ReferenceCallback) common.OpenA
 					"preferredVersion": {
 						SchemaProps: spec.SchemaProps{
 							Description: "preferredVersion is the version preferred by the API server, which probably is the storage version.",
-							Default:     map[string]interface{}{},
+							Default:     map[string]interface{}{"groupVersion": "", "version": ""},
 							Ref:         ref(metav1.GroupVersionForDiscovery{}.OpenAPIModelName()),
 						},
 					},

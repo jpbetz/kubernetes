@@ -193,7 +193,7 @@ func schema_pkg_apis_meta_v1_APIGroup(ref common.ReferenceCallback) common.OpenA
 					"preferredVersion": {
 						SchemaProps: spec.SchemaProps{
 							Description: "preferredVersion is the version preferred by the API server, which probably is the storage version.",
-							Default:     map[string]interface{}{},
+							Default:     map[string]interface{}{"groupVersion": "", "version": ""},
 							Ref:         ref(v1.GroupVersionForDiscovery{}.OpenAPIModelName()),
 						},
 					},
@@ -2798,13 +2798,13 @@ func schema_pkg_apis_samplecontroller_v1alpha1_Foo(ref common.ReferenceCallback)
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
+							Default: map[string]interface{}{"deploymentName": ""},
 							Ref:     ref(v1alpha1.FooSpec{}.OpenAPIModelName()),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
+							Default: map[string]interface{}{"availableReplicas": 0},
 							Ref:     ref(v1alpha1.FooStatus{}.OpenAPIModelName()),
 						},
 					},

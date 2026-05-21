@@ -89,7 +89,12 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinitionSpec
-      default: {}
+      default:
+        group: ""
+        names:
+          kind: ""
+          plural: ""
+        scope: ""
     - name: status
       type:
         namedType: io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinitionStatus
@@ -159,7 +164,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: names
       type:
         namedType: io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinitionNames
-      default: {}
+      default:
+        kind: ""
+        plural: ""
     - name: preserveUnknownFields
       type:
         scalar: boolean
@@ -179,7 +186,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: acceptedNames
       type:
         namedType: io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinitionNames
-      default: {}
+      default:
+        kind: ""
+        plural: ""
     - name: conditions
       type:
         list:
@@ -618,7 +627,12 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDefinitionSpec
-      default: {}
+      default:
+        group: ""
+        names:
+          kind: ""
+          plural: ""
+        scope: ""
     - name: status
       type:
         namedType: io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDefinitionStatus
@@ -694,7 +708,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: names
       type:
         namedType: io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDefinitionNames
-      default: {}
+      default:
+        kind: ""
+        plural: ""
     - name: preserveUnknownFields
       type:
         scalar: boolean
@@ -729,7 +745,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: acceptedNames
       type:
         namedType: io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDefinitionNames
-      default: {}
+      default:
+        kind: ""
+        plural: ""
     - name: conditions
       type:
         list:

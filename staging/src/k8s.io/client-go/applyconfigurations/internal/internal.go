@@ -1679,11 +1679,16 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.apps.v1.DaemonSetSpec
-      default: {}
+      default:
+        template: {}
     - name: status
       type:
         namedType: io.k8s.api.apps.v1.DaemonSetStatus
-      default: {}
+      default:
+        currentNumberScheduled: 0
+        desiredNumberScheduled: 0
+        numberMisscheduled: 0
+        numberReady: 0
 - name: io.k8s.api.apps.v1.DaemonSetCondition
   map:
     fields:
@@ -1791,7 +1796,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.apps.v1.DeploymentSpec
-      default: {}
+      default:
+        template: {}
     - name: status
       type:
         namedType: io.k8s.api.apps.v1.DeploymentStatus
@@ -1912,7 +1918,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: status
       type:
         namedType: io.k8s.api.apps.v1.ReplicaSetStatus
-      default: {}
+      default:
+        replicas: 0
 - name: io.k8s.api.apps.v1.ReplicaSetCondition
   map:
     fields:
@@ -2022,11 +2029,13 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.apps.v1.StatefulSetSpec
-      default: {}
+      default:
+        template: {}
     - name: status
       type:
         namedType: io.k8s.api.apps.v1.StatefulSetStatus
-      default: {}
+      default:
+        replicas: 0
 - name: io.k8s.api.apps.v1.StatefulSetCondition
   map:
     fields:
@@ -2190,7 +2199,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.apps.v1beta1.DeploymentSpec
-      default: {}
+      default:
+        template: {}
     - name: status
       type:
         namedType: io.k8s.api.apps.v1beta1.DeploymentStatus
@@ -2334,11 +2344,13 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.apps.v1beta1.StatefulSetSpec
-      default: {}
+      default:
+        template: {}
     - name: status
       type:
         namedType: io.k8s.api.apps.v1beta1.StatefulSetStatus
-      default: {}
+      default:
+        replicas: 0
 - name: io.k8s.api.apps.v1beta1.StatefulSetCondition
   map:
     fields:
@@ -2502,11 +2514,16 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.apps.v1beta2.DaemonSetSpec
-      default: {}
+      default:
+        template: {}
     - name: status
       type:
         namedType: io.k8s.api.apps.v1beta2.DaemonSetStatus
-      default: {}
+      default:
+        currentNumberScheduled: 0
+        desiredNumberScheduled: 0
+        numberMisscheduled: 0
+        numberReady: 0
 - name: io.k8s.api.apps.v1beta2.DaemonSetCondition
   map:
     fields:
@@ -2614,7 +2631,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.apps.v1beta2.DeploymentSpec
-      default: {}
+      default:
+        template: {}
     - name: status
       type:
         namedType: io.k8s.api.apps.v1beta2.DeploymentStatus
@@ -2735,7 +2753,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: status
       type:
         namedType: io.k8s.api.apps.v1beta2.ReplicaSetStatus
-      default: {}
+      default:
+        replicas: 0
 - name: io.k8s.api.apps.v1beta2.ReplicaSetCondition
   map:
     fields:
@@ -2845,11 +2864,13 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.apps.v1beta2.StatefulSetSpec
-      default: {}
+      default:
+        template: {}
     - name: status
       type:
         namedType: io.k8s.api.apps.v1beta2.StatefulSetStatus
-      default: {}
+      default:
+        replicas: 0
 - name: io.k8s.api.apps.v1beta2.StatefulSetCondition
   map:
     fields:
@@ -3008,11 +3029,17 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.autoscaling.v1.HorizontalPodAutoscalerSpec
-      default: {}
+      default:
+        maxReplicas: 0
+        scaleTargetRef:
+          kind: ""
+          name: ""
     - name: status
       type:
         namedType: io.k8s.api.autoscaling.v1.HorizontalPodAutoscalerStatus
-      default: {}
+      default:
+        currentReplicas: 0
+        desiredReplicas: 0
 - name: io.k8s.api.autoscaling.v1.HorizontalPodAutoscalerSpec
   map:
     fields:
@@ -3026,7 +3053,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: scaleTargetRef
       type:
         namedType: io.k8s.api.autoscaling.v1.CrossVersionObjectReference
-      default: {}
+      default:
+        kind: ""
+        name: ""
     - name: targetCPUUtilizationPercentage
       type:
         scalar: numeric
@@ -3064,7 +3093,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: target
       type:
         namedType: io.k8s.api.autoscaling.v2.MetricTarget
-      default: {}
+      default:
+        type: ""
 - name: io.k8s.api.autoscaling.v2.ContainerResourceMetricStatus
   map:
     fields:
@@ -3100,11 +3130,13 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: metric
       type:
         namedType: io.k8s.api.autoscaling.v2.MetricIdentifier
-      default: {}
+      default:
+        name: ""
     - name: target
       type:
         namedType: io.k8s.api.autoscaling.v2.MetricTarget
-      default: {}
+      default:
+        type: ""
 - name: io.k8s.api.autoscaling.v2.ExternalMetricStatus
   map:
     fields:
@@ -3115,7 +3147,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: metric
       type:
         namedType: io.k8s.api.autoscaling.v2.MetricIdentifier
-      default: {}
+      default:
+        name: ""
 - name: io.k8s.api.autoscaling.v2.HPAScalingPolicy
   map:
     fields:
@@ -3165,11 +3198,16 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerSpec
-      default: {}
+      default:
+        maxReplicas: 0
+        scaleTargetRef:
+          kind: ""
+          name: ""
     - name: status
       type:
         namedType: io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerStatus
-      default: {}
+      default:
+        desiredReplicas: 0
 - name: io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerBehavior
   map:
     fields:
@@ -3221,7 +3259,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: scaleTargetRef
       type:
         namedType: io.k8s.api.autoscaling.v2.CrossVersionObjectReference
-      default: {}
+      default:
+        kind: ""
+        name: ""
 - name: io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerStatus
   map:
     fields:
@@ -3340,15 +3380,19 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: describedObject
       type:
         namedType: io.k8s.api.autoscaling.v2.CrossVersionObjectReference
-      default: {}
+      default:
+        kind: ""
+        name: ""
     - name: metric
       type:
         namedType: io.k8s.api.autoscaling.v2.MetricIdentifier
-      default: {}
+      default:
+        name: ""
     - name: target
       type:
         namedType: io.k8s.api.autoscaling.v2.MetricTarget
-      default: {}
+      default:
+        type: ""
 - name: io.k8s.api.autoscaling.v2.ObjectMetricStatus
   map:
     fields:
@@ -3359,22 +3403,27 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: describedObject
       type:
         namedType: io.k8s.api.autoscaling.v2.CrossVersionObjectReference
-      default: {}
+      default:
+        kind: ""
+        name: ""
     - name: metric
       type:
         namedType: io.k8s.api.autoscaling.v2.MetricIdentifier
-      default: {}
+      default:
+        name: ""
 - name: io.k8s.api.autoscaling.v2.PodsMetricSource
   map:
     fields:
     - name: metric
       type:
         namedType: io.k8s.api.autoscaling.v2.MetricIdentifier
-      default: {}
+      default:
+        name: ""
     - name: target
       type:
         namedType: io.k8s.api.autoscaling.v2.MetricTarget
-      default: {}
+      default:
+        type: ""
 - name: io.k8s.api.autoscaling.v2.PodsMetricStatus
   map:
     fields:
@@ -3385,7 +3434,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: metric
       type:
         namedType: io.k8s.api.autoscaling.v2.MetricIdentifier
-      default: {}
+      default:
+        name: ""
 - name: io.k8s.api.autoscaling.v2.ResourceMetricSource
   map:
     fields:
@@ -3396,7 +3446,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: target
       type:
         namedType: io.k8s.api.autoscaling.v2.MetricTarget
-      default: {}
+      default:
+        type: ""
 - name: io.k8s.api.autoscaling.v2.ResourceMetricStatus
   map:
     fields:
@@ -3424,7 +3475,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.batch.v1.CronJobSpec
-      default: {}
+      default:
+        jobTemplate: {}
+        schedule: ""
     - name: status
       type:
         namedType: io.k8s.api.batch.v1.CronJobStatus
@@ -3489,7 +3542,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.batch.v1.JobSpec
-      default: {}
+      default:
+        template: {}
     - name: status
       type:
         namedType: io.k8s.api.batch.v1.JobStatus
@@ -3618,7 +3672,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.batch.v1.JobSpec
-      default: {}
+      default:
+        template: {}
 - name: io.k8s.api.batch.v1.PodFailurePolicy
   map:
     fields:
@@ -3720,7 +3775,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.batch.v1beta1.CronJobSpec
-      default: {}
+      default:
+        jobTemplate: {}
+        schedule: ""
     - name: status
       type:
         namedType: io.k8s.api.batch.v1beta1.CronJobStatus
@@ -3779,7 +3836,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.batch.v1.JobSpec
-      default: {}
+      default:
+        template: {}
 - name: io.k8s.api.certificates.v1.CertificateSigningRequest
   map:
     fields:
@@ -3796,7 +3854,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.certificates.v1.CertificateSigningRequestSpec
-      default: {}
+      default:
+        signerName: ""
     - name: status
       type:
         namedType: io.k8s.api.certificates.v1.CertificateSigningRequestStatus
@@ -3893,7 +3952,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.certificates.v1alpha1.ClusterTrustBundleSpec
-      default: {}
+      default:
+        trustBundle: ""
 - name: io.k8s.api.certificates.v1alpha1.ClusterTrustBundleSpec
   map:
     fields:
@@ -4016,7 +4076,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.certificates.v1beta1.ClusterTrustBundleSpec
-      default: {}
+      default:
+        trustBundle: ""
 - name: io.k8s.api.certificates.v1beta1.ClusterTrustBundleSpec
   map:
     fields:
@@ -4043,7 +4104,14 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.certificates.v1beta1.PodCertificateRequestSpec
-      default: {}
+      default:
+        nodeName: ""
+        nodeUID: ""
+        podName: ""
+        podUID: ""
+        serviceAccountName: ""
+        serviceAccountUID: ""
+        signerName: ""
     - name: status
       type:
         namedType: io.k8s.api.certificates.v1beta1.PodCertificateRequestStatus
@@ -4177,7 +4245,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.coordination.v1alpha2.LeaseCandidateSpec
-      default: {}
+      default:
+        binaryVersion: ""
+        leaseName: ""
 - name: io.k8s.api.coordination.v1alpha2.LeaseCandidateSpec
   map:
     fields:
@@ -4234,7 +4304,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.coordination.v1beta1.LeaseCandidateSpec
-      default: {}
+      default:
+        binaryVersion: ""
+        leaseName: ""
 - name: io.k8s.api.coordination.v1beta1.LeaseCandidateSpec
   map:
     fields:
@@ -6108,7 +6180,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: kubeletEndpoint
       type:
         namedType: io.k8s.api.core.v1.DaemonEndpoint
-      default: {}
+      default:
+        Port: 0
 - name: io.k8s.api.core.v1.NodeFeatures
   map:
     fields:
@@ -6261,7 +6334,17 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: nodeInfo
       type:
         namedType: io.k8s.api.core.v1.NodeSystemInfo
-      default: {}
+      default:
+        architecture: ""
+        bootID: ""
+        containerRuntimeVersion: ""
+        kernelVersion: ""
+        kubeProxyVersion: ""
+        kubeletVersion: ""
+        machineID: ""
+        operatingSystem: ""
+        osImage: ""
+        systemUUID: ""
     - name: phase
       type:
         scalar: string
@@ -7455,7 +7538,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: status
       type:
         namedType: io.k8s.api.core.v1.ReplicationControllerStatus
-      default: {}
+      default:
+        replicas: 0
 - name: io.k8s.api.core.v1.ReplicationControllerCondition
   map:
     fields:
@@ -8515,7 +8599,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: podAffinityTerm
       type:
         namedType: io.k8s.api.core.v1.PodAffinityTerm
-      default: {}
+      default:
+        topologyKey: ""
     - name: weight
       type:
         scalar: numeric
@@ -8919,11 +9004,16 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.extensions.v1beta1.DaemonSetSpec
-      default: {}
+      default:
+        template: {}
     - name: status
       type:
         namedType: io.k8s.api.extensions.v1beta1.DaemonSetStatus
-      default: {}
+      default:
+        currentNumberScheduled: 0
+        desiredNumberScheduled: 0
+        numberMisscheduled: 0
+        numberReady: 0
 - name: io.k8s.api.extensions.v1beta1.DaemonSetCondition
   map:
     fields:
@@ -9034,7 +9124,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.extensions.v1beta1.DeploymentSpec
-      default: {}
+      default:
+        template: {}
     - name: status
       type:
         namedType: io.k8s.api.extensions.v1beta1.DeploymentStatus
@@ -9309,7 +9400,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.extensions.v1beta1.NetworkPolicySpec
-      default: {}
+      default:
+        podSelector: {}
 - name: io.k8s.api.extensions.v1beta1.NetworkPolicyEgressRule
   map:
     fields:
@@ -9409,7 +9501,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: status
       type:
         namedType: io.k8s.api.extensions.v1beta1.ReplicaSetStatus
-      default: {}
+      default:
+        replicas: 0
 - name: io.k8s.api.extensions.v1beta1.ReplicaSetCondition
   map:
     fields:
@@ -9532,7 +9625,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.flowcontrol.v1.FlowSchemaSpec
-      default: {}
+      default:
+        priorityLevelConfiguration:
+          name: ""
     - name: status
       type:
         namedType: io.k8s.api.flowcontrol.v1.FlowSchemaStatus
@@ -9568,7 +9663,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: priorityLevelConfiguration
       type:
         namedType: io.k8s.api.flowcontrol.v1.PriorityLevelConfigurationReference
-      default: {}
+      default:
+        name: ""
     - name: rules
       type:
         list:
@@ -9620,7 +9716,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: limitResponse
       type:
         namedType: io.k8s.api.flowcontrol.v1.LimitResponse
-      default: {}
+      default:
+        type: ""
     - name: nominalConcurrencyShares
       type:
         scalar: numeric
@@ -9676,7 +9773,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.flowcontrol.v1.PriorityLevelConfigurationSpec
-      default: {}
+      default:
+        type: ""
     - name: status
       type:
         namedType: io.k8s.api.flowcontrol.v1.PriorityLevelConfigurationStatus
@@ -9857,7 +9955,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.flowcontrol.v1beta1.FlowSchemaSpec
-      default: {}
+      default:
+        priorityLevelConfiguration:
+          name: ""
     - name: status
       type:
         namedType: io.k8s.api.flowcontrol.v1beta1.FlowSchemaStatus
@@ -9893,7 +9993,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: priorityLevelConfiguration
       type:
         namedType: io.k8s.api.flowcontrol.v1beta1.PriorityLevelConfigurationReference
-      default: {}
+      default:
+        name: ""
     - name: rules
       type:
         list:
@@ -9949,7 +10050,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: limitResponse
       type:
         namedType: io.k8s.api.flowcontrol.v1beta1.LimitResponse
-      default: {}
+      default:
+        type: ""
 - name: io.k8s.api.flowcontrol.v1beta1.NonResourcePolicyRule
   map:
     fields:
@@ -10002,7 +10104,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.flowcontrol.v1beta1.PriorityLevelConfigurationSpec
-      default: {}
+      default:
+        type: ""
     - name: status
       type:
         namedType: io.k8s.api.flowcontrol.v1beta1.PriorityLevelConfigurationStatus
@@ -10183,7 +10286,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.flowcontrol.v1beta2.FlowSchemaSpec
-      default: {}
+      default:
+        priorityLevelConfiguration:
+          name: ""
     - name: status
       type:
         namedType: io.k8s.api.flowcontrol.v1beta2.FlowSchemaStatus
@@ -10219,7 +10324,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: priorityLevelConfiguration
       type:
         namedType: io.k8s.api.flowcontrol.v1beta2.PriorityLevelConfigurationReference
-      default: {}
+      default:
+        name: ""
     - name: rules
       type:
         list:
@@ -10275,7 +10381,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: limitResponse
       type:
         namedType: io.k8s.api.flowcontrol.v1beta2.LimitResponse
-      default: {}
+      default:
+        type: ""
 - name: io.k8s.api.flowcontrol.v1beta2.NonResourcePolicyRule
   map:
     fields:
@@ -10328,7 +10435,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.flowcontrol.v1beta2.PriorityLevelConfigurationSpec
-      default: {}
+      default:
+        type: ""
     - name: status
       type:
         namedType: io.k8s.api.flowcontrol.v1beta2.PriorityLevelConfigurationStatus
@@ -10509,7 +10617,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.flowcontrol.v1beta3.FlowSchemaSpec
-      default: {}
+      default:
+        priorityLevelConfiguration:
+          name: ""
     - name: status
       type:
         namedType: io.k8s.api.flowcontrol.v1beta3.FlowSchemaStatus
@@ -10545,7 +10655,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: priorityLevelConfiguration
       type:
         namedType: io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfigurationReference
-      default: {}
+      default:
+        name: ""
     - name: rules
       type:
         list:
@@ -10597,7 +10708,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: limitResponse
       type:
         namedType: io.k8s.api.flowcontrol.v1beta3.LimitResponse
-      default: {}
+      default:
+        type: ""
     - name: nominalConcurrencyShares
       type:
         scalar: numeric
@@ -10654,7 +10766,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfigurationSpec
-      default: {}
+      default:
+        type: ""
     - name: status
       type:
         namedType: io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfigurationStatus
@@ -11593,7 +11706,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.node.v1alpha1.RuntimeClassSpec
-      default: {}
+      default:
+        runtimeHandler: ""
 - name: io.k8s.api.node.v1alpha1.RuntimeClassSpec
   map:
     fields:
@@ -11889,7 +12003,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: roleRef
       type:
         namedType: io.k8s.api.rbac.v1.RoleRef
-      default: {}
+      default:
+        kind: ""
+        name: ""
     - name: subjects
       type:
         list:
@@ -11964,7 +12080,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: roleRef
       type:
         namedType: io.k8s.api.rbac.v1.RoleRef
-      default: {}
+      default:
+        kind: ""
+        name: ""
     - name: subjects
       type:
         list:
@@ -12052,7 +12170,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: roleRef
       type:
         namedType: io.k8s.api.rbac.v1alpha1.RoleRef
-      default: {}
+      default:
+        kind: ""
+        name: ""
     - name: subjects
       type:
         list:
@@ -12127,7 +12247,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: roleRef
       type:
         namedType: io.k8s.api.rbac.v1alpha1.RoleRef
-      default: {}
+      default:
+        kind: ""
+        name: ""
     - name: subjects
       type:
         list:
@@ -12213,7 +12335,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: roleRef
       type:
         namedType: io.k8s.api.rbac.v1beta1.RoleRef
-      default: {}
+      default:
+        kind: ""
+        name: ""
     - name: subjects
       type:
         list:
@@ -12288,7 +12412,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: roleRef
       type:
         namedType: io.k8s.api.rbac.v1beta1.RoleRef
-      default: {}
+      default:
+        kind: ""
+        name: ""
     - name: subjects
       type:
         list:
@@ -13006,7 +13132,12 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.resource.v1.ResourceSliceSpec
-      default: {}
+      default:
+        driver: ""
+        pool:
+          generation: 0
+          name: ""
+          resourceSliceCount: 0
 - name: io.k8s.api.resource.v1.ResourceSliceSpec
   map:
     fields:
@@ -13035,7 +13166,10 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: pool
       type:
         namedType: io.k8s.api.resource.v1.ResourcePool
-      default: {}
+      default:
+        generation: 0
+        name: ""
+        resourceSliceCount: 0
     - name: sharedCounters
       type:
         list:
@@ -13075,7 +13209,10 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.resource.v1alpha3.DeviceTaintRuleSpec
-      default: {}
+      default:
+        taint:
+          effect: ""
+          key: ""
     - name: status
       type:
         namedType: io.k8s.api.resource.v1alpha3.DeviceTaintRuleStatus
@@ -13089,7 +13226,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: taint
       type:
         namedType: io.k8s.api.resource.v1alpha3.DeviceTaint
-      default: {}
+      default:
+        effect: ""
+        key: ""
 - name: io.k8s.api.resource.v1alpha3.DeviceTaintRuleStatus
   map:
     fields:
@@ -13163,7 +13302,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.resource.v1alpha3.ResourcePoolStatusRequestSpec
-      default: {}
+      default:
+        driver: ""
     - name: status
       type:
         namedType: io.k8s.api.resource.v1alpha3.ResourcePoolStatusRequestStatus
@@ -13880,7 +14020,12 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.resource.v1beta1.ResourceSliceSpec
-      default: {}
+      default:
+        driver: ""
+        pool:
+          generation: 0
+          name: ""
+          resourceSliceCount: 0
 - name: io.k8s.api.resource.v1beta1.ResourceSliceSpec
   map:
     fields:
@@ -13909,7 +14054,10 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: pool
       type:
         namedType: io.k8s.api.resource.v1beta1.ResourcePool
-      default: {}
+      default:
+        generation: 0
+        name: ""
+        resourceSliceCount: 0
     - name: sharedCounters
       type:
         list:
@@ -14397,7 +14545,10 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.resource.v1beta2.DeviceTaintRuleSpec
-      default: {}
+      default:
+        taint:
+          effect: ""
+          key: ""
     - name: status
       type:
         namedType: io.k8s.api.resource.v1beta2.DeviceTaintRuleStatus
@@ -14411,7 +14562,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: taint
       type:
         namedType: io.k8s.api.resource.v1beta2.DeviceTaint
-      default: {}
+      default:
+        effect: ""
+        key: ""
 - name: io.k8s.api.resource.v1beta2.DeviceTaintRuleStatus
   map:
     fields:
@@ -14649,7 +14802,12 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.resource.v1beta2.ResourceSliceSpec
-      default: {}
+      default:
+        driver: ""
+        pool:
+          generation: 0
+          name: ""
+          resourceSliceCount: 0
 - name: io.k8s.api.resource.v1beta2.ResourceSliceSpec
   map:
     fields:
@@ -14678,7 +14836,10 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: pool
       type:
         namedType: io.k8s.api.resource.v1beta2.ResourcePool
-      default: {}
+      default:
+        generation: 0
+        name: ""
+        resourceSliceCount: 0
     - name: sharedCounters
       type:
         list:
@@ -14746,7 +14907,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.scheduling.v1alpha2.PodGroupSpec
-      default: {}
+      default:
+        schedulingPolicy: {}
     - name: status
       type:
         namedType: io.k8s.api.scheduling.v1alpha2.PodGroupStatus
@@ -15180,11 +15342,15 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.storage.v1.VolumeAttachmentSpec
-      default: {}
+      default:
+        attacher: ""
+        nodeName: ""
+        source: {}
     - name: status
       type:
         namedType: io.k8s.api.storage.v1.VolumeAttachmentStatus
-      default: {}
+      default:
+        attached: false
 - name: io.k8s.api.storage.v1.VolumeAttachmentSource
   map:
     fields:
@@ -15309,11 +15475,15 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.storage.v1alpha1.VolumeAttachmentSpec
-      default: {}
+      default:
+        attacher: ""
+        nodeName: ""
+        source: {}
     - name: status
       type:
         namedType: io.k8s.api.storage.v1alpha1.VolumeAttachmentStatus
-      default: {}
+      default:
+        attached: false
 - name: io.k8s.api.storage.v1alpha1.VolumeAttachmentSource
   map:
     fields:
@@ -15592,11 +15762,15 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.storage.v1beta1.VolumeAttachmentSpec
-      default: {}
+      default:
+        attacher: ""
+        nodeName: ""
+        source: {}
     - name: status
       type:
         namedType: io.k8s.api.storage.v1beta1.VolumeAttachmentStatus
-      default: {}
+      default:
+        attached: false
 - name: io.k8s.api.storage.v1beta1.VolumeAttachmentSource
   map:
     fields:
@@ -15695,7 +15869,10 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: spec
       type:
         namedType: io.k8s.api.storagemigration.v1beta1.StorageVersionMigrationSpec
-      default: {}
+      default:
+        resource:
+          group: ""
+          resource: ""
     - name: status
       type:
         namedType: io.k8s.api.storagemigration.v1beta1.StorageVersionMigrationStatus
@@ -15706,7 +15883,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: resource
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.GroupResource
-      default: {}
+      default:
+        group: ""
+        resource: ""
 - name: io.k8s.api.storagemigration.v1beta1.StorageVersionMigrationStatus
   map:
     fields:

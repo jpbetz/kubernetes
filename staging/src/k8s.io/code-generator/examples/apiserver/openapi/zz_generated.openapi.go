@@ -210,7 +210,7 @@ func schema_pkg_apis_meta_v1_APIGroup(ref common.ReferenceCallback) common.OpenA
 					"preferredVersion": {
 						SchemaProps: spec.SchemaProps{
 							Description: "preferredVersion is the version preferred by the API server, which probably is the storage version.",
-							Default:     map[string]interface{}{},
+							Default:     map[string]interface{}{"groupVersion": "", "version": ""},
 							Ref:         ref(v1.GroupVersionForDiscovery{}.OpenAPIModelName()),
 						},
 					},
@@ -2815,7 +2815,7 @@ func schema_apiserver_apis_core_v1_TestType(ref common.ReferenceCallback) common
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
+							Default: map[string]interface{}{"blah": ""},
 							Ref:     ref(corev1.TestTypeStatus{}.OpenAPIModelName()),
 						},
 					},
@@ -2903,7 +2903,7 @@ func schema_apiserver_apis_example_v1_Conversion(ref common.ReferenceCallback) c
 				Properties: map[string]spec.Schema{
 					"identical": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
+							Default: map[string]interface{}{"bool": false},
 							Ref:     ref(examplev1.MemoryIdentical{}.OpenAPIModelName()),
 						},
 					},
@@ -3017,7 +3017,7 @@ func schema_apiserver_apis_example_v1_ConversionCustomContainer(ref common.Refer
 					},
 					"struct": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
+							Default: map[string]interface{}{"privateField": "", "publicField": ""},
 							Ref:     ref(examplev1.ConversionCustom{}.OpenAPIModelName()),
 						},
 					},
@@ -3204,7 +3204,7 @@ func schema_apiserver_apis_example_v1_TestType(ref common.ReferenceCallback) com
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
+							Default: map[string]interface{}{"blah": ""},
 							Ref:     ref(examplev1.TestTypeStatus{}.OpenAPIModelName()),
 						},
 					},
@@ -3313,7 +3313,7 @@ func schema_apiserver_apis_example2_v1_TestType(ref common.ReferenceCallback) co
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
+							Default: map[string]interface{}{"blah": ""},
 							Ref:     ref(example2v1.TestTypeStatus{}.OpenAPIModelName()),
 						},
 					},
@@ -3422,7 +3422,7 @@ func schema_apiserver_apis_example3io_v1_TestType(ref common.ReferenceCallback) 
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
+							Default: map[string]interface{}{"blah": ""},
 							Ref:     ref(example3iov1.TestTypeStatus{}.OpenAPIModelName()),
 						},
 					},
