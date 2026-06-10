@@ -254,6 +254,11 @@ func (t *envelopeTransformer) TransformFromStorage(ctx context.Context, data []b
 
 // TransformToStorage encrypts data to be written to disk using envelope encryption.
 func (t *envelopeTransformer) TransformToStorage(ctx context.Context, data []byte, dataCtx value.Context) ([]byte, error) {
+	return t.TransformToStorageWithPrefix(ctx, nil, data, dataCtx)
+}
+
+// TransformToStorageWithPrefix is TransformToStorage with prefix prepended to the output.
+func (t *envelopeTransformer) TransformToStorageWithPrefix(ctx context.Context, prefix, data []byte, dataCtx value.Context) ([]byte, error) {
 	ctx, span := tracing.Start(ctx, "TransformToStorage with envelopeTransformer",
 		attribute.String("transformer.provider.name", t.providerName),
 		// The service.instance_id of the apiserver is already available in the trace
@@ -306,7 +311,7 @@ func (t *envelopeTransformer) TransformToStorage(ctx context.Context, data []byt
 
 	span.AddEvent("About to encode encrypted object")
 	// Serialize the EncryptedObject to a byte array.
-	out, err := t.doEncode(encObjectCopy)
+	out, err := t.doEncode(prefix, encObjectCopy)
 	if err != nil {
 		span.AddEvent("Encoding encrypted object failed")
 		span.RecordError(err)
@@ -341,12 +346,14 @@ func (t *envelopeTransformer) addTransformerForDecryption(cacheKey []byte, key [
 	return transformer, nil
 }
 
-// doEncode encodes the EncryptedObject to a byte array.
-func (t *envelopeTransformer) doEncode(request *kmstypes.EncryptedObject) ([]byte, error) {
+// doEncode encodes the EncryptedObject to a byte array, prepended with prefix.
+func (t *envelopeTransformer) doEncode(prefix []byte, request *kmstypes.EncryptedObject) ([]byte, error) {
 	if err := ValidateEncryptedObject(request); err != nil {
 		return nil, err
 	}
-	return proto.Marshal(request)
+	out := make([]byte, len(prefix), len(prefix)+proto.Size(request))
+	copy(out, prefix)
+	return proto.MarshalOptions{}.MarshalAppend(out, request)
 }
 
 // doDecode decodes the byte array to an EncryptedObject.
@@ -504,8 +511,14 @@ func getRequestInfoFromContext(ctx context.Context) *genericapirequest.RequestIn
 //     a. annotation key
 //     b. annotation value
 func generateCacheKey(encryptedDEKSourceType kmstypes.EncryptedDEKSourceType, encryptedDEKSource []byte, keyID string, annotations map[string][]byte) ([]byte, error) {
-	// TODO(aramase): use sync pool buffer to avoid allocations
-	b := cryptobyte.NewBuilder(nil)
+	size := 4 + 2 + len(encryptedDEKSource) + 2 + len(keyID)
+	if len(annotations) > 0 {
+		size += 4
+		for k, v := range annotations {
+			size += 2 + len(k) + 2 + len(v)
+		}
+	}
+	b := cryptobyte.NewFixedBuilder(make([]byte, 0, size))
 	b.AddUint32(uint32(encryptedDEKSourceType))
 	b.AddUint16LengthPrefixed(func(b *cryptobyte.Builder) {
 		b.AddBytes(encryptedDEKSource)

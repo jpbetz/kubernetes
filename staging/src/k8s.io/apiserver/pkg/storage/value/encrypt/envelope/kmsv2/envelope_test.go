@@ -544,7 +544,7 @@ func TestEncodeDecode(t *testing.T) {
 		EncryptedDEKSource: []byte{0x04, 0x05, 0x06},
 	}
 
-	data, err := transformer.doEncode(obj)
+	data, err := transformer.doEncode(nil, obj)
 	if err != nil {
 		t.Fatalf("envelopeTransformer: error while encoding data: %s", err)
 	}

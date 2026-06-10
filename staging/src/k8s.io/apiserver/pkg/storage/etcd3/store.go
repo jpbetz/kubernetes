@@ -26,6 +26,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unsafe"
 
 	"go.etcd.io/etcd/api/v3/mvccpb"
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -69,7 +70,12 @@ type authenticatedDataString string
 
 // AuthenticatedData implements the value.Context interface.
 func (d authenticatedDataString) AuthenticatedData() []byte {
-	return []byte(string(d))
+	// unsafe.StringData is unspecified for the empty string, so we provide a strict interpretation
+	if len(d) == 0 {
+		return nil
+	}
+	// this aliases the string without copying; the returned slice must be treated as read-only
+	return unsafe.Slice(unsafe.StringData(string(d)), len(d))
 }
 
 var _ value.Context = authenticatedDataString("")

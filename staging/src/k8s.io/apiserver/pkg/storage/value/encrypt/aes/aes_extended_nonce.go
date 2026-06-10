@@ -173,14 +173,16 @@ func (t *transformerWithInfo) TransformFromStorage(ctx context.Context, data []b
 }
 
 func (t *transformerWithInfo) TransformToStorage(ctx context.Context, data []byte, dataCtx value.Context) ([]byte, error) {
-	out, err := t.transformer.TransformToStorage(ctx, data, dataCtx)
-	if err != nil {
-		return nil, err
+	return t.TransformToStorageWithPrefix(ctx, nil, data, dataCtx)
+}
+
+func (t *transformerWithInfo) TransformToStorageWithPrefix(ctx context.Context, prefix, data []byte, dataCtx value.Context) ([]byte, error) {
+	prefixWithInfo := t.info
+	if len(prefix) > 0 {
+		prefixWithInfo = make([]byte, 0, len(prefix)+len(t.info))
+		prefixWithInfo = append(prefixWithInfo, prefix...)
+		prefixWithInfo = append(prefixWithInfo, t.info...)
 	}
 
-	outWithInfo := make([]byte, 0, len(out)+len(t.info))
-	outWithInfo = append(outWithInfo, t.info...)
-	outWithInfo = append(outWithInfo, out...)
-
-	return outWithInfo, nil
+	return value.TransformToStorageWithPrefix(ctx, t.transformer, prefixWithInfo, data, dataCtx)
 }

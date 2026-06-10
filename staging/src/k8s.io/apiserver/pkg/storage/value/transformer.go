@@ -54,6 +54,29 @@ type Write interface {
 	TransformToStorage(ctx context.Context, data []byte, dataCtx Context) (out []byte, err error)
 }
 
+// WriteWithPrefix is an optional interface for Write implementations that can write a
+// caller-provided prefix and the transformed data into a single allocation, avoiding the
+// copy otherwise required to prepend the prefix to the TransformToStorage output.
+type WriteWithPrefix interface {
+	// TransformToStorageWithPrefix is TransformToStorage with prefix prepended to the output.
+	TransformToStorageWithPrefix(ctx context.Context, prefix, data []byte, dataCtx Context) (out []byte, err error)
+}
+
+// TransformToStorageWithPrefix writes prefix followed by the transformed data, in a single
+// allocation when transformer implements WriteWithPrefix.
+func TransformToStorageWithPrefix(ctx context.Context, transformer Write, prefix, data []byte, dataCtx Context) ([]byte, error) {
+	if w, ok := transformer.(WriteWithPrefix); ok {
+		return w.TransformToStorageWithPrefix(ctx, prefix, data, dataCtx)
+	}
+	result, err := transformer.TransformToStorage(ctx, data, dataCtx)
+	if err != nil {
+		return nil, err
+	}
+	prefixedData := make([]byte, len(prefix), len(prefix)+len(result))
+	copy(prefixedData, prefix)
+	return append(prefixedData, result...), nil
+}
+
 // Transformer allows a value to be transformed before being read from or written to the underlying store. The methods
 // must be able to undo the transformation caused by the other.
 type Transformer interface {
@@ -170,19 +193,33 @@ func (t *prefixTransformers) TransformFromStorage(ctx context.Context, data []by
 
 // TransformToStorage uses the first transformer and adds its prefix to the data.
 func (t *prefixTransformers) TransformToStorage(ctx context.Context, data []byte, dataCtx Context) ([]byte, error) {
+	return t.TransformToStorageWithPrefix(ctx, nil, data, dataCtx)
+}
+
+// TransformToStorageWithPrefix uses the first transformer and adds prefix followed by the
+// transformer's own prefix to the data.
+func (t *prefixTransformers) TransformToStorageWithPrefix(ctx context.Context, prefix, data []byte, dataCtx Context) ([]byte, error) {
 	start := time.Now()
 	transformer := t.transformers[0]
 	resource := getResourceFromContext(ctx)
-	result, err := transformer.Transformer.TransformToStorage(ctx, data, dataCtx)
+	var combinedPrefix []byte
+	switch {
+	case len(transformer.Prefix) == 0:
+		combinedPrefix = prefix
+	case len(prefix) == 0:
+		combinedPrefix = transformer.Prefix
+	default:
+		combinedPrefix = make([]byte, 0, len(prefix)+len(transformer.Prefix))
+		combinedPrefix = append(combinedPrefix, prefix...)
+		combinedPrefix = append(combinedPrefix, transformer.Prefix...)
+	}
+	result, err := TransformToStorageWithPrefix(ctx, transformer.Transformer, combinedPrefix, data, dataCtx)
 	RecordTransformation(resource, "to_storage", string(transformer.Prefix), time.Since(start), err)
 	if err != nil {
 		logTransformErr(ctx, err, "failed to encrypt data")
 		return nil, err
 	}
-	prefixedData := make([]byte, len(transformer.Prefix), len(result)+len(transformer.Prefix))
-	copy(prefixedData, transformer.Prefix)
-	prefixedData = append(prefixedData, result...)
-	return prefixedData, nil
+	return result, nil
 }
 
 func logTransformErr(ctx context.Context, err error, message string) {

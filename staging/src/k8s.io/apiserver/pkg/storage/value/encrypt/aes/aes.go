@@ -193,15 +193,21 @@ func (t *gcm) TransformFromStorage(ctx context.Context, data []byte, dataCtx val
 }
 
 func (t *gcm) TransformToStorage(ctx context.Context, data []byte, dataCtx value.Context) ([]byte, error) {
-	nonceSize := t.aead.NonceSize()
-	result := make([]byte, nonceSize+t.aead.Overhead()+len(data))
+	return t.TransformToStorageWithPrefix(ctx, nil, data, dataCtx)
+}
 
-	if err := t.nonceFunc(result[:nonceSize]); err != nil {
+func (t *gcm) TransformToStorageWithPrefix(ctx context.Context, prefix, data []byte, dataCtx value.Context) ([]byte, error) {
+	nonceSize := t.aead.NonceSize()
+	result := make([]byte, len(prefix)+nonceSize+t.aead.Overhead()+len(data))
+	copy(result, prefix)
+	nonce := result[len(prefix) : len(prefix)+nonceSize]
+
+	if err := t.nonceFunc(nonce); err != nil {
 		return nil, fmt.Errorf("failed to write nonce for AES-GCM: %w", err)
 	}
 
-	cipherText := t.aead.Seal(result[nonceSize:nonceSize], result[:nonceSize], data, dataCtx.AuthenticatedData())
-	return result[:nonceSize+len(cipherText)], nil
+	cipherText := t.aead.Seal(nonce[nonceSize:nonceSize], nonce, data, dataCtx.AuthenticatedData())
+	return result[:len(prefix)+nonceSize+len(cipherText)], nil
 }
 
 // cbc implements encryption at rest of the provided values given a cipher.Block algorithm.
@@ -255,19 +261,25 @@ func (t *cbc) TransformFromStorage(ctx context.Context, data []byte, dataCtx val
 }
 
 func (t *cbc) TransformToStorage(ctx context.Context, data []byte, dataCtx value.Context) ([]byte, error) {
+	return t.TransformToStorageWithPrefix(ctx, nil, data, dataCtx)
+}
+
+func (t *cbc) TransformToStorageWithPrefix(ctx context.Context, prefix, data []byte, dataCtx value.Context) ([]byte, error) {
 	blockSize := aes.BlockSize
 	paddingSize := blockSize - (len(data) % blockSize)
-	result := make([]byte, blockSize+len(data)+paddingSize)
-	iv := result[:blockSize]
+	result := make([]byte, len(prefix)+blockSize+len(data)+paddingSize)
+	copy(result, prefix)
+	iv := result[len(prefix) : len(prefix)+blockSize]
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
 		return nil, errors.New("unable to read sufficient random bytes")
 	}
-	copy(result[blockSize:], data)
+	payload := result[len(prefix)+blockSize:]
+	copy(payload, data)
 
 	// add PKCS#7 padding for CBC
-	copy(result[blockSize+len(data):], bytes.Repeat([]byte{byte(paddingSize)}, paddingSize))
+	copy(payload[len(data):], bytes.Repeat([]byte{byte(paddingSize)}, paddingSize))
 
 	mode := cipher.NewCBCEncrypter(t.block, iv)
-	mode.CryptBlocks(result[blockSize:], result[blockSize:])
+	mode.CryptBlocks(payload, payload)
 	return result, nil
 }
