@@ -44,6 +44,12 @@ const (
 	// e.g. "+k8s:conversion-gen:explicit-from=net/url.Values" in the type comment
 	// will result in generating conversion from net/url.Values.
 	explicitFromTagName = "k8s:conversion-gen:explicit-from"
+	// e.g. "+k8s:conversion-gen:memory-identical-to=<external-types-pkg>" in the
+	// comment of an internal type asserts that the type (and every type it
+	// references) is memory-identical to the same-named type in that package, so
+	// conversions between them compile to zero-copy unsafe casts. Generation
+	// fails if the assertion does not hold; remove the tag to stop enforcing it.
+	memoryIdenticalTagName = "k8s:conversion-gen:memory-identical-to"
 )
 
 func extractTagValues(tagName string, comments []string) ([]string, error) {
@@ -242,6 +248,10 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 	otherPkgs := make([]string, 0, len(context.Inputs))
 	pkgToPeers := map[string][]string{}
 	pkgToExternal := map[string]string{}
+	// Inputs and their tag-declared peer packages, whose conversion tags this
+	// invocation owns; tags found in packages loaded only via --base-peer-dirs /
+	// --extra-peer-dirs (e.g. another repo's types) are not enforced here.
+	ownedPkgs := map[string]bool{}
 
 	for _, i := range context.Inputs {
 		klog.V(3).Infof("considering pkg %q", i)
@@ -256,6 +266,7 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 			continue
 		}
 		filteredInputs = append(filteredInputs, i)
+		ownedPkgs[i] = true
 
 		// Sole +k8s:conversion-gen=false: emit only the package's
 		// hand-written conversions, no peer-driven standard conversions.
@@ -264,6 +275,9 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 			klog.V(3).Infof("  peers: %q", peerPkgs)
 			pkgToPeers[i] = peerPkgs
 			otherPkgs = append(otherPkgs, peerPkgs...)
+			for _, p := range peerPkgs {
+				ownedPkgs[p] = true
+			}
 		}
 
 		externalTypes := info.ExternalTypes()
@@ -346,6 +360,7 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 
 	// If there is a manual conversion defined between two types, exclude it
 	// from being a candidate for unsafe conversion
+	identityBlockers := conversionFuncMap{}
 	for k, v := range manualConversions {
 		copyOnly, err := isCopyOnly(v.CommentLines)
 		if err != nil {
@@ -356,7 +371,11 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 		}
 		// this type should be excluded from all equivalence, because the converter must be called.
 		memoryEquivalentTypes.Skip(k.inType, k.outType)
+		identityBlockers[k] = v
 	}
+
+	scanPkgs := append(append([]string{}, filteredInputs...), otherPkgs...)
+	checkMemoryIdentical(context.Universe, pkgToExternal, ownedPkgs, scanPkgs, memoryEquivalentTypes, identityBlockers, args.SkipUnsafe)
 
 	return targetList
 }
@@ -378,7 +397,7 @@ func (e equalMemoryTypes) Equal(a, b *types.Type) bool {
 // alreadyVisitedStack is used to check for cycles during recursion.
 // The returned cacheable boolean tells the caller whether the equal result is a definitive answer that can be safely cached,
 // or if it's a temporary assumption made to break a cycle in a recursively defined type.
-func (e equalMemoryTypes) cachingEqual(a, b *types.Type, alreadyVisitedStack []*types.Type) (equal, cacheable bool) {
+func (e equalMemoryTypes) cachingEqual(a, b *types.Type, alreadyVisitedStack []conversionPair) (equal, cacheable bool) {
 	if a == b {
 		return true, true
 	}
@@ -400,19 +419,21 @@ func (e equalMemoryTypes) cachingEqual(a, b *types.Type, alreadyVisitedStack []*
 // alreadyVisitedStack is used to check for cycles during recursion.
 // The returned cacheable boolean tells the caller whether the equal result is a definitive answer that can be safely cached,
 // or if it's a temporary assumption made to break a cycle in a recursively defined type.
-func (e equalMemoryTypes) equal(a, b *types.Type, alreadyVisitedStack []*types.Type) (equal, cacheable bool) {
+func (e equalMemoryTypes) equal(a, b *types.Type, alreadyVisitedStack []conversionPair) (equal, cacheable bool) {
 	in, out := unwrapAlias(a), unwrapAlias(b)
 	switch {
 	case in == out:
 		return true, true
 	case in.Kind == out.Kind:
 		for _, v := range alreadyVisitedStack {
-			if v == in {
-				// if the type was visited in this stack already, return early to avoid infinite recursion, but do not cache the results
+			if v.inType == in && v.outType == out {
+				// if the pair was visited in this stack already, return early to avoid infinite recursion, but do not cache the results.
+				// The stack is keyed on the pair, not just the in type: a recursive type compared against two different
+				// types must keep walking, or one comparison could borrow the cycle assumption of the other.
 				return true, false
 			}
 		}
-		alreadyVisitedStack = append(alreadyVisitedStack, in)
+		alreadyVisitedStack = append(alreadyVisitedStack, conversionPair{in, out})
 
 		switch in.Kind {
 		case types.Struct:

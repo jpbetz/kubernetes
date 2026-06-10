@@ -85,6 +85,10 @@ var (
 		ActivationTag: "k8s:conversion-gen",
 		InputTag:      "k8s:conversion-gen-external-types",
 		ValueMode:     ConversionPeerList,
+		AuxTags: []string{
+			"k8s:conversion-gen:explicit-from",
+			"k8s:conversion-gen:memory-identical-to",
+		},
 	}
 	Defaulter = Spec{
 		ActivationTag: "k8s:defaulter-gen",
