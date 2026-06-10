@@ -19,6 +19,7 @@ package v1_test
 import (
 	"encoding/json"
 	"fmt"
+	"runtime"
 	"testing"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -93,6 +94,58 @@ func BenchmarkParallelDecode(b *testing.B) {
 			})
 		})
 	}
+}
+
+// BenchmarkSiblingPodsResidentBytes measures the live-heap cost of retaining
+// managed fields for many sibling pods (e.g. all pods of one ReplicaSet): the
+// spec entry payload is identical across pods while the kubelet status entry
+// payload is unique per pod. The retained-B/pod metric is the GC-surviving
+// heap delta per pod; run with and without the fieldsv1string build tag to
+// compare interned vs per-object storage.
+func BenchmarkSiblingPodsResidentBytes(b *testing.B) {
+	const numPods = 1000
+	specPayload := []byte(benchmarkPayloads[1])
+	statusPayloads := make([][]byte, numPods)
+	for i := range statusPayloads {
+		statusPayloads[i] = fmt.Appendf(nil,
+			`{"f:status":{"f:conditions":{"k:{\"type\":\"Ready\"}":{".":{},"f:lastTransitionTime":{},"f:status":{},"f:type":{}}},"f:containerStatuses":{},"f:hostIP":{},"f:phase":{},"f:podIP":{},"f:podIPs":{".":{},"k:{\"ip\":\"10.%d.%d.%d\"}":{".":{},"f:ip":{}}},"f:startTime":{}}}`,
+			i>>16&0xff, i>>8&0xff, i&0xff)
+	}
+
+	type podManagedFields struct {
+		spec   metav1.FieldsV1
+		status metav1.FieldsV1
+	}
+	build := func() []podManagedFields {
+		pods := make([]podManagedFields, numPods)
+		for i := range pods {
+			if err := json.Unmarshal(specPayload, &pods[i].spec); err != nil {
+				b.Fatal(err)
+			}
+			if err := json.Unmarshal(statusPayloads[i], &pods[i].status); err != nil {
+				b.Fatal(err)
+			}
+		}
+		return pods
+	}
+
+	var before, after runtime.MemStats
+	runtime.GC()
+	runtime.ReadMemStats(&before)
+	retained := build()
+	runtime.GC()
+	runtime.ReadMemStats(&after)
+	retainedPerPod := float64(int64(after.HeapAlloc)-int64(before.HeapAlloc)) / numPods
+	runtime.KeepAlive(retained)
+	retained = nil
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		pods := build()
+		_ = pods
+	}
+	b.ReportMetric(retainedPerPod, "retained-B/pod")
 }
 
 // BenchmarkEqual_Same measures the fast-path equality check for identical structs.
