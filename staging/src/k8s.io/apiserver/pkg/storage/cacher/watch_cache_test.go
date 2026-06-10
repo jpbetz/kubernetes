@@ -1002,6 +1002,7 @@ func TestSuggestedWatchChannelSize(t *testing.T) {
 		capacity            int
 		indexExists         bool
 		triggerUsed         bool
+		nameScoped          bool
 		eventsFreshDuration time.Duration
 		expected            int
 	}{
@@ -1149,13 +1150,49 @@ func TestSuggestedWatchChannelSize(t *testing.T) {
 			eventsFreshDuration: DefaultEventFreshDuration,
 			expected:            100,
 		},
+		{
+			name:                "capacity=750000, !indexExists, nameScoped",
+			capacity:            750000,
+			indexExists:         false,
+			triggerUsed:         false,
+			nameScoped:          true,
+			eventsFreshDuration: DefaultEventFreshDuration,
+			expected:            10,
+		},
+		{
+			name:                "capacity=750000, indexExists, !triggerUsed, nameScoped",
+			capacity:            750000,
+			indexExists:         true,
+			triggerUsed:         false,
+			nameScoped:          true,
+			eventsFreshDuration: DefaultEventFreshDuration,
+			expected:            10,
+		},
+		{
+			name:                "capacity=750000, indexExists, triggerUsed, nameScoped",
+			capacity:            750000,
+			indexExists:         true,
+			triggerUsed:         true,
+			nameScoped:          true,
+			eventsFreshDuration: DefaultEventFreshDuration,
+			expected:            10,
+		},
+		{
+			name:                "capacity=100, !indexExists, nameScoped",
+			capacity:            100,
+			indexExists:         false,
+			triggerUsed:         false,
+			nameScoped:          true,
+			eventsFreshDuration: DefaultEventFreshDuration,
+			expected:            10,
+		},
 	}
 
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 			store := newTestWatchCache(test.capacity, test.eventsFreshDuration, &cache.Indexers{})
 			defer store.Stop()
-			got := store.suggestedWatchChannelSize(test.indexExists, test.triggerUsed)
+			got := store.suggestedWatchChannelSize(test.indexExists, test.triggerUsed, test.nameScoped)
 			if got != test.expected {
 				t.Errorf("unexpected channel size got: %v, expected: %v", got, test.expected)
 			}

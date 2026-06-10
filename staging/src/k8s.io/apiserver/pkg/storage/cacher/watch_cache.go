@@ -820,7 +820,15 @@ const (
 	maxWatchChanSizeWithoutIndex = 100
 )
 
-func (w *watchCache) suggestedWatchChannelSize(indexExists, triggerUsed bool) int {
+func (w *watchCache) suggestedWatchChannelSize(indexExists, triggerUsed, nameScoped bool) int {
+	// Name-scoped watchers without a trigger are dispatched only the events
+	// for their single object, so the minimal buffer suffices regardless of
+	// the cluster-wide event rate. Watchers using a trigger are dispatched
+	// by trigger value instead, so they are excluded here.
+	if nameScoped && !triggerUsed {
+		return minWatchChanSize
+	}
+
 	// To estimate the channel size we use a heuristic that a channel
 	// should roughly be able to keep one second of history.
 	// We don't have an exact data, but given we store updates from
