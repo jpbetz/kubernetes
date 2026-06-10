@@ -3319,6 +3319,8 @@ const (
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // PodList is a list of Pods.
+//
+// +k8s:conversion-gen:memory-identical-to=k8s.io/api/core/v1
 type PodList struct {
 	metav1.TypeMeta
 	// +optional
@@ -4699,6 +4701,8 @@ type PodStatus struct {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // Pod is a collection of containers, used as either input (create, update) or as output (list, get).
+//
+// +k8s:conversion-gen:memory-identical-to=k8s.io/api/core/v1
 type Pod struct {
 	metav1.TypeMeta
 	// +optional
