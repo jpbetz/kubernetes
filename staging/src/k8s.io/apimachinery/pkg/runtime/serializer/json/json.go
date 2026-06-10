@@ -145,6 +145,35 @@ func (s *Serializer) Decode(originalData []byte, gvk *schema.GroupVersionKind, i
 		data = altered
 	}
 
+	// A preliminary pass over the input to obtain the actual GVK is redundant on a successful
+	// decode into Unstructured.
+	if _, ok := into.(runtime.Unstructured); ok {
+		strictErrs, unmarshalErr := s.unmarshal(into, data, originalData)
+		if unmarshalErr != nil {
+			actual, interpretErr := s.meta.Interpret(data)
+			if interpretErr != nil {
+				return nil, nil, interpretErr
+			}
+
+			if gvk != nil {
+				*actual = gvkWithDefaults(*actual, *gvk)
+			}
+
+			return nil, actual, unmarshalErr
+		}
+
+		actual := into.GetObjectKind().GroupVersionKind()
+		if len(actual.Kind) == 0 {
+			return nil, &actual, runtime.NewMissingKindErr(string(originalData))
+		}
+		// TODO(109023): require apiVersion here as well once unstructuredJSONScheme#Decode does
+
+		if len(strictErrs) > 0 {
+			return into, &actual, runtime.NewStrictDecodingError(strictErrs)
+		}
+		return into, &actual, nil
+	}
+
 	actual, err := s.meta.Interpret(data)
 	if err != nil {
 		return nil, nil, err
@@ -162,26 +191,13 @@ func (s *Serializer) Decode(originalData []byte, gvk *schema.GroupVersionKind, i
 	}
 
 	if into != nil {
-		_, isUnstructured := into.(runtime.Unstructured)
 		types, _, err := s.typer.ObjectKinds(into)
 		switch {
-		case runtime.IsNotRegisteredError(err), isUnstructured:
+		case runtime.IsNotRegisteredError(err):
 			strictErrs, err := s.unmarshal(into, data, originalData)
 			if err != nil {
 				return nil, actual, err
 			}
-
-			// when decoding directly into a provided unstructured object,
-			// extract the actual gvk decoded from the provided data,
-			// and ensure it is non-empty.
-			if isUnstructured {
-				*actual = into.GetObjectKind().GroupVersionKind()
-				if len(actual.Kind) == 0 {
-					return nil, actual, runtime.NewMissingKindErr(string(originalData))
-				}
-				// TODO(109023): require apiVersion here as well once unstructuredJSONScheme#Decode does
-			}
-
 			if len(strictErrs) > 0 {
 				return into, actual, runtime.NewStrictDecodingError(strictErrs)
 			}
