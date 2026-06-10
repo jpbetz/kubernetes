@@ -51,9 +51,11 @@ const (
 // cacheWatcher implements watch.Interface
 // this is not thread-safe
 type cacheWatcher struct {
-	input     chan *watchCacheEvent
-	result    chan watch.Event
-	done      chan struct{}
+	input  chan *watchCacheEvent
+	result chan watch.Event
+	done   chan struct{}
+	// filter is nil when every event in the cache passes the watch's
+	// selection criteria.
 	filter    filterWithAttrsFunc
 	stopped   bool
 	forget    func(bool)
@@ -64,9 +66,9 @@ type cacheWatcher struct {
 	allowWatchBookmarks bool
 	groupResource       schema.GroupResource
 
-	// human readable identifier that helps assigning cacheWatcher
-	// instance with request
-	identifier string
+	// identifier lazily computes a human readable identifier that helps
+	// assigning cacheWatcher instance with request
+	identifier func() string
 
 	// drainInputBuffer indicates whether we should delay closing this watcher
 	// and send all event in the input buffer.
@@ -95,7 +97,7 @@ func newCacheWatcher(
 	deadline time.Time,
 	allowWatchBookmarks bool,
 	groupResource schema.GroupResource,
-	identifier string,
+	identifier func() string,
 ) *cacheWatcher {
 	return &cacheWatcher{
 		input:               make(chan *watchCacheEvent, chanSize),
@@ -200,7 +202,9 @@ func (c *cacheWatcher) add(event *watchCacheEvent, timer *time.Timer) bool {
 			defer c.stateMutex.Unlock()
 			return c.state == cacheWatcherBookmarkReceived
 		}()
-		klog.V(1).Infof("Forcing %v watcher close due to unresponsiveness: %v. len(c.input) = %v, len(c.result) = %v, graceful = %v", c.groupResource.String(), c.identifier, len(c.input), len(c.result), graceful)
+		if klogV := klog.V(1); klogV.Enabled() {
+			klogV.Infof("Forcing %v watcher close due to unresponsiveness: %v. len(c.input) = %v, len(c.result) = %v, graceful = %v", c.groupResource.String(), c.identifier(), len(c.input), len(c.result), graceful)
+		}
 		c.forget(graceful)
 	}
 
@@ -359,33 +363,33 @@ func updateResourceVersion(object runtime.Object, versioner storage.Versioner, r
 	}
 }
 
-func (c *cacheWatcher) convertToWatchEvent(event *watchCacheEvent) *watch.Event {
+func (c *cacheWatcher) convertToWatchEvent(event *watchCacheEvent) (watch.Event, bool) {
 	if event.Type == watch.Bookmark {
-		e := &watch.Event{Type: watch.Bookmark, Object: event.Object.DeepCopyObject()}
+		e := watch.Event{Type: watch.Bookmark, Object: event.Object.DeepCopyObject()}
 		if !c.wasBookmarkAfterRvSent() {
 			if err := storage.AnnotateInitialEventsEndBookmark(e.Object); err != nil {
-				utilruntime.HandleError(fmt.Errorf("error while accessing object's metadata gr: %v, identifier: %v, obj: %#v, err: %v", c.groupResource, c.identifier, e.Object, err))
-				return nil
+				utilruntime.HandleError(fmt.Errorf("error while accessing object's metadata gr: %v, identifier: %v, obj: %#v, err: %v", c.groupResource, c.identifier(), e.Object, err))
+				return watch.Event{}, false
 			}
 		}
-		return e
+		return e, true
 	}
 
-	curObjPasses := event.Type != watch.Deleted && c.filter(event.Key, event.ObjLabels, event.ObjFields, event.Object)
+	curObjPasses := event.Type != watch.Deleted && (c.filter == nil || c.filter(event.Key, event.ObjLabels, event.ObjFields, event.Object))
 	oldObjPasses := false
 	if event.PrevObject != nil {
-		oldObjPasses = c.filter(event.Key, event.PrevObjLabels, event.PrevObjFields, event.PrevObject)
+		oldObjPasses = c.filter == nil || c.filter(event.Key, event.PrevObjLabels, event.PrevObjFields, event.PrevObject)
 	}
 	if !curObjPasses && !oldObjPasses {
 		// Watcher is not interested in that object.
-		return nil
+		return watch.Event{}, false
 	}
 
 	switch {
 	case curObjPasses && !oldObjPasses:
-		return &watch.Event{Type: watch.Added, Object: getMutableObject(event.Object)}
+		return watch.Event{Type: watch.Added, Object: getMutableObject(event.Object)}, true
 	case curObjPasses && oldObjPasses:
-		return &watch.Event{Type: watch.Modified, Object: getMutableObject(event.Object)}
+		return watch.Event{Type: watch.Modified, Object: getMutableObject(event.Object)}, true
 	case !curObjPasses && oldObjPasses:
 		// return a delete event with the previous object content, but with the event's resource version
 		oldObj := getMutableObject(event.PrevObject)
@@ -394,16 +398,16 @@ func (c *cacheWatcher) convertToWatchEvent(event *watchCacheEvent) *watch.Event 
 		// we don't need to update it. However, since cachingObject efficiently
 		// handles noop updates, we avoid this microoptimization here.
 		updateResourceVersion(oldObj, c.versioner, event.ResourceVersion)
-		return &watch.Event{Type: watch.Deleted, Object: oldObj}
+		return watch.Event{Type: watch.Deleted, Object: oldObj}, true
 	}
 
-	return nil
+	return watch.Event{}, false
 }
 
 // NOTE: sendWatchCacheEvent is assumed to not modify <event> !!!
 func (c *cacheWatcher) sendWatchCacheEvent(event *watchCacheEvent) {
-	watchEvent := c.convertToWatchEvent(event)
-	if watchEvent == nil {
+	watchEvent, ok := c.convertToWatchEvent(event)
+	if !ok {
 		// Watcher is not interested in that object.
 		return
 	}
@@ -427,7 +431,7 @@ func (c *cacheWatcher) sendWatchCacheEvent(event *watchCacheEvent) {
 	}
 
 	select {
-	case c.result <- *watchEvent:
+	case c.result <- watchEvent:
 		c.markBookmarkAfterRvSent(event)
 	case <-c.done:
 	}
@@ -507,7 +511,7 @@ func (c *cacheWatcher) processInterval(ctx context.Context, cacheInterval *watch
 	}
 	processingTime := time.Since(startTime)
 	if processingTime > initProcessThreshold {
-		klog.V(2).Infof("processing %d initEvents of %s (%s) took %v", initEventCount, c.groupResource, c.identifier, processingTime)
+		klog.V(2).Infof("processing %d initEvents of %s (%s) took %v", initEventCount, c.groupResource, c.identifier(), processingTime)
 	}
 
 	// send bookmark after sending all events in cacheInterval for watchlist request

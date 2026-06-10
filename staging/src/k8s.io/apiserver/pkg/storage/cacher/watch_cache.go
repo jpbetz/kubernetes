@@ -40,6 +40,7 @@ import (
 	"k8s.io/apiserver/pkg/storage/cacher/store"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/client-go/tools/cache"
+	compbasemetrics "k8s.io/component-base/metrics"
 	"k8s.io/component-base/tracing"
 	"k8s.io/klog/v2"
 	"k8s.io/utils/clock"
@@ -161,6 +162,11 @@ type watchCache struct {
 	snapshottingEnabled atomic.Bool
 
 	getCurrentRV func(context.Context) (uint64, error)
+
+	// eventsReceivedCounter is the per-resource child of
+	// metrics.EventsReceivedCounter, resolved once to avoid the
+	// per-event label lookup.
+	eventsReceivedCounter compbasemetrics.CounterMetric
 }
 
 func newWatchCache(
@@ -200,6 +206,7 @@ func newWatchCache(
 		wc.snapshots = store.NewSnapshotter()
 	}
 	metrics.WatchCacheCapacity.WithLabelValues(groupResource.Group, groupResource.Resource).Set(float64(wc.capacity))
+	wc.eventsReceivedCounter = metrics.EventsReceivedCounter.WithLabelValues(groupResource.Group, groupResource.Resource)
 	wc.cond = sync.NewCond(wc.RLocker())
 	wc.indexValidator = wc.isIndexValidLocked
 
@@ -281,7 +288,7 @@ func (w *watchCache) objectToVersionedRuntimeObject(obj interface{}) (runtime.Ob
 // processEvent is safe as long as there is at most one call to it in flight
 // at any point in time.
 func (w *watchCache) processEvent(event watch.Event, resourceVersion uint64, updateFunc func(*store.Element) error) error {
-	metrics.EventsReceivedCounter.WithLabelValues(w.groupResource.Group, w.groupResource.Resource).Inc()
+	w.eventsReceivedCounter.Inc()
 
 	key, err := w.keyFunc(event.Object)
 	if err != nil {

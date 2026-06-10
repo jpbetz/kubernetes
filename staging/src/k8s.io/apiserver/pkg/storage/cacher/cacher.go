@@ -331,6 +331,9 @@ type Cacher struct {
 	watchersBuffer []*cacheWatcher
 	// blockedWatchers is a list of watchers whose buffer is currently full.
 	blockedWatchers []*cacheWatcher
+	// triggerValuesBuffer is a scratch space reused for computing trigger
+	// values of the currently dispatched event.
+	triggerValuesBuffer []string
 	// watchersToStop is a list of watchers that were supposed to be stopped
 	// during current dispatching, but stopping was deferred to the end of
 	// dispatching that event to avoid race with closing channels in watchers.
@@ -589,7 +592,16 @@ func (c *Cacher) Watch(ctx context.Context, key string, opts storage.ListOptions
 	// Determine watch timeout('0' means deadline is not set, ignore checking)
 	deadline, _ := ctx.Deadline()
 
-	identifier := fmt.Sprintf("key: %q, labels: %q, fields: %q", key, pred.Label, pred.Field)
+	identifier := func() string {
+		return fmt.Sprintf("key: %q, labels: %q, fields: %q", key, pred.Label, pred.Field)
+	}
+
+	// A nil filter means every event in the cache passes the watch's
+	// selection criteria, which allows skipping per-event filtering.
+	var filter filterWithAttrsFunc
+	if !isTrivialFilter(key, c.resourcePrefix, pred) {
+		filter = filterWithAttrsAndPrefixFunction(key, pred, c.groupResource)
+	}
 
 	// Create a watcher here to reduce memory allocations under lock,
 	// given that memory allocation may trigger GC and block the thread.
@@ -597,7 +609,7 @@ func (c *Cacher) Watch(ctx context.Context, key string, opts storage.ListOptions
 	// to compute watcher.forget function (which has to happen under lock).
 	watcher := newCacheWatcher(
 		chanSize,
-		filterWithAttrsAndPrefixFunction(key, pred, c.groupResource),
+		filter,
 		emptyFunc,
 		c.versioner,
 		deadline,
@@ -851,15 +863,16 @@ func (c *Cacher) triggerValuesThreadUnsafe(event *watchCacheEvent) ([]string, bo
 		return nil, false
 	}
 
-	result := make([]string, 0, 2)
-	result = append(result, c.indexedTrigger.indexerFunc(baseObjectThreadUnsafe(event.Object)))
-	if event.PrevObject == nil {
-		return result, true
+	// Reuse the scratch buffer across events; this is safe because events
+	// are dispatched by a single goroutine.
+	result := append(c.triggerValuesBuffer[:0], c.indexedTrigger.indexerFunc(baseObjectThreadUnsafe(event.Object)))
+	if event.PrevObject != nil {
+		prevTriggerValue := c.indexedTrigger.indexerFunc(baseObjectThreadUnsafe(event.PrevObject))
+		if result[0] != prevTriggerValue {
+			result = append(result, prevTriggerValue)
+		}
 	}
-	prevTriggerValue := c.indexedTrigger.indexerFunc(baseObjectThreadUnsafe(event.PrevObject))
-	if result[0] != prevTriggerValue {
-		result = append(result, prevTriggerValue)
-	}
+	c.triggerValuesBuffer = result
 	return result, true
 }
 
@@ -875,6 +888,9 @@ func (c *Cacher) dispatchEvents() {
 	// Jitter to help level out any aggregate load.
 	bookmarkTimer := c.clock.NewTimer(wait.Jitter(time.Second, 0.25))
 	defer bookmarkTimer.Stop()
+
+	// Resolve the metric child once instead of on every event.
+	eventsCounter := metrics.EventsCounter.WithLabelValues(c.groupResource.Group, c.groupResource.Resource)
 
 	// The internal informer populates the RV as soon as it conducts
 	// The first successful sync with the underlying store.
@@ -913,7 +929,7 @@ func (c *Cacher) dispatchEvents() {
 				c.dispatchEvent(&event)
 			}
 			lastProcessedResourceVersion = event.ResourceVersion
-			metrics.EventsCounter.WithLabelValues(c.groupResource.Group, c.groupResource.Resource).Inc()
+			eventsCounter.Inc()
 		case <-bookmarkTimer.C():
 			bookmarkTimer.Reset(wait.Jitter(time.Second, 0.25))
 			bookmarkEvent := &watchCacheEvent{
@@ -1210,6 +1226,16 @@ func forgetWatcher(c *Cacher, w *cacheWatcher, index int, scope namespacedName, 
 		c.watchers.deleteWatcher(index, scope, triggerValue, triggerSupported)
 		c.stopWatcherLocked(w)
 	}
+}
+
+// isTrivialFilter returns true if the filter produced by
+// filterWithAttrsAndPrefixFunction would pass every event in the cache,
+// i.e. the watch spans the whole resource and the predicate has no selectors.
+func isTrivialFilter(key, resourcePrefix string, p storage.SelectionPredicate) bool {
+	if utilfeature.DefaultFeatureGate.Enabled(features.ShardedListAndWatch) && p.ShardSelector != nil && !p.ShardSelector.Empty() {
+		return false
+	}
+	return key == resourcePrefix+"/" && p.Empty()
 }
 
 func filterWithAttrsAndPrefixFunction(key string, p storage.SelectionPredicate, groupResource schema.GroupResource) filterWithAttrsFunc {

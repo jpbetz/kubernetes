@@ -2485,7 +2485,7 @@ func TestForgetWatcher(t *testing.T) {
 		testingclock.NewFakeClock(time.Now()).Now().Add(2*time.Minute),
 		true,
 		schema.GroupResource{Resource: "pods"},
-		"1",
+		func() string { return "1" },
 	)
 	forgetWatcherFn = forgetWatcher(cacher, w, 0, namespacedName{}, "", false)
 	addWatcher := func(w *cacheWatcher) {
