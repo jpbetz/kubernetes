@@ -32,10 +32,38 @@ import (
 //
 //	consider introducing multiple pools for storing buffers of different sizes
 //	perhaps this could allow us to be more efficient.
-var AllocatorPool = sync.Pool{
-	New: func() interface{} {
-		return &Allocator{}
-	},
+var AllocatorPool = allocatorPool{p: new(sync.Pool)}
+
+// maxPooledBufferCap limits the buffer capacity an Allocator may retain when returned
+// to the pool. An Allocator's buffer grows to the largest allocation it has served and
+// never shrinks, so without a cap an occasional very large response would pin a buffer
+// of that size in the pool indefinitely. Allocators above the cap are dropped and
+// reclaimed by the garbage collector instead. The value matches the default max request
+// body size, mirroring the CBOR serializer's buffer pool.
+const maxPooledBufferCap = 3 * 1024 * 1024
+
+type pool interface {
+	Get() interface{}
+	Put(interface{})
+}
+
+type allocatorPool struct {
+	p pool
+}
+
+func (ap *allocatorPool) Get() interface{} {
+	if a, ok := ap.p.Get().(*Allocator); ok {
+		return a
+	}
+	return &Allocator{}
+}
+
+func (ap *allocatorPool) Put(x interface{}) {
+	a, ok := x.(*Allocator)
+	if !ok || cap(a.buf) > maxPooledBufferCap {
+		return
+	}
+	ap.p.Put(a)
 }
 
 // Allocator knows how to allocate memory

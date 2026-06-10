@@ -109,7 +109,16 @@ func SerializeObject(mediaType string, encoder runtime.Encoder, hw http.Response
 		ctx:             ctx,
 	}
 
-	err := encoder.Encode(object, w)
+	var err error
+	if encoderWithAllocator, supportsAllocator := encoder.(runtime.EncoderWithAllocator); supportsAllocator {
+		memoryAllocator := runtime.AllocatorPool.Get().(*runtime.Allocator)
+		// deferredResponseWriter does not retain the bytes passed to Write, so the
+		// allocator's buffer is safe to reuse once SerializeObject returns.
+		defer runtime.AllocatorPool.Put(memoryAllocator)
+		err = encoderWithAllocator.EncodeWithAllocator(object, w, memoryAllocator)
+	} else {
+		err = encoder.Encode(object, w)
+	}
 	if err == nil {
 		err = w.Close()
 		if err != nil {

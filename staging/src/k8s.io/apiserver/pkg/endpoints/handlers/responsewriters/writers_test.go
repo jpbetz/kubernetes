@@ -379,6 +379,56 @@ func TestSerializeObject(t *testing.T) {
 	}
 }
 
+func TestSerializeObjectWithAllocator(t *testing.T) {
+	smallPayload := []byte("{test-object,test-object}")
+	tests := []struct {
+		name        string
+		out         []byte
+		outErrs     []error
+		wantCode    int
+		wantHeaders http.Header
+		wantBody    []byte
+	}{
+		{
+			name:        "encode with pooled allocator",
+			out:         smallPayload,
+			wantCode:    http.StatusOK,
+			wantHeaders: http.Header{"Content-Type": []string{"application/json"}},
+			wantBody:    smallPayload,
+		},
+		{
+			name:        "fallback write after encode error",
+			out:         smallPayload,
+			outErrs:     []error{fmt.Errorf("bad"), fmt.Errorf("bad2")},
+			wantCode:    http.StatusInternalServerError,
+			wantHeaders: http.Header{"Content-Type": []string{"text/plain"}},
+			wantBody:    []byte(": bad"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			encoder := &fakeEncoderWithAllocator{fakeEncoder: fakeEncoder{buf: tt.out, errs: tt.outErrs}}
+			recorder := httptest.NewRecorder()
+			req := &http.Request{Header: http.Header{}, URL: &url.URL{Path: "/path"}}
+			SerializeObject("application/json", encoder, recorder, req, http.StatusOK, nil)
+			result := recorder.Result()
+			if result.StatusCode != tt.wantCode {
+				t.Fatalf("unexpected code: %v", result.StatusCode)
+			}
+			if !reflect.DeepEqual(result.Header, tt.wantHeaders) {
+				t.Fatal(cmp.Diff(tt.wantHeaders, result.Header))
+			}
+			body, _ := io.ReadAll(result.Body)
+			if !bytes.Equal(tt.wantBody, body) {
+				t.Fatalf("wanted:\n%s\ngot:\n%s", hex.Dump(tt.wantBody), hex.Dump(body))
+			}
+			if encoder.memAlloc == nil {
+				t.Error("expected EncodeWithAllocator to be called with a memory allocator")
+			}
+		})
+	}
+}
+
 func TestDeferredResponseWriter_Write(t *testing.T) {
 	smallChunk := bytes.Repeat([]byte("b"), defaultGzipThresholdBytes-1)
 	largeChunk := bytes.Repeat([]byte("b"), defaultGzipThresholdBytes+1)
@@ -805,6 +855,25 @@ func (e *fakeEncoder) Encode(obj runtime.Object, w io.Writer) error {
 
 func (e *fakeEncoder) Identifier() runtime.Identifier {
 	return runtime.Identifier("fake")
+}
+
+type fakeEncoderWithAllocator struct {
+	fakeEncoder
+	memAlloc runtime.MemoryAllocator
+}
+
+func (e *fakeEncoderWithAllocator) EncodeWithAllocator(obj runtime.Object, w io.Writer, memAlloc runtime.MemoryAllocator) error {
+	e.memAlloc = memAlloc
+	if len(e.errs) > 0 {
+		err := e.errs[0]
+		e.errs = e.errs[1:]
+		return err
+	}
+	data := memAlloc.Allocate(uint64(len(e.buf)))
+	copy(data, e.buf)
+	_, err := w.Write(data)
+	e.encodeCalled = true
+	return err
 }
 
 func gzipContent(data []byte, level int) []byte {

@@ -57,6 +57,49 @@ func TestAllocatorNeverShrinks(t *testing.T) {
 	}
 }
 
+func TestAllocatorPoolCapsPooledBuffers(t *testing.T) {
+	testCases := []struct {
+		name       string
+		allocate   uint64
+		wantPooled bool
+	}{
+		{name: "empty allocator is pooled", allocate: 0, wantPooled: true},
+		{name: "buffer at the cap is pooled", allocate: maxPooledBufferCap, wantPooled: true},
+		{name: "buffer above the cap is dropped", allocate: maxPooledBufferCap + 1, wantPooled: false},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			fake := &fakePool{}
+			target := allocatorPool{p: fake}
+			allocator := target.Get().(*Allocator)
+			if tc.allocate > 0 {
+				allocator.Allocate(tc.allocate)
+			}
+			target.Put(allocator)
+			if pooled := len(fake.items) == 1; pooled != tc.wantPooled {
+				t.Errorf("allocator pooled = %v, want %v", pooled, tc.wantPooled)
+			}
+		})
+	}
+}
+
+type fakePool struct {
+	items []interface{}
+}
+
+func (f *fakePool) Get() interface{} {
+	if len(f.items) == 0 {
+		return nil
+	}
+	x := f.items[len(f.items)-1]
+	f.items = f.items[:len(f.items)-1]
+	return x
+}
+
+func (f *fakePool) Put(x interface{}) {
+	f.items = append(f.items, x)
+}
+
 func TestAllocatorZero(t *testing.T) {
 	target := &Allocator{}
 	initialSize := 1000000 // 1MB
