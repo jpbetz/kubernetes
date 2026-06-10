@@ -125,6 +125,29 @@ func TestStoreSnapshotter(t *testing.T) {
 	assert.False(t, found)
 }
 
+func TestStoreSnapshotterEviction(t *testing.T) {
+	cache := NewSnapshotter()
+	overflow := 10
+	for i := 1; i <= maxSnapshotsCount+overflow; i++ {
+		cache.Add(uint64(i), fakeOrderedLister{rv: i})
+	}
+	assert.Equal(t, maxSnapshotsCount, cache.Len())
+
+	t.Log("Snapshots below the retained window are evicted")
+	_, found := cache.GetLessOrEqual(uint64(overflow))
+	assert.False(t, found)
+
+	t.Log("Oldest retained snapshot is the first one above the evicted window")
+	snapshot, found := cache.GetLessOrEqual(uint64(overflow + 1))
+	assert.True(t, found)
+	assert.Equal(t, overflow+1, snapshot.(fakeOrderedLister).rv)
+
+	t.Log("Newest snapshot is retained")
+	snapshot, found = cache.GetLessOrEqual(uint64(maxSnapshotsCount + overflow))
+	assert.True(t, found)
+	assert.Equal(t, maxSnapshotsCount+overflow, snapshot.(fakeOrderedLister).rv)
+}
+
 type fakeOrderedLister struct {
 	rv int
 }

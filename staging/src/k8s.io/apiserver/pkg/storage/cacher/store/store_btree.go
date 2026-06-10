@@ -425,6 +425,14 @@ func (i *indexer) delete(key, value string, index map[string]map[string]*Element
 // should reduce number of allocations and improve removal complexity.
 // However, this solution is more complex and is deferred for future implementation.
 //
+// maxSnapshotsCount caps the number of retained snapshots to bound memory use.
+// A snapshot is taken per watch event, but removed only when the watch cache
+// event buffer is full or etcd compacts, so for high-churn resources retained
+// copy-on-write btree nodes can otherwise grow unbounded. The cap is generous
+// enough not to change steady-state behavior; requests for evicted resource
+// versions return ResourceExpired and fall back to etcd.
+const maxSnapshotsCount = 2048
+
 // TODO: Rewrite to use a cyclic buffer
 func NewSnapshotter() Snapshotter {
 	s := &storeSnapshotter{
@@ -480,6 +488,9 @@ func (s *storeSnapshotter) Add(rv uint64, indexer OrderedLister) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 	s.snapshots.ReplaceOrInsert(rvSnapshot{resourceVersion: rv, snapshot: indexer.Clone()})
+	for s.snapshots.Len() > maxSnapshotsCount {
+		s.snapshots.DeleteMin()
+	}
 }
 
 func (s *storeSnapshotter) RemoveLess(rv uint64) {
