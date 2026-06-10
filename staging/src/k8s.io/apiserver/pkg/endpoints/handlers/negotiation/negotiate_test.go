@@ -20,11 +20,15 @@ import (
 	"mime"
 	"net/http"
 	"net/url"
+	"reflect"
 	"strings"
 	"testing"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apiserver/pkg/features"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	featuregatetesting "k8s.io/component-base/featuregate/testing"
 )
 
 // statusError is an object that can be converted into an metav1.Status
@@ -278,6 +282,60 @@ func TestNegotiate(t *testing.T) {
 		if s.Serializer != test.serializer {
 			t.Errorf("%d: unexpected %s %s", i, test.serializer, s.Serializer)
 		}
+	}
+}
+
+func TestNegotiateDropManagedFields(t *testing.T) {
+	testCases := []struct {
+		name              string
+		accept            string
+		featureEnabled    bool
+		dropManagedFields bool
+		unrecognized      []string
+	}{
+		{
+			name:           "no drop parameter",
+			accept:         "application/json",
+			featureEnabled: true,
+		},
+		{
+			name:              "drop managedFields",
+			accept:            "application/json;drop=metadata.managedFields",
+			featureEnabled:    true,
+			dropManagedFields: true,
+		},
+		{
+			name:              "drop managedFields among multiple targets",
+			accept:            "application/json;drop=metadata.managedFields+metadata.annotations",
+			featureEnabled:    true,
+			dropManagedFields: true,
+		},
+		{
+			name:           "unknown drop target ignored",
+			accept:         "application/json;drop=metadata.annotations",
+			featureEnabled: true,
+		},
+		{
+			name:         "feature disabled",
+			accept:       "application/json;drop=metadata.managedFields",
+			unrecognized: []string{"drop"},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.ManagedFieldsOptOut, tc.featureEnabled)
+			ns := &fakeNegotiater{serializer: fakeCodec, types: []string{"application/json"}}
+			options, ok := NegotiateMediaTypeOptions(tc.accept, ns.SupportedMediaTypes(), DefaultEndpointRestrictions)
+			if !ok {
+				t.Fatal("negotiation failed")
+			}
+			if options.DropManagedFields != tc.dropManagedFields {
+				t.Errorf("DropManagedFields: got %v, want %v", options.DropManagedFields, tc.dropManagedFields)
+			}
+			if !reflect.DeepEqual(options.Unrecognized, tc.unrecognized) {
+				t.Errorf("Unrecognized: got %v, want %v", options.Unrecognized, tc.unrecognized)
+			}
+		})
 	}
 }
 

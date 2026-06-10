@@ -168,6 +168,10 @@ type MediaTypeOptions struct {
 	// has set
 	Export bool
 
+	// dropManagedFields is true if the client requested that metadata.managedFields
+	// be omitted from response objects
+	DropManagedFields bool
+
 	// profile controls the discovery profile (e.g., "local" for local (non peer-aggregated) discovery)
 	Profile string
 
@@ -225,6 +229,19 @@ func acceptMediaTypeOptions(params map[string]string, accepts *runtime.Serialize
 		// or which fit the default behavior.
 		case "export":
 			options.Export = v == "1"
+
+		// a "+"-separated list of fields to omit from returned objects;
+		// unrecognized targets are ignored for forward compatibility
+		case "drop":
+			if !utilfeature.DefaultFeatureGate.Enabled(features.ManagedFieldsOptOut) {
+				options.Unrecognized = append(options.Unrecognized, k)
+				break
+			}
+			for _, target := range strings.Split(v, "+") {
+				if target == "metadata.managedFields" {
+					options.DropManagedFields = true
+				}
+			}
 
 		// if specified, the pretty serializer will be used
 		case "pretty":

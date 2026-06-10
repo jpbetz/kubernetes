@@ -351,6 +351,9 @@ func WriteObjectNegotiated(s runtime.NegotiatedSerializer, restrictions negotiat
 	} else {
 		encoder = s.EncoderForVersion(serializer.Serializer, gv)
 	}
+	if mediaType.DropManagedFields {
+		encoder = &stripManagedFieldsEncoder{delegate: encoder}
+	}
 	request.TrackSerializeResponseObjectLatency(req.Context(), func() {
 		if listGVKInContentType {
 			SerializeObject(generateMediaTypeWithGVK(serializer.MediaType, mediaType.Convert), encoder, w, req, statusCode, object)
