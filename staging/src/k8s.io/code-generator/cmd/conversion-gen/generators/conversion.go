@@ -86,6 +86,52 @@ func isDrop(comments []string) (bool, error) {
 	return len(values) == 1 && values[0] == "drop", nil
 }
 
+func isTypeHub(t *types.Type) (bool, error) {
+	values, err := extractTagValues("k8s:conversion-hub", t.CommentLines)
+	if err != nil {
+		return false, err
+	}
+	if len(values) == 0 {
+		return false, nil
+	}
+	if values[0] == "false" {
+		return false, nil
+	}
+	return true, nil
+}
+
+func isTypeOptedOut(t *types.Type) (bool, error) {
+	values, err := extractTagValues("k8s:conversion-hub", t.CommentLines)
+	if err != nil {
+		return false, err
+	}
+	if len(values) > 0 && values[0] == "false" {
+		return true, nil
+	}
+	return false, nil
+}
+
+func getGroupName(context *generator.Context, pkg *types.Package, peerPkgs []string) (string, bool, error) {
+	groupName, ok, err := apidefinitions.GroupNameForPackage(pkg.Comments)
+	if err != nil {
+		return "", false, err
+	}
+	if ok {
+		return groupName, true, nil
+	}
+	for _, peerPath := range peerPkgs {
+		peerPkg := context.Universe[peerPath]
+		if peerPkg == nil {
+			continue
+		}
+		gName, peerOk, err := apidefinitions.GroupNameForPackage(peerPkg.Comments)
+		if err == nil && peerOk {
+			return gName, true, nil
+		}
+	}
+	return "", false, nil
+}
+
 // TODO: This is created only to reduce number of changes in a single PR.
 // Remove it and use PublicNamer instead.
 func conversionNamer() *namer.NameStrategy {
@@ -296,6 +342,10 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 	orderer := namer.Orderer{Namer: namer.NewPublicNamer(1)}
 	context.Order = orderer.OrderUniverse(context.Universe)
 
+	if err := validateGroupHubs(context, args, filteredInputs, pkgToPeers, pkgToExternal); err != nil {
+		klog.Fatalf("%v", err)
+	}
+
 	// Look for conversion functions in the peer-packages.
 	for _, pp := range otherPkgs {
 		p := context.Universe[pp]
@@ -361,16 +411,164 @@ func GetTargets(context *generator.Context, args *args.Args) []generator.Target 
 	return targetList
 }
 
-type equalMemoryTypes map[conversionPair]bool
+func validateGroupHubs(context *generator.Context, args *args.Args, filteredInputs []string, pkgToPeers map[string][]string, pkgToExternal map[string]string) error {
+	groupToVersioned := map[string][]string{}
+	groupToInternal := map[string]map[string]bool{} // set of internal package paths
+
+	for _, inputPath := range filteredInputs {
+		pkg := context.Universe[inputPath]
+		if pkg == nil {
+			continue
+		}
+		groupName, ok, err := getGroupName(context, pkg, pkgToPeers[inputPath])
+		if err != nil {
+			return fmt.Errorf("error getting group name for pkg %s: %w", inputPath, err)
+		}
+		if !ok {
+			continue
+		}
+		groupToVersioned[groupName] = append(groupToVersioned[groupName], inputPath)
+
+		if groupToInternal[groupName] == nil {
+			groupToInternal[groupName] = map[string]bool{}
+		}
+		info, err := apidefinitions.Identify(pkg, apidefinitions.Conversion)
+		if err != nil {
+			return fmt.Errorf("failed to identify package %s: %w", inputPath, err)
+		}
+		peerPkgs := info.PeerPackages()
+		for _, peer := range peerPkgs {
+			groupToInternal[groupName][peer] = true
+		}
+	}
+
+	type groupType struct {
+		group string
+		name  string
+	}
+
+	type typeLocation struct {
+		pkgPath string
+		t       *types.Type
+	}
+
+	hubTypes := map[groupType][]typeLocation{}
+
+	for groupName, versionedPkgs := range groupToVersioned {
+		for _, pkgPath := range versionedPkgs {
+			externalTypesPkgPath := pkgToExternal[pkgPath]
+			pkg := context.Universe[externalTypesPkgPath]
+			if pkg == nil {
+				continue
+			}
+			for _, t := range pkg.Types {
+				if t.Kind != types.Struct {
+					continue
+				}
+				isHub, err := isTypeHub(t)
+				if err != nil {
+					return fmt.Errorf("error checking conversion-hub tag for type %s in %s: %w", t.Name, pkgPath, err)
+				}
+				if isHub {
+					gt := groupType{group: groupName, name: t.Name.Name}
+					hubTypes[gt] = append(hubTypes[gt], typeLocation{pkgPath: pkgPath, t: t})
+				}
+			}
+		}
+	}
+
+	// Enforce at-most-one-hub rule
+	for gt, locs := range hubTypes {
+		if len(locs) > 1 {
+			var paths []string
+			for _, l := range locs {
+				paths = append(paths, l.pkgPath)
+			}
+			return fmt.Errorf("Type %q in group %q has multiple conversion-hubs: %v", gt.name, gt.group, paths)
+		}
+	}
+
+	// Verify memory identity for conversion-hubs
+	validationMemoryEquivalentTypes := equalMemoryTypes{}
+	for gt, locs := range hubTypes {
+		if len(locs) != 1 {
+			continue
+		}
+		loc := locs[0]
+		internalPkgs := groupToInternal[gt.group]
+		var peerType *types.Type
+		for ipkgPath := range internalPkgs {
+			ipkg := context.Universe[ipkgPath]
+			if ipkg == nil {
+				continue
+			}
+			if t, ok := ipkg.Types[gt.name]; ok {
+				peerType = t
+				break
+			}
+		}
+		if peerType == nil {
+			klog.V(3).Infof("Hub type %s in %s has no peer internal type in group %s, skipping check", gt.name, loc.pkgPath, gt.group)
+			continue
+		}
+
+		if reason := validationMemoryEquivalentTypes.ReasonNotEqual(loc.t, peerType); reason != "" {
+			if !strings.HasPrefix(reason, "\n") {
+				reason = " " + reason
+			}
+			return fmt.Errorf("Type %q in package %q is not memory-identical to internal type %q in %q:%s",
+				loc.t.Name.Name, loc.pkgPath, peerType.Name.Name, peerType.Name.Package, reason)
+		}
+	}
+
+	// Enforce require-group-hub rule
+	if args.RequireConversionHub {
+		for groupName, ipkgs := range groupToInternal {
+			for ipkgPath := range ipkgs {
+				ipkg := context.Universe[ipkgPath]
+				if ipkg == nil {
+					continue
+				}
+				for _, t := range ipkg.Types {
+					if t.Kind != types.Struct {
+						continue
+					}
+					optOut, err := isTypeOptedOut(t)
+					if err != nil {
+						return fmt.Errorf("error checking opt-out for internal type %s: %w", t.Name, err)
+					}
+					if optOut {
+						continue
+					}
+
+					gt := groupType{group: groupName, name: t.Name.Name}
+					hubs := hubTypes[gt]
+					if len(hubs) == 0 {
+						return fmt.Errorf("Internal type %q in group %q must have a conversion-hub, but none was found", t.Name.Name, groupName)
+					}
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+type equalMemoryTypes map[conversionPair]string
 
 func (e equalMemoryTypes) Skip(a, b *types.Type) {
-	e[conversionPair{a, b}] = false
-	e[conversionPair{b, a}] = false
+	e[conversionPair{a, b}] = "manual conversion defined"
+	e[conversionPair{b, a}] = "manual conversion defined"
 }
 
 func (e equalMemoryTypes) Equal(a, b *types.Type) bool {
-	equal, _ := e.cachingEqual(a, b, nil)
-	return equal
+	reason, _ := e.cachingEqual(a, b, nil)
+	return reason == ""
+}
+
+func (e equalMemoryTypes) ReasonNotEqual(a, b *types.Type) string {
+	reason, _ := e.cachingEqual(a, b, nil)
+	return reason
 }
 
 // cachingEqual recursively compares a and b for memory equality,
@@ -378,76 +576,136 @@ func (e equalMemoryTypes) Equal(a, b *types.Type) bool {
 // alreadyVisitedStack is used to check for cycles during recursion.
 // The returned cacheable boolean tells the caller whether the equal result is a definitive answer that can be safely cached,
 // or if it's a temporary assumption made to break a cycle in a recursively defined type.
-func (e equalMemoryTypes) cachingEqual(a, b *types.Type, alreadyVisitedStack []*types.Type) (equal, cacheable bool) {
+func (e equalMemoryTypes) cachingEqual(a, b *types.Type, alreadyVisitedStack []*types.Type) (reason string, cacheable bool) {
 	if a == b {
-		return true, true
+		return "", true
 	}
-	if equal, ok := e[conversionPair{a, b}]; ok {
-		return equal, true
+	if reason, ok := e[conversionPair{a, b}]; ok {
+		return reason, true
 	}
-	if equal, ok := e[conversionPair{b, a}]; ok {
-		return equal, true
+	if reason, ok := e[conversionPair{b, a}]; ok {
+		return reason, true
 	}
-	result, cacheable := e.equal(a, b, alreadyVisitedStack)
+	resReason, cacheable := e.equal(a, b, alreadyVisitedStack)
 	if cacheable {
-		e[conversionPair{a, b}] = result
-		e[conversionPair{b, a}] = result
+		e[conversionPair{a, b}] = resReason
+		e[conversionPair{b, a}] = resReason
 	}
-	return result, cacheable
+	return resReason, cacheable
 }
 
 // equal recursively compares a and b for memory equality.
 // alreadyVisitedStack is used to check for cycles during recursion.
 // The returned cacheable boolean tells the caller whether the equal result is a definitive answer that can be safely cached,
 // or if it's a temporary assumption made to break a cycle in a recursively defined type.
-func (e equalMemoryTypes) equal(a, b *types.Type, alreadyVisitedStack []*types.Type) (equal, cacheable bool) {
+func (e equalMemoryTypes) equal(a, b *types.Type, alreadyVisitedStack []*types.Type) (reason string, cacheable bool) {
 	in, out := unwrapAlias(a), unwrapAlias(b)
 	switch {
 	case in == out:
-		return true, true
+		return "", true
 	case in.Kind == out.Kind:
 		for _, v := range alreadyVisitedStack {
 			if v == in {
 				// if the type was visited in this stack already, return early to avoid infinite recursion, but do not cache the results
-				return true, false
+				return "", false
 			}
 		}
 		alreadyVisitedStack = append(alreadyVisitedStack, in)
 
 		switch in.Kind {
 		case types.Struct:
-			if len(in.Members) != len(out.Members) {
-				return false, true
+			// 1. Check for missing/extra fields by name
+			inMembers := map[string]types.Member{}
+			for _, m := range in.Members {
+				inMembers[m.Name] = m
 			}
+			outMembers := map[string]types.Member{}
+			for _, m := range out.Members {
+				outMembers[m.Name] = m
+			}
+
+			var extraIn []string
+			for _, m := range in.Members {
+				if _, ok := outMembers[m.Name]; !ok {
+					extraIn = append(extraIn, m.Name)
+				}
+			}
+			var extraOut []string
+			for _, m := range out.Members {
+				if _, ok := inMembers[m.Name]; !ok {
+					extraOut = append(extraOut, m.Name)
+				}
+			}
+
+			if len(extraIn) > 0 || len(extraOut) > 0 {
+				var diffs []string
+				for _, name := range extraIn {
+					diffs = append(diffs, fmt.Sprintf("extra field in external type: %s", name))
+				}
+				for _, name := range extraOut {
+					diffs = append(diffs, fmt.Sprintf("missing field in external type (present in internal): %s", name))
+				}
+				return "\n" + strings.Join(diffs, "\n"), true
+			}
+
+			// 2. If sets of fields are identical, check type and order index-by-index
+			var diffs []string
 			cacheable = true
-			for i, inMember := range in.Members {
+			for i := 0; i < len(in.Members); i++ {
+				inMember := in.Members[i]
 				outMember := out.Members[i]
-				memberEqual, memberCacheable := e.cachingEqual(inMember.Type, outMember.Type, alreadyVisitedStack)
-				if !memberEqual {
-					return false, true
+
+				if inMember.Name != outMember.Name {
+					diffs = append(diffs, fmt.Sprintf("field order mismatch at index %d: external has %q, internal has %q", i, inMember.Name, outMember.Name))
+					break
+				}
+
+				memberReason, memberCacheable := e.cachingEqual(inMember.Type, outMember.Type, alreadyVisitedStack)
+				if memberReason != "" {
+					diffs = append(diffs, formatNestedReason(fmt.Sprintf("member %q", inMember.Name), memberReason))
 				}
 				if !memberCacheable {
 					cacheable = false
 				}
 			}
-			return true, cacheable
+			if len(diffs) > 0 {
+				return "\n" + strings.Join(diffs, "\n"), cacheable
+			}
+			return "", cacheable
 		case types.Pointer:
-			return e.cachingEqual(in.Elem, out.Elem, alreadyVisitedStack)
+			reason, cacheable := e.cachingEqual(in.Elem, out.Elem, alreadyVisitedStack)
+			if reason != "" {
+				return formatNestedReason("pointer element", reason), cacheable
+			}
+			return "", cacheable
 		case types.Map:
-			keyEqual, keyCacheable := e.cachingEqual(in.Key, out.Key, alreadyVisitedStack)
-			valueEqual, valueCacheable := e.cachingEqual(in.Elem, out.Elem, alreadyVisitedStack)
-			return keyEqual && valueEqual, keyCacheable && valueCacheable
+			keyReason, keyCacheable := e.cachingEqual(in.Key, out.Key, alreadyVisitedStack)
+			if keyReason != "" {
+				return formatNestedReason("map key", keyReason), keyCacheable
+			}
+			valueReason, valueCacheable := e.cachingEqual(in.Elem, out.Elem, alreadyVisitedStack)
+			if valueReason != "" {
+				return formatNestedReason("map value", valueReason), valueCacheable
+			}
+			return "", keyCacheable && valueCacheable
 		case types.Slice:
-			return e.cachingEqual(in.Elem, out.Elem, alreadyVisitedStack)
+			reason, cacheable := e.cachingEqual(in.Elem, out.Elem, alreadyVisitedStack)
+			if reason != "" {
+				return formatNestedReason("slice element", reason), cacheable
+			}
+			return "", cacheable
 		case types.Interface:
 			// TODO: determine whether the interfaces are actually equivalent - for now, they must have the
 			// same type.
-			return false, true
+			return "interfaces are not supported for memory equality", true
 		case types.Builtin:
-			return in.Name.Name == out.Name.Name, true
+			if in.Name.Name != out.Name.Name {
+				return fmt.Sprintf("different builtin types: %s vs %s", in.Name.Name, out.Name.Name), true
+			}
+			return "", true
 		}
 	}
-	return false, true
+	return fmt.Sprintf("different kinds: %s vs %s", in.Kind, out.Kind), true
 }
 
 func findMember(t *types.Type, name string) (types.Member, bool) {
@@ -468,6 +726,23 @@ func unwrapAlias(in *types.Type) *types.Type {
 		in = in.Underlying
 	}
 	return in
+}
+
+func indent(s, prefix string) string {
+	lines := strings.Split(s, "\n")
+	for i, line := range lines {
+		if line != "" {
+			lines[i] = prefix + line
+		}
+	}
+	return strings.Join(lines, "\n")
+}
+
+func formatNestedReason(label string, reason string) string {
+	if strings.HasPrefix(reason, "\n") {
+		return fmt.Sprintf("%s:%s", label, indent(reason, "  "))
+	}
+	return fmt.Sprintf("%s: %s", label, reason)
 }
 
 const (
@@ -683,10 +958,10 @@ func (g *genConversion) Init(c *generator.Context, w io.Writer) error {
 			var result []string
 			klogV.Info("All objects without identical memory layout:")
 			for k, v := range m {
-				if v {
+				if v == "" {
 					continue
 				}
-				result = append(result, fmt.Sprintf("  %s -> %s = %t", k.inType, k.outType, v))
+				result = append(result, fmt.Sprintf("  %s -> %s: %s", k.inType, k.outType, v))
 			}
 			sort.Strings(result)
 			for _, s := range result {
