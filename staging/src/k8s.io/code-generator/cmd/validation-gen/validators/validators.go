@@ -351,6 +351,24 @@ type Validations struct {
 	// validators). Deferred callbacks may return further deferred validations,
 	// which will be processed iteratively until exhaustion.
 	Deferred []DeferredGen
+
+	// DefaultConditions, when non-nil, are applied to every Function in this
+	// Validations that does not already carry its own Conditions. The registry
+	// folds them into those functions during ExtractValidations; they never reach
+	// the emitter. Multiple accumulated via Add merge with AND semantics.
+	DefaultConditions *Conditions
+
+	// FeatureGateSpec, when non-nil, records the feature gates a field is behind
+	// and whether it opted into dropping. It is metadata for the feature-gate
+	// generator and is never emitted by the validation emitter.
+	FeatureGateSpec *FeatureGateSpec
+}
+
+// FeatureGateSpec records a field's feature gates (the option for each is the
+// gate name) and whether the field opted into automatic dropping.
+type FeatureGateSpec struct {
+	Gates []string
+	Drop  bool
 }
 
 func (v *Validations) Empty() bool {
@@ -388,6 +406,28 @@ func (v *Validations) Add(o Validations) {
 	v.OpaqueType = v.OpaqueType || o.OpaqueType
 	v.OpaqueKeyType = v.OpaqueKeyType || o.OpaqueKeyType
 	v.OpaqueValType = v.OpaqueValType || o.OpaqueValType
+	if o.DefaultConditions != nil {
+		if v.DefaultConditions == nil {
+			v.DefaultConditions = o.DefaultConditions
+		} else {
+			// Merge with AND semantics: a function is gated only when all
+			// accumulated options are enabled.
+			merged := *v.DefaultConditions
+			merged.OptionsEnabled = append(merged.OptionsEnabled, o.DefaultConditions.OptionsEnabled...)
+			v.DefaultConditions = &merged
+		}
+	}
+	if o.FeatureGateSpec != nil {
+		if v.FeatureGateSpec == nil {
+			v.FeatureGateSpec = o.FeatureGateSpec
+		} else {
+			merged := FeatureGateSpec{
+				Gates: append(append([]string{}, v.FeatureGateSpec.Gates...), o.FeatureGateSpec.Gates...),
+				Drop:  v.FeatureGateSpec.Drop || o.FeatureGateSpec.Drop,
+			}
+			v.FeatureGateSpec = &merged
+		}
+	}
 }
 
 // Clone returns a copy of v with new slices for its slice fields.
@@ -467,18 +507,20 @@ const (
 	NonError
 )
 
-// Conditions defines what conditions must be true for a resource to be validated.
-// If any of the conditions are not true, the resource is not validated.
+// Conditions defines the options that must all be enabled for a validation to
+// run. If they are not all enabled, the validation is skipped.
 type Conditions struct {
-	// OptionEnabled specifies an option name that must be set to true for the condition to be true.
-	OptionEnabled string
+	// OptionsEnabled lists option names that must ALL be enabled. Generates
+	// op.HasOption("A") && op.HasOption("B").
+	OptionsEnabled []string
 
-	// OptionDisabled specifies an option name that must be set to false for the condition to be true.
-	OptionDisabled string
+	// Inverted negates the condition: if OptionsEnabled is ["A", "B"] and
+	// Inverted is true, the condition is !(op.HasOption("A") && op.HasOption("B")).
+	Inverted bool
 }
 
 func (c Conditions) Empty() bool {
-	return len(c.OptionEnabled) == 0 && len(c.OptionDisabled) == 0
+	return len(c.OptionsEnabled) == 0
 }
 
 // Identifier is a name that the generator will output as an identifier.

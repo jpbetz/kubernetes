@@ -122,6 +122,21 @@ func (reg *registry) ExtractValidations(context Context, tags ...codetags.Tag) (
 		return Validations{}, err
 	}
 
+	// Fold any accumulated DefaultConditions into the functions that do not
+	// already carry their own Conditions. This resolves meta-tag gating (e.g.
+	// +k8s:featureGate gating all other validations on a field) so that the
+	// emitter only ever sees fully-resolved per-function Conditions. Functions
+	// produced later by Deferred callbacks set their own Conditions and are
+	// intentionally not affected.
+	if validations.DefaultConditions != nil {
+		for i := range validations.Functions {
+			if validations.Functions[i].Conditions.Empty() {
+				validations.Functions[i] = validations.Functions[i].WithConditions(*validations.DefaultConditions)
+			}
+		}
+		validations.DefaultConditions = nil
+	}
+
 	return validations, nil
 }
 

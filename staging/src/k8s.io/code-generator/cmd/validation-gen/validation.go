@@ -1494,17 +1494,7 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 				emitCall = func() {
 					sw.Do("func() $.field.ErrorList|raw$ {\n", targs)
 					sw.Do("  if ", nil)
-					firstCondition := true
-					if len(v.Conditions.OptionEnabled) > 0 {
-						sw.Do("op.HasOption($.$)", strconv.Quote(v.Conditions.OptionEnabled))
-						firstCondition = false
-					}
-					if len(v.Conditions.OptionDisabled) > 0 {
-						if !firstCondition {
-							sw.Do(" && ", nil)
-						}
-						sw.Do("!op.HasOption($.$)", strconv.Quote(v.Conditions.OptionDisabled))
-					}
+					emitCondition(sw, v.Conditions)
 					sw.Do(" {\n", nil)
 					sw.Do("    return ", nil)
 					emitBaseFunction()
@@ -1605,6 +1595,21 @@ func sortIntoCohorts(in []validators.FunctionGen) [][]validators.FunctionGen {
 		result = append(result, sorted)
 	}
 	return result
+}
+
+// emitCondition writes the Go boolean expression for a Conditions struct, e.g.
+// op.HasOption("A") && op.HasOption("B"), optionally wrapped in a negation when
+// Inverted is set.
+func emitCondition(sw *generator.SnippetWriter, cond validators.Conditions) {
+	var parts []string
+	for _, opt := range cond.OptionsEnabled {
+		parts = append(parts, fmt.Sprintf("op.HasOption(%s)", strconv.Quote(opt)))
+	}
+	expr := strings.Join(parts, " && ")
+	if cond.Inverted {
+		expr = "!(" + expr + ")"
+	}
+	sw.Do(expr, nil)
 }
 
 func emitComments(comments []string, sw *generator.SnippetWriter) {
