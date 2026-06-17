@@ -464,12 +464,17 @@ function codegen::validation() {
         done
     fi
 
+    # Generate in-use detection and field dropping.
+    local featuregate_output_file="${GENERATED_FILE_PREFIX}featuregate.go"
+
     git_find -z ':(glob)**'/"${output_file_prefix}"'*' | xargs -0 rm -f
+    git_find -z ':(glob)**'/"${GENERATED_FILE_PREFIX}"'featuregate.go' | xargs -0 rm -f
 
     validation-gen \
         -v "${KUBE_VERBOSE}" \
         --go-header-file "${BOILERPLATE_FILENAME}" \
         --output-file "${output_file}" \
+        --featuregate-output-file "${featuregate_output_file}" \
         --test-output-root "test/declarative_validation" \
         --test-output-file-prefix "${output_file_prefix}" \
         --test-allowlist "test/declarative_validation/coverage-allowlist.yaml" \

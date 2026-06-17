@@ -419,6 +419,13 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 					generators = []generator.Generator{
 						NewGenValidations(args.OutputFile, pkg.Path, rootTypes, td, inputToPkg, schemeRegistry),
 					}
+					// Also generate feature-gate support, for packages that have a
+					// +k8s:featureGate field, when --featuregate-output-file is set.
+					if args.FeatureGateOutputFile != "" {
+						if gg := NewGenFeatureGate(args.FeatureGateOutputFile, pkg.Path, rootTypes, td, schemeRegistry); gg.hasFeatureGates() {
+							generators = append(generators, gg)
+						}
+					}
 					testFixtureTags := testFixtureTag(pkg)
 					if testFixtureTags.Len() > 0 {
 						if !strings.HasSuffix(args.OutputFile, ".go") {

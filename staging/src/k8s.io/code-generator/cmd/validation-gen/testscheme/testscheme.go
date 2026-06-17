@@ -48,8 +48,14 @@ import (
 // to also be used as a scheme builder.
 // Must only be used with tests that perform all registration before calls to validate.
 type Scheme struct {
-	validationFuncs    map[reflect.Type]func(ctx context.Context, op operation.Operation, object, oldObject interface{}) field.ErrorList
-	registrationErrors field.ErrorList
+	validationFuncs       map[reflect.Type]func(ctx context.Context, op operation.Operation, object, oldObject interface{}) field.ErrorList
+	featureGateInfoByType map[reflect.Type]featureGateInfo
+	registrationErrors    field.ErrorList
+}
+
+type featureGateInfo struct {
+	featureGatesInUse func(oldObject interface{}) (inUse []string, notInUse []string)
+	drop              func(op operation.Operation, object interface{})
 }
 
 // New creates a new Scheme.
@@ -61,6 +67,14 @@ func New() *Scheme {
 // Last writer wins.
 func (s *Scheme) AddValidationFunc(srcType any, fn func(ctx context.Context, op operation.Operation, object, oldObject interface{}) field.ErrorList) {
 	s.validationFuncs[reflect.TypeOf(srcType)] = fn
+}
+
+// AddFeatureGateFuncs records a type's feature-gate support.
+func (s *Scheme) AddFeatureGateFuncs(srcType any, featureGatesInUse func(oldObject interface{}) (inUse []string, notInUse []string), drop func(op operation.Operation, object interface{})) {
+	if s.featureGateInfoByType == nil {
+		s.featureGateInfoByType = map[reflect.Type]featureGateInfo{}
+	}
+	s.featureGateInfoByType[reflect.TypeOf(srcType)] = featureGateInfo{featureGatesInUse: featureGatesInUse, drop: drop}
 }
 
 // Validate validates an object using the registered validation function.

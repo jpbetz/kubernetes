@@ -79,6 +79,11 @@ type Args struct {
 	ReadOnlyPkgs []string // Always consider these as last-ditch possibilities for validations.
 	GoHeaderFile string
 	PrintDocs    bool
+
+	// FeatureGateOutputFile, when non-empty, enables +k8s:featureGate
+	// option/drop-support generation and names the emitted file.
+	FeatureGateOutputFile string
+
 	// TestOutputRoot, when non-empty, enables coverage test fixture
 	// generation. For each Kind with declared rules, emits a test directory
 	// at <TestOutputRoot>/<short-group>/<lowercase(kind)>/ containing one
@@ -111,6 +116,8 @@ func (args *Args) AddFlags(fs *pflag.FlagSet) {
 		"the path to a file containing boilerplate header text; the string \"YEAR\" will be replaced with the current 4-digit year")
 	fs.BoolVar(&args.PrintDocs, "docs", false,
 		"print documentation for supported declarative validations, and then exit")
+	fs.StringVar(&args.FeatureGateOutputFile, "featuregate-output-file", "",
+		"if non-empty, also emit +k8s:featureGate option/drop-support code to this file")
 	fs.StringVar(&args.TestOutputRoot, "test-output-root", "",
 		"if non-empty, also emit declarative-validation coverage test fixtures under this path, organized as <root>/<group>/<lowercase(kind)>/<file-prefix>{<version>,main}_test.go")
 	fs.StringVar(&args.TestOutputFilePrefix, "test-output-file-prefix", "",
