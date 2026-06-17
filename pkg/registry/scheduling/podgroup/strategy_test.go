@@ -292,7 +292,7 @@ func TestStrategyCreate(t *testing.T) {
 			strategy := NewStrategy()
 			strategy.PrepareForCreate(ctx, podGroup)
 			errs := strategy.Validate(ctx, podGroup)
-			errs = strategy.ValidateDeclaratively(ctx, podGroup, nil, errs, operation.Create, strategy.DeclarativeValidationConfig(ctx, podGroup, nil))
+			errs = strategy.ValidateDeclaratively(ctx, podGroup, nil, errs, operation.Create, strategy.DeclarativeRequestConfig(ctx, podGroup, nil))
 			if len(errs) != 0 {
 				if tc.expectValidationError == "" {
 					t.Fatalf("unexpected error(s): %v", errs)
@@ -484,7 +484,7 @@ func TestStrategyUpdate(t *testing.T) {
 			strategy := NewStrategy()
 			strategy.PrepareForUpdate(ctx, newPodGroup, podGroup)
 			errs := strategy.ValidateUpdate(ctx, newPodGroup, podGroup)
-			errs = strategy.ValidateDeclaratively(ctx, newPodGroup, podGroup, errs, operation.Update, strategy.DeclarativeValidationConfig(ctx, newPodGroup, podGroup))
+			errs = strategy.ValidateDeclaratively(ctx, newPodGroup, podGroup, errs, operation.Update, strategy.DeclarativeRequestConfig(ctx, newPodGroup, podGroup))
 			if len(errs) != 0 {
 				if tc.expectValidationError == "" {
 					t.Fatalf("unexpected error(s): %v", errs)

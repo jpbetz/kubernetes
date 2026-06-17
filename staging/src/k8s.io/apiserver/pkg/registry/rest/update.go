@@ -133,6 +133,14 @@ func BeforeUpdate(strategy RESTUpdateStrategy, ctx context.Context, obj, old run
 
 	strategy.PrepareForUpdate(ctx, obj, old)
 
+	dvConfig, err := declarativeRequestConfig(ctx, strategy, obj, old)
+	if err != nil {
+		return errors.NewInternalError(err)
+	}
+	if dm, ok := strategy.(DeclarativeDropFieldsStrategy); ok {
+		dm.DropFieldsDeclaratively(ctx, obj, old, operation.Update, dvConfig)
+	}
+
 	// Use the existing UID if none is provided
 	if len(objectMeta.GetUID()) == 0 {
 		objectMeta.SetUID(oldMeta.GetUID())
@@ -158,7 +166,7 @@ func BeforeUpdate(strategy RESTUpdateStrategy, ctx context.Context, obj, old run
 
 	errs = append(errs, strategy.ValidateUpdate(ctx, obj, old)...)
 	if dv, ok := strategy.(DeclarativeValidationStrategy); ok {
-		errs = dv.ValidateDeclaratively(ctx, obj, old, errs, operation.Update, dv.DeclarativeValidationConfig(ctx, obj, old))
+		errs = dv.ValidateDeclaratively(ctx, obj, old, errs, operation.Update, dvConfig)
 	}
 	if len(errs) > 0 {
 		RecordDuplicateValidationErrors(ctx, kind.GroupKind(), errs)

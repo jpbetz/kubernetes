@@ -106,7 +106,7 @@ func (s *resourceclaimStrategy) Validate(ctx context.Context, obj runtime.Object
 	return allErrs
 }
 
-// DeclarativeValidationConfig implements rest.DeclarativeValidationConfigurer to supply declarative
+// DeclarativeRequestConfig implements rest.DeclarativeStrategyConfigurer to supply declarative
 // validation options to the generic BeforeCreate/BeforeUpdate code path.
 //
 // TODO: Behavior drift introduced when wiring declarative validation
@@ -118,8 +118,8 @@ func (s *resourceclaimStrategy) Validate(ctx context.Context, obj runtime.Object
 // comparisons are stricter on status updates) but should be reviewed; if the
 // status subresource should not use these rules, override
 // ValidationConfig on resourceclaimStatusStrategy.
-func (*resourceclaimStrategy) DeclarativeValidationConfig(ctx context.Context, obj, oldObj runtime.Object) rest.DeclarativeValidationConfig {
-	return rest.DeclarativeValidationConfig{NormalizationRules: validation.ResourceNormalizationRules}
+func (*resourceclaimStrategy) DeclarativeRequestConfig(ctx context.Context, obj, oldObj runtime.Object) rest.DeclarativeRequestConfig {
+	return rest.DeclarativeRequestConfig{NormalizationRules: validation.ResourceNormalizationRules}
 }
 
 func (*resourceclaimStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {

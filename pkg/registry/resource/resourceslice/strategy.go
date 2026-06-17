@@ -62,10 +62,10 @@ func (resourceSliceStrategy) Validate(ctx context.Context, obj runtime.Object) f
 	return validation.ValidateResourceSlice(slice)
 }
 
-// DeclarativeValidationConfig implements rest.DeclarativeValidationConfigurer to supply declarative
+// DeclarativeRequestConfig implements rest.DeclarativeStrategyConfigurer to supply declarative
 // validation options to the generic BeforeCreate/BeforeUpdate code path.
-func (resourceSliceStrategy) DeclarativeValidationConfig(ctx context.Context, obj, oldObj runtime.Object) rest.DeclarativeValidationConfig {
-	return rest.DeclarativeValidationConfig{NormalizationRules: validation.ResourceNormalizationRules}
+func (resourceSliceStrategy) DeclarativeRequestConfig(ctx context.Context, obj, oldObj runtime.Object) rest.DeclarativeRequestConfig {
+	return rest.DeclarativeRequestConfig{NormalizationRules: validation.ResourceNormalizationRules}
 }
 
 // WarningsOnCreate returns warnings for the creation of the given object.

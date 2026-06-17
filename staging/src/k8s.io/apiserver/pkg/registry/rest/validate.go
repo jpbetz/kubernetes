@@ -42,10 +42,7 @@ type DeclarativeValidationStrategy interface {
 	// ValidateDeclaratively runs declarative validation, merges the declarative validation errors with any
 	// validationErrs returned from the strategy's Validate / ValidateUpdate functions (which implement hand-written validation)
 	// and performs migration checks.
-	ValidateDeclaratively(ctx context.Context, obj, oldObj runtime.Object, validationErrs field.ErrorList, opType operation.Type, config DeclarativeValidationConfig) field.ErrorList
-
-	// DeclarativeValidationConfig configures declarative validation for a single request.
-	DeclarativeValidationConfig(ctx context.Context, obj, oldObj runtime.Object) DeclarativeValidationConfig
+	ValidateDeclaratively(ctx context.Context, obj, oldObj runtime.Object, validationErrs field.ErrorList, opType operation.Type, config DeclarativeRequestConfig) field.ErrorList
 }
 
 // DeclarativeValidation is an implementation of DeclarativeValidationStrategy that
@@ -64,38 +61,17 @@ type DeclarativeValidation struct {
 	*runtime.Scheme
 }
 
-func (d DeclarativeValidation) ValidateDeclaratively(ctx context.Context, obj, oldObj runtime.Object, validationErrs field.ErrorList, opType operation.Type, config DeclarativeValidationConfig) field.ErrorList {
+func (d DeclarativeValidation) DeclarativeRequestConfig(ctx context.Context, obj, oldObj runtime.Object) DeclarativeRequestConfig {
+	// The zero value of DeclarativeRequestConfig is the default.
+	return DeclarativeRequestConfig{}
+}
+
+func (d DeclarativeValidation) ValidateDeclaratively(ctx context.Context, obj, oldObj runtime.Object, validationErrs field.ErrorList, opType operation.Type, config DeclarativeRequestConfig) field.ErrorList {
 	if d.Scheme == nil {
 		validationErrs = append(validationErrs, field.InternalError(nil, fmt.Errorf("cannot validate declaratively without a scheme")))
 		return validationErrs
 	}
 	return ValidateDeclarativelyWithMigrationChecks(ctx, d.Scheme, obj, oldObj, validationErrs, opType, config)
-}
-
-func (d DeclarativeValidation) DeclarativeValidationConfig(ctx context.Context, obj, oldObj runtime.Object) DeclarativeValidationConfig {
-	// The zero value of DeclarativeValidationConfig is the default.
-	return DeclarativeValidationConfig{}
-}
-
-// DeclarativeValidationConfig holds configuration for declarative validation.
-// Strategies that need to customize declarative validation behavior implement
-// DeclarativeValidationConfigurer and return this struct.
-type DeclarativeValidationConfig struct {
-	// Options contains validation options that declarative validation tags
-	// expect. These often correspond to feature gates.
-	Options []string
-
-	// NormalizationRules are applied to field paths when comparing
-	// handwritten and declarative validation errors.
-	NormalizationRules []field.NormalizationRule
-
-	// SubresourceGVKMapper maps a subresource request to the GVK of the
-	// subresource type for polymorphic subresources like /scale.
-	SubresourceGVKMapper GroupVersionKindProvider
-
-	// ShortCircuitMismatch allows a short-circuit declarative validation error for a field
-	// to match with any handwritten validation error on its subfields.
-	ShortCircuitMismatch bool
 }
 
 type allDeclarativeEnforcedKeyType struct{}
@@ -116,7 +92,7 @@ func WithAllDeclarativeEnforcedForTest(ctx context.Context) context.Context {
 type ValidationConfigOption struct {
 	OpType               operation.Type
 	ValidationIdentifier string
-	DeclarativeValidationConfig
+	DeclarativeRequestConfig
 }
 
 // validateDeclaratively validates obj and oldObj against declarative
@@ -377,7 +353,7 @@ func metricIdentifier(ctx context.Context, scheme *runtime.Scheme, obj runtime.O
 //
 // For testing purposes, WithAllDeclarativeEnforcedForTest enforces all declarative validations regardless
 // of lifecycle and filters all covered handwritten validations.
-func ValidateDeclarativelyWithMigrationChecks(ctx context.Context, scheme *runtime.Scheme, obj, oldObj runtime.Object, errs field.ErrorList, opType operation.Type, config DeclarativeValidationConfig) field.ErrorList {
+func ValidateDeclarativelyWithMigrationChecks(ctx context.Context, scheme *runtime.Scheme, obj, oldObj runtime.Object, errs field.ErrorList, opType operation.Type, config DeclarativeRequestConfig) field.ErrorList {
 	betaEnabled := utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidationBeta)
 	// allDeclarativeEnforced indicates that we should check all declarative errors for testing purposes.
 	allDeclarativeEnforced := ctx.Value(allDeclarativeEnforcedKey) == true
@@ -390,9 +366,9 @@ func ValidateDeclarativelyWithMigrationChecks(ctx context.Context, scheme *runti
 	}
 
 	cfg := &ValidationConfigOption{
-		OpType:                      opType,
-		ValidationIdentifier:        validationIdentifier,
-		DeclarativeValidationConfig: config,
+		OpType:                   opType,
+		ValidationIdentifier:     validationIdentifier,
+		DeclarativeRequestConfig: config,
 	}
 
 	declarativeErrs := runDeclarativeValidationWithRecover(ctx, scheme, obj, oldObj, cfg)

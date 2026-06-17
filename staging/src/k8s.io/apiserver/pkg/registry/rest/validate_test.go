@@ -168,7 +168,7 @@ func TestValidateDeclaratively(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 
 			cfg := &ValidationConfigOption{
-				DeclarativeValidationConfig: DeclarativeValidationConfig{Options: tc.options},
+				DeclarativeRequestConfig: DeclarativeRequestConfig{Options: tc.options},
 			}
 			if tc.oldObject == nil {
 				cfg.OpType = operation.Create
@@ -193,14 +193,8 @@ func (Pod) GetObjectKind() schema.ObjectKind { return schema.EmptyObjectKind }
 
 func (p Pod) DeepCopyObject() runtime.Object {
 	return &Pod{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: p.APIVersion,
-			Kind:       p.Kind,
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      p.Name,
-			Namespace: p.Namespace,
-		},
+		TypeMeta:      p.TypeMeta,
+		ObjectMeta:    *p.ObjectMeta.DeepCopy(),
 		RestartPolicy: p.RestartPolicy,
 	}
 }
@@ -367,7 +361,7 @@ func TestGatherDeclarativeValidationMismatches(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			details := gatherDeclarativeValidationMismatches(tc.imperativeErrors, tc.declarativeErrors, tc.enforced, ValidationConfigOption{
-				DeclarativeValidationConfig: DeclarativeValidationConfig{
+				DeclarativeRequestConfig: DeclarativeRequestConfig{
 					NormalizationRules:   tc.normalizedRules,
 					ShortCircuitMismatch: tc.shortCircuitMismatch,
 				},
@@ -817,7 +811,7 @@ func TestValidateDeclarativelyWithMigrationChecks(t *testing.T) {
 			inputErrs := make(field.ErrorList, len(tc.imperativeErrors))
 			copy(inputErrs, tc.imperativeErrors)
 
-			gotErrs := ValidateDeclarativelyWithMigrationChecks(ctx, localScheme, obj, nil, inputErrs, operation.Create, DeclarativeValidationConfig{})
+			gotErrs := ValidateDeclarativelyWithMigrationChecks(ctx, localScheme, obj, nil, inputErrs, operation.Create, DeclarativeRequestConfig{})
 
 			if !equalErrorLists(gotErrs, tc.expectedErrors) {
 				t.Errorf("Expected errors: %v, got: %v", tc.expectedErrors, gotErrs)

@@ -127,9 +127,18 @@ func BeforeCreate(strategy RESTCreateStrategy, ctx context.Context, obj runtime.
 
 	strategy.PrepareForCreate(ctx, obj)
 
+	dvConfig, err := declarativeRequestConfig(ctx, strategy, obj, nil)
+	if err != nil {
+		return errors.NewInternalError(err)
+	}
+
+	if dm, ok := strategy.(DeclarativeDropFieldsStrategy); ok {
+		dm.DropFieldsDeclaratively(ctx, obj, nil, operation.Create, dvConfig)
+	}
+
 	errs := strategy.Validate(ctx, obj)
 	if dv, ok := strategy.(DeclarativeValidationStrategy); ok {
-		errs = dv.ValidateDeclaratively(ctx, obj, nil, errs, operation.Create, dv.DeclarativeValidationConfig(ctx, obj, nil))
+		errs = dv.ValidateDeclaratively(ctx, obj, nil, errs, operation.Create, dvConfig)
 	}
 	if len(errs) > 0 {
 		return errors.NewInvalid(kind.GroupKind(), objectMeta.GetName(), errs)

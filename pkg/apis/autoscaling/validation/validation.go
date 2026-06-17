@@ -61,7 +61,7 @@ func ValidateScale(scale *autoscaling.Scale) field.ErrorList {
 func ValidateScaleUpdate(ctx context.Context, newScale, oldScale *autoscaling.Scale, scheme *runtime.Scheme, mapper rest.GroupVersionKindProvider) field.ErrorList {
 	errs := ValidateScale(newScale)
 	dv := rest.DeclarativeValidation{Scheme: scheme}
-	return dv.ValidateDeclaratively(ctx, newScale, oldScale, errs, operation.Update, rest.DeclarativeValidationConfig{SubresourceGVKMapper: mapper})
+	return dv.ValidateDeclaratively(ctx, newScale, oldScale, errs, operation.Update, rest.DeclarativeRequestConfig{SubresourceGVKMapper: mapper})
 }
 
 // ValidateHorizontalPodAutoscalerName can be used to check whether the given autoscaler name is valid.

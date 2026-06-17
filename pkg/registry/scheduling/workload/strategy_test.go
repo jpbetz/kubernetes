@@ -247,7 +247,7 @@ func TestStrategyCreate(t *testing.T) {
 
 			Strategy.PrepareForCreate(ctx, workload)
 			errs := Strategy.Validate(ctx, workload)
-			errs = Strategy.ValidateDeclaratively(ctx, workload, nil, errs, operation.Create, Strategy.DeclarativeValidationConfig(ctx, workload, nil))
+			errs = Strategy.ValidateDeclaratively(ctx, workload, nil, errs, operation.Create, Strategy.DeclarativeRequestConfig(ctx, workload, nil))
 			if len(errs) != 0 {
 				if tc.expectValidationError == "" {
 					t.Fatalf("unexpected error(s): %v", errs)
@@ -545,7 +545,7 @@ func TestStrategyUpdate(t *testing.T) {
 
 			Strategy.PrepareForUpdate(ctx, newWorkload, oldWorkload)
 			errs := Strategy.ValidateUpdate(ctx, newWorkload, oldWorkload)
-			errs = Strategy.ValidateDeclaratively(ctx, newWorkload, oldWorkload, errs, operation.Update, Strategy.DeclarativeValidationConfig(ctx, newWorkload, oldWorkload))
+			errs = Strategy.ValidateDeclaratively(ctx, newWorkload, oldWorkload, errs, operation.Update, Strategy.DeclarativeRequestConfig(ctx, newWorkload, oldWorkload))
 			if len(errs) != 0 {
 				if tc.expectValidationError == "" {
 					t.Fatalf("unexpected error(s): %v", errs)

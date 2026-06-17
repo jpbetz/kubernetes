@@ -91,10 +91,10 @@ func (strategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) fie
 	return validation.ValidateRoleBindingUpdate(newRoleBinding, oldRoleBinding)
 }
 
-func (strategy) DeclarativeValidationConfig(ctx context.Context, obj, oldObj runtime.Object) rest.DeclarativeValidationConfig {
+func (strategy) DeclarativeRequestConfig(ctx context.Context, obj, oldObj runtime.Object) rest.DeclarativeRequestConfig {
 	// Match declarative validation short-circuit errors with handwritten child field errors.
 	// This is required because RoleBinding.RoleRef is immutable.
-	return rest.DeclarativeValidationConfig{
+	return rest.DeclarativeRequestConfig{
 		ShortCircuitMismatch: true,
 	}
 }

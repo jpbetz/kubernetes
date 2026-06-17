@@ -272,6 +272,15 @@ func WithSkipGroupVersions(groupVersions ...string) ValidationTestConfig {
 	}
 }
 
+// declarativeRequestConfig returns the strategy's declarative request config, or
+// the zero config when the strategy supplies none.
+func declarativeRequestConfig(ctx context.Context, strategy interface{}, obj, oldObj runtime.Object) rest.DeclarativeRequestConfig {
+	if cfg, ok := strategy.(rest.DeclarativeStrategyConfigurer); ok {
+		return cfg.DeclarativeRequestConfig(ctx, obj, oldObj)
+	}
+	return rest.DeclarativeRequestConfig{}
+}
+
 // VerifyValidationEquivalence provides a helper for testing the migration from
 // hand-written imperative validation to declarative validation. It ensures that
 // the validation logic remains consistent across enforcement modes.
@@ -297,7 +306,7 @@ func VerifyValidationEquivalence(t *testing.T, ctx context.Context, obj runtime.
 	verifyValidationEquivalence(t, expectedErrs, func(c context.Context) field.ErrorList {
 		errs := strategy.Validate(c, obj)
 		if dv, ok := strategy.(rest.DeclarativeValidationStrategy); ok {
-			errs = dv.ValidateDeclaratively(c, obj, nil, errs, operation.Create, dv.DeclarativeValidationConfig(c, obj, nil))
+			errs = dv.ValidateDeclaratively(c, obj, nil, errs, operation.Create, declarativeRequestConfig(c, strategy, obj, nil))
 		}
 		return errs
 	}, ctx, opts, obj)
@@ -329,7 +338,7 @@ func VerifyUpdateValidationEquivalence(t *testing.T, ctx context.Context, obj, o
 	verifyValidationEquivalence(t, expectedErrs, func(c context.Context) field.ErrorList {
 		errs := strategy.ValidateUpdate(c, obj, old)
 		if dv, ok := strategy.(rest.DeclarativeValidationStrategy); ok {
-			errs = dv.ValidateDeclaratively(c, obj, old, errs, operation.Update, dv.DeclarativeValidationConfig(c, obj, old))
+			errs = dv.ValidateDeclaratively(c, obj, old, errs, operation.Update, declarativeRequestConfig(c, strategy, obj, old))
 		}
 		return errs
 	}, ctx, opts, obj)

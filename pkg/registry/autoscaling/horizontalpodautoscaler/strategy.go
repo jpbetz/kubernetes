@@ -84,9 +84,9 @@ func (autoscalerStrategy) Validate(ctx context.Context, obj runtime.Object) fiel
 	return validation.ValidateHorizontalPodAutoscaler(autoscaler, opts)
 }
 
-// DeclarativeValidationConfig implements rest.DeclarativeValidationConfigurer to supply declarative
+// DeclarativeRequestConfig implements rest.DeclarativeStrategyConfigurer to supply declarative
 // validation options.
-func (autoscalerStrategy) DeclarativeValidationConfig(ctx context.Context, obj, oldObj runtime.Object) rest.DeclarativeValidationConfig {
+func (autoscalerStrategy) DeclarativeRequestConfig(ctx context.Context, obj, oldObj runtime.Object) rest.DeclarativeRequestConfig {
 	var options []string
 	// Pass HPAScaleToZero when the gate is enabled, OR (on update) when the
 	// existing object already has MinReplicas == 0.
@@ -101,7 +101,7 @@ func (autoscalerStrategy) DeclarativeValidationConfig(ctx context.Context, obj, 
 	if enableScaleToZero {
 		options = append(options, "HPAScaleToZero")
 	}
-	return rest.DeclarativeValidationConfig{Options: options}
+	return rest.DeclarativeRequestConfig{Options: options}
 }
 
 // WarningsOnCreate returns warnings for the creation of the given object.
