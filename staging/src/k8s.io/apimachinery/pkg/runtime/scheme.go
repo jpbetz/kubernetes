@@ -78,6 +78,9 @@ type Scheme struct {
 	// validation such as transition rules and immutability checks.
 	validationFuncs map[reflect.Type]func(ctx context.Context, op operation.Operation, object, oldObject interface{}) field.ErrorList
 
+	// featureGateInfoByType holds generated feature-gate support keyed by object type.
+	featureGateInfoByType map[reflect.Type]featureGateFuncs
+
 	// converter stores all registered conversion functions. It also has
 	// default converting behavior.
 	converter *conversion.Converter
@@ -107,6 +110,7 @@ func NewScheme() *Scheme {
 		fieldLabelConversionFuncs: map[schema.GroupVersionKind]FieldLabelConversionFunc{},
 		defaulterFuncs:            map[reflect.Type]func(interface{}){},
 		validationFuncs:           map[reflect.Type]func(ctx context.Context, op operation.Operation, object, oldObject interface{}) field.ErrorList{},
+		featureGateInfoByType:     map[reflect.Type]featureGateFuncs{},
 		versionPriority:           map[string][]string{},
 		schemeName:                naming.GetNameFromCallsite(internalPackages...),
 	}
@@ -385,6 +389,62 @@ func (s *Scheme) ValidateUpdate(ctx context.Context, options []string, object, o
 		return fn(ctx, operation.Operation{Type: operation.Update, Request: operation.Request{Subresources: subresources}, Options: options}, object, oldObject)
 	}
 	return nil
+}
+
+// featureGateFuncs holds a type's in-use detection and field dropping functions.
+type featureGateFuncs struct {
+	featureGatesInUse func(oldObject interface{}) (inUse []string, notInUse []string)
+	dropFields        func(op operation.Operation, object interface{})
+}
+
+// AddFeatureGateFuncs registers in-use detection and field dropping for feature
+// gated fields of srcType. featureGatesInUse partitions the gates guarding those
+// fields into ones with a field set in the old object and the rest.
+func (s *Scheme) AddFeatureGateFuncs(srcType Object, featureGatesInUse func(oldObject interface{}) (inUse []string, notInUse []string), dropFields func(op operation.Operation, object interface{})) {
+	s.featureGateInfoByType[reflect.TypeOf(srcType)] = featureGateFuncs{featureGatesInUse: featureGatesInUse, dropFields: dropFields}
+}
+
+// FeatureGatesInUse partitions the gates guarding the type behind gvk into those
+// whose fields are set in oldObject (inUse) and the rest (notInUse). On create
+// pass a nil oldObject: inUse is empty and notInUse lists every gate. A caller
+// keeps a gate-backed option when the gate is in inUse, or in notInUse and
+// DefaultFeatureGate.Enabled(gate). Returns nil, nil if gvk has no feature-gate
+// support. The lists are for membership checks and may contain duplicates.
+func (s *Scheme) FeatureGatesInUse(gvk schema.GroupVersionKind, oldObject Object) (inUse []string, notInUse []string) {
+	t, ok := s.gvkToType[gvk]
+	if !ok {
+		return nil, nil
+	}
+	fn := s.featureGateInfoByType[reflect.PointerTo(t)].featureGatesInUse
+	if fn == nil {
+		return nil, nil
+	}
+	return fn(oldObject)
+}
+
+// DropFields clears the droppable feature-gated fields of object whose option is
+// absent from op (i.e. gate disabled and not in use). It mutates object in place
+// and reports whether a drop function ran. op.Options must already hold the
+// enabled gate-backed options (see FeatureGatesInUse).
+func (s *Scheme) DropFields(op operation.Operation, object Object) bool {
+	info, ok := s.featureGateInfoByType[reflect.TypeOf(object)]
+	if !ok || info.dropFields == nil {
+		return false
+	}
+	info.dropFields(op, object)
+	return true
+}
+
+// HasFeatureGateInfo reports whether feature-gate support is registered for the
+// type behind gvk, letting callers skip the convert round-trip for versions with
+// no feature-gated fields.
+func (s *Scheme) HasFeatureGateInfo(gvk schema.GroupVersionKind) bool {
+	t, ok := s.gvkToType[gvk]
+	if !ok {
+		return false
+	}
+	_, ok = s.featureGateInfoByType[reflect.PointerTo(t)]
+	return ok
 }
 
 // Convert will attempt to convert in into out. Both must be pointers. For easy

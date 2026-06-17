@@ -1177,3 +1177,67 @@ func TestToOpenAPIDefinitionName(t *testing.T) {
 		})
 	}
 }
+
+func TestSchemeFeatureGate(t *testing.T) {
+	gvk := schema.GroupVersion{Group: "test", Version: "v1"}.WithKind("Simple")
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypeWithName(gvk, &runtimetesting.ExternalSimple{})
+
+	if scheme.HasFeatureGateInfo(gvk) {
+		t.Fatal("HasFeatureGateInfo should be false before registration")
+	}
+
+	scheme.AddFeatureGateFuncs((*runtimetesting.ExternalSimple)(nil),
+		func(oldObject interface{}) (inUse, notInUse []string) {
+			if oldObject != nil && oldObject.(*runtimetesting.ExternalSimple).TestString != "" {
+				return []string{"Gate"}, nil
+			}
+			return nil, []string{"Gate"}
+		},
+		func(op operation.Operation, object interface{}) {
+			if !op.HasOption("Gate") {
+				object.(*runtimetesting.ExternalSimple).TestString = ""
+			}
+		})
+
+	if !scheme.HasFeatureGateInfo(gvk) {
+		t.Fatal("HasFeatureGateInfo should be true after registration")
+	}
+
+	// FeatureGates partitions the type's gates into in-use and not-in-use for the
+	// given old object.
+	if inUse, notInUse := scheme.FeatureGatesInUse(gvk, &runtimetesting.ExternalSimple{TestString: "x"}); !slices.Contains(inUse, "Gate") || slices.Contains(notInUse, "Gate") {
+		t.Fatalf("TestString set: got inUse=%v notInUse=%v, want Gate in use", inUse, notInUse)
+	}
+	if inUse, notInUse := scheme.FeatureGatesInUse(gvk, &runtimetesting.ExternalSimple{}); slices.Contains(inUse, "Gate") || !slices.Contains(notInUse, "Gate") {
+		t.Fatalf("TestString empty: got inUse=%v notInUse=%v, want Gate not in use", inUse, notInUse)
+	}
+	// On create (nil old) nothing is in use and every gate is not-in-use.
+	if inUse, notInUse := scheme.FeatureGatesInUse(gvk, nil); len(inUse) != 0 || !slices.Contains(notInUse, "Gate") {
+		t.Fatalf("nil old: got inUse=%v notInUse=%v, want empty inUse and Gate not in use", inUse, notInUse)
+	}
+	if inUse, notInUse := scheme.FeatureGatesInUse(schema.GroupVersion{Group: "test", Version: "v1"}.WithKind("Unknown"), nil); inUse != nil || notInUse != nil {
+		t.Fatal("FeatureGates should be nil, nil for an unregistered kind")
+	}
+
+	// DropFields clears the field when the option is absent.
+	obj := &runtimetesting.ExternalSimple{TestString: "set"}
+	if ran := scheme.DropFields(operation.Operation{Type: operation.Create}, obj); !ran {
+		t.Fatal("DropFields should report it ran for a registered type")
+	}
+	if obj.TestString != "" {
+		t.Fatalf("DropFields should clear TestString when the option is absent, got %q", obj.TestString)
+	}
+
+	// DropFields keeps the field when the option is present.
+	kept := &runtimetesting.ExternalSimple{TestString: "set"}
+	scheme.DropFields(operation.Operation{Type: operation.Create, Options: []string{"Gate"}}, kept)
+	if kept.TestString != "set" {
+		t.Fatalf("DropFields should keep TestString when the option is present, got %q", kept.TestString)
+	}
+
+	// A type with no registered function is a no-op and reports it did not run.
+	if ran := scheme.DropFields(operation.Operation{Type: operation.Create}, &runtimetesting.ExternalComplex{}); ran {
+		t.Fatal("DropFields should report it did not run for an unregistered type")
+	}
+}
