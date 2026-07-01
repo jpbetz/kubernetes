@@ -186,6 +186,13 @@ const (
 	// in the spec returned from kube-apiserver.
 	OpenAPIEnums featuregate.Feature = "OpenAPIEnums"
 
+	// owner: @jpbetz
+	//
+	// Serve /openapi/v2 and /openapi/v3 from a weak-pointer byte cache: keep only
+	// the content etag resident, hold serialized bytes behind a weak.Pointer, and
+	// rebuild the spec graph on demand.
+	OpenAPILazyGraph featuregate.Feature = "OpenAPILazyGraph"
+
 	// owner: @stlaz
 	//
 	// Enable kube-apiserver to accept UIDs via request header authentication.
@@ -400,6 +407,10 @@ var defaultVersionedKubernetesFeatureGates = map[featuregate.Feature]featuregate
 	OpenAPIEnums: {
 		{Version: version.MustParse("1.23"), Default: false, PreRelease: featuregate.Alpha},
 		{Version: version.MustParse("1.24"), Default: true, PreRelease: featuregate.Beta},
+	},
+
+	OpenAPILazyGraph: {
+		{Version: version.MustParse("1.37"), Default: false, PreRelease: featuregate.Alpha},
 	},
 
 	RemoteRequestHeaderUID: {

@@ -22,7 +22,10 @@ import (
 	restful "github.com/emicklei/go-restful/v3"
 	"k8s.io/klog/v2"
 
+	"k8s.io/apiserver/pkg/features"
 	"k8s.io/apiserver/pkg/server/mux"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	"k8s.io/kube-openapi/pkg/cached"
 	builder2 "k8s.io/kube-openapi/pkg/builder"
 	"k8s.io/kube-openapi/pkg/builder3"
 	"k8s.io/kube-openapi/pkg/common"
@@ -41,15 +44,35 @@ type OpenAPI struct {
 
 // Install adds the SwaggerUI webservice to the given mux.
 func (oa OpenAPI) InstallV2(c *restful.Container, mux *mux.PathRecorderMux) (*handler.OpenAPIService, *spec.Swagger) {
-	spec, err := builder2.BuildOpenAPISpecFromRoutes(restfuladapter.AdaptWebServices(c.RegisteredWebServices()), oa.Config)
+	build := func() (*spec.Swagger, error) {
+		s, err := builder2.BuildOpenAPISpecFromRoutes(restfuladapter.AdaptWebServices(c.RegisteredWebServices()), oa.Config)
+		if err != nil {
+			return nil, err
+		}
+		s.Definitions = handler.PruneDefaults(s.Definitions)
+		return s, nil
+	}
+	staticSpec, err := build()
 	if err != nil {
 		klog.Fatalf("Failed to build open api spec for root: %v", err)
 	}
-	spec.Definitions = handler.PruneDefaults(spec.Definitions)
-	openAPIVersionedService := handler.NewOpenAPIService(spec)
-	openAPIVersionedService.RegisterOpenAPIVersionedService("/openapi/v2", mux)
 
-	return openAPIVersionedService, spec
+	var openAPIVersionedService *handler.OpenAPIService
+	if utilfeature.DefaultFeatureGate.Enabled(features.OpenAPILazyGraph) {
+		// staticSpec is still returned as the CRD controller's merge base.
+		src := cached.Func(func() (*spec.Swagger, string, error) {
+			s, berr := build()
+			if berr != nil {
+				return nil, "", berr
+			}
+			return s, "static/v2", nil
+		})
+		openAPIVersionedService = handler.NewOpenAPIServiceWeak(src)
+	} else {
+		openAPIVersionedService = handler.NewOpenAPIService(staticSpec)
+	}
+	openAPIVersionedService.RegisterOpenAPIVersionedService("/openapi/v2", mux)
+	return openAPIVersionedService, staticSpec
 }
 
 // InstallV3 adds the static group/versions defined in the RegisteredWebServices to the OpenAPI v3 spec.
@@ -70,7 +93,23 @@ func (oa OpenAPI) InstallV3(c *restful.Container, mux *mux.PathRecorderMux) *han
 		grouped[gvName] = []*restful.WebService{t}
 	}
 
+	lazy := utilfeature.DefaultFeatureGate.Enabled(features.OpenAPILazyGraph)
 	for gv, ws := range grouped {
+		if lazy {
+			// Built-ins never change, so a constant source etag suffices.
+			src := cached.Func(func() (*spec3.OpenAPI, string, error) {
+				spec, err := builder3.BuildOpenAPISpecFromRoutes(restfuladapter.AdaptWebServices(ws), oa.V3Config)
+				if err != nil {
+					return nil, "", err
+				}
+				if group, version, ok := groupVersionFromPath(gv); ok {
+					filterScopedGVKs(spec, group, version)
+				}
+				return spec, "static/" + gv, nil
+			})
+			openAPIVersionedService.UpdateGroupVersionWeak(gv, src)
+			continue
+		}
 		spec, err := builder3.BuildOpenAPISpecFromRoutes(restfuladapter.AdaptWebServices(ws), oa.V3Config)
 		if err != nil {
 			klog.Errorf("Failed to build OpenAPI v3 for group %s, %q", gv, err)

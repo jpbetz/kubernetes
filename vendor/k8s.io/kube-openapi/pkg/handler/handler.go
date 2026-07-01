@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/NYTimes/gziphandler"
@@ -63,6 +65,14 @@ type OpenAPIService struct {
 	specCache  cached.LastSuccess[*spec.Swagger]
 	jsonCache  cached.Value[timedSpec]
 	protoCache cached.Value[timedSpec]
+
+	// Weak serving path (nil unless enabled): jsonWeak/protoWeak hold the
+	// serialized bytes weakly, rebuilt from weakSrc; weakGen is the content
+	// generation, bumped by UpdateSpec.
+	jsonWeak  *cached.WeakByteCache
+	protoWeak *cached.WeakByteCache
+	weakSrc   *cached.Atomic[*spec.Swagger]
+	weakGen   atomic.Int64
 }
 
 // NewOpenAPIService builds an OpenAPIService starting with the given spec.
@@ -99,6 +109,63 @@ func NewOpenAPIServiceLazy(swagger cached.Value[*spec.Swagger]) *OpenAPIService 
 	return o
 }
 
+// NewOpenAPIServiceWeak serves from a weak byte cache, rebuilding the spec from
+// src on a miss so the graph is not retained. src must rebuild deterministically.
+func NewOpenAPIServiceWeak(src cached.Value[*spec.Swagger]) *OpenAPIService {
+	o := &OpenAPIService{weakSrc: &cached.Atomic[*spec.Swagger]{}}
+	o.weakSrc.Store(src)
+	// weakGen is the cheap generation etag; 0 until UpdateSpec bumps it.
+	genEtag := func() (string, error) { return strconv.FormatInt(o.weakGen.Load(), 10), nil }
+	o.jsonWeak = cached.NewWeakByteCacheWithSource(genEtag, func() ([]byte, error) {
+		s, _, err := o.weakSrc.Get()
+		if err != nil {
+			return nil, err
+		}
+		return s.MarshalJSON()
+	})
+	o.protoWeak = cached.NewWeakByteCacheWithSource(genEtag, func() ([]byte, error) {
+		j, _, err := o.jsonWeak.Get()
+		if err != nil {
+			return nil, err
+		}
+		return ToProtoBinary(j)
+	})
+	// Etag-only adapters for cached.Value[timedSpec] consumers.
+	o.jsonCache = cached.Func(func() (timedSpec, string, error) {
+		etag, _ := o.jsonWeak.Etag()
+		return timedSpec{}, etag, nil
+	})
+	o.protoCache = cached.Func(func() (timedSpec, string, error) {
+		etag, _ := o.protoWeak.Etag()
+		return timedSpec{}, etag, nil
+	})
+	return o
+}
+
+// NewOpenAPIServiceWeakBytes serves pre-merged JSON bytes (and derived protobuf)
+// from a weak byte cache keyed by jsonSrcEtag. jsonBuild must be deterministic
+// for a given jsonSrcEtag.
+func NewOpenAPIServiceWeakBytes(jsonSrcEtag func() (string, error), jsonBuild cached.WeakByteBuilder) *OpenAPIService {
+	o := &OpenAPIService{}
+	o.jsonWeak = cached.NewWeakByteCacheWithSource(jsonSrcEtag, jsonBuild)
+	o.protoWeak = cached.NewWeakByteCacheWithSource(jsonSrcEtag, func() ([]byte, error) {
+		j, _, err := o.jsonWeak.Get()
+		if err != nil {
+			return nil, err
+		}
+		return ToProtoBinary(j)
+	})
+	o.jsonCache = cached.Func(func() (timedSpec, string, error) {
+		etag, _ := o.jsonWeak.Etag()
+		return timedSpec{}, etag, nil
+	})
+	o.protoCache = cached.Func(func() (timedSpec, string, error) {
+		etag, _ := o.protoWeak.Etag()
+		return timedSpec{}, etag, nil
+	})
+	return o
+}
+
 func (o *OpenAPIService) UpdateSpec(swagger *spec.Swagger) error {
 	o.UpdateSpecLazy(cached.Static(swagger, uuid.New().String()))
 	return nil
@@ -106,6 +173,11 @@ func (o *OpenAPIService) UpdateSpec(swagger *spec.Swagger) error {
 
 func (o *OpenAPIService) UpdateSpecLazy(swagger cached.Value[*spec.Swagger]) {
 	o.specCache.Store(swagger)
+	if o.weakSrc != nil {
+		// Re-point the source and bump the generation so the next serve rebuilds.
+		o.weakSrc.Store(swagger)
+		o.weakGen.Add(1)
+	}
 }
 
 func ToProtoBinary(json []byte) ([]byte, error) {
@@ -153,6 +225,42 @@ func (o *OpenAPIService) RegisterOpenAPIVersionedService(servePath string, handl
 					}
 					if clause.SubType != accepts.SubType && clause.SubType != "*" {
 						continue
+					}
+					// Weak path: 304 from the resident etag, else serve (rebuilding on
+					// a miss). Legacy cache when not on the weak path.
+					var wc, etagSrc *cached.WeakByteCache
+					switch accepts.SubType {
+					case subTypeJSON:
+						wc, etagSrc = o.jsonWeak, o.jsonWeak
+					case subTypeProtobuf, subTypeProtobufDeprecated:
+						// Proto reuses the JSON etag (Vary: Accept).
+						wc, etagSrc = o.protoWeak, o.jsonWeak
+					}
+					if wc != nil {
+						// 304 only when the etag is resident; a changed generation
+						// falls through to Get below. Never falls through to the
+						// legacy adapter.
+						if et, ok := etagSrc.Etag(); ok {
+							if inm := r.Header.Get("If-None-Match"); inm != "" && strings.Contains(inm, et) {
+								w.Header().Set("Content-Type", accepts.ReturnedContentType)
+								w.Header().Set("Etag", strconv.Quote(et))
+								w.WriteHeader(http.StatusNotModified)
+								return
+							}
+						}
+						data, etag, gerr := wc.Get()
+						if gerr == nil && wc != etagSrc {
+							_, etag, gerr = etagSrc.Get()
+						}
+						if gerr != nil {
+							klog.Errorf("Error in OpenAPI handler (weak): %s", gerr)
+							w.WriteHeader(http.StatusServiceUnavailable)
+							return
+						}
+						w.Header().Set("Content-Type", accepts.ReturnedContentType)
+						w.Header().Set("Etag", strconv.Quote(etag))
+						http.ServeContent(w, r, servePath, time.Now(), bytes.NewReader(data))
+						return
 					}
 					// serve the first matching media type in the sorted clause list
 					ts, etag, err := accepts.GetDataAndEtag.Get()

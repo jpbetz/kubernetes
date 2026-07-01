@@ -454,6 +454,10 @@ func (s *GenericAPIServer) PrepareRun() preparedGenericAPIServer {
 		s.OpenAPIV3VersionedService = routes.OpenAPI{
 			V3Config: s.openAPIV3Config,
 		}.InstallV3(s.Handler.GoRestfulContainer, s.Handler.NonGoRestfulMux)
+		if utilfeature.DefaultFeatureGate.Enabled(features.OpenAPILazyGraph) {
+			// Rebuild closures recompute definitions via GetDefinitions; drop the pinned map.
+			s.openAPIV3Config.Definitions = nil
+		}
 	}
 
 	s.installHealthz()

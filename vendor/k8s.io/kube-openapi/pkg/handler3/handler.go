@@ -77,6 +77,11 @@ type openAPIV3Group struct {
 	specCache cached.LastSuccess[*spec3.OpenAPI]
 	pbCache   cached.Value[timedSpec]
 	jsonCache cached.Value[timedSpec]
+
+	// Weak serving path (nil unless enabled): jsonWeak/pbWeak hold the serialized
+	// bytes weakly; jsonCache/pbCache become etag-only adapters for discovery.
+	jsonWeak *cached.WeakByteCache
+	pbWeak   *cached.WeakByteCache
 }
 
 func newOpenAPIV3Group() *openAPIV3Group {
@@ -106,6 +111,36 @@ func newOpenAPIV3Group() *openAPIV3Group {
 
 func (o *openAPIV3Group) UpdateSpec(openapi cached.Value[*spec3.OpenAPI]) {
 	o.specCache.Store(openapi)
+}
+
+// newOpenAPIV3GroupWeak serves from a weak byte cache, rebuilding the spec from
+// src on a miss so the graph is not retained. src must rebuild deterministically.
+func newOpenAPIV3GroupWeak(src cached.Value[*spec3.OpenAPI]) *openAPIV3Group {
+	o := &openAPIV3Group{}
+	o.jsonWeak = cached.NewWeakByteCache(func() ([]byte, error) {
+		spec, _, err := src.Get()
+		if err != nil {
+			return nil, err
+		}
+		return json.Marshal(spec)
+	})
+	o.pbWeak = cached.NewWeakByteCache(func() ([]byte, error) {
+		j, _, err := o.jsonWeak.Get()
+		if err != nil {
+			return nil, err
+		}
+		return ToV3ProtoBinary(j)
+	})
+	// Discovery needs only each group's etag; serve it without materializing bytes.
+	o.jsonCache = cached.Func(func() (timedSpec, string, error) {
+		etag, _ := o.jsonWeak.Etag()
+		return timedSpec{}, etag, nil
+	})
+	o.pbCache = cached.Func(func() (timedSpec, string, error) {
+		etag, _ := o.pbWeak.Etag()
+		return timedSpec{}, etag, nil
+	})
+	return o
 }
 
 // OpenAPIService is the service responsible for serving OpenAPI spec. It has
@@ -174,9 +209,22 @@ func (o *OpenAPIService) getSingleGroupBytes(getType string, group string) ([]by
 	}
 	switch getType {
 	case subTypeJSON:
+		if v.jsonWeak != nil {
+			b, etag, err := v.jsonWeak.Get()
+			return b, etag, time.Now(), err
+		}
 		ts, etag, err := v.jsonCache.Get()
 		return ts.spec, etag, ts.lastModified, err
 	case subTypeProtobuf, subTypeProtobufDeprecated:
+		if v.pbWeak != nil {
+			b, _, err := v.pbWeak.Get()
+			if err != nil {
+				return nil, "", time.Now(), err
+			}
+			// Proto reuses the JSON etag; Get so it is never empty.
+			_, etag, jerr := v.jsonWeak.Get()
+			return b, etag, time.Now(), jerr
+		}
 		ts, etag, err := v.pbCache.Get()
 		return ts.spec, etag, ts.lastModified, err
 	default:
@@ -198,6 +246,35 @@ func (o *OpenAPIService) UpdateGroupVersionLazy(group string, openapi cached.Val
 
 func (o *OpenAPIService) UpdateGroupVersion(group string, openapi *spec3.OpenAPI) {
 	o.UpdateGroupVersionLazy(group, cached.Static(openapi, uuid.New().String()))
+}
+
+// UpdateGroupVersionWeak adds or replaces a group served from a weak byte cache,
+// rebuilt from src on demand. src must rebuild the *spec3.OpenAPI deterministically.
+func (o *OpenAPIService) UpdateGroupVersionWeak(group string, src cached.Value[*spec3.OpenAPI]) {
+	o.mutex.Lock()
+	defer o.mutex.Unlock()
+	o.v3Schema[group] = newOpenAPIV3GroupWeak(src)
+	// The group is new, so the discovery cache must be rebuilt.
+	o.discoveryCache.Store(o.buildDiscoveryCacheLocked())
+}
+
+// residentEtag returns a group's resident etag for the media type without
+// materializing bytes, or false when the group is absent or not on the weak path.
+func (o *OpenAPIService) residentEtag(group, getType string) (string, bool) {
+	o.mutex.Lock()
+	defer o.mutex.Unlock()
+	v, ok := o.v3Schema[group]
+	if !ok {
+		return "", false
+	}
+	// Proto reuses the JSON etag (Vary: Accept).
+	if v.jsonWeak != nil {
+		switch getType {
+		case subTypeJSON, subTypeProtobuf, subTypeProtobufDeprecated:
+			return v.jsonWeak.Etag()
+		}
+	}
+	return "", false
 }
 
 func (o *OpenAPIService) DeleteGroupVersion(group string) {
@@ -252,6 +329,20 @@ func (o *OpenAPIService) HandleGroupVersion(w http.ResponseWriter, r *http.Reque
 			}
 			if clause.SubType != accepts.SubType && clause.SubType != "*" {
 				continue
+			}
+			// Weak path: redirect/304 from the resident etag without materializing bytes.
+			if et, ok := o.residentEtag(group, accepts.SubType); ok {
+				if hash := r.URL.Query().Get("hash"); hash != "" && hash != et {
+					w.Header().Set("Content-Type", accepts.ReturnedContentType)
+					w.Header().Set("Etag", strconv.Quote(et))
+					http.Redirect(w, r, constructServerRelativeURL(group, et), 301)
+					return
+				}
+				if inm := r.Header.Get("If-None-Match"); inm != "" && strings.Contains(inm, et) {
+					w.Header().Set("Etag", strconv.Quote(et))
+					w.WriteHeader(http.StatusNotModified)
+					return
+				}
 			}
 			data, etag, lastModified, err := o.getSingleGroupBytes(accepts.SubType, group)
 			if err != nil {
