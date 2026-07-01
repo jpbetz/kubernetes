@@ -26,7 +26,9 @@ import (
 
 	restful "github.com/emicklei/go-restful/v3"
 
+	"k8s.io/apiserver/pkg/features"
 	"k8s.io/apiserver/pkg/server"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/klog/v2"
 	v1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
 	"k8s.io/kube-openapi/pkg/aggregator"
@@ -99,7 +101,12 @@ func buildAndRegisterSpecAggregatorForLocalServices(downloader *Downloader, aggr
 		s.addLocalSpec(name, spec)
 	}
 
-	s.openAPIVersionedService = handler.NewOpenAPIServiceLazy(s.buildMergeSpecLocked())
+	if utilfeature.DefaultFeatureGate.Enabled(features.OpenAPILazyGraph) {
+		// Merged graph re-merged on demand (not retained); freshness from child etags.
+		s.openAPIVersionedService = handler.NewOpenAPIServiceWeakBytes(s.currentMergeEtag, s.currentMergeBytes)
+	} else {
+		s.openAPIVersionedService = handler.NewOpenAPIServiceLazy(s.buildMergeSpecLocked())
+	}
 	s.openAPIVersionedService.RegisterOpenAPIVersionedService("/openapi/v2", pathHandler)
 	return s
 }
@@ -143,8 +150,9 @@ func (s *specAggregator) addLocalSpec(name string, cachedSpec cached.Value[*spec
 	s.specsByAPIServiceName[name] = info
 }
 
-// buildMergeSpecLocked creates a new cached mergeSpec from the list of cached specs.
-func (s *specAggregator) buildMergeSpecLocked() cached.Value[*spec.Swagger] {
+// sortedCachesLocked returns the per-APIService spec caches ordered by priority.
+// Assumes s.mutex is held.
+func (s *specAggregator) sortedCachesLocked() []cached.Value[*spec.Swagger] {
 	apiServices := make([]*v1.APIService, 0, len(s.specsByAPIServiceName))
 	for k := range s.specsByAPIServiceName {
 		apiServices = append(apiServices, &s.specsByAPIServiceName[k].apiService)
@@ -154,35 +162,86 @@ func (s *specAggregator) buildMergeSpecLocked() cached.Value[*spec.Swagger] {
 	for i, apiService := range apiServices {
 		caches[i] = &(s.specsByAPIServiceName[apiService.Name].spec)
 	}
+	return caches
+}
 
-	return cached.MergeList(func(results []cached.Result[*spec.Swagger]) (*spec.Swagger, string, error) {
-		var merged *spec.Swagger
-		etags := make([]string, 0, len(results))
-		for _, specInfo := range results {
-			result, etag, err := specInfo.Get()
-			if err != nil {
-				// APIService name and err message will be included in
-				// the error message as part of decorateError
-				klog.Warning(err)
-				continue
-			}
-			if merged == nil {
-				merged = &spec.Swagger{}
-				*merged = *result
-				// Paths, Definitions and parameters are set by
-				// MergeSpecsIgnorePathConflictRenamingDefinitionsAndParameters
-				merged.Paths = nil
-				merged.Definitions = nil
-				merged.Parameters = nil
-			}
-			etags = append(etags, etag)
-			if err := aggregator.MergeSpecsIgnorePathConflictRenamingDefinitionsAndParameters(merged, result); err != nil {
-				return nil, "", fmt.Errorf("failed to build merge specs: %v", err)
-			}
+// mergeSwaggerResults merges the given per-APIService specs (in priority order)
+// into a single spec and returns it with an etag derived from the child etags.
+func mergeSwaggerResults(results []cached.Result[*spec.Swagger]) (*spec.Swagger, string, error) {
+	var merged *spec.Swagger
+	etags := make([]string, 0, len(results))
+	for _, specInfo := range results {
+		result, etag, err := specInfo.Get()
+		if err != nil {
+			// APIService name and err message will be included in
+			// the error message as part of decorateError
+			klog.Warning(err)
+			continue
 		}
-		// Printing the etags list is stable because it is sorted.
-		return merged, fmt.Sprintf("%x", sha256.Sum256([]byte(fmt.Sprintf("%#v", etags)))), nil
-	}, caches)
+		if result == nil {
+			// Guards the *merged = *result below against a not-yet-produced spec.
+			continue
+		}
+		if merged == nil {
+			merged = &spec.Swagger{}
+			*merged = *result
+			// Paths, Definitions and parameters are set by
+			// MergeSpecsIgnorePathConflictRenamingDefinitionsAndParameters
+			merged.Paths = nil
+			merged.Definitions = nil
+			merged.Parameters = nil
+		}
+		etags = append(etags, etag)
+		if err := aggregator.MergeSpecsIgnorePathConflictRenamingDefinitionsAndParameters(merged, result); err != nil {
+			return nil, "", fmt.Errorf("failed to build merge specs: %v", err)
+		}
+	}
+	// Printing the etags list is stable because it is sorted.
+	return merged, fmt.Sprintf("%x", sha256.Sum256([]byte(fmt.Sprintf("%#v", etags)))), nil
+}
+
+// buildMergeSpecLocked creates a new cached mergeSpec from the list of cached specs.
+func (s *specAggregator) buildMergeSpecLocked() cached.Value[*spec.Swagger] {
+	return cached.MergeList(func(results []cached.Result[*spec.Swagger]) (*spec.Swagger, string, error) {
+		return mergeSwaggerResults(results)
+	}, s.sortedCachesLocked())
+}
+
+// currentMergeEtag returns the merged etag (hash of the child etags) without merging.
+func (s *specAggregator) currentMergeEtag() (string, error) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	caches := s.sortedCachesLocked()
+	etags := make([]string, 0, len(caches))
+	for _, c := range caches {
+		v, etag, err := c.Get()
+		if err != nil || v == nil {
+			continue
+		}
+		etags = append(etags, etag)
+	}
+	return fmt.Sprintf("%x", sha256.Sum256([]byte(fmt.Sprintf("%#v", etags)))), nil
+}
+
+// currentMergeBytes re-merges the child specs and marshals to JSON; the merged
+// graph is transient.
+func (s *specAggregator) currentMergeBytes() ([]byte, error) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	caches := s.sortedCachesLocked()
+	results := make([]cached.Result[*spec.Swagger], len(caches))
+	for i, c := range caches {
+		v, etag, err := c.Get()
+		results[i] = cached.Result[*spec.Swagger]{Value: v, Etag: etag, Err: err}
+	}
+	merged, _, err := mergeSwaggerResults(results)
+	if err != nil {
+		return nil, err
+	}
+	if merged == nil {
+		merged = &spec.Swagger{}
+	}
+	return merged.MarshalJSON()
 }
 
 // updateServiceLocked updates the spec cache by downloading the latest
