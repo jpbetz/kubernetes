@@ -206,6 +206,15 @@ func (c *listMerger[T, V]) Get() (V, string, error) {
 	if c.needsRunningLocked(cacheResults) {
 		c.cache = cacheResults
 		c.result.Value, c.result.Etag, c.result.Err = c.mergeFn(c.cache)
+		// Drop input values after a successful merge; needsRunningLocked reads
+		// only Etag/Err, so this frees the inputs without affecting change
+		// detection. On error they are kept for the re-run.
+		if c.result.Err == nil {
+			var zero T
+			for i := range c.cache {
+				c.cache[i].Value = zero
+			}
+		}
 	}
 	return c.result.Value, c.result.Etag, c.result.Err
 }
