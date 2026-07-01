@@ -18,6 +18,7 @@ package openapi
 
 import (
 	"fmt"
+	"sort"
 	"sync"
 	"time"
 
@@ -28,6 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/apiserver/pkg/features"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
@@ -71,10 +73,17 @@ type Controller struct {
 type specCache struct {
 	crdCache          cached.LastSuccess[*apiextensionsv1.CustomResourceDefinition]
 	mergedVersionSpec cached.Value[*spec.Swagger]
+	// etag is the CRD hash the caches were last built for; detects content-only updates.
+	etag string
 }
 
-func (s *specCache) update(crd *apiextensionsv1.CustomResourceDefinition) {
-	s.crdCache.Store(cached.Static(crd, generateCRDHash(crd)))
+// update re-points the CRD cache and reports whether the content actually changed.
+func (s *specCache) update(crd *apiextensionsv1.CustomResourceDefinition) bool {
+	h := generateCRDHash(crd)
+	changed := s.etag != h
+	s.etag = h
+	s.crdCache.Store(cached.Static(crd, h))
+	return changed
 }
 
 func createSpecCache(crd *apiextensionsv1.CustomResourceDefinition) *specCache {
@@ -227,9 +236,14 @@ func (c *Controller) sync(name string) error {
 	// resulting in the same ETag will be a noop.
 	s, exists := c.specsByName[crd.Name]
 	if exists {
-		s.update(crd)
+		changed := s.update(crd)
 		klog.V(2).Infof("Updating CRD OpenAPI spec because %s changed", name)
 		regenerationCounter.With(map[string]string{"crd": name, "reason": "update"})
+		if changed && utilfeature.DefaultFeatureGate.Enabled(features.OpenAPILazyGraph) {
+			// Bump the weak source generation so the content update is served, not
+			// held stale (the legacy MergeList path detects this via child etags).
+			c.updateSpecLocked()
+		}
 		return nil
 	}
 
@@ -242,6 +256,38 @@ func (c *Controller) sync(name string) error {
 
 // updateSpecLocked updates the cached spec graph.
 func (c *Controller) updateSpecLocked() {
+	if utilfeature.DefaultFeatureGate.Enabled(features.OpenAPILazyGraph) {
+		// Re-merge on demand so the merged graph is not retained. Snapshot
+		// name-sorted for a deterministic rebuild; the etag is unused (the handler
+		// keys off its own generation).
+		names := make([]string, 0, len(c.specsByName))
+		for name := range c.specsByName {
+			names = append(names, name)
+		}
+		sort.Strings(names)
+		specList := make([]cached.Value[*spec.Swagger], 0, len(names))
+		for _, name := range names {
+			specList = append(specList, c.specsByName[name].mergedVersionSpec)
+		}
+		src := cached.Func(func() (*spec.Swagger, string, error) {
+			localCRDSpec := make([]*spec.Swagger, 0, len(specList))
+			for _, cv := range specList {
+				v, _, err := cv.Get()
+				if err != nil || v == nil {
+					continue
+				}
+				localCRDSpec = append(localCRDSpec, v)
+			}
+			mergedSpec, err := builder.MergeSpecs(c.staticSpec, localCRDSpec...)
+			if err != nil {
+				return nil, "", fmt.Errorf("failed to merge specs: %v", err)
+			}
+			return mergedSpec, "crd-v2", nil
+		})
+		c.openAPIService.UpdateSpecLazy(src)
+		return
+	}
+
 	specList := make([]cached.Value[*spec.Swagger], 0, len(c.specsByName))
 	for crd := range c.specsByName {
 		specList = append(specList, c.specsByName[crd].mergedVersionSpec)
