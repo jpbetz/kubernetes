@@ -392,6 +392,36 @@ func TestJSONPatch(t *testing.T) {
 			expectedErr: " mismatch: unexpected type name \"Object.spec.template.spec.containers.portsZ\", expected \"Object.spec.template.spec.containers.ports\", which matches field name path from root Object type",
 		},
 		{
+			name: "jsonPatch value with typed struct from object",
+			expression: `[
+					JSONPatch{op: "add", path: "/spec/template/spec/containers/-", value: object.spec.template.spec.containers[0]},
+				]`,
+			gvr: deploymentGVR,
+			object: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Template: corev1.PodTemplateSpec{Spec: corev1.PodSpec{
+				Containers: []corev1.Container{{Name: "a", Ports: []corev1.ContainerPort{{ContainerPort: 8080}}}},
+			}}}},
+			expectedResult: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Template: corev1.PodTemplateSpec{Spec: corev1.PodSpec{
+				Containers: []corev1.Container{
+					{Name: "a", Ports: []corev1.ContainerPort{{ContainerPort: 8080}}},
+					{Name: "a", Ports: []corev1.ContainerPort{{ContainerPort: 8080}}},
+				},
+			}}}},
+		},
+		{
+			name: "jsonPatch value with typed list from object",
+			expression: `[
+					JSONPatch{op: "replace", path: "/spec/template/spec/initContainers", value: object.spec.template.spec.containers},
+				]`,
+			gvr: deploymentGVR,
+			object: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Template: corev1.PodTemplateSpec{Spec: corev1.PodSpec{
+				Containers: []corev1.Container{{Name: "a"}, {Name: "b"}},
+			}}}},
+			expectedResult: &appsv1.Deployment{Spec: appsv1.DeploymentSpec{Template: corev1.PodTemplateSpec{Spec: corev1.PodSpec{
+				Containers:     []corev1.Container{{Name: "a"}, {Name: "b"}},
+				InitContainers: []corev1.Container{{Name: "a"}, {Name: "b"}},
+			}}}},
+		},
+		{
 			name: "jsonPatch replace end of list with - not allowed",
 			expression: `[
 					JSONPatch{op: "replace", path: "/spec/template/spec/containers/-", value: {"name": "x"}}, 

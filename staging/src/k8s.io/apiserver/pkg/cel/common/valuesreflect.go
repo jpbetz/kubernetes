@@ -30,7 +30,28 @@ import (
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/common/types/traits"
+	"google.golang.org/protobuf/types/known/structpb"
 )
+
+var structpbValueType = reflect.TypeOf(&structpb.Value{})
+
+// convertToStructpbValue converts an arbitrary Go value backed by one of the
+// reflect-based wrappers into a structpb.Value using a JSON round-trip. This is more
+// expensive than the identity conversions the wrappers perform for their own Go types,
+// but it is needed when a typed value read from the "object"/"oldObject" variables is
+// used where an arbitrary JSON value is required, e.g. as the "value" of a JSON Patch
+// operation (see the mutating admission jsonPatcher).
+func convertToStructpbValue(v interface{}) (interface{}, error) {
+	data, err := json.Marshal(v)
+	if err != nil {
+		return nil, err
+	}
+	var raw interface{}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return nil, err
+	}
+	return structpb.NewValue(raw)
+}
 
 // TypedToVal wraps "typed" Go value as CEL ref.Val types using reflection.
 // "typed" values must be values declared by Kubernetes API types.go definitions.
@@ -159,6 +180,9 @@ func (s *typedStruct) ConvertToNative(typeDesc reflect.Type) (interface{}, error
 	if s.value.Type().AssignableTo(typeDesc) {
 		return s.value.Interface(), nil
 	}
+	if typeDesc == structpbValueType {
+		return convertToStructpbValue(s.value.Interface())
+	}
 	return nil, fmt.Errorf("type conversion error from struct type %v to %v", s.value.Type(), typeDesc)
 }
 
@@ -246,6 +270,9 @@ type typedList struct {
 }
 
 func (t *typedList) ConvertToNative(typeDesc reflect.Type) (interface{}, error) {
+	if typeDesc == structpbValueType {
+		return convertToStructpbValue(t.value.Interface())
+	}
 	switch typeDesc.Kind() {
 	case reflect.Slice:
 		return t.value.Interface(), nil
@@ -570,6 +597,9 @@ type typedMap struct {
 }
 
 func (t *typedMap) ConvertToNative(typeDesc reflect.Type) (interface{}, error) {
+	if typeDesc == structpbValueType {
+		return convertToStructpbValue(t.value.Interface())
+	}
 	switch typeDesc.Kind() {
 	case reflect.Map:
 		return t.value, nil

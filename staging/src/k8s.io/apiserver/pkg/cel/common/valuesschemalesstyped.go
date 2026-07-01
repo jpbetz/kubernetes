@@ -147,6 +147,9 @@ type reflectSchemalessTypedList struct {
 }
 
 func (l *reflectSchemalessTypedList) ConvertToNative(typeDesc reflect.Type) (interface{}, error) {
+	if typeDesc == structpbValueType {
+		return convertToStructpbValue(l.value.Interface())
+	}
 	switch typeDesc.Kind() {
 	case reflect.Slice:
 		return l.value.Interface(), nil
@@ -280,6 +283,9 @@ func (m *reflectSchemalessTypedMap) ConvertToNative(typeDesc reflect.Type) (inte
 	if m.value.Type().AssignableTo(typeDesc) {
 		return m.value.Interface(), nil
 	}
+	if typeDesc == structpbValueType {
+		return convertToStructpbValue(m.value.Interface())
+	}
 	return nil, fmt.Errorf("type conversion error from '%s' to '%s'", m.Type(), typeDesc)
 }
 
@@ -412,6 +418,9 @@ type reflectSchemalessTypedStruct struct {
 func (s *reflectSchemalessTypedStruct) ConvertToNative(typeDesc reflect.Type) (interface{}, error) {
 	if s.value.Type().AssignableTo(typeDesc) {
 		return s.value.Interface(), nil
+	}
+	if typeDesc == structpbValueType {
+		return convertToStructpbValue(s.value.Interface())
 	}
 	return nil, fmt.Errorf("type conversion error from struct type %v to %v", s.value.Type(), typeDesc)
 }
