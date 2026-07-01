@@ -19,6 +19,7 @@ package openapiv3
 import (
 	"fmt"
 	"reflect"
+	"sort"
 	"sync"
 	"time"
 
@@ -28,10 +29,12 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/apiserver/pkg/features"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
+	"k8s.io/kube-openapi/pkg/cached"
 	"k8s.io/kube-openapi/pkg/handler3"
 	"k8s.io/kube-openapi/pkg/spec3"
 
@@ -192,6 +195,29 @@ func (c *Controller) deleteCRD(name string) {
 func (c *Controller) updateGroupVersion(gv schema.GroupVersion) error {
 	if _, ok := c.specsByGVandName[gv]; !ok {
 		c.openAPIV3Service.DeleteGroupVersion(groupVersionToOpenAPIV3Path(gv))
+		return nil
+	}
+
+	if utilfeature.DefaultFeatureGate.Enabled(features.OpenAPILazyGraph) {
+		// Re-merge on demand so the per-GV merged graph is not retained. Snapshot
+		// name-sorted for a deterministic rebuild.
+		names := make([]string, 0, len(c.specsByGVandName[gv]))
+		for name := range c.specsByGVandName[gv] {
+			names = append(names, name)
+		}
+		sort.Strings(names)
+		specs := make([]*spec3.OpenAPI, 0, len(names))
+		for _, name := range names {
+			specs = append(specs, c.specsByGVandName[gv][name])
+		}
+		src := cached.Func(func() (*spec3.OpenAPI, string, error) {
+			merged, err := builder.MergeSpecsV3(specs...)
+			if err != nil {
+				return nil, "", err
+			}
+			return merged, fmt.Sprintf("crd-v3/%s/%d", gv.String(), len(specs)), nil
+		})
+		c.openAPIV3Service.UpdateGroupVersionWeak(groupVersionToOpenAPIV3Path(gv), src)
 		return nil
 	}
 
