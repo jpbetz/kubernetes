@@ -22,9 +22,12 @@ import (
 	"net/http"
 	"strings"
 	"sync/atomic"
+	"weak"
 
 	"k8s.io/apiserver/pkg/authentication/user"
 	"k8s.io/apiserver/pkg/endpoints/request"
+	"k8s.io/apiserver/pkg/features"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/apiserver/pkg/util/responsewriter"
 	"k8s.io/kube-openapi/pkg/validation/spec"
 )
@@ -43,6 +46,10 @@ type cacheableDownloader struct {
 	handler atomic.Pointer[http.Handler]
 	etag    string
 	spec    *spec.Swagger
+	// On the OpenAPILazyGraph path the reparsed spec is held weakly so it can be
+	// reclaimed; a 304 whose spec was reclaimed forces a full re-download.
+	lazy     bool
+	weakSpec weak.Pointer[spec.Swagger]
 }
 
 // NewCacheableDownloader creates a downloader that also returns the etag, making it useful to use as a cached dependency.
@@ -50,9 +57,25 @@ func NewCacheableDownloader(apiServiceName string, downloader *Downloader, handl
 	c := &cacheableDownloader{
 		name:       apiServiceName,
 		downloader: downloader,
+		lazy:       utilfeature.DefaultFeatureGate.Enabled(features.OpenAPILazyGraph),
 	}
 	c.handler.Store(&handler)
 	return c
+}
+
+func (d *cacheableDownloader) cachedSpec() *spec.Swagger {
+	if d.lazy {
+		return d.weakSpec.Value()
+	}
+	return d.spec
+}
+
+func (d *cacheableDownloader) storeSpec(s *spec.Swagger) {
+	if d.lazy {
+		d.weakSpec = weak.Make(s)
+	} else {
+		d.spec = s
+	}
 }
 func (d *cacheableDownloader) UpdateHandler(handler http.Handler) {
 	d.handler.Store(&handler)
@@ -74,11 +97,22 @@ func (d *cacheableDownloader) get() (*spec.Swagger, string, error) {
 	}
 	switch status {
 	case http.StatusNotModified:
-		// Nothing has changed, do nothing.
+		if s := d.cachedSpec(); s != nil {
+			return s, d.etag, nil
+		}
+		// Reclaimed: re-download in full.
+		if swagger, etag, status, err = d.downloader.Download(h, ""); err != nil {
+			return nil, "", err
+		}
+		if status != http.StatusOK || swagger == nil {
+			return nil, "", ErrAPIServiceNotFound
+		}
+		d.etag = etag
+		d.storeSpec(swagger)
 	case http.StatusOK:
 		if swagger != nil {
 			d.etag = etag
-			d.spec = swagger
+			d.storeSpec(swagger)
 			break
 		}
 		fallthrough
@@ -87,7 +121,9 @@ func (d *cacheableDownloader) get() (*spec.Swagger, string, error) {
 	default:
 		return nil, "", fmt.Errorf("invalid status code: %v", status)
 	}
-	return d.spec, d.etag, nil
+	// Return the freshly-downloaded strong ref, not d.cachedSpec() (a weak read
+	// could race a GC reclaim and return nil).
+	return swagger, d.etag, nil
 }
 
 // Downloader is the OpenAPI downloader type. It will try to download spec from /openapi/v2 or /swagger.json endpoint.
