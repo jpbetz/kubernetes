@@ -210,6 +210,11 @@ func (c *Controller) updateGroupVersion(gv schema.GroupVersion) error {
 		for _, name := range names {
 			specs = append(specs, c.specsByGVandName[gv][name])
 		}
+		// Validate the merge before swapping so a conflict retains the last-good
+		// group instead of blanking it.
+		if _, err := builder.MergeSpecsV3(specs...); err != nil {
+			return fmt.Errorf("failed to merge specs: %v", err)
+		}
 		src := cached.Func(func() (*spec3.OpenAPI, string, error) {
 			merged, err := builder.MergeSpecsV3(specs...)
 			if err != nil {

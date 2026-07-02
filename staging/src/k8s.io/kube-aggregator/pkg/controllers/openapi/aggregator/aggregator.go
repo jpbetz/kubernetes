@@ -225,7 +225,7 @@ func (s *specAggregator) currentMergeEtag() (string, error) {
 
 // currentMergeBytes re-merges the child specs and marshals to JSON; the merged
 // graph is transient.
-func (s *specAggregator) currentMergeBytes() ([]byte, error) {
+func (s *specAggregator) currentMergeBytes() ([]byte, string, error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	caches := s.sortedCachesLocked()
@@ -236,12 +236,13 @@ func (s *specAggregator) currentMergeBytes() ([]byte, error) {
 	}
 	merged, _, err := mergeSwaggerResults(results)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	if merged == nil {
 		merged = &spec.Swagger{}
 	}
-	return merged.MarshalJSON()
+	b, err := merged.MarshalJSON()
+	return b, "", err
 }
 
 // updateServiceLocked updates the spec cache by downloading the latest

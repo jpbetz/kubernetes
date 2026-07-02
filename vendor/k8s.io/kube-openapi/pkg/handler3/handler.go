@@ -117,19 +117,21 @@ func (o *openAPIV3Group) UpdateSpec(openapi cached.Value[*spec3.OpenAPI]) {
 // src on a miss so the graph is not retained. src must rebuild deterministically.
 func newOpenAPIV3GroupWeak(src cached.Value[*spec3.OpenAPI]) *openAPIV3Group {
 	o := &openAPIV3Group{}
-	o.jsonWeak = cached.NewWeakByteCache(func() ([]byte, error) {
+	o.jsonWeak = cached.NewWeakByteCache(func() ([]byte, string, error) {
 		spec, _, err := src.Get()
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
-		return json.Marshal(spec)
+		j, err := json.Marshal(spec)
+		return j, "", err
 	})
-	o.pbWeak = cached.NewWeakByteCache(func() ([]byte, error) {
-		j, _, err := o.jsonWeak.Get()
+	o.pbWeak = cached.NewWeakByteCache(func() ([]byte, string, error) {
+		j, jetag, err := o.jsonWeak.Get()
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
-		return ToV3ProtoBinary(j)
+		p, err := ToV3ProtoBinary(j)
+		return p, jetag, err
 	})
 	// Discovery needs only each group's etag; serve it without materializing bytes.
 	o.jsonCache = cached.Func(func() (timedSpec, string, error) {
@@ -217,13 +219,8 @@ func (o *OpenAPIService) getSingleGroupBytes(getType string, group string) ([]by
 		return ts.spec, etag, ts.lastModified, err
 	case subTypeProtobuf, subTypeProtobufDeprecated:
 		if v.pbWeak != nil {
-			b, _, err := v.pbWeak.Get()
-			if err != nil {
-				return nil, "", time.Now(), err
-			}
-			// Proto reuses the JSON etag; Get so it is never empty.
-			_, etag, jerr := v.jsonWeak.Get()
-			return b, etag, time.Now(), jerr
+			b, etag, err := v.pbWeak.Get()
+			return b, etag, time.Now(), err
 		}
 		ts, etag, err := v.pbCache.Get()
 		return ts.spec, etag, ts.lastModified, err
@@ -346,6 +343,8 @@ func (o *OpenAPIService) HandleGroupVersion(w http.ResponseWriter, r *http.Reque
 			}
 			data, etag, lastModified, err := o.getSingleGroupBytes(accepts.SubType, group)
 			if err != nil {
+				klog.Errorf("Error serving OpenAPI v3 for %s: %s", group, err)
+				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
 			// Set Content-Type header in the reponse

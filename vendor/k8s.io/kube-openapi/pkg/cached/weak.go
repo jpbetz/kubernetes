@@ -24,10 +24,11 @@ import (
 	"weak"
 )
 
-// WeakByteBuilder produces the serialized bytes for the current generation. It
-// must be deterministic within a generation so the resident etag stays valid
-// across a reclaim and rebuild.
-type WeakByteBuilder func() ([]byte, error)
+// WeakByteBuilder produces the serialized bytes for the current generation and
+// the wire etag to serve them under ("" means sha512 of the bytes). It must be
+// deterministic within a generation so the resident etag stays valid across a
+// reclaim and rebuild.
+type WeakByteBuilder func() (data []byte, etag string, err error)
 
 // WeakByteCache keeps a content etag resident and holds the serialized bytes
 // behind a weak.Pointer, reclaimable under memory pressure and rebuilt on demand.
@@ -90,7 +91,9 @@ func (c *WeakByteCache) Get() ([]byte, string, error) {
 	}
 	if c.built && cur == c.builtFor {
 		if p := c.wp.Value(); p != nil {
-			return *p, c.wireEtag, c.err
+			// Resident bytes are valid for this generation; c.err, if set, belongs to
+			// a later failed rebuild at a different generation, not to these bytes.
+			return *p, c.wireEtag, nil
 		}
 	}
 	// Return the built bytes directly; re-reading the weak pointer could race a
@@ -103,12 +106,15 @@ func (c *WeakByteCache) Get() ([]byte, string, error) {
 }
 
 func (c *WeakByteCache) rebuildLocked(srcEtag string) ([]byte, error) {
-	b, err := c.build()
+	b, etag, err := c.build()
 	c.err = err
 	if err != nil {
 		return nil, err
 	}
-	c.wireEtag = fmt.Sprintf("%X", sha512.Sum512(b)) // %X matches handler.computeETag
+	if etag == "" {
+		etag = fmt.Sprintf("%X", sha512.Sum512(b)) // %X matches handler.computeETag
+	}
+	c.wireEtag = etag
 	c.builtFor = srcEtag
 	c.built = true
 	bb := b
