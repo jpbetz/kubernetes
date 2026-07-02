@@ -2337,9 +2337,33 @@ func (m fakeStorage) GetList(ctx context.Context, key string, opts storage.ListO
 	podList.Items = m.pods
 	return nil
 }
-func (m fakeStorage) Watch(_ context.Context, _ string, _ storage.ListOptions) (watch.Interface, error) {
-	return cachertesting.NewMockWatch(), nil
+type bookmarkWatch struct {
+	ch chan watch.Event
 }
+func (w *bookmarkWatch) ResultChan() <-chan watch.Event { return w.ch }
+func (w *bookmarkWatch) Stop() { close(w.ch) }
+
+func (m fakeStorage) Watch(_ context.Context, _ string, _ storage.ListOptions) (watch.Interface, error) {
+	w := &bookmarkWatch{ch: make(chan watch.Event, 10)}
+	w.ch <- watch.Event{
+		Type: watch.Bookmark,
+		Object: &example.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				ResourceVersion: "12345",
+				Annotations:     map[string]string{"k8s.io/initial-events-end": "true"},
+			},
+		},
+	}
+	return w, nil
+}
+func (m fakeStorage) IsWatchListSemanticsUnSupported() bool { return true }
+func (m fakeStorage) EnableResourceSizeEstimation(storage.KeysFunc) error { return nil }
+func (m fakeStorage) CompactRevision() int64                              { return 0 }
+func (m fakeStorage) RequestWatchProgress(ctx context.Context) error      { return nil }
+func (m fakeStorage) GetCurrentResourceVersion(ctx context.Context) (uint64, error) {
+	return 12345, nil
+}
+func (m fakeStorage) ReadinessCheck() error { return nil }
 
 func BenchmarkCacher_GetList(b *testing.B) {
 	testCases := []struct {
@@ -2424,6 +2448,45 @@ func BenchmarkCacher_GetList(b *testing.B) {
 					}
 				}
 			})
+	}
+}
+
+func BenchmarkCacher_GetList_AllPods(b *testing.B) {
+	totalObjectNum := 10_000
+	fakePods := make([]example.Pod, totalObjectNum)
+	for i := range fakePods {
+		fakePods[i].Namespace = "default"
+		fakePods[i].Name = fmt.Sprintf("pod-%d", i)
+		fakePods[i].ResourceVersion = strconv.Itoa(i)
+		data := make([]byte, 1024*2) // 2k labels
+		rand.Read(data)
+		fakePods[i].Spec.NodeSelector = map[string]string{
+			"key": string(data),
+		}
+	}
+	store := newObjectStorage(fakePods)
+	cacher, _, err := newTestCacher(store)
+	if err != nil {
+		b.Fatalf("new cacher: %v", err)
+	}
+	defer cacher.Stop()
+	delegator := NewCacheDelegator(cacher, store)
+	defer delegator.Stop()
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		result := &example.PodList{}
+		err = delegator.GetList(context.TODO(), "/pods/", storage.ListOptions{
+			Predicate:       storage.Everything,
+			Recursive:       true,
+			ResourceVersion: "12345",
+		}, result)
+		if err != nil {
+			b.Fatalf("GetList cache: %v", err)
+		}
+		if len(result.Items) != totalObjectNum {
+			b.Fatalf("expect %d but got %d", totalObjectNum, len(result.Items))
+		}
 	}
 }
 
