@@ -17,6 +17,7 @@ limitations under the License.
 package handlers
 
 import (
+	"bytes"
 	"context"
 	"encoding/hex"
 	"fmt"
@@ -378,7 +379,18 @@ func limitedReadBody(req *http.Request, limit int64) ([]byte, error) {
 		R: req.Body,
 		N: limit + 1,
 	}
-	data, err := io.ReadAll(lr)
+	var data []byte
+	var err error
+	if cl := req.ContentLength; cl > 0 && cl <= limit {
+		// Presize the buffer from the declared Content-Length to avoid the
+		// growth reallocations of io.ReadAll. Content-Length is never trusted
+		// beyond the configured limit.
+		buf := bytes.NewBuffer(make([]byte, 0, cl+bytes.MinRead))
+		_, err = buf.ReadFrom(lr)
+		data = buf.Bytes()
+	} else {
+		data, err = io.ReadAll(lr)
+	}
 	if err != nil {
 		return nil, err
 	}

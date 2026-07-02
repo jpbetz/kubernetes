@@ -242,6 +242,10 @@ func (w *watchCache) processEvent(event watch.Event, resourceVersion uint64) err
 		wcEvent.PrevObject = previousElem.Object
 		wcEvent.PrevObjLabels = previousElem.Labels
 		wcEvent.PrevObjFields = previousElem.Fields
+		// Reuse the previous key so all store elements and cached events for
+		// an object share a single key string.
+		elem.Key = previousElem.Key
+		wcEvent.Key = previousElem.Key
 	}
 
 	if err := func() error {

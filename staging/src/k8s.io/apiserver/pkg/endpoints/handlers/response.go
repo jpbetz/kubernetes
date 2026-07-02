@@ -442,6 +442,7 @@ func asPartialObjectMetadataList(result runtime.Object, groupVersion schema.Grou
 	switch {
 	case groupVersion == metav1beta1.SchemeGroupVersion:
 		list := &metav1beta1.PartialObjectMetadataList{}
+		list.Items = make([]metav1.PartialObjectMetadata, 0, meta.LenList(result))
 		err := meta.EachListItem(result, func(obj runtime.Object) error {
 			m, err := meta.Accessor(obj)
 			if err != nil {
@@ -462,6 +463,7 @@ func asPartialObjectMetadataList(result runtime.Object, groupVersion schema.Grou
 
 	case groupVersion == metav1.SchemeGroupVersion:
 		list := &metav1.PartialObjectMetadataList{}
+		list.Items = make([]metav1.PartialObjectMetadata, 0, meta.LenList(result))
 		err := meta.EachListItem(result, func(obj runtime.Object) error {
 			m, err := meta.Accessor(obj)
 			if err != nil {
