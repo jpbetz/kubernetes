@@ -33,6 +33,7 @@ import (
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/dynamic/dynamicinformer"
+	"k8s.io/client-go/informers"
 	clientset "k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -86,6 +87,12 @@ type Options struct {
 }
 
 // NewOptions returns default scheduler app options.
+// SharedStateFusionInformerFactory is a prototype hook (shared-state-fusion
+// branch): when non-nil it replaces the scheduler's own typed informer factory.
+// The caller is responsible for pod filtering semantics (the scheduler's own
+// factory serves only non-terminal pods).
+var SharedStateFusionInformerFactory informers.SharedInformerFactory
+
 func NewOptions() *Options {
 	componentGlobalsRegistry := compatibility.DefaultComponentGlobalsRegistry
 	// make sure DefaultKubeComponent is registered in the DefaultComponentGlobalsRegistry.
@@ -335,7 +342,11 @@ func (o *Options) Config(ctx context.Context) (*schedulerappconfig.Config, error
 	}
 
 	c.Client = client
-	c.InformerFactory = scheduler.NewInformerFactory(client, 0)
+	if SharedStateFusionInformerFactory != nil {
+		c.InformerFactory = SharedStateFusionInformerFactory
+	} else {
+		c.InformerFactory = scheduler.NewInformerFactory(client, 0)
+	}
 	dynClient := dynamic.NewForConfigOrDie(c.KubeConfig)
 	c.DynInformerFactory = dynamicinformer.NewFilteredDynamicSharedInformerFactory(dynClient, 0, corev1.NamespaceAll, nil)
 	c.LeaderElection = leaderElectionConfig

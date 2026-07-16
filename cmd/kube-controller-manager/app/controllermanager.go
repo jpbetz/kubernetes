@@ -524,6 +524,10 @@ func (c ControllerContext) NewClient(name string) (kubernetes.Interface, error) 
 	return client, nil
 }
 
+// SharedStateFusionInformerFactory is a prototype hook (shared-state-fusion
+// branch): when non-nil it replaces KCM's own typed informer factory.
+var SharedStateFusionInformerFactory informers.SharedInformerFactory
+
 // CreateControllerContext creates a context struct containing references to resources needed by the
 // controllers such as the cloud provider and clientBuilder. rootClientBuilder is only used for
 // the shared-informers client and token controller.
@@ -549,6 +553,12 @@ func CreateControllerContext(ctx context.Context, s *config.CompletedConfig, roo
 	}
 
 	sharedInformers := informers.NewSharedInformerFactoryWithOptions(versionedClient, ResyncPeriod(s)(), informers.WithTransform(trim), informers.WithInformerName(informerName))
+	if SharedStateFusionInformerFactory != nil {
+		// Prototype hook (shared-state-fusion branch): share one typed factory
+		// across control-plane components. The shared factory must apply an
+		// equivalent managedFields-trim transform.
+		sharedInformers = SharedStateFusionInformerFactory
+	}
 
 	metadataConfig, err := rootClientBuilder.Config("metadata-informers")
 	if err != nil {
