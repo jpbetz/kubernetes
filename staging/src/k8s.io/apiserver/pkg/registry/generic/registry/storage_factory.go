@@ -24,6 +24,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/sharding"
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/storage"
 	cacherstorage "k8s.io/apiserver/pkg/storage/cacher"
@@ -32,8 +33,14 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-// Creates a cacher based given storageConfig.
-func StorageWithCacher() generic.StorageDecorator {
+// StorageWithCacher creates a cacher based on the given storageConfig. The
+// optional residency selector, when non-nil and non-empty, restricts which
+// objects the resulting watch cache keeps resident (PoC for KEP-5866 phase 2).
+func StorageWithCacher(residency ...sharding.Selector) generic.StorageDecorator {
+	var sel sharding.Selector
+	if len(residency) > 0 {
+		sel = residency[0]
+	}
 	return func(
 		storageConfig *storagebackend.ConfigForResource,
 		resourcePrefix string,
@@ -66,6 +73,7 @@ func StorageWithCacher() generic.StorageDecorator {
 			IndexerFuncs:        triggerFuncs,
 			Indexers:            indexers,
 			Codec:               storageConfig.Codec,
+			ResidencySelector:   sel,
 		}
 		cacher, err := cacherstorage.NewCacherFromConfig(cacherConfig)
 		if err != nil {

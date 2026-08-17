@@ -104,6 +104,14 @@ func (c *CacheDelegator) Watch(ctx context.Context, key string, opts storage.Lis
 	if !utilfeature.DefaultFeatureGate.Enabled(features.WatchList) && opts.SendInitialEvents != nil {
 		opts.SendInitialEvents = nil
 	}
+	// Residency gate (KEP-5866 phase 2, PoC): a watch whose shardSelector is
+	// not fully contained in the resident range must be served by storage;
+	// otherwise the cacher's initial interval and SendInitialEvents contract
+	// would silently truncate to the resident slice.
+	if c.cacher.HasResidency() && !c.cacher.RequestFitsResidentRange(opts.Predicate.ShardSelector) {
+		metrics.RecordResidencyDelegation(c.cacher.groupResource, "watch")
+		return c.storage.Watch(ctx, key, opts)
+	}
 	return c.cacher.Watch(ctx, key, opts)
 }
 
@@ -125,6 +133,21 @@ func (c *CacheDelegator) Get(ctx context.Context, key string, opts storage.GetOp
 	if _, err := c.cacher.versioner.ParseResourceVersion(opts.ResourceVersion); err != nil {
 		return err
 	}
+	// Residency gate (KEP-5866 phase 2, PoC): a single GET does not carry a
+	// shardSelector. If we're a slice-holding cache, attempt the cache with
+	// IgnoreNotFound forced off so we can distinguish a miss (which may mean
+	// "resident elsewhere") from a hit, and fall through to storage on miss.
+	// A wrong empty response would violate correctness bar C2.
+	if c.cacher.HasResidency() {
+		cacheOpts := opts
+		cacheOpts.IgnoreNotFound = false
+		err := c.cacher.Get(ctx, key, cacheOpts, objPtr)
+		if storage.IsNotFound(err) {
+			metrics.RecordResidencyDelegation(c.cacher.groupResource, "get")
+			return c.storage.Get(ctx, key, opts, objPtr)
+		}
+		return err
+	}
 	return c.cacher.Get(ctx, key, opts, objPtr)
 }
 
@@ -132,6 +155,16 @@ func (c *CacheDelegator) GetList(ctx context.Context, key string, opts storage.L
 	_, _, err := storage.ValidateListOptions(c.cacher.resourcePrefix, c.cacher.versioner, opts)
 	if err != nil {
 		return err
+	}
+	// Residency gate (KEP-5866 phase 2, PoC): if the request's shardSelector
+	// is not fully contained in the resident range, delegate to storage
+	// BEFORE any snapshot / exact-RV routing so we never serve a partial
+	// list. Early return (not result.ShouldDelegate) keeps the residency
+	// path out of the ConsistentRead / TooLargeRV post-processing, which
+	// must not run for storage-served lists.
+	if c.cacher.HasResidency() && !c.cacher.RequestFitsResidentRange(opts.Predicate.ShardSelector) {
+		metrics.RecordResidencyDelegation(c.cacher.groupResource, "list")
+		return c.storage.GetList(ctx, key, opts, listObj)
 	}
 	result, err := delegator.ShouldDelegateList(opts, c.cacher)
 	if err != nil {

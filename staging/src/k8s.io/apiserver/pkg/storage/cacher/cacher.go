@@ -36,6 +36,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	apisharding "k8s.io/apimachinery/pkg/sharding"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
@@ -122,6 +123,13 @@ type Config struct {
 	Codec runtime.Codec
 
 	Clock clock.WithTicker
+
+	// ResidencySelector, when non-nil and non-empty, causes the watch cache
+	// to store only objects matching the selector. Requests whose
+	// ShardSelector is not fully contained in the resident range are
+	// delegated to Storage by the CacheDelegator. nil = full residency
+	// (default). PoC for KEP-5866 phase 2.
+	ResidencySelector apisharding.Selector
 }
 
 type watchersMap map[int]*cacheWatcher
@@ -343,6 +351,11 @@ type Cacher struct {
 	expiredBookmarkWatchers []*cacheWatcher
 	compactor               *compactor
 	watcherMetrics          *metrics.WatcherMetricsObservers
+
+	// residencySelector is the (optional) shard-range selector that restricts
+	// which objects this cacher's watchCache holds resident. nil or Empty()
+	// means the cacher stores every object. See KEP-5866 phase 2.
+	residencySelector apisharding.Selector
 }
 
 // NewCacherFromConfig creates a new Cacher responsible for servicing WATCH and LIST requests from
@@ -438,9 +451,26 @@ func NewCacherFromConfig(config Config) (*Cacher, error) {
 	}
 
 	progressRequester := progress.NewConditionalProgressRequester(config.Storage.RequestWatchProgress, config.Clock, contextMetadata)
+	// Belt-and-suspenders: if the residency sub-gate is disabled, drop any
+	// residency selector that may have been threaded through Config. The
+	// options.Validate check already blocks the flag when the gates are off,
+	// but wiring the check here too guarantees bit-identical behavior with
+	// today when either gate is off (KEP-5866 phase 2 correctness bar C4).
+	residency := config.ResidencySelector
+	if residency != nil {
+		if !utilfeature.DefaultFeatureGate.Enabled(features.ShardedWatchCacheResidency) ||
+			!utilfeature.DefaultFeatureGate.Enabled(features.ShardedListAndWatch) {
+			residency = nil
+		}
+	}
+	cacher.residencySelector = residency
+	if residency != nil && !residency.Empty() {
+		metrics.RecordResidencyConfigured(config.GroupResource)
+	}
 	watchCache := newWatchCache(
 		config.KeyFunc, cacher.processEvent, config.GetAttrsFunc, config.Versioner, config.Indexers,
-		config.Clock, eventFreshDuration, config.GroupResource, progressRequester, config.Storage.GetCurrentResourceVersion)
+		config.Clock, eventFreshDuration, config.GroupResource, progressRequester, config.Storage.GetCurrentResourceVersion,
+		residency)
 	listerWatcher := NewListerWatcher(config.Storage, resourcePrefix, config.NewListFunc, contextMetadata)
 	reflectorName := "storage/cacher.go:" + resourcePrefix
 
@@ -1469,6 +1499,110 @@ func (c *Cacher) ShouldDelegateConsistentRead() (delegator.Result, error) {
 		ConsistentRead: true,
 		ShouldDelegate: !delegator.ConsistentReadSupported(),
 	}, nil
+}
+
+// HasResidency reports whether this cacher has a non-empty residency shard
+// selector configured — i.e. it only stores a slice of the resource.
+// KEP-5866 phase 2 (PoC).
+func (c *Cacher) HasResidency() bool {
+	return c.residencySelector != nil && !c.residencySelector.Empty()
+}
+
+// GroupResource returns the group/resource this cacher serves.
+func (c *Cacher) GroupResource() schema.GroupResource {
+	return c.groupResource
+}
+
+// RequestFitsResidentRange reports whether a request carrying the given
+// shard selector can be answered entirely from the resident slice of this
+// cacher. When residency is unconfigured (or empty), this returns true and
+// preserves today's behavior (KEP-5866 phase 2 correctness bar C4).
+//
+// The rules follow the semantics in DESIGN §4:
+//   - no residency configured -> true.
+//   - residency configured + request selector nil/empty -> false (client
+//     wants everything; cache holds a slice).
+//   - request field path != residency field path -> false (mixed axis).
+//   - otherwise every request [start,end) must be contained in the union of
+//     resident ranges (merged, sorted by HexLess).
+func (c *Cacher) RequestFitsResidentRange(requestSel apisharding.Selector) bool {
+	if !c.HasResidency() {
+		return true
+	}
+	if requestSel == nil || requestSel.Empty() {
+		return false
+	}
+	residentReqs := c.residencySelector.Requirements()
+	if len(residentReqs) == 0 {
+		return true
+	}
+	requestReqs := requestSel.Requirements()
+	if len(requestReqs) == 0 {
+		return false
+	}
+	// Mixed axis -> cannot serve.
+	axis := residentReqs[0].Key
+	for _, r := range residentReqs[1:] {
+		if r.Key != axis {
+			return false
+		}
+	}
+	for _, r := range requestReqs {
+		if r.Key != axis {
+			return false
+		}
+	}
+	merged := mergeSortedRanges(residentReqs)
+	for _, req := range requestReqs {
+		if !rangeContainedIn(req, merged) {
+			return false
+		}
+	}
+	return true
+}
+
+// mergeSortedRanges returns a copy of reqs sorted by Start with adjacent /
+// overlapping intervals merged.
+func mergeSortedRanges(reqs []apisharding.ShardRangeRequirement) []apisharding.ShardRangeRequirement {
+	sorted := make([]apisharding.ShardRangeRequirement, len(reqs))
+	copy(sorted, reqs)
+	// Simple insertion sort — the number of ranges per selector is expected
+	// to be a handful; we deliberately avoid pulling in "sort" for a helper
+	// this small (and keep it stable/deterministic).
+	for i := 1; i < len(sorted); i++ {
+		for j := i; j > 0 && apisharding.HexLess(sorted[j].Start, sorted[j-1].Start); j-- {
+			sorted[j], sorted[j-1] = sorted[j-1], sorted[j]
+		}
+	}
+	out := make([]apisharding.ShardRangeRequirement, 0, len(sorted))
+	for _, r := range sorted {
+		if len(out) == 0 {
+			out = append(out, r)
+			continue
+		}
+		last := &out[len(out)-1]
+		// If r.Start <= last.End (i.e. !HexLess(last.End, r.Start)), merge.
+		if !apisharding.HexLess(last.End, r.Start) {
+			if apisharding.HexLess(last.End, r.End) {
+				last.End = r.End
+			}
+			continue
+		}
+		out = append(out, r)
+	}
+	return out
+}
+
+// rangeContainedIn reports whether the request [Start,End) sits entirely
+// within one of the merged resident intervals.
+func rangeContainedIn(req apisharding.ShardRangeRequirement, merged []apisharding.ShardRangeRequirement) bool {
+	for _, m := range merged {
+		// req.Start >= m.Start && req.End <= m.End
+		if !apisharding.HexLess(req.Start, m.Start) && !apisharding.HexLess(m.End, req.End) {
+			return true
+		}
+	}
+	return false
 }
 
 // Implements watch.Interface.

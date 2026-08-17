@@ -30,8 +30,10 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	apisharding "k8s.io/apimachinery/pkg/sharding"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/apiserver/pkg/features"
 	"k8s.io/apiserver/pkg/registry/generic"
 	genericregistry "k8s.io/apiserver/pkg/registry/generic/registry"
 	"k8s.io/apiserver/pkg/server"
@@ -40,10 +42,12 @@ import (
 	encryptionconfigcontroller "k8s.io/apiserver/pkg/server/options/encryptionconfig/controller"
 	encryptionconfigmetrics "k8s.io/apiserver/pkg/server/options/encryptionconfig/metrics"
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
+	"k8s.io/apiserver/pkg/sharding"
 	"k8s.io/apiserver/pkg/storage/etcd3/metrics"
 	"k8s.io/apiserver/pkg/storage/storagebackend"
 	storagefactory "k8s.io/apiserver/pkg/storage/storagebackend/factory"
 	storagevalue "k8s.io/apiserver/pkg/storage/value"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/klog/v2"
 )
 
@@ -64,6 +68,16 @@ type EtcdOptions struct {
 	EnableWatchCache bool
 	// WatchCacheSizes represents override to a given resource
 	WatchCacheSizes []string
+
+	// WatchCacheShardSelectors restricts, per resource, which shard range
+	// is kept resident in the watch cache. Format:
+	//   resource[.group]#<shard-selector-expr>
+	// where <shard-selector-expr> is the KEP-5866 shardRange expression
+	// (one or more shardRange(fieldPath,'0xSTART','0xEND') terms joined by ||).
+	// Repeat the flag for additional resources. Requires the
+	// ShardedWatchCacheResidency feature gate.
+	// PoC for KEP-5866 phase 2.
+	WatchCacheShardSelectors []string
 
 	// SkipHealthEndpoints, when true, causes the Apply methods to not set up health endpoints.
 	// This allows multiple invocations of the Apply methods without duplication of said endpoints.
@@ -118,6 +132,21 @@ func (s *EtcdOptions) Validate() []error {
 		allErrors = append(allErrors, fmt.Errorf("--storage-media-type %q invalid, allowed values: %s", s.DefaultStorageMediaType, strings.Join(sets.List(storageMediaTypes), ", ")))
 	}
 
+	if len(s.WatchCacheShardSelectors) > 0 {
+		if !utilfeature.DefaultFeatureGate.Enabled(features.ShardedWatchCacheResidency) {
+			allErrors = append(allErrors, fmt.Errorf("--watch-cache-shard-selector requires the ShardedWatchCacheResidency feature gate"))
+		}
+		if !utilfeature.DefaultFeatureGate.Enabled(features.ShardedListAndWatch) {
+			allErrors = append(allErrors, fmt.Errorf("--watch-cache-shard-selector requires the ShardedListAndWatch feature gate"))
+		}
+		if !s.EnableWatchCache {
+			allErrors = append(allErrors, fmt.Errorf("--watch-cache-shard-selector requires --watch-cache=true"))
+		}
+		if _, err := ParseWatchCacheShardSelectors(s.WatchCacheShardSelectors); err != nil {
+			allErrors = append(allErrors, err)
+		}
+	}
+
 	return allErrors
 }
 
@@ -163,6 +192,16 @@ func (s *EtcdOptions) AddFlags(fs *pflag.FlagSet) {
 		"watch-cache is enabled. The only meaningful size setting to supply here is zero, which means to "+
 		"disable watch caching for the associated resource; all non-zero values are equivalent and mean "+
 		"to not disable watch caching for that resource")
+
+	fs.StringArrayVar(&s.WatchCacheShardSelectors, "watch-cache-shard-selector", s.WatchCacheShardSelectors, ""+
+		"[ALPHA] Restrict which shard range is kept resident in the watch cache for a given "+
+		"resource. Format: resource[.group]#<shard-selector-expr>, where <shard-selector-expr> is "+
+		"the KEP-5866 shardRange expression (e.g. "+
+		"\"pods#shardRange(object.metadata.uid,'0x0000000000000000','0x8000000000000000')\"). "+
+		"May be specified multiple times; one occurrence per resource. Values are NOT comma-split. "+
+		"Requests whose shardSelector is not contained in the resident range are delegated to the "+
+		"underlying storage. Requires the ShardedListAndWatch and ShardedWatchCacheResidency "+
+		"feature gates and --watch-cache=true. Only applies to resources built into this apiserver.")
 
 	fs.StringVar(&s.StorageConfig.Type, "storage-backend", s.StorageConfig.Type,
 		"The storage backend for persistence. Options: 'etcd3' (default).")
@@ -518,11 +557,52 @@ func (f *StorageFactoryRestOptionsFactory) GetRESTOptions(resource schema.GroupR
 			ret.Decorator = generic.UndecoratedStorage
 		} else {
 			klog.V(3).InfoS("Using watch cache", "resource", resource)
-			ret.Decorator = genericregistry.StorageWithCacher()
+			var residency apisharding.Selector
+			if utilfeature.DefaultFeatureGate.Enabled(features.ShardedWatchCacheResidency) &&
+				utilfeature.DefaultFeatureGate.Enabled(features.ShardedListAndWatch) &&
+				len(f.Options.WatchCacheShardSelectors) > 0 {
+				selectors, perr := ParseWatchCacheShardSelectors(f.Options.WatchCacheShardSelectors)
+				if perr != nil {
+					return generic.RESTOptions{}, perr
+				}
+				if sel, has := selectors[resource]; has {
+					residency = sel
+					ret.ResidencyShardSelector = sel
+					klog.V(2).InfoS("Watch cache residency configured", "resource", resource, "selector", sel.String())
+				}
+			}
+			ret.Decorator = genericregistry.StorageWithCacher(residency)
 		}
 	}
 
 	return ret, nil
+}
+
+// ParseWatchCacheShardSelectors parses --watch-cache-shard-selector entries into
+// a map keyed by GroupResource. Each entry is <resource[.group]>#<expr>, where
+// <expr> is the KEP-5866 shardRange expression (parsed by
+// k8s.io/apiserver/pkg/sharding.Parse). Returns an error if any entry is
+// malformed or if the same GroupResource appears more than once.
+func ParseWatchCacheShardSelectors(entries []string) (map[schema.GroupResource]apisharding.Selector, error) {
+	out := make(map[schema.GroupResource]apisharding.Selector, len(entries))
+	for _, entry := range entries {
+		// Use SplitN so a future expression that happens to contain '#'
+		// (none do today) does not silently break parsing.
+		tokens := strings.SplitN(entry, "#", 2)
+		if len(tokens) != 2 || tokens[0] == "" || tokens[1] == "" {
+			return nil, fmt.Errorf("invalid --watch-cache-shard-selector value %q: expected resource[.group]#<shard-selector-expr>", entry)
+		}
+		gr := schema.ParseGroupResource(tokens[0])
+		sel, err := sharding.Parse(tokens[1])
+		if err != nil {
+			return nil, fmt.Errorf("invalid --watch-cache-shard-selector expression for %q: %w", tokens[0], err)
+		}
+		if _, dup := out[gr]; dup {
+			return nil, fmt.Errorf("duplicate --watch-cache-shard-selector entry for resource %q", gr.String())
+		}
+		out[gr] = sel
+	}
+	return out, nil
 }
 
 // ParseWatchCacheSizes turns a list of cache size values into a map of group resources

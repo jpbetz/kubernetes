@@ -222,6 +222,15 @@ const (
 	// on hash ranges of metadata fields (e.g. UID).
 	ShardedListAndWatch featuregate.Feature = "ShardedListAndWatch"
 
+	// owner: @jpbetz
+	// kep: https://kep.k8s.io/5866
+	//
+	// Allows configuring a kube-apiserver, via --watch-cache-shard-selector,
+	// to keep only a shard range of a resource resident in its watch cache.
+	// Requests outside the resident range are served from the underlying
+	// storage. Requires ShardedListAndWatch.
+	ShardedWatchCacheResidency featuregate.Feature = "ShardedWatchCacheResidency"
+
 	// owner: @serathius
 	//
 	// Enables APF to use size of objects for estimating request cost.
@@ -440,6 +449,10 @@ var defaultVersionedKubernetesFeatureGates = map[featuregate.Feature]featuregate
 	},
 
 	ShardedListAndWatch: {
+		{Version: version.MustParse("1.36"), Default: false, PreRelease: featuregate.Alpha},
+	},
+
+	ShardedWatchCacheResidency: {
 		{Version: version.MustParse("1.36"), Default: false, PreRelease: featuregate.Alpha},
 	},
 

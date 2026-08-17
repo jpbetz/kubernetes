@@ -29,6 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	apisharding "k8s.io/apimachinery/pkg/sharding"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/cacher/delegator"
@@ -124,6 +125,18 @@ type ImmutableWatchCacheConfig struct {
 	waitingUntilFresh *progress.ConditionalProgressRequester
 
 	getCurrentRV func(context.Context) (uint64, error)
+
+	// residency, if non-nil and non-empty, restricts which objects the
+	// watch cache stores (PoC for KEP-5866 phase 2). Non-matching events
+	// and initial-list entries are dropped from the store but still
+	// advance the cache's resourceVersion.
+	residency apisharding.Selector
+}
+
+// residencyActive reports whether the watch cache should filter ingest
+// against a resident shard range.
+func (c *ImmutableWatchCacheConfig) residencyActive() bool {
+	return c.residency != nil && !c.residency.Empty()
 }
 
 func newWatchCache(
@@ -137,6 +150,7 @@ func newWatchCache(
 	groupResource schema.GroupResource,
 	progressRequester *progress.ConditionalProgressRequester,
 	getCurrentRV func(context.Context) (uint64, error),
+	residency apisharding.Selector,
 ) *watchCache {
 	config := &ImmutableWatchCacheConfig{
 		keyFunc:           keyFunc,
@@ -147,6 +161,7 @@ func newWatchCache(
 		groupResource:     groupResource,
 		waitingUntilFresh: progressRequester,
 		getCurrentRV:      getCurrentRV,
+		residency:         residency,
 	}
 
 	wc := &watchCache{
@@ -226,6 +241,32 @@ func (w *watchCache) processEvent(event watch.Event, resourceVersion uint64) err
 	elem.Labels, elem.Fields, err = w.config.getAttrsFunc(event.Object)
 	if err != nil {
 		return err
+	}
+
+	// Residency filter (KEP-5866 phase 2, PoC): if the event's object is
+	// outside the resident shard range, do NOT insert it into the store or
+	// fanout to watchers, but still advance resourceVersion and broadcast
+	// so that fresh-waiters (consistent reads, WatchList freshness barrier)
+	// do not stall on the 3s blockTimeout. Bookmark/progress events do not
+	// come through processEvent, so we don't need to worry about them here.
+	if w.config.residencyActive() {
+		match, mErr := w.config.residency.Matches(event.Object)
+		if mErr != nil {
+			return fmt.Errorf("watch cache residency match for %v: %w", w.config.groupResource, mErr)
+		}
+		if !match {
+			func() {
+				w.Lock()
+				defer w.Unlock()
+				if resourceVersion > w.resourceVersion {
+					w.resourceVersion = resourceVersion
+				}
+				w.cond.Broadcast()
+			}()
+			metrics.RecordResidencyFilteredEvent(w.config.groupResource)
+			metrics.RecordResourceVersion(w.config.groupResource, resourceVersion)
+			return nil
+		}
 	}
 
 	wcEvent := &watchCacheEvent{
@@ -576,6 +617,20 @@ func (w *watchCache) Replace(objs []interface{}, resourceVersion string) error {
 		object, ok := obj.(runtime.Object)
 		if !ok {
 			return fmt.Errorf("didn't get runtime.Object for replace: %#v", obj)
+		}
+		// Residency filter (KEP-5866 phase 2, PoC): drop non-resident
+		// objects from the initial sync. The listResourceVersion / cache
+		// resourceVersion are pinned to the LIST RV below regardless of
+		// filtering, so watch establishment starts from the correct RV.
+		if w.config.residencyActive() {
+			match, mErr := w.config.residency.Matches(object)
+			if mErr != nil {
+				return fmt.Errorf("watch cache residency match for %v: %w", w.config.groupResource, mErr)
+			}
+			if !match {
+				metrics.RecordResidencyFilteredInitialObject(w.config.groupResource)
+				continue
+			}
 		}
 		key, err := w.config.keyFunc(object)
 		if err != nil {

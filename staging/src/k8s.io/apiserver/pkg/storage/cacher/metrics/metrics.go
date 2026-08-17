@@ -267,6 +267,47 @@ var (
 		[]string{"group", "resource"},
 	)
 
+	// KEP-5866 phase 2 (residency PoC) metrics.
+	WatchCacheEventsFilteredByResidencyTotal = compbasemetrics.NewCounterVec(
+		&compbasemetrics.CounterOpts{
+			Namespace:      namespace,
+			Name:           "watch_cache_events_filtered_by_residency_total",
+			Help:           "Counter of streamed events the watch cache dropped because they fell outside the configured resident shard range.",
+			StabilityLevel: compbasemetrics.ALPHA,
+		},
+		[]string{"group", "resource"},
+	)
+
+	WatchCacheInitialObjectsFilteredByResidencyTotal = compbasemetrics.NewCounterVec(
+		&compbasemetrics.CounterOpts{
+			Namespace:      namespace,
+			Name:           "watch_cache_initial_objects_filtered_by_residency_total",
+			Help:           "Counter of initial-list objects the watch cache dropped because they fell outside the configured resident shard range.",
+			StabilityLevel: compbasemetrics.ALPHA,
+		},
+		[]string{"group", "resource"},
+	)
+
+	WatchCacheResidencyDelegatedRequestsTotal = compbasemetrics.NewCounterVec(
+		&compbasemetrics.CounterOpts{
+			Namespace:      namespace,
+			Name:           "watch_cache_residency_delegated_requests_total",
+			Help:           "Counter of requests that the CacheDelegator forwarded to the underlying storage because the caller's shardSelector was not contained in the resident range, broken down by verb.",
+			StabilityLevel: compbasemetrics.ALPHA,
+		},
+		[]string{"group", "resource", "verb"},
+	)
+
+	WatchCacheResidencyConfigured = compbasemetrics.NewGaugeVec(
+		&compbasemetrics.GaugeOpts{
+			Namespace:      namespace,
+			Name:           "watch_cache_residency_configured",
+			Help:           "Set to 1 for each resource whose watch cache has a residency shard selector configured.",
+			StabilityLevel: compbasemetrics.ALPHA,
+		},
+		[]string{"group", "resource"},
+	)
+
 	DispatchStageDuration = compbasemetrics.NewHistogramVec(
 		&compbasemetrics.HistogramOpts{
 			Namespace:      namespace,
@@ -305,6 +346,12 @@ func Register() {
 			legacyregistry.MustRegister(WatchShardsTotal)
 			legacyregistry.MustRegister(WatchFilteredEventsTotal)
 		}
+		if utilfeature.DefaultFeatureGate.Enabled(features.ShardedWatchCacheResidency) {
+			legacyregistry.MustRegister(WatchCacheEventsFilteredByResidencyTotal)
+			legacyregistry.MustRegister(WatchCacheInitialObjectsFilteredByResidencyTotal)
+			legacyregistry.MustRegister(WatchCacheResidencyDelegatedRequestsTotal)
+			legacyregistry.MustRegister(WatchCacheResidencyConfigured)
+		}
 		legacyregistry.MustRegister(DispatchStageDuration)
 	})
 }
@@ -332,6 +379,29 @@ func RecordShardedWatchStarted(groupResource schema.GroupResource) {
 // RecordShardedWatchStopped decrements the active sharded watch gauge for the given resource.
 func RecordShardedWatchStopped(groupResource schema.GroupResource) {
 	WatchShardsTotal.WithLabelValues(groupResource.Group, groupResource.Resource).Dec()
+}
+
+// RecordResidencyFilteredEvent increments the counter for streamed events
+// dropped by the watch cache because they were outside the resident range.
+func RecordResidencyFilteredEvent(groupResource schema.GroupResource) {
+	WatchCacheEventsFilteredByResidencyTotal.WithLabelValues(groupResource.Group, groupResource.Resource).Inc()
+}
+
+// RecordResidencyFilteredInitialObject increments the counter for initial-list
+// objects dropped by the watch cache because they were outside the resident range.
+func RecordResidencyFilteredInitialObject(groupResource schema.GroupResource) {
+	WatchCacheInitialObjectsFilteredByResidencyTotal.WithLabelValues(groupResource.Group, groupResource.Resource).Inc()
+}
+
+// RecordResidencyDelegation increments the counter for requests delegated to
+// storage because they were not fully covered by the resident range.
+func RecordResidencyDelegation(groupResource schema.GroupResource, verb string) {
+	WatchCacheResidencyDelegatedRequestsTotal.WithLabelValues(groupResource.Group, groupResource.Resource, verb).Inc()
+}
+
+// RecordResidencyConfigured marks a resource as having a residency selector configured.
+func RecordResidencyConfigured(groupResource schema.GroupResource) {
+	WatchCacheResidencyConfigured.WithLabelValues(groupResource.Group, groupResource.Resource).Set(1)
 }
 
 // RecordWatchFilteredEvent increments the counter for events filtered by shard selector.

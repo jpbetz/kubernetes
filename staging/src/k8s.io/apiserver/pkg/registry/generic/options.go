@@ -21,6 +21,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/sharding"
 	"k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/storagebackend"
 	flowcontrolrequest "k8s.io/apiserver/pkg/util/flowcontrol/request"
@@ -37,6 +38,13 @@ type RESTOptions struct {
 	ResourcePrefix            string
 	CountMetricPollPeriod     time.Duration
 	StorageObjectCountTracker flowcontrolrequest.StorageObjectCountTracker
+
+	// ResidencyShardSelector, when non-nil and non-empty, causes the watch
+	// cache for this resource to store only objects that match the selector.
+	// Requests whose ShardSelector is not fully contained in the resident
+	// range are delegated to the underlying storage. nil = full residency
+	// (default). PoC (KEP-5866 phase 2).
+	ResidencyShardSelector sharding.Selector
 }
 
 // Implement RESTOptionsGetter so that RESTOptions can directly be used when available (i.e. tests)
