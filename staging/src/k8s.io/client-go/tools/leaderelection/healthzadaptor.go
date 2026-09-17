@@ -29,6 +29,10 @@ import (
 // status about the leader election. Most specifically about if the leader
 // has failed to renew without exiting the process. In that case we should
 // report not healthy and rely on the kubelet to take down the process.
+//
+// In recovery mode an elector that lost its lease but keeps attempting to
+// renew it is healthy; only an election loop that stopped making attempts is
+// reported unhealthy. See LeaderElector.Check.
 type HealthzAdaptor struct {
 	pointerLock sync.Mutex
 	le          *LeaderElector
