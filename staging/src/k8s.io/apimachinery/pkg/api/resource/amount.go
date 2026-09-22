@@ -354,7 +354,11 @@ func (a int64Amount) AsCanonicalBytes(out []byte) (result []byte, exponent int32
 	amount, times := removeInt64Factors(mantissa, 10)
 	exponent += int32(times)
 
-	// make sure exponent is a multiple of 3
+	// make sure exponent is a multiple of 3, unless lowering it would take it
+	// below -MaxInt32: it would wrap, and the parser rejects anything smaller.
+	if down := (exponent%3 + 3) % 3; int64(exponent)-int64(down) < -math.MaxInt32 {
+		return strconv.AppendInt(out, amount, 10), exponent
+	}
 	var ok bool
 	switch exponent % 3 {
 	case 1, -2:
@@ -410,7 +414,11 @@ func (a infDecAmount) AsCanonicalBytes(out []byte) (result []byte, exponent int3
 	amount, times := removeBigIntFactors(amount, bigTen)
 	exponent += times
 
-	// make sure exponent is a multiple of 3
+	// make sure exponent is a multiple of 3, unless lowering it would take it
+	// below -MaxInt32: it would wrap, and the parser rejects anything smaller.
+	if down := (exponent%3 + 3) % 3; int64(exponent)-int64(down) < -math.MaxInt32 {
+		return append(out, amount.String()...), exponent
+	}
 	for exponent%3 != 0 {
 		amount.Mul(amount, bigTen)
 		exponent--

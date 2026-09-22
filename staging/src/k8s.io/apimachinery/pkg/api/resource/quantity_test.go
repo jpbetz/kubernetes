@@ -942,8 +942,7 @@ func TestQuantityStringBelowNano(t *testing.T) {
 		{intQuantity(1, math.MinInt32+2, BinarySI), "1e-2147483646"},
 		{intQuantity(1024, math.MinInt32+2, BinarySI), "1024e-2147483646"},
 		{intQuantity(math.MaxInt64, math.MinInt32+2, BinarySI), "9223372036854775807e-2147483646"},
-		// TODO(#141166): Must print the exact value, 1024e-2147483647.
-		{intQuantity(1024, math.MinInt32+1, BinarySI), "102400e2147483647"},
+		{intQuantity(1024, math.MinInt32+1, BinarySI), "1024e-2147483647"},
 		// TODO(#141166): Must print the exact value, 1e-2147483648.
 		{intQuantity(1, math.MinInt32, BinarySI), "1"},
 		// TODO(#141166): Must print the exact value, 1024e-2147483648.
@@ -954,6 +953,39 @@ func TestQuantityStringBelowNano(t *testing.T) {
 	for _, item := range table {
 		if e, a := item.expect, item.in.String(); e != a {
 			t.Errorf("%#v: expected %v, got %v", item.in, e, a)
+		}
+	}
+}
+
+// The multiple-of-3 step in canonicalization lowers the exponent by one or
+// two. There is no room for that at or below -MaxInt32: the int32 exponent
+// would wrap to a large positive value. These canonical forms cannot be
+// reparsed, as the parser rounds anything finer than nano, so they are
+// checked as strings only, on both backends.
+func TestQuantityStringExponentFloor(t *testing.T) {
+	tests := []struct {
+		name string
+		q    Quantity
+		want string
+	}{
+		{name: "floor", q: *NewScaledQuantity(1, Scale(-math.MaxInt32)), want: "1e-2147483647"},
+		{name: "floor-negative", q: *NewScaledQuantity(-1, Scale(-math.MaxInt32)), want: "-1e-2147483647"},
+		{name: "floor-plus-1", q: *NewScaledQuantity(1, Scale(-math.MaxInt32+1)), want: "1e-2147483646"},
+		{name: "floor-plus-2", q: *NewScaledQuantity(1, Scale(-math.MaxInt32+2)), want: "10e-2147483646"},
+		{name: "floor-with-zeros", q: *NewScaledQuantity(1000, Scale(-math.MaxInt32)), want: "100e-2147483646"},
+		{name: "floor-max-mantissa", q: *NewScaledQuantity(math.MaxInt64, Scale(-math.MaxInt32)), want: "9223372036854775807e-2147483647"},
+	}
+	for _, tc := range tests {
+		for _, asDec := range []bool{false, true} {
+			t.Run(fmt.Sprintf("%s/asDec=%t", tc.name, asDec), func(t *testing.T) {
+				q := tc.q
+				if asDec {
+					q.ToDec()
+				}
+				if got := q.String(); got != tc.want {
+					t.Errorf("String() = %q, want %q", got, tc.want)
+				}
+			})
 		}
 	}
 }
