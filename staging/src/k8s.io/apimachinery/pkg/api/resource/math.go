@@ -285,7 +285,7 @@ func divideByScaleInt64(base int64, scale Scale) (result, remainder int64, exact
 		return base, 0, true
 	}
 	// the max scale representable in base 10 in an int64 is 18 decimal places
-	if scale >= 18 {
+	if scale > 18 {
 		return 0, base, false
 	}
 	divisor := pow10Int64(int64(scale))

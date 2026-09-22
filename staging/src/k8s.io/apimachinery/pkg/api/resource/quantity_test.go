@@ -655,13 +655,19 @@ func TestQuantityCmpInt64AndDec(t *testing.T) {
 		{intQuantity(mostNegative, -18, DecimalSI), intQuantity(-1, 0, DecimalSI), -1},
 		{intQuantity(mostNegative, -19, DecimalSI), intQuantity(-1, 0, DecimalSI), 1},
 
-		// TODO(#141166): 1e-2147483648 is below 1, so this must be -1.
-		{intQuantity(1, math.MinInt32, DecimalSI), intQuantity(1, 0, DecimalSI), 1},
-		// TODO(#141166): -1e-2147483648 is above -1, so this must be 1.
-		{intQuantity(-1, math.MinInt32, DecimalSI), intQuantity(-1, 0, DecimalSI), -1},
-		// TODO(#141166): 1e-2147483648 is below 1e-2147483630, so this must be -1.
-		{intQuantity(1, math.MinInt32, DecimalSI), intQuantity(1, math.MinInt32+18, DecimalSI), 1},
+		{intQuantity(1, math.MinInt32, DecimalSI), intQuantity(1, 0, DecimalSI), -1},
+		{intQuantity(-1, math.MinInt32, DecimalSI), intQuantity(-1, 0, DecimalSI), 1},
+		{intQuantity(1, math.MinInt32, DecimalSI), intQuantity(1, math.MinInt32+18, DecimalSI), -1},
 		{intQuantity(1, math.MinInt32+1, DecimalSI), intQuantity(1, 0, DecimalSI), -1},
+		// A scale gap of exactly 18 divides in int64; the remainder decides ties.
+		{intQuantity(1, 0, DecimalSI), intQuantity(1000000000000000000, -18, DecimalSI), 0},
+		{intQuantity(1, 0, DecimalSI), intQuantity(1000000000000000001, -18, DecimalSI), -1},
+		{intQuantity(-1, 0, DecimalSI), intQuantity(-1000000000000000001, -18, DecimalSI), 1},
+		// A gap of 19 or more is decided by sign: an int64 mantissa cannot span it.
+		{intQuantity(1, 19, DecimalSI), intQuantity(mostPositive, 0, DecimalSI), 1},
+		{intQuantity(-1, 19, DecimalSI), intQuantity(mostNegative, 0, DecimalSI), -1},
+		{intQuantity(0, 19, DecimalSI), intQuantity(-5, 0, DecimalSI), 1},
+		{intQuantity(0, math.MinInt32, DecimalSI), intQuantity(0, math.MaxInt32, DecimalSI), 0},
 
 		{intQuantity(1*1000000*1000000*1000000, -17, DecimalSI), intQuantity(1, 1, DecimalSI), 0},
 		{intQuantity(1*1000000*1000000*1000000, -17, DecimalSI), intQuantity(-10, 0, DecimalSI), 1},
@@ -730,11 +736,13 @@ func TestQuantityCmpInt64(t *testing.T) {
 		{decQuantity(901, -2, DecimalSI), 9, 1},
 		{decQuantity(901, -2, DecimalSI), 10, -1},
 
-		// TODO(#141166): 1e-2147483648 is below 1, so this must be -1.
-		{intQuantity(1, math.MinInt32, DecimalSI), 1, 1},
-		// TODO(#141166): -1e-2147483648 is above -1, so this must be 1.
-		{intQuantity(-1, math.MinInt32, DecimalSI), -1, -1},
+		{intQuantity(1, math.MinInt32, DecimalSI), 1, -1},
+		{intQuantity(-1, math.MinInt32, DecimalSI), -1, 1},
 		{intQuantity(1, math.MinInt32+1, DecimalSI), 1, -1},
+		{intQuantity(0, math.MinInt32, DecimalSI), 0, 0},
+		{intQuantity(0, math.MinInt32, DecimalSI), -1, 1},
+		{intQuantity(1, math.MaxInt32, DecimalSI), mostPositive, 1},
+		{intQuantity(-1, math.MaxInt32, DecimalSI), mostNegative, -1},
 	}
 
 	for _, item := range table {
@@ -943,12 +951,9 @@ func TestQuantityStringBelowNano(t *testing.T) {
 		{intQuantity(1024, math.MinInt32+2, BinarySI), "1024e-2147483646"},
 		{intQuantity(math.MaxInt64, math.MinInt32+2, BinarySI), "9223372036854775807e-2147483646"},
 		{intQuantity(1024, math.MinInt32+1, BinarySI), "1024e-2147483647"},
-		// TODO(#141166): Must print the exact value, 1e-2147483648.
-		{intQuantity(1, math.MinInt32, BinarySI), "1"},
-		// TODO(#141166): Must print the exact value, 1024e-2147483648.
-		{intQuantity(1024, math.MinInt32, BinarySI), "1Ki"},
-		// TODO(#141166): Must print the exact value, 9223372036854775807e-2147483648.
-		{intQuantity(math.MaxInt64, math.MinInt32, BinarySI), "9223372036854775807"},
+		{intQuantity(1, math.MinInt32, BinarySI), "1e-2147483648"},
+		{intQuantity(1024, math.MinInt32, BinarySI), "1024e-2147483648"},
+		{intQuantity(math.MaxInt64, math.MinInt32, BinarySI), "9223372036854775807e-2147483648"},
 	}
 	for _, item := range table {
 		if e, a := item.expect, item.in.String(); e != a {
@@ -986,6 +991,59 @@ func TestQuantityStringExponentFloor(t *testing.T) {
 					t.Errorf("String() = %q, want %q", got, tc.want)
 				}
 			})
+		}
+	}
+}
+
+// RoundUp subtracted two int32 scales, which wraps for a MinInt32 receiver:
+// the value was reported as an exact whole number and left as it was.
+func TestQuantityRoundUpFromMinInt32Scale(t *testing.T) {
+	for _, tc := range []struct {
+		value int64
+		want  string
+	}{
+		{1, "1"},
+		{1024, "1"},
+		{-1, "-1"},
+		{math.MaxInt64, "1"},
+	} {
+		q := *NewScaledQuantity(tc.value, Scale(math.MinInt32))
+		if exact := q.RoundUp(0); exact {
+			t.Errorf("%d at MinInt32: RoundUp(0) reported exact", tc.value)
+		}
+		if got := q.String(); got != tc.want {
+			t.Errorf("%d at MinInt32: RoundUp(0) = %q, want %q", tc.value, got, tc.want)
+		}
+	}
+	zero := *NewScaledQuantity(0, Scale(math.MinInt32))
+	if exact := zero.RoundUp(0); !exact {
+		t.Errorf("0 at MinInt32: RoundUp(0) reported inexact")
+	}
+}
+
+// inf.Dec cannot represent a scale of -MinInt32. ToDec rounds such a value
+// away from zero onto the finest scale it has, as ParseQuantity does below
+// nano, instead of flipping the sign of the exponent.
+func TestQuantityToDecAtMinInt32Scale(t *testing.T) {
+	for _, tc := range []struct {
+		value int64
+		want  string
+		sign  int
+	}{
+		{1, "1e-2147483647", 1},
+		{10, "1e-2147483647", 1},
+		{1024, "103e-2147483647", 1},
+		{-1024, "-103e-2147483647", -1},
+		{math.MaxInt64, "922337203685477581e-2147483647", 1},
+		{0, "0", 0},
+	} {
+		q := *NewScaledQuantity(tc.value, Scale(math.MinInt32))
+		q.ToDec()
+		if got := q.Sign(); got != tc.sign {
+			t.Errorf("%d at MinInt32: ToDec().Sign() = %d, want %d", tc.value, got, tc.sign)
+		}
+		if got := q.String(); got != tc.want {
+			t.Errorf("%d at MinInt32: ToDec().String() = %q, want %q", tc.value, got, tc.want)
 		}
 	}
 }

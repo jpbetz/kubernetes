@@ -143,6 +143,15 @@ func (a int64Amount) AsScaledInt64(scale Scale) (result int64, ok bool) {
 // AsDec returns an inf.Dec representation of this value.
 func (a int64Amount) AsDec() *inf.Dec {
 	var base inf.Dec
+	if a.scale == math.MinInt32 {
+		// inf.Dec cannot hold a scale of -MinInt32. Round away from zero onto
+		// the finest scale it has, as the parser does below nano, instead of
+		// wrapping the exponent's sign.
+		value, _ := negativeScaleInt64(a.value, 1)
+		base.SetUnscaled(value)
+		base.SetScale(inf.Scale(math.MaxInt32))
+		return &base
+	}
 	base.SetUnscaled(a.value)
 	base.SetScale(inf.Scale(-a.scale))
 	return &base
@@ -157,8 +166,9 @@ func (a int64Amount) Cmp(b int64Amount) int {
 		// Widen before subtracting: the difference of two int32 scales does not
 		// have to fit one, and a wrapped negative reaches a zero divisor.
 		diff := int64(a.scale) - int64(b.scale)
-		if diff >= 18 {
-			return cmpDec(a.AsDec(), b.AsDec())
+		if diff >= log10MaxInt64 {
+			// |b.value| < 10^19 <= 10^diff, so any non-zero a outweighs b.
+			return cmpDominant(a.value, b.value)
 		}
 		result, remainder, exact := divideByScaleInt64(b.value, Scale(diff))
 		if !exact {
@@ -177,8 +187,8 @@ func (a int64Amount) Cmp(b int64Amount) int {
 		b.value = result
 	default:
 		diff := int64(b.scale) - int64(a.scale)
-		if diff >= 18 {
-			return cmpDec(a.AsDec(), b.AsDec())
+		if diff >= log10MaxInt64 {
+			return -cmpDominant(b.value, a.value)
 		}
 		result, remainder, exact := divideByScaleInt64(a.value, Scale(diff))
 		if !exact {
@@ -213,6 +223,23 @@ func (a int64Amount) Cmp(b int64Amount) int {
 func decimalExponentBounds(bitLen int, s int64) (lo, hi int64) {
 	n := int64(bitLen)
 	return n/4 - s, n/3 + 1 - s
+}
+
+// cmpDominant compares x*10^s to y*10^t when s-t >= 19. An int64 y cannot span
+// nineteen decimal places, so the answer follows the sign of x, or of -y when x
+// is zero.
+func cmpDominant(x, y int64) int {
+	switch {
+	case x > 0:
+		return 1
+	case x < 0:
+		return -1
+	case y > 0:
+		return -1
+	case y < 0:
+		return 1
+	}
+	return 0
 }
 
 // cmpDec compares x and y. inf.Dec.Cmp aligns the two scales by writing their
@@ -340,7 +367,14 @@ func (a int64Amount) AsScale(scale Scale) (int64Amount, bool) {
 	if a.scale >= scale {
 		return a, true
 	}
-	result, exact := negativeScaleInt64(a.value, scale-a.scale)
+	// Widen before subtracting: the difference of two int32 scales does not
+	// have to fit one. Any non-zero int64 divided by 10^20 is a fraction of
+	// one, so a larger difference rounds the same way as 20.
+	diff := int64(scale) - int64(a.scale)
+	if diff > 20 {
+		diff = 20
+	}
+	result, exact := negativeScaleInt64(a.value, Scale(diff))
 	return int64Amount{value: result, scale: scale}, exact
 }
 
