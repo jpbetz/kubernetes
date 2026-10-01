@@ -69,6 +69,7 @@ import (
 	"k8s.io/apiserver/pkg/server/routes"
 	"k8s.io/apiserver/pkg/server/routine"
 	serverstore "k8s.io/apiserver/pkg/server/storage"
+	"k8s.io/apiserver/pkg/storage"
 	storagevalue "k8s.io/apiserver/pkg/storage/value"
 	"k8s.io/apiserver/pkg/storageversion"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
@@ -281,6 +282,8 @@ type Config struct {
 	// in the storage per resource, so we can estimate width of incoming requests.
 	StorageObjectCountTracker flowcontrolrequest.StorageObjectCountTracker
 
+	FinalBookmarks *storage.FinalBookmarks
+
 	// ShutdownSendRetryAfter dictates when to initiate shutdown of the HTTP
 	// Server during the graceful termination of the apiserver. If true, we wait
 	// for non longrunning requests in flight to be drained and then initiate a
@@ -478,6 +481,7 @@ func NewConfig(codecs serializer.CodecFactory) *Config {
 		LongRunningFunc:                     genericfilters.BasicLongRunningRequestCheck(sets.NewString("watch"), sets.NewString()),
 		lifecycleSignals:                    lifecycleSignals,
 		StorageObjectCountTracker:           flowcontrolrequest.NewStorageObjectCountTracker(),
+		FinalBookmarks:                      storage.NewFinalBookmarks(),
 		ShutdownWatchTerminationGracePeriod: time.Duration(0),
 
 		APIServerID:           id,
@@ -866,6 +870,7 @@ func (c completedConfig) New(name string, delegationTarget DelegationTarget) (*G
 
 		lifecycleSignals:       c.lifecycleSignals,
 		ShutdownSendRetryAfter: c.ShutdownSendRetryAfter,
+		finalBookmarks:         c.FinalBookmarks,
 
 		APIServerID:           c.APIServerID,
 		StorageReadinessHook:  NewStorageReadinessHook(c.StorageInitializationTimeout),

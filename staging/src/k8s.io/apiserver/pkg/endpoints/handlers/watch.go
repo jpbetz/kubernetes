@@ -430,6 +430,16 @@ func (s *WatchServer) HandleHTTP(w http.ResponseWriter, req *http.Request) {
 			// limited in order to avoid any thundering herd issue when the
 			// client(s) try to reestablish the WATCH on the other
 			// available apiserver instance(s).
+			if utilfeature.DefaultFeatureGate.Enabled(features.WatchCacheShutdownBookmark) {
+				select {
+				case event, ok := <-ch:
+					if ok && watchEncoder.Encode(event) == nil {
+						recorder.RecordEvent()
+						_ = rw.Flush()
+					}
+				default:
+				}
+			}
 			return
 		case <-done:
 			return

@@ -120,10 +120,12 @@ func (o CustomResourceDefinitionsServerOptions) Config() (*apiserver.Config, err
 	}
 
 	serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(openapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(generatedopenapi.GetOpenAPIDefinitions), openapinamer.NewDefinitionNamer(apiserver.Scheme, scheme.Scheme))
+	etcdOptions := *o.RecommendedOptions.Etcd
+	etcdOptions.StorageConfig.FinalBookmarks = serverConfig.FinalBookmarks
 	config := &apiserver.Config{
 		GenericConfig: serverConfig,
 		ExtraConfig: apiserver.ExtraConfig{
-			CRDRESTOptionsGetter: NewCRDRESTOptionsGetter(*o.RecommendedOptions.Etcd, serverConfig.ResourceTransformers, serverConfig.StorageObjectCountTracker),
+			CRDRESTOptionsGetter: NewCRDRESTOptionsGetter(etcdOptions, serverConfig.ResourceTransformers, serverConfig.StorageObjectCountTracker),
 			ServiceResolver:      &serviceResolver{serverConfig.SharedInformerFactory.Core().V1().Services().Lister()},
 			AuthResolverWrapper:  webhook.NewDefaultAuthenticationInfoResolverWrapper(nil, nil, serverConfig.LoopbackClientConfig, noopoteltrace.NewTracerProvider()),
 		},

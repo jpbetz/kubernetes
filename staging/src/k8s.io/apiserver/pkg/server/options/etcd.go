@@ -218,6 +218,9 @@ func (s *EtcdOptions) ApplyTo(c *server.Config) error {
 	if storageConfigCopy.StorageObjectCountTracker == nil {
 		storageConfigCopy.StorageObjectCountTracker = c.StorageObjectCountTracker
 	}
+	if storageConfigCopy.FinalBookmarks == nil {
+		storageConfigCopy.FinalBookmarks = c.FinalBookmarks
+	}
 
 	return s.ApplyWithStorageFactoryTo(&SimpleStorageFactory{StorageConfig: storageConfigCopy}, c)
 }

@@ -129,6 +129,8 @@ type lifecycleSignals struct {
 	// request will receive an error.
 	NotAcceptingNewRequest lifecycleSignal
 
+	FinalBookmarksSent lifecycleSignal
+
 	// InFlightRequestsDrained event is signaled when the existing requests
 	// in flight have completed. This is used as signal to shut down the audit backends
 	InFlightRequestsDrained lifecycleSignal
@@ -147,11 +149,11 @@ type lifecycleSignals struct {
 }
 
 // ShuttingDown returns the lifecycle signal that is signaled when
-// the server is not accepting any new requests.
+// the server is not accepting any new requests and the final bookmarks have been sent.
 // this is the lifecycle event that is exported to the request handler
 // logic to indicate that the server is shutting down.
 func (s lifecycleSignals) ShuttingDown() <-chan struct{} {
-	return s.NotAcceptingNewRequest.Signaled()
+	return s.FinalBookmarksSent.Signaled()
 }
 
 // newLifecycleSignals returns an instance of lifecycleSignals interface to be used
@@ -162,6 +164,7 @@ func newLifecycleSignals() lifecycleSignals {
 		AfterShutdownDelayDuration: newNamedChannelWrapper("AfterShutdownDelayDuration"),
 		PreShutdownHooksStopped:    newNamedChannelWrapper("PreShutdownHooksStopped"),
 		NotAcceptingNewRequest:     newNamedChannelWrapper("NotAcceptingNewRequest"),
+		FinalBookmarksSent:         newNamedChannelWrapper("FinalBookmarksSent"),
 		InFlightRequestsDrained:    newNamedChannelWrapper("InFlightRequestsDrained"),
 		HTTPServerStoppedListening: newNamedChannelWrapper("HTTPServerStoppedListening"),
 		HasBeenReady:               newNamedChannelWrapper("HasBeenReady"),

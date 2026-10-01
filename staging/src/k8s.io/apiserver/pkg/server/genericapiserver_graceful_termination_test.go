@@ -29,6 +29,7 @@ import (
 	"net/http/httptrace"
 	"os"
 	"reflect"
+	"slices"
 	"sync"
 	"syscall"
 	"testing"
@@ -41,8 +42,11 @@ import (
 	"k8s.io/apiserver/pkg/authorization/authorizer"
 	"k8s.io/apiserver/pkg/endpoints/openapi"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
+	"k8s.io/apiserver/pkg/features"
 	"k8s.io/apiserver/pkg/server/dynamiccertificates"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	clientscheme "k8s.io/client-go/kubernetes/scheme"
+	featuregatetesting "k8s.io/component-base/featuregate/testing"
 	"k8s.io/klog/v2"
 	"k8s.io/klog/v2/ktesting"
 	kubeopenapi "k8s.io/kube-openapi/pkg/common"
@@ -177,6 +181,15 @@ func newSignalInterceptingTestStep() *signalInterceptingTestStep {
 //	             |
 //	         return nil
 func TestGracefulTerminationWithKeepListeningDuringGracefulTerminationDisabled(t *testing.T) {
+	for _, shutdownBookmark := range []bool{false, true} {
+		t.Run(fmt.Sprintf("WatchCacheShutdownBookmark=%v", shutdownBookmark), func(t *testing.T) {
+			testGracefulTerminationWithKeepListeningDuringGracefulTerminationDisabled(t, shutdownBookmark)
+		})
+	}
+}
+
+func testGracefulTerminationWithKeepListeningDuringGracefulTerminationDisabled(t *testing.T, shutdownBookmark bool) {
+	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.WatchCacheShutdownBookmark, shutdownBookmark)
 	fakeAudit := &fakeAudit{}
 	s := newGenericAPIServer(t, fakeAudit, false)
 	connReusingClient := newClient(false)
@@ -194,6 +207,9 @@ func TestGracefulTerminationWithKeepListeningDuringGracefulTerminationDisabled(t
 	signals := &s.lifecycleSignals
 	recorder := &signalRecorder{}
 	wrapLifecycleSignalsWithRecorder(t, signals, recorder.before)
+	if shutdownBookmark {
+		signals.FinalBookmarksSent = wrapLifecycleSignal(t, signals.FinalBookmarksSent, recorder.before, nil)
+	}
 
 	// before the AfterShutdownDelayDuration signal is fired, we want
 	// the test to execute a verification step.
@@ -203,6 +219,14 @@ func TestGracefulTerminationWithKeepListeningDuringGracefulTerminationDisabled(t
 		// the server signals the next steps
 		<-beforeShutdownDelayDurationStep.done()
 	}, nil)
+
+	var finalBookmarkCalls int
+	s.finalBookmarks.Register(&fakeFinalBookmarkSender{send: func(ctx context.Context) error {
+		finalBookmarkCalls++
+		checkFinalBookmarkSend(t, ctx, signals, inflightNonLongRunning)
+		time.Sleep(s.ShutdownWatchTerminationGracePeriod)
+		return nil
+	}})
 
 	// start the API server
 	_, ctx := ktesting.NewTestContext(t)
@@ -326,6 +350,14 @@ func TestGracefulTerminationWithKeepListeningDuringGracefulTerminationDisabled(t
 	if err := assertRequestAudited(inflightNonLongRunningResultGot, fakeAudit); err != nil {
 		t.Errorf("%s", err.Error())
 	}
+	if shutdownBookmark {
+		waitForeverUntilSignaled(t, signals.FinalBookmarksSent)
+		select {
+		case <-signals.InFlightRequestsDrained.Signaled():
+			t.Errorf("Expected the in-flight watch to be drained within the grace period that starts when the final bookmarks are sent")
+		case <-time.After(100 * time.Millisecond):
+		}
+	}
 	inflightWatchResultGot := inflightWatch.unblockAndWaitForResult(t)
 	if err := assertResponseStatusCode(inflightWatchResultGot, http.StatusOK); err != nil {
 		t.Errorf("%s", err.Error())
@@ -344,15 +376,27 @@ func TestGracefulTerminationWithKeepListeningDuringGracefulTerminationDisabled(t
 		t.Errorf("Expected AuditBackend.Shutdown to be completed")
 	}
 
-	if err := recorder.verify([]string{
+	expectedOrder := []string{
 		"ShutdownInitiated",
 		"AfterShutdownDelayDuration",
 		"PreShutdownHooksStopped",
 		"NotAcceptingNewRequest",
 		"HTTPServerStoppedListening",
 		"InFlightRequestsDrained",
-	}); err != nil {
+	}
+	if shutdownBookmark {
+		expectedOrder = slices.Insert(expectedOrder, slices.Index(expectedOrder, "InFlightRequestsDrained"), "FinalBookmarksSent")
+	}
+	if err := recorder.verify(expectedOrder); err != nil {
 		t.Errorf("%s", err.Error())
+	}
+
+	wantFinalBookmarkCalls := 0
+	if shutdownBookmark {
+		wantFinalBookmarkCalls = 1
+	}
+	if finalBookmarkCalls != wantFinalBookmarkCalls {
+		t.Errorf("Expected %d calls to send the final bookmarks, got %d", wantFinalBookmarkCalls, finalBookmarkCalls)
 	}
 }
 
@@ -405,6 +449,15 @@ func TestGracefulTerminationWithKeepListeningDuringGracefulTerminationDisabled(t
 //     |
 //     return nil
 func TestGracefulTerminationWithKeepListeningDuringGracefulTerminationEnabled(t *testing.T) {
+	for _, shutdownBookmark := range []bool{false, true} {
+		t.Run(fmt.Sprintf("WatchCacheShutdownBookmark=%v", shutdownBookmark), func(t *testing.T) {
+			testGracefulTerminationWithKeepListeningDuringGracefulTerminationEnabled(t, shutdownBookmark)
+		})
+	}
+}
+
+func testGracefulTerminationWithKeepListeningDuringGracefulTerminationEnabled(t *testing.T, shutdownBookmark bool) {
+	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.WatchCacheShutdownBookmark, shutdownBookmark)
 	fakeAudit := &fakeAudit{}
 	s := newGenericAPIServer(t, fakeAudit, true)
 	connReusingClient := newClient(false)
@@ -422,6 +475,9 @@ func TestGracefulTerminationWithKeepListeningDuringGracefulTerminationEnabled(t 
 	signals := &s.lifecycleSignals
 	recorder := &signalRecorder{}
 	wrapLifecycleSignalsWithRecorder(t, signals, recorder.before)
+	if shutdownBookmark {
+		signals.FinalBookmarksSent = wrapLifecycleSignal(t, signals.FinalBookmarksSent, recorder.before, nil)
+	}
 
 	// before the AfterShutdownDelayDuration signal is fired, we want
 	// the test to execute a verification step.
@@ -431,6 +487,24 @@ func TestGracefulTerminationWithKeepListeningDuringGracefulTerminationEnabled(t 
 		// will send request(s) to assert on expected behavior.
 		<-beforeShutdownDelayDurationStep.done()
 	}, nil)
+
+	var finalBookmarkCalls int
+	releaseFinalBookmarks := make(chan struct{})
+	s.finalBookmarks.Register(&fakeFinalBookmarkSender{send: func(ctx context.Context) error {
+		finalBookmarkCalls++
+		checkFinalBookmarkSend(t, ctx, signals, inflightNonLongRunning)
+		select {
+		case <-signals.HTTPServerStoppedListening.Signaled():
+			t.Errorf("Expected the server to keep listening until the final bookmarks are sent")
+		default:
+		}
+		close(inflightWatch.stopCh)
+		select {
+		case <-releaseFinalBookmarks:
+		case <-ctx.Done():
+		}
+		return nil
+	}})
 
 	// start the API server
 	_, ctx := ktesting.NewTestContext(t)
@@ -540,6 +614,14 @@ func TestGracefulTerminationWithKeepListeningDuringGracefulTerminationEnabled(t 
 	if err := assertRequestAudited(inflightWatchResultGot, fakeAudit); err != nil {
 		t.Errorf("%s", err.Error())
 	}
+	if shutdownBookmark {
+		select {
+		case <-signals.InFlightRequestsDrained.Signaled():
+			t.Errorf("Expected in-flight requests to drain after the final bookmarks are sent")
+		case <-time.After(100 * time.Millisecond):
+		}
+		close(releaseFinalBookmarks)
+	}
 
 	// all requests in flight have drained
 	waitForeverUntilSignaled(t, signals.InFlightRequestsDrained)
@@ -552,15 +634,27 @@ func TestGracefulTerminationWithKeepListeningDuringGracefulTerminationEnabled(t 
 		t.Errorf("Expected AuditBackend.Shutdown to be completed")
 	}
 
-	if err := recorder.verify([]string{
+	expectedOrder := []string{
 		"ShutdownInitiated",
 		"AfterShutdownDelayDuration",
 		"PreShutdownHooksStopped",
 		"NotAcceptingNewRequest",
 		"InFlightRequestsDrained",
 		"HTTPServerStoppedListening",
-	}); err != nil {
+	}
+	if shutdownBookmark {
+		expectedOrder = slices.Insert(expectedOrder, slices.Index(expectedOrder, "InFlightRequestsDrained"), "FinalBookmarksSent")
+	}
+	if err := recorder.verify(expectedOrder); err != nil {
 		t.Errorf("%s", err.Error())
+	}
+
+	wantFinalBookmarkCalls := 0
+	if shutdownBookmark {
+		wantFinalBookmarkCalls = 1
+	}
+	if finalBookmarkCalls != wantFinalBookmarkCalls {
+		t.Errorf("Expected %d calls to send the final bookmarks, got %d", wantFinalBookmarkCalls, finalBookmarkCalls)
 	}
 }
 
@@ -713,9 +807,9 @@ func (r *signalRecorder) verify(got []string) error {
 }
 
 type inFlightRequest struct {
-	blockedCh, startedCh chan struct{}
-	resultCh             chan result
-	url                  string
+	blockedCh, startedCh, stopCh chan struct{}
+	resultCh                     chan result
+	url                          string
 }
 
 func setupInFlightNonLongRunningRequestHandler(s *GenericAPIServer) *inFlightRequest {
@@ -739,6 +833,7 @@ func setupInFlightWatchRequestHandler(s *GenericAPIServer) *inFlightRequest {
 	inflight := &inFlightRequest{
 		blockedCh: make(chan struct{}),
 		startedCh: make(chan struct{}),
+		stopCh:    make(chan struct{}),
 		resultCh:  make(chan result),
 		url:       "/apis/watches.group/v1/namespaces/foo/bar?watch=true",
 	}
@@ -754,7 +849,10 @@ func setupInFlightWatchRequestHandler(s *GenericAPIServer) *inFlightRequest {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		<-signals.ShuttingDown()
+		select {
+		case <-signals.ShuttingDown():
+		case <-inflight.stopCh:
+		}
 		w.WriteHeader(http.StatusOK)
 	})
 	s.Handler.NonGoRestfulMux.Handle("/apis/watches.group/v1/namespaces/foo/bar", handler)
@@ -804,6 +902,33 @@ func setupPreShutdownHookHandler(t *testing.T, s *GenericAPIServer, doer doer, c
 	}
 
 	return hook
+}
+
+type fakeFinalBookmarkSender struct {
+	send func(context.Context) error
+}
+
+func (f *fakeFinalBookmarkSender) SendFinalBookmark(ctx context.Context) error {
+	return f.send(ctx)
+}
+
+func checkFinalBookmarkSend(t *testing.T, ctx context.Context, signals *lifecycleSignals, inflightNonLongRunning *inFlightRequest) {
+	if err := ctx.Err(); err != nil {
+		t.Errorf("Expected a live context, got %v", err)
+	}
+	if deadline, ok := ctx.Deadline(); !ok || time.Until(deadline) > finalBookmarkTimeout || time.Until(deadline) < finalBookmarkTimeout/2 {
+		t.Errorf("Expected a deadline %v from now, got %v (ok=%v)", finalBookmarkTimeout, time.Until(deadline), ok)
+	}
+	select {
+	case <-inflightNonLongRunning.blockedCh:
+	default:
+		t.Errorf("Expected the final bookmarks to be sent after the in-flight non long-running request drained")
+	}
+	select {
+	case <-signals.ShuttingDown():
+		t.Errorf("Expected the final bookmarks to be sent before active watches drain")
+	default:
+	}
 }
 
 type fakeAudit struct {

@@ -564,6 +564,7 @@ type setupOptions struct {
 	clock          clock.WithTicker
 	codec          runtime.Codec
 	transformer    value.Transformer
+	finalBookmarks *storage.FinalBookmarks
 }
 
 type setupOption func(*setupOptions)
@@ -619,6 +620,12 @@ func withTransformer(transformer value.Transformer) setupOption {
 	}
 }
 
+func withFinalBookmarks(finalBookmarks *storage.FinalBookmarks) setupOption {
+	return func(options *setupOptions) {
+		options.finalBookmarks = finalBookmarks
+	}
+}
+
 func testSetup(t *testing.T, opts ...setupOption) (context.Context, *CacheDelegator, tearDownFunc) {
 	ctx, cacher, _, tearDown := testSetupWithEtcdServer(t, opts...)
 	return ctx, cacher, tearDown
@@ -658,6 +665,7 @@ func testSetupWithEtcdServer(t testing.TB, opts ...setupOption) (context.Context
 		Indexers:            &setupOpts.indexers,
 		Codec:               setupOpts.codec,
 		Clock:               setupOpts.clock,
+		FinalBookmarks:      setupOpts.finalBookmarks,
 	}
 	cacher, err := NewCacherFromConfig(config)
 	if err != nil {

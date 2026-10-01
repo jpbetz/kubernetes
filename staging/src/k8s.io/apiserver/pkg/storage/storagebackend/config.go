@@ -25,6 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/server/egressselector"
+	"k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/etcd3"
 	"k8s.io/apiserver/pkg/storage/value"
 	flowcontrolrequest "k8s.io/apiserver/pkg/util/flowcontrol/request"
@@ -93,6 +94,8 @@ type Config struct {
 	// StorageObjectCountTracker is used to keep track of the total
 	// number of objects in the storage per resource.
 	StorageObjectCountTracker flowcontrolrequest.StorageObjectCountTracker
+
+	FinalBookmarks *storage.FinalBookmarks
 }
 
 // ConfigForResource is a Config specialized to a particular `schema.GroupResource`

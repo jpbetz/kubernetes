@@ -288,6 +288,11 @@ const (
 	// Enables post-start-hook for storage readiness
 	WatchCacheInitializationPostStartHook featuregate.Feature = "WatchCacheInitializationPostStartHook"
 
+	// owner: @jpbetz
+	//
+	// Sends a bookmark at the current etcd revision to every watcher that allows bookmarks during graceful shutdown.
+	WatchCacheShutdownBookmark featuregate.Feature = "WatchCacheShutdownBookmark"
+
 	// owner: @p0lyn0mial
 	//
 	// Allow the API server to stream individual items instead of chunking
@@ -481,6 +486,10 @@ var defaultVersionedKubernetesFeatureGates = map[featuregate.Feature]featuregate
 		{Version: version.MustParse("1.31"), Default: false, PreRelease: featuregate.Beta},
 		{Version: version.MustParse("1.36"), Default: true, PreRelease: featuregate.Beta},
 		{Version: version.MustParse("1.37"), Default: true, PreRelease: featuregate.GA, LockToDefault: true},
+	},
+
+	WatchCacheShutdownBookmark: {
+		{Version: version.MustParse("1.38"), Default: false, PreRelease: featuregate.Alpha},
 	},
 
 	WatchList: {

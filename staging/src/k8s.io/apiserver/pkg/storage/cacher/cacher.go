@@ -122,6 +122,8 @@ type Config struct {
 	Codec runtime.Codec
 
 	Clock clock.WithTicker
+
+	FinalBookmarks *storage.FinalBookmarks
 }
 
 type watchersMap map[int]*cacheWatcher
@@ -343,6 +345,9 @@ type Cacher struct {
 	expiredBookmarkWatchers []*cacheWatcher
 	compactor               *compactor
 	watcherMetrics          *metrics.WatcherMetricsObservers
+
+	finalBookmarks        *storage.FinalBookmarks
+	finalBookmarkRequests chan *finalBookmarkRequest
 }
 
 // NewCacherFromConfig creates a new Cacher responsible for servicing WATCH and LIST requests from
@@ -416,6 +421,8 @@ func NewCacherFromConfig(config Config) (*Cacher, error) {
 		timer:            time.NewTimer(time.Duration(0)),
 		bookmarkWatchers: newTimeBucketWatchers(config.Clock, defaultBookmarkFrequency),
 		watcherMetrics:   metrics.NewWatcherMetricsObservers(config.GroupResource),
+
+		finalBookmarkRequests: make(chan *finalBookmarkRequest, 1),
 	}
 
 	// Ensure that timer is stopped.
@@ -470,6 +477,10 @@ func NewCacherFromConfig(config Config) (*Cacher, error) {
 
 	go cacher.dispatchEvents()
 	go progressRequester.Run(stopCh)
+	if config.FinalBookmarks != nil && utilfeature.DefaultFeatureGate.Enabled(features.WatchCacheShutdownBookmark) {
+		cacher.finalBookmarks = config.FinalBookmarks
+		cacher.finalBookmarks.Register(cacher)
+	}
 
 	cacher.stopWg.Add(1)
 	go func() {
@@ -930,8 +941,18 @@ func (c *Cacher) dispatchEvents() {
 		// the non-empty error means that the stopCh was closed
 		return
 	}
+	var pendingFinalBookmark *finalBookmarkRequest
+	sendFinalBookmarkIfReached := func() {
+		if pendingFinalBookmark != nil && lastProcessedResourceVersion >= pendingFinalBookmark.rv {
+			pendingFinalBookmark.done <- c.dispatchFinalBookmark(lastProcessedResourceVersion)
+			pendingFinalBookmark = nil
+		}
+	}
 	for {
 		select {
+		case req := <-c.finalBookmarkRequests:
+			pendingFinalBookmark = req
+			sendFinalBookmarkIfReached()
 		case event, ok := <-c.incoming:
 			if !ok {
 				return
@@ -952,6 +973,7 @@ func (c *Cacher) dispatchEvents() {
 				metrics.EventsCounter.WithLabelValues(c.groupResource.Group, c.groupResource.Resource).Inc()
 			}
 			lastProcessedResourceVersion = event.ResourceVersion
+			sendFinalBookmarkIfReached()
 		case <-bookmarkTimer.C():
 			bookmarkTimer.Reset(wait.Jitter(time.Second, 0.25))
 			bookmarkEvent := &watchCacheEvent{
@@ -1228,6 +1250,9 @@ func (c *Cacher) Stop() {
 	c.stopped = true
 	c.ready.stop()
 	c.stopLock.Unlock()
+	if c.finalBookmarks != nil {
+		c.finalBookmarks.Unregister(c)
+	}
 	close(c.stopCh)
 	c.stopWg.Wait()
 }

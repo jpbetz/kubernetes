@@ -53,6 +53,7 @@ import (
 	"k8s.io/apiserver/pkg/server/healthz"
 	"k8s.io/apiserver/pkg/server/routes"
 	"k8s.io/apiserver/pkg/server/statusz"
+	"k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storageversion"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	restclient "k8s.io/client-go/rest"
@@ -305,6 +306,8 @@ type GenericAPIServer struct {
 	// This grace period is orthogonal to other grace periods, and
 	// it is not overridden by any other grace period.
 	ShutdownWatchTerminationGracePeriod time.Duration
+
+	finalBookmarks *storage.FinalBookmarks
 }
 
 // DelegationTarget is an interface which allows for composition of API servers with top level handling that works
@@ -491,6 +494,8 @@ func (s preparedGenericAPIServer) Run(stopCh <-chan struct{}) error {
 	return s.RunWithContext(ctx)
 }
 
+const finalBookmarkTimeout = 10 * time.Second
+
 // RunWithContext spawns the secure http server. It only returns if ctx is canceled
 // or the secure port cannot be listened on initially.
 // This is the diagram of what contexts/channels/signals are dependent on each other:
@@ -521,6 +526,8 @@ func (s preparedGenericAPIServer) Run(stopCh <-chan struct{}) error {
 // |           |                      |----------------|-----------------------|                  |
 // |           |                      |                                        |                  |
 // |           |         (NonLongRunningRequestWaitGroup::Wait)   (WatchRequestWaitGroup::Wait)   |
+// |           |                      |                                        |                  |
+// |           |  FinalBookmarksSent (finalBookmarksSentCh)                    |                  |
 // |           |                      |                                        |                  |
 // |           |                      |------------------|---------------------|                  |
 // |           |                                         |                                        |
@@ -672,6 +679,22 @@ func (s preparedGenericAPIServer) RunWithContext(ctx context.Context) error {
 		s.NonLongRunningRequestWaitGroup.Wait()
 	}()
 
+	finalBookmarksSentCh := s.lifecycleSignals.FinalBookmarksSent
+	go func() {
+		defer klog.V(1).InfoS("[graceful-termination] shutdown event", "name", finalBookmarksSentCh.Name())
+		defer finalBookmarksSentCh.Signal()
+
+		<-notAcceptingNewRequestCh.Signaled()
+		if s.finalBookmarks == nil || !utilfeature.DefaultFeatureGate.Enabled(features.WatchCacheShutdownBookmark) {
+			return
+		}
+		<-nonLongRunningRequestDrainedCh
+		ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), finalBookmarkTimeout)
+		defer cancel()
+		sent, failed := s.finalBookmarks.Send(ctx)
+		klog.V(1).InfoS("[graceful-termination] watch caches sent their final bookmarks", "sent", sent, "failed", failed)
+	}()
+
 	// wait for all in-flight watches to finish
 	activeWatchesDrainedCh := make(chan struct{})
 	go func() {
@@ -696,7 +719,18 @@ func (s preparedGenericAPIServer) RunWithContext(ctx context.Context) error {
 				qps = 200
 			}
 
-			ctx, cancel := context.WithTimeout(context.Background(), grace)
+			if !utilfeature.DefaultFeatureGate.Enabled(features.WatchCacheShutdownBookmark) {
+				ctx, cancel := context.WithTimeout(context.Background(), grace)
+				return rate.NewLimiter(rate.Limit(qps), 1), ctx, cancel
+			}
+			ctx, cancel := context.WithCancel(context.Background())
+			go func() {
+				select {
+				case <-finalBookmarksSentCh.Signaled():
+					time.AfterFunc(grace, cancel)
+				case <-ctx.Done():
+				}
+			}()
 			// We don't expect more than one token to be consumed
 			// in a single Wait call, so setting burst to 1.
 			return rate.NewLimiter(rate.Limit(qps), 1), ctx, cancel
@@ -710,6 +744,7 @@ func (s preparedGenericAPIServer) RunWithContext(ctx context.Context) error {
 		defer drainedCh.Signal()
 
 		<-nonLongRunningRequestDrainedCh
+		<-finalBookmarksSentCh.Signaled()
 		<-activeWatchesDrainedCh
 	}()
 

@@ -41,8 +41,11 @@ import (
 	"k8s.io/apiserver/pkg/endpoints/handlers/responsewriters"
 	"k8s.io/apiserver/pkg/endpoints/metrics"
 	endpointstesting "k8s.io/apiserver/pkg/endpoints/testing"
+	"k8s.io/apiserver/pkg/features"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/client-go/dynamic"
 	restclient "k8s.io/client-go/rest"
+	featuregatetesting "k8s.io/component-base/featuregate/testing"
 	"k8s.io/component-base/metrics/legacyregistry"
 	metricstestutil "k8s.io/component-base/metrics/testutil"
 )
@@ -310,6 +313,42 @@ func TestWatchHTTPTimeout(t *testing.T) {
 	// Make sure we can't receive any more events through the timeout watch
 	err = decoder.Decode(&got)
 	require.Equal(t, io.EOF, err)
+}
+
+func TestWatchHTTPServerShuttingDown(t *testing.T) {
+	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.WatchCacheShutdownBookmark, true)
+	info, ok := runtime.SerializerInfoForMediaType(codecs.SupportedMediaTypes(), runtime.ContentTypeJSON)
+	if !ok || info.StreamSerializer == nil {
+		t.Fatal(info)
+	}
+	shuttingDown := make(chan struct{})
+	close(shuttingDown)
+
+	for range 20 {
+		watcher := watch.NewFakeWithOptions(watch.FakeOptions{ChannelSize: 1})
+		watcher.Action(watch.Bookmark, &endpointstesting.Simple{TypeMeta: metav1.TypeMeta{APIVersion: testGroupV2.String()}})
+		watchServer := &WatchServer{
+			Scope:    &RequestScope{},
+			Watching: watcher,
+
+			MediaType:       "testcase/json",
+			Framer:          info.StreamSerializer.Framer,
+			Encoder:         testCodecV2,
+			EmbeddedEncoder: testCodecV2,
+
+			TimeoutFactory:       &fakeTimeoutFactory{make(chan time.Time), make(chan struct{})},
+			ServerShuttingDownCh: shuttingDown,
+		}
+
+		recorder := httptest.NewRecorder()
+		watchServer.HandleHTTP(recorder, httptest.NewRequest(http.MethodGet, "/", nil))
+
+		decoder := json.NewDecoder(recorder.Body)
+		var got watchJSON
+		require.NoError(t, decoder.Decode(&got))
+		require.Equal(t, watch.Bookmark, got.Type)
+		require.ErrorIs(t, decoder.Decode(&got), io.EOF)
+	}
 }
 
 // watchJSON defines the expected JSON wire equivalent of watch.Event.
