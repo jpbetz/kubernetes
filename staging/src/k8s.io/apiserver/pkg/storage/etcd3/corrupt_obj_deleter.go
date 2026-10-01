@@ -124,6 +124,35 @@ type corruptObjectDeleter struct {
 	groupResource schema.GroupResource
 }
 
+type shutdownMarkerStore interface {
+	WriteShutdownMarker(ctx context.Context, apiServerID string) (int64, error)
+	ShutdownMarkerRevision(ctx context.Context, apiServerID string) (int64, bool, error)
+	ShutdownMarkerScope() string
+}
+
+func (s *corruptObjectDeleter) WriteShutdownMarker(ctx context.Context, apiServerID string) (int64, error) {
+	m, ok := s.Interface.(shutdownMarkerStore)
+	if !ok {
+		return 0, fmt.Errorf("storage for %v does not support shutdown markers", s.groupResource)
+	}
+	return m.WriteShutdownMarker(ctx, apiServerID)
+}
+
+func (s *corruptObjectDeleter) ShutdownMarkerRevision(ctx context.Context, apiServerID string) (int64, bool, error) {
+	m, ok := s.Interface.(shutdownMarkerStore)
+	if !ok {
+		return 0, false, fmt.Errorf("storage for %v does not support shutdown markers", s.groupResource)
+	}
+	return m.ShutdownMarkerRevision(ctx, apiServerID)
+}
+
+func (s *corruptObjectDeleter) ShutdownMarkerScope() string {
+	if m, ok := s.Interface.(shutdownMarkerStore); ok {
+		return m.ShutdownMarkerScope()
+	}
+	return ""
+}
+
 func (s *corruptObjectDeleter) Get(ctx context.Context, key string, opts storage.GetOptions, out runtime.Object) error {
 	if err := s.Interface.Get(ctx, key, opts, out); err != nil {
 		var corruptObjErr *corruptObjectError

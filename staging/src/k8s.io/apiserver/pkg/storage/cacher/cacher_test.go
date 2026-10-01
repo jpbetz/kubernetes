@@ -652,7 +652,7 @@ func testSetupWithEtcdServer(t testing.TB, opts ...setupOption) (context.Context
 	}
 
 	config := Config{
-		Storage:             wrappedStorage,
+		Storage:             &markerTestStorage{Interface: wrappedStorage, shutdownMarkerStore: etcdStorage.(shutdownMarkerStore)},
 		Versioner:           storage.APIObjectVersioner{},
 		GroupResource:       schema.GroupResource{Resource: "pods"},
 		EventsHistoryWindow: DefaultEventFreshDuration,

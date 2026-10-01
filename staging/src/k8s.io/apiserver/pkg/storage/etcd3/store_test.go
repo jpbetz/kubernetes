@@ -1347,6 +1347,56 @@ func TestGetCurrentResourceVersion(t *testing.T) {
 	require.Equal(t, currentPodRV, podRV, "didn't expect to see the pod's RV changed")
 }
 
+func TestShutdownMarker(t *testing.T) {
+	for _, tc := range []struct {
+		name                 string
+		prefix               string
+		writes               int
+		corruptObjectDeleter bool
+	}{
+		{name: "no marker"},
+		{name: "marker", writes: 1},
+		{name: "marker written twice", writes: 2},
+		{name: "marker under the etcd prefix", prefix: "/registry", writes: 1},
+		{name: "corrupt object deleter", writes: 1, corruptObjectDeleter: true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx, store, client := testSetup(t, withPrefix(tc.prefix))
+			var markers shutdownMarkerStore = store
+			if tc.corruptObjectDeleter {
+				markers = NewStoreWithUnsafeCorruptObjectDeletion(store, store.groupResource).(shutdownMarkerStore)
+			}
+			var written int64
+			for range tc.writes {
+				rev, err := markers.WriteShutdownMarker(ctx, "apiserver-test")
+				require.NoError(t, err)
+				current, err := store.GetCurrentResourceVersion(ctx)
+				require.NoError(t, err)
+				require.Equal(t, int64(current), rev)
+				written = rev
+			}
+
+			rev, found, err := markers.ShutdownMarkerRevision(ctx, "apiserver-test")
+			require.NoError(t, err)
+			require.Equal(t, tc.writes > 0, found)
+			require.Equal(t, written, rev)
+			require.Equal(t, strings.Join(client.Endpoints(), ",")+tc.prefix, markers.ShutdownMarkerScope())
+			if tc.writes == 0 {
+				return
+			}
+
+			resp, err := client.KV.Get(ctx, tc.prefix+"/apiserver_shutdown_marker/apiserver-test")
+			require.NoError(t, err)
+			require.Len(t, resp.Kvs, 1)
+			require.Equal(t, written, resp.Kvs[0].ModRevision)
+			lease, err := client.TimeToLive(ctx, clientv3.LeaseID(resp.Kvs[0].Lease))
+			require.NoError(t, err)
+			require.Equal(t, int64(3600), lease.GrantedTTL)
+			require.Greater(t, lease.TTL, int64(3500))
+		})
+	}
+}
+
 func BenchmarkStoreStats(b *testing.B) {
 	klog.SetLogger(logr.Discard())
 	data := storagetesting.PrepareBenchmarkData(50, 3_000, 5_000)

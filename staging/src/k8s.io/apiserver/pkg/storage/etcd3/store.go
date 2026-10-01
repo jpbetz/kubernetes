@@ -217,6 +217,38 @@ func (s *store) CompactRevision() int64 {
 	return s.compactor.CompactRevision()
 }
 
+const (
+	shutdownMarkerPrefix     = "/apiserver_shutdown_marker/"
+	shutdownMarkerTTLSeconds = 3600
+)
+
+func (s *store) WriteShutdownMarker(ctx context.Context, apiServerID string) (int64, error) {
+	lease, err := s.client.Grant(ctx, shutdownMarkerTTLSeconds)
+	if err != nil {
+		return 0, err
+	}
+	resp, err := s.client.KV.Put(ctx, s.pathPrefix+shutdownMarkerPrefix+apiServerID, "", clientv3.WithLease(lease.ID))
+	if err != nil {
+		return 0, err
+	}
+	return resp.Header.Revision, nil
+}
+
+func (s *store) ShutdownMarkerRevision(ctx context.Context, apiServerID string) (int64, bool, error) {
+	resp, err := s.client.KV.Get(ctx, s.pathPrefix+shutdownMarkerPrefix+apiServerID)
+	if err != nil {
+		return 0, false, err
+	}
+	if len(resp.Kvs) == 0 {
+		return 0, false, nil
+	}
+	return resp.Kvs[0].ModRevision, true, nil
+}
+
+func (s *store) ShutdownMarkerScope() string {
+	return strings.Join(s.client.Endpoints(), ",") + s.pathPrefix
+}
+
 // Versioner implements storage.Interface.Versioner.
 func (s *store) Versioner() storage.Versioner {
 	return s.versioner

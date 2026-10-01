@@ -2841,7 +2841,7 @@ var defaultKubernetesFeatureGateDependencies = map[featuregate.Feature][]feature
 
 	genericfeatures.WatchCacheInitializationPostStartHook: {},
 
-	genericfeatures.WatchCacheShutdownBookmark: {},
+	genericfeatures.WatchCacheShutdownBookmark: {genericfeatures.APIServerIdentity},
 
 	genericfeatures.WatchList: {},
 

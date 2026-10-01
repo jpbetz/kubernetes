@@ -124,6 +124,8 @@ type Config struct {
 	Clock clock.WithTicker
 
 	FinalBookmarks *storage.FinalBookmarks
+
+	maxReplayRevisions uint64
 }
 
 type watchersMap map[int]*cacheWatcher
@@ -382,6 +384,9 @@ func NewCacherFromConfig(config Config) (*Cacher, error) {
 	if config.Clock == nil {
 		config.Clock = clock.RealClock{}
 	}
+	if config.maxReplayRevisions == 0 {
+		config.maxReplayRevisions = defaultMaxReplayRevisions
+	}
 	objType := reflect.TypeOf(obj)
 	resourcePrefix := config.ResourcePrefix
 	if resourcePrefix == "" {
@@ -448,7 +453,16 @@ func NewCacherFromConfig(config Config) (*Cacher, error) {
 	watchCache := newWatchCache(
 		config.KeyFunc, cacher.processEvent, config.GetAttrsFunc, config.Versioner, config.Indexers,
 		config.Clock, eventFreshDuration, config.GroupResource, progressRequester, config.Storage.GetCurrentResourceVersion)
-	listerWatcher := NewListerWatcher(config.Storage, resourcePrefix, config.NewListFunc, contextMetadata)
+	listerWatcher := newListerWatcher(config.Storage, resourcePrefix, config.NewListFunc, contextMetadata)
+	if markers, ok := config.Storage.(shutdownMarkerStore); ok && config.FinalBookmarks != nil && config.FinalBookmarks.APIServerID() != "" &&
+		utilfeature.DefaultFeatureGate.Enabled(features.WatchCacheShutdownBookmark) {
+		listerWatcher.replay = &replayFromMarker{
+			markers:      markers,
+			apiServerID:  config.FinalBookmarks.APIServerID(),
+			maxRevisions: config.maxReplayRevisions,
+			onList:       watchCache.setCatchUpTarget,
+		}
+	}
 	reflectorName := "storage/cacher.go:" + resourcePrefix
 
 	reflector := cache.NewNamedReflector(reflectorName, listerWatcher, nil, watchCache, 0)
@@ -498,6 +512,8 @@ func NewCacherFromConfig(config Config) (*Cacher, error) {
 }
 
 func (c *Cacher) startCaching(stopChannel <-chan struct{}) {
+	ctx, cancel := context.WithCancel(wait.ContextForChannel(stopChannel))
+	defer cancel()
 	startTime := time.Now()
 	c.watchCache.SetOnReplace(func() {
 		c.ready.setReady()
@@ -506,13 +522,15 @@ func (c *Cacher) startCaching(stopChannel <-chan struct{}) {
 		metrics.WatchCacheInitializations.WithLabelValues(c.groupResource.Group, c.groupResource.Resource).Inc()
 		metrics.WatchCacheInitializationDuration.WithLabelValues(c.groupResource.Group, c.groupResource.Resource).Observe(duration.Seconds())
 	})
+	c.watchCache.setOnCatchUpTimeout(cancel)
 	var err error
 	defer func() {
+		c.watchCache.cancelCatchUp()
 		c.ready.setError(err)
 	}()
 
 	c.terminateAllWatchers()
-	err = c.reflector.ListAndWatch(stopChannel)
+	err = c.reflector.ListAndWatchWithContext(ctx)
 	if err != nil {
 		klog.Errorf("cacher (%v): unexpected ListAndWatch error: %v; reinitializing...", c.groupResource.String(), err)
 		metrics.WatchCacheInitializationErrors.WithLabelValues(c.groupResource.Group, c.groupResource.Resource).Inc()

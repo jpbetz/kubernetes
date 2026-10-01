@@ -19,6 +19,8 @@ package cacher
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"sync/atomic"
 
 	"google.golang.org/grpc/metadata"
 
@@ -33,7 +35,24 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/consistencydetector"
 	"k8s.io/client-go/util/watchlist"
+	"k8s.io/klog/v2"
 )
+
+const defaultMaxReplayRevisions = 5000
+
+type shutdownMarkerStore interface {
+	WriteShutdownMarker(ctx context.Context, apiServerID string) (int64, error)
+	ShutdownMarkerRevision(ctx context.Context, apiServerID string) (int64, bool, error)
+	ShutdownMarkerScope() string
+}
+
+type replayFromMarker struct {
+	markers      shutdownMarkerStore
+	apiServerID  string
+	maxRevisions uint64
+	onList       func(catchUpTarget uint64)
+	done         atomic.Bool
+}
 
 // listerWatcher opaques storage.Interface to expose cache.ListerWatcher.
 type listerWatcher struct {
@@ -44,10 +63,16 @@ type listerWatcher struct {
 
 	unsupportedWatchListSemantics    bool
 	watchListConsistencyCheckEnabled bool
+
+	replay *replayFromMarker
 }
 
 // NewListerWatcher returns a storage.Interface backed ListerWatcher.
 func NewListerWatcher(storage storage.Interface, resourcePrefix string, newListFunc func() runtime.Object, contextMetadata metadata.MD) cache.ListerWatcher {
+	return newListerWatcher(storage, resourcePrefix, newListFunc, contextMetadata)
+}
+
+func newListerWatcher(storage storage.Interface, resourcePrefix string, newListFunc func() runtime.Object, contextMetadata metadata.MD) *listerWatcher {
 	return &listerWatcher{
 		storage:                          storage,
 		resourcePrefix:                   resourcePrefix,
@@ -98,10 +123,48 @@ func (lw *listerWatcher) List(options metav1.ListOptions) (runtime.Object, error
 	if lw.contextMetadata != nil {
 		ctx = metadata.NewOutgoingContext(ctx, lw.contextMetadata)
 	}
+	if lw.replay != nil && !lw.replay.done.Load() && len(options.Continue) == 0 && len(storageOpts.ResourceVersion) == 0 {
+		if start, current, ok := lw.replayStart(ctx); ok {
+			replayOpts := storageOpts
+			replayOpts.ResourceVersion = strconv.FormatUint(start, 10)
+			replayOpts.ResourceVersionMatch = metav1.ResourceVersionMatchExact
+			err := lw.storage.GetList(ctx, lw.resourcePrefix, replayOpts, list)
+			if err == nil {
+				klog.V(1).InfoS("Watch cache starting at the shutdown marker", "resourcePrefix", lw.resourcePrefix, "markerRevision", start, "currentRevision", current)
+				lw.replay.onList(current)
+				return list, nil
+			}
+			klog.InfoS("Watch cache could not list at the shutdown marker, listing at the latest revision", "resourcePrefix", lw.resourcePrefix, "markerRevision", start, "err", err)
+			list = lw.newListFunc()
+		}
+	}
 	if err := lw.storage.GetList(ctx, lw.resourcePrefix, storageOpts, list); err != nil {
 		return nil, err
 	}
 	return list, nil
+}
+
+func (lw *listerWatcher) replayStart(ctx context.Context) (start, current uint64, ok bool) {
+	marker, found, err := lw.replay.markers.ShutdownMarkerRevision(ctx, lw.replay.apiServerID)
+	if err != nil {
+		klog.InfoS("Watch cache could not read the shutdown marker", "resourcePrefix", lw.resourcePrefix, "err", err)
+		return 0, 0, false
+	}
+	current, err = lw.storage.GetCurrentResourceVersion(ctx)
+	if err != nil {
+		klog.InfoS("Watch cache could not read the current revision", "resourcePrefix", lw.resourcePrefix, "err", err)
+		return 0, 0, false
+	}
+	lw.replay.done.Store(true)
+	if !found || uint64(marker) >= current {
+		return 0, 0, false
+	}
+	if current-uint64(marker) > lw.replay.maxRevisions {
+		klog.V(1).InfoS("Watch cache shutdown marker is too far behind, listing at the latest revision", "resourcePrefix", lw.resourcePrefix,
+			"markerRevision", marker, "currentRevision", current, "maxRevisions", lw.replay.maxRevisions)
+		return 0, 0, false
+	}
+	return uint64(marker), current, true
 }
 
 // Implements cache.ListerWatcher interface.
@@ -130,6 +193,9 @@ func (lw *listerWatcher) Watch(options metav1.ListOptions) (watch.Interface, err
 	// returned for watch-list requests
 	if isListWatchRequest(opts) && !utilfeature.DefaultFeatureGate.Enabled(features.WatchList) {
 		return nil, fmt.Errorf("sendInitialEvents is forbidden for watch unless the WatchList feature gate is enabled")
+	}
+	if isListWatchRequest(opts) && lw.replay != nil && !lw.replay.done.Load() {
+		return nil, fmt.Errorf("the first list must check the shutdown marker")
 	}
 
 	return lw.storage.Watch(ctx, lw.resourcePrefix, opts)

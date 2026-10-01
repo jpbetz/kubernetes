@@ -481,7 +481,7 @@ func NewConfig(codecs serializer.CodecFactory) *Config {
 		LongRunningFunc:                     genericfilters.BasicLongRunningRequestCheck(sets.NewString("watch"), sets.NewString()),
 		lifecycleSignals:                    lifecycleSignals,
 		StorageObjectCountTracker:           flowcontrolrequest.NewStorageObjectCountTracker(),
-		FinalBookmarks:                      storage.NewFinalBookmarks(),
+		FinalBookmarks:                      storage.NewFinalBookmarks(id),
 		ShutdownWatchTerminationGracePeriod: time.Duration(0),
 
 		APIServerID:           id,

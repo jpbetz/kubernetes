@@ -38,6 +38,21 @@ func (c *Cacher) SendFinalBookmark(ctx context.Context) error {
 	return nil
 }
 
+func (c *Cacher) ShutdownMarkerScope() string {
+	if m, ok := c.storage.(shutdownMarkerStore); ok {
+		return m.ShutdownMarkerScope()
+	}
+	return ""
+}
+
+func (c *Cacher) WriteShutdownMarker(ctx context.Context, apiServerID string) (int64, error) {
+	m, ok := c.storage.(shutdownMarkerStore)
+	if !ok {
+		return 0, fmt.Errorf("storage for %v does not support shutdown markers", c.groupResource)
+	}
+	return m.WriteShutdownMarker(ctx, apiServerID)
+}
+
 type finalBookmarkRequest struct {
 	rv   uint64
 	done chan finalBookmarkResult

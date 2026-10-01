@@ -20,19 +20,31 @@ import (
 	"context"
 	"sync"
 	"sync/atomic"
+
+	"k8s.io/klog/v2"
 )
 
 type FinalBookmarkSender interface {
 	SendFinalBookmark(ctx context.Context) error
 }
 
-type FinalBookmarks struct {
-	lock    sync.Mutex
-	senders map[FinalBookmarkSender]struct{}
+type shutdownMarkerWriter interface {
+	ShutdownMarkerScope() string
+	WriteShutdownMarker(ctx context.Context, apiServerID string) (int64, error)
 }
 
-func NewFinalBookmarks() *FinalBookmarks {
-	return &FinalBookmarks{senders: map[FinalBookmarkSender]struct{}{}}
+type FinalBookmarks struct {
+	apiServerID string
+	lock        sync.Mutex
+	senders     map[FinalBookmarkSender]struct{}
+}
+
+func NewFinalBookmarks(apiServerID string) *FinalBookmarks {
+	return &FinalBookmarks{apiServerID: apiServerID, senders: map[FinalBookmarkSender]struct{}{}}
+}
+
+func (f *FinalBookmarks) APIServerID() string {
+	return f.apiServerID
 }
 
 func (f *FinalBookmarks) Register(s FinalBookmarkSender) {
@@ -55,14 +67,34 @@ func (f *FinalBookmarks) Send(ctx context.Context) (sent, failed int) {
 	}
 	f.lock.Unlock()
 
+	scopes := map[string][]FinalBookmarkSender{}
+	for _, s := range senders {
+		var scope string
+		if w, ok := s.(shutdownMarkerWriter); ok && f.apiServerID != "" {
+			scope = w.ShutdownMarkerScope()
+		}
+		scopes[scope] = append(scopes[scope], s)
+	}
+
 	var sentCount, failedCount atomic.Int64
 	var wg sync.WaitGroup
-	for _, s := range senders {
+	for scope, group := range scopes {
 		wg.Go(func() {
-			if err := s.SendFinalBookmark(ctx); err != nil {
-				failedCount.Add(1)
-			} else {
-				sentCount.Add(1)
+			if scope != "" {
+				if rev, err := group[0].(shutdownMarkerWriter).WriteShutdownMarker(ctx, f.apiServerID); err != nil {
+					klog.InfoS("Could not write the shutdown marker", "apiServerID", f.apiServerID, "scope", scope, "err", err)
+				} else {
+					klog.V(1).InfoS("Wrote the shutdown marker", "apiServerID", f.apiServerID, "scope", scope, "revision", rev)
+				}
+			}
+			for _, s := range group {
+				wg.Go(func() {
+					if err := s.SendFinalBookmark(ctx); err != nil {
+						failedCount.Add(1)
+					} else {
+						sentCount.Add(1)
+					}
+				})
 			}
 		})
 	}

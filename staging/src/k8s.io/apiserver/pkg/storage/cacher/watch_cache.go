@@ -51,6 +51,9 @@ const (
 	// resourceVersionTooHighRetrySeconds is the seconds before a operation should be retried by the client
 	// after receiving a 'too high resource version' error.
 	resourceVersionTooHighRetrySeconds = 1
+
+	catchUpPollInterval = 100 * time.Millisecond
+	catchUpTimeout      = 30 * time.Second
 )
 
 // watchCacheEvent is a single "watch event" that is send to users of
@@ -89,8 +92,14 @@ type watchCache struct {
 	// ResourceVersion up to which the watchCache is propagated.
 	resourceVersion uint64
 
-	// This handler is run at the end of every successful Replace() method.
+	// This handler is run at the end of every successful Replace() method,
+	// or when the watch cache catches up after it.
 	onReplace func()
+
+	onCatchUpTimeout func()
+	catchUpTarget    uint64
+	pendingReadyAt   uint64
+	catchUpID        uint64
 
 	history *watchCacheHistory
 	storage *store.WatchCacheStorage
@@ -258,6 +267,7 @@ func (w *watchCache) processEvent(event watch.Event, resourceVersion uint64) err
 
 		w.history.updateCache(wcEvent)
 		w.resourceVersion = resourceVersion
+		w.finishCatchUpLocked()
 		defer w.cond.Broadcast()
 
 		if w.history.isCacheFullLocked() {
@@ -304,6 +314,7 @@ func (w *watchCache) UpdateResourceVersion(resourceVersion string) {
 		w.Lock()
 		defer w.Unlock()
 		w.resourceVersion = rv
+		w.finishCatchUpLocked()
 		w.cond.Broadcast()
 	}()
 
@@ -604,7 +615,12 @@ func (w *watchCache) Replace(objs []interface{}, resourceVersion string) error {
 		return err
 	}
 	w.resourceVersion = version
-	if w.onReplace != nil {
+	target := w.catchUpTarget
+	w.cancelCatchUpLocked()
+	if target > version {
+		w.pendingReadyAt = target
+		go w.catchUp(w.catchUpID)
+	} else if w.onReplace != nil {
 		w.onReplace()
 	}
 	w.cond.Broadcast()
@@ -618,6 +634,75 @@ func (w *watchCache) SetOnReplace(onReplace func()) {
 	w.Lock()
 	defer w.Unlock()
 	w.onReplace = onReplace
+}
+
+func (w *watchCache) setOnCatchUpTimeout(onCatchUpTimeout func()) {
+	w.Lock()
+	defer w.Unlock()
+	w.onCatchUpTimeout = onCatchUpTimeout
+}
+
+func (w *watchCache) setCatchUpTarget(target uint64) {
+	w.Lock()
+	defer w.Unlock()
+	w.catchUpTarget = target
+}
+
+func (w *watchCache) cancelCatchUp() {
+	w.Lock()
+	defer w.Unlock()
+	w.cancelCatchUpLocked()
+}
+
+func (w *watchCache) cancelCatchUpLocked() {
+	w.catchUpTarget = 0
+	w.pendingReadyAt = 0
+	w.catchUpID++
+}
+
+func (w *watchCache) finishCatchUpLocked() {
+	if w.pendingReadyAt == 0 || w.resourceVersion < w.pendingReadyAt {
+		return
+	}
+	w.cancelCatchUpLocked()
+	if w.onReplace != nil {
+		w.onReplace()
+	}
+}
+
+func (w *watchCache) catchUp(id uint64) {
+	start := w.config.clock.Now()
+	requesting := false
+	defer func() {
+		if requesting {
+			w.config.waitingUntilFresh.Remove()
+		}
+	}()
+	for {
+		<-w.config.clock.After(catchUpPollInterval)
+		w.Lock()
+		if w.catchUpID != id {
+			w.Unlock()
+			return
+		}
+		if !requesting && delegator.ConsistentReadSupported() {
+			w.config.waitingUntilFresh.Add()
+			requesting = true
+		}
+		if w.config.clock.Since(start) < catchUpTimeout {
+			w.Unlock()
+			continue
+		}
+		klog.InfoS("Watch cache did not catch up in time, reinitializing at the latest revision", "group", w.config.groupResource.Group, "resource", w.config.groupResource.Resource,
+			"resourceVersion", w.resourceVersion, "target", w.pendingReadyAt, "timeout", catchUpTimeout)
+		w.cancelCatchUpLocked()
+		onCatchUpTimeout := w.onCatchUpTimeout
+		w.Unlock()
+		if onCatchUpTimeout != nil {
+			onCatchUpTimeout()
+		}
+		return
+	}
 }
 
 func (w *watchCache) Resync() error {

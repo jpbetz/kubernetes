@@ -19,7 +19,9 @@ package apiserver
 import (
 	"context"
 	"fmt"
+	"os"
 	"strconv"
+	"sync"
 	"testing"
 	"time"
 
@@ -35,6 +37,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	genericfeatures "k8s.io/apiserver/pkg/features"
+	genericapiserver "k8s.io/apiserver/pkg/server"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/client-go/dynamic"
 	clientset "k8s.io/client-go/kubernetes"
@@ -47,14 +50,24 @@ import (
 )
 
 func TestWatchResumesAfterShutdownBookmark(t *testing.T) {
+	hostname, err := os.Hostname()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { genericapiserver.SetHostnameFuncForTests(hostname) })
 	for _, tc := range []struct {
 		name        string
 		enabled     bool
 		gracePeriod string
+		ha          bool
+		etcdWrites  int
+		wantResume  bool
 	}{
-		{name: "enabled", enabled: true, gracePeriod: "0s"},
-		{name: "enabled with watch termination grace period", enabled: true, gracePeriod: "5s"},
+		{name: "enabled", enabled: true, gracePeriod: "0s", wantResume: true},
+		{name: "enabled with watch termination grace period", enabled: true, gracePeriod: "5s", wantResume: true},
 		{name: "disabled", enabled: false, gracePeriod: "0s"},
+		{name: "HA with fewer than 5000 revisions while down", enabled: true, gracePeriod: "0s", ha: true, wantResume: true},
+		{name: "HA with more than 5000 revisions while down", enabled: true, gracePeriod: "0s", ha: true, etcdWrites: 5100},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, genericfeatures.WatchCacheShutdownBookmark, tc.enabled)
@@ -68,8 +81,12 @@ func TestWatchResumesAfterShutdownBookmark(t *testing.T) {
 			storageConfig := framework.SharedEtcd()
 			storageConfig.Transport.ServerList = []string{etcdURL}
 			flags := append(framework.DefaultTestServerFlags(), "--request-timeout=10s", "--shutdown-watch-termination-grace-period="+tc.gracePeriod)
+			startServer := func(hostname string) *kubeapiservertesting.TestServer {
+				genericapiserver.SetHostnameFuncForTests(hostname)
+				return kubeapiservertesting.StartTestServerOrDie(t, nil, flags, storageConfig)
+			}
 
-			server := kubeapiservertesting.StartTestServerOrDie(t, nil, flags, storageConfig)
+			server := startServer("watchcache-restart-a")
 			client := clientset.NewForConfigOrDie(server.ClientConfig)
 			dynamicClient := dynamic.NewForConfigOrDie(server.ClientConfig)
 
@@ -88,6 +105,21 @@ func TestWatchResumesAfterShutdownBookmark(t *testing.T) {
 
 			configMaps := schema.GroupVersionResource{Version: "v1", Resource: "configmaps"}
 			apiServices := schema.GroupVersionResource{Group: "apiregistration.k8s.io", Version: "v1", Resource: "apiservices"}
+			newObject := func(gvr schema.GroupVersionResource, name string) *unstructured.Unstructured {
+				switch gvr {
+				case configMaps:
+					return &unstructured.Unstructured{Object: map[string]interface{}{"apiVersion": "v1", "kind": "ConfigMap", "metadata": map[string]interface{}{"name": name}}}
+				case noxus:
+					return fixtures.NewNoxuInstance("", name)
+				default:
+					return &unstructured.Unstructured{Object: map[string]interface{}{
+						"apiVersion": "apiregistration.k8s.io/v1",
+						"kind":       "APIService",
+						"metadata":   map[string]interface{}{"name": "v1." + name + ".example.com"},
+						"spec":       map[string]interface{}{"group": name + ".example.com", "version": "v1", "groupPriorityMinimum": int64(1000), "versionPriority": int64(15)},
+					}}
+				}
+			}
 			type watchState struct {
 				gvr    schema.GroupVersionResource
 				cursor string
@@ -130,6 +162,11 @@ func TestWatchResumesAfterShutdownBookmark(t *testing.T) {
 				}
 				lastWrite = secret.ResourceVersion
 			}
+			if tc.ha {
+				other := startServer("watchcache-restart-b")
+				defer other.TearDownFn()
+				dynamicClient = dynamic.NewForConfigOrDie(other.ClientConfig)
+			}
 			server.TearDownFn()
 
 			for _, state := range watches {
@@ -150,19 +187,48 @@ func TestWatchResumesAfterShutdownBookmark(t *testing.T) {
 				}
 			}
 
-			server = kubeapiservertesting.StartTestServerOrDie(t, nil, flags, storageConfig)
+			whileDown := map[schema.GroupVersionResource]string{}
+			if tc.ha {
+				for _, state := range watches {
+					namespace := ""
+					if state.gvr == configMaps {
+						namespace = ns
+					}
+					created, err := dynamicClient.Resource(state.gvr).Namespace(namespace).Create(tCtx, newObject(state.gvr, "while-down"), metav1.CreateOptions{})
+					if err != nil {
+						t.Fatal(err)
+					}
+					whileDown[state.gvr] = created.GetName()
+				}
+			}
+			if tc.etcdWrites > 0 {
+				etcdClient, kv, err := kubeapiservertesting.GetEtcdClients(storageConfig.Transport)
+				if err != nil {
+					t.Fatal(err)
+				}
+				defer etcdClient.Close()
+				var wg sync.WaitGroup
+				errs := make(chan error, tc.etcdWrites)
+				for worker := range 50 {
+					wg.Go(func() {
+						for i := worker; i < tc.etcdWrites; i += 50 {
+							if _, err := kv.Put(tCtx, fmt.Sprintf("/unrelated/%d", i), "value"); err != nil {
+								errs <- err
+								return
+							}
+						}
+					})
+				}
+				wg.Wait()
+				close(errs)
+				for err := range errs {
+					t.Fatal(err)
+				}
+			}
+
+			server = startServer("watchcache-restart-a")
 			defer server.TearDownFn()
 			dynamicClient = dynamic.NewForConfigOrDie(server.ClientConfig)
-			afterRestart := map[schema.GroupVersionResource]*unstructured.Unstructured{
-				configMaps: {Object: map[string]interface{}{"apiVersion": "v1", "kind": "ConfigMap", "metadata": map[string]interface{}{"name": "after-restart"}}},
-				noxus:      fixtures.NewNoxuInstance("", "after-restart"),
-				apiServices: {Object: map[string]interface{}{
-					"apiVersion": "apiregistration.k8s.io/v1",
-					"kind":       "APIService",
-					"metadata":   map[string]interface{}{"name": "v1.after-restart.example.com"},
-					"spec":       map[string]interface{}{"group": "after-restart.example.com", "version": "v1", "groupPriorityMinimum": int64(1000), "versionPriority": int64(15)},
-				}},
-			}
 			for _, state := range watches {
 				namespace := ""
 				if state.gvr == configMaps {
@@ -178,23 +244,30 @@ func TestWatchResumesAfterShutdownBookmark(t *testing.T) {
 				}); err != nil {
 					t.Fatalf("Watch of %v at %s: %v", state.gvr, state.cursor, err)
 				}
-				created, err := dynamicClient.Resource(state.gvr).Namespace(namespace).Create(tCtx, afterRestart[state.gvr], metav1.CreateOptions{})
+				created, err := dynamicClient.Resource(state.gvr).Namespace(namespace).Create(tCtx, newObject(state.gvr, "after-restart"), metav1.CreateOptions{})
 				if err != nil {
 					t.Fatal(err)
 				}
 
 				ctx, cancel := context.WithTimeout(tCtx, wait.ForeverTestTimeout)
 				defer cancel()
+				added := map[string]bool{}
 				event, err := watchtools.UntilWithoutRetry(ctx, resumed, func(event watch.Event) (bool, error) {
 					accessor, err := meta.Accessor(event.Object)
+					if err == nil && event.Type == watch.Added {
+						added[accessor.GetName()] = true
+					}
 					return event.Type == watch.Error || (err == nil && accessor.GetName() == created.GetName()), nil
 				})
 				if err != nil {
 					t.Fatalf("Waiting for an event on the resumed watch of %v: %v", state.gvr, err)
 				}
-				if tc.enabled && state.gvr != noxus {
+				if tc.wantResume {
 					if event.Type != watch.Added {
 						t.Errorf("resumed watch of %v got %v %#v, want ADDED %s", state.gvr, event.Type, event.Object, created.GetName())
+					}
+					if name := whileDown[state.gvr]; name != "" && !added[name] {
+						t.Errorf("resumed watch of %v did not get ADDED %s, which was written while the apiserver was down", state.gvr, name)
 					}
 				} else if event.Type != watch.Error || !apierrors.IsResourceExpired(apierrors.FromObject(event.Object)) {
 					t.Errorf("resumed watch of %v got %v %#v, want 410 Expired", state.gvr, event.Type, event.Object)
