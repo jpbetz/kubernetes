@@ -779,6 +779,9 @@ func TestQuantityRoundUp(t *testing.T) {
 		{"1.5", -9, decQuantity(15, -1, DecimalSI), true, 1},
 		{"0.000", -9, decQuantity(0, 0, DecimalSI), true, 3},
 		{"5", -1000, decQuantity(5, 0, DecimalSI), true, 0},
+		{"0Gi", -3, decQuantity(0, 0, BinarySI), true, 0},
+		{"1.5e3", -3, decQuantity(15, 2, DecimalExponent), true, -2},
+		{"1000E", -3, decQuantity(1, 21, DecimalSI), true, -18},
 	}
 
 	for _, asDec := range []bool{false, true} {
@@ -1074,6 +1077,22 @@ func TestQuantityRoundUp(t *testing.T) {
 			want:  roundUpOutcome{ok: true, value: "5", exponent: -math.MinInt32},
 		},
 		{
+			name: "inf.Dec 2^63 RoundUp(64)",
+			in: func() Quantity {
+				return *NewDecimalQuantity(*inf.NewDecBig(new(big.Int).Lsh(big.NewInt(1), 63), 0), DecimalSI)
+			},
+			scale: 64,
+			want:  roundUpOutcome{ok: false, value: "1", exponent: 64},
+		},
+		{
+			name: "inf.Dec -2^64 RoundUp(65)",
+			in: func() Quantity {
+				return *NewDecimalQuantity(*inf.NewDecBig(new(big.Int).Lsh(big.NewInt(-1), 64), 0), DecimalSI)
+			},
+			scale: 65,
+			want:  roundUpOutcome{ok: false, value: "-1", exponent: 65},
+		},
+		{
 			name:  "+1 RoundUp(0)",
 			in:    func() Quantity { return MustParse("+1") },
 			scale: 0,
@@ -1098,6 +1117,18 @@ func TestQuantityRoundUp(t *testing.T) {
 			want:  roundUpOutcome{ok: true, value: "1024", str: "+1Ki"},
 		},
 		{
+			name:  "+1e-3 RoundUp(Milli)",
+			in:    func() Quantity { return MustParse("+1e-3") },
+			scale: Milli,
+			want:  roundUpOutcome{ok: true, value: "1", exponent: -3, str: "+1e-3"},
+		},
+		{
+			name:  "5E+3 RoundUp(Milli)",
+			in:    func() Quantity { return MustParse("5E+3") },
+			scale: Milli,
+			want:  roundUpOutcome{ok: true, value: "5", exponent: 3, str: "5E+3"},
+		},
+		{
 			name:  "2Gi then Format = DecimalSI, RoundUp(Milli)",
 			in:    func() Quantity { q := MustParse("2Gi"); q.Format = DecimalSI; return q },
 			scale: Milli,
@@ -1113,6 +1144,29 @@ func TestQuantityRoundUp(t *testing.T) {
 			},
 			scale: Milli,
 			want:  roundUpOutcome{ok: true, value: "1024", str: "1Ki"},
+		},
+		{
+			name:  "2e3 then Format = DecimalSI, RoundUp(Milli)",
+			in:    func() Quantity { q := MustParse("2e3"); q.Format = DecimalSI; return q },
+			scale: Milli,
+			want:  roundUpOutcome{ok: true, value: "2", exponent: 3, str: "2k"},
+		},
+		{
+			name:  "2k then Format = DecimalExponent, RoundUp(Milli)",
+			in:    func() Quantity { q := MustParse("2k"); q.Format = DecimalExponent; return q },
+			scale: Milli,
+			want:  roundUpOutcome{ok: true, value: "2", exponent: 3, str: "2e3"},
+		},
+		{
+			name: "2000 CacheString as BinarySI then Format = DecimalSI, RoundUp(Milli)",
+			in: func() Quantity {
+				q := *NewQuantity(2000, BinarySI)
+				q.CacheString()
+				q.Format = DecimalSI
+				return q
+			},
+			scale: Milli,
+			want:  roundUpOutcome{ok: true, value: "2", exponent: 3, str: "2k"},
 		},
 		{
 			name:  "1k RoundUp(Nano) then AsApproximateFloat64",
@@ -1381,7 +1435,12 @@ func TestQuantityMutate(t *testing.T) {
 		},
 		"AsScale": {
 			calls: []func(q *Quantity, y Quantity){
-				func(q *Quantity, _ Quantity) { q.AsScale(0) },
+				func(q *Quantity, _ Quantity) {
+					v, _ := q.AsScale(0)
+					if d, ok := v.(infDecAmount); ok {
+						d.UnscaledBig().SetInt64(0x5a5a5a5a)
+					}
+				},
 			},
 		},
 		"AsScaledInt64": {
@@ -1622,6 +1681,7 @@ func TestQuantityMutate(t *testing.T) {
 			{"-9223372036854775808", MustParse("-9223372036854775808")},
 			{"dec -9223372036854775809", MustParse("-9223372036854775809")},
 			{"dec 9223372036854775807", toDec(MustParse("9223372036854775807"))},
+			{"dec 2^63*10^-64", *NewDecimalQuantity(*inf.NewDecBig(new(big.Int).Lsh(big.NewInt(1), 63), 64), DecimalSI)},
 		}
 	}
 	for method := range reflect.TypeFor[*Quantity]().Methods() {
