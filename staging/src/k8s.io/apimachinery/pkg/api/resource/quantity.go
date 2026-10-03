@@ -671,18 +671,25 @@ func (q *Quantity) RoundUp(scale Scale) bool {
 	return exact
 }
 
-// dropStaleString clears a cached string that the current Format would not
-// write. Assigning Format after the string was cached leaves it stale, and
-// String would keep returning it. Decoded spellings such as "+1" always match.
+// dropStaleString clears a cached string that String should no longer return.
+// Assigning Format after the string was cached leaves it stale.
 func (q *Quantity) dropStaleString() {
-	if len(q.s) > 0 && !suffixFitsFormat(q.s, q.Format) {
+	if len(q.s) == 0 || suffixFitsFormat(q.s, q.Format) {
+		return
+	}
+	// Each Format also writes some strings outside its suffix family, such as
+	// BinarySI's "0". Keeping those leaves decoded values unchanged by defaulting.
+	c := *q
+	c.s = ""
+	if c.String() != q.s {
 		q.s = ""
 	}
 }
 
-// suffixFitsFormat reports whether format writes the kind of suffix that s, a
-// string cached for a Quantity, ends in. The suffix is the only record of which
-// Format wrote it.
+// suffixFitsFormat reports whether s, a string cached for a Quantity, ends in a
+// suffix that format writes: a binary suffix for BinarySI, an SI suffix or none
+// for DecimalSI, and an exponent for DecimalExponent. ParseQuantity takes the
+// Format from the suffix, so every spelling it caches verbatim fits.
 func suffixFitsFormat(s string, format Format) bool {
 	end := len(s)
 	for end > 0 && s[end-1] >= '0' && s[end-1] <= '9' {
