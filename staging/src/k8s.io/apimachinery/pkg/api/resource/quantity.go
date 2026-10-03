@@ -648,6 +648,11 @@ func (q *Quantity) AsScale(scale Scale) (CanonicalValue, bool) {
 // Negative numbers are rounded away from zero (-9 scale 1 rounds to -10).
 func (q *Quantity) RoundUp(scale Scale) bool {
 	if q.d.Dec != nil {
+		// Widen first: negating an inf.Scale of math.MinInt32 needs 33 bits.
+		if -int64(q.d.Dec.Scale()) >= int64(scale) {
+			q.dropStaleString()
+			return true
+		}
 		q.s = ""
 		d, exact := q.d.AsScale(scale)
 		q.d = d
@@ -655,12 +660,47 @@ func (q *Quantity) RoundUp(scale Scale) bool {
 	}
 	// avoid clearing the string value if we have already calculated it
 	if q.i.scale >= scale {
+		q.dropStaleString()
 		return true
 	}
 	q.s = ""
-	i, exact := q.i.AsScale(scale)
-	q.i = i
+	// Not q.i.AsScale, which narrows the scale gap to int32. The gap can need 33
+	// bits, and dividing by 10^log10MaxInt64 leaves only the rounding unit.
+	value, exact := negativeScaleInt64(q.i.value, Scale(min(int64(scale)-int64(q.i.scale), log10MaxInt64)))
+	q.i = int64Amount{value: value, scale: scale}
 	return exact
+}
+
+// dropStaleString clears a cached string that the current Format would not
+// write. Assigning Format after the string was cached leaves it stale, and
+// String would keep returning it. Decoded spellings such as "+1" always match.
+func (q *Quantity) dropStaleString() {
+	if len(q.s) > 0 && !suffixFitsFormat(q.s, q.Format) {
+		q.s = ""
+	}
+}
+
+// suffixFitsFormat reports whether format writes the kind of suffix that s, a
+// string cached for a Quantity, ends in. The suffix is the only record of which
+// Format wrote it.
+func suffixFitsFormat(s string, format Format) bool {
+	end := len(s)
+	for end > 0 && s[end-1] >= '0' && s[end-1] <= '9' {
+		end--
+	}
+	switch {
+	case end == len(s):
+		if s[end-1] == 'i' {
+			return format == BinarySI
+		}
+		return format == DecimalSI
+	case end > 0 && (s[end-1] == 'e' || s[end-1] == 'E'),
+		end > 1 && (s[end-1] == '-' || s[end-1] == '+') && (s[end-2] == 'e' || s[end-2] == 'E'):
+		return format == DecimalExponent
+	default:
+		// DecimalSI writes three trailing zeros as a suffix.
+		return format == DecimalSI && !strings.HasSuffix(s, "000")
+	}
 }
 
 // Add adds the provide y quantity to the current value. If the current value is zero,

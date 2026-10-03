@@ -394,9 +394,34 @@ type infDecAmount struct {
 // AsScale adjusts this amount to set a minimum scale, rounding up, and returns true iff no precision
 // was lost. (1.1e5).AsScale(5) would return 1.1e5, but (1.1e5).AsScale(6) would return 1e6.
 func (a infDecAmount) AsScale(scale Scale) (infDecAmount, bool) {
-	tmp := &inf.Dec{}
-	tmp.Round(a.Dec, scale.infScale(), inf.RoundUp)
-	return infDecAmount{tmp}, tmp.Cmp(a.Dec) == 0
+	// inf.Scale is upside-down, so this is the number of digits to drop.
+	// Widen first: it can need 33 bits.
+	drop := int64(scale) + int64(a.Scale())
+	if drop <= 0 {
+		// Quantity.AsScale hands this to callers, so it must not share a.Dec.
+		return infDecAmount{new(inf.Dec).Set(a.Dec)}, true
+	}
+	// scale is above -a.Scale(), so it is not math.MinInt32 and infScale is
+	// faithful.
+	unscaled := a.UnscaledBig()
+	if unscaled.IsInt64() {
+		result, exact := negativeScaleInt64(unscaled.Int64(), Scale(min(drop, log10MaxInt64)))
+		return infDecAmount{inf.NewDec(result, scale.infScale())}, exact
+	}
+	// inf.Dec.Round would build 10^drop. drop >= BitLen implies
+	// 10^drop > 2^BitLen > |unscaled|, so only the rounding unit is left.
+	if drop >= int64(unscaled.BitLen()) {
+		return infDecAmount{inf.NewDec(int64(unscaled.Sign()), scale.infScale())}, false
+	}
+	result := new(inf.Dec).SetScale(scale.infScale())
+	quotient := result.UnscaledBig()
+	_, remainder := quotient.QuoRem(unscaled, new(big.Int).Exp(bigTen, big.NewInt(drop), nil), new(big.Int))
+	if remainder.Sign() == 0 {
+		return infDecAmount{result}, true
+	}
+	// QuoRem truncates toward zero, so this rounds away from it.
+	quotient.Add(quotient, big.NewInt(int64(unscaled.Sign())))
+	return infDecAmount{result}, false
 }
 
 // AsCanonicalBytes accepts a buffer to write the base-10 string value of this field to, and returns
