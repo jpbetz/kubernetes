@@ -2049,7 +2049,7 @@ func TestZeroSubMostNegativePreservesScale(t *testing.T) {
 	if q.d.Dec == nil {
 		t.Fatal("result stayed on the int64 backend, want inf.Dec")
 	}
-	if got, want := q.d.Dec.Scale(), inf.Scale(-100); got != want {
+	if got, want := q.scale(), int64(100); got != want {
 		t.Fatalf("result scale = %d, want %d", got, want)
 	}
 	wantUnscaled := new(big.Int).Neg(big.NewInt(mostNegative)) // 2^63
@@ -3873,5 +3873,26 @@ func TestQuantityPtrEqual(t *testing.T) {
 				t.Errorf("QuantityPtrEqual() = %v, want %v", got, tt.expect)
 			}
 		})
+	}
+}
+
+func TestQuantityScale(t *testing.T) {
+	for _, s := range []Scale{math.MinInt32, math.MinInt32 + 1, Nano, Milli, 0, Kilo, math.MaxInt32} {
+		q := NewScaledQuantity(5, s)
+		if got, want := q.scale(), int64(s); got != want {
+			t.Errorf("NewScaledQuantity(5, %d).scale() = %d, want %d", s, got, want)
+		}
+		if s.canInfScale() {
+			q.ToDec()
+			if got, want := q.scale(), int64(s); got != want {
+				t.Errorf("NewScaledQuantity(5, %d).ToDec().scale() = %d, want %d", s, got, want)
+			}
+		}
+	}
+
+	// inf.Scale(math.MinInt32) negates without int32 overflow because scale() widens to int64 first.
+	minDec := NewDecimalQuantity(*inf.NewDec(5, math.MinInt32), DecimalSI)
+	if got, want := minDec.scale(), -int64(math.MinInt32); got != want {
+		t.Errorf("inf.NewDec(5, math.MinInt32).scale() = %d, want %d", got, want)
 	}
 }

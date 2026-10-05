@@ -524,14 +524,12 @@ func (q *Quantity) CanonicalizeBytes(out []byte) (result, suffix []byte) {
 // float64 +Inf/-Inf will be returned.
 func (q *Quantity) AsApproximateFloat64() float64 {
 	var base float64
-	var exponent int
 	if q.d.Dec != nil {
 		base, _ = big.NewFloat(0).SetInt(q.d.Dec.UnscaledBig()).Float64()
-		exponent = int(-q.d.Dec.Scale())
 	} else {
 		base = float64(q.i.value)
-		exponent = int(q.i.scale)
 	}
+	exponent := int(q.scale())
 	// Avoid 0 * Inf, which returns NaN.
 	if base == 0 || exponent == 0 {
 		return base
@@ -547,17 +545,18 @@ func (q *Quantity) AsApproximateFloat64() float64 {
 func (q *Quantity) AsFloat64Slow() float64 {
 	infDec := q.internalReadOnlyDec()
 
+	scale := q.scale()
 	var absScale int64
-	if infDec.Scale() < 0 {
-		absScale = int64(-infDec.Scale())
+	if scale < 0 {
+		absScale = -scale
 	} else {
-		absScale = int64(infDec.Scale())
+		absScale = scale
 	}
 	pow10AbsScale := big.NewInt(10)
 	pow10AbsScale = pow10AbsScale.Exp(pow10AbsScale, big.NewInt(absScale), nil)
 
 	var resultBigFloat *big.Float
-	if infDec.Scale() < 0 {
+	if scale > 0 {
 		resultBigInt := new(big.Int).Mul(infDec.UnscaledBig(), pow10AbsScale)
 		resultBigFloat = new(big.Float).SetInt(resultBigInt)
 	} else {
@@ -632,6 +631,13 @@ func (q *Quantity) Sign() int {
 		return q.d.Dec.Sign()
 	}
 	return q.i.Sign()
+}
+
+func (q *Quantity) scale() int64 {
+	if q.d.Dec != nil {
+		return -int64(q.d.Dec.Scale())
+	}
+	return int64(q.i.scale)
 }
 
 // AsScale returns the current value, rounded up to the provided scale, and returns
