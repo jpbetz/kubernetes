@@ -527,7 +527,17 @@ func (q *Quantity) AsApproximateFloat64() float64 {
 	var exponent int
 	if q.d.Dec != nil {
 		base, _ = big.NewFloat(0).SetInt(q.d.Dec.UnscaledBig()).Float64()
-		exponent = int(-q.d.Dec.Scale())
+		if math.IsInf(base, 0) && q.d.Dec.Scale() > 0 {
+			return q.AsFloat64Slow()
+		}
+		exp := -int64(q.d.Dec.Scale())
+		if exp > math.MaxInt32 {
+			exponent = math.MaxInt32
+		} else if exp < math.MinInt32 {
+			exponent = math.MinInt32
+		} else {
+			exponent = int(exp)
+		}
 	} else {
 		base = float64(q.i.value)
 		exponent = int(q.i.scale)
@@ -546,25 +556,28 @@ func (q *Quantity) AsApproximateFloat64() float64 {
 // returned.
 func (q *Quantity) AsFloat64Slow() float64 {
 	infDec := q.internalReadOnlyDec()
-
-	var absScale int64
-	if infDec.Scale() < 0 {
-		absScale = int64(-infDec.Scale())
-	} else {
-		absScale = int64(infDec.Scale())
+	unscaled := infDec.UnscaledBig()
+	if unscaled.Sign() == 0 {
+		return 0
 	}
-	pow10AbsScale := big.NewInt(10)
-	pow10AbsScale = pow10AbsScale.Exp(pow10AbsScale, big.NewInt(absScale), nil)
 
-	var resultBigFloat *big.Float
-	if infDec.Scale() < 0 {
-		resultBigInt := new(big.Int).Mul(infDec.UnscaledBig(), pow10AbsScale)
-		resultBigFloat = new(big.Float).SetInt(resultBigInt)
-	} else {
-		pow10AbsScaleFloat := new(big.Float).SetInt(pow10AbsScale)
-		resultBigFloat = new(big.Float).SetInt(infDec.UnscaledBig())
-		resultBigFloat = resultBigFloat.Quo(resultBigFloat, pow10AbsScaleFloat)
+	scale := int64(infDec.Scale())
+	if scale < 0 {
+		if -scale > 308 {
+			return math.Inf(unscaled.Sign())
+		}
+		pow10AbsScale := new(big.Int).Exp(bigTen, big.NewInt(-scale), nil)
+		resultBigInt := new(big.Int).Mul(unscaled, pow10AbsScale)
+		result, _ := new(big.Float).SetInt(resultBigInt).Float64()
+		return result
 	}
+	if scale > int64(unscaled.BitLen())+325 {
+		return float64(unscaled.Sign()) * 0
+	}
+	pow10AbsScale := new(big.Int).Exp(bigTen, big.NewInt(scale), nil)
+	pow10AbsScaleFloat := new(big.Float).SetInt(pow10AbsScale)
+	resultBigFloat := new(big.Float).SetInt(unscaled)
+	resultBigFloat = resultBigFloat.Quo(resultBigFloat, pow10AbsScaleFloat)
 
 	result, _ := resultBigFloat.Float64()
 	return result
@@ -676,6 +689,12 @@ func (q *Quantity) Add(y Quantity) {
 		}
 	} else if q.IsZero() {
 		q.Format = y.Format
+		q.d.Dec = y.AsDec()
+		q.i = int64Amount{}
+		return
+	} else if y.IsZero() {
+		q.ToDec()
+		return
 	}
 	q.ToDec()
 	q.d.Dec = new(inf.Dec).Add(q.d.Dec, y.internalReadOnlyDec())
@@ -699,6 +718,15 @@ func (q *Quantity) Sub(y Quantity) {
 	if q.d.Dec == nil && y.d.Dec == nil && q.i.Sub(y.i) {
 		return
 	}
+	if q.IsZero() {
+		q.d.Dec = new(inf.Dec).Neg(y.internalReadOnlyDec())
+		q.i = int64Amount{}
+		return
+	}
+	if y.IsZero() {
+		q.ToDec()
+		return
+	}
 	q.ToDec()
 	q.d.Dec = new(inf.Dec).Sub(q.d.Dec, y.internalReadOnlyDec())
 }
@@ -711,6 +739,10 @@ func (q *Quantity) Mul(y int64) bool {
 		return true
 	}
 	q.ToDec()
+	if y == 0 {
+		q.d.Dec = inf.NewDec(0, 0)
+		return true
+	}
 	q.d.Dec = new(inf.Dec).Mul(q.d.Dec, inf.NewDec(y, inf.Scale(0)))
 	return q.d.Dec.UnscaledBig().IsInt64()
 }

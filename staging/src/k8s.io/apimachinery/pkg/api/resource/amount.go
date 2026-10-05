@@ -142,28 +142,30 @@ func (a int64Amount) AsScaledInt64(scale Scale) (result int64, ok bool) {
 
 // AsDec returns an inf.Dec representation of this value.
 func (a int64Amount) AsDec() *inf.Dec {
-	var base inf.Dec
-	base.SetUnscaled(a.value)
-	base.SetScale(inf.Scale(-a.scale))
-	return &base
+	if !a.scale.canInfScale() {
+		// inf.Scale(-math.MinInt32) overflows int32 back to math.MinInt32, which
+		// would flip the exponent from 10^-2147483648 to 10^+2147483648. Scale down
+		// one decimal place to the nearest representable inf.Scale (math.MaxInt32),
+		// rounding away from zero to match Quantity rounding semantics.
+		value, _ := negativeScaleInt64(a.value, 1)
+		return inf.NewDec(value, math.MaxInt32)
+	}
+	return inf.NewDec(a.value, a.scale.infScale())
 }
 
 // Cmp returns 0 if a and b are equal, 1 if a is greater than b, or -1 if a is less than b.
 func (a int64Amount) Cmp(b int64Amount) int {
 	switch {
-	case a.scale == b.scale:
+	case a.scale == b.scale || a.value == 0 || b.value == 0 || (a.value > 0) != (b.value > 0):
 		// compare only the unscaled portion
 	case a.scale > b.scale:
 		// Widen before subtracting: the difference of two int32 scales does not
 		// have to fit one, and a wrapped negative reaches a zero divisor.
 		diff := int64(a.scale) - int64(b.scale)
-		if diff >= 18 {
-			return cmpDec(a.AsDec(), b.AsDec())
+		if diff >= log10MaxInt64 {
+			return a.Sign()
 		}
-		result, remainder, exact := divideByScaleInt64(b.value, Scale(diff))
-		if !exact {
-			return cmpDec(a.AsDec(), b.AsDec())
-		}
+		result, remainder, _ := divideByScaleInt64(b.value, Scale(diff))
 		if result == a.value {
 			switch {
 			case remainder == 0:
@@ -177,13 +179,10 @@ func (a int64Amount) Cmp(b int64Amount) int {
 		b.value = result
 	default:
 		diff := int64(b.scale) - int64(a.scale)
-		if diff >= 18 {
-			return cmpDec(a.AsDec(), b.AsDec())
+		if diff >= log10MaxInt64 {
+			return -b.Sign()
 		}
-		result, remainder, exact := divideByScaleInt64(a.value, Scale(diff))
-		if !exact {
-			return cmpDec(a.AsDec(), b.AsDec())
-		}
+		result, remainder, _ := divideByScaleInt64(a.value, Scale(diff))
 		if result == b.value {
 			switch {
 			case remainder == 0:
@@ -334,13 +333,30 @@ func (a *int64Amount) Mul(b int64) bool {
 	return true
 }
 
+const (
+	// maxCanonicalExponent and minCanonicalExponent are the largest and smallest
+	// multiples of 3 that fit in int32.
+	maxCanonicalExponent = math.MaxInt32 - 1 // 2147483646
+	minCanonicalExponent = math.MinInt32 + 2 // -2147483646
+)
+
 // AsScale adjusts this amount to set a minimum scale, rounding up, and returns true iff no precision
 // was lost. (1.1e5).AsScale(5) would return 1.1e5, but (1.1e5).AsScale(6) would return 1e6.
 func (a int64Amount) AsScale(scale Scale) (int64Amount, bool) {
 	if a.scale >= scale {
 		return a, true
 	}
-	result, exact := negativeScaleInt64(a.value, scale-a.scale)
+	if a.value == 0 {
+		return int64Amount{scale: scale}, true
+	}
+	diff := int64(scale) - int64(a.scale)
+	if diff >= log10MaxInt64 {
+		if a.value > 0 {
+			return int64Amount{value: 1, scale: scale}, false
+		}
+		return int64Amount{value: -1, scale: scale}, false
+	}
+	result, exact := negativeScaleInt64(a.value, Scale(diff))
 	return int64Amount{value: result, scale: scale}, exact
 }
 
@@ -349,10 +365,19 @@ func (a int64Amount) AsScale(scale Scale) (int64Amount, bool) {
 // until the exponent is a multiple of 3 - i.e. 1.1e5 would return "110", 3.
 func (a int64Amount) AsCanonicalBytes(out []byte) (result []byte, exponent int32) {
 	mantissa := a.value
-	exponent = int32(a.scale)
-
 	amount, times := removeInt64Factors(mantissa, 10)
-	exponent += int32(times)
+	exp := int64(a.scale) + int64(times)
+	if exp > maxCanonicalExponent {
+		amount, ok := positiveScaleInt64(amount, Scale(exp-maxCanonicalExponent))
+		if !ok {
+			return infDecAmount{a.AsDec()}.AsCanonicalBytes(out)
+		}
+		return strconv.AppendInt(out, amount, 10), maxCanonicalExponent
+	}
+	if exp < minCanonicalExponent {
+		return strconv.AppendInt(out, amount, 10), int32(exp)
+	}
+	exponent = int32(exp)
 
 	// make sure exponent is a multiple of 3
 	var ok bool
@@ -394,6 +419,28 @@ type infDecAmount struct {
 // AsScale adjusts this amount to set a minimum scale, rounding up, and returns true iff no precision
 // was lost. (1.1e5).AsScale(5) would return 1.1e5, but (1.1e5).AsScale(6) would return 1e6.
 func (a infDecAmount) AsScale(scale Scale) (infDecAmount, bool) {
+	targetScale := int64(scale)
+	currentScale := -int64(a.Dec.Scale())
+	dif := targetScale - currentScale
+	if dif <= 0 {
+		if !scale.canInfScale() || -dif > 38 {
+			return infDecAmount{new(inf.Dec).Set(a.Dec)}, true
+		}
+		tmp := &inf.Dec{}
+		tmp.Round(a.Dec, scale.infScale(), inf.RoundUp)
+		return infDecAmount{tmp}, true
+	}
+	unscaled := a.Dec.UnscaledBig()
+	if unscaled.Sign() == 0 {
+		return infDecAmount{inf.NewDec(0, scale.infScale())}, true
+	}
+	if unscaled.IsInt64() {
+		result, exact := negativeScaleInt64(unscaled.Int64(), Scale(min(dif, log10MaxInt64)))
+		return infDecAmount{inf.NewDec(result, scale.infScale())}, exact
+	}
+	if dif >= int64(unscaled.BitLen()) {
+		return infDecAmount{inf.NewDec(int64(unscaled.Sign()), scale.infScale())}, false
+	}
 	tmp := &inf.Dec{}
 	tmp.Round(a.Dec, scale.infScale(), inf.RoundUp)
 	return infDecAmount{tmp}, tmp.Cmp(a.Dec) == 0
@@ -404,11 +451,19 @@ func (a infDecAmount) AsScale(scale Scale) (infDecAmount, bool) {
 // until the exponent is a multiple of 3 - i.e. 1.1e5 would return "110", 3.
 func (a infDecAmount) AsCanonicalBytes(out []byte) (result []byte, exponent int32) {
 	mantissa := a.Dec.UnscaledBig()
-	exponent = int32(-a.Dec.Scale())
 	amount := big.NewInt(0).Set(mantissa)
 	// move all factors of 10 into the exponent for easy reasoning
 	amount, times := removeBigIntFactors(amount, bigTen)
-	exponent += times
+	exp := -int64(a.Dec.Scale()) + int64(times)
+	if exp > maxCanonicalExponent {
+		scale := new(big.Int).Exp(bigTen, big.NewInt(exp-maxCanonicalExponent), nil)
+		amount.Mul(amount, scale)
+		return append(out, amount.String()...), maxCanonicalExponent
+	}
+	if exp < minCanonicalExponent {
+		return append(out, amount.String()...), int32(exp)
+	}
+	exponent = int32(exp)
 
 	// make sure exponent is a multiple of 3
 	for exponent%3 != 0 {
