@@ -737,20 +737,48 @@ func (q *Quantity) AsScale(scale Scale) (CanonicalValue, bool) {
 // least 1. False is returned if the rounding operation resulted in a loss of precision.
 // Negative numbers are rounded away from zero (-9 scale 1 rounds to -10).
 func (q *Quantity) RoundUp(scale Scale) bool {
+	// avoid clearing the string value if we have already calculated it
+	if q.widenedScale() >= widenScale(scale) {
+		q.dropStaleString()
+		return true
+	}
+	q.s = quantityString{}
 	if q.d.Dec != nil {
-		q.s = quantityString{}
 		d, exact := q.d.AsScale(scale)
 		q.d = d
 		return exact
 	}
-	// avoid clearing the string value if we have already calculated it
-	if q.i.scale >= scale {
-		return true
-	}
-	q.s = quantityString{}
 	i, exact := q.i.AsScale(scale)
 	q.i = i
 	return exact
+}
+
+// widenedScale returns the base-10 scale exponent as a widenedScale.
+func (q *Quantity) widenedScale() widenedScale {
+	if q.d.Dec != nil {
+		return q.d.widenedScale()
+	}
+	return q.i.widenedScale()
+}
+
+// dropStaleString clears a cached string that String should no longer return.
+// This detects if the string has become invalid, either by a change to the
+// Format field, which can be changed at will, or a conversion to inf.Dec.
+func (q *Quantity) dropStaleString() {
+	if len(q.s.str) == 0 {
+		return
+	}
+	if q.s.format != formatCodeUnknown && q.s.format == formatCodeOf(q.Format) {
+		// Non-canonical input is preserved as long as Format has not changed.
+		if q.s.rep == nonCanonical || q.s.rep == q.canonicalRepresentation() {
+			return
+		}
+	}
+	c := *q
+	c.s = quantityString{}
+	if c.String() != q.s.str {
+		q.s = quantityString{}
+	}
 }
 
 // Add adds the provide y quantity to the current value. If the current value is zero,
