@@ -94,7 +94,7 @@ func TestScaledValueSaturationAndRounding(t *testing.T) {
 		{"scale-down extreme neg rounds to minus one", big.NewInt(-7), 2000000000, 0, -1, true},
 		{"scale-down extreme zero", big.NewInt(0), 2000000000, 0, 0, true},
 	} {
-		got, ok := scaledValue(tc.unscaled, tc.scale, tc.newScale)
+		got, ok := scaledValue(tc.unscaled, -widenedScale(tc.scale), -widenedScale(tc.newScale))
 		if got != tc.want || ok != tc.wantOK {
 			t.Errorf("%s: scaledValue = (%d, %t), want (%d, %t)", tc.name, got, ok, tc.want, tc.wantOK)
 		}

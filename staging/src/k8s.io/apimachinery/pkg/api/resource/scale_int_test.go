@@ -74,7 +74,7 @@ func TestScaledValueInternal(t *testing.T) {
 
 	for i, tt := range tests {
 		old := (&big.Int{}).Set(tt.unscaled)
-		got, ok := scaledValue(tt.unscaled, tt.scale, tt.newScale)
+		got, ok := scaledValue(tt.unscaled, -widenedScale(tt.scale), -widenedScale(tt.newScale))
 		if got != tt.want {
 			t.Errorf("#%d: got = %v, want %v", i, got, tt.want)
 		}
@@ -90,7 +90,7 @@ func TestScaledValueInternal(t *testing.T) {
 func BenchmarkScaledValueSmall(b *testing.B) {
 	s := big.NewInt(1000)
 	for i := 0; i < b.N; i++ {
-		scaledValue(s, 3, 0)
+		scaledValue(s, -3, 0)
 	}
 }
 
@@ -98,6 +98,6 @@ func BenchmarkScaledValueLarge(b *testing.B) {
 	s := big.NewInt(math.MaxInt64)
 	s.Mul(s, big.NewInt(1000))
 	for i := 0; i < b.N; i++ {
-		scaledValue(s, 10, 0)
+		scaledValue(s, -10, 0)
 	}
 }

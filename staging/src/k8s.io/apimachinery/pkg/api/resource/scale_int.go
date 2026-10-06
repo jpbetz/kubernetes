@@ -40,21 +40,20 @@ func init() {
 // negativeScaleInt64. ok is false when the true value overflows int64, and then
 // the result saturates to mostNegative or mostPositive.
 //
-// scale, newScale represent the scale of the unscaled decimal.
-// The mathematical value of the decimal is unscaled * 10**(-scale).
-func scaledValue(unscaled *big.Int, scale, newScale int64) (int64, bool) {
-	dif := scale - newScale
-	if dif == 0 {
+// The mathematical value of the decimal is unscaled * 10**scale.
+func scaledValue(unscaled *big.Int, scale, newScale widenedScale) (int64, bool) {
+	delta := scale - newScale
+	if delta == 0 {
 		return bigToInt64Saturated(unscaled)
 	}
 
-	// Scale up: multiply by 10^(-dif). No case here needs a big.Int.
-	if dif < 0 {
+	// Scale up: multiply by 10^delta. No case here needs a big.Int.
+	if delta > 0 {
 		if unscaled.Sign() == 0 {
 			return 0, true
 		}
-		// Bound dif before Scale(-dif) narrows it: 2^32 would come back as 0.
-		if dif <= -log10MaxInt64 {
+		// Bound delta before Scale(delta) narrows it: 2^32 would come back as 0.
+		if delta >= log10MaxInt64 {
 			if unscaled.Sign() < 0 {
 				return mostNegative, false
 			}
@@ -67,10 +66,11 @@ func scaledValue(unscaled *big.Int, scale, newScale int64) (int64, bool) {
 			}
 			return mostPositive, false
 		}
-		return positiveScaleInt64(unscaled.Int64(), Scale(-dif))
+		return positiveScaleInt64(unscaled.Int64(), Scale(delta))
 	}
 
 	// Scale down: divide by 10^dif, rounding the quotient away from zero.
+	dif := int64(-delta)
 
 	// Fast path when unscaled fits int64 and the divisor stays below it. The
 	// quotient is then strictly smaller in magnitude, so it cannot overflow.

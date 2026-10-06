@@ -26,6 +26,8 @@ import (
 
 // Scale is used for getting and setting the base-10 scaled value.
 // Base-2 scales are omitted for mathematical simplicity.
+// Note that Scale is the opposite of inf.Scale, which counts digits
+// after the decimal point.
 // See Quantity.ScaledValue for more details.
 type Scale int32
 
@@ -53,6 +55,10 @@ func (s Scale) canAlignInfScale(other Scale) bool {
 	delta := int64(s) - int64(other)
 	return delta >= -int64(math.MaxInt32) && delta <= int64(math.MaxInt32)
 }
+
+// widenedScale is a Scale widened to int64, so it also holds a negated
+// inf.Scale and the difference of two scales without overflow.
+type widenedScale int64
 
 const (
 	Nano  Scale = -9
@@ -117,8 +123,7 @@ func (a int64Amount) AsScaledInt64(scale Scale) (result int64, ok bool) {
 	if a.value == 0 {
 		return 0, true
 	}
-	// Widen first: the delta of two int32 scales can need 33 bits.
-	delta := int64(a.scale) - int64(scale)
+	delta := a.widenedScale() - widenedScale(scale)
 	if delta < 0 {
 		// Scaling down past 10^-log10MaxInt64 leaves only the rounding unit.
 		if delta <= -log10MaxInt64 {
@@ -207,12 +212,12 @@ func (a int64Amount) Cmp(b int64Amount) int {
 	}
 }
 
-// decimalExponentBounds brackets the e for which 10^(e-1) <= |c|*10^-s < 10^e,
+// decimalExponentBounds brackets the e for which 10^(e-1) <= |c|*10^s < 10^e,
 // for a non-zero c. An n-bit magnitude has at least n/4 and at most n/3+1
 // decimal digits, so neither bound has to count them.
-func decimalExponentBounds(bitLen int, s int64) (lo, hi int64) {
-	n := int64(bitLen)
-	return n/4 - s, n/3 + 1 - s
+func decimalExponentBounds(bitLen int, s widenedScale) (lo, hi widenedScale) {
+	n := widenedScale(bitLen)
+	return n/4 + s, n/3 + 1 + s
 }
 
 // cmpDec compares x and y. inf.Dec.Cmp aligns the two scales by writing their
@@ -229,8 +234,8 @@ func cmpDec(x, y *inf.Dec) int {
 	case xSign == 0:
 		return 0
 	}
-	xLo, xHi := decimalExponentBounds(x.UnscaledBig().BitLen(), int64(x.Scale()))
-	yLo, yHi := decimalExponentBounds(y.UnscaledBig().BitLen(), int64(y.Scale()))
+	xLo, xHi := decimalExponentBounds(x.UnscaledBig().BitLen(), infDecAmount{x}.widenedScale())
+	yLo, yHi := decimalExponentBounds(y.UnscaledBig().BitLen(), infDecAmount{y}.widenedScale())
 	switch {
 	case xLo > yHi:
 		return xSign
@@ -344,6 +349,11 @@ func (a int64Amount) AsScale(scale Scale) (int64Amount, bool) {
 	return int64Amount{value: result, scale: scale}, exact
 }
 
+// widenedScale returns the base-10 scale exponent as a widenedScale.
+func (a int64Amount) widenedScale() widenedScale {
+	return widenedScale(a.scale)
+}
+
 // AsCanonicalBytes accepts a buffer to write the base-10 string value of this field to, and returns
 // either that buffer or a larger buffer and the current exponent of the value. The value is adjusted
 // until the exponent is a multiple of 3 - i.e. 1.1e5 would return "110", 3.
@@ -397,6 +407,11 @@ func (a infDecAmount) AsScale(scale Scale) (infDecAmount, bool) {
 	tmp := &inf.Dec{}
 	tmp.Round(a.Dec, scale.infScale(), inf.RoundUp)
 	return infDecAmount{tmp}, tmp.Cmp(a.Dec) == 0
+}
+
+// widenedScale returns the base-10 scale exponent as a widenedScale.
+func (a infDecAmount) widenedScale() widenedScale {
+	return -widenedScale(a.Dec.Scale())
 }
 
 // AsCanonicalBytes accepts a buffer to write the base-10 string value of this field to, and returns
