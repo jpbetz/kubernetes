@@ -453,7 +453,7 @@ func TestQuantityParse(t *testing.T) {
 			t.Errorf("%v: unexpected error: %v", item.input, err)
 			continue
 		}
-		if got.s == "" {
+		if got.s.str == "" {
 			t.Errorf("%v: cached string was not set by ParseQuantity as it should have been", item.input)
 		}
 		gotString := got.String()
@@ -757,7 +757,7 @@ func TestQuantityRoundUp(t *testing.T) {
 					// populate the string cache before rounding
 					got.CacheString()
 				} else {
-					got.s = ""
+					got.s = quantityString{}
 				}
 				cachedString := got.s
 				if ok := got.RoundUp(item.scale); ok != item.ok {
@@ -790,7 +790,7 @@ func TestQuantityRoundUp(t *testing.T) {
 						t.Errorf("%s(%d,%t,%t): unexpected int64 scale: %d vs %d", item.in, item.scale, asDec, cached, got.i.scale, want)
 					}
 					if parsedScale >= item.scale && got.s != cachedString {
-						t.Errorf("%s(%d,%t,%t): RoundUp left the value unchanged but changed the cached string from %q to %q", item.in, item.scale, asDec, cached, cachedString, got.s)
+						t.Errorf("%s(%d,%t,%t): RoundUp left the value unchanged but changed the cached string from %+v to %+v", item.in, item.scale, asDec, cached, cachedString, got.s)
 					}
 				}
 			}
@@ -1236,6 +1236,37 @@ func TestQuantityRoundUpKnownGaps(t *testing.T) {
 	}
 }
 
+func TestParseQuantityRecordsWhetherInputIsCanonical(t *testing.T) {
+	// The cached string's representation says whether String would write it, so two
+	// Quantities holding the same value and string compare equal however the
+	// string was cached.
+	var inputs []string
+	for _, sign := range []string{"", "+", "-"} {
+		for _, zeros := range []string{"", "0", "00"} {
+			for _, digits := range []string{"1", "5", "7", "15", "123", "150", "1500"} {
+				for _, point := range []string{"", ".", ".0", ".5", ".500"} {
+					for _, suffix := range []string{"", "n", "u", "m", "k", "M", "G", "T", "P", "E", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei",
+						"e3", "E3", "e+3", "e03", "e0", "e-3", "e-03", "e-9", "E-9", "e6", "e18", "e4294967299"} {
+						inputs = append(inputs, sign+zeros+digits+point+suffix)
+					}
+				}
+			}
+		}
+	}
+	inputs = append(inputs, "0", "+0", "-0", "0Ki", "00", "0.0")
+	for _, in := range inputs {
+		q, err := ParseQuantity(in)
+		if err != nil || len(q.s.str) == 0 {
+			continue
+		}
+		fresh := q
+		fresh.s = quantityString{}
+		if wrote := fresh.String() == q.s.str; wrote != (q.s.rep != nonCanonical) {
+			t.Errorf("ParseQuantity(%q) cached %q with representation %d, but String writes %q", in, q.s.str, q.s.rep, fresh.String())
+		}
+	}
+}
+
 func TestQuantityCmpInt64AndDec(t *testing.T) {
 	table := []struct {
 		a, b Quantity
@@ -1354,7 +1385,7 @@ type quantityState struct {
 	dec      *inf.Dec
 	unscaled string
 	scale    inf.Scale
-	s        string
+	s        quantityString
 	format   Format
 }
 
@@ -1800,8 +1831,8 @@ func TestQuantityString(t *testing.T) {
 		if err != nil {
 			t.Errorf("%#v: unexpected error: %v", item.expect, err)
 		}
-		if len(q.s) == 0 || q.s != item.expect {
-			t.Errorf("%#v: did not copy canonical string on parse: %s", item.expect, q.s)
+		if len(q.s.str) == 0 || q.s.str != item.expect {
+			t.Errorf("%#v: did not copy canonical string on parse: %s", item.expect, q.s.str)
 		}
 		if len(item.alternate) == 0 {
 			continue
@@ -1813,8 +1844,8 @@ func TestQuantityString(t *testing.T) {
 		}
 		// ParseQuantity always canonicalizes and caches the string form itself now,
 		// since String() no longer mutates the receiver.
-		if len(q.s) == 0 || q.s != item.expect {
-			t.Errorf("%#v: did not set canonical string on parse: %s", item.expect, q.s)
+		if len(q.s.str) == 0 || q.s.str != item.expect {
+			t.Errorf("%#v: did not set canonical string on parse: %s", item.expect, q.s.str)
 		}
 		if q.String() != item.expect {
 			t.Errorf("%#v: unexpected alternate canonical: %v", item.expect, q.String())
@@ -1887,14 +1918,14 @@ func TestBinarySIZeroExponentString(t *testing.T) {
 
 func TestQuantityCacheString(t *testing.T) {
 	q := decQuantity(1000, 6, DecimalSI) // canonicalizes to "1G", built without a cached string
-	if len(q.s) != 0 {
-		t.Fatalf("expected no cached string yet, got %q", q.s)
+	if len(q.s.str) != 0 {
+		t.Fatalf("expected no cached string yet, got %q", q.s.str)
 	}
 	if s := q.CacheString(); s != "1G" {
 		t.Errorf("CacheString() = %q, expected %q", s, "1G")
 	}
-	if q.s != "1G" {
-		t.Errorf("CacheString() did not populate q.s, got %q", q.s)
+	if q.s.str != "1G" {
+		t.Errorf("CacheString() did not populate q.s, got %q", q.s.str)
 	}
 	// calling again with an already-populated cache must return the cached value unchanged
 	if s := q.CacheString(); s != "1G" {
@@ -3899,7 +3930,7 @@ func BenchmarkQuantityString(b *testing.B) {
 	for _, q := range benchmarkQuantities() {
 		b.Run(q.String(), func(b *testing.B) {
 			for b.Loop() {
-				q.s = ""
+				q.s = quantityString{}
 				if len(q.String()) == 0 {
 					b.Fatal(q)
 				}
@@ -3913,7 +3944,7 @@ func BenchmarkQuantityStringBinarySI(b *testing.B) {
 		q.Format = BinarySI
 		b.Run(q.String(), func(b *testing.B) {
 			for b.Loop() {
-				q.s = ""
+				q.s = quantityString{}
 				if len(q.String()) == 0 {
 					b.Fatal(q)
 				}
@@ -3926,7 +3957,7 @@ func BenchmarkQuantityMarshalJSON(b *testing.B) {
 	for _, q := range benchmarkQuantities() {
 		b.Run(q.String(), func(b *testing.B) {
 			for b.Loop() {
-				q.s = ""
+				q.s = quantityString{}
 				if _, err := q.MarshalJSON(); err != nil {
 					b.Fatal(err)
 				}

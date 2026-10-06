@@ -118,11 +118,101 @@ type Quantity struct {
 	// d is the quantity in inf.Dec form if d.Dec != nil
 	d infDecAmount
 	// s is the generated value of this quantity to avoid recalculation
-	s string
+	s quantityString
 
 	// Change Format at will. See the comment for Canonicalize for
 	// more details.
 	Format
+}
+
+// quantityString is a string representation of a Quantity's value.
+type quantityString struct {
+	// str is the string representation.
+	str string
+
+	// format tracks the format of the string. Note that while Quantity also has
+	// a Format field, it can be changed at any time, and will not match this
+	// value if it is changed.
+	format formatCode
+
+	// rep tracks if this string was created in a canonical form, and if so,
+	// which form was used.
+	rep representation
+}
+
+// formatCode identifies a Format in a compact byte representation.
+type formatCode uint8
+
+const (
+	formatCodeUnknown formatCode = iota
+	formatCodeDecimalExponent
+	formatCodeBinarySI
+	formatCodeDecimalSI
+)
+
+func formatCodeOf(format Format) formatCode {
+	switch format {
+	case DecimalExponent:
+		return formatCodeDecimalExponent
+	case BinarySI:
+		return formatCodeBinarySI
+	case DecimalSI:
+		return formatCodeDecimalSI
+	}
+	return formatCodeUnknown
+}
+
+// representation tracks if the string is the canonical serialization of an int64
+// or inf.Dec value, or a non-canonical ParseQuantity input.
+type representation uint8
+
+const (
+	// nonCanonical identifies a ParseQuantity input that String would write
+	// differently. ParseQuantity preserves the input as typed. For example,
+	// signs might be preserved as seen in "+1e-3" or "5E+3".
+	nonCanonical representation = iota
+	// int64Canonical identifies the canonical serialization of an int64 value.
+	int64Canonical
+	// decCanonical identifies the canonical serialization of an inf.Dec value.
+	decCanonical
+)
+
+// canonicalRepresentation returns the representation of a string that String
+// writes for q now: int64Canonical or decCanonical, depending on which form
+// holds the value.
+func (q *Quantity) canonicalRepresentation() representation {
+	if q.d.Dec != nil {
+		return decCanonical
+	}
+	return int64Canonical
+}
+
+// parsedString records str, an input ParseQuantity parsed as format into an
+// int64 value. canonical reports whether String would write str for that value.
+func parsedString(str string, format Format, canonical bool) quantityString {
+	rep := nonCanonical
+	if canonical {
+		rep = int64Canonical
+	}
+	return quantityString{str: str, format: formatCodeOf(format), rep: rep}
+}
+
+// isCanonicalInput reports whether String would write str, an input that
+// ParseQuantity keeps as typed, for the value it parsed. num and suf are the
+// parsed numerator and suffix. Keeping an input already requires the digits and
+// scale String writes, so only the spelling can differ.
+func isCanonicalInput(str, num, suf string, exponent int32, format Format) bool {
+	// Rules out a "+" sign, leading zeros and a decimal point.
+	if strings.TrimPrefix(str[:len(str)-len(suf)], "-") != num {
+		return false
+	}
+	// DecimalSI and BinarySI spell each exponent one way. DecimalExponent also
+	// accepts "E", "+", leading zeros and "e0".
+	if format != DecimalExponent {
+		return true
+	}
+	var buf [12]byte
+	return exponent != 0 && string(strconv.AppendInt(append(buf[:0], 'e'), int64(exponent), 10)) == suf
 }
 
 // CanonicalValue allows a quantity amount to be converted to a string.
@@ -292,7 +382,7 @@ func ParseQuantity(str string) (Quantity, error) {
 		return Quantity{}, ErrFormatWrong
 	}
 	if str == "0" {
-		return Quantity{Format: DecimalSI, s: str}, nil
+		return Quantity{Format: DecimalSI, s: parsedString(str, DecimalSI, true)}, nil
 	}
 
 	positive, value, num, denom, suf, err := parseQuantityString(str)
@@ -359,11 +449,11 @@ func ParseQuantity(str string) (Quantity, error) {
 						switch format {
 						case BinarySI:
 							if !forceRecanonicalize && exponent%10 == 0 && (value&0x07 != 0) {
-								return Quantity{i: int64Amount{value: result, scale: Scale(scale)}, Format: format, s: str}, nil
+								return Quantity{i: int64Amount{value: result, scale: Scale(scale)}, Format: format, s: parsedString(str, format, isCanonicalInput(str, num, suf, exponent, format))}, nil
 							}
 						default:
 							if !forceRecanonicalize && scale%3 == 0 && !strings.HasSuffix(shifted, "000") && shifted[0] != '0' {
-								return Quantity{i: int64Amount{value: result, scale: Scale(scale)}, Format: format, s: str}, nil
+								return Quantity{i: int64Amount{value: result, scale: Scale(scale)}, Format: format, s: parsedString(str, format, isCanonicalInput(str, num, suf, exponent, format))}, nil
 							}
 						}
 						q := Quantity{i: int64Amount{value: result, scale: Scale(scale)}, Format: format}
@@ -648,7 +738,7 @@ func (q *Quantity) AsScale(scale Scale) (CanonicalValue, bool) {
 // Negative numbers are rounded away from zero (-9 scale 1 rounds to -10).
 func (q *Quantity) RoundUp(scale Scale) bool {
 	if q.d.Dec != nil {
-		q.s = ""
+		q.s = quantityString{}
 		d, exact := q.d.AsScale(scale)
 		q.d = d
 		return exact
@@ -657,7 +747,7 @@ func (q *Quantity) RoundUp(scale Scale) bool {
 	if q.i.scale >= scale {
 		return true
 	}
-	q.s = ""
+	q.s = quantityString{}
 	i, exact := q.i.AsScale(scale)
 	q.i = i
 	return exact
@@ -666,7 +756,7 @@ func (q *Quantity) RoundUp(scale Scale) bool {
 // Add adds the provide y quantity to the current value. If the current value is zero,
 // the format of the quantity will be updated to the format of y.
 func (q *Quantity) Add(y Quantity) {
-	q.s = ""
+	q.s = quantityString{}
 	if q.d.Dec == nil && y.d.Dec == nil {
 		if q.i.value == 0 {
 			q.Format = y.Format
@@ -684,7 +774,7 @@ func (q *Quantity) Add(y Quantity) {
 // Sub subtracts the provided quantity from the current value in place. If the current
 // value is zero, the format of the quantity will be updated to the format of y.
 func (q *Quantity) Sub(y Quantity) {
-	q.s = ""
+	q.s = quantityString{}
 	if q.IsZero() {
 		q.Format = y.Format
 	}
@@ -706,7 +796,7 @@ func (q *Quantity) Sub(y Quantity) {
 // Mul multiplies the provided y to the current value.
 // It will return false if the result is inexact. Otherwise, it will return true.
 func (q *Quantity) Mul(y int64) bool {
-	q.s = ""
+	q.s = quantityString{}
 	if q.d.Dec == nil && q.i.Mul(y) {
 		return true
 	}
@@ -736,7 +826,7 @@ func (q *Quantity) CmpInt64(y int64) int {
 
 // Neg sets quantity to be the negative value of itself.
 func (q *Quantity) Neg() {
-	q.s = ""
+	q.s = quantityString{}
 	if q.d.Dec == nil {
 		// -mostNegative overflows int64 and switches to inf.Dec, unless its scale
 		// can't be represented there, in which case it keeps the wrapped result.
@@ -771,12 +861,12 @@ func (q *Quantity) String() string {
 	if q == nil {
 		return "<nil>"
 	}
-	if len(q.s) == 0 {
+	if len(q.s.str) == 0 {
 		result := make([]byte, 0, int64QuantityExpectedBytes)
 		number, suffix := q.CanonicalizeBytes(result)
 		return string(append(number, suffix...))
 	}
-	return q.s
+	return q.s.str
 }
 
 // CacheString formats the Quantity as a string, same as String, but also
@@ -788,20 +878,24 @@ func (q *Quantity) CacheString() string {
 	if q == nil {
 		return "<nil>"
 	}
+	s := q.s
+	if len(s.str) == 0 {
+		s = quantityString{str: q.String(), format: formatCodeOf(q.Format), rep: q.canonicalRepresentation()}
+	}
 	// This intentionally *always* writes the value back:
 	// it's unnecessary when it was already set, but writing anyway
 	// ensures that data races related to calling CacheString
 	// are more likely to be reported, regardless of the state of the instance.
-	q.s = q.String()
-	return q.s
+	q.s = s
+	return s.str
 }
 
 // MarshalJSON implements the json.Marshaller interface.
 func (q Quantity) MarshalJSON() ([]byte, error) {
-	if len(q.s) > 0 {
-		out := make([]byte, len(q.s)+2)
+	if len(q.s.str) > 0 {
+		out := make([]byte, len(q.s.str)+2)
 		out[0], out[len(out)-1] = '"', '"'
-		copy(out[1:], q.s)
+		copy(out[1:], q.s.str)
 		return out, nil
 	}
 	result := make([]byte, int64QuantityExpectedBytes)
@@ -968,7 +1062,7 @@ func (q *Quantity) SetMilli(value int64) {
 
 // SetScaled sets q's value to be value * 10^scale
 func (q *Quantity) SetScaled(value int64, scale Scale) {
-	q.s = ""
+	q.s = quantityString{}
 	q.d.Dec = nil
 	q.i = int64Amount{value: value, scale: scale}
 }
