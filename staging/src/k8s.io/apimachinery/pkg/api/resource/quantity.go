@@ -946,7 +946,7 @@ func (q *Quantity) AsScaledInt64(scale Scale) (value int64, ok bool) {
 	if q.d.Dec == nil {
 		return q.i.AsScaledInt64(scale)
 	}
-	return scaledValue(q.d.Dec.UnscaledBig(), q.d.widenedScale(), widenedScale(scale))
+	return scaledValue(q.d.Dec.UnscaledBig(), q.d.widenedScale(), widenScale(scale))
 }
 
 // AsMilliInt64 returns the value of q*1000 as an int64, rounded away from zero.
