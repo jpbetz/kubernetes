@@ -132,6 +132,11 @@ func TestQuantityAsScale(t *testing.T) {
 		{intQuantity(1, math.MinInt32+1, DecimalSI), math.MinInt32, intQuantity(1, math.MinInt32+1, DecimalSI), true},
 		{intQuantity(1, math.MaxInt32, DecimalSI), math.MinInt32, intQuantity(1, math.MaxInt32, DecimalSI), true},
 		{*NewDecimalQuantity(*inf.NewDec(5, math.MinInt32), DecimalSI), math.MinInt32, *NewDecimalQuantity(*inf.NewDec(5, math.MinInt32), DecimalSI), true},
+		{intQuantity(5, 0, DecimalSI), math.MinInt32 + 1, intQuantity(5, 0, DecimalSI), true},
+		{intQuantity(5, 0, DecimalSI), math.MaxInt32, intQuantity(1, math.MaxInt32, DecimalSI), false},
+		{intQuantity(5, math.MinInt32+1, DecimalSI), 0, intQuantity(1, 0, DecimalSI), false},
+		{intQuantity(-5, math.MinInt32+1, DecimalSI), 0, intQuantity(-1, 0, DecimalSI), false},
+		{intQuantity(0, math.MinInt32+1, DecimalSI), 0, intQuantity(0, 0, DecimalSI), true},
 	} {
 		format := func(d *inf.Dec) string { return fmt.Sprintf("%v*10^%d", d.UnscaledBig(), -int64(d.Scale())) }
 		want := tc.want.AsDec()
@@ -154,6 +159,30 @@ func TestQuantityAsScale(t *testing.T) {
 			if got.Cmp(want) != 0 || ok != tc.ok {
 				t.Errorf("%s (asDec=%t) = (%s, %t), want (%s, %t)", tc.in.String(), asDec, format(got), ok, format(want), tc.ok)
 			}
+		}
+	}
+}
+
+// TestQuantityRoundUpDecAtScaleLimits checks RoundUp on the inf.Dec form when
+// the value is less than one unit of the requested scale.
+func TestQuantityRoundUpDecAtScaleLimits(t *testing.T) {
+	format := func(d *inf.Dec) string { return fmt.Sprintf("%v*10^%d", d.UnscaledBig(), -int64(d.Scale())) }
+	for _, tc := range []struct {
+		in    Quantity
+		scale Scale
+		want  string
+		ok    bool
+	}{
+		{*NewScaledQuantity(1, -math.MaxInt32), 1, "1*10^1", false},
+		{*NewScaledQuantity(5, math.MinInt32+2), 2, "1*10^2", false},
+		{*NewScaledQuantity(5, math.MinInt32+1), math.MaxInt32, "1*10^2147483647", false},
+		{*NewDecimalQuantity(*inf.NewDec(5, math.MaxInt32-1), DecimalSI), math.MaxInt32 - 1, "1*10^2147483646", false},
+	} {
+		q := tc.in.DeepCopy()
+		q.ToDec()
+		ok := q.RoundUp(tc.scale)
+		if got := format(q.AsDec()); got != tc.want || ok != tc.ok {
+			t.Errorf("%s RoundUp(%d) = (%s, %t), want (%s, %t)", format(tc.in.AsDec()), tc.scale, got, ok, tc.want, tc.ok)
 		}
 	}
 }
