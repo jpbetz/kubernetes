@@ -17,6 +17,7 @@ limitations under the License.
 package resource
 
 import (
+	"fmt"
 	"math"
 	"testing"
 
@@ -110,6 +111,48 @@ func TestParseQuantityEmitAtScaleLimits(t *testing.T) {
 				if got := q.String(); got != sign+tc.want {
 					t.Errorf("ParseQuantity(%q) (asDec=%t): String() = %q, want %q", sign+tc.in, asDec, got, sign+tc.want)
 				}
+			}
+		}
+	}
+}
+
+func TestQuantityAsScale(t *testing.T) {
+	for _, tc := range []struct {
+		in    Quantity
+		scale Scale
+		want  Quantity
+		ok    bool
+	}{
+		{intQuantity(1500, Milli, DecimalSI), Milli, intQuantity(1500, Milli, DecimalSI), true},
+		{intQuantity(1500, Milli, DecimalSI), 0, intQuantity(2, 0, DecimalSI), false},
+		{intQuantity(-1500, Milli, DecimalSI), 0, intQuantity(-2, 0, DecimalSI), false},
+		{intQuantity(5, 0, DecimalSI), math.MinInt32, intQuantity(5, 0, DecimalSI), true},
+		{intQuantity(-5, 0, DecimalSI), math.MinInt32, intQuantity(-5, 0, DecimalSI), true},
+		{intQuantity(0, 0, DecimalSI), math.MinInt32, intQuantity(0, 0, DecimalSI), true},
+		{intQuantity(1, math.MinInt32+1, DecimalSI), math.MinInt32, intQuantity(1, math.MinInt32+1, DecimalSI), true},
+		{intQuantity(1, math.MaxInt32, DecimalSI), math.MinInt32, intQuantity(1, math.MaxInt32, DecimalSI), true},
+		{*NewDecimalQuantity(*inf.NewDec(5, math.MinInt32), DecimalSI), math.MinInt32, *NewDecimalQuantity(*inf.NewDec(5, math.MinInt32), DecimalSI), true},
+	} {
+		format := func(d *inf.Dec) string { return fmt.Sprintf("%v*10^%d", d.UnscaledBig(), -int64(d.Scale())) }
+		want := tc.want.AsDec()
+		for _, asDec := range []bool{false, true} {
+			q := tc.in.DeepCopy()
+			if asDec {
+				q.ToDec()
+			}
+			result, ok := q.AsScale(tc.scale)
+			var got *inf.Dec
+			switch v := result.(type) {
+			case int64Amount:
+				got = v.AsDec()
+			case infDecAmount:
+				if v.Dec == q.d.Dec {
+					t.Errorf("%s (asDec=%t): AsScale returned the receiver's inf.Dec, want a copy", tc.in.String(), asDec)
+				}
+				got = v.Dec
+			}
+			if got.Cmp(want) != 0 || ok != tc.ok {
+				t.Errorf("%s (asDec=%t) = (%s, %t), want (%s, %t)", tc.in.String(), asDec, format(got), ok, format(want), tc.ok)
 			}
 		}
 	}
