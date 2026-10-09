@@ -441,11 +441,21 @@ func ParseQuantity(str string) (Quantity, error) {
 	// So that no one but us has to think about suffixes, remove it.
 	if base == 10 {
 		if exponent == math.MinInt32 && amount.Sign() != 0 {
-			// inf.Dec negates the scale to apply it, which this value
-			// cannot survive, so the quantity has no representation here.
+			// e2147483648 narrows to this exponent. Reject it rather than
+			// parse that huge value as 1n. This also rejects e-2147483648.
 			return Quantity{}, ErrSuffix
 		}
-		amount.SetScale(amount.Scale() + Scale(exponent).infScale())
+		// For 1.5e-100, amountScale is -1, exponent is -100, effectiveScale is -101.
+		amountScale := widenInfScale(amount.Scale()) // never positive
+		effectiveScale, fits := narrowScale(amountScale + widenScale(Scale(exponent)))
+		if !fits || !effectiveScale.canInfScale() {
+			// effectiveScale is too small to be represented directly, so we
+			// short circuit and round to nanos and then apply the exponent.
+			rounded, _ := infDecAmount{amount}.AsScale(Nano - Scale(exponent))
+			amount = rounded.Dec
+			effectiveScale = Nano
+		}
+		amount.SetScale(effectiveScale.infScale())
 	} else if base == 2 {
 		// numericSuffix = 2 ** exponent
 		numericSuffix := big.NewInt(1).Lsh(bigOne, uint(exponent))
@@ -464,7 +474,10 @@ func ParseQuantity(str string) (Quantity, error) {
 	// of an amount.  Arguably, this should be inf.RoundHalfUp (normal rounding), but that would have
 	// the side effect of rounding values < .5n to zero.
 	if v, ok := amount.Unscaled(); v != int64(0) || !ok {
-		amount.Round(amount, Nano.infScale(), inf.RoundUp)
+		// AsScale rounds away from zero, leaving a value with Scale that is
+		// already Nano or above unchanged, matching the int64 fast path.
+		rounded, _ := infDecAmount{amount}.AsScale(Nano)
+		amount = rounded.Dec
 	}
 
 	// The max is just a simple cap.

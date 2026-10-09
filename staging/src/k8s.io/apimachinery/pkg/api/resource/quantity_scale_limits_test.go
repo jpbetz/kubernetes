@@ -98,6 +98,10 @@ func TestParseQuantityEmitAtScaleLimits(t *testing.T) {
 		{"10e2147483647", "100e2147483646"},
 		{"1000e2147483646", "1000e2147483646"},
 		{"10000e2147483646", "10000e2147483646"},
+		{"1234567890123456789012e2147483647", "12345678901234567890120e2147483646"}, // Scale math.MaxInt32, over 19 digits to skip the int64 fast path
+		{"1e-2147483647", "1e-9"},                                                   // Scale math.MinInt32+1
+		{"1.5e-2147483647", "1e-9"},                                                 // Scale math.MinInt32, reached through one fraction digit
+		{"1.234567890123456789012e-2147483647", "1e-9"},                             // Scale below the int32 range, over 19 digits to skip the int64 fast path
 	} {
 		for _, sign := range []string{"", "-"} {
 			for _, asDec := range []bool{false, true} {
