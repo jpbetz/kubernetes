@@ -737,6 +737,9 @@ func (q *Quantity) widenedScale() widenedScale {
 // Add adds the provide y quantity to the current value. If the current value is zero,
 // the format of the quantity will be updated to the format of y.
 //
+// The sum is exact when it has at most 38 significant digits. Otherwise it is
+// rounded away from zero to 38 significant digits.
+//
 // This function is unsafe to call concurrently with method calls from other
 // goroutines (even to read-only methods).
 func (q *Quantity) Add(y Quantity) {
@@ -752,11 +755,14 @@ func (q *Quantity) Add(y Quantity) {
 		q.Format = y.Format
 	}
 	q.ToDec()
-	q.d.Dec = new(inf.Dec).Add(q.d.Dec, y.internalReadOnlyDec())
+	q.d.Dec = addDec(q.d.Dec, y.internalReadOnlyDec(), false)
 }
 
 // Sub subtracts the provided quantity from the current value in place. If the current
 // value is zero, the format of the quantity will be updated to the format of y.
+//
+// The difference is exact when it has at most 38 significant digits. Otherwise
+// it is rounded away from zero to 38 significant digits.
 //
 // This function is unsafe to call concurrently with method calls from other
 // goroutines (even to read-only methods).
@@ -777,7 +783,7 @@ func (q *Quantity) Sub(y Quantity) {
 		return
 	}
 	q.ToDec()
-	q.d.Dec = new(inf.Dec).Sub(q.d.Dec, y.internalReadOnlyDec())
+	q.d.Dec = addDec(q.d.Dec, y.internalReadOnlyDec(), true)
 }
 
 // Mul multiplies the provided y to the current value.
