@@ -77,6 +77,13 @@ func TestQuantityStringAtScaleLimits(t *testing.T) {
 		// 2147483646 is the largest multiple of 3 that fits in an int32, so the
 		// exponent stops there and the extra zeros stay in the mantissa.
 		{*NewDecimalQuantity(*inf.NewDec(100, math.MinInt32), DecimalExponent), false, "10000e2147483646"},
+		// 2e69 is 1024^7 * 5^69 but has Scale 69, so it still reaches the
+		// base-1024 formatting rather than CanonicalizeBytes' Scale 70 branch.
+		{decQuantity(2, 69, BinarySI), false, "2e69"},
+		{intQuantity(2, 69, BinarySI), false, "2e69"},
+		{decQuantity(1, math.MaxInt32, BinarySI), false, "10e2147483646"},
+		{intQuantity(1, math.MaxInt32, BinarySI), false, "10e2147483646"},
+		{*NewDecimalQuantity(*inf.NewDec(1, math.MinInt32), BinarySI), false, "100e2147483646"},
 	} {
 		q := tc.in.DeepCopy()
 		if tc.toDec {
@@ -280,6 +287,24 @@ func TestQuantityAddSubZeroScale(t *testing.T) {
 					t.Errorf("%s (xDec=%t, yDec=%t): AsDec().Scale() = %d, want %d", tc.name, xDec, yDec, got, tc.scale)
 				}
 			}
+		}
+	}
+}
+
+// From Scale 70, CanonicalizeBytes writes every non-zero BinarySI value in
+// exponent notation. Below that, whether a value has a suffix depends on its
+// coefficient: 10^69 is 1024^6 * 2^9 * 5^69, so it still gets "Ei". It isn't a
+// TestQuantityString row because ParseQuantity caps BinarySI at the int64
+// maximum, so its string doesn't round-trip.
+func TestBinarySIStringLargestScaleWithSuffix(t *testing.T) {
+	want := "867361737988403547205962240695953369140625000000000Ei" // 2^9 * 5^69
+	for _, asDec := range []bool{false, true} {
+		q := intQuantity(1, 69, BinarySI)
+		if asDec {
+			q.ToDec()
+		}
+		if got := q.String(); got != want {
+			t.Errorf("asDec=%t: String() = %q, want %q", asDec, got, want)
 		}
 	}
 }
