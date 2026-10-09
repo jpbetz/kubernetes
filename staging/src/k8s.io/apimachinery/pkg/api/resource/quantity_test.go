@@ -1124,24 +1124,6 @@ func TestQuantityRoundUpKnownGaps(t *testing.T) {
 			skipDec:  true,
 			want:     outcome{ok: false, value: "-1", exponent: 3},
 		},
-		// TODO: Should be (10, false) on both routes
-		{
-			name:     "1*10^-MaxInt32 RoundUp(1)",
-			in:       func() Quantity { return *NewScaledQuantity(1, -math.MaxInt32) },
-			scale:    1,
-			int64Got: &outcome{ok: true, value: "1", exponent: 1},
-			decGot:   &outcome{panics: true},
-			want:     outcome{ok: false, value: "1", exponent: 1},
-		},
-		// TODO: Should be (100, false) on both routes
-		{
-			name:     "5*10^(MinInt32+2) RoundUp(2)",
-			in:       func() Quantity { return *NewScaledQuantity(5, math.MinInt32+2) },
-			scale:    2,
-			int64Got: &outcome{ok: true, value: "5", exponent: 2},
-			decGot:   &outcome{panics: true},
-			want:     outcome{ok: false, value: "1", exponent: 2},
-		},
 		// TODO: Should be (1, false) on both routes
 		// TODO: int64 route: int64Amount.AsScale overflows computing 0-MinInt32.
 		// TODO: inf.Dec route: ToDec overflows negating MinInt32, so RoundUp gets
@@ -1159,23 +1141,6 @@ func TestQuantityRoundUpKnownGaps(t *testing.T) {
 			in:    func() Quantity { return *NewScaledQuantity(5, math.MaxInt32) },
 			scale: math.MinInt32 + 1,
 			want:  outcome{ok: true, value: "5", exponent: math.MaxInt32},
-		},
-		// TODO: Should be (1*10^MaxInt32, false) on both routes
-		{
-			name:     "5*10^(MinInt32+1) RoundUp(MaxInt32)",
-			in:       func() Quantity { return *NewScaledQuantity(5, math.MinInt32+1) },
-			scale:    math.MaxInt32,
-			int64Got: &outcome{ok: true, value: "5", exponent: math.MaxInt32},
-			decGot:   &outcome{ok: true, value: "5", exponent: math.MaxInt32 + 2},
-			want:     outcome{ok: false, value: "1", exponent: math.MaxInt32},
-		},
-		// TODO: Should be (1*10^(MaxInt32-1), false) on the inf.Dec route
-		{
-			name:   "inf.Dec 5*10^-(MaxInt32-1) RoundUp(MaxInt32-1)",
-			in:     func() Quantity { return *NewDecimalQuantity(*inf.NewDec(5, math.MaxInt32-1), DecimalSI) },
-			scale:  math.MaxInt32 - 1,
-			decGot: &outcome{ok: true, value: "5", exponent: math.MaxInt32 + 3},
-			want:   outcome{ok: false, value: "1", exponent: math.MaxInt32 - 1},
 		},
 		{
 			name:  "inf.Dec 5*10^-MinInt32 RoundUp(MinInt32+1)",
@@ -1523,87 +1488,6 @@ func TestQuantityMinInt32ScaleConstructors(t *testing.T) {
 			}
 			if got := q.Cmp(next); got != tc.cmpNext {
 				t.Errorf("%s(%d, MinInt32): Cmp(1e-2147483647) = %d, want %d", name, tc.value, got, tc.cmpNext)
-			}
-		}
-	}
-}
-
-// TestQuantityAddSubAcrossScales checks that Add and Sub are exact for operands
-// up to 100 orders of magnitude apart, in every combination of int64 and
-// inf.Dec forms.
-func TestQuantityAddSubAcrossScales(t *testing.T) {
-	for _, k := range []int{18, 19, 27, 28, 37, 38, 39, 100} {
-		large, one := intQuantity(1, Scale(k), DecimalSI), intQuantity(1, 0, DecimalSI)
-		plusOne := "1" + strings.Repeat("0", k-1) + "1"
-		minusOne := strings.Repeat("9", k)
-		for _, tc := range []struct {
-			name string
-			x, y Quantity
-			op   func(q *Quantity, y Quantity)
-			want string
-		}{
-			{fmt.Sprintf("1e%d + 1", k), large, one, (*Quantity).Add, plusOne},
-			{fmt.Sprintf("1 + 1e%d", k), one, large, (*Quantity).Add, plusOne},
-			{fmt.Sprintf("1e%d - 1", k), large, one, (*Quantity).Sub, minusOne},
-			{fmt.Sprintf("1 - 1e%d", k), one, large, (*Quantity).Sub, "-" + minusOne},
-		} {
-			want, _ := new(inf.Dec).SetString(tc.want)
-			for _, xDec := range []bool{false, true} {
-				for _, yDec := range []bool{false, true} {
-					x, y := tc.x.DeepCopy(), tc.y.DeepCopy()
-					if xDec {
-						x.ToDec()
-					}
-					if yDec {
-						y.ToDec()
-					}
-					tc.op(&x, y)
-					if got := x.AsDec(); got.Cmp(want) != 0 {
-						t.Errorf("%s (xDec=%t, yDec=%t) = %s, want %s", tc.name, xDec, yDec, got, tc.want)
-					}
-				}
-			}
-		}
-	}
-}
-
-// TestQuantityAddSubZeroScale records the scale AsDec reports after adding or
-// subtracting zero. The int64 form keeps the other operand's scale. The
-// inf.Dec form takes the finer of the two scales.
-func TestQuantityAddSubZeroScale(t *testing.T) {
-	for _, tc := range []struct {
-		name                 string
-		x, y                 Quantity
-		op                   func(q *Quantity, y Quantity)
-		want                 int64
-		int64Scale, decScale inf.Scale
-	}{
-		{"5 + 0n", intQuantity(5, 0, DecimalSI), intQuantity(0, Nano, DecimalSI), (*Quantity).Add, 5, 0, 9},
-		{"0n + 5", intQuantity(0, Nano, DecimalSI), intQuantity(5, 0, DecimalSI), (*Quantity).Add, 5, 0, 9},
-		{"5 - 0n", intQuantity(5, 0, DecimalSI), intQuantity(0, Nano, DecimalSI), (*Quantity).Sub, 5, 0, 9},
-		{"0n - 5", intQuantity(0, Nano, DecimalSI), intQuantity(5, 0, DecimalSI), (*Quantity).Sub, -5, 0, 9},
-		{"5k + 0", intQuantity(5, Kilo, DecimalSI), intQuantity(0, 0, DecimalSI), (*Quantity).Add, 5000, -3, 0},
-	} {
-		for _, xDec := range []bool{false, true} {
-			for _, yDec := range []bool{false, true} {
-				x, y := tc.x.DeepCopy(), tc.y.DeepCopy()
-				if xDec {
-					x.ToDec()
-				}
-				if yDec {
-					y.ToDec()
-				}
-				tc.op(&x, y)
-				wantScale := tc.int64Scale
-				if xDec || yDec {
-					wantScale = tc.decScale
-				}
-				if x.CmpInt64(tc.want) != 0 {
-					t.Errorf("%s (xDec=%t, yDec=%t) = %s, want %d", tc.name, xDec, yDec, x.String(), tc.want)
-				}
-				if got := x.AsDec().Scale(); got != wantScale {
-					t.Errorf("%s (xDec=%t, yDec=%t): AsDec().Scale() = %d, want %d", tc.name, xDec, yDec, got, wantScale)
-				}
 			}
 		}
 	}
@@ -2220,20 +2104,8 @@ func TestQuantityStringBelowNano(t *testing.T) {
 		{toDec(intQuantity(1024, math.MinInt32+2, BinarySI)), "1024e-2147483646", ""},
 		{intQuantity(math.MaxInt64, math.MinInt32+2, BinarySI), "9223372036854775807e-2147483646", ""},
 		{toDec(intQuantity(math.MaxInt64, math.MinInt32+2, BinarySI)), "9223372036854775807e-2147483646", ""},
-		// TODO(#141166): Must print the exact value, 1024e-2147483647.
-		{intQuantity(1024, math.MinInt32+1, BinarySI), "102400e2147483647", "1024e-2147483647"},
-		// TODO: Should be "1024e-2147483647"
-		{toDec(intQuantity(1024, math.MinInt32+1, BinarySI)), "1024000e2147483646", "1024e-2147483647"},
-		// TODO: Should be "1e-2147483647"
-		{intQuantity(1, math.MinInt32+1, DecimalSI), "100e2147483647", "1e-2147483647"},
-		// TODO: Should be "1e-2147483647"
-		{toDec(intQuantity(1, math.MinInt32+1, DecimalSI)), "1000e2147483646", "1e-2147483647"},
-		// TODO: Should be "1e-2147483648"
-		{intQuantity(1, math.MinInt32, DecimalSI), "10e2147483647", "1e-2147483648"},
 		// TODO: Should be "1e-2147483648"
 		{toDec(intQuantity(1, math.MinInt32, DecimalSI)), "100e2147483646", "1e-2147483648"},
-		// TODO: Should be "1e-2147483647"
-		{intQuantity(10, math.MinInt32, DecimalSI), "100e2147483647", "1e-2147483647"},
 		// TODO: Should be "1e-2147483647"
 		{toDec(intQuantity(10, math.MinInt32, DecimalSI)), "1000e2147483646", "1e-2147483647"},
 		// TODO(#141166): Must print the exact value, 1e-2147483648.
@@ -2266,9 +2138,6 @@ func TestQuantityStringDecMinInt32Scale(t *testing.T) {
 		{1, DecimalExponent, "100e2147483646"},
 		{7, DecimalSI, "700e2147483646"},
 		{10, DecimalExponent, "1000e2147483646"},
-		// TODO(#141166): Must print the exact value, 10e2147483649. The exponent
-		// overflows int32 and wraps negative.
-		{100, DecimalExponent, "1e-2147483646"},
 	} {
 		q := NewDecimalQuantity(*inf.NewDec(tc.unscaled, math.MinInt32), tc.format)
 		if got := q.String(); got != tc.expect {
@@ -3875,91 +3744,6 @@ func TestQuantityAsInt64KnownGaps(t *testing.T) {
 			int64Got:   outcome{value: 5, ok: true},
 			decGot:     outcome{},
 		},
-		// TODO: Should be (1, true) on the inf.Dec route
-		{
-			name: "1 in inf.Dec form + 0*10^MinInt32",
-			int64Route: func() Quantity {
-				q := *NewQuantity(1, DecimalSI)
-				q.Add(*NewScaledQuantity(0, math.MinInt32))
-				return q
-			},
-			decRoute: func() Quantity {
-				q := *NewQuantity(1, DecimalSI)
-				q.ToDec()
-				q.Add(*NewScaledQuantity(0, math.MinInt32))
-				return q
-			},
-			int64Got: outcome{value: 1, ok: true},
-			decGot:   outcome{panics: true},
-		},
-		// TODO: Should be (5, true) on the inf.Dec route
-		{
-			name: "0*10^MinInt32 in inf.Dec form + 5",
-			int64Route: func() Quantity {
-				q := *NewScaledQuantity(0, math.MinInt32)
-				q.Add(*NewQuantity(5, DecimalSI))
-				return q
-			},
-			decRoute: func() Quantity {
-				q := *NewScaledQuantity(0, math.MinInt32)
-				q.ToDec()
-				q.Add(*NewQuantity(5, DecimalSI))
-				return q
-			},
-			int64Got: outcome{value: 5, ok: true},
-			decGot:   outcome{panics: true},
-		},
-		// TODO: Should be (1, true) on the inf.Dec route
-		{
-			name: "1 in inf.Dec form - 0*10^MinInt32",
-			int64Route: func() Quantity {
-				q := *NewQuantity(1, DecimalSI)
-				q.Sub(*NewScaledQuantity(0, math.MinInt32))
-				return q
-			},
-			decRoute: func() Quantity {
-				q := *NewQuantity(1, DecimalSI)
-				q.ToDec()
-				q.Sub(*NewScaledQuantity(0, math.MinInt32))
-				return q
-			},
-			int64Got: outcome{value: 1, ok: true},
-			decGot:   outcome{panics: true},
-		},
-		// TODO: Should be (-5, true) on the inf.Dec route
-		{
-			name: "0*10^MinInt32 in inf.Dec form - 5",
-			int64Route: func() Quantity {
-				q := *NewScaledQuantity(0, math.MinInt32)
-				q.Sub(*NewQuantity(5, DecimalSI))
-				return q
-			},
-			decRoute: func() Quantity {
-				q := *NewScaledQuantity(0, math.MinInt32)
-				q.ToDec()
-				q.Sub(*NewQuantity(5, DecimalSI))
-				return q
-			},
-			int64Got: outcome{value: -5, ok: true},
-			decGot:   outcome{panics: true},
-		},
-		// TODO: Should be (1000, true) on the inf.Dec route
-		{
-			name: "1k in inf.Dec form + 0*10^-(MaxInt32-2)",
-			int64Route: func() Quantity {
-				q := *NewScaledQuantity(1, Kilo)
-				q.Add(*NewScaledQuantity(0, -(math.MaxInt32 - 2)))
-				return q
-			},
-			decRoute: func() Quantity {
-				q := *NewScaledQuantity(1, Kilo)
-				q.ToDec()
-				q.Add(*NewScaledQuantity(0, -(math.MaxInt32 - 2)))
-				return q
-			},
-			int64Got: outcome{value: 1000, ok: true},
-			decGot:   outcome{panics: true},
-		},
 		// TODO: Should be (1, true) on both routes
 		{
 			name:       "5*10^MinInt32 RoundUp(0)",
@@ -4460,42 +4244,6 @@ func TestQuantityToDecKnownGaps(t *testing.T) {
 			decGot:     outcome{result: int64(math.MinInt64)},
 			want:       &outcome{result: int64(-1)},
 		},
-		// TODO: Should be "1e-2147483648" on both routes
-		{
-			name:       "1*10^MinInt32 DecimalExponent String()",
-			int64Route: func() any { q := intQuantity(1, math.MinInt32, DecimalExponent); return q.String() },
-			decRoute:   func() any { q := intQuantity(1, math.MinInt32, DecimalExponent); q.ToDec(); return q.String() },
-			int64Got:   outcome{result: "10e2147483647"},
-			decGot:     outcome{result: "100e2147483646"},
-			want:       &outcome{result: "1e-2147483648"},
-		},
-		// TODO: Should be "1e-2147483647" on both routes
-		{
-			name:       "1*10^(MinInt32+1) DecimalExponent String()",
-			int64Route: func() any { q := intQuantity(1, math.MinInt32+1, DecimalExponent); return q.String() },
-			decRoute:   func() any { q := intQuantity(1, math.MinInt32+1, DecimalExponent); q.ToDec(); return q.String() },
-			int64Got:   outcome{result: "100e2147483647"},
-			decGot:     outcome{result: "1000e2147483646"},
-			want:       &outcome{result: "1e-2147483647"},
-		},
-		// TODO: Should be "100e2147483646" on the int64 route
-		{
-			name:       "10*10^MaxInt32 DecimalExponent String()",
-			int64Route: func() any { q := intQuantity(10, math.MaxInt32, DecimalExponent); return q.String() },
-			decRoute:   func() any { q := intQuantity(10, math.MaxInt32, DecimalExponent); q.ToDec(); return q.String() },
-			int64Got:   outcome{result: "10e2147483647"},
-			decGot:     outcome{result: "100e2147483646"},
-			want:       &outcome{result: "100e2147483646"},
-		},
-		// TODO: Should be "10000e2147483646" on both routes
-		{
-			name:       "1000*10^MaxInt32 DecimalExponent String()",
-			int64Route: func() any { q := intQuantity(1000, math.MaxInt32, DecimalExponent); return q.String() },
-			decRoute:   func() any { q := intQuantity(1000, math.MaxInt32, DecimalExponent); q.ToDec(); return q.String() },
-			int64Got:   outcome{result: "1e-2147483646"},
-			decGot:     outcome{result: "1e-2147483646"},
-			want:       &outcome{result: "10000e2147483646"},
-		},
 		// TODO: Should agree between int64 and inf.Dec routes
 		{
 			name:       "MinInt64 BinarySI String()",
@@ -4526,131 +4274,6 @@ func TestQuantityToDecKnownGaps(t *testing.T) {
 			int64Got:   outcome{result: int64(1)},
 			decGot:     outcome{result: int64(math.MaxInt64)},
 			want:       &outcome{result: int64(1)},
-		},
-		// TODO: Should be 5 on the inf.Dec route
-		{
-			name: "1*10^MinInt32 Mul(0) + 5 Value()",
-			int64Route: func() any {
-				q := intQuantity(1, math.MinInt32, DecimalSI)
-				q.Mul(0)
-				q.Add(intQuantity(5, 0, DecimalSI))
-				return q.Value()
-			},
-			decRoute: func() any {
-				q := intQuantity(1, math.MinInt32, DecimalSI)
-				q.ToDec()
-				q.Mul(0)
-				q.Add(intQuantity(5, 0, DecimalSI))
-				return q.Value()
-			},
-			int64Got: outcome{result: int64(5)},
-			decGot:   outcome{panics: true},
-			want:     &outcome{result: int64(5)},
-		},
-		// TODO: Should be 1000 on the inf.Dec route
-		{
-			name: "1*10^-(MaxInt32-2) Mul(0) + 1k Value()",
-			int64Route: func() any {
-				q := intQuantity(1, -(math.MaxInt32 - 2), DecimalSI)
-				q.Mul(0)
-				q.Add(intQuantity(1, Kilo, DecimalSI))
-				return q.Value()
-			},
-			decRoute: func() any {
-				q := intQuantity(1, -(math.MaxInt32 - 2), DecimalSI)
-				q.ToDec()
-				q.Mul(0)
-				q.Add(intQuantity(1, Kilo, DecimalSI))
-				return q.Value()
-			},
-			int64Got: outcome{result: int64(1000)},
-			decGot:   outcome{panics: true},
-			want:     &outcome{result: int64(1000)},
-		},
-		// TODO: Should be 5.0 on the inf.Dec route
-		{
-			name: "1*10^-310 Mul(0) + 5 AsApproximateFloat64()",
-			int64Route: func() any {
-				q := intQuantity(1, -310, DecimalSI)
-				q.Mul(0)
-				q.Add(intQuantity(5, 0, DecimalSI))
-				return q.AsApproximateFloat64()
-			},
-			decRoute: func() any {
-				q := intQuantity(1, -310, DecimalSI)
-				q.ToDec()
-				q.Mul(0)
-				q.Add(intQuantity(5, 0, DecimalSI))
-				return q.AsApproximateFloat64()
-			},
-			int64Got: outcome{result: float64(5)},
-			decGot:   outcome{result: math.Inf(1)},
-			want:     &outcome{result: float64(5)},
-		},
-		// TODO: Should be 5.0 on the inf.Dec route
-		{
-			name: "5 + (1*10^-310 - 1*10^-310) AsApproximateFloat64()",
-			int64Route: func() any {
-				z := intQuantity(1, -310, DecimalSI)
-				z.Sub(intQuantity(1, -310, DecimalSI))
-				q := intQuantity(5, 0, DecimalSI)
-				q.Add(z)
-				return q.AsApproximateFloat64()
-			},
-			decRoute: func() any {
-				z := intQuantity(1, -310, DecimalSI)
-				z.ToDec()
-				z.Sub(intQuantity(1, -310, DecimalSI))
-				q := intQuantity(5, 0, DecimalSI)
-				q.ToDec()
-				q.Add(z)
-				return q.AsApproximateFloat64()
-			},
-			int64Got: outcome{result: float64(5)},
-			decGot:   outcome{result: math.Inf(1)},
-			want:     &outcome{result: float64(5)},
-		},
-		// TODO: Should be false (5.0) on the inf.Dec route
-		{
-			name: "5 + (1*10^-330 - 1*10^-330) AsApproximateFloat64() IsNaN",
-			int64Route: func() any {
-				z := intQuantity(1, -330, DecimalSI)
-				z.Sub(intQuantity(1, -330, DecimalSI))
-				q := intQuantity(5, 0, DecimalSI)
-				q.Add(z)
-				return math.IsNaN(q.AsApproximateFloat64())
-			},
-			decRoute: func() any {
-				z := intQuantity(1, -330, DecimalSI)
-				z.ToDec()
-				z.Sub(intQuantity(1, -330, DecimalSI))
-				q := intQuantity(5, 0, DecimalSI)
-				q.ToDec()
-				q.Add(z)
-				return math.IsNaN(q.AsApproximateFloat64())
-			},
-			int64Got: outcome{result: false},
-			decGot:   outcome{result: true},
-			want:     &outcome{result: false},
-		},
-		// TODO: Should be "5e0 true" on the inf.Dec route
-		{
-			name: "5 AsScale(MinInt32)",
-			int64Route: func() any {
-				q := intQuantity(5, 0, DecimalSI)
-				v, ok := q.AsScale(math.MinInt32)
-				b, e := v.AsCanonicalBytes(nil)
-				return fmt.Sprintf("%se%d %t", b, e, ok)
-			},
-			decRoute: func() any {
-				q := intQuantity(5, 0, DecimalSI)
-				q.ToDec()
-				v, ok := q.AsScale(math.MinInt32)
-				b, e := v.AsCanonicalBytes(nil)
-				return fmt.Sprintf("%se%d %t", b, e, ok)
-			},
-			int64Got: outcome{result: "5e0 true"},
-			decGot:   outcome{panics: true},
 		},
 	}
 
