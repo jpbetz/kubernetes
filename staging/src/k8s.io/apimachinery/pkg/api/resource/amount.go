@@ -347,7 +347,12 @@ func (a *int64Amount) Add(b int64Amount) bool {
 		}
 		a.value = c
 	case a.scale > b.scale:
-		c, ok := positiveScaleInt64(a.value, a.scale-b.scale)
+		// Widen first: the delta of two int32 scales can need 33 bits.
+		up, fits := narrowScale(a.widenedScale() - b.widenedScale())
+		if !fits {
+			return false
+		}
+		c, ok := positiveScaleInt64(a.value, up)
 		if !ok {
 			return false
 		}
@@ -358,7 +363,12 @@ func (a *int64Amount) Add(b int64Amount) bool {
 		a.scale = b.scale
 		a.value = c
 	default:
-		c, ok := positiveScaleInt64(b.value, b.scale-a.scale)
+		// Widen first: the delta of two int32 scales can need 33 bits.
+		up, fits := narrowScale(b.widenedScale() - a.widenedScale())
+		if !fits {
+			return false
+		}
+		c, ok := positiveScaleInt64(b.value, up)
 		if !ok {
 			return false
 		}
@@ -430,7 +440,11 @@ func (a int64Amount) AsScale(scale Scale) (int64Amount, bool) {
 	if a.scale >= scale {
 		return a, true
 	}
-	result, exact := negativeScaleInt64(a.value, scale-a.scale)
+	down, fits := narrowScale(widenScale(scale) - a.widenedScale())
+	if !fits { // The scale drop overflows int32
+		down = log10MaxInt64 // Use the largest possible (19 digit) scale drop
+	}
+	result, exact := negativeScaleInt64(a.value, down)
 	return int64Amount{value: result, scale: scale}, exact
 }
 
