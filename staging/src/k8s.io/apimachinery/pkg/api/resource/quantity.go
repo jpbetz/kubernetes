@@ -440,7 +440,7 @@ func ParseQuantity(str string) (Quantity, error) {
 
 	// So that no one but us has to think about suffixes, remove it.
 	if base == 10 {
-		if exponent == math.MinInt32 {
+		if exponent == math.MinInt32 && amount.Sign() != 0 {
 			// inf.Dec negates the scale to apply it, which this value
 			// cannot survive, so the quantity has no representation here.
 			return Quantity{}, ErrSuffix

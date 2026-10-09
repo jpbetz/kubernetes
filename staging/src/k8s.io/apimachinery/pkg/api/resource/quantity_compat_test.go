@@ -93,3 +93,47 @@ func TestQuantityOutOfInt32ExponentCompatibility(t *testing.T) {
 		})
 	}
 }
+
+// TestQuantityZeroOutOfInt32ExponentCompatibility checks that a zero mantissa
+// whose exponent narrows to math.MinInt32 decodes as 0, as it did in 1.37. A
+// zero has no scale to negate, so it has a representation.
+func TestQuantityZeroOutOfInt32ExponentCompatibility(t *testing.T) {
+	for _, in := range []string{"0e2147483648", "0e-2147483648"} {
+		t.Run(in, func(t *testing.T) {
+			q, err := ParseQuantity(in)
+			if err != nil {
+				t.Fatalf("ParseQuantity(%q) failed: %v", in, err)
+			}
+			if !q.IsZero() {
+				t.Errorf("IsZero() = false, want true")
+			}
+			if got := q.String(); got != "0" {
+				t.Errorf("String() = %q, want %q", got, "0")
+			}
+
+			var fromJSON Quantity
+			if err := json.Unmarshal([]byte(strconv.Quote(in)), &fromJSON); err != nil {
+				t.Fatalf("json.Unmarshal(%q) failed: %v", in, err)
+			}
+			data, err := json.Marshal(&fromJSON)
+			if err != nil {
+				t.Fatalf("json.Marshal failed: %v", err)
+			}
+			if got, want := string(data), strconv.Quote("0"); got != want {
+				t.Errorf("json.Marshal = %s, want %s", got, want)
+			}
+
+			buf, err := q.Marshal()
+			if err != nil {
+				t.Fatalf("proto Marshal failed: %v", err)
+			}
+			var fromProto Quantity
+			if err := fromProto.Unmarshal(buf); err != nil {
+				t.Fatalf("proto Unmarshal failed: %v", err)
+			}
+			if !fromProto.IsZero() {
+				t.Errorf("after proto decode: IsZero() = false, want true")
+			}
+		})
+	}
+}
