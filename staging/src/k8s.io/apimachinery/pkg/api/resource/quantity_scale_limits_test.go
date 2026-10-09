@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"strings"
 	"testing"
 
 	inf "gopkg.in/inf.v0"
@@ -306,5 +307,43 @@ func TestBinarySIStringLargestScaleWithSuffix(t *testing.T) {
 		if got := q.String(); got != want {
 			t.Errorf("asDec=%t: String() = %q, want %q", asDec, got, want)
 		}
+	}
+}
+
+// TestParseQuantityLongMantissa checks that ParseQuantity rounds a mantissa with
+// more than maxAddDigits significant digits away from zero to maxAddDigits digits.
+func TestParseQuantityLongMantissa(t *testing.T) {
+	zeros := func(n int) string { return strings.Repeat("0", n) }
+	testCases := []struct {
+		name    string
+		in      string
+		want    string
+		wantErr bool
+	}{
+		{name: "a nonzero dropped digit rounds up", in: "1" + zeros(63) + "1", want: "1" + zeros(62) + "10"},
+		{name: "a zero dropped digit is exact", in: "1" + zeros(62) + "10", want: "1" + zeros(62) + "10"},
+		{name: "a nonzero digit after a zero dropped digit rounds up", in: "1" + zeros(63) + "01", want: "1" + zeros(62) + "100"},
+		{name: "a negative mantissa rounds away from zero", in: "-1" + zeros(63) + "1", want: "-1" + zeros(62) + "10"},
+		{name: "leading fraction zeros are not significant digits", in: "0.01" + zeros(63) + "1e56", want: "1" + zeros(62) + "1e-9"},
+		{name: "a rounded BinarySI mantissa is still capped", in: strings.Repeat("9", 100) + "Ki", want: "9223372036854775807"},
+		{name: "a rounded scale above math.MaxInt32 is an error", in: "1" + zeros(64) + "e2147483647", wantErr: true},
+		{name: "a carry to a scale above math.MaxInt32 is an error", in: strings.Repeat("9", 65) + "e2147483646", wantErr: true},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			q, err := ParseQuantity(tc.in)
+			if tc.wantErr {
+				if err == nil {
+					t.Fatalf("ParseQuantity() = %s, want an error", q.String())
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("ParseQuantity() failed: %v", err)
+			}
+			if got := q.String(); got != tc.want {
+				t.Errorf("String() = %q, want %q", got, tc.want)
+			}
+		})
 	}
 }

@@ -345,9 +345,9 @@ func ParseQuantity(str string) (Quantity, error) {
 		}
 	}
 
-	amount := new(inf.Dec)
-	if _, ok := amount.SetString(value); !ok {
-		return Quantity{}, ErrNumeric
+	amount, err := parseMantissa(value, positive, num, denom)
+	if err != nil {
+		return Quantity{}, err
 	}
 
 	// So that no one but us has to think about suffixes, remove it.
@@ -358,7 +358,10 @@ func ParseQuantity(str string) (Quantity, error) {
 			return Quantity{}, ErrSuffix
 		}
 		// For 1.5e-100, amountScale is -1, exponent is -100, effectiveScale is -101.
-		amountScale := widenInfScale(amount.Scale()) // never positive
+		amountScale := widenInfScale(amount.Scale()) // positive only for a rounded mantissa
+		if amountScale+widenScale(Scale(exponent)) > math.MaxInt32 {
+			return Quantity{}, ErrNumeric
+		}
 		effectiveScale, fits := narrowScale(amountScale + widenScale(Scale(exponent)))
 		if !fits || !effectiveScale.canInfScale() {
 			// effectiveScale is too small to be represented directly, so we
@@ -407,6 +410,45 @@ func ParseQuantity(str string) (Quantity, error) {
 	}
 
 	return Quantity{d: infDecAmount{amount}, Format: format}, nil
+}
+
+// parseMantissa returns a parsed mantissa as an inf.Dec.
+//
+// If the mantissa is more than maxAddDigits, then it is rounded away from zero.
+// Digits dropped by rounding are moved into the scale.
+//
+// This matches the behavior of Add and Sub, which round to the maxAddDigits limit.
+// This also matches the behavior of ParseQuantity, which rounds to 1n.
+func parseMantissa(value string, positive bool, num, denom string) (*inf.Dec, error) {
+	amount := new(inf.Dec)
+	digits := strings.TrimLeft(num+denom, "0")
+	if len(digits) <= maxAddDigits {
+		if _, ok := amount.SetString(value); !ok {
+			return nil, ErrNumeric
+		}
+		return amount, nil
+	}
+
+	kept, dropped := digits[:maxAddDigits], digits[maxAddDigits:]
+	amount.SetString(kept)
+	wideScale := widenedScale(len(dropped) - len(denom))
+	if strings.Trim(dropped, "0") != "" {
+		amount.Add(amount, decOne)
+	}
+	// Round and move dropped digits into the scale.
+	if ub := amount.UnscaledBig(); ub.Cmp(maxAddCoefficient) == 0 {
+		amount.SetUnscaledBig(ub.Quo(ub, bigTen))
+		wideScale++
+	}
+	if !positive {
+		amount.Neg(amount)
+	}
+	scale, fits := narrowScale(wideScale)
+	if !fits || !scale.canInfScale() {
+		return nil, ErrNumeric
+	}
+	amount.SetScale(scale.infScale())
+	return amount, nil
 }
 
 // DeepCopy returns a deep-copy of the Quantity value.  Note that the method
