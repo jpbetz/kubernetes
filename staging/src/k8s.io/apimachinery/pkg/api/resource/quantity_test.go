@@ -1105,6 +1105,18 @@ func TestQuantityRoundUpKnownGaps(t *testing.T) {
 			want:  outcome{ok: false, value: "-1", exponent: 3},
 		},
 		{
+			name:  "1*10^-MaxInt32 RoundUp(1)",
+			in:    func() Quantity { return *NewScaledQuantity(1, -math.MaxInt32) },
+			scale: 1,
+			want:  outcome{ok: false, value: "1", exponent: 1},
+		},
+		{
+			name:  "5*10^(MinInt32+2) RoundUp(2)",
+			in:    func() Quantity { return *NewScaledQuantity(5, math.MinInt32+2) },
+			scale: 2,
+			want:  outcome{ok: false, value: "1", exponent: 2},
+		},
+		{
 			name:  "5*10^MinInt32 RoundUp(0)",
 			in:    func() Quantity { return *NewScaledQuantity(5, math.MinInt32) },
 			scale: 0,
@@ -1115,6 +1127,18 @@ func TestQuantityRoundUpKnownGaps(t *testing.T) {
 			in:    func() Quantity { return *NewScaledQuantity(5, math.MaxInt32) },
 			scale: math.MinInt32 + 1,
 			want:  outcome{ok: true, value: "5", exponent: math.MaxInt32},
+		},
+		{
+			name:  "5*10^(MinInt32+1) RoundUp(MaxInt32)",
+			in:    func() Quantity { return *NewScaledQuantity(5, math.MinInt32+1) },
+			scale: math.MaxInt32,
+			want:  outcome{ok: false, value: "1", exponent: math.MaxInt32},
+		},
+		{
+			name:  "inf.Dec 5*10^-(MaxInt32-1) RoundUp(MaxInt32-1)",
+			in:    func() Quantity { return *NewDecimalQuantity(*inf.NewDec(5, math.MaxInt32-1), DecimalSI) },
+			scale: math.MaxInt32 - 1,
+			want:  outcome{ok: false, value: "1", exponent: math.MaxInt32 - 1},
 		},
 		{
 			name:  "inf.Dec 5*10^-MinInt32 RoundUp(MinInt32+1)",
@@ -1292,6 +1316,53 @@ func TestQuantityRoundUpKeepsCachedString(t *testing.T) {
 	}
 }
 
+func TestQuantityAsScale(t *testing.T) {
+	for _, tc := range []struct {
+		in    Quantity
+		scale Scale
+		want  Quantity
+		ok    bool
+	}{
+		{intQuantity(1500, Milli, DecimalSI), Milli, intQuantity(1500, Milli, DecimalSI), true},
+		{intQuantity(1500, Milli, DecimalSI), 0, intQuantity(2, 0, DecimalSI), false},
+		{intQuantity(-1500, Milli, DecimalSI), 0, intQuantity(-2, 0, DecimalSI), false},
+		{intQuantity(5, 0, DecimalSI), math.MinInt32, intQuantity(5, 0, DecimalSI), true},
+		{intQuantity(-5, 0, DecimalSI), math.MinInt32, intQuantity(-5, 0, DecimalSI), true},
+		{intQuantity(0, 0, DecimalSI), math.MinInt32, intQuantity(0, 0, DecimalSI), true},
+		{intQuantity(1, math.MinInt32+1, DecimalSI), math.MinInt32, intQuantity(1, math.MinInt32+1, DecimalSI), true},
+		{intQuantity(1, math.MaxInt32, DecimalSI), math.MinInt32, intQuantity(1, math.MaxInt32, DecimalSI), true},
+		{*NewDecimalQuantity(*inf.NewDec(5, math.MinInt32), DecimalSI), math.MinInt32, *NewDecimalQuantity(*inf.NewDec(5, math.MinInt32), DecimalSI), true},
+		{intQuantity(5, 0, DecimalSI), math.MinInt32 + 1, intQuantity(5, 0, DecimalSI), true},
+		{intQuantity(5, 0, DecimalSI), math.MaxInt32, intQuantity(1, math.MaxInt32, DecimalSI), false},
+		{intQuantity(5, math.MinInt32+1, DecimalSI), 0, intQuantity(1, 0, DecimalSI), false},
+		{intQuantity(-5, math.MinInt32+1, DecimalSI), 0, intQuantity(-1, 0, DecimalSI), false},
+		{intQuantity(0, math.MinInt32+1, DecimalSI), 0, intQuantity(0, 0, DecimalSI), true},
+	} {
+		format := func(d *inf.Dec) string { return fmt.Sprintf("%v*10^%d", d.UnscaledBig(), -int64(d.Scale())) }
+		want := tc.want.AsDec()
+		for _, asDec := range []bool{false, true} {
+			q := tc.in.DeepCopy()
+			if asDec {
+				q.ToDec()
+			}
+			result, ok := q.AsScale(tc.scale)
+			var got *inf.Dec
+			switch v := result.(type) {
+			case int64Amount:
+				got = v.AsDec()
+			case infDecAmount:
+				if v.Dec == q.d.Dec {
+					t.Errorf("%s (asDec=%t): AsScale returned the receiver's inf.Dec, want a copy", tc.in.String(), asDec)
+				}
+				got = v.Dec
+			}
+			if got.Cmp(want) != 0 || ok != tc.ok {
+				t.Errorf("%s (asDec=%t) = (%s, %t), want (%s, %t)", tc.in.String(), asDec, format(got), ok, format(want), tc.ok)
+			}
+		}
+	}
+}
+
 func TestQuantityCmpInt64AndDec(t *testing.T) {
 	table := []struct {
 		a, b   Quantity
@@ -1439,6 +1510,98 @@ func TestQuantityMinInt32ScaleConstructors(t *testing.T) {
 			}
 			if got := q.Cmp(next); got != tc.cmpNext {
 				t.Errorf("%s(%d, MinInt32): Cmp(1e-2147483647) = %d, want %d", name, tc.value, got, tc.cmpNext)
+			}
+		}
+	}
+}
+
+// TestQuantityAddSubAcrossScales checks that Add and Sub are exact while the
+// result fits in maxAddDigits significant digits, and round away from zero to
+// maxAddDigits digits beyond that, in every combination of int64 and inf.Dec
+// forms.
+func TestQuantityAddSubAcrossScales(t *testing.T) {
+	pow10 := func(n int) *big.Int { return new(big.Int).Exp(bigTen, big.NewInt(int64(n)), nil) }
+	format := func(d *inf.Dec) string { return fmt.Sprintf("%v*10^%d", d.UnscaledBig(), -int64(d.Scale())) }
+	for _, k := range []int{18, 19, 27, 28, 37, 38, 39, 100, math.MaxInt32} {
+		// 1eK + 1 has k+1 digits and 1eK - 1 has k digits. Past maxAddDigits
+		// digits, 1eK + 1 rounds up to 1, maxAddDigits-2 zeros and 1, and 1eK - 1
+		// rounds up to 1eK.
+		plusOne, minusOne := dec(1, k), dec(1, k)
+		if k+1 <= maxAddDigits {
+			plusOne = bigDec(new(big.Int).Add(pow10(k), bigOne), 0)
+		} else {
+			plusOne = bigDec(new(big.Int).Add(pow10(maxAddDigits-1), bigOne), k+1-maxAddDigits)
+		}
+		if k <= maxAddDigits {
+			minusOne = bigDec(new(big.Int).Sub(pow10(k), bigOne), 0)
+		}
+		// shift moves a want down by k digits, from 1eK and 1 to 1 and 1e-K.
+		shift := func(d infDecAmount) *inf.Dec { return inf.NewDecBig(d.UnscaledBig(), d.Scale()+inf.Scale(k)) }
+		large, small, one := intQuantity(1, Scale(k), DecimalSI), intQuantity(1, Scale(-k), DecimalSI), intQuantity(1, 0, DecimalSI)
+		for _, tc := range []struct {
+			name string
+			x, y Quantity
+			op   func(q *Quantity, y Quantity)
+			want *inf.Dec
+		}{
+			{fmt.Sprintf("1e%d + 1", k), large, one, (*Quantity).Add, plusOne.Dec},
+			{fmt.Sprintf("1 + 1e%d", k), one, large, (*Quantity).Add, plusOne.Dec},
+			{fmt.Sprintf("1e%d - 1", k), large, one, (*Quantity).Sub, minusOne.Dec},
+			{fmt.Sprintf("1 - 1e%d", k), one, large, (*Quantity).Sub, new(inf.Dec).Neg(minusOne.Dec)},
+			{fmt.Sprintf("1 + 1e-%d", k), one, small, (*Quantity).Add, shift(plusOne)},
+			{fmt.Sprintf("1 - 1e-%d", k), one, small, (*Quantity).Sub, shift(minusOne)},
+		} {
+			for _, xDec := range []bool{false, true} {
+				for _, yDec := range []bool{false, true} {
+					x, y := tc.x.DeepCopy(), tc.y.DeepCopy()
+					if xDec {
+						x.ToDec()
+					}
+					if yDec {
+						y.ToDec()
+					}
+					tc.op(&x, y)
+					if got := x.AsDec(); got.Cmp(tc.want) != 0 {
+						t.Errorf("%s (xDec=%t, yDec=%t) = %s, want %s", tc.name, xDec, yDec, format(got), format(tc.want))
+					}
+				}
+			}
+		}
+	}
+}
+
+// TestQuantityAddSubZeroScale checks that adding or subtracting zero keeps the
+// other operand's scale, in both the int64 and inf.Dec forms.
+func TestQuantityAddSubZeroScale(t *testing.T) {
+	for _, tc := range []struct {
+		name  string
+		x, y  Quantity
+		op    func(q *Quantity, y Quantity)
+		want  int64
+		scale inf.Scale
+	}{
+		{"5 + 0n", intQuantity(5, 0, DecimalSI), intQuantity(0, Nano, DecimalSI), (*Quantity).Add, 5, 0},
+		{"0n + 5", intQuantity(0, Nano, DecimalSI), intQuantity(5, 0, DecimalSI), (*Quantity).Add, 5, 0},
+		{"5 - 0n", intQuantity(5, 0, DecimalSI), intQuantity(0, Nano, DecimalSI), (*Quantity).Sub, 5, 0},
+		{"0n - 5", intQuantity(0, Nano, DecimalSI), intQuantity(5, 0, DecimalSI), (*Quantity).Sub, -5, 0},
+		{"5k + 0", intQuantity(5, Kilo, DecimalSI), intQuantity(0, 0, DecimalSI), (*Quantity).Add, 5000, -3},
+	} {
+		for _, xDec := range []bool{false, true} {
+			for _, yDec := range []bool{false, true} {
+				x, y := tc.x.DeepCopy(), tc.y.DeepCopy()
+				if xDec {
+					x.ToDec()
+				}
+				if yDec {
+					y.ToDec()
+				}
+				tc.op(&x, y)
+				if x.CmpInt64(tc.want) != 0 {
+					t.Errorf("%s (xDec=%t, yDec=%t) = %s, want %d", tc.name, xDec, yDec, x.String(), tc.want)
+				}
+				if got := x.AsDec().Scale(); got != tc.scale {
+					t.Errorf("%s (xDec=%t, yDec=%t): AsDec().Scale() = %d, want %d", tc.name, xDec, yDec, got, tc.scale)
+				}
 			}
 		}
 	}
@@ -1863,9 +2026,15 @@ func TestQuantityString(t *testing.T) {
 		// integer like 2^70 serializes as its full decimal digits (see
 		// TestBinarySIPastEiArithmeticRoundTrip). These values round-trip
 		// through parse.
+		// 2e69 is 1024^7 * 5^69 but has Scale 69, so it still reaches the
+		// fallback rather than CanonicalizeBytes' Scale 70 branch.
+		{decQuantity(2, 69, BinarySI), "2e69", ""},
+		{intQuantity(2, 69, BinarySI), "2e69", ""},
 		{decQuantity(1, 70, BinarySI), "10e69", ""},
 		{decQuantity(2, 70, BinarySI), "20e69", ""},
 		{decQuantity(1, 72, BinarySI), "1e72", ""},
+		{decQuantity(1, math.MaxInt32, BinarySI), "10e2147483646", ""},
+		{intQuantity(1, math.MaxInt32, BinarySI), "10e2147483646", ""},
 		{decQuantity(1234567, 6, DecimalSI), "1234567M", ""},
 		{decQuantity(1234567, -3, BinarySI), "1234567m", ""},
 		{decQuantity(3, 3, DecimalSI), "3k", ""},
@@ -1986,6 +2155,24 @@ func TestBinarySIPastEiArithmeticRoundTrip(t *testing.T) {
 	}
 }
 
+// From Scale 70, CanonicalizeBytes writes every non-zero BinarySI value in
+// exponent notation. Below that, whether a value has a suffix depends on its
+// coefficient: 10^69 is 1024^6 * 2^9 * 5^69, so it still gets "Ei". It isn't a
+// TestQuantityString row because ParseQuantity caps BinarySI at the int64
+// maximum, so its string doesn't round-trip.
+func TestBinarySIStringLargestScaleWithSuffix(t *testing.T) {
+	want := "867361737988403547205962240695953369140625000000000Ei" // 2^9 * 5^69
+	for _, asDec := range []bool{false, true} {
+		q := intQuantity(1, 69, BinarySI)
+		if asDec {
+			q.ToDec()
+		}
+		if got := q.String(); got != want {
+			t.Errorf("asDec=%t: String() = %q, want %q", asDec, got, want)
+		}
+	}
+}
+
 func TestBinarySIZeroExponentString(t *testing.T) {
 	table := []struct {
 		in   Quantity
@@ -2072,9 +2259,8 @@ func TestQuantityStringBelowNano(t *testing.T) {
 }
 
 func TestQuantityStringDecMinInt32Scale(t *testing.T) {
-	// An inf.Scale of math.MinInt32 is one past the Scale range. Narrowing its
-	// exponent wraps, and the value still prints exactly unless trailing zeros
-	// push the exponent past int32.
+	// An inf.Scale of math.MinInt32 is one past the Scale range: its exponent,
+	// 2147483648, does not fit in an int32. The value still prints exactly.
 	for _, tc := range []struct {
 		unscaled int64
 		format   Format
@@ -2082,7 +2268,11 @@ func TestQuantityStringDecMinInt32Scale(t *testing.T) {
 	}{
 		{1, DecimalExponent, "100e2147483646"},
 		{7, DecimalSI, "700e2147483646"},
+		{1, BinarySI, "100e2147483646"},
 		{10, DecimalExponent, "1000e2147483646"},
+		// 2147483646 is the largest multiple of 3 that fits in an int32, so the
+		// exponent stops there and the extra zeros stay in the mantissa.
+		{100, DecimalExponent, "10000e2147483646"},
 	} {
 		q := NewDecimalQuantity(*inf.NewDec(tc.unscaled, math.MinInt32), tc.format)
 		if got := q.String(); got != tc.expect {
@@ -2105,6 +2295,13 @@ func TestQuantityParseEmit(t *testing.T) {
 		{".000001Ki", "1024u"},
 		{".000000001Ki", "1024n"},
 		{".000000000001Ki", "2n"},
+		{"10e2147483647", "100e2147483646"},
+		{"1000e2147483646", "1000e2147483646"},
+		{"10000e2147483646", "10000e2147483646"},
+		{"1234567890123456789012e2147483647", "12345678901234567890120e2147483646"}, // Scale math.MaxInt32, over 19 digits to skip the int64 fast path
+		{"1e-2147483647", "1e-9"},                       // Scale math.MinInt32+1
+		{"1.5e-2147483647", "1e-9"},                     // Scale math.MinInt32, reached through one fraction digit
+		{"1.234567890123456789012e-2147483647", "1e-9"}, // Scale below the int32 range, over 19 digits to skip the int64 fast path
 	}
 
 	for _, asDec := range []bool{false, true} {
@@ -2145,6 +2342,48 @@ func TestQuantityParseEmit(t *testing.T) {
 				t.Errorf("%#v: expected %v, got %v (%#v)", item.in, e, a, q.i)
 			}
 		}
+	}
+}
+
+// TestParseQuantityLongMantissa checks that ParseQuantity rounds a mantissa with
+// more than maxAddDigits significant digits away from zero to maxAddDigits digits.
+func TestParseQuantityLongMantissa(t *testing.T) {
+	zeros := func(n int) string { return strings.Repeat("0", n) }
+	testCases := []struct {
+		name    string
+		in      string
+		want    string
+		wantErr bool
+	}{
+		{name: "a nonzero dropped digit rounds up", in: "1" + zeros(63) + "1", want: "1" + zeros(62) + "10"},
+		{name: "a zero dropped digit is exact", in: "1" + zeros(62) + "10", want: "1" + zeros(62) + "10"},
+		{name: "a nonzero digit after a zero dropped digit rounds up", in: "1" + zeros(63) + "01", want: "1" + zeros(62) + "100"},
+		{name: "a negative mantissa rounds away from zero", in: "-1" + zeros(63) + "1", want: "-1" + zeros(62) + "10"},
+		{name: "leading fraction zeros are not significant digits", in: "0.01" + zeros(63) + "1e56", want: "1" + zeros(62) + "1e-9"},
+		{name: "a rounded BinarySI mantissa is still capped", in: strings.Repeat("9", 100) + "Ki", want: "9223372036854775807"},
+		{name: "a rounded scale above math.MaxInt32 is an error", in: "1" + zeros(64) + "e2147483647", wantErr: true},
+		{name: "a carry to a scale above math.MaxInt32 is an error", in: strings.Repeat("9", 65) + "e2147483646", wantErr: true},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			q, err := ParseQuantity(tc.in)
+			if tc.wantErr {
+				if err == nil {
+					t.Fatalf("ParseQuantity() = %s, want an error", q.String())
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("ParseQuantity() failed: %v", err)
+			}
+			if got := q.String(); got != tc.want {
+				t.Errorf("String() = %q, want %q", got, tc.want)
+			}
+			q.s = cachedString{}
+			if got := q.String(); got != tc.want {
+				t.Errorf("String() without the cached string = %q, want %q", got, tc.want)
+			}
+		})
 	}
 }
 
@@ -3662,6 +3901,57 @@ func TestQuantityAsInt64KnownGaps(t *testing.T) {
 		// agreeing.
 		want *outcome
 	}{
+		// TODO: Should be (1, true) on the inf.Dec route
+		{
+			name: "1 in inf.Dec form + 0*10^MinInt32",
+			int64Route: func() Quantity {
+				q := *NewQuantity(1, DecimalSI)
+				q.Add(*NewScaledQuantity(0, math.MinInt32))
+				return q
+			},
+			decRoute: func() Quantity {
+				q := *NewQuantity(1, DecimalSI)
+				q.ToDec()
+				q.Add(*NewScaledQuantity(0, math.MinInt32))
+				return q
+			},
+			int64Got: outcome{value: 1, ok: true},
+			decGot:   outcome{},
+		},
+		// TODO: Should be (1, true) on the inf.Dec route
+		{
+			name: "1 in inf.Dec form - 0*10^MinInt32",
+			int64Route: func() Quantity {
+				q := *NewQuantity(1, DecimalSI)
+				q.Sub(*NewScaledQuantity(0, math.MinInt32))
+				return q
+			},
+			decRoute: func() Quantity {
+				q := *NewQuantity(1, DecimalSI)
+				q.ToDec()
+				q.Sub(*NewScaledQuantity(0, math.MinInt32))
+				return q
+			},
+			int64Got: outcome{value: 1, ok: true},
+			decGot:   outcome{},
+		},
+		// TODO: Should be (1000, true) on the inf.Dec route
+		{
+			name: "1k in inf.Dec form + 0*10^-(MaxInt32-2)",
+			int64Route: func() Quantity {
+				q := *NewScaledQuantity(1, Kilo)
+				q.Add(*NewScaledQuantity(0, -(math.MaxInt32 - 2)))
+				return q
+			},
+			decRoute: func() Quantity {
+				q := *NewScaledQuantity(1, Kilo)
+				q.ToDec()
+				q.Add(*NewScaledQuantity(0, -(math.MaxInt32 - 2)))
+				return q
+			},
+			int64Got: outcome{value: 1000, ok: true},
+			decGot:   outcome{},
+		},
 		// TODO: Should be (1, true) on the inf.Dec route
 		{
 			name:       "5*10^MinInt32 RoundUp(0)",
