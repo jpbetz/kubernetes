@@ -642,7 +642,8 @@ func (q *Quantity) Add(y Quantity) {
 	} else if q.IsZero() {
 		q.Format = y.Format
 	}
-	q.ToDec().d.Dec.Add(q.d.Dec, y.AsDec())
+	q.ToDec()
+	q.d.Dec.Set(addDec(q.d.Dec, y.AsDec(), false))
 }
 
 // Sub subtracts the provided quantity from the current value in place. If the current
@@ -655,7 +656,8 @@ func (q *Quantity) Sub(y Quantity) {
 	if q.d.Dec == nil && y.d.Dec == nil && q.i.Sub(y.i) {
 		return
 	}
-	q.ToDec().d.Dec.Sub(q.d.Dec, y.AsDec())
+	q.ToDec()
+	q.d.Dec.Set(addDec(q.d.Dec, y.AsDec(), true))
 }
 
 // Mul multiplies the provided y to the current value.

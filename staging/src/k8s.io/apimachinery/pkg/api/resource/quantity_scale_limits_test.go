@@ -19,6 +19,7 @@ package resource
 import (
 	"fmt"
 	"math"
+	"math/big"
 	"testing"
 
 	inf "gopkg.in/inf.v0"
@@ -183,6 +184,98 @@ func TestQuantityRoundUpDecAtScaleLimits(t *testing.T) {
 		ok := q.RoundUp(tc.scale)
 		if got := format(q.AsDec()); got != tc.want || ok != tc.ok {
 			t.Errorf("%s RoundUp(%d) = (%s, %t), want (%s, %t)", format(tc.in.AsDec()), tc.scale, got, ok, tc.want, tc.ok)
+		}
+	}
+}
+
+// TestQuantityAddSubAcrossScales checks that Add and Sub are exact while the
+// result fits in maxAddDigits significant digits, and round away from zero to
+// maxAddDigits digits beyond that, in every combination of int64 and inf.Dec
+// forms.
+func TestQuantityAddSubAcrossScales(t *testing.T) {
+	pow10 := func(n int) *big.Int { return new(big.Int).Exp(bigTen, big.NewInt(int64(n)), nil) }
+	format := func(d *inf.Dec) string { return fmt.Sprintf("%v*10^%d", d.UnscaledBig(), -int64(d.Scale())) }
+	for _, k := range []int{18, 19, 27, 28, 37, 38, 39, 100, math.MaxInt32} {
+		// 1eK + 1 has k+1 digits and 1eK - 1 has k digits. Past maxAddDigits
+		// digits, 1eK + 1 rounds up to 1, maxAddDigits-2 zeros and 1, and 1eK - 1
+		// rounds up to 1eK.
+		plusOne, minusOne := dec(1, k), dec(1, k)
+		if k+1 <= maxAddDigits {
+			plusOne = bigDec(new(big.Int).Add(pow10(k), bigOne), 0)
+		} else {
+			plusOne = bigDec(new(big.Int).Add(pow10(maxAddDigits-1), bigOne), k+1-maxAddDigits)
+		}
+		if k <= maxAddDigits {
+			minusOne = bigDec(new(big.Int).Sub(pow10(k), bigOne), 0)
+		}
+		// shift moves a want down by k digits, from 1eK and 1 to 1 and 1e-K.
+		shift := func(d infDecAmount) *inf.Dec { return inf.NewDecBig(d.UnscaledBig(), d.Scale()+inf.Scale(k)) }
+		large, small, one := intQuantity(1, Scale(k), DecimalSI), intQuantity(1, Scale(-k), DecimalSI), intQuantity(1, 0, DecimalSI)
+		for _, tc := range []struct {
+			name string
+			x, y Quantity
+			op   func(q *Quantity, y Quantity)
+			want *inf.Dec
+		}{
+			{fmt.Sprintf("1e%d + 1", k), large, one, (*Quantity).Add, plusOne.Dec},
+			{fmt.Sprintf("1 + 1e%d", k), one, large, (*Quantity).Add, plusOne.Dec},
+			{fmt.Sprintf("1e%d - 1", k), large, one, (*Quantity).Sub, minusOne.Dec},
+			{fmt.Sprintf("1 - 1e%d", k), one, large, (*Quantity).Sub, new(inf.Dec).Neg(minusOne.Dec)},
+			{fmt.Sprintf("1 + 1e-%d", k), one, small, (*Quantity).Add, shift(plusOne)},
+			{fmt.Sprintf("1 - 1e-%d", k), one, small, (*Quantity).Sub, shift(minusOne)},
+		} {
+			for _, xDec := range []bool{false, true} {
+				for _, yDec := range []bool{false, true} {
+					x, y := tc.x.DeepCopy(), tc.y.DeepCopy()
+					if xDec {
+						x.ToDec()
+					}
+					if yDec {
+						y.ToDec()
+					}
+					tc.op(&x, y)
+					if got := x.AsDec(); got.Cmp(tc.want) != 0 {
+						t.Errorf("%s (xDec=%t, yDec=%t) = %s, want %s", tc.name, xDec, yDec, format(got), format(tc.want))
+					}
+				}
+			}
+		}
+	}
+}
+
+// TestQuantityAddSubZeroScale checks that adding or subtracting zero keeps the
+// other operand's scale, in both the int64 and inf.Dec forms.
+func TestQuantityAddSubZeroScale(t *testing.T) {
+	for _, tc := range []struct {
+		name  string
+		x, y  Quantity
+		op    func(q *Quantity, y Quantity)
+		want  int64
+		scale inf.Scale
+	}{
+		{"5 + 0n", intQuantity(5, 0, DecimalSI), intQuantity(0, Nano, DecimalSI), (*Quantity).Add, 5, 0},
+		{"0n + 5", intQuantity(0, Nano, DecimalSI), intQuantity(5, 0, DecimalSI), (*Quantity).Add, 5, 0},
+		{"5 - 0n", intQuantity(5, 0, DecimalSI), intQuantity(0, Nano, DecimalSI), (*Quantity).Sub, 5, 0},
+		{"0n - 5", intQuantity(0, Nano, DecimalSI), intQuantity(5, 0, DecimalSI), (*Quantity).Sub, -5, 0},
+		{"5k + 0", intQuantity(5, Kilo, DecimalSI), intQuantity(0, 0, DecimalSI), (*Quantity).Add, 5000, -3},
+	} {
+		for _, xDec := range []bool{false, true} {
+			for _, yDec := range []bool{false, true} {
+				x, y := tc.x.DeepCopy(), tc.y.DeepCopy()
+				if xDec {
+					x.ToDec()
+				}
+				if yDec {
+					y.ToDec()
+				}
+				tc.op(&x, y)
+				if x.CmpInt64(tc.want) != 0 {
+					t.Errorf("%s (xDec=%t, yDec=%t) = %s, want %d", tc.name, xDec, yDec, x.String(), tc.want)
+				}
+				if got := x.AsDec().Scale(); got != tc.scale {
+					t.Errorf("%s (xDec=%t, yDec=%t): AsDec().Scale() = %d, want %d", tc.name, xDec, yDec, got, tc.scale)
+				}
+			}
 		}
 	}
 }
