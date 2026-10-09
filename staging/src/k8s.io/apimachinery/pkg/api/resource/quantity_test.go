@@ -2033,3 +2033,23 @@ func TestQuantityPtrEqual(t *testing.T) {
 		})
 	}
 }
+
+// TestParseQuantityMinInt32Exponent checks that a zero mantissa whose exponent
+// narrows to math.MinInt32 decodes as 0, and that a nonzero one is rejected.
+func TestParseQuantityMinInt32Exponent(t *testing.T) {
+	for _, in := range []string{"0e2147483648", "0e-2147483648"} {
+		q, err := ParseQuantity(in)
+		if err != nil {
+			t.Errorf("ParseQuantity(%q) failed: %v", in, err)
+			continue
+		}
+		if got := q.String(); got != "0" {
+			t.Errorf("ParseQuantity(%q).String() = %q, want %q", in, got, "0")
+		}
+	}
+	for _, in := range []string{"1e2147483648", "1e-2147483648"} {
+		if q, err := ParseQuantity(in); err != ErrSuffix {
+			t.Errorf("ParseQuantity(%q) = (%s, %v), want ErrSuffix", in, q.String(), err)
+		}
+	}
+}
