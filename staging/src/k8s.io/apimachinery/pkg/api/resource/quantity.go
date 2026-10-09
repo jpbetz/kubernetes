@@ -596,6 +596,14 @@ func (q *Quantity) RoundUp(scale Scale) bool {
 	return exact
 }
 
+// widenedScale returns the base-10 scale exponent as a widenedScale.
+func (q *Quantity) widenedScale() widenedScale {
+	if q.d.Dec != nil {
+		return q.d.widenedScale()
+	}
+	return q.i.widenedScale()
+}
+
 // Add adds the provide y quantity to the current value. If the current value is zero,
 // the format of the quantity will be updated to the format of y.
 func (q *Quantity) Add(y Quantity) {

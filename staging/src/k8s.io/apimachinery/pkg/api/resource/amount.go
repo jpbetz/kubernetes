@@ -17,6 +17,7 @@ limitations under the License.
 package resource
 
 import (
+	"math"
 	"math/big"
 	"strconv"
 
@@ -31,6 +32,37 @@ type Scale int32
 // infScale adapts a Scale value to an inf.Scale value.
 func (s Scale) infScale() inf.Scale {
 	return inf.Scale(-s) // inf.Scale is upside-down
+}
+
+// canInfScale reports whether infScale is faithful for s. Scale is int32 and
+// infScale negates it, so math.MinInt32 is the one scale whose negation
+// overflows back to itself and cannot be represented as an inf.Scale.
+func (s Scale) canInfScale() bool {
+	return s != math.MinInt32
+}
+
+// widenedScale is a Scale widened to int64, so it also holds a negated
+// inf.Scale and the difference of two scales without overflow.
+// Conversions should happen only via widenScale, widenInfScale and
+// narrowScale to ensure the sign is converted safely.
+type widenedScale int64
+
+// widenScale returns s as a widenedScale.
+func widenScale(s Scale) widenedScale {
+	return widenedScale(s)
+}
+
+// narrowScale returns s as a Scale. fits is false when s is outside
+// of the Scale range, in which case the result wraps must not be treated
+// as a valid value.
+func narrowScale(s widenedScale) (narrowed Scale, fits bool) {
+	return Scale(s), s >= math.MinInt32 && s <= math.MaxInt32
+}
+
+// widenInfScale returns the base-10 exponent of an inf.Dec with scale s.
+// This performs the negation required to switch from an inf.Scale to a Scale.
+func widenInfScale(s inf.Scale) widenedScale {
+	return -widenedScale(s)
 }
 
 const (
@@ -167,12 +199,12 @@ func (a int64Amount) Cmp(b int64Amount) int {
 	}
 }
 
-// decimalExponentBounds brackets the e for which 10^(e-1) <= |c|*10^-s < 10^e,
+// decimalExponentBounds brackets the e for which 10^(e-1) <= |c|*10^s < 10^e,
 // for a non-zero c. An n-bit magnitude has at least n/4 and at most n/3+1
 // decimal digits, so neither bound has to count them.
-func decimalExponentBounds(bitLen int, s int64) (lo, hi int64) {
-	n := int64(bitLen)
-	return n/4 - s, n/3 + 1 - s
+func decimalExponentBounds(bitLen int, s widenedScale) (lo, hi widenedScale) {
+	n := widenedScale(bitLen)
+	return n/4 + s, n/3 + 1 + s
 }
 
 // cmpDec compares x and y. inf.Dec.Cmp aligns the two scales by writing their
@@ -189,8 +221,8 @@ func cmpDec(x, y *inf.Dec) int {
 	case xSign == 0:
 		return 0
 	}
-	xLo, xHi := decimalExponentBounds(x.UnscaledBig().BitLen(), int64(x.Scale()))
-	yLo, yHi := decimalExponentBounds(y.UnscaledBig().BitLen(), int64(y.Scale()))
+	xLo, xHi := decimalExponentBounds(x.UnscaledBig().BitLen(), widenInfScale(x.Scale()))
+	yLo, yHi := decimalExponentBounds(y.UnscaledBig().BitLen(), widenInfScale(y.Scale()))
 	switch {
 	case xLo > yHi:
 		return xSign
@@ -294,6 +326,11 @@ func (a int64Amount) AsScale(scale Scale) (int64Amount, bool) {
 	return int64Amount{value: result, scale: scale}, exact
 }
 
+// widenedScale returns the base-10 scale exponent as a widenedScale.
+func (a int64Amount) widenedScale() widenedScale {
+	return widenScale(a.scale)
+}
+
 // AsCanonicalBytes accepts a buffer to write the base-10 string value of this field to, and returns
 // either that buffer or a larger buffer and the current exponent of the value. The value is adjusted
 // until the exponent is a multiple of 3 - i.e. 1.1e5 would return "110", 3.
@@ -349,12 +386,19 @@ func (a infDecAmount) AsScale(scale Scale) (infDecAmount, bool) {
 	return infDecAmount{tmp}, tmp.Cmp(a.Dec) == 0
 }
 
+// widenedScale returns the base-10 scale exponent as a widenedScale.
+func (a infDecAmount) widenedScale() widenedScale {
+	return widenInfScale(a.Dec.Scale())
+}
+
 // AsCanonicalBytes accepts a buffer to write the base-10 string value of this field to, and returns
 // either that buffer or a larger buffer and the current exponent of the value. The value is adjusted
 // until the exponent is a multiple of 3 - i.e. 1.1e5 would return "110", 3.
 func (a infDecAmount) AsCanonicalBytes(out []byte) (result []byte, exponent int32) {
 	mantissa := a.Dec.UnscaledBig()
-	exponent = int32(-a.Dec.Scale())
+	// An inf.Scale of math.MinInt32 does not fit, and wraps.
+	scale, _ := narrowScale(a.widenedScale())
+	exponent = int32(scale)
 	amount := big.NewInt(0).Set(mantissa)
 	// move all factors of 10 into the exponent for easy reasoning
 	amount, times := removeBigIntFactors(amount, bigTen)
