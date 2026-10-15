@@ -600,18 +600,30 @@ func (q *Quantity) AsApproximateFloat64() float64 {
 // more precise than AsApproximateFloat64 but significantly slower.  If the
 // value of the quantity is outside the range of a float64 +Inf/-Inf will be
 // returned.
+// Deprecated: AsFloat64Slow is deprecated as of Kubernetes 1.37. It will remain
+// in the codebase for backward compatibility but its use is discouraged. Please
+// use AsApproximateFloat64 instead.
 func (q *Quantity) AsFloat64Slow() float64 {
 	infDec := q.internalReadOnlyDec()
-
+	sign := infDec.Sign()
+	if sign == 0 {
+		return 0
+	}
+	lo, hi := decimalExponentBounds(infDec.UnscaledBig().BitLen(), widenInfScale(infDec.Scale()))
+	if lo > 309 {
+		return math.Inf(sign)
+	}
+	if hi <= -324 {
+		return 0
+	}
 	var absScale int64
 	if infDec.Scale() < 0 {
-		absScale = int64(-infDec.Scale())
+		absScale = -int64(infDec.Scale())
 	} else {
 		absScale = int64(infDec.Scale())
 	}
 	pow10AbsScale := big.NewInt(10)
 	pow10AbsScale = pow10AbsScale.Exp(pow10AbsScale, big.NewInt(absScale), nil)
-
 	var resultBigFloat *big.Float
 	if infDec.Scale() < 0 {
 		resultBigInt := new(big.Int).Mul(infDec.UnscaledBig(), pow10AbsScale)
@@ -621,7 +633,6 @@ func (q *Quantity) AsFloat64Slow() float64 {
 		resultBigFloat = new(big.Float).SetInt(infDec.UnscaledBig())
 		resultBigFloat = resultBigFloat.Quo(resultBigFloat, pow10AbsScaleFloat)
 	}
-
 	result, _ := resultBigFloat.Float64()
 	return result
 }

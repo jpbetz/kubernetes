@@ -4700,6 +4700,8 @@ func TestQuantityAsApproximateFloat64(t *testing.T) {
 		{decQuantity(-1, -330, DecimalSI), 0, nil},
 		{bigDecQuantity(new(big.Int).Exp(big.NewInt(10), big.NewInt(100), nil), -400, DecimalSI), 0, nil},
 
+		{intQuantity(5, math.MaxInt32, DecimalSI), math.Inf(1), nil},
+		{intQuantity(5, math.MinInt32+1, DecimalSI), 0, nil},
 		{intQuantity(5, math.MinInt32, DecimalSI), 0, nil},
 		// TODO: Should be +Inf
 		{*NewDecimalQuantity(*inf.NewDec(5, math.MinInt32), DecimalSI), 0, new(math.Inf(1))},
@@ -4816,10 +4818,11 @@ func TestQuantityAsFloat64Slow(t *testing.T) {
 		// 10^100 * 10^-400 is within range even though 10^-400 is not.
 		{bigDecQuantity(new(big.Int).Exp(big.NewInt(10), big.NewInt(100), nil), -400, DecimalSI), 1e-300, nil},
 
+		{intQuantity(5, math.MaxInt32, DecimalSI), math.Inf(1), nil},
+		{intQuantity(5, math.MinInt32+1, DecimalSI), 0, nil},
 		// TODO: Should be 0
-		{intQuantity(5, math.MinInt32, DecimalSI), 5, new(0.0)},
-		// TODO: Should be +Inf
-		{*NewDecimalQuantity(*inf.NewDec(5, math.MinInt32), DecimalSI), 5, new(math.Inf(1))},
+		{intQuantity(5, math.MinInt32, DecimalSI), math.Inf(1), new(0.0)},
+		{*NewDecimalQuantity(*inf.NewDec(5, math.MinInt32), DecimalSI), math.Inf(1), nil},
 	}
 
 	for i, item := range table {
