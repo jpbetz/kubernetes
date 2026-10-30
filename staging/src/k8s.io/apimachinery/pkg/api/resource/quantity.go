@@ -645,6 +645,13 @@ func (_ Quantity) OpenAPISchemaFormat() string { return "" }
 // the OpenAPI v3 spec of this type.
 func (Quantity) OpenAPIV3OneOfTypes() []string { return []string{"string", "number"} }
 
+// minExponentNotationBinarySIScale is the smallest Scale at which
+// CanonicalizeBytes writes every non-zero BinarySI value in exponent notation.
+// A value at this Scale or above is a multiple of 10^70, and so of
+// 2^70 = 1024^7, one power of 1024 past Ei, the largest BinarySI suffix. One
+// Scale lower that isn't so: 10^69 is written as 2^9 * 5^69 Ei.
+const minExponentNotationBinarySIScale = 70
+
 // CanonicalizeBytes returns the canonical form of q and its suffix (see comment on Quantity).
 //
 // Note about BinarySI:
@@ -665,6 +672,10 @@ func (q *Quantity) CanonicalizeBytes(out []byte) (result, suffix []byte) {
 		if q.CmpInt64(-1024) > 0 && q.CmpInt64(1024) < 0 {
 			// This avoids rounding and hopefully confusion, too.
 			format = DecimalSI
+		} else if q.widenedScale() >= minExponentNotationBinarySIScale {
+			// Short-circuit the base-1024 computation: q is written in exponent
+			// notation either way.
+			format = DecimalExponent
 		} else {
 			var exact bool
 			if rounded, exact = q.AsScale(0); !exact {

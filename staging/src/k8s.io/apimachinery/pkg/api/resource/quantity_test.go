@@ -2409,6 +2409,11 @@ func TestBinarySIStringAtLargeScales(t *testing.T) {
 		{intQuantity(1, 70, BinarySI), "10e69"},                                                 // 2^70 * 5^70: 2^70 is 1024^7, one power of 1024 past Ei
 		{intQuantity(1, 71, BinarySI), "100e69"},
 		{intQuantity(-1, 70, BinarySI), "-10e69"},
+		// String used to panic here, rounding the value to a whole number.
+		{*NewDecimalQuantity(*inf.NewDec(10, math.MinInt32), BinarySI), "1000e2147483646"},
+		{intQuantity(1, math.MaxInt32, BinarySI), "10e2147483646"},
+		{intQuantity(1, math.MaxInt32-2, BinarySI), "100e2147483643"},
+		{intQuantity(-1, math.MaxInt32, BinarySI), "-10e2147483646"},
 	} {
 		for _, asDec := range []bool{false, true} {
 			q := tc.in
@@ -2502,6 +2507,8 @@ func TestQuantityStringBelowNano(t *testing.T) {
 		// TODO: Should be "1e-2147483647"
 		{toDec(intQuantity(10, math.MinInt32, DecimalSI)), "1000e2147483646", "1e-2147483647"},
 		{intQuantity(1, math.MinInt32, BinarySI), "1e-2147483648", ""},
+		// TODO: Should be "1e-2147483648"
+		{toDec(intQuantity(1, math.MinInt32, BinarySI)), "100e2147483646", "1e-2147483648"},
 		{intQuantity(1024, math.MinInt32, BinarySI), "1024e-2147483648", ""},
 		{intQuantity(math.MaxInt64, math.MinInt32, BinarySI), "9223372036854775807e-2147483648", ""},
 	}
