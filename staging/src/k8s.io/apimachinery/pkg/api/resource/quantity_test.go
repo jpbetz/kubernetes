@@ -2406,6 +2406,9 @@ func TestBinarySIStringAtLargeScales(t *testing.T) {
 		want string
 	}{
 		{intQuantity(1, 69, BinarySI), "867361737988403547205962240695953369140625000000000Ei"}, // 2^9 * 5^69
+		{intQuantity(1, 70, BinarySI), "10e69"},                                                 // 2^70 * 5^70: 2^70 is 1024^7, one power of 1024 past Ei
+		{intQuantity(1, 71, BinarySI), "100e69"},
+		{intQuantity(-1, 70, BinarySI), "-10e69"},
 	} {
 		for _, asDec := range []bool{false, true} {
 			q := tc.in
