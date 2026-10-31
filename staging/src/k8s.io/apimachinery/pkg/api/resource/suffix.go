@@ -17,6 +17,7 @@ limitations under the License.
 package resource
 
 import (
+	"math"
 	"strconv"
 )
 
@@ -24,8 +25,11 @@ import (
 type suffixValue struct {
 	format Format
 	// decimalScale is the value multiplier for decimal suffixes, represented as
-	// a 10^n scale value.
-	decimalScale Scale
+	// a 10^n scale value. It's the exponent value that was parsed, capped to a
+	// range wider than the Scale range. It must not be saturated to the Scale
+	// range until after offsetting it for any digits after the decimal point
+	// from the parsed quantity.
+	decimalScale widenedScale
 	// binaryExponent is the value multiplier for BinarySI suffixes (1024^n).
 	binaryExponent int32
 }
@@ -72,9 +76,9 @@ func parseSuffix(s string) (suffixValue, bool) {
 		if err != nil {
 			return suffixValue{}, false
 		}
-		// Stored objects keep the spelling they were given, so narrowing
-		// rather than rejecting is what keeps them decodable.
-		return suffixValue{format: DecimalExponent, decimalScale: Scale(parsed)}, true
+		// Clamp so scale arithmetic can't overflow.
+		scale := widenedScale(min(max(parsed, math.MinInt32), 2*math.MaxInt32))
+		return suffixValue{format: DecimalExponent, decimalScale: scale}, true
 	}
 
 	return suffixValue{}, false
