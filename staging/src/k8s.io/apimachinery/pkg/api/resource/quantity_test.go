@@ -912,16 +912,17 @@ func TestQuantityParse(t *testing.T) {
 	}
 }
 
-func TestInterpretExponentInt32Bounds(t *testing.T) {
-	// interpret parses the exponent at 64 bits and narrows it to the int32
-	// scale, the way a <=1.37 apiserver did, so that objects it wrote keep
-	// decoding. The exception is a scale of math.MinInt32, whose negation
-	// overflows int32. This checks interpret's suffix-layer behaviour only,
-	// not what the rest of ParseQuantity does with an accepted exponent.
+func TestParseSuffix(t *testing.T) {
+	// parseSuffix rejects anything outside the Quantity grammar. It parses the
+	// exponent at 64 bits and narrows it to the int32 scale, the way a <=1.37
+	// apiserver did, so that objects it wrote keep decoding. The exception is a
+	// scale of math.MinInt32, whose negation overflows int32. This checks
+	// parseSuffix's behaviour only, not what the rest of ParseQuantity does with
+	// an accepted exponent.
 	cases := []struct {
-		suffix  string
-		wantExp int32
-		wantOK  bool
+		suffix    string
+		wantScale Scale
+		wantOK    bool
 	}{
 		{"e14", 14, true},
 		{"E2147483647", 2147483647, true},     // MaxInt32
@@ -933,14 +934,72 @@ func TestInterpretExponentInt32Bounds(t *testing.T) {
 		{"E9223372036854775807", -1, true},    // MaxInt64 narrows to -1
 		{"E9223372036854775808", 0, false},    // MaxInt64 + 1, past int64: ParseInt range error
 		{"E6024865272343", -973843945, true},  // far past int32, narrows
+
+		// suffixes outside the Quantity grammar are rejected
+		{"Zi", 0, false},
+		{"Yi", 0, false},
+		{"Z", 0, false},
+		{"Y", 0, false},
+		{"R", 0, false},
+		{"Q", 0, false},
+		{"K", 0, false},
+		{"ki", 0, false},
+		{"e", 0, false},
+		{"e-", 0, false},
+		{"e1.5", 0, false},
 	}
 	for _, tc := range cases {
-		base, exp, format, ok := quantitySuffixer.interpret(suffix(tc.suffix))
-		if ok != tc.wantOK || (ok && (exp != tc.wantExp || base != 10 || format != DecimalExponent)) {
-			t.Errorf("interpret(%q) = (base=%d, exp=%d, %v, ok=%t), want exp=%d ok=%t",
-				tc.suffix, base, exp, format, ok, tc.wantExp, tc.wantOK)
+		got, ok := parseSuffix(tc.suffix)
+		want := suffixValue{format: DecimalExponent, decimalScale: tc.wantScale}
+		if ok != tc.wantOK || (ok && got != want) {
+			t.Errorf("parseSuffix(%q) = (%+v, ok=%t), want scale=%d ok=%t",
+				tc.suffix, got, ok, tc.wantScale, tc.wantOK)
 		}
 	}
+}
+
+func TestSuffixRoundTrip(t *testing.T) {
+	// Every suffix the write functions produce must parse back to the same multiplier.
+	check := func(written []byte, want suffixValue) {
+		t.Helper()
+		if got, ok := parseSuffix(string(written)); !ok || got != want {
+			t.Errorf("parseSuffix(%q) = (%+v, ok=%t), want %+v", written, got, ok, want)
+		}
+	}
+
+	written := 0
+	for exponent := Scale(-30); exponent <= 30; exponent++ {
+		if s, ok := decimalSISuffix(exponent); ok {
+			written++
+			check(s, suffixValue{format: DecimalSI, decimalScale: exponent})
+		}
+	}
+	// The loop above should reach every suffix in the table.
+	if written != len(decimalSISuffixes) {
+		t.Errorf("decimalSISuffix wrote %d suffixes, want %d", written, len(decimalSISuffixes))
+	}
+
+	written = 0
+	for exponent := int32(-10); exponent <= 10; exponent++ {
+		if s, ok := binarySISuffix(exponent); ok {
+			written++
+			want := suffixValue{format: BinarySI, binaryExponent: exponent}
+			if exponent == 0 {
+				// The empty suffix for 1024^0 parses as DecimalSI.
+				want = suffixValue{format: DecimalSI}
+			}
+			check(s, want)
+		}
+	}
+	if written != len(binarySISuffixes) {
+		t.Errorf("binarySISuffix wrote %d suffixes, want %d", written, len(binarySISuffixes))
+	}
+
+	for _, exponent := range []Scale{math.MinInt32, -9, -1, 1, 18, 21, math.MaxInt32} {
+		check(decimalExponentSuffix(exponent), suffixValue{format: DecimalExponent, decimalScale: exponent})
+	}
+	// The empty suffix parses as DecimalSI.
+	check(decimalExponentSuffix(0), suffixValue{format: DecimalSI})
 }
 
 func TestQuantityRoundUp(t *testing.T) {
