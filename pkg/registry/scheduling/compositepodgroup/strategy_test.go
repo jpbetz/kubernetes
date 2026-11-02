@@ -38,8 +38,9 @@ import (
 var (
 	cpg = &scheduling.CompositePodGroup{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "foo",
-			Namespace: metav1.NamespaceDefault,
+			Name:       "foo",
+			Namespace:  metav1.NamespaceDefault,
+			Generation: 1,
 		},
 		Spec: scheduling.CompositePodGroupSpec{
 			WorkloadRef: &scheduling.WorkloadReference{

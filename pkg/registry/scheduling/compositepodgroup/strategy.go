@@ -21,6 +21,7 @@ import (
 
 	"sigs.k8s.io/structured-merge-diff/v7/fieldpath"
 
+	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -65,6 +66,7 @@ func (*compositePodGroupStrategy) PrepareForCreate(ctx context.Context, obj runt
 	cpg := obj.(*scheduling.CompositePodGroup)
 	// Status must not be set by user on create.
 	cpg.Status = scheduling.CompositePodGroupStatus{}
+	cpg.Generation = 1
 	dropDisabledCompositePodGroupFields(cpg, nil)
 }
 
@@ -97,6 +99,10 @@ func (*compositePodGroupStrategy) PrepareForUpdate(ctx context.Context, obj, old
 	oldCPG := old.(*scheduling.CompositePodGroup)
 	newCPG.Status = oldCPG.Status
 	dropDisabledCompositePodGroupFields(newCPG, oldCPG)
+
+	if !apiequality.Semantic.DeepEqual(oldCPG.Spec, newCPG.Spec) {
+		newCPG.Generation = oldCPG.Generation + 1
+	}
 }
 
 func (*compositePodGroupStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {

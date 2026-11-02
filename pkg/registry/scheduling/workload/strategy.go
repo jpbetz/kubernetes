@@ -19,6 +19,7 @@ package workload
 import (
 	"context"
 
+	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -44,7 +45,9 @@ func (workloadStrategy) NamespaceScoped() bool {
 }
 
 func (workloadStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
-	dropDisabledWorkloadFields(obj.(*scheduling.Workload), nil)
+	workload := obj.(*scheduling.Workload)
+	workload.Generation = 1
+	dropDisabledWorkloadFields(workload, nil)
 }
 
 func (workloadStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
@@ -74,7 +77,13 @@ func (workloadStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 }
 
 func (workloadStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
-	dropDisabledWorkloadFields(obj.(*scheduling.Workload), old.(*scheduling.Workload))
+	newWorkload := obj.(*scheduling.Workload)
+	oldWorkload := old.(*scheduling.Workload)
+	dropDisabledWorkloadFields(newWorkload, oldWorkload)
+
+	if !apiequality.Semantic.DeepEqual(oldWorkload.Spec, newWorkload.Spec) {
+		newWorkload.Generation = oldWorkload.Generation + 1
+	}
 }
 
 func (workloadStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {

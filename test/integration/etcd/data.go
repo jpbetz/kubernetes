@@ -82,6 +82,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		// k8s.io/kubernetes/pkg/api/v1
 		gvr("", "v1", "configmaps"): {
 			Stub:              `{"data": {"foo": "bar"}, "metadata": {"name": "cm1"}}`,
+			MutatedStub:       `{"data": {"foo": "baz"}}`,
 			ExpectedEtcdPath:  "/registry/configmaps/" + namespace + "/cm1",
 			IntroducedVersion: "1.2",
 		},
@@ -95,17 +96,19 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		},
 		gvr("", "v1", "podtemplates"): {
 			Stub:              `{"metadata": {"name": "pt1name"}, "template": {"metadata": {"labels": {"pt": "01"}}, "spec": {"containers": [{"image": "` + image + `", "name": "container9"}]}}}`,
+			MutatedStub:       `{"template": {"metadata": {"labels": {"pt": "01"}}, "spec": {"containers": [{"image": "` + alternateImage + `", "name": "container9"}]}}}`,
 			ExpectedEtcdPath:  "/registry/podtemplates/" + namespace + "/pt1name",
 			IntroducedVersion: "1.0",
 		},
 		gvr("", "v1", "pods"): {
 			Stub:              `{"metadata": {"name": "pod1"}, "spec": {"containers": [{"image": "` + image + `", "name": "container7", "resources": {"limits": {"cpu": "1M"}, "requests": {"cpu": "1M"}}}]}}`,
-			MutatedStub:       `{"metadata": {"deletionTimestamp": "2020-01-01T00:00:00Z", "ownerReferences":[]}, "spec": {"containers": [{"image": "` + alternateImage + `", "name": "container7"}]}}`,
+			MutatedStub:       `{"spec": {"containers": [{"image": "` + alternateImage + `", "name": "container7", "resources": {"limits": {"cpu": "1M"}, "requests": {"cpu": "1M"}}}]}}`,
 			ExpectedEtcdPath:  "/registry/pods/" + namespace + "/pod1",
 			IntroducedVersion: "1.0",
 		},
 		gvr("", "v1", "endpoints"): {
 			Stub:              `{"metadata": {"name": "ep1name"}, "subsets": [{"addresses": [{"hostname": "bar-001", "ip": "192.168.3.1"}], "ports": [{"port": 8000}]}]}`,
+			MutatedStub:       `{"subsets": [{"addresses": [{"hostname": "bar-001", "ip": "192.168.3.2"}], "ports": [{"port": 8000}]}]}`,
 			ExpectedEtcdPath:  "/registry/services/endpoints/" + namespace + "/ep1name",
 			IntroducedVersion: "1.0",
 		},
@@ -119,6 +122,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		},
 		gvr("", "v1", "limitranges"): {
 			Stub:              `{"metadata": {"name": "lr1name"}, "spec": {"limits": [{"type": "Pod"}]}}`,
+			MutatedStub:       `{"spec": {"limits": [{"type": "Container"}]}}`,
 			ExpectedEtcdPath:  "/registry/limitranges/" + namespace + "/lr1name",
 			IntroducedVersion: "1.0",
 		},
@@ -144,6 +148,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		},
 		gvr("", "v1", "events"): {
 			Stub:              `{"involvedObject": {"namespace": "` + namespace + `"}, "message": "some data here", "metadata": {"name": "event1"}}`,
+			MutatedStub:       `{"message": "some other data here"}`,
 			ExpectedEtcdPath:  "/registry/events/" + namespace + "/event1",
 			IntroducedVersion: "1.0",
 		},
@@ -155,17 +160,19 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		},
 		gvr("", "v1", "serviceaccounts"): {
 			Stub:              `{"metadata": {"name": "sa1name"}, "secrets": [{"name": "secret00"}]}`,
+			MutatedStub:       `{"secrets": [{"name": "secret01"}]}`,
 			ExpectedEtcdPath:  "/registry/serviceaccounts/" + namespace + "/sa1name",
 			IntroducedVersion: "1.0",
 		},
 		gvr("", "v1", "secrets"): {
 			Stub:              `{"data": {"key": "ZGF0YSBmaWxl"}, "metadata": {"name": "secret1"}}`,
+			MutatedStub:       `{"data": {"key": "b3RoZXIgZGF0YQ=="}}`,
 			ExpectedEtcdPath:  "/registry/secrets/" + namespace + "/secret1",
 			IntroducedVersion: "1.0",
 		},
 		gvr("", "v1", "replicationcontrollers"): {
 			Stub:              `{"metadata": {"name": "rc1"}, "spec": {"selector": {"new": "stuff"}, "template": {"metadata": {"labels": {"new": "stuff"}}, "spec": {"containers": [{"image": "` + image + `", "name": "container8"}]}}}}`,
-			MutatedStub:       `{"spec": {"selector": {"new": "stuff2"}}}`,
+			MutatedStub:       `{"spec": {"template": {"spec": {"containers": [{"image": "` + alternateImage + `", "name": "container8"}]}}}}`,
 			ExpectedEtcdPath:  "/registry/controllers/" + namespace + "/rc1",
 			IntroducedVersion: "1.0",
 		},
@@ -186,7 +193,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		},
 		gvr("apps", "v1", "statefulsets"): {
 			Stub:              `{"metadata": {"name": "ss3"}, "spec": {"selector": {"matchLabels": {"a": "b"}}, "template": {"metadata": {"labels": {"a": "b"}}, "spec": {"restartPolicy": "Always", "terminationGracePeriodSeconds": 30, "containers": [{"image": "` + image + `", "name": "container6", "terminationMessagePolicy": "File"}]}}}}`,
-			MutatedStub:       `{"spec": {"selector": {"matchLabels": {"a2": "b2"}}}}`,
+			MutatedStub:       `{"spec": {"template": {"spec": {"restartPolicy": "Always", "terminationGracePeriodSeconds": 30, "containers": [{"image": "` + alternateImage + `", "name": "container6", "terminationMessagePolicy": "File"}]}}}}`,
 			ExpectedEtcdPath:  "/registry/statefulsets/" + namespace + "/ss3",
 			IntroducedVersion: "1.9",
 		},
@@ -198,6 +205,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		},
 		gvr("apps", "v1", "controllerrevisions"): {
 			Stub:              `{"metadata":{"name":"crs3"},"data":{"name":"abc","namespace":"default","Spec":{"Replicas":0,"Selector":{"matchLabels":{"foo":"bar"}},"Template":{"labels":{"foo":"bar"},"Spec":{"Volumes":null,"InitContainers":null,"Containers":null,"RestartPolicy":"Always","TerminationGracePeriodSeconds":null,"ActiveDeadlineSeconds":null,"DNSPolicy":"ClusterFirst","NodeSelector":null,"ServiceAccountName":"","AutomountServiceAccountToken":null,"NodeName":"","SecurityContext":null,"ImagePullSecrets":null,"Hostname":"","Subdomain":"","Affinity":null,"SchedulerName":"","Tolerations":null,"HostAliases":null}},"VolumeClaimTemplates":null,"ServiceName":""},"Status":{"ObservedGeneration":null,"Replicas":0}},"revision":0}`,
+			MutatedStub:       `{"revision": 1}`,
 			ExpectedEtcdPath:  "/registry/controllerrevisions/" + namespace + "/crs3",
 			IntroducedVersion: "1.9",
 		},
@@ -228,8 +236,8 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 
 		// k8s.io/kubernetes/pkg/apis/batch/v1
 		gvr("batch", "v1", "jobs"): {
-			Stub:              `{"metadata": {"name": "job1"}, "spec": {"manualSelector": true, "selector": {"matchLabels": {"controller-uid": "uid1"}}, "template": {"metadata": {"labels": {"controller-uid": "uid1"}}, "spec": {"containers": [{"image": "` + image + `", "name": "container1"}], "dnsPolicy": "ClusterFirst", "restartPolicy": "Never"}}}}`,
-			MutatedStub:       `{"spec": {"template": {"spec": {"containers": [{"image": "` + alternateImage + `", "name": "container1"}]}}}}`,
+			Stub:              `{"metadata": {"name": "job1"}, "spec": {"parallelism": 1, "manualSelector": true, "selector": {"matchLabels": {"controller-uid": "uid1"}}, "template": {"metadata": {"labels": {"controller-uid": "uid1"}}, "spec": {"containers": [{"image": "` + image + `", "name": "container1"}], "dnsPolicy": "ClusterFirst", "restartPolicy": "Never"}}}}`,
+			MutatedStub:       `{"spec": {"parallelism": 2}}`,
 			ExpectedEtcdPath:  "/registry/jobs/" + namespace + "/job1",
 			IntroducedVersion: "1.2",
 		},
@@ -253,6 +261,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 
 		gvr("certificates.k8s.io", "v1", "clustertrustbundles"): {
 			Stub:              `{"metadata": {"name": "example.com:signer:abcde"}, "spec": {"signerName":"example.com/signer", "trustBundle": "-----BEGIN CERTIFICATE-----\nMIIBBDCBt6ADAgECAgEAMAUGAytlcDAQMQ4wDAYDVQQDEwVyb290MTAiGA8wMDAx\nMDEwMTAwMDAwMFoYDzAwMDEwMTAxMDAwMDAwWjAQMQ4wDAYDVQQDEwVyb290MTAq\nMAUGAytlcAMhAF2MoFeGa97gK2NGT1h6p1/a1GlMXAXbcjI/OShyIobPozIwMDAP\nBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTWDdK2CNQiHqRjPaAWYPPtIykQgjAF\nBgMrZXADQQCtom9WGl7m2SAa4tXM9Soo/mbInBsRhn187BMoqTAHInHchKup5/3y\nl1tYJSZZsEXnXrCvw2qLCBNif6+2YYgE\n-----END CERTIFICATE-----\n"}}`,
+			MutatedStub:       `{"spec": {"trustBundle": "-----BEGIN CERTIFICATE-----\nMIIC/jCCAeagAwIBAgIBADANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDEwprdWJl\ncm5ldGVzMB4XDTIyMTAxOTIzMTY0MFoXDTMyMTAxNjIzMTY0MFowFTETMBEGA1UE\nAxMKa3ViZXJuZXRlczCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAO+k\nzbj35jHIjCd5mxP1FHMwMtvLFPeKUjtaLDP9Bs2jZ97Igmr7NTysn9QZkRP68/XX\nj993Y8tOLg71N4vRggWiYP+T9Xfo0uHZJmzADKx5XkuC4Gqv79dUdb8IKfAbX9HB\nffGmWRnZLLTu8Bv/vfyl0CfE64a57DK+CzNJDwdK46CYYUnEH6Wb9finYrMQ+PLG\nOi2c0J4KAYc1WTId5npNwouzf/IMD33PvuXfE7r+/pDbP8u/X03e7U0cc9l7KRxr\n3gpRQemCG74yRuy1dd3lJ1YCD8q96xVVZimGebnJ0IHi+lORRa2ix/o3OzW3FaP+\n6kzHU6VnBRDr2rAhMh0CAwEAAaNZMFcwDgYDVR0PAQH/BAQDAgKkMA8GA1UdEwEB\n/wQFMAMBAf8wHQYDVR0OBBYEFGUVOLM74t1TVoZjifsLl3Rwt1A6MBUGA1UdEQQO\nMAyCCmt1YmVybmV0ZXMwDQYJKoZIhvcNAQELBQADggEBANHnPVDemZqRybYPN1as\nYwxi3iT1I3Wma1rZyxTWeIq8Ik0gnyvbtCD1cFB/5QU1xPW09YnmIFM/E73RIeWT\nRmCNMgOGmegYxBQRe4UvmwWGJzKNA66c0MBmd2LDHrQlrvdewOCR667Sm9krsGt1\ntS/t6N/uBXeRSkXKEDXa+jOpYrV3Oq3IntG6zUeCrVbrH2Bs9Ma5fU00TwK3ylw5\nWw8KzYdQaxxrLaiRRtFcpM9dFH/vwxl1QUa5vjHcmUjxmZunEmXKplATyLT0FXDw\nJAo8AuwuuwRh2o+o8SxwzzA+/EBrIREgcv5uIkD352QnfGkEvGu6JOPGZVyd/kVg\nKA0=\n-----END CERTIFICATE-----\n"}}`,
 			ExpectedEtcdPath:  "/registry/clustertrustbundles/example.com:signer:abcde",
 			ExpectedGVK:       gvkP("certificates.k8s.io", "v1beta1", "ClusterTrustBundle"),
 			IntroducedVersion: "1.37",
@@ -272,6 +281,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		// k8s.io/kubernetes/pkg/apis/certificates/v1beta1
 		gvr("certificates.k8s.io", "v1beta1", "clustertrustbundles"): {
 			Stub:              `{"metadata": {"name": "example.com:signer:abc"}, "spec": {"signerName":"example.com/signer", "trustBundle": "-----BEGIN CERTIFICATE-----\nMIIBBDCBt6ADAgECAgEAMAUGAytlcDAQMQ4wDAYDVQQDEwVyb290MTAiGA8wMDAx\nMDEwMTAwMDAwMFoYDzAwMDEwMTAxMDAwMDAwWjAQMQ4wDAYDVQQDEwVyb290MTAq\nMAUGAytlcAMhAF2MoFeGa97gK2NGT1h6p1/a1GlMXAXbcjI/OShyIobPozIwMDAP\nBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTWDdK2CNQiHqRjPaAWYPPtIykQgjAF\nBgMrZXADQQCtom9WGl7m2SAa4tXM9Soo/mbInBsRhn187BMoqTAHInHchKup5/3y\nl1tYJSZZsEXnXrCvw2qLCBNif6+2YYgE\n-----END CERTIFICATE-----\n"}}`,
+			MutatedStub:       `{"spec": {"trustBundle": "-----BEGIN CERTIFICATE-----\nMIIC/jCCAeagAwIBAgIBADANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDEwprdWJl\ncm5ldGVzMB4XDTIyMTAxOTIzMTY0MFoXDTMyMTAxNjIzMTY0MFowFTETMBEGA1UE\nAxMKa3ViZXJuZXRlczCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAO+k\nzbj35jHIjCd5mxP1FHMwMtvLFPeKUjtaLDP9Bs2jZ97Igmr7NTysn9QZkRP68/XX\nj993Y8tOLg71N4vRggWiYP+T9Xfo0uHZJmzADKx5XkuC4Gqv79dUdb8IKfAbX9HB\nffGmWRnZLLTu8Bv/vfyl0CfE64a57DK+CzNJDwdK46CYYUnEH6Wb9finYrMQ+PLG\nOi2c0J4KAYc1WTId5npNwouzf/IMD33PvuXfE7r+/pDbP8u/X03e7U0cc9l7KRxr\n3gpRQemCG74yRuy1dd3lJ1YCD8q96xVVZimGebnJ0IHi+lORRa2ix/o3OzW3FaP+\n6kzHU6VnBRDr2rAhMh0CAwEAAaNZMFcwDgYDVR0PAQH/BAQDAgKkMA8GA1UdEwEB\n/wQFMAMBAf8wHQYDVR0OBBYEFGUVOLM74t1TVoZjifsLl3Rwt1A6MBUGA1UdEQQO\nMAyCCmt1YmVybmV0ZXMwDQYJKoZIhvcNAQELBQADggEBANHnPVDemZqRybYPN1as\nYwxi3iT1I3Wma1rZyxTWeIq8Ik0gnyvbtCD1cFB/5QU1xPW09YnmIFM/E73RIeWT\nRmCNMgOGmegYxBQRe4UvmwWGJzKNA66c0MBmd2LDHrQlrvdewOCR667Sm9krsGt1\ntS/t6N/uBXeRSkXKEDXa+jOpYrV3Oq3IntG6zUeCrVbrH2Bs9Ma5fU00TwK3ylw5\nWw8KzYdQaxxrLaiRRtFcpM9dFH/vwxl1QUa5vjHcmUjxmZunEmXKplATyLT0FXDw\nJAo8AuwuuwRh2o+o8SxwzzA+/EBrIREgcv5uIkD352QnfGkEvGu6JOPGZVyd/kVg\nKA0=\n-----END CERTIFICATE-----\n"}}`,
 			ExpectedEtcdPath:  "/registry/clustertrustbundles/example.com:signer:abc",
 			ExpectedGVK:       gvkP("certificates.k8s.io", "v1beta1", "ClusterTrustBundle"),
 			IntroducedVersion: "1.33",
@@ -282,7 +292,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 			ExpectedEtcdPath:  "/registry/podcertificaterequests/" + namespace + "/req-1",
 			ExpectedGVK:       gvkP("certificates.k8s.io", "v1beta1", "PodCertificateRequest"),
 			StatusStub:        `{"status": {"conditions": [{"type": "Denied", "status":"True", "lastTransitionTime": "2020-01-01T00:00:00Z", "reason": "TestReason", "message": "test message"}]}}`,
-			MutatedStatusStub: `{"status": {"conditions": [{"type": "Denied", "status":"False", "lastTransitionTime": "2020-01-01T00:00:00Z", "reason": "TestReason", "message": "test message"}]}}`,
+			MutatedStatusStub: `{"status": {"conditions": [{"type": "Denied", "status":"True", "lastTransitionTime": "2020-01-01T00:00:00Z", "reason": "TestReason", "message": "updated test message"}]}}`,
 			IntroducedVersion: "1.35",
 			RemovedVersion:    "1.39",
 		},
@@ -291,7 +301,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 			ExpectedEtcdPath:  "/registry/podcertificaterequests/" + namespace + "/req-2",
 			ExpectedGVK:       gvkP("certificates.k8s.io", "v1beta1", "PodCertificateRequest"),
 			StatusStub:        `{"status": {"conditions": [{"type": "Denied", "status":"True", "lastTransitionTime": "2020-01-01T00:00:00Z", "reason": "TestReason", "message": "test message"}]}}`,
-			MutatedStatusStub: `{"status": {"conditions": [{"type": "Denied", "status":"False", "lastTransitionTime": "2020-01-01T00:00:00Z", "reason": "TestReason", "message": "test message"}]}}`,
+			MutatedStatusStub: `{"status": {"conditions": [{"type": "Denied", "status":"True", "lastTransitionTime": "2020-01-01T00:00:00Z", "reason": "TestReason", "message": "updated test message"}]}}`,
 			IntroducedVersion: "1.37",
 		},
 		// --
@@ -299,6 +309,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		// k8s.io/kubernetes/pkg/apis/coordination/v1
 		gvr("coordination.k8s.io", "v1", "leases"): {
 			Stub:              `{"metadata": {"name": "leasev1"}, "spec": {"holderIdentity": "holder", "leaseDurationSeconds": 5}}`,
+			MutatedStub:       `{"spec": {"leaseDurationSeconds": 10}}`,
 			ExpectedEtcdPath:  "/registry/leases/" + namespace + "/leasev1",
 			IntroducedVersion: "1.14",
 		},
@@ -307,6 +318,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		// k8s.io/kubernetes/pkg/apis/coordination/v1beta1
 		gvr("coordination.k8s.io", "v1beta1", "leasecandidates"): {
 			Stub:              `{"metadata": {"name": "leasecandidatev1beta1"}, "spec": {"leaseName": "lease", "binaryVersion": "0.1.0", "emulationVersion": "0.1.0", "strategy": "OldestEmulationVersion"}}`,
+			MutatedStub:       `{"spec": {"binaryVersion": "0.2.0", "emulationVersion": "0.2.0"}}`,
 			ExpectedEtcdPath:  "/registry/leasecandidates/" + namespace + "/leasecandidatev1beta1",
 			IntroducedVersion: "1.33",
 			RemovedVersion:    "1.39",
@@ -316,6 +328,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		// k8s.io/kubernetes/pkg/apis/coordination/v1alpha2
 		gvr("coordination.k8s.io", "v1alpha2", "leasecandidates"): {
 			Stub:              `{"metadata": {"name": "leasecandidatev1alpha2"}, "spec": {"leaseName": "lease", "binaryVersion": "0.1.0", "emulationVersion": "0.1.0", "strategy": "OldestEmulationVersion"}}`,
+			MutatedStub:       `{"spec": {"binaryVersion": "0.2.0", "emulationVersion": "0.2.0"}}`,
 			ExpectedEtcdPath:  "/registry/leasecandidates/" + namespace + "/leasecandidatev1alpha2",
 			ExpectedGVK:       gvkP("coordination.k8s.io", "v1beta1", "LeaseCandidate"),
 			IntroducedVersion: "1.32",
@@ -325,6 +338,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		// k8s.io/kubernetes/pkg/apis/lifecycle/v1alpha1
 		gvr("lifecycle.k8s.io", "v1alpha1", "evictionrequests"): {
 			Stub:              `{"metadata": {"name": "pod-eviction-request"}, "spec": {"target": {"pod": {"name": "my-workload", "uid": "3d7fdff1-3fe5-48b9-b106-1ee24b0277f6"}}, "requester": "drain.foo.com/bar", "intent": "Eviction"}}`,
+			MutatedStub:       `{"spec": {"target": {"pod": {"name": "my-workload", "uid": "3d7fdff1-3fe5-48b9-b106-1ee24b0277f6"}}, "requester": "drain.foo.com/bar", "intent": "Withdrawn"}}`,
 			ExpectedEtcdPath:  "/registry/evictionrequests/" + namespace + "/pod-eviction-request",
 			ExpectedGVK:       gvkP("lifecycle.k8s.io", "v1alpha1", "EvictionRequest"),
 			IntroducedVersion: "1.37",
@@ -340,6 +354,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		// k8s.io/kubernetes/pkg/apis/discovery/v1
 		gvr("discovery.k8s.io", "v1", "endpointslices"): {
 			Stub:              `{"metadata": {"name": "slicev1"}, "addressType": "IPv4", "protocol": "TCP", "ports": [], "endpoints": []}`,
+			MutatedStub:       `{"endpoints": [{"addresses": ["10.1.2.3"]}]}`,
 			ExpectedEtcdPath:  "/registry/endpointslices/" + namespace + "/slicev1",
 			IntroducedVersion: "1.21",
 		},
@@ -348,6 +363,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		// k8s.io/kubernetes/pkg/apis/events/v1
 		gvr("events.k8s.io", "v1", "events"): {
 			Stub:              `{"metadata": {"name": "event3"}, "regarding": {"namespace": "` + namespace + `"}, "note": "some data here", "eventTime": "2017-08-09T15:04:05.000000Z", "reportingInstance": "node-xyz", "reportingController": "k8s.io/my-controller", "action": "DidNothing", "reason": "Laziness", "type": "Normal"}`,
+			MutatedStub:       `{"series": {"count": 2, "lastObservedTime": "2017-08-09T15:04:06.000000Z"}}`,
 			ExpectedEtcdPath:  "/registry/events/" + namespace + "/event3",
 			ExpectedGVK:       gvkP("", "v1", "Event"),
 			IntroducedVersion: "1.19",
@@ -365,11 +381,13 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		},
 		gvr("networking.k8s.io", "v1", "ingressclasses"): {
 			Stub:              `{"metadata": {"name": "ingressclass3"}, "spec": {"controller": "example.com/controller"}}`,
+			MutatedStub:       `{"spec": {"parameters": {"kind": "IngressParameters", "name": "test-params"}}}`,
 			ExpectedEtcdPath:  "/registry/ingressclasses/ingressclass3",
 			IntroducedVersion: "1.19",
 		},
 		gvr("networking.k8s.io", "v1", "networkpolicies"): {
 			Stub:              `{"metadata": {"name": "np2"}, "spec": {"podSelector": {"matchLabels": {"e": "f"}}}}`,
+			MutatedStub:       `{"spec": {"podSelector": {"matchLabels": {"e": "f2"}}}}`,
 			ExpectedEtcdPath:  "/registry/networkpolicies/" + namespace + "/np2",
 			IntroducedVersion: "1.7",
 		},
@@ -492,11 +510,13 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		// k8s.io/kubernetes/pkg/apis/storage/v1
 		gvr("storage.k8s.io", "v1", "storageclasses"): {
 			Stub:              `{"metadata": {"name": "sc2"}, "provisioner": "aws"}`,
+			MutatedStub:       `{"allowVolumeExpansion": true}`,
 			ExpectedEtcdPath:  "/registry/storageclasses/sc2",
 			IntroducedVersion: "1.6",
 		},
 		gvr("storage.k8s.io", "v1", "csistoragecapacities"): {
 			Stub:              `{"metadata": {"name": "csc-12345-3"}, "storageClassName": "sc1"}`,
+			MutatedStub:       `{"capacity": "10Gi"}`,
 			ExpectedEtcdPath:  "/registry/csistoragecapacities/" + namespace + "/csc-12345-3",
 			IntroducedVersion: "1.24",
 		},
@@ -505,21 +525,25 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		// k8s.io/kubernetes/pkg/apis/rbac/v1
 		gvr("rbac.authorization.k8s.io", "v1", "roles"): {
 			Stub:              `{"metadata": {"name": "role3"}, "rules": [{"apiGroups": ["v1"], "resources": ["events"], "verbs": ["watch"]}]}`,
+			MutatedStub:       `{"rules": [{"apiGroups": ["v1"], "resources": ["events"], "verbs": ["get"]}]}`,
 			ExpectedEtcdPath:  "/registry/roles/" + namespace + "/role3",
 			IntroducedVersion: "1.8",
 		},
 		gvr("rbac.authorization.k8s.io", "v1", "clusterroles"): {
 			Stub:              `{"metadata": {"name": "crole3"}, "rules": [{"nonResourceURLs": ["/version"], "verbs": ["get"]}]}`,
+			MutatedStub:       `{"rules": [{"nonResourceURLs": ["/healthz"], "verbs": ["get"]}]}`,
 			ExpectedEtcdPath:  "/registry/clusterroles/crole3",
 			IntroducedVersion: "1.8",
 		},
 		gvr("rbac.authorization.k8s.io", "v1", "rolebindings"): {
 			Stub:              `{"metadata": {"name": "roleb3"}, "roleRef": {"apiGroup": "rbac.authorization.k8s.io", "kind": "ClusterRole", "name": "somecr"}, "subjects": [{"apiVersion": "rbac.authorization.k8s.io/v1alpha1", "kind": "Group", "name": "system:authenticated"}]}`,
+			MutatedStub:       `{"subjects": [{"apiGroup": "rbac.authorization.k8s.io", "kind": "Group", "name": "system:unauthenticated"}]}`,
 			ExpectedEtcdPath:  "/registry/rolebindings/" + namespace + "/roleb3",
 			IntroducedVersion: "1.8",
 		},
 		gvr("rbac.authorization.k8s.io", "v1", "clusterrolebindings"): {
 			Stub:              `{"metadata": {"name": "croleb3"}, "roleRef": {"apiGroup": "rbac.authorization.k8s.io", "kind": "ClusterRole", "name": "somecr"}, "subjects": [{"apiVersion": "rbac.authorization.k8s.io/v1alpha1", "kind": "Group", "name": "system:authenticated"}]}`,
+			MutatedStub:       `{"subjects": [{"apiGroup": "rbac.authorization.k8s.io", "kind": "Group", "name": "system:unauthenticated"}]}`,
 			ExpectedEtcdPath:  "/registry/clusterrolebindings/croleb3",
 			IntroducedVersion: "1.8",
 		},
@@ -528,11 +552,13 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		// k8s.io/kubernetes/pkg/apis/admissionregistration/v1
 		gvr("admissionregistration.k8s.io", "v1", "validatingwebhookconfigurations"): {
 			Stub:              `{"metadata":{"name":"hook2"},"webhooks":[{"name":"externaladmissionhook.k8s.io","clientConfig":{"service":{"namespace":"ns","name":"n"},"caBundle":null},"rules":[{"operations":["CREATE"],"apiGroups":["group"],"apiVersions":["version"],"resources":["resource"]}],"failurePolicy":"Ignore","sideEffects":"None","admissionReviewVersions":["v1beta1"]}]}`,
+			MutatedStub:       `{"webhooks":[]}`,
 			ExpectedEtcdPath:  "/registry/validatingwebhookconfigurations/hook2",
 			IntroducedVersion: "1.16",
 		},
 		gvr("admissionregistration.k8s.io", "v1", "mutatingwebhookconfigurations"): {
 			Stub:              `{"metadata":{"name":"hook2"},"webhooks":[{"name":"externaladmissionhook.k8s.io","clientConfig":{"service":{"namespace":"ns","name":"n"},"caBundle":null},"rules":[{"operations":["CREATE"],"apiGroups":["group"],"apiVersions":["version"],"resources":["resource"]}],"failurePolicy":"Ignore","sideEffects":"None","admissionReviewVersions":["v1beta1"]}]}`,
+			MutatedStub:       `{"webhooks":[]}`,
 			ExpectedEtcdPath:  "/registry/mutatingwebhookconfigurations/hook2",
 			IntroducedVersion: "1.16",
 		},
@@ -544,17 +570,20 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		},
 		gvr("admissionregistration.k8s.io", "v1", "validatingadmissionpolicybindings"): {
 			Stub:              `{"metadata":{"name":"pb1"},"spec":{"policyName":"replicalimit-policy.example.com","paramRef":{"name":"replica-limit-test.example.com","parameterNotFoundAction":"Deny"},"validationActions":["Deny"]}}`,
+			MutatedStub:       `{"spec":{"validationActions":["Warn"]}}`,
 			ExpectedEtcdPath:  "/registry/validatingadmissionpolicybindings/pb1",
 			IntroducedVersion: "1.30",
 		},
 		gvr("admissionregistration.k8s.io", "v1", "mutatingadmissionpolicies"): {
 			Stub:              `{"metadata":{"name":"map1v1"},"spec":{"paramKind":{"apiVersion":"test.example.com/v1","kind":"Example"},"matchConstraints":{"resourceRules": [{"resourceNames": ["fakeName"], "apiGroups":["apps"],"apiVersions":["v1"],"operations":["CREATE", "UPDATE"], "resources":["deployments"]}]},"reinvocationPolicy": "IfNeeded","mutations":[{"applyConfiguration": {"expression":"Object{metadata: Object.metadata{labels: {'example':'true'}}}"}, "patchType":"ApplyConfiguration"}]}}`,
+			MutatedStub:       `{"spec":{"reinvocationPolicy":"Never"}}`,
 			ExpectedEtcdPath:  "/registry/mutatingadmissionpolicies/map1v1",
 			ExpectedGVK:       gvkP("admissionregistration.k8s.io", "v1", "MutatingAdmissionPolicy"),
 			IntroducedVersion: "1.36",
 		},
 		gvr("admissionregistration.k8s.io", "v1", "mutatingadmissionpolicybindings"): {
 			Stub:              `{"metadata":{"name":"mpb1v1"},"spec":{"policyName":"replicalimit-policy.example.com","paramRef":{"name":"replica-limit-test.example.com", "parameterNotFoundAction": "Allow"}}}`,
+			MutatedStub:       `{"spec":{"paramRef":{"name":"other-param","parameterNotFoundAction":"Deny"}}}`,
 			ExpectedEtcdPath:  "/registry/mutatingadmissionpolicybindings/mpb1v1",
 			ExpectedGVK:       gvkP("admissionregistration.k8s.io", "v1", "MutatingAdmissionPolicyBinding"),
 			IntroducedVersion: "1.36",
@@ -564,6 +593,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		// k8s.io/kubernetes/pkg/apis/admissionregistration/v1beta1
 		gvr("admissionregistration.k8s.io", "v1beta1", "validatingadmissionpolicies"): {
 			Stub:              `{"metadata":{"name":"vap1b1"},"spec":{"paramKind":{"apiVersion":"test.example.com/v1","kind":"Example"},"matchConstraints":{"resourceRules": [{"resourceNames": ["fakeName"], "apiGroups":["apps"],"apiVersions":["v1"],"operations":["CREATE", "UPDATE"], "resources":["deployments"]}]},"validations":[{"expression":"object.spec.replicas <= params.maxReplicas","message":"Too many replicas"}]}}`,
+			MutatedStub:       `{"metadata": {"labels": {"a":"c"}}, "spec": {"paramKind": {"apiVersion": "apps/v1", "kind": "Deployment"}}}`,
 			ExpectedEtcdPath:  "/registry/validatingadmissionpolicies/vap1b1",
 			ExpectedGVK:       gvkP("admissionregistration.k8s.io", "v1", "ValidatingAdmissionPolicy"),
 			IntroducedVersion: "1.28",
@@ -571,6 +601,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		},
 		gvr("admissionregistration.k8s.io", "v1beta1", "validatingadmissionpolicybindings"): {
 			Stub:              `{"metadata":{"name":"pb1b1"},"spec":{"policyName":"replicalimit-policy.example.com","paramRef":{"name":"replica-limit-test.example.com","parameterNotFoundAction":"Deny"},"validationActions":["Deny"]}}`,
+			MutatedStub:       `{"spec":{"validationActions":["Warn"]}}`,
 			ExpectedEtcdPath:  "/registry/validatingadmissionpolicybindings/pb1b1",
 			ExpectedGVK:       gvkP("admissionregistration.k8s.io", "v1", "ValidatingAdmissionPolicyBinding"),
 			IntroducedVersion: "1.28",
@@ -578,6 +609,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		},
 		gvr("admissionregistration.k8s.io", "v1beta1", "mutatingadmissionpolicies"): {
 			Stub:              `{"metadata":{"name":"map1b1"},"spec":{"paramKind":{"apiVersion":"test.example.com/v1","kind":"Example"},"matchConstraints":{"resourceRules": [{"resourceNames": ["fakeName"], "apiGroups":["apps"],"apiVersions":["v1"],"operations":["CREATE", "UPDATE"], "resources":["deployments"]}]},"reinvocationPolicy": "IfNeeded","mutations":[{"applyConfiguration": {"expression":"Object{metadata: Object.metadata{labels: {'example':'true'}}}"}, "patchType":"ApplyConfiguration"}]}}`,
+			MutatedStub:       `{"spec":{"reinvocationPolicy":"Never"}}`,
 			ExpectedEtcdPath:  "/registry/mutatingadmissionpolicies/map1b1",
 			ExpectedGVK:       gvkP("admissionregistration.k8s.io", "v1", "MutatingAdmissionPolicy"),
 			IntroducedVersion: "1.34",
@@ -585,6 +617,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		},
 		gvr("admissionregistration.k8s.io", "v1beta1", "mutatingadmissionpolicybindings"): {
 			Stub:              `{"metadata":{"name":"mpb1b1"},"spec":{"policyName":"replicalimit-policy.example.com","paramRef":{"name":"replica-limit-test.example.com", "parameterNotFoundAction": "Allow"}}}`,
+			MutatedStub:       `{"spec":{"paramRef":{"name":"other-param","parameterNotFoundAction":"Deny"}}}`,
 			ExpectedEtcdPath:  "/registry/mutatingadmissionpolicybindings/mpb1b1",
 			ExpectedGVK:       gvkP("admissionregistration.k8s.io", "v1", "MutatingAdmissionPolicyBinding"),
 			IntroducedVersion: "1.34",
@@ -595,12 +628,14 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		// k8s.io/kubernetes/pkg/apis/admissionregistration/v1alpha1
 		gvr("admissionregistration.k8s.io", "v1alpha1", "mutatingadmissionpolicies"): {
 			Stub:              `{"metadata":{"name":"map1"},"spec":{"paramKind":{"apiVersion":"test.example.com/v1","kind":"Example"},"matchConstraints":{"resourceRules": [{"resourceNames": ["fakeName"], "apiGroups":["apps"],"apiVersions":["v1"],"operations":["CREATE", "UPDATE"], "resources":["deployments"]}]},"reinvocationPolicy": "IfNeeded","mutations":[{"applyConfiguration": {"expression":"Object{metadata: Object.metadata{labels: {'example':'true'}}}"}, "patchType":"ApplyConfiguration"}]}}`,
+			MutatedStub:       `{"spec":{"reinvocationPolicy":"Never"}}`,
 			ExpectedEtcdPath:  "/registry/mutatingadmissionpolicies/map1",
 			ExpectedGVK:       gvkP("admissionregistration.k8s.io", "v1", "MutatingAdmissionPolicy"),
 			IntroducedVersion: "1.32",
 		},
 		gvr("admissionregistration.k8s.io", "v1alpha1", "mutatingadmissionpolicybindings"): {
 			Stub:              `{"metadata":{"name":"mpb1"},"spec":{"policyName":"replicalimit-policy.example.com","paramRef":{"name":"replica-limit-test.example.com", "parameterNotFoundAction": "Allow"}}}`,
+			MutatedStub:       `{"spec":{"paramRef":{"name":"other-param","parameterNotFoundAction":"Deny"}}}`,
 			ExpectedEtcdPath:  "/registry/mutatingadmissionpolicybindings/mpb1",
 			ExpectedGVK:       gvkP("admissionregistration.k8s.io", "v1", "MutatingAdmissionPolicyBinding"),
 			IntroducedVersion: "1.32",
@@ -610,6 +645,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		// k8s.io/kubernetes/pkg/apis/scheduling/v1
 		gvr("scheduling.k8s.io", "v1", "priorityclasses"): {
 			Stub:              `{"metadata":{"name":"pc3"},"Value":1000}`,
+			MutatedStub:       `{"globalDefault":true}`,
 			ExpectedEtcdPath:  "/registry/priorityclasses/pc3",
 			IntroducedVersion: "1.14",
 		},
@@ -617,19 +653,22 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 
 		// k8s.io/kubernetes/pkg/apis/scheduling/v1beta1
 		gvr("scheduling.k8s.io", "v1beta1", "workloads"): {
-			Stub:              `{"metadata": {"name": "w2"}, "spec": {"podGroupTemplates": [{"name": "group1", "schedulingPolicy": {"basic": {}}}]}}`,
+			Stub:              `{"metadata": {"name": "w2"}, "spec": {"podGroupTemplates": [{"name": "group1", "schedulingPolicy": {"gang": {"minCount": 1}}}]}}`,
+			MutatedStub:       `{"spec": {"podGroupTemplates": [{"name": "group1", "schedulingPolicy": {"gang": {"minCount": 2}}}]}}`,
 			ExpectedEtcdPath:  "/registry/workloads/" + namespace + "/w2",
 			IntroducedVersion: "1.37",
 			RemovedVersion:    "1.43",
 		},
 		gvr("scheduling.k8s.io", "v1beta1", "podgroups"): {
-			Stub:              `{"metadata": {"name": "pg2"}, "spec": {"workloadRef": {"workloadName": "w", "templateName": "t"}, "schedulingPolicy": {"basic": {}}}}`,
+			Stub:              `{"metadata": {"name": "pg2"}, "spec": {"workloadRef": {"workloadName": "w", "templateName": "t"}, "schedulingPolicy": {"gang": {"minCount": 1}}}}`,
+			MutatedStub:       `{"spec": {"workloadRef": {"workloadName": "w", "templateName": "t"}, "schedulingPolicy": {"gang": {"minCount": 2}}}}`,
 			ExpectedEtcdPath:  "/registry/podgroups/" + namespace + "/pg2",
 			IntroducedVersion: "1.37",
 			RemovedVersion:    "1.43",
 		},
 		gvr("scheduling.k8s.io", "v1beta1", "compositepodgroups"): {
-			Stub:              `{"metadata": {"name": "cpg2"}, "spec": {"workloadRef": {"workloadName": "w", "templateName": "t"}, "schedulingPolicy": {"basic": {}}}}`,
+			Stub:              `{"metadata": {"name": "cpg2"}, "spec": {"workloadRef": {"workloadName": "w", "templateName": "t"}, "schedulingPolicy": {"gang": {"minGroupCount": 1}}}}`,
+			MutatedStub:       `{"spec": {"workloadRef": {"workloadName": "w", "templateName": "t"}, "schedulingPolicy": {"gang": {"minGroupCount": 2}}}}`,
 			ExpectedEtcdPath:  "/registry/compositepodgroups/" + namespace + "/cpg2",
 			IntroducedVersion: "1.38",
 			RemovedVersion:    "1.43",
@@ -638,21 +677,24 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 
 		// k8s.io/kubernetes/pkg/apis/scheduling/v1alpha3
 		gvr("scheduling.k8s.io", "v1alpha3", "workloads"): {
-			Stub:              `{"metadata": {"name": "w1"}, "spec": {"podGroupTemplates": [{"name": "group1", "schedulingPolicy": {"basic": {}}}]}}`,
+			Stub:              `{"metadata": {"name": "w1"}, "spec": {"podGroupTemplates": [{"name": "group1", "schedulingPolicy": {"gang": {"minCount": 1}}}]}}`,
+			MutatedStub:       `{"spec": {"podGroupTemplates": [{"name": "group1", "schedulingPolicy": {"gang": {"minCount": 2}}}]}}`,
 			ExpectedEtcdPath:  "/registry/workloads/" + namespace + "/w1",
 			ExpectedGVK:       gvkP("scheduling.k8s.io", "v1beta1", "Workload"),
 			IntroducedVersion: "1.36",
 			RemovedVersion:    "1.42",
 		},
 		gvr("scheduling.k8s.io", "v1alpha3", "podgroups"): {
-			Stub:              `{"metadata": {"name": "pg1"}, "spec": {"workloadRef": {"workloadName": "w", "templateName": "t"}, "schedulingPolicy": {"basic": {}}}}`,
+			Stub:              `{"metadata": {"name": "pg1"}, "spec": {"workloadRef": {"workloadName": "w", "templateName": "t"}, "schedulingPolicy": {"gang": {"minCount": 1}}}}`,
+			MutatedStub:       `{"spec": {"workloadRef": {"workloadName": "w", "templateName": "t"}, "schedulingPolicy": {"gang": {"minCount": 2}}}}`,
 			ExpectedEtcdPath:  "/registry/podgroups/" + namespace + "/pg1",
 			ExpectedGVK:       gvkP("scheduling.k8s.io", "v1beta1", "PodGroup"),
 			IntroducedVersion: "1.36",
 			RemovedVersion:    "1.42",
 		},
 		gvr("scheduling.k8s.io", "v1alpha3", "compositepodgroups"): {
-			Stub:              `{"metadata": {"name": "cpg1"}, "spec": {"workloadRef": {"templateName": "t", "workloadName": "w"}, "schedulingPolicy": {"basic": {}}}}`,
+			Stub:              `{"metadata": {"name": "cpg1"}, "spec": {"workloadRef": {"templateName": "t", "workloadName": "w"}, "schedulingPolicy": {"gang": {"minGroupCount": 1}}}}`,
+			MutatedStub:       `{"spec": {"workloadRef": {"templateName": "t", "workloadName": "w"}, "schedulingPolicy": {"gang": {"minGroupCount": 2}}}}`,
 			ExpectedEtcdPath:  "/registry/compositepodgroups/" + namespace + "/cpg1",
 			ExpectedGVK:       gvkP("scheduling.k8s.io", "v1beta1", "CompositePodGroup"),
 			IntroducedVersion: "1.37",
@@ -676,18 +718,20 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 				`"scope": "Cluster","group": "webconsole2.operator.openshift.io",` +
 				`"versions": [{"name":"v1alpha1","storage":true,"served":true,"schema":{"openAPIV3Schema":{"type":"object"}}}],` +
 				`"names": {"kind": "OpenShiftWebConsoleConfig","plural": "openshiftwebconsoleconfigs","singular": "openshiftwebconsoleconfig"}}}`,
-			MutatedStub:       `{"metadata": {"labels":{"a":"c"}}, "spec": {"group": "webconsole22.operator.openshift.io"}}`,
+			MutatedStub:       `{"metadata": {"labels":{"a":"c"}}, "spec": {"versions": [{"name":"v1alpha1","storage":true,"served":true,"schema":{"openAPIV3Schema":{"type":"object","description":"updated"}}}]}}`,
 			ExpectedEtcdPath:  "/registry/apiextensions.k8s.io/customresourcedefinitions/openshiftwebconsoleconfigs.webconsole2.operator.openshift.io",
 			ExpectedGVK:       gvkP("apiextensions.k8s.io", "v1beta1", "CustomResourceDefinition"),
 			IntroducedVersion: "1.16",
 		},
 		gvr("cr.bar.com", "v1", "foos"): {
 			Stub:              `{"kind": "Foo", "apiVersion": "cr.bar.com/v1", "metadata": {"name": "cr1foo"}, "color": "blue"}`, // requires TypeMeta due to CRD scheme's UnstructuredObjectTyper
+			MutatedStub:       `{"color": "green"}`,
 			ExpectedEtcdPath:  "/registry/cr.bar.com/foos/" + namespace + "/cr1foo",
 			IntroducedVersion: "1.0",
 		},
 		gvr("custom.fancy.com", "v2", "pants"): {
 			Stub:              `{"kind": "Pant", "apiVersion": "custom.fancy.com/v2", "metadata": {"name": "cr2pant"}, "isFancy": true}`, // requires TypeMeta due to CRD scheme's UnstructuredObjectTyper
+			MutatedStub:       `{"isFancy": false}`,
 			ExpectedEtcdPath:  "/registry/custom.fancy.com/pants/cr2pant",
 			IntroducedVersion: "1.0",
 		},
@@ -706,6 +750,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		},
 		gvr("random.numbers.com", "v1", "integers"): {
 			Stub:              `{"kind": "Integer", "apiVersion": "random.numbers.com/v1", "metadata": {"name": "fortytwo"}, "value": 42, "garbage": "oiujnasdf"}`, // requires TypeMeta due to CRD scheme's UnstructuredObjectTyper
+			MutatedStub:       `{"value": 43}`,
 			ExpectedEtcdPath:  "/registry/random.numbers.com/integers/fortytwo",
 			IntroducedVersion: "1.0",
 		},
@@ -739,7 +784,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		// k8s.io/kubernetes/pkg/apis/resource/v1beta1
 		gvr("resource.k8s.io", "v1beta1", "deviceclasses"): {
 			Stub:              `{"metadata": {"name": "class2name"}}`,
-			MutatedStub:       `{"metadata": {"labels":{"a":"c"}}}`,
+			MutatedStub:       `{"spec": {"selectors": [{"cel": {"expression": "true"}}]}}`,
 			ExpectedEtcdPath:  "/registry/deviceclasses/class2name",
 			ExpectedGVK:       gvkP("resource.k8s.io", "v1", "DeviceClass"),
 			IntroducedVersion: "1.32",
@@ -757,7 +802,6 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		},
 		gvr("resource.k8s.io", "v1beta1", "resourceclaimtemplates"): {
 			Stub:              `{"metadata": {"name": "claimtemplate2name"}, "spec": {"spec": {"devices": {"requests": [{"name": "req-0", "deviceClassName": "example-class", "allocationMode": "ExactCount", "count": 1}]}}}}`,
-			MutatedStub:       `{"spec": {"spec": {"resourceClassName": "class2name"}}}`,
 			ExpectedEtcdPath:  "/registry/resourceclaimtemplates/" + namespace + "/claimtemplate2name",
 			ExpectedGVK:       gvkP("resource.k8s.io", "v1", "ResourceClaimTemplate"),
 			IntroducedVersion: "1.32",
@@ -765,6 +809,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		},
 		gvr("resource.k8s.io", "v1beta1", "resourceslices"): {
 			Stub:              `{"metadata": {"name": "node2slice"}, "spec": {"nodeName": "worker1", "driver": "dra.example.com", "pool": {"name": "worker1", "resourceSliceCount": 1}}}`,
+			MutatedStub:       `{"spec": {"pool": {"name": "worker1", "resourceSliceCount": 2}}}`,
 			ExpectedEtcdPath:  "/registry/resourceslices/node2slice",
 			ExpectedGVK:       gvkP("resource.k8s.io", "v1", "ResourceSlice"),
 			IntroducedVersion: "1.32",
@@ -778,7 +823,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		// v1beta1 is the default although the actual storage version is v1beta2.
 		gvr("resource.k8s.io", "v1beta2", "deviceclasses"): {
 			Stub:              `{"metadata": {"name": "class3name"}}`,
-			MutatedStub:       `{"metadata": {"labels":{"a":"c"}}}`,
+			MutatedStub:       `{"spec": {"selectors": [{"cel": {"expression": "true"}}]}}`,
 			ExpectedEtcdPath:  "/registry/deviceclasses/class3name",
 			ExpectedGVK:       gvkP("resource.k8s.io", "v1", "DeviceClass"),
 			IntroducedVersion: "1.33",
@@ -803,7 +848,6 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		},
 		gvr("resource.k8s.io", "v1beta2", "resourceclaimtemplates"): {
 			Stub:              `{"metadata": {"name": "claimtemplate3name"}, "spec": {"spec": {"devices": {"requests": [{"name": "req-0", "exactly": {"deviceClassName": "example-class", "allocationMode": "ExactCount", "count": 1}}]}}}}`,
-			MutatedStub:       `{"spec": {"spec": {"resourceClassName": "class2name"}}}`,
 			ExpectedEtcdPath:  "/registry/resourceclaimtemplates/" + namespace + "/claimtemplate3name",
 			ExpectedGVK:       gvkP("resource.k8s.io", "v1", "ResourceClaimTemplate"),
 			IntroducedVersion: "1.33",
@@ -811,6 +855,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		},
 		gvr("resource.k8s.io", "v1beta2", "resourceslices"): {
 			Stub:              `{"metadata": {"name": "node3slice"}, "spec": {"nodeName": "worker1", "driver": "dra.example.com", "pool": {"name": "worker1", "resourceSliceCount": 1}}}`,
+			MutatedStub:       `{"spec": {"pool": {"name": "worker1", "resourceSliceCount": 2}}}`,
 			ExpectedEtcdPath:  "/registry/resourceslices/node3slice",
 			ExpectedGVK:       gvkP("resource.k8s.io", "v1", "ResourceSlice"),
 			IntroducedVersion: "1.33",
@@ -821,7 +866,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		// k8s.io/kubernetes/pkg/apis/resource/v1
 		gvr("resource.k8s.io", "v1", "deviceclasses"): {
 			Stub:              `{"metadata": {"name": "class4name"}}`,
-			MutatedStub:       `{"metadata": {"labels":{"a":"c"}}}`,
+			MutatedStub:       `{"spec": {"selectors": [{"cel": {"expression": "true"}}]}}`,
 			ExpectedEtcdPath:  "/registry/deviceclasses/class4name",
 			ExpectedGVK:       gvkP("resource.k8s.io", "v1", "DeviceClass"),
 			IntroducedVersion: "1.34",
@@ -844,13 +889,13 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		},
 		gvr("resource.k8s.io", "v1", "resourceclaimtemplates"): {
 			Stub:              `{"metadata": {"name": "claimtemplate4name"}, "spec": {"spec": {"devices": {"requests": [{"name": "req-0", "exactly": {"deviceClassName": "example-class", "allocationMode": "ExactCount", "count": 1}}]}}}}`,
-			MutatedStub:       `{"spec": {"spec": {"resourceClassName": "class2name"}}}`,
 			ExpectedEtcdPath:  "/registry/resourceclaimtemplates/" + namespace + "/claimtemplate4name",
 			ExpectedGVK:       gvkP("resource.k8s.io", "v1", "ResourceClaimTemplate"),
 			IntroducedVersion: "1.34",
 		},
 		gvr("resource.k8s.io", "v1", "resourceslices"): {
 			Stub:              `{"metadata": {"name": "node4slice"}, "spec": {"nodeName": "worker1", "driver": "dra.example.com", "pool": {"name": "worker1", "resourceSliceCount": 1}}}`,
+			MutatedStub:       `{"spec": {"pool": {"name": "worker1", "resourceSliceCount": 2}}}`,
 			ExpectedEtcdPath:  "/registry/resourceslices/node4slice",
 			ExpectedGVK:       gvkP("resource.k8s.io", "v1", "ResourceSlice"),
 			IntroducedVersion: "1.34",
@@ -869,7 +914,8 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 
 		// k8s.io/kubernetes/pkg/apis/storage/v1
 		gvr("storage.k8s.io", "v1", "csinodes"): {
-			Stub:              `{"metadata": {"name": "csini2"}, "spec": {"drivers": [{"name": "test-driver", "nodeID": "localhost", "topologyKeys": ["company.com/zone1", "company.com/zone2"]}]}}`,
+			Stub:              `{"metadata": {"name": "csini2"}, "spec": {"drivers": [{"name": "test-driver", "nodeID": "localhost", "topologyKeys": ["company.com/zone1", "company.com/zone2"], "allocatable": {"count": 1}}]}}`,
+			MutatedStub:       `{"spec": {"drivers": [{"name": "test-driver", "nodeID": "localhost", "topologyKeys": ["company.com/zone1", "company.com/zone2"], "allocatable": {"count": 2}}]}}`,
 			ExpectedEtcdPath:  "/registry/csinodes/csini2",
 			IntroducedVersion: "1.17",
 			StatusStub:        `{"status": {"storageHealth": [{"name": "test-driver", "healthConditions": [{"status": "StorageUnreachable", "reason": "ConnectionLost", "message": "lost connection", "lastTransitionTime": "2025-01-01T00:00:00Z"}]}]}}`,
@@ -880,6 +926,7 @@ func GetEtcdStorageDataForNamespaceServedAt(namespace string, v string, isEmulat
 		// k8s.io/kubernetes/pkg/apis/storage/v1
 		gvr("storage.k8s.io", "v1", "csidrivers"): {
 			Stub:              `{"metadata": {"name": "csid2"}, "spec": {"attachRequired": true, "podInfoOnMount": true}}`,
+			MutatedStub:       `{"spec": {"podInfoOnMount": false}}`,
 			ExpectedEtcdPath:  "/registry/csidrivers/csid2",
 			IntroducedVersion: "1.18",
 		},

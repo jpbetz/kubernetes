@@ -21,6 +21,7 @@ import (
 
 	"sigs.k8s.io/structured-merge-diff/v7/fieldpath"
 
+	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -65,6 +66,7 @@ func (*resourcePoolStatusRequestStrategy) PrepareForCreate(ctx context.Context, 
 	request := obj.(*resource.ResourcePoolStatusRequest)
 	// Status must not be set by user on create.
 	request.Status = nil
+	request.Generation = 1
 	dropDisabledDRAPartitionableDevicesTypeFields(request, nil)
 }
 
@@ -109,6 +111,10 @@ func (*resourcePoolStatusRequestStrategy) PrepareForUpdate(ctx context.Context, 
 	// Status is not updated via the main resource endpoint
 	request.Status = oldRequest.Status
 	dropDisabledDRAPartitionableDevicesTypeFields(request, oldRequest)
+
+	if !apiequality.Semantic.DeepEqual(oldRequest.Spec, request.Spec) {
+		request.Generation = oldRequest.Generation + 1
+	}
 }
 
 func (*resourcePoolStatusRequestStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {

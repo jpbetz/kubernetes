@@ -38,8 +38,9 @@ import (
 var (
 	workload = &scheduling.Workload{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "foo",
-			Namespace: metav1.NamespaceDefault,
+			Name:       "foo",
+			Namespace:  metav1.NamespaceDefault,
+			Generation: 1,
 		},
 		Spec: scheduling.WorkloadSpec{
 			PodGroupTemplates: []scheduling.PodGroupTemplate{
@@ -542,6 +543,20 @@ func TestStrategyUpdate(t *testing.T) {
 			oldObj:         workload,
 			newObj:         workload,
 			expectWorkload: workload,
+		},
+		"valid spec update increments generation": {
+			oldObj: workload,
+			newObj: func() *scheduling.Workload {
+				w := workload.DeepCopy()
+				w.Spec.PodGroupTemplates[0].SchedulingPolicy.Gang.MinCount = 6
+				return w
+			}(),
+			expectWorkload: func() *scheduling.Workload {
+				w := workload.DeepCopy()
+				w.Generation = 2
+				w.Spec.PodGroupTemplates[0].SchedulingPolicy.Gang.MinCount = 6
+				return w
+			}(),
 		},
 		"name update": {
 			oldObj: workload,

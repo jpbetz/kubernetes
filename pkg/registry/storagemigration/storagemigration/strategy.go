@@ -23,6 +23,7 @@ import (
 
 	"sigs.k8s.io/structured-merge-diff/v7/fieldpath"
 
+	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -70,12 +71,18 @@ func (strategy) GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set {
 func (strategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
 	svm := obj.(*storagemigration.StorageVersionMigration)
 	svm.Status = storagemigration.StorageVersionMigrationStatus{}
+	svm.Generation = 1
 }
 
 // PrepareForUpdate clears fields that are not allowed to be set by end users on update.
 func (s strategy) PrepareForUpdate(ctx context.Context, new, old runtime.Object) {
-	svm := new.(*storagemigration.StorageVersionMigration)
-	svm.Status = old.(*storagemigration.StorageVersionMigration).Status
+	newSVM := new.(*storagemigration.StorageVersionMigration)
+	oldSVM := old.(*storagemigration.StorageVersionMigration)
+	newSVM.Status = oldSVM.Status
+
+	if !apiequality.Semantic.DeepEqual(oldSVM.Spec, newSVM.Spec) {
+		newSVM.Generation = oldSVM.Generation + 1
+	}
 }
 
 func (strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {

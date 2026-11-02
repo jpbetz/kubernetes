@@ -37,8 +37,9 @@ import (
 
 var podGroup = &scheduling.PodGroup{
 	ObjectMeta: metav1.ObjectMeta{
-		Name:      "foo",
-		Namespace: metav1.NamespaceDefault,
+		Name:       "foo",
+		Namespace:  metav1.NamespaceDefault,
+		Generation: 1,
 	},
 	Spec: scheduling.PodGroupSpec{
 		WorkloadRef: &scheduling.WorkloadReference{
