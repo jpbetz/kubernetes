@@ -69,8 +69,11 @@ import (
 // Parsing keeps at most 29 significant digits, enough for any int64 value at
 // nano precision, and rounds any precision beyond this away from zero.
 // Parsing also preserves a value only down to nano, rounding a finer non-zero
-// value away from zero, so "0.9n" becomes "1n". The int64 accessors round and
-// may overflow on top of that: see Value, MilliValue and ScaledValue.
+// value away from zero, so "0.9n" becomes "1n". Parsing saturates the exponent
+// to [-2147483647, 2147483647] after accounting for any digits after the
+// decimal point, so "0.01e2147483649" keeps its value but "1e4294967297"
+// parses as 1e2147483647. The int64 accessors round and may overflow on top
+// of that: see Value, MilliValue and ScaledValue.
 //
 // When a Quantity is parsed from a string, it will remember the type of suffix
 // it had, and will use the same type again when it is serialized.
@@ -378,18 +381,22 @@ func ParseQuantity(str string) (Quantity, error) {
 		return Quantity{}, err
 	}
 
-	base, exponent, format, ok := quantitySuffixer.interpret(suffix(suf))
+	base, parsedExponent, format, ok := quantitySuffixer.interpret(suffix(suf))
 	if !ok {
 		return Quantity{}, ErrSuffix
 	}
+	// Clamp so scale arithmetic can't overflow. The 2x multiplier to math.MaxInt32
+	// gives room for an out of range exponent that is reduced by digits after the decimal point.
+	// For example, "1.25e2147483648" is in range, as 125e2147483646.
+	exponent := min(max(parsedExponent, math.MinInt32), 2*math.MaxInt32)
 
 	precision := int32(0)
-	scale := int32(0)
+	scale := widenedScale(0)
 	mantissa := int64(1)
 	forceRecanonicalize := false
 	switch format {
 	case DecimalExponent, DecimalSI:
-		scale = exponent
+		scale = widenedScale(exponent)
 		precision = maxInt64Factors - int32(len(num)+len(denom))
 		// preserves compatibility with recanonicalizing integers >18 digits long, even if they are in int64 range
 		forceRecanonicalize = precision <= 0
@@ -406,11 +413,24 @@ func ParseQuantity(str string) (Quantity, error) {
 		}
 	}
 
+	// For compatibility, an exponent that wraps to math.MinInt32 when narrowed to
+	// int32, such as "1e2147483648", is an error. A value with digits after the
+	// decimal point that fits in an int64, such as "1.25e2147483648", is allowed.
+	if base == 10 && int32(parsedExponent) == math.MinInt32 {
+		digits, err := strconv.ParseUint(num+denom, 10, 64)
+		fitsInt64 := err == nil && (digits <= math.MaxInt64 || (!positive && digits == math.MaxInt64+1))
+		if len(denom) == 0 || precision < 0 || !fitsInt64 {
+			return Quantity{}, ErrSuffix
+		}
+	}
+
 	if precision >= 0 {
 		// if we have a denominator, shift the entire value to the left by the number of places in the
 		// denominator
-		scale -= int32(len(denom))
-		if scale >= int32(Nano) {
+		scale -= widenedScale(len(denom))
+		// We ignore the fits return value. A scale too large to fit saturates to
+		// math.MaxInt32, the same as on the inf.Dec path below.
+		if fastScale, _ := narrowScale(scale); fastScale >= Nano {
 			shifted := num + denom
 
 			uvalue, err := strconv.ParseUint(shifted, 10, 64)
@@ -437,14 +457,14 @@ func ParseQuantity(str string) (Quantity, error) {
 						switch format {
 						case BinarySI:
 							if !forceRecanonicalize && exponent%10 == 0 && (value&0x07 != 0) {
-								return Quantity{i: int64Amount{value: result, scale: Scale(scale)}, Format: format, s: newCachedString(str, format)}, nil
+								return Quantity{i: int64Amount{value: result, scale: fastScale}, Format: format, s: newCachedString(str, format)}, nil
 							}
 						default:
-							if !forceRecanonicalize && scale%3 == 0 && !strings.HasSuffix(shifted, "000") && shifted[0] != '0' {
-								return Quantity{i: int64Amount{value: result, scale: Scale(scale)}, Format: format, s: newCachedString(str, format)}, nil
+							if !forceRecanonicalize && fastScale%3 == 0 && !strings.HasSuffix(shifted, "000") && shifted[0] != '0' {
+								return Quantity{i: int64Amount{value: result, scale: fastScale}, Format: format, s: newCachedString(str, format)}, nil
 							}
 						}
-						q := Quantity{i: int64Amount{value: result, scale: Scale(scale)}, Format: format}
+						q := Quantity{i: int64Amount{value: result, scale: fastScale}, Format: format}
 						q.CacheString()
 						return q, nil
 					}
@@ -469,13 +489,7 @@ func ParseQuantity(str string) (Quantity, error) {
 
 	// So that no one but us has to think about suffixes, remove it.
 	if base == 10 {
-		if !Scale(exponent).canInfScale() {
-			// Return an error if the exponent is math.MinInt32 rather than
-			// rounding it to 1n.
-			return Quantity{}, ErrSuffix
-		}
-		// This is guaranteed to fit within inf.Scale because of the above check.
-		widenedExponentScale := widenScale(Scale(exponent))
+		widenedExponentScale := widenedScale(exponent)
 
 		// amount only contains the whole number part+fractional part at this point (with no exponent / suffix).
 		// Values that kept fractional digits have scale < 0.
@@ -494,8 +508,8 @@ func ParseQuantity(str string) (Quantity, error) {
 			// yet, we figure out the scale we need to round to, so that when the
 			// exponent is later set, we end with nano scale precision.
 
-			// The exponent is negative here, so the result (-9 minus a negative exponent)
-			// always fits.
+			// The exponent is negative here, and the clamp above keeps it at
+			// least math.MinInt32, so the subtraction below fits.
 			scaleBeforeExponent, fits := narrowScale(widenScale(Nano) - widenedExponentScale)
 			if !fits {
 				assertUnreachable("scaleBeforeExponent did not fit")
