@@ -937,7 +937,7 @@ func TestInterpretExponentInt32Bounds(t *testing.T) {
 	}
 	for _, tc := range cases {
 		base, exp, format, ok := quantitySuffixer.interpret(suffix(tc.suffix))
-		if ok != tc.wantOK || (ok && (exp != tc.wantExp || base != 10 || format != DecimalExponent)) {
+		if ok != tc.wantOK || (ok && (int64(exp) != tc.wantExp || base != 10 || format != DecimalExponent)) {
 			t.Errorf("interpret(%q) = (base=%d, exp=%d, %v, ok=%t), want exp=%d ok=%t",
 				tc.suffix, base, exp, format, ok, tc.wantExp, tc.wantOK)
 		}
