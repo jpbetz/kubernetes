@@ -5126,6 +5126,7 @@ func TestStringQuantityAsFloat64Slow(t *testing.T) {
 		{"1.1Ki", 1126.4e+0},
 		{"1Mi", 1.048576e+06},
 		{"2Gi", 2.147483648e+09},
+		{"0e4294967294", 0}, // a zero with an exponent above the int32 range
 	}
 
 	for _, item := range table {
