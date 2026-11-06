@@ -403,7 +403,7 @@ func ParseQuantity(str string) (Quantity, error) {
 	// Clamp so scale arithmetic can't overflow. The 2x multiplier to math.MaxInt32
 	// gives room for an out of range exponent that is reduced by digits after the decimal point.
 	// For example, "1.25e2147483648" is in range, as 125e2147483646.
-	exponent := min(max(parsedExponent, math.MinInt32), 2*math.MaxInt32)
+	exponent := min(max(parsedExponent, -(1<<20)), 1<<20)
 
 	precision := int32(0)
 	scale := widenedScale(0)
