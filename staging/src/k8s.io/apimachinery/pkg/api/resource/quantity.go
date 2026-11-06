@@ -396,22 +396,58 @@ func ParseQuantity(str string) (Quantity, error) {
 		return Quantity{}, err
 	}
 
-	base, parsedExponent, format, ok := quantitySuffixer.interpret(suffix(suf))
+	base, exponent, format, ok := quantitySuffixer.interpret(suffix(suf))
 	if !ok {
 		return Quantity{}, ErrSuffix
 	}
-	// Clamp so scale arithmetic can't overflow. The 2x multiplier to math.MaxInt32
-	// gives room for an out of range exponent that is reduced by digits after the decimal point.
-	// For example, "1.25e2147483648" is in range, as 125e2147483646.
-	exponent := min(max(parsedExponent, math.MinInt32), 2*math.MaxInt32)
+
+	// For compatibility, an exponent that wraps to math.MinInt32 when narrowed to
+	// int32, such as "1e2147483648", is an error. A value with digits after the
+	// decimal point that fits in an int64, such as "1.25e2147483648", is allowed,
+	// and so is zero, such as "0e2147483648", which 1.37 parses as 0.
+	if exponent == math.MinInt32 {
+		digits, err := strconv.ParseUint(num+denom, 10, 64)
+		zero := err == nil && digits == 0
+		fitsInt64 := err == nil && (digits <= math.MaxInt64 || (!positive && digits == math.MaxInt64+1))
+		if !zero && (len(denom) == 0 || len(num)+len(denom) > maxInt64Factors || !fitsInt64) {
+			return Quantity{}, ErrSuffix
+		}
+	}
+
+	// interpret wraps an exponent outside the int32 range, as 1.37 did. Parse it
+	// again to saturate it instead. A number with no digits, such as "e5", keeps
+	// the wrapped exponent for compatibility with 1.37: it parses as 0 when that
+	// is at least Nano, and is an error otherwise.
+	if format == DecimalExponent && !(len(denom) == 0 && (len(num) == 0 || defaultedNum)) {
+		parsed, _ := strconv.ParseInt(suf[1:], 10, 64)
+		exponent = int32(min(max(parsed, math.MinInt32), math.MaxInt32))
+	}
+
+	// The saturated exponent leaves no room for about 2^31 or more digits after
+	// the decimal point, a string of at least 2 GiB, so reject those.
+	if len(denom) >= math.MaxInt32-maxDecimalExponent {
+		return Quantity{}, ErrNumeric
+	}
+
+	// Cap a decimal to the largest allowed magnitude. BinarySI values are
+	// capped further down.
+	if base == 10 && exceedsParseDecimalCap(num, denom, widenScale(Scale(exponent))) {
+		q := Quantity{i: int64Amount{value: maxDecimalValue, scale: maxDecimalScale}, Format: format}
+		if !positive {
+			q.Neg()
+		}
+		q.CacheString()
+		return q, nil
+	}
 
 	precision := int32(0)
-	scale := widenedScale(0)
+	scale := int32(0)
 	mantissa := int64(1)
 	forceRecanonicalize := false
 	switch format {
 	case DecimalExponent, DecimalSI:
-		scale = widenedScale(exponent)
+		// Leave room to subtract the digits after the decimal point below.
+		scale = max(exponent, math.MinInt32+maxInt64Factors)
 		precision = maxInt64Factors - int32(len(num)+len(denom))
 		// preserves compatibility with recanonicalizing integers >18 digits long, even if they are in int64 range
 		forceRecanonicalize = precision <= 0
@@ -428,39 +464,11 @@ func ParseQuantity(str string) (Quantity, error) {
 		}
 	}
 
-	// For compatibility, an exponent that wraps to math.MinInt32 when narrowed to
-	// int32, such as "1e2147483648", is an error. A value with digits after the
-	// decimal point that fits in an int64, such as "1.25e2147483648", is allowed,
-	// and so is zero, such as "0e2147483648", which 1.37 parses as 0.
-	if base == 10 && int32(parsedExponent) == math.MinInt32 {
-		digits, err := strconv.ParseUint(num+denom, 10, 64)
-		zero := err == nil && digits == 0
-		fitsInt64 := err == nil && (digits <= math.MaxInt64 || (!positive && digits == math.MaxInt64+1))
-		if !zero && (len(denom) == 0 || precision < 0 || !fitsInt64) {
-			return Quantity{}, ErrSuffix
-		}
-	}
-
-	// Cap a decimal to the largest allowed magnitude. BinarySI values are
-	// capped further down.
-	if base == 10 && exceedsParseDecimalCap(num, denom, widenedScale(exponent)) {
-		return cappedDecimal(positive, format), nil
-	}
-
-	// For compatibility with 1.37, a number with no digits, such as "e5", uses its
-	// exponent wrapped to int32. It parses as 0 when that is at least Nano, and is an
-	// error otherwise.
-	if base == 10 && len(denom) == 0 && (len(num) == 0 || defaultedNum) {
-		scale = widenScale(Scale(int32(parsedExponent)))
-	}
-
 	if precision >= 0 {
 		// if we have a denominator, shift the entire value to the left by the number of places in the
 		// denominator
-		scale -= widenedScale(len(denom))
-		// We ignore the fits return value. A scale too large to fit saturates to
-		// math.MaxInt32, the same as on the inf.Dec path below.
-		if fastScale, _ := narrowScale(scale); fastScale >= Nano {
+		scale -= int32(len(denom))
+		if scale >= int32(Nano) {
 			shifted := num + denom
 
 			uvalue, err := strconv.ParseUint(shifted, 10, 64)
@@ -487,14 +495,14 @@ func ParseQuantity(str string) (Quantity, error) {
 						switch format {
 						case BinarySI:
 							if !forceRecanonicalize && exponent%10 == 0 && (value&0x07 != 0) {
-								return Quantity{i: int64Amount{value: result, scale: fastScale}, Format: format, s: newCachedString(str, format)}, nil
+								return Quantity{i: int64Amount{value: result, scale: Scale(scale)}, Format: format, s: newCachedString(str, format)}, nil
 							}
 						default:
-							if !forceRecanonicalize && fastScale%3 == 0 && !strings.HasSuffix(shifted, "000") && shifted[0] != '0' {
-								return Quantity{i: int64Amount{value: result, scale: fastScale}, Format: format, s: newCachedString(str, format)}, nil
+							if !forceRecanonicalize && scale%3 == 0 && !strings.HasSuffix(shifted, "000") && shifted[0] != '0' {
+								return Quantity{i: int64Amount{value: result, scale: Scale(scale)}, Format: format, s: newCachedString(str, format)}, nil
 							}
 						}
-						q := Quantity{i: int64Amount{value: result, scale: fastScale}, Format: format}
+						q := Quantity{i: int64Amount{value: result, scale: Scale(scale)}, Format: format}
 						q.CacheString()
 						return q, nil
 					}
@@ -519,7 +527,7 @@ func ParseQuantity(str string) (Quantity, error) {
 
 	// So that no one but us has to think about suffixes, remove it.
 	if base == 10 {
-		widenedExponentScale := widenedScale(exponent)
+		widenedExponentScale := widenScale(Scale(exponent))
 
 		// amount only contains the whole number part+fractional part at this point (with no exponent / suffix).
 		// Values that kept fractional digits have scale < 0.
@@ -538,8 +546,8 @@ func ParseQuantity(str string) (Quantity, error) {
 			// yet, we figure out the scale we need to round to, so that when the
 			// exponent is later set, we end with nano scale precision.
 
-			// The exponent is negative here, and the clamp above keeps it at
-			// least math.MinInt32, so the subtraction below fits.
+			// The exponent is negative here, so the result (-9 minus a negative exponent)
+			// always fits.
 			scaleBeforeExponent, fits := narrowScale(widenScale(Nano) - widenedExponentScale)
 			if !fits {
 				assertUnreachable("scaleBeforeExponent did not fit")
@@ -597,61 +605,31 @@ func ParseQuantity(str string) (Quantity, error) {
 // ParseQuantity caps the magnitude of a DecimalSI or DecimalExponent value at
 // 1.7976931348623157e308, math.MaxFloat64 as Go prints it, so AsFloat64Slow
 // converts any value whose magnitude is at or below the cap to a finite
-// float64. AsApproximateFloat64 can still overflow near the cap.
+// float64. AsApproximateFloat64 can still overflow near the cap. The cap is
+// maxDecimalValue * 10^maxDecimalScale, or 17976931348623157e292.
 const (
-	// maxDecimalDigits holds the cap's significant digits.
-	maxDecimalDigits = "17976931348623157"
-	// maxDecimalValue is maxDecimalDigits as an integer.
-	maxDecimalValue = 17976931348623157
-	// maxDecimalExponent is the power of ten of the cap's first digit, as in
-	// 1.7976931348623157e308.
-	maxDecimalExponent = 308
-	// maxDecimalScale is the Scale that makes maxDecimalValue equal the cap:
-	// 17976931348623157e292.
-	maxDecimalScale = Scale(maxDecimalExponent - (len(maxDecimalDigits) - 1))
+	maxDecimalDigits   = "17976931348623157" // maxDecimalValue as a string
+	maxDecimalValue    = 17976931348623157
+	maxDecimalExponent = 308 // the power of ten of the cap's first digit
+	maxDecimalScale    = Scale(maxDecimalExponent - (len(maxDecimalDigits) - 1))
 )
-
-// cappedDecimal returns the decimal cap, negated if positive is false.
-func cappedDecimal(positive bool, format Format) Quantity {
-	capped := int64(maxDecimalValue)
-	if !positive {
-		capped = -capped
-	}
-	q := Quantity{i: int64Amount{value: capped, scale: maxDecimalScale}, Format: format}
-	q.CacheString()
-	return q
-}
 
 // exceedsParseDecimalCap checks if a decimal value is larger in magnitude than
 // the decimal cap, 1.7976931348623157e308. The same cap value applies to
-// negative values. The cap was selected to match the range of the float64
-// (see math.MaxFloat64).
+// negative values.
 func exceedsParseDecimalCap(integerDigits, decimalDigits string, widenedExponent widenedScale) bool {
-	// Short-circuit if the written exponent plus the worst-case scale of the
-	// integerDigits (without examining individual digits) is below the cap.
-	if widenedExponent+widenedScale(len(integerDigits)-1) < maxDecimalExponent {
-		return false
-	}
 	significantDigits := strings.TrimLeft(integerDigits+decimalDigits, "0")
 	if significantDigits == "" {
 		return false // value is zero
 	}
-
-	// Find the exact exponent of the first significant digit.
-	decimalDigitsCount := widenedScale(len(decimalDigits))
-	significantDigitsCount := widenedScale(len(significantDigits)) // has the same trailing zeros as decimalDigitsCount
-	firstDigitExponent := widenedExponent - decimalDigitsCount + significantDigitsCount - 1
-
-	// firstDigitExponent tells us the actual scale of the number, and we can use it to compare
-	// against the cap.
+	// Find the exponent of the first significant digit.
+	firstDigitExponent := widenedExponent - widenedScale(len(decimalDigits)) + widenedScale(len(significantDigits)) - 1
 	if firstDigitExponent == maxDecimalExponent {
-		// A string compare of equal-length digit strings is sufficient and
-		// avoids the expense of loading and comparing as big integers.
+		// With the same first digit exponent, digit strings without trailing
+		// zeros compare in numeric order, so big integers are not needed.
 		return strings.TrimRight(significantDigits, "0") > maxDecimalDigits
-	} else {
-		return firstDigitExponent > maxDecimalExponent
 	}
-
+	return firstDigitExponent > maxDecimalExponent
 }
 
 // maxSignificantDigits is how many significant digits ParseQuantity keeps for a
