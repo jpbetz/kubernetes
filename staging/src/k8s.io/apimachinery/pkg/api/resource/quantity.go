@@ -424,7 +424,8 @@ func ParseQuantity(str string) (Quantity, error) {
 			uvalue, err := strconv.ParseUint(num+denom, 10, 64)
 			inRange := err == nil && (uvalue <= math.MaxInt64 || (!positive && uvalue == uint64(math.MaxInt64)+1))
 			tookFastPath := precision >= 0 && wrappedScale >= int32(Nano) && inRange
-			if !tookFastPath {
+			zero := err == nil && uvalue == 0
+			if !tookFastPath && !zero {
 				return Quantity{}, ErrSuffix
 			}
 		}
