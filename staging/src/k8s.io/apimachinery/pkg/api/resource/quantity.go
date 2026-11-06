@@ -381,14 +381,10 @@ func ParseQuantity(str string) (Quantity, error) {
 		return Quantity{}, err
 	}
 
-	base, parsedExponent, format, ok := quantitySuffixer.interpret(suffix(suf))
+	base, exponent, format, ok := quantitySuffixer.interpret(suffix(suf))
 	if !ok {
 		return Quantity{}, ErrSuffix
 	}
-	// Clamp so scale arithmetic can't overflow. The 2x multiplier to math.MaxInt32
-	// gives room for an out of range exponent that is reduced by digits after the decimal point.
-	// For example, "1.25e2147483648" is in range, as 125e2147483646.
-	exponent := min(max(parsedExponent, math.MinInt32), 2*math.MaxInt32)
 
 	precision := int32(0)
 	scale := widenedScale(0)
@@ -479,7 +475,7 @@ func ParseQuantity(str string) (Quantity, error) {
 	// So that no one but us has to think about suffixes, remove it.
 	if base == 10 {
 		// This keeps compatibility by treating possibly-overflowing parsed exponents landing exactly on MinInt32 as an error
-		if !Scale(parsedExponent).canInfScale() {
+		if !Scale(exponent).canInfScale() {
 			return Quantity{}, ErrSuffix
 		}
 		widenedExponentScale := widenedScale(exponent)
