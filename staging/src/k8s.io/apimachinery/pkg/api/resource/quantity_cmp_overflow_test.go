@@ -16,43 +16,29 @@ limitations under the License.
 
 package resource
 
-import (
-	"math"
-	"testing"
-)
+import "testing"
 
 // Cmp is bounded and correct when the two operands' scales differ by more than
 // an int32 can represent.
 func TestCmpLargeScaleDifference(t *testing.T) {
-	// The operands with exponents above 308 are capped when parsed, so we load
-	// them directly to test how Cmp handles them.
+	// ParseQuantity caps these values, so they are built directly.
 	cases := []struct {
-		a    string
-		aVal *Quantity // if set, use this value instead of parsing the a string
-		b    string
-		bVal *Quantity // if set, use this value instead of parsing the b string
+		a, b Quantity
 		want int
 	}{
-		{aVal: NewScaledQuantity(1, math.MaxInt32), b: "1n", want: 1},
-		{a: "1n", bVal: NewScaledQuantity(1, math.MaxInt32), want: -1},
-		{aVal: NewScaledQuantity(1, math.MaxInt32), b: "500m", want: 1},
-		{aVal: NewScaledQuantity(1, math.MaxInt32), b: "1", want: 1},
-		{aVal: NewScaledQuantity(-1, math.MaxInt32), b: "1n", want: -1},
-		{aVal: NewScaledQuantity(-1, math.MaxInt32), b: "-1n", want: -1},
-		{aVal: NewScaledQuantity(1, math.MaxInt32), bVal: NewScaledQuantity(1, math.MaxInt32), want: 0},
-		{aVal: NewScaledQuantity(1, math.MaxInt32), bVal: NewScaledQuantity(1, math.MaxInt32-1), want: 1},
-		{aVal: NewScaledQuantity(1, 10000000), b: "1Gi", want: 1},
-		{a: "1Gi", bVal: NewScaledQuantity(1, 10000000), want: -1},
-	}
-	// quantity returns val if it is set, and otherwise parses s.
-	quantity := func(s string, val *Quantity) Quantity {
-		if val != nil {
-			return *val
-		}
-		return MustParse(s)
+		{*NewScaledQuantity(1, 2147483647), MustParse("1n"), 1},
+		{MustParse("1n"), *NewScaledQuantity(1, 2147483647), -1},
+		{*NewScaledQuantity(1, 2147483647), MustParse("500m"), 1},
+		{*NewScaledQuantity(1, 2147483647), MustParse("1"), 1},
+		{*NewScaledQuantity(-1, 2147483647), MustParse("1n"), -1},
+		{*NewScaledQuantity(-1, 2147483647), MustParse("-1n"), -1},
+		{*NewScaledQuantity(1, 2147483647), *NewScaledQuantity(1, 2147483647), 0},
+		{*NewScaledQuantity(1, 2147483647), *NewScaledQuantity(1, 2147483646), 1},
+		{*NewScaledQuantity(1, 10000000), MustParse("1Gi"), 1},
+		{MustParse("1Gi"), *NewScaledQuantity(1, 10000000), -1},
 	}
 	for _, tc := range cases {
-		a, b := quantity(tc.a, tc.aVal), quantity(tc.b, tc.bVal)
+		a, b := tc.a, tc.b
 		if got := a.Cmp(b); got != tc.want {
 			t.Errorf("%s.Cmp(%s) = %d, want %d", a.String(), b.String(), got, tc.want)
 		}
@@ -61,9 +47,7 @@ func TestCmpLargeScaleDifference(t *testing.T) {
 
 // CmpInt64 is bounded the same way for a decimal-backed receiver.
 func TestCmpInt64LargeScaleDifference(t *testing.T) {
-	// 1e2147483647 is capped when parsed, so we load it directly to test how
-	// CmpInt64 handles it.
-	q := *NewScaledQuantity(1, math.MaxInt32)
+	q := *NewScaledQuantity(1, 2147483647)
 	q.ToDec()
 	if got := q.CmpInt64(1); got != 1 {
 		t.Errorf("CmpInt64(1) = %d, want 1", got)
