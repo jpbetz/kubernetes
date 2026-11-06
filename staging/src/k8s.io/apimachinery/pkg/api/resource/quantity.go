@@ -413,14 +413,20 @@ func ParseQuantity(str string) (Quantity, error) {
 		}
 	}
 
-	// For compatibility, an exponent that wraps to math.MinInt32 when narrowed to
-	// int32, such as "1e2147483648", is an error. A value with digits after the
-	// decimal point that fits in an int64, such as "1.25e2147483648", is allowed.
-	if base == 10 && int32(parsedExponent) == math.MinInt32 {
-		digits, err := strconv.ParseUint(num+denom, 10, 64)
-		fitsInt64 := err == nil && (digits <= math.MaxInt64 || (!positive && digits == math.MaxInt64+1))
-		if len(denom) == 0 || precision < 0 || !fitsInt64 {
-			return Quantity{}, ErrSuffix
+	// For compatibility, keep rejecting the inputs that failed when the exponent
+	// was narrowed to int32: an exponent that wrapped to math.MinInt32, such as
+	// "1e2147483648", was an error unless the int64 fast path below took the
+	// input first. This repeats that int32 arithmetic and the fast path's tests.
+	if base == 10 {
+		wrappedExponent := int32(parsedExponent)
+		if !Scale(wrappedExponent).canInfScale() {
+			wrappedScale := wrappedExponent - int32(len(denom))
+			uvalue, err := strconv.ParseUint(num+denom, 10, 64)
+			inRange := err == nil && (uvalue <= math.MaxInt64 || (!positive && uvalue == uint64(math.MaxInt64)+1))
+			tookFastPath := precision >= 0 && wrappedScale >= int32(Nano) && inRange
+			if !tookFastPath {
+				return Quantity{}, ErrSuffix
+			}
 		}
 	}
 
