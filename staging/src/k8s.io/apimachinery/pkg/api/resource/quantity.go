@@ -428,15 +428,26 @@ func ParseQuantity(str string) (Quantity, error) {
 		}
 	}
 
+	// A zero keeps no exponent, so that AsDec and AsFloat64Slow can't expand
+	// "0e-2147483647" into 2147483647 decimal places. "0e2147483648" parses as 0,
+	// as on 1.37. For compatibility with 1.37, a number with no digits, such as
+	// "e5", uses its exponent wrapped to int32, and is an error below Nano.
+	if base == 10 && strings.Trim(num+denom, "0") == "" {
+		if len(denom) == 0 && defaultedNum && Scale(int32(parsedExponent)) < Nano {
+			return Quantity{}, ErrNumeric
+		}
+		q := Quantity{Format: format}
+		q.CacheString()
+		return q, nil
+	}
+
 	// For compatibility, an exponent that wraps to math.MinInt32 when narrowed to
 	// int32, such as "1e2147483648", is an error. A value with digits after the
-	// decimal point that fits in an int64, such as "1.25e2147483648", is allowed,
-	// and so is zero, such as "0e2147483648", which 1.37 parses as 0.
+	// decimal point that fits in an int64, such as "1.25e2147483648", is allowed.
 	if base == 10 && int32(parsedExponent) == math.MinInt32 {
 		digits, err := strconv.ParseUint(num+denom, 10, 64)
-		zero := err == nil && digits == 0
 		fitsInt64 := err == nil && (digits <= math.MaxInt64 || (!positive && digits == math.MaxInt64+1))
-		if !zero && (len(denom) == 0 || precision < 0 || !fitsInt64) {
+		if len(denom) == 0 || precision < 0 || !fitsInt64 {
 			return Quantity{}, ErrSuffix
 		}
 	}
@@ -445,13 +456,6 @@ func ParseQuantity(str string) (Quantity, error) {
 	// capped further down.
 	if base == 10 && exceedsParseDecimalCap(num, denom, widenedScale(exponent)) {
 		return cappedDecimal(positive, format), nil
-	}
-
-	// For compatibility with 1.37, a number with no digits, such as "e5", uses its
-	// exponent wrapped to int32. It parses as 0 when that is at least Nano, and is an
-	// error otherwise.
-	if base == 10 && len(denom) == 0 && (len(num) == 0 || defaultedNum) {
-		scale = widenScale(Scale(int32(parsedExponent)))
 	}
 
 	if precision >= 0 {
