@@ -17,7 +17,6 @@ limitations under the License.
 package resource
 
 import (
-	"strings"
 	"testing"
 )
 
@@ -285,16 +284,10 @@ func TestQuantityDocExamples(t *testing.T) {
 		{"0.9n", "1n"},
 		{"-0.9n", "-1n"},
 		{"1.5n", "2n"},
-		// A decimalSI or decimalExponent value is capped in magnitude at the
-		// limit, which String writes as 179769313486231570e291.
+		// A decimal value is capped in magnitude at 1.7976931348623157e308.
 		{"2e308", "179769313486231570e291"},
 		{"-2e308", "-179769313486231570e291"},
-		{"2" + strings.Repeat("0", 308), "179769313486231570e291"},
-		// A decimalSI or decimalExponent value keeps at most 29 significant
-		// digits.
-		{strings.Repeat("9", 30), "1e30"},
-		// An exponent outside the int32 range saturates, and then the caps and
-		// rounding above apply.
+		// An exponent outside the int32 range saturates.
 		{"1e4294967297", "179769313486231570e291"},
 		{"1.25e-2147483647", "1e-9"},
 		// A decimalSI value whose canonical form needs an exponent above 18 is

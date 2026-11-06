@@ -87,9 +87,6 @@ type fastLookup struct {
 	*suffixHandler
 }
 
-// interpret extracts the suffix into its parts. DecimalExponent exponents can be any valid int64.
-// DecimalSI exponents are -9 to 18, and BinarySI exponents are 10 to 60.
-// If the suffix fails to parse or the exponent is out of range, ok is returned as false.
 func (l fastLookup) interpret(s suffix) (base int32, exponent int64, format Format, ok bool) {
 	switch s {
 	case "":
