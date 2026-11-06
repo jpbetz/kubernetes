@@ -400,18 +400,17 @@ func ParseQuantity(str string) (Quantity, error) {
 	if !ok {
 		return Quantity{}, ErrSuffix
 	}
-	// Clamp so scale arithmetic can't overflow. The 2x multiplier to math.MaxInt32
-	// gives room for an out of range exponent that is reduced by digits after the decimal point.
-	// For example, "1.25e2147483648" is in range, as 125e2147483646.
-	exponent := min(max(parsedExponent, math.MinInt32), 2*math.MaxInt32)
+	// Saturate the exponent to the int32 range.
+	exponent := int32(min(max(parsedExponent, math.MinInt32), math.MaxInt32))
 
 	precision := int32(0)
-	scale := widenedScale(0)
+	scale := int32(0)
 	mantissa := int64(1)
 	forceRecanonicalize := false
 	switch format {
 	case DecimalExponent, DecimalSI:
-		scale = widenedScale(exponent)
+		// Leave room to subtract the digits after the decimal point below without wrapping.
+		scale = max(exponent, math.MinInt32+maxInt64Factors)
 		precision = maxInt64Factors - int32(len(num)+len(denom))
 		// preserves compatibility with recanonicalizing integers >18 digits long, even if they are in int64 range
 		forceRecanonicalize = precision <= 0
@@ -451,16 +450,14 @@ func ParseQuantity(str string) (Quantity, error) {
 	// exponent wrapped to int32. It parses as 0 when that is at least Nano, and is an
 	// error otherwise.
 	if base == 10 && len(denom) == 0 && (len(num) == 0 || defaultedNum) {
-		scale = widenScale(Scale(int32(parsedExponent)))
+		scale = int32(parsedExponent)
 	}
 
 	if precision >= 0 {
 		// if we have a denominator, shift the entire value to the left by the number of places in the
 		// denominator
-		scale -= widenedScale(len(denom))
-		// We ignore the fits return value. A scale too large to fit saturates to
-		// math.MaxInt32, the same as on the inf.Dec path below.
-		if fastScale, _ := narrowScale(scale); fastScale >= Nano {
+		scale -= int32(len(denom))
+		if scale >= int32(Nano) {
 			shifted := num + denom
 
 			uvalue, err := strconv.ParseUint(shifted, 10, 64)
@@ -487,14 +484,14 @@ func ParseQuantity(str string) (Quantity, error) {
 						switch format {
 						case BinarySI:
 							if !forceRecanonicalize && exponent%10 == 0 && (value&0x07 != 0) {
-								return Quantity{i: int64Amount{value: result, scale: fastScale}, Format: format, s: newCachedString(str, format)}, nil
+								return Quantity{i: int64Amount{value: result, scale: Scale(scale)}, Format: format, s: newCachedString(str, format)}, nil
 							}
 						default:
-							if !forceRecanonicalize && fastScale%3 == 0 && !strings.HasSuffix(shifted, "000") && shifted[0] != '0' {
-								return Quantity{i: int64Amount{value: result, scale: fastScale}, Format: format, s: newCachedString(str, format)}, nil
+							if !forceRecanonicalize && scale%3 == 0 && !strings.HasSuffix(shifted, "000") && shifted[0] != '0' {
+								return Quantity{i: int64Amount{value: result, scale: Scale(scale)}, Format: format, s: newCachedString(str, format)}, nil
 							}
 						}
-						q := Quantity{i: int64Amount{value: result, scale: fastScale}, Format: format}
+						q := Quantity{i: int64Amount{value: result, scale: Scale(scale)}, Format: format}
 						q.CacheString()
 						return q, nil
 					}
@@ -519,7 +516,7 @@ func ParseQuantity(str string) (Quantity, error) {
 
 	// So that no one but us has to think about suffixes, remove it.
 	if base == 10 {
-		widenedExponentScale := widenedScale(exponent)
+		widenedExponentScale := widenScale(Scale(exponent))
 
 		// amount only contains the whole number part+fractional part at this point (with no exponent / suffix).
 		// Values that kept fractional digits have scale < 0.
@@ -538,8 +535,8 @@ func ParseQuantity(str string) (Quantity, error) {
 			// yet, we figure out the scale we need to round to, so that when the
 			// exponent is later set, we end with nano scale precision.
 
-			// The exponent is negative here, and the clamp above keeps it at
-			// least math.MinInt32, so the subtraction below fits.
+			// The exponent is negative here, so the result (-9 minus a negative exponent)
+			// always fits.
 			scaleBeforeExponent, fits := narrowScale(widenScale(Nano) - widenedExponentScale)
 			if !fits {
 				assertUnreachable("scaleBeforeExponent did not fit")
