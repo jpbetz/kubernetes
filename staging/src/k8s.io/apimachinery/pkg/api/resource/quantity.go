@@ -413,17 +413,6 @@ func ParseQuantity(str string) (Quantity, error) {
 		}
 	}
 
-	// For compatibility, an exponent that wraps to math.MinInt32 when narrowed to
-	// int32, such as "1e2147483648", is an error. A value with digits after the
-	// decimal point that fits in an int64, such as "1.25e2147483648", is allowed.
-	if base == 10 && int32(parsedExponent) == math.MinInt32 {
-		digits, err := strconv.ParseUint(num+denom, 10, 64)
-		fitsInt64 := err == nil && (digits <= math.MaxInt64 || (!positive && digits == math.MaxInt64+1))
-		if len(denom) == 0 || precision < 0 || !fitsInt64 {
-			return Quantity{}, ErrSuffix
-		}
-	}
-
 	if precision >= 0 {
 		// if we have a denominator, shift the entire value to the left by the number of places in the
 		// denominator
@@ -489,6 +478,10 @@ func ParseQuantity(str string) (Quantity, error) {
 
 	// So that no one but us has to think about suffixes, remove it.
 	if base == 10 {
+		// This keeps compatibility by treating possibly-overflowing parsed exponents landing exactly on MinInt32 as an error
+		if !Scale(parsedExponent).canInfScale() {
+			return Quantity{}, ErrSuffix
+		}
 		widenedExponentScale := widenedScale(exponent)
 
 		// amount only contains the whole number part+fractional part at this point (with no exponent / suffix).
