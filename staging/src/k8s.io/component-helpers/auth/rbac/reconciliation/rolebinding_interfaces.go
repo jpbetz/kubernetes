@@ -20,6 +20,7 @@ import (
 	"context"
 
 	rbacv1 "k8s.io/api/rbac/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -92,11 +93,13 @@ func (c RoleBindingClientAdapter) Get(namespace, name string) (RoleBinding, erro
 }
 
 func (c RoleBindingClientAdapter) Create(in RoleBinding) (RoleBinding, error) {
-	if err := tryEnsureNamespace(c.NamespaceClient, in.GetNamespace()); err != nil {
-		return nil, err
-	}
-
 	ret, err := c.Client.RoleBindings(in.GetNamespace()).Create(context.TODO(), in.(RoleBindingAdapter).RoleBinding, metav1.CreateOptions{})
+	if apierrors.IsNotFound(err) {
+		if err := tryEnsureNamespace(c.NamespaceClient, in.GetNamespace()); err != nil {
+			return nil, err
+		}
+		ret, err = c.Client.RoleBindings(in.GetNamespace()).Create(context.TODO(), in.(RoleBindingAdapter).RoleBinding, metav1.CreateOptions{})
+	}
 	if err != nil {
 		return nil, err
 	}
