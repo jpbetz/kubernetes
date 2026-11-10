@@ -26,6 +26,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -192,31 +193,7 @@ func AddSystemPriorityClasses() genericapiserver.PostStartHookFunc {
 				utilruntime.HandleError(fmt.Errorf("unable to initialize client: %v", err))
 				return false, nil
 			}
-
-			for _, pc := range schedulingapiv1.SystemPriorityClasses() {
-				_, err := schedClientSet.PriorityClasses().Get(context.TODO(), pc.Name, metav1.GetOptions{})
-				if err != nil {
-					if apierrors.IsNotFound(err) {
-						_, err := schedClientSet.PriorityClasses().Create(context.TODO(), pc, metav1.CreateOptions{})
-						if err == nil || apierrors.IsAlreadyExists(err) {
-							klog.Infof("created PriorityClass %s with value %v", pc.Name, pc.Value)
-							continue
-						}
-						// ServiceUnavailble error is returned when the API server is blocked by storage version updates
-						if apierrors.IsServiceUnavailable(err) {
-							klog.Infof("going to retry, unable to create PriorityClass %s: %v", pc.Name, err)
-							return false, nil
-						}
-						return false, err
-					} else {
-						// Unable to get the priority class for reasons other than "not found".
-						klog.Warningf("unable to get PriorityClass %v: %v. Retrying...", pc.Name, err)
-						return false, nil
-					}
-				}
-			}
-			klog.Infof("all system priority classes are created successfully or already exist.")
-			return true, nil
+			return ensureSystemPriorityClasses(schedClientSet)
 		})
 		// if we're never able to make it through initialization, kill the API server.
 		if err != nil {
@@ -224,6 +201,41 @@ func AddSystemPriorityClasses() genericapiserver.PostStartHookFunc {
 		}
 		return nil
 	}
+}
+
+// ensureSystemPriorityClasses creates each system priority class that is
+// missing. It finds the existing classes with one List, in place of a Get for
+// each class, because the apiserver does not report ready until this hook
+// finishes.
+func ensureSystemPriorityClasses(client schedulingclient.PriorityClassesGetter) (done bool, err error) {
+	list, err := client.PriorityClasses().List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		klog.Warningf("unable to list PriorityClasses: %v. Retrying...", err)
+		return false, nil
+	}
+	existing := sets.New[string]()
+	for _, pc := range list.Items {
+		existing.Insert(pc.Name)
+	}
+
+	for _, pc := range schedulingapiv1.SystemPriorityClasses() {
+		if existing.Has(pc.Name) {
+			continue
+		}
+		_, err := client.PriorityClasses().Create(context.TODO(), pc, metav1.CreateOptions{})
+		if err == nil || apierrors.IsAlreadyExists(err) {
+			klog.Infof("created PriorityClass %s with value %v", pc.Name, pc.Value)
+			continue
+		}
+		// ServiceUnavailble error is returned when the API server is blocked by storage version updates
+		if apierrors.IsServiceUnavailable(err) {
+			klog.Infof("going to retry, unable to create PriorityClass %s: %v", pc.Name, err)
+			return false, nil
+		}
+		return false, err
+	}
+	klog.Infof("all system priority classes are created successfully or already exist.")
+	return true, nil
 }
 
 func (p RESTStorageProvider) GroupName() string {
