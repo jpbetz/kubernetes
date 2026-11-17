@@ -7,13 +7,10 @@ approvers:
 reviewers:
   - wojtek-t
   - deads2k
-  - caesarxuchao
   - liggitt
-  - ingvagabund
-  - enj
-  - stevekuznetsov
-  - MadhavJivrajani
   - serathius
+  - jefftree
+  - mborsz
 emeritus_approvers:
   - xiang90
   - timothysc
